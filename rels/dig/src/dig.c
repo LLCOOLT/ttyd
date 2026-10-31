@@ -6,6 +6,10 @@
 #include "dig.h"
 #include "rel_module.h"
 
+/**
+ * REL module prolog, run when dig.rel is loaded:
+ * runs the static constructors, registers the dig_00 init script and opens the digest movie (dig_thpInit).
+ */
 void _prolog(void) {
     voidfunctionptr* ctor;
 
@@ -16,6 +20,10 @@ void _prolog(void) {
     dig_thpInit();
 }
 
+/**
+ * REL module epilog, run when dig.rel is unloaded:
+ * runs the static destructors and stops and closes the digest movie (dig_thpStop).
+ */
 void _epilog(void) {
     voidfunctionptr* dtor;
 
@@ -24,5 +32,9 @@ void _epilog(void) {
     }
     dig_thpStop();
 }
+/**
+ * Module unresolved-symbol stub: if a relocation could not be resolved the REL linker points it here;
+ * it does nothing.
+ */
 void _unresolved(void) {
 }

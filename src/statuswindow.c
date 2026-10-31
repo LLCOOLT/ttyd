@@ -81,6 +81,10 @@ static void statusGetValue(SVal* values);
 static BOOL valueCheck(void);
 static void valueUpdate(void);
 
+/**
+ * Allocates the field HUD state at boot and sets its open
+ * and closed positions (it slides down from above the screen), starting open.
+ */
 void statusWinInit(void) {
     wp = __memAlloc(HEAP_DEFAULT, sizeof(SWork));
     memset(wp, 0, sizeof(SWork));
@@ -97,6 +101,7 @@ void statusWinInit(void) {
     wp->flags |= 5;
 }
 
+/** Resets the HUD's idle timers on a map change and turns a pending forced open/close into a normal open/close. */
 void statusWinReInit(void) {
     wp->idle = 0;
     wp->forceTimer = 0;
@@ -118,6 +123,13 @@ void statusWinReInit(void) {
     }
 }
 
+/**
+ * Per-frame HUD logic in the field: hidden when Mario is not himself (a transformation or another character)
+ * and left alone in the Pit of 100 Trials ("yuu").
+ * While Mario can move it opens after he stands still for 10 seconds, closes when he walks,
+ * toggles with Z (held for 10 seconds, with a sound) and pops open for 2 seconds when a value changes.
+ * Then starts and runs the slide animation (16 frames in, 28 out).
+ */
 void statusWinMain(void) {
     MarioWork* mario;
     f32 inv;
@@ -244,6 +256,10 @@ void statusWinMain(void) {
 // order gives the target's argument evaluation order.
 #define iconDispGxScaleFirst ((void (*)(f32, Vec*, s16, u16))iconDispGx)
 
+/**
+ * Draws the Star Power gauge at (x, y): one 32-pixel slot per crystal star obtained,
+ * full slots for each 100 of sp and the partly filled slot in 15 steps.
+ */
 static void gaugeDisp(s32 sp, f32 x, f32 y) {
     s32 i;
     s32 max;
@@ -294,6 +310,10 @@ numDisp(f32 x, f32 y, s32 value, BOOL small) {
     iconNumberDispGx(m, value, small, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 }
 
+/**
+ * Draws the HUD: the HP, FP, Star Power and coin/Star Point banners with their icons and numbers,
+ * Mario's and the partner's HP, and the gauge, blinking any value flagged by the stat blink functions.
+ */
 static void statusWinDisp(CameraId camId, void* param) {
     alwaysDtEntry* e;
     s32 i;
@@ -454,6 +474,10 @@ static void statusWinDisp(CameraId camId, void* param) {
 #endif
 }
 
+/**
+ * Reads the values the HUD shows: from the pouch in the field (the partner from the party),
+ * from Mario's and the partner's battle units in battle.
+ */
 static void statusGetValue(SVal* values) {
     BattleWork* bw;
     BattleUnit* mario;
@@ -511,6 +535,10 @@ static void statusGetValue(SVal* values) {
     }
 }
 
+/**
+ * Returns TRUE when any shown value differs from what the HUD last displayed, and marks HP,
+ * FP or Star Power changes for a blink.
+ */
 static BOOL valueCheck(void) {
     SVal v;
     BOOL changed = FALSE;
@@ -566,6 +594,10 @@ static BOOL valueCheck(void) {
     return changed;
 }
 
+/**
+ * Step for the counting-number animation: a tenth of the remaining difference, at least 1 toward the target,
+ * 0 when equal.
+ */
 static inline s32 calcStep(s32 target, s32 cur) {
     s32 d = target - cur;
     if (d) {
@@ -580,6 +612,10 @@ static inline s32 calcStep(s32 target, s32 cur) {
     return d;
 }
 
+/**
+ * Counts the displayed HUD numbers toward the real values every other frame while the window is open,
+ * with the coin counting sound every 8th frame (6th in the demos).
+ */
 static void valueUpdate(void) {
     static s32 count;
     SVal v;
@@ -623,32 +659,38 @@ static void valueUpdate(void) {
     }
 }
 
+/** Requests the HUD to slide in. */
 void statusWinOpen(void) {
     wp->flags &= ~0xA;
     wp->flags |= 5;
 }
 
+/** Requests the HUD to slide out. */
 void statusWinClose(void) {
     wp->flags |= 0xA;
     wp->flags &= ~5;
 }
 
+/** Slides the HUD in and pins it open regardless of Mario's movement, until statusWinForceOff. */
 void statusWinForceOpen(void) {
     wp->flags &= ~0xA;
     wp->flags &= ~0xA0;
     wp->flags |= 0x50;
 }
 
+/** Slides the HUD out and keeps it closed, until statusWinForceOff or statusWinForceCloseClear. */
 void statusWinForceClose(void) {
     wp->flags &= ~5;
     wp->flags &= ~0x50;
     wp->flags |= 0xA0;
 }
 
+/** Drops a forced close without reopening the HUD. */
 void statusWinForceCloseClear(void) {
     wp->flags &= ~0xA0;
 }
 
+/** Ends a forced open or close, leaving the HUD in the matching normal state; called when message windows close. */
 void statusWinForceOff(void) {
     if (wp->flags & 0x10) {
         wp->flags &= ~0x10;
@@ -664,22 +706,27 @@ void statusWinForceOff(void) {
     }
 }
 
+/** Lets the HUD draw again after statusWinDispOff. */
 void statusWinDispOn(void) {
     wp->flags &= ~0x1000;
 }
 
+/** Stops drawing the HUD without changing whether it is open. */
 void statusWinDispOff(void) {
     wp->flags |= 0x1000;
 }
 
+/** Returns TRUE when the HUD is open or forced open. */
 BOOL statusWinCheck(void) {
     return (wp->flags & 0x11) ? TRUE : FALSE;
 }
 
+/** Returns TRUE when a shown value changed since the last display (see valueCheck). */
 BOOL statusWinCheckUpdate(void) {
     return valueCheck() != 0;
 }
 
+/** Snaps every displayed HUD value to the current one without the counting animation. */
 void statusWinForceUpdate(void) {
     SVal v;
 
@@ -699,6 +746,7 @@ void statusWinForceUpdate(void) {
     }
 }
 
+/** Snaps the displayed coin count to the current one. */
 void statusWinForceUpdateCoin(void) {
     SVal v;
 
@@ -706,6 +754,7 @@ void statusWinForceUpdateCoin(void) {
     wp->cur.coins = v.coins;
 }
 
+/** Returns the screen position of the Star Power gauge, where the audience's Star Power sparkles fly to. */
 Vec statusGetApPos(void) {
     Vec pos;
     pos.x = wp->x + (f32)alwaysDt[12].xpos;
@@ -714,34 +763,43 @@ Vec statusGetApPos(void) {
     return pos;
 }
 
+/** Makes the Star Power number blink for frames, replacing any other blink. */
 void statusAPBlink(s32 frames) {
     wp->blink = 0;
     wp->blink |= 4;
     wp->blinkTimer = frames;
 }
 
-// The demo has no N_statusClearBlink.
+/** The demo has no N_statusClearBlink. */
 #if VERSION >= VERSION_JP
 void N_statusClearBlink(void) {
     wp->blink = 0;
 }
 #endif
 
+/** Makes the FP number blink for frames. */
 void statusFPBlink(s32 frames) {
     wp->blink |= 2;
     wp->blinkTimer = frames;
 }
 
+/** Makes Mario's HP number blink for frames. */
 void statusMarioHPBlink(s32 frames) {
     wp->blink |= 1;
     wp->blinkTimer = frames;
 }
 
+/** Makes the partner's HP number blink for frames. */
 void statusPartyHPBlink(s32 frames) {
     wp->blink |= 8;
     wp->blinkTimer = frames;
 }
 
+/**
+ * Unknown: nothing calls it.
+ * It fills f with 0, 1, pi and 0.5 (and 60 in US and PAL), the float constants the file uses,
+ * in the order the original keeps them.
+ */
 void statusWinEase(f32* f) {
     f[0] = 0.0f;
 #if VERSION >= VERSION_US

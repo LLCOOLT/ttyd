@@ -189,6 +189,10 @@ static BattleDataEntry data_table[] = {
     {0},
 };
 
+/**
+ * Registers the Moon Cleft's wait, attack and damage events (confusion reuses the attack event) and its walk,
+ * run and jump sounds, then starts the idle loop.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -201,6 +205,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Data-table event 37, run by btldefaultevt_Damage for damage code 31. Guess: an attack hurt by the spiky head.
+ * After 30 frames it shows a toge_flush spark above the head, placed higher when Huge and lower when Tiny.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -224,6 +232,11 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/**
+ * Hit reaction: takes the hurt pose SIN_D_1 when the hit did damage;
+ * while flipped it switches to the upside-down pose SIN_D_2 and bounces twice in place.
+ * Then runs btldefaultevt_Damage.
+ */
 static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_GetDamage, BTL_UNIT_SELF, LW(15))
     IF_INT_GREATER_OR_EQUAL(LW(15), 1)
@@ -242,6 +255,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Flip event (data-table event 13, run by subsetevt_damage for a flipping hit, e.g. a bomb blast):
+ * defence drops to 0, the upside-down pose table is used and it stays on its back for 2 turns.
+ * It bounces twice (SFX_ENM_INSIDE1), rests at height 7 with a lowered hit offset,
+ * and its spiky top stops countering.
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -264,6 +283,11 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs instead of attacking while flipped: counts the flip turns down and, when they run out,
+ * restores normal defence, poses, ground height and the spiky-top counter,
+ * then hops back upright (SFX_ENM_INSIDE2). Either way the turn ends.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -291,6 +315,13 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack (also used when confused). While flipped it runs wakeup_event instead.
+ * Otherwise it uses a held item if the AI wants to, or picks the frontmost target,
+ * revs up and charges into it for 5 damage (weapon_sinemon_attack):
+ * on a hit it shakes the camera and bounces back off the target; on a miss or a dodge it runs past.
+ * Then it goes home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -415,6 +446,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle: plays the stand pose of the current pose table (normal or flipped). */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

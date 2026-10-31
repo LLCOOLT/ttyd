@@ -264,16 +264,31 @@ static u8 __AXART3DSrc[360+1] = {
 static f32 __AXART3DDopplerScale = 0;
 static f32 __AXART3DDistanceScale = 0;
 
+/**
+ * Sets the scale that divides a 3D articulator's closing speed to get its pitch (Doppler) offset.
+ * Default 20.0 from AXARTInit.
+ */
 void AXARTSet3DDopplerScale(f32 scale) {
     ASSERTLINE(323, scale > 0);
     __AXART3DDopplerScale = scale;
 }
 
+/**
+ * Sets the distance scale for 3D sounds: attenuation is dist / scale times -60 (in the 16.16 fixed format MIX
+ * takes). Default 40.0 from AXARTInit.
+ */
 void AXARTSet3DDistanceScale(f32 scale) {
     ASSERTLINE(340, scale > 0);
     __AXART3DDistanceScale = scale;
 }
 
+/**
+ * When a 3D articulator's 'update' flag is set,
+ * converts its horizontal and vertical angles (radians) to degrees and looks up pan, surround pan,
+ * ITD left/right and SRC type in 360-entry tables (the DPL2 pan table when MIX is in Dolby Pro Logic II mode).
+ * Also sets the pitch offset from closingSpeed / Doppler scale and the attenuation from dist / distance scale,
+ * then clears 'update'.
+ */
 void AXART3DSound(AXART_3D* articulator) {
     u32 hAngle;
     u32 vAngle;

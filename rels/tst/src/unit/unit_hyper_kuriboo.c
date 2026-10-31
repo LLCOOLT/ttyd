@@ -208,6 +208,11 @@ static BattleWeapon weapon_kuriboo_charge = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init script of the Hyper Goomba (shared with the Hyper Paragoomba's ground form):
+ * installs the wait, attack, damage and confusion handlers (confusion reuses the attack), sets its run,
+ * walk and jump sounds, clears unit work 0 (charged flag) and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -221,6 +226,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: runs the shared default damage script (btldefaultevt_Damage) with its default parameters
+ * (LW(10) = -2, LW(11) = 1).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -228,10 +237,18 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Phase script: does nothing. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Attack script of the Hyper Goomba: after the item-use check it may first charge up (unit work 0 = 1:
+ * charge sound, a crystal effect and a self-applied buff).
+ * It then rolls at its target (walking pose, turning with krb_get_dir over 32 steps), jumps at it,
+ * and applies the damage with the guard-timing check (weapon_kuriboo_attack);
+ * a miss lets it bounce past and a hit shakes the camera. It then hops back toward its home position.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -402,11 +419,17 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper for the Goomba family: args[0], args[1] are the x and z of one point and args[2],
+ * args[3] those of another; args[4] receives the angle between them (angleABf of the x/z difference, degrees).
+ * When the two points coincide, args[4] keeps the value it already held.
+ */
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);

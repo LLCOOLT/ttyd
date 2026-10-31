@@ -3,6 +3,7 @@
 #include "evt/evt_cmd.h"
 #include "gon.h"
 
+/** Map init for the Hooktail Castle battle stage; does nothing. */
 EVT_BEGIN(gon_bt00_init_evt)
     RETURN
 EVT_END()

@@ -99,14 +99,20 @@ static USER_FUNC(kpa_get_pole_name);
 static USER_FUNC(fire_func);
 static USER_FUNC(kpa_powerup);
 
+/**
+ * Resolves a map object name for the script commands below;
+ * "me" means the object whose event is running (event->thisMapObj).
+ */
 static inline MapObjectEntry* MOBJ_PTR(EventEntry* event, const char* name) {
     return strcmp(name, "me") ? mobjNameToPtr(name) : event->thisMapObj;
 }
 
+/** Same lookup as MOBJ_PTR with the test written the other way round; evt_mobj_set_scale needs this form. */
 static inline MapObjectEntry* MOBJ_PTR2(EventEntry* event, const char* name) {
     return !strcmp(name, "me") ? event->thisMapObj : mobjNameToPtr(name);
 }
 
+/** Shakes the 3D camera vertically (0.01) for 200 ms; started when Mario hits a timer switch. */
 static EVT_BEGIN(evt_shake)
     CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.01f), 200)
     RETURN
@@ -120,6 +126,10 @@ static inline EvtWord blkHitCheck(MapObjectEntry* m) {
     return (EvtWord)hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, m->position.x, m->position.y + 0.5f, m->position.z, 0.0f, -1.0f, 0.0f);
 }
 
+/**
+ * True when the animation name is "A_1" to "A_3" (an 'A' and a digit 1-3 in the third character);
+ * used by the switch-block code to tell its hit animations from the others.
+ */
 static inline BOOL isAnimA13(const s8* a) {
     if (a[0] == 'A' && a[2] >= '1' && a[2] <= '3') {
         return TRUE;
@@ -128,10 +138,12 @@ static inline BOOL isAnimA13(const s8* a) {
 }
 
 #if VERSION >= VERSION_JP
+/** Event that runs kpa_powerup with LW(0)-LW(2); started when Bowser grabs a power-up in his side-scrolling stages. */
 EVT_BEGIN(kpa_powerup_evt)
     CALL(kpa_powerup, LW(0), LW(1), LW(2))
     RETURN
 EVT_END()
+/** Event that runs fire_func with LW(0)-LW(3) to spawn a fire effect for Bowser's stage objects. */
 EVT_BEGIN(evt_fire)
     CALL(fire_func, LW(0), LW(1), LW(2), LW(3))
     RETURN
@@ -149,6 +161,7 @@ extern EvtWord evt_fire[];
 
 // ---- BEGIN tail (defined in reverse of target order) ----
 
+/** Creates a bare map object. args: name, animation group. Waits (blocks) until the animation group has loaded. */
 USER_FUNC(evt_mobj_entry) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -160,11 +173,16 @@ USER_FUNC(evt_mobj_entry) {
     return EVT_RETURN_DONE;
 }
 
+/** Deletes the map object named by args[0]. */
 USER_FUNC(evt_mobj_delete) {
     mobjDelete((const char*)evtGetValue(event, event->args[0]));
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Looks up the map object named by args[0] without asserting;
+ * writes its pointer, or 0 if it does not exist, to args[1].
+ */
 USER_FUNC(evt_mobj_check) {
     EvtWord* args = event->args;
     MapObjectEntry* mobj = mobjNameToPtrNoAssert((const char*)evtGetValue(event, args[0]));
@@ -172,6 +190,7 @@ USER_FUNC(evt_mobj_check) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets (args[0] nonzero) or clears the flag bits args[2] (a literal mask) on the map object named by args[1]. */
 USER_FUNC(evt_mobj_flag_onoff) {
     EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
@@ -186,6 +205,7 @@ USER_FUNC(evt_mobj_flag_onoff) {
     return EVT_RETURN_DONE;
 }
 
+/** Writes the animation group name of the map object args[0] (its kind, e.g. "MOBJ_SaveBlock") to args[1]. */
 USER_FUNC(evt_mobj_get_kindname) {
     EvtWord* args = event->args;
     MapObjectEntry* mobj = mobjNameToPtr((const char*)evtGetValue(event, args[0]));
@@ -193,6 +213,7 @@ USER_FUNC(evt_mobj_get_kindname) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets the scale of the map object args[0] ("me" allowed) to args[1..3] and marks its matrix for recalculation. */
 USER_FUNC(evt_mobj_set_scale) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -215,6 +236,7 @@ USER_FUNC(evt_mobj_set_scale) {
     return EVT_RETURN_DONE;
 }
 
+/** Reads the position of the map object args[0] ("me" allowed) into the float variables args[1..3]. */
 USER_FUNC(evt_mobj_get_position) {
     EvtWord* args = event->args;
     MapObjectEntry* mobj = MOBJ_PTR(event, (const char*)evtGetValue(event, args[0]));
@@ -224,6 +246,7 @@ USER_FUNC(evt_mobj_get_position) {
     return EVT_RETURN_DONE;
 }
 
+/** Reads the X position of the map object args[0] ("me" allowed) into args[1]. */
 USER_FUNC(evt_mobj_get_x_position) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -232,6 +255,7 @@ USER_FUNC(evt_mobj_get_x_position) {
     return EVT_RETURN_DONE;
 }
 
+/** Reads the Y position of the map object args[0] ("me" allowed) into args[1]. */
 USER_FUNC(evt_mobj_get_y_position) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -240,6 +264,7 @@ USER_FUNC(evt_mobj_get_y_position) {
     return EVT_RETURN_DONE;
 }
 
+/** Reads the Z position of the map object args[0] ("me" allowed) into args[1]. */
 USER_FUNC(evt_mobj_get_z_position) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -248,6 +273,7 @@ USER_FUNC(evt_mobj_get_z_position) {
     return EVT_RETURN_DONE;
 }
 
+/** Moves the map object args[0] ("me" allowed) to (args[1], args[2], args[3]) and recalculates its matrix. */
 USER_FUNC(evt_mobj_set_position) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -264,6 +290,7 @@ USER_FUNC(evt_mobj_set_position) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets only the X position of the map object args[0] ("me" allowed) to args[1]. */
 USER_FUNC(evt_mobj_set_x_position) {
     EvtWord* args = event->args;
     MapObjectEntry* mobj = MOBJ_PTR(event, (const char*)evtGetValue(event, args[0]));
@@ -274,6 +301,7 @@ USER_FUNC(evt_mobj_set_x_position) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets only the Y position of the map object args[0] ("me" allowed) to args[1]. */
 USER_FUNC(evt_mobj_set_y_position) {
     EvtWord* args = event->args;
     MapObjectEntry* mobj = MOBJ_PTR(event, (const char*)evtGetValue(event, args[0]));
@@ -284,6 +312,7 @@ USER_FUNC(evt_mobj_set_y_position) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets only the Z position of the map object args[0] ("me" allowed) to args[1]. */
 USER_FUNC(evt_mobj_set_z_position) {
     EvtWord* args = event->args;
     MapObjectEntry* mobj = MOBJ_PTR(event, (const char*)evtGetValue(event, args[0]));
@@ -294,12 +323,17 @@ USER_FUNC(evt_mobj_set_z_position) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets MOBJ_FLAG_EXEC_CANCEL on the map object args[0] ("me" allowed), which stops its per-frame main function. */
 USER_FUNC(evt_mobj_exec_cancel) {
     MapObjectEntry* mobj = MOBJ_PTR(event, (const char*)evtGetValue(event, event->args[0]));
     mobj->flags |= MOBJ_FLAG_EXEC_CANCEL;
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Sets the gravity (args[1]) and bounce factor (args[2]) used when the map object args[0] falls,
+ * e.g. an item block or switch dropped onto the floor.
+ */
 USER_FUNC(evt_mobj_set_gravity_bound) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -311,6 +345,7 @@ USER_FUNC(evt_mobj_set_gravity_bound) {
     return EVT_RETURN_DONE;
 }
 
+/** Plays the animation args[1] (e.g. "A_1", "S_1") on the map object args[0] ("me" allowed). */
 USER_FUNC(evt_mobj_set_anim) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -320,6 +355,7 @@ USER_FUNC(evt_mobj_set_anim) {
     return EVT_RETURN_DONE;
 }
 
+/** Blocks the script until the current animation of the map object args[0] has played through once. */
 USER_FUNC(evt_mobj_wait_animation_end) {
     const char* name = (const char*)evtGetValue(event, event->args[0]);
     MapObjectEntry* mobj = MOBJ_PTR(event, name);
@@ -329,6 +365,7 @@ USER_FUNC(evt_mobj_wait_animation_end) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Moves the map object args[0] to camera args[1] (CameraId), e.g. to draw it in a 2D/overlay camera. */
 USER_FUNC(evt_mobj_set_camid) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -338,6 +375,7 @@ USER_FUNC(evt_mobj_set_camid) {
     return EVT_RETURN_DONE;
 }
 
+/** Enables (args[1] nonzero) or disables the hit event of the map object args[0], so hitting it does nothing. */
 USER_FUNC(evt_mobj_hitevt_onoff) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -351,6 +389,7 @@ USER_FUNC(evt_mobj_hitevt_onoff) {
     return EVT_RETURN_DONE;
 }
 
+/** Enables (args[1] nonzero) or disables the collision of the map object args[0] by switching its hit groups. */
 USER_FUNC(evt_mobj_hit_onoff) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -377,6 +416,11 @@ USER_FUNC(evt_mobj_hit_onoff) {
 
 // ---- switches ----
 
+/**
+ * Main function of the one-shot blue switches: when hit it runs the object's event,
+ * plays the press animation and sound, then sparkles, sets the save flag (flagVar) to 1 and deletes itself.
+ * Already-set switches start at state 99 and vanish at once.
+ */
 static s32 mobj_switch_blue(MapObjectEntry* mobj) {
     switch (mobj->state) {
         case 0:
@@ -405,6 +449,11 @@ static s32 mobj_switch_blue(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a one-shot floor switch hit by hammer, stomp or partner.
+ * args: kind (0 blue, 1 black, 2 blue without shadow, HOBJ model), name, x, y, z, event to run,
+ * flag variable set when pressed (already set: not placed).
+ */
 USER_FUNC(evt_mobj_switch_blue) {
     s32 flagVar;
     s32 val;
@@ -457,6 +506,10 @@ USER_FUNC(evt_mobj_switch_blue) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Places a blue switch block that is pressed by hitting it from below.
+ * Same args as evt_mobj_switch_blue; args[0] is ignored.
+ */
 USER_FUNC(evt_mobj_floatswitch_blue) {
     EvtWord* args = event->args;
     s32 flagVar;
@@ -495,6 +548,10 @@ USER_FUNC(evt_mobj_floatswitch_blue) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Places a blue tornado switch, pressed only by a spin jump (Paper Mode tornado jump).
+ * Same args as evt_mobj_switch_blue; args[0] is ignored.
+ */
 USER_FUNC(evt_mobj_tornadoswitch_blue) {
     EvtWord* args = event->args;
     s32 flagVar;
@@ -533,6 +590,10 @@ USER_FUNC(evt_mobj_tornadoswitch_blue) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Main function of the red (reusable) switches:
+ * every hit runs the object's event and replays the press animation; the switch stays and can be pressed again.
+ */
 static s32 mobj_switch_red(MapObjectEntry* mobj) {
     switch (mobj->state) {
         case 0:
@@ -565,6 +626,10 @@ static s32 mobj_switch_red(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a reusable floor switch.
+ * args: kind (0 red, 1 white), name, x, y, z, event to run each press, flag variable (stored but not read).
+ */
 USER_FUNC(evt_mobj_switch_red) {
     s32 flagVar;
     s32 val;
@@ -608,6 +673,7 @@ USER_FUNC(evt_mobj_switch_red) {
     return EVT_RETURN_DONE;
 }
 
+/** Places a reusable red switch block pressed from below. Same args as evt_mobj_switch_red; args[0] is ignored. */
 USER_FUNC(evt_mobj_floatswitch_red) {
     EvtWord* args = event->args;
     s32 flagVar;
@@ -647,6 +713,7 @@ USER_FUNC(evt_mobj_floatswitch_red) {
 }
 
 #if MOBJ_EXTRA_OBJS
+/** Places a reusable red tornado switch pressed by a spin jump; only built in PAL and the demos. args[0] ignored. */
 USER_FUNC(evt_mobj_tornadoswitch_red) {
     EvtWord* args = event->args;
     s32 flagVar;
@@ -686,6 +753,12 @@ USER_FUNC(evt_mobj_tornadoswitch_red) {
 }
 
 #endif
+/**
+ * Main function of the paired timer switches: pressing one starts a countdown of typeWork frames;
+ * if the other switch of the pair is pressed before it runs out, the event runs.
+ * The blue pair then sparkles, sets both flags and deletes itself; the red pair resets for another try.
+ * The demo does not stop on timeout first.
+ */
 static s32 mobj_timerswitch(MapObjectEntry* mobj) {
     MapObjectEntry* other = mobjNameToPtr(mobj->linkedName);
     switch (mobj->state) {
@@ -767,6 +840,11 @@ static s32 mobj_timerswitch(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a pair of timer switches linked to each other.
+ * args: kind (0 blue, 1 red), name1, x1, y1, z1, name2, x2, y2, z2, time in frames, event,
+ * flag variable (a blue pair already set is not placed).
+ */
 USER_FUNC(evt_mobj_timerswitch) {
     const char* names[2];
     s32 arg;
@@ -820,7 +898,10 @@ USER_FUNC(evt_mobj_timerswitch) {
 }
 
 #if MOBJ_EXTRA_OBJS
-// PAL: one-shot ride switch (stays pressed)
+/**
+ * Main function of the orange ride switch (PAL and demos):
+ * standing on it runs the event and squashes it flat, where it stays.
+ */
 static s32 mobj_rideswitch_orange(MapObjectEntry* mobj) {
     f32 x, y, z;
     switch (mobj->state) {
@@ -849,6 +930,7 @@ static s32 mobj_rideswitch_orange(MapObjectEntry* mobj) {
     return 0;
 }
 
+/** Places an orange ride switch (MOBJ_RideSwitchA). args: name, x, y, z, event, flag variable. */
 USER_FUNC(evt_mobj_rideswitch_orange) {
     s32 val;
     EvtWord* args = event->args;
@@ -881,7 +963,10 @@ USER_FUNC(evt_mobj_rideswitch_orange) {
     return EVT_RETURN_DONE;
 }
 
-// PAL: ride switch that springs back once Mario steps off
+/**
+ * Main function of the green ride switch (PAL and demos): stepping on it runs the event and flattens it;
+ * once Mario walks away it rises back up and can be pressed again.
+ */
 static s32 mobj_rideswitch_green(MapObjectEntry* mobj) {
     f32 x, y, z;
     AnimationPoseData* data;
@@ -941,6 +1026,7 @@ static s32 mobj_rideswitch_green(MapObjectEntry* mobj) {
     return 0;
 }
 
+/** Places a green ride switch (MOBJ_RideSwitchB). args: name, x, y, z, event, flag variable. */
 USER_FUNC(evt_mobj_rideswitch_green) {
     s32 val;
     EvtWord* args = event->args;
@@ -974,6 +1060,10 @@ USER_FUNC(evt_mobj_rideswitch_green) {
 }
 
 #endif
+/**
+ * Main function of the light blue ride switch: stepping on it runs the event and flattens it;
+ * when Mario leaves it runs the second (release) event and springs back up.
+ */
 static s32 mobj_rideswitch_lightblue(MapObjectEntry* mobj) {
     f32 x, y, z;
     AnimationPoseData* data;
@@ -1045,6 +1135,7 @@ static s32 mobj_rideswitch_lightblue(MapObjectEntry* mobj) {
 }
 
 #if !MOBJ_EXTRA_OBJS
+/** Never called: JP and US keep this stub so the stripped ride-switch and red tornado-switch names stay in .data. */
 void evt_mobj_rideswitch(void) {
     mobjNameToPtr("MOBJ_RideSwitchB");
     mobjNameToPtr("MOBJ_RideSwitchA");
@@ -1052,6 +1143,10 @@ void evt_mobj_rideswitch(void) {
 }
 #endif
 
+/**
+ * Places a light blue ride switch (MOBJ_RideSwitchC).
+ * args: name, x, y, z, press event, release event, flag variable.
+ */
 USER_FUNC(evt_mobj_rideswitch_lightblue) {
     s32 val2;
     s32 val;
@@ -1087,6 +1182,12 @@ USER_FUNC(evt_mobj_rideswitch_lightblue) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Main function of the red jump stands (springs):
+ * landing on one runs the event with LW(0) = 1 when Mario fell onto it from above,
+ * plays the spring sound plus a random voice clip (a plain sound when playing as Bowser, characterId 2)
+ * and the bounce animation; Mario's controls stay locked (systemLevelFlags 0x10) while it runs.
+ */
 static s32 mobj_jumpstand_red(MapObjectEntry* mobj) {
     MarioWork* mario = marioGetPtr();
     EventEntry* ev;
@@ -1154,6 +1255,10 @@ static s32 mobj_jumpstand_red(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a red jump stand that runs a script when stood on.
+ * args: kind (0 normal, 1 MOBJ_RedJumpStand2), name, x, y, z, event, flag variable.
+ */
 USER_FUNC(evt_mobj_jumpstand_red) {
     MapObjectEntry* mobj;
     EvtWord* args = event->args;
@@ -1182,6 +1287,10 @@ USER_FUNC(evt_mobj_jumpstand_red) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Main function of the blue jump stands: landing on one launches Mario upwards with the stored power
+ * (marioChgJumpStandMotion), runs the event and plays the spring sounds; controls stay locked until it ends.
+ */
 static s32 mobj_jumpstand_blue(MapObjectEntry* mobj) {
     MarioWork* mario = marioGetPtr();
     switch (mobj->state) {
@@ -1245,6 +1354,10 @@ static s32 mobj_jumpstand_blue(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a blue jump stand that bounces Mario.
+ * args: kind (0 normal, 1 MOBJ_BlueJumpStand2), name, jump power, x, y, z, event, flag variable.
+ */
 USER_FUNC(evt_mobj_jumpstand_blue) {
     MapObjectEntry* mobj;
     EvtWord* args = event->args;
@@ -1275,6 +1388,12 @@ USER_FUNC(evt_mobj_jumpstand_blue) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Main function of the hammer-level blocks: a hit only counts with a strong enough hammer (Lv1 any,
+ * Lv1 huge block needs Super Hammer and a spin-charged hammer, Lv2 needs Ultra Hammer).
+ * It then runs the event, sets the flag variable
+ * and plays the "P_box_y" paper-peel animation through an offscreen capture before deleting itself.
+ */
 static s32 mobj_lv_blk_evt(MapObjectEntry* mobj) {
     char oname[16] = "o_";
     char iname[16] = "i_";
@@ -1388,6 +1507,11 @@ static s32 mobj_lv_blk_evt(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a block that only a strong enough hammer breaks (MOBJ_Lv1Block etc.).
+ * args: name, x, y, z, event, flag variable (already set: not placed), animation group.
+ * Also loads the "P_box_y" paper-peel animation.
+ */
 USER_FUNC(evt_mobj_lv_blk) {
     s32 val;
     s32 flagVar;
@@ -1427,6 +1551,11 @@ USER_FUNC(evt_mobj_lv_blk) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Main function of the floating (flow) blocks toggled by a switch block:
+ * on their own they show "S_1" (solid, no shadow) when something rests on them and "A_1" otherwise;
+ * when linked they follow the switch's A_1-A_3 animation.
+ */
 static s32 mobj_float_blk(MapObjectEntry* mobj) {
     MapObjectEntry* other;
     const char* cur;
@@ -1456,6 +1585,11 @@ static s32 mobj_float_blk(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a floating colour block.
+ * args: name, x, y, z, colour (0 green, 1 purple, 2 orange, 3 red big), size (0 small, 1 big, 2 big02), unused,
+ * flag variable.
+ */
 USER_FUNC(evt_mobj_float_blk) {
     s32 flagVar;
     EvtWord* args = event->args;
@@ -1536,6 +1670,7 @@ USER_FUNC(evt_mobj_float_blk) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns the index in _switch_anim of the switch block's current animation (0 when not found). */
 static inline s32 switchAnimIdx(s32 poseId) {
     const char** p;
     const s8* cur;
@@ -1553,6 +1688,12 @@ static inline s32 switchAnimIdx(s32 poseId) {
     return idx;
 }
 
+/**
+ * Main function of the coloured switch blocks that raise and lower their linked floating block:
+ * each hit runs the event and plays the next raise/lower animation;
+ * with a nonzero timer it springs back after 120 frames.
+ * typeData[1] records the animation index and which way it was switched for the event.
+ */
 static s32 mobj_switch_float_blk(MapObjectEntry* mobj) {
     const s8* cur;
     s32 anim;
@@ -1693,6 +1834,11 @@ static s32 mobj_switch_float_blk(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a coloured switch block (MOBJ_*_FlowBlockSwitch).
+ * args: name, x, y, z, linked floating block name ("" for none), colour (0 green, 1 purple, 2 orange, 3 red),
+ * event, flag variable. Links both blocks to each other.
+ */
 USER_FUNC(evt_mobj_switch_float_blk) {
     const char* name;
     const char* partner;
@@ -1758,6 +1904,11 @@ USER_FUNC(evt_mobj_switch_float_blk) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Opens the lock map object args[0] from a script:
+ * locks Mario and the partner's controls and starts the lock's unlock sequence (state 3).
+ * Does nothing if the object is not a MOBJ_Lock.
+ */
 USER_FUNC(evt_mobj_lock_unlock) {
     MapObjectEntry* mobj = mobjNameToPtr((const char*)evtGetValue(event, event->args[0]));
     if (strcmp(mobj->animName, "MOBJ_Lock")) {
@@ -1774,6 +1925,7 @@ USER_FUNC(evt_mobj_lock_unlock) {
     return EVT_RETURN_DONE;
 }
 
+/** Lock swing and unlock sounds at the position LW(0)-LW(2), started as the lock opens. */
 EVT_BEGIN(evt_lock_sound)
     WAIT_MS(100)
     CALL(evt_snd_sfxon_3d, STRING("SFX_MOBJ_LOCK_SWING1"), LW(0), LW(1), LW(2), 0)
@@ -1782,6 +1934,12 @@ EVT_BEGIN(evt_lock_sound)
     RETURN
 EVT_END()
 
+/**
+ * Main function of the padlock on locked doors:
+ * when Mario checks it, runs the event, then looks for the key in the pouch (typeData[0] is one item,
+ * or with bit 31 a -1 terminated list) and either uses it up and swings the lock open (sound, flag variable set,
+ * release event, bounce and blink out) or shows "sys_no_key".
+ */
 static s32 mobj_lock(MapObjectEntry* mobj) {
 #if VERSION >= VERSION_US
     s32 i;
@@ -1934,6 +2092,11 @@ static s32 mobj_lock(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a padlock.
+ * args: name, key item (or a key list with bit 31 set), x, y, z, Y rotation in degrees, event run when checked,
+ * event run once unlocked, flag variable (already set: not placed).
+ */
 USER_FUNC(evt_mobj_lock) {
     EvtWord* args = event->args;
     const char* name;
@@ -1981,6 +2144,7 @@ USER_FUNC(evt_mobj_lock) {
     return EVT_RETURN_DONE;
 }
 
+/** Opening sounds for the normal and grey treasure chests at LW(0)-LW(2). */
 EVT_BEGIN(evt_box_sound1)
     WAIT_MS(100)
     CALL(evt_snd_sfxon_3d, STRING("SFX_MOBJ_TREASURE_BOX_SWING1"), LW(0), LW(1), LW(2), 0)
@@ -1989,6 +2153,7 @@ EVT_BEGIN(evt_box_sound1)
     RETURN
 EVT_END()
 
+/** Opening sounds for the big and golden treasure chests at LW(0)-LW(2). */
 EVT_BEGIN(evt_box_sound2)
     WAIT_MS(100)
     CALL(evt_snd_sfxon_3d, STRING("SFX_MOBJ_TREASURE_BOX_SWING2"), LW(0), LW(1), LW(2), 0)
@@ -1997,6 +2162,7 @@ EVT_BEGIN(evt_box_sound2)
     RETURN
 EVT_END()
 
+/** Opening sounds for the black treasure chest (the cursed chests), stopping the swing loop in LW(15). */
 EVT_BEGIN(evt_box_sound3)
     WAIT_MS(100)
     CALL(evt_snd_sfxon_3d, STRING("SFX_MOBJ_BLACKBOX_SWING1"), LW(0), LW(1), LW(2), LW(15))
@@ -2006,6 +2172,10 @@ EVT_BEGIN(evt_box_sound3)
     RETURN
 EVT_END()
 
+/**
+ * Guess: shifts and enlarges the open chest's second matrix (translation, scale2) to fit the raised lid,
+ * from the bounding-box arithmetic; applied once the chest has opened or was already open on load.
+ */
 static inline void mobj_itemb(MapObjectEntry* mobj) {
     AnimationPoseData* data = animPoseGetAnimBaseDataPtr(mobj->poseId);
     Vec a, b;
@@ -2022,6 +2192,11 @@ static inline void mobj_itemb(MapObjectEntry* mobj) {
 }
 static s32 mobj_itembox(MapObjectEntry* mobj);
 
+/**
+ * Main function of the treasure chests: when Mario opens one it locks the controls,
+ * runs the check event (which can cancel with MOBJ_FLAG_EXEC_CANCEL), plays the opening sound and animation,
+ * runs the open event (item get), then sets the flag variable and stays open.
+ */
 static s32 mobj_itembox(MapObjectEntry* mobj) {
     EventEntry* ev;
     switch (mobj->state) {
@@ -2108,6 +2283,11 @@ static s32 mobj_itembox(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a treasure chest.
+ * args: name, x, y, z, kind (0 normal, 1 big, 2 grey, 3 black, 4 golden), check event, open event,
+ * flag variable (already set: placed open). Chests above the floor do not fall or cast a shadow.
+ */
 USER_FUNC(evt_mobj_itembox) {
     s32 flagVar;
     EvtWord* args = event->args;
@@ -2171,6 +2351,10 @@ USER_FUNC(evt_mobj_itembox) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Main function of the signboards: reading one runs its event and waits for it to finish.
+ * JP and later lock Mario's controls while it runs; the demo's sign scripts do that themselves.
+ */
 static s32 mobj_signboard(MapObjectEntry* mobj) {
     switch (mobj->state) {
         case 0:
@@ -2196,6 +2380,7 @@ static s32 mobj_signboard(MapObjectEntry* mobj) {
     return 0;
 }
 
+/** Places a signboard (MOBJ_Signboard). args: name, x, y, z, read event, flag variable. */
 USER_FUNC(evt_mobj_signboard) {
     s32 val;
     EvtWord* args = event->args;
@@ -2230,10 +2415,12 @@ USER_FUNC(evt_mobj_signboard) {
 }
 
 #if MOBJ_EXTRA_OBJS
+/** Main function of the arrow sign; it does nothing (the arrow is only decoration). */
 static s32 mobj_arrow(MapObjectEntry* mobj) {
     return 0;
 }
 
+/** Places a decorative arrow sign (MOBJ_Arrow); only built in PAL and the demos. args: name, x, y, z, flag variable. */
 USER_FUNC(evt_mobj_arrow) {
     EvtWord* args = event->args;
     s32 inBattle;
@@ -2264,12 +2451,13 @@ USER_FUNC(evt_mobj_arrow) {
     return EVT_RETURN_DONE;
 }
 #else
+/** Never called: JP and US keep this stub so the stripped "MOBJ_Arrow" name stays in .data. */
 void mobj_sign(void) {
     mobjNameToPtr("MOBJ_Arrow");
 }
 #endif
 
-// case 3 heal sequence; case 4 spells the same steps out inline (only this split reproduces the target registers)
+/** case 3 heal sequence; case 4 spells the same steps out inline (only this split reproduces the target registers) */
 static inline void recoveryHeal(void) {
     PouchPartyData* party;
     MarioWork* mario;
@@ -2291,6 +2479,14 @@ static inline void recoveryHeal(void) {
 // eff_batfukidashi.h), so mobj_recovery_blk evaluates the position before the other arguments as in the target.
 extern EffectEntry* effCoinFukidashiEntry(f32 x, f32 y, f32 z, s32 type, s32 number, s32 duration);
 
+/**
+ * Main function of the heart (recovery) blocks:
+ * hitting one from below restores Mario's HP and FP and every active partner's HP.
+ * The coin-taking version first checks the price (typeData[1]), shows "sys_no_coin" when Mario is short,
+ * charges the coins and keeps a price bubble above it.
+ * The first hit outside the kiosk build shows the "kaifuku_first_hit" tutorial instead
+ * and sets GSWF_HEART_BLOCK_TUTORIAL_SEEN.
+ */
 static s32 mobj_recovery_blk(MapObjectEntry* mobj) {
     MarioWork* mario;
     PouchPartyData* party;
@@ -2425,6 +2621,11 @@ static s32 mobj_recovery_blk(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a heart block.
+ * args: name, price in coins (0 = free MOBJ_RecoveryBlock, otherwise the coin-taking block), x, y, z, unused,
+ * flag variable.
+ */
 USER_FUNC(evt_mobj_recovery_blk) {
     BOOL inBattle;
     s32 flagVar;
@@ -2467,6 +2668,11 @@ USER_FUNC(evt_mobj_recovery_blk) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Save block script: shows the "save_first_hit" tutorial the first time,
+ * sets GSWF_SAVE_BLOCK_USED_AFTER_GOOMBELLA once Goombella has joined,
+ * then runs the memory card save menu with Mario's controls locked.
+ */
 EVT_BEGIN(mobj_save_blk_sysevt)
     SET_TYPE(0)
     CALL(evt_mario_key_onoff, 0)
@@ -2489,6 +2695,10 @@ EVT_BEGIN(mobj_save_blk_sysevt)
     RETURN
 EVT_END()
 
+/**
+ * Main function of the save blocks: when hit from below it plays the bounce, runs the map's own event if any,
+ * then the save script (mobj_save_blk_sysevt) with Mario locked in place.
+ */
 static s32 mobj_save_blk(MapObjectEntry* mobj) {
     switch (mobj->state) {
         case 0:
@@ -2536,6 +2746,10 @@ static s32 mobj_save_blk(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a save block. args: name, x, y, z, event run before saving (0 for none), flag variable.
+ * Places nothing when GLOBAL_FLAG_SAVE_BLOCKS_OFF is set (the show build, seq_e3).
+ */
 USER_FUNC(evt_mobj_save_blk) {
     s32 flagVar;
     s32 val;
@@ -2575,7 +2789,7 @@ USER_FUNC(evt_mobj_save_blk) {
 }
 
 #if VERSION != VERSION_JP
-// Plain block (MOBJ_Block / MOBJ_PinkBlock) that runs an event when hit; not in JP.
+/** Plain block (MOBJ_Block / MOBJ_PinkBlock) that runs an event when hit; not in JP. */
 static s32 mobj_blk(MapObjectEntry* mobj) {
     switch (mobj->state) {
         case 0:
@@ -2616,6 +2830,10 @@ static s32 mobj_blk(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a plain block that runs an event when hit from below.
+ * args: name, x, y, z, kind (0 yellow MOBJ_Block, 1 MOBJ_PinkBlock), event, flag variable. Not in JP.
+ */
 USER_FUNC(evt_mobj_blk) {
     EvtWord* args = event->args;
     const char* name;
@@ -2663,6 +2881,12 @@ USER_FUNC(evt_mobj_blk) {
 }
 #endif
 
+/**
+ * Main function of the ?
+ * blocks and badge (pink) blocks: the first hit pops out the stored item (or a coin,
+ * which is collected at once and sets the flag), or runs the event instead if one is set.
+ * The block then turns into an empty block that just bounces when hit again.
+ */
 static s32 mobj_badgeblk(MapObjectEntry* mobj) {
     ItemEntry* item;
     switch (mobj->state) {
@@ -2736,6 +2960,11 @@ static s32 mobj_badgeblk(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a ? block or badge block.
+ * args: name, x, y, z, item to give, event (0 to give the item), flag variable (already set: placed empty),
+ * kind (literal: 0 ? block, 1 badge block).
+ */
 USER_FUNC(evt_mobj_badgeblk) {
     EvtWord* args = event->args;
     const char* anim;
@@ -2781,6 +3010,12 @@ USER_FUNC(evt_mobj_badgeblk) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Main function of the Shine Sprite blocks: when hit it pops a Shine Sprite, gives it to Mario,
+ * sets the flag variable and deletes itself.
+ * In Pirate's Grotto (dou_02, dou_05/dou_10 when hit by a partner) it also stops Mario
+ * while the Shine is collected; the demo has no such maps.
+ */
 static s32 mobj_powerupblk(MapObjectEntry* mobj) {
     switch (mobj->state) {
         case 0:
@@ -2839,6 +3074,11 @@ static s32 mobj_powerupblk(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a Shine Sprite block (MOBJ_PowerUpBlock).
+ * args: name, x, y, z, event (stored, not run), flag variable (already set: placed empty),
+ * Y rotation in degrees.
+ */
 USER_FUNC(evt_mobj_powerupblk) {
     MapObjectEntry* mobj;
     const char* name;
@@ -2878,6 +3118,11 @@ USER_FUNC(evt_mobj_powerupblk) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Main function of the brick blocks: when hit it runs the event,
+ * sets the flag variable and breaks apart with the "P_box_y" paper-peel animation drawn through an offscreen
+ * capture, then deletes itself.
+ */
 static s32 mobj_brickblk(MapObjectEntry* mobj) {
     char oname[16] = "o_";
     char iname[16] = "i_";
@@ -2964,6 +3209,11 @@ static s32 mobj_brickblk(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Main function of the coin blocks that pay out several coins (MOBJ_10CountBlock):
+ * the first hit gives a coin, sets the flag variable (or runs the event instead)
+ * and starts a 200-frame window in which every further hit gives another coin; then it becomes an empty block.
+ */
 static s32 mobj_10countblk(MapObjectEntry* mobj) {
     switch (mobj->state) {
         case 0:
@@ -3030,6 +3280,11 @@ static s32 mobj_10countblk(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a brick-style block.
+ * args: name, x, y, z, item, kind (literal: 0 brick, 1 brick ? block, 2 brick badge block, 3 coin block;
+ * 10-13 the same but hidden until hit), event, flag variable (already set: broken or empty).
+ */
 USER_FUNC(evt_mobj_brick) {
     f32 x, y, z;
     EvtWord* args = event->args;
@@ -3155,6 +3410,10 @@ USER_FUNC(evt_mobj_brick) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Main function of the breakable floor panels: a spin jump onto one (Super Boots) runs the event,
+ * sets the flag variable, turns off the panel's collision and fades it out over 64 frames before deleting it.
+ */
 static s32 mobj_breaking_floor(MapObjectEntry* mobj) {
     MarioWork* mario = marioGetPtr();
     GXColor c3;
@@ -3206,6 +3465,11 @@ static s32 mobj_breaking_floor(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a breakable floor panel.
+ * args: name, x, y, z, kind (0 MOBJ_BreakingFloor, 1 black), event,
+ * flag variable (already set: removed at once).
+ */
 USER_FUNC(evt_mobj_breaking_floor) {
     char anim[128];
     s32 flagVar;
@@ -3267,6 +3531,10 @@ typedef struct KpaPoleScoreWork {
 
 static KpaPoleScoreWork* psw;
 
+/**
+ * Draw callback for the flipping floor panels: renders the map below the panel from straight above into a
+ * texture (the panel's paper texture), so the flipped panel shows the floor; restores the camera afterwards.
+ */
 static void kururing_capture(CameraId camId, MapObjectEntry* mobj) {
     u8 saved[0x260];
     CameraEntry* cam;
@@ -3313,6 +3581,7 @@ static void kururing_capture(CameraId camId, MapObjectEntry* mobj) {
     memcpy(camGetPtr(camId), saved, 0x260);
 }
 
+/** True when (px, pz) lies inside the square of half-width r around (x, z). */
 static inline BOOL kururing_in_box(f32 x, f32 z, f32 px, f32 pz, f32 r) {
     if (x - r <= px && px <= x + r && z - r <= pz && pz <= z + r) {
         return TRUE;
@@ -3322,6 +3591,13 @@ static inline BOOL kururing_in_box(f32 x, f32 z, f32 px, f32 pz, f32 r) {
 
 #define KURU_POSE_FLAGS(m) animGetPtr()->poses[(m)->poseId].flags
 
+/**
+ * Main function of the flipping floor panels (MOBJ_KururinFloor) that hide Star Pieces:
+ * a Super Boots spin jump next to it (within 60) with nothing standing on it flips it over
+ * and pops out the Star Piece; a hammer hit, a farther spin jump
+ * or anything on it gives the half flip that carries Mario, partners, NPCs and items with it.
+ * US and later skip a partner with flag 0x100 set.
+ */
 static s32 mobj_kururing_floor(MapObjectEntry* mobj) {
     PartyEntry* party;
     MarioWork* mario = marioGetPtr();
@@ -3481,6 +3757,11 @@ static s32 mobj_kururing_floor(MapObjectEntry* mobj) {
     }
     return 0;
 }
+/**
+ * Places a flipping floor panel.
+ * args: name, x, y, z, map group under it (flagged 0x400000), unused,
+ * flag variable of the Star Piece underneath.
+ */
 USER_FUNC(evt_mobj_kururing_floor) {
     const char* grp;
     s32 flagVar;
@@ -3527,6 +3808,11 @@ USER_FUNC(evt_mobj_kururing_floor) {
 }
 
 #if MOBJ_EXTRA_OBJS
+/**
+ * Main function of the trap door panels (PAL and demos):
+ * standing or spin-jumping on one sets the flag variable and flips it open with the paper texture,
+ * then deletes it.
+ */
 static s32 mobj_trap_floor(MapObjectEntry* mobj) {
     switch (mobj->state) {
         case 0:
@@ -3554,6 +3840,10 @@ static s32 mobj_trap_floor(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a trap door panel (MOBJ_trap; PAL and demos).
+ * args: name, x, y, z, map group under it, unused, flag variable (already set: not placed).
+ */
 USER_FUNC(evt_mobj_trap_floor) {
     EvtWord* args = event->args;
     const char* name;
@@ -3593,7 +3883,7 @@ USER_FUNC(evt_mobj_trap_floor) {
     return EVT_RETURN_DONE;
 }
 
-// PAL: a bomb rock that peels away as a paper sheet when hit
+/** PAL: a bomb rock that peels away as a paper sheet when hit */
 static s32 mobj_breaking_rock(MapObjectEntry* mobj) {
     char oname[16] = "o_";
     char iname[16] = "i_";
@@ -3676,6 +3966,10 @@ static s32 mobj_breaking_rock(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a rock that a Bobbery bomb blows away (MOBJ_BombRock; PAL and demos).
+ * args: name, x, y, z, event, flag variable (already set: not placed).
+ */
 USER_FUNC(evt_mobj_breaking_rock) {
     EvtWord* args = event->args;
     const char* name;
@@ -3714,6 +4008,10 @@ USER_FUNC(evt_mobj_breaking_rock) {
 }
 
 #endif
+/**
+ * Bowser stage power-up pickup. args: x, y, z of the pickup.
+ * Adds 500 points there (1000 more at level 3) and powers Bowser up.
+ */
 static USER_FUNC(kpa_powerup) {
     EvtWord* args = event->args;
     Vec pos;
@@ -3728,6 +4026,12 @@ static USER_FUNC(kpa_powerup) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Main function of the obstacle blocks in Bowser's side-scrolling stages:
+ * they only break for a fire breath or head bump (plus a hip drop from level 2, anything at level 3).
+ * Breaking one runs the event, sets the flag, scores 400 (500 while invincible),
+ * shatters it and launches a Bros. Meat power-up.
+ */
 static s32 mobj_koopa_ojama_blk_evt(MapObjectEntry* mobj) {
     BOOL ok = FALSE;
     ItemEntry* item;
@@ -3798,6 +4102,10 @@ static s32 mobj_koopa_ojama_blk_evt(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a Bowser-stage obstacle block.
+ * args: name, x, y, z, event, flag variable (already set: removed), animation group.
+ */
 USER_FUNC(evt_mobj_koopa_ojama_blk) {
     s32 val;
     s32 flagVar;
@@ -3833,6 +4141,7 @@ USER_FUNC(evt_mobj_koopa_ojama_blk) {
 }
 
 #if !MOBJ_EXTRA_OBJS
+/** Never called: JP and US keep this stub so the stripped bomb-rock and trap names stay in .data. */
 void mobj_koopa_stone_blk(void) {
     mobjNameToPtr("MOBJ_BombRock");
     mobjNameToPtr("OFF_d_bom");
@@ -3840,6 +4149,10 @@ void mobj_koopa_stone_blk(void) {
 }
 #endif
 
+/**
+ * Main function of the Bowser-stage stone blocks:
+ * they never react (the strings only keep stripped names in .rodata).
+ */
 static s32 mobj_koopa_stone_blk_evt(MapObjectEntry* mobj) {
     "MOBJ_BombRock";
     "OFF_d_bom";
@@ -3847,6 +4160,10 @@ static s32 mobj_koopa_stone_blk_evt(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places an unbreakable Bowser-stage stone block.
+ * args: name, x, y, z, event (stored, never run), flag variable, animation group.
+ */
 USER_FUNC(evt_mobj_koopa_stone_blk) {
     s32 val;
     s32 flagVar;
@@ -3877,6 +4194,12 @@ USER_FUNC(evt_mobj_koopa_stone_blk) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Main function of the Bowser-stage brick blocks:
+ * at level 0 only fire breaks them, level 1 adds the head bump, level 2 the hip drop, level 3 anything.
+ * A head bump that cannot break one just bounces it.
+ * Breaking one runs the event, sets the flag, scores 400 (500 while invincible) and shatters it.
+ */
 static s32 mobj_koopa_brickblk(MapObjectEntry* mobj) {
     BOOL ok = FALSE;
     switch (mobj->state) {
@@ -3961,6 +4284,11 @@ static s32 mobj_koopa_brickblk(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a Bowser-stage brick block.
+ * args: name, x, y, z, item (unused), kind (literal: 0 brick, 1 MOBJ_block_ky, 2 bigblock_01, 3 bigblock_02),
+ * event, flag variable (already set: removed).
+ */
 USER_FUNC(evt_mobj_koopa_brick) {
     const char* name;
     s32 flagVar;
@@ -4019,6 +4347,11 @@ USER_FUNC(evt_mobj_koopa_brick) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Main function of the Bowser-stage ?
+ * blocks: a head bump gives the item (a Bros. Meat power-up), a coin to Bowser's tally, or runs the event;
+ * the empty block left behind only breaks at level 3. Hidden blocks get their collision when first bumped.
+ */
 static s32 mobj_koopa_badgeblk(MapObjectEntry* mobj) {
     ItemEntry* item;
     BOOL ok;
@@ -4107,6 +4440,10 @@ static s32 mobj_koopa_badgeblk(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a Bowser-stage ? block.
+ * args: name, x, y, z, item (ITEM_BOWSER_BROS_MEAT or a coin), event, flag variable (already set: placed empty).
+ */
 USER_FUNC(evt_mobj_koopa_badgeblk) {
     s32 val;
     s32 item;
@@ -4148,6 +4485,10 @@ USER_FUNC(evt_mobj_koopa_badgeblk) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Places a hidden Bowser-stage ? block that appears when head-bumped from below.
+ * args: name, x, y, z, item, unused, event, flag variable (already set: placed empty).
+ */
 USER_FUNC(evt_mobj_koopa_hidden_blk) {
     const char* name;
     const char* anim;
@@ -4192,6 +4533,10 @@ USER_FUNC(evt_mobj_koopa_hidden_blk) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Main function of the plain Bowser-stage blocks:
+ * they break only at level 3, running the event and setting the flag variable.
+ */
 static s32 mobj_koopa_blk(MapObjectEntry* mobj) {
     BOOL ok = FALSE;
     switch (mobj->state) {
@@ -4231,6 +4576,7 @@ static s32 mobj_koopa_blk(MapObjectEntry* mobj) {
     return 0;
 }
 
+/** Places a plain Bowser-stage block (MOBJ_Block). args: name, x, y, z, unused, event, flag variable. */
 USER_FUNC(evt_mobj_koopa_blk) {
     s32 val;
     EvtWord* args = event->args;
@@ -4261,6 +4607,10 @@ USER_FUNC(evt_mobj_koopa_blk) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Main function of the green pipes in Bowser's stages: fire breath breaks them at levels 1-2, anything at level
+ * 3. Breaking one runs the event, sets the flag, scores 400 (500 while invincible) and shatters it.
+ */
 static s32 mobj_koopa_dokan_evt(MapObjectEntry* mobj) {
     BOOL ok = FALSE;
     switch (mobj->state) {
@@ -4314,6 +4664,10 @@ static s32 mobj_koopa_dokan_evt(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a breakable green pipe in a Bowser stage.
+ * args: kind (0 MOBJ_GreenPipe_ks, 1 _kl, 2 _ky), name, x, y, z, event, flag variable (already set: removed).
+ */
 USER_FUNC(evt_mobj_koopa_dokan) {
     s32 kind;
     s32 val;
@@ -4364,6 +4718,10 @@ USER_FUNC(evt_mobj_koopa_dokan) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Spawns a fire effect at args[0..2] lasting args[3] frames and grows it to full size over the following frames;
+ * blocks until it is fully grown. Used by evt_fire when Bowser burns a coral.
+ */
 static USER_FUNC(fire_func) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
@@ -4393,6 +4751,12 @@ static USER_FUNC(fire_func) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Main function of the coral in Bowser's stages:
+ * fire breath burns it (anything at level 3), running the event,
+ * setting the flag and scoring 400 (500 while invincible);
+ * it then lights three staggered evt_fire flames up the coral before crumbling and deleting itself.
+ */
 static s32 mobj_koopa_sango_evt(MapObjectEntry* mobj) {
     BOOL ok = FALSE;
     EventEntry* ev;
@@ -4469,6 +4833,10 @@ static s32 mobj_koopa_sango_evt(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a burnable coral (MOBJ_sango) in a Bowser stage.
+ * args: name, x, y, z, event, flag variable (already set: removed).
+ */
 USER_FUNC(evt_mobj_koopa_sango) {
     s32 val;
     s32 flagVar;
@@ -4501,6 +4869,13 @@ USER_FUNC(evt_mobj_koopa_sango) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Main function of the Fire Bar platforms in Bowser's stages:
+ * rotates its column of c_fireber NPCs around the base every frame (typeDataF[3] degrees) with a crackling sound
+ * while Mario is near.
+ * Fire breath (anything at level 3) breaks the base:
+ * event, flag, 400/500 points, and the fireballs fly off towards the camera and are deleted.
+ */
 static s32 mobj_koopa_fireber_dodai_evt(MapObjectEntry* mobj) {
     Mtx mtx;
     Mtx rot;
@@ -4620,6 +4995,12 @@ static s32 mobj_koopa_fireber_dodai_evt(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places a Fire Bar base with its fireballs.
+ * args: direction (nonzero: positive rotation), name, x, y, z, fireball count,
+ * rotation speed in degrees per frame (0 means 1), event, flag variable (already set: removed).
+ * The fireballs are NPCs named name plus a hex index; US and later offset each one's Z by its index.
+ */
 USER_FUNC(evt_mobj_koopa_fireber_dodai) {
     const char* name;
     s32 dir, count, script, flagVar, i;
@@ -4684,7 +5065,7 @@ USER_FUNC(evt_mobj_koopa_fireber_dodai) {
 }
 
 #if VERSION <= VERSION_DEMO_US
-// demo-only: turn Mario to face the given angle
+/** demo-only: turn Mario to face the given angle */
 static USER_FUNC(kpa_set_dir) {
     f32 dir = evtGetFloat(event, event->args[0]);
     MarioWork* mario = marioGetPtr();
@@ -4696,6 +5077,10 @@ static USER_FUNC(kpa_set_dir) {
 }
 #endif
 
+/**
+ * Writes the name of the goal pole whose event is running (event->thisMapObj) to args[0],
+ * or 0 outside a map object event.
+ */
 static USER_FUNC(kpa_get_pole_name) {
     MapObjectEntry* mobj = event->thisMapObj;
     EvtWord* args = event->args;
@@ -4707,6 +5092,7 @@ static USER_FUNC(kpa_get_pole_name) {
     return EVT_RETURN_DONE;
 }
 
+/** Writes the name of the flag attached to the running goal pole (its linkedName, "<pole>_h") to args[0], or 0. */
 static USER_FUNC(kpa_get_hata_name) {
     MapObjectEntry* mobj = event->thisMapObj;
     EvtWord* args = event->args;
@@ -4718,12 +5104,14 @@ static USER_FUNC(kpa_get_hata_name) {
     return EVT_RETURN_DONE;
 }
 
+/** Writes Bowser's power level (kpaGetLevel, 0-3) to args[0]. */
 static USER_FUNC(kpa_get_level) {
     EvtWord* args = event->args;
     evtSetValue(event, args[0], kpaGetLevel());
     return EVT_RETURN_DONE;
 }
 
+/** Writes the width of the player's collision box (Bowser's, growing with his level) to args[0] as an integer. */
 static USER_FUNC(kpa_get_width) {
     EvtWord* args = event->args;
     evtSetValue(event, args[0], (s32)marioGetPtr()->wPlayerCollisionBox.x);
@@ -4731,7 +5119,7 @@ static USER_FUNC(kpa_get_width) {
 }
 
 #if VERSION <= VERSION_DEMO_US
-// demo-only: read Mario's position into three float variables
+/** demo-only: read Mario's position into three float variables */
 static USER_FUNC(kpa_get_mario_pos) {
     EvtWord* args = event->args;
     MarioWork* mario = marioGetPtr();
@@ -4742,6 +5130,7 @@ static USER_FUNC(kpa_get_mario_pos) {
 }
 #endif
 
+/** Formats the score args[0] (0-9999) without leading zeros into the floating pole-score text. */
 static USER_FUNC(kpa_score_to_str) {
     s32 score = evtGetValue(event, event->args[0]);
     s32 d[4];
@@ -4763,6 +5152,7 @@ static USER_FUNC(kpa_score_to_str) {
     return EVT_RETURN_DONE;
 }
 
+/** Draw callback that prints the pole score text at half size at the stored position. */
 static void kpa_disp_pole_score(CameraId camId, void* param) {
     Mtx trans;
     Mtx scale;
@@ -4774,6 +5164,10 @@ static void kpa_disp_pole_score(CameraId camId, void* param) {
     FontDrawStringMtx(trans, psw->str);
 }
 
+/**
+ * Shows the goal-pole score rising from (args[0], args[1], args[2]) by args[3] per frame until Y 230;
+ * never returns, so it runs in its own inline event.
+ */
 static USER_FUNC(kpa_disp_pole_score_main) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
@@ -4794,6 +5188,7 @@ static USER_FUNC(kpa_disp_pole_score_main) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Allocates and clears the pole-score text work from map memory; called at the start of the goal-pole sequence. */
 static USER_FUNC(kpa_disp_pole_init) {
     psw = _mapAlloc(0x14);
     psw->str[0] = 0;
@@ -4803,6 +5198,7 @@ static USER_FUNC(kpa_disp_pole_init) {
     return EVT_RETURN_DONE;
 }
 
+/** Clears Mario's air timer so Bowser's jump onto the goal pole does not count as a long fall. */
 static USER_FUNC(kpa_clear_jump_data) {
     MarioWork* mario = marioGetPtr();
     mario->airTimer = 0;
@@ -4810,18 +5206,22 @@ static USER_FUNC(kpa_clear_jump_data) {
 }
 
 #if VERSION <= VERSION_DEMO_US
-// the demo defines these two with the koopa scripts
+/** the demo defines these two with the koopa scripts */
 EVT_BEGIN(kpa_powerup_evt)
     CALL(kpa_powerup, LW(0), LW(1), LW(2))
     RETURN
 EVT_END()
+/** The demo's copy of evt_fire (see above). */
 EVT_BEGIN(evt_fire)
     CALL(fire_func, LW(0), LW(1), LW(2), LW(3))
     RETURN
 EVT_END()
 #endif
 
-// The demo sets the pole speeds from Mario's height; the other versions use fixed speeds and an inline lowering event
+/**
+ * The demo sets the pole speeds from Mario's height;
+ * the other versions use fixed speeds and an inline lowering event
+ */
 #if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(kpa_pole)
     CALL(evt_cam_letter_box_disable, 1)
@@ -4898,6 +5298,11 @@ EVT_BEGIN(kpa_pole)
     RETURN
 EVT_END()
 #else
+/**
+ * Goal pole sequence for small Bowser (levels 0-1):
+ * shows the score, slides him and the flag down to the ground, then moves the camera on and hands control back.
+ * Run by mobj_koopa_pole_evt with the score in LW(0).
+ */
 EVT_BEGIN(kpa_pole)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_cam_letter_box_onoff, 0, 0)
@@ -4983,6 +5388,10 @@ EVT_BEGIN(kpa_pole)
 EVT_END()
 #endif
 
+/**
+ * Goal pole sequence at level 2 and above: big Bowser throws the pole and flag,
+ * which fly up and away growing to triple size over 100 frames.
+ */
 EVT_BEGIN(kpa_pole_move)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_cam_letter_box_onoff, 0, 0)
@@ -5031,6 +5440,10 @@ EVT_BEGIN(kpa_pole_move)
     RETURN
 EVT_END()
 
+/**
+ * After the goal pole: walks Bowser to the fortress ("toride" in kpa_06, "toride_" elsewhere) and sets LSWF(5).
+ * Guess: at level 2 and above he is too big for the door, hence the 2-second struggle with his model hidden.
+ */
 EVT_BEGIN(kpa_move_to_toride)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_wait_landon)
@@ -5071,6 +5484,12 @@ EVT_END()
 
 static s32 mobj_koopa_pole_evt(MapObjectEntry* mobj);
 
+/**
+ * Main function of the goal pole at the end of Bowser's stages (only Bowser can touch it):
+ * defeats the enemies on screen, sets the flag variable,
+ * scores by grab height (100-1000) or 1000/2000 at levels 2/3, runs kpa_pole or kpa_pole_move,
+ * walks to the fortress, then runs the two map events.
+ */
 static s32 mobj_koopa_pole_evt(MapObjectEntry* mobj) {
     MarioWork* mario = marioGetPtr();
     s32 score;
@@ -5198,6 +5617,11 @@ static s32 mobj_koopa_pole_evt(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Places the goal pole and its flag ("<name>_h", 180 above).
+ * args: name, x, y, z, final event, event run after reaching the fortress,
+ * flag variable (already set: inactive).
+ */
 USER_FUNC(evt_mobj_koopa_pole) {
     s32 inBattle;
     s32 val2;

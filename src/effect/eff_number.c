@@ -12,6 +12,7 @@
 
 static const f32 padz = 0.0f;
 
+/** Draws `number` as digit textures with the colour pair chosen by `type`, transformed by mtx and faded by `alpha`. */
 void effNumberGX(Mtx mtx, s32 type, s32 number, u8 alpha, s32 extra) {
     CameraEntry* cam;
     GXColor cols[2];

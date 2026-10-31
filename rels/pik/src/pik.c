@@ -7,6 +7,11 @@
 #include "pik.h"
 #include "rel_module.h"
 
+/**
+ * Module entry point: runs the static constructors,
+ * then registers the init scripts of pik_00 to pik_04
+ * and the battle setup tables for Poshley Heights with the REL loader.
+ */
 void _prolog(void) {
     voidfunctionptr* ctor;
 
@@ -21,6 +26,7 @@ void _prolog(void) {
     relSetBtlAddr("pik", btlsetup_pik_tbl, btl_pik_setup_no_tbl);
 }
 
+/** Module exit point: runs the static destructors. */
 void _epilog(void) {
     voidfunctionptr* dtor;
 
@@ -28,5 +34,6 @@ void _epilog(void) {
         (*dtor)();
     }
 }
+/** Placeholder the linker points unresolved relocations at; it does nothing. */
 void _unresolved(void) {
 }

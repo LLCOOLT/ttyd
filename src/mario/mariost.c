@@ -245,9 +245,12 @@ static inline void L_gcResetCheck(void);
 void L_gcResetCheck(void);
 #endif
 
-// Start-up. The demos have no error handler (they turn on the SDK's DVD fatal message instead), show English
-// (US demo) or Japanese (JP demo) text whatever the console font, set flag 4 on a restart and always set flag
-// 0x1000.
+/**
+ * Start-up.
+ * The demos have no error handler (they turn on the SDK's DVD fatal message instead),
+ * show English (US demo) or Japanese (JP demo) text whatever the console font,
+ * set flag 4 on a restart and always set flag 0x1000.
+ */
 void marioStInit(void) {
     static u8 stack[0x1000];
     // the releases also start cold after a shutdown reset
@@ -427,6 +430,13 @@ void marioStInit(void) {
 #endif
 }
 
+/**
+ * One frame of game logic, called from the main loop in main.c:
+ * waits out a disc error, reads the pads, then runs every system's per-frame update in a fixed order
+ * and checks for a reset.
+ * In kiosk builds it also watches for idle pads
+ * and raises GLOBAL_FLAG_KIOSK_TIMEOUT (the demos reset outside the field and battle instead).
+ */
 void marioStMain(void) {
     int i;
 
@@ -513,11 +523,18 @@ void marioStMain(void) {
     }
 }
 
+/** Draws the frame through the camera list (camDraw) and clears g_bFirstSmartAlloc after the first drawn frame. */
 void marioStDisp(void) {
     camDraw();
     g_bFirstSmartAlloc = FALSE;
 }
 
+/**
+ * Sets how much of the game is paused, 0 (nothing) to 4 (everything):
+ * each level sets the matching low bits of gp->systemLevelFlags, which stop that level's play-time clock,
+ * and stops or restarts events by type mask.
+ * Used by item pickups (itemdrv.c), map objects (evt_mobj.c) and the evt_lecture script command.
+ */
 void marioStSystemLevel(s32 level) {
     switch (level) {
         case 0:
@@ -551,10 +568,20 @@ void marioStSystemLevel(s32 level) {
     }
 }
 
+/**
+ * Returns the paused-level bit mask (gp->systemLevelFlags), not the level number;
+ * 0 means the game is running freely.
+ */
 u32 marioStGetSystemLevel(void) {
     return gp->systemLevelFlags;
 }
 
+/**
+ * Runs after every vertical retrace: advances the play-time clocks (each stops while its system level is
+ * paused), records the retrace count, watches the console's Reset button
+ * and the B+X+Start soft reset (held 0.5 s), then services rumble and the sound driver.
+ * JP and later also reset when the drive reports a fatal status.
+ */
 static void viPostCallback(u32 retraceCount) {
     OSTime time;
     u32 reset = PAD_BUTTON_B | PAD_BUTTON_X | PAD_BUTTON_START;
@@ -651,6 +678,12 @@ exitcheck:
     psndMainInt();
 }
 
+/**
+ * Background thread started by marioStInit that polls the disc drive:
+ * on cover open, no or wrong disc, retry or fatal error it sets gp->dvdError,
+ * mutes sound and draws the ROM-font error message on its own, until the drive recovers.
+ * US and PAL wait until the status has been steady for 10 frames before drawing.
+ */
 static void* gcDvdCheckThread(void* param) {
 #if VERSION >= VERSION_US
     s32 prevStatus = 0;
@@ -776,6 +809,11 @@ static void* gcDvdCheckThread(void* param) {
     }
 }
 
+/**
+ * Rumble safety, run from viPostCallback: forces a pad's motor off for 30 seconds
+ * after 30 seconds of continuous rumble, and hard-stops all rumble during a disc error or
+ * while the game is paused at any system level.
+ */
 void gcRumbleCheck(void) {
     static BOOL off_trg[4] = {FALSE, FALSE, FALSE, FALSE};
     static OSTime off_time[4] = {0, 0, 0, 0};
@@ -838,8 +876,10 @@ void gcRumbleCheck(void) {
 }
 
 #if VERSION <= VERSION_DEMO_US
-// The demos inline the reset check into its callers (the US demo also logs the reset); their restart codes are
-// only RESTART and HOTRESET.
+/**
+ * The demos inline the reset check into its callers (the US demo also logs the reset);
+ * their restart codes are only RESTART and HOTRESET.
+ */
 static inline void L_gcResetCheck(void) {
     u32 code;
 
@@ -882,6 +922,12 @@ static inline void L_gcResetCheck(void) {
 #else
 // FAKE: keeps the following function(s) out of line as in the target; removing it changes the code
 #pragma dont_inline on
+/**
+ * Performs a requested reset (gp->resetType): blanks the screen, stops sound,
+ * the disc thread and pending memory card work, then restarts the console.
+ * Type 2 hot-resets to the IPL menu; otherwise the restart code carries the video mode (and, in US and PAL, the
+ * language). US and PAL also wait for card access to finish first.
+ */
 void L_gcResetCheck(void) {
     u32 code;
 

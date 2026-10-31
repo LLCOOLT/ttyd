@@ -196,6 +196,10 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Guess: init event of the Koopa Paratroopa: registers its wait, attack (attack_event_patapata),
+ * damage and confusion events and its pose sound table, then starts the wait event.
+ */
 static EVT_BEGIN(init_event_patapata)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_patapata))
@@ -206,6 +210,14 @@ static EVT_BEGIN(init_event_patapata)
     RETURN
 EVT_END()
 
+/**
+ * Data event 14 (the Paratroopa is knocked out of the air):
+ * drops its flying attributes, then after 500 ms swaps its pose,
+ * data table and part for the walking Koopa Troopa's, changes its unit kind to 14 (UNIT_KOOPA_TROOPA),
+ * plays the fall sound and drops it to the floor, setting its home position there.
+ * It then installs the Koopa's wait, attack, damage and confusion events and footstep sounds.
+ * If its HP damage count is above 1 it also runs dmg_turn_event so it lands flipped over.
+ */
 static EVT_BEGIN(dmg_fall_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -252,6 +264,10 @@ static EVT_BEGIN(dmg_fall_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: data event 48 (the Paratroopa's position when hit by a first strike):
+ * sets its Y to 10 and waits for the current attack to end.
+ */
 static EVT_BEGIN(patapata_dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -260,6 +276,14 @@ static EVT_BEGIN(patapata_dmg_first_attack_pos)
     RETURN
 EVT_END()
 
+/**
+ * Guess: attack event of the flying Koopa Paratroopa:
+ * uses an enemy item if one fits, otherwise picks a target (the first-strike target when
+ * BATTLE_FLAG_FIRST_ATTACK is set) and does a diving attack on it:
+ * it swoops in on a dive path, flaps, and dives into the target with the damage check.
+ * A miss flies on past; a hit shakes the camera and knocks it back with a spin.
+ * It then flies home and goes back to waiting. A confused unit with no target runs subsetevt_confuse_flustered.
+ */
 static EVT_BEGIN(attack_event_patapata)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -519,6 +543,11 @@ static BattleWeapon weapon_nokonoko_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Guess: init event of the Koopa Troopa: registers its wait, attack, damage and confusion events,
+ * clears the flipped-over counter and sets the shell-walk and shell-run footstep sounds,
+ * then starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -531,6 +560,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event: runs the default battle damage reaction on the unit itself (part 1). */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -538,6 +568,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Data event 13 (a stomp flips the Koopa over):
+ * switches the unit to its flipped-over defence and pose tables,
+ * sets STATUS_FLAG_FLIPPED with the over-turn counter at 2 and drops the hit offset,
+ * plays the "NKT_D_1" pose with the shell sound, and hops once in place.
+ */
 static EVT_BEGIN(dmg_turn_event)
     CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, -15, 0)
     SET_VALUE(LW(10), -2)
@@ -557,6 +593,11 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: runs in place of a flipped Koopa's attack: counts the over-turn counter down by one;
+ * while turns remain it only wriggles ("NKT_S_3") for 400 ms and passes.
+ * At zero it restores the upright defence and pose tables, clears STATUS_FLAG_FLIPPED and hops back on its feet.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -582,6 +623,12 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the Koopa Troopa's pre-emptive strike variant of its shell attack:
+ * takes the first-attack target, curls into its shell,
+ * spins up its rotation in three steps and rushes at the target, hits for weapon_nokonoko_attack,
+ * then bounces off in two hops and walks home. Nothing in this file points at it.
+ */
 static EVT_BEGIN(first_attack_event)
     CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -650,6 +697,15 @@ static EVT_BEGIN(first_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the Koopa Troopa: a flipped Koopa runs wakeup_event instead.
+ * Otherwise it uses an enemy item if one fits, or picks a target (the first-strike target when
+ * BATTLE_FLAG_FIRST_ATTACK is set), then spin-jumps into its shell,
+ * spins up in three steps (kicking up smoke) and slides into the target with the damage check.
+ * A miss slides past and turns back; a hit shakes the camera and bounces off in two hops,
+ * then it returns home and goes back to waiting.
+ * A confused unit with no target runs subsetevt_confuse_flustered.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -796,6 +852,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait event: sets the idle animation from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

@@ -43,6 +43,7 @@ static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 #include "eff/n64/eff_sweat_n64.h"
 #include "data_tables.h"
 
+// Forward declaration of the helper that loads Yoshi's hatched colour model for battle (defined further down).
 USER_FUNC(yoshi_original_color_anim_set);
 static USER_FUNC(_gundan_yoshi_run_effect);
 static USER_FUNC(_wait_yoshig_complete);
@@ -249,6 +250,10 @@ BattleUnitKind unitdata_Party_Yoshi = {
     data_table,
 };
 
+/**
+ * Yoshi's battle entry: starts 250 units behind his home spot and, after 40 frames,
+ * runs in to it at speed 4 with his footstep sounds, then takes his stay pose.
+ */
 static EVT_BEGIN(battle_entry_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 250)
@@ -263,6 +268,11 @@ static EVT_BEGIN(battle_entry_event)
     RETURN
 EVT_END()
 
+/**
+ * Init for Yoshi: registers his wait, attack, damage, confusion and entry scripts and his walk,
+ * run and jump sounds, clears unit work 2 (set while Ground Pound runs)
+ * and loads the model for his hatched colour.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -278,6 +288,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Hit reaction: straightens his rotation (left over from his moves), then runs the default damage script. */
 static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     SET_VALUE(LW(10), -2)
@@ -286,7 +297,7 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
-// The demo defines wait_event here; retail defines it near the end of the file.
+/** The demo defines wait_event here; retail defines it near the end of the file. */
 #if VERSION <= VERSION_DEMO_US
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
@@ -669,6 +680,11 @@ PoseSoundTiming posesound_normal_attack[] = {
     {NULL, 0.0f, _yoshi_slide_move_sound, NULL, 0, 1},
 };
 
+/**
+ * Yoshi's Ground Pound: he jumps up over the enemy
+ * and flutters above it during the action command (the yoroyoro jump helpers),
+ * then pounds it once per hit the command earned before returning home.
+ */
 EVT_BEGIN(partyYoshiAttack_NormalAttack)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -962,6 +978,12 @@ EVT_BEGIN(partyYoshiAttack_NormalAttack)
     RETURN
 EVT_END()
 
+/**
+ * Yoshi's Gulp: he runs to the target's mouth point (_get_nomikomi_hit_position) and tries to swallow it.
+ * Units that cannot be swallowed or a failed command just take a hit;
+ * others are either spat into the enemy behind them or, by their swallowAttribute bits,
+ * swallowed whole for their experience.
+ */
 EVT_BEGIN(partyYoshiAttack_Nomikomi)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -1241,6 +1263,10 @@ EVT_BEGIN(partyYoshiAttack_Nomikomi)
     RETURN
 EVT_END()
 
+/**
+ * Yoshi's Mini-Egg: he lays eggs as the action command allows and throws each at a target (_egg_attack_event);
+ * hits can shrink the enemies. Ends with an optional stylish.
+ */
 EVT_BEGIN(partyYoshiAttack_EggAttack)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -1582,6 +1608,11 @@ EVT_BEGIN(partyYoshiAttack_EggAttack)
     RETURN
 EVT_END()
 
+/**
+ * Throws one Mini-Egg: launches egg part LW(12) from Yoshi to target LW(3)/LW(4) in a spinning arc,
+ * bursts it there and applies the damage weapon in its part work 2,
+ * or plays the target's dodge when part work 5 marks a miss.
+ */
 EVT_BEGIN(_egg_attack_event)
     CALL(btlevtcmd_GetStatusMg, BTL_UNIT_SELF, LW(6))
     MULTIPLY_FLOAT(LW(6), 10)
@@ -1631,6 +1662,11 @@ EVT_BEGIN(_egg_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Yoshi's Stampede: he calls a herd of Yoshis that runs across the stage (_gundan_yoshi_run_effect)
+ * while the action command builds damage, hitting every enemy as the herd passes,
+ * then waits for the herd to finish.
+ */
 EVT_BEGIN(partyYoshiAttack_CallGuard)
     SET_VALUE(LW(12), PTR(&partyWeapon_YoshiCallGuard))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -1820,6 +1856,7 @@ EVT_BEGIN(partyYoshiAttack_CallGuard)
     RETURN
 EVT_END()
 
+/** Yoshi's Appeal (data tag 5): appeal pose and sound, then the audience is fired up. */
 EVT_BEGIN(yoshi_appeal_event)
     CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_APPEAL)
@@ -1833,6 +1870,7 @@ EVT_BEGIN(yoshi_appeal_event)
     RETURN
 EVT_END()
 
+/** Victory reaction (data tag 64): plays Yoshi's PYS_Y_1 pose through twice, then his stay pose. */
 static EVT_BEGIN(party_win_reaction)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PYS_Y_1"))
     CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
@@ -1842,6 +1880,10 @@ static EVT_BEGIN(party_win_reaction)
     RETURN
 EVT_END()
 
+/**
+ * Audience-attack reaction (data tag 6): from his spot Yoshi turns to the chosen audience member
+ * and throws a randomly green, yellow or pink egg (part 2) at it, which bursts on impact; no running offstage.
+ */
 static EVT_BEGIN(attack_audience_event)
     CALL(_get_attack_aud_no, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
@@ -1922,11 +1964,13 @@ static EVT_BEGIN(attack_audience_event)
     RETURN
 EVT_END()
 
+/** Empty: partner moves come from the player's menu choices, not a unit attack script. */
 static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
 #if VERSION >= VERSION_JP
+/** Idle (retail position; the demo defines it near the top of the file): plays the stay pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -1938,6 +1982,11 @@ u8 _yoshig_tpl_no_tbl[8] __attribute__((aligned(4))) = { // battle tex id per sw
     VERSION_PICK(0x4A, 0x60), VERSION_PICK(0x48, 0x5E), 0, 0,
 };
 
+/**
+ * Swaps unit args[0]'s main part to the battle model for Yoshi's hatched colour (party colour slot 4,
+ * c_babyyoshi2 to c_babyyoshi7); colour 0 keeps the default green model. Blocks until the model has loaded.
+ * Run from init_event.
+ */
 USER_FUNC(yoshi_original_color_anim_set) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -2000,6 +2049,11 @@ USER_FUNC(yoshi_original_color_anim_set) {
     command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name); \
     (*count)++;
 
+/**
+ * Builds Yoshi's battle move list (data tag 1):
+ * Ground Pound and Gulp always, Mini-Egg from Super rank and Stampede from Ultra rank,
+ * appending each to command->weapon and advancing *count.
+ */
 static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     s32 techLv;
 
@@ -2016,6 +2070,11 @@ static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     }
 }
 
+/**
+ * Sets up Ground Pound's flutter for unit args[0] towards (args[1], args[2], args[3]):
+ * a 180-frame move whose horizontal speed covers the X distance.
+ * Returns the speed in args[4] and the frame count in args[5].
+ */
 USER_FUNC(btl_yoshi_yoroyoro_jump_calc_param) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -2060,6 +2119,11 @@ USER_FUNC(btl_yoshi_yoroyoro_jump_calc_param) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Runs the flutter set up by btl_yoshi_yoroyoro_jump_calc_param one frame per call:
+ * drifts unit args[0] toward the target while bobbing up and down, sets the slide sound volume in unit work 5,
+ * and spawns a sweat drop every 20 frames. Blocks until the 180 frames are over, then snaps to the target.
+ */
 USER_FUNC(btl_yoshi_yoroyoro_jump_move) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -2130,10 +2194,19 @@ USER_FUNC(btl_yoshi_yoroyoro_jump_move) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Pose sound callback for Yoshi's walk, run and flutter poses:
+ * plays the footstep sound at volume work[4] * work[5] / 100.
+ */
 static void _yoshi_slide_move_sound(BattleUnit* unit, PoseSoundTiming* s) {
     BtlUnit_snd_se(unit, s->sfxName, -250000000, (s16)(unit->work[4] * unit->work[5] / 100)); // work[4] * work[5] / 100: slide sound volume
 }
 
+/**
+ * Returns in args[3]-args[5] where Yoshi's tongue should reach target unit args[1] for Gulp:
+ * its position plus its bintaHitOffset (scaled by size, X mirrored by facing).
+ * args[0] and args[2] (the part) are read but not used.
+ */
 static USER_FUNC(_get_nomikomi_hit_position) {
     BattleWork* wp;
     EvtWord* args;
@@ -2163,6 +2236,7 @@ static USER_FUNC(_get_nomikomi_hit_position) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns unit args[0]'s swallowRate in args[1]; Gulp treats -1 as cannot be swallowed. */
 static USER_FUNC(_get_swallow_param) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -2178,6 +2252,10 @@ static USER_FUNC(_get_swallow_param) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Returns 1 in args[2] if unit args[0]'s swallowAttribute has any of the bits in args[1], else 0.
+ * Gulp checks bit 8 (hurts when swallowed), 2 (spat as a shot) and 1 and 4 (how it is swallowed whole).
+ */
 static USER_FUNC(_check_swallow_attribute) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -2198,6 +2276,10 @@ static USER_FUNC(_check_swallow_attribute) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Blocks until the Stampede herd of unit args[0] exists
+ * and its average position (work timer) has crossed the stage centre, so the attack can start hitting enemies.
+ */
 static USER_FUNC(_wait_yoshig_run) {
     BattleUnit* unit;
     YoshiGundanWork* w;
@@ -2216,6 +2298,7 @@ static USER_FUNC(_wait_yoshig_run) {
     return EVT_RETURN_DONE;
 }
 
+/** Blocks until unit args[0]'s Stampede herd has run off and its work (kept in countersetWeapon) is freed. */
 static USER_FUNC(_wait_yoshig_complete) {
     BattleUnit* unit;
     s32 id;
@@ -2229,6 +2312,12 @@ static USER_FUNC(_wait_yoshig_complete) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Moves one Stampede Yoshi (index i) for a frame:
+ * on the first call places it in a 16-wide grid off the left edge with a random speed and small depth drift,
+ * then runs it right, bouncing between the depth limits, until it reaches X 300.
+ * Returns FALSE once it has finished.
+ */
 static inline s32 _gundan_part_update(YoshiGundanPart* p, s32 i) {
     switch (p->state) {
         case 0:
@@ -2270,6 +2359,12 @@ static inline s32 _gundan_part_update(YoshiGundanPart* p, s32 i) {
     return TRUE;
 }
 
+/**
+ * Runs the Stampede herd for unit args[0]: allocates 256 running Yoshi sprites (work stored in
+ * countersetWeapon), moves them each frame with dust puffs and a run sound that follows the herd's average X,
+ * draws them, and frees the work and stops the sound when all are across.
+ * The US and PAL releases cap the herd's depth at 65 instead of 80.
+ */
 static USER_FUNC(_gundan_yoshi_run_effect) {
     BattleUnit* unit;
     YoshiGundanWork* w;
@@ -2357,6 +2452,11 @@ static USER_FUNC(_gundan_yoshi_run_effect) {
     } while (0);
     return EVT_RETURN_BLOCK;
 }
+/**
+ * Display callback that draws the Stampede Yoshis as textured planes,
+ * animated from _yoshig_tpl_no_tbl and flipped by run direction.
+ * The US demo draws all 256 in one call; later releases register one call per Yoshi.
+ */
 #if VERSION <= VERSION_DEMO_US
 static void _btlYoshiDisp(CameraId camera, YoshiGundanWork* w) {
     YoshiGundanPart* p;
@@ -2369,6 +2469,7 @@ static void _btlYoshiDisp(CameraId camera, YoshiGundanWork* w) {
     }
 }
 #else
+/** Draws one Stampede Yoshi (later releases). */
 static void _btlYoshiDisp(CameraId camera, YoshiGundanPart* p) {
     f32 s;
     s = (p->vx < 0.0f) ? 0.4f : -0.4f;
@@ -2376,6 +2477,11 @@ static void _btlYoshiDisp(CameraId camera, YoshiGundanPart* p) {
 }
 #endif
 
+/**
+ * Guess: stand-in for a function the linker stripped;
+ * never called, it only creates the int-to-float conversion constant in .sdata2
+ * so the pool keeps its original order.
+ */
 void yoshiStrippedPool(f32* f, s32 i) {
     *f = (f32)i;
 }

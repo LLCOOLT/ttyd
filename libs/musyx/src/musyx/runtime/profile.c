@@ -3,13 +3,22 @@
 
 SND_PROF_USERCALLBACK sndProfUserCallback = NULL;
 
+/**
+ * Installs the callback that would receive the per-frame profile;
+ * snd_handle_irq has its calls commented out in this build.
+ */
 void sndProfSetCallback(SND_PROF_USERCALLBACK callback) { sndProfUserCallback = callback; }
 
+/** Copies the running music and sound-effect voice counts into the profile info. */
 void sndProfUpdateMisc(SND_PROFILE_INFO* info) {
   info->numMusicVoices = voiceMusicRunning;
   info->numSFXVoices = voiceFxRunning;
 }
 
+/**
+ * Zeroes the four PowerPC performance counters and every total, peak and count in the profile record,
+ * leaving it paused.
+ */
 void sndProfResetPMC(SND_PROFILE_DATA* info) {
   PPCMtpmc1(0);
   PPCMtpmc2(0);
@@ -26,6 +35,10 @@ void sndProfResetPMC(SND_PROFILE_DATA* info) {
   info->cnt = 0;
   info->paused = 1;
 }
+/**
+ * Snapshots the PMC1-4 counters (instructions, load/stores, miss cycles, cycles) into the record
+ * and starts counting.
+ */
 void sndProfStartPMC(SND_PROFILE_DATA* info) {
   PPCMtmmcr0(0);
   PPCMtmmcr1(0);
@@ -38,6 +51,7 @@ void sndProfStartPMC(SND_PROFILE_DATA* info) {
   PPCMtmmcr0(0xc08b);
 }
 
+/** Stops counting and adds the counter deltas since the last start to the record's running totals. */
 void sndProfPausePMC(SND_PROFILE_DATA* info) {
   PPCMtmmcr0(0);
   PPCMtmmcr1(0);
@@ -49,6 +63,11 @@ void sndProfPausePMC(SND_PROFILE_DATA* info) {
   PPCMtmmcr1(0x78400000);
   PPCMtmmcr0(0xc08b);
 }
+/**
+ * Finishes a profiled section: adds the last deltas, then updates the count, sums, averages,
+ * last values and peaks for load/stores, miss cycles, cycles and instructions,
+ * and clears the per-section counters.
+ */
 void sndProfStopPMC(SND_PROFILE_DATA* info) {
   PPCMtmmcr0(0);
   PPCMtmmcr1(0);

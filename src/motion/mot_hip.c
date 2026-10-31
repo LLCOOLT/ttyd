@@ -18,11 +18,13 @@
 #include "version.h"
 #include <dolphin/pad.h>
 
+/** Vertical camera shake (0.0195 for 110 ms) when Mario's spin jump lands on the ground. */
 static EVT_BEGIN(quake_evt)
     CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.01953125f), 110)
     RETURN
 EVT_END()
 
+/** The half-strength shake (0.0098 for 110 ms) used instead of quake_evt in background mode. */
 static EVT_BEGIN(quake_bgmode_evt)
     CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.009765625f), 110)
     RETURN
@@ -30,6 +32,10 @@ EVT_END()
 
 s32 U_chkground(void);
 
+/**
+ * TRUE when the spin jump should start: Mario has been airborne at least 10 frames past the jump peak,
+ * A was just pressed and he has the Super Boots or better. Checked from the jump motions in mario_motion.c.
+ */
 BOOL marioChkHipAttack(void) {
     BOOL ret;
     MarioWork* mario;
@@ -42,6 +48,10 @@ BOOL marioChkHipAttack(void) {
     return ret;
 }
 
+/**
+ * TRUE while Mario is in the landing phase of the spin jump (MARIO_MOTION_HIP_2);
+ * mobjdrv uses it to trigger spin-jump switches and blocks he lands on.
+ */
 BOOL marioChkHipBump(void) {
     BOOL ret = FALSE;
 
@@ -51,12 +61,16 @@ BOOL marioChkHipBump(void) {
     return ret;
 }
 
-// mot_hip's two looping sounds. US callers pass a fresh marioGetPtr() (one more call in the code); JP passes its local.
+/**
+ * mot_hip's two looping sounds.
+ * US callers pass a fresh marioGetPtr() (one more call in the code); JP passes its local.
+ */
 static inline void hipSfxReset(MarioWork* mario) {
     mario->hipSfxId[0] = -1;
     mario->hipSfxId[1] = -1;
 }
 
+/** Starts the spin jump's two looping sounds (0x158 and 0xDB) and keeps their ids in mario->hipSfxId. */
 static inline void hipSfxStart(MarioWork* mario) {
 #if VERSION >= VERSION_US
     // US starts each sound only when it is not already playing
@@ -72,6 +86,7 @@ static inline void hipSfxStart(MarioWork* mario) {
 #endif
 }
 
+/** Stops the spin jump's looping sounds if they are playing. */
 static inline void hipSfxStop(MarioWork* mario) {
     if ((u32)mario->hipSfxId[0] != 0xFFFFFFFFU) {
         psndSFXOff(mario->hipSfxId[0]);
@@ -83,6 +98,11 @@ static inline void hipSfxStop(MarioWork* mario) {
     }
 }
 
+/**
+ * Spin jump (Super Boots): Mario hops up, spins in place with the looping sounds, then drops straight down;
+ * on landing it switches to MARIO_MOTION_HIP_2, shakes the camera and stands,
+ * or goes to the water or spike damage motion when the floor has those attributes. Bowser runs kpa_hip instead.
+ */
 void mot_hip(void) {
     MarioWork* mario;
     HitEntry* hit;
@@ -309,6 +329,11 @@ void mot_hip(void) {
 // FAKE: keeps the following function(s) out of line as in the target; removing it changes the code
 #pragma dont_inline on
 #endif
+/**
+ * Landing check for the spin jump: 0 while in the air,
+ * 1 when the floor sent Mario into the water (0x200) or spike (0xC00) damage motion, 2 for a normal landing.
+ * Also resets the spin rotation and turns camera y-follow back on (not in background mode in the PAL release).
+ */
 s32 U_chkground(void) {
     MarioWork* mario;
     HitEntry* hit;
@@ -363,6 +388,7 @@ s32 U_chkground(void) {
 #pragma dont_inline reset
 #endif
 
+/** Cleanup when the spin jump motion ends: resets the spin offsets and air timers and stops the looping sounds. */
 void mot_hip_post(void) {
     MarioWork* mario;
 

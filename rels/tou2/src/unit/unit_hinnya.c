@@ -167,6 +167,11 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/**
+ * Guess: init event of the Spania-type spinning spiked enemy:
+ * sets unit flag 0x1000000 and registers its wait, attack, damage and confusion events,
+ * then starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
@@ -177,6 +182,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Data event 37 (the thorn-head counter, run when a player attack is bounced off its spiked head):
+ * plays pose type 31, waits 30 frames, then flashes the "toge_flush" spike effect above the unit for 60 frames.
+ * The effect sits 53 units up when the unit is Huge (status 10), 33 when Tiny (status 11) and 43 otherwise.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 31)
     WAIT_FRAMES(30)
@@ -199,6 +209,7 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/** Damage event: runs the default battle damage reaction on the unit itself (part 1). */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -206,6 +217,15 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: attack event of the Spania-type spiked enemy, a single charge.
+ * It uses an enemy item if one fits (or picks a target with btlevtcmd_ChoiceSamplingEnemy),
+ * shakes in place for 20 frames while the charge sound plays,
+ * then rushes along the floor to the target (the avoid animation or the ResultACDefence/CheckDamage hit decide
+ * the outcome) and carries on 500 units past it.
+ * It then reappears at x=300 and glides back to its home position in four slowing steps.
+ * A flustered (confused) unit with no target runs subsetevt_confuse_flustered.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -329,6 +349,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait event: sets the idle animation from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

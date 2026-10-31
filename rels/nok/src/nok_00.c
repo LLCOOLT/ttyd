@@ -71,6 +71,11 @@ static ShopperData35 shopper_data;
 static KinopioData kino_dt;
 static HitDamageReturn hitDmgRetPoints[10];
 
+/**
+ * Message callback for Bowser's line kpa_stg2_013 in the Petalburg cutscene.
+ * Once the text has printed past its 49th character it sets the local flag LSWF(2),
+ * which releases the parallel thread waiting to switch Kammy's animation.
+ */
 static void nok_stg2_013_cb(s32 type, void** work) {
     s32* msg = *work;
 
@@ -83,11 +88,20 @@ static void nok_stg2_013_cb(s32 type, void** work) {
     }
 }
 
+/**
+ * Makes the poster visible: sets bit 0 of the PosterWork flags,
+ * which draw_poster checks before drawing the Peach poster onto the Koopa's locator.
+ */
 static USER_FUNC(pposter_nok_on) {
     poster->flags |= 1;
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Init for the first Petalburg Koopa (ノコノコA, the one who greets Mario):
+ * turns on the move and talk animations and puts him at his post by the gate once the first visit is over;
+ * during the Bowser cutscene (STORY_STG2_25_04) he stands near the shop doors.
+ */
 EVT_BEGIN(nokonoko_A_init)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_01A_PETALBURG_1ST_TIME)
@@ -99,10 +113,16 @@ EVT_BEGIN(nokonoko_A_init)
     RETURN
 EVT_END()
 
+/** Regular script for Koopa A; he does nothing on his own. */
 EVT_BEGIN(nokonoko_A_regl)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for Koopa A: his dialogue changes with story progress (before the Gold Fuzzy,
+ * before father and son reunite, before Frankly's house, the chapter 7 hint about white Petalburg,
+ * and after the finale). In chapter 7 he sets GSWF_STG7_WHITE_PETALBURG_HINT.
+ */
 EVT_BEGIN(nokonoko_A_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_06_01_GOLD_FUZZY)
@@ -122,12 +142,20 @@ EVT_BEGIN(nokonoko_A_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init for Koopa B: not an encounter-style talker (talk animation off) but flagged as an enemy NPC
+ * so he can be hit with the hammer (see nokonoko_B_damage).
+ */
 EVT_BEGIN(nokonoko_B_init)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_ENEMY)
     RETURN
 EVT_END()
 
+/**
+ * Regular script for Koopa B: he wanders at random within 100 units of where he stands,
+ * at speed 30 (urouro_init_func and urouro_main_func).
+ */
 EVT_BEGIN(nokonoko_B_regl)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     CALL(urouro_init_func, STRING("me"), LW(0), LW(2), FLOAT(100.0f), FLOAT(30.0f), 0)
@@ -135,6 +163,10 @@ EVT_BEGIN(nokonoko_B_regl)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for Koopa B: story-progress dependent dialogue,
+ * one line per stretch of the story up to the end of chapter 8, and a final line afterwards.
+ */
 EVT_BEGIN(nokonoko_B_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_06_01_GOLD_FUZZY)
@@ -151,6 +183,11 @@ EVT_BEGIN(nokonoko_B_talk)
     RETURN
 EVT_END()
 
+/**
+ * Runs when Mario hits Koopa B with the hammer:
+ * he plays a startled animation and says "Eek, don't touch me!" for 200 ms,
+ * then goes back to his idle animation.
+ */
 EVT_BEGIN(nokonoko_B_damage)
     CALL(evt_npc_set_anim, STRING("me"), STRING("KNP_O_1"))
     CALL(evt_msg_print, 1, STRING("イャーン　さわらないで！！<key>"), 0, 0)
@@ -159,6 +196,7 @@ EVT_BEGIN(nokonoko_B_damage)
     RETURN
 EVT_END()
 
+/** Regular script for Koopa C: wanders at random within 100 units of his spot, like Koopa B. */
 EVT_BEGIN(nokonoko_C_regl)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     CALL(urouro_init_func, STRING("me"), LW(0), LW(2), FLOAT(100.0f), FLOAT(30.0f), 0)
@@ -166,6 +204,7 @@ EVT_BEGIN(nokonoko_C_regl)
     RETURN
 EVT_END()
 
+/** Talk script for Koopa C: story-progress dependent dialogue, same schedule as Koopa B. */
 EVT_BEGIN(nokonoko_C_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_06_01_GOLD_FUZZY)
@@ -182,6 +221,10 @@ EVT_BEGIN(nokonoko_C_talk)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for Koopa D: story-progress dependent dialogue.
+ * Before Frankly's house is reached he asks a yes/no question and then continues with a follow-up line.
+ */
 EVT_BEGIN(nokonoko_D_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_06_01_GOLD_FUZZY)
@@ -208,6 +251,14 @@ s32 iri_15_item_tbl2[] = {
     ITEM_MOUSSE_CAKE, -1,
 };
 
+/**
+ * Talk script for the Koopa who gives the Trouble Center request 15 (GSW_TROUBLE_ACTIVE 15).
+ * He first asks for a Hot Dog, then for a Mousse Cake;
+ * the item chosen from Mario's inventory is checked and removed,
+ * and with the Mousse Cake he rewards Mario with a Dried Bouquet,
+ * records the play time and marks the trouble solved.
+ * After that he can be asked to repeat the swap for another Dried Bouquet by handing over a Hot Dog.
+ */
 EVT_BEGIN(nokonoko_F_talk)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 15)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_BASE), 0)
@@ -320,6 +371,12 @@ EVT_BEGIN(nokonoko_F_talk)
     RETURN
 EVT_END()
 
+/**
+ * Guess: init event of the NPC named ホワイト (White): skipped in the kiosk demo.
+ * During the Bowser interlude (STORY_STG2_25_04) it does nothing;
+ * until the Rogueport dock chapter (STORY_STG5_59) it moves him to (375, 50, -105) beside the inn;
+ * after that he stays where the map put him.
+ */
 static EVT_BEGIN(init_white)
     CALL(evt_sub_get_system_flag, LW(0))
     IF_BITS_SET(LW(0), GLOBAL_FLAG_KIOSK)
@@ -334,6 +391,11 @@ static EVT_BEGIN(init_white)
     RETURN
 EVT_END()
 
+/**
+ * Guess: talk script of the NPC ホワイト (White): one message per stretch of the story,
+ * stg1_nok_19_01 before the Gold Fuzzy, _02 before the Hooktail fight, _03 until after the chapter 2 boss,
+ * and _04 afterwards.
+ */
 static EVT_BEGIN(talk_white)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_06_01_GOLD_FUZZY)
@@ -348,6 +410,10 @@ static EVT_BEGIN(talk_white)
     RETURN
 EVT_END()
 
+/**
+ * Guess: regular script of the Show-off Koopa (キザ野郎):
+ * he wanders at random within 100 units of where he stands, at speed 30 (urouro_init_func and urouro_main_func).
+ */
 static EVT_BEGIN(kizayarou_regl)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     CALL(urouro_init_func, STRING("me"), LW(0), LW(2), FLOAT(100.0f), FLOAT(30.0f), 0)
@@ -355,6 +421,11 @@ static EVT_BEGIN(kizayarou_regl)
     RETURN
 EVT_END()
 
+/**
+ * Guess: talk script of the Show-off Koopa.
+ * If Goombella (party id 1) is with Mario, the first talk plays stg1_nok_10 to 13 as a conversation with her
+ * and sets LSWF(1); later talks play stg1_nok_14 and 15 with her. With any other partner he says stg1_nok_16.
+ */
 static EVT_BEGIN(kizayarou_talk)
     CALL(evt_mario_get_party, LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -382,6 +453,11 @@ static EVT_BEGIN(kizayarou_talk)
     RETURN
 EVT_END()
 
+/**
+ * Entry of the Show-off Koopa (キザ野郎, model c_kiza):
+ * creates the NPC at (350, 0, 175) facing 270 with the talk and wander scripts and the move/talk animations.
+ * Called from the map init between STORY_STG1_00_PETAL_MEADOWS and STORY_STG1_17_FATHER_AND_SON_REUNITED.
+ */
 static EVT_BEGIN(kizayarou_init)
     SET_VALUE(LW(0), STRING("キザ野郎"))
     CALL(evt_npc_entry, LW(0), STRING("c_kiza"))
@@ -655,6 +731,14 @@ static KinopioData kino_dt = {
     NULL, NULL, // toBedEvt..fromBedEvt
 };
 
+/**
+ * Cutscene on Mario's first arrival in Petalburg (story progress before STORY_STG1_01A):
+ * controls are locked, the camera sweeps over the village while the "Petalburg" title card shows,
+ * then the Koopa at the gate greets Mario and the partner.
+ * Afterwards story progress becomes STORY_STG1_01A_PETALBURG_1ST_TIME,
+ * the bottomless respawn point is set to the current position (JP and later),
+ * the partner starts following again and the controls return.
+ */
 EVT_BEGIN(first_time_camera)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgm_scope, 0, 1)
@@ -724,6 +808,10 @@ static HitDamageReturn hitDmgRetPoints[] = {
     {0},
 };
 
+/**
+ * Creates the "poster" NPC (model c_p_peach, the Peach poster) used in the Bowser interlude:
+ * intangible, placed just in front of the S_ie_mad02 wall object, and then hooks it up with pposter_init.
+ */
 EVT_BEGIN(nok_00_koopa_npc_entry)
     CALL(evt_npc_entry, STRING("poster"), STRING("c_p_peach"))
     CALL(evt_npc_pera_onoff, STRING("poster"), 0)
@@ -736,6 +824,13 @@ EVT_BEGIN(nok_00_koopa_npc_entry)
     RETURN
 EVT_END()
 
+/**
+ * Bowser interlude in Petalburg (STORY_STG2_25_04_BOWSER_ACTION_STAGE):
+ * Kammy flies in over the village, Koopa A flees into the shops, and Bowser is led to the Peach poster.
+ * Koopa A jumps up and hangs the poster (via pposter_nok_on), the music slows down and fades,
+ * and the story advances to STORY_STG2_25_05_BOWSER_PETALBURG.
+ * The game is saved and the scene continues into the next Bowser action stage (mri_00).
+ */
 EVT_BEGIN(nok_00_koopa_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_NOK1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_NOK1"))
@@ -1035,6 +1130,14 @@ EVT_BEGIN(nok_00_koopa_evt)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for nok_00: sets up Mario's entrance (the first-visit cutscene,
+ * or the Bowser interlude when that is the story state), the NPCs, doors of the inn, shop and house,
+ * the item shop, the inn's Kinopio, the save block, ambient butterflies,
+ * the pit-fall return points and the star piece panel.
+ * During the Trouble Center era before the father-and-son reunion it also starts the Kizayarou-style
+ * running-around sequence.
+ */
 EVT_BEGIN(nok_00_init_evt)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_04_BOWSER_ACTION_STAGE)
         CALL(evt_mario_set_mode, 2)
@@ -1095,6 +1198,10 @@ EVT_BEGIN(nok_00_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Allocates the PosterWork and finds the poster NPC's shape and the Koopa's "locator7" group
+ * so draw_poster can draw the poster on top of Koopa A.
+ */
 static USER_FUNC(pposter_init) {
     NpcEntry* npc;
 
@@ -1108,6 +1215,10 @@ static USER_FUNC(pposter_init) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Display callback of the Koopa A model: when the group drawn is the poster's locator
+ * and the poster has been switched on, draws the poster's plane shape there.
+ */
 static void draw_poster(void* userdata, s32 group) {
     NpcEntry* npc = npcNameToPtr("poster");
 

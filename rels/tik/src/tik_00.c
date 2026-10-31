@@ -264,6 +264,12 @@ typedef struct UranaiTag {
 static const UranaiTag uranaisi_pos_tag = {"pos"};
 #endif
 
+/**
+ * Merluvlee's "next" reading, run after the card minigame. Prints the hint for the current story step.
+ * If no hint text exists for it, shows a plain Japanese message with the current event number
+ * and pays the reading's fee back as coins (this branch reads like a development fallback).
+ * From the return to Rogueport (chapter 9) on, she only says uranaisi_17 and pays the fee back.
+ */
 EVT_BEGIN(uranaisi_next_evt)
 #if VERSION >= VERSION_JP
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG9_02_RETURN_TO_ROGUEPORT)
@@ -347,6 +353,11 @@ EVT_BEGIN(uranaisi_next_evt)
     RETURN
 EVT_END()
 
+/**
+ * Merluvlee's Star Piece reading.
+ * Prints one random hint about where an unfound Star Piece is hidden and marks it as read.
+ * If there are no unread hints she says uranaisi_14 and refunds the fee as coins.
+ */
 EVT_BEGIN(uranaisi_starpiece_evt)
     CALL(uranaisi_data_alloc, 1, STRING("un_starpiece"))
     CALL(uranaisi_starpiece_check, LW(0))
@@ -383,6 +394,10 @@ EVT_BEGIN(uranaisi_starpiece_evt)
     RETURN
 EVT_END()
 
+/**
+ * Merluvlee's reading about Shine Sprites (supercoin hints).
+ * Prints a random unread hint, or says uranaisi_16 and refunds the fee when none are left.
+ */
 EVT_BEGIN(uranaisi_supercoin_evt)
     CALL(uranaisi_data_alloc, 2, STRING("un_supercoin"))
     CALL(uranaisi_supercoin_check, LW(0))
@@ -431,16 +446,23 @@ static CardName name_tbl[] = {
     {"card_9", 1},
 };
 
+/** Event that runs the card-capture helper (uranai_cap_evt) for the fortune-telling scene. */
 EVT_BEGIN(evt_uranai_cap)
     CALL(uranai_cap_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script helper.
+ * Sets the running event's owner NPC to the NPC named by args[0] (Merluvlee),
+ * so "me" in her scripts refers to her.
+ */
 static USER_FUNC(setmertn) {
     event->ownerNPC = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Stores the module-level flag ssf (set by ss_set) into the variable args[0]. */
 static USER_FUNC(ss_check) {
     s32 a;
     s32 z;
@@ -455,11 +477,13 @@ static USER_FUNC(ss_check) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Sets the module-level flag ssf to the value of args[0]. */
 static USER_FUNC(ss_set) {
     ssf = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Frees the 256-byte message buffer allocated by evt_uranaisi_msg_alloc, if there is one. */
 static USER_FUNC(evt_uranaisi_msg_free) {
     if (uranaisi_msgp == NULL) {
         return EVT_RETURN_DONE;
@@ -469,6 +493,7 @@ static USER_FUNC(evt_uranaisi_msg_free) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Allocates and clears a 256-byte buffer in map memory for building Merluvlee's price menu text. */
 static USER_FUNC(evt_uranaisi_msg_alloc) {
     uranaisi_msgp = _mapAlloc(0x100);
     memset(uranaisi_msgp, 0, 0x100);
@@ -476,6 +501,12 @@ static USER_FUNC(evt_uranaisi_msg_alloc) {
 }
 
 #if VERSION >= VERSION_US
+/**
+ * Script helper for her price menu (US and later).
+ * args[0] is the message id, args[1] receives the formatted string.
+ * It scans the message for her position tags and pads the three reading prices to their column using the font's
+ * text width, then formats the result into the buffer from evt_uranaisi_msg_alloc.
+ */
 static USER_FUNC(evt_uranaisi_msg_set) {
     EvtWord* args = event->args;
     const char* msg = msgSearch((const char*)evtGetValue(event, args[0]));
@@ -568,6 +599,10 @@ static USER_FUNC(evt_uranaisi_msg_set) {
     return EVT_RETURN_DONE;
 }
 #else
+/**
+ * Script helper for her price menu (JP and earlier).
+ * args[0] is the message id, args[1] receives the string with the three reading prices filled in by sprintf.
+ */
 static USER_FUNC(evt_uranaisi_msg_set) {
     EvtWord* args = event->args;
     const char* msg = msgSearch((const char*)evtGetValue(event, args[0]));
@@ -578,6 +613,11 @@ static USER_FUNC(evt_uranaisi_msg_set) {
 }
 #endif
 
+/**
+ * Script helper.
+ * With args[0] = 0, stores in args[1] the name string of the current story progress (search_evt_moji),
+ * used by Merluvlee's fallback reading.
+ */
 static USER_FUNC(evt_osreport) {
     EvtWord* args = event->args;
 
@@ -589,6 +629,11 @@ static USER_FUNC(evt_osreport) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper that starts the card-reading scene.
+ * Allocates the capture work area, saves the script's LW and the global GW registers (the scene reuses them),
+ * puts the card objects on camera 5, and starts the evt_uranai_cap event.
+ */
 static USER_FUNC(uranai_init_func) {
     char name[64];
     s32 i;
@@ -611,6 +656,10 @@ static USER_FUNC(uranai_init_func) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper that ends the card-reading scene.
+ * Restores the saved LW and GW registers, stops the capture event and frees the work area.
+ */
 static USER_FUNC(uranai_exit_func) {
     memcpy(event->lwData, uranai_wp->lwData, sizeof(uranai_wp->lwData));
     memcpy(evtGetWork()->gwData, uranai_wp->gwData, sizeof(uranai_wp->gwData));
@@ -619,6 +668,12 @@ static USER_FUNC(uranai_exit_func) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Draw callback that renders Merluvlee's model into a small texture.
+ * It sets up a perspective camera aimed at her, draws her pose three times at the model's own scale,
+ * copies the frame buffer into an RGB5A3 texture held in the work area and restores the GX state.
+ * The texture is later put on the middle card.
+ */
 static void uranai_cap(CameraId cameraId, void* param) {
     CameraEntry* cam = camGetPtr(CAMERA_3D);
     f32 half;
@@ -692,11 +747,20 @@ static void uranai_cap(CameraId cameraId, void* param) {
     uranai_wp->ready = 1;
 }
 
+/**
+ * Script helper.
+ * Queues the uranai_cap draw callback on the shadow camera and blocks, so the capture runs every frame.
+ */
 static USER_FUNC(uranai_cap_evt) {
     dispEntry(CAMERA_SHADOW, 0.0f, 3, uranai_cap, NULL);
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * TEV callback for the center card (card_omote_5).
+ * Once the capture is ready, it sets up two texture stages
+ * so the card face shows the captured Merluvlee texture modulated by vertex colour.
+ */
 static void card_tev(MapTevCallbackInfo* info) {
     if (uranai_wp->ready) {
         GXLoadTexObj(smartTexObj(&uranai_wp->tex, &uranai_wp->buf->address), GX_TEXMAP0);
@@ -718,6 +782,10 @@ static void card_tev(MapTevCallbackInfo* info) {
     }
 }
 
+/**
+ * Script helper. Takes an offscreen bounding box (args[0..3]) and stores it in the capture work area.
+ * Unusual: the original stores args[0] into all four fields.
+ */
 static USER_FUNC(uranai_bbox) {
     EvtWord* args = event->args;
     s32 x = evtGetValue(event, args[0]);
@@ -732,6 +800,11 @@ static USER_FUNC(uranai_bbox) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper.
+ * Fades the named map group (LW(2)) out, lowering its alpha from 255 by 8 each frame and finishing
+ * when it goes below 0.
+ */
 static USER_FUNC(card_xlu) {
     const char* name = (const char*)evtGetValue(event, LW(2));
 
@@ -746,6 +819,11 @@ static USER_FUNC(card_xlu) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Sets up the fortune-telling scene.
+ * Fades the front wall and door of her house to black,
+ * hides the nine card objects below the table and starts the capture of her portrait for the center card.
+ */
 EVT_BEGIN(uranai_init)
     CALL(uranai_init_func)
     SET_VALUE(GW(15), LW(0))
@@ -787,6 +865,11 @@ EVT_BEGIN(uranai_init)
     RETURN
 EVT_END()
 
+/**
+ * Animates the card reading: the nine cards fly up and spin in, are shuffled between four positions,
+ * and are flipped by a turn while the sound effects SFX_EVT_FORTUNE_CARD_MOVE1 to 5 play.
+ * Merluvlee is hidden during the flip and shown again at the end.
+ */
 EVT_BEGIN(uranai_main)
     BEGIN_INLINE_EVENT
         WAIT_MS(500)
@@ -1002,6 +1085,10 @@ EVT_BEGIN(uranai_main)
     RETURN
 EVT_END()
 
+/**
+ * Ends the fortune-telling scene.
+ * Fades the walls and door back in, hides the cards again and restores the registers with uranai_exit_func.
+ */
 EVT_BEGIN(uranai_exit)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("uranai_mae"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("ie_1_door"), MAPOBJ_FLAG_HIDE)
@@ -1030,6 +1117,14 @@ EVT_BEGIN(uranai_exit)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for Merluvlee at her table.
+ * Greets Mario (first meeting, first visit or repeat),
+ * offers the reading menu with three prices (next step, Star Piece hints, Shine Sprite hints),
+ * charges the coins, runs the card animation (uranai_init, uranai_main) and
+ * then the matching reading script (uranaisi_next_evt, uranaisi_starpiece_evt or uranaisi_supercoin_evt).
+ * Declining or not having enough coins ends the talk.
+ */
 EVT_BEGIN(uranaisi_table_talk)
     CALL(setmertn, STRING("うらない師"))
     CALL(evt_mario_key_onoff, 0)
@@ -1144,17 +1239,27 @@ EVT_BEGIN(uranaisi_table_talk)
     RETURN
 EVT_END()
 
+/** Talk script for Merluvlee when she is spoken to directly instead of at the table; she just says uranaisi_18. */
 EVT_BEGIN(uranaisi_direct_talk)
     CALL(evt_msg_print, 0, STRING("uranaisi_18"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Init script for Merluvlee.
+ * Registers her table talk as a trigger on the "uranai" hit area (facing it with the A button).
+ */
 EVT_BEGIN(uranaisi_init)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("uranai"), 0, PTR(uranaisi_table_talk), 0)
     RETURN
 EVT_END()
 
 #if VERSION >= VERSION_JP
+/**
+ * Init script for Dazzle (starmaniac, the Star Piece collector).
+ * Before the badge tutorial step he is placed at (400, -20, 175) instead of his default spot.
+ * Not used in the US demo, which uses the shared NPC init.
+ */
 EVT_BEGIN(starmaniac_init)
     CALL_CHILD(npc_init_evt)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG0_17_BADGE_TUTORIAL)
@@ -1164,11 +1269,18 @@ EVT_BEGIN(starmaniac_init)
 EVT_END()
 #endif
 
+/** Dazzle's trade event slot. Only returns; his trading is in the talk script. */
 EVT_BEGIN(starmaniac_get_event)
     CALL(ss_set, 1)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for Dazzle.
+ * Greets Mario (first talk sets GSWF_TIK00_DAZZLE_FIRST_TALK), then lets him trade Star Pieces for items;
+ * the menu checks how many Star Pieces Mario holds and refuses when he has none.
+ * Prices and rewards come from the trade table.
+ */
 EVT_BEGIN(starmaniac_talk)
     CALL(evt_badgeShop_starmaniac_get_kind_cnt, LW(0))
     IF_INT_LESS_OR_EQUAL(LW(0), 0)
@@ -1286,6 +1398,12 @@ EVT_BEGIN(starmaniac_talk)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for Wonky (johoyaketi, the stingy information dealer).
+ * The first talk sets GSWF_TIK00_WONKY_FIRST_TALK;
+ * afterwards Mario can buy a piece of information for coins,
+ * and the script refuses when he cannot afford it or has bought all of it.
+ */
 EVT_BEGIN(johoyaketi_talk)
     IF_INT_EQUAL(GSWF(GSWF_TIK00_WONKY_FIRST_TALK), 0)
         CALL(evt_msg_print, 0, STRING("johoyaketi_00"), 0, STRING("me"))
@@ -1358,10 +1476,15 @@ EVT_BEGIN(johoyaketi_talk)
     RETURN
 EVT_END()
 
+/** Init script for a Goomba resident of the sewers; uses the shared NPC init script. */
 EVT_BEGIN(kuribo5_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for the Goomba resident (kuribo5).
+ * Gives a different line (tik_001_01 to tik_001_09) for each story step.
+ */
 EVT_BEGIN(kuribo5_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_17_FATHER_AND_SON_REUNITED)
@@ -1386,12 +1509,14 @@ EVT_BEGIN(kuribo5_talk)
     RETURN
 EVT_END()
 
+/** Init script for resident chusan4; places him at (-175, -19, 235) and sets his NPC status flags. */
 EVT_BEGIN(chusan4_init)
     CALL(evt_npc_set_position, STRING("me"), -175, -19, 235)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/** Regular script for chusan4. He paces back and forth along Z = 235 between X = -175 and X = 175 at speed 40. */
 EVT_BEGIN(chusan4_regl)
     LOOP(0)
         CALL(evt_npc_move_position, STRING("me"), 175, 235, 0, FLOAT(40.0f), 0)
@@ -1402,6 +1527,7 @@ EVT_BEGIN(chusan4_regl)
     RETURN
 EVT_END()
 
+/** Talk script for chusan4. Says a different line (tik_002_01 to tik_002_09) for each story step. */
 EVT_BEGIN(chusan4_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_17_FATHER_AND_SON_REUNITED)
@@ -1426,15 +1552,18 @@ EVT_BEGIN(chusan4_talk)
     RETURN
 EVT_END()
 
+/** Init script for resident borodo3. */
 EVT_BEGIN(borodo3_init)
     RETURN
 EVT_END()
 
+/** Regular script for borodo3. Runs the shared wandering loop tik_villager_urouro. */
 EVT_BEGIN(borodo3_regl)
     CALL_CHILD(tik_villager_urouro)
     RETURN
 EVT_END()
 
+/** Talk script for borodo3. Says a different line (tik_003_01 to tik_003_09) for each story step. */
 EVT_BEGIN(borodo3_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_17_FATHER_AND_SON_REUNITED)
@@ -1459,10 +1588,12 @@ EVT_BEGIN(borodo3_talk)
     RETURN
 EVT_END()
 
+/** Init script for resident borodo4. */
 EVT_BEGIN(borodo4_init)
     RETURN
 EVT_END()
 
+/** Talk script for borodo4. Says a different line (tik_004_01 to tik_004_09) for each story step. */
 EVT_BEGIN(borodo4_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_17_FATHER_AND_SON_REUNITED)
@@ -1487,10 +1618,12 @@ EVT_BEGIN(borodo4_talk)
     RETURN
 EVT_END()
 
+/** Init script for the Pink Bob-omb resident. */
 EVT_BEGIN(pinkbom_init)
     RETURN
 EVT_END()
 
+/** Talk script for the Pink Bob-omb. Says a different line (tik_005_01 to tik_005_09) for each story step. */
 EVT_BEGIN(pinkbom_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_17_FATHER_AND_SON_REUNITED)
@@ -1515,11 +1648,16 @@ EVT_BEGIN(pinkbom_talk)
     RETURN
 EVT_END()
 
+/** Init script for "master 2", a resident placed at (-85, 95, -535) at the far end of the sewer town. */
 EVT_BEGIN(master_2_init)
     CALL(evt_npc_set_position, STRING("me"), -85, 95, -535)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for master 2.
+ * Says a different line (tik_005_10 to tik_005_18) for each story step, up to the Shadow Queen chapter.
+ */
 EVT_BEGIN(master_2_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_17_FATHER_AND_SON_REUNITED)
@@ -1669,6 +1807,10 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Door-swing callback for Merluvlee's house (door_data_01):
+ * hides the "supotto" spotlight and turns the door (ie_1_door) by the door's progress (LW(0)) times 0.6 degrees.
+ */
 static EVT_BEGIN(evt_door_01_00)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("supotto"), MAPOBJ_FLAG_HIDE)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5996094f))
@@ -1676,6 +1818,11 @@ static EVT_BEGIN(evt_door_01_00)
     RETURN
 EVT_END()
 
+/**
+ * Folds the first wall panel (ie_1_1) of Merluvlee's house flat or back up when Mario enters
+ * or leaves (LW(1) = 0 on entry: 0 to 180 degrees over 500 ms), with the house-moving sound effect.
+ * Guess: the three panels are staggered by 100 to 300 ms so they drop one after another.
+ */
 EVT_BEGIN(evt_wall_01_00)
     BEGIN_INLINE_EVENT
         IF_INT_EQUAL(LW(1), 0)
@@ -1702,6 +1849,7 @@ EVT_BEGIN(evt_wall_01_00)
     RETURN
 EVT_END()
 
+/** Folds the second wall panel (ie_1_2) of Merluvlee's house, the same as evt_wall_01_00 with different delays. */
 EVT_BEGIN(evt_wall_01_01)
     BEGIN_INLINE_EVENT
         IF_INT_EQUAL(LW(1), 0)
@@ -1730,6 +1878,7 @@ EVT_BEGIN(evt_wall_01_01)
     RETURN
 EVT_END()
 
+/** Folds the third wall panel (ie_1_3) of Merluvlee's house, the same as evt_wall_01_00 with different delays. */
 EVT_BEGIN(evt_wall_01_02)
     BEGIN_INLINE_EVENT
         IF_INT_EQUAL(LW(1), 0)
@@ -1763,6 +1912,10 @@ static const char* door_data_01_npc[] = {
     NULL,
 };
 
+/**
+ * Wall callback for Merluvlee's house: when LW(6) is 0 (entering),
+ * starts the three wall panels falling flat one after another (evt_wall_01_00 to 02).
+ */
 static EVT_BEGIN(evt_wall_01)
     IF_INT_EQUAL(LW(6), 0)
         SPAWN_EVENT(evt_wall_01_00)
@@ -1772,6 +1925,11 @@ static EVT_BEGIN(evt_wall_01)
     RETURN
 EVT_END()
 
+/**
+ * Runs when Mario enters Merluvlee's house.
+ * Moves the card display out of view, lowers the music and ambience volume and muffles the ambience,
+ * and hides the shadow of the power block outside if it still exists.
+ */
 EVT_BEGIN(evt_open_01)
     CALL(evt_mapobj_trans, 1, STRING("card"), 0, -1000, 0)
 #if VERSION >= VERSION_JP
@@ -1787,6 +1945,11 @@ EVT_BEGIN(evt_open_01)
     RETURN
 EVT_END()
 
+/**
+ * Runs when Mario leaves Merluvlee's house.
+ * Hides the doorway and curtain objects during the door transition,
+ * then restores the music and ambience and the power block's shadow.
+ */
 EVT_BEGIN(evt_close_01)
     CALL(evt_mapobj_trans, 1, STRING("card"), 0, -1000, 0)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("mon"), MAPOBJ_FLAG_HIDE)
@@ -1824,12 +1987,14 @@ static DoorParam door_data_01 = {
     evt_close_01, // evtClose
 };
 
+/** Door-swing callback for the shop house (door_data_02): turns the door (ie_2_door) by the door's progress. */
 static EVT_BEGIN(evt_door_02_00)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5996094f))
     CALL(evt_mapobj_rotate, 1, STRING("ie_2_door"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Folds the first wall panel (ie_2_1) of the shop house down or up as Mario enters or leaves. */
 EVT_BEGIN(evt_wall_02_00)
     BEGIN_INLINE_EVENT
         IF_INT_EQUAL(LW(1), 0)
@@ -1856,6 +2021,7 @@ EVT_BEGIN(evt_wall_02_00)
     RETURN
 EVT_END()
 
+/** Folds the second wall panel (ie_2_2) of the shop house. */
 EVT_BEGIN(evt_wall_02_01)
     BEGIN_INLINE_EVENT
         IF_INT_EQUAL(LW(1), 0)
@@ -1884,6 +2050,7 @@ EVT_BEGIN(evt_wall_02_01)
     RETURN
 EVT_END()
 
+/** Folds the third wall panel (ie_2_3) of the shop house. */
 EVT_BEGIN(evt_wall_02_02)
     BEGIN_INLINE_EVENT
         IF_INT_EQUAL(LW(1), 0)
@@ -1912,6 +2079,7 @@ EVT_BEGIN(evt_wall_02_02)
     RETURN
 EVT_END()
 
+/** Folds the fourth wall panel (ie_2_4) of the shop house. */
 EVT_BEGIN(evt_wall_02_03)
     BEGIN_INLINE_EVENT
         IF_INT_EQUAL(LW(1), 0)
@@ -1938,6 +2106,7 @@ EVT_BEGIN(evt_wall_02_03)
     RETURN
 EVT_END()
 
+/** Wall callback for the shop house: starts the four wall panels falling flat when the door opens. */
 static EVT_BEGIN(evt_wall_02)
     IF_INT_EQUAL(LW(6), 0)
         SPAWN_EVENT(evt_wall_02_00)
@@ -1953,6 +2122,7 @@ static const char* mise_npc[] = {
     NULL,
 };
 
+/** Runs when Mario enters the shop house. Dips the music and ambience and muffles the ambience. */
 EVT_BEGIN(evt_open_02)
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
@@ -1960,6 +2130,7 @@ EVT_BEGIN(evt_open_02)
     RETURN
 EVT_END()
 
+/** Runs when Mario leaves the shop house. Restores the music and ambience. */
 EVT_BEGIN(evt_close_02)
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
@@ -1987,12 +2158,14 @@ static DoorParam door_data_02 = {
     evt_close_02, // evtClose
 };
 
+/** Door-swing callback for the third house (door_data_03): turns the door (ie_3_door) by the door's progress. */
 static EVT_BEGIN(evt_door_03_00)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5996094f))
     CALL(evt_mapobj_rotate, 1, STRING("ie_3_door"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Folds the first wall panel (ie_3_1) of the third house down or up as Mario enters or leaves. */
 EVT_BEGIN(evt_wall_03_00)
     BEGIN_INLINE_EVENT
         IF_INT_EQUAL(LW(1), 0)
@@ -2019,6 +2192,7 @@ EVT_BEGIN(evt_wall_03_00)
     RETURN
 EVT_END()
 
+/** Folds the second wall panel (ie_3_2) of the third house. */
 EVT_BEGIN(evt_wall_03_01)
     BEGIN_INLINE_EVENT
         IF_INT_EQUAL(LW(1), 0)
@@ -2047,6 +2221,7 @@ EVT_BEGIN(evt_wall_03_01)
     RETURN
 EVT_END()
 
+/** Folds the third wall panel (ie_3_3) of the third house. */
 EVT_BEGIN(evt_wall_03_02)
     BEGIN_INLINE_EVENT
         IF_INT_EQUAL(LW(1), 0)
@@ -2075,6 +2250,7 @@ EVT_BEGIN(evt_wall_03_02)
     RETURN
 EVT_END()
 
+/** Folds the fourth wall panel (ie_3_4) of the third house. */
 EVT_BEGIN(evt_wall_03_03)
     BEGIN_INLINE_EVENT
         IF_INT_EQUAL(LW(1), 0)
@@ -2101,6 +2277,7 @@ EVT_BEGIN(evt_wall_03_03)
     RETURN
 EVT_END()
 
+/** Wall callback for the third house: starts the four wall panels falling flat when the door opens. */
 static EVT_BEGIN(evt_wall_03)
     IF_INT_EQUAL(LW(6), 0)
         SPAWN_EVENT(evt_wall_03_00)
@@ -2119,6 +2296,7 @@ static const char* door_data_03_npc[] = {
     NULL,
 };
 
+/** Runs when Mario enters the third house. Dips the music and ambience and muffles the ambience. */
 EVT_BEGIN(evt_open_03)
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
@@ -2126,6 +2304,7 @@ EVT_BEGIN(evt_open_03)
     RETURN
 EVT_END()
 
+/** Runs when Mario leaves the third house. Restores the music and ambience. */
 EVT_BEGIN(evt_close_03)
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
@@ -2159,18 +2338,24 @@ static DoorParam door_data_03 = {
     evt_close_03, // evtClose
 };
 
+/**
+ * Door-swing callback for the teleporter house (door_data_04):
+ * turns the door (ie_4door) around Y by the door's progress times 0.6.
+ */
 static EVT_BEGIN(evt_door_04_00)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5996094f))
     CALL(evt_mapobj_rotate, 1, STRING("ie_4door"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Second door-swing callback of the teleporter house: turns ie_4door around X by half the door's progress. */
 static EVT_BEGIN(evt_door_04_01)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("ie_4door"), LW(0), 0, 0)
     RETURN
 EVT_END()
 
+/** Wall callback of the teleporter house: turns the wall piece ie_4_1_ around Y by the door's progress. */
 static EVT_BEGIN(evt_wall_04)
     SET_FLOAT_VALUE(LW(2), LW(0))
     MULTIPLY_FLOAT(LW(2), FLOAT(1.0f))
@@ -2178,6 +2363,14 @@ static EVT_BEGIN(evt_wall_04)
     RETURN
 EVT_END()
 
+/**
+ * Runs when the teleporter house (ie_4) opens.
+ * Chooses which of its wall variants (ie_4_1 or ie_4_2) and
+ * which glow objects (sui__1, sui__2, wa_pu) show from the story progress and from GW(10),
+ * which the teleporter scripts set once its animation has played.
+ * After the hideout explodes (chapter 7) the other variant shows.
+ * The releases add a third state from the return to Rogueport onwards.
+ */
 EVT_BEGIN(evt_open_04_open)
     // The releases add a third state from the return to Rogueport (STG9_02) on, so the demos' IF/ELSE became a SWITCH
 #if VERSION <= VERSION_DEMO_US
@@ -2252,6 +2445,11 @@ EVT_BEGIN(evt_open_04_open)
     RETURN
 EVT_END()
 
+/**
+ * Guess: runs when Mario leaves the teleporter house:
+ * restores the music and ambience, and, after the hideout explosion (chapter 7) the partner comments
+ * tik_00_tensou_1 on the way out. Guess: the exact comment condition is the story step range.
+ */
 static EVT_BEGIN(evt_door_04_close)
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
@@ -2307,6 +2505,10 @@ static DoorParam door_data_04 = {
     evt_door_04_close, // evtClose
 };
 
+/**
+ * Door trigger for the teleporter house after the X-Naut hideout has exploded.
+ * The first time, Mario reads the sign message tik_000; then the normal door opening runs.
+ */
 EVT_BEGIN(evt_door_stg7_open)
     IF_INT_EQUAL(GSWF(GSWF_TIK00_STG7_DOOR_OPENED), 0)
         CALL(evt_mario_key_onoff, 0)
@@ -2319,12 +2521,18 @@ EVT_BEGIN(evt_door_stg7_open)
     RETURN
 EVT_END()
 
+/** Door trigger for the teleporter house. Sets GSWF_TIK00_STG7_DOOR_OPENED and then runs the normal door closing. */
 EVT_BEGIN(evt_door_stg7_close)
     SET_VALUE(GSWF(GSWF_TIK00_STG7_DOOR_OPENED), 1)
     SPAWN_EVENT(evt_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Registers the teleporter house door: binds its hit,
+ * and for chapter 7 installs evt_door_stg7_close
+ * and evt_door_stg7_open as front-A triggers on the door's two hit areas.
+ */
 static EVT_BEGIN(evt_door_04_entry)
     CALL(evt_door_param, LW(0), 3, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
@@ -2345,6 +2553,12 @@ static EVT_BEGIN(evt_door_04_entry)
     RETURN
 EVT_END()
 
+/**
+ * Arrival cutscene on the teleporter pad.
+ * Mario and his partner spin on the pad in a beam of light (looping sound),
+ * grow from nothing to full size over 0.8 seconds and sink down onto the pad; Mario regains control afterwards.
+ * Used when returning from the X-Naut Fortress.
+ */
 EVT_BEGIN(tensou_return)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -2427,6 +2641,12 @@ EVT_BEGIN(tensou_return)
     RETURN
 EVT_END()
 
+/**
+ * Map-init script for the teleporter (tensou).
+ * Plays the machine animations for the story step, then, if GSWF_TIK00_TELEPORTER_ARRIVAL is set,
+ * puts Mario and his partners on the pad, opens the door and runs tensou_return.
+ * Afterwards the partner comments (tik_00_tensou_0 or stg7_tik_01) depending on the story step.
+ */
 EVT_BEGIN(tensou_init_event)
     SET_VALUE(GW(10), 0)
 #if VERSION <= VERSION_DEMO_US
@@ -2495,6 +2715,7 @@ EVT_BEGIN(tensou_init_event)
     RETURN
 EVT_END()
 
+/** Script helper. Moves the map object named by args[0] onto the camera whose id is args[1]. */
 static USER_FUNC(card_camid) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -2507,6 +2728,11 @@ static USER_FUNC(card_camid) {
 }
 
 #if VERSION >= VERSION_JP
+/**
+ * Script helper (JP and later).
+ * Sets the blend mode of the "supotto" spotlight map object to 10
+ * so it fades with the house walls during the card reading.
+ */
 USER_FUNC(supotto_blendmode) {
     MapObject* obj = mapGetMapObj("supotto");
 
@@ -2514,17 +2740,20 @@ USER_FUNC(supotto_blendmode) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper (JP and later). Mutes sound effects (PSND_FLAG_MUTE_SFX). */
 USER_FUNC(tik_snd_off) {
     psndSetFlag(PSND_FLAG_MUTE_SFX);
     return EVT_RETURN_DONE;
 }
 
+/** Script helper (JP and later). Unmutes sound effects (clears PSND_FLAG_MUTE_SFX). */
 USER_FUNC(tik_snd_on) {
     psndClearFlag(PSND_FLAG_MUTE_SFX);
     return EVT_RETURN_DONE;
 }
 #endif
 
+/** Script helper. Blocks the script until Mario's controls are enabled again (marioChkKey). */
 static USER_FUNC(mario_key_onoff_wait) {
     marioGetPtr();
     // Waits until Mario's controls are enabled again. A switch on the negated flag is the original shape: an if
@@ -2537,6 +2766,11 @@ static USER_FUNC(mario_key_onoff_wait) {
     }
 }
 
+/**
+ * Script helper.
+ * Sets the scale of Mario and his first partner to the float args[0] (1.0 = normal),
+ * used by the teleporter shrink and grow.
+ */
 static USER_FUNC(scale_func) {
     f32 s = evtGetFloat(event, event->args[0]);
     MarioWork* mario = marioGetPtr();
@@ -2549,6 +2783,11 @@ static USER_FUNC(scale_func) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Teleport to the X-Naut Fortress.
+ * Mario and his partner walk to the pad's centre, spin faster for three seconds, shrink and float upward;
+ * GSWF_TIK00_TELEPORT_TO_AJI is set and the map changes to aji_07.
+ */
 EVT_BEGIN(tensou_event)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -2621,6 +2860,10 @@ EVT_BEGIN(tensou_event)
     RETURN
 EVT_END()
 
+/**
+ * Starts the teleporter's activation animation (anm_saisho),
+ * waits for it to end and then plays the idle glow (anm_wa-p); sets GW(10).
+ */
 EVT_BEGIN(tensou_anim_event)
     SET_VALUE(GW(10), 1)
     CALL(evt_map_playanim, STRING("anm_saisho"), 0, 0)
@@ -2632,6 +2875,12 @@ EVT_BEGIN(tensou_anim_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs when Mario steps on the floor switch (a_sui) of the teleporter.
+ * Before the hideout explosion, and after the epilogue starts,
+ * it plays the animation and lets the pad accept Mario;
+ * in between it shows the message stg7_tik_01_01 and does nothing.
+ */
 EVT_BEGIN(tensou_sw_event)
 #if VERSION >= VERSION_JP
     CALL(evt_snd_sfxon, STRING("SFX_STG7_SWITCH_WARP1"), 0)
@@ -2661,6 +2910,11 @@ EVT_BEGIN(tensou_sw_event)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene where Professor Frankly (kurihakase) shows up in the sewer town after the hideout explosion.
+ * Mario and his partner talk with him (mac_7_000 to mac_7_007), he walks away off screen,
+ * and the story progress is set to STORY_STG7_50_A_WAITING_PROF_FRANKLY.
+ */
 EVT_BEGIN(kurihakase_event)
     CALL(evt_party_stop, 0)
     CALL(evt_snd_envon_f, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK2"), 2000)
@@ -2715,6 +2969,11 @@ EVT_BEGIN(kurihakase_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs when Admiral Bobbery's bomb explodes the pillar.
+ * Plays the break sound, swaps the hit areas from before to after the blast,
+ * sets GSWF_TIK00_PILLAR_BOMBED and plays the paper-capture animation (OFF_d_bom_ver2) of the pillar collapsing.
+ */
 EVT_BEGIN(hashira_bomb_sub)
     BEGIN_INLINE_EVENT
         WAIT_MS(200)
@@ -2756,6 +3015,11 @@ EVT_BEGIN(hashira_bomb_sub)
     RETURN
 EVT_END()
 
+/**
+ * Sets up the pillar that Bobbery can blow up.
+ * If it has not been bombed, registers hashira_bomb_sub as a Bobbery trigger on the hit area a_bom_mae;
+ * otherwise leaves the destroyed state.
+ */
 EVT_BEGIN(hashira_bomb)
     IF_INT_EQUAL(GSWF(GSWF_TIK00_PILLAR_BOMBED), 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("bom_go"), MAPOBJ_FLAG_HIDE)
@@ -2770,6 +3034,10 @@ EVT_BEGIN(hashira_bomb)
     RETURN
 EVT_END()
 
+/**
+ * Creates Goombella (クリスチーヌ, Christine, her Japanese name) as an NPC for the epilogue,
+ * at (-540, 20, -25) facing right, ignoring walls and unable to be touched.
+ */
 static EVT_BEGIN(epilogue_npc_entry)
     CALL(evt_npc_entry, STRING("クリスチーヌ"), STRING("c_pkr"))
     CALL(evt_npc_set_tribe, STRING("クリスチーヌ"), STRING("クリスチーヌ"))
@@ -2779,6 +3047,11 @@ static EVT_BEGIN(epilogue_npc_entry)
     RETURN
 EVT_END()
 
+/**
+ * The epilogue scene in the sewer town, when the story is at STORY_STG8_END_AFTER_THE_BATTLE.
+ * Mario is hidden and the camera watches Goombella walk to the teleporter house, open its door,
+ * go in and close it again; then the screen fades and the map changes to moo_04 (the Moon).
+ */
 static EVT_BEGIN(epilogue_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN1"))
     CALL(evt_snd_bgm_scope, 0, 1)
@@ -2820,6 +3093,10 @@ static EVT_BEGIN(epilogue_evt)
     RETURN
 EVT_END()
 
+/**
+ * Item-box callback for the Soft Stomp chest: takes control, puts the Soft Stomp badge at the chest,
+ * waits for the chest animation and hands it to Mario.
+ */
 static EVT_BEGIN(mobj_box01)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box01"), LW(0), LW(1), LW(2))
@@ -2835,6 +3112,14 @@ static EVT_BEGIN(mobj_box01)
     RETURN
 EVT_END()
 
+/**
+ * Map init script of tik_00, the underground town.
+ * Starts the town music and ambience (not after the hideout explosion or the ending), sets up the exits,
+ * the fortune teller, the doors of the four houses, the teleporter, the shop, the moving floor, the pillar,
+ * the Shine Sprite power block, the Soft Stomp chest, the Star Pieces and the roaming residents.
+ * In the epilogue (after the final battle) it places Goombella and runs her walk-in scene,
+ * which ends with the change to moo_04.
+ */
 EVT_BEGIN(tik_00_init_evt)
     IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_END_AFTER_THE_BATTLE)
         IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_26_THE_HIDEOUT_EXPLODES)

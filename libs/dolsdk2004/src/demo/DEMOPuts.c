@@ -17,6 +17,7 @@ static s16 FontSpace;
 static void DrawFontChar(int x, int y, int z, int xChar, int yChar);
 static void LoadSheet(void* image, GXTexMapID texMapID);
 
+/** Sets the GX blend mode for demo text: reversed (inverse copy), translucent (additive) or opaque. */
 void DEMOSetFontType(s32 attr) {
     switch(attr) {
     case DM_FT_RVS:
@@ -32,6 +33,10 @@ void DEMOSetFontType(s32 attr) {
     }
 }
 
+/**
+ * Loads the built-in 64-pixel-wide I4 bitmap font as a texture into the given texture map with a texture matrix
+ * for it, point-sampled or filtered, and sets one texture coordinate generator.
+ */
 void DEMOLoadFont(GXTexMapID texMap, GXTexMtx texMtx, DMTexFlt texFlt) {
     Mtx fontTMtx;
     u16 width;
@@ -55,6 +60,10 @@ void DEMOLoadFont(GXTexMapID texMap, GXTexMtx texMtx, DMTexFlt texFlt) {
     GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, texMtx);
 }
 
+/**
+ * Sets an orthographic projection over 'width' by 'height' screen pixels with an identity position matrix
+ * (shifted by -0.667 on the second field for field rendering), for 2D text drawing.
+ */
 void DEMOSetupScrnSpc(s32 width, s32 height, f32 depth) {
     Mtx44 pMtx;
     Mtx mMtx;
@@ -73,6 +82,10 @@ void DEMOSetupScrnSpc(s32 width, s32 height, f32 depth) {
     GXSetCurrentMtx(GX_PNMTX0);
 }
 
+/**
+ * Sets up GX for drawing 8x8 caption text: screen-space projection, texture-only TEV stage replacing the colour,
+ * the font texture and the font blend type.
+ */
 void DEMOInitCaption(s32 font_type, s32 width, s32 height) {
     DEMOSetupScrnSpc(width, height, 100.0f);
     GXSetZMode(GX_ENABLE, GX_ALWAYS, GX_ENABLE);
@@ -84,6 +97,10 @@ void DEMOInitCaption(s32 font_type, s32 width, s32 height) {
     DEMOSetFontType(font_type);
 }
 
+/**
+ * Draws an ASCII string (characters 0x20-0x7F, 8x8 pixels each) at x, y, z with the built-in bitmap font;
+ * a newline moves down 8 pixels and any other control character ends the string.
+ */
 void DEMOPuts(s16 x, s16 y, s16 z, char* string) {
     char* str;
     s32 s;
@@ -137,6 +154,7 @@ void DEMOPuts(s16 x, s16 y, s16 z, char* string) {
     }
 }
 
+/** printf front end to DEMOPuts (256-byte buffer). */
 void DEMOPrintf(s16 x, s16 y, s16 z, char* fmt, ...) {
     va_list vlist;
     char buf[256];
@@ -147,6 +165,10 @@ void DEMOPrintf(s16 x, s16 y, s16 z, char* fmt, ...) {
     va_end(vlist);
 }
 
+/**
+ * Allocates and loads the console's built-in ROM font (Shift-JIS or ANSI by the OS font encoding)
+ * and sets the default size and spacing. Panics if there is no memory or the boot ROM is too old.
+ */
 OSFontHeader* DEMOInitROMFont(void) {
     switch (OSGetFontEncode()) {
     case OS_FONT_ENCODE_SJIS:
@@ -173,11 +195,13 @@ OSFontHeader* DEMOInitROMFont(void) {
     return FontData;
 }
 
+/** Sets the ROM font cell size and the extra space between characters (stored in 1/16 pixel units). */
 void DEMOSetROMFontSize(s16 size, s16 space) {
     FontSize = size * 16;
     FontSpace = space * 16;
 }
 
+/** Reads the ROM font cell size and spacing back in pixels (either pointer may be NULL). */
 void DEMOGetROMFontSize(s16* size, s16* space) {
     if (size != 0) {
         *size = FontSize / 16;
@@ -188,6 +212,10 @@ void DEMOGetROMFontSize(s16* size, s16* space) {
     }
 }
 
+/**
+ * Draws one ROM font glyph as a textured quad at x, y (in 1/16 pixel),
+ * taking its size from the font's cell width and its top and bottom from the ascent and descent.
+ */
 static void DrawFontChar(int x, int y, int z, int xChar, int yChar) {
     s16 posLeft = x;
     s16 posRight = posLeft + FontSize;
@@ -211,6 +239,7 @@ static void DrawFontChar(int x, int y, int z, int xChar, int yChar) {
     GXEnd();
 }
 
+/** Loads the ROM font texture sheet into a texture map, skipping the load if it is the same sheet as last time. */
 static void LoadSheet(void* image, GXTexMapID texMapID) {
     Mtx mtx;
     GXTexObj texObj;
@@ -227,6 +256,11 @@ static void LoadSheet(void* image, GXTexMapID texMapID) {
     }
 }
 
+/**
+ * Draws a string with the ROM font at x, y, z: handles newline (moves down one line) and tab,
+ * loads the right sheet for each character and advances by the character width.
+ * Returns the width in pixels of the last line.
+ */
 int DEMORFPuts(s16 x, s16 y, s16 z, char* string) {
     s32 cx;
     void* image;
@@ -268,6 +302,10 @@ int DEMORFPuts(s16 x, s16 y, s16 z, char* string) {
     return (width + 15) / 16;
 }
 
+/**
+ * Like DEMORFPuts but draws at most 'length' bytes and wraps to a new line
+ * when a character would pass 'maxWidth' pixels. Returns the width of the last line.
+ */
 int DEMORFPutsEx(s16 x, s16 y, s16 z, char* string, s16 maxWidth, int length) {
     s32 cx;
     void* image;
@@ -312,6 +350,7 @@ int DEMORFPutsEx(s16 x, s16 y, s16 z, char* string, s16 maxWidth, int length) {
     return (width + 15) / 16;
 }
 
+/** printf front end to DEMORFPuts (256-byte buffer). */
 int DEMORFPrintf(s16 x, s16 y, s16 z, char* fmt, ...) {
     va_list vlist;
     char buf[256];
@@ -321,6 +360,11 @@ int DEMORFPrintf(s16 x, s16 y, s16 z, char* fmt, ...) {
     return DEMORFPuts(x, y, z, buf);
 }
 
+/**
+ * Debug helper: loads the ROM font data, converts the glyph for the first character of the string to texels
+ * and prints it as hex through OSReport together with its width, then reinitialises the font.
+ * Returns the string advanced by that character.
+ */
 char* DEMODumpROMFont(char* string) {
     u32 image[288];
     void* temp;
@@ -357,6 +401,7 @@ char* DEMODumpROMFont(char* string) {
     return string;
 }
 
+/** Returns the width in pixels of the widest line of a string in the ROM font. */
 int DEMOGetRFTextWidth(char* string) {
     s32 cx;
     s32 width;
@@ -385,6 +430,7 @@ int DEMOGetRFTextWidth(char* string) {
     return (maxWidth + 15) / 16;
 }
 
+/** Returns the height in pixels of a string (its number of lines times the font's line spacing). */
 int DEMOGetRFTextHeight(char* string) {
     s32 height;
 

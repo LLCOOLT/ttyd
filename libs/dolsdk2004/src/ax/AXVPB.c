@@ -44,10 +44,20 @@ static u32 __AXMaxDspCycles;
 static u32 __AXRecDspCycles;
 static u32 __AXNumVoices;
 
+/** Returns the number of voices that were synchronised during the last __AXSyncPBs pass. */
 u32 __AXGetNumVoices(void) {
     return __AXNumVoices;
 }
 
+/**
+ * Synchronises one voice between the application's copy of its parameter block and the one the DSP reads,
+ * according to the voice's sync flags: with no flags it only pulls state,
+ * volume and current address back from the DSP; COPYALL pushes the whole block;
+ * otherwise each flagged part (select, mixer control, state, type, mix, ITD, update list, depop, volume, FIR,
+ * addresses, ADPCM, sample-rate converter, ADPCM loop,
+ * low-pass filter) is copied to the DSP block and the unflagged parts that the DSP changes (state, current
+ * address) are copied back.
+ */
 void __AXServiceVPB(AXVPB* pvpb) {
     AXPB* ppbDsp;
     AXPB* ppbUser;
@@ -379,6 +389,11 @@ void __AXServiceVPB(AXVPB* pvpb) {
     }
 }
 
+/**
+ * Drops a voice that does not fit in the DSP time budget:
+ * records its depop level if it was playing, stops it in both copies, clears its update counters,
+ * and queues it for its drop callback.
+ */
 void __AXDumpVPB(AXVPB* pvpb) {
     AXPB* ppbDsp;
 
@@ -392,6 +407,14 @@ void __AXDumpVPB(AXVPB* pvpb) {
     __AXPushCallbackStack(pvpb);
 }
 
+/**
+ * Frame-start synchronisation of all voices, from the highest priority (31) down.
+ * It estimates the DSP cycles each active voice costs (sample-rate conversion,
+ * filter and the main and aux mixing) and, as long as the total stays under the maximum, synchronises the voice;
+ * voices that would exceed the budget are dumped.
+ * It then clears the state of free voices, flushes the parameter blocks to memory for the DSP,
+ * and records the cycle estimate.
+ */
 void __AXSyncPBs(u32 lessDlpfycles) {
     u32 cycles;
     u32 i;
@@ -450,10 +473,15 @@ void __AXSyncPBs(u32 lessDlpfycles) {
     DCFlushRange(__AXUpdates, sizeof(__AXUpdates));
 }
 
+/** Returns the base of the parameter block array the DSP reads. */
 AXPB* __AXGetPBs(void) {
     return __AXPB;
 }
 
+/**
+ * Resets a voice to its defaults: stopped, ITD and low-pass filter off, update lists empty,
+ * and the sync flags set to copy the select, state and type fields (0x2000A4).
+ */
 void __AXSetPBDefault(AXVPB* p) {
     p->pb.state = 0;
     p->pb.itd.flag = 0;
@@ -464,6 +492,11 @@ void __AXSetPBDefault(AXVPB* p) {
     p->pb.lpf.on = 0;
 }
 
+/**
+ * Initialises the voice parameter blocks: sets the DSP cycle budget to one 400th of a second of the bus clock,
+ * zeroes all blocks, links the DSP parameter blocks into a chain, gives each voice its index,
+ * ITD buffer and update buffer addresses, and puts every voice on the free stack.
+ */
 void __AXVPBInit(void) {
     u32 i;
     AXPB* ppb;
@@ -535,12 +568,17 @@ void __AXVPBInit(void) {
     DCFlushRange(__AXPB, sizeof(__AXPB));
 }
 
+/** Shutdown hook of the voice parameter block module; only logs in debug builds. */
 void __AXVPBQuit(void) {
 #ifdef DEBUG
     OSReport("Shutting down AXVPB code module\n");
 #endif
 }
 
+/**
+ * Selects the sample-rate conversion method of a voice:
+ * none, linear, or a 4-tap filter with one of three coefficient sets (8, 12 or 16 kHz).
+ */
 void AXSetVoiceSrcType(AXVPB* p, u32 type) {
     BOOL old;
     AXPB* ppb;
@@ -575,6 +613,7 @@ void AXSetVoiceSrcType(AXVPB* p, u32 type) {
     OSRestoreInterrupts(old);
 }
 
+/** Starts (1) or stops (0) a voice at the next frame; stopping also marks it for depop to avoid a click. */
 void AXSetVoiceState(AXVPB* p, u16 state) {
     BOOL old;
 
@@ -587,6 +626,7 @@ void AXSetVoiceState(AXVPB* p, u16 state) {
     OSRestoreInterrupts(old);
 }
 
+/** Sets the voice type field (normal or streaming) for the next sync. */
 void AXSetVoiceType(AXVPB* p, u16 type) {
     BOOL old;
 
@@ -596,6 +636,10 @@ void AXSetVoiceType(AXVPB* p, u16 type) {
     OSRestoreInterrupts(old);
 }
 
+/**
+ * Sets the voice's mixing levels (main left, right and surround, aux A and B) from an AXPBMIX
+ * and builds the mixer control word from which levels are nonzero so the DSP only does the needed mixes.
+ */
 void AXSetVoiceMix(AXVPB* p, AXPBMIX* mix) {
     BOOL old;
     u16 mixerCtrl;
@@ -632,6 +676,7 @@ void AXSetVoiceMix(AXVPB* p, AXPBMIX* mix) {
     OSRestoreInterrupts(old);
 }
 
+/** Turns on the interaural time delay of a voice and resets its shifts. */
 void AXSetVoiceItdOn(AXVPB* p) {
     BOOL old;
 
@@ -643,6 +688,7 @@ void AXSetVoiceItdOn(AXVPB* p) {
     OSRestoreInterrupts(old);
 }
 
+/** Sets the left and right target delay shifts of a voice's interaural time delay. */
 void AXSetVoiceItdTarget(AXVPB* p, u16 lShift, u16 rShift) {
     BOOL old;
 
@@ -653,6 +699,7 @@ void AXSetVoiceItdTarget(AXVPB* p, u16 lShift, u16 rShift) {
     OSRestoreInterrupts(old);
 }
 
+/** Starts the next 1 ms update slot of the voice's timed parameter update list (up to 5 ms). */
 void AXSetVoiceUpdateIncrement(AXVPB* p) {
     BOOL old;
 
@@ -663,6 +710,7 @@ void AXSetVoiceUpdateIncrement(AXVPB* p) {
     OSRestoreInterrupts(old);
 }
 
+/** Appends one (parameter, value) pair to the voice's timed update list for the DSP to apply (at most 128 words). */
 void AXSetVoiceUpdateWrite(AXVPB* p, u16 param, u16 data) {
     BOOL old;
 
@@ -676,6 +724,7 @@ void AXSetVoiceUpdateWrite(AXVPB* p, u16 param, u16 data) {
     OSRestoreInterrupts(old);
 }
 
+/** Copies the voice's depop levels (the level to fade out when the voice stops) into its parameter block. */
 void AXSetVoiceDpop(AXVPB* p, AXPBDPOP* dpop) {
     BOOL old;
     u16* dst;
@@ -700,6 +749,7 @@ void AXSetVoiceDpop(AXVPB* p, AXPBDPOP* dpop) {
     OSRestoreInterrupts(old);
 }
 
+/** Sets the voice's current volume and its per-sample volume delta (volume envelope) from ve. */
 void AXSetVoiceVe(AXVPB* p, AXPBVE* ve) {
     BOOL old;
 
@@ -710,6 +760,7 @@ void AXSetVoiceVe(AXVPB* p, AXPBVE* ve) {
     OSRestoreInterrupts(old);
 }
 
+/** Changes only the voice's volume envelope delta, keeping the DSP's current volume. */
 void AXSetVoiceVeDelta(AXVPB* p, s16 delta) {
     BOOL old;
 
@@ -719,6 +770,7 @@ void AXSetVoiceVeDelta(AXVPB* p, s16 delta) {
     OSRestoreInterrupts(old);
 }
 
+/** Sets the voice's FIR filter (number of coefficients and their address). */
 void AXSetVoiceFir(AXVPB* p, AXPBFIR* fir) {
     BOOL old;
 
@@ -730,6 +782,12 @@ void AXSetVoiceFir(AXVPB* p, AXPBFIR* fir) {
     OSRestoreInterrupts(old);
 }
 
+/**
+ * Sets the voice's sample addresses (loop, end and current, and format)
+ * and fills in the ADPCM parameters appropriate to the format:
+ * ADPCM (format 0), or fixed values for formats 10 and 25 (Guess: 16-bit and 8-bit PCM,
+ * since they need no decoder state).
+ */
 void AXSetVoiceAddr(AXVPB* p, AXPBADDR* addr) {
     BOOL old;
     u32* dst;
@@ -788,6 +846,7 @@ void AXSetVoiceAddr(AXVPB* p, AXPBADDR* addr) {
     OSRestoreInterrupts(old);
 }
 
+/** Sets or clears the voice's loop flag. */
 void AXSetVoiceLoop(AXVPB* p, u16 loop) {
     BOOL old;
 
@@ -797,6 +856,7 @@ void AXSetVoiceLoop(AXVPB* p, u16 loop) {
     OSRestoreInterrupts(old);
 }
 
+/** Sets the address the voice loops back to. */
 void AXSetVoiceLoopAddr(AXVPB* p, u32 addr) {
     BOOL old;
 
@@ -807,6 +867,7 @@ void AXSetVoiceLoopAddr(AXVPB* p, u32 addr) {
     OSRestoreInterrupts(old);
 }
 
+/** Sets the address where the voice's sample data ends. */
 void AXSetVoiceEndAddr(AXVPB* p, u32 addr) {
     BOOL old;
 
@@ -817,6 +878,7 @@ void AXSetVoiceEndAddr(AXVPB* p, u32 addr) {
     OSRestoreInterrupts(old);
 }
 
+/** Sets the address the voice is currently playing from. */
 void AXSetVoiceCurrentAddr(AXVPB* p, u32 addr) {
     BOOL old;
 
@@ -827,6 +889,7 @@ void AXSetVoiceCurrentAddr(AXVPB* p, u32 addr) {
     OSRestoreInterrupts(old);
 }
 
+/** Sets the voice's ADPCM decoder state (coefficients, gain, predictor/scale and history samples). */
 void AXSetVoiceAdpcm(AXVPB* p, AXPBADPCM* adpcm) {
     BOOL old;
     u32* dst;
@@ -853,6 +916,7 @@ void AXSetVoiceAdpcm(AXVPB* p, AXPBADPCM* adpcm) {
     OSRestoreInterrupts(old);
 }
 
+/** Sets the voice's whole sample-rate converter block (ratio, current fractional position and history samples). */
 void AXSetVoiceSrc(AXVPB* p, AXPBSRC* src_) {
     BOOL old;
     u16* dst;
@@ -876,6 +940,7 @@ void AXSetVoiceSrc(AXVPB* p, AXPBSRC* src_) {
     OSRestoreInterrupts(old);
 }
 
+/** Sets the sample-rate conversion ratio (source rate over output rate, as 16.16 fixed point, at most 4.0). */
 void AXSetVoiceSrcRatio(AXVPB* p, float ratio) {
     u32 r;
     BOOL old;
@@ -891,6 +956,7 @@ void AXSetVoiceSrcRatio(AXVPB* p, float ratio) {
     OSRestoreInterrupts(old);
 }
 
+/** Sets the ADPCM state to restore when the voice loops (loop predictor/scale and two history samples). */
 void AXSetVoiceAdpcmLoop(AXVPB* p, AXPBADPCMLOOP* adpcmloop) {
     BOOL old;
     u16* dst;
@@ -908,6 +974,7 @@ void AXSetVoiceAdpcmLoop(AXVPB* p, AXPBADPCMLOOP* adpcmloop) {
     OSRestoreInterrupts(old);
 }
 
+/** Sets the voice's low-pass filter block (on flag, shift and coefficients a0 and b0). */
 void AXSetVoiceLpf(AXVPB* p, AXPBLPF* lpf) {
     BOOL old;
     u16* dst;
@@ -927,6 +994,7 @@ void AXSetVoiceLpf(AXVPB* p, AXPBLPF* lpf) {
     OSRestoreInterrupts(old);
 }
 
+/** Changes only the low-pass filter coefficients a0 and b0 of the voice. */
 void AXSetVoiceLpfCoefs(AXVPB* p, u16 a0, u16 b0) {
     BOOL old;
     old = OSDisableInterrupts();
@@ -940,6 +1008,10 @@ void AXSetVoiceLpfCoefs(AXVPB* p, u16 a0, u16 b0) {
 
 #define PI 3.14159265358979323846f
 
+/**
+ * Computes the low-pass filter coefficients (a0, b0) for a cutoff frequency freq in Hz (up to 16000),
+ * for use with AXSetVoiceLpf at the 32 kHz DSP rate.
+ */
 void AXGetLpfCoefs(u16 freq, u16* a0, u16* b0) {
     f32 bb;
     f32 cc;
@@ -953,14 +1025,17 @@ void AXGetLpfCoefs(u16 freq, u16* a0, u16* b0) {
     *a0 = 0x7FFF - *b0;
 }
 
+/** Sets the DSP cycle budget per audio frame; voices beyond it are dropped by __AXSyncPBs. */
 void AXSetMaxDspCycles(u32 cycles) {
     __AXMaxDspCycles = cycles;
 }
 
+/** Returns the DSP cycle budget per audio frame. */
 u32 AXGetMaxDspCycles(void) {
     return __AXMaxDspCycles;
 }
 
+/** Returns the DSP cycles the last audio frame was estimated to use. */
 u32 AXGetDspCycles(void) {
     return __AXRecDspCycles;
 }

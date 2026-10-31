@@ -68,6 +68,10 @@ DSPvoice* dspVoice = NULL;
 
 SND_MESSAGE_CALLBACK salMessageCallback = NULL;
 
+/** Allocates the DSP-side state: the 1024-word command list, the 160-word surround buffer, the DSP voice array (each
+ * voice gets a physically allocated parameter block, patch data and a 64-byte ITD buffer) and, per studio, a parameter
+ * block plus 0x3C00 bytes of main and aux A/B buffers. Then activates studio 0 as the master (Pro Logic II if
+ * defaultStudioDPL2) and allocates the HRTF history buffer. Returns FALSE if any allocation fails. */
 bool salInitDspCtrl(u8 numVoices, u8 numStudios, u32 defaultStudioDPL2) {
   u32 i;         // r31
   u32 j;         // r27
@@ -176,6 +180,7 @@ bool salInitDspCtrl(u8 numVoices, u8 numStudios, u32 defaultStudioDPL2) {
   return FALSE;
 }
 
+/** Clears the 0x100-byte HRTF history buffer. */
 void salInitHRTFBuffer() {
   memset(dspHrtfHistoryBuffer, 0, 0x100);
 #if MUSY_TARGET == MUSY_TARGET_DOLPHIN
@@ -183,6 +188,8 @@ void salInitHRTFBuffer() {
 #endif
 }
 
+/** Resets a studio to a clean running state: clears its main and aux buffers, parameter block and de-pop sums, empties
+ * its voice lists and inputs, sets state 1 with the given master flag and type, and removes its aux handlers. */
 void salActivateStudio(u8 studio, u32 isMaster, SND_STUDIO_TYPE type) {
   memset(dspStudio[studio].main[0], 0, 0x3c00);
 #if MUSY_TARGET == MUSY_TARGET_DOLPHIN
@@ -510,6 +517,10 @@ const u16 dspMixerCyclesMain[16] = {
     0, 760, 760, 1470, 760, 1520, 1520, 2230, 0, 1265, 1265, 2470, 1265, 2530, 2530, 3735,
 };
 
+/** Decides whether a voice volume that is only slightly off target (32 to 159 units) can be corrected with a one-step
+ * delta of +1 or -1 in a later sub-frame instead of a full ramp: moves *last_vol by that many 32-unit steps, sets the
+ * ramp-reset flag for that step in resetFlags and returns 1. A target of 0 close to the current volume snaps the volume
+ * to 0. Otherwise the delta is 0 and it returns 0. */
 static u32 salCheckVolErrorAndResetDelta(u16* dsp_vol, u16* dsp_delta, u16* last_vol, u16 targetVol,
                                          u16* resetFlags, u16 resetMask) {
   s16 d; // r31
@@ -547,11 +558,15 @@ static u32 salCheckVolErrorAndResetDelta(u16* dsp_vol, u16* dsp_delta, u16* last
   return 0;
 }
 
+/** Turns a target volume into a start value (*last_vol, moved to where the ramp ends this frame) and the per-sample
+ * delta *dsp_delta, spread over the 160 samples of one frame. */
 static void sal_setup_dspvol(u16* dsp_delta, u16* last_vol, u16 vol) {
   *dsp_delta = ((s16)vol - (s16)*last_vol) / 160;
   *last_vol += (s16)*dsp_delta * 160;
 }
 
+/** Advances the host-side estimate of a non-looping voice's play position by one frame's worth of pitch (a 32-bit
+ * fraction plus carry into the high word), so the position can be read without asking the DSP. */
 static void sal_update_hostplayinfo(DSPvoice* dsp_vptr) {
   u32 old_lo; // r30
   u32 pitch;  // r31
@@ -576,11 +591,15 @@ static void sal_update_hostplayinfo(DSPvoice* dsp_vptr) {
   }
 }
 
+/** Adds a DSP voice's remaining DC offset to a studio's accumulated sum, clamped to 24 bits. */
 static inline void AddDpop(s32* sum, s16 delta) {
   *sum += (int)delta;
   *sum = (*sum > 0x7fffff) ? 0x7fffff : (*sum < -0x7fffff ? -0x7fffff : *sum);
 }
 
+/** Works out how to fade the accumulated DC offset of a studio output to zero: the per-sample step is -sum/160 (at most
+ * 20 per sample), and the sum is updated by what the ramp will remove this frame. This hides the click when a voice
+ * stops mid-waveform. */
 static void DoDepopFade(long* dspStart, s16* dspDelta, long* hostSum) {
   if (*hostSum <= -160) {
     *dspDelta = (*hostSum <= -3200) ? 0x14 : (s16)(-*hostSum / 160);
@@ -594,6 +613,8 @@ static void DoDepopFade(long* dspStart, s16* dspDelta, long* hostSum) {
   *hostSum += *dspDelta * 160;
 }
 
+/** Called when a voice is removed: marks it stopped and adds the DC offset it was outputting, for each mix channel its
+ * mixer control enables, to the studio's de-pop sums. */
 static void HandleDepopVoice(DSPstudioinfo* stp, DSPvoice* dsp_vptr) {
   _PB* pb; // r31
   dsp_vptr->postBreak = 0;
@@ -628,6 +649,7 @@ static void HandleDepopVoice(DSPstudioinfo* stp, DSPvoice* dsp_vptr) {
   }
 }
 
+/** Recursive quicksort of voices[l..r] by ascending priority. */
 static void SortVoices(DSPvoice** voices, long l, long r) {
   long i;        // r28
   long last;     // r29
@@ -659,6 +681,11 @@ static void SortVoices(DSPvoice** voices, long l, long r) {
   SortVoices(voices, last + 1, r);
 }
 
+/** Builds the DSP command list for one 5 ms frame into dspCmdList. Per active studio it queues setup, input mixing,
+ * then for each voice (sorted by priority) it applies pending changes (new sample and ADPCM info, ADSR, volume ramps,
+ * pitch, filter, key-off) to the voice's parameter block and queues it for processing, followed by aux A/B mixing, the
+ * surround/LR upload, optional compressor and the final output. A running estimate of DSP cycles is kept: when a
+ * studio's voices exceed the budget the rest are dropped (message 1 to the synth). */
 void salBuildCommandList(s16* dest, u32 nsDelay) {
   static const u16 pbOffsets[10] = {10, 12, 24, 14, 16, 26, 18, 20, 22};
   static DSPvoice* voices[64];
@@ -1748,11 +1775,15 @@ void salBuildCommandList(s16* dest, u32 nsDelay) {
 #endif
 }
 
+/** Passes mesg (1 = voice dropped for lack of DSP time, 3 = virtual sample ended) and the voice's callback user value
+ * to the synth message handler; returns FALSE if none is registered. */
 u32 salSynthSendMessage(DSPvoice* dsp_vptr, u32 mesg) {
   return salMessageCallback == NULL ? FALSE
                                     : salMessageCallback(mesg, dsp_vptr->mesgCallBackUserValue);
 }
 
+/** Puts a voice at the head of studio's voice list in state 1 (starting). If it was already active it is deactivated
+ * first and flagged for a break. */
 void salActivateVoice(DSPvoice* dsp_vptr, u8 studio) {
   if (dsp_vptr->state != 0) {
     salDeactivateVoice(dsp_vptr);
@@ -1771,6 +1802,7 @@ void salActivateVoice(DSPvoice* dsp_vptr, u8 studio) {
   dsp_vptr->studio = studio;
 }
 
+/** Unlinks a voice from its studio's voice list and sets its state to 0 (idle). */
 void salDeactivateVoice(DSPvoice* dsp_vptr) {
   if (dsp_vptr->state == 0) {
     return;
@@ -1789,6 +1821,9 @@ void salDeactivateVoice(DSPvoice* dsp_vptr) {
   dsp_vptr->state = 0;
 }
 
+/** Once per frame, for each active studio, calls its aux A handler (and aux B for standard studios) with the studio's
+ * aux buffers from two frames ago (left, right, surround at +0xA0 and +0x140 words), then flushes them back so the DSP
+ * sees the effect output. */
 void salHandleAuxProcessing() {
   DSPstudioinfo* r28;
   u8 st;             // r29

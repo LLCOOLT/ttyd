@@ -22,6 +22,11 @@ static BeroEntry bero_entry_data[5];
 const char* mapgrp_name_1[18];
 const char* mapgrp_name_2[5];
 
+/**
+ * Door animation script (closing) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_l_01 and S_doa_l_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l_01"), 0, LW(0), 0)
@@ -30,6 +35,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_l_01 and S_doa_l_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l_01"), 0, LW(0), 0)
@@ -38,6 +48,12 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (closing) for the east (door 1) door,
+ * used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_r_01 and S_doa_r_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(e1_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r_01"), 0, LW(0), 0)
@@ -46,6 +62,12 @@ static EVT_BEGIN(e1_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the east (door 1) door,
+ * used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_r_01 and S_doa_r_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(e1_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r_01"), 0, LW(0), 0)
@@ -54,6 +76,12 @@ static EVT_BEGIN(e1_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (closing) for the east (door 2) door,
+ * used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_r2_01
+ * and S_doa_r2_02 by it, the second one the opposite way.
+ */
 static EVT_BEGIN(e2_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r2_01"), 0, LW(0), 0)
@@ -62,6 +90,12 @@ static EVT_BEGIN(e2_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the east (door 2) door,
+ * used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_r2_01
+ * and S_doa_r2_02 by it, the second one the opposite way.
+ */
 static EVT_BEGIN(e2_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r2_01"), 0, LW(0), 0)
@@ -173,11 +207,18 @@ const char* mapgrp_name_2[] = {
     "S_kai_24",
 };
 
+/** Event script: a short camera shake (200 ms), run when a mechanism of las_19 moves. */
 static EVT_BEGIN(cam_shake)
     CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.029296875f), FLOAT(0.029296875f), 200)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the Riddle Tower rises into the Palace after the eight keys are used.
+ * Mario and the partner are hidden, the camera pans along the staircase pieces S_kai_xx,
+ * which are then pushed up in waves with a rumble and camera shake,
+ * and the map changes back to las_10 (ret_chgmap_evt).
+ */
 EVT_BEGIN(change_map_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -267,6 +308,7 @@ EVT_BEGIN(change_map_evt)
     RETURN
 EVT_END()
 
+/** Event script: the first switch of las_19 was hit; toggles GSWF_LAS19_SWITCH1_ON. */
 static EVT_BEGIN(switch1_evt)
     IF_INT_EQUAL(GSWF(GSWF_LAS19_SWITCH1_ON), 0)
         SET_VALUE(GSWF(GSWF_LAS19_SWITCH1_ON), 1)
@@ -276,6 +318,7 @@ static EVT_BEGIN(switch1_evt)
     RETURN
 EVT_END()
 
+/** Event script: the second switch of las_19 was hit; toggles GSWF_LAS19_SWITCH2_ON. */
 static EVT_BEGIN(switch2_evt)
     IF_INT_EQUAL(GSWF(GSWF_LAS19_SWITCH2_ON), 0)
         SET_VALUE(GSWF(GSWF_LAS19_SWITCH2_ON), 1)
@@ -285,11 +328,19 @@ static EVT_BEGIN(switch2_evt)
     RETURN
 EVT_END()
 
+/** Event script: the cloud of las_19 was reached; sets the story progress to STORY_STG8_08_THE_NEW_PATH. */
 static EVT_BEGIN(cloud_evt)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_08_THE_NEW_PATH)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for las_19, the stairs of the Palace of Shadow:
+ * music (first or third Palace theme depending on the story),
+ * the cloud-covered lid (S_futa) that Flurrie must blow off until STORY_STG8_08_THE_NEW_PATH,
+ * the rising- staircase cutscene when entered from las_10, the Wizzerd NPCs,
+ * two float switches and a Thunder Rage block.
+ */
 EVT_BEGIN(las_19_init_evt)
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("chgmap_evt"))

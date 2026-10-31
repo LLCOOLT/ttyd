@@ -16,6 +16,10 @@ static BeroEntry bero_oshimodo[1];
 static BeroEntry bero_entry_data[3];
 static BeroEntry bero_entry_data2[2];
 
+/**
+ * Pushes Mario back from the Twilight Town pipe (oshimodo = push back) before it is open:
+ * he walks out of the pipe (bero exec), the "no entry" message tik_08_01 is shown and controls return.
+ */
 EVT_BEGIN(oshimodo_event_sub)
     CALL(evt_cam_ctrl_onoff, CAMERA_3D, 0)
     CALL(evt_mario_key_onoff, 0)
@@ -28,6 +32,10 @@ EVT_BEGIN(oshimodo_event_sub)
     RETURN
 EVT_END()
 
+/**
+ * Pushes Mario back from the blocked Twilight Town pipe:
+ * spawns oshimodo_event_sub, sets GSWF_TIK08_TWILIGHT_PIPE_REACHED and returns 0 in LW(0).
+ */
 static EVT_BEGIN(oshimodo_event)
     SPAWN_EVENT(oshimodo_event_sub)
     SET_VALUE(GSWF(GSWF_TIK08_TWILIGHT_PIPE_REACHED), 1)
@@ -115,6 +123,7 @@ static BeroEntry bero_entry_data2[] = {
     {0},
 };
 
+/** Signboard script: says tik_08_02 with Mario's controls disabled. */
 static EVT_BEGIN(evt_kanban)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -123,6 +132,13 @@ static EVT_BEGIN(evt_kanban)
     RETURN
 EVT_END()
 
+/**
+ * Map init script of tik_08, the room with the pipe to Twilight Town (usu_00).
+ * Starts the sewer music and sets up the exits.
+ * Until STORY_STG3_51_FRANKLYS_HOUSE the pipe (dokan) is replaced with the push-back version,
+ * and during chapter 3's end (STORY_STG3_52_DARKLY to chapter 4) with a second replacement;
+ * adds a signboard (tik_08_02).
+ */
 EVT_BEGIN(tik_08_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK1"))

@@ -24,11 +24,16 @@
 #include "mario/mario_hit.h"
 #include "version.h"
 
+/**
+ * Small horizontal camera shake (about 0.01 for 50 ms) when Mario lands back
+ * after a damage return (marioDmgRetQuakeOn).
+ */
 static EVT_BEGIN(quake_evt)
     CALL(evt_cam_shake, 4, PTR(0xF24A7A8A), PTR(0xF24A7A80), 50)
     RETURN
 EVT_END()
 
+/** The weaker, shorter shake (about 0.006 for 30 ms) used instead of quake_evt in background mode. */
 static EVT_BEGIN(quake_bgmode_evt)
     CALL(evt_cam_shake, 4, PTR(0xF24A7A86), PTR(0xF24A7A80), 30)
     RETURN
@@ -36,12 +41,20 @@ EVT_END()
 
 static s32 gazigazi(EventEntry* evt, BOOL isFirstCall);
 
+/**
+ * Spawned when Mario climbs out of the water in mot_damage:
+ * records where he surfaced, then plays the Gazigazi biting him (evt_gazigazi_appear in evt_damage.c).
+ */
 EVT_BEGIN(evt_gazigazi)
     CALL(gazigazi)
     SPAWN_EVENT(evt_gazigazi_appear)
     RETURN
 EVT_END()
 
+/**
+ * Shakes the camera as Mario lands back on solid ground after a damage return;
+ * uses a shorter shake in background (2D) mode.
+ */
 void marioDmgRetQuakeOn(void) {
     EvtWord* evt;
     if (marioBgmodeChk() == 0) {
@@ -52,6 +65,10 @@ void marioDmgRetQuakeOn(void) {
     evtEntry(evt, 0, 0);
 }
 
+/**
+ * Splash for Mario or a partner entering (kind 0) or leaving (kind 1) water at pos, with the matching sound;
+ * the splash effect is skipped in background mode. Also called by the partner, plane and Yoshi code.
+ */
 void marioSetSplash(s32 kind, Vec* pos) {
     if (kind == 0) {
         psndSFXOn_3D((char*)0x194, pos);
@@ -64,6 +81,7 @@ void marioSetSplash(s32 kind, Vec* pos) {
     }
 }
 
+/** Script helper for evt_gazigazi: stores Mario's x, the water surface height and z in LW(0..2) as integers. */
 static s32 gazigazi(EventEntry* evt, BOOL isFirstCall) {
     MarioWork* mario = marioGetPtr();
     evt->lwData[0] = (s32)mario->position.x;
@@ -72,6 +90,10 @@ static s32 gazigazi(EventEntry* evt, BOOL isFirstCall) {
     return 2;
 }
 
+/**
+ * TRUE while Mario is still sinking or waiting under the water in the damage motion (sub-motions 0-9);
+ * Yoshi's code uses it.
+ */
 BOOL marioChkDamageSink(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->currMotionId == MARIO_MOTION_DAMAGE && (s32)mario->currSubMotionId >= 0 && (s32)mario->currSubMotionId < 10) {
@@ -80,11 +102,21 @@ BOOL marioChkDamageSink(void) {
     return FALSE;
 }
 
+/**
+ * Records the water surface height (or the height Mario was hit at) that the damage motions measure from;
+ * set by the hit code before switching motion.
+ */
 void set_damage_root_ypos(f32 y) {
     MarioWork* mario = marioGetPtr();
     mario->mot.damage.rootY = y;
 }
 
+/**
+ * Motion for falling into water or a hazard pit:
+ * Mario (or Bowser) sinks, gets bitten and thrown up by the Gazigazi,
+ * flies back hidden to the hit's return position (fixed spots on muj_00, gor_00 and gor_04 when there is none),
+ * drops down, loses 1 HP and returns to standing. Pre-JP builds lack the zero-distance return fix.
+ */
 void mot_damage(void) {
     MarioWork* mario = marioGetPtr();
     Vec dest;
@@ -342,6 +374,10 @@ void mot_damage(void) {
     }
 }
 
+/**
+ * For the partner follow code: -1 if Mario is not in the damage motion,
+ * TRUE once he is falling back down on screen, otherwise FALSE.
+ */
 BOOL marioWaitDamageReturnFall(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->currMotionId != MARIO_MOTION_DAMAGE) {
@@ -358,6 +394,11 @@ BOOL marioWaitDamageReturnFall(void) {
     return FALSE;
 }
 
+/**
+ * Motion for touching spikes (hit attribute 0x800):
+ * Mario is knocked high into the air, carried back to the hit's return position, dropped,
+ * loses 1 HP and stands up. Cancels paper, Yoshi, bomb and Koops actions first.
+ */
 void mot_damageToge(void) {
     MarioWork* mario = marioGetPtr();
     Vec dest;
@@ -500,6 +541,10 @@ void mot_damageToge(void) {
     }
 }
 
+/**
+ * Spike version of marioWaitDamageReturnFall: -1 if not in the spike damage motion,
+ * TRUE once Mario is falling back on screen.
+ */
 BOOL marioWaitDamageTogeReturnFall(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->currMotionId != MARIO_MOTION_DAMAGE_TOGE) {

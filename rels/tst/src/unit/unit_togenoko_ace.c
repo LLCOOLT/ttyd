@@ -49,6 +49,7 @@ static EvtWord guard_cancel_event[90];
 static EvtWord friend_event[88];
 static EvtWord wait_event[6];
 
+/** Script helper: args[0] receives how many units of this Koopatrol kind are on the field. */
 static USER_FUNC(togenoko_getnum) {
     EvtWord* args = event->args;
     s32 num = 0;
@@ -376,6 +377,11 @@ static BattleWeapon weapon_togenoko_charge = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init script of the Dark Koopatrol: registers its wait,
+ * attack and damage scripts (confused, it runs the normal attack script),
+ * sets its run and walk sounds and starts the wait script.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -387,6 +393,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage reaction of the Dark Koopatrol: the default damage script. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -394,6 +401,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Run when a stomp is stopped by the Dark Koopatrol's spiked helmet (data event 37):
+ * after half a second it flashes toge_flush on the spike, placed higher when it is Huge and lower when Tiny.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -414,6 +425,12 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/**
+ * Flip-over reaction (data event 13): moves its hit point down, switches to the flipped defence,
+ * defence-attribute, status-resistance and data tables
+ * and the flipped poses (the guarding ones if it was in its shell), sets the flipped status flag,
+ * turns its helmet spike off and sets an overturn count of 2, then bounces with SFX_ENM_INSIDE1.
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -443,6 +460,11 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Run instead of an attack while flipped: counts the overturn count down and, when it reaches 0,
+ * restores the normal tables and helmet spike, hops upright with SFX_ENM_INSIDE2
+ * and clears unit work 0 (no longer guarding).
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -482,6 +504,14 @@ static BattleUnitSetup entry_togenoko = {
     NULL, // itemDropTable
 };
 
+/**
+ * Attack script of the Dark Koopatrol.
+ * On a first strike it uses the normal attack; while flipped it tries to get up.
+ * While guarding it leaves its shell 80% of the time and otherwise skips the turn.
+ * When charged it picks the normal attack (50 in 85) or the shell attack.
+ * Otherwise it may use an item; it never calls a friend (those chances are 0 here)
+ * and picks the normal attack 50%, shell attack 35% or charge 15% (guard 0%).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -616,6 +646,12 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Koopatrol's helmet charge (weapon in LW(9)):
+ * it revs up for a second (R_3) and dashes at the target head first (A_2, SFX_ENM_TOGENOKO_MOVE5).
+ * A hit applies the guard result and damage and it hops back home in two bounces;
+ * a miss carries it off the right edge and it runs back in to its home spot.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -727,6 +763,12 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Koopatrol's shell attack (weapon in LW(9)):
+ * it hops, withdraws into its spinning shell and slides along the ground through the target
+ * and each further target in line (GetSelectNextEnemy), applying the guard result once and damage to each.
+ * It then slides off-screen, comes back from the right and pops out of its shell at home.
+ */
 static EVT_BEGIN(shell_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -858,6 +900,10 @@ static EVT_BEGIN(shell_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Koopatrol charges itself up (weapon_togenoko_charge targets only itself, charge strength 2):
+ * it revs in place for 48 frames with SFX_ENM_TOGENOKO_CHARGE1 while the camera zooms in.
+ */
 static EVT_BEGIN(charge_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -889,6 +935,11 @@ static EVT_BEGIN(charge_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Koopatrol withdraws into its shell to guard (SFX_ENM_TOGENOKO_SHELL1, A_1, a spinning hop):
+ * switches to the guard defence, defence-attribute, status-resistance,
+ * pose and data tables and sets unit work 0 to 1.
+ */
 static EVT_BEGIN(guard_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -924,6 +975,11 @@ static EVT_BEGIN(guard_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Koopatrol comes out of its shell (SFX_ENM_TOGENOKO_SHELL2, S_1, a hop):
+ * restores the normal defence, defence- attribute, status-resistance,
+ * pose and data tables and clears unit work 0.
+ */
 static EVT_BEGIN(guard_cancel_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -948,6 +1004,11 @@ static EVT_BEGIN(guard_cancel_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Koopatrol calls for help (SFX_ENM_TOGENOKO_CALL1, pose B_1):
+ * a new Dark Koopatrol (entry_togenoko) is spawned off the right edge
+ * and runs in to the free spot attack_event found (LW(0)..LW(2)), which becomes its home.
+ */
 static EVT_BEGIN(friend_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -971,6 +1032,7 @@ static EVT_BEGIN(friend_event)
     RETURN
 EVT_END()
 
+/** Wait script of the Dark Koopatrol: shows its idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

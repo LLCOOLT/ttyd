@@ -22,24 +22,40 @@
 #include "driver/casedrv.h"
 #include "driver/mapdrv.h"
 
+/**
+ * Door animation callback for the passage door (door_1), opening: LW(0) is the swing angle;
+ * turns door_1 about the Y axis by 0.44 times the angle.
+ */
 static EVT_BEGIN(n_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the passage door (door_1), closing:
+ * turns door_1 about the Y axis by -0.44 times the angle.
+ */
 static EVT_BEGIN(n_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the east door (door_2), opening: LW(0) is the swing angle;
+ * turns door_2 about the Y axis by 0.44 times the angle.
+ */
 static EVT_BEGIN(e_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_2"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the east door (door_2), closing:
+ * turns door_2 about the Y axis by -0.44 times the angle.
+ */
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_2"), 0, LW(0), 0)
@@ -99,6 +115,11 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Guess: shut-in scene on Mario's first visit: a guard walks in,
+ * the door locks behind him (set GSWF_TOU11_LOCKED_IN_SEEN) and he explains that the passage is closed;
+ * Mario and the partner react.
+ */
 EVT_BEGIN(evt_tojikome)
     IF_INT_EQUAL(GSWF(GSWF_TOU11_LOCKED_IN_SEEN), 1)
         RETURN
@@ -194,6 +215,10 @@ EVT_BEGIN(evt_tojikome)
     RETURN
 EVT_END()
 
+/**
+ * Guess: second shut-in scene: the partner tries the door (stg3_tou_409_02),
+ * it will not open (stg3_tou_410) and Mario is sent back to tou_03.
+ */
 EVT_BEGIN(evt_tojikome_nidome)
     CALL(evt_snd_bgm_scope, 0, 0)
     CALL(evt_mario_key_onoff, 0)
@@ -221,6 +246,7 @@ EVT_BEGIN(evt_tojikome_nidome)
     RETURN
 EVT_END()
 
+/** Third shut-in scene: the partner's remark stg3_tou_421_01 and the normal Glitz Pit music and ambience return. */
 EVT_BEGIN(evt_tojikome_sandome)
     CALL(evt_snd_bgm_scope, 0, 0)
     CALL(evt_mario_key_onoff, 0)
@@ -236,6 +262,7 @@ EVT_BEGIN(evt_tojikome_sandome)
     RETURN
 EVT_END()
 
+/** Message for a door that will not open: plays the door-locked sound and the partner remarks stg3_tou_421_02. */
 static EVT_BEGIN(evt_tojikome_msg)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -247,6 +274,7 @@ static EVT_BEGIN(evt_tojikome_msg)
     RETURN
 EVT_END()
 
+/** Poster blown away by the cloud-blowing mechanic: a success jingle plays and GSWF_TOU11_POSTER_BLOWN is set. */
 EVT_BEGIN(evt_postar)
     BEGIN_INLINE_EVENT
         CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
@@ -259,6 +287,11 @@ EVT_BEGIN(evt_postar)
     RETURN
 EVT_END()
 
+/**
+ * Map init for tou_11, the passage beside the arena:
+ * NPCs, the blowable poster (pos_1), the shut-in message at n_bero, music,
+ * and Mario's and the partner's entry positions (and the title match entry if reserved).
+ */
 EVT_BEGIN(tou_11_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)

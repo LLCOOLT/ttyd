@@ -141,6 +141,11 @@ static void effPeachDustDisp(CameraId cameraId, EffectEntry* effect);
 static void effPeachDustMain(EffectEntry* effect);
 static void effPeachDustDisp(CameraId cameraId, EffectEntry* effect);
 
+/**
+ * Spawns up to 100 dust particles at (x, y, z) arranged by one of three 16x16 masks selected by type (every
+ * non-'.' cell gets a particle, with jitter), turned by scale degrees.
+ * Record 0 holds the shared header; 80 frames. Via evt_eff64 "peach_dust_n64"; no script callers found.
+ */
 EffectEntry* effPeachDustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 unused, f32 scale) {
     u8* base;
     EffectEntry* effect;
@@ -208,6 +213,10 @@ EffectEntry* effPeachDustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 unused, f32
     return effect;
 }
 
+/**
+ * Advances every particle (spreading outward, scale from a table then easing to 0.1)
+ * and cycles its texture frame; deletes the effect once all particles have expired.
+ */
 static void effPeachDustMain(EffectEntry* effect) {
     EffPeachDustParticle* p = effect->userdata;
     Vec position;
@@ -260,6 +269,7 @@ static void effPeachDustMain(EffectEntry* effect) {
     }
 }
 
+/** Draws each live particle as a camera-facing quad (texture 0x20, one of eight 22x22 cells) with a rotating color. */
 static void effPeachDustDisp(CameraId cameraId, EffectEntry* effect) {
     EffPeachDustParticle* p;
     s32 i;

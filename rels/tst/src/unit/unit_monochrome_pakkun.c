@@ -158,6 +158,11 @@ static BattleWeapon weapon_pakkun_flower_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Attack entry of the Pale Piranha: with a first-strike battle flag, or after any item use check,
+ * it runs normal_attack_event with its single weapon (weapon_pakkun_flower_attack),
+ * then returns to the wait event.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -238,6 +243,10 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init script of the Pale Piranha: installs the wait, attack, damage and confusion event handlers,
+ * sets the hit cursor offset of part 1 and saves its shadow size with shadow_scale_memory.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -249,6 +258,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: counter animation when an attacker lands on its thorny head:
+ * the Pale Piranha plays its hurt pose briefly,
+ * then a flash-of-thorns effect appears over the head (height depends on its status effects).
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 31)
     WAIT_MS(250)
@@ -271,6 +285,10 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: runs the shared default damage script (btldefaultevt_Damage) with its default parameters
+ * (LW(10) = -2, LW(11) = 1).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -278,6 +296,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Counter-damage handler: shows the Pale Piranha's damage pose for a second and, unless the counter killed it,
+ * runs return_event so it climbs back to its spot.
+ */
 static EVT_BEGIN(counter_damage_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_D_1"))
     WAIT_MS(1000)
@@ -292,6 +314,12 @@ static EVT_BEGIN(counter_damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: ceiling-fall handler of a plant hanging from the ceiling (name ceil_fall_ready_event);
+ * it clears the handler, pulls the plant into the ceiling (PKF_E_4 pose and move sound, shadow shrunk),
+ * puts it back at its home x/z on the ground (y = 0) and has it pop out again (PKF_E_1),
+ * with the normal hit offsets, cursor offsets, pose table and attributes of a standing plant.
+ */
 static EVT_BEGIN(ceil_fall_ready_event)
     CALL(btlevtcmd_SetEventCeilFall, BTL_UNIT_SELF, 0)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PAKKUN_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -328,6 +356,13 @@ static EVT_BEGIN(ceil_fall_ready_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: run at the end of the plant's turn after its attack (called by normal_attack_event);
+ * the plant retreats underground (PKF_E_2 pose, shadow shrunk) and comes back up.
+ * If the stage still has a ceiling (pakkun_ceil_exist) a random draw may put it on the ceiling instead (y = 130,
+ * PKF_E_3 pose, upside-down hit offsets, ceiling pose table and the ceiling-fall handler);
+ * otherwise it re-emerges standing on the ground.
+ */
 static EVT_BEGIN(return_event)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(pakkun_ceil_exist, LW(0))
@@ -398,6 +433,11 @@ static EVT_BEGIN(return_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the Pale Piranha's bite attack: picks a target (or the first-strike target),
+ * hops out of the ground and bites with the camera zoomed in, handles the guard/avoid cases,
+ * then runs return_event.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -497,11 +537,16 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/** Guess: wait-pose event of the Pale Piranha: switches to pose table entry 1 (its idle pose). */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: grows the body part's shadow scale back from 0 to the value kept by shadow_scale_memory over 15
+ * frames (blocks until done).
+ */
 static USER_FUNC(shadow_scale_return) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -518,6 +563,10 @@ static USER_FUNC(shadow_scale_return) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper: shrinks the body part's shadow from its remembered scale to 0 over 15 frames (blocks until
+ * done), so the shadow vanishes while the plant is underground.
+ */
 static USER_FUNC(shadow_scale_small) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -534,6 +583,10 @@ static USER_FUNC(shadow_scale_small) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper: remembers the body part's current shadow scale in work[0] for the two helpers that shrink
+ * and restore it.
+ */
 static USER_FUNC(shadow_scale_memory) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -543,6 +596,10 @@ static USER_FUNC(shadow_scale_memory) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: writes 0 to args[0] when the stage's iron frame is gone (STAGE_OBJ_FLAG_IRON_FRAME_GONE) and 1
+ * while the ceiling still exists, so the plant knows whether it can hang from it.
+ */
 static USER_FUNC(pakkun_ceil_exist) {
     EvtWord* args = event->args;
 

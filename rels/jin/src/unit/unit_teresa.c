@@ -291,6 +291,12 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init script of the Boo: registers its wait, attack,
+ * damage and confusion handlers (confusion reuses the attack script),
+ * clears unit work 0 (the "has moved" flag used by move_event) and lifts it to y 15,
+ * which is also its home position, then starts it waiting.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -305,6 +311,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage script of the Boo: runs the default damage handling on itself. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -312,6 +319,14 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the Boo. With a first-strike flag it only does the normal attack.
+ * Otherwise it checks for an item use, then rolls a random number:
+ * roughly 25 in 114 to turn itself invisible (trans_myself_event, only if it is not already invisible),
+ * 25 in 114 to make another Boo invisible (trans_event, only if one exists that is not),
+ * 15 in 114 for the group move (move_event, only if some Boo has not moved yet),
+ * and otherwise the normal attack. The two special options are skipped while it has status 5.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -377,6 +392,12 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Boo's normal attack: it picks a target, fades out,
+ * reappears in front of it with SFX_ENM_TELESA_ATTACK1 and swipes in pose A_2.
+ * A hit deals damage with a small camera shake; a miss leaves it covering its face (X_1).
+ * It then turns around and floats back home.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -483,6 +504,12 @@ static EVT_BEGIN(normal_attack_event)
         RETURN
 EVT_END()
 
+/**
+ * The Boo makes itself invisible: it declares an attack on itself,
+ * spins and fades out (unless it already is invisible, status 18),
+ * and the weapon applies the invisibility to it.
+ * Guess: status 18 is the invisible status, from the "trans" naming and the alpha fade.
+ */
 static EVT_BEGIN(trans_myself_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -535,6 +562,12 @@ static EVT_BEGIN(trans_myself_event)
     RETURN
 EVT_END()
 
+/**
+ * The Boo makes another Boo invisible: it samples allies
+ * until it finds a Boo that is not already invisible (status 18), fades out,
+ * reappears next to it with SFX_ENM_TELESA_MOVE3/4, applies the invisibility with the trans_myself weapon,
+ * then floats home and resets its facing. Gives up if there is no target.
+ */
 static EVT_BEGIN(trans_event)
     LABEL(0)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -608,6 +641,13 @@ static EVT_BEGIN(trans_event)
     RETURN
 EVT_END()
 
+/**
+ * The Boo's group move: for every Boo on its side (itself included) that is a valid target it spawns
+ * move_event_sub, so they float up together; a random delay staggers the others and the wait
+ * before it finishes grows by 20 frames per Boo, starting at 80.
+ * The PAL release also tries to force a minimum wait of 145 frames when two or more Boos take part,
+ * but it clears its count on every pass so that never takes effect.
+ */
 static EVT_BEGIN(move_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_teresa_move))
@@ -655,6 +695,13 @@ static EVT_BEGIN(move_event)
     RETURN
 EVT_END()
 
+/**
+ * Per-Boo part of move_event for the unit in LW(3):
+ * after a delay (none for the casting Boo itself,
+ * 60 to 79 frames for the others) it sets that Boo's unit work 0 to 1, sets attributes 0x600000 on part 1,
+ * spins it for 60 frames while the caster speaks (pose T_1), and raises it to y 40 with SFX_ENM_TELESA_MOVE1,
+ * which becomes its new home position.
+ */
 static EVT_BEGIN(move_event_sub)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(1))
     IF_INT_EQUAL(LW(3), LW(1))
@@ -689,11 +736,16 @@ static EVT_BEGIN(move_event_sub)
     RETURN
 EVT_END()
 
+/** Wait script: plays the Boo's idle pose from its pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Battle script helper: sets args[1] to 1 when at least one other Boo
+ * or Dark Boo that has no status 0x12 is on the field, else 0.
+ */
 static USER_FUNC(teresa_check_trans) {
     EvtWord* args = event->args;
     s32 num = 0;
@@ -721,6 +773,10 @@ static USER_FUNC(teresa_check_trans) {
     }
     return EVT_RETURN_DONE;
 }
+/**
+ * Battle script helper: sets args[0] to 1 when at least one Boo
+ * or Dark Boo has not yet used its move (unit work 0 is 0), else 0.
+ */
 static USER_FUNC(teresa_check_move) {
     EvtWord* args = event->args;
     s32 num = 0;
@@ -744,6 +800,7 @@ static USER_FUNC(teresa_check_move) {
     }
     return EVT_RETURN_DONE;
 }
+/** Battle script helper: sets args[1] to 1 when the unit args[0] exists and is a Boo or Dark Boo, else 0. */
 static USER_FUNC(teresa_check_teresa) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);

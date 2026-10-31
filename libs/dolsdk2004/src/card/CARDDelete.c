@@ -5,6 +5,10 @@
 // prototypes
 static void DeleteCallback(s32 chan, s32 result);
 
+/**
+ * Called after the directory entry has been cleared:
+ * frees the file's block chain (card->startBlock), or reports the error.
+ */
 static void DeleteCallback(s32 chan, s32 result) {
     CARDControl* card;
     CARDCallback callback;
@@ -27,6 +31,11 @@ error:
         callback(chan, result);
 }
 
+/**
+ * Deletes the file with directory index 'fileNo':
+ * checks write permission, clears its directory entry to 0xFF and saves the directory,
+ * after which DeleteCallback frees its blocks.
+ */
 s32 CARDFastDeleteAsync(s32 chan, s32 fileNo, CARDCallback callback) {
     CARDControl* card;
     CARDDir* dir;
@@ -62,6 +71,7 @@ s32 CARDFastDeleteAsync(s32 chan, s32 fileNo, CARDCallback callback) {
     return result;
 }
 
+/** Blocking CARDFastDeleteAsync. */
 s32 CARDFastDelete(s32 chan, s32 fileNo) {
     s32 result = CARDFastDeleteAsync(chan, fileNo, __CARDSyncCallback);
     if (result < 0) {
@@ -71,6 +81,10 @@ s32 CARDFastDelete(s32 chan, s32 fileNo) {
     return __CARDSync(chan);
 }
 
+/**
+ * Deletes a file by name (found among the files this game may access):
+ * clears its directory entry, saves the directory, then DeleteCallback frees its blocks.
+ */
 s32 CARDDeleteAsync(s32 chan, const char* fileName, CARDCallback callback) {
     CARDControl* card;
     s32 fileNo;
@@ -99,6 +113,7 @@ s32 CARDDeleteAsync(s32 chan, const char* fileName, CARDCallback callback) {
     return result;
 }
 
+/** Blocking CARDDeleteAsync. */
 s32 CARDDelete(s32 chan, const char* fileName) {
     s32 result = CARDDeleteAsync(chan, fileName, __CARDSyncCallback);
     if (result < 0)

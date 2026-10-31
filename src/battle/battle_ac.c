@@ -18,6 +18,7 @@
 // local prototypes
 static s32 BattleACPadCheckRecordTrigger(s32 chan, s32 mask);
 
+/** Clears the action-command manager at battle start: resets its pad history and drops every command callback. */
 void BattleActionCommandManagerInit(BattleWork* wp) {
     BtlPad_WorkInit(&wp->actionCommands.pad);
     wp->actionCommands.maincb = NULL;
@@ -27,6 +28,10 @@ void BattleActionCommandManagerInit(BattleWork* wp) {
     wp->actionCommands.seId = -1;
 }
 
+/**
+ * Per-frame action-command driver: records the pad, runs the active command's main callback until it returns 0,
+ * and queues its draw callback on the 2D camera.
+ */
 void BattleActionCommandManager(BattleWork* wp) {
     BattleACMainCallback main;
     DispCallback disp;
@@ -45,6 +50,10 @@ void BattleActionCommandManager(BattleWork* wp) {
     }
 }
 
+/**
+ * Returns the active command's result through its result callback,
+ * or bit 1 of the raw result (success) when it has none.
+ */
 s32 BattleActionCommandResult(BattleWork* wp) {
     BattleACResultCallback result;
 
@@ -56,6 +65,11 @@ s32 BattleActionCommandResult(BattleWork* wp) {
     }
 }
 
+/**
+ * Reports an action command's outcome to the crowd: -1 counts as a flop (audience reacts badly);
+ * otherwise the weapon, its Bingo-slot chance and a Star Power multiplier of 0.5 + 0.25 * result are stored for
+ * the bonus that follows.
+ */
 void BattleActionCommandDeclareACResult(BattleWork* work, BattleWeapon* weapon, s32 result) {
     StarPowerInfo* info = &work->impendingBonuses;
     switch (result) {
@@ -72,6 +86,11 @@ void BattleActionCommandDeclareACResult(BattleWork* work, BattleWeapon* weapon, 
     }
 }
 
+/**
+ * Prepares action command id (from ActionCommandList) for unit:
+ * stores the setup flags and parameter, resets the state and result, and installs the command's main,
+ * result and delete callbacks. A confused unit gets no on-screen prompt (no draw callback).
+ */
 void BattleActionCommandSetup(BattleWork* work, s32 id, BattleUnit* unit, s32 setupFlags, s32 setupParam) {
     ActionCommandEntry* entry; // r6
 
@@ -100,10 +119,12 @@ void BattleActionCommandSetup(BattleWork* work, s32 id, BattleUnit* unit, s32 se
     }
 }
 
+/** Starts the prepared action command (state 100 tells its main callback to begin). */
 void BattleActionCommandStart(BattleWork* work) {
     work->actionCommands.acState = 100;
 }
 
+/** Ends the active action command early through its delete callback. */
 void BattleActionCommandStop(BattleWork* work) {
     if (work->actionCommands.deletecb) {
         work->actionCommands.deletecb(work);
@@ -112,6 +133,15 @@ void BattleActionCommandStop(BattleWork* work) {
 
 // inlining off for BattleActionCommandCheckDefence, BattleACPadCheckRecordTrigger, as in the original (the object differs without it)
 #pragma dont_inline on
+/**
+ * Judges Mario's or a partner's guard against weapon from the recent pad history and returns defenseResult:
+ * 5 = Superguard (B within the window, allowed by the weapon and while above 0 HP),
+ * 4 = Guard (A within the window), 2 = no press,
+ * 1 = failed because buttons were mashed (two or more presses in the last 15 frames).
+ * The windows shrink or widen with Simplifier and Unsimplifier (A: 10..5 frames, B: 5..1);
+ * Auto Command badges always Superguard.
+ * While actionCommands.countdown is above 0, each check uses one count and passes automatically.
+ */
 s32 BattleActionCommandCheckDefence(BattleUnit* unit, BattleWeapon* weapon) {
     BattleWork* wp;
     void* pad;
@@ -210,25 +240,36 @@ s32 BattleActionCommandCheckDefence(BattleUnit* unit, BattleWeapon* weapon) {
     BtlPad_WorkInit(pad);
     return wp->actionCommands.defenseResult;
 }
+/** Returns the buttons in mask that were newly pressed chan frames ago in the action-command pad history. */
 static s32 BattleACPadCheckRecordTrigger(s32 chan, s32 mask) {
     return _battleWorkPointer->actionCommands.pad.buttonsPressedHistory[chan] & mask;
 }
 #pragma dont_inline reset
 
+/** Returns the last guard result from BattleActionCommandCheckDefence (5 Superguard, 4 Guard, 2 none, 1 mashed). */
 s32 BattleActionCommandGetDefenceResult(void) {
     return _battleWorkPointer->actionCommands.defenseResult;
 }
 
+/**
+ * Clears the guard result and the pad history, so damage that is not guardable (audience items) counts as
+ * unguarded.
+ */
 void BattleActionCommandResetDefenceResult(void) {
     BattleWork* wp = _battleWorkPointer;
     wp->actionCommands.defenseResult = 0;
     BtlPad_WorkInit(&wp->actionCommands.pad);
 }
 
+/** Returns the action-command difficulty level 0-6 after Simplifier/Unsimplifier adjustments. */
 s32 BattleActionCommandGetDifficulty(BattleWork* work) {
     return work->actionCommands.acDifficulty;
 }
 
+/**
+ * Sets the base action-command difficulty and the adjusted one:
+ * minus one per Simplifier, plus one per Unsimplifier the unit wears, clamped to 0-6.
+ */
 void BattleActionCommandSetDifficulty(BattleWork* work, BattleUnit* unit, s32 difficulty) {
     s32 adjusted;
     s32 simp;
@@ -246,6 +287,10 @@ void BattleActionCommandSetDifficulty(BattleWork* work, BattleUnit* unit, s32 di
     work->actionCommands.acDifficulty = adjusted;
 }
 
+/**
+ * Returns the prize level (0-6) for a successful command, lv plus the difficulty minus one,
+ * so harder commands earn the better rating; -1 when the unit's damage code is 0x1E.
+ */
 s32 BattleActionCommandGetPrizeLv(BattleWork* work, BattleUnit* unit, s32 lv) {
     if (unit != NULL && (u8)unit->damageCode == 0x1E) {
         return -1;
@@ -261,6 +306,10 @@ s32 BattleActionCommandGetPrizeLv(BattleWork* work, BattleUnit* unit, s32 lv) {
     return lv;
 }
 
+/**
+ * Returns the icon to show for a button in an action-command prompt (A, B, X, Y, Z, L, R and the stick
+ * directions), in its pressed or released form.
+ */
 u16 BattleACGetButtonIcon(s32 button, s32 pressed) {
     u16 icon = 0;
 
@@ -359,10 +408,12 @@ u16 BattleACGetButtonIcon(s32 button, s32 pressed) {
     return icon;
 }
 
+/** The gauge's full-scale value, 100. */
 static inline s32 gaugeMax(void) {
     return 100;
 }
 
+/** Draws one flat-coloured rectangle of the action-command gauge in screen space; skips it when it has no width. */
 static inline void gaugeQuad(CameraEntry* cam, f32 x0, f32 y0, f32 x1, f32 y1, u8 r, u8 g, u8 b, u8 a) {
     f32 ty1, tx1, ty0, tx0;
     tx0 = x0;
@@ -378,6 +429,13 @@ static inline void gaugeQuad(CameraEntry* cam, f32 x0, f32 y0, f32 x1, f32 y1, u
 
 // BattleAcDrawGauge, BattleAcGaugeSeInit, BattleAcGaugeSeUpdate and 1 more size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
+/**
+ * Draws the action-command power gauge at (x, y), width pixels wide,
+ * filled to ratio (0-1; below 0 draws only the frame).
+ * From level 2 the background is split into coloured bands at thresholds a, b and c (percent).
+ * flags 1 tints the fill with the command's display colour, flags 2 draws it red.
+ * Used by the air gauge and timing gauge commands.
+ */
 void BattleAcDrawGauge(s32 x, s32 y, s32 width, f32 ratio, s32 level, s32 a, s32 b, s32 c, s32 flags) {
     BattleWork* wp = _battleWorkPointer;
     s32 max = 100;
@@ -515,6 +573,7 @@ void BattleAcDrawGauge(s32 x, s32 y, s32 width, f32 ratio, s32 level, s32 a, s32
     }
 }
 
+/** Starts the rising "power gauge" sound that accompanies a filling action-command gauge. */
 void BattleAcGaugeSeInit(void) {
     BattleWork* wp = _battleWorkPointer;
 
@@ -522,6 +581,7 @@ void BattleAcGaugeSeInit(void) {
     AC_SE_VAL(wp) = 0.0f;
 }
 
+/** Sets the gauge sound's pitch from value (0-100, clamped). */
 void BattleAcGaugeSeUpdate(f32 value) {
     BattleWork* wp = _battleWorkPointer;
 
@@ -537,6 +597,7 @@ void BattleAcGaugeSeUpdate(f32 value) {
     }
 }
 
+/** Stops the gauge sound, if playing. */
 void BattleAcGaugeSeDelete(void) {
     BattleWork* wp = _battleWorkPointer;
 

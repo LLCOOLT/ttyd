@@ -32,6 +32,11 @@ static effN64Vtx size32x64_tex32x64_vtx[] = {
 static void effBalloonHeihoMain(EffectEntry* effect);
 static void effBalloonHeihoDisp(CameraId cameraId, EffectEntry* effect);
 
+/**
+ * Spawns a rising balloon Shy Guy (heiho) at (x, y, z) for `lifetime` frames.
+ * Type 0, 1 or 2 is the red, blue or yellow version; `accel` is its upward acceleration.
+ * Callers: Glitzville scenes (tou_00, tou_20).
+ */
 EffectEntry* effBalloonHeihoN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 accel, f32 scale) {
     EffectEntry* effect;
     EffBalloonHeihoN64Work* work;
@@ -54,6 +59,7 @@ EffectEntry* effBalloonHeihoN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z
     return effect;
 }
 
+/** Accelerates upward (speed capped at 2 per frame) until the lifetime runs out. */
 static void effBalloonHeihoMain(EffectEntry* effect) {
     EffBalloonHeihoN64Work* work = effect->userdata;
     Vec position;
@@ -77,6 +83,7 @@ static void effBalloonHeihoMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effBalloonHeihoDisp, effect);
 }
 
+/** Draws a camera-facing 32x64 sprite, split into four strips, with the colour's texture and map fog applied. */
 static void effBalloonHeihoDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffBalloonHeihoN64Work* work;

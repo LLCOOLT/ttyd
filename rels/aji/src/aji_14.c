@@ -26,6 +26,11 @@ extern EvtWord evt_robot_waku[];
 extern EvtWord evt_boss2[];
 static NpcSetupInfo npcEnt[3];
 
+/**
+ * Door close animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times 0.25;
+ * the open and close scripts apply the same transform. The demo builds use 0.2217.
+ */
 static EVT_BEGIN(w_door_close)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -38,6 +43,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door open animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times 0.25;
+ * the open and close scripts apply the same transform. The demo builds use 0.2217.
+ */
 static EVT_BEGIN(w_door_open)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -72,6 +82,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Script function that attaches the two arm frame NPCs (腕 and 腕２) of the Magnus von Grapple 2.0 robots to the
+ * robots' locator17 bone each frame, or hides them below the floor while the robot is below ground level,
+ * and then moves all the robot's bone world positions out of sight (y = -1000). Blocks forever.
+ */
 static USER_FUNC(waku) {
     NpcEntry* npc;
     AnimationPose* pose;
@@ -127,6 +142,11 @@ static USER_FUNC(waku) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Creates the two frame NPCs 枠 and 枠２ (model c_mb_robo_2a, no shadow, animation L_1)
+ * and starts the script that keeps the robots' arm NPCs attached (waku).
+ * Guess: the frames are decoration or placeholders for the Magnus von Grapple 2.0 robots.
+ */
 EVT_BEGIN(evt_robot_waku)
     CALL(evt_npc_entry, STRING("枠"), STRING("c_mb_robo_2a"))
     CALL(evt_npc_flag_onoff, 1, STRING("枠"), NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_NO_SHADOW)
@@ -141,6 +161,13 @@ EVT_BEGIN(evt_robot_waku)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene before the Magnus von Grapple 2.0 fight:
+ * the X-Naut executive (幹部, Guess: Lord Crump) and the robot (ロボット) are placed, BGM_EVT_MAGNUM_APP1 plays,
+ * dialogue stg7_aji_36 to 41 plays with the partner, then the robot's battle (battle info 5) starts.
+ * After the fight the partner talks (stg7_aji_42)
+ * and the map changes to moo_04 at the evt_aji_14 entrance with a white fade.
+ */
 static EVT_BEGIN(evt_boss)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_npc_set_position, STRING("幹部"), 150, 60, 0)
@@ -342,6 +369,13 @@ static EVT_BEGIN(evt_boss)
     RETURN
 EVT_END()
 
+/**
+ * Aftermath of the Magnus von Grapple 2.0 fight (aji_14 entered as "tuzuki" = continued):
+ * the Crystal Star appears above, floats down and bobs (an item named "dummy"),
+ * Mario and his partner react (stg7_aji_42_01),
+ * the story becomes STORY_STG7_20_LORD_CRUMP_DEFEATED
+ * and evt_sub_starstone gives Mario the Crystal Star (chapter 7).
+ */
 EVT_BEGIN(evt_boss2)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -414,6 +448,13 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Init script of aji_14, Lord Crump's boss room:
+ * plays BGM_STG7_DUN2 unless entered as "tuzuki" (silent in that case, JP and later),
+ * sets up the exits and the officer and robot NPCs;
+ * entering as "tuzuki" runs evt_boss2 (the post-battle Crystal Star scene),
+ * and before STORY_STG7_20_LORD_CRUMP_DEFEATED the second robot is placed and evt_boss starts the fight.
+ */
 EVT_BEGIN(aji_14_init_evt)
 #if VERSION >= VERSION_JP
     CALL(evt_bero_get_entername, LW(0))

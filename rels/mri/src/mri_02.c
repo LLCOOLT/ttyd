@@ -95,6 +95,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Planter hit script 4: the first time the planter is hit it launches a Power Punch badge out of it;
+ * it is remembered with a flag so it comes out only once.
+ */
 static EVT_BEGIN(evt_ueki_04)
     CALL(evt_item_delete_check, STRING("item_ueki_04"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -112,6 +116,12 @@ static KusaAccess ueki_access_data[] = {
     {4, NULL, NULL, NULL},
 };
 
+/**
+ * Per-frame control of the Puni weight floor: the plate sinks (down to -10) by the weight of the Punies standing
+ * on it (sw->weight, set by setPuniWeight) and rises when they leave, 0.25 units per frame.
+ * Plays the switch-on or switch-off sound when the movement starts and rebinds the S_sui_l collision.
+ * Runs as the punipuni_switch script forever.
+ */
 static USER_FUNC(moveSwitch) {
     Mri02Switch* sw = &mri02switch;
     f32 delta;
@@ -164,15 +174,18 @@ static USER_FUNC(moveSwitch) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Returns the current height of the weight floor, which the Puni code reads to place the Punies on it. */
 f32 getMri02Yuka(void) {
     return mri02switch.pos;
 }
 
+/** Sets the weight (a negative number, one unit per Puni) that pushes the floor down. */
 static USER_FUNC(setPuniWeight) {
     mri02switch.weight = evtGetFloat(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
+/** Returns 1 in args[0] when the weight floor is pressed all the way down (-10), otherwise 0. */
 static USER_FUNC(getSwitch) {
     EvtWord* args = event->args;
     s32 on = FALSE;
@@ -184,11 +197,17 @@ static USER_FUNC(getSwitch) {
     return EVT_RETURN_DONE;
 }
 
+/** Script that runs the weight floor: calls moveSwitch every frame. */
 EVT_BEGIN(punipuni_switch)
     CALL(moveSwitch)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene when enough Punies press the floor with the Puni Orb on its pedestal:
+ * the pipe (dokan2) rises out of the floor with a quake, the party comments on it, and the Puni pipe is enabled.
+ * Sets the story to STORY_STG2_16_PUNI_ELDER_POWERS.
+ */
 EVT_BEGIN(dokan_event)
     WAIT_WHILE(GF(15))
     CALL(evt_mario_key_onoff, 0)
@@ -232,6 +251,10 @@ EVT_BEGIN(dokan_event)
     RETURN
 EVT_END()
 
+/**
+ * Waits for the weight floor to be pressed while the Puni Orb is on its pedestal,
+ * then runs dokan_event to raise the pipe.
+ */
 EVT_BEGIN(dokan_init)
     CALL(evt_hit_bind_mapobj, STRING("A_dokan2"), STRING("S_dokan2"))
     CALL(evt_mapobj_trans, 1, STRING("S_dokan2"), 0, -50, 0)
@@ -249,6 +272,11 @@ EVT_BEGIN(dokan_init)
     RETURN
 EVT_END()
 
+/**
+ * Display event of the Puni weight dial: hides the S_isk_01_03_C part
+ * and every frame turns two dial drums to show GW(0) (0 to 10):
+ * the tens drum (S_isk_01_02) and the ones drum (S_isk_01_03), 36 degrees per digit.
+ */
 static EVT_BEGIN(yuka_main)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_isk_01_03_C"), MAPOBJ_FLAG_HIDE)
     LOOP(0)
@@ -267,6 +295,13 @@ static EVT_BEGIN(yuka_main)
     RETURN
 EVT_END()
 
+/**
+ * Counts the Punies standing on the weight platform every frame
+ * and keeps the dial value GW(0) at 10 minus the count (clamped to 0 to 10).
+ * Each Puni that is alive, not lost and within the platform's square and height band reduces the number by one.
+ * The negative count is passed to setPuniWeight as the weight on the switch,
+ * but only once the orb is on the pedestal; the dial click sound plays whenever the value changes.
+ */
 static EVT_BEGIN(yuka_move)
     SET_VALUE(LW(12), GW(0))
     LOOP(0)
@@ -319,6 +354,12 @@ static EVT_BEGIN(yuka_move)
     RETURN
 EVT_END()
 
+/**
+ * Init script of the orb pedestal: runs the shared Puni-switch setup;
+ * if the orb is already on the pedestal (GSWF_MRI02_ORB_ON_PEDESTAL) it is shown there
+ * and its target is turned on, otherwise the beam of light (S_sui_hikari) is hidden.
+ * The target point is placed at the pedestal.
+ */
 static EVT_BEGIN(punipuni_ball00_init)
     CALL_CHILD(mri_punipuni_setup)
     IF_INT_EQUAL(GSWF(GSWF_MRI02_ORB_ON_PEDESTAL), 1)
@@ -332,6 +373,13 @@ static EVT_BEGIN(punipuni_ball00_init)
     RETURN
 EVT_END()
 
+/**
+ * Hit/talk script of the orb pedestal: if the orb is not placed,
+ * Mario picks an item to put on it (cancel ends the script);
+ * the orb appears on the pedestal with the light beam and the flag is set.
+ * If it is already placed, Mario takes it back, the beam is hidden and the flag is cleared.
+ * Mario is frozen during this.
+ */
 static EVT_BEGIN(punipuni_ball00)
     CALL(evt_mario_key_onoff, 0)
     IF_INT_EQUAL(GSWF(GSWF_MRI02_ORB_ON_PEDESTAL), 0)
@@ -356,6 +404,13 @@ static EVT_BEGIN(punipuni_ball00)
     RETURN
 EVT_END()
 
+/**
+ * Map init script of mri_02, the Puni weight-floor room:
+ * sets up the Puni, the planters, the Star Piece panel in the floor,
+ * the Puni Orb pedestal (punipuni) and the weight floor,
+ * plays the bomb-alarm music while the time bomb is active,
+ * and spawns the floor counter GW(0) (10 down to 0) with its light and the pipe event.
+ */
 EVT_BEGIN(mri_02_init_evt)
     CALL(evt_puni_mem_init)
     CALL(evt_puni_set_yuka, 2, 0, -310, -1000, -1000, 1, 0)

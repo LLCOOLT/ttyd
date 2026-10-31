@@ -21,6 +21,10 @@ FILE __files[_STATIC_FILES] = {
     {2, {must_exist, write_mode, unbuffered, __console_file, __unoriented, 0}, {__neutral, 0, 0, 0}, 0, 0, 0, {0, 0}, {0, 0}, 0, stderr_buff, console_buff_size, stderr_buff, 0, 0, 0, 0, NULL, __read_console, __write_console, __close_console, NULL, &__files[3]},
 };
 
+/**
+ * Calls fflush on every FILE in the global file list that is not closed;
+ * returns EOF if any flush failed, else 0. Used by fflush(NULL).
+ */
 int __flush_all(void) {
     int result = 0;
     FILE* file = &__files[0];
@@ -34,6 +38,11 @@ int __flush_all(void) {
     return (result);
 }
 
+/**
+ * Closes every FILE in the global file list under the stdio lock,
+ * freeing dynamically allocated ones and marking the static ones (stdin/stdout/stderr slots) unavailable.
+ * Installed as __stdio_exit so exit() runs it.
+ */
 void __close_all(void) {
     FILE* p = &__files[0];
     FILE* plast;

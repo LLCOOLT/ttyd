@@ -88,6 +88,12 @@ static struct {
 		(reg) = (u32)__rlwimi((u32)(reg), (val), (shift), (32 - (shift) - (size)), (31 - (shift))); \
 	} while (0);
 
+/**
+ * Sets a TEV stage to one of the preset blend modes (modulate, decal, blend, replace, passclr) by loading the
+ * colour and alpha input/op fields from a table.
+ * Stage 0 uses the table that takes the rasterized colour as input;
+ * later stages use a table that takes the previous stage's output.
+ */
 void GXSetTevOp(GXTevStageID id, GXTevMode mode) {
     u32* ctmp;
     u32* atmp;
@@ -118,6 +124,10 @@ void GXSetTevOp(GXTevStageID id, GXTevMode mode) {
     __GXData->bpSentNot = 0;
 }
 
+/**
+ * Writes the four colour inputs a, b, c and d of a TEV stage (4-bit GXTevColorArg selectors for bits 12, 8,
+ * 4 and 0 of the stage's colour register).
+ */
 void GXSetTevColorIn(GXTevStageID stage, GXTevColorArg a, GXTevColorArg b, GXTevColorArg c, GXTevColorArg d) {
     u32 tevReg;
 
@@ -139,6 +149,7 @@ void GXSetTevColorIn(GXTevStageID stage, GXTevColorArg a, GXTevColorArg b, GXTev
     __GXData->bpSentNot = 0;
 }
 
+/** Writes the four alpha inputs a, b, c and d of a TEV stage (3-bit GXTevAlphaArg selectors). */
 void GXSetTevAlphaIn(GXTevStageID stage, GXTevAlphaArg a, GXTevAlphaArg b, GXTevAlphaArg c, GXTevAlphaArg d) {
     u32 tevReg;
 
@@ -160,6 +171,11 @@ void GXSetTevAlphaIn(GXTevStageID stage, GXTevAlphaArg a, GXTevAlphaArg b, GXTev
     __GXData->bpSentNot = 0;
 }
 
+/**
+ * Sets the colour operation of a TEV stage: add or subtract with bias and scale,
+ * or (for the compare ops, op 2 and up) a comparison with the scale field taken from the op;
+ * plus the clamp flag and which register (GXTevRegID) receives the result.
+ */
 void GXSetTevColorOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale scale, GXBool clamp, GXTevRegID out_reg) {
     u32 tevReg;
 
@@ -183,6 +199,10 @@ void GXSetTevColorOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale 
     __GXData->bpSentNot = 0;
 }
 
+/**
+ * Sets the alpha operation of a TEV stage: add or subtract with bias and scale, or a compare op,
+ * the clamp flag and the output register.
+ */
 void GXSetTevAlphaOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale scale, GXBool clamp, GXTevRegID out_reg) {
     u32 tevReg;
 
@@ -206,6 +226,10 @@ void GXSetTevAlphaOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale 
     __GXData->bpSentNot = 0;
 }
 
+/**
+ * Sets one of the TEV colour registers from 8-bit RGBA by writing two BP registers (0xE0 + 2*id for red/alpha
+ * and 0xE1 + 2*id for blue/green; the second is written three times).
+ */
 void GXSetTevColor(GXTevRegID id, GXColor color) {
     u32 rgba;
     u32 regRA;
@@ -230,6 +254,10 @@ void GXSetTevColor(GXTevRegID id, GXColor color) {
     __GXData->bpSentNot = 0;
 }
 
+/**
+ * Sets one of the TEV colour registers from signed 11-bit components (the S10 colour),
+ * written to the same two BP registers as GXSetTevColor.
+ */
 void GXSetTevColorS10(GXTevRegID id, GXColorS10 color) {
     u32 sRG;
     u32 sBA;
@@ -261,6 +289,10 @@ void GXSetTevColorS10(GXTevRegID id, GXColorS10 color) {
     __GXData->bpSentNot = 0;
 }
 
+/**
+ * Sets one of the four constant (konst) colours,
+ * using the same two BP registers as the TEV colour registers but with the konst bit (8) set in field 20.
+ */
 void GXSetTevKColor(GXTevKColorID id, GXColor color) {
     u32 rgba;
     u32 regRA;
@@ -285,6 +317,11 @@ void GXSetTevKColor(GXTevKColorID id, GXColor color) {
     __GXData->bpSentNot = 0;
 }
 
+/**
+ * Chooses the konst colour selector (a fixed fraction,
+ * or a channel of one of the four konst colours) a stage uses;
+ * two stages share each register, the odd one in the upper field.
+ */
 void GXSetTevKColorSel(GXTevStageID stage, GXTevKColorSel sel) {
     u32* Kreg;
 
@@ -302,6 +339,7 @@ void GXSetTevKColorSel(GXTevStageID stage, GXTevKColorSel sel) {
     __GXData->bpSentNot = 0;
 }
 
+/** Chooses the konst alpha selector a stage uses; two stages share each register, the odd one in the upper field. */
 void GXSetTevKAlphaSel(GXTevStageID stage, GXTevKAlphaSel sel) {
     u32* Kreg;
 
@@ -319,6 +357,10 @@ void GXSetTevKAlphaSel(GXTevStageID stage, GXTevKAlphaSel sel) {
     __GXData->bpSentNot = 0;
 }
 
+/**
+ * Selects, for one stage, which swap table (GXTevSwapSel) applies to the rasterized colour and
+ * which to the texture colour.
+ */
 void GXSetTevSwapMode(GXTevStageID stage, GXTevSwapSel ras_sel, GXTevSwapSel tex_sel) {
     u32* pTevReg;
 
@@ -333,6 +375,10 @@ void GXSetTevSwapMode(GXTevStageID stage, GXTevSwapSel ras_sel, GXTevSwapSel tex
     __GXData->bpSentNot = 0;
 }
 
+/**
+ * Defines one swap table: it writes the red and green source channels to one konst-select register and the blue
+ * and alpha ones to the next.
+ */
 void GXSetTevSwapModeTable(GXTevSwapSel table, GXTevColorChan red, GXTevColorChan green, GXTevColorChan blue, GXTevColorChan alpha) {
     u32* Kreg;
 #if !DEBUG
@@ -361,10 +407,18 @@ void GXSetTevSwapModeTable(GXTevSwapSel table, GXTevColorChan red, GXTevColorCha
     __GXData->bpSentNot = 0;
 }
 
+/**
+ * Obsolete in this hardware revision: clamping is set through GXSetTevColorOp / GXSetTevAlphaOp,
+ * so the call only asserts in debug builds.
+ */
 void GXSetTevClampMode(void) {
     ASSERTMSGLINE(1012, 0, "GXSetTevClampMode: not available on this hardware");
 }
 
+/**
+ * Writes the alpha compare register: two comparison functions and 8-bit references,
+ * combined with GXAlphaOp (and, or, xor, xnor); pixels that fail are discarded.
+ */
 void GXSetAlphaCompare(GXCompare comp0, u8 ref0, GXAlphaOp op, GXCompare comp1, u8 ref1) {
     u32 reg;
 
@@ -381,6 +435,11 @@ void GXSetAlphaCompare(GXCompare comp0, u8 ref0, GXAlphaOp op, GXCompare comp1, 
     __GXData->bpSentNot = 0;
 }
 
+/**
+ * Writes the two Z-texture registers (0xF4 and 0xF5):
+ * the bias, the Z texture format (Z8, Z16 or Z24X8; others fall back to 24-bit)
+ * and the operation (disable, add or replace).
+ */
 void GXSetZTexture(GXZTexOp op, GXTexFmt fmt, u32 bias) {
     u32 zenv0;
     u32 zenv1;
@@ -418,6 +477,12 @@ void GXSetZTexture(GXZTexOp op, GXTexFmt fmt, u32 bias) {
     __GXData->bpSentNot = 0;
 }
 
+/**
+ * Binds a TEV stage to a texture coordinate, texture map and colour channel:
+ * writes the stage's half of a tref register (two stages per register),
+ * records the map in texmapId and whether a texcoord is used (tevTcEnab),
+ * and flags the setup-unit registers dirty.
+ */
 void GXSetTevOrder(GXTevStageID stage, GXTexCoordID coord, GXTexMapID map, GXChannelID color) {
     u32* ptref;
     u32 tmap;
@@ -461,6 +526,7 @@ void GXSetTevOrder(GXTevStageID stage, GXTexCoordID coord, GXTexMapID map, GXCha
     __GXData->dirtyState |= 1;
 }
 
+/** Sets how many TEV stages run: stores nStages - 1 in the general mode register and flags it dirty. */
 void GXSetNumTevStages(u8 nStages) {
     CHECK_GXBEGIN(1187, "GXSetNumTevStages");
 

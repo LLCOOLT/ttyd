@@ -11,6 +11,7 @@
 // this unit is size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
 
+/** Clears the battle input history of all four controllers; called from the battle's init in battle.c. */
 void BattlePadInit(void) {
     int i;
 
@@ -19,6 +20,7 @@ void BattlePadInit(void) {
     }
 }
 
+/** Records this frame's input for all four controllers; called once per frame from the battle main loop in battle.c. */
 void BattlePadManager(void) {
     int i;
 
@@ -27,6 +29,10 @@ void BattlePadManager(void) {
     }
 }
 
+/**
+ * Zeroes one controller's battle input record: the current and previous pad state,
+ * the 30-frame button histories and the hold-repeat timer.
+ */
 void BtlPad_WorkInit(BattleWorkPad* pad) {
     int i;
 
@@ -53,6 +59,12 @@ void BtlPad_WorkInit(BattleWorkPad* pad) {
     pad->holdRepeatFrameCounter = 0;
 }
 
+/**
+ * Pushes one frame of controller chan into its 30-frame histories.
+ * Stick and C-stick tilts of 30 or more are added as extra button bits (BTL_PAD_STICK_*, BTL_PAD_SUBSTICK_*)
+ * with their own press, release and repeat edges; held tilts repeat after 16 frames, then every 8.
+ * Action commands read these histories to judge timing.
+ */
 void BtlPad_WorkUpdate(BattleWorkPad* pad, s32 chan) {
     int i, repeat;
 
@@ -130,54 +142,69 @@ void BtlPad_WorkUpdate(BattleWorkPad* pad, s32 chan) {
     pad->buttonsReleasedHistory[0] |= pad->buttonsHistory[1] & (pad->buttonsHistory[1] ^ pad->buttonsHistory[0]) & 0xFFFF0000;
 }
 
+/** Buttons newly pressed this frame on controller 1, with the stick-direction bits. */
 u32 BattlePadGetTrigger(void) {
     return _battleWorkPointer->padWork[0].buttonsPressedHistory[0];
 }
 
+/** Buttons held this frame on controller 1, with the stick-direction bits. */
 u32 BattlePadGetNow(void) {
     return _battleWorkPointer->padWork[0].buttonsHistory[0];
 }
 
+/** Nonzero if any button in mask was newly pressed this frame on controller 1. */
 BOOL BattlePadCheckTrigger(s32 mask) {
     return BattlePadMultiCheckTrigger(0, mask);
 }
 
+/** Nonzero if any button in mask was newly pressed this frame on controller chan. */
 BOOL BattlePadMultiCheckTrigger(s32 chan, s32 mask) {
     u32* history = _battleWorkPointer->padWork[chan].buttonsPressedHistory;
     return history[0] & mask;
 }
 
+/**
+ * Nonzero if any button in mask was newly pressed on controller 1 frame frames ago (0 = this frame, up to 29).
+ * Timed action commands use it to accept a press made a few frames early.
+ */
 BOOL BattlePadCheckRecordTrigger(s32 frame, s32 mask) {
     return BattlePadMultiCheckRecordTrigger(0, frame, mask);
 }
 
+/** Nonzero if any button in mask was newly pressed on controller chan frame frames ago (0 = this frame, up to 29). */
 u32 BattlePadMultiCheckRecordTrigger(s32 chan, s32 frame, s32 mask) {
     BattleWorkPad* pad = &_battleWorkPointer->padWork[chan];
     return pad->buttonsPressedHistory[frame] & mask;
 }
 
+/** Nonzero if any button in mask is held this frame on controller 1. */
 s32 BattlePadCheckNow(s32 mask) {
     return BattlePadMultiCheckNow(0, mask);
 }
 
+/** Nonzero if any button in mask is held this frame on controller chan. */
 BOOL BattlePadMultiCheckNow(s32 chan, s32 mask) {
     u32* history = _battleWorkPointer->padWork[chan].buttonsHistory;
     return history[0] & mask;
 }
 
+/** Nonzero if any button in mask was released this frame on controller 1. */
 s32 BattlePadCheckUp(s32 mask) {
     return BattlePadMultiCheckUp(0, mask);
 }
 
+/** Nonzero if any button in mask was released this frame on controller chan. */
 u32 BattlePadMultiCheckUp(s32 chan, s32 mask) {
     u32* history = _battleWorkPointer->padWork[chan].buttonsReleasedHistory;
     return history[0] & mask;
 }
 
+/** Nonzero if any button in mask fired its press-or-hold repeat this frame on controller 1 (menu cursor movement). */
 s32 BattlePadCheckRepeat(s32 mask) {
     return BattlePadMultiCheckRepeat(0, mask);
 }
 
+/** Nonzero if any button in mask fired its press-or-hold repeat this frame on controller chan. */
 u32 BattlePadMultiCheckRepeat(s32 chan, s32 mask) {
     u32* history = _battleWorkPointer->padWork[chan].buttonsRepeatHistory;
     return history[0] & mask;

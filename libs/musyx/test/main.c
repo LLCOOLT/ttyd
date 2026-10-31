@@ -5,6 +5,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ * MusyX desktop test program (not part of the game):
+ * installs malloc/free as the sound hooks, starts the synth, loads the test project, sample, pool,
+ * sample-directory and song files, pushes the sound group and keeps triggering effect 1502
+ * until the synth goes idle, then shuts down.
+ */
 int main(int argc, char* argv[]) {
   SND_HOOKS hooks = { malloc, free, };
   sndSetHooks(&hooks);

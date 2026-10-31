@@ -25,12 +25,20 @@ static USER_FUNC(get_mobj_seq);
 
 static BeroEntry bero_entry_data[2];
 
+/**
+ * Door animation script (closing) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panel S_door1 by it.
+ */
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("S_door1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panel S_door1 by it.
+ */
 static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("S_door1"), 0, LW(0), 0)
@@ -59,6 +67,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Event script: the key chest of las_18 opens and Mario receives Palace Key 0x2D. */
 static EVT_BEGIN(box_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
@@ -69,6 +78,12 @@ static EVT_BEGIN(box_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: sets the alpha (0..255) of the map object "switch" to args[0], tinting it white;
+ * below alpha 0x25 the switch also stops casting a shadow.
+ * Used to fade the hidden switch in while Vivian is hiding in shadow next to it.
+ * Does nothing once the switch is gone.
+ */
 static USER_FUNC(switch_set_alpha) {
     s32 alpha = evtGetValue(event, event->args[0]);
     MapObjectEntry* mobj = mobjNameToPtrNoAssert("switch");
@@ -86,6 +101,10 @@ static USER_FUNC(switch_set_alpha) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: restores the map object "switch" to fully opaque with its shadow
+ * and turns the evt colour override off.
+ */
 static USER_FUNC(switch_alpha_off) {
     MapObjectEntry* mobj = mobjNameToPtrNoAssert("switch");
 
@@ -98,6 +117,13 @@ static USER_FUNC(switch_alpha_off) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Event script: the hidden switch of las_18 only becomes visible if Vivian is the partner
+ * and in her shadow form (status 2): the switch's alpha rises by 4 per frame up to 160 while she hides
+ * and falls back when she leaves.
+ * When it reaches 160 for the first time it plays a success jingle and sets GSWF_LAS18_HIDDEN_SWITCH_REVEALED.
+ * Ends when the switch has been pressed.
+ */
 EVT_BEGIN(vivian_check)
     CALL(evt_seq_wait, 2)
     SET_VALUE(LW(15), 0)
@@ -139,6 +165,7 @@ EVT_BEGIN(vivian_check)
     RETURN
 EVT_END()
 
+/** Script helper: returns the state of the map object named args[0] in args[1], or 1 if the object no longer exists. */
 static USER_FUNC(get_mobj_seq) {
     EvtWord* args = event->args;
     MapObjectEntry* mobj = mobjNameToPtrNoAssert((const char*)evtGetValue(event, args[0]));
@@ -151,6 +178,10 @@ static USER_FUNC(get_mobj_seq) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Event script: the switch of las_18 was hit.
+ * The switch-alpha effect is turned off, the camera shows the spot and the key chest drops in (box_syutugen).
+ */
 static EVT_BEGIN(switch_evt)
     CALL(switch_alpha_off)
     CALL(evt_mario_key_onoff, 0)
@@ -167,6 +198,7 @@ static EVT_BEGIN(switch_evt)
     RETURN
 EVT_END()
 
+/** Event script: reading the hint plate of las_18 (stg8_las_43). */
 static EVT_BEGIN(hint_plate)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("stg8_las_43"), 0, 0)
@@ -174,6 +206,11 @@ static EVT_BEGIN(hint_plate)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for las_18, a Riddle Tower room (the chest holds Palace Key 0x2D):
+ * music, the door to las_10, the nearly invisible blue floating switch that only Vivian can reveal,
+ * the key chest and the hint plate.
+ */
 EVT_BEGIN(las_18_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST2"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))

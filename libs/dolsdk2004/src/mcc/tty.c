@@ -26,11 +26,13 @@ static int ttyWaiting(int timeout, volatile int* flag);
 static int ttyWrite(u32 offset, void* data, s32 size);
 static int ttyFlush(u32 msgID, BOOL waitResult);
 
+/** Returns whether the TTY channel is open (gChID is non-zero). */
 static int ttyIsInitialized(void) {
     BOOL bResult = gChID != 0;
     return bResult;
 }
 
+/** Prints an MCC channel's first block, block count, connection state and lock state with OSReport. */
 static void ShowChannelInfo(MCC_CHANNEL chID) {
     MCC_Info info;
 
@@ -45,6 +47,11 @@ static void ShowChannelInfo(MCC_CHANNEL chID) {
              (info.isLocked == TRUE)                    ? "LOCKED" : "UNKNOWN");
 }
 
+/**
+ * MCC event callback for the TTY channel: records the channel on connect and clears it on disconnect;
+ * answers the query notify (protocol 0x210), and on the host's "text consumed" notify (0x400000) advances the
+ * ring-buffer head by the block count and records the message id in gReadDone.
+ */
 static void ttyMccChannelEvent(MCC_CHANNEL chID, u32 event, u32 value) {
     u32 notify;
     u32 size;
@@ -87,6 +94,11 @@ static void ttyMccChannelEvent(MCC_CHANNEL chID, u32 event, u32 value) {
     }
 }
 
+/**
+ * Opens an MCC channel (one block) as a debug text console:
+ * MCCInit with 5 second timeout, MCCOpen with ttyMccChannelEvent, event mask 0x30 (no read/write events).
+ * Returns 0 if already initialised or on failure.
+ */
 int TTYInit(MCC_EXI exiChannel, MCC_CHANNEL chID) {
     if (ttyIsInitialized()) {
         return 0;
@@ -103,6 +115,7 @@ int TTYInit(MCC_EXI exiChannel, MCC_CHANNEL chID) {
     return 0;
 }
 
+/** Restores the old event mask, closes the TTY channel and clears its state. */
 void TTYExit(void) {
     if (ttyIsInitialized()) {
         MCCSetChannelEventMask(gChID, gOldEvent);
@@ -112,6 +125,10 @@ void TTYExit(void) {
     }
 }
 
+/**
+ * Asks the host if a TTY listener exists: sends notify 0x100210 and waits up to 5 seconds;
+ * stalls 5 seconds before returning 0 on failure.
+ */
 int TTYQuery(void) {
     u32 tick;
 
@@ -127,6 +144,11 @@ int TTYQuery(void) {
     return 0;
 }
 
+/**
+ * printf to the host console: formats up to 8179 characters into a packet (protocol 0x210) with a running
+ * message id, copies it into the 8 KB ring buffer through MCCWrite (waiting for space with ttyFlush if needed),
+ * and flushes when the text has a newline or the id wraps at 0xFF.
+ */
 int TTYPrintf(const char* format, ...) {
     if (ttyIsInitialized() && format != NULL) {
         MCC_Hdr* hdr;
@@ -197,6 +219,10 @@ int TTYPrintf(const char* format, ...) {
     return 0;
 }
 
+/**
+ * Public flush: notifies the host of the newest message id and waits until the host has read it;
+ * 1 if nothing is pending.
+ */
 int TTYFlush(void) {
     if (!ttyIsInitialized()) {
         return 0;
@@ -205,6 +231,7 @@ int TTYFlush(void) {
     return ttyFlush(gPrintfID, TRUE);
 }
 
+/** Sets the channel id and zeroes the query flag, read-done id, message id and ring buffer head and tail. */
 static void ttyClearProperty(MCC_CHANNEL chID) {
     gChID = chID;
     gQuery = 0;
@@ -214,6 +241,7 @@ static void ttyClearProperty(MCC_CHANNEL chID) {
     gBufTail = 0;
 }
 
+/** Spins until *flag becomes non-zero or the timeout expires; returns 1 if the flag was set. */
 static int ttyWaiting(int timeout, volatile int* flag) {
     u32 tickStart;
     u32 tickDist;
@@ -231,6 +259,7 @@ static int ttyWaiting(int timeout, volatile int* flag) {
     return 1;
 }
 
+/** Writes size bytes at offset of the TTY channel buffer with MCCWrite; returns 1 on success. */
 static int ttyWrite(u32 offset, void* data, s32 size) {
     if (MCCWrite(gChID, offset, data, size, 0)) {
         return 1;
@@ -238,6 +267,10 @@ static int ttyWrite(u32 offset, void* data, s32 size) {
     return 0;
 }
 
+/**
+ * Sends notify 0x300000 with the message id (nothing if the ring buffer is empty) and, if waitResult,
+ * spins until the host reports that id read; hangs forever if the notify cannot be sent.
+ */
 static int ttyFlush(u32 msgID, BOOL waitResult) {
     u32 notify;
 

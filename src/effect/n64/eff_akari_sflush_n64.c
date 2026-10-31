@@ -37,6 +37,10 @@ static const GXColor kWhite = {255, 255, 255, 0};
 static void effAkariSflushMain(EffectEntry* effect);
 static void effAkariSflushDisp(CameraId cameraId, EffectEntry* effect);
 
+/**
+ * Spawns the flash at (x, y, z), `size` times its normal scale,
+ * for `lifetime` frames (0 or less: until soft deleted). Spawned only from evt_eff ("akari_sflush_n64").
+ */
 EffectEntry* effAkariSflushN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 size) {
     EffectEntry* effect;
     EffAkariSflushN64Work* work;
@@ -68,6 +72,7 @@ EffectEntry* effAkariSflushN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z,
     return effect;
 }
 
+/** Fades the flash in over 16 frames; in its last 8 frames it expands and fades out quickly. */
 static void effAkariSflushMain(EffectEntry* effect) {
     EffAkariSflushN64Work* work = effect->userdata;
     s32 lifetime;
@@ -105,6 +110,10 @@ static void effAkariSflushMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effAkariSflushDisp, effect);
 }
 
+/**
+ * Draws a ring of five pointed, four-corner flares that pulse in size with a cosine;
+ * extra rings are added with `count` (always 0 here).
+ */
 static void effAkariSflushDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffAkariSflushN64Work* work;

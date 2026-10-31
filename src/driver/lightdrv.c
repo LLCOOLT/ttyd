@@ -22,6 +22,11 @@ static s32 _sort(const void* a, const void* b);
 
 #define lightGetWork() (mapGetActiveGroup() == 1 ? &work[1] : &work[0])
 
+/**
+ * Allocates the field and battle light tables and sets up the fixed lights:
+ * PAPER (the far-off light that lights paper characters in 3D), PAPERI (its image-camera twin),
+ * PAPERCRAFT and the light used for Boos. Called once at boot.
+ */
 void lightInit(void) {
     Mtx scale;
     LightWork* wp;
@@ -68,6 +73,7 @@ void lightInit(void) {
     booLight.attenAngle = 10.0f;
 }
 
+/** Clears every light of the active map group (field or battle); mapdrv calls it before loading a map's lights. */
 void lightReInit(void) {
     LightWork* wp = lightGetWork();
     memset(wp->entries, 0, sizeof(LightEntry) * wp->count);
@@ -75,6 +81,10 @@ void lightReInit(void) {
 
 static const Vec camDir = {0.0f, 0.0f, 1.0f};
 
+/**
+ * Per-frame update: places the PAPER light far away along the camera direction (turned into view space)
+ * so paper characters are lit from the camera, and parks the Boo light 1000 units overhead.
+ */
 void lightMain(void) {
     CameraEntry* camera;
     Vec w = camDir;
@@ -110,6 +120,11 @@ static const Vec decay_tbl[] = {
     {0.0f, 0.0f, 0.01f},
     {0.0f, 0.0f, 0.01f}};
 
+/**
+ * Adds a light from the map file: type 0-3 is ambient, point, spot or directional,
+ * attenType picks the distance falloff from decay_tbl, flag 2 marks a character-only light.
+ * A clashing name gets a _0000-style suffix. Returns the slot index.
+ */
 s32 lightEntry(const char* name, s32 type, Vec* position, Vec* rotation, GXColor color, s32 attenType, s32 flags, f32 spotAngle, f32 attenAngle) {
     LightWork* wp = lightGetWork();
     LightEntry* entry;
@@ -177,6 +192,7 @@ s32 lightEntry(const char* name, s32 type, Vec* position, Vec* rotation, GXColor
     return n;
 }
 
+/** Returns the light with this name in the active group, or NULL. */
 LightEntry* lightNameToPtr(const char* name) {
     LightWork* wp = lightGetWork();
     LightEntry* entry = wp->entries;
@@ -195,6 +211,7 @@ typedef struct NearWork {
     f32 dist;
 } NearWork;
 
+/** qsort comparator for lightGetNearObj: orders lights by distance, nearest first. */
 static s32 _sort(const void* a, const void* b) {
     f32 distB, distA;
 
@@ -210,6 +227,11 @@ static s32 _sort(const void* a, const void* b) {
     return 0;
 }
 
+/**
+ * Fills out with up to count non-ambient lights, nearest to position first when more than 8 are enabled,
+ * keeping only lights with any of flags (0 = all); NULL-pads the rest and returns how many were found.
+ * mapdrv uses it to light map parts and characters.
+ */
 s32 lightGetNearObj(Vec position, LightEntry** out, s32 count, LightEntryFlags flags) {
     s32 found;
     LightWork* wp = lightGetWork();
@@ -268,6 +290,7 @@ s32 lightGetNearObj(Vec position, LightEntry** out, s32 count, LightEntryFlags f
     return found;
 }
 
+/** Returns the first enabled map (non-character) ambient light, or NULL. */
 LightEntry* lightGetAmbient(void) {
     LightWork* wp = lightGetWork();
     LightEntry* entry = wp->entries;
@@ -281,6 +304,7 @@ LightEntry* lightGetAmbient(void) {
     return NULL;
 }
 
+/** Returns the first enabled character-only ambient light, or NULL; mapdrv uses it when lighting characters. */
 LightEntry* lightGetCharaAmbient(void) {
     LightWork* wp = lightGetWork();
     LightEntry* entry = wp->entries;
@@ -294,6 +318,10 @@ LightEntry* lightGetCharaAmbient(void) {
     return NULL;
 }
 
+/**
+ * Returns 1 if any enabled light is marked character-only,
+ * so mapdrv adds the nearest such lights when lighting characters.
+ */
 s32 lightCheckCharaLight(void) {
     LightWork* wp = lightGetWork();
     LightEntry* entry = wp->entries;
@@ -307,6 +335,7 @@ s32 lightCheckCharaLight(void) {
     return 0;
 }
 
+/** Returns the PAPER light for the 3D camera and the PAPERI light for the image camera (and any other). */
 LightEntry* lightGetPaper(void) {
     s32 cam = camGetCurNo();
 
@@ -319,10 +348,12 @@ LightEntry* lightGetPaper(void) {
     return &paperLight3DImg;
 }
 
+/** Returns the PAPERCRAFT light, a fixed point light up and to the left that mapdrv adds for some objects. */
 LightEntry* lightGetPaperCraft(void) {
     return &paperCraft;
 }
 
+/** Counts the enabled lights in the active group. */
 s32 lightGetEntryNum(void) {
     LightWork* wp = lightGetWork();
     LightEntry* entry = wp->entries;
@@ -336,6 +367,7 @@ s32 lightGetEntryNum(void) {
     return n;
 }
 
+/** Returns light slot index of the active group if it is enabled, else NULL. */
 LightEntry* lightNumberToPtr(s32 index) {
     LightWork* wp = lightGetWork();
     LightEntry* entry = &wp->entries[index];

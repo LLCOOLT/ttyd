@@ -370,6 +370,10 @@ static u8 scale_dt[][2] = {{0, 0}, {11, 13}, {22, 27}, {34, 41}, {46, 55}, {57, 
 #endif
 };
 
+/**
+ * Spawns a nozzle model (type picks the model) at (x, y, z) rotated by rx and ry for `life` frames;
+ * battle_stage_object.c uses it for the stage nozzle objects.
+ */
 EffectEntry* effNozleEntry(s32 type, f32 x, f32 y, f32 z, f32 rx, f32 ry, s32 life) {
     EffectEntry* effect;
     EffNozleWork* work;
@@ -428,6 +432,7 @@ EffectEntry* effNozleEntry(s32 type, f32 x, f32 y, f32 z, f32 rx, f32 ry, s32 li
     return effect;
 }
 
+/** Per frame: counts the life down and deletes the effect at the end; chooses the draw layer (8 or 2) by type. */
 static void effNozleMain(EffectEntry* effect) {
     EffNozleWork* work = effect->userdata;
     EffNozleWork* p;
@@ -522,6 +527,7 @@ static void effNozleMain(EffectEntry* effect) {
         }                                                     \
     }
 
+/** Draws the nozzle from its display lists with indexed vertex arrays (effect textures 60-62). */
 static void effNozleDisp(CameraId cameraId, EffectEntry* effect) {
     void** dl5;
     u8* sz5;

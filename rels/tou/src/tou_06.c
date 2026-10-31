@@ -46,24 +46,40 @@ static USER_FUNC(make_tbl);
 
 const char* cloud_kontena2_list[5];
 
+/**
+ * Door animation callback for the storage room door (door_1), opening: LW(0) is the swing angle;
+ * turns door_1 about the Y axis by 0.44 times the angle.
+ */
 static EVT_BEGIN(n_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the storage room door (door_1), closing:
+ * turns door_1 about the Y axis by -0.44 times the angle.
+ */
 static EVT_BEGIN(n_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the west door (door_2), opening: LW(0) is the swing angle;
+ * turns door_2 about the Y axis by 0.44 times the angle.
+ */
 static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_2"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the west door (door_2), closing:
+ * turns door_2 about the Y axis by -0.44 times the angle.
+ */
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_2"), 0, LW(0), 0)
@@ -110,12 +126,20 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
+/**
+ * Mario steps on the hole in the floor: controls lock
+ * and he falls into tou_05 (Grubba's office) through the "fall" entrance.
+ */
 EVT_BEGIN(evt_ana)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_bero_mapchange, STRING("tou_05"), STRING("fall"))
     RETURN
 EVT_END()
 
+/**
+ * Mario blows the storage containers (kontena) away:
+ * a success jingle plays and the story advances to STORY_STG3_20_09_BLOWING_CONTAINERS.
+ */
 EVT_BEGIN(evt_kontena)
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
     CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SUCCESS1"))
@@ -126,6 +150,10 @@ EVT_BEGIN(evt_kontena)
     RETURN
 EVT_END()
 
+/**
+ * The hidden staircase appears: the camera frames it, a paper-unfold animation plays with the stairs sound,
+ * the stairs and their hit volume are enabled and the story advances to STORY_STG3_20_10_HIDDEN_STAIRWAY.
+ */
 EVT_BEGIN(evt_kaidan)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, -90, 208, 680, -90, 80, -8, 1000, 11)
@@ -161,6 +189,7 @@ const char* cloud_kontena2_list[] = {
     NULL,
 };
 
+/** Hides the blown container's labels (fuda_1 to fuda_3) and sets GSWF_TOU06_CONTAINER_BLOWN. */
 EVT_BEGIN(evt_kontena2)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("fuda_1"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("fuda_2"), MAPOBJ_FLAG_HIDE)
@@ -169,6 +198,7 @@ EVT_BEGIN(evt_kontena2)
     RETURN
 EVT_END()
 
+/** Run when the floor block is broken: sets the story stage to STORY_STG3_20_11_HOLE_IN_THE_FLOOR. */
 static EVT_BEGIN(evt_block_broken)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_20_11_HOLE_IN_THE_FLOOR)
     RETURN
@@ -178,6 +208,10 @@ static s32 key_tbl[] = {
     ITEM_STORAGE_KEY_0x13, -1,
 };
 
+/**
+ * Check run before the locked door is used: if Mario carries ITEM_STORAGE_KEY_0x13 it shows the item menu
+ * (key_tbl); cancelling the menu cancels the door's action (evt_mobj_exec_cancel).
+ */
 static EVT_BEGIN(evt_chk)
     CALL(evt_pouch_check_item, ITEM_STORAGE_KEY_0x13, LW(0))
     IF_INT_GREATER(LW(0), 0)
@@ -193,6 +227,10 @@ static EVT_BEGIN(evt_chk)
     RETURN
 EVT_END()
 
+/**
+ * Unlocks the door: sets the story stage to STORY_STG3_20_15_UNLOCKING_THE_DOOR,
+ * switches on its entrance and removes ITEM_STORAGE_KEY_0x13 from the pouch.
+ */
 static EVT_BEGIN(evt_lock)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_20_15_UNLOCKING_THE_DOOR)
     SET_VALUE(LW(0), 1)
@@ -201,6 +239,11 @@ static EVT_BEGIN(evt_lock)
     RETURN
 EVT_END()
 
+/**
+ * Guess: scene where Mario meets Ms. Mowz (チュチュリーナ) in the storage room:
+ * Mowz's theme starts, Mario and Goombella react (stg3_tou_308, 309 and following),
+ * and she joins as the Badge-hunting thief introduction.
+ */
 EVT_BEGIN(evt_chuchu)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_CYUCYURINA1"))
@@ -386,11 +429,17 @@ static s32 list[] = {
     -116, 0, -111,
 };
 
+/** Trouble Center job 13 pickup handler: sets GSWF_TROUBLE_WORK_3 when the Battle Trunks are collected. */
 EVT_BEGIN(iri_13_pants_00_evt)
     SET_VALUE(GSWF(GSWF_TROUBLE_WORK_3), 1)
     RETURN
 EVT_END()
 
+/**
+ * Guess: trouble Center job 13 (find the lost Battle Trunks):
+ * puts the Battle Trunks item at a random location of the storage room, with a fly appearing as a hint,
+ * unless Mario already has them.
+ */
 EVT_BEGIN(iri_13_init)
     IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_1), 1)
         RETURN
@@ -449,6 +498,10 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Opens the storage room's item box (mobj_box00):
+ * takes control from Mario, the box pops an item (ITEM_CHARGE_P, the Charge P badge) and Mario receives it.
+ */
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
@@ -460,6 +513,10 @@ static EVT_BEGIN(mobj_box00)
     RETURN
 EVT_END()
 
+/**
+ * Map init for tou_06, the storage room: NPCs, the floor hole (evt_ana), the containers (cloud-blown),
+ * the Lv1 big blocks, the job 13 trunks, and the scene to run from story progress.
+ */
 EVT_BEGIN(tou_06_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
@@ -644,6 +701,7 @@ EVT_BEGIN(tou_06_init_evt)
     RETURN
 EVT_END()
 
+/** Script helper: args[0] = n, args[1] receives the string "pants%02d" (the n-th trunks marker name). */
 static USER_FUNC(iri_13_make_name) {
     static char name[8];
     EvtWord* args = event->args;
@@ -653,12 +711,14 @@ static USER_FUNC(iri_13_make_name) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: frees the shuffled location table made by make_tbl. */
 static USER_FUNC(free_tbl) {
     _mapFree(tbl);
     tbl = NULL;
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: args[0] = index; args[1..3] receive the x, y, z of the index'th shuffled trunks location. */
 static USER_FUNC(get_pos) {
     EvtWord* args = event->args;
     s32 n = evtGetValue(event, args[0]);
@@ -671,6 +731,7 @@ static USER_FUNC(get_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: builds a shuffled table of the 25 candidate locations for the Battle Trunks. */
 static USER_FUNC(make_tbl) {
     s32 i;
     s32 a;

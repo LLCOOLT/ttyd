@@ -38,6 +38,11 @@ static BeroEntry bero_entry_data[8];
 static HitDamageReturn dmgRetPoint[58];
 static NpcSetupInfo npcEnt[4];
 
+/**
+ * Door animation script (closing) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_door1_1 and S_door1_2 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door1_1"), 0, LW(0), 0)
@@ -46,6 +51,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_door1_1 and S_door1_2 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door1_1"), 0, LW(0), 0)
@@ -54,6 +64,11 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (closing) for the east door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_door2_1 and S_door2_2 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door2_1"), 0, LW(0), 0)
@@ -62,6 +77,11 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the east door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_door2_1 and S_door2_2 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(e_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door2_1"), 0, LW(0), 0)
@@ -70,6 +90,12 @@ static EVT_BEGIN(e_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (closing) for the north door,
+ * used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_door3_1 and S_door3_2 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(n_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door3_1"), 0, LW(0), 0)
@@ -78,6 +104,12 @@ static EVT_BEGIN(n_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the north door,
+ * used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_door3_1 and S_door3_2 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(n_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door3_1"), 0, LW(0), 0)
@@ -269,6 +301,12 @@ static HitDamageReturn dmgRetPoint[] = {
     {0},
 };
 
+/**
+ * Event script: the cutscene on the first entry to the Palace garden.
+ * Mario and the partner enter from the west, the camera pans to the door,
+ * the door swings open and shut behind them, the partner comments (stg8_las_11),
+ * the story progress is set to STORY_STG8_03_THE_PALACE_GARDEN and the room is entered normally.
+ */
 static EVT_BEGIN(first_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_get_party, LW(0))
@@ -344,6 +382,13 @@ static EVT_BEGIN(first_evt)
     RETURN
 EVT_END()
 
+/**
+ * Event script: crumbles a Chain Chomp statue wall after Bobbery blows it up.
+ * LW(0) is the statue's map object, LW(1) its hit object.
+ * It captures the statue into an offscreen image, hides the real object,
+ * plays the paper "OFF_d_bom_ver2" break animation,
+ * removes the statue's hit area and plays a short success jingle.
+ */
 EVT_BEGIN(bomb_wanwan)
     SET_VALUE(LW(14), LW(0))
     SET_VALUE(LW(15), LW(1))
@@ -390,6 +435,10 @@ EVT_BEGIN(bomb_wanwan)
     RETURN
 EVT_END()
 
+/**
+ * Event script: Bobbery explodes the first Chain Chomp statue (map object wan3, hit object A_wan1).
+ * Hides the letterbox, locks Mario's controls, runs bomb_wanwan and sets GSWF_LAS09_CHOMP_STATUE_1_BOMBED.
+ */
 EVT_BEGIN(bomb_wanwan1_evt)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -403,6 +452,10 @@ EVT_BEGIN(bomb_wanwan1_evt)
     RETURN
 EVT_END()
 
+/**
+ * Event script: Bobbery explodes the second Chain Chomp statue (wan1, hit object A_wan2).
+ * Same as bomb_wanwan1_evt but sets GSWF_LAS09_CHOMP_STATUE_2_BOMBED.
+ */
 EVT_BEGIN(bomb_wanwan2_evt)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -416,6 +469,12 @@ EVT_BEGIN(bomb_wanwan2_evt)
     RETURN
 EVT_END()
 
+/**
+ * Event script: runs when the first blue switch is pressed.
+ * After a camera move and an earthquake, three platform segments (S_daizadai1_1..3) flip over into place one
+ * after another, opening the way and the "Ship_Change" harbour exit;
+ * plays a success jingle if the other switch is already pressed.
+ */
 EVT_BEGIN(switch_1_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, 0, 400, 1368, 0, -40, 700, 1000, 11)
@@ -512,6 +571,11 @@ EVT_BEGIN(switch_1_evt)
     RETURN
 EVT_END()
 
+/**
+ * Event script: runs when the second blue switch is pressed.
+ * Same as switch_1_evt for the platforms S_daizadai2_1..3 and the harbour exit Ship_Change1,
+ * which is made walkable.
+ */
 EVT_BEGIN(switch_2_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, 0, 450, 45, 0, -75, -558, 1000, 11)
@@ -608,6 +672,10 @@ EVT_BEGIN(switch_2_evt)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of the dazed Shadow Sirens after the battle:
+ * Beldam, Marilyn and Doopliss each say a line, then the partner comments.
+ */
 EVT_BEGIN(goikkou_talk)
     CALL(evt_party_stop, 0)
     CALL(evt_msg_print, 0, STRING("stg8_las_27"), 0, STRING("マジョリン"))
@@ -619,18 +687,27 @@ EVT_BEGIN(goikkou_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Beldam (Majolyne): clears her battle-info flag and sets the invisible status bit,
+ * so she starts hidden until the cutscene calls her.
+ */
 EVT_BEGIN(majyorin_init)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_HAS_BATTLE_INFO)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/**
+ * Init of the Marilyn NPC: clears its battle info flag and sets status bit 2 (evt_npc_status_onoff).
+ * Unknown: what status bit 2 does; the Palace NPCs that start hidden or inert use it.
+ */
 static EVT_BEGIN(maririn_init)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_HAS_BATTLE_INFO)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/** Init event of Doopliss (Rampell): same as Beldam's, hidden until the cutscene. */
 EVT_BEGIN(ranpel_init)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_HAS_BATTLE_INFO)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
@@ -671,6 +748,10 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Event script: creates the NPC "にせ" with the Professor Frankly (Kurihakase) model, hidden below the floor.
+ * In the cutscene it plays the fake professor who turns out to be Doopliss.
+ */
 EVT_BEGIN(majyorin_evt_npc_entry)
     CALL(evt_npc_entry, STRING("にせ"), STRING("c_kuri_h"))
     CALL(evt_npc_set_tribe, STRING("にせ"), STRING("クリハカセ"))
@@ -680,6 +761,14 @@ EVT_BEGIN(majyorin_evt_npc_entry)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the cutscene before the Shadow Sirens battle.
+ * Beldam talks to Mario, Beldam and Marilyn appear,
+ * the fake Frankly transforms into Doopliss in a puff of smoke, they gloat and surround Mario,
+ * and the fight starts with battle info 8 (Beldam, Marilyn and Doopliss).
+ * Afterwards the three are shown dizzy with spinning stars, make a final remark,
+ * and the story moves to STORY_STG8_07_BELDAM_CONFRONTATION.
+ */
 EVT_BEGIN(majyorin_evt_main)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -839,6 +928,10 @@ EVT_BEGIN(majyorin_evt_main)
     RETURN
 EVT_END()
 
+/**
+ * Event script: waits for Mario to reach the trigger area near X 620 (on the walkway, not on the platform
+ * mod_38) and then starts majyorin_evt_main.
+ */
 EVT_BEGIN(majyorin_evt)
     CALL(evt_seq_wait, 2)
     SET_VALUE(LF(0), 0)
@@ -864,6 +957,13 @@ EVT_BEGIN(majyorin_evt)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for las_09: music and ambience, the doors, return points for the falling floor tiles,
+ * the water animation, the Shadow Sirens, a recovery block and a save block,
+ * the two Chain Chomp statues Bobbery can bomb, the two blue switches with their platforms,
+ * and the Shadow Sirens cutscene when the story is at STORY_STG8_06_MOVING_PLANETS.
+ * At STORY_STG8_02_FOLLOW_THE_LIT_TORCHES it plays the arrival cutscene.
+ */
 EVT_BEGIN(las_09_init_evt)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS3"))
@@ -939,6 +1039,10 @@ EVT_END()
 
 EffectEntry* effGuruguruN64Entry(s32 type, s32 num, f32 x, f32 y, f32 z, f32 radius);
 
+/**
+ * Script helper: starts a spinning star ring effect ("guruguru") around args[1..3] with radius args[4]
+ * and gives it the name args[0], so it can be deleted later. Used to show the Shadow Sirens dizzy.
+ */
 static USER_FUNC(eff_guruguru) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);

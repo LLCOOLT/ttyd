@@ -206,6 +206,10 @@ BattleUnitKind unitdata_Party_Nokotarou = {
     data_table,
 };
 
+/**
+ * Koops's battle entry: starts 250 units behind his home spot and, after 40 frames,
+ * runs in to it at speed 4 with his footstep sounds, then takes his stay pose.
+ */
 static EVT_BEGIN(battle_entry_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 250)
@@ -220,6 +224,11 @@ static EVT_BEGIN(battle_entry_event)
     RETURN
 EVT_END()
 
+/**
+ * Init for Koops: registers his wait, attack, damage, confusion and entry scripts and his walk,
+ * run and jump sounds; clears the shell-spin work (unit work 0-1, part work 0 and 2)
+ * and sets the Shell Toss spin sound's top pitch (unit work 4 = 3410, scaled by the charge in unit work 5).
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -239,6 +248,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Hit reaction: the default damage script with no special pose (LW10 = -2). */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -246,6 +256,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Run when Koops is switched into battle (data tag 4):
+ * if he was still flipped on his back (overturn count 1 or more),
+ * restores the flipped defence and pose tables and flag, then starts his pose from the table.
+ */
 EVT_BEGIN(change_party_spawn_init_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_PARTNER, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -257,6 +272,11 @@ EVT_BEGIN(change_party_spawn_init_event)
     RETURN
 EVT_END()
 
+/**
+ * Flipped reaction (data tag 13): Koops lands on his back for 2 turns,
+ * with the flipped defence and pose tables and the flipped status flag;
+ * drops any Defend, plays the status sound and bounces twice.
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -274,6 +294,11 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Turn-start recovery while flipped (data tag 2): counts the flip down;
+ * when it reaches 0 restores his normal defence and pose table,
+ * clears the flipped flag and hops back onto his feet.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -295,10 +320,12 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/** Empty: partner moves come from the player's menu choices, not a unit attack script. */
 static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle: plays the stay pose from the current pose table (normal or flipped). */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -534,6 +561,7 @@ BattleWeapon partyWeapon_NokotarouTsuranukiKoura = {
 #endif
 };
 
+/** Withdraws Koops into his shell for Shell Toss: shell pose PNK_K_2, spinning 15 degrees a frame for 24 frames. */
 static EVT_BEGIN(_change_koura_pose)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PNK_K_2"))
     LOOP(18)
@@ -548,6 +576,10 @@ static EVT_BEGIN(_change_koura_pose)
     RETURN
 EVT_END()
 
+/**
+ * Quicker shell withdraw for Shell Slam: a smoke puff, a 10-frame spin at 27 degrees a frame, 3 more at 30,
+ * and a second puff.
+ */
 static EVT_BEGIN(_change_koura_pose_fast)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_eff, 0, STRING("kemuri_test"), 5, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
@@ -566,6 +598,10 @@ static EVT_BEGIN(_change_koura_pose_fast)
     RETURN
 EVT_END()
 
+/**
+ * Pops Koops back out of his shell: stops the spin loop (unit work 0 = 0),
+ * resets his rotation and turns him through two short spins while switching shell poses.
+ */
 static EVT_BEGIN(_restore_koura_pose)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
@@ -583,6 +619,12 @@ static EVT_BEGIN(_restore_koura_pose)
     RETURN
 EVT_END()
 
+/**
+ * Starts the shell-spin loop in an inline event.
+ * LW0 is the starting spin speed and unit work 1 the target speed in degrees per frame (negative = the other
+ * way); the speed moves 1 a frame toward it, unit work 2 set reverses it,
+ * and with part work 0 set a smoke puff appears each turn. Runs until unit work 0 is cleared.
+ */
 static EVT_BEGIN(_koura_rotate_start)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
@@ -643,12 +685,17 @@ static EVT_BEGIN(_koura_rotate_start)
     RETURN
 EVT_END()
 
+/** Stops the shell-spin loop (unit work 0 = 0) and resets Koops's rotation. */
 static EVT_BEGIN(_koura_rotate_stop)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     RETURN
 EVT_END()
 
+/**
+ * Koops's first strike, used when he hits an enemy in the field to start the battle:
+ * he spins in his shell from offstage into the first-attack target, bounces back and returns home.
+ */
 EVT_BEGIN(partyNokotarouAttack_FirstAttack)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -707,6 +754,10 @@ EVT_BEGIN(partyNokotarouAttack_FirstAttack)
     RETURN
 EVT_END()
 
+/**
+ * Koops's Shell Toss: he spins in his shell along the ground into the front enemy,
+ * the action command (charging the spin) setting the damage, then bounces back home.
+ */
 EVT_BEGIN(partyNokotarouAttack_NormalAttack)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -944,6 +995,10 @@ EVT_BEGIN(partyNokotarouAttack_NormalAttack)
     RETURN
 EVT_END()
 
+/**
+ * Koops's Power Shell: he spins in his shell and sweeps through every enemy on the ground,
+ * the action command deciding the damage, then returns home.
+ */
 EVT_BEGIN(partyNokotarouAttack_SyubibinKoura)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -1170,6 +1225,11 @@ BattleUnitSetup entry_koura = {
     NULL, // itemDropTable
 };
 
+/**
+ * Koops's Shell Shield: removes any existing shell,
+ * then drops a new shell unit (unit_koura) over Mario whose HP the action command sets.
+ * Mario is hidden and untargetable inside it; if he still has a move, the shell opens again.
+ */
 EVT_BEGIN(partyNokotarouAttack_KouraGuard)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -1422,6 +1482,10 @@ EVT_BEGIN(partyNokotarouAttack_KouraGuard)
     RETURN
 EVT_END()
 
+/**
+ * Koops's Shell Slam: he charges a spin with the action command (_tsuranuki_effect_control grows the effect with
+ * the charge level) and slams through every ground enemy, ignoring defence, then returns home.
+ */
 EVT_BEGIN(partyNokotarouAttack_TsuranukiKoura)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -1701,6 +1765,7 @@ EVT_BEGIN(partyNokotarouAttack_TsuranukiKoura)
     RETURN
 EVT_END()
 
+/** Koops's Appeal (data tag 5): appeal pose and sound, then the audience is fired up. */
 EVT_BEGIN(nokotarou_appeal_event)
     CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_APPEAL)
@@ -1713,6 +1778,7 @@ EVT_BEGIN(nokotarou_appeal_event)
     RETURN
 EVT_END()
 
+/** Victory reaction (data tag 64): Koops's PNK_Y_1 pose, unless he is still flipped on his back. */
 static EVT_BEGIN(party_win_reaction)
     CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 17, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -1721,6 +1787,10 @@ static EVT_BEGIN(party_win_reaction)
     RETURN
 EVT_END()
 
+/**
+ * Audience-attack reaction (data tag 6): Koops runs offstage, reappears in the audience, spins up in his shell,
+ * shoots into the chosen audience member, bounces back out of his shell and runs home.
+ */
 static EVT_BEGIN(attack_audience_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetStageSize, LW(3), EVT_NULLPTR, EVT_NULLPTR)
@@ -1788,6 +1858,10 @@ static EVT_BEGIN(attack_audience_event)
     RETURN
 EVT_END()
 
+/**
+ * Data tag 67, run on Koops (args in LW(10)/LW(11)) when he is revived:
+ * resets his defence and pose tables to the upright ones and clears the flipped flag. Not in the US demo.
+ */
 #if VERSION >= VERSION_JP
 EVT_BEGIN(nokotarou_revive_event)
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence))
@@ -1797,6 +1871,12 @@ EVT_BEGIN(nokotarou_revive_event)
 EVT_END()
 #endif
 
+/**
+ * Builds Koops's battle move list (data tag 1):
+ * Shell Toss and Power Shell always (with fixed menu icons),
+ * Shell Shield from Super rank and Shell Slam from Ultra rank,
+ * appending each to command->weapon and advancing *count.
+ */
 static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     s32 techLv;
 
@@ -1839,6 +1919,10 @@ static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     }
 }
 
+/**
+ * Returns Mario's moves remaining this turn in args[0];
+ * Shell Shield opens the new shell right away when he still has a move.
+ */
 static USER_FUNC(_check_mario_move_count) {
     s32 index = event->args[0];
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
@@ -1847,6 +1931,11 @@ static USER_FUNC(_check_mario_move_count) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Reads or writes unit args[0]'s moveColorLv: with args[1] zero it is returned in args[2],
+ * otherwise set to args[2].
+ * Shell Shield saves Mario's value, sets it to 255 during the move and restores it after.
+ */
 static USER_FUNC(_color_lv_set) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1866,6 +1955,11 @@ static USER_FUNC(_color_lv_set) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Runs Shell Slam's shell effect on unit args[0] until stopped:
+ * spawns it on the first call, follows the unit, and eases its size toward the charge level in part work[1];
+ * part work[2] set ends it and deletes the effect.
+ */
 static USER_FUNC(_tsuranuki_effect_control) {
     BattleWork* wp;
     BattleUnit* unit;
@@ -1917,6 +2011,7 @@ static USER_FUNC(_tsuranuki_effect_control) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Returns in args[1] the unit id of the Shell Shield shell covering unit args[0], or -1 when it has none. */
 static USER_FUNC(_check_guard_koura) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;

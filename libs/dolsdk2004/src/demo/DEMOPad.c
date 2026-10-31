@@ -19,6 +19,12 @@ u32 DemoNumValidPads;
 // prototypes
 static void DEMOPadCopy(PADStatus* pad, DEMODMPad* dmpad);
 
+/**
+ * Updates one DEMODMPad from a fresh PADStatus:
+ * builds a direction mask from the main and C sticks (threshold 0x30),
+ * then the newly pressed and released directions and buttons and the stick deltas since last time,
+ * and stores the status. If the pad is disconnected (error -3) the changes are all zero.
+ */
 static void DEMOPadCopy(PADStatus* pad, DEMODMPad* dmpad) {
     u16 dirs;
 
@@ -67,6 +73,10 @@ static void DEMOPadCopy(PADStatus* pad, DEMODMPad* dmpad) {
     }
 }
 
+/**
+ * Reads and clamps all four controllers, counts the usable ones (DemoNumValidPads),
+ * fills DemoPad[] with DEMOPadCopy and calls PADReset for pads that report error -1 (not ready).
+ */
 void DEMOPadRead(void) {
     s32 i;
     u32 ResetReq = 0;
@@ -91,6 +101,7 @@ void DEMOPadRead(void) {
     }
 }
 
+/** Initialises the PAD library and zeroes all four DemoPad entries. */
 void DEMOPadInit(void) {
     s32 i;
 

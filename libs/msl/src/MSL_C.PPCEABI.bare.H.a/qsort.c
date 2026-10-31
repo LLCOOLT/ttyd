@@ -18,6 +18,10 @@ typedef int (*_compare_function)(const void*, const void*);
         }                                            \
     } while (0)
 
+/**
+ * Standard qsort(): in-place heapsort of num_members elements of member_size bytes,
+ * ordered by the compare_members callback.
+ */
 void qsort(void* table_base, size_t num_members, size_t member_size, _compare_function compare_members) {
     size_t l, r, j;
     char* lp;

@@ -24,12 +24,20 @@ static BOOL DBGWriteMailbox(u32);
 static BOOL DBGReadMailbox(void*);
 static BOOL DBGEXIImm(void*, s32, u32);
 
+/**
+ * Masks the EXI channel 2 interrupts (mask 0x18000) and clears the channel 2 control/status register,
+ * preparing the debugger link.
+ */
 static void DBGEXIInit(void)
 {
 	__OSMaskInterrupts(0x18000);
 	__EXIRegs[10] = 0;
 }
 
+/**
+ * Selects device v on EXI channel 2 by writing the chip-select bits
+ * and a clock field (0x80) into the channel 2 control register, keeping only bits 0x405 of the old value.
+ */
 static BOOL DBGEXISelect(u32 v)
 {
 	u32 regs = __EXIRegs[10];
@@ -39,12 +47,14 @@ static BOOL DBGEXISelect(u32 v)
 	return TRUE;
 }
 
+/** Deselects the EXI channel 2 device by clearing everything but bits 0x405 of the control register. */
 static BOOL DBGEXIDeselect(void)
 {
 	__EXIRegs[10] &= 0x405;
 	return TRUE;
 }
 
+/** Busy-waits until the EXI channel 2 transfer-in-progress bit clears. */
 static BOOL DBGEXISync(void)
 {
 	while (__EXIRegs[13] & 1)
@@ -52,6 +62,11 @@ static BOOL DBGEXISync(void)
 	return TRUE;
 }
 
+/**
+ * Performs an immediate (single-word) transfer of 1 to 4 bytes on EXI channel 2:
+ * for a write it packs the bytes big-endian into the data register, starts the transfer and waits;
+ * for a read it unpacks the data register into the buffer afterwards.
+ */
 static BOOL DBGEXIImm(void* data, s32 byte_size, u32 write)
 {
 	u32 writeVal;
@@ -81,6 +96,10 @@ static BOOL DBGEXIImm(void* data, s32 byte_size, u32 write)
 	return TRUE;
 }
 
+/**
+ * Reads the debugger host's mailbox word over EXI channel 2: sends the command 0x6000 and reads the reply.
+ * Returns TRUE on success.
+ */
 static BOOL DBGReadMailbox(void* param1)
 {
 	BOOL error = FALSE;
@@ -100,6 +119,10 @@ static BOOL DBGReadMailbox(void* param1)
 	return !error;
 }
 
+/**
+ * Writes a 29-bit value into the host mailbox (command 0xC0000000 plus the value) to tell the debugger host that
+ * data is waiting. Returns TRUE on success.
+ */
 static BOOL DBGWriteMailbox(u32 param_1)
 {
 	BOOL error = FALSE;
@@ -117,6 +140,10 @@ static BOOL DBGWriteMailbox(u32 param_1)
 	return !error;
 }
 
+/**
+ * Reads byte_size bytes (in 4-byte words, rounded up) from the host's shared buffer at offset param1 into data,
+ * using command 0x20000000 and consecutive immediate reads. Returns TRUE if every EXI step succeeded.
+ */
 static BOOL DBGRead(u32 param1, u32* data, s32 byte_size)
 {
 	BOOL error   = FALSE;
@@ -148,6 +175,10 @@ static BOOL DBGRead(u32 param1, u32* data, s32 byte_size)
 	return !error;
 }
 
+/**
+ * Writes byte_size bytes (in 4-byte words, rounded up) from data into the host's shared buffer at offset param1,
+ * using command 0xA0000000 and consecutive immediate writes. Returns TRUE if every EXI step succeeded.
+ */
 static BOOL DBGWrite(u32 param1, u32* data, s32 byte_size)
 {
 	BOOL error   = FALSE;
@@ -179,6 +210,10 @@ static BOOL DBGWrite(u32 param1, u32* data, s32 byte_size)
 	return !error;
 }
 
+/**
+ * Reads the host's status word over EXI channel 2 (command 0x4000);
+ * bit 1 means the host has a mailbox message, bit 2 means it is busy. Returns TRUE on success.
+ */
 static BOOL DBGReadStatus(void* param_1)
 {
 	BOOL error = FALSE;
@@ -198,6 +233,10 @@ static BOOL DBGReadStatus(void* param_1)
 	return !error;
 }
 
+/**
+ * Default debugger interrupt callback: sets EXIInputFlag to tell the debug monitor that input arrived,
+ * then calls the monitor's own callback (MTRCallback) if one was registered by DBInitComm.
+ */
 static void MWCallback(s32 interrupt, OSContext* context)
 {
 	EXIInputFlag = 1;
@@ -206,6 +245,10 @@ static void MWCallback(s32 interrupt, OSContext* context)
 	}
 }
 
+/**
+ * Interrupt handler installed for the EXI debug interrupt (0x19):
+ * acknowledges it in the processor-interface register and calls DBGCallback.
+ */
 static void DBGHandler(__OSInterrupt interrupt, OSContext* context)
 {
 	__PIRegs[0] = 0x1000;
@@ -214,6 +257,11 @@ static void DBGHandler(__OSInterrupt interrupt, OSContext* context)
 	}
 }
 
+/**
+ * Polls the host: if the status says a mailbox message is pending, reads it,
+ * and if it is a data-ready message (0x1F in the top byte after masking) records the message in SendMailData,
+ * the received length in RecvDataLeng and sets EXIInputFlag.
+ */
 static void CheckMailBox(void)
 {
 	u32 local_8[2];
@@ -230,6 +278,10 @@ static void CheckMailBox(void)
 	}
 }
 
+/**
+ * Initialises debugger communication: hands the caller a pointer to the input-ready flag,
+ * stores the monitor's callback, and initialises EXI channel 2 with interrupts disabled around it.
+ */
 void DBInitComm(u8** param_1, InterruptHandlerLike param_2)
 {
 	BOOL enabled;
@@ -242,6 +294,10 @@ void DBInitComm(u8** param_1, InterruptHandlerLike param_2)
 	OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Installs DBGHandler as the handler for the EXI debug interrupt (0x19) with MWCallback as its callback,
+ * masking and then unmasking the interrupt around the change.
+ */
 void DBInitInterrupts(void)
 {
 	__OSMaskInterrupts(0x18000);
@@ -251,6 +307,10 @@ void DBInitInterrupts(void)
 	__OSUnmaskInterrupts(0x40);
 }
 
+/**
+ * Clears the input flag and, if no received data is pending, polls the host mailbox;
+ * returns the number of bytes waiting for DBRead (0 if none).
+ */
 u32 DBQueryData(void)
 {
 	BOOL enable;
@@ -264,6 +324,10 @@ u32 DBQueryData(void)
 	return RecvDataLeng;
 }
 
+/**
+ * Reads the pending received bytes (length rounded up to 4) from the host's receive buffer into param1 (the
+ * buffer used depends on bit 0x10000 of the last mail), then marks the data as consumed. Always returns 0.
+ */
 u32 DBRead(u32* param1, s32 param2)
 {
 	BOOL enabled;
@@ -282,6 +346,12 @@ u32 DBRead(u32* param1, s32 param2)
 	return 0;
 }
 
+/**
+ * Sends size bytes to the debugger host: waits until the host is not busy,
+ * writes the data into the alternating transmit buffer,
+ * then posts a mailbox message with a sequence number and the length, waiting for the host to accept it.
+ * Always returns 0.
+ */
 BOOL DBWrite(void* data, u32 size)
 {
 	u32 value;
@@ -317,6 +387,8 @@ BOOL DBWrite(void* data, u32 size)
 	return 0;
 }
 
+/** Empty; the debugger link needs no explicit open. */
 void DBOpen(void) { }
 
+/** Empty; the debugger link needs no explicit close. */
 void DBClose(void) { }

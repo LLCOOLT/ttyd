@@ -57,6 +57,13 @@ static HitDamageReturn hitDmgRetPoints[6];
 static HitDamageReturn hitDmgRetPoints[7];
 #endif
 
+/**
+ * Script helper that makes an NPC (or the second partner, when the name resolves to -2) tremble.
+ * args: [0] NPC name, [1] axis (0 X, 1 Y, 2 Z), [2] amplitude, [3] half-period in ms,
+ * [4] total duration in ms (0 = until the script is stopped).
+ * The NPC is nudged between +amplitude and -amplitude every half period and returns to where it started
+ * when the time is up.
+ */
 static USER_FUNC(tik_npc_buruburu) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -133,6 +140,11 @@ static USER_FUNC(tik_npc_buruburu) {
     return EVT_RETURN_YIELD;
 }
 
+/**
+ * Recursive helper for hitIsGroup.
+ * Walks the hit-tree below node (child first, then siblings when checkSibling is set) and returns TRUE
+ * if any joint has the same name as target's.
+ */
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling) {
     if (strcmp(target->joint->name, node->joint->name) == 0) {
         return TRUE;
@@ -146,6 +158,10 @@ static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling) 
     return FALSE;
 }
 
+/**
+ * Returns TRUE if the collision target is the group's top hit or one of the hits below it,
+ * comparing joint names; FALSE when target is NULL.
+ */
 static BOOL hitIsGroup(HitEntry* target, HitEntry* group) {
     if (target != NULL) {
         return _hitIsGroupSub(target, group, FALSE);
@@ -153,6 +169,11 @@ static BOOL hitIsGroup(HitEntry* target, HitEntry* group) {
     return FALSE;
 }
 
+/**
+ * Script helper that carries Mario and his two partners along with a moving platform.
+ * args[0] is the platform's hit name and args[1] the platform's X movement this frame;
+ * each of the three that is standing on that hit group gets the movement added as floor movement.
+ */
 static USER_FUNC(mario_hosei_all) {
     EvtWord* args = event->args;
     HitEntry* hit = hitNameToPtr((const char*)evtGetValue(event, args[0]));
@@ -173,6 +194,7 @@ static USER_FUNC(mario_hosei_all) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Sets the vertical scale (scaleY) of the named N64-style ripple effect to the float args[1]. */
 static USER_FUNC(ripple_scale_func) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -182,6 +204,7 @@ static USER_FUNC(ripple_scale_func) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Tints the named dust (hokori) effect a dull grey-brown (RGB 0x70, 0x58, 0x58). */
 static USER_FUNC(hokori_color_func) {
     EffectEntry* effect = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
 
@@ -191,6 +214,10 @@ static USER_FUNC(hokori_color_func) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper.
+ * Gives the named NPC (the Blooper) the geso_checkpose table, which defines how the game checks its poses.
+ */
 static USER_FUNC(geso_set_checkpose) {
     const char* name = (const char*)evtGetValue(event, event->args[0]);
     NpcEntry* npc = evtNpcNameToPtr(event, name);
@@ -320,15 +347,18 @@ static BeroEntry bero_entry_data2[] = {
     {0},
 };
 
+/** Init script for the Blooper (geso, ゲッソー) NPC; does nothing. */
 EVT_BEGIN(geso_init)
     RETURN
 EVT_END()
 
+/** Talk script for the Blooper; says mac_0_124. */
 EVT_BEGIN(geso_talk)
     CALL(evt_msg_print, 0, STRING("mac_0_124"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/** Ends the Blooper cutscene when his battle unit dies; clears GF(0) which the cutscene waits on, after a second. */
 EVT_BEGIN(geso_dead)
     SET_VALUE(GF(0), 0)
     WAIT_MS(1000)
@@ -352,6 +382,12 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Slides one floating island (ukishima) of the Blooper room back and forth along X and keeps its hit area
+ * and anything standing on it in step (mario_hosei_all).
+ * Arguments in LW: [4] map object, [5] hit name, [6] and [7] the two end X positions,
+ * [8] and [9] the move and rest times in ms. Plays the island-move sound on each pass.
+ */
 EVT_BEGIN(ukishima_move)
     CALL(evt_hit_bind_mapobj, LW(5), LW(4))
     SET_FLOAT_VALUE(LW(2), LW(6))
@@ -398,6 +434,10 @@ EVT_END()
 
 char geso_checkpose[] = "M_S_1";
 
+/**
+ * Raises the two floating islands (ugo_yuka_1 and ugo_yuka_2) of the Blooper room out of the water,
+ * from 30 units below their rest height in 100 ms, moving their hit areas with them.
+ */
 static EVT_BEGIN(ukishima_apper)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("ugo_yuka_1"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("ugo_yuka_2"), MAPOBJ_FLAG_BBOX_CULL)
@@ -523,6 +563,15 @@ static EVT_BEGIN(ukishima_apper)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene and battle with the Blooper (geso, the prologue boss),
+ * started from the map init at STORY_STG0_17_BADGE_TUTORIAL.
+ * Mario is held back at X = -410 until the scene triggers;
+ * the Blooper's tentacle (ゲッソーのゲソ) and then the Blooper rise out of the water (mac_0_125, mac_0_126),
+ * the battle starts (battle info 3), and afterwards he leaves in a crash.
+ * The road of islands then appears (ukishima_apper),
+ * story progress is set to STORY_STG0_19_BLOOPER_BATTLE and the sewer music returns.
+ */
 EVT_BEGIN(geso_battle)
     CALL(evt_npc_set_position, STRING("ゲッソー"), -385, -60, 0)
     CALL(evt_npc_set_anim, STRING("ゲッソー"), STRING("GSO_S_1"))
@@ -699,6 +748,12 @@ EVT_BEGIN(geso_battle)
     RETURN
 EVT_END()
 
+/**
+ * Bobbery bomb trigger for the cracked wall w_bwro_2:
+ * plays the break sound, enables the exit behind it and its hit area,
+ * sets GSWF_TIK01_WALL2_BOMBED and plays the paper-style collapse animation over the wall (the same flag as the
+ * other side in tik_01).
+ */
 static EVT_BEGIN(wall_bomb)
     BEGIN_INLINE_EVENT
         WAIT_MS(200)
@@ -753,6 +808,13 @@ static HitDamageReturn hitDmgRetPoints[] = {
     {0},
 };
 
+/**
+ * Map init script of tik_02, the Blooper room.
+ * Starts the music and the water animations, sets up the exits, the cracked wall to bomb with Bobbery,
+ * the Shine Sprite power block and the floating islands (sunk out of sight before the battle,
+ * sliding on their own after STORY_STG0_19_BLOOPER_BATTLE). Starts geso_battle at STORY_STG0_17_BADGE_TUTORIAL.
+ * Until Petal Meadows opens the pipe exit (dokan) is switched off and its destination replaced.
+ */
 EVT_BEGIN(tik_02_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)

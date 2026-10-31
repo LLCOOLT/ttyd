@@ -97,6 +97,10 @@ Vec fukkipoint[] = {
 };
 
 #if VERSION >= VERSION_JP
+/**
+ * Event wrapper that runs yuu_02_icon_monte_entry as a blocking view event,
+ * so the checkpoint arrow icon is drawn for the whole minigame.
+ */
 EVT_BEGIN(yuu_02_icon_monte_entry_evt)
     CALL(yuu_02_icon_monte_entry)
     RETURN
@@ -117,25 +121,33 @@ static MonteZoneTable montetable[] = {
     {0.0f, 0.0f, 0.0f, 0.0f, 0, 0},
 };
 
+/** The Tube Mode game's coin event (data->viewEvent): runs fall_rtn, which places and collects the coins. */
 static EVT_BEGIN(minigame_view_monte)
     CALL(fall_rtn)
     RETURN
 EVT_END()
 
 #if VERSION >= VERSION_JP
+/** Resets the camera shift offset (camShiftReset) so the camera returns to its normal framing after the minigame. */
 USER_FUNC(yuu_02_cam_shift_reset) {
     camShiftReset();
     return EVT_RETURN_DONE;
 }
 
+/** Shows the one-entry arrow icon array (icon_monte_p[idx]). */
 void yuu_02_icon_monte_on(s32 idx) {
     icon_monte_p[idx].hidden = 0;
 }
 
+/** Hides the arrow icon array entry idx. */
 void yuu_02_icon_monte_off(s32 idx) {
     icon_monte_p[idx].hidden = 1;
 }
 
+/**
+ * args[0] = on/off, args[1] = icon index.
+ * Shows or hides that entry of the arrow icon array if it has been created.
+ */
 USER_FUNC(yuu_02_icon_monte_onoff) {
     EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
@@ -151,6 +163,11 @@ USER_FUNC(yuu_02_icon_monte_onoff) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * 2D draw callback for the arrow icon (ICON_163):
+ * flips it to face the direction of travel depending on which side (z sign) of the course Mario is on,
+ * and nudges it back and forth in a short blink cycle. Guess: it warns that the player is rolling the wrong way.
+ */
 void yuu_02_icon_monte_disp(CameraId camera, void* param) {
     Monte* monte = param;
     MarioWork* mario = marioGetPtr();
@@ -176,6 +193,10 @@ void yuu_02_icon_monte_disp(CameraId camera, void* param) {
     }
 }
 
+/**
+ * View event that creates the single hidden arrow icon on its first call,
+ * registers yuu_02_icon_monte_disp as a 2D draw callback and then blocks forever.
+ */
 USER_FUNC(yuu_02_icon_monte_entry) {
     BOOL exists = FALSE;
     MiniGameWork* wp = (MiniGameWork*)event->lwData[0];
@@ -212,6 +233,7 @@ USER_FUNC(yuu_02_icon_monte_entry) {
 }
 #endif
 
+/** Returns TRUE when two points are within 20 units in 3D and within 20 in height, i.e. Mario is touching a coin. */
 static BOOL get_monte_check(Vec* a, Vec* b) {
     if (PSVECDistance(a, b) < 20.0f && __fabs(a->y - b->y) < 20.0) {
         return TRUE;
@@ -219,6 +241,7 @@ static BOOL get_monte_check(Vec* a, Vec* b) {
     return FALSE;
 }
 
+/** Draw callback that renders every coin icon of a Monte array that has not been collected yet. */
 static void monte_disp(CameraId camera, void* param) {
     Monte* monte = param;
     s32 i;
@@ -232,6 +255,13 @@ static void monte_disp(CameraId camera, void* param) {
     }
 }
 
+/**
+ * Frame-by-frame coin spawner and collector for Tube Mode.
+ * On first call it scatters coins on the course according to montetable (checking by a downward floor probe that
+ * each coin sits over solid ground; type 2 zones keep only some of their candidates visible),
+ * then each frame it checks Mario against every coin, counting and hiding collected ones with a 3D sound.
+ * Blocks forever as a view event.
+ */
 static USER_FUNC(fall_rtn) {
     MiniGameWork* wp = (MiniGameWork*)event->lwData[0];
     BOOL exists = FALSE;
@@ -384,6 +414,10 @@ static USER_FUNC(fall_rtn) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Resets the coins for the next round: stops the view event,
+ * frees the Monte array and starts a fresh minigame_view_monte event.
+ */
 static USER_FUNC(re_fall_rtn) {
     RollWork* data;
 
@@ -400,6 +434,7 @@ static USER_FUNC(re_fall_rtn) {
     return EVT_RETURN_DONE;
 }
 
+/** args[0] = minigame work pointer, args[1] = new phase for the Tube Mode state machine. */
 static USER_FUNC(yuuminigame3_set_phase) {
     EvtWord* args = event->args;
     RollWork* data = ((MiniGameWork*)evtGetValue(event, args[0]))->data;
@@ -408,15 +443,21 @@ static USER_FUNC(yuuminigame3_set_phase) {
     return EVT_RETURN_DONE;
 }
 
+/** Script call that locks Mario's rolling speed/direction for the course (marioRollFixOn). */
 static USER_FUNC(yuuminigame3_roll_fix_on) {
     marioRollFixOn();
     return EVT_RETURN_DONE;
 }
 
+/** Counterpart of yuuminigame3_roll_fix_on; currently does nothing. */
 static USER_FUNC(yuuminigame3_roll_fix_off) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * args[0] = minigame work pointer, args[1] = on/off.
+ * Sets or clears the "opening cutscene pending" bit (flags bit 0).
+ */
 static USER_FUNC(yuuminigame3_opening_on_off) {
     EvtWord* args = event->args;
     RollWork* data = ((MiniGameWork*)evtGetValue(event, args[0]))->data;
@@ -429,6 +470,10 @@ static USER_FUNC(yuuminigame3_opening_on_off) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * args[0] = minigame work pointer, args[1] = output.
+ * Writes 1 if the opening cutscene is still pending (flags bit 0), else 0.
+ */
 static USER_FUNC(yuuminigame3_opening_chk) {
     EvtWord* args = event->args;
     MiniGameWork* wp = (MiniGameWork*)evtGetValue(event, args[0]);
@@ -441,6 +486,10 @@ static USER_FUNC(yuuminigame3_opening_chk) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Init callback for minigame 3: starts the coin view event (and, JP and later, the arrow icon event),
+ * marks the opening cutscene as pending and switches Mario to the tube-rolling motion.
+ */
 void yuuminigame_init_3roll(EventEntry* event, BOOL isFirstCall) {
     RollWork* data = ((MiniGameWork*)event->lwData[0])->data;
 #if VERSION >= VERSION_JP
@@ -455,6 +504,10 @@ void yuuminigame_init_3roll(EventEntry* event, BOOL isFirstCall) {
     marioChgRollMotion();
 }
 
+/**
+ * Per-frame state machine for Tube Mode: phase 1 starts minigame03_start, phases 2 and 3 run the rules check,
+ * phase 4 launches minigame03_end with the coin counter, a result value and the coin count.
+ */
 void yuuminigame_main_3roll(EventEntry* event, BOOL isFirstCall) {
     MiniGameWork* wp = (MiniGameWork*)event->lwData[0];
     RollWork* data = wp->data;
@@ -502,16 +555,27 @@ void yuuminigame_main_3roll(EventEntry* event, BOOL isFirstCall) {
     }
 }
 
+/** Draw callback for minigame 3: draws the collected-coin counter (monteCountDisp). */
 void yuuminigame_disp_3roll(CameraId camera, void* param) {
     monteCountDisp();
 }
 
+/**
+ * Script call that resets Mario's tube rolling speed and clears the roll event flag,
+ * used after he is put back on the course.
+ */
 static USER_FUNC(yuu_roll_reset) {
     marioResetRollSpd();
     clrRollEvtFlag();
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Per-frame rules of Tube Mode: when Mario falls off the course (y <= -50) it starts yuu_02_jumpret to put him
+ * back at the last checkpoint (fukkipoint) and counts a penalty;
+ * otherwise it tracks the checkpoint index as he rolls along the course (JP and later also allow going
+ * backwards). Returns TRUE when the counter runs out or the last checkpoint is reached.
+ */
 BOOL yuuminigame3_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp, RollWork* data) {
     MarioWork* mario = marioGetPtr();
 
@@ -580,6 +644,12 @@ BOOL yuuminigame3_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
     return FALSE;
 }
 
+/**
+ * Event that recovers Mario after falling off the Tube Mode course:
+ * freezes the camera, waits until he has dropped out of sight,
+ * teleports him above the last checkpoint (LW(0) to LW(3) = x, drop y, z, floor y), lets him fall,
+ * spawns a dust puff on landing and gives control back.
+ */
 EVT_BEGIN(yuu_02_jumpret)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION >= VERSION_JP
@@ -636,12 +706,17 @@ EVT_BEGIN(yuu_02_jumpret)
     RETURN
 EVT_END()
 
+/** Puts Mario on the Tube Mode starting spot (x 200, z 300) facing right. */
 EVT_BEGIN(yuu_02_kaijo_init)
     CALL(evt_mario_set_pos, 200, 0, 300)
     CALL(evt_mario_set_dir, 90, 0, 0)
     RETURN
 EVT_END()
 
+/**
+ * Puts Mario back on the start spot after the opening camera
+ * or between rounds (x 200 on US and later, 300 in the US demo, z 300).
+ */
 EVT_BEGIN(yuu_02_kaijo_init2)
 #if VERSION <= VERSION_DEMO_US
     CALL(evt_mario_set_pos, 300, 0, 300)
@@ -652,6 +727,10 @@ EVT_BEGIN(yuu_02_kaijo_init2)
     RETURN
 EVT_END()
 
+/**
+ * Set-up for minigame 3 (Tube Mode): freezes Mario's controls, allocates the minigame work area,
+ * dismisses the partners, starts the crowd sound and sets phase 1.
+ */
 EVT_BEGIN(minigame03_main)
     CALL(evt_mario_key_onoff, 0)
     CALL_CHILD(yuu_02_kaijo_init)
@@ -665,6 +744,10 @@ EVT_BEGIN(minigame03_main)
     RETURN
 EVT_END()
 
+/**
+ * Opening cutscene of Tube Mode: pans the 3D camera across the course,
+ * then shows the "menu_title_minigame3" title card.
+ */
 EVT_BEGIN(minigame03_start_cam)
     CALL(evt_cam3d_evt_set, FLOAT(-1600.0f), FLOAT(573.0f), FLOAT(1333.0f), FLOAT(-1600.0f), FLOAT(12.0f), FLOAT(-89.0f), 0, 11)
     WAIT_FRAMES(1)
@@ -686,6 +769,10 @@ EVT_BEGIN(minigame03_start_cam)
     RETURN
 EVT_END()
 
+/**
+ * Cleans up when the player skips the opening camera:
+ * frees the title card, turns off the event camera and puts Mario at the start spot.
+ */
 EVT_BEGIN(minigame03_start_cam_cancel)
     CALL(evt_seq_wait, 2)
     CALL(evt_yuutitle_free)
@@ -696,6 +783,11 @@ EVT_BEGIN(minigame03_start_cam_cancel)
     RETURN
 EVT_END()
 
+/**
+ * Phase 1 of Tube Mode: starts the two moving platforms (ugo1, ugo2), plays the opening camera (skippable),
+ * starts the minigame music, shows the countdown effect,
+ * locks the rolling controls and starts the 70-second coin counter.
+ */
 EVT_BEGIN(minigame03_start)
     CALL(yuu_atai_init)
     CALL(yuu_atai_push, LW(0))
@@ -774,6 +866,12 @@ EVT_BEGIN(minigame03_start)
     RETURN
 EVT_END()
 
+/**
+ * Ends a Tube Mode round: keeps Mario from falling while the effect plays, removes the moving platforms,
+ * shows the success or failure effect, the score and monte rewards, and pays out the collected coins as medals.
+ * Then asks whether to play again: quitting (or having fewer than 10 medals) sets GSWF_YUU_MINIGAME_QUIT
+ * and returns Mario to gor_03; playing again charges 10 medals and resets the course.
+ */
 EVT_BEGIN(minigame03_end)
 #if VERSION >= VERSION_JP
     CALL(evt_cam_letter_box_onoff, 1, 0)
@@ -854,6 +952,7 @@ EVT_BEGIN(minigame03_end)
     RETURN
 EVT_END()
 
+/** Spins the map object "S_en1" (a rotating part of the Tube Mode set) around Y forever at 0.75 degrees per frame. */
 EVT_BEGIN(s_en1_turn)
     SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
     SET_FLOAT_VALUE(LW(1), FLOAT(0.75f))
@@ -870,6 +969,11 @@ EVT_END()
 
 #if VERSION >= VERSION_US
 USER_FUNC(evt_mapobj_flag_onoff);
+/**
+ * Map init for yuu_02 (Tube Mode room): starts the animations and the S_en1 rotation,
+ * the minigame set-up and the NPC script, and (US and later) hides all
+ * but the current game-language sign graphics.
+ */
 EVT_BEGIN(yuu_02_init_evt)
     CALL(evt_map_playanim, STRING("den1"), 1, 0)
     CALL(evt_map_playanim, STRING("den2"), 1, 0)
@@ -926,6 +1030,11 @@ EVT_BEGIN(yuu_02_init_evt)
     RETURN
 EVT_END()
 #else
+/**
+ * Map init for yuu_02 (Tube Mode room): starts the animations and the S_en1 rotation,
+ * the minigame set-up and the NPC script, and (US and later) hides all
+ * but the current game-language sign graphics.
+ */
 EVT_BEGIN(yuu_02_init_evt)
     CALL(evt_map_playanim, STRING("den1"), 1, 0)
     CALL(evt_map_playanim, STRING("den2"), 1, 0)

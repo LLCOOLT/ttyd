@@ -24,6 +24,11 @@ extern EvtWord nigeru_suifu01[];
 static TreeAccess tree_tbl[5];
 static KusaAccess kusa_tbl[9];
 
+/**
+ * Trigger event (case event) of the jungle path:
+ * the first time Mario passes after STORY_STG5_13_BOBBERY_AND_THE_BRIDGE it starts nigeru_suifu01
+ * and sets GSWF_MUJ03_RUNAWAY_SAILOR_SEEN.
+ */
 EVT_BEGIN(muj_03_event_01)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_13_BOBBERY_AND_THE_BRIDGE)
         IF_INT_EQUAL(GSWF(GSWF_MUJ03_RUNAWAY_SAILOR_SEEN), 0)
@@ -73,6 +78,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * The two sailors Odoodo and the bespectacled one meet Mario on the path (stg5_muj_90_22 to 24 and on)
+ * and run away from him; they move with no wall collision
+ * and with special footstep sounds for the glasses sailor.
+ */
 EVT_BEGIN(nigeru_suifu01)
     CALL(evt_npc_set_position, STRING("オドオド水夫"), 570, 150, -50)
     CALL(evt_npc_set_ry, STRING("オドオド水夫"), 90)
@@ -143,6 +153,10 @@ EVT_BEGIN(nigeru_suifu01)
     RETURN
 EVT_END()
 
+/**
+ * Case event for grass patch 5: when the grass is hit,
+ * launches a Mini Mr. Mini out of it unless it has been taken (item_kusa_5).
+ */
 static EVT_BEGIN(evt_kusa_5)
     CALL(evt_item_delete_check, STRING("item_kusa_5"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -151,6 +165,10 @@ static EVT_BEGIN(evt_kusa_5)
     RETURN
 EVT_END()
 
+/**
+ * Case event for grass patch 7: when the grass is hit,
+ * launches a coin out of it unless it has been taken (item_kusa_7).
+ */
 static EVT_BEGIN(evt_kusa_7)
     CALL(evt_item_delete_check, STRING("item_kusa_7"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -179,6 +197,10 @@ static KusaAccess kusa_tbl[] = {
     {4, NULL, NULL, NULL},
 };
 
+/**
+ * Map init for muj_03 (the jungle path): starts the jungle music and ambience, registers the exits,
+ * the coin and badge blocks (Thunder Rage), a hidden brick, a Shine Sprite block and the NPCs.
+ */
 EVT_BEGIN(muj_03_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_MUJ1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_MUJ5"))

@@ -13,6 +13,10 @@
 
 static void* pose_buf;
 
+/**
+ * Script helper: replaces entry args[0] of Vivian's pose table (partyPoseTbl[6]) with the pose name string in
+ * args[1]; the copy is restored in _epilog.
+ */
 USER_FUNC(evt_usu_vivian_pose_set) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -20,6 +24,10 @@ USER_FUNC(evt_usu_vivian_pose_set) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * REL entry point for usu.rel: runs the static constructors, registers the init scripts of usu_00 and usu_01,
+ * and saves a copy of Vivian's party pose table so the pose edits can be undone on unload.
+ */
 void _prolog(void) {
     voidfunctionptr* ctor;
 
@@ -32,6 +40,10 @@ void _prolog(void) {
     memcpy(pose_buf, partyPoseTbl[6], sizeof(partyPoseTbl[6]));
 }
 
+/**
+ * REL exit point for usu.rel: runs the static destructors
+ * and restores Vivian's original pose table from the copy made in _prolog.
+ */
 void _epilog(void) {
     voidfunctionptr* dtor;
 
@@ -42,5 +54,6 @@ void _epilog(void) {
     _mapFree(pose_buf);
 }
 
+/** Handler called when an unresolved import in usu.rel is hit; does nothing. */
 void _unresolved(void) {
 }

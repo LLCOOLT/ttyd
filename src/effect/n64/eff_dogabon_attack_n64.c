@@ -65,6 +65,11 @@ effN64Vtx size12x12_tex32x32_vtx[] = {
     {-6, 6, 0, 0, 1024, 0, 0, 0, 255},
 };
 
+/**
+ * Spawns the dogabon attack at (x, y, z): 25 pieces laid out on a spiral of radius 120,
+ * each starting after a staggered delay. Guess: dogabon is the Japanese crash sound.
+ * Spawned from event scripts through evt_eff.
+ */
 EffectEntry* effDogabonAttackN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffDogabonAttackN64Work* work;
@@ -115,6 +120,11 @@ EffectEntry* effDogabonAttackN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 
     return effect;
 }
 
+/**
+ * Runs a per-piece state machine (states 0-7) driven by the scale_data and move_data tables,
+ * starting each piece after its delay and spawning a stone-smoke puff when a piece reaches state 6.
+ * A delete request leaves 64 frames.
+ */
 static void effDogabonAttackMain(EffectEntry* effect) {
     EffDogabonAttackN64Work* work = effect->userdata;
     Vec position;
@@ -296,6 +306,7 @@ static void effDogabonAttackMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 1, (DispCallback)effDogabonAttackDisp, effect);
 }
 
+/** Draws the 25 pieces with texture 140, scaled by each piece's scaleX/scaleY. */
 static void effDogabonAttackDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffDogabonAttackN64Work* work;

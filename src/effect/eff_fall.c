@@ -82,6 +82,7 @@ static u8 shibuki_dl_1_1[] __attribute__((aligned(32))) = {0x98, 0x00, 0x06, 0x2
 static u8 shibuki_dl_1_2[] __attribute__((aligned(32))) = {0x98, 0x00, 0x06, 0x22, 0x00, 0x04, 0x22, 0x21, 0x00, 0x07, 0x23, 0x23, 0x00, 0x04, 0x1D, 0x1E, 0x00, 0x07, 0x18, 0x24, 0x00, 0x06, 0x1F, 0x1B, 0x00, 0x07, 0x1E, 0x00, 0x00, 0x00, 0x00, 0x00};
 static u8 shibuki_dl_1_3[] __attribute__((aligned(32))) = {0x98, 0x00, 0x06, 0x25, 0x00, 0x04, 0x20, 0x20, 0x00, 0x04, 0x21, 0x26, 0x00, 0x04, 0x19, 0x1D, 0x00, 0x05, 0x1A, 0x27, 0x00, 0x06, 0x1C, 0x1A, 0x00, 0x06, 0x1B, 0x00, 0x00, 0x00, 0x00, 0x00};
 
+/** Shakes the camera lightly for 300 frames; effFallMain starts it with a smoke puff when a falling object hits. */
 static EVT_BEGIN(evt_shake)
     CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.009765625f), 300)
     RETURN
@@ -93,6 +94,7 @@ static void effFallDisp(CameraId cameraId, EffectEntry* effect);
 static void effFallDispInseki(CameraId cameraId, EffectEntry* effect);
 static void effFallDispWater(CameraId cameraId, EffectEntry* effect);
 
+/** Polynomial sine approximation (radians). */
 static inline f32 fall_sinf(f32 x) {
     f32 a = 0.00761f;
     f32 b = 0.16605f;
@@ -130,6 +132,7 @@ static inline f32 fall_sinf(f32 x) {
     return a;
 }
 
+/** Polynomial cosine approximation matching fall_sinf. */
 static inline f32 fall_cosf(f32 x) {
     f32 a = 0.03705f;
     f32 b = 0.4967f;
@@ -195,6 +198,12 @@ void PSMTXRotAxisRad(Mtx m, const Vec* axis, f32 rad);
 void PSMTXRotRad(Mtx m, char axis, f32 rad);
 void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
 void PSMTXTrans(Mtx m, f32 xT, f32 yT, f32 zT);
+/**
+ * Spawns a falling stage object: 0/1 bugs (num of them), 2 fork, 3 water, 4/5 bucket and tub, 6 Koopa, 7 meteor,
+ * 8 light. width and drop give the spread and fall height; duration is the lifetime.
+ * Guess: the type names come from the animation each uses.
+ * Spawned by the battle stage objects (battle_stage_object.c).
+ */
 EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 width, f32 drop, f32 dir, s32 num, s32 duration) {
     const char* sfxName;
     EffectEntry* effect;
@@ -345,6 +354,7 @@ EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 width, f32 drop, f3
 // lifetimes optimisation off for effFallRelease, effFallMain: the original register allocation and scheduling need it
 #pragma opt_lifetimes off
 
+/** Releases every element's animation poses and stops its sound effect. */
 static inline void effFallRelease(EffectEntry* effect) {
     s32 i;
     EffFallElem* e;
@@ -886,6 +896,7 @@ static void effFallMain(EffectEntry* effect) {
 
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
+/** Draws the sprite-based falling objects (bugs, fork, bucket, tub, Koopa, light) as camera-facing quads. */
 static void effFallDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx trans;
     Mtx scl;
@@ -1077,6 +1088,7 @@ static void effFallDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
+/** Draws the meteor (EFF_inseki) animation poses at the object's position. */
 static void effFallDispInseki(CameraId cameraId, EffectEntry* effect) {
     Mtx trans;
     Mtx scl;
@@ -1131,6 +1143,7 @@ static void effFallDispInseki(CameraId cameraId, EffectEntry* effect) {
 }
 
 static const GXColor white255 = {255, 255, 255, 255};
+/** Draws the falling water (type 3) as translucent quads. */
 static void effFallDispWater(CameraId cameraId, EffectEntry* effect) {
     Mtx trans;
     Mtx scl;
@@ -1268,6 +1281,10 @@ static void effFallDispWater(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
+/**
+ * Returns 1 once the object has landed far enough for its hit to apply; the state threshold depends on type.
+ * Polled by the stage object code and by a Glitzville boss unit (tou2).
+ */
 s32 effFallCheckHit(EffectEntry* effect) {
     EffFallWork* w = effect->userdata;
     switch (w->type) {

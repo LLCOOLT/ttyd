@@ -210,6 +210,11 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_frankli", "c_kuri_h", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x90009, 0, pose_table},
 };
 
+/**
+ * Init event of Professor Frankly in the action-command tutorial:
+ * installs phase, attack, damage and confusion events,
+ * forbids movement and starts the lesson state (unit work 1) at 0.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
@@ -223,6 +228,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event of Professor Frankly in the tutorial: runs the default damage handling. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -230,6 +236,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Phase event that scripts the action-command lesson: unit work 1 is the step (0 to 9).
+ * Each step waits for the right phase and then has Frankly talk (mac_0_b_t2_000 to 023) with the camera framed
+ * on Mario or Goombella, then moves to the next step;
+ * the last steps repeat prompts depending on how many tries the player has made.
+ */
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
     SWITCH(LW(0))
@@ -432,16 +444,23 @@ static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/** Attack event of Professor Frankly: does nothing (he never attacks). */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
+/** Wait (idle) event of Professor Frankly: shows the idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Guess: mario's Jump attack as scripted in the action command tutorial (the lecture unit carries it as its
+ * attack script): approaches the target, shows the Jump action command with Frankly's explanation
+ * (mac_0_b_t2_001, mac_0_b_t2_002), waits for the A press and repeats for the successful chain.
+ */
 EVT_BEGIN(lecAttackEvent_Jump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -645,6 +664,11 @@ EVT_BEGIN(lecAttackEvent_Jump)
     RETURN
 EVT_END()
 
+/**
+ * Guess: mario's Hammer attack as scripted in the action command tutorial:
+ * Frankly explains the Hammer command (mac_0_b_t2_008 to 010),
+ * the player swings with the stick and A as prompted.
+ */
 EVT_BEGIN(lecAttackEvent_Hammer)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -848,6 +872,11 @@ EVT_BEGIN(lecAttackEvent_Hammer)
     RETURN
 EVT_END()
 
+/**
+ * End of the action command tutorial battle: Mario returns to his idle pose, the camera zooms on Frankly,
+ * the status window is hidden and Frankly says his closing line (mac_0_b_t2_024),
+ * then a battle flag (32) is set to end the fight.
+ */
 EVT_BEGIN(lecture_end_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_MARIO, 1, STRING("M_S_1"))
     CALL(evt_btl_camera_set_mode, 0, 3)

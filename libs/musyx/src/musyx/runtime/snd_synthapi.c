@@ -101,6 +101,8 @@ SND_VOICEID sndFXStartEx(SND_FXID fid, u8 vol, u8 pan, u8 studio) {
 }
 
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 2)
+/** Public: starts sound effect fxid at an explicit key (instead of the effect's default key) with the given volume, pan
+ * and studio, using the studio's default ITD setting. Returns the voice ID. */
 u32 sndFXStartKey(u16 fxid, u8 key, u8 vol, u8 pan, u8 studio) {
   u32 v; // r30
 
@@ -257,8 +259,12 @@ SND_VOICEID sndFXCheck(SND_VOICEID vid) {
 }
 
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 1)
+/** Converts a cutoff frequency (80 to 16000 Hz) into a 14-bit filter controller value, inverted so 16000 Hz is 0 and 80
+ * Hz is 16383. */
 static u16 frq2midi(u32 frq) { return 16383.0f * (1.0f - ((frq - 80) / 15920.0f)); }
 
+/** Public: appends two controller settings to a parameter list for sndFXStartPara: the low-pass cutoff (controller 31,
+ * from frq clamped to 80..16000 Hz) and the filter switch (controller 79) on. Does nothing for other filter types. */
 void sndFXAddFilterSetting2ParameterInfo(SND_PARAMETER_INFO* paraInfo, SND_FILTER filter, u32 frq) {
   if (filter == SND_FILTER_LOWPASS) {
     frq = CLAMP_INV(frq, 80, 16000);
@@ -270,6 +276,8 @@ void sndFXAddFilterSetting2ParameterInfo(SND_PARAMETER_INFO* paraInfo, SND_FILTE
   }
 }
 
+/** Public: for a playing sound effect, sets the low-pass cutoff (controller 31) and switches the filter on (controller
+ * 79), or switches it off for any other filter type. */
 void sndFXSetFilter(u32 vid, SND_FILTER filter, u32 frq)
 {
     if (filter == SND_FILTER_LOWPASS) {
@@ -510,8 +518,10 @@ void sndOutputMode(SND_OUTPUTMODE output) {
 }
 
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 2)
+/** Public: turns on the DSP output compressor. */
 void sndCompressorEnable() { hwEnableCompressor(); }
 
+/** Public: turns off the DSP output compressor. */
 void sndCompressorDisable() { hwDisableCompressor(); }
 #endif
 
@@ -709,6 +719,8 @@ void synthChangeStudioMasterMix(u8 studio, u32 isMaster) {
 
 //
 
+/** Public: changes whether a studio is a final output (master) or a sub-mix; studio 0 is always the master and is
+ * ignored. */
 void sndChangeStudioMasterMix(u8 studio, bool isMaster) {
   MUSY_ASSERT_MSG(sndActive != FALSE, "Sound system is not initialized.");
   if (studio != 0) {
@@ -736,6 +748,8 @@ bool synthAddStudioInput(u8 studio, SND_STUDIO_INPUT* in_desc) {
 
 //
 
+/** Public: routes another studio's output (or an external input) into studio as described by in_desc, with interrupts
+ * disabled. Returns TRUE on success. */
 bool sndAddStudioInput(u8 studio, SND_STUDIO_INPUT* in_desc) {
   u32 ret;
   MUSY_ASSERT_MSG(sndActive != FALSE, "Sound system is not initialized.");
@@ -765,6 +779,7 @@ bool sndRemoveStudioInput(u8 studio, SND_STUDIO_INPUT* in_desc) {
   return ret;
 }
 
+/** Public: returns the number of voices in use (running music plus effects). */
 u8 sndDbgGetActiveVoices() {
   u8 n; // r31
   hwDisableIrq();

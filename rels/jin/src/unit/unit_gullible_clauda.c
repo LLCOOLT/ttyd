@@ -150,6 +150,11 @@ static BattleUnitKindPart parts_clauda[] = {
     {1, "btl_un_clauda", "c_windy", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence_clauda, &defence_attr_clauda, 0x9, 0, pose_table_clauda_stay},
 };
 
+/**
+ * Init script of the Doopliss-controlled Flurrie.
+ * Registers her wait, attack, damage and confusion handlers,
+ * sets the hang (walk, run, dive) and jump sound effects, and starts her waiting.
+ */
 static EVT_BEGIN(init_event_clauda)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event_clauda))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_clauda))
@@ -163,6 +168,11 @@ static EVT_BEGIN(init_event_clauda)
     RETURN
 EVT_END()
 
+/**
+ * Damage script of the Doopliss-controlled Flurrie:
+ * if the hit carries damage code 1024 it sets GW(20)
+ * so the fake Mario's phase script knows the partner was struck, then runs the default damage handling.
+ */
 EVT_BEGIN(damage_event_clauda)
     CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 1024, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -174,6 +184,15 @@ EVT_BEGIN(damage_event_clauda)
     RETURN
 EVT_END()
 
+/**
+ * Defeat script of the Doopliss-controlled Flurrie.
+ * She first walks back to her home position if she is away from it, then collapses.
+ * With GW(19) at 0 (the fake Mario is still standing) the camera frames her
+ * and her farewell lines (stg4_jin_26_03_win and stg4_jin_26_04) play;
+ * with GW(19) at 1 or 2 (the fake Mario was hit by damage code 1024,
+ * or is already down) she only plays the collapse pose, waiting for GW(19) to reach 2 first.
+ * She is then removed from the battle and GW(20) is set to 2 so the fake Mario's phase script knows she is gone.
+ */
 static EVT_BEGIN(dead_event_clauda)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(3), LW(4), LW(5))
@@ -232,6 +251,13 @@ static EVT_BEGIN(dead_event_clauda)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the Doopliss-controlled Flurrie: her body slam.
+ * She uses an item if the enemy item check says so;
+ * otherwise she picks a target, jumps onto it (aiming a little off when the action command is not successful),
+ * squashes flat on impact with a camera shake, then walks back home.
+ * Missed or blocked hits trigger the target's avoid reaction.
+ */
 static EVT_BEGIN(attack_event_clauda)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -342,6 +368,7 @@ static EVT_BEGIN(attack_event_clauda)
     RETURN
 EVT_END()
 
+/** Wait script: plays Flurrie's idle pose from her pose table. */
 static EVT_BEGIN(wait_event_clauda)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

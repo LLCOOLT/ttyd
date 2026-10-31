@@ -46,6 +46,12 @@ static EvtWord normal_attack_event[412];
 static EvtWord fire_attack_event[365];
 static EvtWord wait_event[6];
 
+/**
+ * Script helper: args[0] and args[1] are unit ids (BattleTransID).
+ * Copies the first unit's HP (capped at the second one's maximum) and its size-change (Mini/Mega) turns
+ * and strength to the second, then resets the second one's HP gauge to match.
+ * Called with the newly spawned unit (LW(3)) from the unit's own scripts.
+ */
 static USER_FUNC(bubble_copy_status) {
     EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));
@@ -277,6 +283,11 @@ static BattleUnitSetup entry_bubble = {
     NULL, // itemDropTable
 };
 
+/**
+ * Init script of the Bubble: installs the wait, attack,
+ * damage and confusion handlers (confusion reuses the attack),
+ * puts the Bubble and its home position at height 10 above the stage so it floats, and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -289,6 +300,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: runs the shared default damage script (btldefaultevt_Damage) with its default parameters
+ * (LW(10) = -2, LW(11) = 1).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -296,6 +311,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Reaction script bound to data-table entry 40 (fire is avoided):
+ * plays the Bubble's fire sound and the A_2B pose for one second.
+ */
 static EVT_BEGIN(avoid_fire_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_FIRE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
@@ -303,6 +322,12 @@ static EVT_BEGIN(avoid_fire_event)
     RETURN
 EVT_END()
 
+/**
+ * Reaction script bound to data-table entry 11 (hit by fire or an explosion):
+ * plays pose A_2B, then looks along the stage for a free spot, first toward the front then toward the back,
+ * in 10-unit steps; at the first free spot it runs friend_event and the Bubble splits into a second Bubble.
+ * Ends if no free spot is found.
+ */
 static EVT_BEGIN(damage_fire_explosion_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -341,6 +366,12 @@ static EVT_BEGIN(damage_fire_explosion_event)
     RETURN
 EVT_END()
 
+/**
+ * Splits the Bubble: spawns a new Bubble (entry_bubble) at its position,
+ * copies its HP and status into it (bubble_copy_status), plays the split sound,
+ * spins the new one (40 degrees per frame for 30 frames) while it jumps to the free spot given in LW(0..2),
+ * and makes that spot its home position.
+ */
 static EVT_BEGIN(friend_event)
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("S_1"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(12), LW(13), LW(14))
@@ -369,6 +400,10 @@ static EVT_BEGIN(friend_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the Bubble: after the item-use check,
+ * a 70 percent chance of its normal attack and 30 percent of its fire attack.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -393,6 +428,13 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Bubble's normal attack (weapon_bubble_attack):
+ * it picks a target and dives at it twice with its A_1A flying pose,
+ * breathes fire at point blank (A_1B) when the attack lands or is guarded,
+ * then flies past and back to its home spot.
+ * Handles the guard and miss outcomes, the camera and the confused case.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -510,6 +552,11 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper called every frame: keeps a flame effect on part 2 of the unit,
+ * growing it to the unit's size (0.1 per frame).
+ * Creates the effect on the first call and blocks until the script is stopped.
+ */
 static USER_FUNC(eff_fire) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -544,6 +591,12 @@ static USER_FUNC(eff_fire) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * The Bubble's fire attack (weapon_bubble_fire_attack):
+ * it picks a target, spits a fireball (eff_fire on part 2) that flies in three dive stages to the target,
+ * and on a hit shows a smoke puff (kemuri_test) and deals the damage;
+ * avoided or guarded attacks fall through to the camera reset.
+ */
 static EVT_BEGIN(fire_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -644,6 +697,12 @@ static EVT_BEGIN(fire_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper called every frame: args[0] is the unit,
+ * args[1] the index (0-9) of one of the flames of the all-targets fire attack.
+ * The first call creates the flame; each frame it is placed 24 units further along the facing direction per
+ * index, with a size taken from a 1.0-2.25 table. Blocks until the script is stopped.
+ */
 static USER_FUNC(eff_all_fire) {
     EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
@@ -668,6 +727,10 @@ static USER_FUNC(eff_all_fire) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Spawned by all_fire_attack_event: creates one flame effect (eff_all_fire, flame index in LW(0))
+ * and waits 120 frames.
+ */
 static EVT_BEGIN(all_fire_attackEvent_sub)
     BEGIN_SIBLING_EVENT
         CALL(eff_all_fire, BTL_UNIT_SELF, LW(0))
@@ -676,6 +739,12 @@ static EVT_BEGIN(all_fire_attackEvent_sub)
     RETURN
 EVT_END()
 
+/**
+ * Fire attack that hits all targets: the Bubble backs off to x = -40, shakes,
+ * then spawns ten flame effects (all_fire_attackEvent_sub) two frames apart,
+ * and checks damage for each target in turn (the first target also gets the guard-timing result),
+ * then flies home. The US and later versions also set its z position to -15 for the move.
+ */
 static EVT_BEGIN(all_fire_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -782,6 +851,7 @@ static EVT_BEGIN(all_fire_attack_event)
     RETURN
 EVT_END()
 
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

@@ -38,6 +38,10 @@ extern EvtWord black_shadow[];
 static KusaAccess ueki_access_data[5];
 extern EvtWord item_mri_04[];
 
+/**
+ * Door script for the loading zone: returns 1 in LW(0) (use the custom entry)
+ * while the elder is imprisoned (STORY_STG2_12_02_PUNI_ELDER_IMPRISONED), otherwise 0.
+ */
 static EVT_BEGIN(bero_custom)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_12_02_PUNI_ELDER_IMPRISONED)
         SET_VALUE(LW(0), 1)
@@ -67,6 +71,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Init script of the little Jabbi: once Mario has left the tree
+ * after the Puni praise he waits at the left of the room, until he has given his mushroom.
+ */
 static EVT_BEGIN(chibitoge_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_GREATER_OR_EQUAL(STORY_STG2_26_PRAISE_FROM_THE_PUNI)
@@ -79,6 +87,11 @@ static EVT_BEGIN(chibitoge_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the little Jabbi: he jumps to the ledge (two thirds across the room), talks,
+ * then jumps down beside Mario and gives him a Mushroom item before running out of the room.
+ * Sets GSWF_MRI04_JABBI_MUSHROOM_GIVEN.
+ */
 static EVT_BEGIN(chibitoge_talk)
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
@@ -124,6 +137,10 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Spins the NPC Ms. Mowz (チュチュリーナ) around the z axis for args[0] milliseconds (one full turn, smoothed),
+ * as a somersault; blocks until it ends.
+ */
 static USER_FUNC(evt_chuchu_back_loop) {
     EvtWord* args = event->args;
     // チュチュリーナ
@@ -143,6 +160,12 @@ static USER_FUNC(evt_chuchu_back_loop) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Cutscene when Mario comes through the loading zone while the elder is imprisoned:
+ * Ms. Mowz (Chuchurina) and a Third Force underling are in the room,
+ * Ms. Mowz greets him and kisses him (the kiss surprises Mario), he and his partner walk in and Punio follows;
+ * the scene plays the conversation (stg2_mri_e13_00 to 05) and hands the story on from there.
+ */
 static EVT_BEGIN(chuchurina_sogu)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -342,6 +365,11 @@ static EVT_BEGIN(chuchurina_sogu)
     RETURN
 EVT_END()
 
+/**
+ * Chapter 2 cutscene on first entering mri_04 (story STG2_12):
+ * Ms. Mowz, shown as a dark silhouette, leaps in and knocks out an X-Naut grunt with a strike
+ * and a camera shake. Sets the story to STORY_STG2_12_01_A_DARK_FIGURE and returns to mri_03.
+ */
 EVT_BEGIN(black_shadow)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -422,6 +450,7 @@ EVT_BEGIN(black_shadow)
     RETURN
 EVT_END()
 
+/** Planter hit script 2: the first time it is hit it launches a coin out of the planter (remembered with a flag). */
 static EVT_BEGIN(evt_ueki_02)
     CALL(evt_item_delete_check, STRING("item_ueki_02"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -438,6 +467,10 @@ static KusaAccess ueki_access_data[] = {
     {4, NULL, NULL, NULL},
 };
 
+/**
+ * Script run when Mario opens the chest in this room:
+ * shows the Ultra Shroom coming out of mobj_box00 and gives it to Mario.
+ */
 EVT_BEGIN(item_mri_04)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
@@ -449,6 +482,12 @@ EVT_BEGIN(item_mri_04)
     RETURN
 EVT_END()
 
+/**
+ * Map init script of mri_04, the small side room:
+ * sets up the Puni, the planter, the Ultra Shroom chest and the second chest, plays the room's water animations,
+ * and starts the Ms. Mowz scenes (black silhouette at story 12, her meeting with Mario at 12_02)
+ * and drops the Red Key from story 13 on.
+ */
 EVT_BEGIN(mri_04_init_evt)
     CALL(evt_puni_mem_init)
     CALL(evt_puni_set_yuka, 4, 0, -310, -1000, -1000, 0, 0)

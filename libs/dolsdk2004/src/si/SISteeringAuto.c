@@ -4,6 +4,10 @@
 static void (*SamplingCallback)();
 u32 __SISteeringEnableBits;
 
+/**
+ * Starts polling the steering wheel on chan: marks it enabled,
+ * discards any stale response and sets its poll command (0x300680).
+ */
 void __SISteeringEnable(s32 chan) {
     u32 cmd;
     u32 chanBit;
@@ -20,6 +24,7 @@ void __SISteeringEnable(s32 chan) {
     }
 }
 
+/** Stops polling the steering wheel on chan. */
 void __SISteeringDisable(s32 chan) {
     u32 chanBit;
 
@@ -28,6 +33,11 @@ void __SISteeringDisable(s32 chan) {
     __SISteeringEnableBits &= ~chanBit;
 }
 
+/**
+ * Copies the latest polled state of the wheel on chan (buttons, misc bits,
+ * steering position with the 0x80 bias removed, gas, brake, left and right) into status.
+ * Returns 0, or -1 no wheel, -2 busy, -3 bad transfer; status->err holds the same code.
+ */
 s32 SIReadSteering(s32 chan, SISteeringStatus* status) {
     BOOL enabled;
     SISteeringControl* sc;
@@ -75,6 +85,7 @@ s32 SIReadSteering(s32 chan, SISteeringStatus* status) {
     return ret;
 }
 
+/** SI polling handler that runs the user's steering sampling callback inside a scratch OS context. */
 static void SamplingHandler(__OSInterrupt interrupt, OSContext* context) {
     OSContext exceptionContext;
 
@@ -100,6 +111,10 @@ void (* SISetSteeringSamplingCallback(void (*callback)()))() {
     return prev;
 }
 
+/**
+ * Sends a control command to an enabled wheel: control (masked with 0x600) selects the motor/force action
+ * and level (-128 to 128) is its strength, written as the wheel's poll command.
+ */
 void SIControlSteering(s32 chan, u32 control, s32 level) {
     BOOL enabled;
     u32 chanBit;

@@ -760,6 +760,11 @@ GXColor color_tbl_cube[3] ATTRIBUTE_ALIGN(32) = {
 static inline void depthShadowInit(void);
 static inline void projShadowInit(void);
 
+/**
+ * Sets up the shadow system at boot: the 64-entry character shadow list (default mode 2, the cylinder shadow),
+ * the character shadow texture buffer, the projected and depth shadow work,
+ * and the 8-bit and 16-bit ramp textures that depth shadows use to compare depths.
+ */
 void shadowInit(void) {
     u32 bufferSize;
     CharShadowWork* wp;
@@ -807,6 +812,11 @@ void shadowInit(void) {
     projShadowInit();
 }
 
+/**
+ * Per-frame: queues shadowDisp on the 3D, offscreen and effect cameras
+ * and at the shadow camera's render passes (character shadow projection, projected shadow begin/end,
+ * depth shadow end), then empties the shadow list and draw counts for the new frame.
+ */
 void shadowMain(void) {
     dispEntry(CAMERA_3D, 0.0f, 9, shadowDisp, NULL);
     dispEntry(CAMERA_OFFSCREEN2, 0.0f, 9, shadowDisp, NULL);
@@ -827,6 +837,7 @@ void shadowMain(void) {
     dswp->drawCount = 0;
 }
 
+/** GX set-up for the flat shadow shapes: one colour channel from the character shadow colour, no textures. */
 static inline void shadowSetupPolygon(void) {
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
@@ -851,6 +862,11 @@ static inline void shadowSetupPolygon(void) {
     GXSetCullMode(GX_CULL_NONE);
 }
 
+/**
+ * Starts rendering a projected or depth shadow texture:
+ * saves the view, viewport and scissor, switches to the light's view and projection from the shadow config,
+ * and for depth shadows writes depth only.
+ */
 static inline void shadowBegin(ProjShadowWork* wp, BOOL depth) {
     f32(*proj)[4];
     ShadowConfig* cfg;
@@ -882,6 +898,12 @@ static inline void shadowBegin(ProjShadowWork* wp, BOOL depth) {
     PSMTXCopy(wp->view, camGetCurPtr()->view);
 }
 
+/**
+ * Shadow draw callback for every camera and pass:
+ * on the 3D, offscreen and effect cameras draws the polygon, cylinder and texture character shadows;
+ * on the shadow camera (by render pass) places and renders the projected character shadows and begins
+ * or finishes the projected and depth shadow textures.
+ */
 static void shadowDisp(CameraId cameraId, void* param) {
     DispEntry* disp;
     CameraEntry* cam;
@@ -956,6 +978,10 @@ static void shadowDisp(CameraId cameraId, void* param) {
 #pragma push
 // FAKE: keeps the dead stores that the target has; removing it changes the code
 #pragma opt_dead_assignments off
+/**
+ * Ground-hit filter for placing shadows: skips collision that belongs to map objects flagged 0x800 (so shadows
+ * fall through them).
+ */
 static BOOL _filter(HitCheckQuery* query, HitEntry* hit) {
     f32 t = 20.0f; // FAKE: dead store (kept by opt_dead_assignments off) that puts 20.0f at its target .sdata2 slot
 
@@ -966,6 +992,11 @@ static BOOL _filter(HitCheckQuery* query, HitEntry* hit) {
 }
 #pragma pop
 
+/**
+ * Places each new shadow for this frame: casts a ray 150 units down from the owner
+ * and builds a matrix laid on the ground it hits, tilted to the floor normal;
+ * projected (mode 3) and collision-off shadows stay at the owner's position.
+ */
 static void shadowCharShadowDisp_Collision(CameraId cameraId, void* param) {
     ShadowEntry* entry = cswp->entries;
     s32 i;
@@ -1016,6 +1047,10 @@ static void shadowCharShadowDisp_Collision(CameraId cameraId, void* param) {
     }
 }
 
+/**
+ * Renders the projected (mode 3) character shadows into the character shadow texture from the shadow light's
+ * view, at their alpha.
+ */
 static void shadowCharShadowDisp_Projection(CameraId cameraId, void* param) {
     ShadowConfig* cfg;
     CharShadowWork* wp;
@@ -1122,6 +1157,7 @@ static void shadowCharShadowDisp_Projection(CameraId cameraId, void* param) {
     }
 }
 
+/** Draws the flat polygon (mode 0) character shadows on the ground and grows their offscreen regions. */
 static void shadowCharShadowDisp_Polygon(CameraId cameraId, void* param) {
     ShadowEntry* entry = cswp->entries;
     f32(*view)[4];
@@ -1165,10 +1201,15 @@ static void shadowCharShadowDisp_Polygon(CameraId cameraId, void* param) {
     }
 }
 
+/** Sets the GX material colour to the character shadow colour. */
 static inline void shadowSetMat(void) {
     GXSetChanMatColor(GX_COLOR0A0, cswp->color);
 }
 
+/**
+ * Draws the textured (mode 1) character shadows:
+ * a round shadow texture laid on the ground at each shadow's size, also growing their offscreen regions.
+ */
 static void shadowCharShadowDisp_Texture(CameraId cameraId, void* param) {
     ShadowEntry* entry = cswp->entries;
     f32(*view)[4];
@@ -1239,6 +1280,10 @@ static void shadowCharShadowDisp_Texture(CameraId cameraId, void* param) {
 
 // FAKE: keeps the following function(s) out of line as in the target; removing it changes the code
 #pragma dont_inline on
+/**
+ * Draws one shadow volume as a cylinder (top, bottom and sides) for stencil-like darkening of whatever it
+ * intersects, with the fade of the entry's volume and decay values unless flag 4 asks for none.
+ */
 static void cylinder(ShadowEntry* entry) {
     f32 inner;
     f32 a;
@@ -1282,6 +1327,7 @@ static void cylinder(ShadowEntry* entry) {
 }
 #pragma dont_inline reset
 
+/** Draws a shadow's volume shape: a cube for type 1, otherwise the cylinder. */
 static inline void shadowDrawVolume(ShadowEntry* entry) {
     switch (entry->type) {
         case 1:
@@ -1297,16 +1343,22 @@ static inline void shadowDrawVolume(ShadowEntry* entry) {
     }
 }
 
+/** Sets TEV colour register 0 to black with alpha a. */
 static inline void shadowSetTev(u8 a) {
     GXColor c = {0, 0, 0, 0};
     c.a = a;
     GXSetTevColor(GX_TEVREG0, c);
 }
 
+/** Sets the GX material colour to transparent black. */
 static inline void shadowSetMatZero(void) {
     GXSetChanMatColor(GX_COLOR0A0, (GXColor){0, 0, 0, 0});
 }
 
+/**
+ * Draws the cylinder (mode 2, the default) character shadows:
+ * each volume darkens the ground it passes through, and its screen area goes to the shadow's offscreen region.
+ */
 static void cylinderShadowDraw(CameraId cameraId, void* param) {
     ShadowEntry* entry = cswp->entries;
     f32(*view)[4];
@@ -1365,6 +1417,10 @@ static void cylinderShadowDraw(CameraId cameraId, void* param) {
 
 const Vec shadow_unused_zero_vec0 = {0.0f, 0.0f, 0.0f};
 
+/**
+ * Adds a shadow at (x, y, z) with radius size for this frame only, in the default mode;
+ * returns its id for the shadowSet* calls. Characters, items and icons call it every frame they want a shadow.
+ */
 s32 shadowEntry(f32 x, f32 y, f32 z, f32 size) {
     s32 id = cswp->numEntries;
     ShadowEntry* entry = &cswp->entries[id];
@@ -1392,6 +1448,10 @@ s32 shadowEntry(f32 x, f32 y, f32 z, f32 size) {
 
 const Vec shadow_unused_zero_vec1 = {0.0f, 0.0f, 0.0f};
 
+/**
+ * Adds a shadow for this frame like shadowEntry with an explicit mode:
+ * 0 polygon, 1 textured, 2 cylinder, 3 projected.
+ */
 s32 shadowEntryMode(s32 mode, f32 x, f32 y, f32 z, f32 size) {
     s32 id = cswp->numEntries;
     ShadowEntry* entry = &cswp->entries[id];
@@ -1419,18 +1479,21 @@ s32 shadowEntryMode(s32 mode, f32 x, f32 y, f32 z, f32 size) {
 
 const Vec shadow_unused_zero_vec2 = {0.0f, 0.0f, 0.0f};
 
+/** Sets the volume shape of shadow id: 0 cylinder, 1 cube. */
 void shadowSetType(s32 id, u8 type) {
     ShadowEntry* entry = &cswp->entries[id];
     entry->type = type;
 }
 
 #if VERSION >= VERSION_JP
+/** Sets the alpha of shadow id (despite the name); the demo has no per-shadow alpha. */
 void U_shadowSetMode(s32 id, u8 alpha) {
     ShadowEntry* entry = &cswp->entries[id];
     entry->alpha = alpha;
 }
 #endif
 
+/** Sets how a cylinder shadow fades with height: its volume and the two decay factors. */
 void shadowSetVolumeDecay(s32 id, f32 volume, f32 decay, f32 decay2) {
     ShadowEntry* entry = &cswp->entries[id];
     entry->volume = volume;
@@ -1438,16 +1501,19 @@ void shadowSetVolumeDecay(s32 id, f32 volume, f32 decay, f32 decay2) {
     entry->decay2 = decay2;
 }
 
+/** Sets the radius of shadow id. */
 void shadowSetSize(s32 id, f32 size) {
     ShadowEntry* entry = &cswp->entries[id];
     entry->size = size;
 }
 
+/** Sets the camera shadow id is drawn with. */
 void shadowSetCamId(s32 id, s16 camId) {
     ShadowEntry* entry = &cswp->entries[id];
     entry->camId = camId;
 }
 
+/** Turns ground placement on or off for shadow id (flag 1); off keeps the shadow at the owner's position. */
 void shadowSetCollision(s32 id, BOOL enable) {
     s32 off = id * sizeof(ShadowEntry);
     ShadowEntry* e = cswp->entries;
@@ -1458,10 +1524,12 @@ void shadowSetCollision(s32 id, BOOL enable) {
     }
 }
 
+/** Sets flag bits on shadow id. */
 void shadowFlagOn(s32 id, u16 flags) {
     cswp->entries[id].flags |= flags;
 }
 
+/** Returns the character shadow texture rendered this frame, or NULL if none was. */
 GXTexObj* shadowGetCharShadowTexObj(void) {
     if (cswp->flags & 1) {
         return smartTexObj(&cswp->texObj, (void**)cswp->texBuffer);
@@ -1473,26 +1541,32 @@ f32 (*shadowGetCharShadowProjTexMtx(void))[4] {
     return cswp->texMtx;
 }
 
+/** Returns the character shadow colour (semi-transparent black by default). */
 GXColor shadowGetCharShadowColor(void) {
     return cswp->color;
 }
 
+/** Returns whether character shadows are projected with the shadow camera (shadowMain then queues that pass). */
 s32 shadowGetCharShadowProjection(void) {
     return cswp->projection;
 }
 
+/** Returns the 16x16 8-bit ramp texture used to compare depths for depth shadows. */
 GXTexObj* shadowGetRamp8TexObj(void) {
     return &rampTex8;
 }
 
+/** Returns the 256x256 16-bit ramp texture used to compare depths for high-precision depth shadows. */
 GXTexObj* shadowGetRamp16TexObj(void) {
     return &rampTex16;
 }
 
+/** Counts one object drawn into the depth shadow this frame; with none, depthShadowEnd skips the texture copy. */
 void shadowDepthShadowDrawCountUp(void) {
     dswp->drawCount++;
 }
 
+/** Returns the depth shadow texture rendered this frame, or NULL if none was. */
 GXTexObj* shadowGetDepthShadowTexObj(void) {
     if (dswp->flags & 1) {
         return smartTexObj(&dswp->texObj, (void**)dswp->texBuffer);
@@ -1508,6 +1582,7 @@ f32 (*shadowGetDepthShadowProjTexMtx(void))[4] {
     return dswp->texMtx;
 }
 
+/** Resets the depth shadow work: config 0, colour black at alpha 0x40. */
 static inline void depthShadowInit(void) {
     dswp->flags = 2;
     dswp->drawCount = 0;
@@ -1515,6 +1590,7 @@ static inline void depthShadowInit(void) {
     dswp->color = (GXColor){0, 0, 0, 0x40};
 }
 
+/** Returns the colour to subtract for the depth shadow: the inverse of its colour scaled by its alpha. */
 GXColor shadowGetDepthShadowColor(void) {
     GXColor c;
     c.r = ((0xFF - dswp->color.r) * dswp->color.a) / 0xFF;
@@ -1524,14 +1600,17 @@ GXColor shadowGetDepthShadowColor(void) {
     return c;
 }
 
+/** Returns the light set-up (position, target, texture size) of the depth shadow. */
 ShadowConfig* shadowGetDepthShadowConfig(void) {
     return &shadowConfig[dswp->configIdx];
 }
 
+/** Counts one object drawn into the projected shadow this frame; with none, projShadowEnd skips the texture copy. */
 void shadowProjShadowDrawCountUp(void) {
     pswp->drawCount++;
 }
 
+/** Returns the projected shadow texture rendered this frame, or NULL if none was. */
 GXTexObj* shadowGetProjShadowTexObj(void) {
     if (pswp->flags & 1) {
         return smartTexObj(&pswp->texObj, (void**)pswp->texBuffer);
@@ -1543,6 +1622,7 @@ f32 (*shadowGetProjShadowProjTexMtx(void))[4] {
     return pswp->texMtx;
 }
 
+/** Resets the projected shadow work: config 0, colour black at alpha 0x40. */
 static inline void projShadowInit(void) {
     pswp->flags = 2;
     pswp->drawCount = 0;
@@ -1550,14 +1630,20 @@ static inline void projShadowInit(void) {
     pswp->color = (GXColor){0, 0, 0, 0x40};
 }
 
+/** Returns the projected shadow colour. */
 GXColor shadowGetProjShadowColor(void) {
     return pswp->color;
 }
 
+/** Returns the light set-up (position, target, texture size) of the projected shadow. */
 ShadowConfig* shadowGetProjShadowConfig(void) {
     return &shadowConfig[pswp->configIdx];
 }
 
+/**
+ * Builds the texture matrices that map world positions into a shadow texture (and, for depth shadows, into the
+ * depth ramp) from the shadow light's view and projection.
+ */
 static inline void shadowCalcTexMtx(ProjShadowWork* wp, Mtx texMtx, Mtx depthMtx) {
 #if VERSION <= VERSION_DEMO_US
     u32 is16;
@@ -1607,10 +1693,15 @@ static inline void shadowCalcTexMtx(ProjShadowWork* wp, Mtx texMtx, Mtx depthMtx
     }
 }
 
+/** Puts back the current camera's view matrix saved by shadowBegin. */
 static inline void shadowRestoreView(void) {
     PSMTXCopy(tmp_view, camGetCurPtr()->view);
 }
 
+/**
+ * Finishes a projected shadow pass: restores the view, viewport and scissor,
+ * and if anything was drawn copies the rendered area into the shadow texture and computes its texture matrix.
+ */
 static void projShadowEnd(CameraId cameraId, void* param) {
     ProjShadowWork* wp = param;
     u16 size;
@@ -1648,6 +1739,10 @@ static void projShadowEnd(CameraId cameraId, void* param) {
     wp->flags |= 1;
 }
 
+/**
+ * Finishes the depth shadow pass: restores the camera state and colour writes,
+ * and if anything was drawn copies the depth buffer into the depth shadow texture and computes its matrices.
+ */
 static void depthShadowEnd(CameraId cameraId, void* param) {
     ShadowConfig* cfg;
     u32 texFmt;

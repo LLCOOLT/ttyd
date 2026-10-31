@@ -50,6 +50,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Item-box callback: puts a Mushroom at the box, waits for the chest animation and gives it to Mario. */
 static EVT_BEGIN(item_get00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
@@ -61,6 +62,11 @@ static EVT_BEGIN(item_get00)
     RETURN
 EVT_END()
 
+/**
+ * Map init script of tik_14, a small pipe room.
+ * Starts the sewer music and ambience, sets up the exit to tik_06
+ * and places the item box holding a Mushroom (GSWF_TIK14_CHEST_OPENED).
+ */
 EVT_BEGIN(tik_14_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK1"))

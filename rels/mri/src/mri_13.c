@@ -94,6 +94,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Holds Mario for up to 4 seconds (GF(11)) while the Puni switch is being set, ending early when GF(10) is cleared. */
 static EVT_BEGIN(punipuni_mario_halt)
     SET_VALUE(GF(11), 1)
     CALL(evt_mario_key_onoff, 0)
@@ -114,6 +115,12 @@ static EVT_BEGIN(punipuni_mario_halt)
     RETURN
 EVT_END()
 
+/**
+ * Init script of the orb pedestal in the water room: runs the shared Puni-switch setup;
+ * if the orb is on the pedestal it is placed at the pedestal height,
+ * which drops by 309 units once the water has been drained (STORY_STG2_21_06_WATER_SWITCH).
+ * Otherwise the beam of light is hidden. The target point also follows the water level.
+ */
 static EVT_BEGIN(punipuni_ball00_init)
     CALL_CHILD(mri_punipuni_setup)
     IF_INT_EQUAL(GSWF(GSWF_MRI13_ORB_ON_PEDESTAL), 1)
@@ -134,6 +141,12 @@ static EVT_BEGIN(punipuni_ball00_init)
     RETURN
 EVT_END()
 
+/**
+ * Hit/talk script of the orb pedestal in the water room:
+ * if empty, Mario picks an item to put on it (cancel ends the script)
+ * and the orb is placed at the current pedestal height with the beam of light; if full, Mario takes it back.
+ * GF(0) is set while the orb is set down. Mario is frozen during this.
+ */
 static EVT_BEGIN(punipuni_ball00)
     CALL(evt_mario_key_onoff, 0)
     IF_INT_EQUAL(GSWF(GSWF_MRI13_ORB_ON_PEDESTAL), 0)
@@ -161,6 +174,11 @@ static EVT_BEGIN(punipuni_ball00)
     RETURN
 EVT_END()
 
+/**
+ * Init script of the lowered platform: binds the platform collision (A_dai, A_dai_02) to its model (S_dai),
+ * and puts the platform, the water switch (S_sui_l) and its light 309 units down;
+ * the switch collision and the shadow model are off.
+ */
 static EVT_BEGIN(yuka_init)
     CALL(evt_hit_bind_mapobj, STRING("A_dai"), STRING("S_dai"))
     CALL(evt_hit_bind_mapobj, STRING("A_dai_02"), STRING("S_dai"))
@@ -174,6 +192,11 @@ static EVT_BEGIN(yuka_init)
     RETURN
 EVT_END()
 
+/**
+ * Runs the three-digit display on the wall of the elevator room:
+ * shows the count GW(0) (Punies still needed) with the ones, tens and hundreds drums turned to match,
+ * hides the hundreds drum while the count is under 10 and plays a click when the number changes.
+ */
 EVT_BEGIN(yuka_slot)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_isk_02_c"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_isk_03_c"), MAPOBJ_FLAG_HIDE)
@@ -209,6 +232,10 @@ EVT_BEGIN(yuka_slot)
     RETURN
 EVT_END()
 
+/**
+ * Drops every active Puni by 3 units per call until it lands on the floor beneath it (uses a downward hit check
+ * of 3 units); called while the platform sinks so the Punies follow it down.
+ */
 static USER_FUNC(yuka_fall_check) {
     s32 i;
 
@@ -235,6 +262,10 @@ static USER_FUNC(yuka_fall_check) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Resets the display of the Puni whose slot index is args[0]:
+ * clears its offsets, spin and velocity so it stands still.
+ */
 static USER_FUNC(evt_puni_force_pose) {
     s32 offset = evtGetValue(event, event->args[0]) * sizeof(PuniData);
     PuniData* puni = (PuniData*)((u8*)puniGetPunidat() + offset);
@@ -244,6 +275,7 @@ static USER_FUNC(evt_puni_force_pose) {
     return EVT_RETURN_DONE;
 }
 
+/** Camera shake while the elevator platform moves (a long shake in the demo builds, five 1-second shakes later). */
 EVT_BEGIN(yuka_shake)
 #if VERSION <= VERSION_DEMO_US
     LOOP(0)
@@ -256,6 +288,10 @@ EVT_BEGIN(yuka_shake)
     RETURN
 EVT_END()
 
+/**
+ * Fading camera shake for the last part of the elevator descent:
+ * a series of shakes that die down over about 10 seconds, ending in a final stronger one.
+ */
 EVT_BEGIN(yuka_shake2)
 #if VERSION <= VERSION_DEMO_US
     CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 500)
@@ -285,6 +321,11 @@ EVT_BEGIN(yuka_shake2)
     RETURN
 EVT_END()
 
+/**
+ * Counts every frame the Punies standing on the platform (alive, not lost, not in mode 13,
+ * within the platform area and height band; the band moves down by 309 after the water has been drained)
+ * and drives the platform with that weight.
+ */
 static EVT_BEGIN(yuka_check)
     LOOP(0)
         SET_VALUE(LW(10), 1)
@@ -339,6 +380,14 @@ static EVT_BEGIN(yuka_check)
     RETURN
 EVT_END()
 
+/**
+ * Elevator event: waits until the Puni Orb is on the pedestal,
+ * the counter GW(0) has reached 0 (every Puni is standing on the platform) and Mario
+ * and the partner are on it too.
+ * Then Mario stops, the Punies freeze, the floor starts moving with a quake and the camera pans down,
+ * and the platform, Puni Orb and light move 309 units down over 10 seconds.
+ * Afterwards the Punies are released and the story is set to STORY_STG2_21_06_WATER_SWITCH.
+ */
 EVT_BEGIN(yuka_event)
     LOOP(0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -464,6 +513,10 @@ EVT_BEGIN(yuka_event)
     RETURN
 EVT_END()
 
+/**
+ * Planter hit script 1: the first time it is hit it launches a Mushroom out of the planter (remembered with a
+ * flag).
+ */
 static EVT_BEGIN(evt_f1_ueki_01)
     CALL(evt_item_delete_check, STRING("item_ueki_01"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -482,6 +535,13 @@ static KusaAccess ueki_access_data[] = {
     {4, NULL, NULL, NULL},
 };
 
+/**
+ * Map init script of mri_13, the Puni elevator room:
+ * sets up the Puni, planters, save block and recovery block, the counter GW(0) at 101,
+ * the Puni Orb pedestal and the moving floor depending on the story state (before or after
+ * STORY_STG2_21_06_WATER_SWITCH), and the east exit that leads to Lord Crump's room
+ * before STORY_STG2_22_LORD_CRUMP_APPEARS.
+ */
 EVT_BEGIN(mri_13_init_evt)
     CALL(evt_puni_mem_init)
     CALL(evt_puni_set_yuka, 13, 0, -310, -1000, -1000, 0, 0)

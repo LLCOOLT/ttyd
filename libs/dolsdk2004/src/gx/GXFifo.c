@@ -29,6 +29,11 @@ static void __GXWriteFifoIntReset(u8 hiWatermarkClr, u8 loWatermarkClr);
 static char __data_0[] = "[GXOverflowHandler]";
 #endif
 
+/**
+ * CP interrupt handler for FIFO overflow (high watermark):
+ * counts it, switches to waiting for the low watermark and suspends the GX thread so the CPU stops writing
+ * until the GPU has caught up.
+ */
 static void GXOverflowHandler(__OSInterrupt interrupt, OSContext* context) {
 #if DEBUG
     if (__gxVerif->verifyLevel > GX_WARN_SEVERE) {
@@ -50,6 +55,10 @@ static void GXOverflowHandler(__OSInterrupt interrupt, OSContext* context) {
     OSSuspendThread(__GXCurrentThread);
 }
 
+/**
+ * CP interrupt handler for the low watermark after an overflow:
+ * resumes the suspended GX thread and goes back to watching the high watermark.
+ */
 static void GXUnderflowHandler(s16 interrupt, OSContext* context) {
 #if DEBUG
     if (__gxVerif->verifyLevel > GX_WARN_SEVERE) {
@@ -69,6 +78,7 @@ static void GXUnderflowHandler(s16 interrupt, OSContext* context) {
 		(reg) = (u32)__rlwimi((u32)(reg), (val), (shift), (32 - (shift) - (size)), (31 - (shift))); \
 	} while (0);
 
+/** CP interrupt handler for the FIFO breakpoint: turns the breakpoint off and calls the user's callback. */
 static void GXBreakPointHandler(__OSInterrupt interrupt, OSContext* context) {
     OSContext exceptionContext;
 
@@ -83,6 +93,10 @@ static void GXBreakPointHandler(__OSInterrupt interrupt, OSContext* context) {
     }
 }
 
+/**
+ * CP interrupt handler: reads the CP status and calls the underflow,
+ * overflow and breakpoint handlers for the conditions that are both enabled and raised.
+ */
 static void GXCPInterruptHandler(__OSInterrupt interrupt, OSContext* context) {
     __GXData->cpStatus = GX_GET_CP_REG(0);
     if (GET_REG_FIELD(__GXData->cpEnable, 1, 3) && GET_REG_FIELD(__GXData->cpStatus, 1, 1)) {
@@ -96,6 +110,10 @@ static void GXCPInterruptHandler(__OSInterrupt interrupt, OSContext* context) {
     }
 }
 
+/**
+ * Initializes a FIFO object over a buffer: base, size, the high watermark at size - 0x4000,
+ * the low watermark at half the size (32 byte aligned) and read and write pointers at the base.
+ */
 void GXInitFifoBase(GXFifoObj* fifo, void* base, u32 size) {
     __GXFifoObj* realFifo = (__GXFifoObj*)fifo;
 
@@ -114,6 +132,7 @@ void GXInitFifoBase(GXFifoObj* fifo, void* base, u32 size) {
     GXInitFifoPtrs(fifo, base, base);
 }
 
+/** Sets a FIFO object's read and write pointers and the count of bytes between them. */
 void GXInitFifoPtrs(GXFifoObj* fifo, void* readPtr, void* writePtr) {
     __GXFifoObj* realFifo = (__GXFifoObj *)fifo;
     BOOL enabled;
@@ -135,6 +154,7 @@ void GXInitFifoPtrs(GXFifoObj* fifo, void* readPtr, void* writePtr) {
     OSRestoreInterrupts(enabled);
 }
 
+/** Sets the high and low watermarks of a FIFO object. */
 void GXInitFifoLimits(GXFifoObj* fifo, u32 hiWatermark, u32 loWatermark) {
     __GXFifoObj* realFifo = (__GXFifoObj*)fifo;
 
@@ -150,7 +170,11 @@ void GXInitFifoLimits(GXFifoObj* fifo, u32 hiWatermark, u32 loWatermark) {
 
 #define GX_SET_PI_REG(offset, val) (*(volatile u32*)((volatile u32*)(__piReg) + (offset)) = val)
 
-// NONMATCHING DEBUG
+/**
+ * Makes a FIFO object the one the CPU write gather pipe feeds:
+ * programs the PI base, end and write pointer, and links it with the GPU FIFO if they are the same object,
+ * otherwise unlinks them. NONMATCHING DEBUG
+ */
 void GXSetCPUFifo(GXFifoObj* fifo) {
     __GXFifoObj* realFifo = (__GXFifoObj*)fifo;
     BOOL enabled = OSDisableInterrupts();
@@ -192,6 +216,11 @@ void GXSetCPUFifo(GXFifoObj* fifo) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Makes a FIFO object the one the GPU reads from:
+ * stops the GPU reading, programs the CP base, end, count, pointers and watermarks,
+ * links it with the CPU FIFO if they are the same object, then restarts reading.
+ */
 void GXSetGPFifo(GXFifoObj* fifo) {
     __GXFifoObj* realFifo = (__GXFifoObj*)fifo;
     BOOL enabled = OSDisableInterrupts();
@@ -257,6 +286,7 @@ do { \
 } while (0)
 
 #if SDK_REVISION >= 2
+/** Reads the CP read pointer and byte count into the FIFO object. */
 static void __GXSaveFifoCPStat(__GXFifoObj* realFifo) {
     u32 cpStatus;
     u8 readIdle;
@@ -273,6 +303,7 @@ static void __GXSaveFifoCPStat(__GXFifoObj* realFifo) {
     SOME_MACRO2(realFifo);
 }
 
+/** Reads the PI base, end and write pointer (without the wrap bit) into the FIFO object. */
 static void __GXSaveFifoPIStat(__GXFifoObj* realFifo) {
     realFifo->base = OSPhysicalToCached(GX_GET_PI_REG(3));
     realFifo->top = OSPhysicalToCached(GX_GET_PI_REG(4));
@@ -280,6 +311,7 @@ static void __GXSaveFifoPIStat(__GXFifoObj* realFifo) {
 }
 #endif
 
+/** Flushes the write gather pipe and saves the CPU FIFO's registers into a FIFO object. */
 void GXSaveCPUFifo(GXFifoObj* fifo) {
     __GXFifoObj* realFifo = (__GXFifoObj*)fifo;
     ASSERTMSGLINE(LINE(835, 835, 900), realFifo == CPUFifo, "GXSaveCPUFifo: fifo is not attached to CPU");
@@ -287,6 +319,10 @@ void GXSaveCPUFifo(GXFifoObj* fifo) {
     __GXSaveCPUFifoAux(realFifo);
 }
 
+/**
+ * Reads the PI FIFO registers into the object; the byte count comes from the CP registers if the CPU
+ * and GP FIFOs are linked, or from the two pointers otherwise.
+ */
 void __GXSaveCPUFifoAux(__GXFifoObj* realFifo) {
     BOOL enabled = OSDisableInterrupts();
 
@@ -313,6 +349,10 @@ void __GXSaveCPUFifoAux(__GXFifoObj* realFifo) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Reads the GPU FIFO's read pointer and count from the CP registers into a FIFO object (plus the PI registers if
+ * linked).
+ */
 void GXSaveGPFifo(GXFifoObj* fifo) {
     __GXFifoObj* realFifo = (__GXFifoObj*)fifo;
 #if SDK_REVISION < 2
@@ -340,6 +380,10 @@ void GXSaveGPFifo(GXFifoObj* fifo) {
 #endif
 }
 
+/**
+ * Reads the CP status and reports the flags: over the high watermark, under the low one, read idle,
+ * command idle and breakpoint hit.
+ */
 void GXGetGPStatus(GXBool* overhi, GXBool* underlow, GXBool* readIdle, GXBool* cmdIdle, GXBool* brkpt) {
     __GXData->cpStatus = GX_GET_CP_REG(0);
     *overhi   = GET_REG_FIELD(__GXData->cpStatus, 1, 0);
@@ -349,6 +393,10 @@ void GXGetGPStatus(GXBool* overhi, GXBool* underlow, GXBool* readIdle, GXBool* c
     *brkpt    = (int)GET_REG_FIELD(__GXData->cpStatus, 1, 4);
 }
 
+/**
+ * Reports for a FIFO object whether it is over its high watermark or under its low one, its byte count,
+ * whether the CPU writes and the GPU reads it and whether the write pointer wrapped.
+ */
 void GXGetFifoStatus(GXFifoObj* fifo, GXBool* overhi, GXBool* underflow, u32* fifoCount, GXBool* cpuWrite, GXBool* gpRead, GXBool* fifowrap) {
     __GXFifoObj* realFifo = (__GXFifoObj*)fifo;
 
@@ -375,6 +423,7 @@ void GXGetFifoStatus(GXFifoObj* fifo, GXBool* overhi, GXBool* underflow, u32* fi
     *gpRead    = (GPFifo == realFifo);
 }
 
+/** Refreshes and returns the read and write pointers of a FIFO object. */
 void GXGetFifoPtrs(GXFifoObj* fifo, void** readPtr, void** writePtr) {
     __GXFifoObj* realFifo = (__GXFifoObj*)fifo;
 
@@ -396,18 +445,21 @@ void GXGetFifoPtrs(GXFifoObj* fifo, void** readPtr, void** writePtr) {
     *writePtr = realFifo->wrPtr;
 }
 
+/** Returns the start address of a FIFO object's buffer. */
 void* GXGetFifoBase(const GXFifoObj* fifo) {
     __GXFifoObj* realFifo = (__GXFifoObj*)fifo;
 
     return realFifo->base;
 }
 
+/** Returns the size in bytes of a FIFO object's buffer. */
 u32 GXGetFifoSize(const GXFifoObj* fifo) {
     __GXFifoObj* realFifo = (__GXFifoObj*)fifo;
 
     return realFifo->size;
 }
 
+/** Returns the high and low watermarks of a FIFO object. */
 void GXGetFifoLimits(const GXFifoObj* fifo, u32* hi, u32* lo) {
     __GXFifoObj* realFifo = (__GXFifoObj*)fifo;
 
@@ -415,6 +467,7 @@ void GXGetFifoLimits(const GXFifoObj* fifo, u32* hi, u32* lo) {
     *lo = realFifo->loWatermark;
 }
 
+/** Sets the callback the breakpoint interrupt calls and returns the previous one. */
 GXBreakPtCallback GXSetBreakPtCallback(GXBreakPtCallback cb) {
     GXBreakPtCallback oldcb = BreakPointCB;
     BOOL enabled = OSDisableInterrupts();
@@ -426,6 +479,10 @@ GXBreakPtCallback GXSetBreakPtCallback(GXBreakPtCallback cb) {
 
 void* __GXCurrentBP;
 
+/**
+ * Stops the GPU reading, programs the CP breakpoint address,
+ * enables the breakpoint interrupt and restarts reading, so the GPU stops when it reaches that address.
+ */
 void GXEnableBreakPt(void* break_pt) {
     BOOL enabled = OSDisableInterrupts();
 
@@ -445,6 +502,7 @@ void GXEnableBreakPt(void* break_pt) {
     OSRestoreInterrupts(enabled);
 }
 
+/** Turns off the CP breakpoint. */
 void GXDisableBreakPt(void) {
     BOOL enabled = OSDisableInterrupts();
 
@@ -455,6 +513,10 @@ void GXDisableBreakPt(void) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Installs the CP interrupt handler and unmasks it,
+ * records the calling thread as the GX thread and clears the CPU and GPU FIFO pointers. Part of GXInit.
+ */
 void __GXFifoInit(void) {
     __OSSetInterruptHandler(0x11, GXCPInterruptHandler);
     __OSUnmaskInterrupts(0x4000);
@@ -464,33 +526,39 @@ void __GXFifoInit(void) {
     GPFifo = NULL;
 }
 
+/** Sets the CP enable bit that lets the GPU read from its FIFO. */
 static void __GXFifoReadEnable(void) {
     SET_REG_FIELD(0, __GXData->cpEnable, 1, 0, 1);
     GX_SET_CP_REG(1, __GXData->cpEnable);
 }
 
+/** Clears the CP enable bit that lets the GPU read from its FIFO. */
 static void __GXFifoReadDisable(void) {
     SET_REG_FIELD(0, __GXData->cpEnable, 1, 0, 0);
     GX_SET_CP_REG(1, __GXData->cpEnable);
 }
 
+/** Sets or clears the CP bit that links the CPU FIFO to the GPU FIFO, so the CPU's writes go straight to the GPU. */
 static void __GXFifoLink(u8 en) {
     SET_REG_FIELD(LINE(1242, 1242, 1299), __GXData->cpEnable, 1, 4, (en != 0) ? 1 : 0);
     GX_SET_CP_REG(1, __GXData->cpEnable);
 }
 
+/** Writes the CP enable bits for the high and low watermark interrupts. */
 static void __GXWriteFifoIntEnable(u8 hiWatermarkEn, u8 loWatermarkEn) {
     SET_REG_FIELD(LINE(1264, 1264, 1321), __GXData->cpEnable, 1, 2, hiWatermarkEn);
     SET_REG_FIELD(LINE(1265, 1265, 1322), __GXData->cpEnable, 1, 3, loWatermarkEn);
     GX_SET_CP_REG(1, __GXData->cpEnable);
 }
 
+/** Writes the CP clear bits that acknowledge the high and low watermark interrupts. */
 static void __GXWriteFifoIntReset(u8 hiWatermarkClr, u8 loWatermarkClr) {
     SET_REG_FIELD(LINE(1288, 1288, 1345), __GXData->cpClr, 1, 0, hiWatermarkClr);
     SET_REG_FIELD(LINE(1289, 1289, 1346), __GXData->cpClr, 1, 1, loWatermarkClr);
     GX_SET_CP_REG(2, __GXData->cpClr);
 }
 
+/** Sets the GP FIFO high watermark to just 512 bytes above its low watermark (CP registers 20 and 21). */
 void __GXInsaneWatermark(void) {
     __GXFifoObj* realFifo = GPFifo;
 
@@ -499,6 +567,10 @@ void __GXInsaneWatermark(void) {
     GX_SET_CP_REG(21, (realFifo->hiWatermark & 0x3FFFFFFF) >> 16);
 }
 
+/**
+ * Resets the GPU FIFO to empty (read and write pointers back to its base),
+ * going through a temporary copy of the object, and re-applies the CPU FIFO if it was the same object.
+ */
 void __GXCleanGPFifo(void) {
     GXFifoObj dummyFifo;
     GXFifoObj* gpFifo;
@@ -525,6 +597,7 @@ void __GXCleanGPFifo(void) {
     }
 }
 
+/** Records the calling thread as the one the overflow handler suspends and returns the previously recorded thread. */
 OSThread* GXSetCurrentGXThread(void) {
     BOOL enabled;
     OSThread* prev;
@@ -537,22 +610,27 @@ OSThread* GXSetCurrentGXThread(void) {
     return prev;
 }
 
+/** Returns the thread the overflow handler suspends. */
 OSThread* GXGetCurrentGXThread(void) {
     return __GXCurrentThread;
 }
 
+/** Returns the FIFO object the CPU is writing to. */
 GXFifoObj* GXGetCPUFifo(void) {
     return (GXFifoObj*)CPUFifo;
 }
 
+/** Returns the FIFO object the GPU is reading from. */
 GXFifoObj* GXGetGPFifo(void) {
     return (GXFifoObj*)GPFifo;
 }
 
+/** Returns how many FIFO overflows have occurred since the last reset. */
 u32 GXGetOverflowCount(void) {
     return __GXOverflowCount;
 }
 
+/** Resets the overflow counter to 0 and returns its old value. */
 u32 GXResetOverflowCount(void) {
     u32 oldcount;
 
@@ -561,7 +639,10 @@ u32 GXResetOverflowCount(void) {
     return oldcount;
 }
 
-// NONMATCHING
+/**
+ * Flushes the GX FIFO and redirects the CPU write gather pipe to plain memory at ptr (unlinking the CPU and GPU
+ * FIFOs); returns the gather pipe address to write through. NONMATCHING
+ */
 volatile void* GXRedirectWriteGatherPipe(void* ptr) {
     u32 reg = 0;
     BOOL enabled = OSDisableInterrupts();
@@ -593,7 +674,10 @@ volatile void* GXRedirectWriteGatherPipe(void* ptr) {
     return (volatile void *)GXFIFO_ADDR;
 }
 
-// NONMATCHING
+/**
+ * Pads out the gather pipe, then points it back at the CPU FIFO and relinks the CPU and GPU FIFOs
+ * if they were linked. NONMATCHING
+ */
 void GXRestoreWriteGatherPipe(void) {
     u32 reg = 0;
     u32 i;

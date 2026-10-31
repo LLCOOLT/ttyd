@@ -153,6 +153,10 @@ static BattleWeapon weapon_chorobon_drain_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Guess: attack event of the Green Fuzzy: may use an item,
+ * otherwise chooses by chance between its drain attack and a normal jump on a target.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -218,6 +222,10 @@ static BattleUnitSetup entry_chorobon = {
     NULL, // itemDropTable
 };
 
+/**
+ * Guess: splitting event of the Green Fuzzy: when it is hit it splits,
+ * spawning another Fuzzy at its position with the same HP and size status, with a split sound.
+ */
 static EVT_BEGIN(friend_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -356,6 +364,10 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Guess: bouncing movement of the Fuzzy: squashes and stretches it while it hops toward a point,
+ * with a repeated hop loop.
+ */
 static EVT_BEGIN(rabbit_move)
     LOOP(2)
         CALL(btlevtcmd_AddScale, BTL_UNIT_SELF, FLOAT(0.15917969f), FLOAT(-0.23925781f), 0)
@@ -405,6 +417,7 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/** Guess: init event of the Green Fuzzy: sets its work values and pose tables. */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -416,6 +429,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Guess: damage event of the Green Fuzzy: runs the default damage flow. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -423,6 +437,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: damage event for the counter case of the Green Fuzzy:
+ * reacts to the counter hit and runs the default damage flow.
+ */
 static EVT_BEGIN(counter_damage_event)
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
     SET_VALUE(LW(10), -2)
@@ -440,6 +458,7 @@ static EVT_BEGIN(counter_damage_event)
     RETURN
 EVT_END()
 
+/** Guess: return event of the Green Fuzzy: it hops back to its home position after an attack. */
 static EVT_BEGIN(return_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(4.0f), FLOAT(0.5996094f))
@@ -449,6 +468,10 @@ static EVT_BEGIN(return_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: drain attack of the Green Fuzzy: it jumps onto one target
+ * and drains its HP (weapon_chorobon_drain_attack), healing itself.
+ */
 static EVT_BEGIN(drain_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_chorobon_drain_attack))
@@ -688,6 +711,12 @@ static EVT_BEGIN(drain_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0] and args[1] are unit ids (BattleTransID).
+ * Copies the first unit's HP (capped at the second one's maximum) and its size-change (Mini/Mega) turns
+ * and strength to the second, then resets the second one's HP gauge to match.
+ * Called with the newly spawned unit (LW(3)) from the unit's own scripts.
+ */
 static USER_FUNC(chorobon_copy_status) {
     EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));
@@ -708,6 +737,7 @@ static USER_FUNC(chorobon_copy_status) {
     return EVT_RETURN_DONE;
 }
 
+/** Guess: wait (idle) event of the Green Fuzzy: sets the idle pose from its table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

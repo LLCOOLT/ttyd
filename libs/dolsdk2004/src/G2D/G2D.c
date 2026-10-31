@@ -5,6 +5,11 @@
 
 static G2DGlob glob;
 
+/**
+ * Precomputes a sprite's texture coordinates: S0/S1
+ * and T0/T1 are the sprite rectangle (top-left corner and size in texels) divided by the texture size,
+ * inset by half a texel on each side so bilinear filtering does not bleed in neighbouring texels.
+ */
 void G2DInitSprite(G2DSprite *sprite) {
     f32 rInvWidth;
     f32 rInvHeight;
@@ -17,6 +22,12 @@ void G2DInitSprite(G2DSprite *sprite) {
     sprite->rT1 = rInvHeight * (((f32)sprite->nTlcT + (f32)sprite->nHeight) - 0.5f);
 }
 
+/**
+ * Draws one sprite as a textured, alpha-blended quad in the 2D world.
+ * po gives its position and orientation (rOriX, rOriY as a rotation/scale vector).
+ * The position is wrapped to the nearest copy of the world around the camera,
+ * so sprites near the world edge reappear on the other side.
+ */
 void G2DDrawSprite(G2DSprite* sprite, G2DPosOri* po) {
     f32 rOX, rOY;
     f32 rWX, rWY;
@@ -81,6 +92,13 @@ void G2DDrawSprite(G2DSprite* sprite, G2DPosOri* po) {
     GXEnd();
 }
 
+/**
+ * Scan-converts one trapezoid section of a G2D tile layer:
+ * for each scan line up to nEvent it walks the tile map from nL to nR (wrapping with the layer's width/height
+ * masks when bWrap is set), looks up each tile's material,
+ * and appends (tile, x, y) records to the per-material runs in aSortBuffer,
+ * then steps the left/right edges by rStep0/rStep1.
+ */
 static inline void FillSection(G2DLayer* layer, s8* aSortBuffer, s32* nScanLine, s32 nEvent, s16* nIdx,
                                s32* nL, s32* nR, f32* rLeft, f32* rRight, f32 rStep0, f32 rStep1, s32 nMapX,
                                s32 nMapY) {
@@ -245,6 +263,14 @@ static inline void FillSection(G2DLayer* layer, s8* aSortBuffer, s32* nScanLine,
     }
 }
 
+/**
+ * Draws one tile-map layer.
+ * It first scans the (possibly rotated) camera rectangle row by row,
+ * sorting the visible tile cells per material into aSortBuffer (using the FillSection helper,
+ * with the layer's wrap setting), then draws each material's tiles as one batch of quads:
+ * palette-index and colour-only tiles with vertex colours,
+ * texture tiles with the material texture (optionally modulated by a material colour).
+ */
 void G2DDrawLayer(G2DLayer* layer, s8* aSortBuffer) {
     s16* pAddr;
     s16 aCount0;
@@ -671,6 +697,11 @@ void G2DDrawLayer(G2DLayer* layer, s8* aSortBuffer) {
     }
 }
 
+/**
+ * Stores the camera position/orientation and loads the GX position matrix:
+ * a look-at matrix from z = -300 looking at the camera point,
+ * offset so the camera point sits at the centre of the current viewport on a 640 by 448 screen.
+ */
 void G2DSetCamera(G2DPosOri* po) {
     Mtx mView;
     Vec vPos;
@@ -700,6 +731,10 @@ void G2DSetCamera(G2DPosOri* po) {
     GXLoadPosMtxImm(mView, GX_PNMTX0);
 }
 
+/**
+ * Sets the size of the wrapping 2D world and prepares GX for 2D drawing:
+ * depth test always passes, and an orthographic projection covering a 640 by 448 screen.
+ */
 void G2DInitWorld(u32 nWorldX, u32 nWorldY) {
     Mtx44 mProjection;
     
@@ -712,6 +747,7 @@ void G2DInitWorld(u32 nWorldX, u32 nWorldY) {
     GXSetProjection(mProjection, GX_ORTHOGRAPHIC);
 }
 
+/** Records the viewport rectangle used by the camera and sprite code and sets the GX scissor box to it. */
 void G2DSetViewport(u16 nLeft, u16 nTop, u16 nWidth, u16 nHeight) {
     glob.nViewportTlcX = nLeft;
     glob.nViewportTlcY = nTop;

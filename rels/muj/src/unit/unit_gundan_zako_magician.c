@@ -428,6 +428,7 @@ static BattleWeapon weapon_gundan_zako_magician_ziwaziwa_bottle = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Guess: init event of the X-Naut magician: sets its work values and pose tables. */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -437,6 +438,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Guess: damage event of the X-Naut magician: runs the default damage flow. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -444,6 +446,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: attack event of the X-Naut magician: chooses which bottle to throw (fire, confusion, evasion, shrink,
+ * slow, or a recovery) and runs it.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -542,6 +548,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: common start of a magician bottle attack:
+ * the magician winds up and takes the bottle (part one of three common stages).
+ */
 static EVT_BEGIN(attack_common_event1)
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
@@ -590,6 +600,7 @@ static EVT_BEGIN(attack_common_event1)
     RETURN
 EVT_END()
 
+/** Guess: common middle stage of a magician bottle attack: the bottle flies toward the target. */
 static EVT_BEGIN(attack_common_event2)
     IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_fire_bottle))
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("B_1A"))
@@ -678,6 +689,7 @@ static EVT_BEGIN(attack_common_event2)
         RETURN
 EVT_END()
 
+/** Guess: common final stage of a magician bottle attack: the magician returns to its place. */
 static EVT_BEGIN(attack_common_event3)
     IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_magician_yokeyoke_bottle))
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("B_1D"))
@@ -752,6 +764,7 @@ static EVT_BEGIN(attack_common_event3)
         RETURN
 EVT_END()
 
+/** Guess: magician throws a fire bottle at one target: burns it for the weapon damage. */
 static EVT_BEGIN(fire_bottle_event)
     SET_VALUE(LW(9), PTR(&weapon_gundan_zako_magician_fire_bottle))
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
@@ -776,6 +789,7 @@ static EVT_BEGIN(fire_bottle_event)
     RETURN
 EVT_END()
 
+/** Guess: magician throws the "hunyahunya" bottle (a dizzying potion) at one target, afflicting it with a status. */
 static EVT_BEGIN(hunyahunya_bottle_event)
     SET_VALUE(LW(9), PTR(&weapon_gundan_zako_magician_hunyahunya_bottle))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -795,6 +809,7 @@ static EVT_BEGIN(hunyahunya_bottle_event)
     RETURN
 EVT_END()
 
+/** Guess: magician throws the "yokeyoke" bottle, a dodge-up potion, on one ally. */
 static EVT_BEGIN(yokeyoke_bottle_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -822,6 +837,7 @@ static EVT_BEGIN(yokeyoke_bottle_event)
     RETURN
 EVT_END()
 
+/** Guess: magician throws the "minimini" bottle (a shrinking potion) at one target. */
 static EVT_BEGIN(minimini_bottle_event)
     SET_VALUE(LW(9), PTR(&weapon_gundan_zako_magician_minimini_bottle))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -917,6 +933,7 @@ static EVT_BEGIN(minimini_bottle_event)
         RETURN
 EVT_END()
 
+/** Guess: magician heals one ally: throws a recovery bottle at the chosen unit. */
 static EVT_BEGIN(one_recover_event)
     SET_VALUE(LW(9), PTR(&weapon_gundan_zako_magician_one_recover))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -955,6 +972,7 @@ static EVT_BEGIN(one_recover_event)
     RETURN
 EVT_END()
 
+/** Guess: magician heals all allies: throws a recovery bottle that restores the whole party. */
 static EVT_BEGIN(all_recover_event)
     SET_VALUE(LW(9), PTR(&weapon_gundan_zako_magician_all_recover))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -1004,6 +1022,7 @@ static EVT_BEGIN(all_recover_event)
     RETURN
 EVT_END()
 
+/** Guess: the "yokeyoke" bottle event used when Lord Crump is the target. */
 static EVT_BEGIN(yokeyoke_bottle_event_with_kanbu)
     SET_VALUE(LW(9), PTR(&weapon_gundan_zako_magician_yokeyoke_bottle))
     CALL(kanbu_get_id, LW(3), LW(4))
@@ -1013,6 +1032,7 @@ static EVT_BEGIN(yokeyoke_bottle_event_with_kanbu)
     RETURN
 EVT_END()
 
+/** Guess: magician throws the "ziwaziwa" bottle at Lord Crump (finds him with kanbu_get_id). */
 static EVT_BEGIN(ziwaziwa_bottle_event)
     SET_VALUE(LW(9), PTR(&weapon_gundan_zako_magician_ziwaziwa_bottle))
     CALL(kanbu_get_id, LW(3), LW(4))
@@ -1022,11 +1042,16 @@ static EVT_BEGIN(ziwaziwa_bottle_event)
     RETURN
 EVT_END()
 
+/** Guess: wait (idle) event of the X-Naut magician: sets the idle pose. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: finds the battle unit of kind 99 (Lord Crump, the horde leader) and writes its id to args[0]
+ * and its body part id to args[1] (0 when none exists).
+ */
 static USER_FUNC(kanbu_get_id) {
     EvtWord* args = event->args;
     s32 id = -1;

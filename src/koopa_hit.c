@@ -39,10 +39,12 @@ static BOOL kpaFlameHitFilter(HitCheckQuery* query, HitEntry* entry);
 #define KRIDE(i) (KPW->rideHit[i])
 #define KRIDED(i) (KPW->rideDist[i])
 
+/** Slope of a floor normal: its angle from vertical in degrees. */
 static inline f32 kpa_nrmToAngle(f32 x, f32 y, f32 z) {
     return angleABf(0.0f, 0.0f, sqrtf(x * x + z * z), -y);
 }
 
+/** Tilts Bowser's groundRot to match the floor normal (x, y, z) and returns the floor's slope in degrees. */
 static inline f32 kpa_nrmSet(MarioWork* mario, f32 x, f32 y, f32 z) {
     mario->groundRot.x = (s32)(angleABf(0.0f, 0.0f, 100.0f * z, 100.0f * y) - 180.0f);
     mario->groundRot.y = 0.0f;
@@ -50,6 +52,10 @@ static inline f32 kpa_nrmSet(MarioWork* mario, f32 x, f32 y, f32 z) {
     return kpa_nrmToAngle(x, y, z);
 }
 
+/**
+ * TRUE when any active puff of Bowser's fire breath touches the box centre of an object at (x, y, z) with height
+ * h and width w. Only kpaEnemyHitChk calls it.
+ */
 s32 kpaEnemyFireHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
     Mtx m3;
     Mtx m1;
@@ -111,6 +117,11 @@ s32 kpaEnemyFireHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
     return 0;
 }
 
+/**
+ * Checks an enemy box at (x, y, z), h high and w wide, against Bowser for the field NPC code:
+ * 2 burnt by his fire, 1 stomped from above (small Bowser also bounces off unless in kpa_03 or invincible),
+ * 3 touched while he is invincible, 4 he gets hurt, 0 no contact.
+ */
 s32 kpaEnemyHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
     MarioWork* mario;
     f32 dh, dw, dx, dy;
@@ -146,6 +157,7 @@ s32 kpaEnemyHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
     return 0;
 }
 
+/** Clears the ten ceiling-hit slots (headHit/headDist). */
 static inline void kpa_headClear(void) {
     s32 i;
     for (i = 0; i < 10; i++) {
@@ -154,6 +166,10 @@ static inline void kpa_headClear(void) {
     }
 }
 
+// Bowser's floor probe for mario_hit: casts rays down from several points under him (3, or 7 for giant Bowser, spread
+// along his facing), skipping slopes of 50 degrees or more. Returns the floor hit and its height in *outY; for a drop
+// of 2 or more units returns NULL with the depth and its direction in *outDepth/*outAng. Also records each probe's hit
+// as a ride object and sets the floor tilt.
 HitEntry* kpaSearchGround(f32* outY, f32* outDepth, f32* outAng, f32 range) {
     s32 n, i;
     MarioWork* m;
@@ -282,6 +298,12 @@ HitEntry* kpaSearchGround(f32* outY, f32* outDepth, f32* outAng, f32 range) {
     return best;
 }
 
+/**
+ * Bowser's ceiling probe for mario_hit: casts rays up from a per-level set of points over his head (some only
+ * while jumping), at a reach set by level and motion.
+ * Returns the ceiling hit and puts its height in pos->y, or the gap in *h; records each hit in headHit.
+ * Not used while falling.
+ */
 HitEntry* kpaSearchHead(Vec* pos, f32* h, f32 hgt) {
     static s32 _ofs0[] = {3, 12, 16, 1, 0, 16, 0, -9, 16, 0};
     static s32 _ofs1[] = {4, 25, 74, 0, 50, 65, 1, 0, 67, 0, -25, 62, 0};
@@ -373,15 +395,18 @@ HitEntry* kpaSearchHead(Vec* pos, f32* h, f32 hgt) {
     return best;
 }
 
+/** Always returns NULL; the 3D Bowser update still calls it each frame. */
 HitEntry* kpaSearchFrontUnder(void) {
     return NULL;
 }
 
+/** The object ceiling probe i hit this frame (mobjdrv uses it for blocks hit from below). */
 HitEntry* kpaGetHitobjHead(s32 i) {
     HitEntry** e = &KPW->headHit[i];
     return *e;
 }
 
+/** The first object any ceiling probe hit; JP and the demo check only the first probe. */
 HitEntry* kpaGetHitobjHead2(void) {
 #if VERSION >= VERSION_US
     s32 i;
@@ -400,11 +425,13 @@ HitEntry* kpaGetHitobjHead2(void) {
 #endif
 }
 
+/** The floor object floor probe i is standing on (mobjdrv uses it for blocks stood on). */
 HitEntry* kpaGetHitobjRide(s32 i) {
     HitEntry** e = &KPW->rideHit[i];
     return *e;
 }
 
+/** The first floor object any floor probe is standing on, or NULL. */
 HitEntry* kpaChkHitobjRide(void) {
     KpaWork* w = KPW;
     HitEntry* r;
@@ -444,8 +471,10 @@ HitEntry* kpaChkHitobjRide(void) {
     return r;
 }
 
-// No return statement: the original falls off the end (callers ignore the result). Declared void, the
-// kpaWork pointer lands in r3 instead of r4, so the long return type stays.
+/**
+ * No return statement: the original falls off the end (callers ignore the result).
+ * Declared void, the kpaWork pointer lands in r3 instead of r4, so the long return type stays.
+ */
 long kpaClearHitobjRide(void) {
     MarioWork* mario = marioGetPtr();
     mario->kpaWork->rideHit[0] = NULL;
@@ -460,6 +489,7 @@ long kpaClearHitobjRide(void) {
     mario->kpaWork->rideHit[9] = NULL;
 }
 
+/** The object Bowser's body spheres touched this frame (kpaHitCheck), or NULL when the player is not Bowser. */
 HitEntry* kpaGetHitobj(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->characterId != 2) {
@@ -468,6 +498,7 @@ HitEntry* kpaGetHitobj(void) {
     return mario->kpaWork->objHit;
 }
 
+/** The object his fire breath touched this frame (kpaFireMain), or NULL when the player is not Bowser. */
 HitEntry* kpaGetHitFlame(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->characterId != 2) {
@@ -481,7 +512,7 @@ typedef struct HeadSphere {
     s32 y;
     s32 radius;
     s32 mode;
-} HeadSphere; // mode: 0 always, 1 grounded only, 2 airborne only, 3 neither flag
+} HeadSphere; // mode: 0 always, 1 only while jumping, 2 only while not jumping, 3 only when neither jumping nor falling
 typedef struct HeadSphereSet1 {
     s32 count;
     HeadSphere spheres[1];
@@ -527,6 +558,12 @@ static HeadSphereSet4 head_sphere_data_lv3 = {
 };
 static s32* head_sphere_data[] = {(s32*)&head_sphere_data_lv0, (s32*)&head_sphere_data_lv1, (s32*)&head_sphere_data_lv2, (s32*)&head_sphere_data_lv3};
 
+/**
+ * Tests Bowser's body against map objects with the per-level head spheres (head_sphere_data);
+ * returns the last object touched and stores it in objHit.
+ * A sphere touching a block above him while jumping is also stored as a ceiling hit.
+ * Skipped while breathing fire.
+ */
 HitEntry* kpaHitCheck(void) {
     s32* p;
     s32 j;
@@ -589,6 +626,7 @@ HitEntry* kpaHitCheck(void) {
     return best;
 }
 
+/** Hit filter for the fire breath: ignores hidden ? blocks and plain blocks, so flames only hit other objects. */
 static BOOL kpaFlameHitFilter(HitCheckQuery* query, HitEntry* entry) {
     MapObjectEntry* mobj = mobjHitObjPtrToPtr(entry);
     if (!strcmp(mobj->animName, "MOBJ_HiddenHatenaBlock")) {
@@ -600,6 +638,7 @@ static BOOL kpaFlameHitFilter(HitCheckQuery* query, HitEntry* entry) {
     return TRUE;
 }
 
+/** Returns the map object a flame puff sphere at (x, y, z) with radius r touches, ignoring blocks. */
 HitEntry* kpaFlameHitCheck(f32 x, f32 y, f32 z, f32 r) {
     marioGetPtr();
     return hitCheckSphereFilter(kpaFlameHitFilter, x, y, z, r);
@@ -611,7 +650,7 @@ HitEntry* kpaFlameHitCheck(f32 x, f32 y, f32 z, f32 r) {
 // _reflect2/_reflect; the demo kpaSearchWallFront's literals are 45, 0.75, 0.25, 0.5, so the US original
 // (whose only literal left is 0.5) was a different version and cannot be taken from the demo.
 #if VERSION <= VERSION_DEMO_US
-// demo only: Koopa's front-wall search (two rays at 3/4 and 1/4 of the body height), called from searchFrontWall
+/** demo only: Koopa's front-wall search (two rays at 3/4 and 1/4 of the body height), called from searchFrontWall */
 HitEntry* kpaSearchWallFront(Vec* pos, f32* h, f32 dx, f32 dz) {
     Vec p;
     Vec dir;

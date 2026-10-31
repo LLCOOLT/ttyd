@@ -21,12 +21,20 @@ static BeroEntry bero_entry_data[2];
 extern EvtWord jin_06_wall_open_evt[];
 extern EvtWord jin_06_jumpstand[];
 
+/**
+ * Door animation callback: closes door07 as Mario arrives through w_bero (from jin_07);
+ * LW(0) is the door angle and the door turns around Y by 0.44 times it, negated.
+ */
 static EVT_BEGIN(w_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door07"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback: opens door07 as Mario leaves through w_bero (to jin_07);
+ * LW(0) is the door angle and the door turns around Y by 0.44 times it.
+ */
 static EVT_BEGIN(w_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door07"), 0, LW(0), 0)
@@ -55,11 +63,17 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Script run when the peeling wall (a_mekure) is flipped away: sets GSWF_JIN06_PEELING_WALL_BLOWN so it stays open. */
 EVT_BEGIN(jin_06_wall_open_evt)
     SET_VALUE(GSWF(GSWF_JIN06_PEELING_WALL_BLOWN), 1)
     RETURN
 EVT_END()
 
+/**
+ * Script for the red jump stand (mobj_jump) at the bottom of the room:
+ * Mario is launched up (the partner jumps up after him once it is standing on the stand) through the hole to the
+ * floor above.
+ */
 EVT_BEGIN(jin_06_jumpstand)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_get_party, LW(0))
@@ -80,6 +94,10 @@ EVT_BEGIN(jin_06_jumpstand)
     RETURN
 EVT_END()
 
+/**
+ * Chest script for the Flower Saver chest (mobj_box00):
+ * the item appears at the chest while it opens and Mario receives the badge; control is locked meanwhile.
+ */
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
@@ -95,6 +113,12 @@ static EVT_BEGIN(mobj_box00)
     RETURN
 EVT_END()
 
+/**
+ * Creepy Steeple jin_06 map init: sets music, the shadow-Mario tint and the exit,
+ * adds the Flower Saver chest and the red jump stand,
+ * handles Mario falling in from the hole in the jin_00 floor (returning him to jin_00 when he goes back above
+ * height 365), the peeling wall, and moves the story to "Push the statue" at least.
+ */
 EVT_BEGIN(jin_06_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_JIN1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_JIN1"))

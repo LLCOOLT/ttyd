@@ -1,3 +1,7 @@
+/**
+ * memset for the stub: fills n bytes at dst with the byte val,
+ * byte-wise for short blocks and with 32-byte unrolled word stores for long ones.
+ */
 asm void TRK_fill_mem(void* dst, int val, unsigned int n) {
     nofralloc
     cmplwi r5, 0x20

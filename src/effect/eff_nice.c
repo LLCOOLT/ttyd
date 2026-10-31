@@ -110,6 +110,10 @@ s32* acrobat_tbl[2] = {acrobat_jp, acrobat_us};
 static void rendermodeFunc(s32 wXluStage);
 static void effNiceMain(EffectEntry* effect);
 
+/**
+ * Starts loading the rating-text animations for the current language into `group`;
+ * returns TRUE when all are loaded. Called before battles (battle_seq.c) and on map change (seq_mapchange.c).
+ */
 BOOL effNiceAsync(s32 group) {
     int i;
     BOOL valid;
@@ -125,6 +129,7 @@ BOOL effNiceAsync(s32 group) {
     return valid;
 }
 
+/** GX state callback for the rating text's pose: sets up alpha blending. */
 static void rendermodeFunc(s32 wXluStage) {
     AnimationWork* wp = animGetPtr();
 
@@ -135,6 +140,10 @@ static void rendermodeFunc(s32 wXluStage) {
     wp->currDispMode = wXluStage;
 }
 
+/**
+ * Spawns a rating text (type 0-7) at (x, y, z);
+ * battle_damage.c and battle_event_cmd.c call it for Action Command ratings.
+ */
 EffectEntry* effNiceEntry(s32 type, f32 x, f32 y, f32 z) {
     NiceEffectWork *userdata, *ptr;
     EffectEntry* effect;
@@ -206,6 +215,7 @@ EffectEntry* effNiceEntry(s32 type, f32 x, f32 y, f32 z) {
 static void effNiceDisp(CameraId cameraId, void* param);
 static void acrobatMain(EffectEntry* effect);
 
+/** Per frame: advances the text's squash-and-stretch animation, fades it and deletes the effect when finished. */
 static void effNiceMain(EffectEntry* effect) {
     NiceEffectWork* wp = effect->userdata;
     Vec pos;
@@ -335,6 +345,7 @@ static void effNiceMain(EffectEntry* effect) {
     }
 }
 
+/** Draw callback: draws the rating text pose, scaled by the work's stretch factors. */
 static void effNiceDisp(CameraId cameraId, void* param) {
     EffectEntry* effect = param;
     NiceEffectWork* wp = effect->userdata;
@@ -364,6 +375,12 @@ static void effNiceDisp(CameraId cameraId, void* param) {
 
 static void effAcrobatDisp(CameraId cameraId, void* param);
 
+/**
+ * Per-frame update for type 7 (called from effNiceMain):
+ * each letter, 4 frames after the one before (the first plays SFX_SYSTEM_ACROBAT1), slides in from x 500,
+ * squashes, waits its turn, springs back to full size while spreading out, holds 16 frames,
+ * then flattens wide and stretches tall and thin until it vanishes. Deletes when every letter is done.
+ */
 static void acrobatMain(EffectEntry* effect) {
     NiceEffectWork* wp = effect->userdata;
     int i;
@@ -465,6 +482,11 @@ static void acrobatMain(EffectEntry* effect) {
     }
 }
 
+/**
+ * Draw callback for type 7: draws each letter as a camera-facing textured quad (textures from acrobat_tbl for
+ * the current language) at its offset and squash/stretch, with no depth test.
+ * US and PAL skip letters whose texture id is -1.
+ */
 static void effAcrobatDisp(CameraId cameraId, void* param) {
     EffectEntry* effect = param;
     NiceEffectWork* wp = effect->userdata;

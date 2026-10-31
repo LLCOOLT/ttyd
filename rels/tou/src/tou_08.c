@@ -39,6 +39,11 @@ static USER_FUNC(icon_off);
 USER_FUNC(tou_08_belt_camid);
 #endif
 
+/**
+ * Run when Mario arrives from the toilet pipe before STORY_STG3_21_1ST_MATCH_WITH_RAWK_HAWK:
+ * he walks to (-265, 125), the partner remarks (stg3_tou_422),
+ * GSWF_TOU_TITLE_MATCH_RESERVED is cleared and the story advances to STORY_STG3_21_1ST_MATCH_WITH_RAWK_HAWK.
+ */
 static EVT_BEGIN(evt_toile)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_21_1ST_MATCH_WITH_RAWK_HAWK)
         CALL(evt_mario_key_onoff, 0)
@@ -56,18 +61,30 @@ static EVT_BEGIN(evt_toile)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the room door (door_1), opening: LW(0) is the swing angle;
+ * turns door_1 about the Y axis by 0.44 times the angle.
+ */
 static EVT_BEGIN(n_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the room door (door_1), closing:
+ * turns door_1 about the Y axis by -0.44 times the angle.
+ */
 static EVT_BEGIN(n_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Entrance script for the toilet pipe: clears the two "arrived from toilet" flags
+ * (GSWF_TOU04_ARRIVED_FROM_TOILET_A and B) and spawns evt_toile; LW(0) is set to 0.
+ */
 static EVT_BEGIN(toile_in)
     SET_VALUE(GSWF(GSWF_TOU04_ARRIVED_FROM_TOILET_A), 0)
     SET_VALUE(GSWF(GSWF_TOU04_ARRIVED_FROM_TOILET_B), 0)
@@ -76,6 +93,11 @@ static EVT_BEGIN(toile_in)
     RETURN
 EVT_END()
 
+/**
+ * Exit script for the toilet pipe: plays the water ("anm_mizu") and, a second later,
+ * the lid ("anm_futa") animation with the flush sound,
+ * sets GSWF_TOU04_ARRIVED_FROM_TOILET_B (so tou_04 knows Mario came out of this pipe) and sets LW(0) to 0.
+ */
 static EVT_BEGIN(toile_out)
     CALL(evt_map_playanim, STRING("anm_mizu"), 0, 0)
     BEGIN_INLINE_EVENT
@@ -128,12 +150,17 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
+/** NPC init for the Spiny (togenoko) fighter in the locker room: placed at (90, 0, -50) facing 270. */
 EVT_BEGIN(init_togenoko)
     CALL(evt_npc_set_position, STRING("me"), 90, 0, -50)
     CALL(evt_npc_set_ry, STRING("me"), 270)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the Spiny fighter: story-dependent locker-room lines (the first Rawk Hawk match, the rematch
+ * stages).
+ */
 EVT_BEGIN(talk_togenoko)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
         IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_21_1ST_MATCH_WITH_RAWK_HAWK)
@@ -179,12 +206,14 @@ EVT_BEGIN(talk_togenoko)
     RETURN
 EVT_END()
 
+/** NPC init for the Spike Top fighter (togemet): placed at (120, 0, 80) facing 270. */
 EVT_BEGIN(init_togemet)
     CALL(evt_npc_set_position, STRING("トゲメット"), 120, 0, 80)
     CALL(evt_npc_set_ry, STRING("トゲメット"), 270)
     RETURN
 EVT_END()
 
+/** Talk script of the Spike Top fighter: story-dependent locker-room lines. */
 EVT_BEGIN(talk_togemet)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
         IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_21_1ST_MATCH_WITH_RAWK_HAWK)
@@ -230,12 +259,14 @@ EVT_BEGIN(talk_togemet)
     RETURN
 EVT_END()
 
+/** NPC init for the Hammer Bro fighter: placed at (-115, 0, 115) facing 90. */
 EVT_BEGIN(init_hammerbros)
     CALL(evt_npc_set_position, STRING("ハンマーブロス"), -115, 0, 115)
     CALL(evt_npc_set_ry, STRING("ハンマーブロス"), 90)
     RETURN
 EVT_END()
 
+/** Talk script of the Hammer Bro fighter: story-dependent locker-room lines. */
 EVT_BEGIN(talk_hammerbros)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
         IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_21_1ST_MATCH_WITH_RAWK_HAWK)
@@ -281,12 +312,20 @@ EVT_BEGIN(talk_hammerbros)
     RETURN
 EVT_END()
 
+/** NPC init for the Shady Koopa (ウラノコ): placed at (-160, 0, -50) facing 90. */
 static EVT_BEGIN(init_uranoko)
     CALL(evt_npc_set_position, STRING("me"), -160, 0, -50)
     CALL(evt_npc_set_ry, STRING("me"), 90)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the Shady Koopa: before STORY_STG3_34_RETURN_TO_ROGUEPORT he gives a special line
+ * (stg3_npc_08_04_13_01) after the first Rawk Hawk match
+ * until Mario's champion opening has been seen (GSWF_TOU_CHAMP_OPENING_SEEN),
+ * otherwise a line chosen by Mario's Glitz Pit ranking (10 down to 1).
+ * After that (the rematch) the line depends on GSWF_TOU_REMATCH_MAJORS_LEFT and GSWF_TOU_REMATCH_CHAMPION.
+ */
 static EVT_BEGIN(talk_uranoko)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
         IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_21_1ST_MATCH_WITH_RAWK_HAWK)
@@ -396,6 +435,11 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Guess: scene when Mario first reaches this room through the corridor:
+ * Grubba (ガンス) stands next to Mario and says stg3_tou_50,
+ * then the screen changes to tou_05 with a page-flip transition.
+ */
 static EVT_BEGIN(evt_sensyu)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, 0, 0, -75)
@@ -414,6 +458,10 @@ static EVT_BEGIN(evt_sensyu)
     RETURN
 EVT_END()
 
+/**
+ * Guess: door helper for the first-match scenes:
+ * the NPC in LW(0) (Jolene or Grubba) walks to the door and opens it, with the door sound.
+ */
 EVT_BEGIN(evt_1st_sub)
     SET_VALUE(LW(8), LW(0))
     CALL(evt_npc_flag_onoff, 1, LW(8), NPC_FLAG_INTANGIBLE)
@@ -455,6 +503,15 @@ EVT_BEGIN(evt_1st_sub)
     RETURN
 EVT_END()
 
+/**
+ * Scene on Mario's first league promotion (the majors, 10th place):
+ * Jolene (キノシコワ) opens the door and introduces him (stg3_tou_294),
+ * then the champion (チャンピョン, wearing the belt via tou_champion_belt) comes in,
+ * greets Mario and the partner (stg3_tou_294_02 to 08),
+ * after which Mario's mail arrives with the vibration jingle.
+ * Mario reads it (stg3_tou_294_12), mail 6 is received and opened,
+ * the Glitz Pit music resumes and the story advances to STORY_STG3_20_MAJORS_10TH.
+ */
 static EVT_BEGIN(evt_1st_leagu)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -673,6 +730,10 @@ static EVT_BEGIN(evt_1st_leagu)
     RETURN
 EVT_END()
 
+/**
+ * Guess: door of the restroom (t_door_2/3) from the locker room:
+ * refuses with stg3_tou_t_00 if a match is reserved, otherwise walks Mario and the partner through the door.
+ */
 EVT_BEGIN(evt_toile_door)
     IF_INT_EQUAL(GSWF(GSWF_TOU_TITLE_MATCH_RESERVED), 0)
         IF_INT_EQUAL(GSWF(GSWF_TOU_MATCH_RESERVED), 1)
@@ -751,6 +812,7 @@ EVT_BEGIN(evt_toile_door)
     RETURN
 EVT_END()
 
+/** Restroom door from inside: opens door_2 with a wood-door sound, walks the party out and shuts it. */
 EVT_BEGIN(evt_toile_door2)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -792,6 +854,10 @@ EVT_BEGIN(evt_toile_door2)
     RETURN
 EVT_END()
 
+/**
+ * Guess: scene after Mario wins the title match:
+ * Grubba (ガンス) and Jolene (キノシコワ) congratulate Mario in the locker room.
+ */
 EVT_BEGIN(evt_champion_win)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION >= VERSION_US
@@ -873,6 +939,7 @@ EVT_BEGIN(evt_champion_win)
 EVT_END()
 
 #if VERSION >= VERSION_JP
+/** Script helper: switches the champion belt effect and its NPC to camera id 7 so they render over the cutscene. */
 USER_FUNC(tou_08_belt_camid) {
     EffectEntry* eff = effNameToPtr("belt");
     // ベルト
@@ -884,16 +951,22 @@ USER_FUNC(tou_08_belt_camid) {
 }
 #endif
 
+/** Script helper: hides the belt item's icon. */
 static USER_FUNC(icon_off) {
     iconFlagOn(itemNameToPtr("belt")->name, 2);
     return EVT_RETURN_DONE;
 }
 
+/** Bed entry point: registers evt_tou_bed to run when Mario presses A in front of the bed named in LW(0). */
 static EVT_BEGIN(bed_entry)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, LW(0), 0, PTR(evt_tou_bed), 0)
     RETURN
 EVT_END()
 
+/**
+ * Guess: scene where the poison-cake NPC (ウラノコ) is checked on:
+ * the camera frames him and he speaks stg3_tou_297_2; clears GSWF_TOU_CAKE_WAITING.
+ */
 EVT_BEGIN(evt_tou_08_cake)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_bero_exec_wait, 65536)
@@ -913,6 +986,12 @@ EVT_BEGIN(evt_tou_08_cake)
     RETURN
 EVT_END()
 
+/**
+ * Epilogue setup: spawns Goombella (クリスチーヌ) at (30, 0, -50) facing 270
+ * and Mario's Yoshi (チビヨッシー) at (-30, 0, -50) facing 90,
+ * using the baby Yoshi model that matches the Yoshi's colour (get_yoshi_color),
+ * with no wall collision or hitbox for the Yoshi.
+ */
 static EVT_BEGIN(epilogue_npc_entry)
     CALL(evt_npc_entry, STRING("クリスチーヌ"), STRING("c_pkr"))
     CALL(evt_npc_set_tribe, STRING("クリスチーヌ"), STRING("クリスチーヌ"))
@@ -943,6 +1022,11 @@ static EVT_BEGIN(epilogue_npc_entry)
     RETURN
 EVT_END()
 
+/**
+ * Guess: background action of the epilogue room scene:
+ * Goombella and Yoshi take turns talking, a guard (ガードマン) enters through the door and looks at Yoshi,
+ * Yoshi walks up to him and leaves with him, the door closes, and Goombella keeps turning back and forth.
+ */
 static EVT_BEGIN(epilogue_evt_sub)
     WAIT_MS(500)
     CALL(evt_npc_set_anim, STRING("クリスチーヌ"), STRING("PKR_T_1"))
@@ -1053,6 +1137,11 @@ static EVT_BEGIN(epilogue_evt_sub)
     RETURN
 EVT_END()
 
+/**
+ * Epilogue scene in Mario's room: Glitz Pit epilogue music, Mario hidden,
+ * the camera framing Goombella and Yoshi, who talk while epilogue_evt_sub runs;
+ * the narration ep_40 shows Yoshi's name, then the screen fades out and the map changes to usu_00.
+ */
 static EVT_BEGIN(epilogue_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_URN1"))
     CALL(evt_snd_bgm_scope, 0, 1)
@@ -1077,6 +1166,10 @@ static EVT_BEGIN(epilogue_evt)
 EVT_END()
 
 #if VERSION >= VERSION_US
+/**
+ * After a match: runs evt_tou_match_after_default and stops the Hammer Bro
+ * and Spike Top fighters' regular scripts, then restarts them.
+ */
 EVT_BEGIN(evt_match_after_stop_npcs)
     SPAWN_EVENT_GET_ID(PTR(evt_tou_match_after_default), LW(10))
     CALL(evt_npc_check, STRING("ハンマーブロス"), LW(0))
@@ -1106,6 +1199,11 @@ EVT_BEGIN(evt_match_after_stop_npcs)
 EVT_END()
 #endif
 
+/**
+ * Guess: map init for tou_08, the locker room: sets the story stage to match the player's rank
+ * when the map is entered by debugging flags (skip flags), places the fighters, the belt and the cake scene,
+ * and sets up the match monitor.
+ */
 EVT_BEGIN(tou_08_init_evt)
     CALL(evt_tou_get_ranking, LW(0))
     SWITCH(LW(0))
@@ -1233,6 +1331,7 @@ EVT_BEGIN(tou_08_init_evt)
     RETURN
 EVT_END()
 
+/** Script helper: args[0] receives Yoshi's color (0-6) from the pouch. */
 static USER_FUNC(get_yoshi_color) {
     EvtWord* args = event->args;
     evtSetValue(event, args[0], pouchGetPartyColor(4));

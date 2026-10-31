@@ -81,12 +81,20 @@ static int __GXShutdown(int final);
 
 static OSResetFunctionInfo GXResetFuncInfo = {__GXShutdown, 0x7F, NULL, NULL};
 
+/**
+ * Assembly: syncs, reads the write-gather pointer register (WPAR) and returns its low bit,
+ * which is set while data is still buffered in the CPU's write-gather pipe.
+ */
 asm BOOL IsWriteGatherBufferEmpty(void) {
     sync
     mfspr r3, WPAR
     andi. r3, r3, 1
 }
 
+/**
+ * Points WPAR at the physical address of the GX FIFO window and sets the write-gather enable bit in HID2,
+ * so the CPU's stores to the FIFO address are gathered into 32-byte bursts.
+ */
 static void EnableWriteGatherPipe(void) {
     u32 hid2 = PPCMfhid2();
 
@@ -95,6 +103,7 @@ static void EnableWriteGatherPipe(void) {
     PPCMthid2(hid2);
 }
 
+/** Clears the write-gather enable bit in HID2. */
 static void DisableWriteGatherPipe(void) {
     u32 hid2 = PPCMfhid2();
 
@@ -102,6 +111,11 @@ static void DisableWriteGatherPipe(void) {
     PPCMthid2(hid2);
 }
 
+/**
+ * Default choice of texture cache region for a texture: map id (mod 8) picks the slot;
+ * colour-indexed formats use TexRegions0, RGBA8 uses TexRegions1 (TexRegions2 when mipmapped)
+ * and other formats use TexRegions0 (TexRegions1 when mipmapped).
+ */
 static GXTexRegion*__GXDefaultTexRegionCallback(const GXTexObj* t_obj, GXTexMapID id) {
     GXTexFmt fmt;
     u8 mm;
@@ -128,6 +142,7 @@ static GXTexRegion*__GXDefaultTexRegionCallback(const GXTexObj* t_obj, GXTexMapI
     }
 }
 
+/** Default palette region lookup: returns TlutRegions[idx] for idx below 20 and NULL otherwise. */
 static GXTlutRegion* __GXDefaultTlutRegionCallback(u32 idx) {
     if (idx >= 20) {
         return NULL;
@@ -136,11 +151,18 @@ static GXTlutRegion* __GXDefaultTlutRegionCallback(u32 idx) {
 }
 
 #if DEBUG
+/** Default GX verifier callback in debug builds: prints "Level n, Warning id: message" with OSReport. */
 static void __GXDefaultVerifyCallback(GXWarningLevel level, u32 id, const char* msg) {
     OSReport("Level %1d, Warning %3d: %s\n", level, id, msg);
 }
 #endif
 
+/**
+ * OS reset callback for GX.
+ * Before the final stage it returns 0 until the memory-controller pixel counter has stopped changing for 10
+ * ticks (the GPU is idle); at the final stage it removes the breakpoint, draw-sync and draw-done callbacks,
+ * pushes padding into the FIFO, disables the command processor and aborts the GPU.
+ */
 static int __GXShutdown(BOOL final) {
     u32 reg;
     u32 peCountNew;
@@ -202,6 +224,11 @@ static int __GXShutdown(BOOL final) {
 		(reg) = (u32)__rlwimi((u32)(reg), (val), (shift), (32 - (shift) - (size)), (31 - (shift))); \
 	} while (0);
 
+/**
+ * Sets the revision-dependent bits (bit 30 of every VAT A register, bit 31 of every VAT B register)
+ * and writes them to the CP, writes the matching XF setup registers 0 and 0x12 and the BP register 0x58,
+ * for the current hardware revision.
+ */
 void __GXInitRevisionBits(void) {
     u32 i;
 
@@ -246,6 +273,14 @@ void __GXInitRevisionBits(void) {
     }
 }
 
+/**
+ * Initialises the GX library with a command FIFO at base of size bytes:
+ * sets the library state, maps the PI/CP/PE/memory register blocks,
+ * creates the FIFO and makes it both the CPU and GP FIFO, registers the reset hook,
+ * initialises the pixel engine interrupts and write-gather pipe, resets all cached BP/XF register copies,
+ * sets the timing registers from the bus clock, builds the default texture cache and palette regions,
+ * and finally calls __GXInitGX. Returns the FIFO object.
+ */
 GXFifoObj* GXInit(void* base, u32 size) {
     u32 i;
     u32 reg;
@@ -397,6 +432,13 @@ GXFifoObj* GXInit(void* base, u32 size) {
     return &FifoObj;
 }
 
+/**
+ * Puts the GPU into its default state: picks a default render mode from VIGetTvFormat,
+ * then sets the copy clear colour, texgens, vertex descriptor and formats, line and point size,
+ * identity matrices, viewport, projection, culling, scissor, lighting channels,
+ * a default white texture on all maps, a one-stage replace TEV, swap tables, no indirect stages, no fog, blend,
+ * Z and dither modes, pixel format and the display copy settings.
+ */
 void __GXInitGX(void) {
     GXRenderModeObj* rmode;
     GXTexObj tex_obj;

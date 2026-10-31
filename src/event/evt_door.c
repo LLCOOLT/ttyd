@@ -83,6 +83,11 @@ extern EvtWord house_in[];
 extern EvtWord house_out[];
 extern EvtWord door_dark2[];
 
+/**
+ * Plays the door-open sound for a DoorParam (LW(0)) at its map object's position;
+ * the sound comes from DoorParam.se (1 plain, 2-4 wood, 5-6 iron, 7 grille, 8 sliding, 9 turning, 10 electric,
+ * 11 stone, 12-13 castle, 14 metal); 0 stays silent.
+ */
 EVT_BEGIN(door_open_se)
     CALL(evt_door_param, LW(0), 8, LW(1))
     CALL(evt_door_param, LW(0), 1, LW(2), LW(3), LW(4))
@@ -121,6 +126,10 @@ EVT_BEGIN(door_open_se)
     RETURN
 EVT_END()
 
+/**
+ * Plays the door-shut sound matching DoorParam.se at the door's map object;
+ * same table as door_open_se, except se 4 reuses the second wood sound.
+ */
 EVT_BEGIN(door_close_se)
     CALL(evt_door_param, LW(0), 8, LW(1))
     CALL(evt_door_param, LW(0), 1, LW(2), LW(3), LW(4))
@@ -159,6 +168,10 @@ EVT_BEGIN(door_close_se)
     RETURN
 EVT_END()
 
+/**
+ * Plays SFX_DOOR_FALL1 at the door's map object for any nonzero DoorParam.se;
+ * spawned by evt_door_open when the door has a wall event (evtWall).
+ */
 EVT_BEGIN(door_down_se)
     CALL(evt_door_param, LW(0), 8, LW(1))
     CALL(evt_door_param, LW(0), 1, LW(2), LW(3), LW(4))
@@ -171,6 +184,10 @@ EVT_BEGIN(door_down_se)
     RETURN
 EVT_END()
 
+/**
+ * Plays SFX_HOUSE_OPEN1 at the door's map object when the house front swings open,
+ * unless DoorParam.flags bit 2 asks for no sound.
+ */
 EVT_BEGIN(house_open_se)
     CALL(evt_door_param, LW(0), 9, LW(1))
     IF_BITS_SET(LW(1), 2)
@@ -182,18 +199,29 @@ EVT_BEGIN(house_open_se)
     RETURN
 EVT_END()
 
+/**
+ * Sets PSND_FLAG_MUTE_DOOR_SFX once Mario is inside,
+ * silencing door-muted sounds until he leaves (snd_door_out) or the map changes.
+ * The demo defines this pair at the end of the file.
+ */
 #if VERSION >= VERSION_JP
 static USER_FUNC(snd_door_in) {
     psndSetFlag(PSND_FLAG_MUTE_DOOR_SFX);
     return EVT_RETURN_DONE;
 }
 
+/** Clears PSND_FLAG_MUTE_DOOR_SFX after Mario walks back out, letting door-muted sounds play again. */
 static USER_FUNC(snd_door_out) {
     psndClearFlag(PSND_FLAG_MUTE_DOOR_SFX);
     return EVT_RETURN_DONE;
 }
 #endif
 
+/**
+ * Sets up a house for evt_door_setup: allocates a HouseWork on the map heap for the HouseData in args[0],
+ * works out where Mario stands outside (from hit[1]) and inside (from hit[3]),
+ * and returns the HouseWork in args[1].
+ */
 static USER_FUNC(door_entry) {
     EvtWord* args = event->args;
     HouseData* d = (HouseData*)evtGetValue(event, args[0]);
@@ -240,13 +268,17 @@ static USER_FUNC(door_entry) {
 }
 
 #if VERSION <= VERSION_DEMO_US
-// the demo defines house_close_se right after house_open_se
+/** the demo defines house_close_se right after house_open_se */
 EVT_BEGIN(house_close_se)
     CALL_CHILD(house_open_se)
     RETURN
 EVT_END()
 #endif
 
+/**
+ * Fades the map's first blend colour from white to black over 300 ms,
+ * darkening everything not flagged NO_BLEND (the town around a house); spawned by house_in.
+ */
 EVT_BEGIN(evt_dark)
     CALL(evt_sub_intpl_msec_init, 11, 255, 0, 300)
     LOOP(0)
@@ -261,6 +293,7 @@ EVT_BEGIN(evt_dark)
     RETURN
 EVT_END()
 
+/** Same fade as evt_dark on the map's second blend colour (objects not flagged NO_BLEND2). */
 EVT_BEGIN(evt_dark2)
     CALL(evt_sub_intpl_msec_init, 11, 255, 0, 300)
     LOOP(0)
@@ -275,6 +308,7 @@ EVT_BEGIN(evt_dark2)
     RETURN
 EVT_END()
 
+/** Fades the first blend colour back from black to white over 300 ms, then turns the blend off; house_out. */
 static EVT_BEGIN(evt_light)
     CALL(evt_sub_intpl_msec_init, 11, 0, 255, 300)
     LOOP(0)
@@ -289,6 +323,7 @@ static EVT_BEGIN(evt_light)
     RETURN
 EVT_END()
 
+/** Fades the second blend colour back from black to white over 300 ms, then turns it off; house_out. */
 EVT_BEGIN(evt_light2)
     CALL(evt_sub_intpl_msec_init, 11, 0, 255, 300)
     LOOP(0)
@@ -303,10 +338,12 @@ EVT_BEGIN(evt_light2)
     RETURN
 EVT_END()
 
+/** Empty: evt_door_close spawns it where a door-raise sound would go, but it plays nothing. */
 EVT_BEGIN(door_up_se)
     RETURN
 EVT_END()
 
+/** House-front closing sound for evt_door_close: just plays house_open_se again. */
 #if VERSION >= VERSION_JP
 EVT_BEGIN(house_close_se)
     CALL_CHILD(house_open_se)
@@ -314,6 +351,11 @@ EVT_BEGIN(house_close_se)
 EVT_END()
 #endif
 
+/**
+ * Plays the house's opening map animation (HouseData.anim[0]) when Mario goes in,
+ * with the shop-shutter rattle for "S_mise_open" or the plain house-open sound otherwise,
+ * and waits for the animation to finish.
+ */
 EVT_BEGIN(in_houseanim)
     WAIT_MS(500)
     CALL(animation, LW(10), LW(0), LW(1), LW(2), LW(3))
@@ -340,6 +382,10 @@ EVT_BEGIN(in_houseanim)
     RETURN
 EVT_END()
 
+/**
+ * Plays the house's closing map animation (HouseData.anim[2]) when Mario leaves,
+ * with the shutter rattle for "S_mise_close", waits for it, then plays the house-shut sound.
+ */
 EVT_BEGIN(out_houseanim)
     CALL(animation, LW(10), LW(0), LW(1), LW(2), LW(3))
     IF_INT_NOT_EQUAL(LW(2), 0)
@@ -365,6 +411,10 @@ EVT_BEGIN(out_houseanim)
     RETURN
 EVT_END()
 
+/**
+ * Swings the house's door group open 80 degrees and shut again, then tips it 90 degrees over, with the open,
+ * shut and fall sounds; spawned by house_in.
+ */
 EVT_BEGIN(in_dooranim)
     CALL(door_group, LW(10), LW(9))
     BEGIN_INLINE_EVENT
@@ -405,6 +455,7 @@ EVT_BEGIN(in_dooranim)
     RETURN
 EVT_END()
 
+/** Reverse of in_dooranim for house_out: stands the door back up, swings it open and shut with sounds. */
 EVT_BEGIN(out_dooranim)
     CALL(door_group, LW(10), LW(9))
     BEGIN_INLINE_EVENT
@@ -443,6 +494,12 @@ EVT_BEGIN(out_dooranim)
     RETURN
 EVT_END()
 
+/**
+ * Case event (from evt_door_setup) that takes Mario into a house:
+ * dips the music, locks controls, shows the inside groups and hits,
+ * walks Mario and partners in while the town fades dark and the front opens.
+ * LW(10) is the HouseWork; DoorFLAG blocks re-entry while it runs.
+ */
 EVT_BEGIN(house_in)
     PEEK_INT(LW(0), PTR(&DoorFLAG))
     IF_INT_EQUAL(LW(0), 1)
@@ -515,6 +572,11 @@ EVT_BEGIN(house_in)
     RETURN
 EVT_END()
 
+/**
+ * Case event that walks Mario back out of a house:
+ * restores the music, plays the closing animation, fades the town back in,
+ * then hides the inside groups and hits and resets the blend flags. LW(10) is the HouseWork.
+ */
 EVT_BEGIN(house_out)
     PEEK_INT(LW(0), PTR(&DoorFLAG))
     IF_INT_EQUAL(LW(0), 1)
@@ -582,6 +644,10 @@ EVT_BEGIN(house_out)
     RETURN
 EVT_END()
 
+/**
+ * Map-init setup for a house whose whole front opens (Koopa Village, nok_00/nok_01): LW(0) is its HouseData.
+ * Hides the inside, then registers house_in and house_out as case events on the entry and exit hits.
+ */
 EVT_BEGIN(evt_door_setup)
     CALL(door_entry, LW(0), LW(10))
     POKE_INT(0, PTR(&DoorFLAG))
@@ -598,6 +664,11 @@ EVT_BEGIN(evt_door_setup)
     RETURN
 EVT_END()
 
+/**
+ * Fades the map's first blend colour from white to black over 300 ms,
+ * darkening the outside (anything not flagged NO_BLEND) once Mario steps through a door;
+ * used by the evt_door_open family.
+ */
 EVT_BEGIN(door_dark)
     CALL(evt_sub_intpl_msec_init, 11, 255, 0, 300)
     LABEL(0)
@@ -611,6 +682,7 @@ EVT_BEGIN(door_dark)
     RETURN
 EVT_END()
 
+/** Same as door_dark on the map's second blend colour (objects not flagged NO_BLEND2). */
 EVT_BEGIN(door_dark2)
     CALL(evt_sub_intpl_msec_init, 11, 255, 0, 300)
     LABEL(0)
@@ -624,6 +696,10 @@ EVT_BEGIN(door_dark2)
     RETURN
 EVT_END()
 
+/**
+ * Fades the first blend colour back from black to white over 300 ms and turns the blend off;
+ * used when Mario leaves through a door (evt_door_close, evt_door_close_roll).
+ */
 EVT_BEGIN(door_light)
     CALL(evt_sub_intpl_msec_init, 11, 0, 255, 300)
     LABEL(0)
@@ -637,6 +713,7 @@ EVT_BEGIN(door_light)
     RETURN
 EVT_END()
 
+/** Same as door_light on the map's second blend colour; also spawned directly by usu_01 (Twilight Town). */
 EVT_BEGIN(door_light2)
     CALL(evt_sub_intpl_msec_init, 11, 0, 255, 300)
     LABEL(0)
@@ -650,6 +727,12 @@ EVT_BEGIN(door_light2)
     RETURN
 EVT_END()
 
+/**
+ * Front-A case event (registered by evt_door_entry) that takes Mario in through a door:
+ * shows the inside, keeps Mario, partners and the listed NPCs lit, swings the door open,
+ * walks the party in and darkens the outside.
+ * LW(0) is the DoorParam; LW(15) bits: 2 = no darkening, 4 = start the wall event early.
+ */
 EVT_BEGIN(evt_door_open)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -822,6 +905,10 @@ EVT_BEGIN(evt_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Fahr Outpost (bom_01) cutscene variant of evt_door_open: no camera or Mario movement;
+ * sets GF(0) and holds the door open until the map's script clears it, then closes it and darkens the outside.
+ */
 EVT_BEGIN(evt_door_open_bom_01)
     CALL(evt_door_param, LW(0), 7, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
@@ -943,6 +1030,10 @@ EVT_BEGIN(evt_door_open_bom_01)
     RETURN
 EVT_END()
 
+/**
+ * Guess: opens a door for a cutscene in Rogueport (gor_02/gor_03) without the door swing or Mario walking in:
+ * shows the inside, darkens the outside and runs the wall events.
+ */
 EVT_BEGIN(evt_door_open_roll)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_door_param, LW(0), 7, LW(1), LW(2))
@@ -1015,6 +1106,12 @@ EVT_BEGIN(evt_door_open_roll)
     RETURN
 EVT_END()
 
+/**
+ * Front-A case event (registered by evt_door_entry) that takes Mario back out:
+ * undoes evt_door_open, walking the party out, closing the door, restoring the outside and hiding the inside.
+ * LW(15) bits: 1 = keep the inside shown, 2 = no fade, 8 = don't walk Mario,
+ * 16 = use the exit spot measured from Mario (evt_door_param 11).
+ */
 EVT_BEGIN(evt_door_close)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -1166,6 +1263,10 @@ EVT_BEGIN(evt_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Guess: cutscene counterpart of evt_door_open_roll (gor_03):
+ * restores the outside and hides the inside without the door swing or Mario walking out.
+ */
 EVT_BEGIN(evt_door_close_roll)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_door_param, LW(0), 7, LW(1), LW(2))
@@ -1244,6 +1345,11 @@ EVT_BEGIN(evt_door_close_roll)
     RETURN
 EVT_END()
 
+/**
+ * Puts a door straight into its "inside" state with no animation or fade:
+ * blend colours black, wall events at their end angle, camera snapped.
+ * Used when a map starts with Mario indoors (aaa_00, Rogueport maps).
+ */
 EVT_BEGIN(evt_door_open_quick)
     CALL(evt_door_param, LW(0), 7, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
@@ -1304,6 +1410,11 @@ EVT_BEGIN(evt_door_open_quick)
     RETURN
 EVT_END()
 
+/**
+ * Map-init setup for an ordinary door (DoorParam in LW(0)):
+ * hides the inside and its hits, registers evt_door_open on hitOut
+ * and evt_door_close on hitIn as A-in-front case events, and hides the listed NPCs.
+ */
 EVT_BEGIN(evt_door_entry)
     CALL(evt_door_param, LW(0), 3, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
@@ -1328,6 +1439,10 @@ EVT_BEGIN(evt_door_entry)
     RETURN
 EVT_END()
 
+/**
+ * Returns HouseData.hit[0..3] of the HouseWork in args[0] into args[1..4]:
+ * case condition and hit name pairs for the way in and the way out (evt_door_setup).
+ */
 static USER_FUNC(inout_hit) {
     EvtWord* args = event->args;
     HouseWork* w = (HouseWork*)evtGetValue(event, args[0]);
@@ -1338,6 +1453,7 @@ static USER_FUNC(inout_hit) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns the X and Z of the spot outside the house that door_entry worked out. */
 static USER_FUNC(out_pos) {
     EvtWord* args = event->args;
     HouseWork* w = (HouseWork*)evtGetValue(event, args[0]);
@@ -1346,6 +1462,7 @@ static USER_FUNC(out_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns the X and Z of the spot inside the house that door_entry worked out. */
 static USER_FUNC(in_pos) {
     EvtWord* args = event->args;
     HouseWork* w = (HouseWork*)evtGetValue(event, args[0]);
@@ -1354,6 +1471,7 @@ static USER_FUNC(in_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns the house's outside map group name (HouseData.outside). */
 static USER_FUNC(outside_group) {
     EvtWord* args = event->args;
     HouseWork* w = (HouseWork*)evtGetValue(event, args[0]);
@@ -1361,6 +1479,7 @@ static USER_FUNC(outside_group) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns the house's door map group name (HouseData.door); also used as the sound position. */
 static USER_FUNC(door_group) {
     EvtWord* args = event->args;
     HouseWork* w = (HouseWork*)evtGetValue(event, args[0]);
@@ -1368,6 +1487,7 @@ static USER_FUNC(door_group) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns HouseData.inside: the interior map group and its hit object, shown while Mario is inside. */
 static USER_FUNC(inside_group) {
     EvtWord* args = event->args;
     HouseWork* w = (HouseWork*)evtGetValue(event, args[0]);
@@ -1376,6 +1496,7 @@ static USER_FUNC(inside_group) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns HouseData.initInside: the map group and hit object evt_door_setup hides at map start. */
 static USER_FUNC(init_inside_group) {
     EvtWord* args = event->args;
     HouseWork* w = (HouseWork*)evtGetValue(event, args[0]);
@@ -1384,6 +1505,7 @@ static USER_FUNC(init_inside_group) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns the house's four map animation names (HouseData.anim): [0] opening, [2] closing; 0 for none. */
 static USER_FUNC(animation) {
     EvtWord* args = event->args;
     HouseWork* w = (HouseWork*)evtGetValue(event, args[0]);
@@ -1447,14 +1569,23 @@ static USER_FUNC(animation) {
     }                                                            \
     return EVT_RETURN_DONE;
 
+/**
+ * Keeps Mario, both partners and the house's listed NPCs,
+ * map objects and items lit (exempt from the map blend) while house_in darkens the town.
+ */
 static USER_FUNC(npc_dark) {
     NPC_LIGHT_BODY(animPoseSetMaterialFlagOn, iconFlagOn)
 }
 
+/** Undoes npc_dark when Mario leaves the house, letting the map blend reach them again. */
 static USER_FUNC(npc_light) {
     NPC_LIGHT_BODY(animPoseSetMaterialFlagOff, iconFlagOff)
 }
 
+/**
+ * Returns entry args[1] of HouseData.noclip (map groups whose view culling is turned off while Mario is inside),
+ * or -1 past the end of the list.
+ */
 static USER_FUNC(get_noclip_map) {
     EvtWord* args = event->args;
     HouseWork* w = (HouseWork*)evtGetValue(event, args[0]);
@@ -1477,6 +1608,11 @@ static USER_FUNC(get_noclip_map) {
     }                                  \
     hitObjGetNormal(HIT, &nrm);
 
+/**
+ * Works out where Mario stands outside (out) and inside (in) a door from the hit objects' positions and normals;
+ * the outside spot is offset sideways by half the door map object's width according to the hinge side (type).
+ * With mario set, Mario's own position replaces the hit positions. Only X and Z are written.
+ */
 void door_position_sub(s32 type, const char* map, const char* hitIn, const char* hitOut, Vec* in, Vec* out, BOOL mario) {
     Mtx inv;
     Mtx m;
@@ -1602,6 +1738,10 @@ void door_position_sub(s32 type, const char* map, const char* hitIn, const char*
         }                                                        \
     }
 
+/**
+ * Sets (on) or clears the no-blend material flags on Mario, both partners and the listed NPCs,
+ * map objects and items, so they stay lit while the room around them is darkened.
+ */
 void door_dark_flag_sub(BOOL on, const char** npcs, const char** mobjs, const char** items) {
     MarioWork* mario = marioGetPtr();
     PartyEntry* party = partyGetPtr(0);
@@ -1615,6 +1755,10 @@ void door_dark_flag_sub(BOOL on, const char** npcs, const char** mobjs, const ch
     }
 }
 
+/**
+ * Script wrapper for door_dark_flag_sub: args[0] is the DoorParam (its npcs, mobjs and items lists),
+ * args[1] turns the exemption on or off.
+ */
 USER_FUNC(door_dark_flag) {
     EvtWord* args = event->args;
     DoorParam* d = (DoorParam*)evtGetValue(event, args[0]);
@@ -1629,6 +1773,12 @@ USER_FUNC(door_dark_flag) {
     evtSetValue(event, args[3], V.y);                                         \
     evtSetValue(event, args[4], V.z);
 
+/**
+ * Reads a field of the DoorParam in args[0] into args[2..];
+ * args[1] picks it: 0 type, 1 map object and hits, 2 outside, 3 inside, 4/5 inside/outside standing spot,
+ * 6 in/out/wall events, 7 open/close events, 8 sound set, 9 flags,
+ * 10/11 the standing spots measured from Mario's position.
+ */
 USER_FUNC(evt_door_param) {
     EvtWord* args = event->args;
     DoorParam* d = (DoorParam*)evtGetValue(event, args[0]);
@@ -1684,6 +1834,10 @@ USER_FUNC(evt_door_param) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Saves the flags of the map object named in args[0] into door_mapflag before a door changes them;
+ * only one door's flags can be saved at a time.
+ */
 USER_FUNC(evt_door_save_mapflag) {
     const char* name = (const char*)evtGetValue(event, *event->args);
     MapObject* obj = mapGetMapObj(name);
@@ -1695,6 +1849,7 @@ USER_FUNC(evt_door_save_mapflag) {
     return EVT_RETURN_DONE;
 }
 
+/** Restores the flags saved by evt_door_save_mapflag onto the map object named in args[0]. */
 USER_FUNC(evt_door_load_mapflag) {
     const char* name = (const char*)evtGetValue(event, *event->args);
     MapObject* obj = mapGetMapObj(name);
@@ -1706,6 +1861,10 @@ USER_FUNC(evt_door_load_mapflag) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Hides (args[1] on) or shows every NPC in the DoorParam's npcs list,
+ * so NPCs on the other side of the door are only drawn while Mario is in their room.
+ */
 static USER_FUNC(npc_hide_onoff) {
     EvtWord* args = event->args;
     DoorParam* d = (DoorParam*)evtGetValue(event, args[0]);
@@ -1727,18 +1886,23 @@ static USER_FUNC(npc_hide_onoff) {
 }
 
 #if VERSION <= VERSION_DEMO_US
-// the demo defines these with the door helpers at the end of the file
+/** the demo defines these with the door helpers at the end of the file */
 static USER_FUNC(snd_door_in) {
     psndSetFlag(PSND_FLAG_MUTE_DOOR_SFX);
     return EVT_RETURN_DONE;
 }
 
+/** Clears PSND_FLAG_MUTE_DOOR_SFX after Mario walks back out. */
 static USER_FUNC(snd_door_out) {
     psndClearFlag(PSND_FLAG_MUTE_DOOR_SFX);
     return EVT_RETURN_DONE;
 }
 #endif
 
+/**
+ * Copies the DoorParam in args[0] onto the map heap and returns the copy in args[1],
+ * so a map can change it with evt_door_set_param (Rogueport, gor_01/gor_02).
+ */
 USER_FUNC(evt_door_data_copy) {
     EvtWord* args = event->args;
     DoorParam* src = (DoorParam*)evtGetValue(event, args[0]);
@@ -1748,6 +1912,10 @@ USER_FUNC(evt_door_data_copy) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Changes a field of a DoorParam: args[1] 0 replaces its npcs list with args[2]; other kinds do nothing.
+ * Rogueport uses it to swap who is shown behind a door.
+ */
 USER_FUNC(evt_door_set_param) {
     EvtWord* args = event->args;
     DoorParam* d = (DoorParam*)evtGetValue(event, args[0]);
@@ -1761,6 +1929,7 @@ USER_FUNC(evt_door_set_param) {
     return EVT_RETURN_DONE;
 }
 
+/** Blocks the calling script until no door open or close sequence is running (DoorFLAG is 0). */
 USER_FUNC(evt_door_end_wait) {
     return DoorFLAG ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }

@@ -55,6 +55,7 @@ static USER_FUNC(senkaronFlagOnMesPushing);
 static USER_FUNC(senkaronGetMarioPushedFlag);
 static USER_FUNC(senkaronToEscape);
 #if VERSION >= VERSION_JP
+// Declaration of leader_touch_check (see the definition below).
 USER_FUNC(leader_touch_check);
 #endif
 static void nokotaro_callback(s32 type);
@@ -115,6 +116,10 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Door animation callback, closing for the w_bero exit to gon_02:
+ * rotates map object "door01" about Y by 0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(door01_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door01"), 0, LW(0), 0)
@@ -123,18 +128,30 @@ EVT_END()
 
 int rand(void);
 
+/**
+ * Door animation callback, opening for the w_bero exit to gon_02:
+ * rotates map object "door01" about Y by -0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(door01_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door01"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, closing for the e_bero exit to gon_04:
+ * rotates map object "door02" about Y by -0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(door02_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door02"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the e_bero exit to gon_04:
+ * rotates map object "door02" about Y by 0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(door02_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door02"), 0, LW(0), 0)
@@ -186,6 +203,12 @@ const char* nokotaro_pose[] = {
     "PNK_L_2",
 };
 
+/**
+ * Cutscene run when Mario walks into the hall for the first time (before STORY_STG1_10_FATHERS_LETTER):
+ * the partner is switched to Koops, who finds his father's letter,
+ * reads it (stg1_gon_02 to stg1_gon_09) and the story advances to STORY_STG1_10_FATHERS_LETTER;
+ * Guess: the letter is the note Koops' father left behind in the castle.
+ */
 EVT_BEGIN(tegami_event)
     LOOP(0)
         WAIT_FRAMES(1)
@@ -273,6 +296,15 @@ EVT_BEGIN(tegami_event)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene of the Dry Bones swarm in the hall (runs from leaderkaron_talk_event while the story is at
+ * STORY_STG1_11_1000_DRY_BONES or earlier): Mario freezes,
+ * the leader collapses and rebuilds himself (KRN_D_3/D_4), the danger BGM starts,
+ * the swarm (Guess: the senkaron ext objects) pushes Mario back.
+ * Depending on the GSWF_GON03_PUSHED_OUT flags Mario is shoved out to gon_01 (e_bero) the first two times;
+ * after that the leader fights him (evt_npc_battle_start),
+ * then escapes (SFX_STG1_HONE_ESCAPE1) and the west and east doors are unlocked.
+ */
 static EVT_BEGIN(senkaron_event)
     IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_11_1000_DRY_BONES)
         CALL(senkaronFlagOffMesPushing)
@@ -479,11 +511,18 @@ static EVT_BEGIN(senkaron_event)
     RETURN
 EVT_END()
 
+/** Runs when Mario picks up the second Hooktail Castle key in this hall: sets the story to STORY_STG1_13_02_KEY_2. */
 static EVT_BEGIN(key_get)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_13_02_KEY_2)
     RETURN
 EVT_END()
 
+/**
+ * Map init for gon_03 (Dry Bones hall): sets up the doors, music,
+ * the Dry Bones NPCs (the leader, Richard and the lying bones),
+ * the Koops' father letter scene and the Castle Key until it is picked up, and the spinning floor panel.
+ * Locks the east door until the swarm has been dealt with.
+ */
 EVT_BEGIN(gon_03_init_evt)
     CALL(evt_bg_disp_onoff, 0)
     SET_VALUE(LW(0), PTR(bero_entry_data))
@@ -550,6 +589,10 @@ EVT_BEGIN(gon_03_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * NPC init for Richard, a Dry Bones in the hall:
+ * places him at the middle of the room, plays his idle animation and stops him from turning toward Mario.
+ */
 EVT_BEGIN(richard_init_event)
     CALL(evt_npc_set_position, STRING("リチャード"), 0, 0, -100)
     CALL(evt_npc_set_width, STRING("リチャード"), FLOAT(30.0f))
@@ -560,10 +603,15 @@ EVT_BEGIN(richard_init_event)
     RETURN
 EVT_END()
 
+/** NPC regular event for Richard; does nothing. */
 EVT_BEGIN(richard_regl_event)
     RETURN
 EVT_END()
 
+/**
+ * Talk event for Richard: when Mario talks to him he asks a yes/no question (stg1_gon_09_01_yn) and,
+ * on the yes answer, replies with stg1_gon_09_02. Does nothing while the swarm scene is running (GW(15) is 1).
+ */
 EVT_BEGIN(richard_talk_event)
     IF_INT_EQUAL(GW(15), 1)
         RETURN
@@ -583,6 +631,10 @@ EVT_BEGIN(richard_talk_event)
     RETURN
 EVT_END()
 
+/**
+ * NPC init for the Dry Bones leader (リーダー): places him at the east end of the room
+ * until the swarm scene has been done, afterwards he is moved off the map.
+ */
 EVT_BEGIN(leaderkaron_init_event)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_TALK_ANIM)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_11_1000_DRY_BONES)
@@ -598,6 +650,10 @@ EVT_BEGIN(leaderkaron_init_event)
     RETURN
 EVT_END()
 
+/**
+ * Talk event for the Dry Bones leader: plays the bone-rattling sound and, the first time, starts senkaron_event,
+ * the swarm of Dry Bones that rain from the ceiling and push Mario back toward the entrance.
+ */
 EVT_BEGIN(leaderkaron_talk_event)
     BEGIN_INLINE_EVENT
         LOOP(10)
@@ -644,29 +700,41 @@ static ExtTexInfo senkaron_ext_entry_data[] = {
     {0},
 };
 
+/** NPC init for the placeholder Dry Bones (カロン1): moves it far below the map. */
 EVT_BEGIN(senkarondummy_init_event)
     CALL(evt_npc_set_position, STRING("カロン1"), 0, -1000, 0)
     RETURN
 EVT_END()
 
+/** NPC regular event for the placeholder Dry Bones; does nothing. */
 EVT_BEGIN(senkarondummy_regl_event)
     RETURN
 EVT_END()
 
+/** Talk event for the placeholder Dry Bones; does nothing. */
 EVT_BEGIN(senkarondummy_talk_event)
     RETURN
 EVT_END()
 
+/**
+ * Registers the Dry Bones swarm: an ext-pose object of 1000 Dry Bones (senkaron) with its init,
+ * per-frame and draw callbacks.
+ */
 EVT_BEGIN(senkaron_entry_event)
     CALL(evt_ext_entry, 1000, PTR(senkaron_ext_entry_data), PTR(senkaron_ext_init), PTR(senkaron_ext_main), PTR(senkaron_ext_dispent))
     RETURN
 EVT_END()
 
+/** Tells the swarm to run away (sets senkaronEscapeFlag) after the leader has been beaten. */
 EVT_BEGIN(senkaron_escape_event)
     CALL(senkaronToEscape)
     RETURN
 EVT_END()
 
+/**
+ * Message callback for Koops' lines in the letter scene (stg1_gon_08):
+ * switches his pose between talking and standing as the text reaches the marked points.
+ */
 static void nokotaro_callback(s32 type) {
     PartyEntry* party = partyGetPtr(partyCtrlNo);
 
@@ -687,6 +755,13 @@ static void nokotaro_callback(s32 type) {
 }
 
 #if VERSION >= VERSION_JP
+/**
+ * Script helper (US and later): writes 1 into LW(0)
+ * when Mario is touching the Dry Bones leader (the NPC marioGetTouchNpcPtr finds) while he has control,
+ * otherwise 0.
+ * The swarm scene polls it to start the fight; earlier versions started the fight
+ * when Mario simply reached x = 350.
+ */
 USER_FUNC(leader_touch_check) {
     NpcEntry* npc = marioGetTouchNpcPtr();
     BOOL off = FALSE;
@@ -708,6 +783,7 @@ USER_FUNC(leader_touch_check) {
 
 // Kept out of line (removal tested: inlined into senkaron_ext_main, the code differs).
 #pragma dont_inline on
+/** Random float in [min, max] from rand(). */
 static f32 randf(f32 min, f32 max) {
     f32 r = rand() / 32767.0f;
 
@@ -715,6 +791,11 @@ static f32 randf(f32 min, f32 max) {
 }
 #pragma dont_inline reset
 
+/**
+ * Ext-pose init for the Dry Bones swarm: allocates the swarm work array
+ * and puts each of the 1000 Dry Bones at a random spot above the room (y 200) with a random start delay,
+ * ready to fall.
+ */
 static void senkaron_ext_init(void) {
     s32 i;
     ExtdrvPose* pose = extGetPosePtr();
@@ -737,6 +818,13 @@ static void senkaron_ext_init(void) {
     marioHammerFrame = 0;
 }
 
+/**
+ * Per-frame update of the Dry Bones swarm: each bone falls from the ceiling and lands,
+ * then once the attack starts shuffles toward Mario and shoves him west (marioPushedFlag);
+ * hits from Mario's hammer or jumps knock bones into the air,
+ * and when the swarm escapes the bones run off toward the room's edge
+ * and drop away (the knock-back and escape states 0x61 and 0x62 are read from the code only).
+ */
 static void senkaron_ext_main(void) {
     MarioWork* mario;
     const char* sfxLand;
@@ -985,11 +1073,13 @@ static void senkaron_ext_main(void) {
     }
 }
 
+/** Queues the swarm's draw and shadow callbacks into the 3D camera every frame. */
 static void senkaron_ext_dispent(void) {
     dispEntry(CAMERA_3D, 0.0f, 1, senkaron_ext_disp, NULL);
     dispEntry(CAMERA_3D, 0.0f, 2, senkaron_ext_shadow_disp, NULL);
 }
 
+/** Draw callback for the swarm: loads the ext-pose render state, vertices, textures and TEV and draws all the bones. */
 static void senkaron_ext_disp(CameraId camera, void* param) {
     extLoadRenderMode();
     extLoadVertex();
@@ -999,6 +1089,7 @@ static void senkaron_ext_disp(CameraId camera, void* param) {
     extLoadTextureExit();
 }
 
+/** Draw callback for the swarm's shadows: draws every bone flattened with a fixed shadow matrix. */
 static void senkaron_ext_shadow_disp(CameraId camera, void* param) {
     static Mtx mt = {
         {10.0f, 0.0f, 0.0f, 0.0f},
@@ -1013,26 +1104,34 @@ static void senkaron_ext_shadow_disp(CameraId camera, void* param) {
     extDrawShadow();
 }
 
+/** Script helper: sets senkaronEscapeFlag so the swarm runs away. */
 static USER_FUNC(senkaronToEscape) {
     senkaronEscapeFlag = 1;
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: sets senkaronMesPushingFlag; the swarm only pushes Mario while it is clear,
+ * so the partner's comment about the pushing can be shown without being interrupted.
+ */
 static USER_FUNC(senkaronFlagOnMesPushing) {
     senkaronMesPushingFlag = 1;
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: clears senkaronMesPushingFlag (see senkaronFlagOnMesPushing). */
 static USER_FUNC(senkaronFlagOffMesPushing) {
     senkaronMesPushingFlag = 0;
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: sets senkaronAttackStartFlag so the Dry Bones start moving in on Mario. */
 static USER_FUNC(senkaronAttackStart) {
     senkaronAttackStartFlag = 1;
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: writes marioPushedFlag (1 while the swarm is pressing against Mario this frame) into args[0]. */
 static USER_FUNC(senkaronGetMarioPushedFlag) {
     evtSetValue(event, event->args[0], marioPushedFlag);
     return EVT_RETURN_DONE;

@@ -10,6 +10,12 @@ static u32 __AMStackLocation;
 static u32 __AMFreeBytes;
 static u32 __AMPendingReads;
 
+/**
+ * Completion callback for an asynchronous DVD read in a buffered push:
+ * finds the read slot that owns the file handle, and if the read finished,
+ * queues an ARQ transfer of the chunk just read from main memory into ARAM and advances the read
+ * and ARAM offsets.
+ */
 static void __AM_dvd_callback(s32 result, DVDFileInfo* handle) {
     u32 i;
     AMReadInfo* ptr;
@@ -30,6 +36,11 @@ static void __AM_dvd_callback(s32 result, DVDFileInfo* handle) {
     }
 }
 
+/**
+ * Completion callback for the ARQ transfer of one chunk:
+ * if the file has more data it issues the next DVD read (rounded up to 32 bytes),
+ * otherwise it counts the push as finished and calls the user's callback with the file path.
+ */
 static void __AM_arq_callback(u32 task) {
     u32 i;
     AMReadInfo* ptr;
@@ -59,6 +70,7 @@ static void __AM_arq_callback(u32 task) {
     }
 }  
 
+/** ARQ completion callback for the synchronous pushes: sets the slot's poll flag, which the caller is spinning on. */
 static void __AM_arq_poll_callback(u32 task) {
     u32 i;
     AMReadInfo* ptr;
@@ -75,6 +87,11 @@ static void __AM_arq_poll_callback(u32 task) {
     ptr->poll_flag = 1;
 }
 
+/**
+ * Loads a whole file from disc into a newly allocated main-memory buffer (size rounded up to 32 bytes) with a
+ * priority-2 read and returns the buffer; *length, if given, receives the rounded size.
+ * It stops with an assert if the file cannot be opened.
+ */
 void* AMLoadFile(char* path, u32* length) {
     DVDFileInfo dvdFileInfo;
     u32 roundLength;
@@ -106,6 +123,12 @@ void* AMLoadFile(char* path, u32* length) {
     return buffer;
 }
 
+/**
+ * Copies a disc file into ARAM at the top of the ARAM stack:
+ * allocates a temporary main-memory buffer the size of the file, pushes through it with __AMPushBuffered,
+ * frees the buffer and returns the ARAM address (0 for an empty file or if the stack or ARAM is full).
+ * Panics if the file cannot be opened.
+ */
 u32 AMPush(char* path) {
     DVDFileInfo handle;
     void* buffer;
@@ -137,6 +160,11 @@ u32 AMPush(char* path) {
     }
 }
 
+/**
+ * Copies length bytes (rounded up to 32) from a 32-byte-aligned main-memory buffer into ARAM at the top of the
+ * ARAM stack, waits for the transfer, and returns the ARAM address,
+ * or 0 if there is no room or the stack is full.
+ */
 u32 AMPushData(void* buffer, u32 length) {
     BOOL old;
     u32 round_length;
@@ -170,6 +198,13 @@ u32 AMPushData(void* buffer, u32 length) {
     return 0;
 }
 
+/**
+ * Pushes a disc file onto the ARAM stack in pieces through the caller's buffer.
+ * It reserves ARAM for the whole file, then either starts an asynchronous read chain (async_flag 1,
+ * finished through the DVD and ARQ callbacks and then callback) or reads
+ * and transfers each buffer-sized chunk synchronously.
+ * Returns the ARAM start address, or 0 if the stack table or ARAM is full.
+ */
 u32 __AMPushBuffered(char* path, void* buffer, u32 buffer_size, AMCallback callback, int async_flag) {
     BOOL old;
     u32 round_file_length;
@@ -249,6 +284,10 @@ u32 __AMPushBuffered(char* path, void* buffer, u32 buffer_size, AMCallback callb
     return ptr->aram_start_addr;
 }
 
+/**
+ * Pops the most recent ARAM push, returning its space to the free pool;
+ * does nothing while asynchronous reads are pending or when only the zero buffer remains.
+ */
 void AMPop(void) {
     BOOL old;
     old = OSDisableInterrupts();
@@ -263,10 +302,12 @@ void AMPop(void) {
     OSRestoreInterrupts(old);
 }
 
+/** Returns the ARAM address of the 256-byte block of zeros pushed first by AMInit. */
 u32 AMGetZeroBuffer(void) {
     return __AMStackPointer[0];
 }
 
+/** Returns the number of asynchronous pushes that have not finished yet. */
 u32 AMGetReadStatus(void) {
     BOOL old;
     u32 tmp;
@@ -278,6 +319,7 @@ u32 AMGetReadStatus(void) {
     return tmp;
 }
 
+/** Returns the number of bytes still free on the ARAM stack. */
 u32 AMGetFreeSize(void) {
     BOOL old;
     u32 tmp;
@@ -289,6 +331,7 @@ u32 AMGetFreeSize(void) {
     return tmp;
 }
 
+/** Returns the ARAM address where the next push would be placed. */
 u32 AMGetStackPointer(void) {
     BOOL old;
     u32 tmp;
@@ -300,6 +343,10 @@ u32 AMGetStackPointer(void) {
     return tmp;
 }
 
+/**
+ * Sets up the ARAM stack manager over aramBytes of ARAM starting at aramBase,
+ * and pushes a 256-byte block of zeros at the bottom of the stack (the zero buffer).
+ */
 void AMInit(u32 aramBase, u32 aramBytes) {
     u32 i;
     u8 __AMZeroBuffer[256 + 31];

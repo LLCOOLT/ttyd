@@ -49,6 +49,10 @@ extern EvtWord mario_shabon_break_sound[];
 extern EvtWord mario_shabon_check[];
 extern EvtWord evt_shabon_s[];
 
+/**
+ * Guess: puts Mario into the airborne state for the soap bubble ride:
+ * clears the hit object he stands on, sets the air timer and switches to motion 8.
+ */
 static USER_FUNC(mario_shabon_init) {
     MarioWork* mario = marioGetPtr();
 
@@ -58,6 +62,7 @@ static USER_FUNC(mario_shabon_init) {
     return EVT_RETURN_DONE;
 }
 
+/** Init for the fourth villager Puni: after chapter 2, once Mario has left the tree, it is moved to a new spot. */
 EVT_BEGIN(puni_4_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_GREATER_OR_EQUAL(STORY_STG2_26_PRAISE_FROM_THE_PUNI)
@@ -68,6 +73,7 @@ EVT_BEGIN(puni_4_init)
     RETURN
 EVT_END()
 
+/** Talk script of the fourth villager Puni: a line before the finale and a different one afterwards. */
 EVT_BEGIN(puni_4_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS_OR_EQUAL(STORY_STG8_END_AFTER_THE_BATTLE)
@@ -78,6 +84,7 @@ EVT_BEGIN(puni_4_talk)
     RETURN
 EVT_END()
 
+/** Init for the fifth villager Puni: after chapter 2, once Mario has left the tree, it is moved to a new spot. */
 EVT_BEGIN(puni_5_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_GREATER_OR_EQUAL(STORY_STG2_26_PRAISE_FROM_THE_PUNI)
@@ -88,6 +95,7 @@ EVT_BEGIN(puni_5_init)
     RETURN
 EVT_END()
 
+/** Talk script of the fifth villager Puni: a line before the finale and a different one afterwards. */
 EVT_BEGIN(puni_5_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS_OR_EQUAL(STORY_STG8_END_AFTER_THE_BATTLE)
@@ -126,6 +134,7 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/** Closes the south door (S_doa); used as the door-close script of the south loading zone. */
 static EVT_BEGIN(bero_s_doa_close)
     SET_VALUE(LW(9), 0)
     SET_VALUE(LW(10), STRING("S_doa"))
@@ -133,6 +142,7 @@ static EVT_BEGIN(bero_s_doa_close)
     RETURN
 EVT_END()
 
+/** Opens the south door (S_doa); used as the door-open script of the south loading zone. */
 static EVT_BEGIN(bero_s_doa_open)
     SET_VALUE(LW(9), 0)
     SET_VALUE(LW(10), STRING("S_doa"))
@@ -228,6 +238,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Init script of the west door lamp: while the west door is locked (GSWF_MRI05_WEST_DOOR_UNLOCKED is 0) its
+ * loading zone is switched off, otherwise the lamp animation is shown lit.
+ */
 static EVT_BEGIN(door_switch_init)
     IF_INT_EQUAL(GSWF(GSWF_MRI05_WEST_DOOR_UNLOCKED), 0)
         SET_VALUE(LW(0), STRING("w_bero"))
@@ -238,6 +252,11 @@ static EVT_BEGIN(door_switch_init)
     RETURN
 EVT_END()
 
+/**
+ * Hit script of the door switch: plays the unlock sound and, half a second later, the lamp sound,
+ * then toggles GSWF_MRI05_WEST_DOOR_UNLOCKED: unlocks the west loading zone and lights the lamp,
+ * or locks it again and pauses the lamp animation.
+ */
 static EVT_BEGIN(door_switch)
     CALL(evt_mapobj_get_position, STRING("S_lights"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_DOOR_UNLOCK"), LW(0), LW(1), LW(2), 0)
@@ -258,6 +277,10 @@ static EVT_BEGIN(door_switch)
     RETURN
 EVT_END()
 
+/**
+ * Planter hit script 4: the first time it is hit it launches a Thunder Rage out of the planter;
+ * remembered with a flag.
+ */
 static EVT_BEGIN(evt_ueki_04)
     CALL(evt_item_delete_check, STRING("item_ueki_04"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -275,6 +298,12 @@ static KusaAccess ueki_access_data[] = {
     {4, NULL, NULL, NULL},
 };
 
+/**
+ * Init script of the orb pedestal (orb A): runs the shared Puni-switch setup;
+ * if the orb is already on the pedestal it is shown there and its target is on,
+ * otherwise the beam of light is hidden.
+ * The target is placed on the lower floor (A_dai_01_soko) with flag 8 set.
+ */
 static EVT_BEGIN(punipuni_ball00_init)
     CALL_CHILD(mri_punipuni_setup)
     IF_INT_EQUAL(GSWF(GSWF_MRI05_ORB_A_ON_PEDESTAL), 1)
@@ -289,6 +318,11 @@ static EVT_BEGIN(punipuni_ball00_init)
     RETURN
 EVT_END()
 
+/**
+ * Hit/talk script of the orb pedestal (orb A): if empty,
+ * Mario picks an item to put on it (cancel ends the script), the orb appears and the light beam is shown;
+ * if full, Mario takes the orb back and the beam is hidden. Mario is frozen during this.
+ */
 static EVT_BEGIN(punipuni_ball00)
     CALL(evt_mario_key_onoff, 0)
     IF_INT_EQUAL(GSWF(GSWF_MRI05_ORB_A_ON_PEDESTAL), 0)
@@ -310,6 +344,11 @@ static EVT_BEGIN(punipuni_ball00)
     RETURN
 EVT_END()
 
+/**
+ * Sets up the second Puni Orb pedestal (punipuni01) of the bubble room:
+ * if the orb is already on it, places it and lights the beam; otherwise hides the beam.
+ * Sets the pedestal's target position and floor.
+ */
 EVT_BEGIN(punipuni_ball01_init)
     CALL_CHILD(mri_punipuni_setup)
     IF_INT_EQUAL(GSWF(GSWF_MRI05_ORB_B_ON_PEDESTAL), 1)
@@ -324,6 +363,10 @@ EVT_BEGIN(punipuni_ball01_init)
     RETURN
 EVT_END()
 
+/**
+ * Creates the Puni bubble effect around Mario (type args[0] at x, y, z in args[1] to args[3]);
+ * the effect is kept to be moved and deleted by the next helpers.
+ */
 static USER_FUNC(mario_shabon_eff) {
     EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
@@ -334,6 +377,7 @@ static USER_FUNC(mario_shabon_eff) {
     return EVT_RETURN_DONE;
 }
 
+/** Moves the Puni bubble effect around Mario to x, y, z (args[0] to args[2]). */
 static USER_FUNC(mario_shabon_effpos) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
@@ -346,11 +390,17 @@ static USER_FUNC(mario_shabon_effpos) {
     return EVT_RETURN_DONE;
 }
 
+/** Deletes the Puni bubble effect around Mario. */
 static USER_FUNC(mario_shabon_effdel) {
     effDelete(marioeff);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Interaction with the second Puni Orb pedestal:
+ * lets Mario put the Puni Orb on it (item menu) or take it off again,
+ * toggling GSWF_MRI05_ORB_B_ON_PEDESTAL and the light beam.
+ */
 EVT_BEGIN(punipuni_ball01)
     CALL(evt_mario_key_onoff, 0)
     IF_INT_EQUAL(GSWF(GSWF_MRI05_ORB_B_ON_PEDESTAL), 0)
@@ -372,6 +422,7 @@ EVT_BEGIN(punipuni_ball01)
     RETURN
 EVT_END()
 
+/** Loops the soap bubble movement sound at the position in LW(0) to LW(2) every 500 ms. */
 EVT_BEGIN(mario_shabon_move_sound)
     LOOP(0)
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_SOAPBALL_MOVE1"), LW(0), LW(1), LW(2), 0)
@@ -380,11 +431,18 @@ EVT_BEGIN(mario_shabon_move_sound)
     RETURN
 EVT_END()
 
+/** Plays the soap bubble popping sound at the position in LW(0) to LW(2). */
 EVT_BEGIN(mario_shabon_break_sound)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_SOAPBALL_BREAK1"), LW(0), LW(1), LW(2), 0)
     RETURN
 EVT_END()
 
+/**
+ * Watches the bubble spot (hit object A_syabon_yuka):
+ * after Mario has been on it for 60 frames in a row (the count resets whenever his state is 1) he is swallowed
+ * by a soap bubble, floats up for 2 seconds, the bubble pops and he drops back down,
+ * then the watcher restarts itself. The camera letterbox and controls are disabled meanwhile.
+ */
 EVT_BEGIN(mario_shabon_check)
     SET_VALUE(LW(1), 0)
     SET_VALUE(LW(2), 0)
@@ -478,6 +536,10 @@ EVT_BEGIN(mario_shabon_check)
     RETURN
 EVT_END()
 
+/**
+ * Moves a named Puni balloon effect to x, z (args[1] and args[3]) and y raised by 15 (args[2]);
+ * used to drift the rising soap bubbles.
+ */
 static USER_FUNC(evt_pcharge_pos) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -492,6 +554,11 @@ static USER_FUNC(evt_pcharge_pos) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Decorative soap bubbles rising from the bottom of the room:
+ * three independent loops spawn a Puni balloon effect at a random spot, raise it over about 7 seconds,
+ * delete it and show a small pop when it reaches the top.
+ */
 EVT_BEGIN(evt_shabon_s)
     BEGIN_INLINE_EVENT
         CALL(evt_sub_random, 700, LW(0))
@@ -593,6 +660,12 @@ EVT_BEGIN(evt_shabon_s)
     RETURN
 EVT_END()
 
+/**
+ * Map init script of mri_05, the soap bubble room:
+ * sets up the Puni, NPCs, doors, planters, the two Puni Orb pedestals,
+ * the Shine Sprite power-up block and the bubble watcher and effects,
+ * with the bomb-alarm music while the time bomb is active.
+ */
 EVT_BEGIN(mri_05_init_evt)
     CALL(evt_puni_mem_init)
     CALL(evt_puni_set_yuka, 5, -139, -309, -1000, -1000, 0, 0)

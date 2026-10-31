@@ -34,6 +34,11 @@ static EvtWord normal_attack_event[428];
 static EvtWord call_friend_event[311];
 static EvtWord wait_event[6];
 
+/**
+ * Script helper: args[0] = source unit, args[1] = destination unit.
+ * Copies the size-change status (turns and strength) from the Bones unit to the unit it has just spawned in its
+ * place (entry_honenoko).
+ */
 static USER_FUNC(honenoko_copy_status) {
     EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));
@@ -206,6 +211,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init script of the Dull Bones: registers its wait, attack, damage and confusion handlers,
+ * clears unit work 1 (set once its reward has been paid out)
+ * and sets its landing sound (SFX_ENM_HONENOKO_LANDING1).
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -217,6 +227,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage script of the Dull Bones: runs the default damage handling on itself. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -224,6 +235,13 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Real defeat script of the Dull Bones (data event 49):
+ * it spins for 48 frames (SFX_BTL_ENEMY_DIE1_1) and bursts into smoke.
+ * Its coins and experience are stored only if they were not paid already (unit work 1, which fake_dead_event
+ * also sets), a star-point effect shows the experience, it tips over,
+ * returns any item it held and is removed from the battle.
+ */
 static EVT_BEGIN(dead_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(0), 48)
@@ -276,6 +294,13 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Collapse script of the Dull Bones (data event 15):
+ * it walks home, pays its coins and experience out once (unit work 1), shows the star-point effect,
+ * crumbles into a pile of bones (KRN_D_2, SFX_ENM_HONENOKO_CRUMBLE1)
+ * and is taken off the field for 2 to 3 turns (unit work 2), after which rebirth_event brings it back.
+ * Its hit offset is lowered by 20.
+ */
 static EVT_BEGIN(fake_dead_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(2), LW(3), LW(4))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
@@ -314,6 +339,11 @@ static EVT_BEGIN(fake_dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Count-down for a collapsed Dull Bones, run from its attack script:
+ * unit work 2 goes down by one each turn, and at 0 it pieces itself back together (KRN_D_3 and D_4,
+ * SFX_ENM_HONENOKO_UNITE1 and UNITE2) with full HP and a normal hit offset.
+ */
 static EVT_BEGIN(rebirth_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
     SUBTRACT(LW(0), 1)
@@ -334,6 +364,13 @@ static EVT_BEGIN(rebirth_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the Dull Bones. On a first strike it just throws its bone.
+ * If it is collapsed (unit work 2 above 0) it runs rebirth_event.
+ * Otherwise, after an item check, it throws a bone 85 times in 100
+ * and calls a friend (call_friend_event) 15 times in 100,
+ * trying space to the right of it first and then to the left.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -403,6 +440,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Plays the avoid reaction on the target in LW(3) (animation 38, 39 or 40) according to the pre-damage result in
+ * LW(5): 3, 6 or 2.
+ */
 static EVT_BEGIN(start_avoid)
     IF_INT_EQUAL(LW(5), 3)
         CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -416,6 +457,13 @@ static EVT_BEGIN(start_avoid)
     RETURN
 EVT_END()
 
+/**
+ * The Dull Bones' attack: it rears back (KRN_A_1 and A_2)
+ * and throws its bone (part 2, spinning at 25 degrees a frame) at the target.
+ * A dodging target gets its avoid reaction (start_avoid) as the bone reaches it,
+ * and the damage is dealt on impact. The bone then lands behind the target and is hidden again.
+ * After a first strike it pauses first. When confused with no target it is flustered.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -542,6 +590,13 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dull Bones calls a friend: it winds up six times (KRN_A_3 and A_4) while bone parts 3
+ * and 4 act out a hand-over in the KRN_H and KRN_C poses (SFX_ENM_HONENOKO_SEND_GROUP1 and 2).
+ * A heap then re-forms (KRN_D_3, KRN_D_4) and a new Dull Bones is spawned in the free spot,
+ * copying its size status through honenoko_copy_status.
+ * Guess: the pose sequence is the new Bones being assembled from the thrown bones.
+ */
 static EVT_BEGIN(call_friend_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -626,6 +681,7 @@ static EVT_BEGIN(call_friend_event)
     RETURN
 EVT_END()
 
+/** Wait script: plays the Dull Bones' idle pose from its pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

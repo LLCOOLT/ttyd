@@ -4,6 +4,11 @@
 
 #include "__axfx.h"
 
+/**
+ * AX aux-bus callback, run once per audio frame (160 samples):
+ * per channel, outputs the delayed samples scaled by the output level
+ * and writes the incoming samples plus the feedback share back into the delay ring.
+ */
 void AXFXDelayCallback(AXFX_BUFFERUPDATE* bufferUpdate, AXFX_DELAY* delay) {
     s32 l;
     s32 r;
@@ -40,6 +45,11 @@ void AXFXDelayCallback(AXFX_BUFFERUPDATE* bufferUpdate, AXFX_DELAY* delay) {
     delay->currentPos[2] = (s32) ((delay->currentPos[2] + 1) % delay->currentSize[2]);
 }
 
+/**
+ * Validates the per-channel delay (10-5000 ms), feedback and output (0-100 percent) settings,
+ * converts the delays to whole 5 ms audio frames and fixed-point gains,
+ * and reallocates and clears the three delay rings. Returns 0 on bad parameters or allocation failure.
+ */
 int AXFXDelaySettings(AXFX_DELAY* delay) {
     u32 i;
     s32* l;
@@ -112,6 +122,7 @@ int AXFXDelaySettings(AXFX_DELAY* delay) {
     return 1;
 }
 
+/** Initializes the delay effect and applies its settings. */
 int AXFXDelayInit(AXFX_DELAY* delay) {
     BOOL old;
 
@@ -123,6 +134,7 @@ int AXFXDelayInit(AXFX_DELAY* delay) {
     AXFXDelaySettings(delay);
 }
 
+/** Frees the delay effect's buffers. */
 int AXFXDelayShutdown(AXFX_DELAY* delay) {
     BOOL old;
 

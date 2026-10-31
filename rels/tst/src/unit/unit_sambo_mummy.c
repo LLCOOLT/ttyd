@@ -1,4 +1,4 @@
-// Battle unit Pokey Mummy (`sambo_mummy`): tst.rel's copy of rels/eki/src/unit/unit_sambo_mummy.c.
+// Battle unit Poison Pokey (`sambo_mummy`): tst.rel's copy of rels/eki/src/unit/unit_sambo_mummy.c.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "battle/battle_event_default.h"
@@ -535,6 +535,11 @@ static BattleUnitKindPart parts[] = {
     {5, "btl_un_sambo_mummy", "c_sanbo_m", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table_parts},
 };
 
+/**
+ * Registers the Poison Pokey's wait, attack and damage events (confusion reuses the attack event),
+ * sets unit work 0 (segments left) to 4 and sizes the body to match, clears unit work 1 (its summon generation),
+ * shows the loose segment part 5 in its stay pose and sets its walk and run sounds.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -550,6 +555,12 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Data-table events 37 and 39 (run by btldefaultevt_Damage for damage codes 31 and 33).
+ * Guess: an attacker hurt by the spiny body.
+ * Takes pose 47 and shows a toge_flush spark just above its top (height scaled by its size),
+ * then waits 60 frames.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_side_event)
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 47)
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
@@ -568,6 +579,10 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_side_event)
     RETURN
 EVT_END()
 
+/**
+ * Hit reaction: picks the part that is the visible body for the current segment count (part 1 at 4 segments down
+ * to part 4 at 1) and runs btldefaultevt_Damage on it.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
@@ -585,6 +600,13 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Data-table events 16 and 19: Koops' shell hits (damage pattern 8) and being hit by a unit flung by Spin
+ * or Ultra Hammer (15, 17).
+ * With one segment left it just flinches; otherwise it loses a segment:
+ * the shorter body part takes over (with one left Yoshi can swallow it),
+ * the body drops into place and the knocked-off segment bounces away, blinks and vanishes.
+ */
 static EVT_BEGIN(damage_event_bodylost)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -659,6 +681,10 @@ static EVT_BEGIN(damage_event_bodylost)
     RETURN
 EVT_END()
 
+/**
+ * Run while a segment is lost: the body (LW(10), part LW(11)) takes the hurt pose LW(14),
+ * pops up 18 units and settles down in a few bouncing steps, so the stack looks one segment shorter.
+ */
 static EVT_BEGIN(subset_dmg_sambo_fall)
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
@@ -702,6 +728,14 @@ static EVT_BEGIN(subset_dmg_sambo_fall)
     RETURN
 EVT_END()
 
+/**
+ * Data-table event 18: a Spin Hammer or Ultra Hammer hit (damage patterns 14, 16).
+ * With one segment left it takes the shot reaction;
+ * otherwise it loses a segment as in damage_event_bodylost,
+ * but the knocked-off segment flies off stage through the allies behind it,
+ * hitting each as a Spin/Ultra Hammer "involved" unit.
+ * After an Ultra Hammer hit the Pokey also takes the Ultra Hammer finishing hit.
+ */
 static EVT_BEGIN(damage_event_bodylost_blow)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -799,6 +833,12 @@ static EVT_BEGIN(damage_event_bodylost_blow)
     RETURN
 EVT_END()
 
+/**
+ * Data-table event 54, Yoshi's Gulp.
+ * With one segment left it just plays the hurt pose;
+ * otherwise it loses a segment: the shorter body settles and the loose segment slides 25 units forward
+ * and vanishes.
+ */
 static EVT_BEGIN(damage_swallow_body)
     SET_VALUE(LW(14), 39)
     SET_VALUE(LW(15), -1)
@@ -870,6 +910,13 @@ static EVT_BEGIN(damage_swallow_body)
     RETURN
 EVT_END()
 
+/**
+ * The Poison Pokey's turn (also used when confused): uses a held item if the AI wants to.
+ * At full height, if it is not already a second-generation summon,
+ * there is a 20% chance to call another Poison Pokey into the free spot 40 units in front of it.
+ * With 2 or more segments it head-bashes the frontmost target 31 times in 70 (if one is in reach),
+ * else throws one of its segments; with one segment left it hops over and stomps.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 0, 0)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
@@ -939,6 +986,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Head bash with 2-4 segments: walks up to the frontmost target (closer when Tiny), leans back,
+ * then topples its body onto it for 4 damage (3 in the retail releases; one weapon per height) with a 60% chance
+ * of 10 turns of Poison. It swings back upright and walks home.
+ */
 static EVT_BEGIN(attack_head_2_event)
     SET_VALUE(LW(6), LW(11))
     CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(5))
@@ -1125,6 +1177,11 @@ static EVT_BEGIN(attack_head_2_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack with a single segment: hops up to the target (sambo_rabbit_move),
+ * then leaps onto it spinning for 5 damage with a 60% chance of Poison and bounces back in hops;
+ * on a miss or dodge it flips over the target and lands behind it. Then it hops home.
+ */
 static EVT_BEGIN(attack_head_1_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_sambo_mummy_head_attack_1))
@@ -1287,6 +1344,12 @@ static EVT_BEGIN(attack_head_1_event)
     RETURN
 EVT_END()
 
+/**
+ * Throws one of its own segments at the target:
+ * the Pokey loses a segment (shorter body, at one segment Yoshi can swallow it) and the loose segment pops up
+ * and flies at the target. On a miss it flies off stage; on a hit it bounces away (4 damage, 3 in the demos).
+ * Guess: result 21 is a Superguard, which sends the segment back to hit the Pokey itself.
+ */
 static EVT_BEGIN(attack_spike_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(10))
     SWITCH(LW(10))
@@ -1496,6 +1559,12 @@ static EVT_BEGIN(attack_spike_event)
     RETURN
 EVT_END()
 
+/**
+ * Summons another Poison Pokey: sways back and forth with the summon sounds,
+ * then spawns entry_sambo below the free spot LW(6)-LW(8),
+ * which pops out of the ground in smoke and makes the spot its home.
+ * The new Pokey's unit work 1 is the caller's plus one, which limits how many generations can summon.
+ */
 static EVT_BEGIN(call_friend_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("SNB_S_1"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_SAMBO_SEND_GROUP1_3"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -1593,6 +1662,7 @@ static BattleUnitSetup entry_sambo = {
     NULL, // itemDropTable
 };
 
+/** Idle: plays the stand pose of whichever body part matches the current segment count. */
 static EVT_BEGIN(wait_event)
     SET_VALUE(LW(10), -2)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
@@ -1610,6 +1680,10 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+/**
+ * Moves the Pokey in hops toward x = LW(5): hops of LW(8) units at height LW(6) while farther away than that,
+ * then a last hop onto LW(5)/LW(6)/LW(7), each with SFX_ENM_SAMBO_MOVE2.
+ */
 static EVT_BEGIN(sambo_rabbit_move)
     LABEL(0)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -1635,6 +1709,7 @@ static EVT_BEGIN(sambo_rabbit_move)
     RETURN
 EVT_END()
 
+/** Sets the Pokey's height and cut height to 20 per segment left (unit work 0): 20, 40, 60, or 80 at full height. */
 static EVT_BEGIN(_body_param_set)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     SWITCH(LW(0))

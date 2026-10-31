@@ -32,6 +32,10 @@ extern void L_partyVivianTailStart();
 extern void L_partyVivianTailStop();
 extern s32 cloudGetStatus();
 
+/**
+ * Sets or clears PartyFlags bits on a partner slot.
+ * args: slot (0 = the active partner, else the follower slot), the flag mask (literal), and on/off.
+ */
 USER_FUNC(evt_party_flg_onoff) {
     PartyEntry* p;
     int mask;
@@ -49,6 +53,10 @@ USER_FUNC(evt_party_flg_onoff) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Sets or clears PartyDispFlags bits (flags2) on a partner slot.
+ * args: slot (0 = active partner, else follower), the mask (literal), on/off.
+ */
 USER_FUNC(evt_party_dispflg_onoff) {
     PartyEntry* p;
     int mask;
@@ -66,6 +74,10 @@ USER_FUNC(evt_party_dispflg_onoff) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Sets or clears PartyTrigFlags bits on a partner slot.
+ * args: slot (0 = active partner, else follower), the mask (literal), on/off.
+ */
 USER_FUNC(evt_party_trigflg_onoff) {
     PartyEntry* p;
     int mask;
@@ -83,6 +95,10 @@ USER_FUNC(evt_party_trigflg_onoff) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Turns the partner's own control (following Mario) off or on through partyCtrlOff/partyCtrlOn.
+ * args: slot, on/off; the slot only has to exist, the switch is global.
+ */
 USER_FUNC(evt_party_cont_onoff) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -98,6 +114,7 @@ USER_FUNC(evt_party_cont_onoff) {
     return EVT_RETURN_DONE;
 }
 
+/** Puts the partner in a slot (0 = active partner, else follower) back on its default camera with partyInitCamId. */
 USER_FUNC(evt_party_init_camid) {
     PartyEntry* p = GETPARTY(event->args);
     if (p == NULL) {
@@ -107,6 +124,10 @@ USER_FUNC(evt_party_init_camid) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Puts the partner in a slot on the camera given in args[1] (partySetCamId),
+ * e.g. to draw it on a 2D or other camera.
+ */
 USER_FUNC(evt_party_set_camid) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -118,6 +139,11 @@ USER_FUNC(evt_party_set_camid) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * If the partner is off screen, walks it toward Mario a unit at a time,
+ * snapping it to the floor below (or Mario's height), until it is on screen; clears its footmarks first.
+ * The EU release also stops once Mario himself is off screen.
+ */
 USER_FUNC(evt_party_force_reset_outofscreen) {
     void* mw;
     PartyEntry* p = GETPARTY(event->args);
@@ -176,6 +202,10 @@ USER_FUNC(evt_party_force_reset_outofscreen) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Writes 1.0 to args[1] when the partner is on screen and 0.0
+ * when PARTY_DISP_FLAG_OFF_SCREEN is set (the inverse of the name). args[0]: slot.
+ */
 USER_FUNC(evt_party_outofscreen) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -187,6 +217,7 @@ USER_FUNC(evt_party_outofscreen) {
     return EVT_RETURN_DONE;
 }
 
+/** Teleports a partner slot to the position in args[1..3] (x, y, z). */
 USER_FUNC(evt_party_set_pos) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -200,6 +231,10 @@ USER_FUNC(evt_party_set_pos) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Sets the partner's floor-move correction (floorMoveX/Y/Z), the per-frame offset a moving floor carries it by.
+ * args: slot, x, y, z.
+ */
 USER_FUNC(evt_party_set_hosei_xyz) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -213,6 +248,7 @@ USER_FUNC(evt_party_set_hosei_xyz) {
     return EVT_RETURN_DONE;
 }
 
+/** Writes the partner's position into args[1..3]; when the slot is empty all three get -5000.0, the off-map marker. */
 USER_FUNC(evt_party_get_pos) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -229,10 +265,15 @@ USER_FUNC(evt_party_get_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Linear step for a turn: the fraction step/frames of the angle difference a - b. */
 inline float inline_fn(f32 a, f32 b, f32 c, s32 n) {
     return (a - b) * (c / (f32)n);
 }
 
+/**
+ * Turns the partner to face the world angle in args[1] over args[2] milliseconds, blocking until the turn ends;
+ * 0 ms snaps, a negative time only sets the target and lets the partner turn on its own. args[0]: slot.
+ */
 USER_FUNC(evt_party_set_dir) {
     EvtWord* args = event->args;
     PartyEntry* p;
@@ -283,6 +324,10 @@ USER_FUNC(evt_party_set_dir) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Makes the partner face the NPC named in args[1] (left or right relative to the camera).
+ * args[0] is the partyGetPtr slot directly (not the 0 = active-partner convention).
+ */
 USER_FUNC(evt_party_set_dir_npc) {
     EvtWord* args = event->args;
     PartyEntry* p = partyGetPtr(args[0]);
@@ -308,6 +353,10 @@ USER_FUNC(evt_party_set_dir_npc) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Makes the partner face the point x = args[1], z = args[2],
+ * picking the left or right facing relative to the camera. args[0] is the partyGetPtr slot directly.
+ */
 USER_FUNC(evt_party_set_dir_pos) {
     EvtWord* args = event->args;
     PartyEntry* p = partyGetPtr(args[0]);
@@ -324,6 +373,7 @@ USER_FUNC(evt_party_set_dir_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Writes the partner's drawn facing angle (displayDirection, degrees) to args[1]; 0.0 when the slot is empty. */
 USER_FUNC(evt_party_get_dispdir) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -336,6 +386,7 @@ USER_FUNC(evt_party_get_dispdir) {
     return EVT_RETURN_DONE;
 }
 
+/** Snaps the partner's drawn facing angle to args[1] degrees, current and target alike. */
 USER_FUNC(evt_party_set_dispdir) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -348,6 +399,7 @@ USER_FUNC(evt_party_set_dispdir) {
     return EVT_RETURN_DONE;
 }
 
+/** Stops the partner in a slot from following Mario (partyStop); scripts pair it with evt_party_run. */
 USER_FUNC(evt_party_stop) {
     PartyEntry* p = GETPARTY(event->args);
     if (p != NULL) {
@@ -356,6 +408,7 @@ USER_FUNC(evt_party_stop) {
     return EVT_RETURN_DONE;
 }
 
+/** Lets the partner in a slot follow Mario again after evt_party_stop (partyRun). */
 USER_FUNC(evt_party_run) {
     PartyEntry* p = GETPARTY(event->args);
     if (p != NULL) {
@@ -364,6 +417,11 @@ USER_FUNC(evt_party_run) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Walks the partner to x = args[1], z = args[2] in args[3] milliseconds (0 = at its own walk speed),
+ * waiting first until the partner is in a run mode that can take a forced move; blocks until the walk ends.
+ * args[0]: slot.
+ */
 USER_FUNC(evt_party_move_pos) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -400,6 +458,10 @@ USER_FUNC(evt_party_move_pos) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Walks the partner to x = args[1], z = args[2] at args[3] units per second,
+ * blocking until the forced move runs out. args[0]: slot.
+ */
 USER_FUNC(evt_party_move_pos2) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -433,6 +495,7 @@ USER_FUNC(evt_party_move_pos2) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Blocks until the partner in the slot is standing on the ground (PARTY_FLAG_IS_GROUNDED). */
 USER_FUNC(evt_party_wait_landon) {
     PartyEntry* p = GETPARTY(event->args);
     if (p == NULL) {
@@ -441,6 +504,12 @@ USER_FUNC(evt_party_wait_landon) {
     return ((p->flags >> 1) & 1) ? 2 : 0;
 }
 
+/**
+ * Makes the partner jump to (args[1], args[2], args[3]) in args[4] milliseconds, blocking until it lands.
+ * args[5] = 0 also turns it toward the target; args[6] is the arc height for a level jump (-1000 or below = 20).
+ * Rising jumps add headroom (half the partner's height in the JP and US demo releases, 37 units later).
+ * args[0]: slot.
+ */
 USER_FUNC(evt_party_jump_pos) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -563,6 +632,7 @@ USER_FUNC(evt_party_jump_pos) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Sends the partner to its spot behind Mario (partyMoveBehindMario); args[1] is passed through as the move option. */
 USER_FUNC(evt_party_move_behind_mario) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -576,6 +646,7 @@ USER_FUNC(evt_party_move_behind_mario) {
     return EVT_RETURN_DONE;
 }
 
+/** Sends the partner to its spot beside Mario (partyMoveBesideMario); args[1] is passed through as the move option. */
 USER_FUNC(evt_party_move_beside_mario) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -589,6 +660,7 @@ USER_FUNC(evt_party_move_beside_mario) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets how far the partner trails behind Mario before following (homingDist, default 50). args: slot, distance. */
 USER_FUNC(evt_party_set_homing_dist) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -600,6 +672,10 @@ USER_FUNC(evt_party_set_homing_dist) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Plays the named animation pose in args[1] on the partner (partyChgPose),
+ * e.g. a talking or surprised pose in a cutscene.
+ */
 USER_FUNC(evt_party_set_pose) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -613,6 +689,10 @@ USER_FUNC(evt_party_set_pose) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Puts the partner into its sleeping pose (pose id 6) and sets PARTY_FLAG_SLEEP_ON,
+ * e.g. for the inn and bed scenes.
+ */
 USER_FUNC(evt_party_sleep_on) {
     PartyEntry* p = GETPARTY(event->args);
     if (p != NULL) {
@@ -622,6 +702,7 @@ USER_FUNC(evt_party_sleep_on) {
     return EVT_RETURN_DONE;
 }
 
+/** Wakes the partner: back to its standing pose (id 1) and clears PARTY_FLAG_SLEEP_ON. */
 USER_FUNC(evt_party_sleep_off) {
     PartyEntry* p = GETPARTY(event->args);
     if (p != NULL) {
@@ -631,6 +712,7 @@ USER_FUNC(evt_party_sleep_off) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets the partner's pose by pose id (partyChgPoseId) instead of by animation name. args: slot, pose id. */
 USER_FUNC(evt_party_set_breed_pose) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -643,6 +725,10 @@ USER_FUNC(evt_party_set_breed_pose) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Writes 0 to args[1] while the partner is in run mode 0xB or 0xC and 1 otherwise.
+ * Guess: the pipe (dokan) modes, so scripts can wait until the partner has finished going through a pipe.
+ */
 USER_FUNC(L_evt_party_dokan) {
     PartyEntry* p;
     s32 dst, v;
@@ -661,6 +747,10 @@ USER_FUNC(L_evt_party_dokan) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Writes a partner's ability state to args[1]: args[0] = 6 asks Vivian (vivianGetStatus, 2 = Mario hidden in her
+ * shadow), 3 asks Bobbery (bomheiGetStatus). Other ids leave the variable alone.
+ */
 USER_FUNC(evt_party_get_status) {
     EvtWord* args = event->args;
     s32 id = args[0];
@@ -678,6 +768,10 @@ USER_FUNC(evt_party_get_status) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Writes the name of the collision object above the partner's head (hitobjHead) to args[1],
+ * or NULL when there is none.
+ */
 USER_FUNC(evt_party_get_name_hitobj_head) {
     PartyEntry* p;
     EvtWord* args;
@@ -696,6 +790,7 @@ USER_FUNC(evt_party_get_name_hitobj_head) {
     return EVT_RETURN_DONE;
 }
 
+/** Writes the name of the collision object the partner stands on to args[1], or NULL when it is in the air. */
 USER_FUNC(evt_party_get_name_hitobj_ride) {
     PartyEntry* p;
     EvtWord* args;
@@ -714,6 +809,10 @@ USER_FUNC(evt_party_get_name_hitobj_ride) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Makes Bobbery use his field ability (light and throw himself as a bomb) from a script and blocks
+ * until he is done. Does nothing if he is already busy.
+ */
 USER_FUNC(evt_party_thunders_use) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -735,6 +834,7 @@ USER_FUNC(evt_party_thunders_use) {
     return EVT_RETURN_DONE;
 }
 
+/** Makes Vivian pull Mario into her shadow (her field ability) and blocks until he is hidden (status 2). */
 USER_FUNC(evt_party_vivian_hold) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -756,6 +856,7 @@ USER_FUNC(evt_party_vivian_hold) {
     return EVT_RETURN_DONE;
 }
 
+/** Brings Mario back out of Vivian's shadow if he is hidden, blocking until her ability has ended. */
 USER_FUNC(evt_party_vivian_unhold) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -771,6 +872,10 @@ USER_FUNC(evt_party_vivian_unhold) {
     return vivianGetStatus() == 0 ? 2 : 0;
 }
 
+/**
+ * Starts (args[1] nonzero) or stops Vivian's tail effect (L_partyVivianTailStart/Stop).
+ * Guess: the shadow trail she leaves in the hidden state.
+ */
 USER_FUNC(L_evt_party_vivian_tail) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -786,6 +891,7 @@ USER_FUNC(L_evt_party_vivian_tail) {
     return EVT_RETURN_DONE;
 }
 
+/** Mounts Mario on Yoshi (args[1] nonzero) or gets him off, blocking until the ride state has changed. */
 USER_FUNC(evt_party_yoshi_ride) {
     EvtWord* args = event->args;
     PartyEntry* p;
@@ -821,6 +927,10 @@ USER_FUNC(evt_party_yoshi_ride) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * While Mario rides Yoshi, flutters Yoshi at speed args[1] for args[2] milliseconds and blocks
+ * until the flutter ends.
+ */
 USER_FUNC(evt_party_yoshi_fly) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -843,6 +953,10 @@ USER_FUNC(evt_party_yoshi_fly) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Makes Koops do his shell kick from a script and blocks until the shell is back.
+ * Does nothing if the partner is not Koops or he is already in use.
+ */
 USER_FUNC(evt_party_nokotaro_kick) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -869,6 +983,10 @@ USER_FUNC(evt_party_nokotaro_kick) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Starts Koops's held shell (the charge-and-hold variant of his kick) and blocks
+ * until the shell is held in place (status 3), or returns early if the move ends.
+ */
 USER_FUNC(evt_party_nokotaro_kick_hold) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -895,6 +1013,10 @@ USER_FUNC(evt_party_nokotaro_kick_hold) {
     return nokonokoGetStatus(p) == 3 ? 2 : 0;
 }
 
+/**
+ * Releases Koops's held shell: waits for the hold state, cancels it (nokotaro_hold_cancel),
+ * then blocks until his ability has ended.
+ */
 USER_FUNC(evt_party_nokotaro_hold_cancel) {
     PartyEntry* p;
     s32 ret = 0;
@@ -933,6 +1055,10 @@ USER_FUNC(evt_party_nokotaro_hold_cancel) {
     return ret;
 }
 
+/**
+ * Writes Koops's shell ability state (nokonokoGetStatus: 0 idle, 3 shell held) to args[1];
+ * untouched for other partners.
+ */
 USER_FUNC(evt_party_nokotaro_get_status) {
     s32 dst;
     PartyEntry* p;
@@ -949,6 +1075,10 @@ USER_FUNC(evt_party_nokotaro_get_status) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Makes Flurrie use her gust of wind from a script, args[1] being the action time passed to the ability,
+ * and blocks until she is done. Does nothing if the partner is not Flurrie or she is already in use.
+ */
 USER_FUNC(evt_party_cloud_breathout) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -979,7 +1109,7 @@ USER_FUNC(evt_party_cloud_breathout) {
 extern void N_cloudLockAnimationsOn(PartyEntry* party);
 extern void N_cloudLockAnimationsOff(PartyEntry* party);
 
-// US only.
+/** US only. */
 USER_FUNC(N_evt_party_cloud_lock_animations_on_off) {
     PartyEntry* p;
     EvtWord* args = event->args;
@@ -1004,6 +1134,8 @@ USER_FUNC(N_evt_party_cloud_lock_animations_on_off) {
 }
 #endif
 
+// FAKE: stand-in for a function the linker stripped; it only exists to put the float constants in this file's .sdata2
+// pool in the original order and emits nothing in the DOL.
 void evtPartyStrippedPool(f32* f) {
     f[0] = 1.0f;
     f[1] = 0.5f;

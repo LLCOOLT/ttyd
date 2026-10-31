@@ -52,6 +52,7 @@ static USER_FUNC(_fire_wave);
 static USER_FUNC(_mario_fire_ball_controll);
 static USER_FUNC(_kaiten_hammer_acrobat_rotate);
 static USER_FUNC(_hammer_star_effect);
+// Prototype of the Power Bounce stomp limit helper; see its definition near the end of the file.
 USER_FUNC(mario_get_renzoku_count_max);
 static USER_FUNC(_record_renzoku_count);
 static USER_FUNC(_tatsumaki_effect);
@@ -2133,6 +2134,14 @@ BattleWeapon* superActionTable[] = {
     NULL, NULL, NULL, NULL, NULL, NULL,
 };
 
+/**
+ * Mario's plain Jump (marioDefaultWeapon_Jump),
+ * also used for his first strike (battle flag 2)
+ * and the stomp badges (Shrink, Sleepy and Soft Stomp add a star sparkle).
+ * He runs to the takeoff spot and jumps on the target;
+ * a timed press on landing gives a second stomp, a miss or dodge makes him tumble off,
+ * and a Stylish press is possible.
+ */
 static EVT_BEGIN(marioAttackEvent_NormalJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
@@ -2420,6 +2429,12 @@ static EVT_BEGIN(marioAttackEvent_NormalJump)
     RETURN
 EVT_END()
 
+/**
+ * Spin Jump (Super Boots, marioWeapon_KururinJump):
+ * a first stomp like the plain Jump, then on a successful press Mario spins in the air above the target
+ * and dives onto it for a second, stronger hit (marioWeapon_KururinJump2).
+ * Also his first strike with the Super Boots.
+ */
 static EVT_BEGIN(marioAttackEvent_KururinJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.39941406f))
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
@@ -2724,6 +2739,11 @@ static EVT_BEGIN(marioAttackEvent_KururinJump)
     RETURN
 EVT_END()
 
+/**
+ * Spring Jump (Ultra Boots): Mario springs high into the air and drops on the chosen enemy.
+ * On stages with an iron frame overhead that is still up,
+ * he hits the frame instead and falls back with marioWeapon_JyabaraJumpFailed.
+ */
 EVT_BEGIN(marioAttackEvent_JyabaraJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -3170,6 +3190,11 @@ EVT_BEGIN(marioAttackEvent_JyabaraJump)
     RETURN
 EVT_END()
 
+/**
+ * Shared jump attack for Power Jump and Mega Jump:
+ * the caller puts the badge's weapon in LW(12) and this runs the approach, the single timed stomp,
+ * the damage and the return to Mario's home position.
+ */
 EVT_BEGIN(marioAttackEvent_GatsuDokaJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -3340,18 +3365,28 @@ EVT_BEGIN(marioAttackEvent_GatsuDokaJump)
     RETURN
 EVT_END()
 
+/** Power Jump badge attack: GatsuDokaJump with badgeWeapon_GatsunJump. */
 EVT_BEGIN(marioAttackEvent_GatsunJump)
     SET_VALUE(LW(12), PTR(&badgeWeapon_GatsunJump))
     CALL_CHILD(marioAttackEvent_GatsuDokaJump)
     RETURN
 EVT_END()
 
+/**
+ * Mega Jump badge attack: GatsuDokaJump with badgeWeapon_DokanJump.
+ * Guess: the Mega badges are not obtainable in the retail game.
+ */
 EVT_BEGIN(marioAttackEvent_DokanJump)
     SET_VALUE(LW(12), PTR(&badgeWeapon_DokanJump))
     CALL_CHILD(marioAttackEvent_GatsuDokaJump)
     RETURN
 EVT_END()
 
+/**
+ * Tornado Jump badge attack: a stomp on the chosen enemy,
+ * then on a successful second command Mario spins into a tornado (_tatsumaki_effect) that hits every airborne
+ * enemy with badgeWeapon_TatsumakiJumpInvolved.
+ */
 EVT_BEGIN(marioAttackEvent_TatsumakiJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -3864,21 +3899,29 @@ EVT_BEGIN(marioAttackEvent_TatsumakiJump)
     RETURN
 EVT_END()
 
+/** Shrink Stomp badge attack: a normal jump; the shrink status comes from the badge's weapon data. */
 EVT_BEGIN(marioAttackEvent_MiniminiFumi)
     CALL_CHILD(marioAttackEvent_NormalJump)
     RETURN
 EVT_END()
 
+/** Sleepy Stomp badge attack: a normal jump; the sleep status comes from the badge's weapon data. */
 EVT_BEGIN(marioAttackEvent_NemuraseFumi)
     CALL_CHILD(marioAttackEvent_NormalJump)
     RETURN
 EVT_END()
 
+/** Soft Stomp badge attack: a normal jump; the defense-down effect comes from the badge's weapon data. */
 EVT_BEGIN(marioAttackEvent_FunyafunyaJump)
     CALL_CHILD(marioAttackEvent_NormalJump)
     RETURN
 EVT_END()
 
+/**
+ * Power Bounce badge attack: Mario keeps bouncing on one enemy while each timed press succeeds.
+ * The number of bounces allowed is capped by mario_get_renzoku_count_max,
+ * and the best combo is recorded by _record_renzoku_count.
+ */
 EVT_BEGIN(marioAttackEvent_RenzokuJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -4120,6 +4163,10 @@ EVT_BEGIN(marioAttackEvent_RenzokuJump)
     RETURN
 EVT_END()
 
+/**
+ * Multibounce badge attack: Mario bounces from enemy to enemy across the field, one timed press per stomp,
+ * until a press fails or every target has been hit.
+ */
 EVT_BEGIN(marioAttackEvent_TugiTugiJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
@@ -4348,30 +4395,42 @@ EVT_BEGIN(marioAttackEvent_TugiTugiJump)
     RETURN
 EVT_END()
 
+/** Mario's plain Hammer (marioDefaultWeapon_Hammer): NormalHammer_Core with LW(14) = 0, the non-badge swing. */
 static EVT_BEGIN(marioAttackEvent_NormalHammer)
     SET_VALUE(LW(14), 0)
     CALL_CHILD(marioAttackEvent_NormalHammer_Core)
     RETURN
 EVT_END()
 
+/**
+ * Power Smash and Mega Smash badge attack: NormalHammer_Core with LW(14) = 1 (the badge variant of the swing);
+ * the weapon chosen in the menu sets the damage.
+ */
 EVT_BEGIN(marioAttackEvent_GatsunHammer)
     SET_VALUE(LW(14), 1)
     CALL_CHILD(marioAttackEvent_NormalHammer_Core)
     RETURN
 EVT_END()
 
+/** Ice Smash badge attack: a normal hammer swing (LW(14) = 0); the freeze comes from badgeWeapon_IceNaguri. */
 EVT_BEGIN(marioAttackEvent_IceNaguri)
     SET_VALUE(LW(14), 0)
     CALL_CHILD(marioAttackEvent_NormalHammer_Core)
     RETURN
 EVT_END()
 
+/** Piercing Blow badge attack: NormalHammer_Core with LW(14) = 1; the defense-piercing comes from the weapon data. */
 EVT_BEGIN(marioAttackEvent_TsuranukiHammer)
     SET_VALUE(LW(14), 1)
     CALL_CHILD(marioAttackEvent_NormalHammer_Core)
     RETURN
 EVT_END()
 
+/**
+ * Shared hammer attack: walk up to the front enemy, wind up with the hold-and-release command, swing and return.
+ * Also runs as Mario's first strike (battle flag 2) with marioDefaultWeapon_Hammer.
+ * LW(12) is the weapon and LW(14) picks the badge variant of the swing.
+ */
 EVT_BEGIN(marioAttackEvent_NormalHammer_Core)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -4773,6 +4832,13 @@ EVT_BEGIN(marioAttackEvent_NormalHammer_Core)
     RETURN
 EVT_END()
 
+/**
+ * Super Hammer and Ultra Hammer (also their first strikes): Mario winds up with the hold command and swings;
+ * a success knocks the target back (the shared blow-away script hits the enemies behind it with the ...Involved
+ * weapon).
+ * The Ultra Hammer adds a whirlwind, and after a success it waits on the target's knock-back tokens
+ * and hits it once more with marioWeapon_UltraHammerFinish (Guess: when the flung enemy lands).
+ */
 static EVT_BEGIN(marioAttackEvent_KaitenHammer)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -5112,6 +5178,11 @@ static EVT_BEGIN(marioAttackEvent_KaitenHammer)
     RETURN
 EVT_END()
 
+/**
+ * First strike with the Super or Ultra Hammer when the battle starts from a field hammer hit:
+ * picks the first-strike weapon for Ultra Hammer (hammer level 3) or Super Hammer,
+ * then runs the spinning hammer attack.
+ */
 EVT_BEGIN(marioAttackEvent_FirstAttackKaitenHammer)
     CALL(_get_mario_hammer_lv, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 3)
@@ -5124,6 +5195,10 @@ EVT_BEGIN(marioAttackEvent_FirstAttackKaitenHammer)
     RETURN
 EVT_END()
 
+/**
+ * Quake Hammer badge attack: Mario charges and slams the ground with the hold command,
+ * shaking the stage to hit every enemy at once (AttackDeclareAll).
+ */
 EVT_BEGIN(marioAttackEvent_JishinHammer)
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
@@ -5410,6 +5485,10 @@ EVT_BEGIN(marioAttackEvent_JishinHammer)
     RETURN
 EVT_END()
 
+/**
+ * Mega Quake badge attack: the Quake Hammer slam with a shorter command window (16 instead of 25)
+ * and the stronger weapon. Guess: Mega Quake is not obtainable in the retail game.
+ */
 EVT_BEGIN(marioAttackEvent_UltraJishinHammer)
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
@@ -5632,6 +5711,10 @@ EVT_BEGIN(marioAttackEvent_UltraJishinHammer)
     RETURN
 EVT_END()
 
+/**
+ * Spins the thrown hammer (Mario's part 3) by -25 degrees every frame forever;
+ * HammerNageru_object spawns it and deletes it when the hammer lands.
+ */
 EVT_BEGIN(marioAttackEvent_HammerRotate)
     SET_VALUE(LW(0), -25)
     CALL(btlevtcmd_SetPartsRotateOffset, BTL_UNIT_SELF, 3, 0, 12, 0)
@@ -5642,6 +5725,10 @@ EVT_BEGIN(marioAttackEvent_HammerRotate)
     RETURN
 EVT_END()
 
+/**
+ * Hammer Throw badge attack: Mario winds up with the hold command and throws his hammer at the chosen enemy,
+ * which can be anywhere on the field; the flight is run by HammerNageru_object.
+ */
 EVT_BEGIN(marioAttackEvent_HammerNageru)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -5773,6 +5860,11 @@ EVT_BEGIN(marioAttackEvent_HammerNageru)
     RETURN
 EVT_END()
 
+/**
+ * The thrown hammer's flight for Hammer Throw: shows part 3 above Mario,
+ * spins it with HammerRotate and arcs it to the target;
+ * LW(6) carries the guard result that decides whether the target dodges.
+ */
 EVT_BEGIN(marioAttackEvent_HammerNageru_object)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(1), 25)
@@ -5844,6 +5936,11 @@ EVT_END()
 static const char battle_mario_nullstr[4] = "";
 extern const f32 battle_mario_one;
 
+/**
+ * Fire Drive badge attack: Mario charges his hammer with fire and slams it down,
+ * sending a fireball along the floor (FireNaguri_object) through the enemies;
+ * a failed command uses badgeWeapon_FireNaguriFailed.
+ */
 EVT_BEGIN(marioAttackEvent_FireNaguri)
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
@@ -6045,6 +6142,10 @@ EVT_BEGIN(marioAttackEvent_FireNaguri)
     RETURN
 EVT_END()
 
+/**
+ * The fireball (Mario's part 3) of Fire Drive: travels along the stage floor to each target in turn,
+ * burning them with fire pillars (_fire_wave), or rolls off the stage edge when no target is left.
+ */
 EVT_BEGIN(marioAttackEvent_FireNaguri_object)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -6164,6 +6265,10 @@ EVT_BEGIN(marioAttackEvent_FireNaguri_object)
     RETURN
 EVT_END()
 
+/**
+ * Charge and Charge P: the user poses, spins, and gains the attack boost of the weapon in LW(12),
+ * with the charge sound and crystal sparkle; no action command.
+ */
 EVT_BEGIN(_NormalCharge_core)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(3))
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(4))
@@ -6193,18 +6298,24 @@ EVT_BEGIN(_NormalCharge_core)
     RETURN
 EVT_END()
 
+/** Charge badge move for Mario. */
 EVT_BEGIN(marioAttackEvent_NormalCharge)
     SET_VALUE(LW(12), PTR(&badgeWeapon_Charge))
     CALL_CHILD(_NormalCharge_core)
     RETURN
 EVT_END()
 
+/** Charge P badge move for the partner. */
 EVT_BEGIN(marioAttackEvent_NormalChargeP)
     SET_VALUE(LW(12), PTR(&badgeWeapon_ChargeP))
     CALL_CHILD(_NormalCharge_core)
     RETURN
 EVT_END()
 
+/**
+ * Super Charge and Super Charge P: the same pose and spin as Charge with the super charge sound
+ * and the weapon in LW(12). Guess: the Super Charge badges are not obtainable in the retail game.
+ */
 EVT_BEGIN(_SuperCharge_core)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(3))
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(4))
@@ -6234,12 +6345,14 @@ EVT_BEGIN(_SuperCharge_core)
     RETURN
 EVT_END()
 
+/** Super Charge badge move for Mario. */
 EVT_BEGIN(marioAttackEvent_SuperCharge)
     SET_VALUE(LW(12), PTR(&badgeWeapon_SuperCharge))
     CALL_CHILD(_SuperCharge_core)
     RETURN
 EVT_END()
 
+/** Super Charge P badge move for the partner. */
 EVT_BEGIN(marioAttackEvent_SuperChargeP)
     SET_VALUE(LW(12), PTR(&badgeWeapon_SuperChargeP))
     CALL_CHILD(_SuperCharge_core)
@@ -6252,6 +6365,11 @@ static const Vec majinai_effect_pos = {0.0f, 0.0f, 0.0f};
 static const Vec majinai_effect_pos = {0.0f, 10.0f, 0.0f};
 #endif
 
+/**
+ * Run at the start of Mario's attacks: if Merlee's next charm is the attack boost (merleeNextCurseType 1),
+ * uses it up with the Merlee sparkle, a hop and the "power up" banner.
+ * JP and earlier show the banner for 60 frames instead of the US style 180-frame banner that A or B closes.
+ */
 EVT_BEGIN(marioAttackEvent_MajinaiPowerUpCheck)
     CALL(_majinai_powerup_check, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -6276,6 +6394,7 @@ EVT_BEGIN(marioAttackEvent_MajinaiPowerUpCheck)
     RETURN
 EVT_END()
 
+/** Mario's little hop during a Merlee charm, skipped when he cannot act (CheckActStatus is 0). */
 EVT_BEGIN(marioAttackEvent_MajinaiJump)
     CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -6290,6 +6409,7 @@ EVT_BEGIN(marioAttackEvent_MajinaiJump)
     RETURN
 EVT_END()
 
+/** Puts Mario back in his idle stance after a Merlee charm, if he can act. */
 EVT_BEGIN(_MajinaiPoseReset)
     CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -6299,6 +6419,7 @@ EVT_BEGIN(_MajinaiPoseReset)
     RETURN
 EVT_END()
 
+/** Merlee's defense charm: sparkle, hop and the "defense up" banner; started from battle_seq.c. */
 EVT_BEGIN(marioAttackEvent_MajinaiDefenceUp)
     SET_VALUE(LW(0), 0)
     SET_VALUE(LW(1), 0)
@@ -6320,6 +6441,10 @@ EVT_BEGIN(marioAttackEvent_MajinaiDefenceUp)
     RETURN
 EVT_END()
 
+/**
+ * Merlee's Star Point charm: sparkle, hop and the "experience up" banner;
+ * started from battle_seq_end.c after a win.
+ */
 EVT_BEGIN(marioAttackEvent_MajinaiExpUp)
     SET_VALUE(LW(0), 0)
     SET_VALUE(LW(1), 0)
@@ -6340,12 +6465,14 @@ EVT_BEGIN(marioAttackEvent_MajinaiExpUp)
     RETURN
 EVT_END()
 
+/** Puts Mario's hammer level (pouch hammerLevel; 3 is the Ultra Hammer) in args[0]. */
 static USER_FUNC(_get_mario_hammer_lv) {
     s32 ret = *event->args;
     evtSetValue(event, ret, pouchGetPtr()->hammerLevel);
     return EVT_RETURN_DONE;
 }
 
+/** Spawns the N64-style whirlwind effect around unit args[0] for args[1] frames; used by the spinning hammer attack. */
 static USER_FUNC(_whirlwind_effect) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -6364,6 +6491,10 @@ static USER_FUNC(_whirlwind_effect) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Over 25 frames, emits growing energy stars (effect type args[1]) rising behind unit args[0];
+ * the charge-up sparkle of the jump attacks.
+ */
 static USER_FUNC(_jump_star_effect) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -6405,6 +6536,7 @@ static USER_FUNC(_jump_star_effect) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets args[0] to 1 while the stage's overhead iron frame is still there, 0 once it is gone; Spring Jump checks it. */
 static USER_FUNC(_bgset_iron_frame_check) {
     s32 ret = *event->args;
     if (_battleWorkPointer->stageObjectWork.flags & STAGE_OBJ_FLAG_IRON_FRAME_GONE) {
@@ -6415,6 +6547,10 @@ static USER_FUNC(_bgset_iron_frame_check) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Blocks until the top of unit args[0] reaches height 130 (the iron frame), then pins it there;
+ * the Spring Jump collision with the frame.
+ */
 static USER_FUNC(_wait_jyabara_hit_iron_frame) {
     BattleUnit* unit;
     f32 pos[3];
@@ -6428,6 +6564,10 @@ static USER_FUNC(_wait_jyabara_hit_iron_frame) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Tornado Jump's twister: two Kammy-style tornado effects spiralling out to 80 units from unit args[0] over 90
+ * frames, with the tornado sound following them.
+ */
 static USER_FUNC(_tatsumaki_effect) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* ud = event->userWork;
@@ -6480,6 +6620,10 @@ static USER_FUNC(_tatsumaki_effect) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Records a Power Bounce combo of args[0]: keeps this battle's best (capped at 100) and, on a new pouch record,
+ * sets powerBounceRecord and makes the audience react.
+ */
 static USER_FUNC(_record_renzoku_count) {
     s32 n = evtGetValue(event, *event->args);
     BattleActRecord* rec = &_battleWorkPointer->actRecord;
@@ -6497,6 +6641,11 @@ static USER_FUNC(_record_renzoku_count) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Power Bounce limit for target args[0] after args[1] bounces, into args[2]:
+ * below the target's pbSoftCap, the cap; from the cap up to twice it,
+ * one more bounce with a 33% chance each time; at twice the cap, no more. Also used by Goombella's Multibonk.
+ */
 USER_FUNC(mario_get_renzoku_count_max) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -6526,6 +6675,10 @@ USER_FUNC(mario_get_renzoku_count_max) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Over 12 frames, emits energy stars (effect type args[1]) in an arc around the hammer head of unit args[0];
+ * the charge sparkle of the hammer attacks.
+ */
 static USER_FUNC(_hammer_star_effect) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -6559,6 +6712,11 @@ static USER_FUNC(_hammer_star_effect) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Spins unit args[0] one full turn and a bit over args[2] frames,
+ * switching part args[1] to animation args[3] once it is three-quarters round;
+ * the acrobatic spin of the spinning hammer.
+ */
 static USER_FUNC(_kaiten_hammer_acrobat_rotate) {
     BattleUnit* unit;
     BattleUnitPart* part;
@@ -6602,6 +6760,10 @@ static USER_FUNC(_kaiten_hammer_acrobat_rotate) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Keeps a fire effect on Mario's part args[1] (the Fire Drive fireball) until the part's work[0] is cleared,
+ * then deletes it.
+ */
 static USER_FUNC(_mario_fire_ball_controll) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -6625,6 +6787,7 @@ static USER_FUNC(_mario_fire_ball_controll) {
     }
     return EVT_RETURN_BLOCK;
 }
+/** Spawns a fire pillar at args[0..2] scaled by 0.6 * args[3]; Fire Drive's burn on each target. */
 static USER_FUNC(_fire_wave) {
     EvtWord* args = event->args;
     f32 x = evtGetValue(event, args[0]);
@@ -6637,6 +6800,10 @@ static USER_FUNC(_fire_wave) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Sets args[0] to 1 and uses up the charm if Merlee's next charm is the attack boost (merleeNextCurseType 1),
+ * else 0.
+ */
 static USER_FUNC(_majinai_powerup_check) {
     BattleWork* wp = _battleWorkPointer;
     s32 ret = *event->args;
@@ -6651,6 +6818,7 @@ static USER_FUNC(_majinai_powerup_check) {
     return EVT_RETURN_DONE;
 }
 
+/** Plays Merlee's charm sparkle (mjef_coinup) and blocks until it finishes. */
 static USER_FUNC(_battle_majinai_effect) {
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
     if (isFirstCall) {
@@ -6664,6 +6832,7 @@ static USER_FUNC(_battle_majinai_effect) {
     return EVT_RETURN_DONE;
 }
 
+/** Turns off paper lighting on part args[1] of unit args[0]; used by the spinning hammer attack. */
 static USER_FUNC(_paper_light_off) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);

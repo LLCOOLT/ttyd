@@ -18,6 +18,10 @@
 //.sbss
 u32 msg_ep; // unknown since it only gets written to once and never used
 
+/**
+ * TRUE while Goombella is the active partner and her Tattle ability is in use;
+ * marioChkKey checks it to keep Mario's controls locked while she talks.
+ */
 BOOL christineGetStatus(void) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     if (!party || party->currentMemberId != PARTY_MEMBER_GOOMBELLA || !(party->flags & PARTY_FLAG_IS_BEING_USED)) {
@@ -26,6 +30,15 @@ BOOL christineGetStatus(void) {
     return TRUE;
 }
 
+/**
+ * First step of the field Tattle script: picks the message Goombella says into LW(0).
+ * If the script was handed an NPC Mario can talk to,
+ * LW(0) is moved to that NPC's description (its tattle message);
+ * otherwise it looks at the map object Mario pushes, faces or stands on and picks the hint for that block,
+ * switch, chest or sign, falling back to the "msg_kuri_map" comment on the map itself.
+ * Mutes sound effects for the duration; retail also lifts her off the floor collision,
+ * and returns early when she is in paper form (the US demo instead requires her on the ground).
+ */
 static USER_FUNC(pre_kurio_use) {
     HitEntry* hit;
     char* msg;
@@ -165,6 +178,10 @@ static USER_FUNC(pre_kurio_use) {
     }
 }
 
+/**
+ * Last step of the field Tattle script: advances kuribo_use to its wind-down state,
+ * lets Mario move again and unmutes sound effects (retail also restores her floor collision).
+ */
 static USER_FUNC(post_kurio_use) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
 
@@ -185,6 +202,10 @@ static USER_FUNC(post_kurio_use) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Party table init for Goombella, also used by the walking followers that reuse her routines (Professor Frankly,
+ * Marco, the guide, the gatekeepers): sets the 26 wide by 24 tall collision size.
+ */
 void kuribo_init(PartyEntry* party) {
     party->memberKind = 1;
     party->moveKind = 0;
@@ -193,6 +214,10 @@ void kuribo_init(PartyEntry* party) {
     msg_ep = 0;
 }
 
+/**
+ * Field Tattle event: runs pre_kurio_use, prints the chosen message in Goombella's party speech balloon,
+ * then post_kurio_use. Started by kuribo_use with LW(0) set to the NPC Mario faces, if any.
+ */
 EVT_BEGIN(kurio_msg_evt)
     CALL(pre_kurio_use)
     IF_INT_EQUAL(LW(0), 0)
@@ -205,6 +230,10 @@ EVT_BEGIN(kurio_msg_evt)
 EVT_END()
 f32 PSVECDistance(const Vec*, const Vec*);
 
+/**
+ * Party table post_func, run when Goombella leaves use mode (partyUsePost or a run-mode change out of mode 3):
+ * retail clears the floor-collision overrides kuribo_use may have set; empty in the demos.
+ */
 void kuribo_use_post(PartyEntry* party) {
 #if VERSION >= VERSION_JP
     party->flags &= ~PARTY_FLAG_DISABLE_FLOORS;
@@ -213,7 +242,7 @@ void kuribo_use_post(PartyEntry* party) {
 }
 
 #if VERSION <= VERSION_DEMO_US
-// The demo starts the message right where Goombella stands; retail first walks her next to Mario.
+/** The demo starts the message right where Goombella stands; retail first walks her next to Mario. */
 void kuribo_use(PartyEntry* party) {
     EventEntry* evt;
 
@@ -250,6 +279,12 @@ void kuribo_use(PartyEntry* party) {
     partyChkGnd(party);
 }
 #else
+/**
+ * Retail Tattle: if Goombella is far from Mario or a wall separates them,
+ * she first slides over 4 frames to a spot beside him,
+ * then starts kurio_msg_evt with the NPC Mario can talk to and waits for the script to finish
+ * before returning to normal follow mode.
+ */
 void kuribo_use(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     HitEntry* wall;
@@ -337,6 +372,10 @@ void kuribo_use(PartyEntry* party) {
 }
 #endif
 
+/**
+ * Goodbye routine shared by Goombella, Flurrie, Vivian, Ms. Mowz and the walking NPC followers:
+ * plays the standard leave-the-party motion and switches to run mode 14 once it ends.
+ */
 void kuribo_bye(PartyEntry* party) {
     if (party->trigFlags & PARTY_TRIG_FLAG_CHG_RUN_MODE) {
         party->trigFlags &= ~PARTY_TRIG_FLAG_CHG_RUN_MODE;

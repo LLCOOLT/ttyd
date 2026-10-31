@@ -11,10 +11,12 @@
 //.sbss
 static OffscreenWork work[2]; // field, battle
 
+/** Returns the battle (inBattle) or field set of offscreen entries. */
 static inline OffscreenWork* offscreenGetWork(BOOL inBattle) {
     return inBattle ? &work[1] : &work[0];
 }
 
+/** Returns the offscreen entry set for the current mode (battle or field, from gp->inBattle). */
 static inline OffscreenWork* offscreenGetWorkGp(void) {
     return gp->inBattle ? &work[1] : &work[0];
 }
@@ -22,6 +24,7 @@ static inline OffscreenWork* offscreenGetWorkGp(void) {
 // local prototypes
 static void offscreenDisp(CameraId camId, void* param);
 
+/** Allocates the 10-entry offscreen tables for the field and for battle; called once at boot. */
 void offscreenInit(void) {
     OffscreenWork* wp;
 
@@ -34,11 +37,16 @@ void offscreenInit(void) {
     memset(wp->entries, 0, wp->count * sizeof(OffscreenEntry));
 }
 
+/** Frees every offscreen entry of the field or battle set; the map-change and battle sequences call it on entry. */
 void offscreenReset(BOOL inBattle) {
     OffscreenWork* wp = offscreenGetWork(inBattle);
     memset(wp->entries, 0, wp->count * sizeof(OffscreenEntry));
 }
 
+/**
+ * Registers a named offscreen region (reusing the slot if the name exists) with an empty bounding box
+ * and returns its id. Map objects, NPCs, shadows and effects such as the cloud and scissor screens use it.
+ */
 s32 offscreenEntry(const char* name) {
     OffscreenWork* wp = offscreenGetWorkGp();
     int i, count;
@@ -72,6 +80,10 @@ s32 offscreenEntry(const char* name) {
     return i;
 }
 
+/**
+ * Draw callback on the offscreen camera: copies each entry's bounding box from the frame buffer into a freshly
+ * allocated texture so it can be drawn back later in the frame.
+ */
 static void offscreenDisp(CameraId camId, void* param) {
     OffscreenWork* wp = offscreenGetWorkGp();
     int i, count;
@@ -95,6 +107,10 @@ static void offscreenDisp(CameraId camId, void* param) {
     }
 }
 
+/**
+ * Per-frame update: keeps last frame's bounding boxes, empties the current ones for drawers to grow again,
+ * and queues offscreenDisp.
+ */
 void offscreenMain(void) {
     OffscreenWork* wp = offscreenGetWorkGp();
     int i, count;
@@ -117,6 +133,11 @@ void offscreenMain(void) {
     dispEntry(CAMERA_OFFSCREEN2, 0.0f, 7, offscreenDisp, NULL);
 }
 
+/**
+ * Grows entry id's screen-space box (in pixels) to include the given rectangle,
+ * padded by 2 and aligned to even pixels, clamped to the frame buffer;
+ * marks the entry as having an area this frame.
+ */
 void offscreenAddBoundingBox(s32 id, u16 left, u16 top, u16 right, u16 bottom) {
     OffscreenEntry* entry;
 
@@ -159,6 +180,7 @@ void offscreenAddBoundingBox(s32 id, u16 left, u16 top, u16 right, u16 bottom) {
     }
 }
 
+/** Fetches entry id's screen box for this frame; FALSE if the entry is unused or nothing was added to it. */
 BOOL offscreenGetBoundingBox(s32 id, u16* left, u16* top, u16* right, u16* bottom) {
     OffscreenEntry* entry = &offscreenGetWorkGp()->entries[id];
 
@@ -175,6 +197,10 @@ BOOL offscreenGetBoundingBox(s32 id, u16* left, u16* top, u16* right, u16* botto
     return TRUE;
 }
 
+/**
+ * Hands out entry id's copied texture and its buffer,
+ * or NULLs if the entry has no area or was not copied this frame.
+ */
 void offscreenGetTexObj(s32 id, GXTexObj** texObj, smartEntry** texBuf) {
     OffscreenEntry* entry = &offscreenGetWorkGp()->entries[id];
 
@@ -197,6 +223,7 @@ void offscreenGetTexObj(s32 id, GXTexObj** texObj, smartEntry** texBuf) {
     *texBuf = entry->texBuf;
 }
 
+/** Returns the id of the entry with this name (the table size if none). */
 s32 offscreenNameToId(const char* name) {
     OffscreenWork* wp = offscreenGetWorkGp();
     int i, count;
@@ -210,6 +237,7 @@ s32 offscreenNameToId(const char* name) {
     return i;
 }
 
+/** Returns the entry with this name (one past the table if none). */
 OffscreenEntry* offscreenNameToPtr(const char* name) {
     OffscreenWork* wp = offscreenGetWorkGp();
     int i, count;
@@ -223,6 +251,7 @@ OffscreenEntry* offscreenNameToPtr(const char* name) {
     return entry;
 }
 
+/** Frees the entry with this name. */
 void offscreenDelete(const char* name) {
     OffscreenWork* wp = offscreenGetWorkGp();
     int i, count;
@@ -236,6 +265,7 @@ void offscreenDelete(const char* name) {
     entry->flags = 0;
 }
 
+/** Fetches entry id's screen box from the previous frame; FALSE if unused or the box was empty. */
 BOOL offscreenGetBoundingBox_BeforeFrame(s32 id, u16* left, u16* top, u16* right, u16* bottom) {
     OffscreenEntry* entry = &offscreenGetWorkGp()->entries[id];
 

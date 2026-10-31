@@ -1,6 +1,14 @@
 #include <dolphin/thp.h>
 
 #ifdef VERSION_G8MP01
+/**
+ * Decodes one audio frame of a THP movie (4-bit ADPCM,
+ * left and right channels with their own coefficients
+ * and history in the frame header) into 16-bit PCM in audioBuffer, returning the number of samples per channel.
+ * With flag 1 the channels are written one after the other (right, then left); otherwise they are interleaved.
+ * A mono frame is copied to both channels.
+ * This copy (the PAL release) rounds each sample by adding 0x8000 before taking the high half.
+ */
 u32 THPAudioDecode(s16* audioBuffer, u8* audioFrame, s32 flag)
 {
 	THPAudioRecordHeader* header;
@@ -119,6 +127,14 @@ u32 THPAudioDecode(s16* audioBuffer, u8* audioFrame, s32 flag)
 	return header->sampleSize;
 }
 #else
+/**
+ * Decodes one audio frame of a THP movie (4-bit ADPCM,
+ * left and right channels with their own coefficients
+ * and history in the frame header) into 16-bit PCM in audioBuffer, returning the number of samples per channel.
+ * With flag 1 the channels are written one after the other (right, then left); otherwise they are interleaved.
+ * A mono frame is copied to both channels.
+ * This copy (all releases except PAL) rounds to the nearest 16-bit value with ties going to the even value.
+ */
 u32 THPAudioDecode(s16* audioBuffer, u8* audioFrame, s32 flag)
 {
 	THPAudioRecordHeader* header;
@@ -259,6 +275,10 @@ u32 THPAudioDecode(s16* audioBuffer, u8* audioFrame, s32 flag)
 }
 #endif
 
+/**
+ * Returns the next signed 4-bit ADPCM nibble of the stream,
+ * reading a new predictor and scale byte at the start of each 8-byte frame.
+ */
 static s32 __THPAudioGetNewSample(THPAudioDecodeInfo* info)
 {
 	s32 sample;
@@ -281,6 +301,10 @@ static s32 __THPAudioGetNewSample(THPAudioDecodeInfo* info)
 	return sample;
 }
 
+/**
+ * Starts decoding one channel at ptr: reads the first frame's predictor and scale byte
+ * and positions the nibble reader after it.
+ */
 static void __THPAudioInitialize(THPAudioDecodeInfo* info, u8* ptr)
 {
 	info->encodeData    = ptr;

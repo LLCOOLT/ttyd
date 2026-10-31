@@ -15,6 +15,7 @@ static void HandleReverb(s32* sptr, AXFX_REVSTD_WORK* rv);
 static void ReverbSTDCallback(s32* left, s32* right, s32* surround, AXFX_REVSTD_WORK* rv);
 static void ReverbSTDFree(AXFX_REVSTD_WORK* rv);
 
+/** Sets a delay line's read point to 'lag' samples behind its write point, wrapping inside the buffer. */
 static void DLsetdelay(AXFX_REVSTD_DELAYLINE* dl, s32 lag) {
     dl->outPoint = dl->inPoint - (lag * 4);
     while (dl->outPoint < 0) {
@@ -22,6 +23,10 @@ static void DLsetdelay(AXFX_REVSTD_DELAYLINE* dl, s32 lag) {
     }
 }
 
+/**
+ * Allocates and clears a delay line of max_length samples and sets a default lag of half its length.
+ * Returns 0 if allocation fails.
+ */
 static int DLcreate(AXFX_REVSTD_DELAYLINE* dl, s32 max_length) {
     dl->length = (max_length * 4);
     dl->inputs = __AXFXAlloc(max_length * 4);
@@ -38,11 +43,12 @@ static int DLcreate(AXFX_REVSTD_DELAYLINE* dl, s32 max_length) {
 	return 1;
 }
 
+/** Frees a delay line's sample buffer. */
 static void DLdelete(AXFX_REVSTD_DELAYLINE* dl) {
     __AXFXFree(dl->inputs);
 }
 
-// NONMATCHING RELEASE - regalloc
+/** NONMATCHING RELEASE - regalloc */
 static int ReverbSTDCreate(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 predelay) {
     u8 i;
     u8 k;
@@ -122,6 +128,10 @@ static int ReverbSTDCreate(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 m
     return 1;
 }
 
+/**
+ * Validates the new parameters, stores coloration, mix and damping,
+ * frees all delay lines and the pre-delay buffers and rebuilds them with ReverbSTDCreate.
+ */
 static int ReverbSTDModify(AXFX_REVSTD_WORK* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 predelay) {
     u8 i;
 
@@ -170,6 +180,12 @@ const static f32 value0_3 = 0.3f;
 const static f32 value0_6 = 0.6f;
 const static double i2fMagic = 4503601774854144.0;
 
+/**
+ * Assembly inner loop of the standard reverb: for each of three outputs it runs a 160-sample buffer through
+ * pre-delay, comb and all-pass delay lines and a damping low-pass, mixed with the dry signal,
+ * advancing through the buffers from sptr (the left buffer). Guess: the exact filter topology.
+ * Original assembly.
+ */
 asm static void HandleReverb(register s32* sptr, register AXFX_REVSTD_WORK* rv) {
     nofralloc
 	stwu r1, -144(r1)
@@ -431,10 +447,12 @@ L_0000090C:
 	blr
 }
 
+/** Runs HandleReverb starting at the left buffer; the assembly loop covers all three outputs. */
 static void ReverbSTDCallback(s32* left, s32* right, s32* surround, AXFX_REVSTD_WORK* rv) {
     HandleReverb(left, rv);
 }
 
+/** Frees the six all-pass and six comb delay lines and the pre-delay buffers that exist. */
 static void ReverbSTDFree(AXFX_REVSTD_WORK* rv) {
     u8 i;
 
@@ -462,6 +480,10 @@ static void ReverbSTDFree(AXFX_REVSTD_WORK* rv) {
     }
 }
 
+/**
+ * Creates the standard reverb (two comb and two all-pass lines per output) from the AXFX_REVERBSTD parameters
+ * with interrupts disabled; returns nonzero on success.
+ */
 int AXFXReverbStdInit(AXFX_REVERBSTD* rev) {
     int ret;
     BOOL old;
@@ -473,6 +495,7 @@ int AXFXReverbStdInit(AXFX_REVERBSTD* rev) {
     return ret;
 }
 
+/** Frees the standard reverb's delay lines with interrupts disabled; always returns 1. */
 int AXFXReverbStdShutdown(AXFX_REVERBSTD* rev) {
     BOOL old;
 
@@ -482,6 +505,10 @@ int AXFXReverbStdShutdown(AXFX_REVERBSTD* rev) {
     return 1;
 }
 
+/**
+ * Applies changed parameters: pauses processing (tempDisableFX) while ReverbSTDModify rebuilds the delay lines,
+ * then resumes.
+ */
 int AXFXReverbStdSettings(AXFX_REVERBSTD* rev) {
 	int ret;
     BOOL old;
@@ -494,6 +521,10 @@ int AXFXReverbStdSettings(AXFX_REVERBSTD* rev) {
     return ret;
 }
 
+/**
+ * AX aux-bus callback: runs the standard reverb on the aux buffers for one audio frame
+ * unless a settings change has it paused.
+ */
 void AXFXReverbStdCallback(AXFX_BUFFERUPDATE* bufferUpdate, AXFX_REVERBSTD* reverb) {
     if (reverb->tempDisableFX == 0) {
         ReverbSTDCallback(bufferUpdate->left, bufferUpdate->right, bufferUpdate->surround, &reverb->rv);

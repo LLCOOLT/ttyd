@@ -1419,6 +1419,10 @@ NpcTerritoryInfo btl_muj_setup_no_tbl[] = {
     {0},
 };
 
+/**
+ * Battle background event for the beach stage: endlessly bobs the three wave layers (nami_1, nami_2, nami_3)
+ * with different periods and amplitudes through _wave_offset, so the sea moves behind the fight.
+ */
 EVT_BEGIN(bgset_muj_wave_event)
     SET_VALUE(LW(0), 0)
     SET_VALUE(LW(1), 0)
@@ -1437,11 +1441,18 @@ EVT_BEGIN(bgset_muj_wave_event)
     RETURN
 EVT_END()
 
+/** Battle background event that adds the sunlight_n64 effect (sunlight_bt) over the beach stage. */
 EVT_BEGIN(bgset_muj_sun_event)
     CALL(evt_eff64, STRING("sunlight_bt"), STRING("sunlight_n64"), 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     RETURN
 EVT_END()
 
+/**
+ * Script helper for bgset_muj_wave_event: moves the battle stage object named args[0] by a sine wave in x
+ * (period args[2], amplitude args[3]) and y (period args[5], amplitude args[6]);
+ * args[1] and args[4] are the script variables holding the two current steps,
+ * which it advances and wraps each call.
+ */
 static USER_FUNC(_wave_offset) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);

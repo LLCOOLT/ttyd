@@ -149,7 +149,7 @@ static int EdgeLeq( GLUtesselator *tess, ActiveRegion *reg1,
   return (t1 >= t2);
 }
 
-
+/** GLU tessellator sweep: removes an active region from the sweep-line dictionary and frees it. */
 static void DeleteRegion( GLUtesselator *tess, ActiveRegion *reg )
 {
   if( reg->fixUpperEdge ) {
@@ -178,7 +178,7 @@ static int FixUpperEdge( ActiveRegion *reg, GLUhalfEdge *newEdge )
 
   return 1;
 }
-
+// GLU sweep: finds the region above the top edge sharing reg's origin, fixing a ConnectRightVertex edge; NULL if OOM.
 static ActiveRegion *TopLeftRegion( ActiveRegion *reg )
 {
   GLUvertex *org = reg->eUp->Org;
@@ -200,7 +200,7 @@ static ActiveRegion *TopLeftRegion( ActiveRegion *reg )
   }
   return reg;
 }
-
+/** GLU tessellator sweep: finds the region above the topmost edge with the same destination as reg. */
 static ActiveRegion *TopRightRegion( ActiveRegion *reg )
 {
   GLUvertex *dst = reg->eUp->Dst;
@@ -236,7 +236,7 @@ static ActiveRegion *AddRegionBelow( GLUtesselator *tess,
   eNewUp->activeRegion = regNew;
   return regNew;
 }
-
+// GLU tessellator sweep: applies the gluTessProperty winding rule to winding number n; TRUE if the region is inside.
 static GLboolean IsWindingInside( GLUtesselator *tess, int n )
 {
   switch( tess->windingRule ) {
@@ -257,8 +257,8 @@ static GLboolean IsWindingInside( GLUtesselator *tess, int n )
   return GL_FALSE;  /* avoid compiler complaints */
 }
 
-
-
+/** GLU tessellator sweep: sets a region's winding number from the region above it plus its upper edge's winding, and
+ * its inside flag from the winding rule. */
 static void ComputeWinding( GLUtesselator *tess, ActiveRegion *reg )
 {
   reg->windingNumber = RegionAbove(reg)->windingNumber + reg->eUp->winding;
@@ -410,8 +410,8 @@ static void AddRightEdges( GLUtesselator *tess, ActiveRegion *regUp,
     WalkDirtyRegions( tess, regPrev );
   }
 }
-
-
+/** GLU tessellator sweep: asks the client's combine callback for the user data of new vertex isect; if it gives none,
+ * uses data[0] when not needed, else reports GLU_TESS_NEED_COMBINE_CALLBACK once and sets fatalError. */
 static void CallCombine( GLUtesselator *tess, GLUvertex *isect,
 			 void *data[4], GLfloat weights[4], int needed )
 {
@@ -1171,8 +1171,8 @@ static void InitEdgeDict( GLUtesselator *tess )
   AddSentinel( tess, -SENTINEL_COORD );
   AddSentinel( tess, SENTINEL_COORD );
 }
-
-
+/** GLU tessellator sweep: frees every region left in the sweep-line dictionary (only the two sentinels and at most one
+ * fixable edge should remain), then deletes the dictionary. */
 static void DoneEdgeDict( GLUtesselator *tess )
 {
   ActiveRegion *reg;
@@ -1258,7 +1258,7 @@ static int InitPriorityQ( GLUtesselator *tess )
   return 1;
 }
 
-
+/** GLU tessellator sweep: deletes the vertex priority queue. */
 static void DonePriorityQ( GLUtesselator *tess )
 {
   pqDeletePriorityQ( tess->pq ); /* __gl_pqSortDeletePriorityQ */

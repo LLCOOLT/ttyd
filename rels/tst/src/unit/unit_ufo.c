@@ -117,6 +117,10 @@ static BattleUnitKindPart parts[] = {
     {2, "おとしもの", "coin", 0.0f, -15.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x410000, 0, pose_table_2},
 };
 
+/**
+ * Init script of the test UFO: registers its wait,
+ * attack (empty) and damage scripts and the default confusion script and starts main_event alongside.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -126,11 +130,17 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Runs the UFO's whole fly-in, coin drop and fly-off sequence (btlevtcmd_UFOAction) until the UFO deletes itself. */
 static EVT_BEGIN(main_event)
     CALL(btlevtcmd_UFOAction)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction of the test UFO: plays the common damage reaction with the hurt pose.
+ * On the last hit of a move (damage flag 0x100) it first stops the UFO in place (btlevtcmd_UFODamageOn)
+ * and afterwards sends it flying away (btlevtcmd_UFOEscapeOn). The words after its RETURN are never reached.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -155,10 +165,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Attack script of the test UFO: does nothing; it never attacks. */
 static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait script of the test UFO: shows its idle pose (CAT_S_1) from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

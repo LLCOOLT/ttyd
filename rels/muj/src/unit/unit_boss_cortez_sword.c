@@ -202,6 +202,7 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_cortez_sword", "c_buki2", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x3010009, 0x7, pose_table},
 };
 
+/** Guess: init event of one of Cortez's floating swords: sets its work values, its slot and its home height. */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
@@ -217,6 +218,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Guess: damage event of a sword: runs the default damage reaction. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -224,6 +226,7 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Guess: event run when a sword touches a spiked attacker: plays its hurt reaction. */
 static EVT_BEGIN(avoid_thorn_event)
     CALL(btlevtcmd_GetHitPos, BTL_UNIT_SELF, 1, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 40)
@@ -232,6 +235,10 @@ static EVT_BEGIN(avoid_thorn_event)
     RETURN
 EVT_END()
 
+/**
+ * Works out the height a floating sword of Cortez's should hover at (LW(5)) from his mode (unit work 8 of the
+ * owner) and the sword's slot (unit work 2): each slot has its own spot around him.
+ */
 EVT_BEGIN(cortez_weapon_get_home_height)
     SET_VALUE(LW(5), 0)
     CALL(btlevtcmd_GetPos, LW(9), LW(0), LW(1), LW(2))
@@ -290,6 +297,10 @@ EVT_BEGIN(cortez_weapon_get_home_height)
     RETURN
 EVT_END()
 
+/**
+ * Sets the sword's hit-detection attribute on its body part according to its home height:
+ * a sword raised to 40 or higher gets part attributes 6291456 turned on, a lower one turns them off.
+ */
 EVT_BEGIN(cortez_weapon_set_formation_attribute)
     CALL(btlevtcmd_GetBodyId, LW(9), LW(0))
     CALL(btlevtcmd_GetHomePos, LW(9), EVT_NULLPTR, LW(1), EVT_NULLPTR)
@@ -301,6 +312,11 @@ EVT_BEGIN(cortez_weapon_set_formation_attribute)
     RETURN
 EVT_END()
 
+/**
+ * Phase event run in the unison phase (before the player's turn) for a sword:
+ * when Cortez is in mode 4 or later and the sword has no pending delay,
+ * it dives to the height for its slot and updates its home position.
+ */
 EVT_BEGIN(cortez_weapon_unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -335,6 +351,10 @@ EVT_BEGIN(cortez_weapon_unison_phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Per-turn phase event of a sword: counts its timer in unit work 1 down each turn and, when it reaches zero,
+ * it spins and swoops to attack (rotation sibling event), returning to its home spot afterwards.
+ */
 EVT_BEGIN(cortez_weapon_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -373,6 +393,10 @@ EVT_BEGIN(cortez_weapon_phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: attack event of a sword: it swings at one target, spinning,
+ * with the sword sounds and a hit for the weapon damage, then returns to its home spot.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -634,12 +658,17 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Guess: wait (idle) event of a sword: keeps its default idle pose. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeWaitPlayLoopTiming, BTL_UNIT_SELF, 1)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Guess: sub-event of a sword damage handling: applies the knock-back for a hit part,
+ * then continues in the default damage flow.
+ */
 static EVT_BEGIN(cortez_damage_sub_event)
     CALL(btlevtcmd_GetDamage, LW(10), LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -652,6 +681,11 @@ static EVT_BEGIN(cortez_damage_sub_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage event of a sword hit during Cortez's counter phase:
+ * flags the unit hit and, depending on the damage code, plays the knocked-back pose,
+ * runs the sword's data event and lets it fall under gravity.
+ */
 EVT_BEGIN(cortez_weapon_counter_damage_event)
     CALL(btlevtcmd_OnUnitFlag, LW(10), 1)
     SWITCH(LW(0))
@@ -687,10 +721,15 @@ EVT_BEGIN(cortez_weapon_counter_damage_event)
     RETURN
 EVT_END()
 
+/** Guess: death event of a sword: runs cortez_weapon_dead_event. */
 static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Death event of a sword: it falls to the stage floor with a clatter, bounces once, sets its home there,
+ * marks itself dead (unit work 1 = 2) and makes the body part untargetable.
+ */
 EVT_BEGIN(cortez_weapon_dead_event)
     CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 0, 0)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -718,6 +757,10 @@ EVT_BEGIN(cortez_weapon_dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Break event of a sword: tells its owner Cortez that this slot is gone (writes -1 into the owner's unit work
+ * for the sword's slot), so he no longer counts it.
+ */
 EVT_BEGIN(cortez_weapon_break_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_NOT_EQUAL(LW(0), -1)
@@ -742,6 +785,10 @@ EVT_BEGIN(cortez_weapon_break_event)
     RETURN
 EVT_END()
 
+/**
+ * Death event used when a sword is blown away: it spins at 20 degrees per frame
+ * and flies off the side of the stage; its coins and experience are stored for the player before it leaves.
+ */
 EVT_BEGIN(cortez_weapon_blow_dead_event)
     CALL(evt_snd_sfxon, STRING("SFX_BTL_CLAUD_BREATH3"), 0)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(0))

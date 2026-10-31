@@ -19,6 +19,10 @@ static BeroEntry bero_entry_data[5];
 extern EvtWord iri_12_kino_makkino_talk[];
 extern EvtWord iri_12_kino_talk[];
 
+/**
+ * Pushes Mario back when he tries to use the blocked pipe (oshimodo = push back):
+ * takes control, makes him leave the pipe, shows tik_06_01 and gives control back. Returns 0 in LW(0).
+ */
 static EVT_BEGIN(oshimodo_event)
     BEGIN_INLINE_EVENT
         CALL(evt_cam_ctrl_onoff, CAMERA_3D, 0)
@@ -104,6 +108,15 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Conversation of the Trouble Center request 12 (irai_12) with Kino (キーノ, a young Toad girl)
+ * and Makkino (マッキノ, a sailor).
+ * They both turn to Mario and talk (irai_12_001_3 to 5);
+ * if Makkino was the one spoken to (LW(0) = 1) he steps toward Mario first.
+ * Mario receives the Silver Card, Makkino says irai_12_001_6, both hop away to the right and vanish,
+ * the request is marked solved (GSWF_TROUBLE_12_SOLVED, play time saved in GSW_TIK06_TROUBLE12_TIME,
+ * GSW_TROUBLE_ACTIVE cleared) and sys_request_finish is shown.
+ */
 EVT_BEGIN(iri_12_kino_makkino_talk)
     CALL(evt_set_dir_to_target, STRING("キーノ"), STRING("mario"))
     CALL(evt_set_dir_to_target, STRING("マッキノ"), STRING("mario"))
@@ -171,6 +184,11 @@ EVT_BEGIN(iri_12_kino_makkino_talk)
     RETURN
 EVT_END()
 
+/**
+ * Interrupt (talk) script for Kino while Trouble request 12 is active.
+ * Before Makkino has arrived (GSWF_TROUBLE_WORK_2 = 0) it says irai_12_001_1 the first time
+ * and irai_12_001_2 afterwards; once Makkino stands beside her it starts the final conversation with LW(0) = 0.
+ */
 EVT_BEGIN(iri_12_kino_talk)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 12)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_2), 0)
@@ -188,12 +206,21 @@ EVT_BEGIN(iri_12_kino_talk)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of Makkino for Trouble Center request 12:
+ * runs the final conversation with LW(0) = 1, so Makkino steps toward Mario first.
+ */
 static EVT_BEGIN(iri_12_makkino_talk)
     SET_VALUE(LW(0), 1)
     CALL_CHILD(iri_12_kino_makkino_talk)
     RETURN
 EVT_END()
 
+/**
+ * Sets up Kino and Makkino while Trouble Center request 12 is active.
+ * Kino stands at (60, 0, -70) facing left (or right once Makkino has come);
+ * Makkino appears at (90, 0, -70) only after GSWF_TROUBLE_WORK_2 is set. Each gets a talk interrupt script.
+ */
 static EVT_BEGIN(iri_12_init)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 12)
         CALL(evt_npc_entry, STRING("キーノ"), STRING("c_kokinopio"))
@@ -220,6 +247,7 @@ static EVT_BEGIN(iri_12_init)
     RETURN
 EVT_END()
 
+/** Signboard script: says tik_06_02 with Mario's controls disabled. */
 static EVT_BEGIN(evt_kanban)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -228,6 +256,11 @@ static EVT_BEGIN(evt_kanban)
     RETURN
 EVT_END()
 
+/**
+ * Signboard script for the Pit of 100 Trials board:
+ * shows the player's records (deepest floor, Power Bounce record and the Star Pieces found there) in
+ * msg_jon_kanban_3.
+ */
 static EVT_BEGIN(evt_kanban2)
     CALL(evt_npc_stop_for_event)
     CALL(evt_mario_key_onoff, 0)
@@ -246,6 +279,11 @@ static EVT_BEGIN(evt_kanban2)
     RETURN
 EVT_END()
 
+/**
+ * Map init script of tik_06, the room in front of the Pit of 100 Trials.
+ * Starts the ambience (music only in the demo), sets up the exits and the Trouble request 12 characters,
+ * two signboards (one shows the Pit record: deepest floor and best times) and a Star Piece.
+ */
 EVT_BEGIN(tik_06_init_evt)
 #if VERSION <= VERSION_DEMO_US
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))

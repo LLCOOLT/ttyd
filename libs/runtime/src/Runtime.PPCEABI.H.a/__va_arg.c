@@ -6,6 +6,11 @@ typedef struct __va_list_struct {
     char* reg_save_area;
 } _va_list[1];
 
+/**
+ * Runtime helper behind va_arg for the EABI: returns the address of the next variadic argument of the given type
+ * (0 = struct passed by reference, 2 = 64-bit integer, 3 = double, otherwise a 32-bit word),
+ * taking it from the register save area while registers remain and from the overflow stack area after that.
+ */
 void* __va_arg(_va_list v_list, int type) {
     char* addr;
     char* reg = &(v_list->gpr);

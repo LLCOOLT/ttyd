@@ -18,6 +18,11 @@
 #include "rel_module.h"
 #include "driver/mapdrv.h"
 
+/**
+ * REL entry point: runs the static constructors,
+ * then registers each map's init script (las_00 .. las_30)
+ * and the area's battle setup tables with the REL loader.
+ */
 void _prolog(void) {
     voidfunctionptr* ctor;
 
@@ -58,6 +63,7 @@ void _prolog(void) {
     relSetBtlAddr("las", btlsetup_las_tbl, btl_las_setup_no_tbl);
 }
 
+/** REL exit point: runs the static destructors. */
 void _epilog(void) {
     voidfunctionptr* dtor;
 
@@ -66,9 +72,14 @@ void _epilog(void) {
     }
 }
 
+/** Stub the linker points unresolved relocations at; does nothing. */
 void _unresolved(void) {
 }
 
+/**
+ * Script helper: sets the evt colour override of the map object named args[0] to the RGB in args[1..3] (alpha
+ * 255) and turns the override on. Used to fade treasure chests in from black.
+ */
 static USER_FUNC(mobj_set_color) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -82,6 +93,7 @@ static USER_FUNC(mobj_set_color) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: turns off the evt colour override of the map object named args[0]. */
 static USER_FUNC(mobj_color_off) {
     MapObjectEntry* mobj = mobjNameToPtr((const char*)evtGetValue(event, event->args[0]));
 
@@ -89,6 +101,7 @@ static USER_FUNC(mobj_color_off) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: sets the Y rotation (degrees) of the map object named args[0] to args[1]. */
 static USER_FUNC(mobj_set_ry) {
     EvtWord* args = event->args;
     MapObjectEntry* mobj = mobjNameToPtr((const char*)evtGetValue(event, args[0]));
@@ -97,6 +110,10 @@ static USER_FUNC(mobj_set_ry) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Event script: a treasure chest rises out of the floor in a puff of mist. LW(0) is the chest's map object name.
+ * The chest spins and climbs 30 units over 3 seconds while mist effects play, then fades in from black.
+ */
 EVT_BEGIN(box_syutugen)
     SET_VALUE(LW(2), LW(0))
     CALL(evt_mobj_get_position, LW(2), LW(3), LW(4), LW(5))
@@ -149,6 +166,10 @@ EVT_BEGIN(box_syutugen)
     RETURN
 EVT_END()
 
+/**
+ * Event script: a floor platform (map object LW(0), hit object LW(1)) rises 100 units out of the floor,
+ * waits LW(2) milliseconds, then sinks back and hides again.
+ */
 EVT_BEGIN(move_dai)
     SET_VALUE(LW(7), LW(0))
     SET_VALUE(LW(8), LW(1))
@@ -186,6 +207,10 @@ EVT_BEGIN(move_dai)
     RETURN
 EVT_END()
 
+/**
+ * Event script: forever picks one of the six "hikari_0x" light animations of the map at random and plays it,
+ * waiting for each to finish.
+ */
 EVT_BEGIN(hikari_evt)
     LOOP(0)
         CALL(evt_sub_random, 5, LW(0))

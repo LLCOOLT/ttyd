@@ -45,12 +45,20 @@ extern EvtWord nisemario_init[];
 static NpcSetupInfo npcEnt[7];
 extern EvtWord jin_04_jumpstand[];
 
+/**
+ * Door animation callback: closes door00 as Mario arrives through s_bero (from jin_00);
+ * LW(0) is the door angle and the door turns around Y by 0.44 times it.
+ */
 static EVT_BEGIN(s_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door00"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback: opens door00 as Mario leaves through s_bero (to jin_00);
+ * LW(0) is the door angle and the door turns around Y by 0.44 times it, negated.
+ */
 static EVT_BEGIN(s_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door00"), 0, LW(0), 0)
@@ -79,6 +87,12 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Doopliss' entrance (case script when Mario steps on the floor, before the first Doopliss battle):
+ * Doopliss (Rampell in the scripts) is on the stairs, speaks with Mario and Goombella, jumps down to Mario,
+ * and the first Doopliss battle starts.
+ * Afterwards the Mario-swap scene (irekawatta_mario) runs and the story becomes "Doopliss battle".
+ */
 EVT_BEGIN(ranperu_toujou)
     CALL(evt_mario_normalize)
     WAIT_MS(500)
@@ -168,12 +182,21 @@ EVT_BEGIN(ranperu_toujou)
     RETURN
 EVT_END()
 
+/**
+ * Plays the Star Stone jump sound at the Ruby Star's position;
+ * used for each bounce as Doopliss tosses the Ruby Star.
+ */
 EVT_BEGIN(starstone_jump_se)
     CALL(evt_item_get_position, STRING("rubystar"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_STARSTONE_JUMP1"), LW(0), LW(1), LW(2), 0)
     RETURN
 EVT_END()
 
+/**
+ * Sets the stage for the Mario-and-Doopliss swap:
+ * Mario's partner stops, the shadow-Mario tint comes on,
+ * Doopliss is moved off screen and the fake Mario NPC takes his place at (-8, 670, 41), Mario at (80, 670, 50).
+ */
 EVT_BEGIN(irekawatta_mario_init)
     CALL(evt_party_stop, 0)
     CALL(evt_kagemario_change, 1)
@@ -191,6 +214,13 @@ EVT_BEGIN(irekawatta_mario_init)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene after Doopliss wins the first battle:
+ * Mario spins to the floor, the Ruby Star bounces away on Doopliss' head,
+ * Doopliss takes Mario's shape and the fake Mario sends the partners away (they leave the party),
+ * Mario is left as a shadow. Ends with GSWF_STG4_MARIO_IS_SHADOW set and the story at "Trading Places".
+ * Also entered directly (LW(0) = 1) when the map is re-entered at the "Doopliss battle" step.
+ */
 EVT_BEGIN(irekawatta_mario)
     IF_INT_EQUAL(LW(0), 1)
         GOTO(100)
@@ -339,6 +369,7 @@ EVT_BEGIN(irekawatta_mario)
     RETURN
 EVT_END()
 
+/** Re-creates the Yoshi NPC with the sprite of the player's chosen Yoshi colour (c_babyyoshi to c_babyyoshi7). */
 EVT_BEGIN(yoshi_color)
     CALL(evt_npc_delete, STRING("ヨッシー"))
     CALL(getYoshiColor, LW(0))
@@ -365,6 +396,12 @@ EVT_BEGIN(yoshi_color)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene on stepping onto the floor at the "Name Guessing" story step:
+ * Mario's partners (Goombella, Koops, Flurrie, Yoshi) stand around the fake Mario, who taunts them;
+ * Vivian is told to go away, then Mario fights the fake Mario (the second Doopliss battle)
+ * and the story becomes "Doopliss battle 2".
+ */
 EVT_BEGIN(ranperu_lastbattle)
     CALL(evt_npc_set_position, STRING("ランペル"), 0, -1000, 0)
     CALL(evt_mario_key_onoff, 0)
@@ -456,6 +493,10 @@ EVT_BEGIN(ranperu_lastbattle)
     RETURN
 EVT_END()
 
+/**
+ * Sets the stage after the second battle: positions the fake Mario, Doopliss and the partners in a row,
+ * puts Vivian's poses back to normal and Mario and his partner at the left.
+ */
 EVT_BEGIN(hontonosugata_mario_init)
     CALL(evt_jin_vivian_pose_set, 1, STRING("PTR_S_1"))
     CALL(evt_jin_vivian_pose_set, 7, STRING("PTR_T_1"))
@@ -485,6 +526,12 @@ EVT_BEGIN(hontonosugata_mario_init)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene after the second Doopliss battle: Doopliss is beaten, the Ruby Star hops to Mario,
+ * Mario's real shape returns (the shadow tint goes off), Doopliss runs away, the partners cheer,
+ * Vivian takes the Ruby Star and brings it back and the partners rejoin.
+ * The story advances to "The Ruby Star" and the Star Stone cutscene (evt_sub_starstone) plays.
+ */
 EVT_BEGIN(hontonosugata_mario)
     CALL_CHILD(hontonosugata_mario_init)
     CALL(evt_item_entry, STRING("rubystar"), ITEM_RUBY_STAR, 0, -1000, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
@@ -734,6 +781,10 @@ EVT_BEGIN(hontonosugata_mario)
     RETURN
 EVT_END()
 
+/**
+ * Init script of Doopliss (Rampell): stands at (110, 695, -85) before the first battle,
+ * afterwards parked off screen.
+ */
 EVT_BEGIN(ranperu_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG4_10_DOOPLISS_BATTLE)
@@ -744,6 +795,10 @@ EVT_BEGIN(ranperu_init)
     RETURN
 EVT_END()
 
+/**
+ * Init script of the fake Mario: stands at (-8, 670, 81) during the "Doopliss battle" step,
+ * otherwise parked off screen.
+ */
 EVT_BEGIN(nisemario_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG4_10_DOOPLISS_BATTLE)
@@ -816,6 +871,11 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Script for the red jump stand (mobj_jump): Mario and his partner are launched up onto the ledge,
+ * landing at (-75, 670, 50) on the first use (the partner jumps along when it can)
+ * and at (-30, 450, 110) on the second form of the stand's effect.
+ */
 EVT_BEGIN(jin_04_jumpstand)
     IF_INT_EQUAL(LW(0), 0)
         SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -882,6 +942,11 @@ EVT_BEGIN(jin_04_jumpstand)
     RETURN
 EVT_END()
 
+/**
+ * Creepy Steeple jin_04 map init: sets the music for the story step, the shadow-Mario tint, the exit to jin_00,
+ * the recovery block and the red jump stand, and sets up the Doopliss
+ * and fake-Mario scenes depending on the story progress.
+ */
 EVT_BEGIN(jin_04_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG4_10_DOOPLISS_BATTLE)
@@ -930,11 +995,13 @@ EVT_BEGIN(jin_04_init_evt)
     RETURN
 EVT_END()
 
+/** Script helper: returns the colour index of the player's Yoshi in args[0]. */
 static USER_FUNC(getYoshiColor) {
     EvtWord* args = event->args;
     evtSetValue(event, args[0], pouchGetPartyColor(4));
     return EVT_RETURN_DONE;
 }
+/** Script helper: sets a flag in Vivian's party data so she is treated as having left the party. */
 static USER_FUNC(vivian_away) {
     pouchGetPtr()->partyData[6].flags |= 2;
     return EVT_RETURN_DONE;

@@ -64,12 +64,20 @@ static ShopDb trade_list[13];
 static ShopperData35 shopper_data;
 static KinopioData kino_dt;
 
+/**
+ * Door callback for the inn door (ie1): LW(0) is the opening angle;
+ * scales it by 0.444 and turns S_ie1_door around the Y axis.
+ */
 EVT_BEGIN(evt_ie1_door_1)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie1_door"), FLOAT(0.0f), LW(0), FLOAT(0.0f))
     RETURN
 EVT_END()
 
+/**
+ * Door callback for the inn: LW(0) is the door angle;
+ * scales and negates it to tilt the front wall object S_ie1_kai out of the way.
+ */
 EVT_BEGIN(evt_ie1_wall)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.6660156f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie1_kai"), FLOAT(0.0f), FLOAT(0.0f), LW(0))
@@ -81,6 +89,10 @@ const char* ie1_npc[] = {
     NULL,
 };
 
+/**
+ * Runs when the inn door opens: dips the music and ambience to half
+ * and muffles the ambience with a low-pass filter.
+ */
 EVT_BEGIN(evt_ie1_door_open)
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
@@ -88,6 +100,7 @@ EVT_BEGIN(evt_ie1_door_open)
     RETURN
 EVT_END()
 
+/** Runs when the inn door closes: brings the music and ambience back to full volume and removes the low-pass filter. */
 EVT_BEGIN(evt_ie1_door_close)
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
@@ -115,12 +128,20 @@ DoorParam ie1_door = {
     evt_ie1_door_close, // evtClose
 };
 
+/**
+ * Door callback for the shop door (ie2): LW(0) is the opening angle;
+ * scales it and turns S_ie2_door around the Y axis.
+ */
 EVT_BEGIN(evt_ie2_door_1)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie2_door"), FLOAT(0.0f), LW(0), FLOAT(0.0f))
     RETURN
 EVT_END()
 
+/**
+ * Door callback for the shop: LW(0) is the door angle;
+ * scales and negates it to tilt the front wall object S_ie2_kai.
+ */
 EVT_BEGIN(evt_ie2_wall)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie2_kai"), FLOAT(0.0f), FLOAT(0.0f), LW(0))
@@ -132,6 +153,10 @@ const char* ie2_npc[] = {
     NULL,
 };
 
+/**
+ * Runs when the shop door opens: dips the music and ambience to half
+ * and muffles the ambience with a low-pass filter.
+ */
 EVT_BEGIN(evt_ie2_door_open)
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
@@ -139,6 +164,10 @@ EVT_BEGIN(evt_ie2_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Runs when the shop door closes: brings the music and ambience back to full volume
+ * and removes the low-pass filter.
+ */
 EVT_BEGIN(evt_ie2_door_close)
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
@@ -166,18 +195,27 @@ DoorParam ie2_door = {
     evt_ie2_door_close, // evtClose
 };
 
+/**
+ * Door callback for the third house's inside swing (ie3, General White's house): LW(0) is the opening angle;
+ * scales it and turns S_ie3_door around the Y axis.
+ */
 EVT_BEGIN(evt_ie3_door_1)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie3_door"), FLOAT(0.0f), LW(0), FLOAT(0.0f))
     RETURN
 EVT_END()
 
+/** Door callback for the third house's outside swing: LW(0) is the angle, halved and applied to S_ie3_door. */
 EVT_BEGIN(evt_ie3_door_2)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie3_door"), FLOAT(0.0f), FLOAT(0.0f), LW(0))
     RETURN
 EVT_END()
 
+/**
+ * Door callback for the third house: LW(0) is the door angle;
+ * scales and negates it to tilt the front wall object S_ie3_kai.
+ */
 EVT_BEGIN(evt_ie3_wall)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie3_kai"), FLOAT(0.0f), FLOAT(0.0f), LW(0))
@@ -190,6 +228,10 @@ const char* ie3_npc[] = {
     NULL,
 };
 
+/**
+ * Runs when the third house's door opens: dips the music and ambience to half
+ * and muffles the ambience with a low-pass filter.
+ */
 EVT_BEGIN(evt_ie3_door_open)
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
@@ -197,6 +239,10 @@ EVT_BEGIN(evt_ie3_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Runs when the third house's door closes: brings the music and ambience back to full volume
+ * and removes the low-pass filter.
+ */
 EVT_BEGIN(evt_ie3_door_close)
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
@@ -250,6 +296,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Puts the current partner into its "kime" pose (the Y_1 pose of Goombella, Koops, Flurrie, Yoshi, Vivian,
+ * Bobbery or Ms. Mowz, chosen by evt_mario_get_party); used for the cannon-approval gesture.
+ */
 static EVT_BEGIN(evt_kime_pose)
     CALL(evt_mario_get_party, LW(0))
     SWITCH(LW(0))
@@ -272,6 +322,12 @@ static EVT_BEGIN(evt_kime_pose)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene at the inn when the cannon is back online:
+ * the camera pans in, the mayor speaks stg7_bom_60 to 62,
+ * Mario and the partner gesture (hand-up voice, partner kime pose and stg7_bom_60_2),
+ * the mayor hops away and the story progress is set to STORY_STG7_04_BACK_ONLINE.
+ */
 static EVT_BEGIN(evt_taihou)
     CALL(evt_cam3d_evt_set, 140, 100, 593, 140, 40, 248, 500, 11)
     BEGIN_INLINE_EVENT
@@ -324,6 +380,12 @@ static EVT_BEGIN(evt_taihou)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene played from the mayor's talk script:
+ * the first time, General White opens his door, comes out and speaks (stg7_bom_39 to 41),
+ * then walks back to his bed at (380, 45, -150) and lies down; GSWF_BOM02_WHITE_SEEN_IN_TOWN is set.
+ * Afterwards the mayor just repeats a line.
+ */
 EVT_BEGIN(urotuku_white)
     IF_INT_EQUAL(GSWF(GSWF_BOM02_WHITE_SEEN_IN_TOWN), 1)
         CALL(evt_msg_print, 0, STRING("stg7_bom_41_01"), 0, STRING("me"))
@@ -385,6 +447,7 @@ EVT_BEGIN(urotuku_white)
     RETURN
 EVT_END()
 
+/** Init of the mayor (村長): before STORY_STG7_04_BACK_ONLINE he stands at (120, 0, 265). */
 static EVT_BEGIN(init_soncho)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG7_04_BACK_ONLINE)
@@ -393,6 +456,14 @@ static EVT_BEGIN(init_soncho)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the mayor in the east village: before STORY_STG6_71_01 stg7_bom_20_00;
+ * before STORY_STG7_02_MAYOR_BOB the first conversation (stg7_bom_20 to 33,
+ * which ends by setting STORY_STG7_02_MAYOR_BOB, with the partner answering);
+ * then he talks about General White and the cannon (stg7_bom_34 onward,
+ * depending on GSWF_PIK00_GOLDBOB_CANNON_APPROVAL and GSWF_BOM02_GENERAL_WHITE_WOKEN)
+ * until the cannon story point.
+ */
 static EVT_BEGIN(talk_soncho)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_INTANGIBLE)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -520,10 +591,15 @@ static EVT_BEGIN(talk_soncho)
     RETURN
 EVT_END()
 
+/** Init of villager E in the east village: nothing to set up. */
 static EVT_BEGIN(init_murabito_e)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of villager E: the Trouble Center job 30 request text (irai_30_001 to 003)
+ * while that job is active, with a short walk-up of Mario and the partner.
+ */
 static EVT_BEGIN(talk_murabito_e)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 30)
 #if VERSION >= VERSION_US
@@ -628,10 +704,16 @@ static EVT_BEGIN(talk_murabito_e)
     RETURN
 EVT_END()
 
+/** Init of villager F in the east village: nothing to set up. */
 static EVT_BEGIN(init_murabito_f)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of villager F: stg7_bom_12_00 before STORY_STG6_71_01,
+ * stg7_bom_12 and 12_1 until the cannon is back online and ready,
+ * stg7_bom_13 until the end of the chapter 8 battle and stg7_bom_13_1 afterwards.
+ */
 static EVT_BEGIN(talk_murabito_f)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_71_01)
@@ -648,6 +730,10 @@ static EVT_BEGIN(talk_murabito_f)
     RETURN
 EVT_END()
 
+/**
+ * Init of villager G: while Trouble Center job 25 (the search for General White) is active he stands at (270,
+ * 30, -180) facing east.
+ */
 static EVT_BEGIN(init_murabito_g)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 25)
         CALL(evt_npc_set_position, STRING("me"), 270, 30, -180)
@@ -657,6 +743,10 @@ static EVT_BEGIN(init_murabito_g)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of villager G: during job 25 he gives the hints irai_25_00
+ * and 25_01 (setting the trouble work flags); otherwise his story-dependent remarks stg7_bom_14_00 to 15_1.
+ */
 static EVT_BEGIN(talk_murabito_g)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 25)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_BASE), 1)
@@ -688,6 +778,7 @@ static EVT_BEGIN(talk_murabito_g)
     RETURN
 EVT_END()
 
+/** Init of villager H in the east village: nothing to set up. */
 static EVT_BEGIN(init_murabito_h)
     RETURN
 EVT_END()
@@ -696,6 +787,11 @@ s32 iri_26_item_tbl[] = {
     ITEM_HONEY_CANDY, -1,
 };
 
+/**
+ * Talk script of villager H: for Trouble Center job 26 (a Honey Candy request) he asks for the candy with
+ * irai_26_01 to 04 and an item menu; handing it in removes it, he jumps three times for joy, gives 20 coins,
+ * records the completion time and marks GSWF_TROUBLE_26_SOLVED; otherwise Guess: story-dependent remarks.
+ */
 static EVT_BEGIN(talk_murabito_h)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 26)
         CALL(evt_pouch_check_item, ITEM_HONEY_CANDY, LW(0))
@@ -746,10 +842,15 @@ static EVT_BEGIN(talk_murabito_h)
     RETURN
 EVT_END()
 
+/** Init of villager I in the east village: nothing to set up. */
 static EVT_BEGIN(init_murabito_i)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of villager I: stg7_bom_18_00 before STORY_STG6_71_01, stg7_bom_18 and 18_1 until the cannon,
+ * stg7_bom_19 until the end of the chapter 8 battle and stg7_bom_19_1 afterwards.
+ */
 static EVT_BEGIN(talk_murabito_i)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_71_01)
@@ -766,15 +867,26 @@ static EVT_BEGIN(talk_murabito_i)
     RETURN
 EVT_END()
 
+/** Init for the shop clerk: places the clerk at (125, 30, -450). */
 EVT_BEGIN(init_tenin)
     CALL(evt_npc_set_position, STRING("me"), 125, 30, -450)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for the shop clerk: empty; the shop menu itself is handled by the shop system registered in the
+ * map init.
+ */
 EVT_BEGIN(talk_tenin)
     RETURN
 EVT_END()
 
+/**
+ * Init of General White (ホワイト): during Trouble Center job 25 (work flag 4 set, 6 not) he is placed at (380, 45,
+ * -150) facing west and either idles as a talking NPC (work flag 5) or lies in pose N_1 with a narrow width
+ * and no talk script; the same bed placement is used when GSWF_STG7_WHITE_TWILIGHT_HINT is set
+ * and GSWF_BOM02_GENERAL_WHITE_WOKEN is not.
+ */
 static EVT_BEGIN(init_white)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 25)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_4), 1)
@@ -804,6 +916,11 @@ static EVT_BEGIN(init_white)
     RETURN
 EVT_END()
 
+/**
+ * One hop of Mario onto General White's bed: Mario jumps to White's position with a "nice" rating effect
+ * and stars, shakes the camera, then jumps down beside the bed at (335, 30, -130).
+ * White is made intangible during the hop.
+ */
 EVT_BEGIN(mario_jump)
     CALL(evt_mario_cam_keep_on)
     CALL(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
@@ -868,6 +985,10 @@ s32 iri_25_item_tbl[] = {
     ITEM_PACKAGE, -1,
 };
 
+/**
+ * Talk script of General White: in Trouble Center job 25 Mario hands him the package (ITEM_PACKAGE, chosen
+ * through a menu) and he runs off with it (irai_25_18 and 25_19); otherwise Guess: story-dependent remarks.
+ */
 static EVT_BEGIN(talk_white)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 25)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_4), 1)
@@ -912,6 +1033,12 @@ static EVT_BEGIN(talk_white)
     RETURN
 EVT_END()
 
+/**
+ * Trouble Center job 25 (the package for White):
+ * the player is asked repeatedly whether to keep jumping on White's bed;
+ * after eleven hops General White wakes (irai_25_14 to 17) and
+ * then takes the package via talk_white (GSWF_TROUBLE_WORK_5). Saying no ends it early.
+ */
 EVT_BEGIN(iri_25_white_bed)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -1036,6 +1163,12 @@ EVT_BEGIN(iri_25_white_bed)
     RETURN
 EVT_END()
 
+/**
+ * Story version of the bed scene: Mario is asked whether to bounce on General White's bed,
+ * and keeps jumping while the player agrees (stg7_bom_44 to 53).
+ * When he finally wakes (stg7_bom_55 onwards) White talks with Mario and leaves for the cannon;
+ * answering no at any prompt gives up (stg7_bom_54).
+ */
 EVT_BEGIN(evt_white_bed)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -1201,6 +1334,10 @@ EVT_BEGIN(evt_white_bed)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the dandy (キザ野郎): stg7_bom_19_01 before STORY_STG7_02_MAYOR_BOB,
+ * stg7_bom_19_02 before STORY_STG7_04_BACK_ONLINE, stg7_bom_19_03 afterwards.
+ */
 static EVT_BEGIN(kiza_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG7_02_MAYOR_BOB)
@@ -1213,6 +1350,10 @@ static EVT_BEGIN(kiza_talk)
     RETURN
 EVT_END()
 
+/**
+ * Spawns the dandy (キザ野郎, model c_kiza) at (-190, 5, -130) facing east with movement and talk animations
+ * and the talk script kiza_talk.
+ */
 static EVT_BEGIN(kiza_entry)
     CALL(evt_npc_entry, STRING("キザ野郎"), STRING("c_kiza"))
     CALL(evt_npc_set_tribe, STRING("キザ野郎"), STRING("キザ野郎"))
@@ -1364,7 +1505,7 @@ static ShopperData35 shopper_data = {
 };
 
 #if VERSION == VERSION_EU
-// PAL: the NICE / GOOD letters of Mario's jumps on White are drawn at 5/7 size
+/** PAL: the NICE / GOOD letters of Mario's jumps on White are drawn at 5/7 size */
 static USER_FUNC(nice_effect_shrink) {
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
 
@@ -1373,6 +1514,10 @@ static USER_FUNC(nice_effect_shrink) {
 }
 #endif
 
+/**
+ * Script helper: args[0] is a float Z offset; builds a look-at matrix from (0, 100, 100+z)
+ * and hands it to the darkness effect (envSetYamiView) as its view.
+ */
 static USER_FUNC(yami_view) {
     f32 z = evtGetFloat(event, event->args[0]);
     Mtx mtx;
@@ -1382,6 +1527,11 @@ static USER_FUNC(yami_view) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Chapter 8 "world of darkness" scene: Mario and the partner are parked off-stage,
+ * the mayor and three villagers (ボムヘイE, F, G) are placed in the darkened village (envSetYami tint),
+ * the mayor speaks stg8_dark_08 and the map changes to las_26 at the sekai_yami2 entrance.
+ */
 static EVT_BEGIN(sekai_yami_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -1526,6 +1676,11 @@ static EVT_BEGIN(sekai_yami_evt)
     RETURN
 EVT_END()
 
+/**
+ * Chapter 8 finale scene "everyone's voices" in the darkened village:
+ * ボムヘイE speaks stg8_las_148_63 and the mayor stg8_las_148_64,
+ * then the map changes to bom_01 at the minnnanokoe entrance.
+ */
 static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -1588,6 +1743,13 @@ static KinopioData kino_dt = {
     NULL, NULL, // toBedEvt..fromBedEvt
 };
 
+/**
+ * Init script of bom_02, the east part of Fahr Outpost:
+ * music and ambience, snow, NPCs, the three houses (inn, shop, White's),
+ * the shop and the Toad inn (Kinopio) setup, wind vanes, Star Piece, Shine Sprite block and save block,
+ * the cutscenes for the Chapter 8 finale ("sekai_yami2" and "minnnanokoe"),
+ * and the bed events for White (story and Trouble Center job 25).
+ */
 EVT_BEGIN(bom_02_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -1680,6 +1842,10 @@ EVT_BEGIN(bom_02_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0] is an NPC name and args[1] picks a TEV callback slot (low four bits);
+ * turns that callback on in the NPC's animation materials. Does nothing if the NPC does not exist.
+ */
 static USER_FUNC(anim_tevcallback) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1693,6 +1859,10 @@ static USER_FUNC(anim_tevcallback) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: like anim_tevcallback but for a map object (map object name in args[0], slot in args[1]);
+ * the object must exist.
+ */
 static USER_FUNC(anim_tevcallback_mobj) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);

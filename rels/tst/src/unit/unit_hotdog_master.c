@@ -104,6 +104,11 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_teresa", "c_mario", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
+/**
+ * Init script of the hotdog_master placeholder: installs only the wait handler and starts the wait event;
+ * the unit has no attack or damage handlers of its own.
+ * The script is followed by stray end-script opcodes and RETURNs.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -116,6 +121,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

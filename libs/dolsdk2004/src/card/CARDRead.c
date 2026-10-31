@@ -7,6 +7,11 @@
 // prototypes
 static void ReadCallback(s32 chan, s32 result);
 
+/**
+ * Prepares a file access: claims the channel, checks the range against the file's length (LIMIT),
+ * and moves the file handle's offset and block along the FAT chain to the sector holding 'offset'.
+ * Returns the control block through 'pcard'.
+ */
 s32 __CARDSeek(CARDFileInfo* fileInfo, s32 length, s32 offset, CARDControl** pcard) {
     CARDControl* card;
     CARDDir* dir;
@@ -58,6 +63,10 @@ s32 __CARDSeek(CARDFileInfo* fileInfo, s32 length, s32 offset, CARDControl** pca
     return CARD_RESULT_READY;
 }
 
+/**
+ * Completion callback for each sector-sized piece of a file read:
+ * stops with CANCELED if cancelled, otherwise follows the FAT to the next block and reads the next piece.
+ */
 static void ReadCallback(s32 chan, s32 result) {
     CARDControl* card;
     CARDCallback callback;
@@ -107,6 +116,11 @@ error:
     callback(chan, result);
 }
 
+/**
+ * Reads 'length' bytes at 'offset' of an open file into 'buf'; both must be multiples of 512.
+ * Needs read permission and invalidates the destination in the data cache. Reads one sector at a time.
+ * Completes through the callback.
+ */
 s32 CARDReadAsync(CARDFileInfo* fileInfo, void* buf, s32 length, s32 offset, CARDCallback callback) {
     CARDControl* card;
     s32 result;
@@ -141,6 +155,7 @@ s32 CARDReadAsync(CARDFileInfo* fileInfo, void* buf, s32 length, s32 offset, CAR
     return result;
 }
 
+/** Blocking CARDReadAsync; how a game loads its save data. */
 s32 CARDRead(CARDFileInfo* fileInfo, void* buf, s32 length, s32 offset) {
     s32 result = CARDReadAsync(fileInfo, buf, length, offset, __CARDSyncCallback);
     if (result < 0) {
@@ -150,6 +165,10 @@ s32 CARDRead(CARDFileInfo* fileInfo, void* buf, s32 length, s32 offset) {
     return __CARDSync(fileInfo->chan);
 }
 
+/**
+ * Cancels the transfer running on the file handle by setting its remaining length to -1 (the next sector step
+ * reports CANCELED). Returns CANCELED if a transfer was in progress.
+ */
 s32 CARDCancel(CARDFileInfo* fileInfo) {
     BOOL enabled;
     s32 result;

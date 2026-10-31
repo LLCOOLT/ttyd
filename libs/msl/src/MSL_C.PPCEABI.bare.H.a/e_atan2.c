@@ -8,6 +8,7 @@ pi_o_2 = 1.5707963267948965580E+00,
 pi = 3.1415926535897931160E+00,
 pi_lo = 1.2246467991473531772E-16;
 
+/** Four-quadrant arc tangent of y/x in radians (fdlibm), with the IEEE special cases for zeros and infinities. */
 double __ieee754_atan2(double y, double x) {
     double z;
     int k, m, hx, hy, ix, iy;

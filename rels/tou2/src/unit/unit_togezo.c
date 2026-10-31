@@ -241,6 +241,10 @@ static BattleWeapon weapon_togezo_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init script of the Spiny: registers the wait, attack, damage and confusion handlers,
+ * clears unit work 0 (guarding) and 3, sets the run, walk and jump sounds and starts the idle event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -255,6 +259,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs when an attack on the Spiny is stopped by its spikes:
+ * after 30 frames it plays the toge_flush spark effect above the Spiny, 35,
+ * 45 or 25 units up depending on statuses 10 and 11 (Guess: the size-change statuses).
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -275,6 +284,10 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction: runs the default damage handling (btldefaultevt_Damage) with LW(10) = -2 (the unit itself)
+ * and LW(11) = 1.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -282,6 +295,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Flips the Spiny onto its back: it switches to the upside-down defence, status and pose tables,
+ * sets the flipped status flag with a flipped-over counter of 1 turn,
+ * turns off the counter attributes 1 and 4 of its body and plays SFX_CONDITION_INSIDE as it bounces.
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -303,6 +321,12 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Run while the Spiny is on its back: it counts the flipped-over counter down and, while it is still nonzero,
+ * just goes back to idling.
+ * At zero it restores the normal defence, status and pose tables,
+ * turns the counter attributes back on and hops back onto its feet.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -329,6 +353,11 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * The Spiny's action: it wakes up first if it is on its back; otherwise it uses an item if it has one;
+ * if guarding (unit work 0 = 1) it uncurls (guard_cancel_event);
+ * otherwise it either rolls into the target (normal_attack_event) or curls up to guard (guard_event), 50% each.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -362,6 +391,13 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Spiny's rolling attack: it picks a target, curls into a ball (TGZ_P_1),
+ * spins toward it with SFX_ENM_TOGEZO_ROLL1 to 5, and either misses or rams it,
+ * with the action-command defence applied; afterwards it bounces off (SFX_ENM_TOGEZO_JUMP1),
+ * and with a 30% chance it ends the move curled up in guard (unit work 0 = 1),
+ * otherwise it uncurls (TGZ_S_1) and returns.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -585,6 +621,11 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Spiny curls into a spinning ball to guard (SFX_ENM_TOGEZO_TURN1, pose TGZ_P_1):
+ * it takes the guarding defence, status and pose tables and data table,
+ * turns off its body part attribute 4096 and sets unit work 0 to 1.
+ */
 static EVT_BEGIN(guard_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -612,6 +653,11 @@ static EVT_BEGIN(guard_event)
     RETURN
 EVT_END()
 
+/**
+ * The Spiny uncurls from its guard (SFX_ENM_TOGEZO_TURN2, pose TGZ_S_1):
+ * it restores the normal defence, status and pose tables and data table,
+ * turns the body part attribute 4096 back on and clears unit work 0.
+ */
 static EVT_BEGIN(guard_cancel_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -638,6 +684,7 @@ static EVT_BEGIN(guard_cancel_event)
     RETURN
 EVT_END()
 
+/** Idle event: sets the unit's body part 1 to the pose given by its pose table for its current state. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

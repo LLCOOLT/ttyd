@@ -44,17 +44,22 @@ const char* systemStrippedPool0(void) {
 }
 #endif
 
+/** Returns the root directory for the game's disc file paths: "." (the disc root). */
 const char* getMarioStDvdRoot(void) {
     return ".";
 }
 
 #if VERSION == VERSION_EU
-// PAL keeps the assertion helpers that JP and US strip
+/** PAL keeps the assertion helpers that JP and US strip */
 BOOL __assert(const char* filename, s32 line, const char* assertion) {
     OSPanic(filename, line, assertion);
     return TRUE;
 }
 
+/**
+ * PAL only: assertion failure with a printf-style message;
+ * formats it and halts with OSPanic, reporting file and line.
+ */
 BOOL __assert2(const char* filename, s32 line, const char* assertion, const char* message, ...) {
     char buf[1024];
     va_list args;
@@ -66,6 +71,7 @@ BOOL __assert2(const char* filename, s32 line, const char* assertion, const char
 }
 #endif
 
+/** Wraps an angle in degrees into [0, 360); NaN becomes 0. */
 f32 reviseAngle(f32 angle) {
     f32 result, temp;
 
@@ -85,6 +91,7 @@ f32 reviseAngle(f32 angle) {
     return result;
 }
 
+/** Returns the 2D distance between (x1, y1) and (x2, y2). */
 f32 distABf(f32 x1, f32 y1, f32 x2, f32 y2) {
     f32 xdiff, ydiff;
 
@@ -93,6 +100,7 @@ f32 distABf(f32 x1, f32 y1, f32 x2, f32 y2) {
     return sqrtf((xdiff * xdiff) + (ydiff * ydiff));
 }
 
+/** Returns the signed shortest turn in degrees from angle1 to angle2 (within -180..180). */
 f32 compAngle(f32 angle1, f32 angle2) {
     if (fabsf(angle2 - angle1) >= 180.0f) {
         if (angle2 < angle1) {
@@ -104,6 +112,11 @@ f32 compAngle(f32 angle1, f32 angle2) {
     return angle2 - angle1;
 }
 
+/**
+ * Returns the direction in degrees from (x1, y1) to (x2, y2) in the game's convention (0 toward -y,
+ * 90 toward +x; on the field the second axis is z),
+ * computed with an arctangent correction table instead of atan2.
+ */
 f32 angleABf(f32 x1, f32 y1, f32 x2, f32 y2) {
     f32 xdiff, ydiff;
     f32 xabs, yabs;
@@ -170,6 +183,13 @@ f32 angleABf(f32 x1, f32 y1, f32 x2, f32 y2) {
     return angle;
 }
 
+/**
+ * Interpolates from start to end at step currStep of steps, along curve mode:
+ * 0 linear, 1-3 accelerating (power 2-4), 4-6 decelerating, 7-11 overshoot,
+ * wobble ("bururun") and bounce curves, 12 sine ease-out, 13 cosine ease-in.
+ * Any other mode value is called as a custom curve function. Returns end when steps is 0.
+ * Used everywhere for movement, fades and camera moves.
+ */
 f32 intplGetValue(s32 mode, f32 start, f32 end, s32 currStep, s32 steps) {
     f32 step;
     f32 total;
@@ -244,6 +264,7 @@ static u8 tmp1[0x100];
 
 static s32 (*comp)(const void* a, const void* b);
 
+/** Sorts an array of n element pointers with a quicksort, comparing through the callback qqsort stored in comp. */
 static void fsort(void** base, u32 n) {
     static void** lo;
     static void** hi;
@@ -457,6 +478,11 @@ static void fsort(void** base, u32 n) {
     } while (n > 1);
 }
 
+/**
+ * Sorts n elements of size bytes at base with compare, like qsort:
+ * sorts a table of pointers (at most 0xC00 elements, size at most 0x100 bytes) with fsort,
+ * then moves the elements into place by following the permutation cycles.
+ */
 void qqsort(void* base, u32 n, u32 size, s32 (*compare)(const void* a, const void* b)) {
     u8* dst;      /* r27 */
     void** idx;   /* r26 */
@@ -511,10 +537,17 @@ void qqsort(void* base, u32 n, u32 size, s32 (*compare)(const void* a, const voi
     }
 }
 
+/** Returns the DEMO pad library's status for controller i. */
 static inline DEMOPadStatus* GET_DEMO_PAD_STATUS(u32 i) {
     return DemoPad + i;
 }
 
+/**
+ * Reads the controllers once per frame (DEMOPadRead) into the global input state:
+ * held, newly pressed, released and auto-repeat (24 frames first, then every 6) for buttons
+ * and stick directions, the analogue sticks and triggers,
+ * and applies rumble changes to the motors when rumble is enabled.
+ */
 void makeKey(void) {
     s32 delay;
 #if VERSION <= VERSION_DEMO_US
@@ -619,63 +652,77 @@ void makeKey(void) {
     gp->keyDataValid = 1;
 }
 
+/** Returns the stick and d-pad directions held on controller chan. */
 u32 keyGetDir(u32 chan) {
     return gp->dirs[chan];
 }
 
+/** Returns the buttons held on controller chan. */
 u32 keyGetButton(u32 chan) {
     return gp->button[chan];
 }
 
+/** Returns the directions pressed this frame or auto-repeating on controller chan (for menu scrolling). */
 u32 keyGetDirRep(u32 chan) {
     return gp->dirsRepeat[chan];
 }
 
+/** Returns the buttons pressed this frame or auto-repeating on controller chan. */
 u32 keyGetButtonRep(u32 chan) {
     return gp->buttonRepeat[chan];
 }
 
+/** Returns the directions newly pressed this frame on controller chan. */
 u32 keyGetDirTrg(u32 chan) {
     return gp->dirsNew[chan];
 }
 
+/** Returns the buttons newly pressed this frame on controller chan. */
 u32 keyGetButtonTrg(u32 chan) {
     return gp->buttonNew[chan];
 }
 
+/** Returns the main stick's x position on controller chan (-128..127). */
 s8 keyGetStickX(u32 chan) {
     return gp->stickX[chan];
 }
 
+/** Returns the main stick's y position on controller chan (-128..127). */
 s8 keyGetStickY(u32 chan) {
     return gp->stickY[chan];
 }
 
-// unused on retail
+/** unused on retail */
 s8 keyGetSubStickX(u32 chan) {
     return gp->substickX[chan];
 }
 
+/** Returns the C stick's y position on controller chan. */
 s8 keyGetSubStickY(u32 chan) {
     return gp->substickY[chan];
 }
 
+/** Starts rumble on controller chan (applied by makeKey). */
 void padRumbleOn(u32 chan) {
     gp->rumbleStatus[chan] = PAD_MOTOR_RUMBLE;
 }
 
+/** Stops rumble on controller chan, letting the motor spin down. */
 void padRumbleOff(u32 chan) {
     gp->rumbleStatus[chan] = PAD_MOTOR_STOP;
 }
 
+/** Stops rumble on controller chan with the motor brake. */
 void padRumbleHardOff(u32 chan) {
     gp->rumbleStatus[chan] = PAD_MOTOR_STOP_HARD;
 }
 
+/** Returns the requested rumble state of controller chan. */
 u8 padGetRumbleStatus(u32 chan) {
     return gp->rumbleStatus[chan];
 }
 
+/** Returns the sine and the negated cosine of an angle in degrees, the game's x/z direction for that facing. */
 void sincosf(f32* ret_sin, f32* ret_cos, f32 degree) {
     float result; // fp31
 
@@ -684,6 +731,10 @@ void sincosf(f32* ret_sin, f32* ret_cos, f32 degree) {
     *ret_cos = -(f32)cos(result);
 }
 
+/**
+ * Moves the point (*ret_sin, *ret_cos) by dist in direction degree (0 = toward -z, clockwise),
+ * the same convention as sincosf.
+ */
 void movePos(float* ret_sin, float* ret_cos, f32 dist, f32 degree) {
     f32 result1, result2, radian;
 
@@ -694,6 +745,7 @@ void movePos(float* ret_sin, float* ret_cos, f32 dist, f32 degree) {
     *ret_cos = -((dist * result2) - *ret_cos);
 }
 
+/** Returns a random integer in [0, scalar), or 0 when scalar is 0. */
 s32 irand(s32 scalar) {
     if (scalar == 0) {
         return 0;
@@ -701,11 +753,16 @@ s32 irand(s32 scalar) {
     return rand() % scalar;
 }
 
+/** Returns the next 16-bit draw sync token. */
 u16 sysGetToken(void) {
     static u16 token;
     return token++;
 }
 
+/**
+ * Waits (at most 100 ms) for the GPU to finish the commands sent so far, using a draw sync token;
+ * skipped while the map driver is recording a display list.
+ */
 void sysWaitDrawSync(void) {
     u16 token = sysGetToken();
     OSTick tick = OSGetTick();
@@ -719,6 +776,7 @@ void sysWaitDrawSync(void) {
     }
 }
 
+/** Draws an invisible triangle with a plain TEV setup through mtx, leaving the GX state in a known default. */
 void sysDummyDraw(Mtx mtx) {
     f32 vtxMin, vtxMax;
 
@@ -756,7 +814,7 @@ void sysDummyDraw(Mtx mtx) {
     GXTexCoord2f32(0.0f, 0.0f);
 }
 
-// Scales a per-frame (60 fps) amount by the real time between two OSTime stamps.
+/** Scales a per-frame (60 fps) amount by the real time between two OSTime stamps. */
 f32 getV60FPS(f32 perFrame, s64 prevTime, s64 nowTime) {
     u64 prevMs, nowMs;
 
@@ -770,10 +828,15 @@ f32 getV60FPS(f32 perFrame, s64 prevTime, s64 nowTime) {
     return ((60.0f * perFrame) * (f32)nowMs) / 1000.0f;
 }
 
+/** Converts frames to seconds at 60 frames per second. */
 f32 sysFrame2SecFloat(f32 frame) {
     return frame / 60.0f;
 }
 
+/**
+ * Converts milliseconds to whole frames at the current frame rate (50 or 60 in US and PAL;
+ * always 60 in JP and the demos).
+ */
 s32 sysMsec2Frame(s32 msec) {
 #if VERSION >= VERSION_US
     return (msec * gp->framerate) / 1000;
@@ -782,6 +845,7 @@ s32 sysMsec2Frame(s32 msec) {
 #endif
 }
 
+/** Converts milliseconds to frames as a float, at the current frame rate (60 in JP and the demos). */
 f32 sysMsec2FrameFloat(f32 msec) {
 #if VERSION >= VERSION_US
     return (msec * (f32)gp->framerate) / 1000.0f;
@@ -791,7 +855,7 @@ f32 sysMsec2FrameFloat(f32 msec) {
 }
 
 #if VERSION == VERSION_EU
-// PAL keeps the file:line debug print that JP and US strip
+/** PAL keeps the file:line debug print that JP and US strip */
 void sysDebugReport(const char* filename, s32 line, const char* format, ...) {
     char buf[2048];
     va_list args;
@@ -802,6 +866,10 @@ void sysDebugReport(const char* filename, s32 line, const char* format, ...) {
 }
 #endif
 
+/**
+ * Extracts the pure rotation of src into dst: normalises the two named axes (firstAxis, secondAxis: 'x', 'y' or
+ * 'z') and rebuilds the third with cross products, dropping scale and translation.
+ */
 void mtxGetRotationElement(Mtx src, Mtx dst, s8 firstAxis, s8 secondAxis) {
     Vec vecX, vecY, vecZ;
     switch (firstAxis) {
@@ -906,6 +974,10 @@ void mtxGetRotationElement(Mtx src, Mtx dst, s8 firstAxis, s8 secondAxis) {
     dst[2][3] = 0.0f;
 }
 
+/**
+ * Decompresses Nintendo LZ77 data (header byte 0x10 and a 24-bit size) from inputBuffer into outputBuffer.
+ * Returns the decompressed size, 0 when the header is not LZ77.
+ */
 s32 LZ77Decode(u8* inputBuffer, u8* outputBuffer) {
     u8* output;
     s8 flag;
@@ -972,9 +1044,11 @@ asm void* memcpy_as4(void* dest, const void* src, u32 count) {
 	blr
 }
 #else
-// The same word copy in C, except for the result: the asm returns the address of the last word
-// written (r3 is advanced by stwu) and, given count < 4, loops 2^32 times (ctr = 0); no caller
-// uses the result or passes less than one word.
+/**
+ * The same word copy in C, except for the result:
+ * the asm returns the address of the last word written (r3 is advanced by stwu) and, given count < 4,
+ * loops 2^32 times (ctr = 0); no caller uses the result or passes less than one word.
+ */
 void* memcpy_as4(void* dest, const void* src, u32 count) {
 	u32* d = (u32*)dest;
 	const u32* s = (const u32*)src;
@@ -990,8 +1064,10 @@ void* memcpy_as4(void* dest, const void* src, u32 count) {
 // FAKE: the original file had debug functions that the linker dead-stripped; their constants
 // stayed in the literal pools. These stand-ins recreate the pool contents in order.
 #if VERSION >= VERSION_US
-// US pools the int->float constant between the strings and the doubles; functions are emitted in
-// reverse order, so the doubles come first in the source
+/**
+ * US pools the int->float constant between the strings and the doubles;
+ * functions are emitted in reverse order, so the doubles come first in the source
+ */
 void systemStrippedPool1b(f32* f, f64* d) {
     d[0] = 1.5;
     d[1] = 2.5;
@@ -999,10 +1075,18 @@ void systemStrippedPool1b(f32* f, f64* d) {
     f[2] = 1000.0f;
 }
 
+/**
+ * FAKE stand-in (see above): keeps the int-to-float conversion constant of the stripped debug code in its pool
+ * place.
+ */
 f32 systemStrippedPool2(s32 x) {
     return (f32)x;
 }
 
+/**
+ * FAKE stand-in (see above): recreates the stripped debug code's constants (the interpolation mode names LINEAR,
+ * ACCEL, ..., the file:line report format and a few numbers) in their original pool order.
+ */
 void systemStrippedPool1(const char** str, f32* f, f64* d, f32 x) {
     f[0] = 1.0f;
     str[0] = "LINEAR";
@@ -1019,6 +1103,7 @@ void systemStrippedPool1(const char** str, f32* f, f64* d, f32 x) {
     str[10] = "[%8s:% 4d] %s";
 }
 #else
+/** FAKE stand-in, JP and demo form of systemStrippedPool1 above (the demo keeps the full mode name table). */
 void systemStrippedPool1(const char** str, f32* f, f64* d, f32 x) {
     f[0] = 1.0f;
 #if VERSION <= VERSION_DEMO_US

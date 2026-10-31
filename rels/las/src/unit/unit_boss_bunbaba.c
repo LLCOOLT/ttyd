@@ -387,6 +387,11 @@ BattleWeapon weapon_bunbaba_mega_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Entry event of the Gloomtail fight: the camera moves in on Gloomtail while Mario
+ * and the partner strike a startled pose, Gloomtail rises (GNB_F_3) and roars with a camera shake,
+ * and Mario and the partner ready themselves before the battle starts.
+ */
 static EVT_BEGIN(battle_entry_event)
     CALL(evt_btl_camera_set_prilimit, 1)
     CALL(evt_map_replayanim, 0, STRING("dontyo"))
@@ -474,6 +479,10 @@ static EVT_BEGIN(battle_entry_event)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Gloomtail: installs its wait, phase, attack, damage and confusion events and entry event,
+ * and clears unit work 1 (the flag that its last line before death was spoken).
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
@@ -490,6 +499,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event of Gloomtail: default damage handling. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -497,6 +507,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Event script: Gloomtail's sub-event when he is hit:
+ * plays the pain animation of the part that was hit (GNB_D_2 for the head part 1, GNB_D_1 otherwise) and,
+ * if the hit did no damage, a miss sound at the hit position.
+ */
 EVT_BEGIN(bunbaba_damage_sub_event)
     CALL(btlevtcmd_GetDamagePartsId, BTL_UNIT_SELF, LW(11))
     IF_INT_EQUAL(LW(11), 1)
@@ -513,6 +528,11 @@ EVT_BEGIN(bunbaba_damage_sub_event)
     RETURN
 EVT_END()
 
+/**
+ * Dead event of Gloomtail: it collapses (GNB_X_1), the camera closes in,
+ * the status window is hidden and Gloomtail says its last words (stg8_las_49_08)
+ * before the death animation (GNB_D_3, GNB_H_x) and the unit is removed.
+ */
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_X_1"))
     CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_DOWN1"), EVT_NULLPTR, 0, -250, 0, 0, LW(15))
@@ -583,6 +603,11 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Phase event of Gloomtail: after the player phase it speaks lines (stg8_las_49_03 to 49_07) as its HP drops
+ * through the stages tracked in unit work 0, and below a low HP threshold marks that (unit work 1)
+ * so it speaks stg8_las_49_07 once.
+ */
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_EQUAL(LW(0), 0)
@@ -637,6 +662,11 @@ static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Stomp attack of Gloomtail (fumituke): it raises a foot
+ * and stamps on one target (weapon_bunbaba_fumituke_attack, with the camera shaking),
+ * which dodges or takes the damage with the action command defence check.
+ */
 static EVT_BEGIN(fumituke_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -740,6 +770,10 @@ static EVT_BEGIN(fumituke_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Bite attack of Gloomtail (kamituki): it bites one target (GNB_A_2),
+ * which dodges or takes the damage with the action command defence check.
+ */
 static EVT_BEGIN(kamituki_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -791,6 +825,11 @@ static EVT_BEGIN(kamituki_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Event script: Gloomtail's earthquake attack (weapon_bunbaba_eq_attack):
+ * a stomp that shakes the stage and hits the sampled target;
+ * the damage is checked once the animation reaches the impact.
+ */
 EVT_BEGIN(eq_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -857,6 +896,10 @@ EVT_BEGIN(eq_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Event script: Gloomtail's poison breath (weapon_bunbaba_poison_attack):
+ * raises his neck (GNB_A2_1..3) and breathes poison at the chosen target.
+ */
 EVT_BEGIN(poison_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -942,6 +985,11 @@ EVT_BEGIN(poison_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Event script: Gloomtail's Mega Breath (weapon_bunbaba_mega_attack):
+ * charges (SFX_BOSS_GNB_CHARGE1) and breathes fire with the mega breath sound at the chosen targets;
+ * the attack he announces with a message.
+ */
 EVT_BEGIN(mega_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -1031,6 +1079,10 @@ EVT_BEGIN(mega_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Charge move of Gloomtail: a charge effect appears at its head
+ * and it powers itself up (damage check against itself) for the mega attack that follows.
+ */
 static EVT_BEGIN(charge_event)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_CHARGE1"), EVT_NULLPTR, 0, -250, 0, 0, LW(15))
@@ -1043,6 +1095,11 @@ static EVT_BEGIN(charge_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of Gloomtail: can use an item; its attacks depend on the stage in unit work 0.
+ * It opens with the poison breath, then draws lots among the stomp, bite, poison breath and earthquake,
+ * and at later stages also the charge and the mega attack (always follows a charge).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -1139,6 +1196,10 @@ EVT_END()
 
 struct EffectEntry* effKemuri9N64Entry(s32 type, s32 count, s32 life, f32 x, f32 y, f32 z, f32 radiusEnd, f32 angle);
 
+/**
+ * Script helper: spawns a ring of 18 puffs of smoke (N64 style, radius 60, 90 frames) at (args[0], args[1],
+ * args[2]) for Gloomtail's footsteps.
+ */
 static USER_FUNC(_leg_smoke_effect) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
@@ -1149,6 +1210,7 @@ static USER_FUNC(_leg_smoke_effect) {
     return EVT_RETURN_DONE;
 }
 
+/** Wait event of Gloomtail: plays its idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

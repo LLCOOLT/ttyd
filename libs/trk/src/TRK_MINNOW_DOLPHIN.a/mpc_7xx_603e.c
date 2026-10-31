@@ -1,6 +1,11 @@
 extern unsigned char gTRKCPUState[];
 extern unsigned char gTRKRestoreFlags[];
 
+/**
+ * Assembly: snapshots the 750CL's extra registers (segment registers, time base, HID0/1, BATs, SDR1, SPRGs, DAR,
+ * DSISR, DEC, GQRs, hardware-implementation registers and so on) into gTRKCPUState.Extended1
+ * so the debugger can read them.
+ */
 asm void TRKSaveExtended1Block(void) {
     nofralloc
     lis r2, gTRKCPUState@h
@@ -116,6 +121,11 @@ L_8025CD60:
     blr
 }
 
+/**
+ * Assembly: writes the extended registers back from gTRKCPUState before the game resumes.
+ * The time base and decrementer are only written if the debugger changed them (gTRKRestoreFlags),
+ * and the flags are cleared.
+ */
 asm void TRKRestoreExtended1Block(void) {
     nofralloc
     lis r2, gTRKCPUState@h

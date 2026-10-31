@@ -188,6 +188,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Registers the Bald Cleft's wait, attack and damage events (confusion reuses the attack event) and its walk,
+ * run and jump sounds, then starts the idle loop.
+ * Guess: `sinnosuke` is the Bald Cleft (2 HP, 2 defence, 1 attack, no spikes).
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -200,6 +205,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Hit reaction: takes the hurt pose SIS_D_1 when the hit did damage;
+ * while flipped it switches to the upside-down pose SIS_D_2 and bounces twice in place.
+ * Then runs btldefaultevt_Damage.
+ */
 static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_GetDamage, BTL_UNIT_SELF, LW(15))
     IF_INT_GREATER_OR_EQUAL(LW(15), 1)
@@ -218,6 +228,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * The pose and bounce part of damage_event without the btldefaultevt_Damage call.
+ * Nothing in this unit references it.
+ */
 static EVT_BEGIN(damage_event_sub)
     CALL(btlevtcmd_GetDamage, BTL_UNIT_SELF, LW(15))
     IF_INT_GREATER_OR_EQUAL(LW(15), 1)
@@ -234,6 +248,11 @@ static EVT_BEGIN(damage_event_sub)
     RETURN
 EVT_END()
 
+/**
+ * Flip event (data-table event 13, run by subsetevt_damage for a flipping hit, e.g. a bomb blast):
+ * defence drops to 0, the upside-down pose table is used and it stays on its back for 2 turns.
+ * It bounces twice (SFX_ENM_INSIDE1) and rests at height 5 with a lowered hit offset.
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -255,6 +274,11 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs instead of attacking while flipped: counts the flip turns down and, when they run out,
+ * restores normal defence, poses and ground height, then hops back upright (SFX_ENM_INSIDE2).
+ * Either way the turn ends.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -281,6 +305,13 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack (also used when confused). While flipped it runs wakeup_event instead.
+ * Otherwise it uses a held item if the AI wants to, or picks the frontmost target,
+ * revs up and charges into it for 1 damage (weapon_sinnosuke_attack):
+ * on a hit it shakes the camera and bounces back off the target; on a miss or a dodge it runs past.
+ * Then it goes home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -405,6 +436,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle: plays the stand pose of the current pose table (normal or flipped). */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

@@ -16,6 +16,7 @@
 #include <dolphin/pad.h>
 #include <demo/DEMOPad.h>
 
+/** Builds the "Equipped" tab's list from the pouch: one entry (slot index, badge id, equipped) per equipped badge. */
 void winMakeEquipList(WindowWork* w) {
     s32 n = 0;
     s32 i;
@@ -32,6 +33,7 @@ void winMakeEquipList(WindowWork* w) {
     w->badge.count = n;
 }
 
+/** Resets the Badges window when the pause menu opens: "All Badges" tab, cursors and pages at the top. */
 void winBadgeInit(WindowWork* w) {
     w->badge.state = 0;
     w->badge.tab = 0;
@@ -42,6 +44,11 @@ void winBadgeInit(WindowWork* w) {
     winMakeEquipList(w);
 }
 
+/**
+ * Run from win_root.c each time the Badges window comes to the front:
+ * snaps the list scroll to the saved pages, sets the help text for the current tab
+ * and rebuilds the equipped list.
+ */
 void winBadgeInit2(WindowWork* w) {
     w->helpTgtX = -270.0f;
     w->helpTgtY = 125 - w->badge.tab * 40;
@@ -51,9 +58,15 @@ void winBadgeInit2(WindowWork* w) {
     winMakeEquipList(w);
 }
 
+/** Closing hook for the Badges window; empty. */
 void winBadgeExit(WindowWork* w) {
 }
 
+/**
+ * After a badge change, reloads the menu's Mario models
+ * so they show the L Emblem / W Emblem outfits (a_mario_l, a_mario_w, a_mario_wl),
+ * or the matching 8-bit Mario animations when Mario is in 8-bit form.
+ */
 static void mario_change(WindowWork* w, s32 unused) {
     s32 hasLeft = pouchEquipCheckBadge(ITEM_L_EMBLEM);
     s32 hasRight = pouchEquipCheckBadge(ITEM_W_EMBLEM);
@@ -116,6 +129,12 @@ static void mario_change(WindowWork* w, s32 unused) {
 enum { WIN_SORT_BADGE_ALL = 2,
        WIN_SORT_BADGE_EQUIP = 3 };
 
+/**
+ * Badges window input.
+ * State 0 picks the "All Badges" / "Equipped" tab,
+ * state 10 moves through the list (L/R page) and equips or removes the badge on A if BP allows,
+ * state 1000 runs the Z sort menu. Returns -1 on B (back), -2 on Start (close the menu), else 0.
+ */
 s32 winBadgeMain(WindowWork* w) {
     PouchData* pouch = pouchGetPtr();
     s32 tab;
@@ -257,6 +276,10 @@ s32 winBadgeMain(WindowWork* w) {
     return 0;
 }
 
+/**
+ * Every frame: eases each tab's list scroll a quarter of the way toward its current page (184 units per 8-row
+ * page).
+ */
 void winBadgeMain2(WindowWork* w) {
     s32 i;
     for (i = 0; i < 2; i++) {
@@ -269,6 +292,10 @@ static void badge_disp(WindowWork* w, f32 xo, f32 yo);
 
 #define Q ((pouch->maximumBP + 9) / 10)
 
+/**
+ * Draws the Badges window (menu slot n): the two tabs,
+ * the BP panel with total and remaining BP and a pip per BP point, then the badge list via badge_disp.
+ */
 void winBadgeDisp(s32 camId, void* param, s32 n) {
     WindowWork* w = param;
     GXColor white = {255, 255, 255, 255};
@@ -342,6 +369,11 @@ void winBadgeDisp(s32 camId, void* param, s32 n) {
     badge_disp(w, x, y);
 }
 
+/**
+ * Draws the scrolling badge list for the current tab:
+ * equipped highlight, icon, name, BP cost and cost pips, plus the page arrows and the Z sort hint.
+ * The JP and later releases gray out badges Mario cannot afford.
+ */
 static void badge_disp(WindowWork* w, f32 xo, f32 yo) {
     ItemData* item;
     s8* cost;

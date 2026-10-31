@@ -13,6 +13,12 @@
 
 static BeroEntry bero_entry_data[5];
 
+/**
+ * Door animation script (closing) for the west (door 1) door,
+ * used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_l1_01
+ * and S_doa_l1_02 by it, the second one the opposite way.
+ */
 static EVT_BEGIN(w1_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l1_01"), 0, LW(0), 0)
@@ -21,6 +27,12 @@ static EVT_BEGIN(w1_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the west (door 1) door,
+ * used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_l1_01
+ * and S_doa_l1_02 by it, the second one the opposite way.
+ */
 static EVT_BEGIN(w1_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l1_01"), 0, LW(0), 0)
@@ -29,6 +41,12 @@ static EVT_BEGIN(w1_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (closing) for the west (door 2) door,
+ * used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_l2_01
+ * and S_doa_l2_02 by it, the second one the opposite way.
+ */
 static EVT_BEGIN(w2_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l2_01"), 0, LW(0), 0)
@@ -37,6 +55,12 @@ static EVT_BEGIN(w2_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the west (door 2) door,
+ * used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_l2_01
+ * and S_doa_l2_02 by it, the second one the opposite way.
+ */
 static EVT_BEGIN(w2_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l2_01"), 0, LW(0), 0)
@@ -45,6 +69,12 @@ static EVT_BEGIN(w2_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (closing) for the east (door 1) door,
+ * used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_r1_01
+ * and S_doa_r_02 by it, the second one the opposite way.
+ */
 static EVT_BEGIN(e1_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r1_01"), 0, LW(0), 0)
@@ -53,6 +83,12 @@ static EVT_BEGIN(e1_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the east (door 1) door,
+ * used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_r1_01
+ * and S_doa_r_02 by it, the second one the opposite way.
+ */
 static EVT_BEGIN(e1_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r1_01"), 0, LW(0), 0)
@@ -61,6 +97,12 @@ static EVT_BEGIN(e1_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (closing) for the east (door 2) door,
+ * used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_r2_01
+ * and S_doa_r2_02 by it, the second one the opposite way.
+ */
 static EVT_BEGIN(e2_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r2_01"), 0, LW(0), 0)
@@ -69,6 +111,12 @@ static EVT_BEGIN(e2_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the east (door 2) door,
+ * used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_r2_01
+ * and S_doa_r2_02 by it, the second one the opposite way.
+ */
 static EVT_BEGIN(e2_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r2_01"), 0, LW(0), 0)
@@ -77,6 +125,11 @@ static EVT_BEGIN(e2_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Event script (bero callback): the wrong-door check for the first door puzzle.
+ * If GSWF_LAS_WRONG_DOOR_TAKEN is set it plays the buzzer sound (SFX_STG8_DOOR_NG_OPEN1) and clears the flag;
+ * always returns 0 in LW(0), so the door never blocks Mario.
+ */
 static EVT_BEGIN(door_matigai_evt)
     IF_INT_EQUAL(GSWF(GSWF_LAS_WRONG_DOOR_TAKEN), 1)
         CALL(evt_snd_sfxon, STRING("SFX_STG8_DOOR_NG_OPEN1"), 0)
@@ -162,6 +215,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Map init script for las_07: music and ambience,
+ * the four doors (two to las_06 and las_08 each of which can be the wrong door of the Palace's door puzzle),
+ * and three hidden blocks with a Coin, Jammin' Jelly and P-Up, D-Down, P.
+ */
 EVT_BEGIN(las_07_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))

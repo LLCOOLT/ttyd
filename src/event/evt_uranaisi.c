@@ -231,10 +231,18 @@ s32 uranaisi_data_make_next(const char* prefix, s32 type);
         }                                           \
     }
 
+/** Number of fortune entries the last uranaisi_data_alloc collected. */
 static inline s32 uranaiCount(UranaiWork* w) {
     return w->count;
 }
 
+/**
+ * Builds the fortune list for a session with the fortune teller.
+ * args[0] is the kind (0 = where to go next, 1 = a missing Star Piece, 2 = a missing Shine Sprite),
+ * args[1] the message label prefix.
+ * Counts the matching "<prefix>_NNNN" messages, allocates the list on the map heap,
+ * then fills it in a second pass.
+ */
 USER_FUNC(uranaisi_data_alloc) {
     const char* prefix;
     UranaiWork* wp = &_udt;
@@ -276,6 +284,7 @@ USER_FUNC(uranaisi_data_alloc) {
     return 2;
 }
 
+/** Frees the fortune list from uranaisi_data_alloc and clears the work state; safe when nothing is allocated. */
 USER_FUNC(uranaisi_data_free) {
     UranaiWork* wp = &_udt;
 
@@ -291,17 +300,23 @@ USER_FUNC(uranaisi_data_free) {
     return 2;
 }
 
+/**
+ * Forgets which Star Piece and Shine Sprite fortunes were already told, so they can be told again.
+ * The told bits live only in RAM (_udt), not in the save file.
+ */
 USER_FUNC(uranaisi_table_clear) {
     memset(_udt.starpiece, 0, 0xD);
     memset(_udt.supercoin, 0, 6);
     return 2;
 }
 
+/** Writes to args[0] how many "where to go next" fortunes uranaisi_data_alloc found for the current story point. */
 USER_FUNC(uranaisi_next_check) {
     evtSetValue(event, *event->args, _udt.count);
     return 2;
 }
 
+/** Writes to args[1] the message label ("<prefix>_NNNN") of "where to go next" fortune number args[0]. */
 USER_FUNC(uranaisi_next_makelabel) {
     EvtWord* args = event->args;
     UranaiWork* wp = &_udt;
@@ -312,6 +327,7 @@ USER_FUNC(uranaisi_next_makelabel) {
     return 2;
 }
 
+/** Writes to args[0] how many Star Piece fortunes in the list have not been told yet. */
 USER_FUNC(uranaisi_starpiece_check) {
     UranaiWork* wp = &_udt;
     EvtWord* args = event->args;
@@ -327,6 +343,10 @@ USER_FUNC(uranaisi_starpiece_check) {
     return 2;
 }
 
+/**
+ * Writes to args[1] the message label of the args[0]-th untold Star Piece fortune
+ * and remembers it for uranaisi_starpiece_setreadflag; writes an empty string when there are fewer than that.
+ */
 USER_FUNC(uranaisi_starpiece_makelabel) {
     UranaiWork* wp;
     s32 target;
@@ -355,11 +375,13 @@ USER_FUNC(uranaisi_starpiece_makelabel) {
     return 2;
 }
 
+/** Marks the Star Piece fortune last picked by uranaisi_starpiece_makelabel as told. */
 USER_FUNC(uranaisi_starpiece_setreadflag) {
     UranaiWork* wp = &_udt;
     johoya_set(wp->starpiece, wp->info[wp->cur].idx, 1);
     return 2;
 }
+/** Writes to args[0] how many Shine Sprite fortunes in the list have not been told yet. */
 USER_FUNC(uranaisi_supercoin_check) {
     UranaiWork* wp = &_udt;
     EvtWord* args = event->args;
@@ -375,6 +397,10 @@ USER_FUNC(uranaisi_supercoin_check) {
     return 2;
 }
 
+/**
+ * Writes to args[1] the message label of the args[0]-th untold Shine Sprite fortune
+ * and remembers it for uranaisi_supercoin_setreadflag; writes an empty string when there are fewer than that.
+ */
 USER_FUNC(uranaisi_supercoin_makelabel) {
     UranaiWork* wp;
     s32 target;
@@ -403,12 +429,19 @@ USER_FUNC(uranaisi_supercoin_makelabel) {
     return 2;
 }
 
+/** Marks the Shine Sprite fortune last picked by uranaisi_supercoin_makelabel as told. */
 USER_FUNC(uranaisi_supercoin_setreadflag) {
     UranaiWork* wp = &_udt;
     johoya_set(wp->supercoin, wp->info[wp->cur].idx, 1);
     return 2;
 }
 
+/**
+ * Scans the "<prefix>_NNNN" messages, whose leading <!tag> names a story point,
+ * and keeps those of the latest story point not past GSW_STORY_PROGRESS:
+ * the fortune about where Mario should go next.
+ * Type bit 0 clear only counts them (and finds that story point); set, it fills the list. Returns the count.
+ */
 s32 uranaisi_data_make_next(const char* prefix, s32 type) {
     s32 maxLabel;
     UranaiWork* wp = &_udt;
@@ -476,6 +509,7 @@ s32 uranaisi_data_make_next(const char* prefix, s32 type) {
     return infoId;
 }
 
+/** Looks up a GSWF_STARPIECE_NN flag name in uranai_table_starpiece; returns its flag id, or -1 if unknown. */
 static inline s32 starpiece_search(const char* name) {
     s32 i;
     for (i = 0; uranai_table_starpiece[i].name != NULL; i++) {
@@ -486,6 +520,12 @@ static inline s32 starpiece_search(const char* name) {
     return -1;
 }
 
+/**
+ * Scans the "<prefix>_NNNN" fortune messages for Star Pieces:
+ * an entry counts when its story point is reached
+ * and the GSWF_STARPIECE flag named in its tag is still clear (that Star Piece not collected yet).
+ * Type bit 0 set also fills the list. Returns the count.
+ */
 s32 uranaisi_data_make_starpiece(const char* prefix, s32 type) {
     UranaiWork* wp = &_udt;
     char label[64];
@@ -547,6 +587,7 @@ s32 uranaisi_data_make_starpiece(const char* prefix, s32 type) {
     }
     return count;
 }
+/** Looks up a GSWF_SHINE_NN flag name in uranai_table_supercoin; returns its flag id, or -1 if unknown. */
 static inline s32 supercoin_search(const char* name) {
     s32 i;
     for (i = 0; uranai_table_supercoin[i].name != NULL; i++) {
@@ -557,6 +598,11 @@ static inline s32 supercoin_search(const char* name) {
     return -1;
 }
 
+/**
+ * Scans the "<prefix>_NNNN" fortune messages for Shine Sprites (supercoin):
+ * an entry counts when its story point is reached and the GSWF_SHINE flag named in its tag is still clear.
+ * Type bit 0 set also fills the list. Returns the count.
+ */
 s32 uranaisi_data_make_supercoin(const char* prefix, s32 type) {
     UranaiWork* wp = &_udt;
     char label[64];
@@ -619,6 +665,11 @@ s32 uranaisi_data_make_supercoin(const char* prefix, s32 type) {
     return count;
 }
 
+/**
+ * Fortune price in coins (ryokin = fee) for kind mode:
+ * twice Mario's level for "where to go next", otherwise uranaisi_ryokin_tbl (5 for a Star Piece, 10 for a Shine
+ * Sprite).
+ */
 s32 uranaisi_ryokin_rtn(s32 mode) {
     if (mode != 0) {
         return uranaisi_ryokin_tbl[mode];
@@ -626,6 +677,7 @@ s32 uranaisi_ryokin_rtn(s32 mode) {
     return pouchGetPtr()->level * 2;
 }
 
+/** Script form of uranaisi_ryokin_rtn: writes the price in coins of fortune kind args[0] to args[1]. */
 USER_FUNC(uranaisi_ryokin) {
     EvtWord* args = event->args;
     s32 mode = evtGetValue(event, args[0]);

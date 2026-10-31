@@ -9,6 +9,10 @@
 static void effNokotarouDisp(CameraId cameraId, EffectEntry* effect);
 static void effNokotarouMain(EffectEntry* effect);
 
+/**
+ * Spawns the Koops effect at (x, y, z) scaled by `size` for `duration` frames;
+ * called by the Koops party unit and a tst test script.
+ */
 EffectEntry* effNokotarouEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 size) {
     EffectEntry* effect;
     EffNokotarouWork* work;
@@ -40,6 +44,7 @@ EffectEntry* effNokotarouEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 
     return effect;
 }
 
+/** Per frame: advances the two MOBJ_EFF_nokotarou3 animations, fades the effect and deletes it at the end. */
 static void effNokotarouMain(EffectEntry* effect) {
     EffNokotarouWork* work = effect->userdata;
     Vec position;
@@ -85,6 +90,7 @@ static void effNokotarouMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effNokotarouDisp, effect);
 }
 
+/** Draws the pose in three stretched segments from the start point to the current point. */
 static void effNokotarouDisp(CameraId cameraId, EffectEntry* effect) {
     EffNokotarouWork* work = effect->userdata;
     Mtx mtx;

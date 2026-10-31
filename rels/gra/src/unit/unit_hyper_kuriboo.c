@@ -209,6 +209,10 @@ static BattleWeapon weapon_kuriboo_charge = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init event of the Hyper Goomba: installs wait, attack, damage and confusion events, sets the Goomba run,
+ * walk and jump sounds and clears unit work 0 (the "charged" flag).
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -222,6 +226,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Hyper Goomba: runs the default damage handling. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -229,10 +234,18 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Phase event of the Hyper Goomba: does nothing. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the Hyper Goomba: if it is not already charged (status 16) it may use an enemy item;
+ * otherwise it draws lots (25% on turn 1, 25/25 later) to either spend its turn charging,
+ * with a crystal effect and a hop (weapon_kuriboo_charge, unit work 0 set to 1),
+ * or to run at a target and headbutt it (weapon_kuriboo_attack),
+ * with the pre-damage check choosing between a dodge and a hit.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -403,11 +416,16 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait (idle) event of the Hyper Goomba: shows the idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: computes the facing direction (degrees) from point (args[0], args[1]) to (args[2], args[3])
+ * and stores it in args[4]; if both points coincide args[4] is left as it was.
+ */
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);

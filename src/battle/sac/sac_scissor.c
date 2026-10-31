@@ -32,6 +32,7 @@
 
 double fabs(double);
 double __fabs(double);
+/** Absolute value through the __fabs intrinsic; scissor_intersection uses it to pick each segment's major axis. */
 static inline double my_fabsf(float x) {
     return __fabs(x);
 }
@@ -193,11 +194,17 @@ BattleWeapon weapon_scissor_finish = {
 
 // inlining off for GetScissorPtr, as in the original (the object differs without it)
 #pragma dont_inline on
+/** The minigame's work area, kept in the battle's shared action-command work buffer. */
 ScissorWork* GetScissorPtr(void) {
     return (ScissorWork*)_battleWorkPointer->actionCommands.work;
 }
 #pragma dont_inline reset
 
+/**
+ * Intersects segments (x1,y1)-(x2,y2) and (x3,y3)-(x4,y4) in screen space,
+ * handling vertical and horizontal ones separately;
+ * returns 1 with the crossing point in *ox, *oy when they cross, 0 otherwise.
+ */
 static s32 scissor_intersection(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy) {
     f32 a1, a2, d;
     f32 dx1, dy1, dx2, dy2;
@@ -379,6 +386,7 @@ static s32 scissor_intersection(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, 
 
 // inlining off for scissor_intersection2, as in the original (the object differs without it)
 #pragma dont_inline on
+/** scissor_intersection, but segments that share an endpoint do not count as crossing. */
 static s32 scissor_intersection2(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy) {
     if (x1 == x3 && y1 == y3) {
         return 0;
@@ -398,6 +406,10 @@ static s32 scissor_intersection2(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3,
 #pragma dont_inline reset
 // inlining off for scissor_intersection3, as in the original (the object differs without it)
 #pragma dont_inline on
+/**
+ * scissor_intersection with the first segment stretched 1000 units both ways,
+ * testing that whole line against the second segment.
+ */
 static s32 scissor_intersection3(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy) {
     f32 dx = x2 - x1;
     f32 slope;
@@ -429,6 +441,7 @@ static s32 scissor_intersection3(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3,
 
 // inlining off for scissor_intersection4, as in the original (the object differs without it)
 #pragma dont_inline on
+/** scissor_intersection3, but a shared endpoint counts as a crossing at that point. */
 static s32 scissor_intersection4(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy) {
     if (x1 == x3 && y1 == y3) {
         *ox = x1;
@@ -454,6 +467,11 @@ static s32 scissor_intersection4(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3,
 }
 
 #pragma dont_inline reset
+/**
+ * Whether chord a-b is a usable diagonal of polygon pts (n points):
+ * it must cross no edge and its midpoint must lie inside (crossings counted along the chord's line).
+ * Returns 1 if so; used by tess.
+ */
 static s32 scissor_cross(Pt* a, Pt* b, Pt* pts, s32 n) {
     f32 xs[512];
     f32 ys[512];
@@ -551,6 +569,10 @@ static s32 scissor_cross(Pt* a, Pt* b, Pt* pts, s32 n) {
     return 0;
 }
 
+/**
+ * Triangulates the closed loop the player drew (a copy of the stroke points) into the triangle list
+ * and flushes it for the GPU, so the region can be drawn and hit-tested.
+ */
 static s32 scissor_tess(void) {
     ScissorWork* w = GetScissorPtr();
     void* p = BattleAlloc(w->stars.count * 8);
@@ -562,6 +584,10 @@ static s32 scissor_tess(void) {
 }
 
 static s32 scissor_cross(Pt* a, Pt* b, Pt* pts, s32 n);
+/**
+ * Splits polygon pts (n points) recursively along the first usable diagonal into triangles appended to the
+ * triangle list; frees pts.
+ */
 static void tess(Pt* pts, s32 n) {
     ScissorWork* w = GetScissorPtr();
     s32 i, j, k;
@@ -610,6 +636,10 @@ static void tess(Pt* pts, s32 n) {
     }
 }
 
+/**
+ * Damage function of Art Attack: the power scissor_damage worked out for the target enemy (0 to 3),
+ * 0 for anything else.
+ */
 s32 weaponGetPower_Scissor(BattleUnit* attacker, BattleWeapon* weapon, BattleUnit* target, BattleUnitPart* part) {
     ScissorWork* w = GetScissorPtr();
     s32 i;
@@ -628,6 +658,11 @@ s32 weaponGetPower_Scissor(BattleUnit* attacker, BattleWeapon* weapon, BattleUni
 
 static void star_disp2D(CameraId camera, void* param);
 
+/**
+ * Event helper for the star: rises out of Mario spinning, flies up off screen,
+ * then drops in as the drawing cursor and stays there.
+ * Keeps a four-point trail and registers star_disp2D from the cursor phase on.
+ */
 static s32 star_control(EventEntry* evt, BOOL first) {
     ScissorWork* w = GetScissorPtr();
     struct ScissorStars* t = &w->stars;
@@ -731,6 +766,7 @@ static s32 star_control(EventEntry* evt, BOOL first) {
     return 0;
 }
 
+/** Draws the drawing cursor with its four fading trail copies. */
 static void star_disp2D(CameraId camera, void* param) {
     ScissorWork* w = GetScissorPtr();
     if (w->phase >= 2 && w->phase <= 6) {
@@ -744,6 +780,10 @@ static void star_disp2D(CameraId camera, void* param) {
 
 // inlining off for star_disp2D_sub, as in the original (the object differs without it)
 #pragma dont_inline on
+/**
+ * Draws star idx (0 the cursor, 1-4 the trail) as the Art Attack icon at the given alpha;
+ * once time is up (phase 6) fades them all out over 30 frames.
+ */
 static void star_disp2D_sub(s32 idx, s32 alpha) {
     ScissorWork* w = GetScissorPtr();
     Mtx rotMtx;
@@ -786,6 +826,7 @@ static void star_disp2D_sub(s32 idx, s32 alpha) {
 }
 #pragma dont_inline reset
 
+/** Returns the frames left on the drawing timer in args[0]; at 59 or less also starts the star fade. */
 static s32 scissor_timer_get(EventEntry* evt) {
     ScissorWork* w = GetScissorPtr();
     EvtWord* args = evt->args;
@@ -796,6 +837,10 @@ static s32 scissor_timer_get(EventEntry* evt) {
     return 2;
 }
 
+/**
+ * The drawing timer: slides the timer in, counts down the 959-frame limit,
+ * slides it back out at 59 frames left and finishes when it reaches 0.
+ */
 static s32 scissor_timer_main(void) {
     ScissorWork* w = GetScissorPtr();
     switch (w->state) {
@@ -843,6 +888,11 @@ static s32 scissor_timer_main(void) {
 static void scissor_disp_control(CameraId camera, void* param);
 static void scissor_disp_region(CameraId camera, void* param);
 
+/**
+ * The player's drawing: moves the star with the Control Stick, records a point every 6 frames,
+ * and finishes once the newest segment crosses an earlier one, closing the loop and capturing the screen.
+ * Also finishes when time runs out; until then draws the line each frame.
+ */
 static s32 scissor_control(EventEntry* evt, BOOL first) {
     ScissorWork* w = GetScissorPtr();
     Pt* buf = (Pt*)w->strokePts;
@@ -931,6 +981,11 @@ static s32 scissor_control(EventEntry* evt, BOOL first) {
 #include "battle/battle_database_common.h"
 #include "version.h"
 
+/**
+ * Applies one closed loop: scores every enemy the loop covers (skipping KO'd, evasive,
+ * untargetable and immune ones and some defense attributes) and hits each with Art Attack.
+ * args[0] gets the rating level for the popup when every enemy was hit, else -1; the crowd cheers louder.
+ */
 static s32 scissor_damage(EventEntry* evt, BOOL first) {
     BattleWork* wp;
     BattleUnit* mario;
@@ -1014,6 +1069,10 @@ static s32 scissor_damage(EventEntry* evt, BOOL first) {
     return 2;
 }
 
+/**
+ * Samples a 10x10 grid over the unit's cut box on screen
+ * and sets *out to the power from the share inside the loop: 1 from 30%, 2 from 60%, 3 from 90%.
+ */
 static void scissor_damage_sub(BattleUnit* unit, s32* out) {
     Vec pos;
     Vec p;
@@ -1060,6 +1119,7 @@ static void scissor_damage_sub(BattleUnit* unit, s32* out) {
 
 // inlining off for scissor_damage_sub2, as in the original (the object differs without it)
 #pragma dont_inline on
+/** Whether screen point pt is inside any triangle of the drawn loop. */
 static s32 scissor_damage_sub2(Vec pt) {
     ScissorWork* w = GetScissorPtr();
     s32 n = w->triCount;
@@ -1085,6 +1145,7 @@ static s32 scissor_damage_sub2(Vec pt) {
 }
 
 #pragma dont_inline reset
+/** Returns 1 in args[0] when the loop drawn off-screen covered any pixels (scissor_disp_region), else 0. */
 static s32 scissor_ofscreen_ok(EventEntry* evt) {
     EvtWord* args = evt->args;
     ScissorWork* w = GetScissorPtr();
@@ -1096,6 +1157,7 @@ static s32 scissor_ofscreen_ok(EventEntry* evt) {
     return 2;
 }
 
+/** Copies the screen into the capture texture when a loop closes, for the cut-out image. */
 static void scissor_capture(CameraId camera, void* param) {
     ScissorWork* w = GetScissorPtr();
     GXSetTexCopySrc(0, 0, 0x260, 0x1E0);
@@ -1104,6 +1166,7 @@ static void scissor_capture(CameraId camera, void* param) {
     GXPixModeSync();
 }
 
+/** Draws the player's line in shifting rainbow colours. The demos also outline each enemy's cut box in red. */
 static void scissor_disp_control(CameraId camera, void* param) {
     ScissorWork* w = GetScissorPtr();
     f32* pts = (f32*)w->strokePts;
@@ -1226,12 +1289,18 @@ static void scissor_disp_control(CameraId camera, void* param) {
 #endif
 }
 
+/** Registers scissor_disp_region on the off-screen camera to draw the closed loop. */
 static s32 scissor_offscreen(void) {
     GetScissorPtr();
     dispEntry(CAMERA_OFFSCREEN2, 0.0f, 1, scissor_disp_region, NULL);
     return 2;
 }
 
+/**
+ * Draws the closed loop's triangles off-screen, textured with the captured screen,
+ * records whether anything was drawn, and gives the bounding box to the "ofs" off-screen used for the cut-out
+ * image.
+ */
 static void scissor_disp_region(CameraId camera, void* param) {
     ScissorWork* w = GetScissorPtr();
     GXTexObj texObj;
@@ -1283,6 +1352,7 @@ static void scissor_disp_region(CameraId camera, void* param) {
     offscreenAddBoundingBox(offscreenNameToId("ofs"), left, top, right, bottom);
 }
 
+/** Sets up the work: the 959-frame timer, the stroke point and triangle buffers, the star at the centre. */
 static s32 scissor_init(void) {
     ScissorWork* w = GetScissorPtr();
     memset(w, 0, 0x174);
@@ -1296,6 +1366,7 @@ static s32 scissor_init(void) {
     return 2;
 }
 
+/** Cleanup when the move ends: deletes the star effect and frees the capture and the two buffers. */
 static s32 scissor_end(void) {
     ScissorWork* w = GetScissorPtr();
     effDelete(((EffStarStoneWork*)w->eff->userdata)->dust);
@@ -1309,16 +1380,24 @@ static s32 scissor_end(void) {
     return 2;
 }
 
+/** Starts the star rising out of Mario (star_control). */
 static s32 star_stone_appear(void) {
     ScissorWork* w = GetScissorPtr();
     w->phase = 1;
     return 2;
 }
 
+/** Waits until the star has dropped into place as the drawing cursor. */
 static s32 wait_star_standby(void) {
     return GetScissorPtr()->phase == 5 ? 2 : 0;
 }
 
+/**
+ * Attack event of Art Attack: after the star intro the player draws loops around enemies
+ * until the timer runs out; each closed loop cuts out that part of the screen
+ * and damages the enemies inside (scissor_damage).
+ * Then pays the Star Power and gives each damaged enemy a finishing hit.
+ */
 EVT_BEGIN(marioAttackEvent_Scissor)
     CALL(scissor_init)
     BEGIN_SIBLING_EVENT

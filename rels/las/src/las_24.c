@@ -18,6 +18,8 @@
 #include "driver/mapdrv.h"
 
 #if VERSION >= VERSION_US
+// Declaration of the script helper that stretches a duration for the game's frame rate (defined at the end of this
+// file; US and later).
 USER_FUNC(las_24_adjust_for_framerate);
 #endif
 
@@ -27,6 +29,11 @@ static const char* haguruma_hontai2[6];
 static const char* haguruma_kage[12];
 static const char* haguruma_kage2[5];
 
+/**
+ * Door animation script (closing) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_01 and S_doa_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_01"), 0, LW(0), 0)
@@ -35,6 +42,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_01 and S_doa_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_01"), 0, LW(0), 0)
@@ -147,6 +159,11 @@ static const char* haguruma_kage2[] = {
     "S_hgm_17b",
 };
 
+/**
+ * Event script: runs while the room is loaded and spins the gears of the turntable room (see las_22):
+ * the same two counter-rotating gear sets plus the sine-driven gear pairs S_hgm_21..23,
+ * with different gear counts.
+ */
 static EVT_BEGIN(haguruma_evt)
     SET_FLOAT_VALUE(LW(0), FLOAT(20.0f))
     SET_FLOAT_VALUE(LW(1), FLOAT(0.0f))
@@ -211,17 +228,27 @@ static EVT_BEGIN(haguruma_evt)
     RETURN
 EVT_END()
 
+/**
+ * Event script: runs when the cloud over the big stone block has been blown away by Flurrie.
+ * Sets GSWF_LAS24_BLOCK_UNCOVERED and makes the block solid.
+ */
 EVT_BEGIN(cloud_blk_evt)
     SET_VALUE(GSWF(GSWF_LAS24_BLOCK_UNCOVERED), 1)
     CALL(evt_mobj_flag_onoff, 0, STRING("blk"), MOBJ_FLAG_NO_HIT)
     RETURN
 EVT_END()
 
+/** Event script: runs when the breaking floor gives way; sets the story to STORY_STG8_12_LARGE_STONE_BLOCK. */
 EVT_BEGIN(break_floor_evt)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_12_LARGE_STONE_BLOCK)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the red jump stand.
+ * Mario jumps from the stand at (-500, -200) to the ledge at (-450, -200);
+ * if a partner is present it first jumps to the ledge when it stands on the stand ("MOBJ_jump").
+ */
 EVT_BEGIN(jump_evt)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_get_party, LW(0))
@@ -248,6 +275,10 @@ EVT_BEGIN(jump_evt)
     RETURN
 EVT_END()
 
+/**
+ * Event script: starts the moving platform S_move_dai (hit object A_move_dai) via move_dai.
+ * The movement time is 7200, scaled for the frame rate in the US and later versions.
+ */
 static EVT_BEGIN(dai_evt)
     SET_VALUE(LW(0), STRING("S_move_dai"))
     SET_VALUE(LW(1), STRING("A_move_dai"))
@@ -259,6 +290,10 @@ static EVT_BEGIN(dai_evt)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the key chest of las_24 opens and Mario receives Palace Key 0x30;
+ * the story progress is set to STORY_STG8_13_KEY.
+ */
 static EVT_BEGIN(box_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
@@ -270,6 +305,13 @@ static EVT_BEGIN(box_evt)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for las_24, the cloud and breaking floor room:
+ * music, the door set, the gear animation, the cloud over the big stone block (until
+ * STORY_STG8_12_LARGE_STONE_BLOCK), the big stone block, the breaking floor, a red jump stand,
+ * a moving platform with its red floating switch, a coin block,
+ * a hidden brick with Point Swap and the key chest with Palace Key 0x30.
+ */
 EVT_BEGIN(las_24_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST3"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS7"))
@@ -320,6 +362,10 @@ EVT_END()
 #include "mario/mariost.h"
 #include "manager/evtmgr_cmd.h"
 
+/**
+ * Script helper: reads a duration in args[0] and returns it in args[1],
+ * multiplied by 1.2 when the frame rate is not 60 so the platform ride lasts as long on PAL timing.
+ */
 USER_FUNC(las_24_adjust_for_framerate) {
     EvtWord* args = event->args;
     s32 value = evtGetValue(event, args[0]);

@@ -12,6 +12,10 @@ static u32 bytesRead;
 // prototypes
 void __GXShadowIndexState(u32 idx_reg, u32 reg_data);
 
+/**
+ * Copies sz bytes from the display list being decoded into ptr and advances the read position;
+ * returns FALSE if fewer than sz bytes remain.
+ */
 static u8 __ReadMem(void* ptr, u32 sz) {
     const u8* src;
     u8* dst;
@@ -31,10 +35,19 @@ static u8 __ReadMem(void* ptr, u32 sz) {
     return TRUE;
 }
 
+/**
+ * Empty debug-print stub for the display list shadowing code;
+ * its format strings (CP stream registers, XF registers, display list in/out) go nowhere in this build.
+ */
 inline void DPF(char*, ...) {
     u8 unused[4];
 }
 
+/**
+ * Applies one CP register write found in a display list to the saved GX state:
+ * registers 5 and 6 are the vertex descriptor, 7 to 9 the vertex attribute table words for a format,
+ * 10 and 11 the index array base and stride; anything else is reported as an invalid CP stream register.
+ */
 static void __SaveCPRegs(u8 reg, u8 vatIdx, u32 data) {
     s32 idx;
 
@@ -83,6 +96,11 @@ static void __SaveCPRegs(u8 reg, u8 vatIdx, u32 data) {
     }
 }
 
+/**
+ * After a CP update, recomputes whether vertices carry plain normals
+ * or normal-binormal-tangent triples (hasNrms / hasBiNrms) from the vertex descriptor
+ * and the VAT A word of the format.
+ */
 static void __ReconstVtxStatus(u8 vatIdx) {
     u32 vat;
 
@@ -101,6 +119,11 @@ static void __ReconstVtxStatus(u8 vatIdx) {
 static u32 vtxCompSize[5] = { 1, 1, 2, 2, 4 };
 static int clrCompSize[6] = { 2, 3, 4, 2, 3, 4 };
 
+/**
+ * Returns the size in bytes of one attribute in a vertex of the given format,
+ * from the vertex descriptor (direct or indexed) and attribute table (component counts and types);
+ * used to step over vertex data.
+ */
 static u32 GetAttrSize(u8 vatIdx, u32 attrIdx) {
     u32 vcd;
     u32 vat;
@@ -311,6 +334,11 @@ static u32 GetAttrSize(u8 vatIdx, u32 attrIdx) {
     return 0;
 }
 
+/**
+ * Reads the vertex count of a draw command in the display list,
+ * sums the sizes of all attributes in the vertex format (skipping the NBT slot)
+ * and skips count times that many bytes.
+ */
 static void __ParseVertexData(u8 vatIdx) {
     u16 vcnt;
     GXAttr attrIdx;
@@ -329,6 +357,12 @@ static void __ParseVertexData(u8 vatIdx) {
     }
 }
 
+/**
+ * Walks a display list as it is called and copies its state changes into the debug shadow state:
+ * CP register writes, XF register loads, indexed loads and BP register writes are recorded,
+ * and draw commands are checked with the verifier and skipped.
+ * Does nothing unless a verify level is set; a nested display list call is reported.
+ */
 void __GXShadowDispList(void* list, u32 nbytes) {
     u8 cmd;
     u8 cmdOp;
@@ -426,6 +460,11 @@ void __GXShadowDispList(void* list, u32 nbytes) {
     DPF("Displaylist OUT\n");
 }
 
+/**
+ * Applies an indexed XF load found in a display list to the shadow state:
+ * it reads count words, a stride apart, from the index array in memory
+ * and records them at the XF address in the load word.
+ */
 void __GXShadowIndexState(u32 idx_reg, u32 reg_data) {
     u32* basePtr;
     u32* memAddr;
@@ -455,6 +494,10 @@ void __GXShadowIndexState(u32 idx_reg, u32 reg_data) {
     &data;  // needed to match
 }
 
+/**
+ * Prints the shadowed state with OSReport: CP vertex descriptor and attribute tables, the modified XF matrices,
+ * normal matrices, lights and XF registers.
+ */
 void __GXPrintShadowState(void) {
     u32 i;
     u32 j;

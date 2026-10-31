@@ -20,6 +20,7 @@ T[] = {
     2.59073051863633712884e-05,
 };
 
+/** Tangent on the reduced range |x| <= pi/4 (fdlibm); iy selects tan or -1/tan for odd quadrants. */
 double __kernel_tan(double x, double y, int iy) {
     double z, r, v, w, s;
     int ix, hx;

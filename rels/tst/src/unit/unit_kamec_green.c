@@ -76,6 +76,10 @@ static EvtWord spawn_event[66];
 #endif
 static EvtWord wait_event[55];
 
+/**
+ * Script helper: args[0] is the Magikoopa, args[1] receives the current x offset of its spell effect (the one
+ * stored in work[5] by eff_magic), so the script can follow the spell's flight.
+ */
 static USER_FUNC(eff_magic_get_posX) {
     EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
@@ -574,6 +578,10 @@ static BattleUnitSetup entry_kamec = {
     NULL, // itemDropTable
 };
 
+/**
+ * Init script of the real Green Magikoopa.
+ * Registers its wait, attack, damage and other scripts and starts it waiting.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
@@ -583,6 +591,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Init script of a Green Magikoopa clone (bunsin).
+ * Same as init_event but the clone uses the sky data table (it floats).
+ */
 static EVT_BEGIN(init_event2)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -608,6 +620,10 @@ static EVT_BEGIN(init_event2)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Fades the Green Magikoopa out (alpha from 254 down to 0) when it vanishes;
+ * used when it teleports or the clones appear.
+ */
 static EVT_BEGIN(alpha_down_event)
     IF_INT_EQUAL(LW(0), -1)
         RETURN
@@ -628,6 +644,7 @@ static EVT_BEGIN(alpha_down_event)
     RETURN
 EVT_END()
 
+/** Guess: Fades the Green Magikoopa in (alpha from 0 up to 255) when it appears again. */
 static EVT_BEGIN(alpha_up_event)
     IF_INT_EQUAL(LW(0), -1)
         RETURN
@@ -648,6 +665,11 @@ static EVT_BEGIN(alpha_up_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction of the Green Magikoopa.
+ * Runs the default damage; if it is a clone that was hit, or the real one died,
+ * it kills the clones (bunsin_kill_event, kamec_subset_bunsin_all_kill).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -674,6 +696,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Kills all four of the Green Magikoopa's clones:
+ * fetches their unit ids with kamec_get_bunsin and spawns bunsin_kill_event for each existing one.
+ */
 static EVT_BEGIN(kamec_subset_bunsin_all_kill)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -701,6 +727,11 @@ static EVT_BEGIN(kamec_subset_bunsin_all_kill)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Death script of the Green Magikoopa: plays the death sounds, clears its statuses,
+ * kills all its clones and then removes the unit (normally,
+ * or the special variant when the damage code says it was blown away).
+ */
 static EVT_BEGIN(kamec_subset_dead_event)
     CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 50)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -757,6 +788,10 @@ static EVT_BEGIN(kamec_subset_dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Death script when the Green Magikoopa is blown away (Flurrie's gust):
+ * plays SFX_BTL_CLAUD_BREATH3, kills all its clones and removes the unit.
+ */
 static EVT_BEGIN(kamec_subset_blow_dead_event)
     CALL(evt_snd_sfxon, STRING("SFX_BTL_CLAUD_BREATH3"), 0)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(0))
@@ -781,6 +816,10 @@ static EVT_BEGIN(kamec_subset_blow_dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs when an attack misses the Green Magikoopa;
+ * kills the clones (bunsin_kill_event) so the player sees which one was real. Guess.
+ */
 static EVT_BEGIN(avoid_miss_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -790,6 +829,7 @@ static EVT_BEGIN(avoid_miss_event)
     RETURN
 EVT_END()
 
+/** Removes the clone whose unit id is in LW(0). */
 static EVT_BEGIN(bunsin_kill_event)
     CALL(btlevtcmd_GetUnitId, LW(0), LW(0))
     IF_INT_EQUAL(LW(0), -1)
@@ -807,10 +847,15 @@ static EVT_BEGIN(bunsin_kill_event)
     RETURN
 EVT_END()
 
+/** Phase script: does nothing. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Fall reaction when a Green Magikoopa is hit while floating:
+ * it switches to the clone data table, fades, falls with SFX_ENM_FALL1 and lands. Guess.
+ */
 static EVT_BEGIN(dmg_fall_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -854,6 +899,7 @@ static EVT_BEGIN(dmg_fall_event)
     RETURN
 EVT_END()
 
+/** Position the Green Magikoopa takes for a first-strike reaction (the pre-battle attack by Mario). Guess. */
 static EVT_BEGIN(dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -862,6 +908,12 @@ static EVT_BEGIN(dmg_first_attack_pos)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the Green Magikoopa.
+ * Chooses a spell: usually the attack magic (weapon_kamec_attack_magic), or the heal, buff, Huge, Electric,
+ * Invisible or defence spells for its allies, or creates its clones (bunsin_magic_event) depending on how many
+ * clones exist and on random chances.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -990,6 +1042,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Spell wind-up on the ground: the staff is raised with SFX_ENM_KAMEKU_MAGIC1,
+ * 4 and 8 while the clones copy the pose (kamec_get_bunsin).
+ */
 static EVT_BEGIN(ground_magic_common_event1)
     BEGIN_SIBLING_EVENT
         LOOP(2)
@@ -1104,6 +1160,7 @@ static EVT_BEGIN(ground_magic_common_event1)
     RETURN
 EVT_END()
 
+/** Guess: Spell finish on the ground: the casting pose with SFX_ENM_KAMEKU_MAGIC6 and 7. */
 static EVT_BEGIN(ground_magic_common_event2)
     BEGIN_SIBLING_EVENT
         LOOP(2)
@@ -1126,6 +1183,7 @@ static EVT_BEGIN(ground_magic_common_event2)
     RETURN
 EVT_END()
 
+/** Guess: The same casting scene for a Green Magikoopa flying in the air, including its clones. */
 static EVT_BEGIN(sky_magic_common_event)
     BEGIN_SIBLING_EVENT
         LOOP(2)
@@ -1223,6 +1281,10 @@ static EVT_BEGIN(sky_magic_common_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Chooses the ground or sky wind-up (ground_magic_common_event1 or sky_magic_common_event) depending on
+ * whether the Green Magikoopa is floating.
+ */
 static EVT_BEGIN(magic_common_event1)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -1238,6 +1300,7 @@ static EVT_BEGIN(magic_common_event1)
     RETURN
 EVT_END()
 
+/** Guess: Chooses the ground or sky finish (ground_magic_common_event2 or the sky equivalent). */
 static EVT_BEGIN(magic_common_event2)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -1248,6 +1311,10 @@ static EVT_BEGIN(magic_common_event2)
     RETURN
 EVT_END()
 
+/**
+ * Starts the target's avoid animation for the result of a pre-damage check (3, 6 or 2 select the three avoid
+ * types).
+ */
 static EVT_BEGIN(start_avoid)
     IF_INT_EQUAL(LW(5), 3)
         CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -1261,6 +1328,12 @@ static EVT_BEGIN(start_avoid)
     RETURN
 EVT_END()
 
+/**
+ * Guess: The Green Magikoopa's attack spell (magic blast):
+ * it fires the shot with SFX_ENM_KAMEKU_MAGIC3_2 at the target, checks the pre-damage result,
+ * and either misses (attack_magic_event_sub_no_hit) or hits (attack_magic_event_sub_hit)
+ * while the clones cast with it.
+ */
 static EVT_BEGIN(attack_magic_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -1379,6 +1452,7 @@ static EVT_BEGIN(attack_magic_event)
         RETURN
 EVT_END()
 
+/** Guess: The miss case of the attack spell: the shot passes by the avoiding target. */
 static EVT_BEGIN(attack_magic_event_sub_no_hit)
     IF_INT_EQUAL(LW(14), -1)
         RETURN
@@ -1394,6 +1468,7 @@ static EVT_BEGIN(attack_magic_event_sub_no_hit)
     RETURN
 EVT_END()
 
+/** Guess: The hit case of the attack spell: applies the action-command result and the damage. */
 static EVT_BEGIN(attack_magic_event_sub_hit)
     IF_INT_EQUAL(LW(14), -1)
         RETURN
@@ -1405,6 +1480,11 @@ static EVT_BEGIN(attack_magic_event_sub_hit)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Common part of the support spells (Huge, Electrified, Invisible, Defence up):
+ * it checks the target's current status (types 10, 14, 6 and 18) so it does not cast what is already active,
+ * then applies the status and the damage code result.
+ */
 static EVT_BEGIN(support_magic_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -1453,30 +1533,35 @@ static EVT_BEGIN(support_magic_event)
     RETURN
 EVT_END()
 
+/** Casts the size-up spell (dekadeka = huge) on an ally: makes it Huge (size change strength 2) for three turns. */
 static EVT_BEGIN(dekadeka_magic_event)
     SET_VALUE(LW(15), 10)
     CALL_CHILD(support_magic_event)
     RETURN
 EVT_END()
 
+/** Casts the hardening spell (katikati = rock-hard) on an ally: raises its defence by 3 for three turns. */
 static EVT_BEGIN(katikati_magic_event)
     SET_VALUE(LW(15), 14)
     CALL_CHILD(support_magic_event)
     RETURN
 EVT_END()
 
+/** Casts the electric spell (biribiri = tingling) on an ally: it becomes Electrified for three turns. */
 static EVT_BEGIN(biribiri_magic_event)
     SET_VALUE(LW(15), 6)
     CALL_CHILD(support_magic_event)
     RETURN
 EVT_END()
 
+/** Casts the transparency spell on an ally: it becomes Invisible for three turns. */
 static EVT_BEGIN(trans_magic_event)
     SET_VALUE(LW(15), 18)
     CALL_CHILD(support_magic_event)
     RETURN
 EVT_END()
 
+/** Heal spell on one ally: restores up to 8 HP. */
 static EVT_BEGIN(recover_magic_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -1520,6 +1605,10 @@ static EVT_BEGIN(recover_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * Heal spell on all allies: restores up to 4 HP each.
+ * Only the first target's missing HP is checked, so it may heal nobody when only that one is at full HP.
+ */
 static EVT_BEGIN(all_recover_magic_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -1582,6 +1671,10 @@ static EVT_BEGIN(all_recover_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: The Green Magikoopa's clone spell (bunsin = split):
+ * it shoots out up to four copies with SFX_ENM_KAMEKU_OFFSHOOT1 and 2, then shuffles them with the real one.
+ */
 static EVT_BEGIN(bunsin_magic_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -1637,6 +1730,13 @@ static EVT_BEGIN(bunsin_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: shoots the Magikoopa's spell.
+ * args[0] is the caster, args[1]-args[3] the three floats effMagic1N64Entry takes
+ * after the start position (the target point) and args[4] the effect type.
+ * The spell starts at the wand tip (25 units ahead of the caster, 20 up, scaled by size);
+ * the effect handle is kept in the caster's work[5] for eff_magic_get_posX.
+ */
 static USER_FUNC(eff_magic) {
     EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
@@ -1661,6 +1761,10 @@ static USER_FUNC(eff_magic) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper called every frame: keeps a charging-sparkle effect (effPokopiPchargeN64) on the tip of the
+ * Magikoopa's wand, scaled with the unit's size. Creates the effect on the first call and blocks until it ends.
+ */
 static USER_FUNC(eff_staff2) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -1684,6 +1788,11 @@ static USER_FUNC(eff_staff2) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper called every frame: keeps a lightning flare (effThunderflareN64) on the tip of the Magikoopa's
+ * wand while it casts, scaled with the unit's size.
+ * Creates the effect on the first call and blocks until it ends.
+ */
 static USER_FUNC(eff_staff1) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -1707,6 +1816,12 @@ static USER_FUNC(eff_staff1) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper: args[0] is the real caster and args[1] one of its copies.
+ * The copy takes over the real one's current HP
+ * and its block of status-effect counters (0x1E bytes from sleepTurns), and its HP gauge is reset to match,
+ * so every decoy shows the same health and status.
+ */
 static USER_FUNC(kamec_copy_status) {
     EvtWord* args = event->args;
     s32 id1 = evtGetValue(event, args[0]);
@@ -1724,6 +1839,11 @@ static USER_FUNC(kamec_copy_status) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: ten times swaps, at random, the x/z positions
+ * and home positions of two of the Magikoopas on the field (the real one, kind 0xC, and its copies, kind 0xD),
+ * so the player cannot tell which one is real.
+ */
 static USER_FUNC(kamec_shuffle) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* kamecs[6];
@@ -1760,6 +1880,11 @@ static USER_FUNC(kamec_shuffle) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: lists the Magikoopa's copies ('bunsin' = clone, kind 0xD).
+ * args[0]-args[3] receive the unit indices of up to four copies (-1 for unused slots)
+ * and args[4] receives how many copies exist.
+ */
 static USER_FUNC(kamec_get_bunsin) {
     EvtWord* args = event->args;
     s32 copies[4];
@@ -1787,6 +1912,10 @@ static USER_FUNC(kamec_get_bunsin) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] receives the number of enemy-side units (alliance 1) that are still alive,
+ * i.e. do not have status 0x1B. The scripts use it to see whether any Magikoopa or Wizzerd is left.
+ */
 static USER_FUNC(kamec_get_live_num) {
     s32 i;
     EvtWord* args = event->args;
@@ -1804,6 +1933,11 @@ static USER_FUNC(kamec_get_live_num) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Guess: Spawns one Green Magikoopa clone at the caster's position:
+ * invisible at first, sharing the original's HP and status (kamec_copy_status),
+ * with the clone's attack script and resistances.
+ */
 static EVT_BEGIN(spawn_event)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_kamec), 0)
     CALL(btlevtcmd_SetAlpha, LW(3), 1, 0)
@@ -1824,6 +1958,7 @@ static EVT_BEGIN(spawn_event)
     RETURN
 EVT_END()
 
+/** Wait script of the Green Magikoopa: shows its idle pose (and the clones' poses) from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)

@@ -207,6 +207,10 @@ static BattleWeapon weapon_togedaruma_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init event of the Dark Bristle: registers its wait,
+ * attack and damage events (attack_event also handles confusion) and starts waiting.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -216,6 +220,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Data-table event 37, run when an attacker is hurt by the spikes on top:
+ * after 30 frames a toge_flush flash appears over its head (higher when Huge, lower when Tiny)
+ * and it waits 60 more frames.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -237,6 +246,12 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/**
+ * Data-table events 38 and 39, run when an attacker is hurt by the spikes in front:
+ * with SFX_ENM_TOGEDA_MOVE1 it plays TGD_J_1 then TGD_J_2 (TGD_J_3 and TGD_J_4 while flipped),
+ * and after 30 frames a toge_flush flash appears in front of it (further out and higher when Huge,
+ * closer when Tiny).
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_front_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_TOGEDA_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     BEGIN_SIBLING_EVENT
@@ -274,6 +289,7 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_front_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Dark Bristle: runs the default damage reaction (btldefaultevt_Damage) for its body part. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -281,6 +297,13 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Data-table event 13: flips the Dark Bristle over.
+ * Switches to the overturned defence and pose tables,
+ * sets the flipped status flag and the overturned counter to 2,
+ * plays SFX_ENM_INSIDE1 and hops (rolling half a turn unless it was already flipped),
+ * then rests on its back at height 10 and makes that its home position.
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -318,6 +341,12 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Run instead of a normal attack while the Dark Bristle is flipped: counts the overturned counter down.
+ * While it is still above 0 it just goes back to waiting;
+ * at 0 it restores its normal defence and pose tables, clears the flipped status flag,
+ * rolls back upright with a hop (SFX_ENM_TOGEDA_MOVE6) and sets its home position back on the floor.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -357,6 +386,13 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the Dark Bristle. While flipped it runs wakeup_event instead.
+ * Otherwise it uses an item if it decides to, or picks the front-most target (the first-attack target on a first
+ * strike), rears up (TGD_J_1) and charges at it (TGD_A_1).
+ * A dodge or miss sends it hopping onto the target's spot, where it sits (TGD_N_1) for 1.5 s;
+ * a hit shakes the camera and damages the target (8 damage, 7 in the demos). It then hops home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -462,6 +498,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Wait event of the Dark Bristle: plays the idle pose,
+ * then every frame turns off its pre-emptive front-spike counter while it is asleep, stopped, dizzy, poisoned,
+ * confused or frozen (statuses 1-5 and 9), and turns it back on otherwise.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     LABEL(0)

@@ -157,6 +157,11 @@ BattleWeapon weapon_kohatty_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Battle init script for the Hatty: installs the wait,
+ * attack and damage handlers (confusion uses the default one), shrinks the model with a base scale of about 0.3,
+ * starts the wait event and lifts the unit and its home position to y = 10.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -170,6 +175,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: selects this unit (-2) and its part 1
+ * and runs the shared default damage reaction (btldefaultevt_Damage).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -179,12 +188,17 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Empty attack: the Hatty has no attack, so its turn only restarts the wait event. */
 static EVT_BEGIN(attack_event)
     LABEL(99)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
+/**
+ * Wait (idle) event: refreshes the body animation (part 1) from the unit's pose table
+ * so it matches the current state, then returns; the battle system runs it whenever the unit is idle.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

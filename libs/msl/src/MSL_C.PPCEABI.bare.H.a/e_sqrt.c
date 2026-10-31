@@ -2,6 +2,10 @@
 
 static const double one = 1.0, tiny = 1.0e-300;
 
+/**
+ * Square root of x (fdlibm), bit-by-bit integer method;
+ * NaN and infinity set errno to EDOM, and negative arguments return NaN with EDOM.
+ */
 double __ieee754_sqrt(double x) {
     double z;
     int sign = (int)0x80000000;

@@ -45,6 +45,11 @@ static TelopWork* wp = &work;
 
 static void telop(CameraId cameraId, void* param);
 
+/**
+ * Shows the name banner for area args[0] (an index into msg_tbl: Rogueport, Petal Meadows,
+ * ...) the first time a map script calls it for that area: fades in for 1 s, holds 5 s, fades out for 1 s.
+ * A saved flag per area keeps it from showing twice.
+ */
 USER_FUNC(evt_telop_entry) {
     EvtWord* args = event->args;
     u32 ms;
@@ -96,6 +101,11 @@ USER_FUNC(evt_telop_entry) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Draws the area name banner each frame: the banner texture with a drop shadow,
+ * masked by a randomly scrolled noise texture, then the area name (from the menu_monosiri messages) centred on
+ * it, shrunk to fit when gp->language is not 0 (Japanese).
+ */
 static void telop(CameraId cameraId, void* param) {
     GXTexObj texObj;
     Mtx mtx;

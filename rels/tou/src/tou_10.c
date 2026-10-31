@@ -42,6 +42,7 @@ USER_FUNC(evt_sub_get_language);
 #endif
 
 #if VERSION >= VERSION_JP
+/** Script helper: args[0] receives 1 if Mario's key input or control is currently disabled, else 0. */
 USER_FUNC(tou_10_mario_keyoff_check) {
     EvtWord* args = event->args;
 
@@ -55,11 +56,16 @@ USER_FUNC(tou_10_mario_keyoff_check) {
 #endif
 
 #if VERSION >= VERSION_US
+/** Script helper: returns DONE once Mario has left his talking motion, otherwise blocks. */
 s32 tou_10_mario_talk_end_wait(void) {
     return marioGetPtr()->currMotionId != MARIO_MOTION_TALK ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 #endif
 #if VERSION >= VERSION_JP
+/**
+ * Script helper: waits until Mario has been free (idle, walking or dashing, with no lockout) for a total of 240
+ * frames.
+ */
 USER_FUNC(tou_10_mario_free_wait) {
     MarioWork* mario = marioGetPtr();
 
@@ -78,12 +84,17 @@ USER_FUNC(tou_10_mario_free_wait) {
 }
 #endif
 
+/** Script helper: args[0] receives Yoshi's color (0-6) from the pouch. */
 static USER_FUNC(getYoshiColor) {
     EvtWord* args = event->args;
     evtSetValue(event, args[0], pouchGetPartyColor(4));
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: picks Yoshi's color from the real time that has passed since the egg was received (stored in
+ * GSW_TOU_EGG_TIME), modulo 20 minutes, and stores it in the pouch.
+ */
 static USER_FUNC(setYoshiColor) {
     OSTime start;
     s32 i;
@@ -113,18 +124,27 @@ static USER_FUNC(setYoshiColor) {
     return EVT_RETURN_DONE;
 }
 
+/** Exit script: sets GSWF_TOU10_ROOM_EXITED when Mario leaves the room. */
 EVT_BEGIN(room_out)
     SET_VALUE(GSWF(GSWF_TOU10_ROOM_EXITED), 1)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the locker room door (door_1), opening: LW(0) is the swing angle;
+ * turns door_1 about the Y axis by 0.44 times the angle.
+ */
 static EVT_BEGIN(n_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the locker room door (door_1), closing:
+ * turns door_1 about the Y axis by -0.44 times the angle.
+ */
 static EVT_BEGIN(n_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
@@ -153,6 +173,7 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
+/** NPC init for the Toad in the registration room: placed at (0, 0, -160) before the first match. */
 EVT_BEGIN(init_kino)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_05_MATCH)
@@ -161,6 +182,7 @@ EVT_BEGIN(init_kino)
     RETURN
 EVT_END()
 
+/** Talk script of the Toad: the first-match registration reminders (stg3_tou_66, 73). */
 EVT_BEGIN(talk_kino)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_05_MATCH)
@@ -173,10 +195,15 @@ EVT_BEGIN(talk_kino)
     RETURN
 EVT_END()
 
+/** NPC init for the room guard (empty). */
 EVT_BEGIN(init_gard)
     RETURN
 EVT_END()
 
+/**
+ * Guess: talk script of the guard at the arena door:
+ * he opens the door, walks out and Mario is taken on to tou_03, the ring.
+ */
 EVT_BEGIN(talk_gard)
     CALL(evt_npc_flag_onoff, 1, STRING("ガードマン"), NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_move_position, STRING("ガードマン"), 0, -130, 0, FLOAT(80.0f), 1)
@@ -203,6 +230,11 @@ EVT_BEGIN(talk_gard)
     RETURN
 EVT_END()
 
+/**
+ * NPC init for Michel (マイケル), a Koopa fighter: before STORY_STG3_34_RETURN_TO_ROGUEPORT he stands at (120, 0,
+ * -30) facing 270, unless the rank 12 fighter has already left (GSWF_TOU_RANK12_KING_K_GONE);
+ * from that story stage on he is always there.
+ */
 static EVT_BEGIN(init_michel)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_34_RETURN_TO_ROGUEPORT)
@@ -219,6 +251,10 @@ static EVT_BEGIN(init_michel)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of Michel: before STORY_STG3_34_RETURN_TO_ROGUEPORT the line depends on Mario's Glitz Pit ranking
+ * (20 down to 13); after that it depends on GSWF_TOU_REMATCH_MAJORS_LEFT.
+ */
 static EVT_BEGIN(talk_michel)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
         CALL(evt_tou_get_ranking, LW(0))
@@ -250,6 +286,7 @@ static EVT_BEGIN(talk_michel)
     RETURN
 EVT_END()
 
+/** NPC init for Octor (オクトール): placed at (80, 0, 85) facing 270. */
 EVT_BEGIN(init_octo)
     CALL(evt_npc_set_position, STRING("オクトール"), 80, 0, 85)
     CALL(evt_npc_status_onoff, 1, STRING("オクトール"), 2)
@@ -257,6 +294,10 @@ EVT_BEGIN(init_octo)
     RETURN
 EVT_END()
 
+/**
+ * Guess: talk script of Octor: story-dependent lines (before Mario's return to Rogueport, the escort stages,
+ * the rematch).
+ */
 EVT_BEGIN(talk_octo)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
         CALL(evt_tou_get_ranking, LW(0))
@@ -303,6 +344,10 @@ EVT_BEGIN(talk_octo)
     RETURN
 EVT_END()
 
+/**
+ * NPC init for Brots (ブロッツ): he stands at (-160, 0, -50) facing 90 once Mario's ranking is 19
+ * or worse (unless GSWF_TOU_RANK18_SCENE has played), and always from STORY_STG3_34_RETURN_TO_ROGUEPORT on.
+ */
 static EVT_BEGIN(init_brots)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
         CALL(evt_tou_get_ranking, LW(0))
@@ -322,6 +367,10 @@ static EVT_BEGIN(init_brots)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of Brots: before STORY_STG3_34_RETURN_TO_ROGUEPORT he speaks only when Mario's ranking is 19
+ * or worse (stg3_npc_10_04_04); afterwards the line depends on GSWF_TOU_REMATCH_MAJORS_LEFT.
+ */
 static EVT_BEGIN(talk_brots)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
         CALL(evt_tou_get_ranking, LW(0))
@@ -339,6 +388,7 @@ static EVT_BEGIN(talk_brots)
     RETURN
 EVT_END()
 
+/** NPC init for Gangan (ガンガン): placed at (-75, 0, 90) facing 90. */
 EVT_BEGIN(init_gangan)
     CALL(evt_npc_set_position, STRING("me"), -75, 0, 90)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
@@ -346,6 +396,7 @@ EVT_BEGIN(init_gangan)
     RETURN
 EVT_END()
 
+/** Talk script of Gangan: story-dependent lines like talk_octo. */
 EVT_BEGIN(talk_gangan)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
         CALL(evt_tou_get_ranking, LW(0))
@@ -392,6 +443,10 @@ EVT_BEGIN(talk_gangan)
     RETURN
 EVT_END()
 
+/**
+ * Guess: NPC init for Poku (the Iron Cleft opening spectator):
+ * placed at (120, 0, -30) after the Iron Clefts opening scene, elsewhere by story stage.
+ */
 EVT_BEGIN(init_poku)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -409,6 +464,7 @@ EVT_BEGIN(init_poku)
     RETURN
 EVT_END()
 
+/** Guess: talk script of Poku: story-dependent lines (stg3_npc_10_05_12 to 15 and later). */
 EVT_BEGIN(talk_poku)
     CALL(evt_tou_get_ranking, LW(0))
     SWITCH(LW(0))
@@ -431,6 +487,7 @@ EVT_BEGIN(talk_poku)
     RETURN
 EVT_END()
 
+/** NPC init for the first Iron Cleft: placed at (75, 0, -100) facing 270, scaled 1.5x. */
 EVT_BEGIN(init_iron)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
         CALL(evt_tou_get_ranking, LW(0))
@@ -448,6 +505,7 @@ EVT_BEGIN(init_iron)
     RETURN
 EVT_END()
 
+/** Talk script of the first Iron Cleft (stg3_npc_10_06_07, rematch lines stg3_npc_re_080/081). */
 EVT_BEGIN(talk_iron)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
         CALL(evt_msg_print, 0, STRING("stg3_npc_10_06_07"), 0, 0)
@@ -461,6 +519,7 @@ EVT_BEGIN(talk_iron)
     RETURN
 EVT_END()
 
+/** NPC init for the second Iron Cleft: placed at (100, 0, -80) facing 270, scaled 1.5x. */
 EVT_BEGIN(init_iron2)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
         CALL(evt_tou_get_ranking, LW(0))
@@ -478,6 +537,7 @@ EVT_BEGIN(init_iron2)
     RETURN
 EVT_END()
 
+/** Talk script of the second Iron Cleft (stg3_npc_10_06_08, rematch lines). */
 EVT_BEGIN(talk_iron2)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
         CALL(evt_msg_print, 0, STRING("stg3_npc_10_06_08"), 0, 0)
@@ -609,6 +669,11 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Guess: scene after Mario's very first win in the Glitz Pit:
+ * Grubba and Jolene congratulate him, the prize money is handed over
+ * and the story moves on (stg3_tou_89, 93_1 and following).
+ */
 EVT_BEGIN(evt_saisyo_after)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, -90, 0, -95)
@@ -823,6 +888,10 @@ EVT_BEGIN(evt_saisyo_after)
     RETURN
 EVT_END()
 
+/**
+ * Guess: scene after the first match of the rematch league:
+ * Jolene (キノシコワ) pays the prize money and comments (stg3_tou_re_028, 029 and following).
+ */
 EVT_BEGIN(evt_saisyo_after_re)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, -90, 0, -95)
@@ -940,6 +1009,10 @@ EVT_BEGIN(evt_saisyo_after_re)
     RETURN
 EVT_END()
 
+/**
+ * Guess: mini-Yoshi egg hatching scene (Yoshi joins):
+ * the new Yoshi NPC appears in its color, the party talks, and the partner joins the party.
+ */
 EVT_BEGIN(evt_tou_chibi_yoshi)
     CALL(setYoshiColor)
     CALL(getYoshiColor, LW(0))
@@ -1058,6 +1131,12 @@ EVT_BEGIN(evt_tou_chibi_yoshi)
     RETURN
 EVT_END()
 
+/**
+ * Scene after the first league win: Jolene (キノシコワ) talks to Mario in the locker room (stg3_tou_179_00,
+ * then 179_01 announcing a payout of 7 coins if GSWF_TOU_LAST_MATCH_WON is set and 1 otherwise,
+ * followed by the ranking message), hands over the coins, says stg3_tou_286 and leaves;
+ * Mario follows her out, GSWF_TOU_PROMOTION_PENDING is set and the map changes to tou_05.
+ */
 static EVT_BEGIN(evt_1st_leagu)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, -90, 0, -95)
@@ -1132,6 +1211,10 @@ static EVT_BEGIN(evt_1st_leagu)
     RETURN
 EVT_END()
 
+/**
+ * Guess: scene after a match when Mario has just re-entered the league:
+ * Jolene announces win or loss and gives the prize (stg3_tou_179_00 and following).
+ */
 EVT_BEGIN(evt_1st_leagu_re)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, -90, 0, -95)
@@ -1213,6 +1296,10 @@ EVT_BEGIN(evt_1st_leagu_re)
     RETURN
 EVT_END()
 
+/**
+ * Locker room door script: the staff member (キノシコワ) stops Mario at the door with stg3_tou_67
+ * if no match is reserved (GSWF_TOU_MATCH_RESERVED clear), or stg3_tou_73_01 if one is.
+ */
 static EVT_BEGIN(evt_door)
     CALL(evt_mario_key_onoff, 0)
     IF_INT_EQUAL(GSWF(GSWF_TOU_MATCH_RESERVED), 0)
@@ -1224,6 +1311,10 @@ static EVT_BEGIN(evt_door)
     RETURN
 EVT_END()
 
+/**
+ * Guess: scene where Jolene receives Mario for the day's registration, with the door,
+ * partner positioning and camera.
+ */
 EVT_BEGIN(evt_rec)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, 0, 0, -180)
@@ -1304,6 +1395,13 @@ EVT_BEGIN(evt_rec)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the guard scene after a match is reserved: it waits for Mario to be free;
+ * if he is near the locker room door (x within 35, z at or below -60) he is bounced back to (40, 0, -120),
+ * the guard (ガードマン) opens the door, steps in, closes it and says stg3_tou_74,
+ * and the staff member answers (stg3_tou_75). The pre-US versions wait 240 frames of free movement first.
+ * Control then returns to Mario.
+ */
 static EVT_BEGIN(evt_gardman)
 #if VERSION <= VERSION_DEMO_US
     SET_VALUE(LW(0), 0)
@@ -1402,6 +1500,10 @@ static EVT_BEGIN(evt_gardman)
     RETURN
 EVT_END()
 
+/**
+ * Guess: registration console demonstration for the first match:
+ * Grubba explains the match rule on the monitor (stg3_tou_69) and a fixed rule (43) is chosen.
+ */
 EVT_BEGIN(evt_match_make_sub)
     CALL(evt_cam3d_evt_set, -75, 91, 188, -75, 57, -1, 1000, 11)
     CALL(evt_party_stop, 0)
@@ -1444,6 +1546,11 @@ EVT_BEGIN(evt_match_make_sub)
     RETURN
 EVT_END()
 
+/**
+ * Registration console interaction: Mario and the partner step to the console,
+ * the prompt (stg3_tou_103) asks whether to change the match,
+ * and the chosen opponent and rule are announced (stg3_tou_104_01).
+ */
 EVT_BEGIN(evt_match_make)
 #if VERSION >= VERSION_JP
     CALL(tou_10_mario_keyoff_check, LW(0))
@@ -1487,11 +1594,13 @@ EVT_BEGIN(evt_match_make)
     RETURN
 EVT_END()
 
+/** Bed entry point: registers evt_tou_bed to run when Mario presses A in front of the bed named in LW(0). */
 static EVT_BEGIN(bed_entry)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, LW(0), 0, PTR(evt_tou_bed), 0)
     RETURN
 EVT_END()
 
+/** Guess: scene where Jolene scolds Mario (stg3_tou_297_16, 17 and following) for breaking a rule or running late. */
 EVT_BEGIN(evt_okorareru)
     CALL(evt_npc_set_position, STRING("キノシコワ"), 0, 0, -85)
     CALL(evt_set_dir_to_target, STRING("キノシコワ"), STRING("mario"))
@@ -1577,6 +1686,10 @@ EVT_BEGIN(evt_okorareru)
     RETURN
 EVT_END()
 
+/**
+ * Guess: mario hands over or receives documents (item "syorui"):
+ * partner and Mario move to the desk, the partner comments (stg3_tou_297_14, 15).
+ */
 EVT_BEGIN(evt_syorui)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -1609,6 +1722,10 @@ EVT_BEGIN(evt_syorui)
     RETURN
 EVT_END()
 
+/**
+ * Guess: first egg sighting in the registration room:
+ * Mario and the partner walk in and the partner remarks (stg3_tou_256).
+ */
 EVT_BEGIN(first_tamago)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_bero_exec_wait, 65536)
@@ -1629,11 +1746,18 @@ EVT_BEGIN(first_tamago)
     RETURN
 EVT_END()
 
+/** Run when the yellow block is hit: sets the story stage to STORY_STG3_20_03_THE_YELLOW_BLOCK. */
 static EVT_BEGIN(evt_block)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_20_03_THE_YELLOW_BLOCK)
     RETURN
 EVT_END()
 
+/**
+ * Guess: map init for tou_10, the match registration room:
+ * music by story stage, the registration console and monitor,
+ * NPCs (Toad, guard, Octor, Gangan, Poku, the Iron Clefts), lockers,
+ * and the entry scene to run (first match, rematch, egg).
+ */
 EVT_BEGIN(tou_10_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG3_00_WELCOME_TO_GLITZVILLE, STORY_STG3_12_MINI_YOSHI_EGG)
@@ -1742,6 +1866,10 @@ EVT_BEGIN(tou_10_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Guess: script helper: args[0] = name string; replaces the full-width space (a blank name) with the default
+ * "name_party3" message so the party member name is never empty.
+ */
 static USER_FUNC(name_check) {
     EvtWord* args = event->args;
 

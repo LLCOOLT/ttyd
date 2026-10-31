@@ -9,6 +9,13 @@ static BOOL LastState;
 static OSTime HoldUp;
 static OSTime HoldDown;
 
+/**
+ * PI interrupt handler for the console RESET button.
+ * Waits up to 100 microseconds for the button to be released;
+ * if it is still held it marks the button down,
+ * masks the reset interrupt and calls (once) the callback set with OSSetResetCallback,
+ * then acknowledges the interrupt in PI register 0.
+ */
 void __OSResetSWInterruptHandler(s16 exception, OSContext* context) {
     OSResetCallback callback;
 
@@ -29,6 +36,10 @@ void __OSResetSWInterruptHandler(s16 exception, OSContext* context) {
     __PIRegs[0] = 2;
 }
 
+/**
+ * Installs the function the OS calls when the user presses the RESET button, and returns the previous callback.
+ * Setting a callback unmasks the PI reset-switch interrupt (mask 0x200); setting NULL masks it.
+ */
 OSResetCallback OSSetResetCallback(OSResetCallback callback) {
     BOOL enabled;
     OSResetCallback prevCallback;
@@ -47,6 +58,12 @@ OSResetCallback OSSetResetCallback(OSResetCallback callback) {
     return prevCallback;
 }
 
+/**
+ * Polls the RESET button (bit 16 of PI register 0, active low) and returns TRUE while it counts as pressed:
+ * a press must last over 100 microseconds, and a release is held as pressed for 40 ms.
+ * Surprising: if a reset-button timer was set with __OSSetResetButtonTimer
+ * and that many minutes have passed since boot, it reports a pressed/released toggle every two seconds.
+ */
 BOOL OSGetResetButtonState(void) {
     BOOL enabled = OSDisableInterrupts();
     int state;
@@ -104,10 +121,16 @@ BOOL OSGetResetButtonState(void) {
     return state;
 }
 
+/** Older name for OSGetResetButtonState; returns the same value. */
 int OSGetResetSwitchState(void) {
     return OSGetResetButtonState();
 }
 
+/**
+ * Sets, in minutes (clamped to 31), the delay after
+ * which OSGetResetButtonState starts reporting a simulated button press.
+ * Stored in the low 5 bits of the byte at 0x800030E3 in low memory.
+ */
 void __OSSetResetButtonTimer(u8 min) {
     BOOL enabled = OSDisableInterrupts();
     if (min > 0x1F) {

@@ -41,6 +41,8 @@ u8 synthTrackVolume[64]; // size: 0x40
 
 static void synthAddJob(SYNTH_VOICE* svoice, SYNTH_JOBTYPE jobType, u32 deltaTime);
 
+/** Stores the tempo of a sequence section as ticks per second ((bpm * 8 * 1536) / 240); set 0xFF (sound effect voices)
+ * uses slot 8. */
 void synthSetBpm(u32 bpm, u8 set, u8 section) {
   if (set == 0xFF) {
     set = 8;
@@ -48,10 +50,13 @@ void synthSetBpm(u32 bpm, u8 set, u8 section) {
   synthTicksPerSecond[set][section] = ((bpm << 3) * 1536) / 240;
 }
 
+/** Returns the ticks per second of the section the voice belongs to, as set by synthSetBpm. */
 u32 synthGetTicksPerSecond(SYNTH_VOICE* svoice) {
   return synthTicksPerSecond[svoice->midiSet == 0xFF ? 8 : svoice->midiSet][svoice->section];
 }
 
+/** While portamento is active, moves the voice's current gliding pitch toward the target pitch ccents, spread over the
+ * remaining glide time, and returns the pitch to use this step (the target once the glide is over). */
 static u32 apply_portamento(SYNTH_VOICE* svoice, u32 ccents, u32 deltaTime) {
   u32 old_portCurPitch; // r31
 
@@ -72,6 +77,9 @@ static u32 apply_portamento(SYNTH_VOICE* svoice, u32 ccents, u32 deltaTime) {
   return ccents;
 }
 
+/** Starts a portamento glide for a voice: begins from the previous note's pitch, with the glide time elapsed already
+ * for non-"always glide" types unless the controller state says otherwise. Does nothing if the voice was already taken
+ * over by legato. */
 void synthInitPortamento(SYNTH_VOICE* svoice) {
   if (svoice->cFlags & 0x20000) {
     return;
@@ -90,6 +98,10 @@ void synthInitPortamento(SYNTH_VOICE* svoice) {
   svoice->portCurPitch = svoice->lastNote << 16;
 }
 
+/** Legato handling for a new note on a MIDI channel with portamento on: finds playing voices of the channel and,
+ * instead of starting new ones, retunes them to the new key (keeping their glide start pitch), relinks them under one
+ * new voice ID and marks the most recent as last started. Returns the new voice ID, or SND_ID_ERROR; *rejected is TRUE
+ * when the note must be dropped. */
 static u32 do_voice_portamento(u8 key, u8 midi, u8 midiSet, u32 isMaster, u32* rejected) {
   u32 i;                      // r30
   u32 vid;                    // r29
@@ -149,6 +161,8 @@ static u32 do_voice_portamento(u8 key, u8 midi, u8 midiSet, u32 isMaster, u32* r
   return vid;
 }
 
+// If the portamento controller (65) of the channel is on (above 8064), tries legato via do_voice_portamento. Returns
+// FALSE if the note must be rejected; *vid receives the retuned voice or 0xFFFFFFFF if a new voice should be started.
 static u32 check_portamento(u8 key, u8 midi, u8 midiSet, u32 newVID, u32* vid) {
   u32 rejected; // r1+0x14
 
@@ -334,6 +348,8 @@ static u32 StartKeymap(u16 keymapID, s16 prio, u8 maxVoices,
 }
 
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(1, 5, 4)
+/** Clears the "blocked" flag of every voice in a layered sound's chain so they can all start together once the whole
+ * set has been allocated. */
 static void unblockAllAllocatedVoices(u32 vid) {
   u32 id; // r31
 
@@ -416,6 +432,8 @@ u32 synthStartSound(u16 id, u8 prio, u8 max,
   }
 }
 
+/** Converts a pitch in 16.16 semitone fixed point to the DSP pitch ratio, interpolating between neighbouring keys for
+ * the fractional part (sndGetPitch / sndPitchUpOne). */
 static u32 convert_cents(SYNTH_VOICE* svoice, u32 ccents) {
   u32 curDetune; // r30
   u32 cpitch;    // r31
@@ -427,6 +445,7 @@ static u32 convert_cents(SYNTH_VOICE* svoice, u32 ccents) {
   return cpitch;
 }
 
+// If one of the voice's controller inputs depends on elapsed time, marks all its inputs dirty so they are recomputed.
 static void UpdateTimeMIDICtrl(SYNTH_VOICE* sv) {
   if (!sv->timeUsedByInput) {
     return;
@@ -440,6 +459,9 @@ static void UpdateTimeMIDICtrl(SYNTH_VOICE* sv) {
 #endif
 }
 
+/** Slow per-voice update (runs every few frames): advances the voice's two LFOs and vibrator, pitch sweeps, pan fades
+ * and pitch envelope; adds pitch bend, modulation vibrato, portamento and doppler to the base pitch and sends the
+ * result to the DSP voice with hwSetPitch. Reschedules itself. */
 static void LowPrecisionHandler(u32 i) {
   u32 j;            // r30
   s32 pbend;        // r29
@@ -616,6 +638,9 @@ end:
   UpdateTimeMIDICtrl(sv);
 }
 
+/** Per-frame voice volume update: runs the volume envelope, multiplies the voice volume with the fader groups, track
+ * volume, tremolo, and the volume/pan/reverb/aux controllers, and sends the levels to the DSP voice with hwSetVolume.
+ * Also updates the low-pass filter from its controllers and ages the voice priority. Reschedules itself every frame. */
 static void ZeroOffsetHandler(u32 i) {
   SYNTH_VOICE* sv;  // r31
   u32 lowDeltaTime; // r26
@@ -763,6 +788,8 @@ end:
   UpdateTimeMIDICtrl(sv);
 }
 
+/** Handles pending key state changes of a voice: updates the sustain pedal state, starts the hardware voice once the
+ * macro has released it (cFlags 0x20) and sends key-off to the DSP and pitch envelope when a key-off is pending. */
 static void EventHandler(u32 i) {
   SYNTH_VOICE* sv; // r31
 
@@ -791,6 +818,7 @@ end:
   UpdateTimeMIDICtrl(sv);
 }
 
+/** Empties the 32-slot ring of per-voice job lists and resets its index. */
 static void synthInitJobQueue() {
   u8 i; // r31
 
@@ -803,6 +831,8 @@ static void synthInitJobQueue() {
   synthJobTableIndex = 0;
 }
 
+/** Schedules a voice's low-precision, zero-offset or event job to run deltaTime (8.8 fixed point ms) from now by
+ * linking it into the matching slot of the job ring; a job already queued is moved (or left alone for event jobs). */
 static void synthAddJob(SYNTH_VOICE* svoice, SYNTH_JOBTYPE jobType, u32 deltaTime) {
   SYNTH_QUEUE* newJq;   // r31
   SYNTH_QUEUE** root;   // r30
@@ -866,6 +896,8 @@ static void synthAddJob(SYNTH_VOICE* svoice, SYNTH_JOBTYPE jobType, u32 deltaTim
   *root = newJq;
 }
 
+/** Starts the periodic jobs of a freshly started voice: records the time and queues the low-precision and zero-offset
+ * handlers. */
 void synthStartSynthJobHandling(SYNTH_VOICE* svoice) {
   svoice->lastLowCallTime = synthRealTime;
   svoice->lastZeroCallTime = synthRealTime;
@@ -873,13 +905,16 @@ void synthStartSynthJobHandling(SYNTH_VOICE* svoice) {
   synthAddJob(svoice, SYNTH_JOBTYPE_ZERO, 0);
 }
 
+/** Queues the low-precision and zero-offset handlers of a voice to run right away. */
 void synthForceLowPrecisionUpdate(SYNTH_VOICE* svoice) {
   synthAddJob(svoice, SYNTH_JOBTYPE_LOW, 0);
   synthAddJob(svoice, SYNTH_JOBTYPE_ZERO, 0);
 }
 
+/** Queues the event handler of a voice, to run on the next job pass. */
 void synthKeyStateUpdate(SYNTH_VOICE* svoice) { synthAddJob(svoice, SYNTH_JOBTYPE_EVENT, 0); }
 
+/** Runs handler for every voice in a job list (skipping blocked voices) and empties the list. */
 static void HandleJobQueue(SYNTH_QUEUE** queueRoot, void (*handler)(u32)) {
   SYNTH_QUEUE* jq;     // r31
   SYNTH_QUEUE* nextJq; // r30
@@ -897,6 +932,8 @@ static void HandleJobQueue(SYNTH_QUEUE** queueRoot, void (*handler)(u32)) {
   *queueRoot = NULL;
 }
 
+/** Runs the jobs due in the current slot of the job ring: low precision, event, then zero offset updates, and advances
+ * the ring. */
 static void HandleVoices() {
   SYNTH_JOBTAB* jTab = &synthJobTable[synthJobTableIndex]; // r31
   HandleJobQueue(&jTab->lowPrecision, LowPrecisionHandler);
@@ -905,6 +942,7 @@ static void HandleVoices() {
   synthJobTableIndex = synthJobTableIndex + 1 & 0x1f;
 }
 
+// When a master fader reaches its target, applies its sequence action: 1 stops the sequence, 2 pauses it, 3 mutes it.
 static void HandleFaderTermination(SYNTHMasterFader* smf) {
   switch (smf->seqMode) {
   case 1:
@@ -919,6 +957,9 @@ static void HandleFaderTermination(SYNTHMasterFader* smf) {
   }
 }
 
+/** Per-step synthesizer update: runs the macro interpreter and voice jobs; on the first step of each frame it also
+ * advances the volume group faders (and pause fades) and sends the new parameters to the aux effect callbacks, then
+ * adds deltaTime to the synth clock. */
 void synthHandle(u32 deltaTime) {
   u32 i;                 // r29
   u32 s;                 // r30
@@ -985,6 +1026,7 @@ void synthHandle(u32 deltaTime) {
   synthRealTime += deltaTime;
 }
 
+/** Returns the maximum simultaneous voices of sound effect fid, or 0 if it is not loaded. */
 u8 synthFXGetMaxVoices(u16 fid) {
   FX_TAB* fx;
   if ((fx = dataGetFX(fid)) != NULL) {
@@ -1032,6 +1074,8 @@ u32 synthFXStart(u16 fid,
 }
 
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 1)
+/** Returns nonzero if starting sound effect fid right now would take over the voice that already plays the same effect
+ * (voice limit reached by itself). */
 int synthCheckFXRealloc(unsigned short fid) {
   struct FX_TAB* fx;            // r31
   unsigned long allocId;        // r30
@@ -1051,6 +1095,8 @@ int synthCheckFXRealloc(unsigned short fid) {
 }
 #endif
 
+/** Sets a 7-bit MIDI controller on the voices of sound effect voice ID vid (and its children); returns TRUE if any
+ * voice was found. */
 bool synthFXSetCtrl(u32 vid, u8 ctrl, u8 value) {
   u32 i;   // r31
   u32 ret; // r29
@@ -1077,6 +1123,8 @@ bool synthFXSetCtrl(u32 vid, u8 ctrl, u8 value) {
   return ret;
 }
 
+/** Sets a 14-bit MIDI controller on the voices of sound effect voice ID vid (and its children); returns TRUE if any
+ * voice was found. */
 bool synthFXSetCtrl14(u32 vid, u8 ctrl, u16 value) {
   u32 i;   // r31
   u32 ret; // r29
@@ -1103,6 +1151,7 @@ bool synthFXSetCtrl14(u32 vid, u8 ctrl, u16 value) {
   return ret;
 }
 
+/** Copies the volume, pan, reverb, pitch bend and doppler controllers from one sound effect voice to another. */
 void synthFXCloneMidiSetup(SYNTH_VOICE* dest, SYNTH_VOICE* src) {
   inpFXCopyCtrl(SND_MIDICTRL_VOLUME, dest, src);
   inpFXCopyCtrl(SND_MIDICTRL_PANNING, dest, src);
@@ -1111,6 +1160,7 @@ void synthFXCloneMidiSetup(SYNTH_VOICE* dest, SYNTH_VOICE* src) {
   inpFXCopyCtrl(SND_MIDICTRL_DOPPLER, dest, src);
 }
 
+/** Sets the volume controller (7) of the voices of sound effect voice ID vid; returns TRUE if any voice was found. */
 static bool synthFXVolume(u32 vid, u8 vol) {
   u32 i;   // r31
   u32 ret; // r29
@@ -1137,6 +1187,7 @@ static bool synthFXVolume(u32 vid, u8 vol) {
   return ret;
 }
 
+/** Sends a key-off to the voice (and its children) with the given voice ID; returns TRUE if any voice was found. */
 bool synthSendKeyOff(u32 voiceid) {
   u32 i;    // r30
   bool ret; // r29
@@ -1161,6 +1212,8 @@ bool synthSendKeyOff(u32 voiceid) {
   return ret;
 }
 
+/** Returns the current output volume (0..32767) of the sound effect voice vid, or 0 if it does not exist or belongs to
+ * a sequence. */
 u16 synthGetVolume(u32 vid) {
   u32 i; // r30
 
@@ -1175,6 +1228,8 @@ u16 synthGetVolume(u32 vid) {
   return 0;
 }
 
+/** Starts a volume group fade to volume (0..127) over time (8.8 ms; 0 = immediately), remembering the sequence action
+ * to run at the end; an immediate fade runs that action at once. */
 static void SetupFader(SYNTHMasterFader* smf, u8 volume, u32 time, u8 seqMode, u32 seqId) {
   smf->seqMode = seqMode;
   smf->seqId = seqId;
@@ -1191,6 +1246,8 @@ static void SetupFader(SYNTHMasterFader* smf, u8 volume, u32 time, u8 seqMode, u
   }
 }
 
+/** Fades a volume group (or all music, all effects, all user groups) to volume over time ms; seqMode and seqId say
+ * which sequence to stop, pause or mute when the fade ends. */
 void synthVolume(u8 volume, u16 time, u8 vGroup, u8 seqMode, u32 seqId) {
   u32 ltime;             // r1+0x14
   u32 i;                 // r30
@@ -1252,6 +1309,7 @@ void synthVolume(u8 volume, u16 time, u8 vGroup, u8 seqMode, u32 seqId) {
   }
 }
 
+/** Returns TRUE if the volume group is currently fading toward a lower volume. */
 bool synthIsFadeOutActive(u8 vGroup) {
   if (synthMasterFader[vGroup].type != 4 && (synthMasterFaderActiveFlags & (1 << vGroup)) != 0 &&
       synthMasterFader[vGroup].start > synthMasterFader[vGroup].target) {
@@ -1260,6 +1318,8 @@ bool synthIsFadeOutActive(u8 vGroup) {
   return FALSE;
 }
 
+/** Fades the "pause" gain of a volume group (or group class) to volume over time ms (at least 1); used to duck or
+ * restore sound while paused. */
 void synthPauseVolume(u8 volume, u16 time, u8 vGroup) {
   u32 i;                 // r30
   u32 ltime;             // r1+0x10
@@ -1352,12 +1412,15 @@ void synthPauseVolume(u8 volume, u16 time, u8 vGroup) {
   }
 }
 
+/** Sets the type of a volume group (0 music, 1 effects, 2 user music, 3 user effects, 4 none). */
 void synthSetMusicVolumeType(u8 vGroup, u8 type) {
   if (sndActive) {
     synthMasterFader[vGroup].type = type;
   }
 }
 
+/** Receives DSP voice events: 0 = sample ended (ends virtual sample and macro), 1 = voice dropped for lack of DSP time
+ * (kills it), 2 = virtual sample start, 3 = virtual sample end. Returns the virtual sample start result. */
 static u32 synthHWMessageHandler(u32 mesg, u32 voiceID) {
   u32 ret; // r30
 
@@ -1395,6 +1458,9 @@ static u32 synthHWMessageHandler(u32 mesg, u32 voiceID) {
   return ret;
 }
 
+/** Allocates and clears the synth voice array, sets up the volume group faders (groups 23-30 are music, 31 effects, 21
+ * and 22 start at full volume), clears aux callbacks and ITD defaults, then initializes macros, voice IDs, allocation,
+ * last-started tracking, virtual samples and streams. */
 void synthInit(u32 mixFrq, u32 numVoices) {
   u32 i; // r31
 
@@ -1487,4 +1553,5 @@ void synthInit(u32 mixFrq, u32 numVoices) {
   hwSetMesgCallback(synthHWMessageHandler);
 }
 
+/** Frees the synth voice array. */
 void synthExit() { salFree(synthVoice); }

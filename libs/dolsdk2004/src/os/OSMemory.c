@@ -16,6 +16,7 @@ static OSResetFunctionInfo ResetFunctionInfo = {
     NULL
 };
 
+/** Returns the console's physical main memory size from the boot info (24 MB on a retail GameCube). */
 u32 OSGetPhysicalMemSize(void) {
 #if DEBUG
     OSBootInfo* BootInfo = (OSBootInfo*)OSPhysicalToCached(0);
@@ -26,6 +27,7 @@ u32 OSGetPhysicalMemSize(void) {
 #endif
 }
 
+/** Returns the memory size the console was told to simulate (what the memory map is set up for). */
 u32 OSGetConsoleSimulatedMemSize(void) {
 #if DEBUG
     u32* memSize = (u32*)OSPhysicalToCached(0xF0);
@@ -36,6 +38,10 @@ u32 OSGetConsoleSimulatedMemSize(void) {
 #endif
 }
 
+/**
+ * Reset callback: on the final pass it opens up all memory-protection channels again
+ * and masks the memory protection interrupts.
+ */
 static BOOL OnReset(BOOL final) {
     if (final != FALSE) {
         __MEMRegs[8] = 0xFF;
@@ -46,6 +52,11 @@ static BOOL OnReset(BOOL final) {
 
 void (*__OSErrorTable[])(u16, OSContext*, ...);
 
+/**
+ * Interrupt handler for the memory protection hardware:
+ * reads the cause and faulting address and passes them to the memory-protection error handler,
+ * or to __OSUnhandledException if none is installed.
+ */
 static void MEMIntrruptHandler(__OSInterrupt interrupt, OSContext* context) {
     u32 addr;
     u32 cause;
@@ -62,6 +73,12 @@ static void MEMIntrruptHandler(__OSInterrupt interrupt, OSContext* context) {
     __OSUnhandledException(__OS_EXCEPTION_MEMORY_PROTECTION, context, cause, addr);
 }
 
+/**
+ * Limits access to the 1 KB-aligned range around addr on one of the four memory-protection channels.
+ * control is the allowed access (0 none, 1 read, 2 write, 3 both);
+ * anything less than 3 enables the protection interrupt for that channel.
+ * The range is flushed from the data cache first.
+ */
 void OSProtectRange(u32 chan, void* addr, u32 nBytes, u32 control) {
     BOOL enabled;
     u32 start;
@@ -102,6 +119,7 @@ void OSProtectRange(u32 chan, void* addr, u32 nBytes, u32 control) {
     OSRestoreInterrupts(enabled);
 }
 
+/** Assembly: sets the BATs for the retail 24 MB memory map and returns with address translation on. */
 #ifdef __GEKKO__
 static asm void Config24MB(void) {
     nofralloc
@@ -140,6 +158,7 @@ static asm void Config24MB(void) {
 }
 #endif
 
+/** Assembly: sets the BATs for the 48 MB development-kit memory map and returns with address translation on. */
 #ifdef __GEKKO__
 static asm void Config48MB(void) {
     nofralloc
@@ -178,6 +197,10 @@ static asm void Config48MB(void) {
 }
 #endif
 
+/**
+ * Assembly: jumps to a function by physical address with address translation turned off (so the BATs can be
+ * rewritten).
+ */
 #ifdef __GEKKO__
 static asm void RealMode(register u32 addr) {
     nofralloc
@@ -190,6 +213,11 @@ static asm void RealMode(register u32 addr) {
 }
 #endif
 
+/**
+ * Sets up memory protection and the BATs for the console's memory size (24 MB or 48 MB map),
+ * installs the memory interrupt handlers and the reset callback. Skipped when running under the IPL.
+ * Called from OSInit.
+ */
 void __OSInitMemoryProtection(void) {
 #ifndef DEBUG
     u32 padding[9];

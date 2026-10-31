@@ -192,6 +192,13 @@ static BattleWeapon weapon_kurokumorn_thunder_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Turn script of the Dark Puff.
+ * After an item-use check, if its thunder barrier is up (counter attribute 1024 on part 1) it fires the
+ * lightning attack through thunder_event.
+ * Otherwise it rolls 0 to 99: below 60 it makes a normal attack,
+ * otherwise it charges up the barrier through charge_event.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -222,6 +229,14 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Puff's lightning attack, used while its thunder barrier is up.
+ * It samples a target, declares an attack on every opponent,
+ * plays the charge sound and the A_2B/A_3A/A_3B animations,
+ * drops the barrier (clears counter attribute 1024)
+ * and rains pokopi_thunder_n64 lightning bolts on the player's side,
+ * with the damage decided by the pre-damage check and CheckDamage per target.
+ */
 static EVT_BEGIN(thunder_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -381,6 +396,10 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init script of the Poison Puff: installs the wait, unison-phase, attack, damage and confusion handlers,
+ * clears its unit work 0 and 1, and starts barrier_event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventUnisonPhase, BTL_UNIT_SELF, PTR(unison_phase_event))
@@ -394,6 +413,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Background loop on the Dark Puff: every 31 frames, while its thunder barrier is up,
+ * spawns the akari_charge_n64 spark effect above it; ends when the unit is gone.
+ */
 static EVT_BEGIN(barrier_event)
     LABEL(0)
     WAIT_FRAMES(31)
@@ -413,6 +436,7 @@ static EVT_BEGIN(barrier_event)
     RETURN
 EVT_END()
 
+/** Position the Magikoopa takes for a first-strike reaction (the pre-battle attack by Mario). Guess. */
 static EVT_BEGIN(dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -421,6 +445,7 @@ static EVT_BEGIN(dmg_first_attack_pos)
     RETURN
 EVT_END()
 
+/** Guess: damage event of a sword: runs the default damage reaction. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -428,10 +453,16 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Counter handler of the Poison Puff: empty, it does nothing. */
 static EVT_BEGIN(counter_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: before the player's phase, if the Puff can act and its barrier is down,
+ * it has a 50 percent chance to swoop between the ground (height 10) and the air (height 40),
+ * toggling unit work 0 and part attribute bits 6291456, with a movement sound.
+ */
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_EQUAL(LW(0), 0)
@@ -470,6 +501,10 @@ static EVT_BEGIN(unison_phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the Poison Puff's regular attack: picks a target (or the first-strike target), floats over and attacks,
+ * handles guard and miss results and returns home.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -577,6 +612,10 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Charge-up: the camera zooms on the Puff, a charge sound plays
+ * and the thunder barrier is raised (counter attribute 1024 on part 1) with its A_2A/A_2B charge animations.
+ */
 static EVT_BEGIN(charge_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -595,6 +634,7 @@ static EVT_BEGIN(charge_event)
     RETURN
 EVT_END()
 
+/** Wait script of the Dark Puff: shows its idle pose from the pose table and resets its scale to 1. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, 1, 1, 1)

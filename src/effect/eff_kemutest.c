@@ -68,12 +68,14 @@ static f32 bom_dir[10] = {10.0f, 40.0f, 80.0f, 170.0f, 140.0f, 100.0f, 25.0f, 15
 static f32 bom_spd[10] = {2.2f, 2.7f, 3.0f, 2.2f, 2.7f, 3.0f, 1.9f, 1.9f, 1.5f, 1.5f};
 #endif
 
+/** Sets the X and Z rotation used by type 11, which is drawn tilted rather than camera-facing. */
 void effKemuTestSetRxRz(EffectEntry* effect, f32 rx, f32 rz) {
     KemuTestWork* work = effect->userdata;
     work->rx = rx;
     work->rz = rz;
 }
 
+/** Chooses which camera draws the effect. */
 void effKemuTestDrawCam(EffectEntry* effect, s32 camera) {
     KemuTestWork* work = effect->userdata;
 
@@ -82,6 +84,7 @@ void effKemuTestDrawCam(EffectEntry* effect, s32 camera) {
 
 // Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_loop_invariants off
+/** Draws the smoke pieces (texture 0x28) with three TEV stages; billboarded unless type 11. */
 static void effKemuTestDisp(CameraId cameraId, void* param) {
     EffectEntry* effect = param;
     Mtx trans;
@@ -212,6 +215,7 @@ static void effKemuTestDisp(CameraId cameraId, void* param) {
 
 #pragma opt_loop_invariants reset
 
+/** Advances each smoke piece (delay, gravity, spread, texture frame) per type and deletes the effect when all end. */
 static void effKemuTestMain(EffectEntry* effect) {
     KemuTestWork* work = effect->userdata;
     Vec pos;
@@ -370,6 +374,10 @@ static void effKemuTestMain(EffectEntry* effect) {
     }
 }
 
+/**
+ * Spawns the smoke burst at (x, y, z): the type (0-19) picks the piece count and motion.
+ * Spawned by the hammer motion (mot_hammer.c), partner code and event scripts.
+ */
 EffectEntry* effKemuTestEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
 #if VERSION >= VERSION_JP
     static f32 bom_dir[10] = {10.0f, 40.0f, 80.0f, 170.0f, 140.0f, 100.0f, 25.0f, 155.0f, 60.0f, 120.0f};

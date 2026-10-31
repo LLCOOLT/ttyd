@@ -28,6 +28,11 @@ static EvtWord kpa_act_stg3_mobj[] = {
     KPA_OBJ_POLE(262.5f, 0.0f, kpa_goal), KPA_OBJ_END,
 };
 
+/**
+ * Watches Bowser in the stage: each frame it checks whether he is dead (evt_koopa_chk_dead)
+ * or has fallen below y = -20, then runs the death handler (kpa_dead) if he died,
+ * or the pit fall handler (kpa_fall_sub) if he fell.
+ */
 static EVT_BEGIN(kpa_fall)
     SET_VALUE(LF(0), 0)
     LOOP(0)
@@ -50,6 +55,11 @@ static EVT_BEGIN(kpa_fall)
     RETURN
 EVT_END()
 
+/**
+ * Goal of the third Bowser stage: locks the controls,
+ * sets the story progress to STORY_STG6_55_03_BOWSER_ACTION_STAGE and changes the map to kpa_07
+ * after a 300 ms pause that also removes the letterbox.
+ */
 static EVT_BEGIN(kpa_goal)
     CALL(evt_mario_key_onoff, 0)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_55_03_BOWSER_ACTION_STAGE)
@@ -66,6 +76,11 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Map init for kpa_06, the second half of stage 3:
+ * Bowser arrives at the top left, the blocks come from kpa_act_stg3_mobj, and the clock and music run.
+ * The goal leads to kpa_07.
+ */
 EVT_BEGIN(kpa_06_init_evt)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_npc_setup, PTR(npcEnt))

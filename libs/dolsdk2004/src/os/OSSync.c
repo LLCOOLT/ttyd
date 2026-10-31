@@ -8,6 +8,11 @@ void __OSSystemCallVectorStart(void);
 void __OSSystemCallVectorEnd(void);
 
 #ifdef __GEKKO__
+/**
+ * Assembly body of the PowerPC system-call (sc) exception handler:
+ * briefly sets HID0 bit 0x8 (flash-invalidates the instruction cache), restores HID0 and returns with rfi.
+ * Copied to physical 0xC00 by __OSInitSystemCall.
+ */
 static asm void SystemCallVector(void) {
 entry __OSSystemCallVectorStart
     nofralloc
@@ -23,6 +28,10 @@ entry __OSSystemCallVectorEnd
 }
 #endif
 
+/**
+ * Copies the system-call handler into the exception vector at 0xC00,
+ * flushes it out of the data cache and invalidates the instruction cache so it takes effect.
+ */
 void __OSInitSystemCall(void) {
     void* addr = (void*)OSPhysicalToCached(0xC00);
 

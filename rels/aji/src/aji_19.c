@@ -33,6 +33,11 @@ static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
 static BeroEntry bero_entry_data[3];
 extern EvtWord evt_hajimete[];
 
+/**
+ * Door close animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times 0.25;
+ * the open and close scripts apply the same transform. The demo builds use 0.2217.
+ */
 static EVT_BEGIN(w_door_close)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -45,6 +50,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door open animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times 0.25;
+ * the open and close scripts apply the same transform. The demo builds use 0.2217.
+ */
 static EVT_BEGIN(w_door_open)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -57,6 +67,11 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door close animation step: moves the two door leaves S_door2_1
+ * and S_door2_2 in opposite directions along Z by the animation value in LW(0) times -0.25;
+ * the open and close scripts apply the same transform. The demo builds use -0.2217.
+ */
 static EVT_BEGIN(e_door_close)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
@@ -69,6 +84,11 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door open animation step: moves the two door leaves S_door2_1
+ * and S_door2_2 in opposite directions along Z by the animation value in LW(0) times -0.25;
+ * the open and close scripts apply the same transform. The demo builds use -0.2217.
+ */
 static EVT_BEGIN(e_door_open)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
@@ -121,6 +141,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * First-visit scene of the fortress (aji_19, before STORY_STG7_07_01_INSIDE_THE_BUILDING):
+ * the partner comments (stg7_aji_00_00_01), the story becomes STORY_STG7_07_01_INSIDE_THE_BUILDING
+ * and the area name telop is shown.
+ */
 EVT_BEGIN(evt_hajimete)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_seq_wait, 2)
@@ -136,6 +161,10 @@ EVT_BEGIN(evt_hajimete)
     RETURN
 EVT_END()
 
+/**
+ * Init script of aji_19, the entrance room of the fortress:
+ * plays BGM_STG7_DUN1, sets up the exits and the conveyor check, and runs evt_hajimete on the first visit.
+ */
 EVT_BEGIN(aji_19_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI1"))
@@ -159,7 +188,7 @@ EVT_BEGIN(aji_19_init_evt)
     RETURN
 EVT_END()
 
-// Conveyor push per frame: PAL scales the 60 Hz speed to the frame rate
+/** Conveyor push per frame: PAL scales the 60 Hz speed to the frame rate */
 static inline f32 beltSpeed(void) {
 #if VERSION == VERSION_EU
     return 60.0f / gp->framerate;
@@ -168,6 +197,11 @@ static inline f32 beltSpeed(void) {
 #endif
 }
 
+/**
+ * Script function that carries Mario and his partners on the conveyor belts of the room:
+ * whoever stands on the upper belt A_b_ue is pushed along X at beltSpeed(),
+ * on the lower belt A_b_shita the other way. Blocks forever.
+ */
 static USER_FUNC(mario_chk) {
     MarioWork* mario = marioGetPtr();
     PartyEntry* party;
@@ -200,11 +234,16 @@ static USER_FUNC(mario_chk) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Whether the hit area target is group or one of its descendants. */
 static BOOL hitIsGroup(HitEntry* target, HitEntry* group) {
     // whether target is group or one of its descendants
     return _hitIsGroupSub(target, group, FALSE);
 }
 
+/**
+ * Recursive helper of hitIsGroup: whether the joint name of target equals that of node,
+ * of any of node's descendants, or (when checkSibling is TRUE) of the siblings that follow.
+ */
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling) {
     if (strcmp(target->joint->name, node->joint->name) == 0) {
         return TRUE;

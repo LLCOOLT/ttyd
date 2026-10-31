@@ -46,13 +46,13 @@
 #include "glu/gluos.h"
 #include "glu/mesh.h"
 #include "glu/geom.h"
-
+/** GLU tessellator: returns TRUE when vertex u sorts at or before v in the sweep order (by s, then t). */
 int __gl_vertLeq(GLUvertex* u, GLUvertex* v) {
     /* Returns TRUE if u is lexicographically <= v. */
 
     return VertLeq(u, v);
 }
-
+/** GLU tessellator: signed t-distance from edge uw to v at v's s (u <= v <= w in sweep order; 0 if uw is vertical). */
 GLdouble __gl_edgeEval(GLUvertex* u, GLUvertex* v, GLUvertex* w) {
     /* Given three vertices u,v,w such that VertLeq(u,v) && VertLeq(v,w),
      * evaluates the t-coord of the edge uw at the s-coord of the vertex v.
@@ -81,7 +81,7 @@ GLdouble __gl_edgeEval(GLUvertex* u, GLUvertex* v, GLUvertex* w) {
     /* vertical line */
     return 0;
 }
-
+/** GLU tessellator: cheaper __gl_edgeEval with the same sign: > 0, 0 or < 0 as v is above, on or below edge uw. */
 GLdouble __gl_edgeSign(GLUvertex* u, GLUvertex* v, GLUvertex* w) {
     /* Returns a number whose sign matches EdgeEval(u,v,w) but which
      * is cheaper to evaluate. Returns > 0, == 0 , or < 0
@@ -107,7 +107,7 @@ GLdouble __gl_edgeSign(GLUvertex* u, GLUvertex* v, GLUvertex* w) {
  * The sweep uses these to compute the t coordinate of an intersection
  * (see __gl_edgeIntersect below).
  */
-
+/** GLU tessellator: __gl_edgeEval with s and t swapped; the sweep uses it for the t coordinate of an intersection. */
 GLdouble __gl_transEval(GLUvertex* u, GLUvertex* v, GLUvertex* w) {
     /* Given three vertices u,v,w such that TransLeq(u,v) && TransLeq(v,w),
      * evaluates the t-coord of the edge uw at the s-coord of the vertex v.
@@ -136,7 +136,7 @@ GLdouble __gl_transEval(GLUvertex* u, GLUvertex* v, GLUvertex* w) {
     /* vertical line */
     return 0;
 }
-
+/** GLU tessellator: __gl_edgeSign with s and t swapped. */
 GLdouble __gl_transSign(GLUvertex* u, GLUvertex* v, GLUvertex* w) {
     /* Returns a number whose sign matches TransEval(u,v,w) but which
      * is cheaper to evaluate. Returns > 0, == 0 , or < 0
@@ -157,6 +157,7 @@ GLdouble __gl_transSign(GLUvertex* u, GLUvertex* v, GLUvertex* w) {
     return 0;
 }
 
+/** GLU tessellator: returns TRUE when u, v, w are in counter-clockwise order (non-negative signed area). */
 int __gl_vertCCW(GLUvertex* u, GLUvertex* v, GLUvertex* w) {
     /* For almost-degenerate situations, the results are not reliable.
      * Unless the floating-point arithmetic can be performed without
@@ -189,6 +190,8 @@ int __gl_vertCCW(GLUvertex* u, GLUvertex* v, GLUvertex* w) {
 #include <stdlib.h>
 extern int RandomInterpolate;
 
+/** GLU tessellator, test build only (FOR_TRITE_TEST_PROGRAM): an Interpolate that can randomise the weights to check
+ * that the sweep only relies on the result lying between x and y. */
 GLdouble Interpolate(GLdouble a, GLdouble x, GLdouble b, GLdouble y) {
     printf("*********************%d\n", RandomInterpolate);
     if (RandomInterpolate) {

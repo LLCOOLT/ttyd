@@ -78,6 +78,13 @@ BeroEntry bero_data_c_nidome[] = {
     {0},
 };
 
+/**
+ * Init script of rsh_08_a, the connector room off rsh_01 (the only map of rsh_08):
+ * picks the music for the station the train has reached (Poshley Heights, Rogueport or the train ambience),
+ * chooses the door set that leads back to rsh_01 a,
+ * b or c from the scenery variant flag (GSWF_RSH_REVISIT_VARIANT_A, B or C)
+ * and starts the shaking train scenery.
+ */
 EVT_BEGIN(rsh_08_a_init_evt)
     IF_INT_EQUAL(GSWF(GSWF_TRAIN_ARRIVED_POSHLEY), 1)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG6_PIK1"))

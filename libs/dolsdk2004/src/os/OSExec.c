@@ -10,6 +10,11 @@ extern volatile u8 g_unk_800030E2 AT_ADDRESS(0x800030E2);
 
 static int Prepared;
 
+/**
+ * Builds the 0x2000-byte argument block a launched DOL reads:
+ * argument strings packed at the end, then the argv pointer list (as offsets within the block) and argc,
+ * with the offset of argc stored at +8.
+ */
 static int PackArgs(void* addr, s32 argc, char** argv) {
     s32 numArgs;
     char* bootInfo2;
@@ -50,6 +55,7 @@ static int PackArgs(void* addr, s32 argc, char** argv) {
     return 1;
 }
 
+/** Assembly: invalidates the instruction cache and jumps to the entry point (it never returns). */
 #ifdef __GEKKO__
 static asm void Run(register void* entryPoint) {
     nofralloc
@@ -73,6 +79,10 @@ static asm void Run(register void* entryPoint) {
 }
 #endif
 
+/**
+ * Stores the exec parameters in the arena, writes 7 to PI register 9,
+ * disables interrupts and jumps to the loaded DOL's entry point.
+ */
 static void StartDol(const OSExecParams* params, void* entry) {
     OSExecParams* paramsWork = OSAllocFromArenaLo(sizeof(OSExecParams), 1);
 
@@ -83,6 +93,10 @@ static void StartDol(const OSExecParams* params, void* entry) {
     Run(entry);
 }
 
+/**
+ * Reads length bytes at a disc offset into memory with an asynchronous DVD read, polling until it finishes;
+ * if the disc is removed it triggers a hot reset.
+ */
 static void ReadDisc(void* addr, s32 length, s32 offset) {
     DVDCommandBlock block;
 #if SDK_REVISION < 1
@@ -107,10 +121,12 @@ static void ReadDisc(void* addr, s32 length, s32 offset) {
     }
 }
 
+/** DVD callback for __DVDPrepareResetAsync; sets Prepared so __OSBootDolSimple knows the drive is ready. */
 static void Callback(s32, DVDCommandBlock*) {
     Prepared = TRUE;
 }
 
+/** Returns whether the current disc's ID has audio streaming enabled. */
 static int IsStreamEnabled() {
     if (DVDGetCurrentDiskID()->streaming) {
         return TRUE;
@@ -119,6 +135,10 @@ static int IsStreamEnabled() {
     return FALSE;
 }
 
+/**
+ * Copies the exec parameters left by the previous program into the caller's structure,
+ * or marks it invalid if none were stored.
+ */
 void __OSGetExecParams(OSExecParams* params) {
     if (0x80000000 <= (u32)__OSExecParams) {
         memcpy(params, __OSExecParams, sizeof(OSExecParams));
@@ -127,11 +147,16 @@ void __OSGetExecParams(OSExecParams* params) {
     }
 }
 
+/** Copies exec parameters to addr and remembers that address in low memory for the next program to find. */
 void __OSSetExecParams(const OSExecParams* params, OSExecParams* addr) {
     memcpy(addr, params, sizeof(OSExecParams));
     __OSExecParams = addr;
 }
 
+/**
+ * If the disc has audio streaming on (and this is not an arcade board), mutes the AI stream,
+ * cancels the DVD stream and stops AI stream playback so the drive is free to load a program.
+ */
 static void StopStreaming() {
     DVDCommandBlock block;
 #if SDK_REVISION < 1
@@ -162,6 +187,10 @@ static void StopStreaming() {
     }
 }
 
+/**
+ * Returns the disc offset of the apploader: 0x2440 on a normal disc, or, for a TGC image,
+ * the apploader offset in its TGC header plus the image offset. Cached after the first call.
+ */
 static int GetApploaderPosition(void) {
     static s32 apploaderPosition;
 
@@ -193,6 +222,10 @@ typedef struct {
     u32 reserved2;
 } AppLoaderStruct;
 
+/**
+ * Reads the apploader header from the disc, loads its body to 0x81200000,
+ * invalidates the instruction cache there and returns the header.
+ */
 static AppLoaderStruct* LoadApploader() {
     AppLoaderStruct* header;
 
@@ -205,6 +238,10 @@ static AppLoaderStruct* LoadApploader() {
     return header;
 }
 
+/**
+ * Gets the apploader's init, get-next and get-entry callbacks, saves the exec parameters, runs init,
+ * then reads every chunk of the DOL that the apploader asks for and returns the DOL entry point.
+ */
 static void* LoadDol(const OSExecParams* params, AppLoaderCallback getInterface) {
     appInitCallback appInit;
     appGetNextCallback appGetNext;
@@ -227,10 +264,21 @@ static void* LoadDol(const OSExecParams* params, AppLoaderCallback getInterface)
     return appGetEntry();
 }
 
+/**
+ * Returns whether the apploader's build date is later than 2004/02/01;
+ * newer apploaders can load the DOL themselves.
+ */
 static BOOL IsNewApploader(AppLoaderStruct* header) {
     return strncmp(header->date, "2004/02/01", 10) > 0 ? TRUE : FALSE;
 }
 
+/**
+ * Quits the running program and boots a DOL from the disc:
+ * prepares the DVD drive, stops audio streaming,
+ * loads the apploader and starts the DOL at the given offset (-1 means just after the apploader),
+ * passing the restart code, preserved memory region and arguments.
+ * With an older apploader it loads a reboot stub to 0x81300000 and jumps there.
+ */
 void __OSBootDolSimple(u32 doloffset, u32 restartCode, void* regionStart, void* regionEnd, BOOL argsUseDefault, s32 argc, char** argv) {
     OSExecParams* params;
     void* dolEntry;
@@ -303,6 +351,10 @@ void __OSBootDolSimple(u32 doloffset, u32 restartCode, void* regionStart, void* 
     }
 }
 
+/**
+ * Boots a DOL by disc offset: passes the offset as argv[0] followed by the given arguments,
+ * with the saved memory region, to __OSBootDolSimple.
+ */
 void __OSBootDol(u32 doloffset, u32 restartCode, const char** argv) {
     char doloffInString[20];
     s32 argvlen;
@@ -332,6 +384,10 @@ void __OSBootDol(u32 doloffset, u32 restartCode, const char** argv) {
     __OSBootDolSimple(-1, restartCode, saveStart, saveEnd, FALSE, argvlen, argvToPass);
 }
 
+/**
+ * Opens the named DOL file on the disc (an empty name means disc offset 0)
+ * and boots it with restart code 0xC0000000; returns quietly if the file cannot be opened.
+ */
 static void ExecCommon(const char* dolfile, const char** argv) {
     DVDFileInfo fileInfo;
     u32 doloff;
@@ -348,6 +404,10 @@ static void ExecCommon(const char* dolfile, const char** argv) {
     __OSBootDol(doloff, 0xC0000000, argv);
 }
 
+/**
+ * Launches another DOL from the disc with an argument vector:
+ * shuts the devices down, resets the arena to a fixed range at 0x81280000 and boots it.
+ */
 void OSExecv(const char* dolfile, const char** argv) {
     ASSERTMSGLINE(LINE(718, 724, 726), dolfile != 0, "OSExecv(): null pointer was specified for the dol file name.");
     ASSERTMSGLINE(LINE(719, 725, 727), argv != 0, "OSExecv(): null pointer was specified for argv.");
@@ -360,6 +420,10 @@ void OSExecv(const char* dolfile, const char** argv) {
     ExecCommon(dolfile, argv);
 }
 
+/**
+ * Launches another DOL from the disc with a NULL-terminated list of arguments:
+ * shuts devices down, resets the arena, builds the argv and boots it.
+ */
 void OSExecl(const char* dolfile, const char* arg0, ...) {
     va_list vl;
     char* ptr;

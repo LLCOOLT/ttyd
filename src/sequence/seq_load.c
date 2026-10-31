@@ -96,6 +96,7 @@ static void continueGame(void);
 #if VERSION <= VERSION_DEMO_US
 s32 stone_id[7] = {ICON_197, ICON_198, ICON_19A, ICON_19C, ICON_19D, ICON_199, ICON_19B};
 
+/** Demo: a 150 ms rumble on controller 0, as feedback when rumble is switched on in the file select options. */
 static EVT_BEGIN(evt_shake)
     CALL(evt_sub_rumble_onoff, 0, 0)
     WAIT_MS(150)
@@ -141,6 +142,11 @@ __declspec(section ".sdata2") const u32 seq_logo_zero_color[2];
 
 static EvtWord evt_shake[12];
 
+/**
+ * Called by the memory card scripts after a copy or delete changed the card:
+ * resets the fade and keeps the script's message window id
+ * so seq_loadMain can hand it to the restarted card check (later versions only).
+ */
 #if VERSION >= VERSION_JP
 s32 evt_seq_load_keep_msg_window(EventEntry* evt, BOOL isFirstCall) {
     fadeReset(4);
@@ -149,10 +155,12 @@ s32 evt_seq_load_keep_msg_window(EventEntry* evt, BOOL isFirstCall) {
 }
 #endif
 
+/** Enters the file select sequence; clears its work. */
 void seq_loadInit(SequenceWork* seq) {
     memset(wp, 0, sizeof(LoadWork));
 }
 
+/** Leaves the file select sequence; frees the menu texture file (name.tpl). */
 void seq_loadExit(SequenceWork* seq) {
     if (wp->file != NULL) {
         fileFree(wp->file);
@@ -162,6 +170,10 @@ void seq_loadExit(SequenceWork* seq) {
 
 static inline BOOL loadStart(void);
 
+/**
+ * File select sequence: loads name.tpl, runs the memory card check script (back to the title if the card is
+ * unusable), reads the sound and rumble settings and last used slot, opens the curtain, then runs loadMain.
+ */
 void seq_loadMain(SequenceWork* seq) {
     switch (seq->state) {
         case 0:
@@ -238,6 +250,7 @@ void seq_loadMain(SequenceWork* seq) {
     }
 }
 
+/** Starts loading the file menu's texture file (name.tpl, per language in US and PAL); TRUE once it is loaded. */
 static inline BOOL loadStart(void) {
 #if VERSION >= VERSION_US
     const char* lang[] = {"jp", "us", "ge", "fr", "sp", "it"};
@@ -255,7 +268,7 @@ static inline BOOL loadStart(void) {
     return FALSE;
 }
 
-// New game: reset the story state and the party and set the fades into the prologue map
+/** New game: reset the story state and the party and set the fades into the prologue map */
 static inline void loadNewGameSetup(void) {
     stg0_00_init();
     gp->saveSlot = wp->slot;
@@ -271,9 +284,15 @@ static inline void loadNewGameSetup(void) {
     swByteSet(GSW_STORY_PROGRESS, STORY_STG0_00_PROLOGUE);
 }
 
+/**
+ * File menu state machine: moves the cursor between the four save slots and the copy, delete, back,
+ * sound and rumble buttons, starts a new game (name entry, then the prologue on aaa_00) or continues a file,
+ * and runs the copy, delete, sound mode and rumble sub-menus. Queues loadDraw. The demos return FALSE.
+ */
 #if VERSION <= VERSION_DEMO_US
 static BOOL loadMain(SequenceWork* seq) {
 #else
+/** Later versions: the same menu with no return value. */
 static void loadMain(SequenceWork* seq) {
 #endif
     u32 trg;
@@ -858,6 +877,7 @@ static void loadMain(SequenceWork* seq) {
 #endif
 }
 
+/** Draws the texture id from name.tpl stretched over the rectangle (x0, y0)-(x1, y1). */
 static inline void loadDrawBg(u32 id, f32 x0, f32 y0, f32 x1, f32 y1) {
     GXTexObj obj;
     Mtx m;
@@ -884,6 +904,11 @@ static inline void loadDrawBg(u32 id, f32 x0, f32 y0, f32 x1, f32 y1) {
     GXTexCoord2f32(1.0f, 0.0f);
 }
 
+/**
+ * Draws the file menu: the four save slot windows (name, level, play time, crystal star icons;
+ * new or corrupted file messages), the copy/delete/back buttons, the sound and rumble options,
+ * the prompt message and the wobbling cursor (hidden while a card script runs).
+ */
 static void loadDraw(CameraId camera, void* param) {
     CameraEntry* cam = camGetPtr(CAMERA_2D);
     GXColor white = {255, 255, 255, 255};
@@ -1303,6 +1328,7 @@ static void loadDraw(CameraId camera, void* param) {
 #if VERSION >= VERSION_JP
 s32 stone_id[7] = {ICON_197, ICON_198, ICON_19A, ICON_19C, ICON_19D, ICON_199, ICON_19B};
 
+/** A 150 ms rumble on controller 0, as feedback when rumble is switched on in the file select options. */
 static EVT_BEGIN(evt_shake)
     CALL(evt_sub_rumble_onoff, 0, 0)
     WAIT_MS(150)
@@ -1311,6 +1337,7 @@ static EVT_BEGIN(evt_shake)
 EVT_END()
 #endif
 
+/** Preloads the Mario, Bowser and Peach story-transition animations before a saved file is continued. */
 EVT_BEGIN(evt_continue)
     CALL(evt_sub_animgroup_async, STRING("OFF_f_in_out_mario"))
     CALL(evt_sub_animgroup_async, STRING("OFF_f_in_out_kuppa"))
@@ -1318,6 +1345,12 @@ EVT_BEGIN(evt_continue)
     RETURN
 EVT_END()
 #pragma defer_codegen off
+/**
+ * Loads the chosen save slot into the game state, rebuilds the party,
+ * restarts any countdown and starts the map change:
+ * to the saved map, or for a save made at a chapter break to the Peach/Bowser interlude
+ * or next chapter start chosen by GSW_SAVE_RESUME_KIND (23 starts a new game).
+ */
 static void continueGame(void) {
     cardCopy2Main(wp->slot);
     gp->saveSlot = wp->slot;

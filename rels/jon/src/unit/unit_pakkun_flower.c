@@ -154,6 +154,10 @@ static BattleWeapon weapon_pakkun_flower_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Attack script of the Piranha Plant: its normal attack on a first strike,
+ * otherwise an item check and then the normal attack.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -234,6 +238,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init script of the Piranha Plant: registers its wait, attack, damage and confusion handlers,
+ * sets its hit cursor offset to 50 and records its shadow scale (shadow_scale_memory) so it can be restored
+ * after it burrows.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -245,6 +254,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * The Piranha Plant reacts to hitting a spiked attacker (pose type 31, 250 ms),
+ * returns to its idle pose and plays the "toge_flush" spark effect over its head,
+ * at a height that depends on its size statuses 10 and 11 (Guess: the big and small size changes).
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 31)
     WAIT_MS(250)
@@ -267,6 +281,7 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/** Damage script of the Piranha Plant: runs the default damage handling on itself. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -274,6 +289,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Counter-damage script of the Piranha Plant: plays the hurt pose (PKF_D_1) for a second and,
+ * unless the damage code is 512 without 2048, burrows and comes back up (return_event).
+ */
 static EVT_BEGIN(counter_damage_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_D_1"))
     WAIT_MS(1000)
@@ -288,6 +307,12 @@ static EVT_BEGIN(counter_damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Script for when the ceiling the Piranha Plant hangs from falls:
+ * it burrows (shadow shrinks, SFX_ENM_PAKKUN_MOVE1, pose PKF_E_4),
+ * resurfaces on the floor at its home x with the ceiling attributes, hit offsets and pose table removed,
+ * and returns to its idle pose.
+ */
 static EVT_BEGIN(ceil_fall_ready_event)
     CALL(btlevtcmd_SetEventCeilFall, BTL_UNIT_SELF, 0)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PAKKUN_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -322,6 +347,12 @@ static EVT_BEGIN(ceil_fall_ready_event)
     RETURN
 EVT_END()
 
+/**
+ * The Piranha Plant burrows into the ground and comes back at its home position.
+ * If a ceiling-hanging plant exists (pakkun_ceil_exist) a random roll decides between the floor and the ceiling;
+ * on the ceiling (height 130) it gets the ceiling-fall handler, upside-down hit offsets,
+ * attributes and pose table.
+ */
 static EVT_BEGIN(return_event)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(pakkun_ceil_exist, LW(0))
@@ -388,6 +419,12 @@ static EVT_BEGIN(return_event)
     RETURN
 EVT_END()
 
+/**
+ * The Piranha Plant's bite: it burrows (the shadow shrinks, pose PKF_E_2 or E_4 when hanging from the ceiling),
+ * pops up in front of the target, winds up (PKF_A_1A and A_1B, SFX_ENM_PAKKUN_ATTACK1),
+ * bites (A_1C) and the target takes the damage. It then burrows back home (return_event).
+ * After a first strike it pauses 750 ms first.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -487,11 +524,17 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/** Wait script: plays the Piranha Plant's idle pose from its current pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0] = unit.
+ * Over 15 frames grows part 1's shadow from nothing back to the size remembered by shadow_scale_memory;
+ * blocks until done.
+ */
 static USER_FUNC(shadow_scale_return) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -508,6 +551,11 @@ static USER_FUNC(shadow_scale_return) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper: args[0] = unit.
+ * Over 15 frames shrinks part 1's shadow from the size remembered by shadow_scale_memory to nothing,
+ * as the plant dives; blocks until done.
+ */
 static USER_FUNC(shadow_scale_small) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -524,6 +572,7 @@ static USER_FUNC(shadow_scale_small) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper: args[0] = unit. Remembers the current shadow scale of part 1 in work[0]. */
 static USER_FUNC(shadow_scale_memory) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -533,6 +582,10 @@ static USER_FUNC(shadow_scale_memory) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: returns in args[0] 1 if the stage's iron frame is still in place
+ * and 0 once it has been knocked away.
+ */
 static USER_FUNC(pakkun_ceil_exist) {
     EvtWord* args = event->args;
 

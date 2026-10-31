@@ -4,6 +4,13 @@
 
 #include "__gx.h"
 
+/**
+ * Projects the model-space point (x, y, z) to screen space on the CPU:
+ * transforms it by the 3x4 matrix mtx, applies the projection given in the 7-float projection vector pm
+ * (perspective when pm[0] is 0, otherwise orthographic)
+ * and the viewport vector vp (left, top, width, height, near, far), and returns the screen x,
+ * y and depth in *sx, *sy, *sz.
+ */
 void GXProject(f32 x, f32 y, f32 z, const Mtx mtx, const f32* pm, const f32* vp, f32* sx, f32* sy, f32* sz) {
     Vec peye;
     f32 xc;
@@ -32,6 +39,7 @@ void GXProject(f32 x, f32 y, f32 z, const Mtx mtx, const f32* pm, const f32* vp,
     *sz = vp[5] + (wc * (zc * (vp[5] - vp[4])));
 }
 
+/** Writes the six projection constants to the FIFO with paired-single loads and stores (assembly). */
 static void WriteProjPS(const register f32 proj[6], register volatile void* dest) {
     register f32 p01, p23, p45;
 
@@ -45,6 +53,10 @@ static void WriteProjPS(const register f32 proj[6], register volatile void* dest
     }
 }
 
+/**
+ * Copies six floats from src to dest with paired-single loads and stores (assembly);
+ * used to copy the projection and viewport constants.
+ */
 static void Copy6Floats(const register f32 src[6], register volatile f32* dest) {
     register f32 ps01, ps23, ps45;
 
@@ -58,6 +70,11 @@ static void Copy6Floats(const register f32 src[6], register volatile f32* dest) 
     }
 }
 
+/**
+ * Sends the saved projection to the transform unit:
+ * an XF load of seven words at 0x1020 (the six projection constants and the type) written straight into the
+ * FIFO, with the debug build also recording them in the XF shadow.
+ */
 void __GXSetProjection(void) {
     u32 reg = 0x00061020;
     GX_WRITE_U8(0x10);
@@ -76,6 +93,11 @@ void __GXSetProjection(void) {
 #endif
 }
 
+/**
+ * Sets the projection from a 4x4 matrix: saves mtx[0][0], [1][1], [2][2],
+ * [2][3] and either the third column (perspective)
+ * or the fourth column (orthographic) terms of the first two rows, plus the type, and sends them.
+ */
 void GXSetProjection(const Mtx44 mtx, GXProjectionType type) {
     CHECK_GXBEGIN(295, "GXSetProjection");
 
@@ -96,6 +118,10 @@ void GXSetProjection(const Mtx44 mtx, GXProjectionType type) {
     __GXData->bpSentNot = 1;
 }
 
+/**
+ * Sets the projection from the 7-float vector (element 0 is 0 for perspective, anything else for orthographic,
+ * followed by the six constants) and sends it.
+ */
 void GXSetProjectionv(const f32* ptr) {
     CHECK_GXBEGIN(339, "GXSetProjectionv");
 
@@ -118,6 +144,7 @@ void GXSetProjectionv(const f32* ptr) {
 
 #define qr0 0
 
+/** Reads the current projection into the 7-float vector layout used by GXSetProjectionv. */
 void GXGetProjectionv(f32* ptr) {
     ASSERTMSGLINE(370, ptr, "GXGet*: invalid null pointer");
 
@@ -135,6 +162,7 @@ void GXGetProjectionv(f32* ptr) {
 #endif
 }
 
+/** Writes a 3x4 matrix (12 floats) to the FIFO with paired-single stores (assembly). */
 static void WriteMTXPS4x3(const register f32 mtx[3][4], register volatile f32* dest) {
     register f32 a00_a01;
     register f32 a02_a03;
@@ -159,6 +187,7 @@ static void WriteMTXPS4x3(const register f32 mtx[3][4], register volatile f32* d
     }
 }
 
+/** Writes the upper-left 3x3 of a 3x4 matrix (9 floats) to the FIFO, skipping the translation column (assembly). */
 static void WriteMTXPS3x3from3x4(register f32 mtx[3][4], register volatile f32* dest) {
     register f32 a00_a01;
     register f32 a02_a03;
@@ -183,6 +212,7 @@ static void WriteMTXPS3x3from3x4(register f32 mtx[3][4], register volatile f32* 
     }
 }
 
+/** Writes a 3x3 matrix (9 floats) to the FIFO (assembly). */
 static void WriteMTXPS3x3(register f32 mtx[3][3], register volatile f32* dest) {
     register f32 a00_a01;
     register f32 a02_a10;
@@ -204,6 +234,7 @@ static void WriteMTXPS3x3(register f32 mtx[3][3], register volatile f32* dest) {
     }
 }
 
+/** Writes a 2x4 matrix (8 floats) to the FIFO with paired-single stores (assembly). */
 static void WriteMTXPS4x2(const register f32 mtx[2][4], register volatile f32* dest) {
     register f32 a00_a01;
     register f32 a02_a03;
@@ -229,6 +260,10 @@ do { \
     VERIF_MTXLIGHT((addr), *(u32 *)&xfData); \
 } while (0)
 
+/**
+ * Loads a 3x4 position (modelview) matrix into position matrix slot id (XF memory at id * 4) by writing it into
+ * the FIFO.
+ */
 void GXLoadPosMtxImm(const Mtx mtx, u32 id) {
     u32 reg;
     u32 addr;
@@ -258,6 +293,10 @@ void GXLoadPosMtxImm(const Mtx mtx, u32 id) {
 #endif
 }
 
+/**
+ * Loads position matrix slot id from entry mtx_indx of the position matrix array (see GXSetArray),
+ * as an indexed XF load (command 0x20) that the GPU fetches from main memory.
+ */
 void GXLoadPosMtxIndx(u16 mtx_indx, u32 id) {
     u32 offset;
     u32 reg;
@@ -275,6 +314,10 @@ void GXLoadPosMtxIndx(u16 mtx_indx, u32 id) {
 #endif
 }
 
+/**
+ * Loads the normal matrix for slot id (XF memory at 0x400 + id * 3) from the upper-left 3x3 of a 3x4 matrix,
+ * written into the FIFO.
+ */
 void GXLoadNrmMtxImm(const Mtx mtx, u32 id) {
     u32 reg;
     u32 addr;
@@ -301,6 +344,7 @@ void GXLoadNrmMtxImm(const Mtx mtx, u32 id) {
 #endif
 }
 
+/** Loads the normal matrix for slot id (XF memory at 0x400 + id * 3) from a 3x3 matrix, written into the FIFO. */
 void GXLoadNrmMtxImm3x3(const f32 mtx[3][3], u32 id) {
     u32 reg;
     u32 addr;
@@ -327,6 +371,10 @@ void GXLoadNrmMtxImm3x3(const f32 mtx[3][3], u32 id) {
 #endif
 }
 
+/**
+ * Loads the normal matrix for slot id from entry mtx_indx of the normal matrix array,
+ * as an indexed XF load (command 0x28).
+ */
 void GXLoadNrmMtxIndx3x3(u16 mtx_indx, u32 id) {
     u32 offset;
     u32 reg;
@@ -344,12 +392,20 @@ void GXLoadNrmMtxIndx3x3(u16 mtx_indx, u32 id) {
 #endif
 }
 
+/**
+ * Selects the position matrix slot (low 6 bits of the matrix index word) used by vertices that carry no matrix
+ * index of their own.
+ */
 void GXSetCurrentMtx(u32 id) {
     CHECK_GXBEGIN(708, "GXSetCurrentMtx");
     SET_REG_FIELD(712, __GXData->matIdxA, 6, 0, id);
     __GXSetMatrixIndex(GX_VA_PNMTXIDX);
 }
 
+/**
+ * Loads a texture matrix (2x4 or 3x4 by type) into XF texture matrix memory:
+ * slots from GX_PTTEXMTX0 go to 0x500, the others at id * 4. Written into the FIFO.
+ */
 void GXLoadTexMtxImm(const f32 mtx[][4], u32 id, GXTexMtxType type) {
     u32 reg;
     u32 addr;
@@ -392,6 +448,7 @@ void GXLoadTexMtxImm(const f32 mtx[][4], u32 id, GXTexMtxType type) {
 #endif
 }
 
+/** Loads a texture matrix from entry mtx_indx of the texture matrix array, as an indexed XF load (command 0x30). */
 void GXLoadTexMtxIndx(u16 mtx_indx, u32 id, GXTexMtxType type) {
     u32 offset;
     u32 reg;
@@ -418,6 +475,11 @@ void GXLoadTexMtxIndx(u16 mtx_indx, u32 id, GXTexMtxType type) {
 #endif
 }
 
+/**
+ * Sends the saved viewport to the transform unit (XF registers 26 to 31):
+ * half width and negative half height as scales, centre offset by 342 (the hardware's screen origin),
+ * and the near/far depth scaled by zScale and zOffset.
+ */
 void __GXSetViewport(void) {
     f32 sx;
     f32 sy;
@@ -451,6 +513,10 @@ void __GXSetViewport(void) {
     GX_WRITE_XF_REG_F(31, oz);
 }
 
+/**
+ * Saves and sends the viewport; when field is 0 the top is moved up half a line,
+ * which shifts the picture for the first field of interlaced rendering.
+ */
 void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz, u32 field) {
     CHECK_GXBEGIN(903, "GXSetViewport");  // not the correct function name
 
@@ -469,10 +535,12 @@ void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz,
     __GXData->bpSentNot = 1;
 }
 
+/** Sets the viewport (left, top, width, height in pixels, near and far depth) with no field jitter. */
 void GXSetViewport(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz) {
     GXSetViewportJitter(left, top, wd, ht, nearz, farz, 1);
 }
 
+/** Reads the saved viewport back as six floats (left, top, width, height, near, far). */
 void GXGetViewportv(f32* vp) {
     ASSERTMSGLINE(968, vp, "GXGet*: invalid null pointer");
 
@@ -499,6 +567,10 @@ do { \
     } \
 } while (0)
 
+/**
+ * Changes the depth range scale and offset (in units of the 24-bit Z range)
+ * and updates the viewport's depth scale and offset registers (XF 0x1C and 0x1F).
+ */
 void GXSetZScaleOffset(f32 scale, f32 offset) {
     f32 sz;
     f32 oz;
@@ -524,6 +596,7 @@ void GXSetZScaleOffset(f32 scale, f32 offset) {
     __GXData->bpSentNot = 1;
 }
 
+/** Sets the scissor rectangle in EFB pixels (the hardware counts from 342) and writes both scissor registers. */
 void GXSetScissor(u32 left, u32 top, u32 wd, u32 ht) {
     u32 tp;
     u32 lf;
@@ -551,6 +624,7 @@ void GXSetScissor(u32 left, u32 top, u32 wd, u32 ht) {
     __GXData->bpSentNot = 0;
 }
 
+/** Reads the scissor rectangle back from the cached registers (left, top, width, height). */
 void GXGetScissor(u32* left, u32* top, u32* wd, u32* ht) {
     u32 tp;
     u32 lf;
@@ -570,6 +644,10 @@ void GXGetScissor(u32* left, u32* top, u32* wd, u32* ht) {
     *ht = bm - tp + 1;
 }
 
+/**
+ * Shifts the scissor box and viewport origin by x_off and y_off pixels (BP 0x59, in units of 2),
+ * used to render a target larger than the EFB in pieces.
+ */
 void GXSetScissorBoxOffset(s32 x_off, s32 y_off) {
     u32 reg = 0;
     u32 hx;
@@ -590,12 +668,17 @@ void GXSetScissorBoxOffset(s32 x_off, s32 y_off) {
     __GXData->bpSentNot = 0;
 }
 
+/** Writes XF register 5 to enable or disable clipping. */
 void GXSetClipMode(GXClipMode mode) {
     CHECK_GXBEGIN(1151, "GXSetClipMode");
     GX_WRITE_XF_REG(5, mode);
     __GXData->bpSentNot = 1;
 }
 
+/**
+ * Writes the per-vertex matrix index defaults (position and texture matrix slots) to both the CP
+ * and XF registers; texcoord matrices 4 to 7 live in a second word.
+ */
 void __GXSetMatrixIndex(GXAttr matIdxAttr) {
     if (matIdxAttr < GX_VA_TEX4MTXIDX) {
         GX_WRITE_SOME_REG4(8, 0x30, __GXData->matIdxA, -12);

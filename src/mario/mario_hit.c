@@ -37,6 +37,11 @@ static HitEntry* marioChkFrontStep(f32* y, f32* h, f32* ang);
 static const Vec zv0 = {0.0f, 0.0f, 0.0f};
 static const Vec zv1 = {0.0f, 0.0f, 0.0f};
 
+/**
+ * Unused inline: TRUE unless the hit attribute has 0x80 (a wall only Mario's paper boat passes)
+ * and Mario is not in boat motion.
+ * Sub2 to Sub6 below are the same test written other ways; none of them is called.
+ */
 static inline BOOL marioChkBeroSub(s32 attr) {
     BOOL r = TRUE;
     if (attr & 0x80) {
@@ -48,6 +53,7 @@ static inline BOOL marioChkBeroSub(s32 attr) {
     return r;
 }
 
+/** Inline copy of marioChkBero (TRUE = Mario passes through the hit), used by the roll, ship and wall-around checks. */
 static inline BOOL marioChkBeroInl(HitEntry* hit) {
     s32 attr = hitGetAttr(hit);
     MarioWork* mario = marioGetPtr();
@@ -60,6 +66,7 @@ static inline BOOL marioChkBeroInl(HitEntry* hit) {
     return mario->currMotionId == MARIO_MOTION_SHIP;
 }
 
+/** Unused variant of marioChkBeroSub (same 0x80 boat test). */
 static inline BOOL marioChkBeroSub2(s32 attr) {
     if (!(attr & 0x80)) {
         return TRUE;
@@ -67,10 +74,12 @@ static inline BOOL marioChkBeroSub2(s32 attr) {
     return marioGetPtr()->currMotionId == MARIO_MOTION_SHIP;
 }
 
+/** Unused variant of marioChkBeroSub (same 0x80 boat test). */
 static inline BOOL marioChkBeroSub3(s32 attr) {
     return (attr & 0x80) ? (marioGetPtr()->currMotionId == MARIO_MOTION_SHIP) : TRUE;
 }
 
+/** Unused variant of marioChkBeroSub (same 0x80 boat test). */
 static inline BOOL marioChkBeroSub4(s32 attr) {
     BOOL r = TRUE;
     if (attr & 0x80) {
@@ -79,6 +88,7 @@ static inline BOOL marioChkBeroSub4(s32 attr) {
     return r;
 }
 
+/** Unused variant of marioChkBeroSub that reads the attribute from the hit itself. */
 static inline BOOL marioChkBeroSub5(HitEntry* hit) {
     s32 attr = hitGetAttr(hit);
     if (!(attr & 0x80)) {
@@ -87,6 +97,7 @@ static inline BOOL marioChkBeroSub5(HitEntry* hit) {
     return marioGetPtr()->currMotionId == MARIO_MOTION_SHIP;
 }
 
+/** Unused variant of marioChkBeroSub (same 0x80 boat test). */
 static inline BOOL marioChkBeroSub6(s32 attr) {
     if (attr & 0x80) {
         return marioGetPtr()->currMotionId == MARIO_MOTION_SHIP;
@@ -95,6 +106,11 @@ static inline BOOL marioChkBeroSub6(s32 attr) {
     }
 }
 
+/**
+ * Turns a surface normal into Mario's groundRot tilt (x and z, degrees rounded to 0.01)
+ * and returns the surface's slope in degrees from horizontal (0 = flat floor, 90 = wall, 180 = flat ceiling).
+ * Used by marioSearchHead.
+ */
 static inline f32 marioHitNrmAngle(Vec* nrm) {
     f32 nz = nrm->z;
     f32 ny = nrm->y;
@@ -108,6 +124,7 @@ static inline f32 marioHitNrmAngle(Vec* nrm) {
 }
 
 #if VERSION <= VERSION_DEMO_US
+/** Demo-only form of marioHitNrmAngle taking the normal as three floats (the demo's tube ground and landing checks). */
 static inline f32 marioHitNrmAngleXYZ(f32 nx, f32 ny, f32 nz) {
     MarioWork* mario = marioGetPtr();
     mario->groundRot.x = (s32)(100.0f * (angleABf(0.0f, 0.0f, 100.0f * nz, 100.0f * ny) - 180.0f) + 0.5f) / 100.0f;
@@ -117,6 +134,7 @@ static inline f32 marioHitNrmAngleXYZ(f32 nx, f32 ny, f32 nz) {
 }
 #endif
 
+/** marioHitNrmAngle without the local copies: sets groundRot from the normal and returns the slope in degrees. */
 static inline f32 marioHitNrmAnglePtr(Vec* nrm) {
     MarioWork* mario = marioGetPtr();
     mario->groundRot.x = (s32)(100.0f * (angleABf(0.0f, 0.0f, 100.0f * nrm->z, 100.0f * nrm->y) - 180.0f) + 0.5f) / 100.0f;
@@ -125,6 +143,11 @@ static inline f32 marioHitNrmAnglePtr(Vec* nrm) {
     return angleABf(0.0f, 0.0f, sqrtf(nrm->x * nrm->x + nrm->z * nrm->z), -nrm->y);
 }
 
+/**
+ * Eases Mario's collision width (wPlayerCollisionBox.z) by 1 per frame toward its target:
+ * the full box width (18 in tube mode) normally, 6 while he is paper-thin.
+ * Called every frame from mario.c before the hit checks.
+ */
 void marioHitCheckWidth(void) {
     MarioWork* mario = marioGetPtr();
     f32 v;
@@ -154,6 +177,11 @@ void marioHitCheckWidth(void) {
     }
 }
 
+/**
+ * Ray filter (TRUE = test this hit): skips hits that have none of query->user0's attribute bits
+ * or any of user1's.
+ * marioHitCheckAttr2Inl passes 0x4 / 0x800000, so only 0x4 surfaces without 0x800000 are tested.
+ */
 static BOOL chkFilterAttr2(HitCheckQuery* query, HitEntry* entry) {
     s32 ret = 0;
     s32 attr = entry->attributes;
@@ -163,6 +191,11 @@ static BOOL chkFilterAttr2(HitCheckQuery* query, HitEntry* entry) {
     return ret;
 }
 
+/**
+ * Mario's normal ray filter (TRUE = test this hit):
+ * always tests 0x80 / 0x80000 hits, skips 0x4 hits unless they also have 0x800000,
+ * and skips the map objects of hidden ? Blocks, hidden badge blocks and hidden 10-coin blocks.
+ */
 static BOOL chkfilterVec(HitCheckQuery* query, HitEntry* entry) {
     MapObjectEntry* mobj;
     if (entry->attributes & 0x80080) {
@@ -183,6 +216,10 @@ static BOOL chkfilterVec(HitCheckQuery* query, HitEntry* entry) {
     return TRUE;
 }
 
+/**
+ * chkfilterVec for tube mode: 0x80000 hits are skipped like 0x4 ones (unless 0x800000),
+ * so the tube rolls through them; hidden blocks are skipped as well.
+ */
 static BOOL chkfilterVecRoll(HitCheckQuery* query, HitEntry* entry) {
     MapObjectEntry* mobj;
     if (entry->attributes & 0x80) {
@@ -203,6 +240,10 @@ static BOOL chkfilterVecRoll(HitCheckQuery* query, HitEntry* entry) {
     return TRUE;
 }
 
+/**
+ * chkfilterVec while Mario hides in Vivian's shadow:
+ * 0x4, 0x800 (spike) and 0x80000 hits are skipped unless they have 0x800000; hidden blocks are skipped as well.
+ */
 static BOOL chkfilterVecVivian(HitCheckQuery* query, HitEntry* entry) {
     MapObjectEntry* mobj;
     if ((entry->attributes & 0x80804) && !(entry->attributes & 0x800000)) {
@@ -220,6 +261,11 @@ static BOOL chkfilterVecVivian(HitCheckQuery* query, HitEntry* entry) {
     return TRUE;
 }
 
+/**
+ * Casts a ray for Mario with the filter for his current state (Vivian's shadow, tube mode or normal).
+ * On a hit, *dist, outPos (rounded to 0.001) and outNrm are filled in; returns the hit or NULL.
+ * The core of every check in this file.
+ */
 static inline HitEntry* marioHitCheckVecInl(Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist) {
     HitCheckQuery query;
     HitEntry* hit;
@@ -271,10 +317,18 @@ static inline HitEntry* marioHitCheckVecInl(Vec* pos, Vec* dir, Vec* outPos, Vec
     return hit;
 }
 
+/**
+ * Out-of-line marioHitCheckVecInl for the plane, slit and tube motions,
+ * Bowser (koopa_hit.c) and partners (party_hit.c).
+ */
 HitEntry* marioHitCheckVec(Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist) {
     return marioHitCheckVecInl(pos, dir, outPos, outNrm, dist);
 }
 
+/**
+ * Scalar wrapper of marioHitCheckVecInl: casts Mario's ray from (x, y, z) along (dx, dy, dz) for up to *dist
+ * and returns the hit position, normal and distance through the pointers. Used by the plane and roll motions.
+ */
 HitEntry* marioHitCheck(f32* ox, f32* oy, f32* oz, f32* dist, f32* nx, f32* ny, f32* nz, f32 x, f32 y, f32 z, f32 dx,
                         f32 dy, f32 dz) {
     Vec outPos, outNrm;
@@ -300,6 +354,7 @@ HitEntry* marioHitCheck(f32* ox, f32* oy, f32* oz, f32* dist, f32* nx, f32* ny, 
     return hit;
 }
 
+/** marioHitCheckVecInl with chkFilterAttr2: the ray only hits 0x4 surfaces that lack 0x800000. */
 static inline HitEntry* marioHitCheckAttr2Inl(Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist) {
     HitCheckQuery query;
     HitEntry* hit;
@@ -347,6 +402,12 @@ static inline HitEntry* marioHitCheckAttr2Inl(Vec* pos, Vec* dir, Vec* outPos, V
     return hit;
 }
 
+/**
+ * The ceiling ray of marioSearchHead and marioSearchHead_jabara:
+ * while Mario is not falling (or in the Spring Jump's state 1) it only hits 0x4 surfaces
+ * (marioHitCheckAttr2Inl), otherwise it uses the normal filters.
+ * Guess: 0x4 marks surfaces Mario only bumps from below, such as the hidden blocks chkfilterVec lets him pass.
+ */
 static HitEntry* marioHitCheck2(Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist) {
     HitEntry* hit;
     MarioWork* mario = marioGetPtr();
@@ -366,6 +427,10 @@ static HitEntry* marioHitCheck2(Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f3
     return hit;
 }
 
+/**
+ * Forgets the hit object Mario stands on (hitobjStandOn), and Bowser's ride object when playing as him.
+ * Called when a jump starts (mot_jump.c).
+ */
 void clear_hitobj_ride(void) {
     MarioWork* mario = marioGetPtr();
     mario->hitobjStandOn = NULL;
@@ -374,6 +439,12 @@ void clear_hitobj_ride(void) {
     }
 }
 
+/**
+ * TRUE if Mario passes through this hit instead of being stopped:
+ * 0x800000 hits, 0x80 hits only in boat motion, and 0x80000 hits never outside tube mode.
+ * Used by the wall, tube, balloon and Yoshi checks.
+ * Guess: named after bero (map exits), whose walls Mario walks into.
+ */
 BOOL marioChkBero(HitEntry* hit) {
     s32 attr = hitGetAttr(hit);
     MarioWork* mario = marioGetPtr();
@@ -388,6 +459,11 @@ BOOL marioChkBero(HitEntry* hit) {
 
 // FAKE: #pragma inline_max_size(1000): raises the inline size limit so marioChkGndRoll is inlined into marioChkGnd as in the target; without it marioChkGndRoll stays a separate function (marioChkGnd 861 -> 613 instructions)
 #pragma inline_max_size(1000)
+/**
+ * Tube mode on the ground: casts down from 10 above Mario
+ * and stores the floor's tilt in roll_grx / roll_grz for the rolling tube (mot_roll.c).
+ * Inlined into marioChkGnd.
+ */
 static inline void marioChkGndRoll(MarioWork* mario) {
     HitEntry* hit;
     f32 gz, gx;
@@ -411,6 +487,11 @@ static inline void marioChkGndRoll(MarioWork* mario) {
     }
 }
 
+/**
+ * Casts a ray straight down from Mario's head (half height in tube mode) for up to 1000 units
+ * and stores the floor's height in groundY (-3000 if none).
+ * Returns the floor hit, which callers keep in hitobjUnder.
+ */
 HitEntry* marioSearchUnder(void) {
     Vec pos, outPos, outNrm;
     f32 d = 1000.0f;
@@ -431,6 +512,11 @@ HitEntry* marioSearchUnder(void) {
     return hit;
 }
 
+/**
+ * Finds the floor below a point: casts down from 37 above (x, y, z) for up to 1037 units,
+ * writes its height to *out (-1 if none) and returns the hit.
+ * Used by evt_mario.c and evt_party.c to place Mario and partners on the ground.
+ */
 HitEntry* searchUnder2(f32* out, f32 x, f32 y, f32 z) {
     Vec pos2, outPos, outNrm;
     HitEntry* hit;
@@ -451,6 +537,7 @@ HitEntry* searchUnder2(f32* out, f32 x, f32 y, f32 z) {
     return hit;
 }
 
+/** FALSE when floors are disabled for Mario or he is at y >= 5000 (out of the map), so marioChkGnd skips the floor. */
 static inline BOOL marioChkGndOk(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->flags & MARIO_FLAG_FLOORS_DISABLED) {
@@ -462,6 +549,12 @@ static inline BOOL marioChkGndOk(void) {
     return TRUE;
 }
 
+/**
+ * Mario's per-frame ground check while on the ground (mario.c, koopa.c, peach.c, the Spring Jump):
+ * finds the floor he stands on, starts a fall when it is gone,
+ * hurts him on 0x200 (damage) and 0x800 (spike) floors, steps him up 5-11 unit steps in front,
+ * and handles the boat, Bowser and tube-mode variants. Skipped while he is in Vivian's shadow.
+ */
 void marioChkGnd(void) {
     f32 b, y, c;
     f32 sy, sb, sc;
@@ -618,6 +711,12 @@ void marioChkGnd(void) {
     }
 }
 
+/**
+ * Catches Mario on a floor during a jump or fall (mario.c, koopa.c, peach.c, after 5 airborne frames):
+ * if the floor is up to 10 units above his feet he snaps onto it,
+ * his air state is cleared and he changes to standing (Bowser to walking or dashing, with a landing quake),
+ * and the camera follows him again.
+ */
 void marioChkGnd2(void) {
     f32 b, y, c;
     HitEntry* hit;
@@ -666,8 +765,10 @@ void marioChkGnd2(void) {
 }
 
 #if VERSION <= VERSION_DEMO_US
-// The demo always probes at 0.375 of the collision width, allows steeper ground only in the slit, and takes the
-// first ground it finds.
+/**
+ * The demo always probes at 0.375 of the collision width, allows steeper ground only in the slit,
+ * and takes the first ground it finds.
+ */
 HitEntry* marioSearchGround(f32* y, f32* b, f32* c, f32 spd, f32 h) {
     f32 dist;
     f32 yl, sx, sz, x0, y0, z0, a;
@@ -772,6 +873,12 @@ HitEntry* marioSearchGround(f32* y, f32* b, f32* c, f32 spd, f32 h) {
     return NULL;
 }
 #else
+/**
+ * Finds the floor under Mario with five downward rays (his centre and four points around it,
+ * 0.375 or 0.425 of his width out), ignoring slopes of 50 degrees or more (75 in the slit or a Spin Jump).
+ * Writes the highest floor's y to *y, the drop to a lower ledge to *b and its direction to *c;
+ * returns the floor hit or NULL.
+ */
 HitEntry* marioSearchGround(f32* y, f32* b, f32* c, f32 spd, f32 h) {
     f32 dist;
     f32 best, yl, sx, sz, x0, y0, z0, a;
@@ -914,6 +1021,7 @@ typedef struct LandonRay {
     Vec dir;
 } LandonRay;
 
+/** marioHitNrmAngle for marioLandonChk_old: sets groundRot from the normal and returns the slope in degrees. */
 static inline f32 landonNrmAngle(f32 nx, f32 ny, f32 nz) {
     MarioWork* mario = marioGetPtr();
     f32 y100 = 100.0f * ny;
@@ -923,6 +1031,7 @@ static inline f32 landonNrmAngle(f32 nx, f32 ny, f32 nz) {
     return angleABf(0.0f, 0.0f, sqrtf(nx * nx + nz * nz), -ny);
 }
 
+/** marioHitCheckVecInl taking the ray as a LandonRay (position and direction), for the landing checks. */
 static inline HitEntry* landonHitCheck(LandonRay* ray, Vec* outPos, Vec* outNrm, f32* dist) {
     HitCheckQuery query;
     HitEntry* hit;
@@ -975,8 +1084,10 @@ static inline HitEntry* landonHitCheck(LandonRay* ray, Vec* outPos, Vec* outNrm,
 }
 
 #if VERSION <= VERSION_DEMO_US
-// The demo probes three points (on flat ground the three points 3 units ahead) with the landon ray check and
-// takes the first ground it finds.
+/**
+ * The demo probes three points (on flat ground the three points 3 units ahead) with the landon ray check
+ * and takes the first ground it finds.
+ */
 HitEntry* marioSearchGroundRoll(f32* y, f32* b, f32* c, f32 spd, f32 h) {
     LandonRay ray;
     Vec nrm;
@@ -1123,6 +1234,10 @@ HitEntry* marioSearchGroundRoll(f32* y, f32* b, f32* c, f32 spd, f32 h) {
     return NULL;
 }
 #else
+/**
+ * marioSearchGround for tube mode: probes the tube's centre and its sides (8.64 out, some 3 ahead),
+ * skips near-vertical surfaces (75-105 degrees) and keeps the highest floor; outputs as marioSearchGround.
+ */
 HitEntry* marioSearchGroundRoll(f32* y, f32* b, f32* c, f32 spd, f32 h) {
     f32 dist;
     f32 lim, best, hh, x0, y0, z0, a, r;
@@ -1250,6 +1365,11 @@ HitEntry* marioSearchGroundRoll(f32* y, f32* b, f32* c, f32 spd, f32 h) {
 }
 #endif
 
+/**
+ * Hurts Mario on spikes (toge): if the wall in front (within half his width),
+ * the wall that stopped him or the ceiling above has attribute 0x800, he changes to the spike damage motion.
+ * Called each frame from mario.c; not in Vivian's shadow.
+ */
 void marioChkToge(void) {
     MarioWork* mario = marioGetPtr();
     s32 attr;
@@ -1279,6 +1399,11 @@ void marioChkToge(void) {
     }
 }
 
+/**
+ * Landing check used by the jump, fall, damage, ship and Bowser motions:
+ * searches for the floor within d below Mario (the tube's own search in tube mode,
+ * marioLandonChk_old for Bowser), writes its height to *a and returns the hit.
+ */
 HitEntry* marioChkLandon(f32* a, f32 d) {
     f32 b, c;
     HitEntry* ret;
@@ -1295,6 +1420,11 @@ HitEntry* marioChkLandon(f32* a, f32 d) {
     return ret;
 }
 
+/**
+ * The older landing check, still used for Bowser (where it hands over to kpaSearchGround):
+ * five rays down from 3/4 of Mario's height, accepting a floor only
+ * where it lies at the ray's reported distance; *outY gets its height.
+ */
 HitEntry* marioLandonChk_old(f32* outY, f32 spd) {
     LandonRay ray;
     Vec nrm;
@@ -1414,7 +1544,7 @@ HitEntry* marioLandonChk_old(f32* outY, f32 spd) {
 }
 
 #if VERSION <= VERSION_DEMO_US
-// The demo's version is the five-point probe of marioLandonChk_old with its own sizes.
+/** The demo's version is the five-point probe of marioLandonChk_old with its own sizes. */
 HitEntry* marioChkLandon2(f32* y, f32 spd, f32 ofs) {
     LandonRay ray;
     Vec nrm;
@@ -1531,6 +1661,11 @@ HitEntry* marioChkLandon2(f32* y, f32 spd, f32 ofs) {
     return NULL;
 }
 #else
+/**
+ * Landing check for the Spring Jump (mot_jabara.c):
+ * five rays down from half of Mario's height, raised by ofs (the display offset), within spd;
+ * writes the floor height to *y and returns the hit or NULL.
+ */
 HitEntry* marioChkLandon2(f32* y, f32 spd, f32 ofs) {
     Vec dir;
     Vec outPos;
@@ -1628,6 +1763,10 @@ typedef struct {
     char name[16];
 } MobjNameView;
 
+/**
+ * TRUE if the ceiling hit is a Super Block (MOBJ_PowerUpBlock), Save Block or Heart Block (free or paid):
+ * bumping one stops Mario's air movement in marioChkOverhead.
+ */
 static inline BOOL marioChkHeadBlock(HitEntry* hit) {
     MobjNameView* mobj;
     char* name;
@@ -1645,6 +1784,7 @@ static inline BOOL marioChkHeadBlock(HitEntry* hit) {
     return FALSE;
 }
 
+/** Mario's collision height, or the riding partner's height (partyGetHeight) while he is on Yoshi. */
 static inline f32 marioGetHeightInl(void) {
     MarioWork* mario = marioGetPtr();
     f32 ph = mario->wPlayerCollisionBox.y;
@@ -1658,11 +1798,18 @@ static inline f32 marioGetHeightInl(void) {
 }
 
 #if VERSION >= VERSION_JP // the demo's 18.0f is marioHitCheckWidth's own
+/** Never called. Guess: stands in for a function the original link stripped, so 18.0f keeps its float-pool slot. */
 void marioHitStrippedPool2(f32* f) {
     f[0] = 18.0f;
 }
 #endif
 
+/**
+ * Mario's ceiling check each frame (mario.c, koopa.c, peach.c, the plane and Spring Jump):
+ * finds a ceiling above him (Spring Jump, tube and Bowser variants), sets IS_TOUCHING_CEILING,
+ * ends a jump with sound 0x156 and a fall, and returns the y Mario must stay under (his own y when nothing is
+ * hit).
+ */
 f32 marioChkOverhead(void) {
 #if VERSION >= VERSION_JP
     Vec pa = {0.0f, 0.0f, 0.0f};
@@ -1784,6 +1931,11 @@ f32 marioChkOverhead(void) {
     return pos.y;
 }
 
+/**
+ * Ceiling check for the Spring Jump (mot_jabara.c):
+ * *sideOut gets which side of Mario the ceiling was hit (-1, 0, 1)
+ * and *distOut the gap to a ceiling not yet reached (-1 if none); returns the y Mario must stay under.
+ */
 f32 marioChkOverheadJabara(s32* sideOut, f32* distOut) {
     Vec pos;
     f32 margin = 5.0f;
@@ -1821,10 +1973,12 @@ f32 marioChkOverheadJabara(s32* sideOut, f32* distOut) {
     return pos.y;
 }
 
+/** Unused: marioHitCheck2 taking the position and direction by value. */
 static inline HitEntry* marioHitCheck2Val(Vec p, Vec d, Vec* op, Vec* on, f32* dist) {
     return marioHitCheck2(&p, &d, op, on, dist);
 }
 
+/** Offset of half of Mario's width (less 0.5) in the direction deg (degrees), for marioSearchHead's side rays. */
 static inline void marioSearchHeadOfs(MarioWork* mario, f32 deg, f32* px, f32* pz) {
     f32 r = (3.1415927f * deg) / 180.0f;
     f32 t;
@@ -1834,6 +1988,13 @@ static inline void marioSearchHeadOfs(MarioWork* mario, f32 deg, f32* px, f32* p
     *pz = 0.5f * ((mario->wPlayerCollisionBox.x - 0.5f) * -t);
 }
 
+/**
+ * Finds a ceiling over pos: five rays up from half of *h (Mario's height) for up to *h + dd,
+ * ignoring walls (slopes of 50-130 degrees).
+ * If his head reaches it, pos->y is set to the ceiling, *h to 0 and the hit is returned;
+ * otherwise *h gets the gap (-1 if none).
+ * The US and PAL releases also ignore ceilings while falling faster than 10 per frame.
+ */
 HitEntry* marioSearchHead(Vec* pos, f32* h, f32 dd) {
     Vec p;
     Vec d;
@@ -1933,10 +2094,16 @@ HitEntry* marioSearchHead(Vec* pos, f32* h, f32 dd) {
     return NULL;
 }
 
+/** cos(a) as f32, for marioSearchHead_roll's side offsets. */
 inline f32 marioSearchHead_roll_cos(f32 a) {
     return (f32)cos(a);
 }
 
+/**
+ * Ceiling check for the tube: five rays up from 1 above pos (centre and the tube's front and back corners).
+ * On contact Mario is pushed down under the ceiling, *h is 0 and the hit is returned;
+ * otherwise *h gets the smallest gap.
+ */
 HitEntry* marioSearchHead_roll(Vec* pos, f32* h, f32 d) {
     f32 a;
     Vec outPos, outNrm;
@@ -2010,6 +2177,12 @@ HitEntry* marioSearchHead_roll(Vec* pos, f32* h, f32 d) {
     return NULL;
 }
 
+/**
+ * Ceiling check for the Spring Jump: eight rays up along a line across Mario.
+ * A 0x40000 hit counts on any ray and *side says which side it was on;
+ * any other ceiling only counts on the middle ray. Outputs as marioSearchHead.
+ * Guess: 0x40000 marks the ceilings the Spring Jump can catch on from the side.
+ */
 HitEntry* marioSearchHead_jabara(Vec* pos, f32* h, s32* side, f32 d) {
     Vec v, dir, outPos, outNrm;
     f32 dist;
@@ -2055,6 +2228,12 @@ HitEntry* marioSearchHead_jabara(Vec* pos, f32* h, s32* side, f32 d) {
     return NULL;
 }
 
+/**
+ * Moves Mario dx units (his speed) in direction dz (degrees) and stops him at walls,
+ * from mario.c and koopa.c each frame.
+ * Sets hitobjFront / hitobjWall, and hitobjPush once he has pushed a wall for 20 frames (10 for pipes, "dokan",
+ * from the US release on). Ends with marioChkWallAround and the Pirate's Grotto spear check (dou10_yoko_yari).
+ */
 void marioCheckWall(f32 dx, f32 dz) {
     Vec pos;
     f32 h;
@@ -2131,6 +2310,11 @@ void marioCheckWall(f32 dx, f32 dz) {
     dou10_yoko_yari(&mario->frontWallDist);
 }
 
+/**
+ * Wall check while Mario stands still: finds the wall he faces (hitobjFront, frontWallDist;
+ * none during a hammer swing), the wall in front on an A press (hitobjFrontA) and on dou_10 a wall behind him,
+ * then pushes him out of nearby walls with marioChkWallAround.
+ */
 void marioSearchFrontWall_staying(f32 dz) {
     Vec pos;
     f32 h;
@@ -2191,6 +2375,10 @@ void marioSearchFrontWall_staying(f32 dz) {
     mario->position.z = pos.z;
 }
 
+/**
+ * marioCheckWall for a jumping tube: also stops the jump against a ceiling within 16.8 above,
+ * then moves the tube dx in direction dz against walls and pushes it out of nearby ones.
+ */
 void marioCheckWall_roll(f32 dx, f32 dz) {
     Vec pos;
     Vec outPos;
@@ -2276,7 +2464,7 @@ void marioCheckWall_roll(f32 dx, f32 dz) {
     mario->position.z = pos.z;
 }
 
-// marioHitCheckVecInl with the direction built after the position copy (the target schedules the pos loads first)
+/** marioHitCheckVecInl with the direction built after the position copy (the target schedules the pos loads first) */
 static inline HitEntry* marioChkFrontInl(const Vec* pos, f32 s, f32 c, Vec* outPos, Vec* outNrm, f32* dist) {
     HitCheckQuery query;
     HitEntry* hit;
@@ -2332,6 +2520,11 @@ static inline HitEntry* marioChkFrontInl(const Vec* pos, f32 s, f32 c, Vec* outP
     }
     return hit;
 }
+/**
+ * Casts a horizontal ray from pos in direction angle (degrees) for up to dist.
+ * Returns the hit and its flat distance in *out, or NULL with *out = -1.
+ * Used by the jump motions (mot_jump.c) to look for a wall ahead.
+ */
 HitEntry* marioChkFront(f32* out, const Vec* pos, f32 angle, f32 dist) {
     Vec outPos, outNrm;
     f32 s, c;
@@ -2348,11 +2541,12 @@ HitEntry* marioChkFront(f32* out, const Vec* pos, f32 angle, f32 dist) {
     return NULL;
 }
 
+/** Copies v into *d (helper of sfwVecSetNested for searchFrontWall). */
 static inline void sfwVecSet(Vec* d, Vec v) {
     *d = v;
 }
 
-// wall-slide offset: half of the move vector minus its component along the wall normal
+/** wall-slide offset: half of the move vector minus its component along the wall normal */
 static inline void sfwSlide(Vec* n, f32 vx, f32 vz, f32* mx, f32* mz) {
     f32 dot = vx * n->x + vz * n->z;
     *mx = 0.5f * (vx - dot * n->x);
@@ -2367,6 +2561,14 @@ static inline void sfwVecSetNested(Vec* d, Vec v) {
 #if VERSION <= VERSION_DEMO_US
 #endif
 
+/**
+ * Moves pos dx in direction dz (degrees) unless a wall blocks it:
+ * rays at two to four heights (by character and mode) reach half the width w ahead, plus 45-degree side rays.
+ * On a wall pos slides along it, *h gets the distance and the wall is returned;
+ * balloon walls (chkBalloon) also go in hitobjFrontWall.
+ * On Riverside Station's eki_04, in marioChkSts state 0x10 on a slope of 45 degrees or more,
+ * pos just moves with no wall check.
+ */
 static HitEntry* searchFrontWall(Vec* pos, f32* h, f32 dx, f32 dz, f32 w) {
     Vec p;
     Vec dir;
@@ -2532,6 +2734,12 @@ static HitEntry* searchFrontWall(Vec* pos, f32* h, f32 dx, f32 dz, f32 w) {
     return NULL;
 }
 
+/**
+ * The sideways spears (yoko yari) of Pirate's Grotto dou_10:
+ * when no wall is in front and Mario is not a tube,
+ * looks for a spike (0x800) below him and by +z rays from him and 8 units (2 paper-thin) to either side;
+ * a spike becomes hitobjFront with *out = 0.8, so marioChkToge hurts him.
+ */
 HitEntry* dou10_yoko_yari(f32* out) {
     Vec pos, pos2, outPos, outNrm;
     f32 h;
@@ -2591,6 +2799,7 @@ HitEntry* dou10_yoko_yari(f32* out) {
     return hit;
 }
 
+/** dou10_yoko_yari for Yoshi (party_yoshi.c): the same spike search on dou_10, run even when a wall is in front. */
 HitEntry* dou10_yoko_yari2(f32* out) {
     Vec pos, pos2, outPos, outNrm;
     f32 h;
@@ -2637,6 +2846,10 @@ HitEntry* dou10_yoko_yari2(f32* out) {
 }
 
 #if VERSION >= VERSION_JP // not in the demo
+/**
+ * Spear check on dou_10 for tube mode (mario.c): unfiltered rays 40 along +z from 10 ahead of and behind Mario;
+ * a hit becomes hitobjFront, and mario.c hurts him if it has the spike attribute 0x800.
+ */
 HitEntry* N_dou10_yoko_yari3(void) {
     HitCheckQuery query;
     f32 s, c;
@@ -2702,11 +2915,17 @@ HitEntry* N_dou10_yoko_yari3(void) {
 }
 #endif
 
+/** marioHitCheckVecInl that stores the hit in *out and returns whether there was one. */
 static inline BOOL marioHitCheckVecChk(Vec* p, Vec* d, Vec* op, Vec* on, f32* di, HitEntry** out) {
     *out = marioHitCheckVecInl(p, d, op, on, di);
     return *out != NULL;
 }
 
+/**
+ * Looks for a step just ahead of Mario (or the tube): one ray down from half his height.
+ * A floor above his feet or less than 2 below gives its y in *y and is returned,
+ * which marioChkGnd uses to climb 5-11 unit steps; a lower floor gives the drop in *h and its direction in *ang.
+ */
 static HitEntry* marioChkFrontStep(f32* y, f32* h, f32* ang) {
     Vec outPos;
     Vec outNrm;
@@ -2774,6 +2993,11 @@ static HitEntry* marioChkFrontStep(f32* y, f32* h, f32* ang) {
     return NULL;
 }
 
+/**
+ * Never called.
+ * Guess: stands in for a function the original link stripped,
+ * so its float constants (0.75, -1, pi, 0.1, 2) keep their float-pool order.
+ */
 void marioHitStrippedPool(f32* f) {
     f[0] = 0.75f;
     f[1] = -1.0f;
@@ -2782,6 +3006,7 @@ void marioHitStrippedPool(f32* f) {
     f[4] = 2.0f;
 }
 
+/** Sets up marioChkWallAround's two ray origins (11 above pos and h - 1 above it) and the ray length (half of w). */
 static inline void wallBase(Vec* pos, Vec* hi, Vec* lo, f32 h, f32* half, f32 w) {
     Vec base = *pos;
     *hi = base;
@@ -2791,6 +3016,7 @@ static inline void wallBase(Vec* pos, Vec* hi, Vec* lo, f32 h, f32* half, f32 w)
     lo->y += h - 1.0f;
 }
 
+/** Copies *in to *out through a temporary, for marioChkWallAround's second pass. */
 static inline void wallCopy(Vec* out, Vec* in) {
     Vec t;
     t = *in;
@@ -2798,9 +3024,15 @@ static inline void wallCopy(Vec* out, Vec* in) {
 }
 
 #if VERSION <= VERSION_DEMO_US
-// The demo has no mode argument: the push is always limited to 1/8 of the width.
+/** The demo has no mode argument: the push is always limited to 1/8 of the width. */
 BOOL marioChkWallAround(Vec* pos, f32 unused, f32 dir, f32 w, f32 h) {
 #else
+/**
+ * Pushes pos out of walls closer than half of w:
+ * rays at two heights in 8 directions (2 when kpaGetStageViewType is
+ * 0) add up the overlap, the push is capped at 1/8 of w (1/4 while falling with mode 0), and a second pass halves a
+ * push back. Returns TRUE if any wall was near. Called after each wall move and from npcdrv.c.
+ */
 BOOL marioChkWallAround(Vec* pos, s32 mode, f32 unused, f32 dir, f32 w, f32 h) {
 #endif
     Vec hi;
@@ -2928,6 +3160,11 @@ BOOL marioChkWallAround(Vec* pos, s32 mode, f32 unused, f32 dir, f32 w, f32 h) {
     return TRUE;
 }
 
+/**
+ * TRUE when walls within 13 units (at three heights) surround Mario
+ * so that no three neighbouring directions of eight are all open. Used by the slit and tube motions.
+ * Guess: tells whether he is wedged in a gap and may not turn back.
+ */
 BOOL marioSlitChkWallAround(void) {
     s32 flags[8];
     Vec pos;
@@ -2989,6 +3226,11 @@ BOOL marioSlitChkWallAround(void) {
     return TRUE;
 }
 
+/**
+ * marioCheckWall for the paper boat (mot_ship.c):
+ * moves it dx in direction dz against walls, pushes it out of nearby ones at a height of 4,
+ * and caps the total movement at the boat's dash speed.
+ */
 void marioCheckWallShip(f32 dx, f32 dz) {
     Vec pos;
     Vec old;

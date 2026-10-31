@@ -8,6 +8,12 @@ static void LoadTexPalette(TEXPalettePtr* pal, char* name);
 static void UnpackTexPalette(TEXPalettePtr pal);
 static void TexFreeFunc(TEXPalettePtr* pal);
 
+/**
+ * Gets the texture palette file name into *pal:
+ * from the display-object cache if it is cached (adding a reference),
+ * otherwise by loading it from disc with LoadTexPalette
+ * and adding it to the cache with TexFreeFunc as its free function.
+ */
 void TEXGetPalette(TEXPalettePtr* pal, char* name) {
     void* p = TexFreeFunc;
 
@@ -24,6 +30,10 @@ void TEXGetPalette(TEXPalettePtr* pal, char* name) {
     }
 }
 
+/**
+ * Opens the palette file name on the DVD, allocates a buffer rounded up to 32 bytes,
+ * reads the whole file at priority 2 and relocates it with UnpackTexPalette.
+ */
 static void LoadTexPalette(TEXPalettePtr* pal, char* name) {
     DVDFileInfo dfi;
 
@@ -36,6 +46,12 @@ static void LoadTexPalette(TEXPalettePtr* pal, char* name) {
 
 #define PALETTE_VERSION 0x20AF30
 
+/**
+ * Turns the file offsets inside a freshly loaded palette into pointers:
+ * checks the version number (0x20AF30, otherwise OSPanic),
+ * then fixes up the descriptor array and each texture header and colour lookup table header and their data.
+ * Does the fix-up only once per header (the unpacked flag).
+ */
 static void UnpackTexPalette(TEXPalettePtr pal) {
     u16 i;
 
@@ -63,16 +79,22 @@ static void UnpackTexPalette(TEXPalettePtr pal) {
     }
 }
 
+/** Returns the descriptor of texture number id (its texture header and optional CLUT header) in a loaded palette. */
 TEXDescriptorPtr TEXGet(TEXPalettePtr pal, u32 id) {
     ASSERTMSGLINE(147, id < pal->numDescriptors, "GetTexture():  Texture Not Found ");
     return &pal->descriptorArray[id];
 }
 
+/** Cache free function for palettes: frees the palette's memory with OSFree and clears the pointer. */
 static void TexFreeFunc(TEXPalettePtr* pal) {
     OSFree(*pal);
     *pal = NULL;
 }
 
+/**
+ * Releases a palette obtained with TEXGetPalette:
+ * drops its cache reference when the cache is in use, otherwise frees the memory and clears *pal.
+ */
 void TEXReleasePalette(TEXPalettePtr* pal) {
     if (DOCacheInitialized) {
         DSReleaseCacheObj(&DODisplayCache, (Ptr)*pal);
@@ -82,6 +104,10 @@ void TEXReleasePalette(TEXPalettePtr* pal) {
     }
 }
 
+/**
+ * Initialises the GXTexObj to for texture id of the palette from its header (data, size, format, wrap modes,
+ * and LOD range and bias); mipmapping is turned on when the minimum and maximum LOD differ.
+ */
 void TEXGetGXTexObjFromPalette(TEXPalettePtr pal, GXTexObj* to, u32 id) {
     TEXDescriptorPtr tdp;
     GXBool mipMap;
@@ -96,6 +122,11 @@ void TEXGetGXTexObjFromPalette(TEXPalettePtr pal, GXTexObj* to, u32 id) {
     GXInitTexObjLOD(to, tdp->textureHeader->minFilter, tdp->textureHeader->magFilter, tdp->textureHeader->minLOD, tdp->textureHeader->maxLOD, tdp->textureHeader->LODBias, GX_DISABLE, tdp->textureHeader->edgeLODEnable, GX_ANISO_1);
 }
 
+/**
+ * Same as TEXGetGXTexObjFromPalette for colour-indexed textures:
+ * it also initialises the GXTlutObj tlo from the texture's CLUT header
+ * and attaches the texture to the TLUT slot tluts.
+ */
 void TEXGetGXTexObjFromPaletteCI(TEXPalettePtr pal, GXTexObj* to, GXTlutObj* tlo, GXTlut tluts, u32 id) {
     GXBool mipMap;
     TEXDescriptorPtr tdp;

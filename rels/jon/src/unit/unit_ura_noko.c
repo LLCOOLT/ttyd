@@ -245,6 +245,10 @@ static BattleWeapon weapon_ura_noko_ura_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init event of the Shady Koopa: installs its wait, attack, damage and confusion events,
+ * clears its over-turn count (it starts upright) and sets its run and walk sounds.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -257,6 +261,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Shady Koopa: runs the default damage handling with LW(10) = -2 and LW(11) = 1. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -264,6 +269,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Flips the Shady Koopa onto its back: lowers the part's hit offset by 15,
+ * swaps in the turned defence and pose tables, sets the flipped status flag with an over-turn count of 2,
+ * plays NKT_D_1, hops twice with the inside sound and settles into the NKT_S_2 pose.
+ */
 static EVT_BEGIN(dmg_turn_event)
     CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, -15, 0)
     SET_VALUE(LW(10), -2)
@@ -283,6 +293,12 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Called when the flipped Shady Koopa takes its turn: counts the over-turn down by one.
+ * While it is still above zero it attacks from its back (ura_attack_event);
+ * once it reaches zero it flips back up (normal tables, NKT_S_1, INSIDE2 sound, a hop)
+ * and restores its hit offset.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -306,6 +322,11 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the Shady Koopa's pre-emptive attack when the battle starts with the first-strike flag:
+ * it targets the first attack target and does a shell spin at it (NKT_A_1, SHELL1 and MOVE sounds) using
+ * weapon_nokonoko_attack, ending with a hop back to its place.
+ */
 static EVT_BEGIN(first_attack_event)
     CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -374,6 +395,13 @@ static EVT_BEGIN(first_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the Shady Koopa: wakes up first if it is flipped.
+ * In the forced-attack case it uses the first attack target after a half-second pause,
+ * otherwise it uses an enemy item if it has one or samples a target.
+ * It then spins into its shell and rams the target (NKT_A_1, with a smoke puff),
+ * the hit being checked with weapon_nokonoko_attack, and returns home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -520,6 +548,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the Shady Koopa's attack while it is flipped onto its back:
+ * with the eff_aura aura around it, it spins on its shell (NKT_A_2, URANOKO_MOVE sounds)
+ * and travels to the target, hits or misses it, then spins back to its place and sets unit work 0 to 1.
+ */
 static EVT_BEGIN(ura_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_ura_noko_ura_attack))
@@ -676,6 +709,11 @@ static EVT_BEGIN(ura_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0] = unit.
+ * Keeps the Shady Koopa's aura effect (created on the first call and stored in work[2]) at its position
+ * and scale; blocks until the effect's own flag clears.
+ */
 static USER_FUNC(eff_aura) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -699,6 +737,7 @@ static USER_FUNC(eff_aura) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Idle event: sets the unit's body part 1 to the pose given by its pose table for its current state. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

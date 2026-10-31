@@ -35,6 +35,7 @@ static USER_FUNC(_disp_heart_entry_stop);
 static void _disp_heart(CameraId camera, void* param);
 static USER_FUNC(_disp_heart_entry);
 static USER_FUNC(_make_kagenuke_weapon);
+// Forward declaration: the Shade Fist positioning helper, defined further down; the US demo has neither.
 #if VERSION >= VERSION_JP
 USER_FUNC(_get_vivian_attack_position);
 #endif
@@ -203,10 +204,16 @@ BattleUnitKind unitdata_Party_Vivian = {
     data_table,
 };
 
+/** Empty: partner moves come from the player's menu choices, not a unit attack script. */
 static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Vivian-style emergence from a shadow for part args[1] of unit args[0]:
+ * grows the shadow, places the unit at (args[2], args[3], args[4]) and plays the p_bibi rise animation,
+ * then shrinks the shadow back. args[5] non-zero also clears the shared-shadow flag. Blocks until done.
+ */
 USER_FUNC(battle_evt_majo_disp_on) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -293,6 +300,10 @@ USER_FUNC(battle_evt_majo_disp_on) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Vivian's battle entry: starts 250 units behind her home spot and, after 40 frames,
+ * floats in to it at speed 4 with her hovering sound, then takes her stay pose.
+ */
 static EVT_BEGIN(battle_entry_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 250)
@@ -307,6 +318,11 @@ static EVT_BEGIN(battle_entry_event)
     RETURN
 EVT_END()
 
+/**
+ * Init for Vivian: allocates her spare weapon, registers her wait, attack, damage, confusion and entry scripts,
+ * clears the Veil turns (unit work 4) and hiding flag (unit work 3),
+ * spawns vivian_shadow_tail_event and sets her walk, run, dive and jump sounds.
+ */
 static EVT_BEGIN(init_event)
     CALL(_vivian_make_extra_work_area)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
@@ -325,6 +341,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Hit reaction: straightens her rotation (left over from her moves), then runs the default damage script. */
 static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     SET_VALUE(LW(10), -2)
@@ -333,6 +350,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Veil's per-phase countdown (data tag 3): decrements the turns left in unit work 4 and, when they run out,
+ * Mario and Vivian rise out of the shadow (battle_evt_majo_disp_on) and walk back home,
+ * with an optional stylish.
+ */
 EVT_BEGIN(vivian_hide_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -386,6 +408,7 @@ EVT_BEGIN(vivian_hide_event)
     RETURN
 EVT_END()
 
+/** Idle: plays the stay pose from the current pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -590,6 +613,11 @@ BattleWeapon partyWeapon_VivianCharmKissAttack = {
 #endif
 };
 
+/**
+ * Vivian's Shade Fist: she sinks into the shadows,
+ * reappears beside the enemy (_get_vivian_attack_position) and punches it with the action command,
+ * the hit able to burn it for 2 turns (_make_kagenuke_weapon), then returns.
+ */
 EVT_BEGIN(partyVivianAttack_NormalAttack)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -762,6 +790,10 @@ EVT_BEGIN(partyVivianAttack_NormalAttack)
     RETURN
 EVT_END()
 
+/**
+ * Vivian's Veil: she pulls Mario down into the shadows with her, so both are veiled and cannot be targeted;
+ * unit work 4 is set to 1 so vivian_hide_event brings them back out next turn.
+ */
 EVT_BEGIN(partyVivianAttack_ShadowGuard)
     SET_VALUE(LW(3), -3)
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
@@ -880,6 +912,10 @@ EVT_BEGIN(partyVivianAttack_ShadowGuard)
     RETURN
 EVT_END()
 
+/**
+ * Vivian's Fiery Jinx: she casts fire over all the enemies,
+ * with the action command deciding the damage and whether they are burned.
+ */
 EVT_BEGIN(partyVivianAttack_MagicalPowder)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -1021,6 +1057,11 @@ EVT_BEGIN(partyVivianAttack_MagicalPowder)
     RETURN
 EVT_END()
 
+/**
+ * Vivian's Infatuate: she blows a kiss at all the enemies,
+ * confusing those it takes hold on for 3 turns (90% chance in the US demo, 100% later);
+ * a heart shows over the target during the action command (_disp_heart_entry).
+ */
 EVT_BEGIN(partyVivianAttack_CharmKissAttack)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -1171,6 +1212,11 @@ EVT_BEGIN(partyVivianAttack_CharmKissAttack)
     RETURN
 EVT_END()
 
+/**
+ * Spawned by init_event, runs for the unit's lifetime:
+ * each frame, while she is not hiding (unit work 3 is 0),
+ * stores Vivian's floor position in unit works 0-2 so a counter-hit can return her there.
+ */
 EVT_BEGIN(vivian_shadow_tail_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
@@ -1195,6 +1241,11 @@ EVT_BEGIN(vivian_shadow_tail_event)
     RETURN
 EVT_END()
 
+/**
+ * Counter-damage reaction (data tags 25-35): Vivian is knocked up and back;
+ * if she was out of her shadow (unit work 3 set) she dives back to the saved floor spot,
+ * sinks into the shadow and resurfaces at home.
+ */
 EVT_BEGIN(vivian_counter_damage_event)
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
     CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_SHOW_HP_GAUGE)
@@ -1234,6 +1285,7 @@ EVT_BEGIN(vivian_counter_damage_event)
     RETURN
 EVT_END()
 
+/** Vivian's Appeal (data tag 5): appeal pose and sound, then the audience is fired up. */
 EVT_BEGIN(vivian_appeal_event)
     CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PTR_O_1"))
@@ -1255,6 +1307,7 @@ EVT_BEGIN(vivian_appeal_event)
     RETURN
 EVT_END()
 
+/** Victory reaction (data tag 64): plays Vivian's PTR_Y_1 pose to the end, holds half a second, then her stay pose. */
 static EVT_BEGIN(party_win_reaction)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PTR_Y_1"))
     CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
@@ -1263,6 +1316,10 @@ static EVT_BEGIN(party_win_reaction)
     RETURN
 EVT_END()
 
+/**
+ * Audience-attack reaction (data tag 6): Vivian runs offstage, reappears in the audience,
+ * hits the chosen audience member with her Shade Fist pose (PTR_A1_2) and runs home.
+ */
 static EVT_BEGIN(attack_audience_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetStageSize, LW(3), EVT_NULLPTR, EVT_NULLPTR)
@@ -1310,6 +1367,12 @@ static EVT_BEGIN(attack_audience_event)
     RETURN
 EVT_END()
 
+/**
+ * Sinks part args[1] of unit args[0] into its shadow:
+ * grows the shadow, plays the p_bibi sink animation and sound,
+ * then shrinks the shadow away and drops the unit 500 units below the stage.
+ * args[2] non-zero sets the shared-shadow flag; args[3] non-zero hides the part. Blocks until done.
+ */
 USER_FUNC(battle_evt_majo_disp_off) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -1382,6 +1445,10 @@ USER_FUNC(battle_evt_majo_disp_off) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Allocates a spare BattleWeapon in the running unit's countersetWeapon slot,
+ * which Shade Fist fills per use (_make_kagenuke_weapon). Run from init_event.
+ */
 static USER_FUNC(_vivian_make_extra_work_area) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -1393,6 +1460,11 @@ static USER_FUNC(_vivian_make_extra_work_area) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Builds Vivian's battle move list (data tag 1):
+ * Shade Fist and Veil always, Fiery Jinx from Super rank and Infatuate from Ultra rank,
+ * appending each to command->weapon and advancing *count.
+ */
 static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     s32 techLv;
 
@@ -1418,6 +1490,10 @@ static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     }
 }
 
+/**
+ * Returns in args[7] how many frames moving from point args[0..2] to args[3..5] takes at speed args[6],
+ * capped at 15.
+ */
 static USER_FUNC(_get_move_frame) {
     EvtWord* args = event->args;
     Vec a, b, d;
@@ -1443,6 +1519,12 @@ static USER_FUNC(_get_move_frame) {
 
 #if VERSION >= VERSION_JP
 
+/**
+ * Takes target unit args[0] and a position in args[1]-args[3]
+ * and adjusts it in place to where Vivian should surface for Shade Fist:
+ * 30 units behind her facing, plus the target's vivianOffsetX/Z, 20 units lower but not below the floor.
+ * Not in the US demo.
+ */
 USER_FUNC(_get_vivian_attack_position) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -1482,6 +1564,11 @@ USER_FUNC(_get_vivian_attack_position) {
 }
 #endif
 
+/**
+ * Copies the weapon pointed to by args[0] into the unit's spare weapon,
+ * sets its burn duration (burnTime) to args[1] turns, and writes the copy's address back into args[0].
+ * Shade Fist always passes 2.
+ */
 static USER_FUNC(_make_kagenuke_weapon) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -1503,6 +1590,11 @@ static USER_FUNC(_make_kagenuke_weapon) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Shows Infatuate's heart over part args[4] of unit args[3] for args[2] frames,
+ * popping in by frame args[0] and settling by frame args[1] (state kept in event->heart).
+ * Ends early once _disp_heart_entry_stop is called.
+ */
 static USER_FUNC(_disp_heart_entry) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -1529,6 +1621,10 @@ static USER_FUNC(_disp_heart_entry) {
     return event->heart.cur < event->heart.total ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
 
+/**
+ * Display callback for _disp_heart_entry: draws the heart icons at the target's hit position,
+ * scaled through the pop-in animation.
+ */
 static void _disp_heart(CameraId camera, void* param) {
     EventEntry* w;
     f32 scale;
@@ -1562,12 +1658,14 @@ static void _disp_heart(CameraId camera, void* param) {
     }
 }
 
+/** Stops the heart display of the event whose id is args[0] (sets its heart.stop). */
 static USER_FUNC(_disp_heart_entry_stop) {
     EventEntry* e = evtGetPtrID(evtGetValue(event, *event->args));
     e->heart.stop = 1;
     return EVT_RETURN_DONE;
 }
 
+/** Returns in args[0] whether the running event's heart display has been stopped. */
 static USER_FUNC(_disp_heart_entry_stop_check) {
     evtSetValue(event, *event->args, event->heart.stop);
     return EVT_RETURN_DONE;

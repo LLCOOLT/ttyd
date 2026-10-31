@@ -38,24 +38,40 @@ extern EvtWord evt_poster_13[];
 extern EvtWord evt_poster_14[];
 extern EvtWord evt_poster_15[];
 
+/**
+ * Door animation callback, closing for the w_bero_1 exit to eki_01:
+ * rotates map object "door_1" about Y by 0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(w1_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the w_bero_1 exit to eki_01:
+ * rotates map object "door_1" about Y by -0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(w1_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, closing for the w_bero_2 exit to eki_04:
+ * rotates map object "door_2" about Y by 0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(w2_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door_2"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the w_bero_2 exit to eki_04:
+ * rotates map object "door_2" about Y by -0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(w2_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door_2"), 0, LW(0), 0)
@@ -102,6 +118,10 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
+/**
+ * Case event for the first poster wall: advances the story to STORY_STG6_33_BLOW_THE_POSTER
+ * and opens the door switch (bero_case_switch_on).
+ */
 EVT_BEGIN(evt_poster)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_33_BLOW_THE_POSTER)
     SET_VALUE(LW(0), 1)
@@ -109,6 +129,11 @@ EVT_BEGIN(evt_poster)
     RETURN
 EVT_END()
 
+/**
+ * Checks the poster flags after one is blown away: if any of posters 5 to 15 has not been blown yet it returns;
+ * otherwise it switches on the bero case, opens the a_kabe wall hit object
+ * and advances the story to STORY_STG6_33_BLOW_THE_POSTER if it is not already past it.
+ */
 static EVT_BEGIN(evt_chk)
     IF_INT_EQUAL(GSWF(GSWF_EKI03_POSTER_5_BLOWN), 0)
         RETURN
@@ -152,60 +177,74 @@ static EVT_BEGIN(evt_chk)
     RETURN
 EVT_END()
 
+/** Case event for poster 1: sets GSWF_EKI03_POSTER_1_BLOWN and rechecks the posters with evt_chk. */
 static EVT_BEGIN(evt_poster_1)
     SET_VALUE(GSWF(GSWF_EKI03_POSTER_1_BLOWN), 1)
     CALL_CHILD(evt_chk)
     RETURN
 EVT_END()
 
+/** Case event for poster 2: sets GSWF_EKI03_POSTER_2_BLOWN and rechecks the posters with evt_chk. */
 static EVT_BEGIN(evt_poster_2)
     SET_VALUE(GSWF(GSWF_EKI03_POSTER_2_BLOWN), 1)
     CALL_CHILD(evt_chk)
     RETURN
 EVT_END()
 
+/** Case event for poster 3: sets GSWF_EKI03_POSTER_3_BLOWN and rechecks the posters with evt_chk. */
 static EVT_BEGIN(evt_poster_3)
     SET_VALUE(GSWF(GSWF_EKI03_POSTER_3_BLOWN), 1)
     CALL_CHILD(evt_chk)
     RETURN
 EVT_END()
 
+/** Case event for poster 4: sets GSWF_EKI03_POSTER_4_BLOWN and rechecks the posters with evt_chk. */
 static EVT_BEGIN(evt_poster_4)
     SET_VALUE(GSWF(GSWF_EKI03_POSTER_4_BLOWN), 1)
     CALL_CHILD(evt_chk)
     RETURN
 EVT_END()
 
+/** Case event for poster 5: sets GSWF_EKI03_POSTER_5_BLOWN and rechecks the posters with evt_chk. */
 static EVT_BEGIN(evt_poster_5)
     SET_VALUE(GSWF(GSWF_EKI03_POSTER_5_BLOWN), 1)
     CALL_CHILD(evt_chk)
     RETURN
 EVT_END()
 
+/** Case event for poster 6: sets GSWF_EKI03_POSTER_6_BLOWN and rechecks the posters with evt_chk. */
 static EVT_BEGIN(evt_poster_6)
     SET_VALUE(GSWF(GSWF_EKI03_POSTER_6_BLOWN), 1)
     CALL_CHILD(evt_chk)
     RETURN
 EVT_END()
 
+/** Case event for poster 7: sets GSWF_EKI03_POSTER_7_BLOWN and rechecks the posters with evt_chk. */
 static EVT_BEGIN(evt_poster_7)
     SET_VALUE(GSWF(GSWF_EKI03_POSTER_7_BLOWN), 1)
     CALL_CHILD(evt_chk)
     RETURN
 EVT_END()
 
+/** Case event for poster 8: sets GSWF_EKI03_POSTER_8_BLOWN and rechecks the posters with evt_chk. */
 static EVT_BEGIN(evt_poster_8)
     SET_VALUE(GSWF(GSWF_EKI03_POSTER_8_BLOWN), 1)
     CALL_CHILD(evt_chk)
     RETURN
 EVT_END()
 
+/** Case event for poster 9: sets GSWF_EKI03_POSTER_9_BLOWN and rechecks the posters with evt_chk. */
 static EVT_BEGIN(evt_poster_9)
     SET_VALUE(GSWF(GSWF_EKI03_POSTER_9_BLOWN), 1)
     CALL_CHILD(evt_chk)
     RETURN
 EVT_END()
 
+/**
+ * Case event when poster 10 is blown off the wall by Flurrie:
+ * sets GSWF_EKI03_POSTER_10_BLOWN, turns off the hit area of the poster behind it (a_kami_13)
+ * and checks whether all posters are gone.
+ */
 EVT_BEGIN(evt_poster_10)
     SET_VALUE(GSWF(GSWF_EKI03_POSTER_10_BLOWN), 1)
     CALL(evt_hitobj_onoff, STRING("a_kami_13"), 1, 0)
@@ -213,6 +252,11 @@ EVT_BEGIN(evt_poster_10)
     RETURN
 EVT_END()
 
+/**
+ * Case event when poster 11 is blown off: sets its flag,
+ * turns off the hit areas of the four neighbouring posters (a_kami_14, a_kami_15, a_kami_6, a_kami_7) it
+ * covered, then checks whether all are gone.
+ */
 EVT_BEGIN(evt_poster_11)
     SET_VALUE(GSWF(GSWF_EKI03_POSTER_11_BLOWN), 1)
     CALL(evt_hitobj_onoff, STRING("a_kami_14"), 1, 0)
@@ -223,6 +267,11 @@ EVT_BEGIN(evt_poster_11)
     RETURN
 EVT_END()
 
+/**
+ * Case event when poster 12 is blown off: sets its flag,
+ * turns off the hit areas of the posters it covered (a_kami_8, a_kami_9, a_kami_5;
+ * the demo versions also a_kami_2), then checks whether all are gone.
+ */
 EVT_BEGIN(evt_poster_12)
     SET_VALUE(GSWF(GSWF_EKI03_POSTER_12_BLOWN), 1)
     CALL(evt_hitobj_onoff, STRING("a_kami_8"), 1, 0)
@@ -235,24 +284,33 @@ EVT_BEGIN(evt_poster_12)
     RETURN
 EVT_END()
 
+/** Case event when poster 13 is blown off: sets GSWF_EKI03_POSTER_13_BLOWN and checks whether all posters are gone. */
 EVT_BEGIN(evt_poster_13)
     SET_VALUE(GSWF(GSWF_EKI03_POSTER_13_BLOWN), 1)
     CALL_CHILD(evt_chk)
     RETURN
 EVT_END()
 
+/** Case event when poster 14 is blown off: sets GSWF_EKI03_POSTER_14_BLOWN and checks whether all posters are gone. */
 EVT_BEGIN(evt_poster_14)
     SET_VALUE(GSWF(GSWF_EKI03_POSTER_14_BLOWN), 1)
     CALL_CHILD(evt_chk)
     RETURN
 EVT_END()
 
+/** Case event when poster 15 is blown off: sets GSWF_EKI03_POSTER_15_BLOWN and checks whether all posters are gone. */
 EVT_BEGIN(evt_poster_15)
     SET_VALUE(GSWF(GSWF_EKI03_POSTER_15_BLOWN), 1)
     CALL_CHILD(evt_chk)
     RETURN
 EVT_END()
 
+/**
+ * Map init for eki_03: sets up the doors to eki_01 and eki_04, the HP Plus item,
+ * the Shine Sprite block (power-up block), the brick blocks (one holds a Thunder Rage),
+ * the sun's heat-haze shader and glare, and the 15 posters that Flurrie can blow away.
+ * Posters already blown are hidden; the wall behind them is opened by evt_chk once all are gone.
+ */
 EVT_BEGIN(eki_03_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
@@ -413,6 +471,10 @@ EVT_BEGIN(eki_03_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Map TEV callback for the "sun" object: redraws a 64x64 indirect texture every frame as a scrolling sine wave
+ * and uses it to warp the sun's texture, giving a heat-haze shimmer.
+ */
 static void sun_tev(MapTevCallbackInfo* info) {
     static const s32 texmtx_tbl[] = {
         GX_TEXMTX0,
@@ -473,6 +535,12 @@ static void sun_tev(MapTevCallbackInfo* info) {
     info->texCoord = texMap + 1;
 }
 
+/**
+ * Per-frame script helper (started inline from the map init, never finishes):
+ * keeps the screen glare filter on the sun.
+ * Switches the glare off when the sun's screen rectangle is off screen or empty,
+ * otherwise sets the glare box around it (50 pixels margin) and its depth limit.
+ */
 static USER_FUNC(test_glare) {
     MapObject* sun = mapGetMapObj("sun");
     u16* rect;

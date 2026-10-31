@@ -6,6 +6,7 @@
 #define FP_NORMAL 4
 #define FP_SUBNORMAL 5
 
+/** Classifies a double as NaN, infinity, zero, subnormal or normal (the C99 fpclassify macro). */
 inline int __fpclassifyd(double x) {
     switch (__HI(x) & 0x7ff00000) {
         case 0x7ff00000:
@@ -26,6 +27,11 @@ twom54 = 5.55111512312578270212e-17,
 huge = 1.0e+300,
 tiny = 1.0e-300;
 
+/**
+ * Returns x * 2^n by editing the exponent field directly:
+ * zero, NaN and infinity pass through, subnormals are scaled first,
+ * and overflow or underflow gives a signed huge or tiny result.
+ */
 double ldexp(double x, int n) {
     int k, hx, lx;
     if (!isfinite(x) || x == 0.0) return x;

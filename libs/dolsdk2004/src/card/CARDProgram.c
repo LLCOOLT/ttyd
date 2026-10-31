@@ -5,6 +5,11 @@
 #define TRUNC(n, a) (((u32)(n)) & ~((a)-1))
 #define CARD_PROGRAM_SIZE 128
 
+/**
+ * Completion callback for each sector-sized piece of a program:
+ * stops with CANCELED if the file was cancelled,
+ * otherwise follows the FAT to the next block and writes the next piece.
+ */
 static void ProgramCallback(s32 chan, s32 result) {
     CARDControl* card;
     CARDCallback callback;
@@ -51,6 +56,11 @@ error:
     callback(chan, result);
 }
 
+/**
+ * Writes 'length' bytes at 'offset' of an open file without erasing the sectors first.
+ * Both must be multiples of 128; the file must be writable.
+ * Writes one sector at a time (the first piece up to the end of its sector).
+ */
 s32 CARDProgramAsync(CARDFileInfo* fileInfo, void* buf, s32 length, s32 offset, CARDCallback callback) {
     CARDControl* card;
     s32 result;
@@ -91,6 +101,7 @@ s32 CARDProgramAsync(CARDFileInfo* fileInfo, void* buf, s32 length, s32 offset, 
     return result;
 }
 
+/** Blocking CARDProgramAsync. */
 s32 CARDProgram(CARDFileInfo* fileInfo, void* buf, s32 length, s32 offset) {
     s32 result = CARDProgramAsync(fileInfo, buf, length, offset, __CARDSyncCallback);
     if (result < 0)

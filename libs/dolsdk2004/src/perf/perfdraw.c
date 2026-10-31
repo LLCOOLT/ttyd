@@ -108,15 +108,28 @@ void (*GameDrawInit)();
 Mtx mID;
 
 #ifndef DEBUG
+/**
+ * Converts a count of bus transactions a over a sample of f frames into a bar height (140 pixels is the maximum
+ * bandwidth, MaxBusTransactions per frame).
+ */
 inline f32 HEIGHT(u32 a, f32 f) {
     return 140.0f * ((f32) a / ((f32) MaxBusTransactions * f));
 }
 
+/**
+ * Converts a time in CPU cycles into an x position in the 616 pixel wide timeline,
+ * where DrawFrameMax cycles fill the width.
+ */
 inline f32 COORD(u32 a) {
     return 616.0f * ((f32) a / (f32) DrawFrameMax);
 }
 #endif
 
+/**
+ * Sets up the overlay's layout: stores the game's draw-init function,
+ * the timeline length (three 60 Hz frames of CPU clock), the row height for each event type,
+ * the bus-transaction maximum, and the frame-outline coordinates.
+ */
 void __PERFDrawInit(void (*id)()) {
     MTXIdentity(mID);
     GameDrawInit = id;
@@ -132,6 +145,11 @@ void __PERFDrawInit(void (*id)()) {
 static Mtx44 mProj;
 f32 pSave[7];
 
+/**
+ * Prepares GX for drawing the overlay: saves the game's projection,
+ * sets an orthographic projection covering the 616 pixel timeline, and puts the vertex format, blending,
+ * TEV and Z mode into a flat-colour state.
+ */
 void PERFPreDraw(void) {
     u32 i;
     u32 j;
@@ -167,6 +185,11 @@ void PERFPreDraw(void) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_TEX_ST, GX_RGBA6, 0);
 }
 
+/**
+ * Draws one sample's slice of the overlay: the stacked memory-bandwidth bar (CP, TC, CPU read/write, DSP, IO,
+ * VI, PE, RF, FI), the CPU instructions-per-cycle and cache-miss bars,
+ * and the GPU transform-wait and raster-busy bars, each only if enabled.
+ */
 static void DrawBWBar(PerfSample* s) {
     u32 delta;
     u32 interval;
@@ -308,6 +331,10 @@ __declspec(weak) f32 COORD(u32 a) {
 }
 #endif
 
+/**
+ * Draws the legend for the bandwidth bar: one coloured box per memory client,
+ * stacked to show the scale of one tenth of the bus maximum.
+ */
 static void DrawKey(void) {
     u32 delta;
     u32 foo[2];
@@ -395,6 +422,13 @@ static void DrawKey(void) {
     }
 }
 
+/**
+ * Draws the overlay for the current frame's history:
+ * the frame outline and frame dividers, the timeline backgrounds for the enabled bars,
+ * one line per event (CPU in its colour, GP in blue, with connecting lines), and the sampled bars;
+ * scales to the frame length unless PERFSetDrawFrames fixed it.
+ * Does nothing unless PERFInit was given a draw-init callback.
+ */
 void PERFDumpScreen(void) {
     PerfSample* samples;
     u32 s;
@@ -624,6 +658,10 @@ void PERFDumpScreen(void) {
     }
 }
 
+/**
+ * Restores the game's perspective projection from the values saved by PERFPreDraw
+ * and calls the draw-init function given to PERFInit.
+ */
 void PERFPostDraw(void) {
     u32 i;
     u32 j;
@@ -645,46 +683,60 @@ void PERFPostDraw(void) {
     GameDrawInit();
 }
 
+/** Shows or hides the legend for the bandwidth bar. */
 void PERFSetDrawBWBarKey(BOOL tf) {
     bDrawBWBarKey = tf;
 }
 
+/** Shows or hides the memory-bandwidth bars. */
 void PERFSetDrawBWBar(BOOL tf) {
     bDrawBWBar = tf;
 }
 
+/** Shows or hides the CPU instruction and cache-miss bars. */
 void PERFSetDrawCPUBar(BOOL tf) {
     bDrawCPUBar = tf;
 }
 
+/** Shows or hides the GPU transform-unit wait bars. */
 void PERFSetDrawXFBars(BOOL tf) {
     bDrawXFBars = tf;
 }
 
+/** Shows or hides the GPU raster-busy bar. */
 void PERFSetDrawRASBar(BOOL tf) {
     bDrawRASBar = tf;
 }
 
+/** Flips the bandwidth bar legend between shown and hidden. */
 void PERFToggleDrawBWBarKey(void) {
     bDrawBWBarKey = (bDrawBWBarKey) ? FALSE : TRUE; 
 }
 
+/** Flips the memory-bandwidth bars between shown and hidden. */
 void PERFToggleDrawBWBar(void) {
     bDrawBWBar = (bDrawBWBar) ? FALSE : TRUE; 
 }
 
+/** Flips the CPU bars between shown and hidden. */
 void PERFToggleDrawCPUBar(void) {
     bDrawCPUBar = (bDrawCPUBar) ? FALSE : TRUE; 
 }
 
+/** Flips the GPU transform-unit bars between shown and hidden. */
 void PERFToggleDrawXFBars(void) {
     bDrawXFBars = (bDrawXFBars) ? FALSE : TRUE; 
 }
 
+/** Flips the GPU raster bar between shown and hidden. */
 void PERFToggleDrawRASBar(void) {
     bDrawRASBar = (bDrawRASBar) ? FALSE : TRUE; 
 }
 
+/**
+ * Fixes the width of the overlay timeline to the given number of 60 Hz frames;
+ * 0 switches back to scaling it to the frame length automatically.
+ */
 void PERFSetDrawFrames(u32 frames) {
     if (frames != 0) {
         DrawNumFrames = frames;

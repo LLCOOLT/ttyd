@@ -35,7 +35,7 @@ static EvtWord damage_event[10];
 static EvtWord attack_event[19];
 static EvtWord wait_event[6];
 
-// tan in single precision, as in tou2's unit_wanawana.c.
+/** tan in single precision, as in tou2's unit_wanawana.c. */
 static inline f32 tanFloat(f32 x) {
     return tan(x);
 }
@@ -127,6 +127,10 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_wanawana", "nakayama_test4", 0.0f, 0.0f, 0.0f, 0.0f, 40.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
+/**
+ * Draw callback on the shadow camera: renders the stage floor from above, framed to the trap's model bounds,
+ * and copies it into the trap's texture so the trap looks like the ground under it; sets ready when done.
+ */
 void replace_disp(CameraId camera, void* param) {
     WanaWork* wp = param;
     CameraEntry saved;
@@ -171,6 +175,10 @@ void replace_disp(CameraId camera, void* param) {
     wp->ready = 1;
 }
 
+/**
+ * Animation callback of the trap's body part: once the floor texture is ready,
+ * binds it as the model's paper texture (type 0) or clears the binding (other types).
+ */
 void replace_callback(BattleUnitPart* part, s32 type) {
     WanaWork* wp = (WanaWork*)TST_BATTLE_UNIT(part->owner)->countersetWeapon;
 
@@ -188,6 +196,10 @@ void replace_callback(BattleUnitPart* part, s32 type) {
     }
 }
 
+/**
+ * Script helper: allocates the trap's floor texture buffer (sized from its model bounds),
+ * registers the texture overlay on its body pose and queues replace_disp to fill it.
+ */
 USER_FUNC(replace_evt) {
     BattleUnitPart* part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 1);
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, BattleTransID(event, -2));
@@ -224,6 +236,11 @@ USER_FUNC(replace_evt) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Init event of the trap unit: registers its wait, attack and damage events (default confusion),
+ * sets the KURURING_PASS flag on the S_yuka floor object, has replace_evt dress the trap in the floor's texture,
+ * and starts waiting.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -235,6 +252,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event of the trap: runs the default damage reaction (btldefaultevt_Damage) for its body part. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -242,10 +260,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Empty phase event; nothing in this file registers it. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/** Attack event of the trap: it has no attack of its own; it only uses an item if it decides to, then waits again. */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -257,6 +277,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait event of the trap: plays the idle pose from its pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

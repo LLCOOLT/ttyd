@@ -111,6 +111,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Positions Mario, his partner, Mony and Peton for a conversation with the couple:
+ * walks Mario and the partner to a spot beside whichever side of the path they are on (decided by LW(10))
+ * and hides Mario's shadow flag while moving.
+ */
 EVT_BEGIN(mony_peton_setup)
     IF_INT_EQUAL(LW(10), 0)
         CALL(evt_npc_get_position, STRING("モニー"), LW(0), LW(1), LW(2))
@@ -156,11 +161,20 @@ EVT_BEGIN(mony_peton_setup)
     RETURN
 EVT_END()
 
+/**
+ * Display event for the ring-search counter: runs countDisp so the number of rings
+ * or tries is drawn on screen each frame.
+ */
 EVT_BEGIN(lost_wedding_ring_sub)
     CALL(countDisp)
     RETURN
 EVT_END()
 
+/**
+ * The lost wedding ring request (STORY_STG5_64_LOST_WEDDING_RING):
+ * Peton and Mony ask Mario to find the ring they lost in the jungle (stg5_muj_171 onwards),
+ * then they head off the left edge of the screen so Mario can search. Control returns when both have left.
+ */
 EVT_BEGIN(lost_wedding_ring)
     CALL(evt_party_stop, 0)
     CALL(evt_npc_flag_onoff, 1, STRING("ピートン"), NPC_FLAG_INTANGIBLE)
@@ -263,6 +277,10 @@ static s32 itemsel_table00[] = {
     ITEM_WEDDING_RING, -1,
 };
 
+/**
+ * Lets the player hand over the Wedding Ring: if Mario carries ITEM_WEDDING_RING it opens the item window
+ * listing it, and when it is chosen removes the ring from the pouch and returns 1 in LW(0) (0 otherwise).
+ */
 EVT_BEGIN(wedding_ring_consign)
     SET_VALUE(LW(0), 0)
     CALL(evt_pouch_check_item, ITEM_WEDDING_RING, LW(10))
@@ -280,6 +298,10 @@ EVT_BEGIN(wedding_ring_consign)
     RETURN
 EVT_END()
 
+/**
+ * Mony and Peton's reunion after the ring has been handed over:
+ * they are placed beside Mario, talk (stg5_muj_196 to 198), then walk off the left edge of the screen.
+ */
 EVT_BEGIN(find_wedding_ring)
     CALL(evt_party_stop, 0)
     CALL(evt_npc_flag_onoff, 1, STRING("ピートン"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
@@ -339,6 +361,10 @@ EVT_BEGIN(find_wedding_ring)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Mony in the jungle: she cannot be pushed around (status bit 2)
+ * and between STORY_STG5_63_KEELHAUL_ANYTIME and STORY_STG5_64_LOST_WEDDING_RING she is placed at (500, 0, -40).
+ */
 static EVT_BEGIN(mony_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -348,6 +374,10 @@ static EVT_BEGIN(mony_init)
     RETURN
 EVT_END()
 
+/**
+ * Regular loop shared by Mony and Peton: they pace left and right around their spawn point,
+ * turning to face the way they walk and pausing 1 to 1.5 seconds between steps.
+ */
 EVT_BEGIN(mony_peton_regl)
     LOOP(0)
         SET_VALUE(LW(3), LW(0))
@@ -380,6 +410,7 @@ EVT_BEGIN(mony_peton_regl)
     RETURN
 EVT_END()
 
+/** Regular event of Mony: runs the shared pacing loop mony_peton_regl while the couple stands in the jungle. */
 EVT_BEGIN(mony_regl)
     SET_VALUE(LW(0), 500)
     SET_VALUE(LW(1), 0)
@@ -388,6 +419,10 @@ EVT_BEGIN(mony_regl)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of Mony: says stg5_muj_169 at STORY_STG5_63_KEELHAUL_ANYTIME and
+ * then starts the lost wedding ring request (lost_wedding_ring).
+ */
 static EVT_BEGIN(mony_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG5_63_KEELHAUL_ANYTIME)
@@ -409,6 +444,10 @@ static EVT_BEGIN(mony_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Peton in the jungle: status bit 2 set,
+ * and between STORY_STG5_63_KEELHAUL_ANYTIME and STORY_STG5_64_LOST_WEDDING_RING he is placed beside Mony.
+ */
 static EVT_BEGIN(peton_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -418,6 +457,7 @@ static EVT_BEGIN(peton_init)
     RETURN
 EVT_END()
 
+/** Regular event of Peton: runs the shared pacing loop mony_peton_regl while the couple stands in the jungle. */
 EVT_BEGIN(peton_regl)
     SET_VALUE(LW(0), 400)
     SET_VALUE(LW(1), 0)
@@ -426,6 +466,10 @@ EVT_BEGIN(peton_regl)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of Peton: says stg5_muj_170 at STORY_STG5_63_KEELHAUL_ANYTIME and
+ * then starts the lost wedding ring request (lost_wedding_ring).
+ */
 static EVT_BEGIN(peton_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG5_63_KEELHAUL_ANYTIME)
@@ -480,6 +524,10 @@ static HitDamageReturn hitDmgRetPoints[] = {
     {0},
 };
 
+/**
+ * Guess: shows the sewer pipe (S_dakan, A_dokan) only once GSWF_TIK17_PIPE_MUJ_OPEN is set,
+ * which the pipe in Rogueport sets from the other end.
+ */
 static EVT_BEGIN(evt_switch_init)
     IF_INT_EQUAL(GSWF(GSWF_TIK17_PIPE_MUJ_OPEN), 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_dakan"), MAPOBJ_FLAG_HIDE)
@@ -488,6 +536,10 @@ static EVT_BEGIN(evt_switch_init)
     RETURN
 EVT_END()
 
+/**
+ * Hitting the banana tree (treeb_01): if the Keel Mango has not been dropped yet,
+ * it falls from the tree (ITEM_KEEL_MANGO, GSWF_MUJ02_KEEL_MANGO_TAKEN).
+ */
 EVT_BEGIN(evt_treeb_01)
     CALL(evt_item_delete_check, STRING("item_treeb_01"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -496,6 +548,10 @@ EVT_BEGIN(evt_treeb_01)
     RETURN
 EVT_END()
 
+/**
+ * Case event for grass patch 2: when the grass is hit,
+ * launches a coin out of it unless it has been taken (item_kusa_2).
+ */
 static EVT_BEGIN(evt_kusa_2)
     CALL(evt_item_delete_check, STRING("item_kusa_2"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -504,6 +560,10 @@ static EVT_BEGIN(evt_kusa_2)
     RETURN
 EVT_END()
 
+/**
+ * Case event for grass patch 6: when the grass is hit,
+ * launches a Star Piece out of it unless it has been taken (item_kusa_6).
+ */
 static EVT_BEGIN(evt_kusa_6)
     CALL(evt_item_delete_check, STRING("item_kusa_6"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -554,6 +614,11 @@ static KusaAccess kusa_tbl[] = {
     {4, NULL, NULL, NULL},
 };
 
+/**
+ * Map init for muj_02 (the jungle): starts the jungle music and ambience, registers the exits, NPCs,
+ * hidden badge blocks (Head Rattle, Courage Shell), the Keel Mango tree and grass patches,
+ * and removes the Chorobon enemy NPCs once the story is past STORY_STG5_59_ROGUEPORT_DOCK.
+ */
 EVT_BEGIN(muj_02_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_MUJ1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_MUJ4"))
@@ -597,8 +662,10 @@ EVT_BEGIN(muj_02_init_evt)
     RETURN
 EVT_END()
 
-// (body lives in countDisp.c to keep the original definition order)
-// printCount comes first so the deferred compile emits both functions in the original order
+/**
+ * (body lives in countDisp.c to keep the original definition order) printCount comes first
+ * so the deferred compile emits both functions in the original order
+ */
 static void printCount(CameraId camera, void* param) {
 #if VERSION >= VERSION_US
     char buf[32];
@@ -657,6 +724,10 @@ static void printCount(CameraId camera, void* param) {
 #endif
 }
 
+/**
+ * Debug display callback: queues a draw of the 2D print counter each frame (always blocks, so it runs until
+ * killed).
+ */
 static USER_FUNC(countDisp) {
     dispEntry(CAMERA_2D, 399.0f, 0, printCount, NULL);
     return EVT_RETURN_BLOCK;

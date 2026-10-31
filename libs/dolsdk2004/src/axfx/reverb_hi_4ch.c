@@ -7,6 +7,10 @@
 
 static void ReverbHIDpl2Free(AXFX_REVHI_WORK_DPL2* rv);
 
+/**
+ * Sets a delay line's read point to 'lag' samples behind its write point,
+ * wrapping inside the buffer (Dolby Pro Logic II 4-channel reverb).
+ */
 static void DLsetdelayDpl2(AXFX_REVHI_DELAYLINE* dl, s32 lag) {
     dl->outPoint = dl->inPoint - (lag * 4);
     while (dl->outPoint < 0) {
@@ -14,6 +18,10 @@ static void DLsetdelayDpl2(AXFX_REVHI_DELAYLINE* dl, s32 lag) {
     }
 }
 
+/**
+ * Allocates and clears a delay line of max_length samples and sets a default lag of half its length.
+ * Returns 0 if allocation fails.
+ */
 static int DLcreateDpl2(AXFX_REVHI_DELAYLINE* dl, s32 max_length) {
     dl->length = (max_length * 4);
     dl->inputs = __AXFXAlloc(max_length << 2);
@@ -30,10 +38,16 @@ static int DLcreateDpl2(AXFX_REVHI_DELAYLINE* dl, s32 max_length) {
     return 1;
 }
 
+/** Frees a delay line's sample buffer. */
 static void DLdeleteDpl2(AXFX_REVHI_DELAYLINE* dl) {
     __AXFXFree(dl->inputs);
 }
 
+/**
+ * Validates the parameters (as the stereo version, without crosstalk) and builds the reverb for four outputs:
+ * per output three comb and three all-pass delay lines from a fixed length table plus an optional pre-delay
+ * buffer. Returns 0 on bad parameters or allocation failure.
+ */
 static int ReverbHICreateDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 preDelay) {
     u8 i;
     u8 k;
@@ -128,6 +142,10 @@ static int ReverbHICreateDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time
     return 1;
 }
 
+/**
+ * Validates the new parameters, stores coloration, mix and damping,
+ * frees all delay lines and pre-delay buffers and rebuilds them with ReverbHICreateDpl2.
+ */
 static int ReverbHIModifyDpl2(AXFX_REVHI_WORK_DPL2* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 preDelay) {
     u8 i;
 
@@ -176,6 +194,11 @@ const static f32 value0_6 = 0.6f;
 const static f32 value0_3 = 0.3f;
 const static double i2fMagic = 4503601774854144.0;
 
+/**
+ * Assembly inner loop of the 4-channel reverb for output k (0 L, 1 R, 2 Ls, 3 Rs) over a 160-sample buffer:
+ * pre-delay, comb and all-pass delay lines and damping, mixed with the dry signal.
+ * Guess: the exact filter topology, as in the stereo version. Original assembly.
+ */
 asm static void HandleReverbDpl2(register s32* sptr, register AXFX_REVHI_WORK_DPL2* rv, register s32 k) {
     nofralloc
 	stwu r1, -0xc0(r1)
@@ -533,6 +556,7 @@ L_00000C7C:
 	blr
 }
 
+/** Runs HandleReverbDpl2 on the L, R, Ls and Rs buffers in turn. */
 static void ReverbHICallbackDpl2(s32* l, s32* r, s32* ls, s32* rs, AXFX_REVHI_WORK_DPL2* rv) {
     HandleReverbDpl2(l, rv, 0);
     HandleReverbDpl2(r, rv, 1);
@@ -540,6 +564,7 @@ static void ReverbHICallbackDpl2(s32* l, s32* r, s32* ls, s32* rs, AXFX_REVHI_WO
     HandleReverbDpl2(rs, rv, 3);
 }
 
+/** Frees the 12 all-pass and 12 comb delay lines and the pre-delay buffers that exist. */
 static void ReverbHIDpl2Free(AXFX_REVHI_WORK_DPL2* rv) {
     u8 i;
 
@@ -567,6 +592,10 @@ static void ReverbHIDpl2Free(AXFX_REVHI_WORK_DPL2* rv) {
     }
 }
 
+/**
+ * Creates the Dolby Pro Logic II reverb from the AXFX_REVERBHI_DPL2 parameters with interrupts disabled;
+ * returns nonzero on success.
+ */
 int AXFXReverbHiInitDpl2(AXFX_REVERBHI_DPL2* reverb) {
     int ret;
     BOOL old;
@@ -578,6 +607,7 @@ int AXFXReverbHiInitDpl2(AXFX_REVERBHI_DPL2* reverb) {
     return ret;
 }
 
+/** Frees the Dolby Pro Logic II reverb's delay lines with interrupts disabled; always returns 1. */
 int AXFXReverbHiShutdownDpl2(AXFX_REVERBHI_DPL2* reverb) {
     BOOL old;
 
@@ -587,6 +617,10 @@ int AXFXReverbHiShutdownDpl2(AXFX_REVERBHI_DPL2* reverb) {
     return 1;
 }
 
+/**
+ * Applies changed parameters: pauses processing (tempDisableFX)
+ * while ReverbHIModifyDpl2 rebuilds the delay lines, then resumes.
+ */
 int AXFXReverbHiSettingsDpl2(AXFX_REVERBHI_DPL2* rev) {
     int ret;
     BOOL old;
@@ -599,6 +633,11 @@ int AXFXReverbHiSettingsDpl2(AXFX_REVERBHI_DPL2* rev) {
     return ret;
 }
 
+/**
+ * AX aux-bus callback for the 4-channel reverb:
+ * runs it on the L, R, Ls and Rs buffers for one audio frame unless a settings change has it paused.
+ * AX must be in DPL2 mode.
+ */
 void AXFXReverbHiCallbackDpl2(AXFX_BUFFERUPDATE_DPL2* bufferUpdate, AXFX_REVERBHI_DPL2* reverb) {
     ASSERTMSGLINE(1399, AXGetMode() == 2, "AX mode isn't AX_MODE_DPL2. AX mode must be AX_MODE_DPL2 for using AXFXReverbHiCallbackDpl2");
 

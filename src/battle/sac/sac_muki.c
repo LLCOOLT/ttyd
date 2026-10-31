@@ -112,7 +112,7 @@ static void main_cursor(void);
 static BattleWeapon weapon;
 extern EvtWord nice_event_pow[];
 
-// the demo defines the event first
+/** the demo defines the event first */
 #if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(nice_event_pow)
     CALL(btlevtcmd_ACSuccessEffect, LW(0), -100, 175, 0)
@@ -158,6 +158,10 @@ static BattleWeapon weapon = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Shows the Nice/Good/Great/Wonderful/Excellent popup for level LW(0);
+ * main_base starts it when the game ends with any boost earned. The demos define it before the weapon template.
+ */
 #if VERSION >= VERSION_JP
 EVT_BEGIN(nice_event_pow)
     CALL(btlevtcmd_ACSuccessEffect, LW(0), -100, 175, 0)
@@ -165,6 +169,11 @@ EVT_BEGIN(nice_event_pow)
 EVT_END()
 #endif
 
+/**
+ * Per-frame driver of the Power Lift minigame, run as a sibling event by marioAttackEvent_Muki;
+ * args[0] is the partner's unit id (-1 when absent or KO'd).
+ * The first call clears the work and makes the arrow effects; it never finishes itself.
+ */
 static USER_FUNC(main_muki) {
     MukiWork* w = get_ptr();
     EvtWord* args = event->args;
@@ -192,6 +201,11 @@ static USER_FUNC(main_muki) {
     return 0;
 }
 
+/**
+ * Game state machine: grows the 3x3 grid in, slides the gauges in, runs the 900-frame timer,
+ * then shrinks the grid and pops the rating (from the attack + defense levels earned) when time is up.
+ * Also eases the shown gauge values toward the earned ones.
+ */
 static void main_base(void) {
     MukiWork* w = get_ptr();
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
@@ -351,6 +365,12 @@ static void main_base(void) {
         BattleAudienceSoundHandBeat();  \
     }
 
+/**
+ * The cursor on the 3x3 grid: moves square to square with the Control Stick (slower while Mario is dizzy)
+ * and on A hits what is in its square: a red arrow adds to the attack gauge,
+ * a blue arrow to the defense gauge (0.25 in JP and the demos, 0.2 in US and PAL, up to level 9),
+ * a poison mushroom makes Mario dizzy and the crowd boo.
+ */
 static void main_cursor(void) {
     MukiWork* w = get_ptr();
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
@@ -510,6 +530,11 @@ static void main_cursor(void) {
     }
 }
 
+/**
+ * One grid square: grows in after a random delay,
+ * then while the game runs now and then spawns an arrow or mushroom (main_icon) in it when empty,
+ * and shrinks away at the end.
+ */
 static void main_point(s32 idx) {
     MukiWork* w = get_ptr();
     Muki3D* o = &w->o3d[idx];
@@ -582,6 +607,10 @@ static void main_point(s32 idx) {
     }
 }
 
+/**
+ * One arrow or poison mushroom in a square: spins in as a random type (0 attack, 1 defense, 2 mushroom),
+ * stays 90 frames, then spins out; a hit removes it at once and the end of the game fades it.
+ */
 static void main_icon(s32 idx) {
     MukiWork* w = get_ptr();
     MukiObj* o = &w->obj[idx];
@@ -655,6 +684,7 @@ static void main_icon(s32 idx) {
     }
 }
 
+/** The star that rises out of Mario at the start, grows and spins, then flies off the top of the screen. */
 static void main_star(void) {
     MukiWork* w = get_ptr();
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
@@ -718,6 +748,7 @@ static void main_star(void) {
     }
 }
 
+/** Cleanup when the move ends: deletes the star and the grid icon effects. */
 static USER_FUNC(end_muki) {
     MukiWork* w = get_ptr();
     s32 i;
@@ -730,12 +761,19 @@ static USER_FUNC(end_muki) {
     return 2;
 }
 
+/** Float add, kept as a function so disp_2D matches the original's operation order. */
 static inline f32 addf(f32 a, f32 b) {
     return a + b;
 }
+/** Float multiply, kept as a function so disp_3D_alpha matches the original's operation order. */
 static inline f32 mulf(f32 x, f32 y) {
     return x * y;
 }
+/**
+ * Draws the two gauges on the left: attack (red) and defense (blue),
+ * each a bar filled by the fractional part of the level with the level number beside it,
+ * blinking when a new level is reached.
+ */
 static void disp_2D(CameraId cam, void* param) {
     MukiWork* w = get_ptr();
     Mtx m;
@@ -855,6 +893,7 @@ static void disp_2D(CameraId cam, void* param) {
     }
 }
 
+/** Draws the frame of each grid square and the cursor (white, blue while moving, red on the frame A is pressed). */
 static void disp_3D(CameraId cam, void* param) {
     MukiWork* w = get_ptr();
     s32 a[8] = {-8, 8, 8, 8, 8, -8, -8, -8};
@@ -884,6 +923,7 @@ static void disp_3D(CameraId cam, void* param) {
     }
 }
 
+/** Draws the arrows and mushrooms in the grid: red attack arrows, blue defense arrows and the poison mushroom. */
 static void disp_3D_alpha(CameraId cam, void* param) {
     MukiWork* w = get_ptr();
     s32 i;
@@ -946,12 +986,17 @@ static void disp_3D_alpha(CameraId cam, void* param) {
 
 // inlining off for get_ptr, as in the original (the object differs without it)
 #pragma dont_inline on
+/** The minigame's work area, kept in the battle's shared action-command work buffer. */
 static MukiWork* get_ptr(void) {
     return (MukiWork*)_battleWorkPointer->actionCommands.work;
 }
 
 #pragma dont_inline reset
 
+/**
+ * Builds the boost weapon: copies the template and gives it a sure 3-turn attack up (args[0] 0)
+ * or defense up (1) of args[1] points, and returns its address in args[2].
+ */
 static USER_FUNC(set_weapon) {
     EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
@@ -974,12 +1019,14 @@ static USER_FUNC(set_weapon) {
     return 2;
 }
 
+/** Starts the grid game (main_base state 1). */
 static USER_FUNC(start_game) {
     MukiWork* w = get_ptr();
     w->state = 1;
     return 2;
 }
 
+/** Waits for the game to finish and returns the earned attack level in args[0] and defense level in args[1]. */
 static USER_FUNC(wait_game_end) {
     MukiWork* w = get_ptr();
     EvtWord* args = event->args;
@@ -991,12 +1038,18 @@ static USER_FUNC(wait_game_end) {
     return 0;
 }
 
+/** Starts the star rising out of Mario (main_star). */
 static USER_FUNC(star_stone_appear) {
     MukiWork* w = get_ptr();
     w->star = 1;
     return 2;
 }
 
+/**
+ * Attack event of Power Lift: pays the Star Power, plays the star intro, runs the 3x3 grid game,
+ * then raises Mario's and the partner's attack and defense for 3 turns by the levels earned.
+ * PAL stops the US double run of the enemy return and cleanup when only defense was raised.
+ */
 EVT_BEGIN(marioAttackEvent_Muki)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_PARTNER, LW(14))
     CALL(btlevtcmd_GetBodyId, LW(14), LW(15))

@@ -8,6 +8,10 @@ static AXVPB* __AXStackTail[AX_PRIORITY_STACKS];
 
 static AXVPB* __AXCallbackStack;
 
+/**
+ * Sanity check of the voice lists: walks all 32 priority stacks and returns 0
+ * if more than 64 voices are found (a corrupted list), else 1.
+ */
 static u32 __AXCheckStacks(void) {
     u32 i;
     u32 voices;
@@ -29,11 +33,17 @@ static u32 __AXCheckStacks(void) {
     return 1;
 }
 
+/** Returns the first voice of the given priority stack (stack 0 holds the free voices). */
 AXVPB* __AXGetStackHead(u32 priority) {
     ASSERTLINE(97, priority < AX_PRIORITY_STACKS);
     return __AXStackHead[priority];
 }
 
+/**
+ * Handles voices the DSP has finished with (dropped voices pushed on the callback stack):
+ * for each one still allocated it calls the voice's callback,
+ * removes it from its priority stack and returns it to the free list.
+ */
 void __AXServiceCallbackStack(void) {
     AXVPB* p;
 
@@ -49,6 +59,7 @@ void __AXServiceCallbackStack(void) {
     }
 }
 
+/** Empties the callback stack and all priority stacks (free voices are in stack 0). */
 void __AXInitVoiceStacks(void) {
     u32 i;
 
@@ -58,6 +69,7 @@ void __AXInitVoiceStacks(void) {
     }
 }
 
+/** Initialises the voice allocation module by emptying the stacks. */
 void __AXAllocInit(void) {
 #ifdef DEBUG
     OSReport("Initializing AXAlloc code module\n");
@@ -65,6 +77,7 @@ void __AXAllocInit(void) {
     __AXInitVoiceStacks();
 }
 
+/** Shuts the voice allocation module down by emptying the stacks. */
 void __AXAllocQuit(void) {
 #ifdef DEBUG
     OSReport("Shutting down AXAlloc code module\n");
@@ -72,6 +85,7 @@ void __AXAllocQuit(void) {
     __AXInitVoiceStacks();
 }
 
+/** Returns a voice to the free list (priority 0) at its head. */
 void __AXPushFreeStack(AXVPB* p) {
     ASSERTLINE(168, p->priority);
     p->next = __AXStackHead[0];
@@ -79,6 +93,7 @@ void __AXPushFreeStack(AXVPB* p) {
     p->priority = 0;
 }
 
+/** Takes the first voice off the free list and returns it (NULL if none are free). */
 AXVPB* __AXPopFreeStack(void) {
     AXVPB* p;
 
@@ -89,11 +104,13 @@ AXVPB* __AXPopFreeStack(void) {
     return p;
 }
 
+/** Pushes a voice on the stack of voices waiting for their drop callback. */
 void __AXPushCallbackStack(AXVPB* p) {
     p->next1 = __AXCallbackStack;
     __AXCallbackStack = p;
 }
 
+/** Pops a voice from the callback stack (NULL when empty). */
 AXVPB* __AXPopCallbackStack(void) {
     AXVPB* p;
 
@@ -104,6 +121,10 @@ AXVPB* __AXPopCallbackStack(void) {
     return p;
 }
 
+/**
+ * Unlinks a voice from its priority stack's doubly linked list,
+ * fixing the head and tail when it was at either end.
+ */
 void __AXRemoveFromStack(AXVPB* p) {
     u32 i;
     AXVPB* head;
@@ -137,6 +158,7 @@ void __AXRemoveFromStack(AXVPB* p) {
     tail->prev = head;
 }
 
+/** Puts a voice at the head of the priority stack and records its priority. */
 void __AXPushStackHead(AXVPB* p, u32 priority) {
     ASSERTLINE(261, priority);
     ASSERTLINE(262, priority < AX_PRIORITY_STACKS);
@@ -155,6 +177,10 @@ void __AXPushStackHead(AXVPB* p, u32 priority) {
     p->priority = priority;
 }
 
+/**
+ * Removes and returns the voice at the tail (oldest) of the priority stack, or NULL if it is empty;
+ * this is the voice stolen when a higher priority voice needs one.
+ */
 AXVPB* __AXPopStackFromBottom(u32 priority) {
     AXVPB* p;
 
@@ -176,6 +202,10 @@ AXVPB* __AXPopStackFromBottom(u32 priority) {
     return p;
 }
 
+/**
+ * Releases a voice: unlinks it, fades out a voice that was playing (depop),
+ * resets its parameter block to defaults and puts it on the free list.
+ */
 void AXFreeVoice(AXVPB* p) {
     BOOL old;
     
@@ -194,6 +224,12 @@ void AXFreeVoice(AXVPB* p) {
     OSRestoreInterrupts(old);
 }
 
+/**
+ * Allocates a voice for the given priority (1 to 31, higher steals from lower).
+ * Takes a free voice, or else steals the oldest voice of any lower priority,
+ * calling its callback so the owner learns it was dropped.
+ * The voice gets the new callback and user context and default parameters; returns NULL if none is available.
+ */
 AXVPB* AXAcquireVoice(u32 priority, void (*callback)(void*), u32 userContext) {
     BOOL old;
     AXVPB* p;
@@ -231,6 +267,7 @@ AXVPB* AXAcquireVoice(u32 priority, void (*callback)(void*), u32 userContext) {
     return p;
 }
 
+/** Moves an allocated voice to the head of another priority stack (priority 0 is not allowed; use AXFreeVoice). */
 void AXSetVoicePriority(AXVPB* p, u32 priority) {
     BOOL old;
 

@@ -100,18 +100,25 @@ static const char* name_tbl[] = {
     "yajirusi_6",
 };
 
+/** Door callback of the villa (evtIn): rotates door_1 around y by the angle in LW(0) scaled by 0.5546875. */
 static EVT_BEGIN(evt_door)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5546875f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Door callback of the villa (evtOut): rotates door_1 around x by half the angle in LW(0). */
 static EVT_BEGIN(evt_door2)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), LW(0), 0, 0)
     RETURN
 EVT_END()
 
+/**
+ * Wall callback of the villa (evtWall): rotates the walls ie_3_kabe_1,
+ * ie_3_kabe_2 and ie_3_kabe_3 by the angle in LW(0) scaled by 0.75,
+ * the first two around y in opposite directions and the third around z.
+ */
 static EVT_BEGIN(evt_wall)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.75f))
     CALL(evt_mapobj_rotate, 1, STRING("ie_3_kabe_1"), 0, LW(0), 0)
@@ -127,6 +134,10 @@ const char* ie_3_npc[] = {
     NULL,
 };
 
+/**
+ * Door 1 open callback: dips the BGM and ambience to 50
+ * and low-pass filters the ambience (the muffled indoor/outdoor change).
+ */
 static EVT_BEGIN(door_1_open)
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
@@ -134,6 +145,7 @@ static EVT_BEGIN(door_1_open)
     RETURN
 EVT_END()
 
+/** Door 1 close callback: resumes the BGM and ambience from the dip and removes the ambience low-pass filter. */
 static EVT_BEGIN(door_1_close)
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
@@ -161,6 +173,11 @@ static DoorParam door_1 = {
     door_1_close, // evtClose
 };
 
+/**
+ * Guess: door-open animation of the hotel's double door (door_h_a and door_h_b):
+ * the opening angle LW(0) is scaled and applied to door_h_a as a rotation about y,
+ * and the mirror angle to door_h_b.
+ */
 EVT_BEGIN(evt_door_h)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.5546875f))
     CALL(evt_mapobj_rotate, 1, STRING("door_h_a"), 0, LW(0), 0)
@@ -169,6 +186,10 @@ EVT_BEGIN(evt_door_h)
     RETURN
 EVT_END()
 
+/**
+ * Guess: second door animation of the hotel doors (evtOut):
+ * the scaled angle in LW(0) is applied as a rotation about x to both door_h_a and door_h_b.
+ */
 EVT_BEGIN(evt_door2_h)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("door_h_a"), LW(0), 0, 0)
@@ -176,6 +197,10 @@ EVT_BEGIN(evt_door2_h)
     RETURN
 EVT_END()
 
+/**
+ * Guess: wall animation of the hotel entrance: rotates the front wall hotel_kabe_1 about y by LW(0) scaled by
+ * -0.75, so the wall opens up as Mario enters.
+ */
 EVT_BEGIN(evt_wall_h)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.75f))
     CALL(evt_mapobj_rotate, 1, STRING("hotel_kabe_1"), 0, LW(0), 0)
@@ -188,6 +213,10 @@ const char* hotel_npc[] = {
     NULL,
 };
 
+/**
+ * Door 2 open callback: hides the map object group ERE (JP and later),
+ * dips the BGM and ambience to 50 and low-pass filters the ambience.
+ */
 static EVT_BEGIN(door_2_open)
 #if VERSION >= VERSION_JP
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("ERE"), MAPOBJ_FLAG_HIDE)
@@ -198,6 +227,7 @@ static EVT_BEGIN(door_2_open)
     RETURN
 EVT_END()
 
+/** Door 2 close callback: resumes the BGM and ambience from the dip and removes the ambience low-pass filter. */
 static EVT_BEGIN(door_2_close)
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
@@ -225,6 +255,10 @@ static DoorParam door_2 = {
     door_2_close, // evtClose
 };
 
+/**
+ * Guess: sets up the image capture used to fade the hotel interior in
+ * and out (a paper "OFF_hei_07" image bound to an offscreen buffer of 608 by 480), and leaves it off.
+ */
 EVT_BEGIN(imginit)
     CALL(evt_paper_entry, STRING("OFF_hei_07"))
     CALL(evt_img_entry, STRING("capture_img"))
@@ -238,6 +272,12 @@ EVT_BEGIN(imginit)
     RETURN
 EVT_END()
 
+/**
+ * Guess: cross-fade used when Mario leaves the elevator in the hotel's upper floor:
+ * the lobby objects (hotel_naka, door_h) and the clerk and the dandy NPC are rendered to the offscreen buffer
+ * and shown through the capture image, which fades out over one second (255 to 0 alpha) to reveal the real
+ * scene. In JP and later the breakfast item fades too.
+ */
 EVT_BEGIN(imgstart)
     CALL(evt_mapobj_set_offscreen, 1, STRING("hotel_naka"), STRING("offscreen"))
     CALL(evt_mapobj_set_offscreen, 1, STRING("door_h"), STRING("offscreen"))
@@ -271,6 +311,11 @@ EVT_BEGIN(imgstart)
     RETURN
 EVT_END()
 
+/**
+ * Guess: reverse of imgstart: the same objects are captured
+ * and the image fades in from 0 to 255 alpha over one second, then the real objects are hidden and shown again,
+ * covering the change between floors.
+ */
 EVT_BEGIN(imgend)
     CALL(evt_mapobj_set_offscreen, 1, STRING("hotel_naka"), STRING("offscreen"))
     CALL(evt_mapobj_set_offscreen, 1, STRING("door_h"), STRING("offscreen"))
@@ -308,7 +353,7 @@ EVT_BEGIN(imgend)
     RETURN
 EVT_END()
 
-// The demo's elevator keeps the field camera and carries Mario and the partner from where they stand.
+/** The demo's elevator keeps the field camera and carries Mario and the partner from where they stand. */
 #if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(evt_up)
     CALL(evt_mario_key_onoff, 0)
@@ -419,6 +464,12 @@ EVT_BEGIN(evt_up)
     RETURN
 EVT_END()
 #else
+/**
+ * Elevator ride up to the inn room (US and later):
+ * the elevator doors open, the box "hako" (with its hit area a_hako) rises 1325 units over ten seconds carrying
+ * Mario and the partner, the lobby fades through imgend,
+ * and the doors open on the upper floor and Mario walks out.
+ */
 EVT_BEGIN(evt_up)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("ERE"), MAPOBJ_FLAG_HIDE)
@@ -530,7 +581,7 @@ EVT_BEGIN(evt_up)
 EVT_END()
 #endif
 
-// The demo's ride down, like evt_up.
+/** The demo's ride down, like evt_up. */
 #if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(evt_down)
     CALL(evt_mario_key_onoff, 0)
@@ -643,6 +694,10 @@ EVT_BEGIN(evt_down)
     RETURN
 EVT_END()
 #else
+/**
+ * Elevator ride back down from the inn room (US and later): the reverse of evt_up.
+ * The camera follows the box down, the doors open at the bottom and Mario walks out onto the street.
+ */
 EVT_BEGIN(evt_down)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -754,6 +809,7 @@ EVT_BEGIN(evt_down)
 EVT_END()
 #endif
 
+/** Guess: init for the souvenir-shop NPC (the girl at the stall in the street): places her at (-363, 10, 142). */
 EVT_BEGIN(init_miyage)
 #if VERSION >= VERSION_US
     CALL(evt_npc_set_position, STRING("me"), -363, 10, 142)
@@ -763,10 +819,12 @@ EVT_BEGIN(init_miyage)
     RETURN
 EVT_END()
 
+/** Guess: talk script of the same NPC: empty. */
 EVT_BEGIN(talk_miyage)
     RETURN
 EVT_END()
 
+/** Talk script for the three girls (３人娘１ to ３): they speak stg7_pik_clear_10, 11 and 12 in turn. */
 static EVT_BEGIN(talk_musume)
     CALL(evt_msg_print, 0, STRING("stg7_pik_clear_10"), 0, STRING("３人娘１"))
     CALL(evt_msg_print, 0, STRING("stg7_pik_clear_11"), 0, STRING("３人娘２"))
@@ -774,6 +832,10 @@ static EVT_BEGIN(talk_musume)
     RETURN
 EVT_END()
 
+/**
+ * Init for the first of the three girls (３人娘１):
+ * after the Thousand-Year Door has been opened she is moved off screen.
+ */
 EVT_BEGIN(init_musume1)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_GREATER(STORY_STG6_70_THOUSAND_YEAR_DOOR)
@@ -782,11 +844,13 @@ EVT_BEGIN(init_musume1)
     RETURN
 EVT_END()
 
+/** Talk script of the first girl: runs the shared conversation of all three girls (talk_musume). */
 EVT_BEGIN(talk_musume1)
     CALL_CHILD(talk_musume)
     RETURN
 EVT_END()
 
+/** Init for the second of the three girls (３人娘２): moved off screen after the Thousand-Year Door has been opened. */
 EVT_BEGIN(init_musume2)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_GREATER(STORY_STG6_70_THOUSAND_YEAR_DOOR)
@@ -795,11 +859,13 @@ EVT_BEGIN(init_musume2)
     RETURN
 EVT_END()
 
+/** Talk script of the second girl: runs the shared conversation of the three girls. */
 EVT_BEGIN(talk_musume2)
     CALL_CHILD(talk_musume)
     RETURN
 EVT_END()
 
+/** Init for the third of the three girls (３人娘３): moved off screen after the Thousand-Year Door has been opened. */
 EVT_BEGIN(init_musume3)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_GREATER(STORY_STG6_70_THOUSAND_YEAR_DOOR)
@@ -808,15 +874,21 @@ EVT_BEGIN(init_musume3)
     RETURN
 EVT_END()
 
+/** Talk script of the third girl: runs the shared conversation of the three girls. */
 EVT_BEGIN(talk_musume3)
     CALL_CHILD(talk_musume)
     RETURN
 EVT_END()
 
+/** Init for Tar-kun 1: nothing to do. */
 EVT_BEGIN(init_takun1)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for Tar-kun 1: story-progress dependent line (before the Thousand-Year Door,
+ * up to the end of chapter 8, and afterwards).
+ */
 EVT_BEGIN(talk_takun1)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_70_THOUSAND_YEAR_DOOR)
@@ -829,10 +901,12 @@ EVT_BEGIN(talk_takun1)
     RETURN
 EVT_END()
 
+/** Init for Tar-kun 2: nothing to do. */
 EVT_BEGIN(init_takun2)
     RETURN
 EVT_END()
 
+/** Talk script for Tar-kun 2: story-progress dependent line, same schedule as Tar-kun 1. */
 EVT_BEGIN(talk_takun2)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_70_THOUSAND_YEAR_DOOR)
@@ -845,11 +919,13 @@ EVT_BEGIN(talk_takun2)
     RETURN
 EVT_END()
 
+/** Init for Tar-kun 3: turns on the walk and talk animations and lets him hop on the floor. */
 EVT_BEGIN(init_takun3)
     CALL(evt_npc_flag_onoff, 1, STRING("ターくん３"), NPC_FLAG_JUMPING | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR)
     RETURN
 EVT_END()
 
+/** Talk script for Tar-kun 3: story-progress dependent line, same schedule as Tar-kun 1. */
 EVT_BEGIN(talk_takun3)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_70_THOUSAND_YEAR_DOOR)
@@ -862,6 +938,10 @@ EVT_BEGIN(talk_takun3)
     RETURN
 EVT_END()
 
+/**
+ * Guess: init for the show-off NPC (キザ): from STORY_STG6_70_THOUSAND_YEAR_DOOR on,
+ * moves him off the map to (0, -1000, 0).
+ */
 static EVT_BEGIN(init_kiza)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_GREATER_OR_EQUAL(STORY_STG6_70_THOUSAND_YEAR_DOOR)
@@ -870,6 +950,7 @@ static EVT_BEGIN(init_kiza)
     RETURN
 EVT_END()
 
+/** Talk script for the show-off NPC: stg7_pik_clear_19. */
 static EVT_BEGIN(talk_kiza)
     CALL(evt_msg_print, 0, STRING("stg7_pik_clear_19"), 0, STRING("me"))
     RETURN
@@ -972,6 +1053,11 @@ static NpcSetupInfo npc_data[] = {
     {0},
 };
 
+/**
+ * Case event of the souvenir stall (a_roten): the stall owner offers Fresh Pasta for 50 coins.
+ * If Mario has room in his inventory and at least 50 coins he pays and receives the item;
+ * otherwise one of three refusals (no room, not enough coins, or declined) is printed.
+ */
 EVT_BEGIN(evt_roten)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION <= VERSION_DEMO_US
@@ -1018,6 +1104,10 @@ EVT_BEGIN(evt_roten)
     RETURN
 EVT_END()
 
+/**
+ * toBedEvt of the hotel's Kinopio data: walks Mario to the elevator,
+ * rides it up (evt_up) and walks him to the bed in the inn room.
+ */
 EVT_BEGIN(evt_kinopio_to_bed)
     CALL(evt_mario_mov_pos2, 340, -25, FLOAT(70.0f))
     CALL(evt_mario_mov_pos2, 370, 5, FLOAT(70.0f))
@@ -1028,6 +1118,10 @@ EVT_BEGIN(evt_kinopio_to_bed)
     RETURN
 EVT_END()
 
+/**
+ * fromBedEvt of the hotel's Kinopio data: after sleeping,
+ * walks Mario from the bed back to the elevator and rides it down (evt_down).
+ */
 EVT_BEGIN(evt_kinopio_from_bed)
     CALL(evt_party_run, 0)
     CALL(evt_mario_mov_pos2, 220, -15, FLOAT(70.0f))
@@ -1057,6 +1151,11 @@ static KinopioData kino_dt = {
     evt_kinopio_from_bed, // fromBedEvt
 };
 
+/**
+ * Guess: creates the epilogue's X-Naut cast: Grodus (シュリョー, c_shuryo) and Lord Crump (カンブー, c_kanbu_ibt),
+ * and the soldiers 軍団Ａ to Ｅ (grunts, a researcher, an elite and others) with their positions,
+ * facings and animations.
+ */
 static EVT_BEGIN(epilogue_npc_entry)
     CALL(evt_npc_entry, STRING("シュリョー"), STRING("c_shuryo"))
     CALL(evt_npc_set_tribe, STRING("シュリョー"), STRING("第三勢力総統"))
@@ -1098,6 +1197,11 @@ static EVT_BEGIN(epilogue_npc_entry)
     RETURN
 EVT_END()
 
+/**
+ * Guess: choreography beside the epilogue: Grodus hops up and down three times, Crump turns and calls,
+ * the X-Naut soldiers start their P_1 animation with the BATTEN sound,
+ * and the group moves about (jumps, turns) in loops.
+ */
 static EVT_BEGIN(epilogue_evt_sub)
     WAIT_MS(500)
     CALL(evt_npc_get_position, STRING("シュリョー"), LW(0), LW(1), LW(2))
@@ -1128,6 +1232,10 @@ static EVT_BEGIN(epilogue_evt_sub)
     RETURN
 EVT_END()
 
+/**
+ * Epilogue cutscene in Poshley Heights: fades out the music, sets the camera on the street,
+ * runs epilogue_evt_sub, prints ep_44 after two seconds, fades out the sound and changes to tik_00.
+ */
 static EVT_BEGIN(epilogue_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG6_PIK1"))
     CALL(evt_snd_bgm_scope, 0, 1)
@@ -1147,6 +1255,12 @@ static EVT_BEGIN(epilogue_evt)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for pik_04: loads the entrances, music and ambience, the waterfall and water animations,
+ * arrow signs, NPCs, the hotel doors and the elevator case events, the stall, the Star Piece and Inn Coupon,
+ * the image capture used for the hotel fade, the hotel's inn service (Kinopio data) and the epilogue ending,
+ * where Mario's partners are removed and the scene continues to Rogueport (tik_00).
+ */
 EVT_BEGIN(pik_04_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)

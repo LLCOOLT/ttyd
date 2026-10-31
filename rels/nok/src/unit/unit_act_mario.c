@@ -132,6 +132,10 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_act_mario", "c_mario", 0.0f, 0.0f, 0.0f, -5.0f, 30.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
+/**
+ * Init event of the Mario stage actor: installs the wait event and battle_entry_event as the entry event,
+ * hides the status window and starts the wait event. This unit runs the whole stage play.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventEntry, BTL_UNIT_SELF, PTR(battle_entry_event))
@@ -140,6 +144,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Mario stage actor: runs the default damage handling with LW(10) = -2 and LW(11) = 1. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -147,15 +152,18 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Phase event of the Mario stage actor: does nothing. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/** Attack event of the Mario stage actor: just restarts the wait event; the play is driven by _battle_event. */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
+/** Idle event of the Mario stage actor: shows the unit's table pose for state 1. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -244,6 +252,13 @@ BattleUnitSetup entry_unit_data[] = {
     },
 };
 
+/**
+ * Guess: entry of the stage play: hides the status window,
+ * places Mario's actor and moves the real Mario off to the left edge of the stage,
+ * spawns the eight other actors of entry_unit_data (Clauda, two Boos, the Atomic Boo, two Toads,
+ * Toadette and Christine), keeping their unit ids in unit work 1 to 8, starts _battle_event,
+ * prints ep_39 after two seconds and sets battle flag 32.
+ */
 static EVT_BEGIN(battle_entry_event)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_MARIO, LW(0), LW(1), LW(2))
@@ -284,6 +299,12 @@ static EVT_BEGIN(battle_entry_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Looping stage-play script: Mario jumps on an enemy,
+ * then Clauda attacks (a press or a breath, picked at random),
+ * then the two Boos (Teresas) and the Atomic Boo each take a turn, with the supporting actors posing in between.
+ * It repeats forever until the epilogue ends the battle.
+ */
 EVT_BEGIN(_battle_event)
     LABEL(0)
     CALL_CHILD(_act_mario_jump_attack)
@@ -331,6 +352,10 @@ EVT_BEGIN(_battle_event)
     RETURN
 EVT_END()
 
+/**
+ * Picks a random enemy actor of the play (unit work 2, 3 or 4: the two Boos and the Atomic Boo) as the target:
+ * returns its unit id in LW(3) and its body id in LW(4).
+ */
 EVT_BEGIN(_act_target_enemy)
     CALL(evt_sub_random, 2, LW(0))
     SWITCH(LW(0))
@@ -345,6 +370,10 @@ EVT_BEGIN(_act_target_enemy)
     RETURN
 EVT_END()
 
+/**
+ * Picks Mario (unit work 0) or Clauda (unit work 1) as the target of a Boo attack:
+ * returns the unit id in LW(3) and the body id in LW(4).
+ */
 EVT_BEGIN(_act_target_mario)
     CALL(evt_sub_random, 1, LW(0))
     SWITCH(LW(0))
@@ -357,6 +386,11 @@ EVT_BEGIN(_act_target_mario)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Mario's part of the play: he steps back,
+ * jumps on a random enemy actor (which gets a hit effect, applause and a knocked-over pose),
+ * hops back with a few smaller bounces and runs to his home position.
+ */
 EVT_BEGIN(_act_mario_jump_attack)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_TALK)
@@ -409,6 +443,10 @@ EVT_BEGIN(_act_mario_jump_attack)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Clauda's stomp: Clauda (unit in LW(5), body in LW(6)) leaps onto a random enemy actor
+ * and squashes it flat, then lands and takes a bow with the audience cheering; the victim springs back up.
+ */
 EVT_BEGIN(_act_clauda_press_attack)
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), BTL_POSE_TALK)
     WAIT_MS(1000)
@@ -500,6 +538,10 @@ EVT_BEGIN(_act_clauda_press_attack)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Clauda's breath: she charges (blue-violet smoke puffs), breathes at all three enemy actors,
+ * who shake while the breath lasts, then the effect is removed, she poses and the audience cheers.
+ */
 EVT_BEGIN(_act_clauda_breath_attack)
     CALL(btlevtcmd_JumpSetting, LW(5), 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), BTL_POSE_TALK)
@@ -568,6 +610,10 @@ EVT_BEGIN(_act_clauda_breath_attack)
     RETURN
 EVT_END()
 
+/**
+ * Guess: A Boo's attack: the Boo (unit in LW(5), body in LW(6)) fades out, reappears next to Mario or Clauda,
+ * hits it, and floats back home; the target gets a hit effect and the audience cheers.
+ */
 EVT_BEGIN(_act_teresa_attack)
     CALL_CHILD(_act_target_mario)
     CALL(btlevtcmd_AnimeChangePoseType, LW(5), LW(6), 42)
@@ -618,6 +664,10 @@ EVT_BEGIN(_act_teresa_attack)
     RETURN
 EVT_END()
 
+/**
+ * Guess: The Atomic Boo's attack: it drops in from above and presses Mario and Clauda flat,
+ * with a hit effect and applause, then returns to its home position.
+ */
 EVT_BEGIN(_act_atmic_teresa_press_attack)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
@@ -659,6 +709,11 @@ EVT_BEGIN(_act_atmic_teresa_press_attack)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: spawns the smoke puff effect (effKumokumoN64Entry, blue-to-violet colours) in front of the
+ * current battle unit that is about to breathe.
+ * Stores the effect pointer in the script variable args[0] so the script can delete it later.
+ */
 static USER_FUNC(_clauda_breath_effect_fire) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -686,6 +741,7 @@ static USER_FUNC(_clauda_breath_effect_fire) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: spawns the smaller smoke puff effect in front of Clauda while she winds up her breath attack. */
 static USER_FUNC(_clauda_breath_effect_ready) {
     BattleWork* wp = _battleWorkPointer;
     s32 id;
@@ -708,6 +764,10 @@ static USER_FUNC(_clauda_breath_effect_ready) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: turns the battle status window off (statusWindowOff = 1)
+ * so it does not show during the stage play.
+ */
 static USER_FUNC(_status_window_off) {
     _battleWorkPointer->statusWindowOff = 1;
     return EVT_RETURN_DONE;

@@ -165,6 +165,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init script of the Bullet Bill.
+ * Registers its wait, attack, damage and confusion scripts,
+ * starts the wait script and raises the unit and its home position to height 10.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -177,6 +182,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Guess: damage event of a sword: runs the default damage reaction. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -184,6 +190,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Starts the target's avoid animation for the result of a pre-damage check (3, 6 or 2 select the three avoid
+ * types, 38 to 40).
+ */
 static EVT_BEGIN(start_avoid)
     IF_INT_EQUAL(LW(5), 3)
         CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -197,6 +207,15 @@ static EVT_BEGIN(start_avoid)
     RETURN
 EVT_END()
 
+/**
+ * The Bullet Bill's suicide charge.
+ * It picks a target (the first-attack target on a pre-emptive strike),
+ * charges up with SFX_ENM_KILLER_CHARGE1 and flies at it.
+ * If the pre-damage check says the attack misses or is guarded,
+ * it flies past the target with the avoid animation; on a hit it deals damage with a camera shake.
+ * Either way it ends by exploding (smoke effect, then coin, exp and star points are paid out)
+ * and KillUnit removes it.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -309,6 +328,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Guess: wait (idle) event of Cortez: sets the idle pose from the current mode's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

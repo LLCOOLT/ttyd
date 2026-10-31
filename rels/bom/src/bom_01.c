@@ -122,6 +122,11 @@ smartEntry* lp;
 #define EXT_DATA ((ExtAnimDef*)ext_data)
 static void pose_change(s32 i, const char* name);
 static ExtTexInfo ext_data[31];
+/**
+ * Approximates sin(x) with a short polynomial for x in [0, 2*pi) radians,
+ * folding the argument into the first quadrant;
+ * used for the crowd Bob-ombs' circle positions and hop directions.
+ */
 static inline f32 chb_sin(f32 x) {
     f32 y;
     f32 x2;
@@ -163,6 +168,10 @@ static inline f32 chb_sin(f32 x) {
     }
     return r;
 }
+/**
+ * Approximates cos(x) with a short polynomial for x in [0, 2*pi) radians,
+ * folding the argument into the first quadrant; the cosine partner of chb_sin.
+ */
 static inline f32 chb_cos(f32 x) {
     f32 y;
     f32 x2;
@@ -277,6 +286,11 @@ static f32 spline_dt[9];
 const char* oh_data[8];
 static NpcSetupInfo npcEnt[7];
 
+/**
+ * Draws one textured 2D quad from the cannon-sight texture file (taihou.tpl) at screen position (x, y),
+ * scaled by (sx, sy) and rotated by rot degrees; a negative scale mirrors it.
+ * Texture 0 is drawn with a constant alpha.
+ */
 static void drawBG(s32 id, f32 x, f32 y, f32 sx, f32 sy, f32 rot) {
     CameraEntry* cam = camGetPtr(CAMERA_2D);
     Mtx trans;
@@ -331,6 +345,10 @@ static void drawBG(s32 id, f32 x, f32 y, f32 sx, f32 sy, f32 rot) {
     GXEnd();
 }
 
+/**
+ * Draws a number from the sight texture file one digit at a time, right-aligned:
+ * digits glyphs starting at (x, y), at the given scale; the sign is ignored.
+ */
 static void drawNum(s32 num, s32 digits, f32 x, f32 y, f32 scale) {
     GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
     GXTexObj obj;
@@ -355,6 +373,12 @@ static void drawNum(s32 num, s32 digits, f32 x, f32 y, f32 scale) {
 enum { SIGHT_TEX_ARROW_ON = 6,
        SIGHT_TEX_ARROW_OFF = 7 };
 
+/**
+ * Guess: debug-style overlay of the cannon sight (taihou.tpl):
+ * spinning corner frames, arrow indicators for the direction set by sight_dir,
+ * a bar graph of the microphone level, and frame-timing counters.
+ * It is only drawn once sight_dir has moved off the idle value 5, so it does not appear in normal play.
+ */
 static void disp_sight(CameraId camera, void* param) {
     GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     GXColor black = {0x00, 0x00, 0x00, 0xFF};
@@ -470,6 +494,11 @@ static void disp_sight(CameraId camera, void* param) {
     drawNum(sight_wp->count2, 2, 200.0f, 0.0f, 0.8f);
 }
 
+/**
+ * Script helper started from the map init: loads taihou.tpl, allocates the SightWork state and,
+ * once the sight direction is not idle (5), queues disp_sight every frame until the direction is set to 6,
+ * which frees everything and ends it.
+ */
 static s32 sight(EventEntry* event, BOOL isFirstCall) {
     s32 i;
 
@@ -500,11 +529,19 @@ static s32 sight(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper: sets the sight overlay's direction state to args[0] (0 to 3 are the arrows, 4 none lit,
+ * 5 idle and hidden, 6 shut the overlay down).
+ */
 static s32 sight_dir(EventEntry* event, BOOL isFirstCall) {
     sight_wp->dir = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] switches the bits in args[1] on
+ * or off in the crowd work flags (bit 0 mutes the Bob-omb hop sounds).
+ */
 static s32 bom_flag(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
@@ -519,6 +556,10 @@ static s32 bom_flag(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: puts every crowd Bob-omb (Bom state 127) at a random spot high above the village
+ * and switches them to the falling pose S_2, so they drift down as a slow rain of bombs.
+ */
 static s32 bom_fall(EventEntry* event, BOOL isFirstCall) {
     BomWork* wp = lp->address;
     ExtdrvPose* pose = extGetPosePtr();
@@ -534,6 +575,10 @@ static s32 bom_fall(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Builds the crowd's animation table (name, start frame, frame count, duration) from the c_bom_sen entries in
+ * ext_data, one table row per run of identical animation names.
+ */
 static void pose_init(void) {
     BomWork* wp;
     ExtAnimDef* def;
@@ -560,6 +605,10 @@ static void pose_init(void) {
     wp->animCount++;
 }
 
+/**
+ * Per-frame update of the crowd: turns each Bob-omb's elapsed time into a frame of its current animation
+ * and stores it in the extdrv pose texId.
+ */
 static void pose_main(void) {
     OSTime now;
     BomWork* wp = lp->address;
@@ -580,6 +629,10 @@ static void pose_main(void) {
     }
 }
 
+/**
+ * Switches crowd Bob-omb i to the animation called name (looked up in the table from pose_init),
+ * restarting its timer at a random offset so the crowd does not animate in lockstep.
+ */
 static void pose_change(s32 i, const char* name) {
     BomWork* wp = lp->address;
     s32 j = 0;
@@ -595,6 +648,10 @@ static void pose_change(s32 i, const char* name) {
     }
 }
 
+/**
+ * Script helper: fills ext_data with the c_bom_sen (Bob-omb crowd) sprite frames for the cannon scene:
+ * ten frames of "R_1" followed by twenty of "S_2".
+ */
 static s32 make_ext_table(EventEntry* event, BOOL isFirstCall) {
     s32 i;
 
@@ -613,18 +670,24 @@ static s32 make_ext_table(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Door callback for the house door: LW(0) is the opening angle;
+ * scales it by 0.5546875 and turns the door object s_ie_door around the Y axis.
+ */
 EVT_BEGIN(evt_door_1)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5546875f))
     CALL(evt_mapobj_rotate, 1, STRING("s_ie_door"), FLOAT(0.0f), LW(0), FLOAT(0.0f))
     RETURN
 EVT_END()
 
+/** Door-swing callback: scales LW(0) by 0.5 and applies it as the s_ie_door map object's X rotation. */
 static EVT_BEGIN(evt_door_2)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("s_ie_door"), LW(0), FLOAT(0.0f), FLOAT(0.0f))
     RETURN
 EVT_END()
 
+/** Wall-swing callback: scales LW(0) by -0.5 and applies it as the s_ie_kai map object's Y rotation. */
 static EVT_BEGIN(evt_wall)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("s_ie_kai"), FLOAT(0.0f), LW(0), FLOAT(0.0f))
@@ -638,12 +701,14 @@ const char* door_npc[] = {
     NULL,
 };
 
+/** House door open callback: dips the ambience to 50 and low-pass filters it (the muffled indoor sound). */
 static EVT_BEGIN(door_open)
     CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_env_lpf, 0, 800)
     RETURN
 EVT_END()
 
+/** House door close callback: resumes the ambience from the dip and removes the low-pass filter. */
 static EVT_BEGIN(door_close)
     CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_snd_env_lpf, 0, 0)
@@ -707,6 +772,12 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * First arrival in the Fahr Outpost village: letterboxed intro with the location banner (telop 13)
+ * and a long camera pan over the village; the partner speaks stg7_bom_01__2 (with stg7_bom_01__2_00 first when
+ * GSWF_BOM01_VISITED_BEFORE_STG7 shows an earlier visit),
+ * the story progress is set to STORY_STG7_01_FAHR_OUTPOST_1ST_VISIT and the exits are enabled.
+ */
 static EVT_BEGIN(first_evt)
     CALL(evt_snd_bgm_scope, 0, 1)
     CALL(evt_cam_letter_box_onoff, 1, 1)
@@ -759,6 +830,11 @@ static EVT_BEGIN(first_evt)
     RETURN
 EVT_END()
 
+/**
+ * Spins one wind-vane style map group (name in LW(0), e.g. group10 to group15) forever:
+ * speeds up over one second, spins for a random 0.5 to 5 seconds, then slows down again.
+ * The demo versions also play a wind-vane sound at the object.
+ */
 EVT_BEGIN(evt_bom_01_karakara)
     SET_VALUE(LW(9), LW(0))
     SET_VALUE(LW(8), 0)
@@ -816,6 +892,10 @@ EVT_END()
 // without either pragma the register use and load order change.
 #pragma opt_propagation off
 #pragma opt_lifetimes off
+/**
+ * Extension-draw init for the 1000-Bob-omb crowd of the cannon scene:
+ * allocates BomWork and scatters every sprite on a ring 500 to 900 units from the origin in the "R_1" pose.
+ */
 static void ext_init(void) {
     s32 i;
     BomWork* wp;
@@ -847,6 +927,7 @@ static void ext_init(void) {
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
+/** Draw callback for the crowd sprites: loads render mode, vertices, texture and TEV, then draws all poses. */
 static void ext_disp(CameraId camera, void* param) {
     extLoadRenderMode();
     extLoadVertex();
@@ -856,6 +937,11 @@ static void ext_disp(CameraId camera, void* param) {
     extLoadTextureExit();
 }
 
+/**
+ * Starts a hop for crowd Bob-omb i towards (x, y, z) at speed per frame under gravity;
+ * computes the flight time and vertical speed, faces the target
+ * and plays the "bombs together" sound for every 20th one. next is the state it takes on landing.
+ */
 static void jump(s32 i, s32 next, f32 x, f32 y, f32 z, f32 speed, f32 gravity) {
     BomWork* wp = lp->address;
     ExtdrvPose* pose = extGetPosePtr() + i;
@@ -882,6 +968,11 @@ static void jump(s32 i, s32 next, f32 x, f32 y, f32 z, f32 speed, f32 gravity) {
 
 #pragma opt_propagation off
 #pragma opt_lifetimes off
+/**
+ * Per-frame logic of the crowd: state 0 walks each Bob-omb towards the middle,
+ * states 1 to 3 hop it onto the pile in three stages, 100 runs the hop arc,
+ * and 127 makes it sink and sway while falling (with an occasional falling sound).
+ */
 static void ext_main(void) {
 
     s32 i;
@@ -993,6 +1084,7 @@ static void ext_main(void) {
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
+/** Queues ext_disp every frame for the crowd unless the mute flag in BomWork is set. */
 static void ext_dispent(void) {
     BomWork* wp = lp->address;
 
@@ -1035,6 +1127,10 @@ static ExtTexInfo ext_data[] = {
     {0},
 };
 
+/**
+ * Registers the 1000-sprite Bob-omb crowd of the cannon scene as extension 1000 (make_ext_table frames,
+ * ext_init, ext_main, ext_dispent).
+ */
 EVT_BEGIN(evt_bom1000)
     CALL(make_ext_table)
     CALL(evt_npc_entry, STRING("dummy"), STRING("c_bom_sen"))
@@ -1042,11 +1138,13 @@ EVT_BEGIN(evt_bom1000)
     RETURN
 EVT_END()
 
+/** Small camera shake (amplitude 0.002) used while the cannon is charging. */
 EVT_BEGIN(gamen_shake)
     CALL(evt_cam_shake, 4, FLOAT(0.001953125f), FLOAT(0.0f), 0)
     RETURN
 EVT_END()
 
+/** Heavy camera shake that dies down in four steps (0.02, 0.01, 0.005, 0) of 100 each; the cannon's recoil. */
 EVT_BEGIN(gamen_shake2)
     CALL(evt_cam_shake, 4, FLOAT(0.01953125f), FLOAT(0.0f), 100)
     CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 100)
@@ -1055,6 +1153,10 @@ EVT_BEGIN(gamen_shake2)
     RETURN
 EVT_END()
 
+/**
+ * Moves Mario up and to the right along a 45 degree line from (400, 780) over 0.3 s,
+ * with the partner trailing 30 units behind; Mario flying out of the cannon.
+ */
 EVT_BEGIN(mario_tobideru)
     CALL(evt_mario_set_pos, 400, 780, 0)
     CALL(evt_sub_intpl_msec_init, 2, 0, 400, 300)
@@ -1075,6 +1177,11 @@ EVT_BEGIN(mario_tobideru)
     RETURN
 EVT_END()
 
+/**
+ * The cannon firing: starts Mario's flight, plays the discharge sound,
+ * kicks the barrel (dekatai) back and forth, shakes the screen and spawns the smoke,
+ * ripple and particle effects at the muzzle.
+ */
 EVT_BEGIN(mario_shot)
     SPAWN_EVENT(mario_tobideru)
     CALL(evt_snd_sfxon, STRING("SFX_STG7_CANNON_DISCHARGE1"), 0)
@@ -1111,6 +1218,7 @@ EVT_BEGIN(mario_shot)
     RETURN
 EVT_END()
 
+/** Removes the smoke, ripple and particle effects spawned by mario_shot. */
 EVT_BEGIN(effect_delete)
     CALL(evt_eff_delete, STRING("kemuri"))
     CALL(evt_eff_delete, STRING("ripple"))
@@ -1118,6 +1226,10 @@ EVT_BEGIN(effect_delete)
     RETURN
 EVT_END()
 
+/**
+ * Runs forever, puffing a smoke effect at Mario's position every 2 frames (used while Mario is fired through the
+ * air in the cannon scene).
+ */
 static EVT_BEGIN(mario_kemuri)
     LOOP(0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -1127,11 +1239,16 @@ static EVT_BEGIN(mario_kemuri)
     RETURN
 EVT_END()
 
+/** Starts the depth (screen blur) display; it keeps running for the rest of the map. */
 EVT_BEGIN(evt_depth)
     CALL(depth)
     RETURN
 EVT_END()
 
+/**
+ * Camera/map setup for being outside the house:
+ * resets the blend colours, hides the interior (S_ie_naka) and shows the exterior wall.
+ */
 EVT_BEGIN(cam_outside)
     CALL(evt_map_set_blend, 0, 255, 255, 255, 255)
     CALL(evt_map_set_blend, 1, 255, 255, 255, 255)
@@ -1144,6 +1261,11 @@ EVT_BEGIN(cam_outside)
     RETURN
 EVT_END()
 
+/**
+ * Camera/map setup for the first interior view of the house:
+ * sets the camera, darkens the blend colours, opens the door and hides the exterior wall (s_ie_kai)
+ * so the inside can be seen.
+ */
 EVT_BEGIN(cam_inside)
     CALL(evt_cam3d_evt_set, -160, 125, -100, 10, 55, -427, 0, 11)
     CALL(evt_map_set_blend, 0, 0, 0, 0, 0)
@@ -1155,6 +1277,7 @@ EVT_BEGIN(cam_inside)
     RETURN
 EVT_END()
 
+/** Same as cam_inside with a different, closer camera position. */
 EVT_BEGIN(cam_inside2)
     CALL(evt_cam3d_evt_set, -93, 104, -250, 9, 62, -447, 0, 11)
     CALL(evt_map_set_blend, 0, 0, 0, 0, 0)
@@ -1166,6 +1289,10 @@ EVT_BEGIN(cam_inside2)
     RETURN
 EVT_END()
 
+/**
+ * Puts the current partner into its damage pose (the D_1 pose of Goombella, Koops, Flurrie, Yoshi, Vivian,
+ * Bobbery or Ms. Mowz, chosen by evt_mario_get_party).
+ */
 static EVT_BEGIN(party_damage_pose)
     CALL(evt_mario_get_party, LW(0))
     SWITCH(LW(0))
@@ -1188,6 +1315,7 @@ static EVT_BEGIN(party_damage_pose)
     RETURN
 EVT_END()
 
+/** Rings of dust puffs (kemuri_test) along the edges of a 440 by 440 square on the ground, one every 20 units. */
 EVT_BEGIN(effect_1)
     SET_VALUE(LW(0), -220)
     LOOP(22)
@@ -1204,6 +1332,10 @@ EVT_BEGIN(effect_1)
     RETURN
 EVT_END()
 
+/**
+ * Slides two hatch or shutter objects apart over half a second with a shutter sound and a screen shake.
+ * LW(0) and LW(1) name the objects, LW(2) is 0 to slide along Z and anything else along X.
+ */
 EVT_BEGIN(open_hatch)
     CALL(evt_mapobj_get_position, LW(1), LW(10), LW(11), LW(12))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_SHUTTER_OPEN1"), LW(10), LW(11), LW(12), 0)
@@ -1242,6 +1374,13 @@ const char* oh_data[] = {
     "ボムヘイD", "stg7_bom_65_d",
 };
 
+/**
+ * The cannon scene (taihou = cannon) started by talking to the mayor before STORY_STG7_05_THE_CANNON:
+ * the mayor explains the plan (stg7_bom_63 to 91) while the camera switches between the room and the outside,
+ * the screen shakes and the hatches open (Guess: the Bob-omb soldiers ready the huge gun),
+ * the partner reacts in its damage pose, Mario is fired from the cannon,
+ * the Goldbob guide (ITEM_GOLDBOB_GUIDE) is taken from the pouch and the map changes to moo_03.
+ */
 static EVT_BEGIN(evt_taihou)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
@@ -1886,6 +2025,7 @@ static EVT_BEGIN(evt_taihou)
     RETURN
 EVT_END()
 
+/** Init of the mayor (村長): from STORY_STG7_04_BACK_ONLINE on he stands at (-15, 0, -35). */
 static EVT_BEGIN(init_soncho)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_GREATER_OR_EQUAL(STORY_STG7_04_BACK_ONLINE)
@@ -1894,6 +2034,10 @@ static EVT_BEGIN(init_soncho)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the mayor: before STORY_STG7_05_THE_CANNON it runs the cannon scene (evt_taihou);
+ * until the end of chapter 8's battle he says stg7_bom_59_04_1, and afterwards stg7_bom_59_04_2.
+ */
 static EVT_BEGIN(talk_soncho)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG7_05_THE_CANNON)
@@ -1906,11 +2050,16 @@ static EVT_BEGIN(talk_soncho)
     RETURN
 EVT_END()
 
+/** Init for the Bob-omb Nitoro: places him at (-120, 0, -220). */
 EVT_BEGIN(init_nitoro)
     CALL(evt_npc_set_position, STRING("me"), -120, 0, -220)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for Nitoro: his line depends on story progress (before Fahr Outpost is reached,
+ * before power is restored, before the cannon, until the end of Chapter 8, and afterwards).
+ */
 EVT_BEGIN(talk_nitoro)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_71_01)
@@ -1927,11 +2076,13 @@ EVT_BEGIN(talk_nitoro)
     RETURN
 EVT_END()
 
+/** Init for the Bob-omb Pentrit: places him at (-150, 0, 130). */
 EVT_BEGIN(init_pentrit)
     CALL(evt_npc_set_position, STRING("me"), -150, 0, 130)
     RETURN
 EVT_END()
 
+/** Talk script for Pentrit: five story-progress dependent lines, in the same stages as Nitoro. */
 EVT_BEGIN(talk_pentrit)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_71_01)
@@ -1948,11 +2099,13 @@ EVT_BEGIN(talk_pentrit)
     RETURN
 EVT_END()
 
+/** Init for the Bob-omb Surary: places him at a fixed spot in the village. */
 EVT_BEGIN(init_surary)
     CALL(evt_npc_set_position, STRING("me"), 152, 0, -188)
     RETURN
 EVT_END()
 
+/** Talk script for Surary: five story-progress dependent lines, in the same stages as Nitoro. */
 EVT_BEGIN(talk_surary)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_71_01)
@@ -1969,11 +2122,13 @@ EVT_BEGIN(talk_surary)
     RETURN
 EVT_END()
 
+/** Init for the villager Bomb-hei D: places him at a fixed spot. */
 EVT_BEGIN(init_murabito_d)
     CALL(evt_npc_set_position, STRING("me"), 175, 0, 210)
     RETURN
 EVT_END()
 
+/** Talk script for villager D: five story-progress dependent lines, in the same stages as Nitoro. */
 EVT_BEGIN(talk_murabito_d)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_71_01)
@@ -1990,11 +2145,16 @@ EVT_BEGIN(talk_murabito_d)
     RETURN
 EVT_END()
 
+/** Init of villager E: places him at (-200, 0, -80). */
 static EVT_BEGIN(init_murabito_e)
     CALL(evt_npc_set_position, STRING("me"), -200, 0, -80)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of villager E: stg7_bom_10_00 before STORY_STG6_71_01, stg7_bom_10 until the cannon,
+ * then stg7_bom_11.
+ */
 static EVT_BEGIN(talk_murabito_e)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_71_01)
@@ -2007,11 +2167,16 @@ static EVT_BEGIN(talk_murabito_e)
     RETURN
 EVT_END()
 
+/** Init of villager F: places him at (-150, 0, -80). */
 static EVT_BEGIN(init_murabito_f)
     CALL(evt_npc_set_position, STRING("me"), -150, 0, -80)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of villager F: stg7_bom_12_00 before STORY_STG6_71_01, stg7_bom_12 until the cannon,
+ * then stg7_bom_13.
+ */
 static EVT_BEGIN(talk_murabito_f)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_71_01)
@@ -2024,11 +2189,16 @@ static EVT_BEGIN(talk_murabito_f)
     RETURN
 EVT_END()
 
+/** Init of villager G: places him at (-100, 0, -80). */
 static EVT_BEGIN(init_murabito_g)
     CALL(evt_npc_set_position, STRING("me"), -100, 0, -80)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of villager G: stg7_bom_14_00 before STORY_STG6_71_01, stg7_bom_14 until the cannon,
+ * then stg7_bom_15.
+ */
 static EVT_BEGIN(talk_murabito_g)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_71_01)
@@ -2041,11 +2211,16 @@ static EVT_BEGIN(talk_murabito_g)
     RETURN
 EVT_END()
 
+/** Init of villager H: places him at (-50, 0, -80). */
 static EVT_BEGIN(init_murabito_h)
     CALL(evt_npc_set_position, STRING("me"), -50, 0, -80)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of villager H: stg7_bom_16_00 before STORY_STG6_71_01, stg7_bom_16 until the cannon,
+ * then stg7_bom_17.
+ */
 static EVT_BEGIN(talk_murabito_h)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_71_01)
@@ -2058,11 +2233,16 @@ static EVT_BEGIN(talk_murabito_h)
     RETURN
 EVT_END()
 
+/** Init of villager I: places him at (0, 0, -80). */
 static EVT_BEGIN(init_murabito_i)
     CALL(evt_npc_set_position, STRING("me"), 0, 0, -80)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of villager I: stg7_bom_18_00 before STORY_STG6_71_01, stg7_bom_18 until the cannon,
+ * then stg7_bom_19.
+ */
 static EVT_BEGIN(talk_murabito_i)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_71_01)
@@ -2075,6 +2255,11 @@ static EVT_BEGIN(talk_murabito_i)
     RETURN
 EVT_END()
 
+/**
+ * Init of General White: leaves him where he is
+ * while Trouble Center job 25 is active with its work flag 6 unset;
+ * otherwise, once GSWF_BOM02_GENERAL_WHITE_WOKEN is set, he stands at (50, 0, -100).
+ */
 static EVT_BEGIN(init_white)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 25)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_6), 0)
@@ -2088,6 +2273,11 @@ static EVT_BEGIN(init_white)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of General White: before the cannon he says stg7_bom_59_02
+ * or 59_03 depending on whether Goldbob's cannon approval (GSWF_PIK00_GOLDBOB_CANNON_APPROVAL) has been given,
+ * until the end of the chapter 8 battle stg7_bom_59_04, and afterwards stg7_bom_59_05.
+ */
 static EVT_BEGIN(talk_white)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG7_05_THE_CANNON)
@@ -2104,6 +2294,10 @@ static EVT_BEGIN(talk_white)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the three dancing girls (３人娘Ａ, Ｂ, Ｃ):
+ * three lines each that change at STORY_STG7_02_MAYOR_BOB and STORY_STG7_04_BACK_ONLINE.
+ */
 static EVT_BEGIN(musume_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG7_02_MAYOR_BOB)
@@ -2122,6 +2316,10 @@ static EVT_BEGIN(musume_talk)
     RETURN
 EVT_END()
 
+/**
+ * Spawns dancing girl A (踊り子, model c_dance_r) at (370, 5, -120) with movement and talk animations
+ * and her talk script musume_talk.
+ */
 static EVT_BEGIN(musume_a_entry)
     CALL(evt_npc_entry, STRING("３人娘Ａ"), STRING("c_dance_r"))
     CALL(evt_npc_set_tribe, STRING("３人娘Ａ"), STRING("踊り子"))
@@ -2131,6 +2329,10 @@ static EVT_BEGIN(musume_a_entry)
     RETURN
 EVT_END()
 
+/**
+ * Spawns dancing girl B (踊り子ピンク, model c_dance_p) at (400, 5, -150) with movement and talk animations
+ * and her talk script musume_talk.
+ */
 static EVT_BEGIN(musume_b_entry)
     CALL(evt_npc_entry, STRING("３人娘Ｂ"), STRING("c_dance_p"))
     CALL(evt_npc_set_tribe, STRING("３人娘Ｂ"), STRING("踊り子ピンク"))
@@ -2140,6 +2342,10 @@ static EVT_BEGIN(musume_b_entry)
     RETURN
 EVT_END()
 
+/**
+ * Spawns dancing girl C (踊り子黄緑, model c_dance_k) at (430, 5, -100) with movement and talk animations
+ * and her talk script musume_talk.
+ */
 static EVT_BEGIN(musume_c_entry)
     CALL(evt_npc_entry, STRING("３人娘Ｃ"), STRING("c_dance_k"))
     CALL(evt_npc_set_tribe, STRING("３人娘Ｃ"), STRING("踊り子黄緑"))
@@ -2225,6 +2431,10 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Script helper: tilts the cannon smoke (kemuri) and ripple effects 45 degrees so they leave along the barrel
+ * when the cannon fires.
+ */
 static s32 taihou_r(EventEntry* event, BOOL isFirstCall) {
     f32 c = cos(0.7853981852531433);
     f32 s = sin(0.7853981852531433);
@@ -2242,6 +2452,7 @@ static s32 taihou_r(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/** Same polynomial sine approximation as chb_sin, used by the blur effect to place its eight offset copies. */
 static inline f32 dd_sin(f32 x) {
     f32 a = 0.00761f;
     f32 b = 0.16605f;
@@ -2279,6 +2490,7 @@ static inline f32 dd_sin(f32 x) {
     return a;
 }
 
+/** Same polynomial cosine approximation as chb_cos, used by the blur effect to place its eight offset copies. */
 static inline f32 dd_cos(f32 x) {
     f32 a = 0.03705f;
     f32 b = 0.4967f;
@@ -2314,6 +2526,11 @@ static inline f32 dd_cos(f32 x) {
 
 #pragma opt_propagation off
 #pragma opt_lifetimes off
+/**
+ * Guess: full-screen blur or glow.
+ * Copies the frame buffer into a texture and redraws it as eight overlapping copies,
+ * each shifted by GW(5)/100 in a ring (45 degrees apart) and blended at 1/8 strength.
+ */
 static void depthDisp(CameraId camera, void* param) {
     f32 amp = evtGetValue(NULL, GW(5)) / 100.0f;
     CameraEntry* cam = camGetPtr(camera);
@@ -2383,11 +2600,16 @@ static void depthDisp(CameraId camera, void* param) {
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
+/** Script helper: queues depthDisp on the 2D camera and keeps blocking, so the blur runs every frame. */
 static s32 depth(EventEntry* event, BOOL isFirstCall) {
     dispEntry(CAMERA_2D, 1000.0f, 0, depthDisp, NULL);
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper: formats the name "S_hikari<args[0]>" into a static buffer and returns its address in args[1],
+ * to address the numbered light objects.
+ */
 static s32 make_name(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
 
@@ -2396,6 +2618,10 @@ static s32 make_name(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: fills ext_data with the c_bom_sen sprite frames for the cheering crowd:
+ * ten "S_1" frames followed by twenty "R_1" frames.
+ */
 static s32 make_ext_table_minnnanokoe(EventEntry* event, BOOL isFirstCall) {
     s32 i;
 
@@ -2414,6 +2640,10 @@ static s32 make_ext_table_minnnanokoe(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Extension-draw init for the cheering crowd of the final-battle scene:
+ * places Bob-ombs in a grid of rows of 14 (30 units wide, 20 deep), all facing the same way in the "S_1" pose.
+ */
 static void ext_init_minnnanokoe(void) {
     s32 i;
     BomWork* wp;
@@ -2444,6 +2674,10 @@ static void ext_init_minnnanokoe(void) {
     }
 }
 
+/**
+ * Makes crowd Bob-omb i hop on the spot to height h over 20 frames,
+ * and plays the "bombs together" sound for every fifth one (not during the Shadow Queen story step).
+ */
 static void jump_minnnanokoe(s32 i, f32 h) {
     BomWork* wp = lp->address;
     ExtdrvPose* pose = extGetPosePtr() + i;
@@ -2461,6 +2695,10 @@ static void jump_minnnanokoe(s32 i, f32 h) {
     }
 }
 
+/**
+ * Draw callback for the cheering crowd: draws each Bob-omb with the darkness TEV callback (envSetYami)
+ * so they are lit like the stage.
+ */
 static void ext_disp_minnnanokoe(CameraId camera, void* param) {
     MapTevCallbackInfo yp;
     MapTevCallbackInfo* p = &yp;
@@ -2486,10 +2724,16 @@ static void ext_disp_minnnanokoe(CameraId camera, void* param) {
     extLoadTextureExit();
 }
 
+/** Queues ext_disp_minnnanokoe for the 3D camera each frame. */
 static void ext_dispent_minnnanokoe(void) {
     dispEntry(CAMERA_3D, 0.0f, 1, ext_disp_minnnanokoe, NULL);
 }
 
+/**
+ * Script helper: picks the position for the next speech bubble above the cheering crowd.
+ * args[0] and args[1] are updated (row group and a column that moves 4 or 8 places);
+ * the chosen Bob-omb's X and Z come back through the next two arguments.
+ */
 static s32 bom1000_msg(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     s32* fa = args;
@@ -2519,6 +2763,7 @@ static s32 bom1000_msg(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: makes a random crowd Bob-omb hop (height 10), unless it is already mid-hop. */
 static s32 bom1000_jump(EventEntry* event, BOOL isFirstCall) {
     BomWork* wp = lp->address;
     s32 i = rand() % wp->count;
@@ -2531,6 +2776,10 @@ static s32 bom1000_jump(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] is a float Z offset; builds a look-at matrix from (0, 100, 100+z)
+ * and hands it to the darkness effect (envSetYamiView) as its view.
+ */
 static s32 yami_view(EventEntry* event, BOOL isFirstCall) {
     f32 z = evtGetFloat(event, event->args[0]);
     Mtx mtx;
@@ -2540,6 +2789,10 @@ static s32 yami_view(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] is an NPC name and args[1] picks a TEV callback slot (low four bits);
+ * turns that callback on in the NPC's animation materials. Does nothing if the NPC does not exist.
+ */
 static s32 anim_tevcallback(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -2553,6 +2806,7 @@ static s32 anim_tevcallback(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: creates a Star Stone effect named args[0] at (args[1], args[2], args[3]), size 1. */
 static s32 starstone_entry(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -2564,6 +2818,7 @@ static s32 starstone_entry(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: moves the named Star Stone effect (args[0]) to the float position in args[1..3]. */
 static s32 starstone_set_pos(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -2578,6 +2833,7 @@ static s32 starstone_set_pos(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: sets the Y rotation of the named Star Stone effect (args[0]) to the float in args[1]. */
 static s32 starstone_set_ry(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -2587,6 +2843,10 @@ static s32 starstone_set_ry(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Spawns the cheering crowd: builds its frame table, adds a dummy c_bom_sen NPC below the map,
+ * and registers extension 250 with the crowd callbacks.
+ */
 EVT_BEGIN(bom1000_minnnanokoe)
     CALL(make_ext_table_minnnanokoe)
     CALL(evt_npc_entry, STRING("dummy"), STRING("c_bom_sen"))
@@ -2595,6 +2855,12 @@ EVT_BEGIN(bom1000_minnnanokoe)
     RETURN
 EVT_END()
 
+/**
+ * Chapter 8 scene "everyone's voices" (minnnanokoe):
+ * a crowd of Bob-ombs is created, the partner is parked off-stage,
+ * the screen darkens and the stg8_las_148_65 to 71 messages play
+ * before the map changes to las_29 at the minnnanokoe entrance.
+ */
 static EVT_BEGIN(minnnanokoe_evt)
     SPAWN_EVENT(bom1000_minnnanokoe)
     CALL(evt_mario_key_onoff, 0)
@@ -2745,6 +3011,7 @@ static EVT_BEGIN(minnnanokoe_evt)
     RETURN
 EVT_END()
 
+/** Case script on the locked house door (A_ie_door): shows stg7_bom_09_01 with controls frozen. */
 static EVT_BEGIN(evt_door)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("stg7_bom_09_01"), 0, 0)
@@ -2752,6 +3019,12 @@ static EVT_BEGIN(evt_door)
     RETURN
 EVT_END()
 
+/**
+ * Init script of bom_01, the village of Fahr Outpost:
+ * sets up the doors, wind vanes, snow, Star Piece, NPCs and the three dancers (during Chapter 7),
+ * runs the arrival cutscene on the first visit and, in the Chapter 8 finale (when entered as "minnnanokoe"),
+ * starts the cheering scene instead of the normal music.
+ */
 EVT_BEGIN(bom_01_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)

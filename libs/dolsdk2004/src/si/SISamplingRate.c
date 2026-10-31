@@ -42,6 +42,11 @@ static XY XYPAL[12] = {
     {0x009C, 0x02},
 };
 
+/**
+ * Sets how many times per frame the SI polls the controllers, from a millisecond interval (clamped to 11).
+ * The table gives the line spacing and poll count for the current TV format (NTSC/MPAL/EuRGB60 or PAL),
+ * doubled in progressive mode, and passes them to SISetXY.
+ */
 void SISetSamplingRate(u32 msec) {
     XY* xy;
     BOOL progressive;
@@ -79,11 +84,16 @@ void SISetSamplingRate(u32 msec) {
     OSRestoreInterrupts(enabled);
 }
 
+/** Re-applies the last sampling rate, for example after the TV format changes. */
 void SIRefreshSamplingRate(void) {
     SISetSamplingRate(SamplingRate);
 }
 
 #if DEBUG
+/**
+ * Debug-build test hook that prints the poll timing table (count, line spacing, last poll line) of a TV format
+ * through OSReport.
+ */
 void __SITestSamplingRate(u32 tvmode) {
     u32 msec;
     u32 line;

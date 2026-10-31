@@ -61,6 +61,10 @@ DBCommTable gDBCommTable = {0};
 BOOL _MetroTRK_Has_Framing;
 u8 TRK_Use_BBA;
 
+/**
+ * Assembly: loads r0-r2, the general registers, CR, LR, CTR, XER and SRR0/SRR1 from a saved context at ctx,
+ * puts val in r3 and jumps to TRKInterruptHandler as if that exception had just been taken.
+ */
 asm void TRKLoadContext(void* ctx, u32 val) {
     nofralloc
     lwz r0, 0x0(r3)
@@ -103,11 +107,21 @@ L_8025D640:
 
 
 
+/**
+ * Callback the debug channel runs when the host sends data:
+ * re-enables the OS scheduler and enters the stub as an external interrupt (exception 0x500) with the saved
+ * context.
+ */
 void TRKEXICallBack(int interrupt, void* ctx) {
     OSEnableScheduler();
     TRKLoadContext(ctx, 0x500);
 }
 
+/**
+ * Fills gDBCommTable with the functions of the channel for the given hardware id (0 AMC DDH, 1 GDEV, 2 BBA/UDP;
+ * anything else falls back to GDEV) and prints which one was chosen.
+ * Returns the Hu_IsStub/AMC_IsStub result, 0 for BBA.
+ */
 int InitMetroTRKCommTable(int hwId) {
     int result = 1;
 
@@ -163,12 +177,17 @@ int InitMetroTRKCommTable(int hwId) {
     return result;
 }
 
+/**
+ * Starts the debug channel: its initialize function gets the input-pending flag pointer and TRKEXICallBack,
+ * then its open function runs. The other parameters are unused. Returns 0.
+ */
 int TRKInitializeIntDrivenUART(u32 param_0, u32 param_1, u32 param_2, void* param_3) {
     gDBCommTable.initialize_func(param_3, TRKEXICallBack);
     gDBCommTable.open_func();
     return 0;
 }
 
+/** Calls the channel's interrupt-enable function if it has one; skipped when the BBA channel is in use. */
 void EnableEXI2Interrupts(void) {
     if (!TRK_Use_BBA) {
         if (gDBCommTable.init_interrupts_func != 0)
@@ -176,32 +195,42 @@ void EnableEXI2Interrupts(void) {
     }
 }
 
+/** Returns how many bytes the debug channel has waiting for the stub (the channel's peek function). */
 int TRKPollUART(void) {
     return gDBCommTable.peek_func();
 }
 
+/** Reads length bytes from the debug channel into bytes; returns 0 on success, -1 on any channel error. */
 int TRKReadUARTN(void* bytes, u32 length) {
     int readErr = gDBCommTable.read_func(bytes, length);
     return readErr == 0 ? 0 : -1;
 }
 
+/** Writes length bytes to the debug channel; returns 0 on success, -1 on any channel error. */
 int TRKWriteUARTN(const void* bytes, u32 length) {
     int writeErr = gDBCommTable.write_func(bytes, length);
     return writeErr == 0 ? 0 : -1;
 }
 
+/** Takes the debug channel back for the stub when the game stops (calls the channel's post-stop hook). */
 void ReserveEXI2Port(void) {
     gDBCommTable.post_stop_func();
 }
 
+/** Hands the debug channel back before the game resumes (calls the channel's pre-continue hook). */
 void UnreserveEXI2Port(void) {
     gDBCommTable.pre_continue_func();
 }
 
+/** Shows a stub message; on this board it just prints the string with OSReport. */
 void TRK_board_display(char* str) {
     OSReport("%s\n", str);
 }
 
+/**
+ * Overwrites the second instruction of PPCHalt with the bytes 00 45 4E 44 ("END"), an invalid instruction,
+ * so halting the program traps into the debugger, and flushes the data and instruction caches over it.
+ */
 void InitializeProgramEndTrap(void) {
     static const u8 EndofProgramInstruction[4] = {0x00, 0x45, 0x4E, 0x44};
     u8* endOfProgramInstructionBytes = (u8*)EndofProgramInstruction;
@@ -212,4 +241,5 @@ void InitializeProgramEndTrap(void) {
     DCFlushRange(ppcHaltPtr + 4, 4);
 }
 
+/** Called from the stub's interrupt entry for the debug link interrupt; intentionally empty. */
 void TRKUARTInterruptHandler(void) {}

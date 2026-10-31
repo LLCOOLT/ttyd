@@ -48,6 +48,11 @@ void PSMTXRotAxisRad(Mtx m, const Vec* axis, f32 rad);
 void PSMTXRotRad(Mtx m, char axis, f32 rad);
 void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
 void PSMTXTrans(Mtx m, f32 xT, f32 yT, f32 zT);
+/**
+ * Spawns a Magikoopa (kameki) tornado at (x, y, z) of 8 spinning layers, scaled by scale;
+ * life is in frames (0 = until soft-deleted).
+ * battle_mario.c spawns two (life 90, scale 3); boss_magnum_battender_mkII uses one.
+ */
 EffectEntry* effKamekiTornadeN64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffKamekiTornadeN64Work* work;
@@ -97,6 +102,11 @@ EffectEntry* effKamekiTornadeN64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f
     return effect;
 }
 
+/**
+ * Fades in over 16 frames and out over the last 16.
+ * Each layer follows the one below it, so the column leans as the base moves (rot is clamped to 90 degrees);
+ * also advances the twist and the texture scroll.
+ */
 static void effKamekiTornadeMain(EffectEntry* effect) {
     EffKamekiTornadeN64Work* work = effect->userdata;
     Vec position;
@@ -161,6 +171,10 @@ static void effKamekiTornadeMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effKamekiTornadeDisp, effect);
 }
 
+/**
+ * Builds a 16-segment ring of vertices and draws seven stacked, twisted layers, each tilted and scaled,
+ * using texture 0x6C on both texture maps.
+ */
 static void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
     f32 scale;
     s32 i;

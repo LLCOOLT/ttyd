@@ -62,6 +62,7 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/** Effect for the ground-pound hit: a hit spark above the Bread Heart NPC and four puffs of smoke around it. */
 EVT_BEGIN(kpa_07_hipattack_eff)
     CALL(evt_npc_get_position, STRING("ブレッドハート"), LW(0), LW(1), LW(2))
     ADD(LW(2), 10)
@@ -94,6 +95,15 @@ EVT_BEGIN(kpa_07_hipattack_eff)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene after stage 3 (STORY_STG6_55_03_BOWSER_ACTION_STAGE):
+ * out-of-breath Kammy joins Bowser, a fake star stone (nise) appears, and the Bread Heart NPC argues with him,
+ * tackles him and ends up with the stone dropping and breaking.
+ * The story advances to STORY_STG6_55_04_BOWSER_RAWK_HAWK, the game is saved,
+ * and play goes to Rogueport (gor_04).
+ * Guess: Bread Heart is a rival character on the conveyor belt;
+ * the details come from the effect and sound names only.
+ */
 EVT_BEGIN(kpa_07_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, -249, 0, 0)
@@ -404,6 +414,10 @@ EVT_BEGIN(kpa_07_evt)
     RETURN
 EVT_END()
 
+/**
+ * Map init for kpa_07: plays BGM_EVT_KUPPA1, sets up the NPCs and the conveyor belt NPC,
+ * and starts kpa_07_evt while the story is at STORY_STG6_55_03_BOWSER_ACTION_STAGE.
+ */
 EVT_BEGIN(kpa_07_init_evt)
     CALL(evt_mario_set_mode, 2)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_KUPPA1"))
@@ -422,6 +436,10 @@ EVT_BEGIN(kpa_07_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Message callback for kpa_stg6_014: swaps the Bread Heart NPC's idle/talk animations to S_5/T_5 on page 1
+ * and back to S_1/T_1 on page 2.
+ */
 static void kpa_stg6_014_cb(s32 type, smartEntry* smart) {
     MsgWinData* info = smart->address;
     NpcEntry* npc;
@@ -444,6 +462,7 @@ static void kpa_stg6_014_cb(s32 type, smartEntry* smart) {
     }
 }
 
+/** Message callback for kpa_stg6_012_1: plays Kammy's A_2B animation at the start and her T_1 animation at entry 8. */
 static void kpa_stg6_012_1_cb(s32 type, smartEntry* smart) {
     MsgWinData* info = smart->address;
 
@@ -461,6 +480,10 @@ static void kpa_stg6_012_1_cb(s32 type, smartEntry* smart) {
     }
 }
 
+/**
+ * Script helper: args = name, type, x, y, z, scale.
+ * Creates a star stone effect with the given name and turns off its jump sound.
+ */
 static USER_FUNC(starstone_entry) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -476,6 +499,7 @@ static USER_FUNC(starstone_entry) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: args[0] = effect name; returns the star stone's x, y, z in args[1..3]. */
 static USER_FUNC(get_starstone_pos) {
     EvtWord* args = event->args;
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
@@ -486,6 +510,7 @@ static USER_FUNC(get_starstone_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: args[0] = effect name, args[1..3] = x, y, z; moves the star stone. */
 static USER_FUNC(set_starstone_pos) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -500,6 +525,7 @@ static USER_FUNC(set_starstone_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: args[0] = effect name, args[1] = degrees; rotates the star stone about Y. */
 static USER_FUNC(set_starstone_ry) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -509,6 +535,7 @@ static USER_FUNC(set_starstone_ry) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: args[0] = effect name; switches the star stone effect to state 1 (the falling/breaking animation). */
 static USER_FUNC(starstone_fall) {
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
 

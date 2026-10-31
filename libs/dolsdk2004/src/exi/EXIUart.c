@@ -13,6 +13,11 @@ int ReadUARTN(void);
 int WriteUARTN(void *buf, u32 len);
 void __OSEnableBarnacle(s32 chan, u32 dev);
 
+/**
+ * Checks for a Barnacle debug UART on a channel and device by sending command 0x20011300 at 1 MHz
+ * and reading a 4 byte revision. True if the read succeeded and was not 0xFFFFFFFF.
+ * Attaches and detaches the channel around the probe when it is a memory card slot.
+ */
 static BOOL ProbeBarnacle(s32 chan, u32 dev, u32* revision) {
     int err;
     u32 cmd;
@@ -52,6 +57,11 @@ static BOOL ProbeBarnacle(s32 chan, u32 dev, u32* revision) {
     return FALSE;
 }
 
+/**
+ * Reads the EXI ID of the device on a channel.
+ * If it is not one of the known device IDs (memory cards, adapters and so on)
+ * and a Barnacle UART answers a probe, selects it as the debug console channel and device and enables it.
+ */
 void __OSEnableBarnacle(s32 chan, u32 dev) {
     u32 id;
 
@@ -92,6 +102,12 @@ void __OSEnableBarnacle(s32 chan, u32 dev) {
     }
 }
 
+/**
+ * Sets up the debug console UART.
+ * Returns 0 at once if a Barnacle UART is already enabled;
+ * returns 2 and disables the UART unless the console type has bit 0x10000000 set;
+ * otherwise selects channel 0, device 1, enables it and returns 0.
+ */
 int InitializeUART(void) {
     if (BarnacleEnabled == 0xA5FF005A) {
         return 0;
@@ -108,10 +124,15 @@ int InitializeUART(void) {
     return 0;
 }
 
+/** Not implemented: reads nothing and always returns 4. */
 int ReadUARTN(void) {
     return 4;
 }
 
+/**
+ * Asks the UART how much room its transmit queue has by sending command 0x20010000 and reading the status byte.
+ * Returns 16 minus that byte, or -1 if the device cannot be selected.
+ */
 static int QueueLength(void) {
     u32 cmd;
 
@@ -128,6 +149,12 @@ static int QueueLength(void) {
     return 0x10 - (cmd >> 0x18);
 }
 
+/**
+ * Sends len bytes to the debug UART, changing every '\n' in the buffer to '\r' first.
+ * Writes in chunks as the queue frees up.
+ * Returns 0 on success, 2 if the UART is not enabled, 0 if the channel could not be locked,
+ * or 3 on a transfer error.
+ */
 int WriteUARTN(void *buf, u32 len) {
     u32 cmd;
     s32 xLen;

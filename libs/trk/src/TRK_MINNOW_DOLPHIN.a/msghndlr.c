@@ -57,6 +57,10 @@ DSError TRKTargetStepOutOfRange(u32 rangeStart, u32 rangeEnd, BOOL stepOver);
 
 static BOOL IsTRKConnected;
 
+/**
+ * Builds a 0x40-byte reply header (command 0x80, the given error byte) and writes it straight to the host link;
+ * the reply tells the debugger whether its command succeeded.
+ */
 static inline void TRKSendReply(u8 replyError) {
     CommandReply reply;
 
@@ -67,6 +71,7 @@ static inline void TRKSendReply(u8 replyError) {
     TRKWriteUARTN(&reply, sizeof(CommandReply));
 }
 
+/** Sends the already filled message buffer to the host as the reply and returns the send status. */
 static inline DSError TRKSendACK(TRKBuffer* buffer) {
     DSError err;
 
@@ -76,6 +81,7 @@ static inline DSError TRKSendACK(TRKBuffer* buffer) {
     return err;
 }
 
+/** Trace helper that dumps a block of bytes as hex, 16 per line, through MWTRACE (compiled out here). */
 void OutputData(u8* data, int length) {
     int i;
 
@@ -88,20 +94,27 @@ void OutputData(u8* data, int length) {
     MWTRACE(8, "\n");
 }
 
+/** Returns whether a debugger has sent a connect command and not yet disconnected. */
 BOOL GetTRKConnected(void) {
     return IsTRKConnected;
 }
 
+/** Sets the connected flag; usr_puts_serial clears it temporarily so its text is not sent over the debug link. */
 void SetTRKConnected(BOOL connected) {
     IsTRKConnected = connected;
 }
 
+/** Handles the connect command (0x01): marks the stub connected and replies OK. */
 DSError TRKDoConnect(TRKBuffer* buffer) {
     IsTRKConnected = 1;
     TRKSendReply(0);
     return 0;
 }
 
+/**
+ * Handles the disconnect command (0x02): marks the stub disconnected,
+ * replies OK and posts a shutdown event so the main loop ends.
+ */
 DSError TRKDoDisconnect(TRKBuffer* buffer) {
     TRKEvent event;
 
@@ -112,26 +125,38 @@ DSError TRKDoDisconnect(TRKBuffer* buffer) {
     return 0;
 }
 
+/** Handles the reset command (0x03): replies OK, then resets the whole system through OSResetSystem. */
 DSError TRKDoReset(TRKBuffer* buffer) {
     TRKSendReply(0);
     __TRK_reset();
     return 0;
 }
 
+/**
+ * Handles the override command (0x07): replies OK,
+ * then installs the stub's handlers over the game's exception vectors.
+ */
 DSError TRKDoOverride(TRKBuffer* buffer) {
     TRKSendReply(0);
     __TRK_copy_vectors();
     return 0;
 }
 
+/** Handler for the versions command (0x04); does nothing here (no reply is sent) and returns 0. */
 DSError TRKDoVersions(TRKBuffer* buffer) {
     return 0;
 }
 
+/** Handler for the support-mask command (0x05); does nothing here (no reply is sent) and returns 0. */
 DSError TRKDoSupportMask(TRKBuffer* buffer) {
     return 0;
 }
 
+/**
+ * Handles the read-memory command (0x10): reads the requested length from the start address (main memory, or
+ * ARAM when option bit 0x40 is set) into the reply after a 0x40-byte header.
+ * Failures are mapped to protocol error codes.
+ */
 DSError TRKDoReadMemory(TRKBuffer* buffer) {
     DSError error;
     u8 replyError;
@@ -206,6 +231,10 @@ DSError TRKDoReadMemory(TRKBuffer* buffer) {
     return TRKSendACK(buffer);
 }
 
+/**
+ * Handles the write-memory command (0x11): copies the bytes that follow the header to the start address (main
+ * memory or ARAM) and replies OK or with the mapped error code.
+ */
 DSError TRKDoWriteMemory(TRKBuffer* buffer) {
     DSError error;
     u8 replyError;
@@ -279,6 +308,11 @@ DSError TRKDoWriteMemory(TRKBuffer* buffer) {
     return TRKSendACK(buffer);
 }
 
+/**
+ * Handles the read-registers command (0x12): replies with all default (GPR/PC/LR/CR/CTR/XER), floating point,
+ * extended 1 and paired-single register groups, in that order.
+ * Rejects a first register past the last with error 0x14.
+ */
 DSError TRKDoReadRegisters(TRKBuffer* buffer) {
     DSError error;
     u8 replyError;
@@ -354,6 +388,10 @@ DSError TRKDoReadRegisters(TRKBuffer* buffer) {
     return TRKSendACK(buffer);
 }
 
+/**
+ * Handles the write-registers command (0x13): the option byte selects the group (0 default, 1 floating point,
+ * 2 extended 1, 3 extended 2) and the values after the header are stored into the saved context.
+ */
 DSError TRKDoWriteRegisters(TRKBuffer* buffer) {
     DSError error;
     u8 replyError;
@@ -439,12 +477,20 @@ DSError TRKDoWriteRegisters(TRKBuffer* buffer) {
     return TRKSendACK(buffer);
 }
 
+/**
+ * Handler for a flush-cache command; unimplemented here (prints a message and replies with error 0x12).
+ * It is not in the dispatcher's table.
+ */
 DSError TRKDoFlushCache(TRKBuffer* buffer) {
     MWTRACE(8, "DoFlushCache unimplemented!!!\n");
     TRKSendReply(0x12);
     return 0;
 }
 
+/**
+ * Handles the continue command (0x18): if the game is stopped, replies OK and resumes it;
+ * otherwise replies error 0x16.
+ */
 DSError TRKDoContinue(TRKBuffer* buffer) {
     MWTRACE(1, "DoContinue\n");
 
@@ -457,6 +503,11 @@ DSError TRKDoContinue(TRKBuffer* buffer) {
     return TRKTargetContinue();
 }
 
+/**
+ * Handles the step command (0x19): option 0/0x10 steps a count of instructions,
+ * 1/0x11 steps until the PC leaves a range (0x10/0x11 mean step over, which the target rejects).
+ * Replies OK then starts the step; errors if the game is not stopped.
+ */
 DSError TRKDoStep(TRKBuffer* buffer) {
     DSError error;
     u8 options;
@@ -514,6 +565,7 @@ DSError TRKDoStep(TRKBuffer* buffer) {
     return error;
 }
 
+/** Handles the stop command (0x1A): marks the game stopped and replies OK (or a mapped error). */
 DSError TRKDoStop(TRKBuffer* buffer) {
     u8 replyError;
 
@@ -539,6 +591,10 @@ DSError TRKDoStop(TRKBuffer* buffer) {
     return 0;
 }
 
+/**
+ * Handles the set-option command (0x17): option 1 turns console I/O over the host link on or off (prints which),
+ * then replies OK.
+ */
 DSError TRKDoSetOption(TRKBuffer* buffer) {
     u8 spID = buffer->data[8];
     u8 mask = buffer->data[0xC];

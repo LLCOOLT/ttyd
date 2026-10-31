@@ -194,6 +194,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init script of Dull Bones: installs the wait, attack,
+ * damage and confusion handlers (confusion reuses the attack),
+ * clears unit work 1 (reward paid flag) and sets its landing sound, and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -205,6 +210,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: runs the shared default damage script (btldefaultevt_Damage) with its default parameters
+ * (LW(10) = -2, LW(11) = 1).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -212,6 +221,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Real death script of Dull Bones: spins it for 48 frames with the defeat sound, shows a smoke puff,
+ * and the first time pays the coins, experience and star points (unit work 1 marks them as paid).
+ * It then tilts it for 30 frames, collects any item it held,
+ * and if the killing hit was flagged 0x400 removes the unit for good.
+ */
 static EVT_BEGIN(dead_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(0), 48)
@@ -264,6 +279,13 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Fake death script of Dull Bones: it moves to the spot given in LW(2) to LW(4),
+ * and the first time pays out the coins, experience and star points (unit work 1 = 1) with a smoke puff.
+ * It then plays the crumbled pose KRN_D_2 with the crumble sound, waits a second,
+ * makes the unit unavailable (KillUnit mode 2),
+ * and picks a random 0 or 1 in unit work 2 (the time it stays collapsed).
+ */
 static EVT_BEGIN(fake_dead_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(2), LW(3), LW(4))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
@@ -302,6 +324,12 @@ static EVT_BEGIN(fake_dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Reassembly script of Dull Bones, run from its attack turn while collapsed:
+ * counts down the collapse timer in unit work 2 and stays down while it is still 1 or more;
+ * at 0 it plays KRN_D_3 and KRN_D_4 with the unite sounds, restores full HP,
+ * clears the collapsed attribute (0x20000) and resets its hit offset.
+ */
 static EVT_BEGIN(rebirth_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
     SUBTRACT(LW(0), 1)
@@ -322,6 +350,12 @@ static EVT_BEGIN(rebirth_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of Dull Bones: when battle flag 2 is set it uses the normal attack;
+ * if it is still collapsed (unit work 2 is 1 or more) it first rebuilds itself with rebirth_event.
+ * After the item-use check it picks the normal attack 85 percent of the time;
+ * otherwise, if there is free space on the stage, it calls a friend (call_friend_event) from either side.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -391,6 +425,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Starts the target's dodge animation for the thrown bone depending on the avoid result in LW(5):
+ * 3, 6 and 2 map to avoid animations 38, 39 and 40 for the unit in LW(3).
+ */
 static EVT_BEGIN(start_avoid)
     IF_INT_EQUAL(LW(5), 3)
         CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -404,6 +442,12 @@ static EVT_BEGIN(start_avoid)
     RETURN
 EVT_END()
 
+/**
+ * Dull Bones' normal attack (weapon_honenoko_attack):
+ * it picks a target, plays KRN_A_1 and KRN_A_2 and throws its bone (part 2, KRN_H_1) spinning across the stage
+ * with the bone-throw sound; the target dodges as the bone passes it,
+ * and a hit applies the damage with the guard-timing check. The bone bounces and returns to the unit.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -530,6 +574,12 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Dull Bones calls a friend: it throws its bones one after another (part 3, KRN_H_n poses)
+ * and collects them (part 4, KRN_C_n) over six rounds with the call sounds, reassembles with the unite sounds,
+ * and spawns a new Dull Bones (entry_honenoko) at the free spot in LW(0) to LW(2),
+ * copying its status to it (honenoko_copy_status).
+ */
 static EVT_BEGIN(call_friend_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -614,11 +664,17 @@ static EVT_BEGIN(call_friend_event)
     RETURN
 EVT_END()
 
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0] and args[1] are unit ids (BattleTransID).
+ * Copies the size-change (Mini/Mega) turns and strength from the first unit to the second,
+ * so a unit spawned or replaced mid-battle keeps the size it had. Called with the new unit (LW(3)).
+ */
 static USER_FUNC(honenoko_copy_status) {
     EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));

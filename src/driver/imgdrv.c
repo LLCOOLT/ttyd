@@ -30,6 +30,11 @@ static void imgCapture(CameraId camId, void* param);
 
 static void imgShadowDisp(CameraId camId, void* param);
 
+/**
+ * Draws a full-view quad at depth -1000 that writes only depth (a Z8 texture of 0xFF,
+ * colour and alpha updates off), so the image drawn next is not hidden behind the scene.
+ * imgDisp uses it for images with no virtual point.
+ */
 static void zFill(void) {
     static s32 depth_image[32] ATTRIBUTE_ALIGN(32) = {// GX texture: 32-byte aligned (US .data placement shows it)
                                                       -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -94,6 +99,11 @@ static void zFill(void) {
     GXSetColorUpdate(GX_TRUE);
 }
 
+/**
+ * Draw callback for one image: binds its up to three captured textures (screen copies) as the pose's paper
+ * textures, advances the animation, and draws the pose as a flat screen-space quad sized to the capture,
+ * scaled by distance when it has a virtual point. Later versions flag the entry when no capture is ready.
+ */
 static void imgDisp(CameraId camId, void* param) {
     ImageEntry* entry = param;
     ImageShadow* sh;
@@ -218,6 +228,10 @@ static void imgDisp(CameraId camId, void* param) {
 #endif
 }
 
+/**
+ * Draw callback for an image's shadow: shadowId 1 blends
+ * and 2 subtracts the projected shadow over a full-screen quad on the image camera; 0 draws nothing.
+ */
 static void imgDisp_ProjPlane(CameraId camId, void* param) {
     ImageEntry* entry = param;
     static const Vec lightPos = {0.0f, 0.0f, 0.0f};
@@ -272,6 +286,11 @@ static void imgDisp_ProjPlane(CameraId camId, void* param) {
     GXColor4u8(0, 0, 0, 0);
 }
 
+/**
+ * Copies capture slot sh's rectangle of the frame buffer into a texture,
+ * allocating the buffer from the smart heap (allocMode 1 or 2 pick the heap kind)
+ * or as a type-3 block that smartAutoFree(3) reclaims.
+ */
 static inline void imgCaptureCopy(ImageShadow* sh, ImageEntry* entry) {
     s32 fmt, dstFmt, alloc;
     u16 h, w;
@@ -303,6 +322,11 @@ static inline void imgCaptureCopy(ImageShadow* sh, ImageEntry* entry) {
     sh->data = data;
 }
 
+/**
+ * Refreshes capture slot id of an image: takes the texture of its offscreen region (copying it into the image's
+ * own buffer once when it keeps the capture) or copies its rectangle straight from the frame buffer.
+ * The demo copies from the offscreen texture's address directly.
+ */
 static void imgCapture_Prim(ImageEntry* entry, s32 id) {
     ImageShadow* sh = &entry->shadows[id];
 #if VERSION <= VERSION_DEMO_US
@@ -385,6 +409,10 @@ static void imgCapture_Prim(ImageEntry* entry, s32 id) {
     }
 }
 
+/**
+ * Draw callback queued on every camera at the end of the frame:
+ * refreshes the captures of all images of the current mode that are drawn on that camera.
+ */
 static void imgCapture(CameraId camId, void* param) {
     s32 type = gp->inBattle != 0;
     int i, count;
@@ -406,12 +434,14 @@ static void imgCapture(CameraId camId, void* param) {
     }
 }
 
+/** Allocates the 10-entry image table; called once at boot. */
 void imgInit(void) {
     wp->count = 10;
     wp->entries = __memAlloc(HEAP_DEFAULT, wp->count * sizeof(ImageEntry));
     memset(wp->entries, 0, wp->count * sizeof(ImageEntry));
 }
 
+/** Releases every image of the given type (0 field, 1 battle); run when that mode is torn down. */
 void imgAutoRelease(s32 type) {
     int i, count;
     ImageEntry* entry;
@@ -425,6 +455,11 @@ void imgAutoRelease(s32 type) {
     }
 }
 
+/**
+ * Creates a named image of type 0 (field), 1 (battle) or 2 (both) with no pose yet,
+ * default image camera and three empty capture slots, and returns its index.
+ * Used by the pipe (fImg_dokan) and page-flip (fImg_peron) fades, the cloud effect and evt_img.
+ */
 s32 imgEntry(const char* name, s32 type) {
     int i, count;
     ImageEntry* entry;
@@ -489,6 +524,10 @@ s32 imgEntry(const char* name, s32 type) {
     return i;
 }
 
+/**
+ * Per-frame update: queues each live image that has a capture slot in use for drawing on its camera,
+ * plus its shadow callbacks per shadowId, and queues imgCapture on all 13 cameras.
+ */
 void imgMain(void) {
     s32 type = gp->inBattle != 0;
     int shadow, i, count;
@@ -533,6 +572,7 @@ void imgMain(void) {
     }
 }
 
+/** Returns the image with this name for type (or of type 2, shared), or one past the table if none. */
 ImageEntry* imgNameToPtr(const char* name, s32 type) {
     int i, count;
     ImageEntry* entry;
@@ -548,6 +588,7 @@ ImageEntry* imgNameToPtr(const char* name, s32 type) {
     return entry;
 }
 
+/** Empties capture slot shadowId of an image, freeing its copied texture when the image owns one. */
 void imgFreeCapture(ImageEntry* entry, s32 shadowId) {
     ImageShadow* shadow = &entry->shadows[shadowId];
     if (shadow->flags & 4) {
@@ -563,15 +604,18 @@ void imgFreeCapture(ImageEntry* entry, s32 shadowId) {
     }
 }
 
+/** Anchors the image at a 3D point so it is scaled by the camera distance to it instead of drawn at a fixed depth. */
 void imgSetVirtualPoint(ImageEntry* entry, const Vec* point) {
     entry->flags &= ~8;
     entry->point = *point;
 }
 
+/** Removes the image's 3D anchor point; it is drawn at a fixed depth again. */
 void imgClearVirtualPoint(ImageEntry* entry) {
     entry->flags |= 8;
 }
 
+/** Frees all three capture slots of an image and clears its entry. */
 void imgRelease(ImageEntry* entry, s32 type) {
     int i;
 
@@ -582,10 +626,15 @@ void imgRelease(ImageEntry* entry, s32 type) {
     memset(entry, 0, sizeof(ImageEntry));
 }
 
+/** Sets the image's shadow mode: 0 none, 1 projected, 2 depth shadow (the cloud effect uses 2). */
 void imgSetShadow(ImageEntry* entry, s32 shadowId) {
     entry->shadowId = shadowId;
 }
 
+/**
+ * Draw callback on the shadow camera: draws the image's pose with its captured textures into the shadow pass
+ * so it casts a projected or depth shadow, and counts the shadow draw for shadowdrv.
+ */
 static void imgShadowDisp(CameraId camId, void* param) {
     ImageShadow* sh;
     ImageEntry* entry = param;

@@ -856,6 +856,7 @@ MayaAnimData ice_effAnimDt = {{0}, 119.0f, &ice_effAnimRSTDt};
 static void effIceMain(EffectEntry* effect);
 static void effIceDisp(CameraId cameraId, EffectEntry* effect);
 
+/** Spawns an ice block at (x, y, z); duration <= 0 keeps it until soft-deleted. Used for the frozen status. */
 EffectEntry* effIceEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffIceWork* work;
@@ -887,6 +888,7 @@ EffectEntry* effIceEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale)
     return effect;
 }
 
+/** Plays the ice block's animation; soft delete jumps to its shrinking phase, which drips smoke puffs. */
 static void effIceMain(EffectEntry* effect) {
     EffIceWork* work = effect->userdata;
     Vec calcPos;
@@ -956,6 +958,7 @@ static void effIceMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&calcPos), 2, (DispCallback)effIceDisp, effect);
 }
 
+/** Draws the ice block model with its animated joint transforms. */
 static void effIceDisp(CameraId cameraId, EffectEntry* effect) {
     EffIceWork* work = effect->userdata;
     GXTexObj texObj;

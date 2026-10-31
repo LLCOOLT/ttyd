@@ -155,6 +155,11 @@ static BattleWeapon weapon_twinkling_pansy_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Attack event of the Amazy Dayzee: uses an enemy item if it has one,
+ * otherwise rolls 0 to 99 and sings its attack song (song_event, weapon_twinkling_pansy_attack) below 20,
+ * else runs away (escape_event).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -203,6 +208,10 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init event of the Amazy Dayzee: installs its wait, attack, damage and confusion events,
+ * starts twink_event for its sparkle and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -213,6 +222,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs for as long as the Amazy Dayzee exists: every 40 frames it shows a stardust_n64 sparkle effect at its
+ * position (scaled for its size status).
+ */
 static EVT_BEGIN(twink_event)
     LABEL(0)
     WAIT_FRAMES(40)
@@ -232,6 +245,7 @@ LABEL(99)
 RETURN
 EVT_END()
 
+/** Guess: damage event of a sword: runs the default damage reaction. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -239,6 +253,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the Amazy Dayzee's song attack: it picks targets with the weapon in LW(9),
+ * turns to face them and sings (ATTACK1 sound, music-note effects drifting the way it faces)
+ * while the screen darkens with a map blend, then the damage check runs on every target in turn (PreCheckDamage,
+ * avoid poses, CheckDamage with the defence result on the first) and the lighting fades back to normal.
+ */
 static EVT_BEGIN(song_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -342,6 +362,10 @@ static EVT_BEGIN(song_event)
     RETURN
 EVT_END()
 
+/**
+ * The Amazy Dayzee flees the battle: it turns away, blurs,
+ * hops and dashes off the right side of the stage at speed 9 with the escape sounds, then is removed (KillUnit).
+ */
 static EVT_BEGIN(escape_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PANSY_ESCAPE1_1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PAN_E_1"))
@@ -362,6 +386,7 @@ static EVT_BEGIN(escape_event)
     RETURN
 EVT_END()
 
+/** Guess: wait (idle) event of horde group 2: keeps the default idle pose. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

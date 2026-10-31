@@ -11,6 +11,10 @@ static void __SYNSetupAdpcm(SYNVOICE* voice);
 static void __SYNSetupPcm16(SYNVOICE* voice);
 static void __SYNSetupPcm8(SYNVOICE* voice);
 
+/**
+ * Converts a sample count into an offset in ADPCM nibbles:
+ * 14 samples per 16-nibble frame, past the 2-nibble header.
+ */
 static u32 __SYNGetNibbleAddress(u32 count) {
     u32 samples = count;
     u32 frames = (samples / 14);
@@ -19,6 +23,11 @@ static u32 __SYNGetNibbleAddress(u32 count) {
     return (frames * 0x10) + 2 + samplesLeft;
 }
 
+/**
+ * Fills the AX voice for an ADPCM sample: looping when the region has a loop (loop start and end addresses,
+ * the loop's predictor state), otherwise ending at the sample length and looping to the zero sample;
+ * also copies the ADPCM coefficients.
+ */
 static void __SYNSetupAdpcm(SYNVOICE* voice) {
     AXVPB* axvpb = voice->axvpb;
 
@@ -101,6 +110,10 @@ static void __SYNSetupAdpcm(SYNVOICE* voice) {
     }
 }
 
+/**
+ * Fills the AX voice for a 16-bit PCM sample, looping when the region has a loop,
+ * otherwise ending at the sample length.
+ */
 static void __SYNSetupPcm16(SYNVOICE* voice) {
     AXVPB* axvpb = voice->axvpb;
 
@@ -161,6 +174,10 @@ static void __SYNSetupPcm16(SYNVOICE* voice) {
     axvpb->sync |= 0x21000;
 }
 
+/**
+ * Fills the AX voice for an 8-bit PCM sample, looping when the region has a loop,
+ * otherwise ending at the sample length.
+ */
 static void __SYNSetupPcm8(SYNVOICE* voice) {
     AXVPB* axvpb = voice->axvpb;
 
@@ -221,6 +238,7 @@ static void __SYNSetupPcm8(SYNVOICE* voice) {
     axvpb->sync |= 0x21000;
 }
 
+/** Sets up the voice's sample playback by dispatching on the sample format (ADPCM, 16-bit or 8-bit PCM). */
 void __SYNSetupSample(SYNVOICE* voice) {
     ASSERTLINE(361, voice);
 

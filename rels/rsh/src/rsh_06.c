@@ -59,6 +59,11 @@ static void ext_moamoa_main(void);
 // The unit's inlining budget: the default limit changes which of the moamoa helpers are inlined (checked by
 // removing it; eki_00 and rsh_05 use their own limits).
 #pragma inline_max_total_size(100000)
+/**
+ * Polynomial approximation of sin(x) for an angle in radians in [0, 2*pi);
+ * the Smorg (moamoa) swarm code uses its own sine to keep results identical on every frame without calling the
+ * libm. Inlined into the swarm code.
+ */
 static inline f32 moa_sin(f32 x) {
     f32 a = 0.00761f;
     f32 b = 0.16605f;
@@ -94,6 +99,10 @@ static inline f32 moa_sin(f32 x) {
     }
     return a;
 }
+/**
+ * Polynomial approximation of cos(x) for an angle in radians in [0, 2*pi), companion of moa_sin.
+ * Inlined into the swarm code.
+ */
 static inline f32 moa_cos(f32 x) {
     f32 a = 0.03705f;
     f32 b = 0.4967f;
@@ -125,6 +134,10 @@ static inline f32 moa_cos(f32 x) {
     }
     return a;
 }
+/**
+ * Variant of moa_sin that reduces its argument in place instead of using a second local;
+ * same polynomial sine for an angle in radians in [0, 2*pi).
+ */
 static inline f32 moa_sinx(f32 x) {
     f32 a = 0.00761f;
     f32 b = 0.16605f;
@@ -160,6 +173,10 @@ static inline f32 moa_sinx(f32 x) {
     }
     return a;
 }
+/**
+ * Variant of moa_cos that reduces its argument in place;
+ * same polynomial cosine for an angle in radians in [0, 2*pi).
+ */
 static inline f32 moa_cosx(f32 x) {
     f32 a = 0.03705f;
     f32 b = 0.4967f;
@@ -301,6 +318,12 @@ static MoamoaData ext_moamoa_data[] = {
 
 // dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
 #pragma dont_inline on
+/**
+ * Builds the swarm's animation table (wp->defs) from ext_moamoa_data:
+ * consecutive rows with the same model and animation name become one MoamoaPoseDef (first texture frame,
+ * frame count, speed, and looping unless the animation name starts with J).
+ * Kept out of line to match the original.
+ */
 static void moamoa_pose_init(void) {
     MoamoaData* data = ext_moamoa_data;
     s32 i = 0;
@@ -335,6 +358,10 @@ static void moamoa_pose_init(void) {
     wp->numDefs++;
 }
 #pragma dont_inline reset
+/**
+ * Per-frame update of every Moamoa sprite's animation:
+ * turns the time since its pose started into a texture frame index in the sprite's ExtdrvPose.
+ */
 static void moamoa_pose_main(void) {
     f32 t;
     u64 now;
@@ -357,6 +384,12 @@ static void moamoa_pose_main(void) {
         pose->texId = def->start + (s32)((def->count - 1) * t);
     }
 }
+/**
+ * Switches one Moamoa to the named model/animation pair (a swarm member with MOAMOA_FLAG_KIND_MODEL set uses the
+ * model of its kind from group_tbl instead) and restarts its animation clock.
+ * A damaged Moamoa only accepts D_ poses and an escaping one only R_ poses.
+ * Out-of-line copy of moamoa_pose_change_i.
+ */
 static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim) {
     static const char* group_tbl[][2] = {
         {(char*)"c_n_moa_a", (char*)"S_1"},
@@ -403,6 +436,10 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
         moa->startTime = gp->renderTime;
     }
 }
+/**
+ * Script helper: sets (args[0] nonzero) or clears the MOAMOA_WORK_* bits args[1] in the swarm's work flags,
+ * e.g. to start drawing the swarm, turn its hit checks off, or draw it offscreen.
+ */
 static s32 evt_moamoa_flag_onoff(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
@@ -415,10 +452,12 @@ static s32 evt_moamoa_flag_onoff(EventEntry* event, BOOL isFirstCall) {
     }
     return EVT_RETURN_DONE;
 }
+/** Script helper: removes the swarm effect (extReset). */
 static s32 evt_moamoa_exit(EventEntry* event, BOOL isFirstCall) {
     extReset();
     return EVT_RETURN_DONE;
 }
+/** Script helper: resets the facing (ry and target ry) of every Moamoa sprite to 0. */
 static s32 evt_moamoa_ry_reset(EventEntry* event, BOOL isFirstCall) {
     s32 i;
     ExtdrvPose* pose = extGetPosePtr();
@@ -429,6 +468,7 @@ static s32 evt_moamoa_ry_reset(EventEntry* event, BOOL isFirstCall) {
     }
     return EVT_RETURN_DONE;
 }
+/** Script helper: blocks the calling script until every Moamoa has finished leaving (MOAMOA_FLAG_GONE). */
 static s32 evt_moamoa_end_wait(EventEntry* event, BOOL isFirstCall) {
     s32 i;
     Moamoa* moa;
@@ -442,6 +482,11 @@ static s32 evt_moamoa_end_wait(EventEntry* event, BOOL isFirstCall) {
     }
     return EVT_RETURN_DONE;
 }
+/**
+ * Script helper: makes the whole swarm gather at its target and merge into one body.
+ * The first call puts every Moamoa into the gather state with a staggered delay;
+ * the helper then blocks until all have arrived (MOAMOA_FLAG_GATHERED) and switches them to the merged state.
+ */
 static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall) {
     s32 i;
     ExtdrvPose* pose;
@@ -477,6 +522,11 @@ static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall) {
     }
     return EVT_RETURN_DONE;
 }
+/**
+ * Script helper: args[0] turns the per-kind model on or off (MOAMOA_FLAG_KIND_MODEL),
+ * args[1] applies it to every Moamoa or only to those of kind 1; each sprite then refreshes its pose.
+ * Used to dress the merged Smorg in the models of the people it swallowed.
+ */
 static s32 evt_moamoa_kind_onoff(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
@@ -508,6 +558,10 @@ static s32 evt_moamoa_kind_onoff(EventEntry* event, BOOL isFirstCall) {
     }
     return EVT_RETURN_DONE;
 }
+/**
+ * Script helper: breaks the merged Smorg apart;
+ * every Moamoa leaves the merged state and goes to the blown-away state (63).
+ */
 static s32 evt_moamoa_blow(EventEntry* event, BOOL isFirstCall) {
     s32 i;
     Moamoa* moa;
@@ -521,6 +575,10 @@ static s32 evt_moamoa_blow(EventEntry* event, BOOL isFirstCall) {
     }
     return EVT_RETURN_DONE;
 }
+/**
+ * Debug leftover: instantly puts every Moamoa into the fully merged state with kind models,
+ * skipping the gathering. Used by moamoa_debug.
+ */
 static s32 evt_moamoa_fusion_debug(EventEntry* event, BOOL isFirstCall) {
     s32 i;
     ExtdrvPose* pose = extGetPosePtr();
@@ -537,6 +595,11 @@ static s32 evt_moamoa_fusion_debug(EventEntry* event, BOOL isFirstCall) {
     }
     return EVT_RETURN_DONE;
 }
+/**
+ * Prepares the giant Smorg's body: turns on world-position evaluation for the "base" NPC's skeleton,
+ * hides its joints, sets up the chains of Moamoa along the bones and divides the swarm among them.
+ * Gives some chains the models of the swallowed passengers (kinds 1 to 9).
+ */
 static void evalOn(void) {
     NpcEntry* npc = npcNameToPtr("base");
     AnimationPose* anim;
@@ -597,6 +660,11 @@ static void evalOn(void) {
         }
     }
 }
+/**
+ * Script helper: retires one of the swarm's targets.
+ * args[0] picks target 0 or 1; its hit count is set to 100,
+ * the target is replaced by the other one and the matching MOAMOA_WORK_TARGETn_OFF bit is set.
+ */
 static s32 evt_moamoa_target_off(EventEntry* event, BOOL isFirstCall) {
     s32 i = evtGetValue(event, event->args[0]);
 
@@ -609,11 +677,19 @@ static s32 evt_moamoa_target_off(EventEntry* event, BOOL isFirstCall) {
     }
     return EVT_RETURN_DONE;
 }
+/** Returns a random float between min and max using rand(). */
 static f32 randf(f32 min, f32 max) {
     f32 r = rand() / 32767.0f;
 
     return r * (max - min) + min;
 }
+/**
+ * Init callback of the swarm effect on the roof (evt_ext_entry):
+ * allocates the work area, puts all three targets at the center of the roof (10, 215, 0),
+ * scatters the sprites over the roof (a sprite with no floor under it is put in the background and flagged
+ * MOAMOA_FLAG_OFF_FLOOR), gives each a small random jitter,
+ * builds the body chains (evalOn) and runs 600 frames of the swarm logic so it starts spread out.
+ */
 static void ext_moamoa_init(void) {
     s32 i;
     ExtdrvPose* pose;
@@ -665,6 +741,10 @@ static void ext_moamoa_init(void) {
         ext_moamoa_main();
     }
 }
+/**
+ * Draw callback of the swarm sprites: loads the ext driver state and draws all sprites.
+ * When drawn into the offscreen camera it also records the bounding box of what was drawn.
+ */
 static void ext_disp(CameraId camera, void* param) {
     u16 left, top, right, bottom;
 
@@ -685,6 +765,10 @@ static void ext_disp(CameraId camera, void* param) {
         offscreenAddBoundingBox(offscreenNameToId((char*)"offscreen"), left, top, right, bottom);
     }
 }
+/**
+ * Draw callback of the swarm's shadows: loads the shadow matrix and TEV state
+ * and draws the flat shadow of every sprite (also records the bounding box for the offscreen camera).
+ */
 static void ext_shadow_disp(CameraId camera, void* param) {
     static Mtx mt = {
         {8.0f, 0.0f, 0.0f, 0.0f},
@@ -710,6 +794,12 @@ static void ext_shadow_disp(CameraId camera, void* param) {
 
 // dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
 #pragma dont_inline on
+/**
+ * Starts a hop for one Moamoa toward (x, y, z) with the given horizontal speed and gravity:
+ * optionally snaps y to the ground below the target, computes the flight time and initial vertical speed,
+ * turns the sprite toward the target, and sets its state to the jump state (3) with `next` as the state to
+ * return to.
+ */
 static void moamoa_jump(ExtdrvPose* pose, Moamoa* moa, s32 next, s32 checkGround, f32 x, f32 y, f32 z, f32 speed, f32 gravity) {
     f32 hitX, hitY, hitZ, dist, nx, ny, nz;
     f32 dy;
@@ -747,6 +837,12 @@ static void moamoa_jump(ExtdrvPose* pose, Moamoa* moa, s32 next, s32 checkGround
 // removing them).
 #pragma opt_propagation off
 #pragma opt_lifetimes off
+/**
+ * Checks whether something hits one Moamoa.
+ * Returns 0 for nothing, 1 for Mario jumping on it (Mario bounces), 2 for a hammer swing or Koops's shell,
+ * 3 for Flurrie's breath and 4 for Bobbery's bomb.
+ * As a side effect it also pushes Mario out when he walks into a Moamoa on the ground.
+ */
 static s32 moamoa_hit_check(ExtdrvPose* pose, Moamoa* moa) {
     MarioWork* mario = marioGetPtr();
     CameraEntry* cam;
@@ -860,9 +956,18 @@ static s32 moamoa_hit_check(ExtdrvPose* pose, Moamoa* moa) {
 #pragma opt_lifetimes off
 __declspec(section ".rodata") static Vec moamoa_zero_vec = {0.0f, 0.0f, 0.0f};
 #pragma opt_dead_assignments off // FAKE: keeps the named in-argument holder `aa` of case 15 (dead store otherwise dropped by IRO), so the sum is a low-numbered named vreg as in the target
+// FAKE: identity function used so the compiler keeps the original code shape of the swarm main loop; it returns its
+// argument.
 static inline f32 mmI(f32 x) {
     return x;
 } // FAKE: identity; replaces the dead `(k = A - B)` holders of the hand-inlined randf sites, which opt_dead_assignments off would otherwise keep as named vregs
+/**
+ * Per-frame callback of the Smorg swarm.
+ * Tracks hammer and idle time, Flurrie's breath and partner use, counts hits on the swarm's targets,
+ * and runs each Moamoa's state machine (idle hopping toward its target or Mario, jumps, damage and knock-off,
+ * escape, gathering and merging, being blown away).
+ * When both targets have been freed it starts the swarm's escape.
+ */
 static void ext_moamoa_main(void) {
     MarioWork* mario = marioGetPtr();
     PartyEntry* party = partyGetPtr(0);
@@ -1397,6 +1502,10 @@ static void ext_moamoa_main(void) {
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 #pragma opt_dead_assignments reset
+/**
+ * Registers the swarm's draw callbacks each frame (sprites and shadows on the 3D camera and, if enabled,
+ * on the offscreen camera).
+ */
 static void ext_moamoa_dispent(void) {
     if (wp->flags & MOAMOA_WORK_ACTIVE) {
         dispEntry(CAMERA_3D, 0.0f, 1, ext_disp, NULL);
@@ -1407,6 +1516,11 @@ static void ext_moamoa_dispent(void) {
         dispEntry(CAMERA_OFFSCREEN2, -5000.0f, 2, ext_shadow_disp, NULL);
     }
 }
+/**
+ * Computes the world position of one Moamoa on the giant Smorg's body:
+ * a point along the bone chain of its group, interpolated by its order in the chain,
+ * taken from the base model's joint positions.
+ */
 static void moamoa_joint_position(Moamoa* moa, Vec* out) {
     NpcEntry* npc = npcNameToPtr((char*)"base");
     AnimationPose* anim = animPoseGetAnimPosePtr(npc->poseId);
@@ -1452,6 +1566,11 @@ static SharinData sharinDt[] = {
     {0},
 };
 
+/**
+ * Spins one wheel map object (LW(0)) of the train:
+ * LW(1) picks the wheel's radius and LW(2) picks which wheel speed, GW(0) or GW(1), drives it;
+ * every frame the angle grows by speed over radius and the object is rotated.
+ */
 static EVT_BEGIN(evt_sharin_main)
     SET_FLOAT_VALUE(LW(10), FLOAT(0.0f))
     SWITCH(LW(1))
@@ -1492,6 +1611,7 @@ static EVT_BEGIN(evt_sharin_main)
     RETURN
 EVT_END()
 
+/** Starts evt_sharin_main for every wheel listed in sharinDt (sha_1_1 and so on). */
 static EVT_BEGIN(evt_sharin)
     SET_INT_READ_ADDR(PTR(sharinDt))
     LOOP(0)
@@ -1516,6 +1636,10 @@ static ClankData clankDt[] = {
     {0},
 };
 
+/**
+ * Moves one connecting rod (bou_n) in a small circle every frame according to the wheel speed,
+ * so the rods move with the wheels.
+ */
 static EVT_BEGIN(evt_clank_main)
     SET_FLOAT_VALUE(LW(10), FLOAT(0.0f))
     SWITCH(LW(1))
@@ -1561,6 +1685,7 @@ static EVT_BEGIN(evt_clank_main)
     RETURN
 EVT_END()
 
+/** Starts evt_clank_main for every rod listed in clankDt. */
 static EVT_BEGIN(evt_clank)
     SET_INT_READ_ADDR(PTR(clankDt))
     LOOP(0)
@@ -1574,8 +1699,11 @@ static EVT_BEGIN(evt_clank)
     RETURN
 EVT_END()
 
-// US and PAL wrap the two scrolling layers with float compares over a shorter range and move "yama" with the far
-// layer; JP and the demos wrap them with integer compares and move "yama" with the near one.
+/**
+ * US and PAL wrap the two scrolling layers with float compares over a shorter range
+ * and move "yama" with the far layer; JP and the demos wrap them with integer compares
+ * and move "yama" with the near one.
+ */
 #if VERSION >= VERSION_US
 static EVT_BEGIN(evt_bg)
     SET_FLOAT_VALUE(LW(10), FLOAT(0.0f))
@@ -1609,6 +1737,10 @@ static EVT_BEGIN(evt_bg)
     END_LOOP
     RETURN
 EVT_END()
+/**
+ * Scrolls the background layers (ground, mountains) sideways every frame by speeds derived from the train speed
+ * GW(0), so the scenery flows past the train.
+ */
 #else
 static EVT_BEGIN(evt_bg)
     SET_FLOAT_VALUE(LW(10), FLOAT(0.0f))
@@ -1644,6 +1776,10 @@ static EVT_BEGIN(evt_bg)
 EVT_END()
 #endif
 
+/**
+ * Rotates the star objects (hosi_left, hosi_center,
+ * hosi_right and the _c copies) every frame by the train speed GW(0).
+ */
 static EVT_BEGIN(evt_hoshi)
     SET_FLOAT_VALUE(LW(10), FLOAT(0.0f))
     LOOP(0)
@@ -1674,6 +1810,10 @@ static EVT_BEGIN(evt_hoshi)
     RETURN
 EVT_END()
 
+/**
+ * Departure of the train outbound: clears the at-station flags, rings the bell,
+ * plays the engine sounds and ramps the wheel speeds GW(0) and GW(1) up to -15 (leftward).
+ */
 static EVT_BEGIN(hom_10_evt_resha_start)
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_RIVERSIDE), 0)
@@ -1772,6 +1912,10 @@ static EVT_BEGIN(hom_10_evt_resha_start)
     RETURN
 EVT_END()
 
+/**
+ * Departure of the train on the return trip: like hom_10_evt_resha_start
+ * but ramps the speeds up to +15 (rightward).
+ */
 static EVT_BEGIN(hom_10_evt_resha_start2)
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_RIVERSIDE), 0)
@@ -1876,6 +2020,7 @@ static EVT_BEGIN(hom_10_evt_resha_start2)
     RETURN
 EVT_END()
 
+/** Puts the train at full outbound speed at once: marks it moving and sets GW(0) and GW(1) to -15. */
 static EVT_BEGIN(hom_10_evt_resha_start3)
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(-15.0f))
@@ -1883,6 +2028,7 @@ static EVT_BEGIN(hom_10_evt_resha_start3)
     RETURN
 EVT_END()
 
+/** Puts the train at full return speed at once: marks it moving and sets GW(0) and GW(1) to +15. */
 static EVT_BEGIN(hom_10_evt_resha_start4)
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(15.0f))
@@ -1890,6 +2036,10 @@ static EVT_BEGIN(hom_10_evt_resha_start4)
     RETURN
 EVT_END()
 
+/**
+ * Arrival braking of the outbound train: plays the stop sounds and slows the wheel speeds to 0,
+ * then clears GSWF_TRAIN_MOVING.
+ */
 static EVT_BEGIN(stop_1)
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
@@ -1924,6 +2074,7 @@ static EVT_BEGIN(stop_1)
     RETURN
 EVT_END()
 
+/** Arrival braking of the return-trip train: like stop_1 with the return-trip sound variants. */
 static EVT_BEGIN(stop_2)
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
@@ -1958,6 +2109,7 @@ static EVT_BEGIN(stop_2)
     RETURN
 EVT_END()
 
+/** Stops the train: runs stop_1 or stop_2 depending on the trip direction (GSWF_TRAIN_RETURN_TRIP). */
 static EVT_BEGIN(hom_10_evt_resha_stop)
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("pik_00"))
@@ -1978,6 +2130,7 @@ static EVT_BEGIN(hom_10_evt_resha_stop)
     RETURN
 EVT_END()
 
+/** Keeps the lamp objects (ranpu, ranpu_c) swinging every frame by the amount from ramp_r while the train is moving. */
 static EVT_BEGIN(evt_ramp)
     LOOP(0)
         CALL(ramp_r)
@@ -2005,6 +2158,11 @@ static const char* pika_tbl_rsh_06[] = {
     "pika_3", "pika_4", "pika_5", "pika_6", NULL,
 };
 
+/**
+ * Common start of the train-exterior scenes: marks the train as not moving,
+ * zeroes the wheel speeds and spawns the wheel, rod,
+ * background and star scripts (plus lamp and sparks on the maps that have them).
+ */
 static EVT_BEGIN(hom_10_evt_resha_sub)
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 0)
     SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
@@ -2048,6 +2206,10 @@ static EVT_BEGIN(hom_10_evt_resha_sub)
     RETURN
 EVT_END()
 
+/**
+ * Train facing right: runs hom_10_evt_resha_sub and, outside rsh_06_a,
+ * hides the rear cars (train_7, train_8) and their couplings.
+ */
 static EVT_BEGIN(hom_10_evt_resha_right)
     CALL_CHILD(hom_10_evt_resha_sub)
     CALL(evt_sub_get_mapname, LW(0))
@@ -2060,6 +2222,7 @@ static EVT_BEGIN(hom_10_evt_resha_right)
     RETURN
 EVT_END()
 
+/** Train facing left: runs hom_10_evt_resha_sub and hides the front cars (train_1, train_6) and their couplings. */
 static EVT_BEGIN(hom_10_evt_resha_left)
     CALL_CHILD(hom_10_evt_resha_sub)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("train_1"), 1)
@@ -2069,6 +2232,11 @@ static EVT_BEGIN(hom_10_evt_resha_left)
     RETURN
 EVT_END()
 
+/**
+ * Copy of the hom_10 init event (the outside view of the train at the start of the second trip) that this module
+ * does not use: the train drives past a fixed camera for about 4 seconds,
+ * then the map changes to rsh_02_a (entrance nidome).
+ */
 static EVT_BEGIN(hom_10_init_evt)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_RSH2"))
@@ -2109,6 +2277,12 @@ static EVT_BEGIN(hom_10_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Starts the train-exterior effects of the roof map using the train scripts shared with hom_10
+ * (hom_10_evt_resha_right: wheels, clanking, train cars shown or hidden),
+ * marks the train as moving (GSWF_TRAIN_MOVING, JP and later) and sets the wheel rotation speeds GW(0)
+ * and GW(1) to -15.
+ */
 EVT_BEGIN(evt_resha_init)
     CALL_CHILD(hom_10_evt_resha_right)
 #if VERSION >= VERSION_JP
@@ -2140,6 +2314,10 @@ static BeroEntry bero_data_a[] = {
     {0},
 };
 
+/**
+ * Sets up the roof boss: registers the Smorg and passenger NPC models, the giant Smorg model (base),
+ * the swarm effect for 700 sprites and the voice sound, turns the swarm on and runs the Great Moamoa cutscene.
+ */
 static EVT_BEGIN(evt_moamoa_init)
     CALL(evt_npc_entry, STRING("moa_a"), STRING("c_n_moa_a"))
     CALL(evt_npc_entry, STRING("moa_b"), STRING("c_n_moa_b"))
@@ -2186,6 +2364,13 @@ static EVT_BEGIN(evt_moamoa_init)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene and boss fight with the Great Moamoa (giant Smorg) on the roof of the train:
+ * the swarm gathers and merges (evt_moamoa_fusion) into a giant body with the passengers' faces (kinds),
+ * the camera sweeps over it, Mario and the partner react (stg6_rsh_244 to 246),
+ * the battle starts with the "base" NPC and, after the fight, the Smorg falls apart (evt_moamoa_blow),
+ * the story advances to STORY_STG6_48_SMORG_MIASMA and the map changes to rsh_01_a.
+ */
 EVT_BEGIN(evt_great_moamoa)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -2371,6 +2556,11 @@ const char* pose_name[] = {
     "S_3",
 };
 
+/**
+ * Debug leftover run when map events are skipped (GLOBAL_FLAG_SKIP_MAP_EVENTS):
+ * spawns all the Smorg models, the swarm and the pre-merged giant body
+ * so it can be inspected without the cutscene.
+ */
 EVT_BEGIN(moamoa_debug)
     CALL(evt_npc_entry, STRING("moa_a"), STRING("c_n_moa_a"))
     CALL(evt_npc_entry, STRING("moa_b"), STRING("c_n_moa_b"))
@@ -2431,6 +2621,10 @@ EVT_BEGIN(moamoa_debug)
     RETURN
 EVT_END()
 
+/**
+ * Shared map init for rsh_06 on the first trip:
+ * starts the train-exterior scene and the music and ambience for the story stage.
+ */
 EVT_BEGIN(rsh_06_init_evt)
     CALL_CHILD(evt_resha_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -2461,6 +2655,11 @@ EVT_BEGIN(rsh_06_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Init script of rsh_06_a (first trip): places Mario at (-500, 250, 0) on the roof,
+ * sets the door back to rsh_05, runs the shared init and, before STORY_STG6_48_SMORG_MIASMA,
+ * sets up the swarm and the Great Moamoa scenes (or the debug scene when map events are skipped).
+ */
 EVT_BEGIN(rsh_06_a_init_evt)
     CALL(evt_mario_set_pos, -500, 250, 0)
     SET_VALUE(LW(0), PTR(bero_data_a))
@@ -2478,6 +2677,10 @@ EVT_BEGIN(rsh_06_a_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Shared map init for rsh_06 on the second visit:
+ * train-exterior scene plus the music for the station the train has reached.
+ */
 EVT_BEGIN(rsh_06_init_evt_nidome)
     CALL_CHILD(evt_resha_init)
     IF_INT_EQUAL(GSWF(GSWF_TRAIN_ARRIVED_POSHLEY), 1)
@@ -2501,6 +2704,7 @@ EVT_BEGIN(rsh_06_init_evt_nidome)
     RETURN
 EVT_END()
 
+/** Init script of rsh_06_a on the second visit: door back to rsh_05 plus rsh_06_init_evt_nidome. */
 EVT_BEGIN(rsh_06_a_init_evt_nidome)
     SET_VALUE(LW(0), PTR(bero_data_a))
     CALL(evt_bero_get_info)
@@ -2509,6 +2713,11 @@ EVT_BEGIN(rsh_06_a_init_evt_nidome)
     RETURN
 EVT_END()
 
+/**
+ * Script helper used by evt_ramp: writes into LW(10) a swaying angle,
+ * 1.8 times the absolute value of GW(0) times sin(retraceCount / 15),
+ * which the script applies to the lamp objects (ranpu, ranpu_c) so they swing with the train.
+ */
 static s32 ramp_r(EventEntry* event, BOOL isFirstCall) {
     f32 amp = __fabsf(evtGetFloat(event, GW(0)));
     f32 wave = sin(gp->retraceCount / 15.0f);
@@ -2516,9 +2725,14 @@ static s32 ramp_r(EventEntry* event, BOOL isFirstCall) {
     evtSetFloat(event, LW(10), 1.8f * amp * wave);
     return EVT_RETURN_DONE;
 }
+/**
+ * Guess: TEV callback of the train map objects (installed with evt_map_set_tevcallback);
+ * adds the environment TEV stage number 7 (envAddTev).
+ */
 static void resha_tev(MapTevCallbackInfo* info) {
     envAddTev(7, info);
 }
+/** Script helper: blocks until the base NPC's (the Great Moamoa model) current animation has played through once. */
 static s32 npc_anim_wait(EventEntry* event, BOOL isFirstCall) {
     NpcEntry* npc = npcNameToPtr((char*)"base");
 

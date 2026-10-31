@@ -46,6 +46,11 @@ static HitDamageReturn hitDmgRetPoints[] = {
     {0},
 };
 
+/**
+ * Map init script of tik_20, a side room off tik_15.
+ * Sets up fall recovery, the water animation, a moving floor,
+ * the Defend Plus badge and three Shine Sprite power blocks.
+ */
 EVT_BEGIN(tik_20_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK7"))

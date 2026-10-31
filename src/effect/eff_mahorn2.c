@@ -20,6 +20,10 @@ static void effMahorn2Disp(CameraId cameraId, EffectEntry* effect);
 
 #define TWO_PI 6.283184f
 
+/**
+ * Spawns the Wizzerd attack effect travelling from (posX, posY, posZ) toward the destination,
+ * spread over `radius`; called by the Wizzerd battle units (jon and las: mahorn, super_mahorn).
+ */
 EffectEntry* effMahorn2Entry(BOOL unused, f32 posX, f32 posY, f32 posZ, f32 dstX, f32 dstY, f32 dstZ, f32 scale, f32 radius) {
     EffectEntry* effect;
     effMahorn2Data* data;
@@ -107,6 +111,10 @@ EffectEntry* effMahorn2Entry(BOOL unused, f32 posX, f32 posY, f32 posZ, f32 dstX
     return effect;
 }
 
+/**
+ * Per frame: moves the effect elements along the path to the destination,
+ * updates their scale and alpha and deletes the effect once every element has finished.
+ */
 static void effMahorn2Main(EffectEntry* effect) {
     effMahorn2Data* data = effect->userdata;
     Vec position;
@@ -179,6 +187,7 @@ static void effMahorn2Main(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effMahorn2Disp, effect);
 }
 
+/** Draws the travelling elements as textured quads (effect textures 0x8F and 0x90). */
 static void effMahorn2Disp(CameraId cameraId, EffectEntry* effect) {
     effMahorn2Data* data = effect->userdata;
     Mtx mtx;

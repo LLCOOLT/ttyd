@@ -27,6 +27,11 @@ extern EvtWord peach_evt_yuge[];
 extern EvtWord peach_evt_syawa_main[];
 extern EvtWord peach_evt_syawa_init[];
 
+/**
+ * Door close animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times -0.22167969;
+ * the open and close scripts apply the same transform.
+ */
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
     CALL(evt_mapobj_trans, 0, STRING("S_door1_1"), 0, 0, LW(0))
@@ -35,6 +40,11 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door open animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times -0.22167969;
+ * the open and close scripts apply the same transform.
+ */
 static EVT_BEGIN(e_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
     CALL(evt_mapobj_trans, 0, STRING("S_door1_1"), 0, 0, LW(0))
@@ -65,6 +75,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Puffs steam (the kemuri_test effect) at random spots above the bath every 0.7 seconds, forever,
+ * while Peach is bathing.
+ */
 EVT_BEGIN(peach_evt_yuge)
     LOOP(0)
         CALL(evt_sub_random, 38, LW(0))
@@ -79,6 +93,7 @@ EVT_BEGIN(peach_evt_yuge)
     RETURN
 EVT_END()
 
+/** Script function: sets Mario's (Peach's) position directly to the x, y and z floats in args[0] to args[2]. */
 static USER_FUNC(peach_set_pos) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
@@ -90,6 +105,13 @@ static USER_FUNC(peach_set_pos) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Peach's shower scene (case script on the bath A_furo):
+ * she steps to the tub (peach_aji_35, or peach_aji_35_1 on a repeat visit), hangs up her clothes,
+ * showers humming (SFX_PEACH_SHOWER1, SFX_VOICE_PEACH_HAMMING1 to 3) amid steam, says peach_aji_36 and 37,
+ * changes clothes (SFX_PEACH_CHANGE_CLOTH1, evt_peach_set_condition 1) and leaves;
+ * GSWF_AJI15_PEACH_SHOWER_TAKEN records that she has showered.
+ */
 EVT_BEGIN(peach_evt_syawa_main)
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(30))
     CALL(evt_snd_envoff, PSND_FADE_HOLD)
@@ -334,6 +356,13 @@ EVT_BEGIN(peach_evt_syawa_main)
     RETURN
 EVT_END()
 
+/**
+ * Shower room set-up: hides Peach's dress (p_fuku) and the towel,
+ * flattens the shower stream and starts its animation.
+ * If the player is Peach it removes the partner,
+ * plays the towel animation and attaches peach_evt_syawa_main to the bath hit area A_furo;
+ * for Mario's visit it stops after the set-up.
+ */
 EVT_BEGIN(peach_evt_syawa_init)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("p_fuku"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("taoru"), MAPOBJ_FLAG_HIDE)
@@ -352,6 +381,12 @@ EVT_BEGIN(peach_evt_syawa_init)
     RETURN
 EVT_END()
 
+/**
+ * Init script of aji_15, the shower room: sets up the exits,
+ * removes the elite grunt 軍団ザコエリート once Lord Crump is beaten (and during Peach's visit),
+ * plays BGM_EVT_PEACH1 with the ambience off, runs the shower room set-up (peach_evt_syawa_init)
+ * and records the first entry in GSWF_AJI15_PEACH1_SHOWER_ROOM_ENTERED.
+ */
 EVT_BEGIN(aji_15_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -380,6 +415,10 @@ EVT_BEGIN(aji_15_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script function: returns in args[0] whether Peach already has her
+ * after-shower state (peachFlags bit 0x10 set) as 1 or 0.
+ */
 static USER_FUNC(peach_chk_aftershower) {
     EvtWord* args = event->args;
 

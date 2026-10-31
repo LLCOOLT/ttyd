@@ -249,6 +249,11 @@ static BattleWeapon weapon_togezo_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init script of the Spiny: registers its wait,
+ * attack and damage scripts (confused, it runs the normal attack script),
+ * clears unit work 0 (not curled up) and 3, sets its run, walk and jump sounds and starts the wait script.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -263,6 +268,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Run when an attack is stopped by the Spiny's spikes (data events 37 and 39, from above or in front):
+ * after half a second it flashes toge_flush on its back, placed higher when it is Huge and lower when Tiny.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -283,6 +292,7 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_event)
     RETURN
 EVT_END()
 
+/** Damage reaction of the Spiny: the default damage script. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -290,6 +300,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Flip-over reaction (data event 13): switches to the flipped defence, defence-attribute, status-resistance,
+ * pose and data tables, sets the flipped status flag and an overturn count of 1,
+ * turns its top and front spikes off, plays SFX_CONDITION_INSIDE and bounces twice.
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -311,6 +326,10 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Run instead of an attack while flipped: counts the overturn count down and, when it reaches 0,
+ * restores the normal tables and its top and front spikes and hops upright.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -337,6 +356,11 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the Spiny: while flipped it tries to get up instead.
+ * It may use an item; if it is curled up (unit work 0 is 1) it uncurls.
+ * Otherwise it rolls at a target (normal_attack_event) or curls up to guard, 50/50.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -370,6 +394,12 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Spiny's rolling attack (weapon_togezo_attack):
+ * it flips into a spiked ball (TGZ_P_1), hops and rolls at the target.
+ * A hit applies the guard result and damage and it bounces back; a miss rolls it past and it slows to a stop.
+ * Then it uncurls and walks home, or (30% after a hit) rolls home and stays curled up in its guard state.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -593,6 +623,11 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Spiny curls into a ball to guard (SFX_ENM_TOGEZO_TURN1, TGZ_P_1):
+ * switches to the guard defence, defence-attribute, status-resistance, pose and data tables,
+ * clears PART_ATTR_SHELLED and sets unit work 0 to 1.
+ */
 static EVT_BEGIN(guard_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -620,6 +655,10 @@ static EVT_BEGIN(guard_event)
     RETURN
 EVT_END()
 
+/**
+ * The Spiny uncurls from its guard ball (SFX_ENM_TOGEZO_TURN2, TGZ_S_1):
+ * restores the normal tables, sets PART_ATTR_SHELLED again and clears unit work 0.
+ */
 static EVT_BEGIN(guard_cancel_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -646,6 +685,7 @@ static EVT_BEGIN(guard_cancel_event)
     RETURN
 EVT_END()
 
+/** Wait script of the Spiny: shows its idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

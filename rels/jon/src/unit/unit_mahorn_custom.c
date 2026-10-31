@@ -24,6 +24,7 @@
 #include "evt/evt_sub.h"
 
 double __fabs(double x);
+/** Absolute value of a double, wrapped so the compiler emits the same code as the original. */
 static inline double mahorn_fabs(double x) {
     return __fabs(x);
 }
@@ -551,6 +552,13 @@ static BattleUnitSetup entry_mahorn = {
     NULL, // itemDropTable
 };
 
+/**
+ * Attack script of the Dark Wizzerd. On a first strike it just punches. Its copies (unit work 4 set) do nothing.
+ * After an item check, if it is the only unit of its side left it splits into copies (bunsin_event);
+ * if it has copies it casts its single-target magic (or is flustered when confused with no target);
+ * otherwise it draws a spell: punch (30 in 120), single-target magic (60), and 10 each for magic on all enemies,
+ * size-up, defence-up, invisibility, dodgy and heal.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -652,6 +660,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Attack script of the Dark Wizzerd's copies: they do nothing but return to waiting. */
 static EVT_BEGIN(attack_event_bunsin)
     LABEL(99)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -692,6 +701,11 @@ static BattleDataEntry data_table_bunsin[] = {
     {0, NULL},
 };
 
+/**
+ * Init script of the Dark Wizzerd: registers its wait, attack, damage and confusion handlers,
+ * lifts its home position to y 20, sets up its four floating hands (hand_init) with their resting offsets,
+ * starts hand_ctrl_event to animate them, and clears unit work 4 (set on its copies) and unit work 6.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -713,6 +727,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Fades the unit in LW(0) out over 30 frames (all five body parts) and then hides all its parts.
+ * A unit id of -1 does nothing. Used when the Dark Wizzerd vanishes to make or remove copies.
+ */
 static EVT_BEGIN(alpha_down_event)
     IF_INT_EQUAL(LW(0), -1)
         RETURN
@@ -741,6 +759,10 @@ static EVT_BEGIN(alpha_down_event)
     RETURN
 EVT_END()
 
+/**
+ * Fades the unit in LW(0) back in over 30 frames (all five body parts) after showing its parts again;
+ * a unit id of -1 does nothing.
+ */
 static EVT_BEGIN(alpha_up_event)
     IF_INT_EQUAL(LW(0), -1)
         RETURN
@@ -773,6 +795,10 @@ static EVT_BEGIN(alpha_up_event)
     RETURN
 EVT_END()
 
+/**
+ * Background loop of the Dark Wizzerd, run for as long as it exists:
+ * each frame it moves the floating hands towards their targets (hand_ctrl).
+ */
 static EVT_BEGIN(hand_ctrl_event)
     LABEL(0)
     WAIT_FRAMES(1)
@@ -786,6 +812,12 @@ static EVT_BEGIN(hand_ctrl_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage script of the Dark Wizzerd.
+ * When the real Wizzerd is hit while copies exist it remembers that (unit work 5),
+ * and after the default damage handling all its copies vanish (mahorn_subset_bunsin_all_kill).
+ * When a copy is hit it disappears (bunsin_kill_event) before the damage is dealt.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -812,6 +844,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Removes all of the Dark Wizzerd's copies: waits for the current attack to finish,
+ * then has each of the up to four copies fade out and be removed (bunsin_kill_event),
+ * and waits until none remain.
+ */
 static EVT_BEGIN(mahorn_subset_bunsin_all_kill)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -839,6 +876,12 @@ static EVT_BEGIN(mahorn_subset_bunsin_all_kill)
     RETURN
 EVT_END()
 
+/**
+ * Defeat script of the Dark Wizzerd: it spins for 48 frames (SFX_BTL_ENEMY_DIE1_1),
+ * bursts into smoke with a star-point effect, stores its coins and experience,
+ * clears its statuses and makes all its copies vanish (mahorn_subset_bunsin_all_kill),
+ * then it is removed from the battle.
+ */
 static EVT_BEGIN(mahorn_subset_dead_event)
     CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 50)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -895,6 +938,11 @@ static EVT_BEGIN(mahorn_subset_dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Defeat script when the Dark Wizzerd is blown away (SFX_BTL_CLAUD_BREATH3):
+ * it spins off the stage, its coins and experience are stored,
+ * all its copies vanish and it is removed from the battle.
+ */
 static EVT_BEGIN(mahorn_subset_blow_dead_event)
     CALL(evt_snd_sfxon, STRING("SFX_BTL_CLAUD_BREATH3"), 0)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(0))
@@ -919,6 +967,10 @@ static EVT_BEGIN(mahorn_subset_blow_dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Called when an attack on the Dark Wizzerd misses.
+ * If the unit is a copy (unit work 4 set) it disappears (bunsin_kill_event).
+ */
 static EVT_BEGIN(avoid_miss_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -928,6 +980,10 @@ static EVT_BEGIN(avoid_miss_event)
     RETURN
 EVT_END()
 
+/**
+ * Removes the copy in LW(0) (-2 for itself): marks it (unit work 6), fades it out,
+ * waits for its current attack to end and removes it from the battle.
+ */
 static EVT_BEGIN(bunsin_kill_event)
     CALL(btlevtcmd_GetUnitId, LW(0), LW(0))
     IF_INT_EQUAL(LW(0), -1)
@@ -945,6 +1001,12 @@ static EVT_BEGIN(bunsin_kill_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Wizzerd's punch flurry: it moves next to the target (35 units to the side), spreads its four hands,
+ * which blur (SFX_ENM_MAHO_ATTACK2), and has them dart to random spots around the target for 25 rounds,
+ * then pulls them back. The target is checked and takes the damage. It then returns home.
+ * After a first strike it uses the first-strike target.
+ */
 static EVT_BEGIN(attack_punch_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -1066,6 +1128,10 @@ static EVT_BEGIN(attack_punch_event)
         RETURN
 EVT_END()
 
+/**
+ * Plays the avoid reaction on the target in LW(3) (animation 38, 39 or 40) according to the pre-damage result in
+ * LW(5): 3, 6 or 2.
+ */
 static EVT_BEGIN(start_avoid)
     IF_INT_EQUAL(LW(5), 3)
         CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -1079,6 +1145,13 @@ static EVT_BEGIN(start_avoid)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Wizzerd's single-target spell: it and its copies (found by mahorn_get_bunsin) all charge up
+ * (SFX_ENM_MAHO_CHARGE1, attack_enemy_common_event_sub1) and cast (SFX_ENM_MAHO_MAGIC2);
+ * the copies' orbs fly past the target to the edge of the stage (attack_enemy_common_event_sub_no_hit)
+ * while the real one's orb flies to the target (attack_enemy_common_event_sub_hit).
+ * The target gets its avoid reaction when the orb reaches it, and takes the damage.
+ */
 static EVT_BEGIN(attack_enemy_common_event)
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
@@ -1189,6 +1262,11 @@ static EVT_BEGIN(attack_enemy_common_event)
         RETURN
 EVT_END()
 
+/**
+ * The Dark Wizzerd's spell on all enemies: it charges up (SFX_ENM_MAHO_CHARGE1, attack_enemy_common_event_sub1),
+ * casts (attack_enemy_common_event_sub2) and then a "thunder_n64" bolt strikes each target in turn,
+ * damaging them (the defence action command result is taken once, at the first target).
+ */
 static EVT_BEGIN(attack_enemy_all_common_event)
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
@@ -1252,6 +1330,11 @@ static EVT_BEGIN(attack_enemy_all_common_event)
         RETURN
 EVT_END()
 
+/**
+ * Charge-up of the Dark Wizzerd in LW(15) (-2 for itself):
+ * it stops its wait script, an "akari_charge_n64" glow appears over it,
+ * it takes the MAH_A_4 pose and raises its four hands (MAH_S_5A), then waits 50 frames.
+ */
 static EVT_BEGIN(attack_enemy_common_event_sub1)
     IF_INT_EQUAL(LW(15), -1)
         RETURN
@@ -1273,6 +1356,11 @@ static EVT_BEGIN(attack_enemy_common_event_sub1)
     RETURN
 EVT_END()
 
+/**
+ * Casting gesture of the Dark Wizzerd in LW(15) (-2 for itself):
+ * in pose MAH_A_1 its four hands sweep to and fro in turn, 20 units each way, offset by 7,
+ * 10 and 15 frames from each other, before a 55-frame pause.
+ */
 static EVT_BEGIN(attack_enemy_common_event_sub2)
     IF_INT_EQUAL(LW(15), -1)
         RETURN
@@ -1350,6 +1438,11 @@ static EVT_BEGIN(attack_enemy_common_event_sub2)
     RETURN
 EVT_END()
 
+/**
+ * A copy's spell: the Dark Wizzerd in LW(15) sends its magic orb (eff_magic, 40 frames) to the far edge of the
+ * stage and does the casting gesture (attack_enemy_common_event_sub2) with SFX_ENM_MAHO_MAGIC1 and MAGIC3,
+ * so it looks like a real attack.
+ */
 static EVT_BEGIN(attack_enemy_common_event_sub_no_hit)
     IF_INT_EQUAL(LW(15), -1)
         RETURN
@@ -1370,6 +1463,10 @@ static EVT_BEGIN(attack_enemy_common_event_sub_no_hit)
     RETURN
 EVT_END()
 
+/**
+ * The real spell: the Dark Wizzerd in LW(15) sends its magic orb (eff_magic, 20 frames) at the target's hit
+ * position and does the casting gesture (attack_enemy_common_event_sub2) with SFX_ENM_MAHO_MAGIC1 and MAGIC3.
+ */
 static EVT_BEGIN(attack_enemy_common_event_sub_hit)
     IF_INT_EQUAL(LW(15), -1)
         RETURN
@@ -1386,6 +1483,12 @@ static EVT_BEGIN(attack_enemy_common_event_sub_hit)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Wizzerd's single-target magic attack:
+ * picks a target (the first-strike target on a first strike),
+ * casts the spell (attack_enemy_common_event) and resets its facing.
+ * When confused with no target it is flustered.
+ */
 static EVT_BEGIN(attack_magic_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -1409,6 +1512,11 @@ static EVT_BEGIN(attack_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Wizzerd's confusion spell: picks a target,
+ * casts the single-target spell (attack_enemy_common_event) with the confuse weapon in LW(9) (50 percent chance,
+ * 3 turns) and resets its facing. When confused with no target it is flustered.
+ */
 static EVT_BEGIN(confuse_magic_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -1427,6 +1535,11 @@ static EVT_BEGIN(confuse_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Wizzerd's magic attack on all enemies:
+ * picks the targets, casts the area spell (attack_enemy_all_common_event) and resets its facing.
+ * When confused with no target it is flustered.
+ */
 static EVT_BEGIN(all_attack_magic_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -1445,6 +1558,11 @@ static EVT_BEGIN(all_attack_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * Support spell animation of the Dark Wizzerd: it charges up (SFX_ENM_MAHO_CHARGE1, "akari_charge_n64" glow,
+ * hands raised), casts (MAH_A_2A, SFX_ENM_MAHO_MAGIC4) and sparkles with the "mahorn" effect first over itself
+ * and then over the target in LW(3).
+ */
 static EVT_BEGIN(support_friend_common_event)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
@@ -1485,6 +1603,10 @@ static EVT_BEGIN(support_friend_common_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Wizzerd's size-up spell: it casts the support spell (support_friend_common_event) on itself
+ * and grows for 3 turns (the weapon's size change, strength 2).
+ */
 static EVT_BEGIN(dekadeka_magic_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -1503,6 +1625,10 @@ static EVT_BEGIN(dekadeka_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Wizzerd's defence-up spell: it casts the support spell (support_friend_common_event) on itself
+ * and its defence rises by 3 for 3 turns.
+ */
 static EVT_BEGIN(katikati_magic_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -1521,6 +1647,10 @@ static EVT_BEGIN(katikati_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Wizzerd's invisibility spell: it casts the support spell (support_friend_common_event) on itself
+ * and turns invisible for 3 turns.
+ */
 static EVT_BEGIN(trans_magic_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -1539,6 +1669,10 @@ static EVT_BEGIN(trans_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Wizzerd's dodgy spell: it casts the support spell (support_friend_common_event) on itself
+ * and becomes dodgy for 3 turns.
+ */
 static EVT_BEGIN(yokeyoke_magic_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -1557,6 +1691,10 @@ static EVT_BEGIN(yokeyoke_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Wizzerd's heal: it casts the support spell (support_friend_common_event) on itself
+ * and recovers 6 HP with the "recovery" effect.
+ */
 static EVT_BEGIN(recover_magic_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -1578,6 +1716,13 @@ static EVT_BEGIN(recover_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Wizzerd makes copies of itself: it casts the support animation,
+ * fades out (SFX_ENM_MAHO_OFFSHOOT1) and spawns up to four copies in free spots to its right and
+ * then its left (spawn_event).
+ * The real one and the copies are then shuffled (mahorn_shuffle) so the player cannot tell which is which,
+ * and all of them fade back in (SFX_ENM_MAHO_OFFSHOOT2).
+ */
 static EVT_BEGIN(bunsin_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -1631,6 +1776,12 @@ static EVT_BEGIN(bunsin_event)
     RETURN
 EVT_END()
 
+/**
+ * Spawns one copy of the Dark Wizzerd at the free spot in LW(0..2):
+ * an invisible Wizzerd unit that copies the real one's HP and status (mahorn_copy_status),
+ * is marked as a copy in unit work 4, gets the copy attack script and the copy status vulnerabilities,
+ * and is placed at that spot as its home position.
+ */
 static EVT_BEGIN(spawn_event)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_mahorn), 0)
     CALL(btlevtcmd_SetAlpha, LW(3), 1, 0)
@@ -1653,6 +1804,11 @@ static EVT_BEGIN(spawn_event)
     RETURN
 EVT_END()
 
+/**
+ * Wait script of the Dark Wizzerd: unless it is a plain copy (unit work 4 set) its copies also play their idle
+ * pose, and each of the four hands bobs between two positions and poses at random intervals of 15 to 29 frames.
+ * Under statuses 1, 2 or 9 the hands hold still (MAH_Z_2).
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -1780,6 +1936,10 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0] = unit; returns in args[1] the x position of the magic effect's type-3 particle (the
+ * moving orb), or 0 if none exists.
+ */
 static USER_FUNC(eff_magic_get_posX) {
     EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, *args++));
@@ -1800,6 +1960,11 @@ static USER_FUNC(eff_magic_get_posX) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] = unit, args[1..3] = target x, y, z, args[4] = travel time in frames.
+ * Starts the Wizzerd's magic effect from its wand towards the target and stores it in work[7];
+ * the speed is derived from the distance and time.
+ */
 static USER_FUNC(eff_magic) {
     EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
@@ -1820,6 +1985,11 @@ static USER_FUNC(eff_magic) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] = source unit, args[1] = destination unit.
+ * Copies the HP and status block from the real unit to a copy (or back), and resets the HP gauge,
+ * so the copies share damage and ailments.
+ */
 static USER_FUNC(mahorn_copy_status) {
     EvtWord* args = event->args;
     s32 id1 = evtGetValue(event, args[0]);
@@ -1836,6 +2006,10 @@ static USER_FUNC(mahorn_copy_status) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: shuffles the real Wizzerd and its copies (kinds 0x80/0x81 and 0xA9/0xAA) by swapping their x
+ * and z positions ten times at random, so the player cannot tell which is the real one.
+ */
 static USER_FUNC(mahorn_shuffle) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* kamecs[6];
@@ -1872,6 +2046,10 @@ static USER_FUNC(mahorn_shuffle) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: finds the Wizzerd's copies on the field (kinds 0x81 and 0xAA)
+ * and returns up to four of their unit indices in args[0..3] (-1 for none) and the count in args[4].
+ */
 static USER_FUNC(mahorn_get_bunsin) {
     EvtWord* args = event->args;
     s32 copies[4];
@@ -1899,6 +2077,11 @@ static USER_FUNC(mahorn_get_bunsin) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] = unit, args[1] = hand (2-5), args[2..4] = x, y, z.
+ * Sets the target offset of one floating hand, mirrored in x and scaled by 1.25 or 0.75 when the Wizzerd is big
+ * or small.
+ */
 static USER_FUNC(set_hand_dest) {
     s32 hand;
     BattleUnit* unit;
@@ -1937,6 +2120,11 @@ static USER_FUNC(set_hand_dest) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Per-frame script helper: args[0] = unit.
+ * Eases each of the four floating hand parts (2-5) a tenth of the way towards the destination set by
+ * set_hand_dest; does nothing while the Wizzerd is under certain statuses (ids 1, 2 and 9).
+ */
 static USER_FUNC(hand_ctrl) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1985,6 +2173,7 @@ static USER_FUNC(hand_ctrl) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: args[0] = unit. Frees the four hand destination blocks held in work[0..3]. */
 static USER_FUNC(hand_end) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -2002,6 +2191,11 @@ static USER_FUNC(hand_end) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] = unit.
+ * Gives each of the four hand parts (2-5) the idle animation MAH_Z_2
+ * and a zeroed destination block (work[0..3]).
+ */
 static USER_FUNC(hand_init) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -2026,6 +2220,7 @@ static USER_FUNC(hand_init) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: returns in args[0] how many units of alliance 1 are on the field and not knocked out. */
 static USER_FUNC(mahorn_get_live_num) {
     s32 i;
     EvtWord* args = event->args;

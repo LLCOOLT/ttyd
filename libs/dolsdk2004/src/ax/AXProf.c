@@ -8,6 +8,10 @@ static u32 __AXMaxProfiles;
 static u32 __AXCurrentProfile;
 static u32 __AXProfileInitialized;
 
+/**
+ * Returns the next slot of the profile ring buffer registered with AXInitProfile (advancing and wrapping the
+ * index), or NULL if profiling was not set up.
+ */
 AXPROFILE* __AXGetCurrentProfile(void) {
     AXPROFILE* profile;
 
@@ -21,6 +25,7 @@ AXPROFILE* __AXGetCurrentProfile(void) {
     return 0;
 }
 
+/** Gives AX an array of maxProfiles profile records to fill, one per audio frame, and starts profiling. */
 void AXInitProfile(AXPROFILE* profile, u32 maxProfiles) {
     ASSERTLINE(60, profile);
     ASSERTLINE(61, maxProfiles);
@@ -31,6 +36,10 @@ void AXInitProfile(AXPROFILE* profile, u32 maxProfiles) {
     __AXProfileInitialized = 1;
 }
 
+/**
+ * Returns how many profile records were filled since the last call (minus one when any)
+ * and restarts the ring from slot 0.
+ */
 u32 AXGetProfile(void) {
     BOOL old;
     u32 n;

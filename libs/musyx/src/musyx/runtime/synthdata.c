@@ -21,6 +21,8 @@ static u16 dataMacTotal;
 static FX_GROUP dataFXGroups[128];
 static u16 dataFXGroupNum;
 
+/** Adds keymap cid to the sorted keymap table (up to 256 entries) with a reference count of 1. If it is already present
+ * only the reference count goes up. Returns 1 only when a new entry was created. */
 bool dataInsertKeymap(u16 cid, void* keymapdata) {
   long i; // r31
   long j; // r29
@@ -63,6 +65,8 @@ bool dataInsertKeymap(u16 cid, void* keymapdata) {
   return 1;
 }
 
+/** Drops one reference to keymap sid and removes it from the table when the count reaches 0. Returns 1 if the entry was
+ * removed. */
 bool dataRemoveKeymap(u16 sid) {
   long i; // r31
   long j; // r30
@@ -85,6 +89,8 @@ bool dataRemoveKeymap(u16 sid) {
   return 0;
 }
 
+/** Adds layer cid (an array of size entries) to the sorted layer table (up to 256 entries) with a reference count of 1,
+ * or just raises the count if present. Returns 1 only when a new entry was created. */
 bool dataInsertLayer(u16 cid, void* layerdata, u16 size) {
   long i; // r31
   long j; // r29
@@ -133,6 +139,7 @@ bool dataInsertLayer(u16 cid, void* layerdata, u16 size) {
   return 1;
 }
 
+/** Drops one reference to layer sid and removes it when the count reaches 0. Returns 1 if the entry was removed. */
 bool dataRemoveLayer(u16 sid) {
   long i; // r31
   long j; // r30
@@ -155,6 +162,8 @@ bool dataRemoveLayer(u16 sid) {
   return 0;
 }
 
+/** Adds curve cid to the sorted curve table (up to 2048 entries) with a reference count of 1, or just raises the count
+ * if present. Returns 1 only when a new entry was created. */
 bool dataInsertCurve(u16 cid, void* curvedata) {
   long i; // r31
   long j; // r29
@@ -200,6 +209,7 @@ bool dataInsertCurve(u16 cid, void* curvedata) {
   return 1;
 }
 
+/** Drops one reference to curve sid and removes it when the count reaches 0. Returns 1 if the entry was removed. */
 bool dataRemoveCurve(u16 sid) {
   long i; // r31
   long j; // r30
@@ -222,6 +232,9 @@ bool dataRemoveCurve(u16 sid) {
   return 0;
 }
 
+/** Registers a sample directory (the table of sample IDs of a group) with the base address of its sample data (up to
+ * 128 directories). Samples already known from another directory are marked, then all reference counts are cleared.
+ * Returns 1 if the directory is registered, 0 if the table is full. */
 bool dataInsertSDir(SDIR_DATA* sdir, void* smp_data) {
   s32 i;        // r31
   SDIR_DATA* s; // r25
@@ -281,6 +294,8 @@ bool dataInsertSDir(SDIR_DATA* sdir, void* smp_data) {
   return 1;
 }
 
+/** Unregisters a sample directory if none of its samples is still referenced, giving back ownership of any shared
+ * sample IDs to earlier directories. Returns TRUE if it was removed. */
 bool dataRemoveSDir(struct SDIR_DATA* sdir) {
   long i;          // r28
   long j;          // r30
@@ -443,6 +458,8 @@ bool dataRemoveSampleReference(u16 sid
   return FALSE;
 }
 
+/** Registers the sound effect table of group gid (fxNum entries; each is put into volume group 31). Registering the
+ * same group again only raises its count. Returns TRUE when the group was newly added. */
 bool dataInsertFX(u16 gid, struct FX_TAB* fx, u16 fxNum) {
   long i; // r31
 
@@ -476,6 +493,8 @@ bool dataInsertFX(u16 gid, struct FX_TAB* fx, u16 fxNum) {
   return FALSE;
 }
 
+/** Drops one reference to the sound effect group gid and removes it when the count reaches 0. Returns TRUE if the group
+ * was found. */
 bool dataRemoveFX(u16 gid) {
   long i; // r31
   long j; // r30
@@ -503,6 +522,9 @@ bool dataRemoveFX(u16 gid) {
   return FALSE;
 }
 
+/** Registers macro mid (a pointer to its first command): macros are kept in 512 buckets by mid >> 6, each a sorted run
+ * in one shared array of 2048 entries. An existing macro only gets its reference count raised. Returns TRUE when a new
+ * entry was created. */
 bool dataInsertMacro(u16 mid, void* macroaddr) {
   long main; // r28
   long pos;  // r29
@@ -563,6 +585,8 @@ bool dataInsertMacro(u16 mid, void* macroaddr) {
   return FALSE;
 }
 
+/** Drops one reference to macro mid and removes it from its bucket when the count reaches 0 (the return value is always
+ * FALSE). */
 bool dataRemoveMacro(u16 mid) {
   s32 main; // r29
   s32 base; // r28
@@ -598,8 +622,10 @@ bool dataRemoveMacro(u16 mid) {
   return FALSE;
 }
 
+/** Comparison function for the macro table binary search: orders by macro ID. */
 static s32 maccmp(void* p1, void* p2) { return ((MAC_SUBTAB*)p1)->id - ((MAC_SUBTAB*)p2)->id; }
 
+/** Looks up macro mid and returns a pointer to its first command, or NULL if it is not loaded. */
 MSTEP* dataGetMacro(u16 mid) {
   static s32 base;
   static s32 main;
@@ -620,8 +646,11 @@ MSTEP* dataGetMacro(u16 mid) {
   return NULL;
 }
 
+/** Comparison function for the sample directory binary search: orders by sample ID. */
 static s32 smpcmp(void* p1, void* p2) { return ((SDIR_DATA*)p1)->id - ((SDIR_DATA*)p2)->id; }
 
+/** Looks up sample sid in the registered sample directories and fills in newsmp (address, loop, length, compression
+ * type, extra data). Returns 0 on success, -1 if the sample is not loaded. */
 s32 dataGetSample(u16 sid, SAMPLE_INFO* newsmp) {
   static SDIR_DATA key;
   static SDIR_DATA* result;
@@ -659,8 +688,10 @@ s32 dataGetSample(u16 sid, SAMPLE_INFO* newsmp) {
   return -1;
 }
 
+/** Comparison function for the curve and keymap table binary search: orders by ID. */
 static s32 curvecmp(void* p1, void* p2) { return ((DATA_TAB*)p1)->id - ((DATA_TAB*)p2)->id; }
 
+/** Looks up curve cid and returns its data, or NULL. */
 void* dataGetCurve(u16 cid) {
   static DATA_TAB key;
   static DATA_TAB* result;
@@ -673,6 +704,7 @@ void* dataGetCurve(u16 cid) {
   return NULL;
 }
 
+/** Looks up keymap cid and returns its data, or NULL. */
 void* dataGetKeymap(u16 cid) {
   static DATA_TAB key;
   static DATA_TAB* result;
@@ -685,8 +717,10 @@ void* dataGetKeymap(u16 cid) {
   return NULL;
 }
 
+/** Comparison function for the layer table binary search: orders by layer ID. */
 static s32 layercmp(void* p1, void* p2) { return ((LAYER_TAB*)p1)->id - ((LAYER_TAB*)p2)->id; }
 
+/** Looks up layer cid and returns its entry array, with the number of entries in *n, or NULL. */
 void* dataGetLayer(u16 cid, u16* n) {
   static LAYER_TAB key;
   static LAYER_TAB* result;
@@ -700,6 +734,7 @@ void* dataGetLayer(u16 cid, u16* n) {
   return NULL;
 }
 
+/** Comparison function for the sound effect table binary search: orders by effect ID. */
 static s32 fxcmp(void* p1, void* p2) { return ((FX_TAB*)p1)->id - ((FX_TAB*)p2)->id; }
 
 struct FX_TAB* dataGetFX(u16 fid) {
@@ -721,6 +756,8 @@ struct FX_TAB* dataGetFX(u16 fid) {
   return NULL;
 }
 
+/** Clears all data tables (samples, curves, keymaps, layers, effects, macros) and sets up ARAM sample memory at smpBase
+ * for smpLength bytes. */
 void dataInit(u32 smpBase, u32 smpLength) {
   long i; // r31
 
@@ -737,9 +774,12 @@ void dataInit(u32 smpBase, u32 smpLength) {
   hwInitSampleMem(smpBase, smpLength);
 }
 
+/** Shuts down ARAM sample memory. */
 void dataExit() { hwExitSampleMem(); }
 
 #if MUSY_TARGET == MUSY_PLATFORM_PC
+/** Used only when the sample directory was built for 32-bit pointers: copies each entry (ID, reference count, offset,
+ * address, header, extra data) into a pointer-width SDIR_DATA array, frees the original and returns the new array. */
 void* sndConvert32BitSDIRTo64BitSDIR(void* sdir_int) {
   SDIR_DATA_INTER* sdir_inter = sdir_int;
   SDIR_DATA* sdir = NULL;

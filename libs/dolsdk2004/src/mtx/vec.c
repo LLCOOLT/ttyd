@@ -2,6 +2,7 @@
 #include <dolphin.h>
 #include <dolphin/mtx.h>
 
+/** Adds two 3D vectors (C reference version). */
 void C_VECAdd(const Vec* a, const Vec* b, Vec* ab) {
     ASSERTMSGLINE(108, a, "VECAdd():  NULL VecPtr 'a' ");
     ASSERTMSGLINE(109, b, "VECAdd():  NULL VecPtr 'b' ");
@@ -11,6 +12,7 @@ void C_VECAdd(const Vec* a, const Vec* b, Vec* ab) {
     ab->z = a->z + b->z;
 }
 
+/** Adds two 3D vectors (paired-singles version). */
 asm void PSVECAdd(const register Vec* a, const register Vec* b, register Vec* ab) {
     psq_l f2, Vec.x(a), 0, 0
     psq_l f4, Vec.x(b), 0, 0
@@ -22,6 +24,7 @@ asm void PSVECAdd(const register Vec* a, const register Vec* b, register Vec* ab
     psq_st f7, Vec.z(ab), 1, 0
 }
 
+/** Subtracts one 3D vector from another (C reference version). */
 void C_VECSubtract(const Vec* a, const Vec* b, Vec* a_b) {
     ASSERTMSGLINE(177, a, "VECSubtract():  NULL VecPtr 'a' ");
     ASSERTMSGLINE(178, b, "VECSubtract():  NULL VecPtr 'b' ");
@@ -31,6 +34,7 @@ void C_VECSubtract(const Vec* a, const Vec* b, Vec* a_b) {
     a_b->z = a->z - b->z;
 }
 
+/** Subtracts one 3D vector from another (paired-singles version). */
 asm void PSVECSubtract(const register Vec* a, const register Vec* b, register Vec* a_b) {
     psq_l f2, Vec.x(a), 0, 0
     psq_l f4, Vec.x(b), 0, 0
@@ -42,6 +46,7 @@ asm void PSVECSubtract(const register Vec* a, const register Vec* b, register Ve
     psq_st f7, Vec.z(a_b), 1, 0
 }
 
+/** Multiplies a 3D vector by a scalar (C reference version). */
 void C_VECScale(const Vec* src, Vec* dst, f32 scale) {
     ASSERTMSGLINE(247, src, "VECScale():  NULL VecPtr 'src' ");
     ASSERTMSGLINE(248, dst, "VECScale():  NULL VecPtr 'dst' ");
@@ -50,6 +55,7 @@ void C_VECScale(const Vec* src, Vec* dst, f32 scale) {
     dst->z = (src->z * scale);
 }
 
+/** Multiplies a 3D vector by a scalar (paired-singles version). */
 void PSVECScale(const register Vec* src, register Vec* dst, register f32 scale) {
     register f32 vxy, vz, rxy, rz;
 
@@ -63,6 +69,7 @@ void PSVECScale(const register Vec* src, register Vec* dst, register f32 scale) 
     }
 }
 
+/** Scales a 3D vector to unit length; a zero vector divides by zero (C reference version). */
 void C_VECNormalize(const Vec* src, Vec* unit) {
     f32 mag;
 
@@ -78,6 +85,7 @@ void C_VECNormalize(const Vec* src, Vec* unit) {
     unit->z = src->z * mag;
 }
 
+/** Scales a 3D vector to unit length (paired-singles version). */
 void PSVECNormalize(const register Vec* src, register Vec* unit) {
     register float c_half = 0.5f;
     register float c_three = 3.0f;
@@ -108,6 +116,7 @@ void PSVECNormalize(const register Vec* src, register Vec* unit) {
     }
 }
 
+/** Returns the squared length of a 3D vector, avoiding the square root (C reference version). */
 f32 C_VECSquareMag(const Vec* v) {
     f32 sqmag;
 
@@ -117,6 +126,7 @@ f32 C_VECSquareMag(const Vec* v) {
     return sqmag;
 }
 
+/** Returns the squared length of a 3D vector (paired-singles version). */
 f32 PSVECSquareMag(const register Vec* v) {
     register f32 vxy, vzz, sqmag;
 
@@ -131,10 +141,12 @@ f32 PSVECSquareMag(const register Vec* v) {
     return sqmag;
 }
 
+/** Returns the length of a 3D vector (C reference version). */
 f32 C_VECMag(const Vec* v) {
     return sqrtf(C_VECSquareMag(v));
 }
 
+/** Returns the length of a 3D vector (paired-singles version). */
 f32 PSVECMag(const register Vec* v) {
     register f32 vxy, vzz;
     register f32 sqmag, rmag;
@@ -169,6 +181,7 @@ f32 PSVECMag(const register Vec* v) {
     return sqmag;
 }
 
+/** Returns the dot product of two 3D vectors (C reference version). */
 f32 C_VECDotProduct(const Vec* a, const Vec* b) {
     f32 dot;
 
@@ -178,6 +191,7 @@ f32 C_VECDotProduct(const Vec* a, const Vec* b) {
     return dot;
 }
 
+/** Returns the dot product of two 3D vectors (paired-singles version). */
 asm f32 PSVECDotProduct(const register Vec* a, const register Vec* b) {
     psq_l f2, Vec.y(a), 0, 0
     psq_l f3, Vec.y(b), 0, 0
@@ -188,6 +202,7 @@ asm f32 PSVECDotProduct(const register Vec* a, const register Vec* b) {
     ps_sum0 f1, f3, f2, f2
 }
 
+/** Computes the cross product of two 3D vectors (C reference version). */
 void C_VECCrossProduct(const Vec* a, const Vec* b, Vec* axb) {
     Vec vTmp;
 
@@ -203,6 +218,7 @@ void C_VECCrossProduct(const Vec* a, const Vec* b, Vec* axb) {
     axb->z = vTmp.z;
 }
 
+/** Computes the cross product of two 3D vectors (paired-singles version). */
 asm void PSVECCrossProduct(const register Vec* a, const register Vec* b, register Vec* axb) {
     psq_l f1, Vec.x(b), 0, 0
     lfs f2, Vec.z(a)
@@ -220,6 +236,10 @@ asm void PSVECCrossProduct(const register Vec* a, const register Vec* b, registe
     psq_st f10, Vec.y(axb), 0, 0
 }
 
+/**
+ * Negates both a and b, normalizes them and returns the normalized sum,
+ * the half-way vector for specular lighting; if the sum is zero it is returned as is.
+ */
 void C_VECHalfAngle(const Vec* a, const Vec* b, Vec* half) {
     Vec aTmp;
     Vec bTmp;
@@ -247,6 +267,10 @@ void C_VECHalfAngle(const Vec* a, const Vec* b, Vec* half) {
     *half = hTmp;
 }
 
+/**
+ * Reflects the incident vector src about normal (both normalized; src points toward the surface)
+ * and returns a unit-length result in dst.
+ */
 void C_VECReflect(const Vec* src, const Vec* normal, Vec* dst) {
     f32 cosA;
     Vec uI;
@@ -270,6 +294,7 @@ void C_VECReflect(const Vec* src, const Vec* normal, Vec* dst) {
     VECNormalize(dst, dst);
 }
 
+/** Returns the squared distance between two points (C reference version). */
 f32 C_VECSquareDistance(const Vec* a, const Vec* b) {
     Vec diff;
 
@@ -279,6 +304,7 @@ f32 C_VECSquareDistance(const Vec* a, const Vec* b) {
     return (diff.z * diff.z) + ((diff.x * diff.x) + (diff.y * diff.y));
 }
 
+/** Returns the squared distance between two points (paired-singles version). */
 f32 PSVECSquareDistance(const register Vec* a, const register Vec* b) {
     register f32 v0yz, v1yz, v0xy, v1xy, dyz, dxy;
     register f32 sqdist;
@@ -298,10 +324,12 @@ f32 PSVECSquareDistance(const register Vec* a, const register Vec* b) {
     return sqdist;
 }
 
+/** Returns the distance between two points (C reference version). */
 f32 C_VECDistance(const Vec* a, const Vec* b) {
     return sqrtf(C_VECSquareDistance(a, b));
 }
 
+/** Returns the distance between two points (paired-singles version). */
 f32 PSVECDistance(const register Vec* a, const register Vec* b) {
     register f32 v0yz, v1yz, v0xy, v1xy, dyz, dxy;
     register f32 sqdist, rdist;

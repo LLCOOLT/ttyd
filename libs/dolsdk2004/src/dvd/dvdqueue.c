@@ -11,6 +11,7 @@ static struct {
 // prototypes
 static DVDCommandBlock* PopWaitingQueuePrio(s32 prio);
 
+/** Makes all four priority queues of waiting command blocks empty (each list head points at itself). */
 void __DVDClearWaitingQueue(void) {
     u32 i;
     DVDCommandBlock* q;
@@ -22,6 +23,10 @@ void __DVDClearWaitingQueue(void) {
     }
 }
 
+/**
+ * Appends a command block to the tail of the waiting queue for priority prio (0 to 3), with interrupts off.
+ * Always returns 1.
+ */
 int __DVDPushWaitingQueue(s32 prio, DVDCommandBlock* block) {
     BOOL enabled = OSDisableInterrupts();
     DVDCommandBlock* q = (DVDCommandBlock*)&WaitingQueue[prio];
@@ -34,6 +39,7 @@ int __DVDPushWaitingQueue(s32 prio, DVDCommandBlock* block) {
     return 1;
 }
 
+/** Unlinks and returns the first command block of one priority queue, which must not be empty. */
 static DVDCommandBlock* PopWaitingQueuePrio(s32 prio) {
     DVDCommandBlock* tmp;
     BOOL enabled;
@@ -52,6 +58,7 @@ static DVDCommandBlock* PopWaitingQueuePrio(s32 prio) {
     return tmp;
 }
 
+/** Removes and returns the first waiting command block, highest priority first, or NULL if none. */
 DVDCommandBlock* __DVDPopWaitingQueue(void) {
     u32 i;
     BOOL enabled;
@@ -70,6 +77,7 @@ DVDCommandBlock* __DVDPopWaitingQueue(void) {
     return NULL;
 }
 
+/** Returns whether any command block is waiting. */
 int __DVDCheckWaitingQueue(void) {
     u32 i;
     BOOL enabled;
@@ -88,6 +96,10 @@ int __DVDCheckWaitingQueue(void) {
     return 0;
 }
 
+/**
+ * Unlinks a command block from the queue it is waiting in.
+ * Returns 0 if the block is not linked into a queue, 1 otherwise.
+ */
 int __DVDDequeueWaitingQueue(DVDCommandBlock* block) {
     BOOL enabled;
     DVDCommandBlock* prev;
@@ -106,6 +118,7 @@ int __DVDDequeueWaitingQueue(DVDCommandBlock* block) {
     return 1;
 }
 
+/** Returns whether a given command block is waiting in a queue. */
 int __DVDIsBlockInWaitingQueue(DVDCommandBlock* block) {
     u32 i;
     DVDCommandBlock* start;
@@ -146,6 +159,11 @@ static char* CommandNames[16] = {
     "BS_CHANGE_DISK",
 };
 
+/**
+ * Debug helper: OSReports each of the four queues,
+ * and for every waiting block its command name (and, for reads, the disc offset,
+ * length and destination address).
+ */
 void DVDDumpWaitingQueue(void) {
     u32 i;
     DVDCommandBlock* start;

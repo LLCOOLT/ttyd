@@ -21,6 +21,10 @@ one = 1.0,
 two24 = 1.67772160000000000000e+07,
 twon24 = 5.96046447753906250000e-08;
 
+/**
+ * Payne-Hanek style argument reduction for large arguments using the table of 2/pi bits;
+ * returns the quadrant of the reduced value.
+ */
 int __kernel_rem_pio2(double* x, double* y, int e0, int nx, int prec, const int* ipio2) {
     int jz, jx, jv, jp, jk, carry, n, iq[20], i, j, k, m, q0, ih;
     double z, fw, f[20], fq[20], q[20];

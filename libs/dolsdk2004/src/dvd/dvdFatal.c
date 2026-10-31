@@ -57,6 +57,11 @@ const char* const Europe[6] = {
     },
 };
 
+/**
+ * Shows the "An error has occurred. Turn the power off..." screen with OSFatal (white text on black).
+ * NTSC consoles show the Japanese text if the font encoding is Shift-JIS and English otherwise;
+ * other regions pick the translation from the Europe table by OSGetLanguage.
+ */
 static void ShowMessage(void) {
     const char* message;
     GXColor bg = {0x00, 0x00, 0x00, 0x00};
@@ -75,6 +80,7 @@ static void ShowMessage(void) {
     OSFatal(fg, bg, message);
 }
 
+/** Enables or disables the automatic fatal drive error screen; returns the previous setting. */
 int DVDSetAutoFatalMessaging(BOOL enable) {
     BOOL enabled;
     int prev;
@@ -88,6 +94,7 @@ int DVDSetAutoFatalMessaging(BOOL enable) {
     return prev;
 }
 
+/** Shows the fatal drive error message through the registered handler if automatic messaging is on. */
 void __DVDPrintFatalMessage(void) {
     if (FatalFunc) {
         FatalFunc();

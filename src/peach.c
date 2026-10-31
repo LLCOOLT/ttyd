@@ -20,6 +20,11 @@
 
 void peachChgPose(const char* name);
 
+/**
+ * Plays Peach's footstep sounds while she walks or dashes:
+ * one sound every d1 frames and the other on the frames in between that are multiples of d2.
+ * The sounds differ when she wears the X-Naut disguise and when she is invisible with no height.
+ */
 static inline void peachStepSe(s32 d1, s32 d2) {
     MarioWork* mario = marioGetPtr();
     s32 a, b;
@@ -43,6 +48,10 @@ static inline void peachStepSe(s32 d1, s32 d2) {
     mario->multiTimer++;
 }
 
+/**
+ * Condition 0 of evt_peach_set_condition: clears Peach's mood and drops the X-Naut disguise if she wears it,
+ * back to her ordinary poses.
+ */
 void peachSetStsNormal(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->peachFlags & 0x2000) {
@@ -53,6 +62,10 @@ void peachSetStsNormal(void) {
     }
 }
 
+/**
+ * Condition 1 of evt_peach_set_condition: after-shower look (peachFlags 0x10, the P_*_2 poses),
+ * used after her shower in the X-Naut fortress.
+ */
 void peachSetStsAftershower(void) {
     MarioWork* mario = marioGetPtr();
     mario->peachFlags &= ~0x7F0;
@@ -60,6 +73,10 @@ void peachSetStsAftershower(void) {
     peachChgPose("P_S_1");
 }
 
+/**
+ * Condition 2 of evt_peach_set_condition: invisible Peach (peachFlags 0x20, the P_*_3 poses),
+ * for the interlude where TEC turns her invisible.
+ */
 void peachSetStsInvisible(void) {
     MarioWork* mario = marioGetPtr();
     mario->peachFlags &= ~0x7F0;
@@ -67,6 +84,7 @@ void peachSetStsInvisible(void) {
     peachChgPose("P_S_1");
 }
 
+/** Condition 3 of evt_peach_set_condition: happy Peach (peachFlags 0x40, the P_*_5 poses). */
 void peachSetStsHappy(void) {
     MarioWork* mario = marioGetPtr();
     mario->peachFlags &= ~0x7F0;
@@ -74,6 +92,7 @@ void peachSetStsHappy(void) {
     peachChgPose("P_S_1");
 }
 
+/** Condition 4 of evt_peach_set_condition: uneasy, worried Peach (peachFlags 0x80, the P_*_4 poses). */
 void peachSetStsUneasy(void) {
     MarioWork* mario = marioGetPtr();
     mario->peachFlags &= ~0x7F0;
@@ -81,6 +100,7 @@ void peachSetStsUneasy(void) {
     peachChgPose("P_S_1");
 }
 
+/** Condition 5 of evt_peach_set_condition: angry Peach (peachFlags 0x100, the P_*_6 poses). */
 void peachSetStsAngry(void) {
     MarioWork* mario = marioGetPtr();
     mario->peachFlags &= ~0x7F0;
@@ -88,6 +108,10 @@ void peachSetStsAngry(void) {
     peachChgPose("P_S_1");
 }
 
+/**
+ * Condition 6 of evt_peach_set_condition: peachFlags 0x200, the P_*_7 poses with P_T_13 as her talk pose.
+ * Guess: a calm, matter-of-fact mood, from the name.
+ */
 void peachSetStsOrdinary(void) {
     MarioWork* mario = marioGetPtr();
     mario->peachFlags &= ~0x7F0;
@@ -95,6 +119,10 @@ void peachSetStsOrdinary(void) {
     peachChgPose("P_S_1");
 }
 
+/**
+ * Condition 7 of evt_peach_set_condition: peachFlags 0x400, the P_*_8 poses with P_T_14 as her talk pose.
+ * Guess: Peach carrying something in her hands, from the name.
+ */
 void peachSetStsCarry(void) {
     MarioWork* mario = marioGetPtr();
     mario->peachFlags &= ~0x7F0;
@@ -102,6 +130,11 @@ void peachSetStsCarry(void) {
     peachChgPose("P_S_1");
 }
 
+/**
+ * Peach's version of marioChgPose: maps the base pose names (P_Z_1, P_S_1, P_W_1, P_R_1, P_T_1) to the variant
+ * for her current condition, or to the X-Naut model's Z_1/S_1/...
+ * while disguised, then starts the pose unless the pose is locked or already playing.
+ */
 void peachChgPose(const char* name) {
     MarioWork* mario = marioGetPtr();
     if (mario->dispFlags & MARIO_DISP_FLAG_POSE_LOCK)
@@ -203,6 +236,10 @@ void peachChgPose(const char* name) {
     }
 }
 
+/**
+ * Puts Peach in the X-Naut disguise (evt_peach_transform_gundan_on):
+ * switches her model to the X-Naut c_zako_n, its talk poses and a 30x30 collision box.
+ */
 void peachTransformOn(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->characterId != 1) {
@@ -220,6 +257,10 @@ void peachTransformOn(void) {
     }
 }
 
+/**
+ * Takes off Peach's X-Naut disguise (evt_peach_transform_gundan_off):
+ * back to the c_peach model, her own talk poses and her 20 wide, 47 tall collision box.
+ */
 void peachTransformOff(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->characterId != 1) {
@@ -237,9 +278,15 @@ void peachTransformOff(void) {
     }
 }
 
+/** Called by marioSetCharMode when the player becomes Peach; does nothing. */
 void peachPreInit(void) {
 }
 
+/**
+ * Peach's per-frame player update, run by marioMain instead of Mario's:
+ * moves her, handles stepping, jumping and falling against the ground, counts down forced movement,
+ * and updates balloons, dust, the partner slot and the camera. Always returns 1.
+ */
 s32 peachMain(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->currMotionId == MARIO_MOTION_JUMP_3) {
@@ -302,6 +349,11 @@ s32 peachMain(void) {
     return 1;
 }
 
+/**
+ * Peach's standing motion (from mot_stay): switches to walking on stick input.
+ * With no condition set, after 50 seconds idle she plays P_U_1, stands again,
+ * then dozes off in P_N_1 until control is taken away.
+ */
 void peach_stay(void) {
     MarioWork* mario = marioGetPtr();
 #define MT (mario->multiTimer)
@@ -368,6 +420,11 @@ void peach_stay(void) {
 #undef MT
 }
 
+/**
+ * Peach's walking motion (from mot_walk): walks at Mario's walk speed,
+ * switches to dashing when the stick is pushed far, to standing when it is released,
+ * with footsteps every 20 frames.
+ */
 void peach_walk(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->trigFlags & MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION) {
@@ -394,6 +451,10 @@ void peach_walk(void) {
     }
 }
 
+/**
+ * Peach's dashing motion (from mot_walk): runs at Mario's dash speed,
+ * drops back to walking when the stick eases off (unless the movement is forced) and to standing when released.
+ */
 void peach_dash(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->trigFlags & MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION) {
@@ -422,6 +483,10 @@ void peach_dash(void) {
     }
 }
 
+/**
+ * Peach's talking motion (from mario_motion): stops her and turns her to the talk pose.
+ * In the PAL release she returns to the standing pose after 60 frames while in the X-Naut disguise.
+ */
 void peach_talk(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->trigFlags & MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION) {

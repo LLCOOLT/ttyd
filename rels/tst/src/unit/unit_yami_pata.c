@@ -200,6 +200,11 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Init event of the Dark Paratroopa: registers its wait,
+ * attack and damage events (attack_event_patapata also handles confusion) and its wing-flap pose sounds,
+ * then starts waiting.
+ */
 static EVT_BEGIN(init_event_patapata)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_patapata))
@@ -210,6 +215,13 @@ static EVT_BEGIN(init_event_patapata)
     RETURN
 EVT_END()
 
+/**
+ * Data-table event 14: the Dark Paratroopa loses its wings.
+ * It switches to the Dark Koopa's pose table, data table and part, becomes unit kind 156 (the Dark Koopa),
+ * falls to the floor and makes that its home position, and takes the Koopa's events and walking sounds.
+ * If its HP damage count is above 1 (Guess: hit more than once by the attack) it also lands flipped over
+ * (dmg_turn_event).
+ */
 static EVT_BEGIN(dmg_fall_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -256,6 +268,10 @@ static EVT_BEGIN(dmg_fall_event)
     RETURN
 EVT_END()
 
+/**
+ * Data-table event 48: when Mario's first strike hits the flying Paratroopa,
+ * drops it to height 10 and waits for the attack to end.
+ */
 static EVT_BEGIN(patapata_dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -264,6 +280,13 @@ static EVT_BEGIN(patapata_dmg_first_attack_pos)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the flying Dark Paratroopa: uses an item if it decides to,
+ * otherwise picks a target (the first-attack target on a first strike),
+ * flies above it and swoops down in a kick.
+ * A dodge or miss swoops past; a hit shakes the camera, damages the target and somersaults back up into the air.
+ * It then flies home.
+ */
 static EVT_BEGIN(attack_event_patapata)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -527,6 +550,11 @@ static BattleWeapon weapon_nokonoko_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init event of the Dark Koopa the Paratroopa turns into:
+ * registers its wait, attack and damage events, clears the overturned counter,
+ * sets its run and walk sounds and starts waiting.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -539,6 +567,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event shared by both forms: runs the default damage reaction (btldefaultevt_Damage) for the body part. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -546,6 +575,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Data-table event 13 of the grounded Dark Koopa: flips it onto its back after a stomp-type hit.
+ * Moves its hit offset 15 units down, switches to the overturned defence (0 DEF) and pose tables,
+ * sets the flipped status flag and the overturned counter to 2,
+ * plays SFX_ENM_INSIDE1 and bounces twice in place.
+ */
 static EVT_BEGIN(dmg_turn_event)
     CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, -15, 0)
     SET_VALUE(LW(10), -2)
@@ -565,6 +600,13 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Run instead of a normal attack while the grounded Dark Koopa is on its back:
+ * counts the overturned counter down.
+ * While it is still above 0 the Koopa struggles in place (NKT_S_3) and goes back to waiting;
+ * at 0 it restores its normal defence and pose tables,
+ * clears the flipped status flag and hops back onto its feet.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -590,6 +632,10 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * Unused (no table or event refers to it): a first-strike version of the Koopa's shell attack that spins into
+ * the first-attack target and always runs the damage check, then bounces off in two hops and walks home.
+ */
 static EVT_BEGIN(first_attack_event)
     CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -658,6 +704,13 @@ static EVT_BEGIN(first_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the grounded Dark Koopa. On its back it runs wakeup_event instead.
+ * Otherwise it uses an item if it decides to, or picks the front-most target for its shell attack (the
+ * first-attack target on a first strike), tucks into its shell and slides at the target with a smoke trail.
+ * A miss slides past and hops back; a hit shakes the camera, damages the target and bounces off in two hops.
+ * It then walks home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -804,6 +857,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait event shared by both forms: plays the idle pose from the current pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

@@ -100,6 +100,7 @@ static const char* mario_status_labelname_table[3] = {("_hp"), ("_fp"), ("_bp")}
 static const char* mario_status_name_table[3] = {("ＨＰ"), ("ＦＰ"), ("ＢＰ")};
 static s32 mario_status_henka_table[3] = {5, 5, 3};
 
+/** Demo: the unit window's per-frame event (evt_unitwin_alloc starts it); runs evt_unitwin_main_func. */
 static EVT_BEGIN(main_evt)
     CALL(evt_unitwin_main_func)
     RETURN
@@ -110,6 +111,10 @@ EVT_END()
     RETURN
 EVT_END()
 
+/**
+ * Maps Yoshi's list icon (ICON_158) to the icon for the colour Yoshi hatched in (pouchGetPartyColor);
+ * other icons pass through.
+ */
 static s32 iconid_conv(s32 icon) {
     if (icon == ICON_158) {
         switch (pouchGetPartyColor(4)) {
@@ -140,6 +145,10 @@ static s32 iconid_conv(s32 icon) {
     return icon;
 }
 
+/**
+ * Returns the display name of the partner in list row i (Goombella, Koops, Flurrie,
+ * Yoshi by the player's chosen name, Vivian, Bobbery, Ms. Mowz order).
+ */
 static const char* party_name_table_rtn(s32 i) {
     const char* name;
     switch (i) {
@@ -168,6 +177,11 @@ static const char* party_name_table_rtn(s32 i) {
     return name;
 }
 
+/**
+ * Demo: sets up the unit window work (_wp), the pointing-finger cursor icon and the per-frame main_evt,
+ * and points the HP/FP/BP table at Mario's base stats for the stat windows.
+ * Must run before the other unitwin commands.
+ */
 USER_FUNC(evt_unitwin_alloc) {
     UnitWinWork* wp = _mapAlloc(sizeof(UnitWinWork));
     memset(wp, 0, sizeof(UnitWinWork));
@@ -184,6 +198,11 @@ USER_FUNC(evt_unitwin_alloc) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Demo: tears the unit window down.
+ * Blocks until main_evt has stopped, then removes the counter item icons and their case events,
+ * the cursor icon and the work.
+ */
 USER_FUNC(evt_unitwin_free) {
     s32 i;
     UnitWinWork* wp = _wp;
@@ -214,6 +233,11 @@ USER_FUNC(evt_unitwin_free) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Demo: puts goods on a shop counter.
+ * args[0] is a null-terminated table of (map object, hit object, script) rows, args[1] the item id for each row;
+ * shows each item's icon over its map object and registers a case on its hit object that runs select_evt.
+ */
 USER_FUNC(evt_unitwin_selltable_setup) {
     s32 i;
     EvtWord* args = event->args;
@@ -243,6 +267,12 @@ USER_FUNC(evt_unitwin_selltable_setup) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Demo: the case event of one counter slot.
+ * While the slot has an item it shows that item's name and description (through flag 1 and the timer)
+ * and on A starts the row's script with the work in its LW(0);
+ * then waits for that script to end and gives Mario control back.
+ */
 static USER_FUNC(select_func) {
     UnitWinWork* wp = (UnitWinWork*)event->lwData[0];
     if (wp->mode == 0) {
@@ -268,6 +298,10 @@ static USER_FUNC(select_func) {
     return EVT_RETURN_YIELD;
 }
 
+/**
+ * Shows (args[0] nonzero) or hides the coin counter window,
+ * starting it from Mario's current coins so it counts up or down to later changes.
+ */
 USER_FUNC(unitwincoin_disp_onoff) {
     s32 on = evtGetValue(event, event->args[0]);
     UnitWinWork* wp;
@@ -283,6 +317,7 @@ USER_FUNC(unitwincoin_disp_onoff) {
     return EVT_RETURN_DONE;
 }
 
+/** Blocks until the coin counter window has caught up with Mario's coin total. */
 USER_FUNC(unitwincoin_wait) {
     UnitWinWork* wp = _wp;
     pouchGetPtr();
@@ -292,7 +327,7 @@ USER_FUNC(unitwincoin_wait) {
     return EVT_RETURN_DONE;
 }
 
-// list window: arg = window kind; returns lwData[0] = 1 and the picked entry in lwData[1..]
+/** list window: arg = window kind; returns lwData[0] = 1 and the picked entry in lwData[1..] */
 USER_FUNC(unitwin_window_select_func) {
     EvtWord* args = event->args;
     s32 arg = evtGetValue(event, *args++);
@@ -773,6 +808,10 @@ USER_FUNC(unitwin_window_select_func) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Demo: per-frame loop of the unit window: counts the name/description timer down
+ * and queues evt_unitwin_disp_func for drawing, until evt_unitwin_free asks it to stop.
+ */
 static USER_FUNC(evt_unitwin_main_func) {
     UnitWinWork* wp = (UnitWinWork*)event->lwData[0];
     if (wp->flags2 & 1) {
@@ -846,6 +885,7 @@ static const char* mario_status_labelname_table[3] = {("_hp"), ("_fp"), ("_bp")}
 static const char* mario_status_name_table[3] = {("ＨＰ"), ("ＦＰ"), ("ＢＰ")};
 static s32 mario_status_henka_table[3] = {5, 5, 3};
 
+/** The unit window's per-frame event, started by evt_unitwin_alloc outside counter mode; runs evt_unitwin_main_func. */
 static EVT_BEGIN(main_evt)
     CALL(evt_unitwin_main_func)
     RETURN
@@ -856,6 +896,10 @@ EVT_END()
     RETURN
 EVT_END()
 
+/**
+ * Draws the name of the item at the selected counter slot in the name window,
+ * and the price over each item still on the counter.
+ */
 void unitwin_name_disp(WinMgrEntry* entry) {
     UnitWinWork* wp = _wp;
     const char* msg = msgSearch(itemDataTable[wp->goods[wp->goodsIdx]].name);
@@ -885,15 +929,17 @@ void unitwin_name_disp(WinMgrEntry* entry) {
     }
 }
 
-// unused (dead-stripped): only its "%s_%04d" string survives
+/** unused (dead-stripped): only its "%s_%04d" string survives */
 static void unitwin_fmt(char* buf, const char* name, s32 n) {
     sprintf(buf, "%s_%04d", name, n);
 }
 
+/** Help window update: runs the shared help-window logic. */
 void unitwin_help_main(WinMgrEntry* entry) {
     winMgrHelpMain(entry);
 }
 
+/** Help window draw: shows the description of the item at the selected counter slot. */
 void unitwin_help_disp(WinMgrEntry* entry) {
     UnitWinWork* wp = _wp;
     s32* goods = &wp->goods[wp->goodsIdx];
@@ -903,6 +949,11 @@ void unitwin_help_disp(WinMgrEntry* entry) {
     }
 }
 
+/**
+ * Draws the shop-point window: the points label and the count,
+ * which steps a tenth of the way to Mario's shop points each frame.
+ * The label icon differs between Japanese (language 0) and other text.
+ */
 void unitwin_point_disp(WinMgrEntry* entry) {
     UnitWinWork* wp = _wp;
     PouchData* pouch = pouchGetPtr();
@@ -936,6 +987,12 @@ void unitwin_point_disp(WinMgrEntry* entry) {
     }
 }
 
+/**
+ * Sets up the unit window work (_wp) and the pointing-finger cursor.
+ * args[0] nonzero selects counter mode (flag 0x80),
+ * where select_func and the name/help/point windows run instead of the per-frame main_evt.
+ * Points the HP/FP/BP table at Mario's base stats for the stat windows.
+ */
 USER_FUNC(evt_unitwin_alloc) {
     s32 arg = evtGetValue(event, event->args[0]);
     UnitWinWork* wp = _mapAlloc(sizeof(UnitWinWork));
@@ -960,6 +1017,10 @@ USER_FUNC(evt_unitwin_alloc) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Tears the unit window down: blocks until its loop has stopped, then removes the counter item icons,
+ * the three windows (counter mode) and the cursor, and frees the work.
+ */
 USER_FUNC(evt_unitwin_free) {
     UnitWinWork* wp = _wp;
     s32 i;
@@ -989,6 +1050,11 @@ USER_FUNC(evt_unitwin_free) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Puts goods on a shop counter: args[0] is a null-terminated table of (map object, hit object, script) rows,
+ * args[1] the item id for each row (0 for an empty slot).
+ * Shows each item's icon over its map object, starts select_evt and creates the name, help and point windows.
+ */
 USER_FUNC(evt_unitwin_selltable_setup) {
     s32 i;
     EvtWord* args = event->args;
@@ -1022,6 +1088,10 @@ USER_FUNC(evt_unitwin_selltable_setup) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Shows (args[0] nonzero) or hides the coin counter window,
+ * starting it from Mario's current coins so it counts up or down to later changes.
+ */
 USER_FUNC(unitwincoin_disp_onoff) {
     s32 on = evtGetValue(event, event->args[0]);
     UnitWinWork* wp;
@@ -1037,6 +1107,7 @@ USER_FUNC(unitwincoin_disp_onoff) {
     return EVT_RETURN_DONE;
 }
 
+/** Blocks until the coin counter window has caught up with Mario's coin total. */
 USER_FUNC(unitwincoin_wait) {
     UnitWinWork* wp = _wp;
     pouchGetPtr();
@@ -1046,6 +1117,10 @@ USER_FUNC(unitwincoin_wait) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Shows (args[0] nonzero) or hides the lottery ticket number (from evt_lottery) in the unit window;
+ * it is drawn only while the lottery reports a ticket.
+ */
 USER_FUNC(unitwin_lottery_disp_onoff) {
     s32 on = evtGetValue(event, event->args[0]);
     UnitWinWork* wp = _wp;
@@ -1057,6 +1132,10 @@ USER_FUNC(unitwin_lottery_disp_onoff) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Tells the counter whether the purchase script finished with a sale:
+ * args[0] is the unit window work, args[1] nonzero marks the slot sold so its item disappears.
+ */
 USER_FUNC(unitwin_set_bought) {
     EvtWord* args = event->args;
     UnitWinWork* wp = (UnitWinWork*)evtGetValue(event, args[0]);
@@ -1064,7 +1143,7 @@ USER_FUNC(unitwin_set_bought) {
     return EVT_RETURN_DONE;
 }
 
-// Closes the two windows of the selected entry, if one is selected.
+/** Closes the two windows of the selected entry, if one is selected. */
 static inline void unitwinClose(UnitWinWork* wp) {
     if (wp->selected != -1) {
         wp->selected = -1;
@@ -1073,6 +1152,12 @@ static inline void unitwinClose(UnitWinWork* wp) {
     }
 }
 
+/**
+ * Counter loop: while Mario stands on a slot's hit object (and is free to act: no partner move,
+ * no Ghost Diary or field pickup) opens the name and help windows for that item;
+ * A starts the row's script with the work in its LW(0). When the script ends hides the item if it was sold.
+ * Keeps the item icons hidden for sold or hidden slots.
+ */
 static USER_FUNC(select_func) {
     UnitWinWork* wp = (UnitWinWork*)event->lwData[0];
     s32 found = FALSE;
@@ -1160,6 +1245,11 @@ static USER_FUNC(select_func) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Per-frame loop of the unit window outside counter mode:
+ * counts the highlight timer down and queues evt_unitwin_disp_func for drawing,
+ * until evt_unitwin_free asks it to stop.
+ */
 static USER_FUNC(evt_unitwin_main_func) {
     UnitWinWork* wp = (UnitWinWork*)event->lwData[0];
     if (wp->flags2 & 1) {
@@ -1177,6 +1267,10 @@ static USER_FUNC(evt_unitwin_main_func) {
 #endif
 
 #if VERSION >= VERSION_JP
+/**
+ * Maps Yoshi's list icon (ICON_158) to the icon for the colour Yoshi hatched in (pouchGetPartyColor);
+ * other icons pass through.
+ */
 static inline s32 iconid_conv(s32 icon) {
     if (icon == ICON_158) {
         switch (pouchGetPartyColor(4)) {
@@ -1207,6 +1301,10 @@ static inline s32 iconid_conv(s32 icon) {
     return icon;
 }
 
+/**
+ * Returns the display name of the partner in list row i (Goombella, Koops, Flurrie,
+ * Yoshi by the player's chosen name, Vivian, Bobbery, Ms. Mowz order).
+ */
 static inline const char* party_name_table_rtn(s32 i) {
     const char* name;
     switch (i) {
@@ -1237,6 +1335,14 @@ static inline const char* party_name_table_rtn(s32 i) {
 #endif
 #define ICONGX ((void (*)(Vec*, u16, u16, f32))iconDispGx)
 #define ICONGX2 ((void (*)(Vec*, u16, f32, u16))iconDispGx)
+/**
+ * Draws the unit window each frame: the item name and description for the highlighted counter slot with prices,
+ * the counter window that counts toward Mario's coins (or Star Pieces, or pouchGetSuperCoin with flag 0x4000),
+ * the demo's Shine Sprite counter, the lottery number (not in the demos), and the list windows by mode:
+ * badge lists (2-3, 11-16), the informant's rumour lists (17-18),
+ * the partner lists (5-7) and the HP/FP/BP lists (8-10),
+ * with the finger cursor and the help text of the highlighted row.
+ */
 static void evt_unitwin_disp_func(CameraId cameraId, void* param) {
     PouchData* pouch = pouchGetPtr();
     UnitWinWork* wp = (UnitWinWork*)param;
@@ -2151,6 +2257,10 @@ static void evt_unitwin_disp_func(CameraId cameraId, void* param) {
     }
 }
 
+/**
+ * Replaces the item at the selected counter slot (args[0] is the unit window work) with item args[1],
+ * swapping its icon, or removes the icon when args[1] is 0.
+ */
 USER_FUNC(set_new_goods_list) {
     EvtWord* args = event->args;
     UnitWinWork* wp = (UnitWinWork*)evtGetValue(event, args[0]);
@@ -2168,11 +2278,16 @@ USER_FUNC(set_new_goods_list) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Returns the unit window work pointer in args[0],
+ * for scripts that pass it to set_new_goods_list or unitwin_set_bought.
+ */
 USER_FUNC(unitwin_get_work_ptr) {
     evtSetValue(event, event->args[0], (EvtWord)_wp);
     return EVT_RETURN_DONE;
 }
 
+/** Returns the rank (0-2) of partner args[0] in args[1]. */
 USER_FUNC(unitwin_getpartylank) {
     EvtWord* args = event->args;
     PouchData* pouch = pouchGetPtr();
@@ -2181,6 +2296,10 @@ USER_FUNC(unitwin_getpartylank) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Sets partner args[0] to rank args[1] (HP, attack and tech levels together),
+ * recomputes its stats and refills its HP. Guess: Chet Rippo's partner rank trade in Rogueport.
+ */
 USER_FUNC(unitwin_setpartylank) {
     EvtWord* args = event->args;
     PouchData* pouch = pouchGetPtr();
@@ -2192,6 +2311,11 @@ USER_FUNC(unitwin_setpartylank) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Sets Mario's base HP, FP and BP to args[0..2], refills HP and FP,
+ * and if the BP no longer covers the equipped badges takes them all off; args[3] returns 1 when that happened.
+ * Guess: Chet Rippo's stat trade.
+ */
 USER_FUNC(unitwin_setmariolevel) {
     EvtWord* args = event->args;
     PouchData* pouch = pouchGetPtr();

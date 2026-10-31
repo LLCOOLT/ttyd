@@ -17,6 +17,10 @@ typedef void (*BattleStageReturnStgDarkBaseS32Fn)(s32, s32);
 // FAKE: evt_batstage.c calls BattleStageReturnAudDarkBase through this prototype (the types it was compiled with) instead of the one in battle/battle_stage.h; same registers, behaviour-identical.
 typedef void (*BattleStageReturnAudDarkBaseS32Fn)(s32, s32);
 
+/**
+ * Fades the battle stage's darkness: args are the darkness level (0-255), the fade time in frames and a mode.
+ * Used by the battle-end and Showstopper (sac_suki) scripts.
+ */
 USER_FUNC(evt_batstage_set_stg_dark) {
     EvtWord* args = event->args;
     u8 a = evtGetValue(event, args[0]);
@@ -26,6 +30,7 @@ USER_FUNC(evt_batstage_set_stg_dark) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets the stage's base darkness (the level evt_batstage_return_stg_dark_base fades back to): level, frames, mode. */
 USER_FUNC(evt_batstage_set_stg_dark_base) {
     EvtWord* args = event->args;
     u8 a = evtGetValue(event, args[0]);
@@ -35,6 +40,7 @@ USER_FUNC(evt_batstage_set_stg_dark_base) {
     return EVT_RETURN_DONE;
 }
 
+/** Fades the stage darkness back to its base level; args are the fade time in frames and a mode. */
 USER_FUNC(evt_batstage_return_stg_dark_base) {
     EvtWord* args = event->args;
     s32 a = evtGetValue(event, args[0]);
@@ -43,6 +49,7 @@ USER_FUNC(evt_batstage_return_stg_dark_base) {
     return EVT_RETURN_DONE;
 }
 
+/** Fades the audience's darkness: args are the darkness level (0-255), the fade time in frames and a mode. */
 USER_FUNC(evt_batstage_set_aud_dark) {
     EvtWord* args = event->args;
     u8 a = evtGetValue(event, args[0]);
@@ -52,6 +59,7 @@ USER_FUNC(evt_batstage_set_aud_dark) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets the audience's base darkness level (restored by evt_batstage_return_aud_dark_base): level, frames, mode. */
 USER_FUNC(evt_batstage_set_aud_dark_base) {
     EvtWord* args = event->args;
     u8 a = evtGetValue(event, args[0]);
@@ -61,6 +69,7 @@ USER_FUNC(evt_batstage_set_aud_dark_base) {
     return EVT_RETURN_DONE;
 }
 
+/** Fades the audience darkness back to its base level; args are the fade time in frames and a mode. */
 USER_FUNC(evt_batstage_return_aud_dark_base) {
     EvtWord* args = event->args;
     s32 a = evtGetValue(event, args[0]);
@@ -69,6 +78,11 @@ USER_FUNC(evt_batstage_return_aud_dark_base) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Spotlights the acting unit for an Appeal: dims stage and audience to 140
+ * and aims up to three grey "sys_activeUnit_N" lights at it (arg 1: only the third, in white).
+ * Paired with ..._player_off.
+ */
 USER_FUNC(evt_batstage_light_set_player_on) {
     EvtWord* args = event->args;
     BattleWork* bw = _battleWorkPointer;
@@ -116,6 +130,10 @@ USER_FUNC(evt_batstage_light_set_player_on) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Undoes evt_batstage_light_set_player_on: restores stage and audience darkness
+ * and releases the three sys_activeUnit spotlights over 30 frames.
+ */
 USER_FUNC(evt_batstage_light_set_player_off) {
     s32 idx;
     BattleStageReturnAudDarkBase(0, 0);

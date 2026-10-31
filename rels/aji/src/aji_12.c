@@ -31,6 +31,11 @@ static BeroEntry bero_entry_data[2];
 const char* hit_list[50];
 static HitDamageReturn dmgReturnPt[2];
 
+/**
+ * Door close animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times -0.25;
+ * the open and close scripts apply the same transform. The demo builds use -0.2217.
+ */
 static EVT_BEGIN(e_door_close)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
@@ -43,6 +48,11 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door open animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times -0.25;
+ * the open and close scripts apply the same transform. The demo builds use -0.2217.
+ */
 static EVT_BEGIN(e_door_open)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
@@ -130,6 +140,10 @@ const char* hit_list[] = {
     "A_hikaru_44",
 };
 
+/**
+ * Item-box script for the chest at "box": gives Mario the card key (ITEM_CARD_KEY_0x1E),
+ * sets GSWF_AJI12_CARD_KEY_TAKEN, turns off the floor lights and makes Mario turn to face east.
+ */
 static EVT_BEGIN(evt_box)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
@@ -162,6 +176,11 @@ static HitDamageReturn dmgReturnPt[] = {
     {0},
 };
 
+/**
+ * Sets up the electrified-floor puzzle: places the chest, sets the damage return point,
+ * starts the thunder effect (thunder_main) and the Mario position checker (mario_chk),
+ * and starts the floor animation denyuka.
+ */
 static EVT_BEGIN(hikaru_yuka_init)
     CALL(evt_mobj_itembox, STRING("box"), -350, 10, -10, 2, 0, PTR(evt_box), GSWF(GSWF_AJI12_CARD_KEY_CHEST_OPENED))
     CALL(evt_hit_damage_return_set, PTR(dmgReturnPt))
@@ -177,6 +196,12 @@ static EVT_BEGIN(hikaru_yuka_init)
     RETURN
 EVT_END()
 
+/**
+ * Init script of aji_12, a glowing-floor room with 44 panels:
+ * plays BGM_STG7_DUN2, sets up the exits and an HP Drain badge block, and,
+ * until the card key from the chest has been taken (GSWF_AJI12_CARD_KEY_TAKEN),
+ * runs the floor puzzle (hikaru_yuka_init); afterwards the floor is switched off.
+ */
 EVT_BEGIN(aji_12_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI1"))
@@ -201,6 +226,11 @@ EVT_BEGIN(aji_12_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script function that plays an electric shock when Mario is in the spike-damage motion
+ * (MARIO_MOTION_DAMAGE_TOGE): SFX_STG7_ELECTRIC_SHOCK1 and a blue-green spark effect at his position,
+ * once per hit.
+ */
 static USER_FUNC(thunder_main) {
     MarioWork* mario = marioGetPtr();
 
@@ -227,6 +257,14 @@ static USER_FUNC(thunder_main) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script function that drives the floor puzzle every frame until the card key is taken:
+ * all panels start dark (nashi_NN shown) with hit flag 0x800 set (Guess: the damage flag),
+ * then a lit window of two panels (three in the US and later releases) walks along the safe path listed in
+ * hit_list, with 0x800 cleared on them.
+ * Stepping on the start panel A_hikaru_01 restarts the walk and slows it from 20 to 60 frames per step;
+ * stepping off the panels resets it. Uses the panel under Yoshi when he is ridden.
+ */
 static USER_FUNC(mario_chk) {
     s32 n;
     char name[256];
@@ -337,6 +375,10 @@ static USER_FUNC(mario_chk) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script function: hides all 44 panel lights (hikaru_NN and nashi_NN) and clears hit flag 0x800 on every panel
+ * and on A_no1, ending the puzzle.
+ */
 static USER_FUNC(hikaru_off) {
     char name[256];
     s32 i;

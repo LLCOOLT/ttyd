@@ -4,6 +4,10 @@
 
 #include "__syn.h"
 
+/**
+ * Finds the wavetable data for a note: the region for the key from the channel's instrument,
+ * then its articulation, sample and ADPCM entries. Returns 0 when the instrument has no region for the key.
+ */
 int __SYNGetWavetableData(SYNVOICE* voice) {
     u32 regionIndex;
     SYNSYNTH* synth;

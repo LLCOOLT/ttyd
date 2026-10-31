@@ -35,6 +35,10 @@ static u32 fiReq;
 static void DEMOWriteStats(u8 update);
 static void DEMOWriteStats(u8 update);
 
+/**
+ * Selects the list of statistics to collect and how to display them (to the console or to a screen corner);
+ * a NULL list or zero count turns stats off.
+ */
 void DEMOSetStats(DemoStatData* stat, u32 nstats, DEMO_STAT_DISP disp) {
     if (stat == 0 || nstats == 0) {
         DemoStatEnable = FALSE;
@@ -48,6 +52,12 @@ void DEMOSetStats(DemoStatData* stat, u32 nstats, DEMO_STAT_DISP disp) {
     }
 }
 
+/**
+ * Starts or finishes the collection of one statistic:
+ * with 'update' set it reads the GX metric of the current entry (GP counter, memory, pixel, vertex cache,
+ * frame-rate or texture bandwidth values) into its static variables and disables the metric;
+ * otherwise it programs and clears the metric for the entry.
+ */
 static void DEMOWriteStats(u8 update) {
     u32 cnt0;
     u32 cnt1;
@@ -168,6 +178,7 @@ static void DEMOWriteStats(u8 update) {
     }
 }
 
+/** Calls DEMOWriteStats and, when 'inc' is set, moves on to the next statistic in the list (wrapping). */
 void DEMOUpdateStats(u8 inc) {
     DEMOWriteStats(inc);
     if (inc) {
@@ -178,6 +189,11 @@ void DEMOUpdateStats(u8 inc) {
     }
 }
 
+/**
+ * Prints all statistics: with the console display it uses OSReport,
+ * otherwise it picks a screen corner (full or half size) and draws one line per statistic with DEMOPrintf,
+ * computing rates for the frame-rate and bandwidth entries.
+ */
 void DEMOPrintStats(void) {
     GXRenderModeObj* rmode;
     u32 i;

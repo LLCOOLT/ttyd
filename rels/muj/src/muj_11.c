@@ -14,24 +14,28 @@
 static BeroEntry bero_entry_data[3];
 extern EvtWord warning_event[];
 
+/** Guess: closes the left door (S_doa_l) of the corridor by turning it over a short interpolation. */
 static EVT_BEGIN(w_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Guess: opens the left door (S_doa_l) of the corridor by turning it over a short interpolation. */
 static EVT_BEGIN(w_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Guess: closes the right door (S_doa_r) of the corridor by turning it over a short interpolation. */
 static EVT_BEGIN(e_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Guess: opens the right door (S_doa_r) of the corridor by turning it over a short interpolation. */
 static EVT_BEGIN(e_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r"), 0, LW(0), 0)
@@ -78,6 +82,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Cortez's warning (STORY_STG5_31_FOUR_EYES): when Mario enters the corridor a spoken narration (stg5_dou_20)
+ * warns of the danger ahead and the story becomes STORY_STG5_32_CORTEZS_WARNING.
+ */
 EVT_BEGIN(warning_event)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_bero_exec_wait, 65536)
@@ -93,6 +101,10 @@ EVT_BEGIN(warning_event)
     RETURN
 EVT_END()
 
+/**
+ * Map init for muj_11 (the corridor between the dock and Cortez's lair):
+ * picks music by story stage, registers the exits and spawns warning_event at STORY_STG5_31_FOUR_EYES.
+ */
 EVT_BEGIN(muj_11_init_evt)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG5_33_CORTEZ_AND_THE_TREASURE)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG5_GHOST1"))

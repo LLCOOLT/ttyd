@@ -249,6 +249,11 @@ static BattleUnitSetup entry_togezo = {
     NULL, // itemDropTable
 };
 
+/**
+ * Init script of the Dark Lakitu: registers its wait, unison-phase, attack, damage and confusion handlers,
+ * clears unit work 0 (set while it holds a Spiny egg) and unit work 2 (charged flag),
+ * and puts its second part (the egg) in the JGM_P_1 pose.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventUnisonPhase, BTL_UNIT_SELF, PTR(unison_phase_event))
@@ -262,6 +267,15 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage script of the Dark Lakitu. While it is not holding an egg it just takes the default damage.
+ * While it is holding one (unit work 0 set), a hit that damages it,
+ * or that applies one of a set of status effects (Guess: the ones that stun or disable it),
+ * makes it drop the egg: the egg part is thrown away behind it,
+ * the holding state and counter attribute are cleared and its pose table is restored
+ * before the default damage runs.
+ * Other status-inflicting damage codes (22, 30, 31, 38, 39 and 41) drop the egg too, with a shorter toss.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -357,6 +371,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Before the player's phase, on every turn but the first, if the Dark Lakitu can act and is not in status 27, 3,
+ * 5 or 6 (Guess: the ailments that disable it), it has a 50 percent chance to pick up an egg:
+ * it plays JGM_A_1 and A_2 with the hold sounds, sets unit work 0 and counter attribute 1 on part 1,
+ * switches to the holding pose table and raises its hit offset by 20.
+ */
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_EQUAL(LW(0), 0)
@@ -402,6 +422,10 @@ static EVT_BEGIN(unison_phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Plays the "toge_flush" spark effect over the Dark Lakitu 30 frames after it is hit,
+ * at a height that depends on its size statuses 10 and 11 (Guess: the big and small size changes).
+ */
 static EVT_BEGIN(avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -422,6 +446,7 @@ static EVT_BEGIN(avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/** Data event 48 of the Dark Lakitu: after a first strike it is set to y 10 and waits for the attack to end. */
 static EVT_BEGIN(dmg_first_attack_pos_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -430,6 +455,15 @@ static EVT_BEGIN(dmg_first_attack_pos_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the Dark Lakitu.
+ * After an item check it draws lots: 40 against 90 (70 after the first turn) between throwing an egg that
+ * hatches a Spiny into a free spot (friend_event, trying the space to its right first and then to its left)
+ * and an attack. A charged Dark Lakitu (unit work 2 set) always throws an egg.
+ * Otherwise the attack is drawn from the plain egg throw,
+ * the Spiny-hatching throw and charging up (charge_event) in the ratio 30:30:30 on the first turn
+ * and 30:30:10 afterwards.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -509,6 +543,13 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Lakitu's egg throw: if it is not already holding an egg it takes one (JGM_A_1 and A_2),
+ * then throws it (SFX_ENM_JUGEM_THROW1) in an arc at the target and the target takes the damage.
+ * If unit work 1 is set and the egg hits a target with damage code 262144 (Guess: a target that can be hit) the
+ * egg also bounces to a free spot and hatches a Spiny there (togezo_copy_status copies its size status).
+ * Otherwise the egg hops and lands behind the target and is picked up again.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_jyugem_attack))
@@ -666,6 +707,12 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Lakitu throws an egg that hatches a Spiny:
+ * it takes an egg if it is not holding one, throws it to the free spot in LW(0..2),
+ * where it bounces twice (SFX_ENM_JUGEM_JUMP1) and spawns a new Spiny (copying its size status),
+ * which spins into place.
+ */
 static EVT_BEGIN(friend_event)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
@@ -725,6 +772,11 @@ static EVT_BEGIN(friend_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Lakitu charges up: it pays the charge weapon's cost, the camera zooms in,
+ * a "crystal_n64" effect appears over it (SFX_ENM_CHARGE1) and it bounces once;
+ * the charge weapon is then applied to itself (a power-up).
+ */
 static EVT_BEGIN(charge_event)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(evt_btl_camera_set_mode, 0, 7)
@@ -750,11 +802,17 @@ static EVT_BEGIN(charge_event)
     RETURN
 EVT_END()
 
+/** Wait script: plays the Dark Lakitu's idle pose from its current pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0] = source unit, args[1] = destination unit.
+ * Copies the size-change status (turns and strength) from the Lakitu to the Spiny it has just spawned
+ * (entry_togezo).
+ */
 static USER_FUNC(togezo_copy_status) {
     EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));

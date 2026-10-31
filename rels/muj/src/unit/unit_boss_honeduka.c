@@ -106,6 +106,7 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_honeduka", "c_honezuka", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x2090009, 0, pose_table},
 };
 
+/** Guess: init event of the bone pile: sets its work values and links it to Cortez. */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
@@ -115,6 +116,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: damage event of the bone pile: runs honeduka_damage_sub_event so Cortez reacts,
+ * then the default damage flow.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -122,6 +127,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage sub-event of the bone pile (honeduka):
+ * after it is hit it runs the owner's data events 70 and 71 (the owner is stored in unit work 0,
+ * the Cortez body), then returns to waiting. Guess: those two events collapse or rebuild the pile.
+ */
 EVT_BEGIN(honeduka_damage_sub_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
 #if VERSION <= VERSION_DEMO_US
@@ -133,6 +143,7 @@ EVT_BEGIN(honeduka_damage_sub_event)
     RETURN
 EVT_END()
 
+/** Guess: wait (idle) event of the bone pile: keeps the default idle pose. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

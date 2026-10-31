@@ -181,6 +181,10 @@ BattleUnitKind unitdata_Party_Christine = {
     data_table,
 };
 
+/**
+ * Goombella's battle entry: starts 250 units behind her home spot and, after 40 frames,
+ * runs in to it at speed 4 with her footstep sounds, then takes her stay pose.
+ */
 static EVT_BEGIN(battle_entry_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 250)
@@ -195,6 +199,10 @@ static EVT_BEGIN(battle_entry_event)
     RETURN
 EVT_END()
 
+/**
+ * Init for Goombella: registers her wait, attack, damage, confusion and entry scripts and her walk,
+ * run and jump sounds, and clears unit work 0 (the Tattle log card state).
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -209,6 +217,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Hit reaction: straightens her rotation (left over from tilted jumps), then runs the default damage script. */
 static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     SET_VALUE(LW(10), -2)
@@ -217,10 +226,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Empty: partner moves come from the player's menu choices, not a unit attack script. */
 static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle: plays the stay pose from the current pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -410,6 +421,11 @@ BattleWeapon partyWeapon_ChristineKiss = {
 #endif
 };
 
+/**
+ * Goombella's Headbonk: she runs up and jumps onto the selected enemy,
+ * headbonking again for each successful action command press,
+ * then lands with an optional stylish and returns home.
+ */
 EVT_BEGIN(partyChristineAttack_NormalAttack)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -644,6 +660,10 @@ EVT_BEGIN(partyChristineAttack_NormalAttack)
     RETURN
 EVT_END()
 
+/**
+ * Spawned by Tattle: drives the tattle log card for the target each frame through _dictionary
+ * until it reports state 6 (closed), then clears unit work 0.
+ */
 EVT_BEGIN(christine_dictionary_event)
     LABEL(0)
     CALL(_dictionary, LW(3), LW(4))
@@ -656,6 +676,10 @@ EVT_BEGIN(christine_dictionary_event)
     RETURN
 EVT_END()
 
+/**
+ * Goombella's Tattle: after the action command she reads the target, opens its tattle card,
+ * says its tattle line, and marks the enemy as tattled so its HP shows from then on.
+ */
 EVT_BEGIN(partyChristineAttack_Monosiri)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -769,6 +793,10 @@ EVT_BEGIN(partyChristineAttack_Monosiri)
     RETURN
 EVT_END()
 
+/**
+ * Goombella's Multibonk: like Headbonk, but she keeps bouncing on the same enemy for as long as the action
+ * command is timed right.
+ */
 EVT_BEGIN(partyChristineAttack_RenzokuAttack)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -1065,6 +1093,11 @@ EVT_BEGIN(partyChristineAttack_RenzokuAttack)
     RETURN
 EVT_END()
 
+/**
+ * Goombella's Rally Wink: she blows a kiss at Mario;
+ * with a successful action command he gets another move this turn (_set_hustle and the quick-change
+ * announcement). Ends with an optional stylish.
+ */
 EVT_BEGIN(partyChristineAttack_Kiss)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -1249,6 +1282,10 @@ EVT_BEGIN(partyChristineAttack_Kiss)
     RETURN
 EVT_END()
 
+/**
+ * Goombella's Appeal (data tag 5): appeal pose and sound, a kiss effect towards the audience,
+ * then the audience is fired up.
+ */
 EVT_BEGIN(christine_appeal_event)
     CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_APPEAL)
@@ -1267,6 +1304,7 @@ EVT_BEGIN(christine_appeal_event)
     RETURN
 EVT_END()
 
+/** Victory reaction (data tag 64): Goombella's PKR_Y_1 cheer for 64 frames, then her stay pose. */
 static EVT_BEGIN(party_win_reaction)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_Y_1"))
     WAIT_FRAMES(64)
@@ -1274,6 +1312,10 @@ static EVT_BEGIN(party_win_reaction)
     RETURN
 EVT_END()
 
+/**
+ * Audience-attack reaction (data tag 6): Goombella runs offstage, reappears in the audience,
+ * headbonks the chosen audience member while tilting along her jump arc, bounces back down and runs home.
+ */
 static EVT_BEGIN(attack_audience_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetStageSize, LW(3), EVT_NULLPTR, EVT_NULLPTR)
@@ -1371,6 +1413,10 @@ static EVT_BEGIN(attack_audience_event)
     RETURN
 EVT_END()
 
+/**
+ * Returns in args[4] the angle (degrees) of the movement from point (args[0], args[1]) to (args[2], args[3]),
+ * used to tilt Goombella along her jump arc; leaves args[4] as it was if the points coincide.
+ */
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1, y1, x2, y2;
@@ -1392,6 +1438,11 @@ static USER_FUNC(krb_get_dir) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Builds Goombella's battle move list (data tag 1):
+ * Headbonk and Tattle always, Multibonk from Super rank and Rally Wink from Ultra rank,
+ * appending each to command->weapon and advancing *count.
+ */
 static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     s32 techLv;
 
@@ -1434,6 +1485,10 @@ static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     }
 }
 
+/**
+ * Returns in args[2] the battle tattle message tag of the unit kind of unit args[0].
+ * args[1] (the part) is read but not used.
+ */
 static USER_FUNC(btlevtcmd_get_monosiri_msg_no) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -1447,6 +1502,10 @@ static USER_FUNC(btlevtcmd_get_monosiri_msg_no) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Records that the unit kind of unit args[0] has been tattled,
+ * which unlocks its HP display and its Tattle Log entry.
+ */
 static USER_FUNC(_monosiri_flag_on) {
     s32 id = evtGetValue(event, event->args[0]);
 
@@ -1454,6 +1513,11 @@ static USER_FUNC(_monosiri_flag_on) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Steps the tattle card state machine kept in the running unit's work[0] (and the card work in workPtr[1]) once
+ * per call: 1 opens the card for target args[0], 2-3 keep it shown, 4 starts closing, 5 waits for it to close,
+ * 6 done.
+ */
 static USER_FUNC(_dictionary) {
     EvtWord* args = event->args;
     s32 selfId;
@@ -1505,6 +1569,11 @@ static USER_FUNC(_dictionary) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Rally Wink effect on unit args[0]: if it has no moves left this turn it gets one more,
+ * otherwise it is flagged for an extra move.
+ * The US and later releases also raise its max moves and mark Rally Wink when it is slowed.
+ */
 static USER_FUNC(_set_hustle) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;

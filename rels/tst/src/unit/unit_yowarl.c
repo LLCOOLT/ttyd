@@ -104,6 +104,10 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_yowarl", "c_kuribo", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
+/**
+ * Init event of the placeholder unit: registers its wait,
+ * attack and damage events (default confusion) and starts waiting.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -113,6 +117,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage event of the placeholder unit: runs the default damage reaction (btldefaultevt_Damage);
+ * the END_SCRIPT and second RETURN after it are never reached.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -122,6 +130,7 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Attack event of the placeholder unit: it has no attack; it only uses an item if it decides to, then waits again. */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -133,6 +142,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait event of the placeholder unit: plays the idle pose from its pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

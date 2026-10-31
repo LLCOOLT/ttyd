@@ -10,18 +10,26 @@
 //.sbss
 static OSTime none_key;
 
-//.sdata
+/** .sdata */
 EVT_BEGIN(maku_spread)
     WAIT_MS(2000)
     CALL(evt_fade_entry, FADE_CURTAIN_LEAVE, 0, 0, 0, 0)
     RETURN
 EVT_END()
 
+/** Enters the field sequence: records the time (none_key, otherwise unused here) and clears system level flag 0x10. */
 void seq_gameInit(SequenceWork* wp) {
     none_key = OSGetTime();
     gp->systemLevelFlags &= ~0x10;
 }
 
+/**
+ * Per-frame field sequence.
+ * State 0 starts the fade-in (curtain opening after a stage-show intro, else the map or area fade)
+ * and resets the next fades to a 300 ms black fade;
+ * state 1 keeps the sound listener on the 3D camera and, on a kiosk build after the idle timeout,
+ * jumps to the game-over sequence once the fade has finished.
+ */
 void seq_gameMain(SequenceWork* wp) {
     CameraEntry *camera, *camera2;
     Vec position;
@@ -58,6 +66,7 @@ void seq_gameMain(SequenceWork* wp) {
     }
 }
 
+/** Leaves the field sequence; clears GLOBAL_FLAG_SKIP_MAP_EVENTS so the next map runs its events. */
 void seq_gameExit(SequenceWork* wp) {
     gp->flags &= ~GLOBAL_FLAG_SKIP_MAP_EVENTS;
 }

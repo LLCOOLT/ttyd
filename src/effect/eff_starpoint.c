@@ -27,7 +27,7 @@ typedef struct EffStarPointWork {
     s32 delay;    // 0x30
 } EffStarPointWork;
 
-// cheap polynomial approximations, valid for x in [0, 2pi]
+/** cheap polynomial approximations, valid for x in [0, 2pi] */
 static inline f32 _sinf(f32 x) {
     f32 a = 0.00761f;
     f32 b = 0.16605f;
@@ -65,6 +65,7 @@ static inline f32 _sinf(f32 x) {
     return a;
 }
 
+/** Cosine approximation by a quartic polynomial, valid for x in [0, 2pi]. */
 static inline f32 _cosf(f32 x) {
     f32 a = 0.03705f;
     f32 b = 0.4967f;
@@ -108,6 +109,10 @@ static inline f32 _cosf(f32 x) {
 #pragma opt_propagation off
 // lifetimes optimisation off for effStarPointEntry: the original register allocation and scheduling need it
 #pragma opt_lifetimes off
+/**
+ * Spawns `count` star icons at (x, y, z), each launched at a random horizontal angle
+ * and release delay (staggered every 3 frames). Caller: the evt_eff "starpoint" effect.
+ */
 EffectEntry* effStarPointEntry(s32 type, s32 count, f32 x, f32 y, f32 z) {
     s32 delay;
     EffectEntry* effect;
@@ -147,6 +152,10 @@ EffectEntry* effStarPointEntry(s32 type, s32 count, f32 x, f32 y, f32 z) {
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
+/**
+ * Runs ballistic motion for each icon once its delay is up, fading it out after it starts falling;
+ * deletes the effect 60 frames after the start.
+ */
 static void effStarPointMain(EffectEntry* effect) {
     EffStarPointWork* work = effect->userdata;
     Vec position;
@@ -181,6 +190,7 @@ static void effStarPointMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 1, (DispCallback)effStarPointDisp, effect);
 }
 
+/** Draws each visible star as an icon billboarded to the camera yaw (ICON_18C). */
 static void effStarPointDisp(CameraId cameraId, EffectEntry* effect) {
     EffStarPointWork* work = effect->userdata;
     Mtx mtx;

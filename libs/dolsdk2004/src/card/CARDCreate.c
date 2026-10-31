@@ -5,6 +5,11 @@
 // prototypes
 static void CreateCallbackFat(s32 chan, s32 result);
 
+/**
+ * Called after the FAT has been updated for a new file:
+ * fills in the free directory entry (game and maker code from the disk ID, permission 4, no banner or icon,
+ * start block, current time, fast icon speed), points the file info at the first block and saves the directory.
+ */
 static void CreateCallbackFat(s32 chan, s32 result) {
     CARDControl* card;
     CARDDir* dir;
@@ -48,6 +53,12 @@ after:;
     }
 }
 
+/**
+ * Creates a file: rejects names over CARD_FILENAME_MAX characters,
+ * sizes that are not a multiple of the sector size, existing names for this game (EXIST),
+ * a full directory (NOENT) and too little space (INSSPACE), then allocates the blocks.
+ * CreateCallbackFat finishes the job and 'fileInfo' is left pointing at the new file.
+ */
 s32 CARDCreateAsync(s32 chan, const char* fileName, u32 size, CARDFileInfo* fileInfo, CARDCallback callback) {
     CARDControl* card;
     CARDDir* dir;
@@ -116,6 +127,7 @@ s32 CARDCreateAsync(s32 chan, const char* fileName, u32 size, CARDFileInfo* file
     return result;
 }
 
+/** Blocking CARDCreateAsync. */
 s32 CARDCreate(s32 chan, const char* fileName, u32 size, CARDFileInfo* fileInfo) {
     s32 result = CARDCreateAsync(chan, fileName, size, fileInfo, __CARDSyncCallback);
     if (result < 0) {

@@ -5,7 +5,7 @@
 #include "manager/evtmgr_cmd.h"
 #include "libc_decls.h"
 
-// s32* mask
+/** s32* mask */
 USER_FUNC(evt_audience_base_flag_on) {
     BattleAudience* audience;
     s32 mask;
@@ -16,7 +16,7 @@ USER_FUNC(evt_audience_base_flag_on) {
     return EVT_RETURN_DONE;
 }
 
-// s32* memberId, s32* flags, s32 retIndex
+/** s32* memberId, s32* flags, s32 retIndex */
 USER_FUNC(evt_audience_flag_check) {
     EvtWord* args = event->args;
     s32 id, flags;
@@ -33,7 +33,7 @@ USER_FUNC(evt_audience_flag_check) {
     return EVT_RETURN_DONE;
 }
 
-// s32* memberId, s32* flags
+/** s32* memberId, s32* flags */
 USER_FUNC(evt_audience_flag_on) {
     EvtWord* args = event->args;
     s32 id, flags;
@@ -44,7 +44,7 @@ USER_FUNC(evt_audience_flag_on) {
     return EVT_RETURN_DONE;
 }
 
-// s32* memberId, s32* flags
+/** s32* memberId, s32* flags */
 USER_FUNC(evt_audience_flag_off) {
     EvtWord* args = event->args;
     s32 id, flags;
@@ -55,7 +55,7 @@ USER_FUNC(evt_audience_flag_off) {
     return EVT_RETURN_DONE;
 }
 
-// s32* memberId, f32* x, f32* y, f32* z
+/** s32* memberId, f32* x, f32* y, f32* z */
 USER_FUNC(evt_audience_set_position) {
     EvtWord* args = event->args;
     f32 x, y, z;
@@ -69,7 +69,7 @@ USER_FUNC(evt_audience_set_position) {
     return EVT_RETURN_DONE;
 }
 
-// s32* memberId, s32 retX, s32 retY, s32 retZ
+/** s32* memberId, s32 retX, s32 retY, s32 retZ */
 USER_FUNC(evt_audience_get_position) {
     BattleAudienceMember* member;
     EvtWord* args = event->args;
@@ -83,7 +83,7 @@ USER_FUNC(evt_audience_get_position) {
     return EVT_RETURN_DONE;
 }
 
-// s32* memberId, f32* x, f32* y, f32* z
+/** s32* memberId, f32* x, f32* y, f32* z */
 USER_FUNC(evt_audience_set_rotate) {
     EvtWord* args = event->args;
     f32 x, y, z;
@@ -97,7 +97,7 @@ USER_FUNC(evt_audience_set_rotate) {
     return EVT_RETURN_DONE;
 }
 
-// s32* memberId, f32* x, f32* y, f32* z
+/** s32* memberId, f32* x, f32* y, f32* z */
 USER_FUNC(evt_audience_set_rotate_offset) {
     EvtWord* args = event->args;
     f32 x, y, z;
@@ -111,7 +111,7 @@ USER_FUNC(evt_audience_set_rotate_offset) {
     return EVT_RETURN_DONE;
 }
 
-// s32* memberId, f32* targetX, f32* targetY, f32* targetZ, s32* interpMode, s32* numFrames
+/** s32* memberId, f32* targetX, f32* targetY, f32* targetZ, s32* interpMode, s32* numFrames */
 USER_FUNC(evt_audience_move_position_frame) {
     EvtWord* args = event->args;
     f32 targetX, targetY, targetZ;
@@ -155,7 +155,7 @@ USER_FUNC(evt_audience_move_position_frame) {
     return EVT_RETURN_BLOCK;
 }
 
-// s32* memberId, f32* targetX, f32* targetY, f32* targetZ, f32* interpSpeed
+/** s32* memberId, f32* targetX, f32* targetY, f32* targetZ, f32* interpSpeed */
 USER_FUNC(evt_audience_move_position_speed) {
     EvtWord* args = event->args;
     BattleAudienceMember* member;
@@ -228,7 +228,7 @@ USER_FUNC(evt_audience_move_position_speed) {
     return EVT_RETURN_BLOCK;
 }
 
-// s32* memberId, f32* targetX, f32* targetY, f32* targetZ, s32* numFrames, f32* deltaY
+/** s32* memberId, f32* targetX, f32* targetY, f32* targetZ, s32* numFrames, f32* deltaY */
 USER_FUNC(evt_audience_jump_position_firstsp) {
     EvtWord* args = event->args;
     BattleAudienceMember* member;
@@ -274,7 +274,7 @@ USER_FUNC(evt_audience_jump_position_firstsp) {
     return EVT_RETURN_BLOCK;
 }
 
-// s32* memberId, f32* targetX, f32* targetY, f32* targetZ, s32* numFrames, f32* gravity
+/** s32* memberId, f32* targetX, f32* targetY, f32* targetZ, s32* numFrames, f32* gravity */
 USER_FUNC(evt_audience_jump_position_gravity) {
     EvtWord* args = event->args;
     BattleAudienceMember* member;
@@ -321,7 +321,7 @@ USER_FUNC(evt_audience_jump_position_gravity) {
     return EVT_RETURN_BLOCK;
 }
 
-// s32* memberId, s32* animId, BOOL* force
+/** s32* memberId, s32* animId, BOOL* force */
 USER_FUNC(evt_audience_set_animpose) {
     EvtWord* args = event->args;
     s32 id, animId;
@@ -334,6 +334,10 @@ USER_FUNC(evt_audience_set_animpose) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Adds audience member args[0] as AudienceMemberType args[1];
+ * when the entry succeeds it is put straight into animation 1.
+ */
 USER_FUNC(evt_audience_entry) {
     EvtWord* args = event->args;
     AudienceMemberType type;
@@ -348,16 +352,26 @@ USER_FUNC(evt_audience_entry) {
     return EVT_RETURN_DONE;
 }
 
+/** Removes audience member args[0] from the crowd. */
 USER_FUNC(evt_audience_delete) {
     s32 id = evtGetValue(event, *event->args);
     BattleAudience_Delete(id);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Does nothing in every version, though Mario's battle scripts still call it after his attacks.
+ * Guess: a leftover hook for crowd-driven Star Power refills.
+ */
 USER_FUNC(evt_audience_ap_recovery) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Gives every member in status 13 at sub-step 1 an args[0]% chance to move on to sub-step 2;
+ * args[1] and args[2] are read but unused. Called by the quake hammers and the POW Block.
+ * Guess: this wakes members out of the stopped state that evt_audience_abnormal_natural_all puts them in.
+ */
 USER_FUNC(evt_audience_reflesh_natural_all) {
     EvtWord* args = event->args;
     BattleAudienceMember* member;
@@ -376,6 +390,10 @@ USER_FUNC(evt_audience_reflesh_natural_all) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Puts every active member in status 0-7 into status 13 with an args[0]% chance; args[1] and args[2] are unused.
+ * Called by the Clock Out special move (sac_bakugame). Guess: status 13 is the stopped state.
+ */
 USER_FUNC(evt_audience_abnormal_natural_all) {
     EvtWord* args = event->args;
     BattleAudienceMember* member;
@@ -398,6 +416,10 @@ USER_FUNC(evt_audience_abnormal_natural_all) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Plays the crowd cheer sized to the current audience (BattleAudienceSoundCheer):
+ * args[0] duration, args[1] fade time. The default battle events call it with 45, 25.
+ */
 USER_FUNC(evt_audience_sound_cheer) {
     EvtWord* args = event->args;
     s32 a, b;
@@ -408,17 +430,26 @@ USER_FUNC(evt_audience_sound_cheer) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Adds the float args[0] to the audience's added-member count (BattleAudienceAddTargetNum with no direct
+ * change), so events can raise or lower how many spectators turn up.
+ */
 USER_FUNC(evt_audience_num_updown_in_event) {
     f32 v = evtGetFloat(event, *event->args);
     BattleAudienceAddTargetNum(0.0f, v);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Run when Mario skips the Stylish command.
+ * Up to the US demo it clears AUDIENCE_FLAG_STYLISH_MISSED; the later releases do nothing here.
+ */
 USER_FUNC(evt_audience_acrobat_notry) {
     BattleAudience_Case_AcrobatNoTry();
     return EVT_RETURN_DONE;
 }
 
+/** Sets the whole crowd cheering with the ending reaction (BattleAudienceJoy type 3). */
 USER_FUNC(evt_audience_joy_ending) {
     BattleAudienceJoyEnding();
     return EVT_RETURN_DONE;

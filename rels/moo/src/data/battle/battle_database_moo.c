@@ -1379,6 +1379,11 @@ NpcTerritoryInfo btl_moo_setup_no_tbl[] = {
     {0},
 };
 
+/**
+ * Event script: the animated space background of the Moon battles.
+ * It rotates the three star objects of the stage (star_01, star_02, star_03) about Z once every 7500,
+ * 6750 and 6000 frames, forever.
+ */
 EVT_BEGIN(bgset_moo_space_event)
     SET_VALUE(LW(0), 0)
     SET_VALUE(LW(1), 0)
@@ -1393,6 +1398,11 @@ EVT_BEGIN(bgset_moo_space_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: turns the stage object named in args[0] around Z. args[1] is a script variable holding the
+ * current step, args[2] the number of steps in one turn:
+ * it sets the rotation to 360 degrees times step/total and advances and wraps the step.
+ */
 static USER_FUNC(_space_rotate) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);

@@ -104,6 +104,7 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_teresa", "c_mario", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
+/** Battle init script of the placeholder unit: installs only the wait handler and starts the wait event. */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -116,6 +117,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Wait (idle) event: refreshes the body animation (part 1) from the unit's pose table
+ * so it matches the current state.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

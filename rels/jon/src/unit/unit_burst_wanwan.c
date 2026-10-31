@@ -224,6 +224,11 @@ static BattleWeapon weapon_wanwan_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init script of the Red Chomp: registers its wait, attack, damage and confusion handlers,
+ * sets unit work 0 (the chained flag) to 1, sets up the chain parts (chain_init) and starts chain_event,
+ * sets its landing sound and unit work 1 (sound volume) to 127.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -238,6 +243,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Background loop of the Red Chomp, run while it exists:
+ * each frame it animates the chain parts (chain_main) until the unit no longer exists.
+ */
 static EVT_BEGIN(chain_event)
     LABEL(0)
     WAIT_FRAMES(1)
@@ -251,6 +260,11 @@ static EVT_BEGIN(chain_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage script of the Red Chomp: marks it as chained (unit work 0 = 1),
+ * sets unit work 2 to 2 while the hit is processed (which freezes the chain's current shape)
+ * and sets attribute 4 on it, runs the default damage handling, then clears both again.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -263,6 +277,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Counter-damage script of the Red Chomp (data events 25 to 33):
+ * flings the head up in the knocked-back pose (39) and, in the demo builds, drops it back with two hops.
+ * Unless the damage code is 512 without 2048 it then goes back to waiting.
+ */
 static EVT_BEGIN(counter_damage_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 39)
     CALL(btlevtcmd_SetPartsFallAccel, LW(10), 1, FLOAT(1.0f))
@@ -293,6 +312,14 @@ static EVT_BEGIN(counter_damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Defeat script of the Red Chomp: the chain links
+ * and head spin in place for 48 frames with SFX_BTL_ENEMY_DIE1_1,
+ * then the unit puffs out in smoke with SFX_BTL_ENEMY_DIE1_2 and a "star_point" effect,
+ * its coins and experience are stored, the chain pieces shake for 30 frames,
+ * it returns any item it held and is removed from the battle (without a defeat reward if hit with damage code
+ * 1024).
+ */
 static EVT_BEGIN(dead_event)
     SET_VALUE(LW(0), 48)
     CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -351,6 +378,13 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the Red Chomp: it lunges at its target.
+ * It clears unit work 0 and stops its wait script first (Guess: so the chain no longer pulls the head back),
+ * jumps twice in place while barking, snaps its head forward into the target and bites for a couple of rounds,
+ * dealing damage on the bite. It then sets unit work 0 back to 1 and resumes waiting.
+ * After a first strike it pauses 750 ms first.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -472,6 +506,12 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Wait script of the Red Chomp: its idle depends on its status.
+ * With status 1 (Guess: sleep) it nods slowly in pose WAN_N_1; with status 2 or 9 it plays WAN_Y_1;
+ * with status 3, 4 or 5 it hops on the spot with extra variants; otherwise it plays its normal idle hops.
+ * The hops use the landing and bark sounds of wait_sound_event1 and 2, and sound_gensui_event lowers the volume.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
     CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 1, LW(15))
@@ -594,6 +634,10 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+/**
+ * Lowers the Red Chomp's bark volume (unit work 1) to 70 percent per call, with a floor of 32.
+ * The status idle loops in wait_event call it.
+ */
 static EVT_BEGIN(sound_gensui_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(11))
     MULTIPLY_FLOAT(LW(11), FLOAT(0.69921875f))
@@ -604,6 +648,10 @@ static EVT_BEGIN(sound_gensui_event)
     RETURN
 EVT_END()
 
+/**
+ * Bark sound of the Red Chomp: SFX_ENM_WAN_WAIT1 and WAIT3 at once and, after LW(10) frames, WAIT2,
+ * at volume LW(11).
+ */
 static EVT_BEGIN(wait_sound_event1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_WAN_WAIT1"), LW(11), 0, EVT_NULLPTR)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_WAN_WAIT3"), LW(11), 0, EVT_NULLPTR)
@@ -612,6 +660,7 @@ static EVT_BEGIN(wait_sound_event1)
     RETURN
 EVT_END()
 
+/** Second bark sound of the Red Chomp: waits LW(10) frames and then plays SFX_ENM_WAN_WAIT4 at volume LW(11). */
 static EVT_BEGIN(wait_sound_event2)
     WAIT_FRAMES(LW(10))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_WAN_WAIT4"), LW(11), 0, EVT_NULLPTR)
@@ -622,6 +671,13 @@ EVT_END()
 EVT_END_PAD()
 #endif
 
+/**
+ * Per-frame script helper that animates the Chomp's chain (parts 2-9). args[0] = unit.
+ * Part 9 is the stake, behind the chomp; when work[2] is 2 the current link layout is recorded relative to the
+ * stake and when it is 1 the links keep that shape (the Chomp has been pulled away).
+ * Otherwise the links hang as a sagging chain between the Chomp (part 1, kept below y = 110) and the stake,
+ * each link moved to a fixed distance from its neighbour and held above the floor.
+ */
 static USER_FUNC(chain_main) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -744,6 +800,11 @@ static USER_FUNC(chain_main) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] = unit.
+ * Puts the chain's link parts (2-7) on top of the Chomp,
+ * links 8 and 9 behind it and plays their chain animations (WAN_S_1B, WAN_Z_2 for the stake).
+ */
 static USER_FUNC(chain_init) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;

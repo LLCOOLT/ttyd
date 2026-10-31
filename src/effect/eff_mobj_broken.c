@@ -33,6 +33,7 @@ static void effMObjBrokenDisp(CameraId cameraId, EffectEntry* effect);
 static void effMObjBrokenDisp2(CameraId cameraId, EffectEntry* effect);
 static void rendermodeFunc(s32 arg);
 
+/** Inline sine, kept as a local copy so the compiler inlines it in this unit. */
 static inline f32 _sinf(f32 x) {
     f32 a = 0.00761f;
     f32 b = 0.16605f;
@@ -70,6 +71,7 @@ static inline f32 _sinf(f32 x) {
     return a;
 }
 
+/** Inline cosine, kept as a local copy so the compiler inlines it in this unit. */
 static inline f32 _cosf(f32 x) {
     f32 a = 0.03705f;
     f32 b = 0.4967f;
@@ -103,6 +105,7 @@ static inline f32 _cosf(f32 x) {
     return a;
 }
 
+/** Spawns the debris of a broken map object at (x, y, z); evt_mobj.c calls it with a type per object kind (0-7). */
 EffectEntry* effMObjBrokenEntry(s32 type, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
     EffMObjBrokenWork* work;
@@ -204,6 +207,10 @@ EffectEntry* effMObjBrokenEntry(s32 type, f32 x, f32 y, f32 z) {
 #pragma opt_propagation off
 // lifetimes optimisation off for effMObjBrokenMain: the original register allocation and scheduling need it
 #pragma opt_lifetimes off
+/**
+ * Per frame: throws each fragment outward with gravity, fades it and releases its pose;
+ * deletes the effect at the end.
+ */
 static void effMObjBrokenMain(EffectEntry* effect) {
     EffMObjBrokenWork* work = effect->userdata;
     s32 type;
@@ -281,6 +288,7 @@ static void effMObjBrokenMain(EffectEntry* effect) {
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
+/** Draws the fragments as textured quads (effect textures 56-59) with alpha blending. */
 static void effMObjBrokenDisp(CameraId cameraId, EffectEntry* effect) {
     EffMObjBrokenWork* work = effect->userdata;
     CameraEntry* camera;
@@ -368,6 +376,7 @@ static void effMObjBrokenDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
+/** GX state callback for the EFF_sango pose: sets up alpha blending. */
 static void rendermodeFunc(s32 arg) {
     animGetPtr()->currDispMode = arg;
     GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
@@ -376,6 +385,7 @@ static void rendermodeFunc(s32 arg) {
     GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
 }
 
+/** Draws the EFF_sango model pieces for the type that shows them, tinted with an event colour for fading. */
 static void effMObjBrokenDisp2(CameraId cameraId, EffectEntry* effect) {
     s32 off;
     EffMObjBrokenWork* work;

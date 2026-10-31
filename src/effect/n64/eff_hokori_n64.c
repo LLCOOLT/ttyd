@@ -33,6 +33,11 @@ effN64Vtx size8x8_tex32x32_vtx[] = {
 static void effHokoriMain(EffectEntry* effect);
 static void effHokoriDisp(CameraId cameraId, EffectEntry* effect);
 
+/**
+ * Spawns hokori (dust) puffs near (x, y, z) for lifetime frames: four puffs, five for types 0 and 1.
+ * The tint is grey-brown by default.
+ * Called by the boss_magnum_battender unit (mri) and by event scripts through evt_eff.
+ */
 EffectEntry* effHokoriN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z) {
     s32 count;
     EffectEntry* effect;
@@ -87,6 +92,10 @@ EffectEntry* effHokoriN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z) {
     return effect;
 }
 
+/**
+ * Counts the life down (fading over the last 24 frames) and grows each puff;
+ * types 0 and 1 also speed the growth up.
+ */
 static void effHokoriMain(EffectEntry* effect) {
     EffHokoriN64Work* work = effect->userdata;
     Vec position;
@@ -128,6 +137,10 @@ static void effHokoriMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effHokoriDisp, effect);
 }
 
+/**
+ * Draws each puff as a camera-facing sprite (texture 21 for type 0, 22 otherwise):
+ * tall and square ones alternate for types 0-1, small ones for other types.
+ */
 static void effHokoriDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffHokoriN64Work* work;

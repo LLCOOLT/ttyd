@@ -1,6 +1,10 @@
 #include <dolphin/gd.h>
 #include <dolphin/os.h>
 
+/**
+ * Writes the BP indirect texture setup of one TEV stage:
+ * indirect stage, format, bias, matrix, S and T wrap, add- previous and unsigned LOD flags and alpha selection.
+ */
 void GDSetTevIndirect(GXTevStageID tev_stage, GXIndTexStageID ind_stage,
                       GXIndTexFormat format, GXIndTexBiasSel bias_sel,
                       GXIndTexMtxID matrix_sel, GXIndTexWrap wrap_s,
@@ -20,6 +24,11 @@ void GDSetTevIndirect(GXTevStageID tev_stage, GXIndTexStageID ind_stage,
     ));
 }
 
+/**
+ * Writes one of the three indirect texture matrices as three BP registers.
+ * Each element is converted to fixed point (scaled by 1024, 11 bits)
+ * and the scale exponent plus 17 is split across the three registers.
+ */
 void GDSetIndTexMtx(GXIndTexMtxID mtx_id, const f32 offset[2][3], s8 scale_exp) {
     u32 id_offset;
 
@@ -62,6 +71,10 @@ void GDSetIndTexMtx(GXIndTexMtxID mtx_id, const f32 offset[2][3], s8 scale_exp) 
     ));
 }
 
+/**
+ * Writes the S and T scales for a pair of indirect stages (starting at an even stage) into BP register 0x25
+ * or 0x26.
+ */
 void GDSetIndTexCoordScale(GXIndTexStageID indStageEven, GXIndTexScale scaleS0,
                            GXIndTexScale scaleT0, GXIndTexScale scaleS1,
                            GXIndTexScale scaleT1) {
@@ -74,6 +87,7 @@ void GDSetIndTexCoordScale(GXIndTexStageID indStageEven, GXIndTexScale scaleS0,
     ));
 }
 
+/** Writes the texture map and texture coordinate for each of the four indirect stages into BP register 0x27. */
 void GDSetIndTexOrder(GXTexCoordID texCoord0, GXTexMapID texMap0,
                       GXTexCoordID texCoord1, GXTexMapID texMap1,
                       GXTexCoordID texCoord2, GXTexMapID texMap2,
@@ -91,10 +105,15 @@ void GDSetIndTexOrder(GXTexCoordID texCoord0, GXTexMapID texMap0,
     ));
 }
 
+/** Switches a TEV stage back to direct texturing: no indirect matrix, bias or wrap. */
 void GDSetTevDirect(GXTevStageID tev_stage) {
     GDSetTevIndirect(tev_stage, GX_INDTEXSTAGE0, GX_ITF_8, GX_ITB_NONE, GX_ITM_OFF, GX_ITW_OFF, GX_ITW_OFF, 0, 0, GX_ITBA_OFF);
 }
 
+/**
+ * Sets a TEV stage to warp its texture coordinates by an indirect texture,
+ * using a matrix and optionally a signed offset; replace_mode replaces the coordinates instead of adding.
+ */
 void GDSetTevIndWarp(GXTevStageID tev_stage, GXIndTexStageID ind_stage, u8 signed_offset, u8 replace_mode, GXIndTexMtxID matrix_sel) {
     GXIndTexWrap wrap;
     wrap = replace_mode ? GX_ITW_0 : GX_ITW_OFF;
@@ -111,6 +130,10 @@ void GDSetTevIndWarp(GXTevStageID tev_stage, GXIndTexStageID ind_stage, u8 signe
                      GX_ITBA_OFF);
 }
 
+/**
+ * Sets a TEV stage for tiled indirect lookups: picks the wrap from the tile size (16 to 256),
+ * loads an indirect matrix scaled by the tile spacing and writes the stage's setup.
+ */
 void GDSetTevIndTile(GXTevStageID tev_stage, GXIndTexStageID ind_stage,
                      u16 tilesize_s, u16 tilesize_t, u16 tilespacing_s,
                      u16 tilespacing_t, GXIndTexFormat format,
@@ -183,6 +206,11 @@ void GDSetTevIndTile(GXTevStageID tev_stage, GXIndTexStageID ind_stage,
                      alpha_sel);
 }
 
+/**
+ * Sets up bump mapping in S/T space, which takes three TEV stages from tev_stage:
+ * one applying the S matrix, one the T matrix (adding the previous stage)
+ * and one repeating the result with no matrix.
+ */
 void GDSetTevIndBumpST(GXTevStageID tev_stage, GXIndTexStageID ind_stage, GXIndTexMtxID matrix_sel) {
     GXIndTexMtxID sm;
     GXIndTexMtxID tm;
@@ -239,6 +267,7 @@ void GDSetTevIndBumpST(GXTevStageID tev_stage, GXIndTexStageID ind_stage, GXIndT
                      GX_ITBA_OFF);
 }
 
+/** Sets a TEV stage for bump mapping where the indirect texture gives an XYZ offset through the chosen matrix. */
 void GDSetTevIndBumpXYZ(GXTevStageID tev_stage, GXIndTexStageID ind_stage, GXIndTexMtxID matrix_sel) {
     GDSetTevIndirect(tev_stage,
                      ind_stage,
@@ -252,6 +281,7 @@ void GDSetTevIndBumpXYZ(GXTevStageID tev_stage, GXIndTexStageID ind_stage, GXInd
                      GX_ITBA_OFF);
 }
 
+/** Sets a TEV stage to use the previous stage's coordinates (wrap 0, add previous) with no indirect lookup. */
 void GDSetTevIndRepeat(GXTevStageID tev_stage) {
     GDSetTevIndirect(tev_stage,
                      GX_INDTEXSTAGE0,
@@ -265,6 +295,7 @@ void GDSetTevIndRepeat(GXTevStageID tev_stage) {
                      GX_ITBA_OFF);
 }
 
+/** Writes the BP mask of enabled indirect stages (low 8 bits). */
 void __GDSetIndTexMask(u32 mask) {
     GDWriteBPCmd(BP_IND_MASK(mask & 0xFF, 0xF));
 }

@@ -13,6 +13,7 @@ extern EvtWord jin_11_ana[];
 static BeroEntry bero_entry_data[3];
 extern EvtWord evt_yuka[];
 
+/** Exit event of the hole in the floor: sets GSWF_STG4_DROP_IN_ENTRANCE and drops Mario into jin_07. */
 EVT_BEGIN(jin_11_ana)
     SET_VALUE(GSWF(GSWF_STG4_DROP_IN_ENTRANCE), 1)
     CALL(evt_bero_mapchange, STRING("jin_07"), 0)
@@ -20,12 +21,20 @@ EVT_BEGIN(jin_11_ana)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback: closes door10 as Mario arrives through s_bero (from jin_10);
+ * LW(0) is the door angle and the door turns around Y by 0.44 times it.
+ */
 static EVT_BEGIN(s_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door10"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback: opens door10 as Mario leaves through s_bero (to jin_10);
+ * LW(0) is the door angle and the door turns around Y by 0.44 times it, negated.
+ */
 static EVT_BEGIN(s_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door10"), 0, LW(0), 0)
@@ -70,11 +79,16 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Script run when Mario breaks the weak floor: sets the story to "Breaking the floor". */
 EVT_BEGIN(evt_yuka)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG4_13_03_BREAKING_THE_FLOOR)
     RETURN
 EVT_END()
 
+/**
+ * Creepy Steeple jin_11 map init: sets music, the shadow-Mario tint and the exits, adds the save block,
+ * the Shine Sprite power-up block and, before the "Breaking the floor" step, the breaking floor.
+ */
 EVT_BEGIN(jin_11_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_JIN1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_JIN1"))

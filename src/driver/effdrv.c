@@ -255,6 +255,10 @@ const char* prefix_tbl[2] = {"jp", "us"};
 // local prototypes
 static void _callback_tpl(s32 error, DVDFileInfo* info);
 
+/**
+ * DVD read callback for the asynchronous effect.tpl load:
+ * unpacks the texture palette, closes the file and marks the effect textures ready.
+ */
 static void _callback_tpl(s32 error, DVDFileInfo* info) {
     DVDEntry* entry = info->cb.userData;
     UnpackTexPalette(wp->texture);
@@ -262,6 +266,10 @@ static void _callback_tpl(s32 error, DVDFileInfo* info) {
     wp->texLoaded = TRUE;
 }
 
+/**
+ * Boot setup: allocates the effect entry pool (512 entries in the US and later releases, 256 before),
+ * clears it and the texture state, and initialises the N64-style effects.
+ */
 void effInit(void) {
 #if VERSION >= VERSION_US
     wp->count = 0x200;
@@ -283,6 +291,11 @@ void effInit(void) {
 #define EFF_NTEX 146
 #endif
 
+/**
+ * Loads effect.tpl, the shared effect textures:
+ * from the startup archive if it is there, otherwise asynchronously from the disc (the jp or us folder by
+ * language in the US and later releases). Called from the logo sequence at boot.
+ */
 void effTexSetup(void) {
     DVDEntry* entry;
     char path[128];
@@ -310,6 +323,11 @@ void effTexSetup(void) {
 }
 
 #pragma explicit_zero_data on
+/**
+ * Fills obj with effect texture id.
+ * Ids below the effect.tpl count come from effect.tpl, higher ones from the current language's effect_xx.tpl;
+ * until a file has loaded a 1x1 blank texture stands in.
+ */
 void effGetTexObj(u32 id, GXTexObj* obj) {
 #ifdef __MWERKS__
     if ((s32)id < EFF_NTEX) { // number of images in effect.tpl
@@ -331,6 +349,10 @@ void effGetTexObj(u32 id, GXTexObj* obj) {
 }
 #pragma explicit_zero_data reset
 
+/**
+ * Frees every in-use effect that belongs to the battle (inBattle TRUE) or to the field (FALSE);
+ * the battle and map change sequences call it when leaving.
+ */
 void effAutoRelease(BOOL inBattle) {
     int i;
     int count = wp->count;
@@ -344,6 +366,11 @@ void effAutoRelease(BOOL inBattle) {
     }
 }
 
+/**
+ * Takes the first free effect entry, marks it in use,
+ * tags it as a field or battle effect by the current mode and clears its type, counter, data and callback.
+ * The pool has no overflow check.
+ */
 EffectEntry* effEntry(void) {
     EffectEntry* entry = wp->entries;
     int i;
@@ -363,6 +390,10 @@ EffectEntry* effEntry(void) {
     return entry;
 }
 
+/**
+ * Gives an effect the name scripts use to find it again (effNameToPtr).
+ * The search for an existing effect with that name has no effect; the name is copied regardless.
+ */
 void effSetName(EffectEntry* effect, const char* name) {
     int i;
     int count = wp->count;
@@ -376,6 +407,11 @@ void effSetName(EffectEntry* effect, const char* name) {
     strcpy(effect->name, name);
 }
 
+/**
+ * Once per frame: runs the callback of every in-use effect of the current mode (field or battle).
+ * When the game language changes it also reloads the language's effect_xx.tpl (lettering textures such as
+ * "Nice!").
+ */
 void effMain(void) {
     const char *dvdroot, *prefix;
     int i;
@@ -411,6 +447,7 @@ void effMain(void) {
     }
 }
 
+/** Frees an effect's data and releases its entry at once; safe on NULL. */
 void effDelete(EffectEntry* effect) {
     if (effect && effect->flags) {
         __memFree(HEAP_EFFECT, effect->userdata);
@@ -418,6 +455,10 @@ void effDelete(EffectEntry* effect) {
     }
 }
 
+/**
+ * Asks an effect to end: effects that handle their own fade-out (EFFECT_FLAG_SOFT_DELETE) only get a delete
+ * request and free themselves later; others are deleted at once.
+ */
 void effSoftDelete(EffectEntry* effect) {
     if (effect && effect->flags) {
         if (effect->flags & EFFECT_FLAG_SOFT_DELETE) {
@@ -428,6 +469,7 @@ void effSoftDelete(EffectEntry* effect) {
     }
 }
 
+/** Returns the in-use effect with the given name, or NULL. */
 EffectEntry* effNameToPtr(const char* name) {
     int i;
     int count = wp->count;
@@ -445,6 +487,10 @@ EffectEntry* effNameToPtr(const char* name) {
     }
 }
 
+/**
+ * Looks an effect type up by its name in eff_set_table (e.g. "kemuri", "confetti");
+ * used by the evt_eff script helpers. NULL if unknown.
+ */
 EffectSet* effGetSet(const char* name) {
     s32 i;
 
@@ -456,8 +502,11 @@ EffectSet* effGetSet(const char* name) {
     return NULL;
 }
 
-// per-key interpolation and the GQR5 setup were inlines in the original: inline locals take the low registers,
-// last declared lowest (qv0 f9 .. qm1 f12 above dt f8 / s f7 / s3 f6 / s2 f5; gqr r9 under the key-offset temp r10)
+/**
+ * per-key interpolation and the GQR5 setup were inlines in the original:
+ * inline locals take the low registers, last declared lowest (qv0 f9 .. qm1 f12 above dt f8 / s f7 / s3 f6 / s2
+ * f5; gqr r9 under the key-offset temp r10)
+ */
 static inline void effMayaKeyInterp(MayaHermitKey* prev, MayaHermitKey* curr, f32 t, f32* buf) {
     s32 i;
     f32* out;
@@ -501,12 +550,21 @@ static inline void effMayaKeyInterp(MayaHermitKey* prev, MayaHermitKey* curr, f3
     }
 }
 
+/**
+ * Sets GQR5 to load signed 16-bit values scaled by 1/64,
+ * the fixed-point format of the Maya key values read by __OSs16tof32.
+ */
 static inline void effMayaSetGQR(void) {
     register u32 gqr; // an asm operand (HW_SET_GQR5) must be a register variable
     gqr = 0x06070607;
     HW_SET_GQR5(gqr);
 }
 
+/**
+ * Evaluates one polygon of a Maya effect animation at the animation's current time:
+ * interpolates its 22 channels between the surrounding keys
+ * and builds its transform matrix (translate, rotate, scale about pivots) and its alpha, clamped to 0..1.
+ */
 static void effCalcMayaAnimMatrix(MayaAnim* anim, MayaPoly* poly, f32* mtx, f32* alpha) {
     f32 buf[22];
     Mtx trans;
@@ -567,6 +625,10 @@ static void effCalcMayaAnimMatrix(MayaAnim* anim, MayaPoly* poly, f32* mtx, f32*
     }
 }
 
+/**
+ * Allocates and clears a playback state for a Maya-exported effect animation, with one joint matrix per polygon;
+ * used by the damage star, ice and recovery effects.
+ */
 MayaAnim* effMayaAnimAlloc(MayaAnimData* data) {
     s32 size = data->polyList->count * sizeof(MayaJoint) + 0x18;
     MayaAnim* anim = __memAlloc(HEAP_EFFECT, size);
@@ -575,10 +637,12 @@ MayaAnim* effMayaAnimAlloc(MayaAnimData* data) {
     return anim;
 }
 
+/** Frees a playback state from effMayaAnimAlloc. */
 void effDeleteMayaAnim(MayaAnim* anim) {
     __memFree(HEAP_EFFECT, anim);
 }
 
+/** Starts a Maya effect animation from time 0, using the field or battle render clock. */
 void effPlayMayaAnim(MayaAnim* anim) {
     OSTime now = gp->inBattle ? gp->renderTime : gp->renderFieldTime;
     anim->startTime = now / (OS_TIMER_CLOCK / 1000);
@@ -586,6 +650,10 @@ void effPlayMayaAnim(MayaAnim* anim) {
     anim->flags |= MAYA_ANIM_FLAG_PLAYING;
 }
 
+/**
+ * Advances a playing Maya effect animation from the render clock (field or battle) in frames since it started,
+ * stops it at its end time, and recomputes every polygon's matrix and alpha.
+ */
 void effCalcMayaAnim(MayaAnim* anim) {
     if ((anim->flags & MAYA_ANIM_FLAG_PLAYING) && !(anim->flags & MAYA_ANIM_FLAG_ENDED)) {
         OSTime now = gp->inBattle ? gp->renderTime : gp->renderFieldTime;
@@ -602,6 +670,10 @@ void effCalcMayaAnim(MayaAnim* anim) {
     }
 }
 
+/**
+ * Draws one polygon of a Maya effect model as triangle fans from its fixed-point (1/512) positions
+ * and texture coordinates; the caller sets up the matrix, texture and colour.
+ */
 void effDrawMayaPoly(MayaPoly* poly) {
     s32 i;
     GXClearVtxDesc();

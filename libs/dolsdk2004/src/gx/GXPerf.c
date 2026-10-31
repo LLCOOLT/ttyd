@@ -3,6 +3,13 @@
 
 #include "__gx.h"
 
+/**
+ * Chooses what the two GP performance counters count.
+ * It first resets the hardware selection for the old perf0/perf1 metrics (XF register 6, BP 0x23, 0x24 and 0x67,
+ * and the CP perf select), then programs the registers for the new GXPerf0 metric (vertex, clip,
+ * transform clocks, triangle or quad counts) and GXPerf1 metric (texel, texture cache,
+ * vertex cache and CP request counts).
+ */
 void GXSetGPMetric(GXPerf0 perf0, GXPerf1 perf1) {
     u32 reg;
 
@@ -180,6 +187,12 @@ void GXSetGPMetric(GXPerf0 perf0, GXPerf1 perf1) {
 }
 
 #pragma scheduling off
+/**
+ * Reads the four CP counters (registers 32 to 39) and converts them according to the selected metrics:
+ * counter 0 for most perf0 metrics (clip ratio is counter 1 * 1000 / counter 0), and for perf1 counter 3,
+ * with the texel metric multiplied by 4, the texture cache check metrics combining counters 2 and 3,
+ * and the CP request metrics using counter 2.
+ */
 void GXReadGPMetric(u32* cnt0, u32* cnt1) {
     u32 cpCtr0, cpCtr1, cpCtr2, cpCtr3;
 
@@ -285,6 +298,7 @@ void GXReadGPMetric(u32* cnt0, u32* cnt1) {
 }
 #pragma scheduling reset
 
+/** Resets the GP performance counters by writing 4 to CP register 2. */
 void GXClearGPMetric(void) {
     u32 reg;
 
@@ -292,6 +306,7 @@ void GXClearGPMetric(void) {
     GX_SET_CP_REG(2, reg);
 }
 
+/** Returns the first value from GXReadGPMetric (the perf0 counter). */
 u32 GXReadGP0Metric(void) {
     u32 cnt0, cnt1;
 
@@ -299,6 +314,7 @@ u32 GXReadGP0Metric(void) {
     return cnt0;
 }
 
+/** Returns the second value from GXReadGPMetric (the perf1 counter). */
 u32 GXReadGP1Metric(void) {
     u32 cnt0, cnt1;
 
@@ -307,6 +323,10 @@ u32 GXReadGP1Metric(void) {
 }
 
 #pragma scheduling off
+/**
+ * Reads the memory-controller request counters (registers 25 to 44) for the command processor, texture cache,
+ * CPU reads, CPU writes, DSP, I/O, video interface, pixel engine, refresh and FIFO into the ten output pointers.
+ */
 void GXReadMemMetric(u32* cp_req, u32* tc_req, u32* cpu_rd_req, u32* cpu_wr_req, u32* dsp_req, u32* io_req, u32* vi_req, u32* pe_req, u32* rf_req, u32* fi_req) {
     *cp_req = __GXReadMEMCounterU32(26, 25);
     *tc_req = __GXReadMEMCounterU32(28, 27);
@@ -321,6 +341,7 @@ void GXReadMemMetric(u32* cp_req, u32* tc_req, u32* cpu_rd_req, u32* cpu_wr_req,
 }
 #pragma scheduling reset
 
+/** Zeroes the memory-controller request counters (registers 25 to 44). */
 void GXClearMemMetric(void) {
     GX_SET_MEM_REG(25, 0);
     GX_SET_MEM_REG(26, 0);
@@ -345,6 +366,10 @@ void GXClearMemMetric(void) {
 }
 
 #pragma scheduling off
+/**
+ * Reads the pixel-engine counters: pixels in and out for the top and bottom of the pipeline
+ * and the colour pixels in (each multiplied by 4) and the clocks spent copying.
+ */
 void GXReadPixMetric(u32* top_pixels_in, u32* top_pixels_out, u32* bot_pixels_in, u32* bot_pixels_out, u32* clr_pixels_in, u32* copy_clks) {
     *top_pixels_in = __GXReadPECounterU32(12, 13) * 4;
     *top_pixels_out = __GXReadPECounterU32(14, 15) * 4;
@@ -355,6 +380,7 @@ void GXReadPixMetric(u32* top_pixels_in, u32* top_pixels_out, u32* bot_pixels_in
 }
 #pragma scheduling reset
 
+/** Clears the pixel-engine counters by writing BP register 0x57 with 0 and then 0xAAA. */
 void GXClearPixMetric(void) {
     u32 reg;
 
@@ -367,6 +393,10 @@ void GXClearPixMetric(void) {
     __GXData->bpSentNot = 0;
 }
 
+/**
+ * Selects which vertex-cache event the vertex-cache counters track (sets the perf select field,
+ * then writes the CP perf registers).
+ */
 void GXSetVCacheMetric(GXVCachePerf attr) {
     u32 reg;
 
@@ -377,6 +407,7 @@ void GXSetVCacheMetric(GXVCachePerf attr) {
 }
 
 #pragma scheduling off
+/** Reads the vertex-cache counters from CP registers 40 to 45: checks, misses and stalls. */
 void GXReadVCacheMetric(u32* check, u32* miss, u32* stall) {
     *check = __GXReadCPCounterU32(40, 41);
     *miss = __GXReadCPCounterU32(42, 43);
@@ -384,10 +415,15 @@ void GXReadVCacheMetric(u32* check, u32* miss, u32* stall) {
 }
 #pragma scheduling reset
 
+/** Clears the vertex-cache metric setting by writing zero to the CP perf register. */
 void GXClearVCacheMetric(void) {
     GX_WRITE_SOME_REG4(8, 0, 0, -12);
 }
 
+/**
+ * Programs the counters for transform and rasterizer idle measurement:
+ * BP 0x24 with 0x2C022 and XF register 6 with 0x31000.
+ */
 void GXInitXfRasMetric(void) {
     u32 reg;
 
@@ -401,6 +437,10 @@ void GXInitXfRasMetric(void) {
 }
 
 #pragma scheduling off
+/**
+ * Reads the CP counters 32 to 39 as the transform unit's wait-in and wait-out clocks,
+ * rasterizer busy clocks and total clocks.
+ */
 void GXReadXfRasMetric(u32* xf_wait_in, u32* xf_wait_out, u32* ras_busy, u32* clocks) {
     *ras_busy = __GXReadCPCounterU32(32, 33);
     *clocks = __GXReadCPCounterU32(34, 35);
@@ -409,6 +449,10 @@ void GXReadXfRasMetric(u32* xf_wait_in, u32* xf_wait_out, u32* ras_busy, u32* cl
 }
 #pragma scheduling reset
 
+/**
+ * Waits for the GPU to finish drawing, starts the CP counters with 0x1007
+ * and returns the clocks-per-vertex figure from CP register 50 (shifted right by 8).
+ */
 u32 GXReadClksPerVtx(void) {
     u32 perfCnt;
     u32 ctrh;
@@ -422,6 +466,10 @@ u32 GXReadClksPerVtx(void) {
     return perfCnt;
 }
 
+/**
+ * Sets the memory-controller bandwidth limit registers (9 to 13) for the command processor, texture cache,
+ * pixel engine, CPU reads and CPU writes.
+ */
 void __GXSetBWDials(u16 cpDial, u16 tcDial, u16 peDial, u16 cpuRdDial, u16 cpuWrDial) {
     __MEMRegs[9] = cpDial;
     __MEMRegs[10] = tcDial;

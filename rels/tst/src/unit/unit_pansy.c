@@ -161,6 +161,11 @@ BattleWeapon weapon_pansy_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Attack AI of the Crazee Dayzee: uses an enemy item if it has one.
+ * At 1 HP or less it always runs away (escape_event);
+ * otherwise it sings its lullaby 70% of the time and runs away 30% of the time.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -214,6 +219,10 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Battle init script for the Crazee Dayzee: installs the wait, attack,
+ * damage and confusion handlers and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -223,6 +232,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: selects this unit (-2) and its part 1
+ * and runs the shared default damage reaction (btldefaultevt_Damage).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -230,6 +243,13 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * The Crazee Dayzee's lullaby, aimed at every opposing target:
+ * darkens the screen (map blend 255 to 192), sings with music-note effects for 120 frames (60 + 60 in the US
+ * demo) and then checks each target in turn, showing avoid animations
+ * or applying the attack (it can put them to sleep). Then the screen brightens back to normal.
+ * A flustered (confused) unit with no target runs the confused subset instead.
+ */
 static EVT_BEGIN(song_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -339,6 +359,10 @@ static EVT_BEGIN(song_event)
     RETURN
 EVT_END()
 
+/**
+ * Flees the battle: turns around, jumps back and dashes off the right side of the stage (x = 300) at speed 9
+ * with a blur trail, then removes the unit from the battle without rewards (KillUnit mode 0).
+ */
 static EVT_BEGIN(escape_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PANSY_ESCAPE1_1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PAN_E_1"))
@@ -359,6 +383,10 @@ static EVT_BEGIN(escape_event)
     RETURN
 EVT_END()
 
+/**
+ * Wait (idle) event: refreshes the body animation (part 1) from the unit's pose table
+ * so it matches the current state, then returns; the battle system runs it whenever the unit is idle.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

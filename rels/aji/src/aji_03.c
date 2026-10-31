@@ -61,6 +61,11 @@ extern EvtWord badge_evt[];
 extern EvtWord badge_evt2[];
 extern EvtWord badge_evt3[];
 
+/**
+ * Door close animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times -0.25;
+ * the open and close scripts apply the same transform. The demo builds use -0.2217.
+ */
 static EVT_BEGIN(e_door_close)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
@@ -73,6 +78,11 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door open animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times -0.25;
+ * the open and close scripts apply the same transform. The demo builds use -0.2217.
+ */
 static EVT_BEGIN(e_door_open)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
@@ -107,6 +117,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Spins the map object named in LW(10) around its Y axis, 5 degrees per frame, until GF(15) is set;
+ * used for the rotating warning beacon S_pato4 once the crane has been powered.
+ * The object is unhidden while it spins and hidden again at the end.
+ */
 EVT_BEGIN(evt_kaitentou)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(10), MAPOBJ_FLAG_HIDE)
     SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
@@ -125,6 +140,11 @@ EVT_BEGIN(evt_kaitentou)
     RETURN
 EVT_END()
 
+/**
+ * Spins the map object named in LW(10) around its Z axis, 5 degrees per frame,
+ * until GF(15) is set (evt_sw_reinit sets it to stop all spinners);
+ * the lamp spinners (S_pato1 to 3) of the crane power switches use it.
+ */
 EVT_BEGIN(evt_kaitentou2)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(10), MAPOBJ_FLAG_HIDE)
     SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
@@ -143,6 +163,11 @@ EVT_BEGIN(evt_kaitentou2)
     RETURN
 EVT_END()
 
+/**
+ * Swings the needle map object named in LW(10) (Guess: a gauge needle such as S_hari01) around its Z axis:
+ * picks random target angles up to 90 degrees (alternating sides) over 1.5 to 3 seconds each,
+ * until GF(15) is raised by a switch reset, then eases it back to 0 over one second.
+ */
 static EVT_BEGIN(evt_hari)
     SET_VALUE(LW(6), LW(8))
     SET_VALUE(LW(7), LW(9))
@@ -195,6 +220,11 @@ static EVT_BEGIN(evt_hari)
     RETURN
 EVT_END()
 
+/**
+ * Opens and closes the crane's claw forever: the four claw arms (S_te_1_a/b, S_te_2_a/b) swing by 30 degrees
+ * over one second and back.
+ * GF(9) is 1 while the claw is open, so ufo_main can wait for it to be shut before lowering.
+ */
 EVT_BEGIN(ufo_hand)
     LOOP(0)
         SET_VALUE(GF(9), 1)
@@ -234,26 +264,37 @@ EVT_BEGIN(ufo_hand)
     RETURN
 EVT_END()
 
+/**
+ * Sets GF(10) to 1.
+ * Guess: an unused leftover of the crane's left-right control; evt_ufo_sousaban sets GF(10) directly.
+ */
 EVT_BEGIN(move_left)
     SET_VALUE(GF(10), 1)
     RETURN
 EVT_END()
 
+/** Sets GF(10) back to 0; unused, see move_left. */
 EVT_BEGIN(move_left2)
     SET_VALUE(GF(10), 0)
     RETURN
 EVT_END()
 
+/**
+ * Sets GF(11) to 1.
+ * Guess: an unused leftover of the crane's forward-back control; evt_ufo_sousaban sets GF(11) directly.
+ */
 EVT_BEGIN(move_up)
     SET_VALUE(GF(11), 1)
     RETURN
 EVT_END()
 
+/** Sets GF(11) back to 0; unused, see move_up. */
 EVT_BEGIN(move_up2)
     SET_VALUE(GF(11), 0)
     RETURN
 EVT_END()
 
+/** Closes the crane's claw (all three arm pairs rotate 30 degrees over one second) to grab a prize. */
 EVT_BEGIN(hand_success)
     CALL(evt_sub_intpl_msec_init, 11, 0, 3000, 1000)
     LABEL(0)
@@ -272,6 +313,11 @@ EVT_BEGIN(hand_success)
     RETURN
 EVT_END()
 
+/**
+ * Closes the claw to 50 degrees over one second and opens it again.
+ * Guess: the claw's missed-grab motion; nothing in this map runs it (ufo_main calls hand_success on both
+ * outcomes).
+ */
 EVT_BEGIN(hand_fail)
     CALL(evt_sub_intpl_msec_init, 11, 0, 5000, 1000)
     LABEL(0)
@@ -304,6 +350,7 @@ EVT_BEGIN(hand_fail)
     RETURN
 EVT_END()
 
+/** Opens the claw back up over one second after the crane has carried a prize to the chute or come up empty. */
 EVT_BEGIN(hand_release)
     CALL(evt_sub_intpl_msec_init, 11, 3000, 0, 1000)
     LABEL(0)
@@ -322,6 +369,13 @@ EVT_BEGIN(hand_release)
     RETURN
 EVT_END()
 
+/**
+ * The crane game itself. The claw (map object S_kure; GW(10) is its X, GW(11) its Z) starts at (230, 100).
+ * While the player holds A (GF(10)) it slides toward -150 in X,
+ * then while B is held (GF(11)) toward -100 in Z. It then lowers, closes (hand_success),
+ * checks with item_chk for a prize 'keihinNN' under it, lifts, carries the prize to the drop point at (40, 110),
+ * drops it with a random bounce and opens (hand_release). GF(12) marks the claw as busy.
+ */
 EVT_BEGIN(ufo_main)
     SET_VALUE(GF(10), 0)
     SET_VALUE(GF(11), 0)
@@ -488,6 +542,11 @@ EVT_BEGIN(ufo_main)
     RETURN
 EVT_END()
 
+/**
+ * Powers up the crane: the machine's light S_hikari flickers on
+ * and the prize-light balls S_tama_a/S_tama_b blink alternately and S_hikari rotates
+ * until GF(14) (crane shut down), then ufo_main starts.
+ */
 EVT_BEGIN(evt_ufo_init)
     LOOP(3)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_hikari"), MAPOBJ_FLAG_HIDE)
@@ -532,6 +591,11 @@ EVT_BEGIN(evt_ufo_init)
     RETURN
 EVT_END()
 
+/**
+ * Spins the clock gears (zenmai, clockwork) of the room forever;
+ * one revolution takes 2 seconds, 1 second once STORY_STG7_19_THE_DOOR_TO_LORD_CRUMP is reached.
+ * Plays SFX_STG7_AMB_GEAR1.
+ */
 EVT_BEGIN(evt_zenmai)
     CALL(evt_snd_sfxon, STRING("SFX_STG7_AMB_GEAR1"), 0)
     LOOP(0)
@@ -567,6 +631,10 @@ EVT_BEGIN(evt_zenmai)
     RETURN
 EVT_END()
 
+/**
+ * Makes the switch lamps pair LW(0) and LW(1) blink forever (the three crane power switches use it while they
+ * are not yet pressed).
+ */
 EVT_BEGIN(blink_sw)
     LOOP(0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(0), MAPOBJ_FLAG_HIDE)
@@ -579,6 +647,13 @@ EVT_BEGIN(blink_sw)
     RETURN
 EVT_END()
 
+/**
+ * Case script of the crane's control panel (A_sui_01):
+ * locks Mario's controls, powers the crane up (evt_ufo_init) and slides the claw to its start,
+ * prints stg7_aji_00_01 the first time (GSWF_AJI03_CRANE_PANEL_FIRST_USE),
+ * then shows the A and B button icons in turn: holding A moves the claw sideways, holding B forward,
+ * and the claw then grabs (ufo_main). GF(14) is set when the game ends.
+ */
 EVT_BEGIN(evt_ufo_sousaban)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, 230, 200, 380, 230, 130, -13, 1000, 11)
@@ -701,6 +776,14 @@ EVT_BEGIN(evt_ufo_sousaban)
     RETURN
 EVT_END()
 
+/**
+ * Runs when a crane power switch (A_sui*) is pressed:
+ * does nothing until all three switches are pressed (GSWF_AJI03_CRANE_BUTTON_1 to 3).
+ * The first time that happens it sets GSWF_AJI03_CRANE_ACTIVATED, pans the camera,
+ * sounds the crane siren (SFX_STG7_CRANE_SIREN1), starts the S_pato4 warning light rotating,
+ * swaps the metal plates (meta_*), starts both needles
+ * and attaches the crane control panel (evt_ufo_sousaban) to A_sui_01.
+ */
 static EVT_BEGIN(evt_sw)
     IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_BUTTON_1), 0)
         RETURN
@@ -747,6 +830,11 @@ static EVT_BEGIN(evt_sw)
     RETURN
 EVT_END()
 
+/**
+ * Resets the three crane power switches: clears the pressed flags (GSWF_AJI03_CRANE_BUTTON_1 to 3),
+ * stops the spinners (GF(15)) and sets the switch lamps blinking again.
+ * Called when a switch is pressed in the wrong order.
+ */
 EVT_BEGIN(evt_sw_reinit)
     SET_VALUE(GF(15), 1)
     IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_BUTTON_1), 1)
@@ -778,6 +866,12 @@ EVT_BEGIN(evt_sw_reinit)
     RETURN
 EVT_END()
 
+/**
+ * Case script of the first crane power switch (A_sui1).
+ * The three switches have to be pressed in the order 1, 3, 2;
+ * a correct press sets GSWF_AJI03_CRANE_BUTTON_1, stops its lamp blinking and starts a spinner,
+ * otherwise everything is reset (evt_sw_reinit).
+ */
 EVT_BEGIN(evt_sw0)
     IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_BUTTON_2), 0)
         IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_BUTTON_3), 0)
@@ -806,6 +900,10 @@ EVT_BEGIN(evt_sw0)
     RETURN
 EVT_END()
 
+/**
+ * Case script of the second crane power switch (A_sui2), the last one in the order 1, 3, 2:
+ * needs buttons 1 and 3 already pressed, then sets GSWF_AJI03_CRANE_BUTTON_2; otherwise resets all switches.
+ */
 EVT_BEGIN(evt_sw1)
     IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_BUTTON_1), 1)
         IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_BUTTON_3), 1)
@@ -834,6 +932,11 @@ EVT_BEGIN(evt_sw1)
     RETURN
 EVT_END()
 
+/**
+ * Case script of the third crane power switch (A_sui3), pressed second in the order 1, 3, 2:
+ * needs button 1 pressed and button 2 not, then sets GSWF_AJI03_CRANE_BUTTON_3; otherwise resets all switches.
+ * When all three are on, evt_sw powers the crane (GSWF_AJI03_CRANE_ACTIVATED).
+ */
 EVT_BEGIN(evt_sw2)
     IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_BUTTON_1), 1)
         IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_BUTTON_2), 0)
@@ -866,6 +969,13 @@ s32 haguruma_tbl[] = {
     85, -1,
 };
 
+/**
+ * Case script on the empty cog slot of the crane's clockwork: without a Cog (ITEM_COG) it shows stg7_aji_00_00;
+ * otherwise it opens the item menu and, if one is chosen, plays a success jingle,
+ * swaps the hidden meshes (S_zenmais_nashi / S_zenmais_ari), starts the clockwork (evt_zenmai),
+ * removes the cog from the pouch, sets GSWF_AJI03_COG_INSERTED and re-attaches the three switch scripts
+ * and their blink events. Menu argument layout differs between the demos and the final game.
+ */
 static EVT_BEGIN(evt_haguruma)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_pouch_check_item, ITEM_COG, LW(0))
@@ -912,21 +1022,34 @@ static EVT_BEGIN(evt_haguruma)
     RETURN
 EVT_END()
 
+/**
+ * Item pick-up event for the crane prize keihin04 (Feeling Fine badge):
+ * records it in GSWF_AJI03_CRANE_PRIZE_A so it is not placed again.
+ */
 EVT_BEGIN(badge_evt)
     SET_VALUE(GSWF(GSWF_AJI03_CRANE_PRIZE_A), 1)
     RETURN
 EVT_END()
 
+/** Item pick-up event for the crane prize keihin06 (Feeling Fine P badge): records it in GSWF_AJI03_CRANE_PRIZE_B. */
 EVT_BEGIN(badge_evt2)
     SET_VALUE(GSWF(GSWF_AJI03_CRANE_PRIZE_B), 1)
     RETURN
 EVT_END()
 
+/** Item pick-up event for the crane prize keihin08 (Star Piece): records it in GSWF_AJI03_STAR_PIECE_PRIZE. */
 EVT_BEGIN(badge_evt3)
     SET_VALUE(GSWF(GSWF_AJI03_STAR_PIECE_PRIZE), 1)
     RETURN
 EVT_END()
 
+/**
+ * Init script of aji_03, the crane game room: plays BGM_STG7_DUN2,
+ * sets up the exits and restores the room's state from the flags:
+ * the cog slot (A_tanadoor_1, evt_haguruma) until GSWF_AJI03_COG_INSERTED, then the clock gears,
+ * the three power switches and the crane panel;
+ * finally it places the prizes (coins, the two badges and the Star Piece) on the crane floor unless already won.
+ */
 EVT_BEGIN(aji_03_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI3"))
@@ -1059,6 +1182,11 @@ EVT_BEGIN(aji_03_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script function: shows the crane's control hint on screen every frame.
+ * args[0] picks the icon (0 = A button, otherwise B button) and args[1], args[2] the screen position;
+ * the drawing is done by icon_disp.
+ */
 static USER_FUNC(evt_sousa_icon) {
     EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
@@ -1072,6 +1200,10 @@ static USER_FUNC(evt_sousa_icon) {
     return EVT_RETURN_YIELD;
 }
 
+/**
+ * Draw callback of evt_sousa_icon: draws the button icon (ICON_163 and ICON_064 for the A button,
+ * ICON_066 for the B button) at the stored position, scaled by 1.5; the B version is rotated 270 degrees.
+ */
 static void icon_disp(CameraId camera, void* param) {
     EventEntry* event = param;
     Mtx trans;
@@ -1120,6 +1252,7 @@ static void icon_disp(CameraId camera, void* param) {
     }
 }
 
+/** Script function: looks up the item named in args[0] and returns its item ID in args[1] and the name in args[2]. */
 static USER_FUNC(evt_itemNameToItemID) {
     static char tmp[64];
     EvtWord* args = event->args;
@@ -1132,6 +1265,11 @@ static USER_FUNC(evt_itemNameToItemID) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script function: finds the crane prize closest (within 20 units) to the claw position (GW(10), GW(11)) among
+ * the items named keihin00 to keihin31.
+ * Returns TRUE and the prize's name in args[0] and args[1], or FALSE and 0 when nothing is within reach.
+ */
 static USER_FUNC(item_chk) {
     char name[256];
     EvtWord* args = event->args;

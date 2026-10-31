@@ -37,6 +37,10 @@ static USER_FUNC(evt_yuuranking_main_func);
 static USER_FUNC(yuuranking_get_monte);
 static s32 yuu_kesan(s32 type, s32 score, s32 bonus, s32 mul, s32 max);
 
+/**
+ * Width of a string in a fixed-pitch font: the number of characters (a two-byte character counts once) times
+ * pitch, or the proportional message width when pitch is 0.
+ */
 static s32 fontlenpitch(const char* str, s32 pitch) {
     s32 i;
     s32 n;
@@ -57,7 +61,7 @@ static s32 fontlenpitch(const char* str, s32 pitch) {
 }
 
 #if VERSION >= VERSION_US
-// US: centered in [x, x + width], squeezed to fit width.
+/** US: centered in [x, x + width], squeezed to fit width. */
 static inline void yuuDrawCenter(f32 x, f32 y, f32 scale, const char* msg, s32 width) {
     Mtx trans;
     Mtx scl;
@@ -79,7 +83,7 @@ static inline void yuuDrawCenter(f32 x, f32 y, f32 scale, const char* msg, s32 w
 #endif
 
 #if VERSION >= VERSION_US
-// US: left-aligned at x, squeezed to fit width.
+/** US: left-aligned at x, squeezed to fit width. */
 static inline void yuuDrawLeft(f32 x, f32 y, f32 scale, const char* msg, s32 width) {
     Mtx trans;
     Mtx scl;
@@ -120,6 +124,7 @@ static inline void yuuDrawRight(f32 xo, f32 y, f32 scale, const char* msg, s32 w
 #endif
 
 #if VERSION >= VERSION_JP
+/** Draws message msg at (x, y) with the given scale, squeezing it horizontally when it is wider than width. */
 void gor_yuuranking_draw_msg_fit(f32 x, f32 y, f32 scale, const char* msg, s32 width) {
     Mtx trans;
     Mtx scl;
@@ -139,7 +144,7 @@ void gor_yuuranking_draw_msg_fit(f32 x, f32 y, f32 scale, const char* msg, s32 w
 #endif
 
 #if VERSION >= VERSION_US
-// US: centered text, squeezed to fit width.
+/** US: centered text, squeezed to fit width. */
 void gor_yuuranking_draw_msg_fit_center(f32 x, f32 y, f32 scale, const char* msg, s32 width) {
     Mtx trans;
     Mtx scl;
@@ -159,7 +164,7 @@ void gor_yuuranking_draw_msg_fit_center(f32 x, f32 y, f32 scale, const char* msg
     FontDrawMessageMtx(mtx, msg);
 }
 
-// US: right-aligned text, squeezed to fit width.
+/** US: right-aligned text, squeezed to fit width. */
 void gor_yuuranking_draw_msg_fit_right(f32 x, f32 y, f32 scale, const char* msg, s32 width) {
     Mtx trans;
     Mtx scl;
@@ -185,6 +190,12 @@ void gor_yuuranking_draw_msg_fit_right(f32 x, f32 y, f32 scale, const char* msg,
     RETURN
 EVT_END()
 
+/**
+ * Draw callback of the Pianta Parlor ranking and result board:
+ * draws the frame and title of the minigame, the five ranked scores with their rank labels,
+ * the player's score and the Monte (token) count that is being counted up.
+ * US keeps separate 60Hz and 50Hz tables.
+ */
 static void evt_yuuranking_disp_func(CameraId camera, void* param) {
 #if VERSION >= VERSION_US
     const char* head;
@@ -667,6 +678,12 @@ static void evt_yuuranking_disp_func(CameraId camera, void* param) {
     }
 }
 
+/**
+ * Per-frame driver of the ranking board (work block in LW(0)).
+ * In mode 0 (the result screen) it counts the score up with a sound,
+ * then counts the Monte (tokens) up or down to the base amount, and, when a multiplier applies,
+ * a second time to the final amount; in the other mode it only draws the board. Stops when the quit flag is set.
+ */
 static USER_FUNC(evt_yuuranking_main_func) {
     YuuRankingWork* wp = (YuuRankingWork*)event->lwData[0];
     static s32 snd_id;
@@ -839,6 +856,12 @@ static USER_FUNC(evt_yuuranking_main_func) {
 
 static YuuRankingWork* _wp;
 
+/**
+ * Converts a minigame score into the number of Monte (tokens) it is worth:
+ * type 0 by score divided by 30000 (25000 in the demos), types 2 and 3 by the score above a base,
+ * type 1 (a time) by how far under max it is out of 15;
+ * then adds bonus and applies mul (a multiplier below 0x100, an additive amount above it). Never negative.
+ */
 static s32 yuu_kesan(s32 type, s32 score, s32 bonus, s32 mul, s32 max) {
     s32 ret;
 
@@ -895,6 +918,13 @@ static s32 yuu_kesan(s32 type, s32 score, s32 bonus, s32 mul, s32 max) {
     return ret;
 }
 
+/**
+ * Script helper that opens the ranking board: allocates the work block
+ * and fills it from the script arguments (x, y, minigame type, mode, score, bonus, multiplier).
+ * In mode 1 it inserts the new score into the saved top-5 table of that minigame, shifting lower entries down,
+ * computes its Monte value with yuu_kesan, and sets GSWF_YUU_PLANE_GAME_RECORD for a new first place in game 0.
+ * Then starts the driver script.
+ */
 USER_FUNC(evt_yuuranking_alloc) {
     EvtWord* args = event->args;
     YuuRankingWork* wp = _mapAlloc(sizeof(YuuRankingWork));
@@ -1118,6 +1148,10 @@ USER_FUNC(evt_yuuranking_alloc) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper that closes the ranking board: sets the quit flag on the first call,
+ * waits until the driver acknowledges it, then frees the work block.
+ */
 USER_FUNC(evt_yuuranking_free) {
     YuuRankingWork* wp = _wp;
 
@@ -1135,6 +1169,10 @@ USER_FUNC(evt_yuuranking_free) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper that waits for A or B while the board is shown;
+ * on press it clears the wait flag, plays a sound and finishes.
+ */
 USER_FUNC(yuuranking_wait_button) {
     YuuRankingWork* wp = _wp;
 
@@ -1149,6 +1187,7 @@ USER_FUNC(yuuranking_wait_button) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper that returns in args[0] the number of Monte (tokens) won, from the board's work block. */
 static USER_FUNC(yuuranking_get_monte) {
     evtSetValue(event, event->args[0], _wp->monte);
     return EVT_RETURN_DONE;

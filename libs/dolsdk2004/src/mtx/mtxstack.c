@@ -2,6 +2,10 @@
 #include <dolphin/mtx.h>
 #include "fake_tgmath.h"
 
+/**
+ * Prepares a matrix stack over caller-provided storage (stackBase) with room for numMtx matrices;
+ * the stack starts empty, with no identity loaded.
+ */
 void MTXInitStack(MTXStack* sPtr, u32 numMtx) {
     ASSERTMSGLINE(74, sPtr, "MTXInitStack():  NULL MtxStackPtr 'sPtr' ");
     ASSERTMSGLINE(75, sPtr->stackBase, "MTXInitStack():  'sPtr' contains a NULL ptr to stack memory ");
@@ -11,6 +15,7 @@ void MTXInitStack(MTXStack* sPtr, u32 numMtx) {
     sPtr->stackPtr = 0;
 }
 
+/** Pushes a copy of m as the new top of the stack (the first push goes to the base) and returns the new top. */
 MtxPtr MTXPush(MTXStack* sPtr, const Mtx m) {
     ASSERTMSGLINE(104, sPtr, "MTXPush():  NULL MtxStackPtr 'sPtr' ");
     ASSERTMSGLINE(105, sPtr->stackBase, "MTXPush():  'sPtr' contains a NULL ptr to stack memory ");
@@ -28,6 +33,10 @@ MtxPtr MTXPush(MTXStack* sPtr, const Mtx m) {
     return sPtr->stackPtr;
 }
 
+/**
+ * Pushes top * m, composing a child transform onto the current top (or m itself if the stack is empty),
+ * and returns the new top.
+ */
 MtxPtr MTXPushFwd(MTXStack* sPtr, const Mtx m) {
     ASSERTMSGLINE(157, sPtr, "MTXPushFwd():  NULL MtxStackPtr 'sPtr' ");
     ASSERTMSGLINE(158, sPtr->stackBase, "MTXPushFwd():  'sPtr' contains a NULL ptr to stack memory ");
@@ -45,6 +54,7 @@ MtxPtr MTXPushFwd(MTXStack* sPtr, const Mtx m) {
     return sPtr->stackPtr;
 }
 
+/** Pushes inverse(m) * top (or just inverse(m) on an empty stack) and returns the new top. */
 MtxPtr MTXPushInv(MTXStack* sPtr, const Mtx m) {
     Mtx mInv;
     ASSERTMSGLINE(216, sPtr, "MTXPushInv():  NULL MtxStackPtr 'sPtr' ");
@@ -64,6 +74,7 @@ MtxPtr MTXPushInv(MTXStack* sPtr, const Mtx m) {
     return sPtr->stackPtr;
 }
 
+/** Pushes top * transpose(inverse(m)), the form used for normal transforms, and returns the new top. */
 MtxPtr MTXPushInvXpose(MTXStack* sPtr, const Mtx m) {
     Mtx mIT;
     ASSERTMSGLINE(279, sPtr, "MTXPushInvXpose():  NULL MtxStackPtr 'sPtr' ");
@@ -84,6 +95,7 @@ MtxPtr MTXPushInvXpose(MTXStack* sPtr, const Mtx m) {
     return sPtr->stackPtr;
 }
 
+/** Pops the top matrix and returns the new top; returns NULL when the stack is empty or the pop leaves it empty. */
 MtxPtr MTXPop(MTXStack* sPtr) {
     ASSERTMSGLINE(328, sPtr, "MTXPop():  NULL MtxStackPtr 'sPtr' ");
     ASSERTMSGLINE(329, sPtr->stackBase, "MTXPop():  'sPtr' contains a NULL ptr to stack memory ");
@@ -101,6 +113,7 @@ MtxPtr MTXPop(MTXStack* sPtr) {
     return sPtr->stackPtr;
 }
 
+/** Returns the matrix on top of the stack, or NULL when the stack is empty. */
 MtxPtr MTXGetStackPtr(const MTXStack* sPtr) {
     ASSERTMSGLINE(366, sPtr, "MTXGetStackPtr():  NULL MtxStackPtr 'sPtr' ");
     ASSERTMSGLINE(367, sPtr->stackBase, "MTXGetStackPtr():  'sPtr' contains a NULL ptr to stack memory ");

@@ -27,6 +27,10 @@ static YuuTitleWork* _wp;
 
 static EvtWord main_evt[4];
 
+/**
+ * Draws the minigame title text: it slides in from 200 units off its target and scales up
+ * while fading in over about 43 frames, then draws centred with a white outline.
+ */
 static void evt_yuutitle_disp_func(CameraId camera, void* param) {
     YuuTitleWork* wp = param;
     f32 scale = 2.0f;
@@ -54,6 +58,10 @@ static void evt_yuutitle_disp_func(CameraId camera, void* param) {
     FontDrawEdgeOff();
 }
 
+/**
+ * Body of the title event: queues the draw callback each frame until the free request flag is set,
+ * then marks itself stopped.
+ */
 static USER_FUNC(evt_yuutitle_main_func) {
     YuuTitleWork* wp = (YuuTitleWork*)event->lwData[0];
 
@@ -65,6 +73,10 @@ static USER_FUNC(evt_yuutitle_main_func) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * args[0], args[1] = target x, y, args[2] = message id string looked up with msgSearch.
+ * Creates the title card and starts its event.
+ */
 USER_FUNC(evt_yuutitle_alloc) {
     EvtWord* args = event->args;
     YuuTitleWork* wp = _mapAlloc(sizeof(YuuTitleWork));
@@ -82,6 +94,7 @@ USER_FUNC(evt_yuutitle_alloc) {
     return EVT_RETURN_DONE;
 }
 
+/** Script call that asks the title event to stop, blocks until it has, then frees the title card. */
 USER_FUNC(evt_yuutitle_free) {
     YuuTitleWork* wp = _wp;
 
@@ -99,6 +112,7 @@ USER_FUNC(evt_yuutitle_free) {
     return EVT_RETURN_DONE;
 }
 
+/** The title card's per-frame event, started by evt_yuutitle_alloc; runs evt_yuutitle_main_func. */
 static EVT_BEGIN(main_evt)
     CALL(evt_yuutitle_main_func)
     RETURN

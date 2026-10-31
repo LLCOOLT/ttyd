@@ -18,11 +18,16 @@
 #include "version.h"
 #include <dolphin/pad.h>
 
+/** TRUE when Mario is at 5 HP or less, which switches his idle to the tired pose (M_S_3) and breathing sounds. */
 static inline BOOL lowHP(void) {
     BOOL r = pouchGetHP() <= 5;
     return r;
 }
 
+/**
+ * Starts Mario's charge-up voice (sound 0xDC) in mario->soundId[1] if it is not already playing;
+ * used while he glares holding B for the spin hammer or A for the Spring Jump.
+ */
 void marioVoiceGlareOn(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->soundId[1] == (u32)-1) {
@@ -30,6 +35,7 @@ void marioVoiceGlareOn(void) {
     }
 }
 
+/** Stops the charge-up voice started by marioVoiceGlareOn. */
 void marioVoiceGlareOff(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->soundId[1] != (u32)-1) {
@@ -38,6 +44,10 @@ void marioVoiceGlareOff(void) {
     }
 }
 
+/**
+ * TRUE once Mario has been asleep in the idle animation for 10 seconds;
+ * the partners then fall asleep too (party_motion.c).
+ */
 BOOL marioChkDeepSleep(void) {
     BOOL result = FALSE;
     MarioWork* mario = marioGetPtr();
@@ -47,6 +57,13 @@ BOOL marioChkDeepSleep(void) {
     return result;
 }
 
+/**
+ * Standing motion: idle pose (tired at low HP, with breathing sounds), turning into Paper Mode,
+ * starting the spin hammer, Spring Jump, jumps, items and partner actions,
+ * and walking or dashing when the stick moves.
+ * After 50 seconds without input Mario yawns and then naps (M_N_5A, snoring).
+ * Bowser and Peach run their own versions.
+ */
 void mot_stay(void) {
     MarioWork* mario;
     MarioWork* m;
@@ -324,6 +341,10 @@ void mot_stay(void) {
     }
 }
 
+/**
+ * Picks the ground motion from the stick: stay when centred,
+ * dash when pushed far (walk instead with the Slow Go badge), walk otherwise.
+ */
 void marioChgMotAuto(void) {
     MarioWork* mario = marioGetPtr();
     s32 a = (u8)mario->wStickDir1;
@@ -341,6 +362,7 @@ void marioChgMotAuto(void) {
 }
 
 #if VERSION <= VERSION_DEMO_US
+/** Cleanup when the stay motion ends: stops the idle sound and the charge-up voice. */
 void mot_stay_post(void) {
     MarioWork* mario;
     mario = marioGetPtr();
@@ -355,6 +377,11 @@ void mot_stay_post(void) {
     }
 }
 #else
+/**
+ * Cleanup when the stay motion ends: stops the idle sound,
+ * and also the charge-up voice unless Mario is going into the spin hammer
+ * or the Spring Jump (which keep it playing).
+ */
 void mot_stay_post(void) {
     MarioWork* mario;
     MarioMotion id = marioGetPtr()->currMotionId;

@@ -29,12 +29,20 @@ static BeroEntry bero_entry_data[8];
 static BeroEntry bero_entry_data2[2];
 extern EvtWord tik_07_down_evt[];
 
+/**
+ * Opening callback for the door at exit bero_00:
+ * rotates the door_1 map object by the door's progress (LW(0)) times -0.444 degrees per unit.
+ */
 EVT_BEGIN(bero_00_open_door)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Closing callback for the door at exit bero_00:
+ * rotates door_1 by progress times 0.444, the reverse of bero_00_open_door.
+ */
 EVT_BEGIN(bero_00_close_door)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
@@ -183,6 +191,11 @@ static BeroEntry bero_entry_data2[] = {
     {0},
 };
 
+/**
+ * Entry cutscene when Mario drops into the sewers through the Rogueport hole (GSWF_GOR03_DROP_TO_UNDERGROUND).
+ * He and his partners are placed in the air at height 300,
+ * controls are given back and the camera is released once they land. Clears the flag.
+ */
 EVT_BEGIN(tik_07_down_evt)
     IF_INT_EQUAL(GSWF(GSWF_GOR03_DROP_TO_UNDERGROUND), 0)
         RETURN
@@ -228,6 +241,12 @@ EVT_BEGIN(tik_07_down_evt)
     RETURN
 EVT_END()
 
+/**
+ * Scene at STORY_STG4_16_LEAVING_TWILIGHT_TOWN:
+ * Mario's mail alert (a vibrating exclamation), the partner comments (tik_07_mail4_00);
+ * after he presses A the mail jingle plays, Peach's mail is read (tik_07_mail4_01, 02),
+ * story progress becomes STORY_STG4_17_A_MAIL_FROM_PEACH and the mail is opened (mail slot 3).
+ */
 static EVT_BEGIN(peach_mail)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_seq_wait, 2)
@@ -281,11 +300,19 @@ static EVT_BEGIN(peach_mail)
     RETURN
 EVT_END()
 
+/**
+ * Guess: callback when the big block (mobj_blk01) is broken; does nothing but return.
+ * Guess: the flag is set by the block handler itself.
+ */
 static EVT_BEGIN(evt_block)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("s_hikari"), MAPOBJ_FLAG_HIDE)
     RETURN
 EVT_END()
 
+/**
+ * Item-box callback for the Flower Saver P chest:
+ * takes control, puts the badge at the chest, waits for the chest animation and hands it to Mario.
+ */
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
@@ -301,6 +328,14 @@ static EVT_BEGIN(mobj_box00)
     RETURN
 EVT_END()
 
+/**
+ * Map init script of tik_07.
+ * Runs the drop-in scene, sets up the exits, the save block, the big block, the Flower Saver P chest,
+ * the Shine Sprite block, two Star Pieces and the moving and descending floors.
+ * Removes the enemy NPCs that do not belong to the story step,
+ * switches the pipe to Fahr Outpost (dokan__1) off between chapters 6 and 7,
+ * and runs peach_mail at STORY_STG4_16_LEAVING_TWILIGHT_TOWN.
+ */
 EVT_BEGIN(tik_07_init_evt)
     CALL_CHILD(tik_07_down_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))

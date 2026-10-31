@@ -29,11 +29,17 @@
 #include "driver/mapdrv.h"
 #include "driver/camdrv.h"
 
+// Declaration of the script helper that waits until Gloomtail has landed.
 static USER_FUNC(bonbaba_wait_landon);
 
 static BeroEntry bero_entry_data[3];
 static NpcSetupInfo npcEnt[2];
 
+/**
+ * Door animation script (closing) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_door1_1 and S_door1_2 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door1_1"), 0, LW(0), 0)
@@ -42,6 +48,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_door1_1 and S_door1_2 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door1_1"), 0, LW(0), 0)
@@ -85,6 +96,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Event script: the chest of las_26 opens and Mario receives the Star Key. */
 static EVT_BEGIN(box_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
@@ -95,6 +107,13 @@ static EVT_BEGIN(box_evt)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the Gloomtail fight scene (battle info 14),
+ * played when Mario first enters the Palace garden (STORY_STG8_03_THE_PALACE_GARDEN).
+ * Mario and the partner enter, the door closes behind them, Gloomtail roars and steps forward,
+ * delivers his threats, the battle runs, and afterwards he collapses in the middle of the room,
+ * throws up the Star Key chest, and the story moves to STORY_STG8_04_GLOOMTAIL.
+ */
 EVT_BEGIN(bonbaba_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_get_party, LW(0))
@@ -319,6 +338,11 @@ EVT_BEGIN(bonbaba_evt)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Gloomtail: before the fight he is placed at the back of the garden at 1.3 times scale;
+ * after the fight, until the body is cleared, he lies collapsed in the middle of the room, intangible,
+ * in his defeated pose.
+ */
 EVT_BEGIN(bonbaba_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG8_03_THE_PALACE_GARDEN)
@@ -339,6 +363,7 @@ EVT_BEGIN(bonbaba_init)
     RETURN
 EVT_END()
 
+/** Script helper: blocks until the Gloomtail NPC is standing on the ground (groundHit), then finishes. */
 static USER_FUNC(bonbaba_wait_landon) {
     // ボンババ
     return npcNameToPtr("\x83\x7B\x83\x93\x83\x6F\x83\x6F")->groundHit ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
@@ -358,6 +383,12 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Event script: the "dark world" scene.
+ * Mario and the partner are taken out of control, Professor Frankly (the Goomba professor, クリハカセ) appears,
+ * the ceiling falls with a dust effect and he speaks (stg8_dark_09).
+ * The screen fades black, then the map changes to las_29 (sekai_yami2) and fades in from white.
+ */
 static EVT_BEGIN(sekai_yami_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -395,6 +426,10 @@ static EVT_BEGIN(sekai_yami_evt)
     RETURN
 EVT_END()
 
+/**
+ * Event script: Bobbery blows up the cracked wall (S_ana_before1) with the paper explosion effect,
+ * swapping the wall for the opening (S_ana_after) and setting GSWF_LAS26_WALL_BOMBED.
+ */
 EVT_BEGIN(bomb_wall)
     CALL(evt_mario_key_onoff, 0)
     BEGIN_INLINE_EVENT
@@ -441,6 +476,13 @@ EVT_BEGIN(bomb_wall)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for las_26, the Gloomtail room:
+ * music and ambience by story, the doors to las_25 and las_28, Gloomtail, the wall Bobbery can bomb,
+ * the collapsed body hit area, the Star Key chest after the fight,
+ * the cutscene with the dark world (sekai_yami_evt) at STORY_STG8_15_GRODUS,
+ * and blocks with an Ultra Shroom and Jammin' Jelly.
+ */
 EVT_BEGIN(las_26_init_evt)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_03_THE_PALACE_GARDEN)
         CALL(evt_snd_bgmoff, PSND_FADE_OUT)

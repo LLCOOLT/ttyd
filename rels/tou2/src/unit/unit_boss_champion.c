@@ -56,6 +56,10 @@ extern EvtWord healing_event[];
 extern EvtWord roof_shake_attack_event[];
 static EvtWord wait_event[6];
 
+/**
+ * Script helper: arg0 receives 1 if the iron frame hanging from the arena ceiling (the stage object Rawk Hawk
+ * grabs) is still there, 0 once it has been removed.
+ */
 static USER_FUNC(ceil_exist) {
     EvtWord* args = event->args;
 
@@ -202,6 +206,10 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_champion", "c_bred_h", 0.0f, 0.0f, 0.0f, 0.0f, 50.0f, 0.0f, 0.0f, 55.0f, 0.0f, 35, 70, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
+/**
+ * Script helper that removes the iron frame from the ceiling at the start of the fight:
+ * moves its body and wire up to y=250 and marks the frame as gone.
+ */
 static USER_FUNC(init_ceil) {
     u8* ceil = &_battleWorkPointer->stageObjectWork.flags;
     BattleStageObject* body = BattleSearchObjectPtr("if_body");
@@ -477,6 +485,11 @@ BattleWeapon weapon_champion_roof_shake_last_attack = {
     {0, 25, 25, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Rawk Hawk jumps up and hangs from the iron frame in the ceiling:
+ * switches to the roof pose table, becomes untargetable by ground attacks and shifts the hit
+ * and cursor offsets for the hanging body.
+ */
 EVT_BEGIN(to_ceiling)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("J_1A"))
     WAIT_MS(250)
@@ -500,6 +513,10 @@ EVT_BEGIN(to_ceiling)
     RETURN
 EVT_END()
 
+/**
+ * Rawk Hawk drops from the ceiling back to the floor with a landing shake and restores the ground pose table
+ * and hit offsets.
+ */
 EVT_BEGIN(to_floor)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("D_2"))
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(4.0f), FLOAT(0.19921875f))
@@ -521,6 +538,12 @@ EVT_BEGIN(to_floor)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Rawk Hawk: registers his wait, phase, attack,
+ * damage and entry events (confusion uses the default confuse event),
+ * clears the iron frame from the ceiling with init_ceil,
+ * resets his phase counter in unit work 0 and sets his walk and run footstep sounds, then starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
@@ -536,6 +559,17 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Rawk Hawk's pre-fight talk when the battle starts.
+ * Before the story reaches STORY_STG3_30_NEW_CHAMPION,
+ * the first time (GSWF_TOU_RAWK_HAWK_INTRO_SEEN) he poses
+ * and trades lines with the party partner (stg3_tou_432 to 435_02);
+ * later attempts use a shorter exchange (stg3_tou_436).
+ * From STORY_STG3_34_RETURN_TO_ROGUEPORT on it is the rematch,
+ * with its own lines (stg3_tou_re_*) depending on GSWF_TOU_REMATCH_CHAMPION, and the phase 1 flag is reset.
+ * Between those two story points there is no talk.
+ * It finishes by putting the partner and Rawk Hawk back in their idle poses.
+ */
 static EVT_BEGIN(entry_event)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_30_NEW_CHAMPION)
@@ -631,6 +665,12 @@ static EVT_BEGIN(entry_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage event of Rawk Hawk: default damage reaction;
+ * if he is hanging from the ceiling and a hit of damage code 23 to 27 did at least 1 damage,
+ * or he is Tiny (status 11), he is knocked down to the floor with to_floor (the wait event is stopped and
+ * restarted around it).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -664,12 +704,22 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Ceiling-fall event (registered with SetEventCeilFall when he grabs the frame):
+ * clears itself and drops him to the floor with to_floor.
+ */
 static EVT_BEGIN(ceil_fall_ready_event)
     CALL(btlevtcmd_SetEventCeilFall, BTL_UNIT_SELF, 0)
     CALL_CHILD(to_floor)
     RETURN
 EVT_END()
 
+/**
+ * Rawk Hawk's death: if he is hanging he drops to the floor first, then plays his "D_3" defeat pose and cry.
+ * In the first fight (before STORY_STG3_30_NEW_CHAMPION) he waits for the attack to end
+ * and delivers a last line (stg3_tou_436_06) under a close camera,
+ * before the common no-spin death (subsetevt_dead_core_nospin_norotate).
+ */
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -701,6 +751,17 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Rawk Hawk's phase script, run after the player's phase while he can act.
+ * Unit work 0 is the phase counter that attack_event reads.
+ * At 67% HP or below (counter 0) it moves to 1 and, once,
+ * shows his taunt (stg3_tou_436_02, 436_03 with the blur camera) in the first fight.
+ * At 34% HP or below (counter 2), unless he is Tiny, it moves to 3, shows 436_04 once in the first fight,
+ * has him jump, lower the iron frame (down_ceil) and grab it, and registers ceil_fall_ready_event.
+ * At 25% HP or below (counter 4) it shows the last taunt (436_05) once in the first fight.
+ * After the story passes STORY_STG3_30_NEW_CHAMPION the lines are skipped but the phase changes still happen.
+ * The percentages are 67, 34 and 25 of max HP.
+ */
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_EQUAL(LW(0), 0)
@@ -836,6 +897,15 @@ static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Rawk Hawk's move choice. He uses an enemy item if one fits.
+ * Otherwise unit work 0 (set by phase_event) picks the move: 0 chooses between Drop Kick and Screw Attack;
+ * 1 does Flying Chop and moves to 2; 2 chooses among the three;
+ * 3 goes to the ceiling, does Roof Shake and moves to 4;
+ * 4 draws among all four ground moves (Roof Shake only if he is not Tiny and the frame is down)
+ * while on the floor, or, when hanging, among Foot Stamp, his healing move and Roof Shake.
+ * LW(9) receives the weapon each sub-event uses.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -925,6 +995,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: rawk Hawk's Drop Kick: he runs at the front-most target
+ * and kicks it (power 4, hammer-like, action command level 3).
+ */
 EVT_BEGIN(drop_kick_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -1006,6 +1080,7 @@ EVT_BEGIN(drop_kick_attack_event)
     RETURN
 EVT_END()
 
+/** Guess: rawk Hawk's Screw Attack: he jumps up, spins and drills into the whole party (all targets). */
 EVT_BEGIN(screw_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -1092,6 +1167,7 @@ EVT_BEGIN(screw_attack_event)
     RETURN
 EVT_END()
 
+/** Guess: rawk Hawk's Flying Chop: he leaps and chops down on a single target. */
 EVT_BEGIN(flying_chop_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -1181,6 +1257,7 @@ EVT_BEGIN(flying_chop_attack_event)
     RETURN
 EVT_END()
 
+/** Guess: rawk Hawk's Foot Stamp: he walks to a target and stamps on it. */
 EVT_BEGIN(foot_stamp_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -1291,6 +1368,10 @@ EVT_BEGIN(foot_stamp_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: rawk Hawk's healing move: he shakes the ceiling three times, an item drops,
+ * he eats it (HP recovery of 5) and a recovery sparkle plays. Used while he is hanging from the ceiling.
+ */
 EVT_BEGIN(healing_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -1352,6 +1433,10 @@ EVT_BEGIN(healing_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper that lowers the iron frame from y=250 to y=130 over 120 frames (ease-in),
+ * clearing the "frame gone" flag. Blocks until it is down.
+ */
 static USER_FUNC(down_ceil) {
     u8* ceil = &_battleWorkPointer->stageObjectWork.flags;
     BattleStageObject* body = BattleSearchObjectPtr("if_body");
@@ -1369,12 +1454,18 @@ static USER_FUNC(down_ceil) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper: LW(1) receives non-zero when the iron frame is gone from the ceiling. */
 static USER_FUNC(check_ceil) {
     event->lwData[1] = _battleWorkPointer->stageObjectWork.flags & STAGE_OBJ_FLAG_IRON_FRAME_GONE;
     return EVT_RETURN_DONE;
 }
 
 #if VERSION >= VERSION_JP
+/**
+ * Guess: script helper (JP and later): spawns a falling-object effect.
+ * arg0 receives the effect pointer; arg1 = type; arg2..4 = position; arg5..7 = fall parameters;
+ * arg8/arg9 = timing values.
+ */
 USER_FUNC(eff_fall_entry) {
     EvtWord* args = event->args;
     s32 var = args[0];
@@ -1395,6 +1486,7 @@ USER_FUNC(eff_fall_entry) {
 #endif
 
 #if VERSION >= VERSION_JP
+/** Guess: script helper (JP and later): blocks until the falling-object effect in arg0 has hit the ground. */
 USER_FUNC(eff_fall_hit_wait) {
     EffectEntry* eff = (EffectEntry*)evtGetValue(event, event->args[0]);
 
@@ -1405,6 +1497,10 @@ USER_FUNC(eff_fall_hit_wait) {
 }
 #endif
 
+/**
+ * Guess: rawk Hawk's Roof Shake: hanging from the ceiling he shakes it
+ * so that debris falls on the party (uses the falling-object effects and waits for each to hit).
+ */
 EVT_BEGIN(roof_shake_attack_event)
 #if VERSION >= VERSION_JP
     SET_VALUE(LW(15), 0)
@@ -1559,6 +1655,7 @@ EVT_BEGIN(roof_shake_attack_event)
     RETURN
 EVT_END()
 
+/** Wait event: sets the idle animation from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

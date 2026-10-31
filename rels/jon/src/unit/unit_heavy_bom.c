@@ -512,6 +512,13 @@ static BattleUnitKindPart parts[] = {
     {2, "ヘビーボム", "c_heavy", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x2010000, 0, pose_table_3},
 };
 
+/**
+ * Init script of the Bob-ulk: registers its wait, phase,
+ * attack and damage handlers and the default confusion handler.
+ * Unit work 0 (fuse lit) is cleared, unit work 1 (fuse stages left) is 3,
+ * unit work 2 (fuse sound handle) is -1 and unit work 3 (guard cycle) is 0.
+ * It sets the fuse part's pose (F_1), the pose sound timing table and the draw callback for the fuse flame.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
@@ -529,6 +536,14 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage script of the Bob-ulk.
+ * If it has status 9 while its fuse is lit, the fuse sound stops,
+ * the fuse is put out and the pose table for the current fuse stage is restored.
+ * A damaging hit with damage code 24, 25, 27, 46, 50,
+ * 52 or 54 (Guess: the fire and explosion kinds) sets it off at once (pose 29, dead_event);
+ * anything else takes the default damage handling.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -574,6 +589,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * After the player's phase, if the fuse is lit, the Bob-ulk burns one fuse stage:
+ * the stage 3 to 2, 2 to 1 and 1 to 0 pose tables are played with SFX_ENM_HEAVYB_WAIT2
+ * and the stage in unit work 1 goes down.
+ * When the fuse is already at 0 it instead plays pose K_4 and queues the explosion (after-reaction 52).
+ */
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -617,6 +638,13 @@ static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the Bob-ulk, with SFX_ENM_HEAVYB_ATTACK1
+ * and the pose for the current fuse stage (G_1 to G_4).
+ * If the fuse is not lit it lights it: the looping fuse sound starts (handle kept in unit work 2)
+ * and unit work 0 and unit flag 16 are set.
+ * If it is already lit it instead applies one of its three guard weapons to itself, cycling through them.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_HEAVYB_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
@@ -670,11 +698,17 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait script: plays the Bob-ulk's idle pose from its current pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Defeat script of the Bob-ulk: stops the fuse sound, then,
+ * if the killing blow has a fire or explosion damage code (24, 25, 27, 46, 50, 52 or 54),
+ * queues the explosion (after-reaction 52); otherwise it dies the normal way.
+ */
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
     IF_INT_NOT_EQUAL(LW(0), -1)
@@ -701,6 +735,12 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * The Bob-ulk blows up (after-reaction 52): stops the fuse sound,
+ * plays SFX_ENM_HEAVYB_ATTACK3 and a sequence of "bomb" explosion effects scaled to its size
+ * while the stage fog is cleared, then deals the super explosion weapon's damage to every enemy it can hit.
+ * It then dies and is removed from the battle.
+ */
 static EVT_BEGIN(explosion_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
     CALL(evt_snd_sfxoff, LW(0))
@@ -757,6 +797,11 @@ EVT_END()
 
 void animPoseDrawShape(s32 poseId, s32 shapeIdx);
 
+/**
+ * Pose draw callback: draws the fuse flame (a plane shape of part 2)
+ * when the body's animation group is the locator matching the current fuse stage in work[1] (locator11 down to
+ * locator8); does nothing while work[0] is 0.
+ */
 static void _fire_point_callback(BattleUnitPart* part, s32 group) {
     BattleUnit* unit = part->owner;
     const char* name;
@@ -788,6 +833,10 @@ static void _fire_point_callback(BattleUnitPart* part, s32 group) {
     }
 }
 
+/**
+ * Script helper: hooks _fire_point_callback onto the bomb's body (part 1), and hides part 2, the fuse flame,
+ * so the callback can draw it at the fuse's locator.
+ */
 static USER_FUNC(_set_draw_callback) {
     BattleWork* wp = _battleWorkPointer;
     s32 id = BattleTransID(event, -2);

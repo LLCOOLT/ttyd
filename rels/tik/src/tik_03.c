@@ -36,6 +36,13 @@ extern EvtWord puni_switch[];
 extern EvtWord puni_nakama[];
 extern EvtWord tik03_switch_evt[];
 
+/**
+ * Custom entry hook for the exit bero_05.
+ * Once the chapter 2 boss is beaten it records that Mario left the Great Tree (GSWF_MRI_LEFT_TREE_AFTER_STG2)
+ * and clears the gift flags GSWF_MRI04_JABBI_MUSHROOM_GIVEN and GSWF_MRI01_PETUNI_QUIZ_EGG_GIVEN
+ * so those items can be given again. Returns 0 in LW(0).
+ * Guess: the flags belong to the Great Tree side of this exit.
+ */
 EVT_BEGIN(bero_05_custom_in)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_AFTER_THE_BOSS_BATTLE)
         IF_INT_EQUAL(GSWF(GSWF_MRI_LEFT_TREE_AFTER_STG2), 0)
@@ -52,6 +59,11 @@ EVT_BEGIN(bero_05_custom_in)
     RETURN
 EVT_END()
 
+/**
+ * Custom exit hook for bero_05.
+ * If the guide Puni has just joined (STORY_STG1_35_PUNI_JOINS), advances the story to STORY_STG1_END_TO_STAGE_2.
+ * Returns 0 in LW(0).
+ */
 EVT_BEGIN(bero_05_custom_out)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_35_PUNI_JOINS)
         SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_END_TO_STAGE_2)
@@ -168,6 +180,11 @@ static BeroEntry bero_entry_data2[] = {
     {0},
 };
 
+/**
+ * Init script of the guide Puni (ガイド) for tik_03.
+ * Places him by story step: (-80, -149, 50) at STORY_STG1_32, (100, -150, 50) at STORY_STG1_33,
+ * (230, -50, 80) at STORY_STG1_34, and out of sight otherwise.
+ */
 static EVT_BEGIN(guide_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG1_32_PUNI_ENCOUNTER_2)
@@ -185,6 +202,10 @@ static EVT_BEGIN(guide_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the guide Puni.
+ * At STORY_STG1_33_A_PUNI_PLEA_FOR_HELP, after a second, he starts puni_switch; at other steps it does nothing.
+ */
 static EVT_BEGIN(guide_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG1_33_A_PUNI_PLEA_FOR_HELP)
@@ -210,6 +231,10 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Footstep sound loop for the guide Puni: plays SFX_STG2_PUNI_MOVE2_1 at his position repeatedly while he walks.
+ * Started and stopped by the scenes.
+ */
 static EVT_BEGIN(puni_walk_se)
     LOOP(0)
         CALL(evt_npc_get_position, STRING("ガイド"), LW(0), LW(1), LW(2))
@@ -219,6 +244,12 @@ static EVT_BEGIN(puni_walk_se)
     RETURN
 EVT_END()
 
+/**
+ * Third meeting with the guide Puni (ガイド), at STORY_STG1_32_PUNI_ENCOUNTER_2.
+ * He appears in the cave, runs off, and Mario follows him to the dead end
+ * where he asks for help (mac_1_012 to mac_1_029_00, with a yes/no prompt at mac_1_014).
+ * Ends with the music back to the sewer theme and story progress STORY_STG1_33_A_PUNI_PLEA_FOR_HELP.
+ */
 EVT_BEGIN(puni_soguu_3)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_seq_wait, 2)
@@ -385,6 +416,11 @@ EVT_BEGIN(puni_soguu_3)
     RETURN
 EVT_END()
 
+/**
+ * Sound effects for the secret passage (para) appearing:
+ * a SFX_STG1_LOAD_APPEAR1 step sound at each of eight positions from X = 55 to 425 and at -454, in sequence,
+ * timed to the opening animation.
+ */
 EVT_BEGIN(anm_para_snd)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG1_LOAD_APPEAR1"), 55, -50, -90, 0)
     WAIT_MS(100)
@@ -404,6 +440,7 @@ EVT_BEGIN(anm_para_snd)
     RETURN
 EVT_END()
 
+/** The same as anm_para_snd played in reverse order, for the passage closing again. */
 EVT_BEGIN(anm_rapa_snd)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG1_LOAD_APPEAR1"), -454, -50, -90, 0)
     WAIT_MS(100)
@@ -423,6 +460,12 @@ EVT_BEGIN(anm_rapa_snd)
     RETURN
 EVT_END()
 
+/**
+ * Scene where the guide Puni shows Mario the secret passage (STORY_STG1_33).
+ * He walks to a switch at X = 220 and steps on it (mac_1_029_01, mac_1_030);
+ * the camera shakes, success jingle plays, the wall (kabe_1) is replaced and the passage (para) opens.
+ * Sets GSWF_TIK03_SECRET_DOOR_OPEN and story progress STORY_STG1_34_PUNIS_SECRET_PASSAGE.
+ */
 EVT_BEGIN(puni_switch)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -458,6 +501,11 @@ EVT_BEGIN(puni_switch)
     RETURN
 EVT_END()
 
+/**
+ * Waits until Mario reaches the end of the passage (X >= 300, Z >= -90) at STORY_STG1_34,
+ * then the guide Puni joins as the second partner (mac_1_031): his NPC is removed and he follows Mario.
+ * Sets story progress STORY_STG1_35_PUNI_JOINS.
+ */
 EVT_BEGIN(puni_nakama)
     LOOP(0)
         IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_34_PUNIS_SECRET_PASSAGE)
@@ -489,6 +537,12 @@ EVT_BEGIN(puni_nakama)
     RETURN
 EVT_END()
 
+/**
+ * The floor switch for the secret passage.
+ * Toggles it: pressed while closed, it plays the opening animation (anm_para),
+ * hides the wall and sets GSWF_TIK03_SECRET_DOOR_OPEN;
+ * pressed while open, it plays the closing animation (anm_rapa), clears the flag and restores the hit areas.
+ */
 EVT_BEGIN(tik03_switch_evt)
     IF_INT_EQUAL(GSWF(GSWF_TIK03_SECRET_DOOR_OPEN), 0)
         CALL(evt_map_playanim, STRING("anm_para"), 0, 0)
@@ -511,6 +565,15 @@ EVT_BEGIN(tik03_switch_evt)
     RETURN
 EVT_END()
 
+/**
+ * Map init script of tik_03.
+ * Starts the sewer music and ambience, sets up the exits and the guide Puni,
+ * runs puni_soguu_3 and puni_nakama at their story steps,
+ * restores the passage state from GSWF_TIK03_SECRET_DOOR_OPEN,
+ * and places the Damage Dodge badge and the Star Piece panel.
+ * Before Boggly Woods (STORY_STG2_00_BOGGLY_WOODS) the pipe exit (dokan) is switched off
+ * and its destination replaced.
+ */
 EVT_BEGIN(tik_03_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK1"))

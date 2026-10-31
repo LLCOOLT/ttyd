@@ -237,6 +237,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init event of the Dark Bones: installs its wait, attack, damage and confusion events,
+ * sets the thrown-bone part poses (KRN_H_1) and the landing sound,
+ * and clears unit work 1 (the flag that the death reward was already given).
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -251,6 +256,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Dark Bones: runs the default damage handling on its body part (unit LW(10) = -2, part 1). */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -258,6 +264,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Dead event of the Dark Bones: it spins for 48 frames with the death sound, a smoke puff appears and the coins,
+ * experience and star points are awarded once (unit work 1 guards it);
+ * then it tips over and the unit is killed (with a different kill mode when the damage code 0x400 is set,
+ * Guess: a special defeat).
+ */
 static EVT_BEGIN(dead_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(0), 48)
@@ -310,6 +322,13 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Event when the Dark Bones runs out of HP but can rebuild itself:
+ * it moves to its home position, awards the reward once,
+ * collapses into a pile of bones (KRN_D_2, crumble sound),
+ * stays there for a second and sets unit work 2 to 2 or 3,
+ * the number of turns until rebirth_event brings it back.
+ */
 static EVT_BEGIN(fake_dead_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(2), LW(3), LW(4))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
@@ -348,6 +367,11 @@ static EVT_BEGIN(fake_dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Turn event of the collapsed Dark Bones: counts unit work 2 down and, when it reaches zero,
+ * reassembles it (KRN_D_3 and KRN_D_4 with the reunite sounds),
+ * clears attribute 0x20000 and restores its HP to the maximum.
+ */
 static EVT_BEGIN(rebirth_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
     SUBTRACT(LW(0), 1)
@@ -368,6 +392,13 @@ static EVT_BEGIN(rebirth_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the Dark Bones: when confused it throws a plain bone;
+ * when collapsed it rebuilds itself (rebirth_event);
+ * otherwise it can use an item, or draws a number from 0 to 99:
+ * bone throw (50), three-bone throw (30) or calling a Dull Bones friend (20).
+ * For the call it first checks that there is room beside it by turning to both sides with btlevtcmd_CheckSpace.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -442,6 +473,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Helper child script of the bone throw: given the pre-check result in LW(5) it makes the target start its dodge
+ * reaction (avoid type 38, 39 or 40) as the bone passes it.
+ */
 static EVT_BEGIN(start_avoid)
     IF_INT_EQUAL(LW(5), 3)
         CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -455,6 +490,13 @@ static EVT_BEGIN(start_avoid)
     RETURN
 EVT_END()
 
+/**
+ * Attack of the Dark Bones: it picks a target (weapon_honenoko_attack),
+ * winds up (KRN_A_1, KRN_A_2) and throws a spinning bone (part 2) in an arc;
+ * the target can dodge as the bone passes (start_avoid).
+ * If the bone is not avoided it lands on the target with the action command defence check,
+ * and the bone then bounces off.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -581,6 +623,7 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/** Helper child script of the three-bone throw: like start_avoid but the pre-check result comes from LW(11). */
 static EVT_BEGIN(start_avoid2)
     IF_INT_EQUAL(LW(11), 3)
         CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -594,6 +637,11 @@ static EVT_BEGIN(start_avoid2)
     RETURN
 EVT_END()
 
+/**
+ * Attack of the Dark Bones: three bones thrown at one target in sequence (weapon_honenoko_link_attack).
+ * It spawns link_attack_event_sub for bone parts 2, 3 and 4, 40 and 35 frames apart,
+ * and waits until the last one has finished (unit work 4 = -1).
+ */
 static EVT_BEGIN(link_attack_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -635,6 +683,12 @@ static EVT_BEGIN(link_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * One bone of the three-bone throw of the Dark Bones: LW(12) is the bone part (2, 3 or 4).
+ * Wind-up, a spinning arc to the target and dodge or hit handling as in normal_attack_event;
+ * the third bone does the damage check, and if an earlier bone hit,
+ * unit work 3 makes the following ones hit too.
+ */
 static EVT_BEGIN(link_attack_event_sub)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRN_A_1"))
     WAIT_MS(250)
@@ -752,6 +806,12 @@ static EVT_BEGIN(link_attack_event_sub)
     RETURN
 EVT_END()
 
+/**
+ * Call-for-help move of the Dark Bones: the camera zooms in and, six times,
+ * it throws up pieces of itself (parts and poses KRN_H_x, KRN_C_x) which pile up beside it;
+ * the pile reassembles (KRN_D_3, KRN_D_4) and a new Dull Bones unit (entry_honenoko) is spawned in that spot,
+ * copying its status (honenoko_copy_status).
+ */
 static EVT_BEGIN(call_friend_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -836,11 +896,16 @@ static EVT_BEGIN(call_friend_event)
     RETURN
 EVT_END()
 
+/** Wait event of the Dark Bones: plays the idle pose from its pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: copies the shrink/grow status (sizeChangeTurns and sizeChangeStrength) from the unit in args[0]
+ * to the unit in args[1], so a revived or called-in bone keeps the caller's size effect.
+ */
 static USER_FUNC(honenoko_copy_status) {
     EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));

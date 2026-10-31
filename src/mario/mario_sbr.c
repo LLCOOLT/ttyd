@@ -46,8 +46,11 @@ void marioGetStick(f32* dir, f32* mag);
 RubWork rubwork;
 
 #if VERSION <= VERSION_DEMO_US
-// The demo has no respawn position in MarioWork: falling out of eki_04, gon_10 or muj_00 puts Mario at a fixed
-// spot for that map, and anywhere else at (0, 74, 0) with the partners.
+/**
+ * The demo has no respawn position in MarioWork:
+ * falling out of eki_04, gon_10 or muj_00 puts Mario at a fixed spot for that map,
+ * and anywhere else at (0, 74, 0) with the partners.
+ */
 void marioBottomless(void) {
     MarioWork* mario = marioGetPtr();
     PartyEntry* party;
@@ -82,6 +85,11 @@ void marioBottomless(void) {
     marioChgMot(MARIO_MOTION_FORCE_RESET);
 }
 #else
+/**
+ * Called every frame: once Mario has fallen below y -2000,
+ * either changes to the bottomless motion (background mode),
+ * reloads the map (set by a boat entrance) or puts Mario and the partners back at the saved respawn point.
+ */
 void marioBottomless(void) {
     MarioWork* mario = marioGetPtr();
     PartyEntry* party;
@@ -110,6 +118,10 @@ void marioBottomless(void) {
     }
 }
 
+/**
+ * Saves where Mario respawns after falling out of the map:
+ * an entrance (evt_bero.c) or the boat's landing spot, 37 units above the given point.
+ */
 void N_marioSetBottomlessRespawnPosOnBeroEntry(f32 x, f32 y, f32 z) {
     MarioWork* mario = marioGetPtr();
     Vec position;
@@ -118,6 +130,7 @@ void N_marioSetBottomlessRespawnPosOnBeroEntry(f32 x, f32 y, f32 z) {
     mario->bottomlessResetPosition = position;
 }
 
+/** Saves the bottomless-pit respawn point as given; set from seq_mapchange.c to 10 above Mario on map entry. */
 void N_marioSetBottomlessRespawnPos(f32 x, f32 y, f32 z) {
     MarioWork* mario = marioGetPtr();
     Vec position;
@@ -126,17 +139,27 @@ void N_marioSetBottomlessRespawnPos(f32 x, f32 y, f32 z) {
     mario->bottomlessResetPosition = position;
 }
 
+/**
+ * Makes falling out of the map reload the current map at its entrance instead of respawning;
+ * set when Mario enters a map as the boat.
+ */
 void N_marioReloadMapOnBottomlessOn(void) {
     MarioWork* mario = marioGetPtr();
     mario->bottomlessReload = 1;
 }
 
+/** Goes back to respawning at the saved point after a fall; cleared when the boat lands. */
 void N_marioReloadMapOnBottomlessOff(void) {
     MarioWork* mario = marioGetPtr();
     mario->bottomlessReload = 0;
 }
 #endif
 
+/**
+ * Per-frame step of a scripted turn (MARIO_DISP_FLAG_DIR_EVENT):
+ * turns Mario from dirEvtStartDir to dirEvtTargetDir over dirEvtMsec.
+ * Returns TRUE when no turn is running or it has just finished.
+ */
 BOOL marioSetDirEventMain(void) {
     MarioWork* mario = marioGetPtr();
     s32 frames;
@@ -168,32 +191,46 @@ BOOL marioSetDirEventMain(void) {
     }
 }
 
+/**
+ * Speed multiplier for moving in world direction dir:
+ * 1.0 across the screen up to 1.19 straight towards or away from the camera,
+ * so depth moves look as fast as sideways ones. Used by Mario's and Yoshi's movement.
+ */
 f32 marioGetMoveRate(f32 dir) {
     f32 c = cos(3.1415927f * (dir - marioGetPtr()->targetYaw) / 180.0f);
     return 1.0f + (1.19f - 1.0f) * __fabsf(c);
 }
 
+/** Sets Mario's gravity multiplier (playerGravity; 1.0 is normal). */
 static inline void marioSetGravity(f32 g) {
     marioGetPtr()->playerGravity = g;
 }
 
+/** Puts Mario's gravity back to normal (1.0); run from mario.c. */
 void marioResetGravity(void) {
     marioSetGravity(1.0f);
 }
 
+// NPC Mario last touched (touchNpc).
 struct NpcEntry* marioGetTouchNpcPtr(void) {
     return marioGetPtr()->touchNpc;
 }
 
+/** TRUE if the surface is a plane panel (hit attribute bits 0x38); Mario's motion checks then turn him into a plane. */
 BOOL marioChkPlanePlace(HitEntry* hit) {
     return (hitGetAttr(hit) & 0x38) != 0;
 }
 
+/** Records Mario's current height as the peak of the jump or fall (jumpPeakY). */
 void marioSetPeakYpos(void) {
     MarioWork* mario = marioGetPtr();
     mario->jumpPeakY = mario->position.y;
 }
 
+/**
+ * Snaps Mario to face straight left or right on screen, whichever is nearer,
+ * and points his movement direction that way. JP and the demos give both cases the 90-degree move direction.
+ */
 void marioAdjustMoveDir(void) {
     MarioWork* mario = marioGetPtr();
 
@@ -218,11 +255,16 @@ void marioAdjustMoveDir(void) {
     }
 }
 
+/**
+ * Mario's facing as a world angle (displayDirection turned by the camera yaw);
+ * npcdrv.c uses it to compare with NPC directions.
+ */
 f32 marioGetDispDir(void) {
     MarioWork* mario = marioGetPtr();
     return revise360(mario->displayDirection - 90.0f + mario->targetYaw);
 }
 
+/** Wraps an angle in degrees into 0 <= angle < 360. */
 f32 revise360(f32 angle) {
     while (angle < 0.0f) {
         angle += 360.0f;
@@ -233,6 +275,11 @@ f32 revise360(f32 angle) {
     return angle;
 }
 
+/**
+ * Converts a screen-relative angle in degrees into a world move direction (270 - angle + camera yaw, wrapped).
+ * In paper mode the result is forced to 0 or 180 from the side Mario faces.
+ * The US and PAL releases round to 0.001 degree; JP and the demos to 0.01.
+ */
 f32 toMovedir(f32 angle) {
     MarioWork* mario = marioGetPtr();
 
@@ -256,6 +303,7 @@ f32 toMovedir(f32 angle) {
     return angle;
 }
 
+/** toMovedir for a partner: uses the partner's paper mode and facing and the camera yaw from its playerPtr. */
 f32 partyToMovedir(PartyEntry* party, f32 angle) {
     void* cam = party->playerPtr;
 
@@ -279,6 +327,7 @@ f32 partyToMovedir(PartyEntry* party, f32 angle) {
     return angle;
 }
 
+/** toMovedir without the paper-mode facing override: only converts the screen angle by the camera yaw. */
 f32 toMovedirSimple(f32 angle) {
     MarioWork* mario = marioGetPtr();
 #if VERSION >= VERSION_US
@@ -295,6 +344,10 @@ f32 toMovedirSimple(f32 angle) {
     return angle;
 }
 
+/**
+ * toMovedir, then turns the result ofs degrees further away from the camera yaw side it is on;
+ * used to aim the hammer and partner moves a little off Mario's line.
+ */
 f32 toMovedir2(f32 angle, f32 ofs) {
     MarioWork* mario = marioGetPtr();
 
@@ -319,6 +372,10 @@ f32 toMovedir2(f32 angle, f32 ofs) {
     return revise360(angle);
 }
 
+/**
+ * Per-frame: counts down a forced move (marioSetForceMove) and when it ends gives Mario back the walk
+ * or dash speed his stick asks for.
+ */
 void marioForceMoveMain(void) {
     MarioWork* mario = marioGetPtr();
 
@@ -336,6 +393,11 @@ void marioForceMoveMain(void) {
     }
 }
 
+/**
+ * Makes Mario walk or dash in direction dir at speed for time frames regardless of the stick;
+ * scripts use it (evt_mario.c) to move him to a point.
+ * The boat, slit, tube and Yoshi motions keep their own motion.
+ */
 void marioSetForceMove(f32 dir, s32 time, f32 speed) {
     MarioWork* mario = marioGetPtr();
 
@@ -361,6 +423,10 @@ void marioSetForceMove(f32 dir, s32 time, f32 speed) {
     }
 }
 
+/**
+ * Per-frame: copies controller 0's sticks, triggers and buttons into MarioWork, masked by enableKeyMask,
+ * and blanks them while Mario's controls are off; also records the demo pad's new presses.
+ */
 void marioUpdateKeyData(void) {
     MarioWork* mario = marioGetPtr();
     u32 mask = 0xFFFFFFFF;
@@ -430,6 +496,10 @@ void marioUpdateKeyData(void) {
     mario->demoButtonPrev = btn;
 }
 
+/**
+ * Stick input as a world direction (degrees, camera yaw applied) and magnitude (0..70);
+ * during a forced move it returns the forced direction and speed instead.
+ */
 void marioGetStick(f32* dir, f32* mag) {
     MarioWork* mario = marioGetPtr();
     s32 x;
@@ -461,6 +531,10 @@ void marioGetStick(f32* dir, f32* mag) {
 }
 
 #if VERSION >= VERSION_JP
+/**
+ * How far the main stick is pushed: 0 neutral, 1 a little, 2 past radius 55;
+ * partner walking picks its walk or run pose from it.
+ */
 s32 N_marioGetMovementSpeed(void) {
     MarioWork* mario = marioGetPtr();
     s8 x = mario->wStickDir1;
@@ -475,11 +549,16 @@ s32 N_marioGetMovementSpeed(void) {
 }
 #endif
 
+/** Resets the stick-rotation (rub) tracker; run at Mario init and when the tube motion starts. */
 void marioGetRubInit(void) {
     memset(&rubwork, 0, sizeof(rubwork));
     rubwork.revDir = -1;
 }
 
+/**
+ * Looks at the last ten stick angles in the rub history and decides which way the stick is turning:
+ * 0 one way, 1 the other (no steps against it and at least four with it), or -1 when it is not turning steadily.
+ */
 static s32 chkRevolveDir(s32* cw, s32* ccw) {
     s32 base;
     s32 i;
@@ -538,6 +617,10 @@ static s32 chkRevolveDir(s32* cw, s32* ccw) {
     return -1;
 }
 
+/**
+ * 1 when the newest stick step has passed the angle where the current rotation started,
+ * i.e. one full turn of the stick in direction dir; 0 otherwise, -1 when there is not enough history.
+ */
 static s32 checkOneRevolution(s32 dir) {
     RubWork* rw;
     s32 idx;
@@ -594,6 +677,7 @@ static s32 checkOneRevolution(s32 dir) {
     return ret;
 }
 
+/** Fills the rub history with the angle v, restarting the turn count from there. */
 static inline void rubClearHist(s32 v) {
     u32 i;
     s16* p = rubwork.hist;
@@ -602,6 +686,13 @@ static inline void rubClearHist(s32 v) {
     }
 }
 
+/**
+ * Tracks the stick being spun while button btn is held (0 = no button):
+ * returns 1 on each completed turn and 0 between,
+ * with the spin direction (0 or 1) in dirOut and the turn count in countOut;
+ * -1 when the button is released or the stick is not spinning.
+ * Used for the Spring Jump (A), hammer spin (B) and tube (R) inputs.
+ */
 s32 marioGetRub(u32 btn, s32* dirOut, s32* countOut, f32* magOut) {
     s32 ret = 0;
     MarioWork* mario = marioGetPtr();

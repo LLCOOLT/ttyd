@@ -166,6 +166,10 @@
 #include "eff/n64/eff_booboo_n64.h"
 #include "version.h"
 
+/**
+ * Spawns an effect by effect-set name args[1] ("kemuri", "recovery", ...) and names it args[0]
+ * unless that is ""; args[2..13] are passed to the set's entry function as ints or floats as each one needs.
+ */
 USER_FUNC(evt_eff) {
     EvtWord* args = event->args;
     s32* p;
@@ -389,6 +393,10 @@ USER_FUNC(evt_eff) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Like evt_eff for the effects ported from Paper Mario 64 (the *_n64 effect sets):
+ * args[0] name, args[1] set name, the rest as each entry function needs.
+ */
 USER_FUNC(evt_eff64) {
     EvtWord* args;
     s32* intArg;
@@ -874,21 +882,25 @@ USER_FUNC(evt_eff64) {
     return 2;
 }
 
+/** Ends the effect named args[0], letting it finish its fade-out when it supports soft deletion. */
 USER_FUNC(evt_eff_softdelete) {
     effSoftDelete(effNameToPtr((const char*)evtGetValue(event, *event->args)));
     return EVT_RETURN_DONE;
 }
 
+/** Removes the effect named args[0] at once. */
 USER_FUNC(evt_eff_delete) {
     effDelete(effNameToPtr((const char*)evtGetValue(event, *event->args)));
     return EVT_RETURN_DONE;
 }
 
+/** As evt_eff_softdelete, for an effect pointer held in args[0]. */
 USER_FUNC(evt_eff_softdelete_ptr) {
     effSoftDelete((EffectEntry*)evtGetValue(event, *event->args));
     return EVT_RETURN_DONE;
 }
 
+/** As evt_eff_delete, for an effect pointer held in args[0]. */
 USER_FUNC(evt_eff_delete_ptr) {
     effDelete((EffectEntry*)evtGetValue(event, *event->args));
     return EVT_RETURN_DONE;
@@ -897,6 +909,11 @@ USER_FUNC(evt_eff_delete_ptr) {
 #pragma push
 // FAKE: turns off copy propagation so the temporaries and registers match the target; removing it changes the code
 #pragma opt_propagation off
+/**
+ * Shows an emote bubble (!, ?, ...) of type args[3] over Mario (args[0] 0),
+ * NPC args[2] (1, "me" = the owner NPC), point args[5..7] (2), the partner (3) or the follower (4);
+ * args[1] names the effect. The US and later releases keep the bubble at a fixed height over Flurrie.
+ */
 USER_FUNC(evt_eff_fukidashi) {
     EvtWord* args = event->args;
     s32 mode = evtGetValue(event, args[0]);

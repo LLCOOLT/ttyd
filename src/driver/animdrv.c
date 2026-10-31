@@ -3198,10 +3198,15 @@ static void pushGXModelMtx_JointNode__(AnimPoseNode* node, f32 sx, f32 sy, f32 s
 static void pushGXModelMtx_TransformNode__(AnimPoseNode* node);
 static void evalProc(s32 parentId, s32 groupId);
 
+/** Returns the animation driver's work (files, textures, pose pool, scratch buffers). */
 AnimationWork* animGetPtr(void) {
     return wp;
 }
 
+/**
+ * Current time in milliseconds on the battle render clock (globalTime TRUE) or the field one;
+ * pose timing runs on it, so field poses pause while a battle runs.
+ */
 OSTime animTimeGetTime(BOOL globalTime) {
     if (globalTime == FALSE) {
         return OSTicksToMilliseconds(gp->renderFieldTime);
@@ -3209,6 +3214,7 @@ OSTime animTimeGetTime(BOOL globalTime) {
     return OSTicksToMilliseconds(gp->renderTime);
 }
 
+/** Allocates the 1.5 MB per-frame vertex heap on first use and rewinds it. */
 static void initTestHeap(void) {
     if (!wp->testHeap) { // allocate 1.5MiB test heap
         wp->testHeap = __memAlloc(HEAP_DEFAULT, TESTHEAP_SIZE);
@@ -3216,7 +3222,7 @@ static void initTestHeap(void) {
     wp->testAlloc = wp->testHeap;
 }
 
-// heavily inlined
+/** heavily inlined */
 static void* testAlloc(u32 size) {
     void* alloc = wp->testAlloc;
 
@@ -3282,6 +3288,12 @@ static void animPose_AllocBuffer(AnimationPose* pose);
 static void animSetMaterial_Texture(s32 texCount, s32* texIdRemap, AnimPoseTexEntry* pTexEntries, AnimTexMtx* animEntries, s32 texBindsCapacity, AnimTexBind* texBinds, AnimationTextureFile* texFile);
 static void dispProc(s32 parentId, s32 groupId, s32 xluStage, s32 nextKeyframe, f32 blend);
 static void materialProc(s32 shapeId, s32 xluStage);
+/**
+ * Boot setup: allocates the pools (64 animation files, 64 texture files, 256 poses,
+ * a 1024-vector scratch buffer), the per-frame vertex heap and the tangent table used to bend paper,
+ * and loads a/vivian.bin (the hair and tail chain data of Vivian and her sisters)
+ * and a/ag2tg.bin (the animation-group to texture-group map).
+ */
 void animInit(void) {
     int i;
     FileEntry* file;
@@ -3329,18 +3341,23 @@ void animInit(void) {
     wp->mp_ag2tg = fileAllocf(0, "a/ag2tg.bin");
 }
 
+/** Once per frame: queues the offscreen pass that renders the paper (effect overlay) poses. */
 void animMain(void) {
     dispEntry(CAMERA_OFFSCREEN, 0.0f, 1, animPaperPoseDisp, NULL);
 }
 
+/** The animation file data of pose pose. */
 inline AnimationPoseData* animPoseGetBaseData(AnimationPose* pose) {
     return *wp->files[pose->fileId].handle->data;
 }
 
 #define animPoseGetBaseData(pose) (*(AnimationPoseData**)(wp->files[(pose)->fileId].handle->data))
 
-// Allocates the pose's vertex buffers. animPoseGetBaseData is animPoseGetAnimBaseDataPtr for a pose pointer; the
-// original inlines that lookup at every use.
+/**
+ * Allocates the pose's vertex buffers.
+ * animPoseGetBaseData is animPoseGetAnimBaseDataPtr for a pose pointer;
+ * the original inlines that lookup at every use.
+ */
 static void animPose_AllocBuffer(AnimationPose* pose) {
     pose->bufferVtxPos = testAlloc(sizeof(Vec) * animPoseGetBaseData(pose)->bufferPosNum);
     pose->vtxArrayPos = testAlloc(sizeof(Vec) * animPoseGetBaseData(pose)->bufferPosNum);
@@ -3360,7 +3377,7 @@ static void animPose_AllocBuffer(AnimationPose* pose) {
     pose->lastFrameZero = -1;
 }
 
-// heavily inlined
+/** heavily inlined */
 void animPoseRefresh(void) {
     int i;
 
@@ -3376,6 +3393,7 @@ void animPoseRefresh(void) {
     }
 }
 
+/** Switches the driver to battle mode and reallocates the vertex buffers of the battle and shared poses. */
 void animPoseBattleInit(void) {
     wp->inBattle = TRUE;
     animPoseRefresh();
@@ -3397,6 +3415,13 @@ static inline AnimationPoseFile* apeFreeFile(s32* id) {
 found:
     return q;
 }
+/**
+ * Creates a pose for animation file animName (e.g. "c_kuribo") and returns its id,
+ * or -2 if it could not be loaded. type picks the archive and clock: 0 field, 1 battle, 2 shared.
+ * Loads the model file and its texture file (sharing ones already loaded),
+ * allocates the vertex buffers and resets time, material and turning state;
+ * Vivian, Marilyn and Beldam get their hair and tail chain data.
+ */
 s32 animPoseEntry(const char* animName, s32 type) {
     static s32 _dummy = -1;
     // FAKE: counters and found-slot temps are one-element s32 arrays (IRO scalarizes them into @ window temps, giving the
@@ -3559,6 +3584,10 @@ have_file:
     return poseId[0];
 }
 
+/**
+ * Returns the shared paper pose for animName in group, creating it if needed and counting another user;
+ * -2 if it could not be loaded.
+ */
 s32 animPaperPoseEntry(const char* animName, s32 group) {
     s32 i;
     AnimationPose* pose;
@@ -3582,6 +3611,10 @@ s32 animPaperPoseEntry(const char* animName, s32 group) {
 
 const char* animGetTexName(const char* name);
 
+/**
+ * Starts loading animation file animName and its textures in group's archive in the background;
+ * TRUE once both are loaded (or missing), FALSE while still loading.
+ */
 BOOL animEffectAsync(const char* animName, u32 group) {
     FileEntry* model;
     FileEntry* anim;
@@ -3614,14 +3647,17 @@ BOOL animEffectAsync(const char* animName, u32 group) {
     return ret;
 }
 
+/** Turns on pose poseId's paper turning (the flat character flips to face its new direction). */
 void animPosePeraOn(s32 poseId) {
     wp->poses[poseId].flags |= ANIM_POSE_FLAG_PERA;
 }
 
+/** Turns off pose poseId's paper turning. */
 void animPosePeraOff(s32 poseId) {
     wp->poses[poseId].flags &= ~ANIM_POSE_FLAG_PERA;
 }
 
+/** Turns on paper turning for pose poseId's paper overlay pose, copying the pose's current turn angles to it. */
 void animPosePaperPeraOn(s32 poseId) {
     AnimationPose* dst = &wp->poses[wp->poses[poseId].paperId];
     AnimationPose* src = &wp->poses[poseId];
@@ -3632,15 +3668,21 @@ void animPosePaperPeraOn(s32 poseId) {
     dst->peraTargetRotY = src->peraTargetRotY;
 }
 
+/** Turns off paper turning for pose poseId's paper overlay pose. */
 void animPosePaperPeraOff(s32 poseId) {
     wp->poses[wp->poses[poseId].paperId].flags &= ~ANIM_POSE_FLAG_PERA;
 }
 
+/** Sets how fast pose poseId's animation plays (1.0 normal speed). */
 void animPoseSetLocalTimeRate(s32 poseId, f32 localTimeRate) {
     AnimationPose* pose = &wp->poses[poseId];
     pose->localTimeRate = localTimeRate;
 }
 
+/**
+ * Moves pose poseId's animation clock to localTimeFrames frames in (at 60 per second),
+ * and its own paper overlay's too.
+ */
 void animPoseSetLocalTime(s32 poseId, f32 localTimeFrames) {
     AnimationPose *pose, *pera;
 
@@ -3655,6 +3697,7 @@ void animPoseSetLocalTime(s32 poseId, f32 localTimeFrames) {
     }
 }
 
+/** Sets the time pose poseId's animation counts from, in animTimeGetTime milliseconds. */
 void animPoseSetStartTime(s32 poseId, OSTime startTime) {
     AnimationPose* pose = &wp->poses[poseId];
     pose->localTime = startTime;
@@ -3667,6 +3710,10 @@ void animPoseSetStartTime(s32 poseId, OSTime startTime) {
 #define ANIM_INDEX_NAME(idx) ((const char*)(AddrWord)(idx))
 #define animPoseGetBaseDataId(id) (*(AnimationPoseData**)(wp->files[wp->poses[id].fileId].handle->data))
 
+/**
+ * Looks up an animation in data: by name, or directly by index when name holds a non-negative index.
+ * Unknown names and indices give 0.
+ */
 inline s32 animPoseGetAnimIdx(AnimationPoseData* data, const char* name) {
     s32 i = ANIM_NAME_INDEX(name);
     s32 count = data->animCount;
@@ -3683,6 +3730,10 @@ inline s32 animPoseGetAnimIdx(AnimationPoseData* data, const char* name) {
     return 0;
 }
 
+/**
+ * Switches pose poseId to animation animName (e.g. "S_1", "W_1"), restarting it from the beginning;
+ * with reset FALSE nothing happens if it already plays that animation.
+ */
 void animPoseSetAnim(s32 poseId, const char* animName, BOOL reset) {
     AnimationPose* pose;
     s32 animId;
@@ -3702,6 +3753,7 @@ void animPoseSetAnim(s32 poseId, const char* animName, BOOL reset) {
     }
 }
 
+/** Returns the id of the shared paper pose loaded from animName in group, or -1. */
 s32 animPaperPoseGetId(const char* animName, s32 group) {
     AnimationPose* pose;
     s32 i;
@@ -3720,6 +3772,10 @@ s32 animPaperPoseGetId(const char* animName, s32 group) {
     return i;
 }
 
+/**
+ * Attaches the shared paper pose animName (from the pose's group, or the shared group) to pose poseId as its
+ * paper overlay; NULL detaches it. someflag turns on caching of the overlay's screen rectangle.
+ */
 void animPoseSetPaperAnimGroup(s32 poseId, const char* animName, BOOL someflag) {
     AnimationPose* pose = animPoseGetAnimPosePtr(poseId);
 
@@ -3744,6 +3800,10 @@ void animPoseSetPaperAnimGroup(s32 poseId, const char* animName, BOOL someflag) 
     animPoseSetMaterialLightFlagOn(poseId, ANIM_MATERIAL_LIGHT_PAPER);
 }
 
+/**
+ * Plays animation animName of pose poseId's paper overlay, restarting its clock;
+ * an overlay of its own (not shared) is evaluated at once.
+ */
 void animPoseSetPaperAnim(s32 poseId, const char* animName, BOOL reset) {
     AnimationPose* pose = animPoseGetAnimPosePtr(poseId);
     AnimationPoseData* data;
@@ -3762,6 +3822,7 @@ void animPoseSetPaperAnim(s32 poseId, const char* animName, BOOL reset) {
 
 void animPoseFileRelease(s32 fileId);
 
+/** Creates a paper overlay pose owned by one pose (not shared), returning its id or -2. */
 inline s32 animEffectPoseEntry(const char* animName, s32 group) {
     s32 i;
     AnimationPose* pose;
@@ -3777,6 +3838,11 @@ inline s32 animEffectPoseEntry(const char* animName, s32 group) {
     return i;
 }
 
+/**
+ * Gives pose poseId its own paper overlay loaded from animName (e.g. a status or transformation effect),
+ * releasing the previous one; NULL removes it.
+ * Does nothing if that overlay is already attached with the same someflag (screen rectangle caching).
+ */
 void animPoseSetEffect(s32 poseId, const char* animName, BOOL someflag) {
     AnimationPose* paper;
     AnimationPose* pose = animPoseGetAnimPosePtr(poseId);
@@ -3810,6 +3876,7 @@ void animPoseSetEffect(s32 poseId, const char* animName, BOOL someflag) {
     animPoseSetMaterialLightFlagOn(poseId, ANIM_MATERIAL_LIGHT_PAPER);
 }
 
+/** Plays animation animName on pose poseId's paper overlay, if it has one. */
 void animPoseSetEffectAnim(s32 poseId, const char* animName, BOOL reset) {
     AnimationPose* pose = &wp->poses[poseId];
 
@@ -3818,25 +3885,36 @@ void animPoseSetEffectAnim(s32 poseId, const char* animName, BOOL reset) {
     }
 }
 
+/**
+ * Sets a GX callback that runs before each of pose poseId's draw stages (to change TEV or blend setup);
+ * disableDraw skips the normal drawing.
+ */
 void animPoseSetGXFunc(s32 poseId, void (*callback)(s32 wXluStage), BOOL disableDraw) {
     AnimationPose* pose = &wp->poses[poseId];
     pose->gxCallback = callback;
     pose->disableDraw = disableDraw;
 }
 
+/** Pose poseId's radius from its animation file, in world units. */
 f32 animPoseGetRadius(s32 poseId) {
     return 2.0f * animPoseGetAnimBaseDataPtr(poseId)->radius;
 }
 
+/** Pose poseId's height from its animation file, in world units. */
 f32 animPoseGetHeight(s32 poseId) {
     return 2.0f * animPoseGetAnimBaseDataPtr(poseId)->height;
 }
 
+/** How many times pose poseId's current animation has looped (fractional). */
 f32 animPoseGetLoopTimes(s32 id) {
     AnimationPose* pose = &wp->poses[id];
     return pose->loopTime;
 }
 
+/**
+ * Tells whether pose poseId has finished its paper turn (within 10 degrees of the target),
+ * TRUE also when turning is off.
+ */
 BOOL animPoseGetPeraEnd(s32 poseId) {
     AnimationPose* pose = &wp->poses[poseId];
 
@@ -3849,41 +3927,52 @@ BOOL animPoseGetPeraEnd(s32 poseId) {
     return FALSE;
 }
 
+/** Sets material flag bits mask on pose poseId (draw modifiers such as the event colour or blending). */
 void animPoseSetMaterialFlagOn(s32 poseId, u32 mask) {
     AnimationPose* pose = &wp->poses[poseId];
     pose->materialFlag |= mask;
 }
 
+/** Clears material flag bits mask on pose poseId. */
 void animPoseSetMaterialFlagOff(s32 poseId, u32 mask) {
     AnimationPose* pose = &wp->poses[poseId];
     pose->materialFlag &= ~mask;
 }
 
+/** Sets material light flag bits mask on pose poseId (lighting and paper overlay modes). */
 void animPoseSetMaterialLightFlagOn(s32 poseId, u32 mask) {
     AnimationPose* pose = &wp->poses[poseId];
     pose->materialLightFlag |= mask;
 }
 
+/** Clears material light flag bits mask on pose poseId. */
 void animPoseSetMaterialLightFlagOff(s32 poseId, u32 mask) {
     AnimationPose* pose = &wp->poses[poseId];
     pose->materialLightFlag &= ~mask;
 }
 
+/**
+ * Sets the colour pose poseId is tinted with while ANIM_MATERIAL_FLAG_EVT_COLOR is on (scripts use it to fade or
+ * colour characters).
+ */
 void animPoseSetMaterialEvtColor(s32 poseId, GXColor color) {
     AnimationPose* pose = &wp->poses[poseId];
     pose->materialColor = color;
 }
 
+/** Pose poseId's material flags. */
 u32 animPoseGetMaterialFlag(s32 poseId) {
     AnimationPose* pose = &wp->poses[poseId];
     return pose->materialFlag;
 }
 
+/** Pose poseId's material light flags. */
 u32 animPoseGetMaterialLightFlag(s32 poseId) {
     AnimationPose* pose = &wp->poses[poseId];
     return pose->materialLightFlag;
 }
 
+/** Pose poseId's event tint colour. */
 GXColor animPoseGetMaterialEvtColor(s32 poseId) {
     AnimationPose* pose = &wp->poses[poseId];
     return pose->materialColor;
@@ -3895,25 +3984,32 @@ static inline f32 apmMul(f32 a, f32 b) {
     return a * b;
 }
 #if VERSION <= VERSION_DEMO_US
-// The demo copies the frame buffers through small inline helpers. Kept: writing the copies out as
-// `if (n != 0) memcpy_as4(...)` changes the demo animPoseMain's registers, and calling the helpers from the later
-// versions' animPoseMain changes theirs.
+/**
+ * The demo copies the frame buffers through small inline helpers.
+ * Kept: writing the copies out as `if (n != 0) memcpy_as4(...)` changes the demo animPoseMain's registers,
+ * and calling the helpers from the later versions' animPoseMain changes theirs.
+ */
 static inline void apmCopy4(void* src, void* dst, s32 count, s32 size) {
     if (count != 0)
         memcpy_as4(dst, src, count * size);
 }
 
+/** Copies count bytes of a frame buffer when there are any (demo animPoseMain helper). */
 static inline void apmCopy(void* src, void* dst, s32 count) {
     if (count != 0)
         memcpy(dst, src, count);
 }
 
+/**
+ * Copies count elements of size bytes from src to dst, 4 bytes at a time,
+ * when there are any (demo animPoseMain helper).
+ */
 static inline void apmCopyTo(void* dst, void* src, s32 count, s32 size) {
     if (count != 0)
         memcpy_as4(dst, src, count * size);
 }
 
-// the demo converts the s8 deltas with plain casts (no fast-cast setup) and walks the keyframes and deltas by index
+/** the demo converts the s8 deltas with plain casts (no fast-cast setup) and walks the keyframes and deltas by index */
 void animPoseMain(s32 poseId) {
     s32 frame;
     s32 nA;
@@ -4271,6 +4367,13 @@ void animPoseMain(s32 poseId) {
     }
 }
 #else
+/**
+ * Advances pose poseId to the current time and evaluates its animation:
+ * works out the frame (at the pose's time rate, looping by the animation's loop range and counting loops),
+ * then decodes the keyframes into the pose's node transforms, vertex positions and normals,
+ * texture animation and group visibility, blending towards the next keyframe.
+ * A pose's own paper overlay is evaluated first.
+ */
 void animPoseMain(s32 poseId) {
     s32 frame;
     s32 nA;
@@ -4684,7 +4787,7 @@ void animPoseMain(s32 poseId) {
 #endif
 
 #if VERSION <= VERSION_DEMO_US
-// the demo always builds every matrix and concatenates them all
+/** the demo always builds every matrix and concatenates them all */
 static void pushGXModelMtx_TransformNode__(AnimPoseNode* node) {
     Mtx trans, scale, rot, tmp;
     Mtx sc1, sc2, sc3;
@@ -4728,6 +4831,10 @@ static void pushGXModelMtx_TransformNode__(AnimPoseNode* node) {
     PSMTXConcat(g_modeling_mtx_stack[g_modeling_mtx_lv - 1], trans, g_modeling_mtx_stack[g_modeling_mtx_lv]);
 }
 
+/**
+ * Pushes the modelling matrix of a joint node (translation, two rotations and a scale,
+ * cancelling the parent's scale): demo version, which always builds and concatenates every matrix.
+ */
 static void pushGXModelMtx_JointNode__(AnimPoseNode* node, f32 sx, f32 sy, f32 sz) {
     Mtx trans, scale, iscale, rot, tmp;
 
@@ -4771,6 +4878,10 @@ static void pushGXModelMtx_JointNode__(AnimPoseNode* node, f32 sx, f32 sy, f32 s
     PSMTXConcat(g_modeling_mtx_stack[g_modeling_mtx_lv - 1], trans, g_modeling_mtx_stack[g_modeling_mtx_lv]);
 }
 #else
+/**
+ * Pushes the modelling matrix of a plain transform node onto the modelling stack:
+ * translation, rotation and scale about their pivot points, building only the parts that are not identity.
+ */
 static void pushGXModelMtx_TransformNode__(AnimPoseNode* node) {
     Mtx trans, scale, rot, tmp;
     Mtx sc1, sc2, sc3;
@@ -4894,6 +5005,10 @@ static void pushGXModelMtx_TransformNode__(AnimPoseNode* node) {
     }
     PSMTXConcat(g_modeling_mtx_stack[g_modeling_mtx_lv - 1], p, g_modeling_mtx_stack[g_modeling_mtx_lv]);
 }
+/**
+ * Pushes the modelling matrix of a joint node onto the modelling stack:
+ * translation, rotations and scale, with the parent's scale cancelled (sx, sy, sz).
+ */
 static void pushGXModelMtx_JointNode__(AnimPoseNode* node, f32 sx, f32 sy, f32 sz) {
     Mtx trans, scale, iscale, rot, tmp;
     MtxPtr p;
@@ -5042,8 +5157,12 @@ static void pushGXModelMtx_JointNode__(AnimPoseNode* node, f32 sx, f32 sy, f32 s
 
 static void animSetMaterial_Texture(s32 texCount, s32* texIdRemap, AnimPoseTexEntry* pTexEntries, AnimTexMtx* animEntries, s32 texBindsCapacity, AnimTexBind* texBinds, AnimationTextureFile* texFile);
 #if VERSION <= VERSION_DEMO_US
-// the demo sets up each texture object, then builds the full texture matrix unless the animation is the identity.
-// The local declaration order is load-bearing: it decides the register colouring (wrapFlags r30, params r23-r29).
+/**
+ * the demo sets up each texture object, then builds the full texture matrix
+ * unless the animation is the identity.
+ * The local declaration order is load-bearing: it decides the register colouring (wrapFlags r30, params
+ * r23-r29).
+ */
 static void animSetMaterial_Texture(s32 texCount, s32* texIdRemap, AnimPoseTexEntry* pTexEntries, AnimTexMtx* animEntries, s32 texBindsCapacity, AnimTexBind* texBinds, AnimationTextureFile* texFile) {
     u32 mipmap;
     u32 texId;
@@ -5176,6 +5295,10 @@ static void animSetMaterial_Texture(s32 texCount, s32* texIdRemap, AnimPoseTexEn
     }
 }
 #else
+/**
+ * Loads a shape's textures: sets up each texture object from the pose's texture file (wrap modes and filters
+ * from its binding) and loads it with its animated texture matrix.
+ */
 static void animSetMaterial_Texture(s32 texCount_, s32* texIdRemap_, AnimPoseTexEntry* pTexEntries_, AnimTexMtx* animEntries, s32 texBindsCapacity, AnimTexBind* texBinds, AnimationTextureFile* texFile) {
     s32 texCount;
     s32* texIdRemap;
@@ -5360,6 +5483,10 @@ static void animSetMaterial_Texture(s32 texCount_, s32* texIdRemap_, AnimPoseTex
 }
 #endif
 
+/**
+ * Replaces the shape's texture of kind texType with texObj (and texture matrix mtx, if given),
+ * for paper overlays and other substituted textures; TRUE if the shape uses such a texture.
+ */
 inline BOOL animSetMaterial_ChangeTexture(AnimationPoseData* data, AnimPoseShapeDraw* draw, AnimationPose* pose, GXTexObj* texObj, void** texData, Mtx mtx, s32 texType) {
     AnimTexBind* bind;
     s32 bindCount;
@@ -5406,13 +5533,21 @@ inline BOOL animSetMaterial_ChangeTexture(AnimationPoseData* data, AnimPoseShape
     return FALSE;
 }
 
-// Sets GX culling for a shape's cull mode. The demo map has one static local tbl$1109 that materialProc and
-// renderProc both read, so the table sits in a helper both inline.
+/**
+ * Sets GX culling for a shape's cull mode.
+ * The demo map has one static local tbl$1109 that materialProc and renderProc both read,
+ * so the table sits in a helper both inline.
+ */
 static inline void animSetCullMode(s32 cullMode) {
     static s32 tbl[4] = {2, 1, 3, 0};
     GXSetCullMode(tbl[cullMode]);
 }
 
+/**
+ * Sets up the material of shape shapeId for draw stage xluStage:
+ * the matrices, lighting, cull mode, alpha test and blending, the tint colours and textures,
+ * including substituted paper textures.
+ */
 static void materialProc(s32 shapeId, s32 xluStage) {
     AnimationPoseData* cd;
     int i;
@@ -5516,6 +5651,10 @@ static void materialProc(s32 shapeId, s32 xluStage) {
 static inline AnimationPoseData* rpCurData(void) {
     return wp->curPoseData;
 }
+/**
+ * Draws shape shapeId of the current pose: points GX at the pose's evaluated vertex positions and normals
+ * and the file's colours and texture coordinates, then sends its polygons.
+ */
 static void renderProc(s32 shapeId, s32 unused) {
     AnimationPoseData* cd;
     s32 texIndex;
@@ -5772,6 +5911,11 @@ static void renderProc(s32 shapeId, s32 unused) {
 
 static void materialProc(s32 shapeId, s32 xluStage);
 
+/**
+ * Walks the pose's group tree from groupId (children, then siblings) and draws each visible group:
+ * pushes its node matrix, sets up its material and draws its shape.
+ * Vivian, Marilyn and Beldam's hair and tail chains are bent towards their movement on the way.
+ */
 static void dispProc(s32 parentId, s32 groupId, s32 xluStage, s32 nextKeyframe, f32 blend) {
     AnimPoseGroup* group;
     AnimPoseGroup* parent;
@@ -5881,6 +6025,7 @@ static void dispProc(s32 parentId, s32 groupId, s32 xluStage, s32 nextKeyframe, 
     dispProc(groupId, group->brotherGroupId, xluStage, nextKeyframe, blend);
 }
 
+/** Draws pose poseId at x, y, z turned by rotY degrees and scaled, for draw stage xluMode. */
 void animPoseDraw(s32 poseId, f32 x, f32 y, f32 z, f32 rotY, f32 scale, s32 xluMode) {
     Mtx matrix;
 
@@ -5891,6 +6036,7 @@ void animPoseDraw(s32 poseId, f32 x, f32 y, f32 z, f32 rotY, f32 scale, s32 xluM
 // _animPoseDrawMtx
 void animPoseMainSub(AnimationPose* pose);
 
+/** Wraps an angle in degrees into 0..360. */
 static inline f32 _animClampAngle(f32 a) {
     while (a < -360.0f)
         a += 360.0f;
@@ -5901,6 +6047,7 @@ static inline f32 _animClampAngle(f32 a) {
     return a;
 }
 
+/** Wraps an angle in degrees into -360..360. */
 static inline f32 _animClampAngle2(f32 a) {
     while (a < -360.0f)
         a += 360.0f;
@@ -5909,11 +6056,18 @@ static inline f32 _animClampAngle2(f32 a) {
     return a;
 }
 
+/** The 3D camera's yaw in degrees (0..360), from the direction it looks along. */
 static inline f32 _animCamAngle(void) {
     CameraEntry* cam = camGetPtr(CAMERA_3D);
     return _animClampAngle(57.29579f * (f32)atan2(-(cam->cameraAt.x - cam->cameraPos.x), -(cam->cameraAt.z - cam->cameraPos.z)));
 }
 
+/**
+ * Draws a pose with matrix for draw stage xluMode (skipped when the animation file has nothing for that stage,
+ * or for a field pose in battle and a battle pose on the field):
+ * applies the event colour and GX callback, turns a paper-turning pose smoothly to face the camera (from behind
+ * when seen from the back), scales it, evaluates the animation if needed and draws its group tree.
+ */
 void _animPoseDrawMtx(AnimationPose* pose, Mtx matrix, s32 xluMode, f32 rotY, f32 scale) {
     Mtx result;
     Mtx tmp2;
@@ -6038,6 +6192,7 @@ void _animPoseDrawMtx(AnimationPose* pose, Mtx matrix, s32 xluMode, f32 rotY, f3
     dispProc(-1, data->groupCount - 1, keyframeIdx, nextKeyframeIdx, keyframeBlend);
 }
 
+/** Stores the three paper texture matrices for the next draw (NULL for none). */
 inline void animSetPaperMtx(Mtx m0, Mtx* m1, Mtx* m2) {
     if (m0 == NULL) {
         wp->paperMtxPtr[0] = NULL;
@@ -6092,6 +6247,11 @@ static inline void apdEval(AnimationPose* pose, Mtx matrix, f32 rotY, f32 scale)
 #pragma push
 // FAKE: turns off lifetime splitting so the register allocation matches the target; removing it changes the code
 #pragma opt_lifetimes off
+/**
+ * Draws pose poseId with matrix for draw stage xluMode, rotY and scale.
+ * A pose with a paper overlay is drawn as that overlay,
+ * textured with the pose's own image rendered offscreen and stretched to the overlay's shape.
+ */
 void animPoseDrawMtx(s32 poseId, Mtx matrix, s32 xluMode, f32 rotY, f32 scale) {
     Mtx m1;
     static Mtx mtx;
@@ -6193,6 +6353,7 @@ void animPoseDrawMtx(s32 poseId, Mtx matrix, s32 xluMode, f32 rotY, f32 scale) {
 
 u32 anim_ext_tex_size;
 
+/** Sets the textures (and their data) the next paper overlay draw substitutes, and the paper texture mode. */
 void animSetPaperTexObj(GXTexObj* obj1, GXTexObj* obj2, GXTexObj* obj3, void* data1, void* data2, void* data3, s32 paperTexMode, s32 unused) {
     wp->texObjs[0] = data1 ? obj1 : NULL;
     wp->texObjs[1] = data2 ? obj2 : NULL;
@@ -6204,6 +6365,10 @@ void animSetPaperTexObj(GXTexObj* obj1, GXTexObj* obj2, GXTexObj* obj3, void* da
     wp->paperTexMode1 = paperTexMode;
 }
 
+/**
+ * Drops a reference to animation file fileId; the last user frees it
+ * and its texture file (when nobody else uses that).
+ */
 inline void animPoseFileRelease(s32 fileId) {
     AnimationPoseFile* file = &wp->files[fileId];
     AnimationTextureFile* tex;
@@ -6221,6 +6386,10 @@ inline void animPoseFileRelease(s32 fileId) {
     }
 }
 
+/**
+ * Releases pose poseId: paper overlays drop a reference;
+ * normal poses free their world position and matrix buffers and their animation file.
+ */
 void animPoseRelease(s32 poseId) {
     AnimationPose* pose = &wp->poses[poseId];
 
@@ -6238,6 +6407,7 @@ void animPoseRelease(s32 poseId) {
     }
 }
 
+/** Drops a reference to the paper pose poseId and releases it with its file when no user is left. */
 void animPaperPoseRelease(s32 poseId) {
     AnimationPose* pose = &wp->poses[poseId];
 
@@ -6248,6 +6418,10 @@ void animPaperPoseRelease(s32 poseId) {
     }
 }
 
+/**
+ * Releases every pose of type type (0 field, 1 battle, 2 shared), e.g. when leaving a map or a battle;
+ * releasing the battle poses also leaves battle mode. Then reallocates the vertex buffers of the rest.
+ */
 void animPoseAutoRelease(s32 type) {
     int i;
     AnimationPose* pose;
@@ -6264,6 +6438,7 @@ void animPoseAutoRelease(s32 type) {
     animPoseRefresh();
 }
 
+/** Offscreen draw callback: renders every pose that has a paper overlay into its own texture. */
 static void animPaperPoseDisp(CameraId camId, void* param) {
     int i;
     AnimationPose* pose;
@@ -6277,6 +6452,11 @@ static void animPaperPoseDisp(CameraId camId, void* param) {
 
 #include "sdk/DEMOInit.h"
 void _animPoseDrawMtx(AnimationPose* pose, Mtx matrix, s32 xluMode, f32 rotY, f32 scale);
+/**
+ * Renders one pose with a paper overlay offscreen (unturned) into a texture sized to its screen bounding box,
+ * so the overlay can be drawn with the character's image;
+ * with rectangle caching on, the rectangle is only remeasured when it changes.
+ */
 static void animPaperPoseDispSub(s32 unused, AnimationPose* arg) {
     AnimationPose* pose;
     AnimData* d;
@@ -6430,6 +6610,7 @@ void _animPoseDrawMtx(AnimationPose* pose, Mtx matrix, s32 xluMode, f32 rotY, f3
 #include "sdk/DEMOInit.h"
 // target .bss/.sbss pad (uninitialised objects are emitted in reverse order, so this sits last)
 
+/** Returns the id of the first used pose of type type loaded from animation file name, or -1. */
 inline s32 animPoseSearchName(const char* name, s32 type) {
     AnimationPose* pose;
     s32 i;
@@ -6450,6 +6631,13 @@ inline s32 animPoseSearchName(const char* name, s32 type) {
 #pragma push
 // FAKE: turns off lifetime splitting so the register allocation matches the target; removing it changes the code
 #pragma opt_lifetimes off
+/**
+ * Renders frame frame of animation anim of the loaded pose group at scale into the EFB (white material, no paper
+ * effect), copies its bounding box to a new RGB5A3 texture (*image, obj)
+ * and returns the box relative to the screen centre in x0..y1; the pose is restored afterwards.
+ * Used by extdrv for its crowds of flat sprites.
+ * The clamp of the bottom edge tests top instead of bottom, as in the original.
+ */
 void animPoseDisp_MakeExtTexture(const char* group, const char* anim, f32 frame, f32 scale, GXTexObj* obj,
                                  smartEntry** image, s32* x0, s32* y0, s32* x1, s32* y1) {
     AnimationPose* pose;
@@ -6538,6 +6726,7 @@ void animPoseDisp_MakeExtTexture(const char* group, const char* anim, f32 frame,
 }
 #pragma pop
 
+/** Copies the three paper texture matrices for the next draw (NULL for none). */
 void animSetPaperTexMtx(Mtx mtx1, Mtx mtx2, Mtx mtx3) {
     if (mtx1 == NULL) {
         wp->paperMtxPtr[0] = NULL;
@@ -6559,6 +6748,10 @@ void animSetPaperTexMtx(Mtx mtx1, Mtx mtx2, Mtx mtx3) {
     }
 }
 
+/**
+ * Starts loading animation file name and its textures in group's archive in the background,
+ * with callback for the model; TRUE once both are loaded (or missing), FALSE while still loading.
+ */
 BOOL animGroupBaseAsync(const char* name, s32 group, void* callback) {
     FileEntry* model;
     FileEntry* anim;
@@ -6588,6 +6781,7 @@ BOOL animGroupBaseAsync(const char* name, s32 group, void* callback) {
     return anim != NULL;
 }
 
+/** Returns the texture file name the animation file name uses, from a/ag2tg.bin; "" if it is not listed. */
 const char* animGetTexName(const char* name) {
     void** data = wp->mp_ag2tg->data;
     s32 size;
@@ -6614,29 +6808,38 @@ void animStrippedPool(f32* p, u32 n) {
     p[2] = n;
 }
 
+/** Returns pose poseId's entry. */
 AnimationPose* animPoseGetAnimPosePtr(s32 poseId) {
     return &wp->poses[poseId];
 }
 
+/** Returns the data of pose poseId's current animation. */
 AnimData* animPoseGetAnimDataPtr(s32 poseId) {
     AnimationPose* pose = animPoseGetAnimPosePtr(poseId);
     return animPoseGetAnimBaseDataPtr(poseId)->anims[pose->animId].data;
 }
 
+/** Returns the animation file data pose poseId was loaded from. */
 AnimationPoseData* animPoseGetAnimBaseDataPtr(s32 poseId) {
     AnimationPose* pose = animPoseGetAnimPosePtr(poseId);
     return *wp->files[pose->fileId].handle->data;
 }
 
+/** Returns the table entry (name and data) of pose poseId's current animation. */
 AnimTableEntry* animPoseGetCurrentAnim(s32 poseId) {
     AnimationPoseData* data = animPoseGetAnimBaseDataPtr(poseId);
     return &data->anims[animPoseGetAnimPosePtr(poseId)->animId];
 }
 
+/** Tells whether pose poseId's animation file has translucent parts (file flag 8). */
 BOOL animPoseTestXLU(s32 poseId) {
     return (animPoseGetAnimBaseDataPtr(poseId)->flags >> 3) & 1;
 }
 
+/**
+ * Walks the pose's group tree from groupId and pushes each visible group's node matrix,
+ * storing the groups' world positions or matrices when the pose asked for them; it does not draw.
+ */
 static void evalProc(s32 parentId, s32 groupId) {
     AnimPoseGroup* group;
     AnimPoseGroup* parent;
@@ -6691,6 +6894,10 @@ static void evalProc(s32 parentId, s32 groupId) {
     evalProc(groupId, group->brotherGroupId);
 }
 
+/**
+ * Makes pose poseId record the world position of each of its groups
+ * when evaluated (for attaching things to body parts), allocating the buffer from the pose's heap.
+ */
 void animPoseWorldPositionEvalOn(s32 poseId) {
     AnimationPose* pose = &wp->poses[poseId];
     AnimationPoseData* data = animPoseGetBaseData(pose);
@@ -6714,6 +6921,7 @@ void animPoseWorldPositionEvalOn(s32 poseId) {
     }
 }
 
+/** Stops pose poseId recording group world positions and frees the buffer. */
 void L_animPoseWorldPositionEvalOff(s32 poseId) {
     AnimationPose* pose = &wp->poses[poseId];
 
@@ -6724,6 +6932,10 @@ void L_animPoseWorldPositionEvalOff(s32 poseId) {
     }
 }
 
+/**
+ * Makes pose poseId record the world matrix of each of its groups when evaluated,
+ * allocating the buffer from the pose's heap.
+ */
 void animPoseWorldMatrixEvalOn(s32 poseId) {
     AnimationPose* pose = &wp->poses[poseId];
     AnimationPoseData* data = animPoseGetBaseData(pose);
@@ -6747,6 +6959,7 @@ void animPoseWorldMatrixEvalOn(s32 poseId) {
     }
 }
 
+/** Updates Vivian's (or Marilyn's or Beldam's) hair and tail chain this frame with the character's position pos. */
 void animPoseVivianMain(s32 poseId, Vec* pos) {
     AnimationPose* pose = &wp->poses[poseId];
 
@@ -6756,17 +6969,23 @@ void animPoseVivianMain(s32 poseId, Vec* pos) {
     pose->matrix[2][3] = pos->z;
 }
 
+/** Which of the chain-haired characters pose poseId is: 0 none, 1 Vivian, 2 Marilyn, 3 Beldam. */
 s32 animPoseGetVivianType(s32 poseId) {
     AnimationPose* pose = &wp->poses[poseId];
     return pose->vivianType;
 }
 
+/** Sets a callback called with userData before each group of pose poseId is drawn. */
 void animPoseSetDispCallBack(s32 poseId, void* callback, void* userData) {
     AnimationPose* pose = &wp->poses[poseId];
     pose->dispCallback = callback;
     pose->dispUserDataCallback = userData;
 }
 
+/**
+ * Evaluates a pose's animation; shared paper poses evaluate into the float scratch buffer instead of their own
+ * vertex buffers.
+ */
 inline void animPoseMainSub(AnimationPose* pose) {
     s32 id = (u32)((u8*)pose - (u8*)wp->poses) / sizeof(AnimationPose);
     if (pose->typeFlags & ANIM_POSE_TYPE_SHARED_PAPER) {
@@ -6790,6 +7009,10 @@ inline void animPoseMainSub(AnimationPose* pose) {
     }
 }
 
+/**
+ * Draws one shape shapeId of pose poseId on its own (evaluating the pose first if needed),
+ * saving and restoring the driver's current draw state around it.
+ */
 void animPoseDrawShape(s32 poseId, s32 shapeId) {
     AnimationPose* pose;
     GXTexObj* texObj0;
@@ -6859,6 +7082,7 @@ void animPoseDrawShape(s32 poseId, s32 shapeId) {
     wp->paperTexMode1 = dc;
 }
 
+/** Returns the index of the shape named name in pose poseId's animation file, or -1. */
 s32 animPoseGetShapeIdx(s32 poseId, const char* name) {
     AnimationPoseData* data;
     AnimPoseShape* shape;
@@ -6874,6 +7098,7 @@ s32 animPoseGetShapeIdx(s32 poseId, const char* name) {
     return -1;
 }
 
+/** Returns the index of the group named name in pose poseId's animation file, or -1. */
 s32 animPoseGetGroupIdx(s32 poseId, const char* name) {
     AnimationPoseData* data;
     AnimPoseGroup* group;
@@ -6889,6 +7114,7 @@ s32 animPoseGetGroupIdx(s32 poseId, const char* name) {
     return -1;
 }
 
+/** Returns the name of group group of pose poseId's animation file. */
 const char* animPoseGetGroupName(s32 poseId, s32 group) {
     return animPoseGetAnimBaseDataPtr(poseId)->groups[group].name;
 }

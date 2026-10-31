@@ -252,6 +252,12 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Brings a Swampire down from the ceiling when it is first hit or attacks:
+ * if its ceiling attribute is still set (attribute 2) it clears it, sets the flying attribute (4),
+ * switches to the flying pose table and moves it 30 units down with new hit, cursor,
+ * kiss and status icon offsets. Leaves its home position in LW(0) to LW(2).
+ */
 static EVT_BEGIN(ceil_sky_event)
     CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -277,6 +283,11 @@ static EVT_BEGIN(ceil_sky_event)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the Swampire: installs wait, attack, ceiling damage (damage_event_ceil),
+ * confusion and ceiling-fall (ceil_fall_ready_event) events and the hang-from-ceiling hit offsets;
+ * if unit work 0 is 1 it starts already in flight (ceil_sky_event).
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -298,6 +309,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Position the Swampire takes for a first-strike reaction:
+ * drops from the ceiling (ceil_sky_event), sets its height to 10 and waits for the attack to end.
+ */
 static EVT_BEGIN(dmg_first_attack_pos)
     CALL_CHILD(ceil_sky_event)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), 10, LW(2))
@@ -305,6 +320,7 @@ static EVT_BEGIN(dmg_first_attack_pos)
     RETURN
 EVT_END()
 
+/** Damage event of the Swampire: runs the default damage handling. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -312,6 +328,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage event of the Swampire while it hangs from the ceiling:
+ * runs the default damage handling and then, unless the hit was a counter-type hit (512 without 2048)
+ * or did no damage, makes it drop to its flying position (ceil_sky_event) and dive down.
+ */
 static EVT_BEGIN(damage_event_ceil)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -332,6 +353,11 @@ static EVT_BEGIN(damage_event_ceil)
     RETURN
 EVT_END()
 
+/**
+ * Damage event used for the Swampire's counter-damage case:
+ * drops it from the ceiling (ceil_sky_event) and runs the shared counter damage handling
+ * (subsetevt_counter_damage).
+ */
 static EVT_BEGIN(counter_damage_event)
     CALL_CHILD(ceil_sky_event)
     SET_VALUE(LW(10), -2)
@@ -341,6 +367,10 @@ static EVT_BEGIN(counter_damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Event run when the ceiling-fall hit lands on a hanging Swampire:
+ * runs the default damage handling, then drops it to its flying position (ceil_sky_event) and dives down.
+ */
 static EVT_BEGIN(ceil_fall_ready_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -350,6 +380,14 @@ static EVT_BEGIN(ceil_fall_ready_event)
     RETURN
 EVT_END()
 
+/**
+ * The Swampire's draining bite: like the Swampire's swoop,
+ * but when the hit lands it tilts into the target (SFX_ENM_BASA_SUCK1, pose CYU_A_2)
+ * and heals itself with the recovery effect for the damage it dealt.
+ * When the pre- check counter result is 17 or 14 (Guess: the target shocks attackers,
+ * from the weapon name biribiri_counterd) it uses weapon_basabasa_drain_attack_biribiri_counterd for the damage
+ * instead.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -542,6 +580,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait (idle) event of the Swampire: shows the idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

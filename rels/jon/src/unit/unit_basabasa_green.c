@@ -252,6 +252,13 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Takes the Swoopula off the ceiling.
+ * If it still hangs from it (attribute 2) the script clears that, sets the flying attribute 4,
+ * restores the flying pose table, offsets and normal damage script,
+ * and lowers it and its home position by 70 units; the home position ends up in LW(0..2) either way.
+ * Called when it is hit, countered, or when the ceiling falls, and at init if it starts already in the air.
+ */
 static EVT_BEGIN(ceil_sky_event)
     CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -277,6 +284,11 @@ static EVT_BEGIN(ceil_sky_event)
     RETURN
 EVT_END()
 
+/**
+ * Init script of the Swoopula: installs its wait, attack, damage (the ceiling version),
+ * confusion and ceiling-fall handlers, the wing-flap pose sound table and the offsets for hanging upside down.
+ * If unit work 0 is 1 it starts already off the ceiling and moves to its home position.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -298,6 +310,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Data event 48 of the Swoopula: after a first strike it leaves the ceiling,
+ * is set to y 10 and waits for the attack to end.
+ */
 static EVT_BEGIN(dmg_first_attack_pos)
     CALL_CHILD(ceil_sky_event)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), 10, LW(2))
@@ -305,6 +321,7 @@ static EVT_BEGIN(dmg_first_attack_pos)
     RETURN
 EVT_END()
 
+/** Damage script of the Swoopula once it is in the air: runs the default damage handling on itself. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -312,6 +329,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage script of the Swoopula while it hangs from the ceiling:
+ * runs the default damage handling, then, unless the hit has damage code 512 without 2048 or did no damage,
+ * it leaves the ceiling (ceil_sky_event) and flies down to its home position over 60 frames.
+ */
 static EVT_BEGIN(damage_event_ceil)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -332,6 +354,10 @@ static EVT_BEGIN(damage_event_ceil)
     RETURN
 EVT_END()
 
+/**
+ * Counter-damage script of the Swoopula: leaves the ceiling (ceil_sky_event) and
+ * then runs the shared counter-damage handling.
+ */
 static EVT_BEGIN(counter_damage_event)
     CALL_CHILD(ceil_sky_event)
     SET_VALUE(LW(10), -2)
@@ -341,6 +367,10 @@ static EVT_BEGIN(counter_damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Ceiling-fall script of the Swoopula: runs the default damage handling,
+ * then leaves the ceiling (ceil_sky_event) and flies down to its home position over 60 frames.
+ */
 static EVT_BEGIN(ceil_fall_ready_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -350,6 +380,18 @@ static EVT_BEGIN(ceil_fall_ready_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the Swoopula: a draining bite.
+ * After an item check it picks a target, drops off the ceiling if it is still on it, flaps in place,
+ * then swoops to the target. A dodged or blocked bite ends with a short pause.
+ * When it connects it deals the damage while pulsing in size (SFX_ENM_BASA_SUCK1)
+ * and recovers HP equal to the damage dealt (with the "recovery" effect).
+ * Guess: when the target's pre-counter result is 14
+ * or 17 (a shock counter) it uses the drain_attack_biribiri_counterd weapon for the damage check,
+ * so the bite also takes the counter damage.
+ * It then flies back home and returns to hanging pose if it is on the ceiling.
+ * When confused with no target it is flustered.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -542,6 +584,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait script: plays the Swoopula's idle pose from its pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

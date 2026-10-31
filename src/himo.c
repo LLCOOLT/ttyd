@@ -27,6 +27,12 @@ u8 Col[4] ATTRIBUTE_ALIGN(32) = {0xFF, 0xFF, 0xFF, 0xFF};
 
 static void vivihimoDisp(CameraId camId, HimoWork* w);
 
+/**
+ * Draws the ribbon (himo) of a Vivian-flagged model part between matrices a and b:
+ * builds a 4-point spline that sags sideways and wobbles with the retrace count (speed sets the wobble rate,
+ * scale its size), with offA/offB lifting the two ends, then draws it.
+ * Called from animdrv when a pose part has ANIM_POSE_FLAG_VIVIAN. Guess: the streamer on Vivian's hat.
+ */
 void vivihimo(Mtx a, Mtx b, f32 speed, f32 scale, f32 offA, f32 offB) {
     HimoWork w;
     HimoWork* pw = &w;
@@ -88,6 +94,10 @@ void vivihimo(Mtx a, Mtx b, f32 speed, f32 scale, f32 offA, f32 offB) {
     }
 }
 
+/**
+ * Builds the matrix for a ribbon segment at spline parameter t:
+ * blends the two end matrices (x axis widened 10x) and places it at point p.
+ */
 static inline void himoMtx(HimoWork* w, Mtx out, f32 t, Vec* p) {
     f32 u = 1.0f - t;
     out[0][0] = 10.0f * (u * w->m0[0][0] + t * w->m1[0][0]);
@@ -104,6 +114,10 @@ static inline void himoMtx(HimoWork* w, Mtx out, f32 t, Vec* p) {
     out[2][3] = p->z;
 }
 
+/**
+ * Draws the ribbon as 15 quads along the spline in camera camId, tapering the width along a tangent curve;
+ * uses two position matrix slots so each quad joins the previous one.
+ */
 static void vivihimoDisp(CameraId camId, HimoWork* w) {
     CameraEntry* cam;
     Vec* pts;

@@ -49,6 +49,7 @@ extern EvtWord coin_effect[];
 static const GXColor evtflash_col1 = {0xFF, 0xFF, 0xFF, 0xFF};
 static const GXColor evtflash_col2 = {0xFF, 0xFF, 0xFF, 0xFF};
 
+/** Guess: fades the map brightness down to dark over LW(10) ms (map blend layer 0). */
 static EVT_BEGIN(back_dark)
     CALL(evt_sub_intpl_msec_init, 11, 255, 0, LW(10))
     LOOP(0)
@@ -62,6 +63,10 @@ static EVT_BEGIN(back_dark)
     RETURN
 EVT_END()
 
+/**
+ * Guess: custom door entrance for Cortez's lair:
+ * reads the entrance animation and, if it names an event, runs it then walks Mario in.
+ */
 static EVT_BEGIN(door_custom)
     CALL(evt_bero_get_info_anime, LW(1), LW(10), LW(11), LW(12), LW(13))
     IF_INT_NOT_EQUAL(LW(12), 0)
@@ -86,6 +91,10 @@ static EVT_BEGIN(door_custom)
     RETURN
 EVT_END()
 
+/**
+ * Guess: entrance event of Cortez's lair: at STORY_STG5_32_CORTEZS_WARNING it runs door_custom and freezes Mario
+ * until it ends.
+ */
 static EVT_BEGIN(bero_custom)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG5_32_CORTEZS_WARNING)
@@ -134,12 +143,14 @@ static EVT_BEGIN(bero_custom)
     RETURN
 EVT_END()
 
+/** Guess: closes the lair door (S_doa) by turning it over a short interpolation. */
 static EVT_BEGIN(w_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.61035156f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Guess: opens the lair door (S_doa) by turning it over a short interpolation. */
 static EVT_BEGIN(w_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.61035156f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa"), 0, LW(0), 0)
@@ -168,6 +179,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Shakes the camera and plays a ship-shaking sound at Cortez until GF(0) is cleared, to show him thrashing. */
 EVT_BEGIN(korutesu_yure)
     CALL(evt_npc_get_position, STRING("コルテス"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_SHIP_SHAKE2"), LW(0), LW(1), LW(2), LW(10))
@@ -190,6 +202,7 @@ EVT_BEGIN(korutesu_yure)
     RETURN
 EVT_END()
 
+/** Flashes the screen (evtflash) at random intervals while GF(0) is set, as Cortez shows his power. */
 EVT_BEGIN(korutesu_flush)
     LOOP(0)
         CALL(evt_snd_sfxon, STRING("SFX_STG5_KOR_APPEAR_LIGHT1"), 0)
@@ -204,6 +217,7 @@ EVT_BEGIN(korutesu_flush)
     RETURN
 EVT_END()
 
+/** A shorter burst of screen flashes with random pauses (one second at most), used in the fight with Cortez. */
 EVT_BEGIN(korutesu_flush2)
     CALL(evt_snd_sfxon, STRING("SFX_STG5_KOR_APPEAR_LIGHT1"), 0)
     CALL(evtflash)
@@ -220,6 +234,7 @@ EVT_BEGIN(korutesu_flush2)
     RETURN
 EVT_END()
 
+/** Spins Cortez (NPC "コルテス") around his Y axis while he shrinks. */
 EVT_BEGIN(korutesu_rotate)
     CALL(evt_sub_intpl_msec_init, 0, 0, 1800, 2700)
     LOOP(0)
@@ -233,6 +248,7 @@ EVT_BEGIN(korutesu_rotate)
     RETURN
 EVT_END()
 
+/** Shrinks Cortez while he glides to a new position over 2.7 seconds, scaling him by LW(2). */
 EVT_BEGIN(korutesu_small)
     BEGIN_INLINE_EVENT
         CALL(evt_npc_get_position, STRING("コルテス"), LW(0), LW(1), LW(2))
@@ -253,6 +269,7 @@ EVT_BEGIN(korutesu_small)
     RETURN
 EVT_END()
 
+/** Second shrinking glide for Cortez, also 2.7 seconds. */
 EVT_BEGIN(korutesu_small2)
     BEGIN_INLINE_EVENT
         CALL(evt_npc_get_position, STRING("コルテス"), LW(0), LW(1), LW(2))
@@ -273,6 +290,7 @@ EVT_BEGIN(korutesu_small2)
     RETURN
 EVT_END()
 
+/** Spins Cortez around his Y axis while he grows again (second rotation). */
 EVT_BEGIN(korutesu_rotate2)
     CALL(evt_sub_intpl_msec_init, 0, 1800, 0, 1300)
     LOOP(0)
@@ -286,6 +304,7 @@ EVT_BEGIN(korutesu_rotate2)
     RETURN
 EVT_END()
 
+/** Makes Cortez glide to a new position and grow (scale LW(2)) over 1.3 seconds. */
 EVT_BEGIN(korutesu_large)
     BEGIN_INLINE_EVENT
         CALL(evt_npc_get_position, STRING("コルテス"), LW(0), LW(1), LW(2))
@@ -306,6 +325,10 @@ EVT_BEGIN(korutesu_large)
     RETURN
 EVT_END()
 
+/**
+ * Camera blur loop: switches the environment blur on and alternates between two camera positions every 100 ms
+ * until GF(0) is cleared.
+ */
 EVT_BEGIN(korutesu_blur)
     LOOP(0)
         BEGIN_INLINE_EVENT
@@ -323,6 +346,7 @@ EVT_BEGIN(korutesu_blur)
     RETURN
 EVT_END()
 
+/** Guess: makes the Sapphire Star float up and down in place (fuwafuwa), looping its interpolation forever. */
 static EVT_BEGIN(starstone_fuwafuwa)
     LOOP(0)
         CALL(evt_sub_intpl_msec_init, 11, 0, 500, 500)
@@ -347,6 +371,11 @@ static EVT_BEGIN(starstone_fuwafuwa)
     RETURN
 EVT_END()
 
+/**
+ * Cortez's first scene in the lair (STORY_STG5_32_CORTEZS_WARNING):
+ * he appears, speaks to Mario (stg5_dou_21 to 29) with flashes and camera shakes, grows and shrinks,
+ * and then the fight with him begins (battle info 4).
+ */
 static EVT_BEGIN(korutesu_event)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mario_key_onoff, 0)
@@ -513,6 +542,10 @@ static EVT_BEGIN(korutesu_event)
     RETURN
 EVT_END()
 
+/**
+ * After the battle with Cortez (STORY_STG5_33_CORTEZ_AND_THE_TREASURE):
+ * Cortez speaks a last line (stg5_dou_30), a narration (stg5_dou_39) plays and the party returns to muj_10.
+ */
 EVT_BEGIN(korutesu_event_after)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, -65, 0, 0)
@@ -552,6 +585,12 @@ EVT_BEGIN(korutesu_event_after)
     RETURN
 EVT_END()
 
+/**
+ * The bargain with Cortez (STORY_STG5_40_TRUE_IDENTITY):
+ * Cortez appears in his tornado (korutesu_apper),
+ * speaks with Mario (stg5_dou_31 to 36_06) about the Sapphire Star and Skull Gem;
+ * the gem floats up and glows (starstone_fuwafuwa), and Cortez disappears again.
+ */
 EVT_BEGIN(kosho_event)
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
     CALL(evt_mario_key_onoff, 0)
@@ -674,6 +713,10 @@ EVT_BEGIN(kosho_event)
     RETURN
 EVT_END()
 
+/**
+ * Loop that makes Cortez's treasure pile glitter:
+ * picks one of ten spots at random and spawns a hagetaka flush effect there.
+ */
 EVT_BEGIN(coin_effect)
     LOOP(0)
         CALL(evt_sub_random, 10, LW(10))
@@ -729,6 +772,11 @@ EVT_BEGIN(coin_effect)
     RETURN
 EVT_END()
 
+/**
+ * Map init for muj_12 (Cortez's lair): registers the exits, picks music,
+ * spawns the right scene for the story stage (korutesu_event, korutesu_event_after or kosho_event)
+ * and starts the treasure glitter.
+ */
 EVT_BEGIN(muj_12_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -754,6 +802,11 @@ EVT_BEGIN(muj_12_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Easing function for Cortez's treasure item motion:
+ * speed accelerates for the first 20 percent of the frames and decelerates over the last 20 percent;
+ * returns the position between start and end for frame step out of total.
+ */
 static f32 accdec_type(s32 step, s32 total, f32 start, f32 end) {
     f32 cur;
     f32 speed;
@@ -779,6 +832,10 @@ static f32 accdec_type(s32 step, s32 total, f32 start, f32 end) {
     return start + cur * (end - start) / sum;
 }
 
+/**
+ * Script helper: moves the named item to the position (args[1], args[2], args[3]) over args[4] ms using
+ * interpolation mode args[5], adding args[6] to its height; blocks until it arrives.
+ */
 static USER_FUNC(muj_item_move_3d_position) {
     EvtWord* args = event->args;
     char* name = (char*)evtGetValue(event, args[0]);
@@ -816,6 +873,10 @@ static USER_FUNC(muj_item_move_3d_position) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper that flashes the screen white: fades out in 20 frames with colour evtflash_col1 (white),
+ * holds 50 ms, then fades back in over 80 frames with evtflash_col2. Blocks until finished.
+ */
 static USER_FUNC(evtflash) {
     if (isFirstCall) {
         event->userdata[2] = 0;

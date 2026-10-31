@@ -165,6 +165,10 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Registers the Bombshell Bill's wait, attack and damage events (confusion reuses the attack event),
+ * starts the idle loop and lifts its position and home 10 units off the ground, so it flies.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -177,6 +181,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Hit reaction: just the default btldefaultevt_Damage for its single part. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -184,6 +189,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Makes the target play its dodge reaction for the precheck result in LW(5) (3, 6 and 2 map to avoid poses 38,
+ * 39 and
+ * 40) on the target in LW(3); other results do nothing.
+ */
 static EVT_BEGIN(start_avoid)
     IF_INT_EQUAL(LW(5), 3)
         CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -197,6 +207,14 @@ static EVT_BEGIN(start_avoid)
     RETURN
 EVT_END()
 
+/**
+ * Attack (also used when confused): uses a held item if the AI wants to, otherwise picks a target,
+ * charges up (SFX_ENM_KILLER_CHARGE1) and flies at it.
+ * On a hit it deals 6 damage, explodes in smoke, hides itself and pays out its coins and Star Points;
+ * on a miss or dodge it flies past off screen and hides.
+ * Then, as also when it has no target (unless confused into the flustered act),
+ * the Bill removes itself (KillUnit): one shot per Bill.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -309,6 +327,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle: plays the stand pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

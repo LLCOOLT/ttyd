@@ -7,14 +7,20 @@
 #include "tst.h"
 #include "rel_module.h"
 
+/**
+ * Script helper: calls mobjKoopaOn(); the map-object test maps (tst_moj_00 and tst_moj_01) use it
+ * before placing their objects. Guess: it enables the objects that react to Koops' shell.
+ */
 USER_FUNC(tst_mobj_koopa_on) {
     mobjKoopaOn();
     return EVT_RETURN_DONE;
 }
 
+/** REL stub for unresolved imports: does nothing. */
 void _unresolved(void) {
 }
 
+/** REL unload entry: runs the global destructors listed in _dtors. */
 void _epilog(void) {
     voidfunctionptr* dtor;
 
@@ -23,6 +29,10 @@ void _epilog(void) {
     }
 }
 
+/**
+ * REL load entry: runs the global constructors listed in _ctors,
+ * then registers each tst map's init event with relSetEvtAddr so the map loader finds it.
+ */
 void _prolog(void) {
     voidfunctionptr* ctor;
 

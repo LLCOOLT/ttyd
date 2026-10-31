@@ -169,6 +169,10 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/**
+ * Init script of the Spania: sets unit flag 0x1000000 and registers its wait, attack,
+ * damage and confusion handlers (confusion reuses the attack script).
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
@@ -179,6 +183,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Plays the "toge_flush" spark effect over the Spania's spiked top 30 frames after it is hit,
+ * with the pose type 31 reaction and a height that depends on its size statuses 10
+ * and 11 (Guess: the big and small size changes).
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 31)
     WAIT_FRAMES(30)
@@ -201,6 +210,7 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/** Damage script of the Spania: runs the default damage handling on itself. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -208,6 +218,14 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * The Spania's dash: after a first-strike pause or an item check it picks a target,
+ * shakes in place for ten rounds (SFX_ENM_HANNYA_CHARGE1) and
+ * then rolls through the target (SFX_ENM_HANNYA_MOVE1) and on to the far side of the stage,
+ * dealing damage as it passes.
+ * It reappears at x 300 (SFX_ENM_HANNYA_MOVE2) and rolls home in three decreasing steps.
+ * When confused with no target it is flustered.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -331,6 +349,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait script: plays the Spania's idle pose from its pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

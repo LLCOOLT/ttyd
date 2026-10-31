@@ -18,6 +18,10 @@ extern void* gTRKInputPendingPtr;
 
 BOOL gTRKBigEndian;
 
+/**
+ * Checks the target's byte order with a test word and sets gTRKBigEndian;
+ * returns nonzero only if the order is neither big nor little endian.
+ */
 static inline BOOL TRKInitializeEndian(void) {
     unsigned char bendian[4];
     BOOL result = 0;
@@ -39,6 +43,11 @@ static inline BOOL TRKInitializeEndian(void) {
     return result;
 }
 
+/**
+ * Brings up the stub in order: endianness, print channel, event queue, message buffers, dispatcher,
+ * the program-end trap, serial handler, target, then the interrupt-driven link (passing it gTRKInputPendingPtr).
+ * Returns the first error.
+ */
 DSError TRKInitializeNub(void) {
     DSError result;
     DSError resultTemp;
@@ -77,11 +86,13 @@ DSError TRKInitializeNub(void) {
     return result;
 }
 
+/** Shuts the nub down by terminating the serial handler; returns 0. */
 DSError TRKTerminateNub(void) {
     TRKTerminateSerialHandler();
     return 0;
 }
 
+/** Prints the startup banner "MetroTRK for GAMECUBE v2.6". */
 void TRKNubWelcome(void) {
     TRK_board_display("MetroTRK for GAMECUBE v2.6");
 }

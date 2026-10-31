@@ -22,6 +22,11 @@
 #endif
 #include <math.h>
 
+/**
+ * Default collision filter for partner rays (hitCheckVecFilter: TRUE collides, FALSE skips):
+ * skips surfaces with attribute 0x800004 unless 0x80080 is set, and passes through hidden ?
+ * blocks, hidden badge blocks and hidden 10-coin blocks (MOBJ_Hidden*Block map objects).
+ */
 static BOOL chkfilter(HitCheckQuery* query, HitEntry* entry) {
     MapObjectEntry* mobj;
     marioGetPtr();
@@ -43,6 +48,11 @@ static BOOL chkfilter(HitCheckQuery* query, HitEntry* entry) {
     return TRUE;
 }
 
+/**
+ * Partner ray filter used while yoshiGetStatus() is nonzero:
+ * like chkfilter, but surfaces with 0x800000 still collide and only attribute 0x4 is skipped.
+ * Hidden blocks are passed through.
+ */
 static BOOL chkfilterYoshi(HitCheckQuery* query, HitEntry* entry) {
     MapObjectEntry* mobj;
     marioGetPtr();
@@ -67,6 +77,11 @@ static BOOL chkfilterYoshi(HitCheckQuery* query, HitEntry* entry) {
     return TRUE;
 }
 
+/**
+ * Partner ray filter used while Koops is in his shell ability:
+ * skips any surface with attribute 0x800005 (checked before the 0x80080 override, unlike chkfilter)
+ * and passes through hidden blocks.
+ */
 static BOOL chkfilterNokotaro(HitCheckQuery* query, HitEntry* entry) {
     MapObjectEntry* mobj;
     marioGetPtr();
@@ -88,10 +103,16 @@ static BOOL chkfilterNokotaro(HitCheckQuery* query, HitEntry* entry) {
     return TRUE;
 }
 
+/** Squared horizontal length x*x + z*z. Not used in this file. */
 static inline f32 party_sumsq(f32 x, f32 z) {
     return x * x + z * z;
 }
 
+/**
+ * Casts a ray with the filter for the current partner state (Yoshi, Koops' shell, or the default)
+ * and on a hit returns the hit object with the distance,
+ * hit position (both rounded to 0.001) and surface normal; NULL on a miss.
+ */
 static inline HitEntry* partyHitCheckInl(PartyEntry* party, Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist) {
     HitCheckQuery query;
     Vec d = *dir;
@@ -141,18 +162,33 @@ static inline HitEntry* partyHitCheckInl(PartyEntry* party, Vec* pos, Vec* dir, 
     return hit;
 }
 
+/**
+ * Exported partyHitCheckInl: a partner-filtered ray cast returning the hit object,
+ * rounded distance and position, and normal. Used by party_motion.c and evt_party.c.
+ */
 HitEntry* partyHitCheck(PartyEntry* party, Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist) {
     return partyHitCheckInl(party, pos, dir, outPos, outNrm, dist);
 }
 
+/** Slope in degrees of the surface with normal n (0 for a flat floor). */
 static inline f32 partyNrmTo(Vec* n) {
     return angleABf(0.0f, 0.0f, sqrtf(n->x * n->x + n->z * n->z), -n->y);
 }
 
+/**
+ * Slope in degrees of a surface normal, by value (party_move.c calls it through a pointer prototype,
+ * the same thing at the ABI level).
+ */
 f32 partyNrmToAngle(Vec n) {
     return angleABf(0.0f, 0.0f, sqrtf(n.x * n.x + n.z * n.z), -n.y);
 }
 
+/**
+ * Per-frame ground check for a walking partner (Goombella, Bobbery, Ms. Mowz):
+ * snaps her to the floor, sets the grounded and shallow-water flags (attribute 0x100),
+ * starts a fall when there is no floor (attribute 0x200 counts as none),
+ * and starts the step-up motion when the floor just ahead is 5 or more units higher on a gentle slope.
+ */
 void partyChkGnd(PartyEntry* party) {
     s32 attr;
     HitEntry* hit;
@@ -198,6 +234,7 @@ void partyChkGnd(PartyEntry* party) {
     }
 }
 
+/** Stores the floor tilt from normal n in the partner's groundRot (x and z, in degrees) and returns the slope. */
 static inline f32 partyNrmSet(PartyEntry* party, Vec n) {
     party->groundRot.x = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.z, 100.0f * n.y) - 180.0f);
     party->groundRotY = 0.0f;
@@ -205,6 +242,10 @@ static inline f32 partyNrmSet(PartyEntry* party, Vec n) {
     return partyNrmTo(&n);
 }
 
+/**
+ * Demo only: downward ray with the partner filter that returns the hit object,
+ * the floor height (rounded to 0.001) and the normal.
+ */
 #if VERSION <= VERSION_DEMO_US
 static inline HitEntry* partyHitCheckGnd(PartyEntry* party, Vec* pos, Vec* dir, f32 dist, f32* outY, Vec* outNrm) {
     HitCheckQuery query;
@@ -417,6 +458,12 @@ HitEntry* _partySearchGround(PartyEntry* party, f32* outY, f32* outDepth, f32 ra
 }
 
 #else
+/**
+ * Ground search: five downward rays (centre and four points 0.375 of the width around it) from 0.75 of the
+ * partner's height above her (5 when Mario rides Yoshi).
+ * Ignores floors steeper than 50 degrees and takes the highest floor within 11 units up or `depth` down:
+ * sets groundY and dropDepth (-1 none, or the drop when too deep).
+ */
 HitEntry* _partySearchGround(PartyEntry* party, f32 range, f32 depth) {
     HitEntry* hit;
     HitEntry* best;
@@ -523,6 +570,11 @@ HitEntry* _partySearchGround(PartyEntry* party, f32 range, f32 depth) {
 }
 
 #endif
+/**
+ * Probes the floor 0.265 of the partner's width ahead, from her height above (half her height in the demo).
+ * On a floor not more than 2 units lower, returns it with *outY = floor height and *outDist = 0;
+ * on a lower floor returns NULL with *outDist = the drop. Also sets her floor tilt and slope.
+ */
 HitEntry* partyChkFrontStep(PartyEntry* party, f32 range, f32* outY, f32* outDist, f32* outAng) {
     HitEntry* hit;
     f32 dx, sn, cs, h, ang, ox, oy, oz, gy;
@@ -589,6 +641,10 @@ HitEntry* partyChkFrontStep(PartyEntry* party, f32 range, f32* outY, f32* outDis
     return NULL;
 }
 
+/**
+ * Moves *out by half of the movement (sn, cs) * d with its component into the wall normal n removed,
+ * so a partner pushing into a wall slides along it.
+ */
 static inline void partyWallSlide(Vec* out, Vec n, f32 d, f32 sn, f32 cs) {
 #if VERSION >= VERSION_JP
     Vec unused = {0.0f, 0.0f, 0.0f};
@@ -601,6 +657,7 @@ static inline void partyWallSlide(Vec* out, Vec n, f32 d, f32 sn, f32 cs) {
 }
 
 #if VERSION <= VERSION_DEMO_US
+/** Demo only: partner-filtered ray that returns the hit object, the rounded hit distance in *dist and the normal. */
 static inline HitEntry* partyHitCheckDistNrm(PartyEntry* party, Vec* pos, Vec* dir, Vec* outNrm, f32* dist) {
     HitCheckQuery query;
     HitEntry* hit;
@@ -631,6 +688,7 @@ static inline HitEntry* partyHitCheckDistNrm(PartyEntry* party, Vec* pos, Vec* d
     return hit;
 }
 
+/** Demo only: partner-filtered ray of fixed length that returns the hit object and the surface normal. */
 static inline HitEntry* partyHitCheckNrm(PartyEntry* party, Vec* pos, Vec* dir, Vec* outNrm, f32 dist) {
     HitCheckQuery query;
     HitEntry* hit;
@@ -708,6 +766,12 @@ HitEntry* partySearchWallFront(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
 }
 
 #elif VERSION >= VERSION_US
+/**
+ * Wall probe with Mario's filter (marioHitCheckVec) at 0.75 and 0.5 of the height and step height (11,
+ * or 1 when airborne or yoshiGetStatus() is 2; an extra 1-unit ray in one corner of gor_02):
+ * slides *pos along the nearest wall, or moves it by dist; it stays put when both diagonals are blocked.
+ * No callers in this tree.
+ */
 HitEntry* partySearchWallFront(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     Vec qpos;
     Vec qdir;
@@ -829,6 +893,7 @@ HitEntry* partySearchWallFront(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
 }
 
 #else
+/** Japanese release: the same wall probe without the extra gor_02 ray. */
 HitEntry* partySearchWallFront(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     Vec qpos;
     Vec qdir;
@@ -943,6 +1008,12 @@ HitEntry* partySearchWallFront(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
 
 #endif
 
+/**
+ * The partners' main wall check: a ray ahead at 0.75 of the height,
+ * then one at step height (11, or 1 for Bobbery in use) that only counts walls of 45 degrees or more.
+ * On a hit slides *pos along the wall and returns it; otherwise moves *pos by dist.
+ * Retail versions store frontWallDist (-1 none); the US release narrows paper-mode width to 6.
+ */
 HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     f32 sn, cs;
     f32 d, dy, hh;
@@ -1009,6 +1080,11 @@ HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     return NULL;
 }
 
+/**
+ * Ceiling check: casts upward rays from 10 units above four points 0.3 of the width around *pos,
+ * stopping at the first that hits within *dist.
+ * Leaves *pos at the last probe point and *dist at the ceiling distance (0 if none).
+ */
 void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
     f32 lx;
     f32 ly;
@@ -1144,6 +1220,11 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
     }
 }
 
+/**
+ * Never called; the link drops it.
+ * Like the other *StrippedPool stand-ins it only creates 10.0f, 0.0f, 1.0f, 0.5f,
+ * 100.0f and the int-to-float double so the file's constant pools come out in the original order.
+ */
 void partyHitStrippedPool(f32* f, s32 i) {
     f[0] = 10.0f;
     f[1] = 0.0f;
@@ -1160,6 +1241,7 @@ static inline f32 party_addf(f32 a, f32 b) {
     return a + b;
 }
 
+/** 20-unit partner-filtered ray from *pos along *dir; returns the hit object and its normal in *nrm. */
 static inline HitEntry* partyHitNrm(PartyEntry* party, Vec* pos, Vec* dir, Vec* nrm) {
     HitCheckQuery query;
     HitEntry* hit;
@@ -1183,6 +1265,10 @@ static inline HitEntry* partyHitNrm(PartyEntry* party, Vec* pos, Vec* dir, Vec* 
     return hit;
 }
 
+/**
+ * Pushes *pos out of nearby walls with Mario's marioChkWallAround, using the partner's width (6 in paper mode).
+ * The demo arm is never built: the whole block is US and PAL only.
+ */
 void partyChkWallAround(PartyEntry* party, Vec* pos, f32 spd, f32 dir, f32 width, f32 height) {
     if (party->flags & PARTY_FLAG_PAPER_MODE) {
         width = 6.0f;
@@ -1194,6 +1280,11 @@ void partyChkWallAround(PartyEntry* party, Vec* pos, f32 spd, f32 dir, f32 width
 #endif
 }
 
+/**
+ * TRUE when 20-unit rays 10 units up hit walls on both sides of pos (directions 180 and 0,
+ * from the centre or half a width aside) whose normals face each other (average angle within 10 of 180).
+ * Used by party_motion.c's slit code.
+ */
 BOOL partyChkBetweenWalls(PartyEntry* party, Vec pos) {
     f32 r = party->width;
     f32 sn, cs;

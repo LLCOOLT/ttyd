@@ -192,6 +192,12 @@ static BattleWeapon weapon_kurokumorn_thunder_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Attack AI of the Dark Puff: uses an enemy item if it has one.
+ * If it is charged (counter attribute 1024 on its part,
+ * set by charge_event) it releases the thunder attack on everyone.
+ * Otherwise it draws a normal attack (60) or a charge (40).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -222,6 +228,12 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Puff's charged lightning attack on every target of the opposing side:
+ * it winds up for 60 frames, drops a ring of pokopi_thunder effects from above (eight bolts around each target
+ * in four volleys) while the camera shakes, and then resolves the damage on each target in turn,
+ * showing each avoid animation. The charge flag is cleared when the bolts start.
+ */
 static EVT_BEGIN(thunder_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -381,6 +393,10 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Battle init script for the Dark Puff: installs the wait, unison phase, attack, damage and confusion handlers,
+ * clears unit work 0 and 1 and starts barrier_event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventUnisonPhase, BTL_UNIT_SELF, PTR(unison_phase_event))
@@ -394,6 +410,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Looping script started from init_event: every 31 frames, for as long as the unit exists,
+ * shows the glowing charge effect (akari_charge_n64) over the Dark Puff
+ * while it is charged (counter attribute 1024); it stops when the unit is gone.
+ */
 static EVT_BEGIN(barrier_event)
     LABEL(0)
     WAIT_FRAMES(31)
@@ -413,6 +434,10 @@ static EVT_BEGIN(barrier_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: position setup for the first attack after being damaged (name dmg_first_attack_pos):
+ * puts the unit at y = 10 and waits for the attack to end.
+ */
 static EVT_BEGIN(dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -421,6 +446,10 @@ static EVT_BEGIN(dmg_first_attack_pos)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: selects this unit (-2) and its part 1
+ * and runs the shared default damage reaction (btldefaultevt_Damage).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -428,10 +457,18 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Empty counter handler (data table slot 42). */
 static EVT_BEGIN(counter_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs at the start of the enemy phase before the player's turn, if the Dark Puff can act and is not charged:
+ * with a 50% chance it switches height.
+ * Work 0 = 1 means it is high: it then dives down to y = 10
+ * and its parts get the flags that make it targetable on the ground;
+ * otherwise it rises to y = 40 and the flags are cleared. Plays the matching movement sound.
+ */
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_EQUAL(LW(0), 0)
@@ -470,6 +507,11 @@ static EVT_BEGIN(unison_phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Normal attack: the Dark Puff squashes and shakes, dives up and back,
+ * then swoops through the target at its hit position and returns home, resetting its scale.
+ * A hit shakes the camera and zooms in; avoid results start the target's avoid animation.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -577,6 +619,11 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Charging turn: zooms the camera on the Dark Puff,
+ * plays the charge sound and animation for 80 frames and sets counter attribute 1024 on its part,
+ * so that it is charged for its next attack (and for barrier_event's glow).
+ */
 static EVT_BEGIN(charge_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -595,6 +642,10 @@ static EVT_BEGIN(charge_event)
     RETURN
 EVT_END()
 
+/**
+ * Wait (idle) event: refreshes the body animation (part 1) from the pose table and resets the unit's scale to 1,
+ * undoing any squash from an earlier animation.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, 1, 1, 1)

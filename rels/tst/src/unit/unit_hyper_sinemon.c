@@ -235,6 +235,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init script of the Hyper Cleft: installs the wait, attack,
+ * damage and confusion handlers (confusion reuses the attack), sets its walk,
+ * run and jump sounds and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -247,6 +252,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Spike spark shown when an attacker is hurt by (or avoids) the spiked head:
+ * waits 30 frames, then spawns the toge_flush effect in front of and above the unit (35 up,
+ * scaled to 45 when Huge and 25 when Tiny, with the offset toward the front adjusted to match).
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -270,6 +280,11 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler of the Hyper Cleft: plays the hurt pose SIN_D_1 if it took damage;
+ * if it is flipped (flipped-over count 1 or more) it plays SIN_D_2 and bounces twice;
+ * then runs the default damage script.
+ */
 static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_GetDamage, BTL_UNIT_SELF, LW(15))
     IF_INT_GREATER_OR_EQUAL(LW(15), 1)
@@ -288,6 +303,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Flips the Hyper Cleft onto its back: swaps in the flipped defence and pose tables,
+ * marks status flag 1 (flipped) with a flipped-over count of 2, plays the flip sound and SIN_D_2,
+ * drops it to height 7 in two bounces and turns off the spike counter on part 1.
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -310,6 +330,12 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Turn-over recovery of the Hyper Cleft: counts down the flipped-over count;
+ * at 0 it restores the normal defence and pose tables, clears status flag 1,
+ * plays SIN_S_1 and the wake-up sound, resets its hit offset,
+ * turns the spike counter on part 1 back on and hops to the ground.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -337,6 +363,13 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the Hyper Cleft: after the item-use check it may charge up first (charge sound,
+ * crystal effect and a self-applied buff), then walks up to the target with the move sounds,
+ * curls (pose type 50) for 750 ms and dashes at it at speed 5 (weapon_sinemon_attack).
+ * A miss lets it run past; a hit shakes the camera and applies the damage with the guard-timing check.
+ * It then hops twice and walks home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -497,6 +530,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

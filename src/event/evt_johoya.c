@@ -66,6 +66,11 @@ const char* evtNoLabel[] = {
 // local prototypes
 s32 johoya_data_make(const char* prefix, s32 type);
 
+/**
+ * Builds the rumour list for the message prefix in args[0] (for example "<prefix>_0003"):
+ * counts the rumours the story has reached, allocates the InformantInfo array from the map heap (plus room for a
+ * label) and fills it.
+ */
 USER_FUNC(johoya_data_alloc) {
     InformantWork* wp = &_jdt;
 
@@ -78,6 +83,7 @@ USER_FUNC(johoya_data_alloc) {
     return 2;
 }
 
+/** Frees the rumour list from johoya_data_alloc and clears the count and prefix; safe to call twice. */
 USER_FUNC(johoya_data_free) {
     InformantWork* wp = &_jdt;
 
@@ -91,6 +97,10 @@ USER_FUNC(johoya_data_free) {
     return 2;
 }
 
+/**
+ * Counts the rumours in the current list not yet bought (no ketiRead flag) and writes the count to args[0].
+ * Guess: "keti" is kechi, the informant who charges coins for rumours.
+ */
 USER_FUNC(johoya_keti_newjoho_check) {
     InformantWork* wp = &_jdt;
     EvtWord* args = event->args;
@@ -107,6 +117,13 @@ USER_FUNC(johoya_keti_newjoho_check) {
     return 2;
 }
 
+/**
+ * Picks the args[0]-th unbought rumour: writes its message label to args[1], the title text to args[2],
+ * its length to args[3] and the cost to args[4], and remembers it for setreadflag.
+ * Empty label and zeros when there is none.
+ * Retail reads the title from the "jketi_title_%04d" message;
+ * the demos use the text inside the rumour's own tag.
+ */
 USER_FUNC(johoya_keti_newjoho_makelabel) {
     EvtWord* args = event->args;
 #if VERSION >= VERSION_JP
@@ -149,6 +166,10 @@ USER_FUNC(johoya_keti_newjoho_makelabel) {
     return 2;
 }
 
+/**
+ * Marks the rumour picked by the last makelabel as bought (ketiRead)
+ * and as heard on this visit (InformantInfo flag 1).
+ */
 USER_FUNC(johoya_keti_newjoho_setreadflag) {
     s32 cur = _jdt.curIndex;
     johoya_set(_jdt.readFlags.ketiRead, _jdt.info[cur].storyId, 1);
@@ -156,6 +177,7 @@ USER_FUNC(johoya_keti_newjoho_setreadflag) {
     return 2;
 }
 
+/** Counts the rumours already bought but not yet heard again on this visit, and writes the count to args[0]. */
 USER_FUNC(johoya_keti_oldspeak_check) {
     InformantWork* wp = &_jdt;
     EvtWord* args = event->args;
@@ -172,6 +194,11 @@ USER_FUNC(johoya_keti_oldspeak_check) {
     return 2;
 }
 
+/**
+ * Picks the args[0]-th bought rumour not yet heard on this visit:
+ * writes its label, tag text, tag length and cost 0 to args[1..4] and remembers it.
+ * Empty label and zeros when there is none.
+ */
 USER_FUNC(johoya_keti_oldspeak_makelabel) {
     EvtWord* args = event->args;
     s32 target = evtGetValue(event, args[0]);
@@ -202,21 +229,35 @@ USER_FUNC(johoya_keti_oldspeak_makelabel) {
     return 2;
 }
 
+/** Marks the rumour picked by the last makelabel as heard on this visit (InformantInfo flag 1). */
 USER_FUNC(johoya_keti_oldspeak_setreadflag) {
     _jdt.info[_jdt.curIndex].flags |= 1;
     return 2;
 }
 
+/**
+ * Sets the perfectRead flag for the rumour picked by the last makelabel.
+ * Unknown: which character or script uses this table; no caller in the C code.
+ */
 USER_FUNC(johoya_perfect_newjoho_setreadflag) {
     johoya_set(_jdt.readFlags.perfectRead, _jdt.info[_jdt.curIndex].storyId, 1);
     return 2;
 }
 
+/**
+ * Sets the luigiRead flag for the rumour picked by the last makelabel.
+ * Guess: Luigi's adventure stories; no caller in the C code.
+ */
 USER_FUNC(johoya_luigi_newjoho_setreadflag) {
     johoya_set(_jdt.readFlags.luigiRead, _jdt.info[_jdt.curIndex].storyId, 1);
     return 2;
 }
 
+/**
+ * Scans messages "<prefix>_0000", "_0001", ... until one lacks a "<!label,...>" tag or the tag is "enddata".
+ * Counts those whose story label (evtNoLabel) the story has reached;
+ * with type bit 0 also fills InformantInfo (cost 5).
+ */
 s32 johoya_data_make(const char* prefix, s32 type) {
     InformantWork* wp = &_jdt;
     char label[64];
@@ -315,6 +356,7 @@ s32 johoya_data_make(const char* prefix, s32 type) {
     return count;
 }
 
+/** Clears the three rumour read-flag tables. Runs on a new game (stg0_00_init in event.c). */
 void johoya_init(void) {
     InformantUnknown* unk = &_jdt.readFlags;
 
@@ -323,6 +365,10 @@ void johoya_init(void) {
     memset(&unk->luigiRead, 0, 0xD);
 }
 
+/**
+ * Writes a one-bit flag (val clamped to 0 or 1) for id into a read-flag table (eight ids per byte); returns it.
+ * Also used by the fortune teller (evt_uranaisi.c) for her starpiece and supercoin read flags.
+ */
 s16 johoya_set(u8* table, s16 id, s16 val) {
     u8 mask;
     s32 shift;
@@ -372,6 +418,7 @@ s16 johoya_set(u8* table, s16 id, s16 val) {
     return val;
 }
 
+/** Reads id's one-bit flag from a read-flag table (eight ids per byte); see johoya_set. */
 s16 johoya_get(u8* table, s16 id) {
     u8 mask;
     s32 shift;
@@ -413,6 +460,10 @@ s16 johoya_get(u8* table, s16 id) {
     return (mask & table[id / 8]) >> shift;
 }
 
+/**
+ * Returns the index of a story label ("STG1_05" and so on) in evtNoLabel, or -1;
+ * callers compare it with GSW_STORY_PROGRESS. Also used by the fortune teller (evt_uranaisi.c).
+ */
 s32 search_evt_no(const char* label) {
     s32 labelId;
 
@@ -424,6 +475,7 @@ s32 search_evt_no(const char* label) {
     return -1;
 }
 
+/** Returns the story label string in evtNoLabel for an index (no bounds check). No caller in the C code. */
 const char* search_evt_moji(s32 id) {
     return evtNoLabel[id];
 }

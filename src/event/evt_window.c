@@ -55,7 +55,7 @@ WinMgrDesc coin_desc = {
     2, 0, 8, -250, -75, 150, 45, {0xF0, 0xF0, 0xF0, 0xFF}, NULL, coin_disp
 };
 
-// The release versions take a flag first and, when it is set, also return the select window's cursor
+/** The release versions take a flag first and, when it is set, also return the select window's cursor */
 #if VERSION <= VERSION_DEMO_US
 USER_FUNC(evt_win_item_select) {
     EvtWord* args = event->args;
@@ -77,6 +77,11 @@ USER_FUNC(evt_win_item_select) {
     return EVT_RETURN_DONE;
 }
 #else
+/**
+ * Retail: args[0] flag, args[1] select window type;
+ * args[2] gets the chosen entry (-1 if cancelled) and, when the flag is set, args[3] the cursor slot.
+ * Mario's controls are locked while the window is open.
+ */
 USER_FUNC(evt_win_item_select) {
     EvtWord* args = event->args;
     s32 flag = evtGetValue(event, args[0]);
@@ -104,6 +109,11 @@ USER_FUNC(evt_win_item_select) {
 }
 #endif
 
+/**
+ * Opens select window type args[0] for partners, stat upgrades or shop lists and waits;
+ * winMgrSelectOther writes the choice into LW(1..7) (id, name, price, ...).
+ * LW(0) gets 1 if something was chosen, 0 if cancelled.
+ */
 USER_FUNC(evt_win_other_select) {
     EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
@@ -128,6 +138,11 @@ USER_FUNC(evt_win_other_select) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Filters the -1-terminated item list args[0] down to the items Mario carries;
+ * args[1] gets the new list (allocated from map memory, free it with evt_win_item_desttable) or 0
+ * if he has none.
+ */
 USER_FUNC(evt_win_item_maketable) {
     s32* src;
     s32* item;
@@ -172,6 +187,7 @@ USER_FUNC(evt_win_item_maketable) {
     return EVT_RETURN_DONE;
 }
 
+/** Frees an item list made by evt_win_item_maketable (args[0]). */
 USER_FUNC(evt_win_item_desttable) {
     EvtWord* args = event->args;
 #if VERSION >= VERSION_US
@@ -183,6 +199,10 @@ USER_FUNC(evt_win_item_desttable) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Opens the name entry (on-screen keyboard) screen of type args[0], waiting until it has loaded;
+ * the X-Naut Fortress map aji_01 uses type 4.
+ */
 USER_FUNC(evt_win_nameent_on) {
     s32 type = evtGetValue(event, event->args[0]);
     if (!nameEntPrepare()) {
@@ -192,21 +212,25 @@ USER_FUNC(evt_win_nameent_on) {
     return EVT_RETURN_DONE;
 }
 
+/** Blocks until the player has finished the name entry screen. */
 USER_FUNC(evt_win_nameent_wait) {
     return nameEntWait() != 0 ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
 
+/** Returns a pointer to the name typed on the name entry screen in args[0]. */
 USER_FUNC(evt_win_nameent_name) {
     EvtWord* args = event->args;
     evtSetValue(event, args[0], (EvtWord)nameEntGetName());
     return EVT_RETURN_DONE;
 }
 
+/** Closes the name entry screen. */
 USER_FUNC(evt_win_nameent_off) {
     nameEntOff();
     return EVT_RETURN_DONE;
 }
 
+/** Draws the one-line message window's text in red; type 0 is "You got mail!" (msg_you_gotta_mail). */
 static void oneMessageDisp(WinMgrEntry* entry) {
     OneMsgWin* w = entry->param;
     const char* msg;
@@ -225,6 +249,10 @@ static void oneMessageDisp(WinMgrEntry* entry) {
     }
 }
 
+/**
+ * Shows a one-line message window of type args[0] until the player presses A, then closes it.
+ * Type 0 is the new mail notice from evt_sub.c, which plays the mail jingle on A.
+ */
 USER_FUNC(evt_win_one_message) {
     s32 type = evtGetValue(event, event->args[0]);
     OneMsgWin* w;
@@ -275,6 +303,11 @@ USER_FUNC(evt_win_one_message) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Draws the coin counter window (type 0 coins, 1 Shine Sprites, 2 Star Pieces)
+ * and rolls the shown number toward the pouch value,
+ * playing the coin count sound and keeping the status bar in step.
+ */
 static void coin_disp(WinMgrEntry* entry) {
     CoinWin* w;
     s32 target;
@@ -342,6 +375,10 @@ static void coin_disp(WinMgrEntry* entry) {
 #endif
 }
 
+/**
+ * Opens the counter window of type args[0] (0 coins, 1 Shine Sprites, 2 Star Pieces) at the top left,
+ * as shops do while buying; args[1] gets the window handle for evt_win_coin_off/wait.
+ */
 USER_FUNC(evt_win_coin_on) {
     EvtWord* args = event->args;
     CoinWin* w = _mapAlloc(sizeof(CoinWin));
@@ -366,6 +403,7 @@ USER_FUNC(evt_win_coin_on) {
     return EVT_RETURN_DONE;
 }
 
+/** Waits until counter window args[0] has finished rolling to the pouch value, then closes and frees it. */
 USER_FUNC(evt_win_coin_off) {
     CoinWin* w = (CoinWin*)evtGetValue(event, event->args[0]);
     s32 coins;
@@ -388,6 +426,7 @@ USER_FUNC(evt_win_coin_off) {
     return EVT_RETURN_DONE;
 }
 
+/** Blocks until counter window args[0] has finished rolling to the pouch value. */
 USER_FUNC(evt_win_coin_wait) {
     CoinWin* w = (CoinWin*)evtGetValue(event, event->args[0]);
     s32 coins;
@@ -405,11 +444,13 @@ USER_FUNC(evt_win_coin_wait) {
     return w->coins != coins ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
 
+/** Allows the pause menu to be opened again. */
 USER_FUNC(mainwindow_openenable) {
     winOpenEnable();
     return EVT_RETURN_DONE;
 }
 
+/** Stops the player from opening the pause menu (for cutscenes). */
 USER_FUNC(mainwindow_opendisable) {
     winOpenDisable();
     return EVT_RETURN_DONE;

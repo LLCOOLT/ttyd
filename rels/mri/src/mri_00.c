@@ -59,6 +59,8 @@ static void _img_alloc_capture(EvtWord name, EvtWord shadowId, EvtWord offscreen
 static USER_FUNC(anim_tevcallback);
 static USER_FUNC(evt_cloud_main);
 #if VERSION >= VERSION_US
+// Prototype of the status gauge refresh helper (implemented elsewhere) used by this map's scripts; only present in the
+// US and later releases.
 USER_FUNC(N_evt_sub_status_gauge_force_update);
 #endif
 static USER_FUNC(starstone_entry);
@@ -87,6 +89,10 @@ extern EvtWord mario_see_you[];
 extern EvtWord puni_set[];
 extern EvtWord sekai_yami_puni[];
 
+/**
+ * Calls the script function evt_img_alloc_capture with the given arguments (name, shadow id, offscreen name,
+ * unused, and the box x, y, w, h) from C code by building a throwaway event with the argument array filled in.
+ */
 static void _img_alloc_capture(EvtWord name, EvtWord shadowId, EvtWord offscreenName, EvtWord unused, EvtWord x, EvtWord y,
                                EvtWord w, EvtWord h) {
     EventEntry event;
@@ -104,6 +110,11 @@ static void _img_alloc_capture(EvtWord name, EvtWord shadowId, EvtWord offscreen
     evt_img_alloc_capture(&event, TRUE);
 }
 
+/**
+ * Asks the offscreen (capture) buffer for its bounding box on screen in pixels;
+ * the width gets 50 extra pixels and is clipped at x=608.
+ * Returns 0 if the box is not available yet, otherwise 2.
+ */
 static s32 _ofs_get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h) {
     u16 left;
     u16 top;
@@ -123,6 +134,10 @@ static s32 _ofs_get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h
     return 2;
 }
 
+/**
+ * Assigns the cloud's offscreen buffer to every map group the cloud covers (up to 8),
+ * so they are drawn into the capture.
+ */
 static void _mapsetofs_all(CloudMapWork* wp) {
     s32 i;
 
@@ -134,6 +149,7 @@ static void _mapsetofs_all(CloudMapWork* wp) {
     }
 }
 
+/** Takes the cloud's map groups back out of the offscreen buffer. */
 static void _mapclsofs_all(CloudMapWork* wp) {
     s32 i;
 
@@ -173,6 +189,10 @@ static s16 puni_rand_position[] = {
     197, 110, 212, 162,
 };
 
+/**
+ * Places the Punies (slots 5 to 102) at the scripted spots from puni_rand_position for the thank-you scene.
+ * Each one is an idle Puni that can chatter.
+ */
 EVT_BEGIN(mario_see_you_init)
     SET_VALUE(LW(10), 5)
     SET_VALUE(LW(11), 0)
@@ -199,6 +219,12 @@ static f32 spline_dt[] = {
     74.6f, -167.18973f, -49.43834f, 143.94997f, -205.0f, 10.0f, 155.0f, -220.0f,
 };
 
+/**
+ * Cutscene when Mario first reaches the sealed Great Boggly Tree:
+ * Punio, the Puni who guides him, tells the party the entrance is locked,
+ * runs off along a spline path and ends in front of the tree.
+ * Sets the story to STORY_STG2_03_01_SEALED_ENTRANCE.
+ */
 EVT_BEGIN(seal_bigtree)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_move_beside_mario, 0)
@@ -255,6 +281,11 @@ EVT_BEGIN(seal_bigtree)
     RETURN
 EVT_END()
 
+/**
+ * Second cutscene at the sealed tree entrance: Punio talks to Mario, hops away and vanishes,
+ * Mario's partner steps up, and the west exit gets the lost-item exit.
+ * Sets the story to STORY_STG2_03_02_SEALED_ENTRANCE_2.
+ */
 EVT_BEGIN(seal_bigtree2)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -295,6 +326,12 @@ EVT_BEGIN(seal_bigtree2)
     RETURN
 EVT_END()
 
+/**
+ * Init script of Punio, the guide Puni, in the yard.
+ * Places him by story progress: facing the entrance at the start of chapter 2 and at the sealed door,
+ * beside the secret door once it is revealed (if he is not already following Mario), and,
+ * once the boss is beaten and Mario has not yet left the tree, among the crowd at the front.
+ */
 static EVT_BEGIN(guide_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG2_02_TO_THE_GREAT_TREE, STORY_STG2_03_THE_GREAT_TREE)
@@ -319,6 +356,11 @@ static EVT_BEGIN(guide_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of Punio: at the sealed entrance he starts the scene that explains the seal (seal_bigtree,
+ * seal_bigtree2 on the second visit); after the secret door is revealed he tells Mario to go in;
+ * after the Puni praise he says a thank-you line.
+ */
 static EVT_BEGIN(guide_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG2_03_THE_GREAT_TREE)
@@ -337,6 +379,10 @@ static EVT_BEGIN(guide_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init script of the rival Puni: after the boss battle (and until Mario leaves the tree) he stands in the crowd
+ * near the front.
+ */
 static EVT_BEGIN(rival_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_GREATER_OR_EQUAL(STORY_STG2_25_05_BOWSER_PETALBURG)
@@ -348,11 +394,16 @@ static EVT_BEGIN(rival_init)
     RETURN
 EVT_END()
 
+/** Talk script of the rival Puni: one line of thanks after the boss battle. */
 static EVT_BEGIN(rival_talk)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e26_00_09"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Init script of the little Jabbi (chibitoge): after the boss battle he waits in the crowd,
+ * but only if he has joined the Puni group.
+ */
 static EVT_BEGIN(chibitoge_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_GREATER_OR_EQUAL(STORY_STG2_25_05_BOWSER_PETALBURG)
@@ -366,6 +417,10 @@ static EVT_BEGIN(chibitoge_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the little Jabbi: he hops twice on the spot (with the Puni jump sound) when talked to;
+ * he has no text.
+ */
 static EVT_BEGIN(chibitoge_talk)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     BEGIN_INLINE_EVENT
@@ -382,6 +437,7 @@ static EVT_BEGIN(chibitoge_talk)
     RETURN
 EVT_END()
 
+/** Init script of Punio's sister: after the boss battle she stands in the crowd near the front. */
 static EVT_BEGIN(sister_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_GREATER_OR_EQUAL(STORY_STG2_25_05_BOWSER_PETALBURG)
@@ -393,11 +449,13 @@ static EVT_BEGIN(sister_init)
     RETURN
 EVT_END()
 
+/** Talk script of Punio's sister: one line of thanks after the boss battle. */
 static EVT_BEGIN(sister_talk)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e26_00_08"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/** Init script of the Puni elder: after the boss battle he stands in front of the crowd. */
 static EVT_BEGIN(elder_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_GREATER_OR_EQUAL(STORY_STG2_25_05_BOWSER_PETALBURG)
@@ -409,11 +467,16 @@ static EVT_BEGIN(elder_init)
     RETURN
 EVT_END()
 
+/** Talk script of the Puni elder: one line of thanks after the boss battle. */
 static EVT_BEGIN(elder_talk)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e26_00_10"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Init script of Fabio, the merchant: once his request (trouble 28) has been solved,
+ * and outside the final story point, he stands on the left side of the yard.
+ */
 static EVT_BEGIN(fabio_init)
     IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_28_SOLVED), 1)
@@ -424,6 +487,7 @@ static EVT_BEGIN(fabio_init)
     RETURN
 EVT_END()
 
+/** Talk script of Fabio: one line up to the end of the game's last battle, a different line afterwards. */
 static EVT_BEGIN(fabio_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS_OR_EQUAL(STORY_STG8_END_AFTER_THE_BATTLE)
@@ -434,6 +498,7 @@ static EVT_BEGIN(fabio_talk)
     RETURN
 EVT_END()
 
+/** Talk script of dancer 1 (red): the three dancers' lines in a row; all three dancers share this chat. */
 static EVT_BEGIN(odoriko_1_talk)
     CALL(evt_msg_print, 0, STRING("stg2_mri_00_07"), 0, STRING("踊り子１"))
     CALL(evt_msg_print, 0, STRING("stg2_mri_00_08"), 0, STRING("踊り子２"))
@@ -441,6 +506,10 @@ static EVT_BEGIN(odoriko_1_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init script of dancer 1, the red dancer: registers her with the red dancer model,
+ * makes her talk through odoriko_1_talk and puts her at the back of the yard.
+ */
 static EVT_BEGIN(odoriko_1_init)
     SET_VALUE(LW(0), STRING("踊り子１"))
     CALL(evt_npc_entry, LW(0), STRING("c_dance_r"))
@@ -452,6 +521,7 @@ static EVT_BEGIN(odoriko_1_init)
     RETURN
 EVT_END()
 
+/** Talk script of dancer 2 (pink): the same three lines in a row. */
 static EVT_BEGIN(odoriko_2_talk)
     CALL(evt_msg_print, 0, STRING("stg2_mri_00_07"), 0, STRING("踊り子１"))
     CALL(evt_msg_print, 0, STRING("stg2_mri_00_08"), 0, STRING("踊り子２"))
@@ -459,6 +529,10 @@ static EVT_BEGIN(odoriko_2_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init script of dancer 2, the pink dancer: registers her,
+ * makes her talk through odoriko_2_talk and puts her beside the others.
+ */
 static EVT_BEGIN(odoriko_2_init)
     SET_VALUE(LW(0), STRING("踊り子２"))
     CALL(evt_npc_entry, LW(0), STRING("c_dance_p"))
@@ -470,6 +544,7 @@ static EVT_BEGIN(odoriko_2_init)
     RETURN
 EVT_END()
 
+/** Talk script of dancer 3 (yellow-green): the same three lines in a row. */
 static EVT_BEGIN(odoriko_3_talk)
     CALL(evt_msg_print, 0, STRING("stg2_mri_00_07"), 0, STRING("踊り子１"))
     CALL(evt_msg_print, 0, STRING("stg2_mri_00_08"), 0, STRING("踊り子２"))
@@ -477,6 +552,10 @@ static EVT_BEGIN(odoriko_3_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init script of dancer 3, the yellow-green dancer:
+ * registers her, makes her talk through odoriko_3_talk and puts her beside the others.
+ */
 static EVT_BEGIN(odoriko_3_init)
     SET_VALUE(LW(0), STRING("踊り子３"))
     CALL(evt_npc_entry, LW(0), STRING("c_dance_k"))
@@ -564,18 +643,31 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Closes the diagonal door (S_doa) on the northeast side;
+ * used as the door-close script of the northeast loading zone.
+ */
 static EVT_BEGIN(bero_01_doa_close)
     SET_VALUE(LW(10), STRING("S_doa"))
     SPAWN_EVENT(evt_mri_door_naname_close)
     RETURN
 EVT_END()
 
+/**
+ * Opens the diagonal door (S_doa) on the northeast side;
+ * used as the door-open script of the northeast loading zone.
+ */
 static EVT_BEGIN(bero_01_doa_open)
     SET_VALUE(LW(10), STRING("S_doa"))
     SPAWN_EVENT(evt_mri_door_naname_open)
     RETURN
 EVT_END()
 
+/**
+ * Entry script of the west loading zone: at the start of chapter 2 (STORY_STG2_02_TO_THE_GREAT_TREE) it waits
+ * until the opening scene has cleared GF(0), and returns 1 in LW(0) so the normal walk-in is skipped.
+ * Otherwise it returns 0.
+ */
 static EVT_BEGIN(first_time_w_bero)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_02_TO_THE_GREAT_TREE)
         SET_VALUE(GF(0), 1)
@@ -587,6 +679,11 @@ static EVT_BEGIN(first_time_w_bero)
     RETURN
 EVT_END()
 
+/**
+ * Exit script of the northeast door (to mri_01):
+ * the first time through, Punio is hidden and the party member takes his place,
+ * then he is marked as following Mario (GSWF_MRI00_PUNIO_FOLLOWING). Returns 0 to the door code in LW(0).
+ */
 EVT_BEGIN(out_ne_bero)
     IF_INT_EQUAL(GSWF(GSWF_MRI00_PUNIO_FOLLOWING), 0)
         WAIT_MS(50)
@@ -603,12 +700,21 @@ EVT_BEGIN(out_ne_bero)
     RETURN
 EVT_END()
 
+/**
+ * Exit script of the west loading zone (back to the tree top road): irises out over half a second.
+ * Returns 0 in LW(0).
+ */
 static EVT_BEGIN(out_w_bero)
     CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_IRIS, 500, FADE_IN_IRIS, 500)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Exit script of the pipe back to Rogueport (tik_16):
+ * once the Puni boss is beaten it records that Mario has left the tree after chapter 2
+ * and clears the Jabbi-mushroom and Petuni quiz-egg flags so those can be repeated. Returns 0 in LW(0).
+ */
 EVT_BEGIN(out_dokan_1)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_AFTER_THE_BOSS_BATTLE)
         IF_INT_EQUAL(GSWF(GSWF_MRI_LEFT_TREE_AFTER_STG2), 0)
@@ -699,6 +805,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Opening cutscene of chapter 2 when Mario arrives at the Great Boggly Tree:
+ * the camera pans over the tree, the area name title appears and Mario walks in.
+ * Sets the story to STORY_STG2_03_THE_GREAT_TREE.
+ */
 EVT_BEGIN(first_bigtree)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -734,6 +845,13 @@ static const char* capturemap[] = {
     "\0",
 };
 
+/**
+ * Per-frame state machine of one cloud in front of the tree.
+ * A cloud is cleared when Flurrie's breath keeps hitting it:
+ * it plays the cloud animation, captures it into an offscreen buffer, counts the breath time and,
+ * once the limit (180) is exceeded, runs the end script and releases the capture.
+ * Runs as an event with the cloud's work in LW(0).
+ */
 static USER_FUNC(evt_cloud_main) {
     CloudMapWork* wp = (CloudMapWork*)event->lwData[0];
     s32 group = gp->inBattle != 0;
@@ -887,6 +1005,7 @@ static USER_FUNC(evt_cloud_main) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Allocates the 16 cloud work slots and names their images and offscreen buffers. */
 static USER_FUNC(evt_mri_cloud_init) {
     s32 i;
 
@@ -900,6 +1019,11 @@ static USER_FUNC(evt_mri_cloud_init) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Registers a cloud that Flurrie can blow away.
+ * Arguments: array of map group names, name of the hit area, script run when the cloud is gone.
+ * Starts evt_cloud_main_evt for the cloud.
+ */
 static USER_FUNC(evt_mri_cloud_ent) {
     EvtWord* args = event->args;
     char** groups;
@@ -941,6 +1065,7 @@ static USER_FUNC(evt_mri_cloud_ent) {
     return EVT_RETURN_DONE;
 }
 
+/** Event that runs the cloud system (evt_cloud_main) for the clouds hiding the tree top. */
 static EVT_BEGIN(evt_cloud_main_evt)
     CALL(evt_cloud_main)
     RETURN
@@ -951,6 +1076,11 @@ f32 guide_move_data[] = {
     -188.3354f, 130.73201f, 155.65002f, -185.70927f, 160.16298f, 165.45027f, -184.42146f,
 };
 
+/**
+ * Cutscene after Flurrie blows the clouds off the tree:
+ * the hidden door part is shown, Punio jumps in, Mario and Flurrie talk, and the secret door (S_doa) opens.
+ * Sets the story to STORY_STG2_10_SECRET_ENTRANCE_REVEALED and enables the northeast door.
+ */
 EVT_BEGIN(open_bigtree)
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
     CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SUCCESS1"))
@@ -1066,6 +1196,11 @@ EVT_BEGIN(open_bigtree)
     RETURN
 EVT_END()
 
+/**
+ * Chapter 2 epilogue back in the tree's front yard:
+ * the Punies thank Mario, with Punio, the Puni elder and Punio's sister talking, and the party is praised.
+ * Sets the story to STORY_STG2_26_PRAISE_FROM_THE_PUNI.
+ */
 EVT_BEGIN(mario_see_you)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -1119,6 +1254,10 @@ EVT_BEGIN(mario_see_you)
     RETURN
 EVT_END()
 
+/**
+ * Sets up the dark view (yami view) camera used for the dark scenes:
+ * a look-at matrix 100 units to the side of x, handed to the environment manager.
+ */
 static USER_FUNC(yami_view) {
     f32 x = evtGetFloat(event, event->args[0]);
     Mtx mtx;
@@ -1128,6 +1267,10 @@ static USER_FUNC(yami_view) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Turns on a TEV callback material flag for the NPC named in args[0] (flag number in args[1], low 4 bits);
+ * does nothing if the NPC does not exist.
+ */
 static USER_FUNC(anim_tevcallback) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1141,6 +1284,10 @@ static USER_FUNC(anim_tevcallback) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Picks a position in the Puni crowd grid for a Puni index (args[0]):
+ * 15 per row, 20 units apart, with a random scatter. Returns x in args[1] and z in args[2].
+ */
 static USER_FUNC(get_puni_pos) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -1154,6 +1301,7 @@ static USER_FUNC(get_puni_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Creates a Star Stone effect at the given x, y, z (args[1] to args[3]) and gives it the name in args[0]. */
 static USER_FUNC(starstone_entry) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1165,6 +1313,7 @@ static USER_FUNC(starstone_entry) {
     return EVT_RETURN_DONE;
 }
 
+/** Moves the named Star Stone effect (args[0]) to x, y, z. */
 static USER_FUNC(starstone_set_pos) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1179,6 +1328,7 @@ static USER_FUNC(starstone_set_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets the rotation (y) of the named Star Stone effect. */
 static USER_FUNC(starstone_set_ry) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1188,6 +1338,7 @@ static USER_FUNC(starstone_set_ry) {
     return EVT_RETURN_DONE;
 }
 
+/** Fills the crowd of Punies (slots 5 to 102) at positions from get_puni_pos and faces each left or right at random. */
 EVT_BEGIN(puni_set)
     SET_VALUE(LW(0), 5)
     SET_VALUE(LW(1), 0)
@@ -1211,6 +1362,11 @@ EVT_BEGIN(puni_set)
     RETURN
 EVT_END()
 
+/**
+ * Per-NPC chatter during the chapter 8 dark scene:
+ * once the camera counter GW(0) reaches the NPC's x position it shows a surprised speech bubble above it
+ * and keeps turning around now and then.
+ */
 static EVT_BEGIN(sekai_yami_npc)
     LOOP(0)
         CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
@@ -1234,6 +1390,11 @@ static EVT_BEGIN(sekai_yami_npc)
     RETURN
 EVT_END()
 
+/**
+ * Per-Puni chatter during the chapter 8 dark scene:
+ * once the camera counter GW(0) reaches the Puni's x position it shows a surprised speech bubble
+ * and keeps turning around now and then.
+ */
 EVT_BEGIN(sekai_yami_puni)
     LOOP(0)
         CALL(evt_puni_get_position, LW(0), LW(1), LW(2), LW(3))
@@ -1260,6 +1421,13 @@ EVT_BEGIN(sekai_yami_puni)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene when Mario arrives in the yard after the Shadow Queen has darkened the world (chapter 8):
+ * Mario is hidden, the Puni NPCs are lined up facing the left,
+ * the screen fades down and the dark view sweeps in from the left while they react.
+ * The guide's sister and the guide talk, then the screen fades out
+ * and the game moves on to tou_01 (Mario arrives through sekai_yami1).
+ */
 static EVT_BEGIN(sekai_yami_evt)
     CALL(evt_puni_wait_systemmode, 2)
     SPAWN_EVENT(puni_set)
@@ -1362,6 +1530,11 @@ static EVT_BEGIN(sekai_yami_evt)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene of the Puni's voices for the final battle (the "everyone's voices" scene):
+ * the Puni NPCs are lined up in the dark yard, they and the Punies speak their lines (stg8_las_148_10 to 17)
+ * and the crowd cheers, then the game moves on to tou_01 through the minnnanokoe entry.
+ */
 static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_puni_wait_systemmode, 2)
     SPAWN_EVENT(puni_set)
@@ -1533,6 +1706,10 @@ static EVT_BEGIN(minnnanokoe_evt)
     RETURN
 EVT_END()
 
+/**
+ * Map-local init: while the pipe to Rogueport (tik_16) has not been opened (GSWF_TIK16_PIPE_MRI_OPEN is 0),
+ * hides the pipe model (S_dakan) and turns its collision off.
+ */
 static EVT_BEGIN(evt_switch_init)
     IF_INT_EQUAL(GSWF(GSWF_TIK16_PIPE_MRI_OPEN), 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_dakan"), MAPOBJ_FLAG_HIDE)
@@ -1541,6 +1718,10 @@ static EVT_BEGIN(evt_switch_init)
     RETURN
 EVT_END()
 
+/**
+ * Clears the loaded-from-save flag once the area is entered and starts a curtain fade-in,
+ * so a map reached by loading a save fades in instead of popping.
+ */
 static USER_FUNC(sysflag) {
     if (gp->flags & GLOBAL_FLAG_LOADED) {
         gp->flags &= ~GLOBAL_FLAG_LOADED;
@@ -1549,6 +1730,12 @@ static USER_FUNC(sysflag) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Map init script of mri_00, the front yard of the Great Boggly Tree:
+ * registers the NPCs (Punio, the rival Puni, the little Jabbi, Punio's sister, the Puni elder,
+ * Fabio and the dancers), the doors, the clouds, the FP Plus badge and the language-specific sign,
+ * and starts the chapter 2 scenes and the chapter 8 Puni crowd scenes depending on the story progress.
+ */
 EVT_BEGIN(mri_00_init_evt)
     CALL(sysflag)
     CALL(evt_puni_mem_init)

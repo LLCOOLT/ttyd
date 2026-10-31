@@ -3,6 +3,7 @@
 #include "evt/evt_cmd.h"
 #include "hei.h"
 
+/** Map init for the battle-stage map; empty. */
 EVT_BEGIN(hei_bt00_init_evt)
     RETURN
 EVT_END()

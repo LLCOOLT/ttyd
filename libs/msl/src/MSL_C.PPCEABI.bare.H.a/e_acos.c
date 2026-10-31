@@ -16,6 +16,7 @@ qS2 = 2.02094576023350569471e+00,
 qS3 = -6.88283971605453293030e-01,
 qS4 = 7.70381505559019352791e-02;
 
+/** Arc cosine of x in radians (fdlibm); NaN outside [-1, 1]. */
 double __ieee754_acos(double x) {
     double z, p, q, r, w, s, c, df;
     int hx, ix;

@@ -329,6 +329,10 @@ static BattleWeapon weapon_koopa_fire_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Camera helper for Bowser's talk: moves the camera to x = LW(0), looking at him from the front,
+ * over 30 frames and waits 37 frames for it to arrive.
+ */
 static EVT_BEGIN(koopa_zoom)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -337,6 +341,12 @@ static EVT_BEGIN(koopa_zoom)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Bowser: registers his wait, phase, attack,
+ * damage and entry events (confusion uses the default confuse event), sets unit work 1 and 4 to 0,
+ * work 2 to half his max HP (the threshold for his half-HP line) and work 3 to 0 (that line not yet shown),
+ * and sets his walk and run sounds, then starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
@@ -356,6 +366,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Bowser's entrance: he stands still, then laughs and strikes a pose ("KPA_Y_2") while the camera zooms in,
+ * and says stg3_tou_403_06_01 before the fight starts.
+ */
 static EVT_BEGIN(entry_event)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     WAIT_FRAMES(60)
@@ -372,6 +386,7 @@ static EVT_BEGIN(entry_event)
     RETURN
 EVT_END()
 
+/** Damage event: runs the default battle damage reaction on the unit itself (part 1). */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -379,6 +394,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Bowser's defeat: if he is away from his home spot he walks back to it, waits for the attack to end,
+ * zooms the camera and has him say the closing line (stg3_tou_403_06_03) with a satisfied voice
+ * and the "KPA_D_2" collapse pose, then runs the common no-spin death.
+ */
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(3), LW(4), LW(5))
@@ -414,6 +434,10 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Phase event of Bowser: after the player's phase, unless he is marked with the instant-kill status (27),
+ * it declares the phase event and runs harf_hp_event, then restarts the wait event.
+ */
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 27, LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -429,6 +453,11 @@ static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Bowser's half-HP line ("harf" is the original spelling of "half"):
+ * the first time his HP drops below the value in unit work 2 (half his max HP) it sets unit work 3,
+ * zooms in on him and has him say stg3_tou_403_06_02 in a new talk pose.
+ */
 static EVT_BEGIN(harf_hp_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(1))
     IF_INT_EQUAL(LW(1), 0)
@@ -450,6 +479,12 @@ static EVT_BEGIN(harf_hp_event)
     RETURN
 EVT_END()
 
+/**
+ * Bowser's move choice. He uses an enemy item if one fits.
+ * His first three turns are scripted by unit work 4: fire breath, then bite, then hip drop.
+ * After that he draws lots with weights 30 (hip drop), 30 (bite),
+ * 0 (critical bite, never drawn) and 30 (fire breath). LW(9) receives the weapon each sub-event uses.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -494,6 +529,14 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Bowser's Hip Drop: walks to the target, jumps up and slams down on it (camera shake on a hit).
+ * If the action command result is 3 or less and the target is Mario or a partner,
+ * it also seals one of that character's commands:
+ * the lost command's icon is tossed across the screen with _icon_jump_icon
+ * and an announcement message is shown (the US and later versions pass the partner to party_cannot_use_command).
+ * Then he walks back home.
+ */
 static EVT_BEGIN(hip_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -618,6 +661,10 @@ static EVT_BEGIN(hip_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Bowser's Bite: walks to the side of the target, bites down (two bite sounds) and does the weapon damage,
+ * then walks back home.
+ */
 static EVT_BEGIN(bite_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -696,6 +743,11 @@ static EVT_BEGIN(bite_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Bowser's strong Bite: like bite_attack_event but on a hit he holds the target in his jaws for 1.5 seconds
+ * ("KPA_A_4") before the damage lands.
+ * It is in the code but attack_event gives it zero weight, so it never runs.
+ */
 static EVT_BEGIN(critical_bite_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -770,6 +822,12 @@ static EVT_BEGIN(critical_bite_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Bowser's Fire Breath: moves in front of the party,
+ * breathes fire for about 1.5 seconds and hits every target in turn (AttackDeclareAll,
+ * with the action command result taken from the first),
+ * using the "gonbaba_breath" fire effect scaled by his size. Then he returns to his home position.
+ */
 static EVT_BEGIN(fire_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -872,6 +930,7 @@ static EVT_BEGIN(fire_attack_event)
     RETURN
 EVT_END()
 
+/** Wait event: sets the idle animation from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -885,12 +944,18 @@ static const char* cmd_disable_string[] = {
     "btl_party_item_cmd_disable",
 };
 
+/** Draw callback of _icon_jump_icon: draws the flying icon at its current position. */
 static void _disp_icon(CameraId camera, void* param) {
     EventEntry* event = param;
 
     iconDispGx(&((IconJumpWork*)event->userdatap[0])->pos, 0, event->userdata[1], 1.0f);
 }
 
+/**
+ * Script helper that tosses an icon along an arc:
+ * arg0 = icon id, arg1..3 = start, arg4..6 = end, arg7 = gravity, arg8 = frames.
+ * Runs until it lands; used to show the command that Bowser takes away.
+ */
 static USER_FUNC(_icon_jump_icon) {
     EvtWord* args = event->args;
     s32 icon = evtGetValue(event, args[0]);
@@ -944,6 +1009,12 @@ static USER_FUNC(_icon_jump_icon) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Guess: script helper for Bowser's command-seal attack on the partner:
+ * disables either the partner's special command or its item command for 3 turns
+ * and gives the matching message key in LW(0); arg0 (and arg1, the partner, on US and later) selects the weapon
+ * id written back.
+ */
 static USER_FUNC(party_cannot_use_command) {
     BattleWork* wp = _battleWorkPointer;
     s32 r = irand(1);
@@ -991,6 +1062,11 @@ static USER_FUNC(party_cannot_use_command) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Guess: script helper for Bowser's command-seal attack on Mario:
+ * randomly disables jump, hammer or item for 3 turns;
+ * LW(0) receives the message key of the disabled command and arg0 the weapon id used to show it.
+ */
 static USER_FUNC(mario_cannot_use_command) {
     BattleWork* wp = _battleWorkPointer;
     s32 r = irand(2);

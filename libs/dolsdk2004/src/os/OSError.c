@@ -9,6 +9,7 @@ OSErrorHandler __OSErrorTable[17];
 #define FPSCR_ENABLE (FPSCR_VE | FPSCR_OE | FPSCR_UE | FPSCR_ZE | FPSCR_XE)
 u32 __OSFpscrEnableBits = FPSCR_ENABLE;
 
+/** printf to the debug console; the usual log call for game and SDK code. */
 void OSReport(const char* msg, ...) {
     va_list marker;
     va_start(marker, msg);
@@ -16,10 +17,15 @@ void OSReport(const char* msg, ...) {
     va_end(marker);
 }
 
+/** va_list version of OSReport. */
 void OSVReport(const char* msg, va_list list) {
     vprintf(msg, list);
 }
 
+/**
+ * Prints a fatal message with the file and line, then up to 16 stack frames of back chain, and halts the CPU.
+ * Interrupts are disabled first; this is what a failed ASSERT calls.
+ */
 void OSPanic(const char* file, int line, const char* msg, ...) {
     va_list marker;
     u32 i;
@@ -39,6 +45,11 @@ void OSPanic(const char* file, int line, const char* msg, ...) {
     PPCHalt();
 }
 
+/**
+ * Installs a handler for one OS error code (exception number) and returns the old one.
+ * Installing or removing the floating-point exception handler also turns FP exceptions on or off in the MSR,
+ * the FPSCR and every thread's saved context.
+ */
 OSErrorHandler OSSetErrorHandler(OSError error, OSErrorHandler handler) {
     OSErrorHandler oldHandler;
     int enabled;
@@ -108,6 +119,13 @@ OSErrorHandler OSSetErrorHandler(OSError error, OSErrorHandler handler) {
 
 volatile OSContext* __OSFPUContext AT_ADDRESS(OS_BASE_CACHED | 0x00D8);
 
+/**
+ * Called by OSDefaultExceptionHandler.
+ * A program exception raised by an FP exception is turned into the FP-exception error;
+ * if an error handler is installed for the exception it runs with the scheduler off and the context resumes.
+ * Otherwise it prints the exception, context, DSISR/DAR, a description of the cause and the last interrupt,
+ * and halts.
+ */
 void __OSUnhandledException(__OSException exception, OSContext* context, u32 dsisr, u32 dar) {
     OSTime now;
     u32 fpscr;

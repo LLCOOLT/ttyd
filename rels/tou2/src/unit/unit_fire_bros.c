@@ -34,6 +34,10 @@ static EvtWord wait_event[6];
 
 // dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
 #pragma dont_inline on
+/**
+ * Advances the weapon target list to the next target and returns its unit and part index,
+ * or -1 and 0 at the end of the list.
+ */
 static void fire_bros_get_next_target(s32* unitIdx, s32* partIdx) {
     BattleWorkWeaponTargets* wt = &_battleWorkPointer->weaponTargets;
 
@@ -51,6 +55,7 @@ static void fire_bros_get_next_target(s32* unitIdx, s32* partIdx) {
 
 // dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
 #pragma dont_inline on
+/** Returns the unit and part index of the weapon target currently selected in the target list. */
 static void fire_bros_get_target(s32* unitIdx, s32* partIdx) {
     BattleWorkWeaponTargets* wt = &_battleWorkPointer->weaponTargets;
     BattleWorkTarget* target = &wt->targets[wt->targetIndices[wt->currentTarget]];
@@ -60,6 +65,11 @@ static void fire_bros_get_target(s32* unitIdx, s32* partIdx) {
 }
 #pragma dont_inline reset
 
+/**
+ * Script helper for the Fire Bro's throwing barrage (nagemakuri):
+ * collects the possible targets and writes five random (unit, part) pairs, one per fireball,
+ * into the script variables passed as arguments.
+ */
 static USER_FUNC(fire_bros_nagemakuri_set_target) {
     EvtWord* args = event->args;
     s32 unitIdx[20];
@@ -322,6 +332,10 @@ BattleWeapon weapon_fire_bros_nagemakuri_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init event of the Boomerang Bro: registers its wait, attack,
+ * damage and confusion events and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -331,6 +345,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event: runs the default battle damage reaction on the unit itself (part 1). */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -338,6 +353,13 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the Fire Bro: a first strike always uses normal_attack_event,
+ * otherwise it uses an enemy item if one fits.
+ * With 3 HP or less it picks the two-shot renzoku_attack_event 30% of the time
+ * and the all-target nagemakuri_attack_event otherwise;
+ * with more HP it picks the single-shot normal_attack_event 70% of the time and renzoku_attack_event the rest.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -379,6 +401,15 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: shared damage check for the Fire Bro's fireballs:
+ * LW(6) is the weapon, LW(3) and LW(4) the target and part,
+ * LW(7) = 1 marks the last hit and LW(8) = 1 the all-target attack.
+ * It pre-checks the hit, returns LW(0) = 1 when it hit,
+ * notes the hit in the fireball parts' work values
+ * so later fireballs aimed at the same target know about it (for the two-shot attack in part 2's work 10)
+ * and applies the damage with the last-hit flag if requested.
+ */
 static EVT_BEGIN(damage_check_sub)
     SET_VALUE(LW(0), 0)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), 0, LW(5))
@@ -445,12 +476,19 @@ static EVT_BEGIN(damage_check_sub)
     RETURN
 EVT_END()
 
+/** Checks a boomerang hit that is not the last one (LW(7) = 0): runs damage_check_sub. */
 static EVT_BEGIN(damage_check_no_last)
     SET_VALUE(LW(7), 0)
     CALL_CHILD(damage_check_sub)
     RETURN
 EVT_END()
 
+/**
+ * Guess: final damage check of the Fire Bro's attacks:
+ * works out whether an earlier fireball already hit the same target (for the two-shot attack from part 2's work
+ * 10, for the all-target attack from the fireball parts' work values).
+ * If one did, the target takes the last hit; if none did, it runs damage_check_sub with the last-hit flag.
+ */
 static EVT_BEGIN(damage_check_last)
     IF_INT_EQUAL(LW(6), PTR(&weapon_fire_bros_renzoku_attack))
         CALL(btlevtcmd_GetPartsWork, BTL_UNIT_SELF, 2, 10, LW(0))
@@ -496,6 +534,12 @@ static EVT_BEGIN(damage_check_last)
     RETURN
 EVT_END()
 
+/**
+ * Guess: flight of one Fire Bro fireball (part LW(15)):
+ * plays the throw sound, puts the fireball at the thrower
+ * and moves it along a flat arc towards the target at LW(3)/LW(4),
+ * with a sibling loop that spins it and handles the hit.
+ */
 EVT_BEGIN(fire_move_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_FIREB_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, LW(15), STRING("BRO_A_1B"))
@@ -654,6 +698,10 @@ EVT_BEGIN(fire_move_event)
     RETURN
 EVT_END()
 
+/**
+ * The Fire Bro's single fireball: picks a target, throws one fireball ("BRO_A_1A") by spawning fire_move_event,
+ * and waits until it reports back (unit work 1).
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -699,6 +747,11 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Fire Bro's two-fireball attack (weapon_fire_bros_renzoku_attack):
+ * throws one fireball, 12 frames later a second one, spawning fire_move_event each time,
+ * and waits until both have reported back (unit work 1 reaches 2).
+ */
 static EVT_BEGIN(renzoku_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_fire_bros_renzoku_attack))
@@ -748,6 +801,12 @@ static EVT_BEGIN(renzoku_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the Fire Bro's all-target fireball barrage (nagemakuri, "throwing spree"):
+ * selects every enemy, loads one fireball part (parts 2 to 7) with each target's data using
+ * fire_bros_nagemakuri_set_target, and then throws the fireballs one after another with fire_move_event,
+ * working through them as earlier ones finish, until all have hit or missed.
+ */
 static EVT_BEGIN(nagemakuri_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_fire_bros_nagemakuri_attack))
@@ -845,6 +904,10 @@ static EVT_BEGIN(nagemakuri_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: decides whether the fireball just resolved was the last of the barrage:
+ * LW(14) = 1 if so, 0 if more fireballs are still pending for other targets.
+ */
 EVT_BEGIN(nagemakuri_judge_last_attack_event)
     SET_VALUE(LW(0), LW(10))
     SET_VALUE(LW(1), LW(11))
@@ -877,6 +940,7 @@ EVT_BEGIN(nagemakuri_judge_last_attack_event)
     RETURN
 EVT_END()
 
+/** Wait event: sets the idle animation from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

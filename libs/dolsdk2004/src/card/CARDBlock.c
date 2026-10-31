@@ -6,11 +6,17 @@
 static void WriteCallback(s32 chan, s32 result);
 static void EraseCallback(s32 chan, s32 result);
 
+/** Returns the FAT copy (in the mount work area) that is currently valid. */
 void* __CARDGetFatBlock(CARDControl* card) {
     ASSERTLINE(57, card->currentFat);
     return card->currentFat;
 }
 
+/**
+ * Completion callback for the FAT write: on success duplicates the block just written over the other FAT copy
+ * and makes it the current one, releases the channel unless an API callback is pending,
+ * and calls the user callback saved in eraseCallback.
+ */
 static void WriteCallback(s32 chan, s32 result) {
     CARDControl* card;
     CARDCallback callback;
@@ -44,6 +50,10 @@ static void WriteCallback(s32 chan, s32 result) {
     }
 }
 
+/**
+ * Completion callback for the FAT sector erase:
+ * writes the current 8 KiB FAT block into that sector with __CARDWrite, or reports the error.
+ */
 static void EraseCallback(s32 chan, s32 result) {
     CARDControl* card = &__CARDBlock[chan];
     CARDCallback callback;
@@ -72,6 +82,13 @@ error:
     }
 }
 
+/**
+ * Allocates 'cBlock' blocks from the FAT: fails with INSSPACE if the free count (FAT word 3) is too small,
+ * then scans from the last-allocated hint (word 4) for free entries,
+ * links them into a chain and marks the last as 0xFFFF.
+ * The first block goes to card->startBlock; the changed FAT is saved with __CARDUpdateFatBlock.
+ * Returns BROKEN if the scan wraps all the way around.
+ */
 s32 __CARDAllocBlock(s32 chan, u32 cBlock, CARDCallback callback) {
     CARDControl* card;
     u16* fat;
@@ -119,6 +136,11 @@ s32 __CARDAllocBlock(s32 chan, u32 cBlock, CARDCallback callback) {
     return __CARDUpdateFatBlock(chan, fat, callback);
 }
 
+/**
+ * Frees the chain of blocks starting at 'nBlock':
+ * zeroes each FAT entry, counts the free blocks back up, and saves the FAT.
+ * Returns BROKEN on an invalid block number.
+ */
 s32 __CARDFreeBlock(s32 chan, u16 nBlock, CARDCallback callback) {
     CARDControl* card;
     u16* fat;
@@ -144,6 +166,10 @@ s32 __CARDFreeBlock(s32 chan, u16 nBlock, CARDCallback callback) {
     return __CARDUpdateFatBlock(chan, fat, callback);
 }
 
+/**
+ * Saves the FAT: bumps its update counter, recomputes its checksums,
+ * flushes it from the data cache and erases its sector; EraseCallback then writes it out.
+ */
 s32 __CARDUpdateFatBlock(s32 chan, u16* fat, CARDCallback callback) {
     CARDControl* card;
     u32 addr;

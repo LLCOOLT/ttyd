@@ -276,6 +276,10 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_crimson_togemet", "c_met_h", 0.0f, 0.0f, 0.0f, 0.0f, 23.0f, 0.0f, 0.0f, 28.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0x1, pose_table},
 };
 
+/**
+ * Init event of the Spike Top: reads unit work 0 (0 = on the floor, anything else = hanging from the ceiling),
+ * applies the matching event set with init_event2, and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(15))
     CALL_CHILD(init_event2)
@@ -283,6 +287,15 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Sets the Spike Top up for its current place, shared by init_event and the drop events.
+ * On the floor (unit work 0 = 0) it uses the normal wait, attack,
+ * damage and confusion events and clears the ceiling-fall event.
+ * Hanging from the ceiling it sets UNIT_ATTR_CEILING and the ceiling part attributes,
+ * the ceiling pose and data tables and puts the unit and its home 130 units high with the ceiling wait, attack,
+ * damage and ceiling-fall events and offsets for hanging upside down.
+ * Either way it sets the shell footstep sounds and clears the flipped-over counter.
+ */
 static EVT_BEGIN(init_event2)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(15))
     IF_INT_EQUAL(LW(15), 0)
@@ -318,6 +331,12 @@ static EVT_BEGIN(init_event2)
     RETURN
 EVT_END()
 
+/**
+ * Data event 37 (the thorn-head counter, run when a player attack is bounced off its spiked top):
+ * waits 30 frames and flashes the "toge_flush" spike effect above the unit,
+ * 38 units up when it is Huge (status 10), 18 when Tiny (status
+ * 11) and 28 otherwise.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -338,6 +357,7 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/** Damage event: runs the default battle damage reaction on the unit itself (part 1). */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -345,6 +365,13 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Data event 13 (a stomp flips the Spike Top onto its back):
+ * switches to the flipped defence, attribute and pose tables,
+ * sets STATUS_FLAG_FLIPPED with the over-turn counter at 1, plays the shell sound and a hop,
+ * moves its home to the floor and clears the counter attribute on its part (its spikes no longer hurt
+ * attackers).
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -365,6 +392,11 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs in place of a flipped Spike Top's attack: counts the over-turn counter down;
+ * at zero it restores the upright defence, attribute and pose tables, clears STATUS_FLAG_FLIPPED,
+ * hops back on its feet and turns the spike counter attribute back on.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -391,6 +423,13 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the floor Spike Top: a flipped unit runs wakeup_event.
+ * Otherwise it uses an enemy item if one fits, or picks a target (the first-strike target in a first strike)
+ * and curls into its shell, spins up in steps to a rolling charge (leaving smoke)
+ * and rolls into the target with weapon_met_attack.
+ * A miss rolls on past and turns back; a hit bounces it off in two hops. Then it returns home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -537,11 +576,16 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait event: sets the idle animation from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Damage event while hanging from the ceiling: default damage reaction, then,
+ * unless the hit knocked it out for good or did no damage, it falls with ceil_fall_ready_event.
+ */
 static EVT_BEGIN(damage_event_ceil)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -564,6 +608,11 @@ static EVT_BEGIN(damage_event_ceil)
     RETURN
 EVT_END()
 
+/**
+ * Reaction to a counterattack while hanging: drops it off the ceiling (clears UNIT_ATTR_CEILING and the ceiling
+ * attributes, restores the floor pose and data tables and offsets), re-runs init_event2 for the floor state,
+ * then runs subsetevt_counter_damage with the damage code.
+ */
 static EVT_BEGIN(counter_damage_event_ceil)
     CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 2)
     CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 4194304)
@@ -584,6 +633,11 @@ static EVT_BEGIN(counter_damage_event_ceil)
     RETURN
 EVT_END()
 
+/**
+ * Ceiling-fall event: the Spike Top drops from the ceiling with the fall sound, lands (landing sound),
+ * switches to the floor tables and offsets (init_event2) and ends up flipped on its back like
+ * after a stomp (flipped defence and pose tables, over-turn counter 1, small bounces).
+ */
 static EVT_BEGIN(ceil_fall_ready_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_FALL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, 0)
@@ -619,6 +673,11 @@ static EVT_BEGIN(ceil_fall_ready_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event while hanging from the ceiling: picks a target, moves over it along the ceiling,
+ * lets go and drops onto it (weapon_met_ceil_attack), then waits 60 frames and returns to the floor tables.
+ * It hops twice to its home and sets up the floor events again with init_event2.
+ */
 static EVT_BEGIN(attack_event_ceil)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -731,6 +790,7 @@ static EVT_BEGIN(attack_event_ceil)
     RETURN
 EVT_END()
 
+/** Wait event while hanging: sets the idle pose from the ceiling pose table. */
 static EVT_BEGIN(wait_event_ceil)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

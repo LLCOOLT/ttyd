@@ -13,6 +13,11 @@
 #include "mario/mario_pouch.h"
 #include "version.h"
 
+/**
+ * Footstep sounds for walking and running: every interval frames a full step and at half that a lighter one,
+ * chosen by the floor's hit attribute (0x100, 0x200000, 0x100000, 0x1000, 0x400000, or plain ground).
+ * The 0x1000 floor plays the plain 0x100 sound on the Great Tree (mri) maps.
+ */
 void marioWalkDashSe(HitEntry* hitObj, u32 interval) {
     s32 hitAttr;
     MarioWork* mario;
@@ -76,6 +81,10 @@ void marioWalkDashSe(HitEntry* hitObj, u32 interval) {
     }
 }
 
+/**
+ * Mario's walking speed: baseWalkSpeed, halved in Paper Mode when the stick is only tilted a little
+ * and always in background mode, times playerGravity. Also used by Peach's walk and mario_sbr.c.
+ */
 f32 marioGetWalkSpd(void) {
     f32 walkSpeed;
     s8 stickDir2;
@@ -98,6 +107,10 @@ f32 marioGetWalkSpd(void) {
     return walkSpeed;
 }
 
+/**
+ * Mario's running speed: baseDashSpeed (just the walk speed in Paper Mode, halved for a small tilt;
+ * halved in background mode), times playerGravity.
+ */
 f32 marioGetDashSpd(void) {
     MarioWork* mario;
     f32 dashSpeed;
@@ -122,6 +135,12 @@ f32 marioGetDashSpd(void) {
     return dashSpeed;
 }
 
+/**
+ * Walking motion: moves Mario at marioGetWalkSpd with footstep sounds,
+ * switches to the pushing pose (M_O_1) against a pushable case object,
+ * to running when the stick is pushed far (unless the Slow Go badge is on), to Paper Mode when R is pressed,
+ * and back to standing when the stick is released. Bowser and Peach run their own versions.
+ */
 void mot_walk(void) {
     f32 walkSpeed;
     s32 trigFlags;
@@ -244,6 +263,11 @@ void mot_walk(void) {
     }
 }
 
+/**
+ * Running motion: like mot_walk at marioGetDashSpd,
+ * dropping back to walking for a small stick tilt or with the Slow Go badge,
+ * with the pushing pose against pushable objects.
+ */
 void mot_dash(void) {
     f32 dashSpeed;
     u32 trigFlags;

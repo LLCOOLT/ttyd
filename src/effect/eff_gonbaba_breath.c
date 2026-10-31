@@ -42,7 +42,7 @@ static GXColor col_mini[] = {
 };
 static GXColor* col_tbl[] = {col_normal, col_poison, col_mega, col_cold, col_confu, col_sleep, col_mini, col_normal};
 
-// cheap polynomial approximations, valid for x in [0, 2pi]
+/** cheap polynomial approximations, valid for x in [0, 2pi] */
 static inline f32 _sinf(f32 x) {
     f32 a = 0.00761f;
     f32 b = 0.16605f;
@@ -81,6 +81,7 @@ static inline f32 _sinf(f32 x) {
     return a;
 }
 
+/** Polynomial cosine approximation (radians). */
 static inline f32 _cosf(f32 x) {
     f32 a = 0.03705f;
     f32 b = 0.4967f;
@@ -122,6 +123,7 @@ static void effGonbabaBreathDisp(CameraId cameraId, EffectEntry* effect);
 #pragma opt_propagation off
 // lifetimes optimisation off for init_breath: the original register allocation and scheduling need it
 #pragma opt_lifetimes off
+/** Initialises one breath particle for the given type: delay by index, start offset, velocity and lifetime. */
 static void init_breath(EffGonbabaBreathWork* work, s32 idx, s32 type) {
     f32 ang;
     f32 spd;
@@ -212,6 +214,11 @@ static void init_breath(EffGonbabaBreathWork* work, s32 idx, s32 type) {
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
+/**
+ * Spawns a breath of the given type (0-7, plus companion layers 10-17) at (x, y, z) pointing along yaw;
+ * life <= 0 keeps it endless.
+ * Spawned by the Hooktail Castle, Pit of 100 Trials and Palace of Shadow bosses and event scripts.
+ */
 EffectEntry* effGonbabaBreathEntry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 yaw) {
     EffectEntry* effect;
     EffGonbabaBreathWork* work;
@@ -277,6 +284,7 @@ EffectEntry* effGonbabaBreathEntry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 
     return effect;
 }
 
+/** Moves and ages each particle, and on soft delete fades the breath over 32 frames (also soft-deleting the child). */
 static void effGonbabaBreathMain(EffectEntry* effect) {
     EffGonbabaBreathWork* work = effect->userdata;
     Vec position;
@@ -411,6 +419,7 @@ static void effGonbabaBreathMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effGonbabaBreathDisp, effect);
 }
 
+/** Draws the particles as camera-facing quads, coloured by type; companion layers sit slightly off the camera plane. */
 static void effGonbabaBreathDisp(CameraId cameraId, EffectEntry* effect) {
     EffGonbabaBreathWork* work = effect->userdata;
     Mtx trans;

@@ -61,6 +61,7 @@ static EvtWord wait_event[6];
 static EvtWord wait_event[7];
 #endif
 
+/** Script helper: allocates the Pider's PidersYarn buffer and keeps it in the unit's countersetWeapon slot. */
 static USER_FUNC(piders_yarn_init) {
     s32 id = BattleTransID(event, -2);
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -186,6 +187,10 @@ static BattleUnitKindPart parts[] = {
     {5, "btl_un_piders", "c_paid", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
 };
 
+/**
+ * Draw callback: draws the Pider's thread as a thin white quad (2 units wide, with the unit's yarn alpha) from
+ * the ceiling point down to the spider, using direct GX calls and no texture.
+ */
 static void piders_draw_yarn_sub(CameraId camera, void* param) {
     PidersYarn* yarn = param;
     CameraEntry* cam = camGetPtr(CAMERA_3D);
@@ -213,6 +218,11 @@ static void piders_draw_yarn_sub(CameraId camera, void* param) {
     GXEnd();
 }
 
+/**
+ * Script helper: args[0] is the thread's alpha.
+ * Sets the thread from y = 400 (ceiling) down to the Pider's hanging height (work[2])
+ * and queues piders_draw_yarn_sub to draw it.
+ */
 static USER_FUNC(piders_draw_yarn) {
     u8 alpha = evtGetValue(event, event->args[0]);
     s32 id = BattleTransID(event, -2);
@@ -229,6 +239,7 @@ static USER_FUNC(piders_draw_yarn) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: args[0] receives how many Piders (kinds 0x1B and 0xA4) are still alive. */
 static USER_FUNC(piders_get_num) {
     BattleUnit* unit;
     s32 i;
@@ -246,6 +257,10 @@ static USER_FUNC(piders_get_num) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] is a unit id; args[1] receives that Pider's turn order ('zyun') among the living
+ * Piders, counting from 1.
+ */
 static USER_FUNC(piders_get_zyun) {
     s32 id;
     s32 i;
@@ -272,6 +287,10 @@ static USER_FUNC(piders_get_zyun) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] receives the position attribute (work[0]) of the first living Pider,
+ * flipped between 0 and 1 when that Pider can act, so the others take the opposite side.
+ */
 static USER_FUNC(piders_get_first_pos_attr) {
     s32 i;
     EvtWord* args = event->args;
@@ -298,6 +317,10 @@ static USER_FUNC(piders_get_first_pos_attr) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: picks three random targets from the weapon's current target list
+ * and writes them as (unit, part) pairs to args, for the Pider's multi-hit ('renzoku') attack.
+ */
 static USER_FUNC(piders_renzoku_attack_set_target) {
     EvtWord* args = event->args;
     s32 unitIdx[20];
@@ -324,6 +347,7 @@ static USER_FUNC(piders_renzoku_attack_set_target) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns the unit and part index of the weapon target currently selected in weaponTargets. */
 static void piders_get_target(s32* unitIdx, s32* partIdx) {
     BattleWorkWeaponTargets* wt = &_battleWorkPointer->weaponTargets;
     BattleWorkTarget* target = &wt->targets[wt->targetIndices[wt->currentTarget]];
@@ -332,6 +356,7 @@ static void piders_get_target(s32* unitIdx, s32* partIdx) {
     *partIdx = target->partIdx;
 }
 
+/** Advances to the next weapon target and returns its unit and part index, or (-1, 0) after the last one. */
 static void piders_get_next_target(s32* unitIdx, s32* partIdx) {
     BattleWorkWeaponTargets* wt = &_battleWorkPointer->weaponTargets;
 
@@ -418,6 +443,11 @@ static BattleWeapon weapon_piders_renzoku_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Battle init script for the Pider: installs the wait, unison phase, attack, damage,
+ * confusion and entry handlers, sets its unit work (work 1 starts at 255)
+ * and starts the yarn_event that draws its thread, then the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventUnisonPhase, BTL_UNIT_SELF, PTR(unison_phase_event))
@@ -435,6 +465,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: position setup for the first attack after being damaged (name dmg_first_attack_pos):
+ * puts the unit at y = 10 and waits for the attack to end.
+ */
 static EVT_BEGIN(dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -443,6 +477,12 @@ static EVT_BEGIN(dmg_first_attack_pos)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Looping helper started from init_event:
+ * every frame, as long as the unit exists, fades the Pider's thread:
+ * unit work 1 holds the thread's alpha (255 = fully drawn, 254 = hidden after the battle) and counts down by 2
+ * while it is between 3 and 254, and piders_draw_yarn is called to draw the thread with that value.
+ */
 static EVT_BEGIN(yarn_event)
     LABEL(0)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))
@@ -463,6 +503,10 @@ static EVT_BEGIN(yarn_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Entry event: the Pider starts 180 units up (on its thread), waits a delay based on its x position,
+ * then lowers itself to its place; unit work 2 (the thread length) eases from 400 to 0 over 40 frames.
+ */
 static EVT_BEGIN(entry_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 180)
@@ -480,6 +524,10 @@ static EVT_BEGIN(entry_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: selects this unit (-2) and its part 1
+ * and runs the shared default damage reaction (btldefaultevt_Damage).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -487,6 +535,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Death script: spins the Pider 15 degrees per frame for 48 frames, then shows an explosion effect,
+ * banks its coins and experience and star points and tips it over for 30 frames.
+ * It then hides its parts, takes it out of the turn order and removes the unit (kill mode 1).
+ * From the JP release on it is also moved far below the stage.
+ */
 static EVT_BEGIN(dead_event)
     SET_VALUE(LW(0), 48)
     CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -537,6 +591,12 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Death when the Pider is blown away: plays the blow sound,
+ * spins it 20 degrees per frame as it flies up and off the stage, banks its coins and experience,
+ * hides its parts, takes it out of the turn order and removes it (kill mode 1;
+ * moved far below the stage from the JP release on).
+ */
 static EVT_BEGIN(blow_dead_event)
     CALL(evt_snd_sfxon, STRING("SFX_BTL_CLAUD_BREATH3"), 0)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(0))
@@ -568,11 +628,16 @@ static EVT_BEGIN(blow_dead_event)
     RETURN
 EVT_END()
 
+/** Battle-end event: sets unit work 1 to 254 so the thread stops being drawn. */
 static EVT_BEGIN(battle_end_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 254)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Makes the Pider sway: a damped back and forth rotation around the y axis (6, -5, 4, -3, 2,
+ * -1 degrees per frame over 10 to 22 frames each), ending with the rotation reset.
+ */
 static EVT_BEGIN(yure_event)
     BEGIN_INLINE_EVENT
         LOOP(10)
@@ -604,6 +669,11 @@ static EVT_BEGIN(yure_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: moves the Pider to its low position (kuutei, on the ground): the first time it just lowers;
+ * otherwise it sways, dives down to y = 10 and sets that as home,
+ * clears the part flags that made it unhittable and sets unit work 0 to 1.
+ */
 static EVT_BEGIN(move_kuutei_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -632,6 +702,11 @@ static EVT_BEGIN(move_kuutei_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: moves the Pider up into the air (kuuchu, out of reach of ground attacks):
+ * sways, rises to y = 70 and makes that its home position,
+ * flags the part as unhittable from the ground and sets unit work 0 to 0.
+ */
 static EVT_BEGIN(move_kuuchu_event)
     SPAWN_EVENT(yure_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -649,6 +724,12 @@ static EVT_BEGIN(move_kuuchu_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Runs at the start of the enemy phase before the player's turn, when the Pider can act:
+ * if it has the status 27 effect, it decides with piders_get_zyun,
+ * piders_get_first_pos_attr and the number of Piders whether to move up into the air or down to the ground,
+ * so that neighbouring Piders alternate between the two heights.
+ */
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_EQUAL(LW(0), 0)
@@ -707,6 +788,10 @@ static EVT_BEGIN(unison_phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack AI of the Pider: clears its web target work (11 to 13), uses an enemy item if it has one,
+ * otherwise attacks with a single web shot (50%) or a rapid-fire web attack (renzoku, 50%).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 11, 0)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 12, 0)
@@ -736,6 +821,13 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Resolves one web shot at the target in LW(3), LW(4):
+ * the pre-damage check decides the avoid animation or the hit.
+ * It tracks which targets have already been hit (unit work 5 to 10),
+ * taking the attack defence result only for the first hit,
+ * and then applies the damage (with the extra damage flag when LW(8) is 1).
+ */
 static EVT_BEGIN(damage_check_event_sub)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(0))
     SWITCH(LW(0))
@@ -795,6 +887,11 @@ static EVT_BEGIN(damage_check_event_sub)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Wind-up of the web attack: the Pider turns to the target, shows its attack pose,
+ * raises its hand (part 2) to 110 degrees and holds for 20 frames, pulls back to 70 and then to 100 degrees,
+ * ending with the angle stored in unit work 4.
+ */
 static EVT_BEGIN(piders_attack_common_event1)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(8))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(8))
@@ -854,6 +951,10 @@ static EVT_BEGIN(piders_attack_common_event1)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Shorter wind-up used between rapid-fire web shots:
+ * the Pider raises its hand (part 2) from the stored angle to 100 degrees in 5 frames and stores the result.
+ */
 static EVT_BEGIN(piders_attack_common_event1_2)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(8))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(8))
@@ -896,6 +997,10 @@ static EVT_BEGIN(piders_attack_common_event1_2)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Recovery after the web attack: the Pider lowers its hand (part 2) from 100 degrees to 0 over 15 frames
+ * and returns to its stand pose (PAI_S_1).
+ */
 static EVT_BEGIN(piders_attack_common_event2)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(8))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(8))
@@ -911,6 +1016,10 @@ static EVT_BEGIN(piders_attack_common_event2)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Throws one web ball: the part in LW(7) is placed at the Pider,
+ * scaled to double size and arcs across to the target's hit position.
+ */
 static EVT_BEGIN(piders_attack_common_event3)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PAIDA_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, LW(7), STRING("PAI_A_3a"))
@@ -926,6 +1035,11 @@ static EVT_BEGIN(piders_attack_common_event3)
     RETURN
 EVT_END()
 
+/**
+ * The Pider's single web shot: picks the target (the fixed first target in a flag-2 battle,
+ * otherwise a sampled enemy), winds up, throws the web ball (part 3) at the target while the arm lowers,
+ * and resolves the damage with damage_check_event_sub. Then it waits half a second.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -961,6 +1075,12 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: The Pider's rapid-fire web attack: it picks several targets (piders_renzoku_attack_set_target stores
+ * them in unit work 5 to 10), winds up, and then throws three web balls in a row 30 frames apart (parts 3, 4 and
+ * 5), each one resolved by renzoku_attack_event_sub;
+ * the last throw is resolved separately (renzoku_attack_event_sub_last).
+ */
 static EVT_BEGIN(renzoku_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -1008,6 +1128,10 @@ static EVT_BEGIN(renzoku_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Resolves one web ball of the rapid-fire attack: it looks through the stored targets;
+ * if the ball's target is the final one it calls the last-hit handling, otherwise the normal one.
+ */
 static EVT_BEGIN(renzoku_attack_event_sub)
     SET_VALUE(LW(0), LW(5))
     SET_VALUE(LW(1), LW(6))
@@ -1032,6 +1156,10 @@ static EVT_BEGIN(renzoku_attack_event_sub)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Resolves a web ball that is not the last of the attack,
+ * through damage_check_event_sub with the "not last" arguments.
+ */
 static EVT_BEGIN(renzoku_attack_event_sub_no_last)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(10), 1)
@@ -1039,6 +1167,12 @@ static EVT_BEGIN(renzoku_attack_event_sub_no_last)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Resolves the last web ball of the rapid-fire attack:
+ * finds out whether its target was already hit by the earlier balls.
+ * If it was, the web ball is shown landing and the attack defence and damage are applied;
+ * otherwise damage_check_event_sub resolves it normally.
+ */
 static EVT_BEGIN(renzoku_attack_event_sub_last)
     SET_VALUE(LW(0), 5)
     SET_VALUE(LW(1), 8)
@@ -1068,6 +1202,10 @@ static EVT_BEGIN(renzoku_attack_event_sub_last)
     RETURN
 EVT_END()
 
+/**
+ * Wait (idle) event: refreshes the body animation (part 1) from the unit's pose table
+ * so it matches the current state.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

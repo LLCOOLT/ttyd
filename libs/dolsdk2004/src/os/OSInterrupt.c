@@ -81,6 +81,10 @@ static void ExternalInterruptHandler(register __OSException exception, register 
 extern void __RAS_OSDisableInterrupts_begin(void);
 extern void __RAS_OSDisableInterrupts_end(void);
 
+/**
+ * Assembly: clears the external-interrupt-enable bit in the MSR and returns the previous enable state.
+ * Pair with OSRestoreInterrupts to make a critical section.
+ */
 #ifdef __GEKKO__
 asm BOOL OSDisableInterrupts(void) {
     nofralloc
@@ -93,6 +97,7 @@ entry    __RAS_OSDisableInterrupts_end
     blr
 }
 
+/** Assembly: sets the external-interrupt-enable bit in the MSR and returns the previous enable state. */
 asm BOOL OSEnableInterrupts(void) {
     nofralloc
 
@@ -103,6 +108,10 @@ asm BOOL OSEnableInterrupts(void) {
     blr
 }
 
+/**
+ * Assembly: sets or clears the MSR interrupt-enable bit to match the state returned by OSDisableInterrupts
+ * or OSEnableInterrupts, and returns the previous state.
+ */
 asm BOOL OSRestoreInterrupts(register BOOL level) {
     nofralloc
 
@@ -120,6 +129,10 @@ _restore:
 }
 #endif
 
+/**
+ * Installs the handler for one hardware interrupt source (memory, DSP, AI, EXI, PI sources such as video,
+ * serial or DVD) and returns the previous one.
+ */
 __OSInterruptHandler __OSSetInterruptHandler(__OSInterrupt interrupt, __OSInterruptHandler handler) {
     __OSInterruptHandler oldHandler;
  
@@ -131,12 +144,18 @@ __OSInterruptHandler __OSSetInterruptHandler(__OSInterrupt interrupt, __OSInterr
     return oldHandler;
 }
 
+/** Returns the handler installed for one hardware interrupt source. */
 __OSInterruptHandler __OSGetInterruptHandler(__OSInterrupt interrupt) {
     ASSERTMSGLINE(433, InterruptHandlerTable, "__OSGetInterruptHandler(): OSInit() must be called in advance.");
     ASSERTMSGLINE(435, interrupt < 0x20, "__OSGetInterruptHandler(): unknown interrupt.");
     return InterruptHandlerTable[interrupt];
 }
 
+/**
+ * Places the interrupt handler table at 0x3040, clears it and the global and local masks,
+ * masks all interrupt groups and installs ExternalInterruptHandler as the external-interrupt exception handler.
+ * Called from OSInit.
+ */
 void __OSInterruptInit(void) {
     InterruptHandlerTable = (void*)OSPhysicalToCached(0x3040);
 
@@ -157,6 +176,11 @@ void __OSInterruptInit(void) {
     #endif
 }
 
+/**
+ * Writes the hardware interrupt-enable bits of the register group (memory, DSP, AI, EXI channel 0/1/2 or PI)
+ * that the highest mask bit belongs to, enabling the sources not set in current.
+ * Returns the mask bits still left to handle.
+ */
 static u32 SetInterruptMask(OSInterruptMask mask, OSInterruptMask current) {
     u32 reg;
 
@@ -294,10 +318,15 @@ static u32 SetInterruptMask(OSInterruptMask mask, OSInterruptMask current) {
     return mask;
 }
 
+/** Returns the local interrupt mask, the sources the game itself has masked off with OSSetInterruptMask. */
 OSInterruptMask OSGetInterruptMask(void) { 
     return *(OSInterruptMask *)OSPhysicalToCached(0x00C8);
 }
 
+/**
+ * Replaces the local interrupt mask (set bits are masked)
+ * and updates the hardware registers to the union with the OS-internal mask; returns the previous local mask.
+ */
 OSInterruptMask OSSetInterruptMask(OSInterruptMask local) {
     BOOL enabled;
     OSInterruptMask global;
@@ -316,6 +345,10 @@ OSInterruptMask OSSetInterruptMask(OSInterruptMask local) {
     return prev;
 }
 
+/**
+ * Masks (disables) the interrupt sources set in global in the OS-internal mask, updating the hardware;
+ * returns the previous internal mask.
+ */
 OSInterruptMask __OSMaskInterrupts(OSInterruptMask global) {
     BOOL enabled;
     OSInterruptMask prev;
@@ -335,6 +368,10 @@ OSInterruptMask __OSMaskInterrupts(OSInterruptMask global) {
     return prev;
 }
 
+/**
+ * Unmasks (enables) the interrupt sources set in global in the OS-internal mask, updating the hardware;
+ * returns the previous internal mask.
+ */
 OSInterruptMask __OSUnmaskInterrupts(OSInterruptMask global) {
     BOOL enabled;
     OSInterruptMask prev;
@@ -354,6 +391,11 @@ OSInterruptMask __OSUnmaskInterrupts(OSInterruptMask global) {
     return prev;
 }
 
+/**
+ * Handles an external interrupt: reads the PI cause register and each device's status, drops masked sources,
+ * picks the highest-priority pending one, and calls its handler with the scheduler disabled
+ * before resuming the context. Spurious or unhandled interrupts just resume the context.
+ */
 void __OSDispatchInterrupt(__OSException exception, OSContext* context) {
     u32 intsr;
     u32 reg;
@@ -497,6 +539,11 @@ void __OSDispatchInterrupt(__OSException exception, OSContext* context) {
 }
 
 #ifdef __GEKKO__
+/**
+ * Assembly entry installed for the external interrupt exception:
+ * saves the GPRs into the interrupted context, then branches to __OSDispatchInterrupt to find
+ * and call the registered handler.
+ */
 static asm void ExternalInterruptHandler(register __OSException exception,
                                          register OSContext* context) {
 #pragma unused(exception)

@@ -57,11 +57,16 @@ static EvtWord hit_check_event[95];
 static EvtWord wait_event[6];
 ExtTexInfo zakogun_ext_entry_data[49];
 
+/** Script helper: stores the battle unit id args[0] that the X-Naut horde is aiming at (work->targetId). */
 USER_FUNC(zakogun_set_target_id) {
     work->targetId = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Sets the animation of one horde member: which texture to start from (base),
+ * how many (num) and the frames per texture (div), and restarts the animation counter.
+ */
 void zakogun_set_pose(ZakoGun* zako, s32 base, s32 num, s32 div) {
     zako->poseBase = base;
     zako->poseNum = num;
@@ -69,6 +74,10 @@ void zakogun_set_pose(ZakoGun* zako, s32 base, s32 num, s32 div) {
     zako->poseCount = 0;
 }
 
+/**
+ * Script helper: when the horde takes damage, switches every one of the 500 X-Nauts to the hurt texture for the
+ * current formation (group 1, 2 or 3), once on the first call.
+ */
 USER_FUNC(zakogun_damage_pose) {
     s32 i;
     ZakoGun* zako;
@@ -92,6 +101,10 @@ USER_FUNC(zakogun_damage_pose) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: after the damage animation switches every X-Naut of the horde back to its idle texture for the
+ * current formation, once on the first call.
+ */
 USER_FUNC(zakogun_damage_pose_cancel) {
     s32 i;
     ZakoGun* zako;
@@ -117,6 +130,10 @@ USER_FUNC(zakogun_damage_pose_cancel) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Returns the battle unit of the horde: the first unit whose kind is 0x64,
+ * 0x65 or 0x66 (the three horde groups), or NULL.
+ */
 BattleUnit* zakogun_get_ptr(void) {
     BattleUnit* unit;
     s32 i;
@@ -261,6 +278,7 @@ BattleWeapon weapon_gundan_zako_group1_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Guess: init event of horde group 1: sets its work values and spawns the horde display (zakogun_entry). */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -274,6 +292,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: damage event of horde group 1: plays the horde hurt animation and, for a spin hammer hit,
+ * opens a gap in the formation, then runs the default damage flow.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -317,6 +339,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage event for the horde in group 1 when Mario hits it with a spin hammer:
+ * plays the hurt animation (zakogun_damage_pose), opens a gap in the formation (zakogun_start_sukima),
+ * then restores the X-Nauts and closes the gap.
+ */
 EVT_BEGIN(damage_event_kaiten_hammer)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -333,6 +360,10 @@ EVT_BEGIN(damage_event_kaiten_hammer)
     RETURN
 EVT_END()
 
+/**
+ * Guess: death event of horde group 1: the six X-Nauts fall (zakogun_dead1)
+ * and the group is removed from the battle.
+ */
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
     CALL(zakogun_dead1)
@@ -370,6 +401,10 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: attack event of horde group 1: picks a target,
+ * runs the six X-Nauts' attack (zakogun_attack1) and deals the weapon damage.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     SET_VALUE(LW(9), PTR(&weapon_gundan_zako_group1_attack))
@@ -401,6 +436,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: hit check event of horde group 1: before damage,
+ * starts the avoid animation of a target that dodges the attack.
+ */
 static EVT_BEGIN(hit_check_event)
     LOOP(0)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
@@ -443,6 +482,7 @@ static EVT_BEGIN(hit_check_event)
     RETURN
 EVT_END()
 
+/** Guess: wait (idle) event of horde group 1: keeps the default idle pose. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -500,6 +540,10 @@ ExtTexInfo zakogun_ext_entry_data[] = {
     {0},
 };
 
+/**
+ * Spawns the horde: registers the "ext_zakogun" NPC with the c_zako_n model
+ * and 500 extended poses driven by zakogun_ext_init and zakogun_ext_main.
+ */
 EVT_BEGIN(zakogun_entry)
     CALL(evt_npc_entry, STRING("ext_zakogun"), STRING("c_zako_n"))
     CALL(evt_npc_set_position, STRING("ext_zakogun"), 0, -1000, 0)
@@ -507,6 +551,10 @@ EVT_BEGIN(zakogun_entry)
     RETURN
 EVT_END()
 
+/**
+ * Init callback of the horde extended draw: allocates the horde controller (ZakoGunWork)
+ * and the 500 X-Naut records, selects formation 1 and looks up the stage objects if_body and if_wire.
+ */
 static void zakogun_ext_init(void) {
     u8* flags = &_battleWorkPointer->stageObjectWork.flags;
     BattleStageObject* body;
@@ -523,6 +571,7 @@ static void zakogun_ext_init(void) {
     *flags |= STAGE_OBJ_FLAG_IRON_FRAME_GONE | STAGE_OBJ_FLAG_NO_IRON_FRAME_FALL;
 }
 
+/** Main callback of the horde extended draw: runs the update for the current formation (group 1, 2 or 3). */
 static void zakogun_ext_main(void) {
     switch (work->flag) {
         case 0:
@@ -538,6 +587,7 @@ static void zakogun_ext_main(void) {
     dispEntry(CAMERA_3D, 0.0f, 1, zakogun_ext_disp, NULL);
 }
 
+/** Draw callback of the horde: loads render mode, vertices, textures and TEV then draws all the extended poses. */
 static void zakogun_ext_disp(CameraId camera, void* param) {
     extLoadRenderMode();
     extLoadVertex();
@@ -547,6 +597,10 @@ static void zakogun_ext_disp(CameraId camera, void* param) {
     extLoadTextureExit();
 }
 
+/**
+ * Script helper: writes the battle unit id of the horde leader (the unit of kind 0x63, the X-Naut officer) to
+ * args[0], or -1 if there is none.
+ */
 USER_FUNC(zakogun_get_kanbu_id_evtcmd) {
     BattleUnit* unit;
     s32 id = -1;
@@ -564,6 +618,7 @@ USER_FUNC(zakogun_get_kanbu_id_evtcmd) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns the battle unit id of the horde leader (kind 0x63), or -1 if there is none. */
 s32 zakogun_get_kanbu_id(void) {
     s32 i;
     BattleUnit* unit;
@@ -579,6 +634,7 @@ s32 zakogun_get_kanbu_id(void) {
     return id;
 }
 
+/** Script helper: starts formation 1: selects it (work->flag = 0) and sets up the first six X-Nauts of the pool. */
 USER_FUNC(zakogun_ext_init1) {
     s32 i;
     ExtdrvPose* pose = extGetPosePtr();
@@ -590,6 +646,10 @@ USER_FUNC(zakogun_ext_init1) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Common initialisation for one horde member: shows its pose,
+ * puts it below the stage at (0, -1000, 0) facing right and clears its state, timer and position.
+ */
 void zakogun_ext_init123_common(ExtdrvPose* pose, s32 i) {
     pose->flags = 1;
     PSMTXIdentity(*pose->mtx);
@@ -605,6 +665,11 @@ void zakogun_ext_init123_common(ExtdrvPose* pose, s32 i) {
     zakogun[i].rot.y = 0.0f;
 }
 
+/**
+ * Per-frame update of formation 1 (six X-Nauts):
+ * moves each one through its state machine (appearing, walking, attacking, hurt, dead, running away)
+ * and updates its pose matrix.
+ */
 void zakogun_ext_main1(void) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit = zakogun_get_ptr();
@@ -1118,6 +1183,7 @@ void zakogun_ext_main1(void) {
     }
 }
 
+/** Script helper for group 1 attack: sets all six X-Nauts to attack state 30 and blocks until they finish attacking. */
 USER_FUNC(zakogun_attack1) {
     s32 i;
     s32 n;
@@ -1135,6 +1201,7 @@ USER_FUNC(zakogun_attack1) {
     return n == 6 ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
+/** Script helper: puts the six X-Nauts of group 1 into their death state (80). */
 USER_FUNC(zakogun_dead1) {
     s32 i;
 
@@ -1144,6 +1211,10 @@ USER_FUNC(zakogun_dead1) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: sends the six X-Nauts of group 1 running away (state 90, escape animation);
+ * blocks until they have left.
+ */
 USER_FUNC(zakogun_escape1) {
     s32 i;
     s32 n;
@@ -1163,6 +1234,10 @@ USER_FUNC(zakogun_escape1) {
     return n == 6 ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
+/**
+ * Guess: script helper that opens a gap (sukima) in the formation so an attacker can strike through:
+ * sets each living X-Naut of group 1 to state 96 (args[0] = 1) or another state otherwise.
+ */
 static USER_FUNC(zakogun_start_sukima) {
     s32 mode = evtGetValue(event, event->args[0]);
     s32 i;
@@ -1181,6 +1256,7 @@ static USER_FUNC(zakogun_start_sukima) {
     return EVT_RETURN_DONE;
 }
 
+/** Guess: script helper that closes the gap again: sets each living X-Naut of group 1 back to state 20. */
 static USER_FUNC(zakogun_end_sukima) {
     s32 i;
 

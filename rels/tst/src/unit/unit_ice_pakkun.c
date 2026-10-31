@@ -168,6 +168,10 @@ static BattleWeapon weapon_ice_pakkun_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Attack script of the Frost Piranha: when battle flag 2 is set it attacks straight away;
+ * otherwise, after the item-use check, it always uses its normal attack (weapon_ice_pakkun_attack).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -248,6 +252,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init script of the Frost Piranha: installs the wait, attack,
+ * damage and confusion handlers (confusion reuses the attack), sets the hit cursor offset to 50,
+ * records the shadow scale (shadow_scale_memory) and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -259,6 +268,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Spike spark shown when an attacker is hurt by (or avoids) the spiked head:
+ * plays pose type 31 for a quarter second, returns to the PKF_S_1 pose,
+ * then spawns the toge_flush effect above the unit (63 up when Huge, 37 when Tiny, else 50).
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 31)
     WAIT_MS(250)
@@ -281,6 +295,10 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: runs the shared default damage script (btldefaultevt_Damage) with its default parameters
+ * (LW(10) = -2, LW(11) = 1).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -288,6 +306,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler for when the Frost Piranha was hurt by a counter:
+ * plays PKF_D_1 for a second, and unless the hit knocked it out (damage flag 0x200) without a Life Shroom revive
+ * (0x800) it burrows back to its place with return_event.
+ */
 static EVT_BEGIN(counter_damage_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_D_1"))
     WAIT_MS(1000)
@@ -302,6 +325,12 @@ static EVT_BEGIN(counter_damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Called when the Frost Piranha is knocked off the ceiling:
+ * it clears the ceiling fall handler, burrows (PKF_E_4, shrinking its shadow),
+ * reappears on the ground at height 0 (PKF_E_1), restores the ground hit offsets and pose table,
+ * and returns to the PKF_S_1 idle pose.
+ */
 static EVT_BEGIN(ceil_fall_ready_event)
     CALL(btlevtcmd_SetEventCeilFall, BTL_UNIT_SELF, 0)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PAKKUN_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -338,6 +367,13 @@ static EVT_BEGIN(ceil_fall_ready_event)
     RETURN
 EVT_END()
 
+/**
+ * Returns the Frost Piranha to its home after an attack:
+ * it burrows (PKF_E_2, shrinking its shadow) and,
+ * depending on whether a ceiling spot exists (pakkun_ceil_exist) and a random pick,
+ * reappears either on the ground (PKF_E_1, ground tables) or hanging from the ceiling at height 130 (PKF_E_3,
+ * ceiling hit offsets and pose table, with the ceiling fall handler).
+ */
 static EVT_BEGIN(return_event)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(pakkun_ceil_exist, LW(0))
@@ -408,6 +444,13 @@ static EVT_BEGIN(return_event)
     RETURN
 EVT_END()
 
+/**
+ * The Frost Piranha's normal attack (weapon_ice_pakkun_attack):
+ * it burrows (PKF_E_2, or PKF_E_4 from the ceiling) and pops up in front of the target,
+ * then bites in three poses (PKF_A_1A to A_1C) with the attack sound;
+ * the usual avoid, guard and hit check follows, with a camera shake on a hit,
+ * and it returns home with return_event.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -507,11 +550,16 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: grows the body part's shadow scale back from 0 to the value kept by shadow_scale_memory over 15
+ * frames (blocks until done).
+ */
 static USER_FUNC(shadow_scale_return) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -528,6 +576,10 @@ static USER_FUNC(shadow_scale_return) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper: shrinks the body part's shadow from its remembered scale to 0 over 15 frames (blocks until
+ * done), so the shadow vanishes while the plant is underground.
+ */
 static USER_FUNC(shadow_scale_small) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -544,6 +596,10 @@ static USER_FUNC(shadow_scale_small) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper: remembers the body part's current shadow scale in work[0] for the two helpers that shrink
+ * and restore it.
+ */
 static USER_FUNC(shadow_scale_memory) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -553,6 +609,10 @@ static USER_FUNC(shadow_scale_memory) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: writes 0 to args[0] when the stage's iron frame is gone (STAGE_OBJ_FLAG_IRON_FRAME_GONE) and 1
+ * while the ceiling still exists, so the plant knows whether it can hang from it.
+ */
 static USER_FUNC(pakkun_ceil_exist) {
     EvtWord* args = event->args;
 

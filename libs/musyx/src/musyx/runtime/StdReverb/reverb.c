@@ -8,6 +8,7 @@
 
 extern double pow(double x, double y);
 
+/** Sets the read point of a delay line so its output lags the input by len samples. */
 static inline void DLsetdelay(_SND_REVHI_DELAYLINE* delayline, s32 len) {
   delayline->outPoint = delayline->inPoint - (len * sizeof(f32));
   while (delayline->outPoint < 0) {
@@ -15,6 +16,7 @@ static inline void DLsetdelay(_SND_REVHI_DELAYLINE* delayline, s32 len) {
   }
 }
 
+/** Allocates a delay line of length samples, clears it and sets a default lag of half its length. */
 static inline void DLcreate(_SND_REVHI_DELAYLINE* delayline, s32 length) {
   delayline->length = (s32)length * sizeof(f32);
   delayline->inputs = (f32*)salMalloc(length * sizeof(f32));
@@ -25,7 +27,13 @@ static inline void DLcreate(_SND_REVHI_DELAYLINE* delayline, s32 length) {
   delayline->outPoint = 0;
 }
 
+/** Frees a delay line's sample buffer. */
 static inline void DLdelete(_SND_REVHI_DELAYLINE* delayline) { salFree(delayline->inputs); }
+/**
+ * Builds the high-quality reverb for 32 kHz: per channel three comb filters (lengths 1789, 1999, 2333)
+ * and three all-pass filters (433, 149 and a per-channel length), mix, damping,
+ * crosstalk and an optional pre-delay. Returns FALSE if a setting is out of range.
+ */
 bool ReverbHICreate(_SND_REVHI_WORK* rev, f32 coloration, f32 time, f32 mix, f32 damping,
                     f32 preDelay, f32 crosstalk) {
   static int lens[] = {1789, 1999, 2333, 433, 149, 47, 73, 67};
@@ -83,6 +91,10 @@ bool ReverbHICreate(_SND_REVHI_WORK* rev, f32 coloration, f32 time, f32 mix, f32
 }
 
 #if 0 // stripped in TTYD
+/**
+ * Changes the settings of a high-quality reverb by freeing its delay lines
+ * and creating it again (removed from this game build).
+ */
 bool ReverbHIModify(struct _SND_REVHI_WORK* rv, float coloration, float time, float mix,
                     float damping, float preDelay, float crosstalk) {
   u8 i; // r30
@@ -608,6 +620,10 @@ static void HandleReverb(s32*, SND_AUX_REVERBHI* rev, s32) {
 }
 #endif
 
+/**
+ * Runs the high-quality reverb on one frame: for the left channel it first applies the crosstalk blend with the
+ * right channel (if any), then reverberates the left, right and surround buffers.
+ */
 void ReverbHICallback(s32* left, s32* right, s32* surround, SND_AUX_REVERBHI* rev) {
   u8 i;
   for (i = 0; i < 3; ++i) {
@@ -629,6 +645,10 @@ void ReverbHICallback(s32* left, s32* right, s32* surround, SND_AUX_REVERBHI* re
 }
 
 #if 0 // stripped in TTYD
+/**
+ * Frees the nine all-pass and nine comb delay lines
+ * and the pre-delay buffers of the high-quality reverb (removed from this game build).
+ */
 void ReverbHIFree(_SND_REVHI_WORK* rv) {
   u8 i;
   for (i = 0; i < 9; ++i) {

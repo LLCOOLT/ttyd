@@ -60,6 +60,11 @@ EvtWord kpa_act_stg2_item[] = {
     KPA_ITEM(1150.0f, 387.5f), KPA_ITEM_END,
 };
 
+/**
+ * Watches Bowser in the stage: each frame it checks whether he is dead (evt_koopa_chk_dead)
+ * or has fallen below y = -20, then runs the death handler (kpa_dead) if he died,
+ * or the pit fall handler (kpa_fall_sub) if he fell.
+ */
 static EVT_BEGIN(kpa_fall)
     SET_VALUE(LF(0), 0)
     LOOP(0)
@@ -82,6 +87,10 @@ static EVT_BEGIN(kpa_fall)
     RETURN
 EVT_END()
 
+/**
+ * Gives Bowser a small constant push (hosei) while he is between x = -175 and -100 below y = 400:
+ * the sea current at this part of stage 2. Runs until the stage ends.
+ */
 EVT_BEGIN(kairyu_evt)
     CALL(evt_seq_wait, 2)
     LOOP(0)
@@ -101,6 +110,14 @@ EVT_BEGIN(kairyu_evt)
     RETURN
 EVT_END()
 
+/**
+ * Guess: run when Bowser lands on the stage's jump platform:
+ * kills the event whose id is in GW(15) (the stage's countdown, probably),
+ * saves Bowser's current power level (evt_koopa_get_level), loads kpa_04 after 600 ms,
+ * turns the camera off once he is above y = 400
+ * and launches him up with evt_mario_jump_jumpstand 700 units above the platform (a lower launch speed in the US
+ * demo and earlier). The EU release also cancels the attack mode first.
+ */
 static EVT_BEGIN(jumpstand_evt)
     DELETE_EVENT(GW(15))
 #if VERSION == VERSION_EU
@@ -136,6 +153,11 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Map init for kpa_03, side-scrolling stage 2 (by the sea):
+ * builds the blocks and coins from kpa_act_stg2_*, plays the sea animation, and starts the pit watcher, HUD,
+ * intro, current and clock. It continues in kpa_04.
+ */
 EVT_BEGIN(kpa_03_init_evt)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL_CHILD(kpa_init)

@@ -111,20 +111,30 @@ EndExtData* end_moa_ext_data;
 EndMoa* end_moa_tbl;
 extern CreditNpc R_credits_npc_info[152];
 #endif
-// tan() on a float, inlined; named apart from the C library's own tanf.
+/** tan() on a float, inlined; named apart from the C library's own tanf. */
 static inline f32 end_tanf(f32 x) {
     return tan(x);
 }
 
+// Forward declaration of evt_end_npc_silhouette_on (defined below).
 USER_FUNC(evt_end_npc_silhouette_on);
+// Forward declaration of evt_end_font_restore (defined below).
 USER_FUNC(evt_end_font_restore);
+// Forward declaration of end_bgm_wait_stop (defined below).
 USER_FUNC(end_bgm_wait_stop);
+// Forward declaration of evt_end_staff_roll_init (defined below).
 USER_FUNC(evt_end_staff_roll_init);
+// Forward declaration of evt_end_staff_roll_msg_main (defined below).
 USER_FUNC(evt_end_staff_roll_msg_main);
+// Forward declaration of evt_end_image_set_blend (defined below).
 USER_FUNC(evt_end_image_set_blend);
+// Forward declaration of evt_end_image_set_mode (defined below).
 USER_FUNC(evt_end_image_set_mode);
+// Forward declaration of evt_end_image_set_overlay_alpha (defined below).
 USER_FUNC(evt_end_image_set_overlay_alpha);
+// Forward declaration of evt_end_image_set_alpha (defined below).
 USER_FUNC(evt_end_image_set_alpha);
+// Forward declaration of evt_end_image_disp_entry (defined below).
 USER_FUNC(evt_end_image_disp_entry);
 void end_ext_moamoa_dispent(void);
 void end_ext_disp(CameraId cameraId, void* param);
@@ -169,6 +179,11 @@ f32 fd_end_00_one_364;
 
 // the REL entry points (the Japanese demo has them in end_module.c)
 
+/**
+ * REL prolog of the ending module (the releases keep it in end_00.c):
+ * runs the static constructors, registers the init event of end_00 and, in the US and later versions,
+ * switches off the 2D camera's letterbox bars so the credits fill the screen.
+ */
 void _prolog(void) {
     voidfunctionptr* ctor;
 
@@ -183,6 +198,10 @@ void _prolog(void) {
 #endif
 }
 
+/**
+ * REL epilog of the ending module: runs the static destructors, ends the staff roll (end_staff_roll_exit) and,
+ * in the US and later versions, lets the 2D letterbox bars come back.
+ */
 void _epilog(void) {
     voidfunctionptr* dtor;
 
@@ -195,14 +214,24 @@ void _epilog(void) {
 #endif
 }
 
+/** Target of unresolved relocations; the module has no code to run for them, so it is empty. */
 void _unresolved(void) {
 }
 #endif
 
+/**
+ * Map TEV callback that makes a model draw as a flat black silhouette:
+ * it replaces the colour of the stage before the callback's stage with black.
+ */
 void end_silhouette_tev(MapTevCallbackInfo* info) {
     GXSetTevColorIn(info->tevStage - 1, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ONE);
 }
 
+/**
+ * Animation GX callback used with the silhouette:
+ * sets opaque drawing with the alpha test at 0x80 and depth writes on, so the silhouettes have clean edges,
+ * and records the display mode for the animation driver.
+ */
 void end_silhouette_rendermode(s32 wXluStage) {
     animGetPtr()->currDispMode = wXluStage;
     GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
@@ -211,6 +240,11 @@ void end_silhouette_rendermode(s32 wXluStage) {
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 }
 
+/**
+ * Draw callback for one parade character (CreditActor):
+ * draws its pose three times as a black silhouette (three animation draw passes)
+ * unless the roll has ended (GF(10) set).
+ */
 void end_credit_npc_disp(CameraId cameraId, void* param) {
     CreditActor* actor = param;
 
@@ -225,6 +259,12 @@ void end_credit_npc_disp(CameraId cameraId, void* param) {
     }
 }
 
+/**
+ * Script helper: for credit NPC number args[0] writes into args[1] how long the parade script waits
+ * before sending the next one: 0 for a character with its own script,
+ * 1 for a normal silhouette (about 2 seconds), and in the Japanese release
+ * and later 2 for the Gazigazi (a longer 6 second wait). Out-of-range numbers give 0.
+ */
 USER_FUNC(evt_end_credit_npc_get_wait_type) {
     EvtWord* args = event->args;
     u32 id = evtGetValue(event, args[0]);
@@ -614,6 +654,13 @@ CreditNpc R_credits_npc_info[] = {
 };
 #endif
 
+/**
+ * Runs one silhouette of the character parade (credit NPC number args[0] in R_credits_npc_info).
+ * Characters with their own script (evt) just start it.
+ * Others get a CreditActor that is drawn as a silhouette spinning around a screen corner chosen by the current
+ * staff roll position, rotating until it passes its limit angle and is then freed.
+ * The next character's animation group is requested early so it is loaded in time.
+ */
 USER_FUNC(evt_end_credit_npc_main) {
     s32 id = evtGetValue(event, event->args[0]);
     BOOL inBattle;
@@ -762,6 +809,12 @@ USER_FUNC(evt_end_credit_npc_main) {
     return 0;
 }
 
+/**
+ * Runs the parade of characters during the staff roll:
+ * goes through R_credits_npc_info in order, starts evt_end_credit_npc_main for each
+ * and waits between characters as evt_end_credit_npc_get_wait_type says,
+ * until the table ends or the roll finishes.
+ */
 EVT_BEGIN(end_credit_npc_parade)
     SET_VALUE(LW(0), 0)
     LOOP(0)
@@ -794,8 +847,11 @@ EVT_BEGIN(end_credit_npc_parade)
 EVT_END()
 
 #if VERSION <= VERSION_DEMO_US
-// Requests the animation groups of the credit NPCs after the ones already loaded, one for each NPC that has left the
-// screen, so the parade's next characters are ready in time; runs until the roll ends (GF(10)).
+/**
+ * Requests the animation groups of the credit NPCs after the ones already loaded,
+ * one for each NPC that has left the screen, so the parade's next characters are ready in time;
+ * runs until the roll ends (GF(10)).
+ */
 USER_FUNC(evt_end_credit_npc_preload) {
     BOOL inBattle = gp->inBattle != 0;
     s32 i;
@@ -817,6 +873,11 @@ s32 end_overlay_tex_tbl[6] = {52, 52, 54, 55, 55, 56};
 #endif
 
 #if VERSION >= VERSION_JP
+/**
+ * Japanese release and later: loops the two ending pictures during the last credit image:
+ * shows one, cross-fades to the next and back, with long holds (about 18 s) and 4 s fades,
+ * by driving evt_end_image_set_mode and the TEV blend value.
+ */
 EVT_BEGIN(end_image_blend_loop)
     LOOP(0)
         CALL(evt_end_image_set_mode, 1)
@@ -874,8 +935,10 @@ EVT_END()
 #endif
 
 #if VERSION <= VERSION_DEMO_US
-// The demo draws only the roll's picture (the id wraps around the picture count), with no overlay or blended
-// pictures, a little further out to the sides.
+/**
+ * The demo draws only the roll's picture (the id wraps around the picture count),
+ * with no overlay or blended pictures, a little further out to the sides.
+ */
 void end_image_disp(CameraId cameraId, void* param) {
     s32 i;
     f32 w;
@@ -960,6 +1023,12 @@ void end_image_disp(CameraId cameraId, void* param) {
     }
 }
 #else
+/**
+ * Guess (details): draw callback of the ending pictures (Japanese release and later):
+ * draws the picture selected by GW(11) from ending.tpl in the position given by GW(12), with the fade alpha,
+ * the overlay picture and the cross-blend of end_image_blend_loop;
+ * for picture 9 it shows the version where Ms. Mowz was met with Koops if that flag is set.
+ */
 void end_image_disp(CameraId cameraId, void* param) {
     s32 i;
     f32 w;
@@ -1124,6 +1193,12 @@ void end_image_disp(CameraId cameraId, void* param) {
 }
 #endif
 
+/**
+ * Runs the pictures shown beside the credits: waits until the roll asks for a picture (GW(10) = 1),
+ * fades it in over 500 ms, holds it until GW(10) = 2 and fades it out.
+ * For picture 49, the last one, the Japanese release and later also fade in an overlay, change the music,
+ * loop the blended pictures until the player presses a button and then start end_return_title_evt.
+ */
 EVT_BEGIN(end_image_main_evt)
     LOOP(0)
         IF_INT_EQUAL(GF(10), 1)
@@ -1212,6 +1287,11 @@ EVT_BEGIN(end_image_main_evt)
     RETURN
 EVT_END()
 
+/**
+ * End of the credits: fades the screen to black, restores the font, sets the story to STORY_STG9_01_END_CREDITS,
+ * saves the game to the memory card (the European release first heals Mario and the party),
+ * fades the music out and changes map to the title screen.
+ */
 EVT_BEGIN(end_return_title_evt)
     CALL(evt_fade_entry, FADE_OUT_BLACK_2D, 2000, 0, 0, 0)
     CALL(evt_fade_end_wait)
@@ -1242,6 +1322,12 @@ EVT_BEGIN(end_return_title_evt)
     RETURN
 EVT_END()
 
+/**
+ * Map init for end_00 (the only room): hides Mario and the partner, sets the fixed camera and black background,
+ * loads the ending data, starts the character parade and the staff roll message script,
+ * and starts the staff roll music (BGM_STAFF_ROLL1).
+ * The demo versions also start the NPC preload script and queue the return to the title.
+ */
 EVT_BEGIN(end_00_init_evt)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
@@ -1271,8 +1357,10 @@ EVT_BEGIN(end_00_init_evt)
 EVT_END()
 
 #if VERSION <= VERSION_DEMO_US
-// the demo's silhouette scripts: other models and paths than the releases' (most rise straight up through the middle
-// of the screen)
+/**
+ * the demo's silhouette scripts: other models and paths than the releases' (most rise straight up through the
+ * middle of the screen)
+ */
 EVT_BEGIN(end_credit_gesso_evt)
     CALL(evt_npc_entry, STRING("gesso"), STRING("c_gesso"))
     CALL(evt_npc_set_anim, STRING("gesso"), STRING("GSO_S2_1"))
@@ -1292,6 +1380,7 @@ EVT_BEGIN(end_credit_gesso_evt)
     RETURN
 EVT_END()
 
+/** Demo parade script for Hooktail (ゴンババ): the silhouette slides across the screen from the right. */
 EVT_BEGIN(end_credit_gonbaba_evt)
     CALL(evt_npc_entry, STRING("gonbaba"), STRING("c_gonbaba"))
     CALL(evt_npc_set_anim, STRING("gonbaba"), STRING("GNB_S_1"))
@@ -1322,6 +1411,11 @@ EVT_BEGIN(end_credit_gonbaba_evt)
     RETURN
 EVT_END()
 
+/**
+ * Demo parade script for the first Magnus von Grapple robot model (c_mb_robo_1b):
+ * rises up through the middle of the screen as a silhouette.
+ * Guess: batten is the robot's name from the model name.
+ */
 EVT_BEGIN(end_credit_batten_evt)
     CALL(evt_npc_entry, STRING("batten"), STRING("c_mb_robo_1b"))
     CALL(evt_npc_set_anim, STRING("batten"), STRING("MGN_W_1"))
@@ -1341,6 +1435,7 @@ EVT_BEGIN(end_credit_batten_evt)
     RETURN
 EVT_END()
 
+/** Demo parade script for Cortez (korutesu): rises up through the middle of the screen. */
 EVT_BEGIN(end_credit_korutesu_evt)
     CALL(evt_npc_entry, STRING("kortesu"), STRING("c_korutesu1"))
     CALL(evt_npc_set_anim, STRING("kortesu"), STRING("KRT_S_1"))
@@ -1360,6 +1455,10 @@ EVT_BEGIN(end_credit_korutesu_evt)
     RETURN
 EVT_END()
 
+/**
+ * Demo parade script for the second robot model (c_mb_robo_2b):
+ * rises up through the middle of the screen as a silhouette.
+ */
 EVT_BEGIN(end_credit_batten2_evt)
     CALL(evt_npc_entry, STRING("batten2"), STRING("c_mb_robo_2b"))
     CALL(evt_npc_set_anim, STRING("batten2"), STRING("MGN_W_1"))
@@ -1379,6 +1478,7 @@ EVT_BEGIN(end_credit_batten2_evt)
     RETURN
 EVT_END()
 
+/** Demo parade script for the Shadow Queen model (c_q_kage): rises up through the middle of the screen. */
 EVT_BEGIN(end_credit_queen_evt)
     CALL(evt_npc_entry, STRING("queen"), STRING("c_q_kage"))
     CALL(evt_npc_set_anim, STRING("queen"), STRING("KRT_S_1"))
@@ -1398,6 +1498,7 @@ EVT_BEGIN(end_credit_queen_evt)
     RETURN
 EVT_END()
 #else
+/** Parade script (releases) for the Blooper (gesso, model c_gesso): rises up through the screen as a silhouette. */
 EVT_BEGIN(end_credit_gesso_evt)
     CALL(evt_npc_entry, STRING("gesso"), STRING("c_gesso"))
     CALL(evt_npc_set_anim, STRING("gesso"), STRING("GSO_S2_1"))
@@ -1417,6 +1518,10 @@ EVT_BEGIN(end_credit_gesso_evt)
     RETURN
 EVT_END()
 
+/**
+ * Parade script (releases) for Hooktail (ゴンババ):
+ * shrunk to half size and turned around, she slides in from the left past the camera.
+ */
 EVT_BEGIN(end_credit_gonbaba_evt)
     CALL(evt_npc_entry, STRING("gonbaba"), STRING("c_gonbaba"))
     CALL(evt_npc_set_anim, STRING("gonbaba"), STRING("GNB_S_3"))
@@ -1449,6 +1554,10 @@ EVT_BEGIN(end_credit_gonbaba_evt)
     RETURN
 EVT_END()
 
+/**
+ * Parade script (releases) for the second Magnus robot model flipped upside down (c_mb_robo_2a):
+ * falls down the screen as a silhouette.
+ */
 EVT_BEGIN(end_credit_batten2_evt)
     CALL(evt_npc_entry, STRING("batten2"), STRING("c_mb_robo_2a"))
     CALL(evt_npc_set_anim, STRING("batten2"), STRING("J_2"))
@@ -1469,6 +1578,7 @@ EVT_BEGIN(end_credit_batten2_evt)
     RETURN
 EVT_END()
 
+/** Parade script (releases) for Atomic Boo (c_atmic_trs): drifts across the screen at 0.8 scale. */
 EVT_BEGIN(end_credit_atomic_evt)
     CALL(evt_npc_entry, STRING("atomic"), STRING("c_atmic_trs"))
     CALL(evt_npc_set_anim, STRING("atomic"), STRING("W_1"))
@@ -1490,6 +1600,7 @@ EVT_BEGIN(end_credit_atomic_evt)
     RETURN
 EVT_END()
 
+/** Parade script (releases) for Cortez (korutesu): slides in from the left, low on the screen. */
 EVT_BEGIN(end_credit_korutesu_evt)
     CALL(evt_npc_entry, STRING("korutesu"), STRING("c_korutesu1"))
     CALL(evt_npc_set_anim, STRING("korutesu"), STRING("KRT_S_1"))
@@ -1521,6 +1632,10 @@ EVT_BEGIN(end_credit_korutesu_evt)
     RETURN
 EVT_END()
 
+/**
+ * Parade script (releases) for the c_bom_sen model, a Bob-omb character: falls down the screen.
+ * Guess: this is Admiral Bobbery, from the model name.
+ */
 EVT_BEGIN(end_credit_para_evt)
     WAIT_MS(1000)
     CALL(evt_npc_entry, STRING("para"), STRING("c_bom_sen"))
@@ -1541,6 +1656,10 @@ EVT_BEGIN(end_credit_para_evt)
     RETURN
 EVT_END()
 
+/**
+ * Parade script (releases) for the first Magnus robot model (c_mb_robo_1a):
+ * slides in from the right as a silhouette at 0.6 scale.
+ */
 EVT_BEGIN(end_credit_batten_evt)
     CALL(evt_npc_entry, STRING("batten"), STRING("c_mb_robo_1a"))
     CALL(evt_npc_set_anim, STRING("batten"), STRING("W_1"))
@@ -1572,6 +1691,7 @@ EVT_BEGIN(end_credit_batten_evt)
     RETURN
 EVT_END()
 
+/** Parade script (releases) for the Shadow Queen (c_q_kage_m): slides in from the left at half size. */
 EVT_BEGIN(end_credit_queen_evt)
     WAIT_MS(7000)
     CALL(evt_npc_entry, STRING("queen"), STRING("c_q_kage_m"))
@@ -1613,33 +1733,54 @@ const char* end_moa_ext_anim = "c_n_moa_a";
 const char* end_moa_ext_pose = "S_1";
 #endif
 
+/** Script helper: queues the ending picture draw callback (end_image_disp) for this frame. */
 USER_FUNC(evt_end_image_disp_entry) {
     dispEntry(CAMERA_3D, 0.0f, 7, end_image_disp, NULL);
     return 0;
 }
 
+/** Script helper: sets the opacity (0 to 255) of the ending picture to args[0]. */
 USER_FUNC(evt_end_image_set_alpha) {
     end_wp->alpha = evtGetValue(event, event->args[0]);
     return 2;
 }
 
 #if VERSION >= VERSION_JP
+/**
+ * Script helper: sets args[0] as the second alpha value (alpha2) of the ending pictures.
+ * Guess: the opacity of the overlay picture drawn over the main one.
+ */
 USER_FUNC(evt_end_image_set_overlay_alpha) {
     end_wp->alpha2 = evtGetValue(event, event->args[0]);
     return 2;
 }
 
+/**
+ * Guess: selects which of the two alternating ending pictures end_image_disp shows (args[0]: 0 neither, 1 the
+ * first, 2 the second); end_image_blend_loop switches it.
+ */
 USER_FUNC(evt_end_image_set_mode) {
     end_wp->mode = evtGetValue(event, event->args[0]);
     return 2;
 }
 
+/**
+ * Script helper: sets args[0] (0 to 255) as the TEV blend alpha of the ending pictures.
+ * Guess: the cross-fade amount between the two alternating pictures.
+ */
 USER_FUNC(evt_end_image_set_blend) {
     end_wp->tevAlpha = evtGetValue(event, event->args[0]);
     return 2;
 }
 #endif
 
+/**
+ * Script helper that runs the whole staff roll:
+ * steps through end_staff_roll_msg_tbl, and for each entry opens two message windows (job title and names) at
+ * one of five screen positions, waits the entry's time, closes them and starts the next,
+ * while telling end_image_main_evt when to show each picture (GW(10) and GW(11)).
+ * Starts end_image_main_evt on its first call.
+ */
 USER_FUNC(evt_end_staff_roll_msg_main) {
     s32 state = event->userdata[0];
     s32 idx = event->userdata[1];
@@ -1868,6 +2009,12 @@ USER_FUNC(evt_end_staff_roll_msg_main) {
     return 0;
 }
 
+/**
+ * Script helper: prepares the staff roll.
+ * On the first call it resets the roll state, mutes the sound effects,
+ * and in the Japanese versions switches the language to English for the credits text;
+ * then it waits until ending.tpl (the picture file) and the first characters' animation groups have loaded.
+ */
 USER_FUNC(evt_end_staff_roll_init) {
     BOOL inBattle = gp->inBattle ? TRUE : FALSE;
     s32 i;
@@ -1923,6 +2070,10 @@ USER_FUNC(evt_end_staff_roll_init) {
 
 // Kept out of line: inlining it into its caller changes the code.
 #pragma dont_inline on
+/**
+ * Cleans up after the staff roll: frees the ending picture file, lets sound effects play again and,
+ * in the Japanese versions, switches back to Japanese text (and in the demos reloads the global messages).
+ */
 void end_staff_roll_exit(void) {
     fileFree(end_wp->tpl);
     psndClearFlag(PSND_FLAG_SFX_OFF);
@@ -1937,6 +2088,10 @@ void end_staff_roll_exit(void) {
 }
 #pragma dont_inline reset
 
+/**
+ * Script helper: puts the font and messages back to normal before the game continues:
+ * restores Japanese text where the credits switched it, or turns the sound effects back on.
+ */
 USER_FUNC(evt_end_font_restore) {
 #if VERSION <= VERSION_JP
     gp->language = 0;
@@ -1951,11 +2106,19 @@ USER_FUNC(evt_end_font_restore) {
     return 2;
 }
 
+/**
+ * Script helper: sets the sound flag that makes the music stop wait for the current track to end
+ * (PSND_FLAG_WAIT_BGM_0).
+ */
 USER_FUNC(end_bgm_wait_stop) {
     psndSetFlag(PSND_FLAG_WAIT_BGM_0);
     return 2;
 }
 
+/**
+ * Script helper: turns the NPC named by args[0] into a black silhouette by hooking the silhouette TEV callback
+ * and GX callback into its animation pose.
+ */
 USER_FUNC(evt_end_npc_silhouette_on) {
     NpcEntry* npc = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
 
@@ -1966,12 +2129,18 @@ USER_FUNC(evt_end_npc_silhouette_on) {
 }
 
 #if VERSION >= VERSION_JP
+/** Random float in [min, max] from rand(). */
 f32 end_randf(f32 min, f32 max) {
     f32 r = rand() / 32767.0f;
 
     return r * (max - min) + min;
 }
 
+/**
+ * Ext-pose init for the Smorg silhouette in the credits:
+ * gives each of the 300 small Moamoa a random offset of up to 10 units
+ * and assigns it to a chain (between two points of the big Smorg's skeleton) and a place along that chain.
+ */
 void end_ext_moamoa_init(void) {
     ExtdrvPose* pose = extGetPosePtr();
     EndMoa* elem = end_moa_tbl;
@@ -1991,6 +2160,12 @@ void end_ext_moamoa_init(void) {
     }
 }
 
+/**
+ * Per-frame update of the Smorg silhouette: places each small Moamoa on its chain between two joints of the big
+ * Smorg model (c_g_moamoa), hides it when a joint is off screen, scales it with the model,
+ * and sets its animation frame from the retrace counter.
+ * Then clears the model's joint positions for the next frame.
+ */
 void end_ext_moamoa_main(void) {
     NpcEntry* npc = npcNameToPtr("モアモア");
     Vec* wpos = *animPoseGetAnimPosePtr(npc->poseId)->worldPositions;
@@ -2044,6 +2219,10 @@ void end_ext_moamoa_main(void) {
     }
 }
 
+/**
+ * Draw callback for the Smorg silhouette: draws all the small Moamoa in plain black using the silhouette render
+ * mode.
+ */
 void end_ext_disp(CameraId cameraId, void* param) {
     extLoadRenderMode();
     extLoadVertex();
@@ -2055,10 +2234,16 @@ void end_ext_disp(CameraId cameraId, void* param) {
     extLoadTextureExit();
 }
 
+/** Queues end_ext_disp into the 3D camera every frame. */
 void end_ext_moamoa_dispent(void) {
     dispEntry(CAMERA_3D, 0.0f, 1, end_ext_disp, NULL);
 }
 
+/**
+ * Script helper: allocates the Smorg silhouette's tables (300 Moamoa, 40 animation frames,
+ * the chains between joints of the big Smorg model),
+ * turns on world-position tracking for its pose and writes the animation table to LW(10) for evt_ext_entry.
+ */
 USER_FUNC(evt_end_moamoa_init) {
     NpcEntry* npc = npcNameToPtr("モアモア");
     AnimationPose* ap;
@@ -2094,6 +2279,7 @@ USER_FUNC(evt_end_moamoa_init) {
     return 2;
 }
 
+/** Script helper: turns off the joint tracking, frees the Smorg silhouette's tables and resets the ext-pose driver. */
 USER_FUNC(evt_end_moamoa_exit) {
     NpcEntry* npc = npcNameToPtr("モアモア");
 
@@ -2105,6 +2291,10 @@ USER_FUNC(evt_end_moamoa_exit) {
     return 2;
 }
 
+/**
+ * Parade script for the giant Smorg: builds the big Smorg out of 300 small Moamoa as a silhouette,
+ * raises it up the screen over 2 seconds, holds it for 3 seconds, lowers it away, and cleans it up.
+ */
 EVT_BEGIN(end_credit_moamoa_evt)
     CALL(evt_npc_entry, STRING("モアモアダミー"), STRING("c_n_moa_a"))
     CALL(evt_npc_set_position, STRING("モアモアダミー"), 0, -1000, 0)

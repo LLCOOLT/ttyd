@@ -22,7 +22,7 @@ typedef struct CamShiftWork {
     u8 pad_34[0x38 - 0x34]; // 0x34, pads to the 8-byte alignment
 } CamShiftWork;
 
-// The demo times the shift with the field clock (it stops in battle), retail with the render clock.
+/** The demo times the shift with the field clock (it stops in battle), retail with the render clock. */
 static inline OSTime camShiftClock(void) {
 #if VERSION <= VERSION_DEMO_US
     return gp->renderFieldTime;
@@ -34,6 +34,11 @@ static inline OSTime camShiftClock(void) {
 static CamShiftWork work;
 static CamShiftWork* wp = &work;
 
+/**
+ * Clears the sideways camera lead and sets its tuning:
+ * 300 units of held stick before it starts, at most 3 units per frame, easing in at 0.002 per frame.
+ * Called from camRoadInit.
+ */
 void camShiftInit(void) {
     wp->current = 0.0f;
     wp->target = 0.0f;
@@ -47,6 +52,13 @@ void camShiftInit(void) {
     wp->lastZ = 0.0f;
 }
 
+/**
+ * Per frame, from the camera driver and the door and camera scripts:
+ * when Mario keeps walking left or right (stick held and actually moving) long enough,
+ * eases the field camera sideways by the road's shift rate (camRoadGetCurrentShiftXRate) toward the side he
+ * walks to; a camera with CAM_FLAG_ROAD_SHIFT_OFF eases back to centre. Writes the current offset to *out.
+ * Speeds are scaled to 60 fps by elapsed time.
+ */
 void camShiftMain(CameraEntry* camera, MarioWork* mario, f32* out) {
     f32 shiftRate;
     f32 stick;
@@ -156,10 +168,15 @@ void camShiftMain(CameraEntry* camera, MarioWork* mario, f32* out) {
     *out = wp->current;
 }
 
+/** Records this frame's clock so the next camShiftMain can scale by the time elapsed. */
 void camShiftPostMain(void) {
     wp->prevTime = camShiftClock();
 }
 
+/**
+ * Snaps the sideways camera lead back to zero with the default tuning (same as camShiftInit).
+ * Called on map changes, door transitions, game over and by camera scripts.
+ */
 void camShiftReset(void) {
     wp->current = 0.0f;
     wp->target = 0.0f;

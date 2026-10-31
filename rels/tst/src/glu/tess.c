@@ -186,7 +186,7 @@ gluNewTess( void )
 
   return tess;
 }
-
+/** GLU tessellator: returns the tessellator to its dormant state, deleting the mesh and forgetting the last edge. */
 static void MakeDormant( GLUtesselator *tess )
 {
   /* Return the tessellator to its original dormant state. */
@@ -200,7 +200,7 @@ static void MakeDormant( GLUtesselator *tess )
 }
 
 #define RequireState( tess, s )   if( tess->state != s ) GotoState(tess,s)
-
+/** GLU tessellator: steps the state toward newState one level at a time, reporting each missing Begin/End call. */
 static void GotoState( GLUtesselator *tess, enum TessState newState )
 {
   while( tess->state != newState ) {
@@ -392,6 +392,9 @@ gluTessCallback( GLUtesselator *tess, GLenum which, _GLUfuncptr fn)
   }
 }
 
+/** GLU tessellator: appends a vertex to the current contour as a new mesh edge (the first one makes a self-loop),
+ * storing its coordinates and user data and giving the edge winding +1 (and its twin -1) so counter-clockwise contours
+ * count as +1 inside. */
 static int AddVertex( GLUtesselator *tess, GLdouble coords[3], void *data )
 {
   GLUhalfEdge *e;
@@ -431,6 +434,8 @@ static int AddVertex( GLUtesselator *tess, GLdouble coords[3], void *data )
 }
 
 
+/** GLU tessellator: stores a vertex in the small cache used while the polygon looks like a single contour, before any
+ * mesh is built. */
 static void CacheVertex( GLUtesselator *tess, GLdouble coords[3], void *data )
 {
   CachedVertex *v = &tess->cache[tess->cacheCount];
@@ -443,6 +448,7 @@ static void CacheVertex( GLUtesselator *tess, GLdouble coords[3], void *data )
 }
 
 
+/** GLU tessellator: creates the mesh and adds each cached vertex to it with AddVertex; returns 0 on failure. */
 static int EmptyCache( GLUtesselator *tess )
 {
   CachedVertex *v = tess->cache;

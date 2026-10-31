@@ -54,6 +54,11 @@ static u8 geso_scale_dt[] = {0x60, 0x60, 0x72, 0x88, 0x9F, 0xB6, 0xCC, 0xDF, 0xE
 static s8 geso_trans_dt[] = {-40, -12, -40, -12, -39, -9, -39, -6, -39, -3, -39, 0, -38, 3, -38, 5, -38, 8, -39, 10, -40, 12, -41, 13, -42, 13, -43, 13, -45, 13, -47, 13, -49, 13, -51, 12, -52, 12, -54, 12, -56, 12, -57, 12, -58, 12, -59, 12, -61, 12, -62, 12, -63, 12, -65, 12, -66, 12, -67, 12, -69, 12, -70, 12, -71, 12, -73, 12, -74, 12, -75, 12, -76, 12, -78, 12, -79, 12, -80, 12, -81, 12, -83, 12, -84, 12, -85, 12, -87, 12, -88, 12, -89, 12, -90, 12, -92, 12, -93, 12, -94, 12, -95, 12, -97, 12, -98, 12, -99, 12, -100, 12, -102, 12, -103, 12, -104, 12, -106, 12, -107, 12, -108, 12, -109, 12, -111, 12, -112, 12, -113, 12, -114, 12, -116, 12, -117, 12, -118, 12, -120, 12};
 static u8 geso_shibuki_dl_0_size_tbl[] = {1, 1, 1, 1, 1};
 
+/**
+ * Spawns the splash at (x, y, z) with `size`.
+ * Types: 0 falls in water, 1 jumps out of water, 2 falls into lava/fire (also starts a smoke effect),
+ * 3 Blooper (gesso) entrance, 4 its background variant. Allocates 1+n1+n2 records.
+ */
 EffectEntry* effSplashEntry(s32 type, f32 x, f32 y, f32 z, f32 size) {
     EffectEntry* effect;
     EffSplashWork* work;
@@ -201,6 +206,11 @@ EffectEntry* effSplashEntry(s32 type, f32 x, f32 y, f32 z, f32 size) {
     return effect;
 }
 
+/**
+ * The first frame only queues effSplashGetCol to sample the water colour;
+ * afterwards integrates each column and droplet (velocity, gravity, delay) and deletes after 30,
+ * 60 or 71 frames depending on type.
+ */
 static void effSplashMain(EffectEntry* effect) {
     EffSplashWork* work = effect->userdata;
     Vec position;
@@ -300,6 +310,10 @@ static void effSplashMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 1, (DispCallback)effSplashDisp, effect);
 }
 
+/**
+ * Projects the splash position to the screen and reads the frame buffer pixel there for the water tint (the
+ * retail build then overrides it with the map colour from eff_funemizu).
+ */
 static void effSplashGetCol(CameraId cameraId, EffectEntry* effect) {
     EffSplashWork* work = effect->userdata;
     CameraEntry* cam;
@@ -352,6 +366,11 @@ static void effSplashGetCol(CameraId cameraId, EffectEntry* effect) {
 #endif
 }
 
+/**
+ * Draws the splash columns (scrolling textured cones,
+ * or the Blooper's display lists for type 3) followed by the camera-facing droplet quads tinted from the sampled
+ * colour.
+ */
 static void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
     EffSplashWork* work = effect->userdata;
     Mtx trans;

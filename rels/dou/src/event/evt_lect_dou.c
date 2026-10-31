@@ -41,6 +41,11 @@ static OSTime wwstart;
 static s32 x_flag_data[2];
 static void lecture_button_disp(CameraId camera, void* param);
 static LectButton lbtn[2];
+/**
+ * Moves the camera by the offset ofs: the new target position and look-at are the current ones plus ofs,
+ * applied instantly (zero-length move) with curve 11.
+ * Used to jump the camera between the lecture stage and the lecture's item- get view.
+ */
 static inline void effitemget_cam_move(CameraEntry* camera, Vec ofs) {
     camera->presetPos = camera->cameraPos;
     camera->presetAt = camera->cameraAt;
@@ -85,12 +90,21 @@ static USER_FUNC(x_flag_add);
 static USER_FUNC(lect_mario_ido_sum);
 static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start);
 
+/**
+ * Weighted average used for the lecture's Mario movement:
+ * (remaining * end + elapsed * start) / total, so it runs from end at elapsed = 0 to start at elapsed = total.
+ */
 static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start) {
     f32 rem = total - elapsed;
 
     return (rem * end + elapsed * start) / total;
 }
 
+/**
+ * Script helper: moves Mario in a straight line over args[0] milliseconds from the position saved in LW(0) to
+ * LW(2) on its first call to the target in LW(3) to LW(5), setting his position directly.
+ * Done when the time is up.
+ */
 static USER_FUNC(lect_mario_ido_sum) {
     EvtWord* args = event->args;
     MarioWork* mario = marioGetPtr();
@@ -116,16 +130,22 @@ static USER_FUNC(lect_mario_ido_sum) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper: forcibly closes the status window (HP and FP display) so it stays out of the lecture. */
 static USER_FUNC(lect_status_off) {
     statusWinForceClose();
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: lifts the force-close of the status window set by lect_status_off. */
 static USER_FUNC(lect_status_on) {
     statusWinForceCloseClear();
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: stores args[1] in lecture flag number args[0] (there are two,
+ * used to synchronise the lecture's parallel events).
+ */
 static USER_FUNC(x_flag_set) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -134,6 +154,7 @@ static USER_FUNC(x_flag_set) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: adds args[1] to lecture flag number args[0]. */
 static USER_FUNC(x_flag_add) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -142,6 +163,7 @@ static USER_FUNC(x_flag_add) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: reads lecture flag number args[0] into args[1]. */
 static USER_FUNC(x_flag_get) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -150,6 +172,7 @@ static USER_FUNC(x_flag_get) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: blocks until lecture flag number args[0] equals args[1]. */
 static USER_FUNC(x_flag_wait) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -161,6 +184,11 @@ static USER_FUNC(x_flag_wait) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Draw callback for the two lecture button prompts:
+ * draws each visible button's icon at its screen position with its alpha (nine of the icons are shifted up 15
+ * units).
+ */
 static void lecture_button_disp(CameraId camera, void* param) {
     s32 i;
 
@@ -195,6 +223,12 @@ static void lecture_button_disp(CameraId camera, void* param) {
     }
 }
 
+/**
+ * Script helper that runs the lecture's two button prompts:
+ * clears them on its first call, then every frame fades each in (sequence 2)
+ * or out (sequence 3) by 7 alpha per frame, hides them on sequence 4, and queues lecture_button_disp.
+ * Finishes when both are hidden (sequence 4).
+ */
 static USER_FUNC(lecture_button_rtn) {
     LectButton* btn;
     s32 i;
@@ -245,6 +279,7 @@ static USER_FUNC(lecture_button_rtn) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper: sets the icon of button args[0] to icon id args[1]. */
 static USER_FUNC(lecture_button_set_icon_id) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -255,6 +290,7 @@ static USER_FUNC(lecture_button_set_icon_id) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: sets the alpha of button args[0] to args[1]. */
 static USER_FUNC(lecture_button_set_alpha) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -265,6 +301,7 @@ static USER_FUNC(lecture_button_set_alpha) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: turns the flag bits args[1] on (args[2] nonzero) or off for button args[0]. */
 static USER_FUNC(lecture_button_flag_on_off) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -281,6 +318,7 @@ static USER_FUNC(lecture_button_flag_on_off) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: sets the fade sequence of button args[0] to args[1] (2 fades in, 3 fades out, 4 hides, 1 is idle). */
 static USER_FUNC(lecture_button_set_seq) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -291,6 +329,7 @@ static USER_FUNC(lecture_button_set_seq) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: reads the sequence number (not the icon id, despite the name) of button args[0] into args[1]. */
 static USER_FUNC(lecture_button_get_icon_id) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -300,6 +339,7 @@ static USER_FUNC(lecture_button_get_icon_id) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: blocks until button args[0] has reached sequence args[1] (usually 1, idle after a fade). */
 static USER_FUNC(lecture_button_seq_wait) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -312,6 +352,7 @@ static USER_FUNC(lecture_button_seq_wait) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: moves button args[0] to the screen position args[1..3]. */
 static USER_FUNC(lecture_button_set_pos) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -324,6 +365,10 @@ static USER_FUNC(lecture_button_set_pos) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Sets the camera id of a map object and its children (and its siblings when siblings is set),
+ * so a whole object draws on another camera.
+ */
 static void lect_map_cam_chg_sub(MapObject* obj, s32 camId, BOOL siblings) {
     obj->cameraId = camId;
     if (obj->child != NULL) {
@@ -334,6 +379,7 @@ static void lect_map_cam_chg_sub(MapObject* obj, s32 camId, BOOL siblings) {
     }
 }
 
+/** Script helper: puts the map object named args[0] (with its children) on camera id args[1]. */
 static USER_FUNC(lect_map_cam_chg) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -346,6 +392,7 @@ static USER_FUNC(lect_map_cam_chg) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: moves the item-get effect named args[0] to camera id args[1]. */
 static USER_FUNC(effitemgetchange_cam) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -357,6 +404,7 @@ static USER_FUNC(effitemgetchange_cam) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: as effitemgetchange_cam, but the effect is given by pointer in args[0]. */
 static USER_FUNC(effitemgetchange_cam_ptr) {
     EvtWord* args = event->args;
     EffectEntry* eff = (EffectEntry*)evtGetValue(event, args[0]);
@@ -367,6 +415,7 @@ static USER_FUNC(effitemgetchange_cam_ptr) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: opens the item-get effect named args[0] (sets its state to 1). */
 static USER_FUNC(effitemget_open) {
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
     ItemGetWork* work = eff->userdata;
@@ -375,6 +424,7 @@ static USER_FUNC(effitemget_open) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: as effitemget_open, but the effect is given by pointer in args[0]. */
 static USER_FUNC(effitemget_open_ptr) {
     EffectEntry* eff = (EffectEntry*)evtGetValue(event, event->args[0]);
     ItemGetWork* work = eff->userdata;
@@ -383,6 +433,10 @@ static USER_FUNC(effitemget_open_ptr) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: moves the 3D camera 2016 units up (args[0] nonzero) or down.
+ * Guess: used to jump to and from a stage placed far above the map for the item-get effect.
+ */
 static USER_FUNC(effitemget_busaiku) {
     s32 up = evtGetValue(event, event->args[0]);
     CameraEntry* camera = camGetPtr(CAMERA_3D);
@@ -397,6 +451,10 @@ static USER_FUNC(effitemget_busaiku) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: switches on the hit groups of the map object named args[0] ("me" means the object running the
+ * event), skipping unnamed ones.
+ */
 static USER_FUNC(lect_mobj_hit_nasi) {
     const char* name = (const char*)evtGetValue(event, event->args[0]);
     MapObjectEntry* mobj;
@@ -416,6 +474,10 @@ static USER_FUNC(lect_mobj_hit_nasi) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: stores the offset args[0..2] (floats) for the ship-change platform (daiv),
+ * which the lecture then applies to the platform every frame.
+ */
 static USER_FUNC(dai_moveti_set) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
@@ -426,6 +488,7 @@ static USER_FUNC(dai_moveti_set) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: reads the platform offset set by dai_moveti_set into args[0..2]. */
 static USER_FUNC(dai_moveti_get) {
     EvtWord* args = event->args;
 
@@ -435,6 +498,7 @@ static USER_FUNC(dai_moveti_get) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: sets args[0] to TRUE if Mario is currently in paper-thin (slit) mode. */
 static USER_FUNC(lect_slit_check) {
     EvtWord* args = event->args;
 
@@ -446,6 +510,10 @@ static USER_FUNC(lect_slit_check) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: a camera flash for the genie's light:
+ * fades out to white in 40 ms, holds for 60 ms, fades back in over 40 ms and holds 60 ms.
+ */
 static USER_FUNC(evtflash) {
     if (isFirstCall) {
         event->userdata[2] = 0;
@@ -494,6 +562,11 @@ static USER_FUNC(evtflash) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Prepares the boat-move lecture: switches the system level for the lecture,
+ * puts Mario aside while the camera is set relative to him, restores him and starts him facing right,
+ * and puts the ship-change platform on camera 7.
+ */
 EVT_BEGIN(ship_majin_lecture_init)
     CALL(lect_set_systemlevel, 0)
     CALL(lect_test_systemlevel)
@@ -511,6 +584,14 @@ EVT_BEGIN(ship_majin_lecture_init)
     RETURN
 EVT_END()
 
+/**
+ * The paper genie's boat-move lecture on the ship-change platform:
+ * the genie explains (stg1_gon_majin4_12 to 14), flashing the light, the platform slides in,
+ * and then Mario is made to try the transformation with a flashing button prompt:
+ * he turns into a boat on the platform and sails across it, then turns back.
+ * The prompt repeats until the player answers the question at the end (stg1_gon_majin4_16 to 18);
+ * the genie is removed and the lecture flag is set.
+ */
 EVT_BEGIN(ship_majin_lecture)
     CALL(evt_mario_trigflag_onoff, 1, MARIO_TRIG_FLAG_SHIP_PLANE_EVT_ON)
     BEGIN_SIBLING_EVENT
@@ -828,6 +909,7 @@ EVT_BEGIN(ship_majin_lecture)
     RETURN
 EVT_END()
 
+/** Script helper: sets args[0] to TRUE while the R trigger is held on controller 1. */
 static USER_FUNC(lect_push_r_check) {
     EvtWord* args = event->args;
 
@@ -839,6 +921,10 @@ static USER_FUNC(lect_push_r_check) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper that returns Mario to normal form:
+ * cancels a roll or paper-slit mode on its first call, and blocks until he is no longer rolling or in a slit.
+ */
 static USER_FUNC(evt_nomal_cange) {
     MarioWork* mario = marioGetPtr();
 
@@ -858,6 +944,7 @@ static USER_FUNC(evt_nomal_cange) {
     return (mario->dispFlags & MARIO_DISP_FLAG_SLIT) ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
 
+/** Script helper: blocks until music channel 1 has started playing. */
 static USER_FUNC(bgm_start_wait) {
     return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }

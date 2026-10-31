@@ -15,6 +15,7 @@
 #include <math.h>
 #include <string.h>
 
+/** Sets the read point of a delay line so its output lags the input by lag samples. */
 static void DLsetdelay(_SND_REVSTD_DELAYLINE* dl, s32 lag) {
   dl->outPoint = dl->inPoint - (lag * sizeof(f32));
   while (dl->outPoint < 0) {
@@ -22,6 +23,7 @@ static void DLsetdelay(_SND_REVSTD_DELAYLINE* dl, s32 lag) {
   }
 }
 
+/** Allocates a delay line of len samples, clears it and sets a default lag of half its length. */
 static void DLcreate(_SND_REVSTD_DELAYLINE* dl, s32 len) {
   dl->length = (s32)len * sizeof(f32);
   dl->inputs = (f32*)salMalloc(len * sizeof(f32));
@@ -32,8 +34,16 @@ static void DLcreate(_SND_REVSTD_DELAYLINE* dl, s32 len) {
   dl->outPoint = 0;
 }
 
+/** Frees a delay line's sample buffer. */
 static void DLdelete(_SND_REVSTD_DELAYLINE* dl) { salFree(dl->inputs); }
 
+/**
+ * Builds the standard reverb for 32 kHz: for each of the three channels two comb filters (lengths 1789 and 1999,
+ * with feedback from the reverb time) and two all-pass filters (433 and 149), the mix level,
+ * the damping coefficient and an optional pre-delay line.
+ * Returns FALSE if any setting is out of range (coloration 0..1, time 0.01..10 s, mix 0..1, damping 0..1,
+ * pre-delay up to 0.1 s).
+ */
 bool ReverbSTDCreate(_SND_REVSTD_WORK* rv, float coloration, float time, float mix, float damping,
                      float predelay) {
   static u32 lens[4] = {1789, 1999, 433, 149};
@@ -87,6 +97,10 @@ bool ReverbSTDCreate(_SND_REVSTD_WORK* rv, float coloration, float time, float m
   return TRUE;
 }
 
+/**
+ * Changes the settings of a running standard reverb by freeing its delay lines and creating it again;
+ * FALSE if a setting is out of range.
+ */
 bool ReverbSTDModify(_SND_REVSTD_WORK* rv, float coloration, float time, float mix, float damping,
                      float predelay) {
   unsigned char i; // r31
@@ -127,6 +141,12 @@ bool ReverbSTDModify(_SND_REVSTD_WORK* rv, float coloration, float time, float m
 static const float value0_3 = 0.3f;
 static const float value0_6 = 0.6f;
 static const double i2fMagic = 4.503601774854144E15;
+/**
+ * Assembly: processes one 160-sample frame of the three consecutive channel buffers (left, right, surround)
+ * starting at sptr.
+ * Guess: per channel it runs two comb filters, two all-pass filters
+ * and a one-pole low-pass from the state in rv, and blends the result with the input using the mix level.
+ */
 static asm void HandleReverb(long* sptr, struct _SND_REVSTD_WORK* rv) {
 #if 1
   nofralloc
@@ -415,15 +435,26 @@ lbl_803B599C:
 #endif
 }
 #else
+/**
+ * Assembly: processes one 160-sample frame of the three consecutive channel buffers (left, right, surround)
+ * starting at sptr.
+ * Guess: per channel it runs two comb filters, two all-pass filters
+ * and a one-pole low-pass from the state in rv, and blends the result with the input using the mix level.
+ */
 static void HandleReverb(s32* sptr, struct _SND_REVSTD_WORK* rv) {
   // TODO: Reimplement this in C
 }
 #endif
 
+/**
+ * Runs the standard reverb on the three buffers of a frame (the assembly HandleReverb handles all channels from
+ * the left buffer).
+ */
 void ReverbSTDCallback(s32* left, s32* right, s32* surround, _SND_REVSTD_WORK* rv) {
   HandleReverb(left, rv);
 }
 
+/** Frees the delay lines and pre-delay buffers of a standard reverb. */
 void ReverbSTDFree(_SND_REVSTD_WORK* rv) {
   u8 i; // r31
   for (i = 0; i < 6; ++i) {

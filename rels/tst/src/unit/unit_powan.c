@@ -144,6 +144,11 @@ static BattleUnitKindPart parts[] = {
     {3, "btl_un_powan", "c_gazigazi", 0.0f, 10.0f, 6.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table_gazigazi},
 };
 
+/**
+ * Battle init script for the test unit Powan: installs the wait,
+ * attack and damage handlers (confusion uses the default one),
+ * registers its post-battle event and starts rider_follow_event so the rider part follows the body.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -155,6 +160,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Looping helper started from init_event: every frame, while the unit exists,
+ * calls powan_rider_follow so the rider (part 1) stays on top of the body (part 2).
+ */
 static EVT_BEGIN(rider_follow_event)
     LABEL(0)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))
@@ -167,6 +176,10 @@ static EVT_BEGIN(rider_follow_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: selects this unit (-2) and its part 1
+ * and runs the shared default damage reaction (btldefaultevt_Damage).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -174,6 +187,7 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Empty phase handler. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
@@ -214,6 +228,11 @@ static BattleWeapon weapon_powan_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Attack of the test unit Powan: uses an enemy item if it has one, otherwise picks a sampled enemy,
+ * walks up to it, lowers the body and swings (GAZ_A_1) for an attack that is always resolved at once (the
+ * pre-damage check is followed directly by the defence and damage calls), then walks home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -267,8 +286,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-// On a hit the Toad is knocked off: the second body (part 3) flies out and lands while the rider runs away
-// and comes back.
+/**
+ * On a hit the Toad is knocked off: the second body (part 3) flies out and lands while the rider runs away
+ * and comes back.
+ */
 static EVT_BEGIN(hit_event)
     CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 2, 0x1000000)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -307,6 +328,10 @@ static EVT_BEGIN(hit_event)
     RETURN
 EVT_END()
 
+/**
+ * Wait (idle) event: refreshes the body animation (part 1) from the unit's pose table
+ * so it matches the current state.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -323,7 +348,7 @@ static BattleUnitSetup entry_powan = {
     NULL, // itemDropTable
 };
 
-// Post-battle events: each respawns the unit with the next counter value (unit work 0) and arms the next one.
+/** Post-battle events: each respawns the unit with the next counter value (unit work 0) and arms the next one. */
 static EVT_BEGIN(post_battle_event_2)
     SET_VALUE(LW(5), 2)
     CALL_CHILD(respawn_event)
@@ -332,6 +357,10 @@ static EVT_BEGIN(post_battle_event_2)
     RETURN
 EVT_END()
 
+/**
+ * Post-battle event for the third respawn: respawns Powan with counter 3 (respawn_event),
+ * then registers post_battle_event_4 to run after the next battle.
+ */
 static EVT_BEGIN(post_battle_event_3)
     SET_VALUE(LW(5), 3)
     CALL_CHILD(respawn_event)
@@ -340,6 +369,10 @@ static EVT_BEGIN(post_battle_event_3)
     RETURN
 EVT_END()
 
+/**
+ * Post-battle event for the fourth respawn: respawns Powan with counter 4,
+ * then registers post_battle_event_5 to run after the next battle.
+ */
 static EVT_BEGIN(post_battle_event_4)
     SET_VALUE(LW(5), 4)
     CALL_CHILD(respawn_event)
@@ -348,6 +381,7 @@ static EVT_BEGIN(post_battle_event_4)
     RETURN
 EVT_END()
 
+/** Post-battle event for the last respawn: respawns Powan with counter 5 and registers no further post-battle event. */
 static EVT_BEGIN(post_battle_event_5)
     SET_VALUE(LW(5), 5)
     CALL_CHILD(respawn_event)
@@ -356,6 +390,12 @@ static EVT_BEGIN(post_battle_event_5)
     RETURN
 EVT_END()
 
+/**
+ * Respawns Powan after a battle (LW(5) is the respawn counter, stored in its unit work 0):
+ * spawns entry_powan high above the stage at x = 80,
+ * lets it fall to the floor and then prints a Japanese complaint from it that depends on the counter (the lines
+ * get shorter and more worn out each time).
+ */
 static EVT_BEGIN(respawn_event)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_powan), 0)
     CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(5))
@@ -385,6 +425,11 @@ static EVT_BEGIN(respawn_event)
     RETURN
 EVT_END()
 
+/**
+ * Death script of Powan: on the fifth life it prints a last line first.
+ * It then spins 15 degrees per frame for 48 frames, banks its coins and experience,
+ * tips over for 30 frames and kills the unit (kill mode 0 if blown away, otherwise 2).
+ */
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(10))
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(5))
@@ -426,7 +471,7 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
-// arg 0: FieldBattleData.postBattleMode
+/** arg 0: FieldBattleData.postBattleMode */
 static USER_FUNC(powan_set_post_battle_mode) {
     s32 mode = evtGetValue(event, event->args[0]);
 
@@ -434,7 +479,7 @@ static USER_FUNC(powan_set_post_battle_mode) {
     return EVT_RETURN_DONE;
 }
 
-// arg 0: the event FieldBattleData runs after a won battle
+/** arg 0: the event FieldBattleData runs after a won battle */
 static USER_FUNC(powan_set_post_battle_event) {
     void* evt = (void*)evtGetValue(event, event->args[0]);
 
@@ -442,7 +487,7 @@ static USER_FUNC(powan_set_post_battle_event) {
     return EVT_RETURN_DONE;
 }
 
-// args: unit id, part id. Keeps the part on the "pPlane1" joint of the unit's body animation.
+/** args: unit id, part id. Keeps the part on the "pPlane1" joint of the unit's body animation. */
 static USER_FUNC(powan_rider_follow) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);

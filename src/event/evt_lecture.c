@@ -26,18 +26,22 @@ static f32 stXdir3;
 static f32 stXdir4;
 static void* lect_work;
 
-// s32 level
+/** s32 level */
 USER_FUNC(lect_set_systemlevel) {
     marioStSystemLevel(evtGetValue(event, *event->args));
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Unknown: reads the system level with marioStGetSystemLevel and discards the result; no arguments.
+ * Likely a leftover debug check.
+ */
 USER_FUNC(lect_test_systemlevel) {
     marioStGetSystemLevel();
     return EVT_RETURN_DONE;
 }
 
-// save the camera, Mario, partner and follower positions
+/** save the camera, Mario, partner and follower positions */
 USER_FUNC(lect_cam_save) {
     CameraEntry* camera;
     MarioWork* mario;
@@ -73,7 +77,7 @@ USER_FUNC(lect_cam_save) {
     return EVT_RETURN_DONE;
 }
 
-// s32 msec
+/** s32 msec */
 USER_FUNC(lect_cam_load) {
     EvtWord* args = event->args;
     s32 msec;
@@ -119,13 +123,13 @@ USER_FUNC(lect_cam_load) {
     return EVT_RETURN_DONE;
 }
 
-// void* evt
+/** void* evt */
 USER_FUNC(lect_juyoitem_rel_set) {
     lect_work = (void*)evtGetValue(event, *event->args);
     return EVT_RETURN_DONE;
 }
 
-// void* evt (out)
+/** void* evt (out) */
 USER_FUNC(lect_juyoitem_rel_get) {
     evtSetValue(event, *event->args, (EvtWord)lect_work);
     return EVT_RETURN_DONE;

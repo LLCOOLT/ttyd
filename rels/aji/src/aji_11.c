@@ -37,6 +37,11 @@ extern EvtWord peach_evt_disksys[];
 extern EvtWord peach_evt_tana1[];
 extern EvtWord peach_evt_tana2[];
 
+/**
+ * Door close animation step: moves the two door leaves door_w_A
+ * and door_w_B in opposite directions along Z by the animation value in LW(0) times 0.25;
+ * the open and close scripts apply the same transform. The demo builds use 0.2217.
+ */
 static EVT_BEGIN(w_door_close)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -49,6 +54,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door open animation step: moves the two door leaves door_w_A
+ * and door_w_B in opposite directions along Z by the animation value in LW(0) times 0.25;
+ * the open and close scripts apply the same transform. The demo builds use 0.2217.
+ */
 static EVT_BEGIN(w_door_open)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -83,6 +93,13 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Exit event of the west door w_bero during Peach's disk search:
+ * while the story is before STORY_STG5_46_PEACH_DISK_SEARCH
+ * and she has taken the Data Disk (GSWF_AJI11_PEACH5_DATA_DISK_TAKEN),
+ * she refuses to leave (peach_aji_249_01 if the disk has not been read, peach_aji_250 if it has)
+ * and LW(0) = 1 cancels the exit; otherwise LW(0) = 0 lets her through.
+ */
 EVT_BEGIN(peach_evt_bero)
     IF_INT_EQUAL(GSWF(GSWF_AJI11_PEACH5_DATA_DISK_TAKEN), 1)
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG5_46_PEACH_DISK_SEARCH)
@@ -127,11 +144,16 @@ static BeroEntry bero_peach_data[] = {
     {0},
 };
 
+/**
+ * Pick-up event for the Card Key on the storage-room floor:
+ * records it in GSWF_AJI11_CARD_KEY_TAKEN so it is not placed again.
+ */
 static EVT_BEGIN(key_evt)
     SET_VALUE(GSWF(GSWF_AJI11_CARD_KEY_TAKEN), 1)
     RETURN
 EVT_END()
 
+/** Plays the small creature's walking animation GAZ_A_1 over and over for the NPC whose name is in LW(10). */
 EVT_BEGIN(evt_gajigaji_anim)
     LOOP(0)
         CALL(evt_npc_set_anim, LW(10), STRING("GAZ_A_1"))
@@ -140,6 +162,12 @@ EVT_BEGIN(evt_gajigaji_anim)
     RETURN
 EVT_END()
 
+/**
+ * Creates one of the background creatures (NPC LW(10) from c_gazigazi,
+ * placed at a random spot on the floor at depth LW(11),
+ * scaled between 0.5 and 1.5) and makes it glide around the room at random forever.
+ * Half of them also run the animation script evt_gajigaji_anim.
+ */
 EVT_BEGIN(evt_gajigaji_main)
     SET_VALUE(LW(10), LW(0))
     SET_VALUE(LW(11), LW(1))
@@ -169,6 +197,10 @@ EVT_BEGIN(evt_gajigaji_main)
     RETURN
 EVT_END()
 
+/**
+ * Creates the six small background creatures gazi1 to gazi6 that scuttle around the storage room
+ * (evt_gajigaji_main for each, at depths -280 to -255).
+ */
 EVT_BEGIN(evt_gajigaji)
     SET_VALUE(LW(0), STRING("gazi1"))
     SET_VALUE(LW(1), -280)
@@ -195,6 +227,12 @@ static s32 item_list[] = {
     ITEM_DATA_DISK, -1,
 };
 
+/**
+ * Case script of the disk console (a_disksys): Peach says she has nothing to put in (peach_aji_244_01)
+ * until she has the Data Disk; otherwise she picks the disk from the item menu,
+ * the monitor lights up and plays the disk (BGM_FF_PEACH_DISCSET1, peach_aji_247 and 248),
+ * which sets GSWF_AJI11_PEACH5_DISK_READ and attaches peach_evt_tana2 to the shelf.
+ */
 EVT_BEGIN(peach_evt_disksys)
     CALL(evt_mario_key_onoff, 0)
     IF_INT_EQUAL(GSWF(GSWF_AJI11_PEACH5_DATA_DISK_TAKEN), 0)
@@ -241,6 +279,11 @@ EVT_BEGIN(peach_evt_disksys)
     RETURN
 EVT_END()
 
+/**
+ * Case script of the shelf (tana) before the disk is found:
+ * Peach looks at the shelf (peach_aji_245), takes the Data Disk (ITEM_DATA_DISK) and shows it (peach_aji_246),
+ * sets GSWF_AJI11_PEACH5_DATA_DISK_TAKEN and attaches the console script to a_disksys.
+ */
 EVT_BEGIN(peach_evt_tana1)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("peach_aji_245"), 0, STRING("mario"))
@@ -256,6 +299,11 @@ EVT_BEGIN(peach_evt_tana1)
     RETURN
 EVT_END()
 
+/**
+ * Case script of the shelf after the disk was read:
+ * takes the Data Disk out of Peach's items, says peach_aji_249
+ * and sets the story to STORY_STG5_46_PEACH_DISK_SEARCH.
+ */
 EVT_BEGIN(peach_evt_tana2)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_pouch_check_item, ITEM_DATA_DISK, LW(0))
@@ -269,6 +317,13 @@ EVT_BEGIN(peach_evt_tana2)
     RETURN
 EVT_END()
 
+/**
+ * Peach's chapter 5 setup of the storage room: if system flag bit 64 is set it clears it
+ * and sets Peach's condition to 2, makes her invisible,
+ * then attaches the shelf (tana) and disk system (a_disksys) scripts according to whether the data disk has been
+ * taken or read.
+ * It overwrites the w_bero exit with her own, and once says peach_aji_244 (GSWF_AJI11_PEACH5_ROOM_REMARK).
+ */
 static EVT_BEGIN(peach_evt_stg5)
     CALL(evt_sub_get_system_flag, LW(0))
     IF_BITS_SET(LW(0), 64)
@@ -305,6 +360,12 @@ static EVT_BEGIN(peach_evt_stg5)
     RETURN
 EVT_END()
 
+/**
+ * Init script of aji_11, the storage room: plays BGM_STG7_DUN1 during Peach's search (STORY_STG5_45 to 46)
+ * and BGM_STG7_DUN2 otherwise, sets up the exits and, after STORY_STG7_00_START,
+ * places a Card Key (ITEM_CARD_KEY_0x1F) on the floor until it is taken (GSWF_AJI11_CARD_KEY_TAKEN).
+ * During Peach's search it starts peach_evt_stg5; the background creatures always run.
+ */
 EVT_BEGIN(aji_11_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_45_PEACH_POTION_PUZZLE, STORY_STG5_46_PEACH_DISK_SEARCH)
@@ -344,6 +405,7 @@ EVT_BEGIN(aji_11_init_evt)
     RETURN
 EVT_END()
 
+/** Script function: clears the flag bits args[1] in the map animation named args[0] (if it exists). */
 static USER_FUNC(map_anim_flag_off) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -356,6 +418,7 @@ static USER_FUNC(map_anim_flag_off) {
     anim->flags &= ~mask;
     return EVT_RETURN_DONE;
 }
+/** Script function: sets Mario's scale to 0 on all axes, making the player (Peach) invisible. */
 static USER_FUNC(peach_evt_toumei) {
     MarioWork* mario = marioGetPtr();
 

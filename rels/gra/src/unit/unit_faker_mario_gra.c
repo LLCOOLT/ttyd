@@ -281,6 +281,10 @@ static BattleWeapon weapon_masao_kaiten_hammer = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Camera shot on Mario's side of the stage (x = -110):
+ * sets the battle camera to a fixed position and waits 37 frames for it to arrive.
+ */
 static EVT_BEGIN(mario_zoom)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, -110, 65, 332, -110, 30, -340, 30, 11)
@@ -288,6 +292,10 @@ static EVT_BEGIN(mario_zoom)
     RETURN
 EVT_END()
 
+/**
+ * Camera shot on the enemy side (x = 115): sets the battle camera to a fixed position
+ * and waits 37 frames for it to arrive.
+ */
 static EVT_BEGIN(enemy_zoom)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 115, 65, 332, 115, 30, -340, 30, 11)
@@ -295,6 +303,10 @@ static EVT_BEGIN(enemy_zoom)
     RETURN
 EVT_END()
 
+/**
+ * Camera shot on the fake Mario (x = 90): sets the battle camera to a fixed position
+ * and waits 37 frames for it to arrive.
+ */
 static EVT_BEGIN(fmario_zoom)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 90, 65, 332, 90, 30, -340, 30, 11)
@@ -302,6 +314,10 @@ static EVT_BEGIN(fmario_zoom)
     RETURN
 EVT_END()
 
+/**
+ * Camera shot on the Goombella unit (x = 130): sets the battle camera to a fixed position
+ * and waits 37 frames for it to arrive.
+ */
 static EVT_BEGIN(gparty_zoom)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 130, 65, 332, 130, 30, -340, 30, 11)
@@ -309,6 +325,10 @@ static EVT_BEGIN(gparty_zoom)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the fake Mario: installs his wait, attack, damage and confusion events,
+ * sets part 1 attributes and the boss walk and run sounds.
+ */
 static EVT_BEGIN(init_event_fmario)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event_fmario))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_fmario))
@@ -321,10 +341,12 @@ static EVT_BEGIN(init_event_fmario)
     RETURN
 EVT_END()
 
+/** Death event of the fake Mario: does nothing. */
 static EVT_BEGIN(dead_event_fmario)
     RETURN
 EVT_END()
 
+/** Damage event of the fake Mario: runs the default damage handling. */
 static EVT_BEGIN(damage_event_fmario)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -332,6 +354,11 @@ static EVT_BEGIN(damage_event_fmario)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the fake Mario: uses an enemy item if he has one,
+ * otherwise draws one of Mario's moves with weights 50/50/20/20:
+ * jump, hammer, spin jump (kururin) and spin hammer (kaiten).
+ */
 static EVT_BEGIN(attack_event_fmario)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -359,6 +386,7 @@ static EVT_BEGIN(attack_event_fmario)
     RETURN
 EVT_END()
 
+/** Plays one of three Mario-style jump voices (SFX_BOSS_VOICE_NM_AC1_1, _2 or _5) at random. */
 static EVT_BEGIN(jump_attack_voice)
     CALL(evt_sub_random, 2, LW(15))
     SWITCH(LW(15))
@@ -372,6 +400,12 @@ static EVT_BEGIN(jump_attack_voice)
     RETURN
 EVT_END()
 
+/**
+ * The fake Mario's jump attack (weapon_masao_jump):
+ * walks to the take-off point and jumps onto the target with the Mario jump voice;
+ * the pre-damage check decides between a dodge (he falls back down) and a hit,
+ * after which he bounces back in three small hops and returns home.
+ */
 static EVT_BEGIN(marioAttackEvent_NormalJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -460,6 +494,10 @@ static EVT_BEGIN(marioAttackEvent_NormalJump)
     RETURN
 EVT_END()
 
+/**
+ * The fake Mario's spin jump (weapon_masao_kururin_jump):
+ * like the normal jump, but after the first hop he spins in the air and dives onto the target a second time.
+ */
 static EVT_BEGIN(marioAttackEvent_KururinJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -576,6 +614,11 @@ static EVT_BEGIN(marioAttackEvent_KururinJump)
     RETURN
 EVT_END()
 
+/**
+ * The fake Mario's hammer attack (weapon_masao_hammer):
+ * walks next to the target, raises the hammer (EM_A_1A to 1C, SFX_BOSS_NM_HAMMER_FURU2 and DON2) and swings it;
+ * the pre-damage check decides between a dodge and a hit, then he returns home.
+ */
 static EVT_BEGIN(marioAttackEvent_NormalHammer)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -661,6 +704,10 @@ static EVT_BEGIN(marioAttackEvent_NormalHammer)
     RETURN
 EVT_END()
 
+/**
+ * The fake Mario's spinning hammer attack: the script is identical to marioAttackEvent_NormalHammer;
+ * only the weapon in LW(9) (weapon_masao_kaiten_hammer, set by attack_event) differs.
+ */
 static EVT_BEGIN(marioAttackEvent_KaitenHammer)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -746,11 +793,16 @@ static EVT_BEGIN(marioAttackEvent_KaitenHammer)
     RETURN
 EVT_END()
 
+/** Wait (idle) event of the fake Mario: shows the idle pose from the pose table. */
 static EVT_BEGIN(wait_event_fmario)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: clears flag 2 of Vivian's party data (partyData[6].flags &= ~2) so she can rejoin
+ * after the Doopliss fight; returns 1.
+ */
 static USER_FUNC(vivian_comeback) {
     pouchGetPtr()->partyData[6].flags &= ~2;
     return 1;
@@ -762,7 +814,7 @@ static USER_FUNC(vivian_comeback) {
 #include "manager/evtmgr_cmd.h"
 #include "battle/battle_database_common.h"
 
-// US only: restore the moves of the unit for this turn.
+/** US only: restore the moves of the unit for this turn. */
 USER_FUNC(faker_mario_gra_sync_max_moves) {
     BattleUnit* unit;
     s32 id = evtGetValue(event, event->args[0]);

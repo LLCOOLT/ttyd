@@ -33,6 +33,10 @@ u8 heavy_scale[30][2] = {
     {0xF9, 0x98}, {0xFB, 0x98}, {0xFD, 0x99}, {0xFE, 0x99}, {0xFF, 0x99}, {0xFF, 0x99},
 };
 
+/**
+ * Spawns smoke puffs around (x, y, z): type 0 touchdown (2 puffs), 1 and 2 (1 puff); dir biases the spread.
+ * Spawned when Mario lands or moves (mario_kemuri.c, evt_mario.c) and by event scripts.
+ */
 EffectEntry* effKemuriEntry(s32 type, f32 x, f32 y, f32 z, f32 dir) {
     effKemuriData* d;
     effKemuriData* data;
@@ -103,6 +107,10 @@ EffectEntry* effKemuriEntry(s32 type, f32 x, f32 y, f32 z, f32 dir) {
 
 // Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
+/**
+ * Spawns one smoke puff at (x, y, z) that drifts along (dx, dz) while rising and spinning.
+ * Spawned by Mario and partner movement code (mario_kemuri.c).
+ */
 EffectEntry* effKemuri2Entry(s32 type, f32 x, f32 y, f32 z, f32 dx, f32 dz) {
     EffectEntry* entry;
     effKemuri2Data* data;
@@ -145,6 +153,7 @@ EffectEntry* effKemuri2Entry(s32 type, f32 x, f32 y, f32 z, f32 dx, f32 dz) {
 }
 #pragma opt_propagation reset
 
+/** Steps each puff's texture frame, scales it from the touchdown/heavy tables, slides it outward, and deletes it. */
 static void effKemuriMain(EffectEntry* effect) {
     effKemuriData* data = effect->userdata;
     Vec pos2;
@@ -201,6 +210,7 @@ static void effKemuriMain(EffectEntry* effect) {
 
 // Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
+/** Moves the puff along its direction with friction, spins it, and deletes it after 30 frames. */
 static void effKemuri2Main(EffectEntry* entry) {
     effKemuri2Data* data;
     effKemuri2Data* p = entry->userdata;
@@ -236,6 +246,7 @@ static void effKemuri2Main(EffectEntry* entry) {
 }
 #pragma opt_propagation reset
 
+/** Draws the smoke puffs as camera-facing quads with an animated texture. */
 static void effKemuriDisp(CameraId camId, void* param) {
     Mtx t, s, r, m, m2;
     GXTexObj tex;
@@ -330,6 +341,7 @@ static void effKemuriDisp(CameraId camId, void* param) {
     }
 }
 
+/** Draws the drifting puff, with an offset darker copy as shadow. */
 static void effKemuri2Disp(CameraId camId, void* param) {
     Mtx t, r, rz, s, m, tmp;
     GXTexObj tex;

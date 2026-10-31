@@ -37,6 +37,7 @@
 #include <string.h>
 #include "glu/memalloc.h"
 
+/** GLU tessellator memory hook: nothing to set up, because allocations go to the map heap; always returns 1. */
 int __gl_memInit(size_t maxFast) {
     return 1;
 }

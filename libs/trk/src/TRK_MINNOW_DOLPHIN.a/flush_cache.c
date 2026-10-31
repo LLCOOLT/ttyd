@@ -1,3 +1,8 @@
+/**
+ * Makes a changed address range (r3 start, r4 length) visible to instruction fetch:
+ * walks it in 32-byte cache lines with dcbst/dcbf and invalidates the instruction cache lines,
+ * so breakpoints and writes from the debugger take effect.
+ */
 asm void TRK_flush_cache(void) {
     nofralloc
     lis r5, 0xffff

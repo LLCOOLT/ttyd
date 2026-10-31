@@ -84,6 +84,11 @@ enum hex_scan_states {
 #define fetch() (count++, (*ReadProc)(ReadProcArg, 0, __GetAChar))
 #define unfetch(c) (*ReadProc)(ReadProcArg, c, __UngetAChar)
 
+/**
+ * Core of strtod/strtold/scanf float input: reads a decimal, hexadecimal,
+ * inf or nan number through ReadProc up to max_width characters and returns the value;
+ * chars_scanned receives the characters consumed.
+ */
 long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* ReadProcArg, int* chars_scanned, int* overflow) {
     int scan_state = start;
     int hex_scan_state = not_hex;

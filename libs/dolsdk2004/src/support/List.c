@@ -1,11 +1,16 @@
 #include <charPipeline/structures/List.h>
 
+/**
+ * Initialises an empty doubly linked list; Offset records
+ * where the link node sits inside each object (link minus obj).
+ */
 void DSInitList(DSListPtr list, Ptr obj, DSLinkPtr link) {
     list->Head = NULL;
     list->Tail = NULL;
     list->Offset = (Ptr)link - obj;
 }
 
+/** Inserts obj into the list before cursor, or at the tail when cursor is NULL. */
 void DSInsertListObject(DSListPtr list, Ptr cursor, Ptr obj) {
     DSLinkPtr link;
     DSLinkPtr linkNext;
@@ -40,6 +45,7 @@ void DSInsertListObject(DSListPtr list, Ptr cursor, Ptr obj) {
     }
 }
 
+/** Unlinks obj from the list and clears its links. */
 void DSRemoveListObject(DSListPtr list, Ptr obj) {
     DSLinkPtr link = (DSLinkPtr)(obj + list->Offset);
 
@@ -61,6 +67,10 @@ void DSRemoveListObject(DSListPtr list, Ptr obj) {
     }
 }
 
+/**
+ * Appends the objects of attachList to the end of baseList when both use the same link offset.
+ * attachList is left unchanged.
+ */
 void DSAttachList(DSListPtr baseList, DSListPtr attachList) {
     DSLinkPtr link;
     DSLinkPtr linkPrev;
@@ -80,6 +90,7 @@ void DSAttachList(DSListPtr baseList, DSListPtr attachList) {
     }
 }
 
+/** Returns the object after obj in the list, or the head when obj is NULL; NULL at the end. */
 void* DSNextListObj(DSListPtr list, Ptr obj) {
     if (!list) {
         return NULL;

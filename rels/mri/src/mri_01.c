@@ -91,6 +91,7 @@ extern EvtWord puni_mario_wait[];
 extern EvtWord mri_01_koopa_first_evt[];
 extern EvtWord mri_01_koopa_second_evt[];
 
+/** Screen flash: fades out over 20 frames, holds for 50 ms, then fades back in over 80 frames. */
 static USER_FUNC(evtflash) {
     if (isFirstCall) {
         event->userdata[2] = 0;
@@ -128,6 +129,12 @@ static USER_FUNC(evtflash) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Checks whether the Punies are ready for the Puni elder's check.
+ * Returns in args[0]: 0 if some Puni is away or lost in another area, 1 if every Puni is with Mario,
+ * 2 if all are present but some are caught in traps.
+ * Punio waiting at the cell in mri_03 is not counted (US and later).
+ */
 static USER_FUNC(elder_talk_sub_punicheck) {
     EvtWord* args = event->args;
     PuniWork* punigp = puniGetPunigp();
@@ -184,11 +191,16 @@ static USER_FUNC(elder_talk_sub_punicheck) {
     return EVT_RETURN_DONE;
 }
 
+/** Fades the Puni display out (args[0] = 0) or back in (args[0] = 1) through puniFadeOff. */
 static USER_FUNC(elder_talk_sub_fadeoff) {
     puniFadeOff(evtGetValue(event, event->args[0]));
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Init script of Punio in the village: during Bowser's visit (STORY_STG3_33_04 to 33_06) talking is switched
+ * off; once Mario has left the tree after the Puni praise he stands near the middle of the village.
+ */
 static EVT_BEGIN(guide_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG3_33_04_PEACH_BACK_TO_TEC, STORY_STG3_33_06_BOWSER_PUNI_ELDER)
@@ -202,6 +214,7 @@ static EVT_BEGIN(guide_init)
     RETURN
 EVT_END()
 
+/** Talk script of Punio: one line until the end of the game's last battle, another line after it. */
 static EVT_BEGIN(guide_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS_OR_EQUAL(STORY_STG8_END_AFTER_THE_BATTLE)
@@ -212,6 +225,11 @@ static EVT_BEGIN(guide_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init script of the rival Puni in the village:
+ * placed near the middle while the rival is arriving (STORY_STG2_12 to 13),
+ * moved once the elder has been freed (STORY_STG2_14), and unable to talk during Bowser's visit.
+ */
 static EVT_BEGIN(rival_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG2_12_RIVAL_ARRIVAL, STORY_STG2_13_MS_MOWZ)
@@ -224,11 +242,18 @@ static EVT_BEGIN(rival_init)
     RETURN
 EVT_END()
 
+/** Talk script of the rival Puni: his line from the rival's arrival (stg2_mri_e12_26). */
 static EVT_BEGIN(rival_talk)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e12_26"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Init script of the Puni elder in the village:
+ * stands left of the middle from the point he is freed to Lord Crump's appearance
+ * and again once Mario has left the tree after the praise.
+ * During Bowser's visit he cannot talk and the status icon is set.
+ */
 static EVT_BEGIN(elder_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG2_14_PUNI_ELDER_FREED, STORY_STG2_22_LORD_CRUMP_APPEARS)
@@ -273,6 +298,11 @@ s32 puni_return_data[] = {
     300, 0, 300, 10,
 };
 
+/**
+ * Brings every missing Puni back: for each Puni slot (1 to 102) that is lost or left in another area,
+ * clears its area data and re-enters it at the next free spot from puni_return_data in the village.
+ * Puni that are already beside Mario stay.
+ */
 EVT_BEGIN(puni_return)
     SET_VALUE(LW(10), 1)
     SET_INT_READ_ADDR(PTR(puni_return_data))
@@ -334,6 +364,11 @@ EVT_BEGIN(puni_return)
     RETURN
 EVT_END()
 
+/**
+ * Dialog of the Puni elder's "gather the Punies" offer: the elder asks whether to call them;
+ * if some Punies are lost the elder calls them back with puni_return (a loud call with a camera zoom),
+ * then reports that everyone has gathered. The camera is restored and the Punies unfreeze at the end.
+ */
 EVT_BEGIN(elder_talk_sub)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e15_22"), 0, STRING("me"))
     CALL(evt_msg_select, 0, STRING("stg2_mri_e15_22_sel"))
@@ -452,6 +487,16 @@ static s32 iri_17_item_tbl[] = {
     ITEM_ROUTING_SLIP, -1,
 };
 
+/**
+ * Talk script of the Puni elder.
+ * Handles two of Rogueport's trouble-center requests first:
+ * trouble 10 (bring a Life Shroom, pays 60 coins)
+ * and trouble 17 (take the Routing Slip: the elder asks which item to hand over,
+ * then gives out the slip as an item).
+ * Otherwise he explains the Puni's powers (story points 15_11 to 26,
+ * once explained he repeats a shorter version),
+ * and has a different line after the praise and after the game's end.
+ */
 static EVT_BEGIN(elder_talk)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 10)
         CALL(evt_pouch_check_item, ITEM_LIFE_SHROOM, LW(0))
@@ -520,6 +565,10 @@ static EVT_BEGIN(elder_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init for the first villager Puni NPC: during Bowser's visit (story 33_04 to 33_06) it is left alone;
+ * after chapter 2 and once Mario has left the tree it is placed at its post.
+ */
 EVT_BEGIN(puni_1_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG3_33_04_PEACH_BACK_TO_TEC, STORY_STG3_33_06_BOWSER_PUNI_ELDER)
@@ -532,6 +581,11 @@ EVT_BEGIN(puni_1_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the first villager Puni.
+ * In chapter 7 it gives the hint about the white Boggly Tree;
+ * otherwise it has a line that changes after the story.
+ */
 EVT_BEGIN(puni_1_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
 #if VERSION <= VERSION_DEMO_US
@@ -555,6 +609,7 @@ EVT_BEGIN(puni_1_talk)
     RETURN
 EVT_END()
 
+/** Init for the second villager Puni NPC (same placement rules as puni_1_init). */
 EVT_BEGIN(puni_2_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG3_33_04_PEACH_BACK_TO_TEC, STORY_STG3_33_06_BOWSER_PUNI_ELDER)
@@ -567,6 +622,7 @@ EVT_BEGIN(puni_2_init)
     RETURN
 EVT_END()
 
+/** Talk script of the second villager Puni: one line before the finale and a different one afterwards. */
 EVT_BEGIN(puni_2_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS_OR_EQUAL(STORY_STG8_END_AFTER_THE_BATTLE)
@@ -577,23 +633,31 @@ EVT_BEGIN(puni_2_talk)
     RETURN
 EVT_END()
 
+/** Init for the generic villager Puni NPCs; only runs the shared NPC init. */
 EVT_BEGIN(puni_init)
     CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/** Init script of the old woman Puni in Bowser's chapter 3 scene: does the shared NPC init and sets the status icon. */
 static EVT_BEGIN(baba_init)
     CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/** Talk script of the old woman Puni: her line in Bowser's scene (kpa_stg3_006). */
 static EVT_BEGIN(baba_talk)
     CALL(evt_msg_print, 0, STRING("kpa_stg3_006"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Init script of Punio's sister Petuni in the village:
+ * cannot talk during Bowser's visit, is moved to the east side once Mario has left the tree after the praise,
+ * and clears the hopping flags GF(10) and GF(11).
+ */
 static EVT_BEGIN(sister_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG3_33_04_PEACH_BACK_TO_TEC, STORY_STG3_33_06_BOWSER_PUNI_ELDER)
@@ -608,6 +672,10 @@ static EVT_BEGIN(sister_init)
     RETURN
 EVT_END()
 
+/**
+ * Makes the sister Puni hop in place over and over with the Puni jump sound, until the talk script sets GF(11).
+ * GF(10) is set while she hops.
+ */
 EVT_BEGIN(sister_jump)
     SET_VALUE(GF(10), 1)
     SET_VALUE(GF(11), 0)
@@ -626,6 +694,14 @@ EVT_BEGIN(sister_jump)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of Petuni.
+ * She stops hopping (GF(11)); once the quiz prize has been given she only repeats her last line.
+ * Otherwise she greets Mario, then offers a quiz:
+ * four multiple-choice questions about the Puni village (the answers must be the right ones for questions 1 to
+ * 4); with all correct she gives a Mystic Egg (GSWF_MRI01_PETUNI_QUIZ_EGG_GIVEN),
+ * with any wrong answer she tells Mario to try again.
+ */
 static EVT_BEGIN(sister_talk)
     SET_VALUE(GF(11), 1)
     WAIT_WHILE(GF(10))
@@ -791,6 +867,7 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/** Closing animation of the west door (to mri_00), played after Mario enters the village. */
 EVT_BEGIN(bero_00_doa_close)
     SET_VALUE(LW(9), 1)
     SET_VALUE(LW(10), STRING("S_doa_l_a"))
@@ -798,6 +875,7 @@ EVT_BEGIN(bero_00_doa_close)
     RETURN
 EVT_END()
 
+/** Opening animation of the west door (to mri_00), played when Mario leaves through it. */
 EVT_BEGIN(bero_00_doa_open)
     SET_VALUE(LW(9), 1)
     SET_VALUE(LW(10), STRING("S_doa_l_a"))
@@ -805,6 +883,7 @@ EVT_BEGIN(bero_00_doa_open)
     RETURN
 EVT_END()
 
+/** Closes the east door (S_doa_r_a) of the village; used as the door-close script of that loading zone. */
 static EVT_BEGIN(bero_01_doa_close)
     SET_VALUE(LW(9), 1)
     SET_VALUE(LW(10), STRING("S_doa_r_a"))
@@ -812,6 +891,7 @@ static EVT_BEGIN(bero_01_doa_close)
     RETURN
 EVT_END()
 
+/** Opens the east door (S_doa_r_a) of the village; used as the door-open script of that loading zone. */
 static EVT_BEGIN(bero_01_doa_open)
     SET_VALUE(LW(9), 1)
     SET_VALUE(LW(10), STRING("S_doa_r_a"))
@@ -819,6 +899,7 @@ static EVT_BEGIN(bero_01_doa_open)
     RETURN
 EVT_END()
 
+/** Exit script of the west door; returns 0 so the map change goes ahead. */
 EVT_BEGIN(out_mri_event)
     SET_VALUE(LW(0), 0)
     RETURN
@@ -881,6 +962,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * First visit to the village (story STG2_10): Punio leads Mario in and the door opens,
+ * but two X-Naut grunts rush in. Mario fights them (battle info 4).
+ * Sets the story to STORY_STG2_11_X_NAUT_BATTLE and starts meet_rival.
+ */
 EVT_BEGIN(bigtree_firstbattle)
     LOOP(0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -1066,6 +1152,11 @@ EVT_BEGIN(bigtree_firstbattle)
     RETURN
 EVT_END()
 
+/**
+ * After the X-Naut battle: the Punies hurry back, the rival Puni turns up,
+ * argues with Punio and the villagers react; at the end Punio joins Mario's Puni group
+ * (GSWF_MRI_PUNIO_IN_PUNI_GROUP). Sets the story to STORY_STG2_12_RIVAL_ARRIVAL.
+ */
 EVT_BEGIN(meet_rival)
     CALL(evt_mario_key_onoff, 0)
     SET_VALUE(LW(15), 5)
@@ -1634,6 +1725,11 @@ EVT_BEGIN(meet_rival)
     RETURN
 EVT_END()
 
+/**
+ * The rival Puni joins Mario (story STG2_14, elder freed):
+ * the Puni elder gives Mario the Puni Orb, the rival and Punio join the group and nine Punies follow Mario.
+ * Sets the story to STORY_STG2_15_11_PUNIES and starts elder_kaisetsu.
+ */
 EVT_BEGIN(rival_nakama)
     CALL(evt_puni_init_puni, 5, 14, -89, 0, 0, 0)
     CALL(evt_puni_flag_onoff, 5, 0, 8388608)
@@ -1912,6 +2008,10 @@ EVT_BEGIN(rival_nakama)
     RETURN
 EVT_END()
 
+/**
+ * The Puni elder explains the Punies' powers to Mario right after the Puni Orb scene,
+ * with a camera shake as a Puni lands on Mario. Sets GSWF_MRI01_ELDER_POWERS_EXPLAINED.
+ */
 EVT_BEGIN(elder_kaisetsu)
     LOOP(0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -1976,6 +2076,10 @@ EVT_BEGIN(elder_kaisetsu)
     RETURN
 EVT_END()
 
+/**
+ * Draw callback for the boss robot's cross-mark model ("batu"):
+ * draws it at the robot's locator23 bone with the alpha passed in param, once per render mode.
+ */
 static void bossrobot_batu(CameraId camera, void* param) {
     u8* alpha = param;
     NpcEntry* robot = npcNameToPtr("ボスロボット");
@@ -2006,6 +2110,11 @@ static void bossrobot_batu(CameraId camera, void* param) {
     }
 }
 
+/**
+ * Guess: each frame puts the robot's "maru" model at its locator17 bone
+ * and queues the cross-mark draw with the alpha in args[0].
+ * On its first call it allocates the alpha byte and moves the robot's own world matrices out of view.
+ */
 static USER_FUNC(bossrobot) {
     u8 alpha = evtGetValue(event, event->args[0]);
     NpcEntry* robot = npcNameToPtr("ボスロボット");
@@ -2037,11 +2146,16 @@ static USER_FUNC(bossrobot) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Stops the bomb countdown timer. */
 static USER_FUNC(evt_countdown_stop) {
     countDownStop();
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Spawns the N64-style charge-up light effect at x, y, z (args[0] to args[2]) with the color args[3] to args[5],
+ * scale args[6] and the effect time args[7].
+ */
 static USER_FUNC(akari_charge_entry) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
@@ -2059,6 +2173,10 @@ static USER_FUNC(akari_charge_entry) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Message callback for the "kpa_stg3_012" line:
+ * at the callback type 3, when the message result is 1 it sets local flag LSWF(2). Used in Bowser's visit.
+ */
 static void mri_stg3_012_cb(s32 type, void* param) {
     u16* work = *(u16**)param;
 
@@ -2071,6 +2189,7 @@ static void mri_stg3_012_cb(s32 type, void* param) {
     }
 }
 
+/** Places the Punies 5 to 13 at fixed idle spots in the village (inert, no collision). */
 EVT_BEGIN(puni_taiki)
     CALL(evt_puni_init_puni, 5, 14, -55, 0, 20, 0)
     CALL(evt_puni_flag_onoff, 5, 0, 9437184)
@@ -2109,6 +2228,10 @@ s32 puni_position[] = {
     19267607, 16973911, 23199730, 22675515, 17432589, 20774915,
 };
 
+/**
+ * Creates the NPCs of the boss scene: the third-force executive (Lord Crump),
+ * the Magnus von Grapple robot with its cross and circle parts, five X-Naut grunts and a dummy.
+ */
 EVT_BEGIN(boss_battle_init)
     CALL(evt_npc_entry, STRING("第三勢力幹部"), STRING("c_kanbu_ibt"))
     CALL(evt_npc_set_tribe, STRING("第三勢力幹部"), STRING("第三勢力幹部"))
@@ -2161,6 +2284,10 @@ EVT_BEGIN(boss_battle_init)
     RETURN
 EVT_END()
 
+/**
+ * The executive shrinks flat, spins and glides to the robot,
+ * then is parked out of sight and restored to normal size.
+ */
 EVT_BEGIN(dai3kanbu_suikomare)
 #if VERSION == VERSION_EU
     BEGIN_INLINE_EVENT_GET_ID(LW(1))
@@ -2197,6 +2324,10 @@ EVT_BEGIN(dai3kanbu_suikomare)
     RETURN
 EVT_END()
 
+/**
+ * Starts the X-Naut paper animation: loads the OFF_d_xten paper,
+ * captures it full screen into the "img" image and plays A_1.
+ */
 EVT_BEGIN(boss_robot_pera)
     CALL(evt_paper_entry, STRING("OFF_d_xten"))
     CALL(evt_img_entry, STRING("img"))
@@ -2208,6 +2339,7 @@ EVT_BEGIN(boss_robot_pera)
     RETURN
 EVT_END()
 
+/** Waits for the X-Naut paper animation to end, then releases the capture, image and paper. */
 EVT_BEGIN(boss_robot_pera_after)
     CALL(evt_img_wait_animend, STRING("img"))
     CALL(evt_img_free_capture, STRING("img"), 0)
@@ -2217,6 +2349,11 @@ EVT_BEGIN(boss_robot_pera_after)
     RETURN
 EVT_END()
 
+/**
+ * The boss intro in the village (story 23_01): Crump confronts the Puni elder, the Punies are hidden,
+ * the time bomb is set and Crump gloats, then the Magnus von Grapple lands.
+ * Mario then fights it (battle info 20). Sets the story to STORY_STG2_24_BOSS_BATTLE, then runs boss_battle_win.
+ */
 EVT_BEGIN(boss_battle)
     CALL(evt_npc_set_position, STRING("プニ族長老"), -320, 0, 30)
     CALL(evt_npc_set_ry, STRING("プニ族長老"), 90)
@@ -2536,6 +2673,10 @@ EVT_BEGIN(boss_battle)
     RETURN
 EVT_END()
 
+/**
+ * Keeps a Star Stone item on top of an NPC: copies the position of the NPC named in LW(8) onto the item in LW(9)
+ * every frame.
+ */
 EVT_BEGIN(starstone_item)
     LOOP(0)
         CALL(evt_npc_get_position, LW(8), LW(0), LW(1), LW(2))
@@ -2545,6 +2686,10 @@ EVT_BEGIN(starstone_item)
     RETURN
 EVT_END()
 
+/**
+ * Boss robot damage effect: electric charge effects and crackling sounds at the NPC in LW(10),
+ * forever until the event is deleted.
+ */
 EVT_BEGIN(boss_robot_electro)
     CALL(evt_npc_get_position, LW(10), LW(0), LW(1), LW(2))
     BEGIN_SIBLING_EVENT
@@ -2562,6 +2707,10 @@ EVT_BEGIN(boss_robot_electro)
     RETURN
 EVT_END()
 
+/**
+ * Boss robot damage effect: smoke puffs and explosion sounds at the NPC in LW(10),
+ * forever until the event is deleted.
+ */
 EVT_BEGIN(boss_robot_kemuri)
     CALL(evt_npc_get_position, LW(10), LW(0), LW(1), LW(2))
     BEGIN_SIBLING_EVENT
@@ -2579,6 +2728,7 @@ EVT_BEGIN(boss_robot_kemuri)
     RETURN
 EVT_END()
 
+/** Places the cast for the boss-win scene: Mario, his partner, the Puni elder and the robot. */
 EVT_BEGIN(boss_battle_win_init)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -2593,6 +2743,11 @@ EVT_BEGIN(boss_battle_win_init)
     RETURN
 EVT_END()
 
+/**
+ * After beating the Magnus von Grapple: the robot breaks down, Crump is sucked away,
+ * the Emerald Star appears and Mario receives it, and the Punies and the elder thank the party.
+ * Sets the story to STORY_STG2_25_AFTER_THE_BOSS_BATTLE and runs the Star Stone sequence.
+ */
 EVT_BEGIN(boss_battle_win)
     CALL(evt_cam3d_evt_set, 70, 156, 549, 70, 60, 7, 0, 11)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
@@ -3034,6 +3189,10 @@ EVT_BEGIN(boss_battle_win)
     RETURN
 EVT_END()
 
+/**
+ * Init script of the lit door switch: while the west door of mri_05 is still locked,
+ * switches the east loading zone off; otherwise plays the lit door animation.
+ */
 static EVT_BEGIN(door_switch_init)
     IF_INT_EQUAL(GSWF(GSWF_MRI05_WEST_DOOR_UNLOCKED), 0)
         SET_VALUE(LW(0), STRING("e_bero"))
@@ -3044,6 +3203,10 @@ static EVT_BEGIN(door_switch_init)
     RETURN
 EVT_END()
 
+/**
+ * The Puni NPC "プニ族" appears at a planter (x in LW(0), z in LW(1), message key in LW(2)), says its line,
+ * hops and runs off.
+ */
 EVT_BEGIN(ueki_puni_nigeru)
     CALL(evt_npc_flag_onoff, 1, STRING("プニ族"), NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("プニ族"), NPC_FLAG_HIDDEN)
@@ -3071,6 +3234,7 @@ EVT_BEGIN(ueki_puni_nigeru)
     RETURN
 EVT_END()
 
+/** Planter hit script 1: during Bowser's visit the rival Puni speaks a line from a planter. */
 EVT_BEGIN(evt_ueki_01)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_05_BOWSER_THE_GREAT_TREE)
         CALL(evt_mario_key_onoff, 0)
@@ -3080,6 +3244,10 @@ EVT_BEGIN(evt_ueki_01)
     RETURN
 EVT_END()
 
+/**
+ * Planter hit script 2: during Bowser's visit (STORY_STG3_33_05) Punio's sister and Punio speak their lines
+ * when Mario hits it.
+ */
 static EVT_BEGIN(evt_ueki_02)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_05_BOWSER_THE_GREAT_TREE)
         CALL(evt_mario_key_onoff, 0)
@@ -3090,6 +3258,10 @@ static EVT_BEGIN(evt_ueki_02)
     RETURN
 EVT_END()
 
+/**
+ * Planter hit script 3: during Bowser's visit a Puni runs out of it (once,
+ * GSWF_MRI01_BOWSER_PLANTER_SCENE_DONE); outside of it the planter drops a coin.
+ */
 EVT_BEGIN(evt_ueki_03)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_05_BOWSER_THE_GREAT_TREE)
         IF_INT_EQUAL(GSWF(GSWF_MRI01_BOWSER_PLANTER_SCENE_DONE), 0)
@@ -3110,6 +3282,10 @@ EVT_BEGIN(evt_ueki_03)
     RETURN
 EVT_END()
 
+/**
+ * Planter hit script 8: during Bowser's visit (STORY_STG3_33_05) it starts the second Koopa scene
+ * (mri_01_koopa_second_evt).
+ */
 static EVT_BEGIN(evt_ueki_08)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_05_BOWSER_THE_GREAT_TREE)
         SPAWN_EVENT(mri_01_koopa_second_evt)
@@ -3125,6 +3301,10 @@ static KusaAccess ueki_access_data[] = {
     {4, NULL, NULL, NULL},
 };
 
+/**
+ * When Mario comes back from mri_02, puts every Puni that is not stuck in a trap on the village floor at a
+ * random spot.
+ */
 EVT_BEGIN(puni_mario_wait)
     CALL(evt_puni_wait_systemmode, 2)
     SET_VALUE(LW(10), 1)
@@ -3145,6 +3325,11 @@ EVT_BEGIN(puni_mario_wait)
     RETURN
 EVT_END()
 
+/**
+ * Bowser's chapter 3 interlude, part 1 (story 33_04):
+ * Bowser and Kammy Koopa arrive in the village and a Puni sees them.
+ * Sets the story to STORY_STG3_33_05_BOWSER_THE_GREAT_TREE.
+ */
 EVT_BEGIN(mri_01_koopa_first_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, -415, 0, 30)
@@ -3240,6 +3425,12 @@ EVT_BEGIN(mri_01_koopa_first_evt)
     RETURN
 EVT_END()
 
+/**
+ * Bowser's chapter 3 interlude, part 2 (story 33_05):
+ * Bowser leaps up to the Puni elder, who grows huge, and they talk about the Star Stone;
+ * the scene ends with a save and a Bowser-style map change.
+ * Sets the story to STORY_STG3_33_06_BOWSER_PUNI_ELDER.
+ */
 EVT_BEGIN(mri_01_koopa_second_evt)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_mario_key_onoff, 0)
@@ -3419,6 +3610,11 @@ EVT_BEGIN(mri_01_koopa_second_evt)
     RETURN
 EVT_END()
 
+/**
+ * Map init script of mri_01, the Puni village: sets up the NPCs, doors, planters and Puni,
+ * starts the bomb countdown and the story scenes (X-Nauts, rival, elder, boss and Bowser's visit) according to
+ * the story progress.
+ */
 EVT_BEGIN(mri_01_init_evt)
     SET_VALUE(LF(0), 0)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_04_PEACH_BACK_TO_TEC)

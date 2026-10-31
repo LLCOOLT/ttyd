@@ -9,6 +9,10 @@
 extern EvtWord end_00_init_evt[];
 void end_staff_roll_exit(void);
 
+/**
+ * REL prolog of the ending module (Japanese demo):
+ * runs the static constructors and registers the init event of the one room, end_00 (the staff roll).
+ */
 void _prolog(void) {
     voidfunctionptr* ctor;
 
@@ -18,6 +22,10 @@ void _prolog(void) {
     relSetEvtAddr("end_00", end_00_init_evt);
 }
 
+/**
+ * REL epilog of the ending module: runs the static destructors and then end_staff_roll_exit,
+ * which frees the ending picture file and restores the sound and font settings the staff roll changed.
+ */
 void _epilog(void) {
     voidfunctionptr* dtor;
 
@@ -27,5 +35,6 @@ void _epilog(void) {
     end_staff_roll_exit();
 }
 
+/** Target of unresolved relocations; the module has no code to run for them, so it is empty. */
 void _unresolved(void) {
 }

@@ -74,6 +74,12 @@ GXRenderModeObj GXEurgb60Hz480Int = {20, 640, 480, 480, 40, 0, 640, 480, 1, 0, 0
 GXRenderModeObj GXEurgb60Hz480IntAa = {20, 640, 242, 480, 40, 0, 640, 480, 1, 0, 1, { 3, 2, 9, 6, 3, 10, 3, 2, 9, 6, 3, 10, 9, 2, 3, 6, 9, 10, 9, 2, 3, 6, 9, 10 }, { 4, 8, 12, 16, 12, 8, 4 } };
 GXRenderModeObj GXRmHW = {1, 320, 240, 240, 40, 0, 640, 480, 0, 0, 0, { 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }, { 0, 0, 21, 22, 21, 0, 0 } };
 
+/**
+ * Copies rmin to rmout and shrinks it for overscan:
+ * hor pixels are trimmed from each side (width and viewport width drop by 2*hor, the origin moves in by hor),
+ * and ver lines from the top and bottom, with efbHeight reduced in proportion to xfbHeight.
+ * In single-field mode on a non-interlaced TV the XFB loses only ver lines.
+ */
 void GXAdjustForOverscan(const GXRenderModeObj* rmin, GXRenderModeObj* rmout, u16 hor, u16 ver) {
     u16 hor2 = hor * 2;
     u16 ver2 = ver * 2;
@@ -106,6 +112,10 @@ void GXAdjustForOverscan(const GXRenderModeObj* rmin, GXRenderModeObj* rmout, u1
     rmout->viYOrigin = rmin->viYOrigin + ver;
 }
 
+/**
+ * Sets the rectangle of the embedded framebuffer (EFB) that the next GXCopyDisp copies out to the external
+ * framebuffer (XFB). Left/top/width/height are in EFB pixels.
+ */
 void GXSetDispCopySrc(u16 left, u16 top, u16 wd, u16 ht) {
     CHECK_GXBEGIN(1235, "GXSetDispCopySrc");
 
@@ -121,6 +131,7 @@ void GXSetDispCopySrc(u16 left, u16 top, u16 wd, u16 ht) {
 }
 
 
+/** Sets the EFB rectangle that the next GXCopyTex copies into a texture. Games use this to render-to-texture. */
 void GXSetTexCopySrc(u16 left, u16 top, u16 wd, u16 ht) {
     CHECK_GXBEGIN(1263, "GXSetTexCopySrc");
 
@@ -135,6 +146,10 @@ void GXSetTexCopySrc(u16 left, u16 top, u16 wd, u16 ht) {
     SET_REG_FIELD(1272, __GXData->cpTexSize,  8, 24, 0x4A);
 }
 
+/**
+ * Sets the XFB row stride for the next GXCopyDisp from the pixel width wd (2 bytes per pixel, stored in 32-byte
+ * units). The height ht is not used.
+ */
 void GXSetDispCopyDst(u16 wd, u16 ht) {
     u16 stride;
 
@@ -147,6 +162,10 @@ void GXSetDispCopyDst(u16 wd, u16 ht) {
     SET_REG_FIELD(1300, __GXData->cpDispStride,  8, 24, 0x4D);
 }
 
+/**
+ * Sets the format, mipmap flag and row stride (from the tile counts for wd x ht) for the next GXCopyTex;
+ * Z formats select the Z copy path.
+ */
 void GXSetTexCopyDst(u16 wd, u16 ht, GXTexFmt fmt, GXBool mipmap) {
     u32 rowTiles;
     u32 colTiles;
@@ -191,12 +210,20 @@ void GXSetTexCopyDst(u16 wd, u16 ht, GXTexFmt fmt, GXBool mipmap) {
     SET_REG_FIELD(1393, __GXData->cpTex, 3, 4, peTexFmt);
 }
 
+/**
+ * Sets the frame/field mode (GXCopyMode) in the display-copy control word;
+ * the texture-copy word is set to plain frame mode.
+ */
 void GXSetDispCopyFrame2Field(GXCopyMode mode) {
     CHECK_GXBEGIN(1410, "GXSetDispCopyFrame2Field");
     SET_REG_FIELD(1411, __GXData->cpDisp, 2, 12, mode);
     SET_REG_FIELD(1411, __GXData->cpTex, 2, 12, 0);
 }
 
+/**
+ * Sets whether the top and bottom edges of the copy region clamp to the nearest line,
+ * in both the display-copy and texture-copy control words.
+ */
 void GXSetCopyClamp(GXFBClamp clamp) {
     u8 clmpB;
     u8 clmpT;
@@ -213,6 +240,10 @@ void GXSetCopyClamp(GXFBClamp clamp) {
     SET_REG_FIELD(1439, __GXData->cpTex, 1, 1, clmpB);
 }
 
+/**
+ * Returns how many XFB lines result from efbHt EFB lines at the inverse vertical scale iScale (256 means 1:1),
+ * capped at 1024.
+ */
 static u32 __GXGetNumXfbLines(u32 efbHt, u32 iScale) {
     u32 count;
     u32 realHt;
@@ -240,6 +271,10 @@ static u32 __GXGetNumXfbLines(u32 efbHt, u32 iScale) {
     return realHt;
 }
 
+/**
+ * Converts a vertical scale factor to the hardware's integer inverse scale
+ * and returns how many XFB lines efbHeight EFB lines produce.
+ */
 u16 GXGetNumXfbLines(u16 efbHeight, f32 yScale) {
     u32 iScale;
     ASSERTMSGLINE(1486, yScale >= 1.0f, "GXGetNumXfbLines: Vertical scale must be >= 1.0");
@@ -248,6 +283,10 @@ u16 GXGetNumXfbLines(u16 efbHeight, f32 yScale) {
     return __GXGetNumXfbLines(efbHeight, iScale);
 }
 
+/**
+ * Searches for the vertical scale factor that makes efbHeight EFB lines come out as exactly xfbHeight XFB lines,
+ * since the hardware's integer scale does not hit every height directly.
+ */
 f32 GXGetYScaleFactor(u16 efbHeight, u16 xfbHeight) {
     f32 fScale;
     f32 yScale;
@@ -282,6 +321,10 @@ f32 GXGetYScaleFactor(u16 efbHeight, u16 xfbHeight) {
     return fScale;
 }
 
+/**
+ * Writes the vertical scale register for the display copy (enabled unless the scale is 1.0)
+ * and returns the number of XFB lines the copy of the current source height will produce.
+ */
 u32 GXSetDispCopyYScale(f32 vscale) {
     u8 enable;
     u32 iScale;
@@ -305,6 +348,7 @@ u32 GXSetDispCopyYScale(f32 vscale) {
     return __GXGetNumXfbLines(ht, iScale);
 }
 
+/** Writes the colour (RGBA) and 24-bit Z value that the EFB is cleared to by a copy with clear enabled. */
 void GXSetCopyClear(GXColor clear_clr, u32 clear_z) {
     u32 reg;
 
@@ -330,6 +374,11 @@ void GXSetCopyClear(GXColor clear_clr, u32 clear_z) {
     __GXData->bpSentNot = 0;
 }
 
+/**
+ * Writes the copy filter: if aa is set the 12 multisample positions from sample_pattern,
+ * otherwise the centred default; and if vf is set the 7 vertical filter coefficients from vfilter,
+ * otherwise the default 0,0,21,22,21,0,0 (no deflicker).
+ */
 void GXSetCopyFilter(GXBool aa, const u8 sample_pattern[12][2], GXBool vf, const u8 vfilter[7]) {
     u32 msLoc[4];
     u32 coeff0;
@@ -413,12 +462,18 @@ void GXSetCopyFilter(GXBool aa, const u8 sample_pattern[12][2], GXBool vf, const
     __GXData->bpSentNot = 0;
 }
 
+/** Sets the gamma (GXGamma: 1.0, 1.7 or 2.2) in the display-copy control word. */
 void GXSetDispCopyGamma(GXGamma gamma) {
     CHECK_GXBEGIN(1741, "GXSetDispCopyGamma");
     SET_REG_FIELD(1742, __GXData->cpDisp, 2, 7, gamma);
 }
 
 #if DEBUG
+/**
+ * Debug-build check for GXCopyDisp/GXCopyTex: asserts on clamp settings (top clamp when the source starts at
+ * line 0, bottom clamp past line 528), no clear for Z or YUV copies,
+ * 2- or 4-pixel alignment of the source rectangle, and 32-byte alignment of the destination.
+ */
 static void __GXVerifCopy(void* dest, u8 clear) {
     u8 clmpT;
     u8 clmpB;
@@ -457,6 +512,12 @@ static void __GXVerifCopy(void* dest, u8 clear) {
 }
 #endif
 
+/**
+ * Copies the EFB region set by GXSetDispCopySrc into the XFB at dest (32-byte aligned, uses the physical
+ * address) with the display-copy settings.
+ * With clear set it temporarily makes Z always-write and colour writes off
+ * so the copy also clears the EFB to the GXSetCopyClear values, then restores the Z and colour modes.
+ */
 void GXCopyDisp(void* dest, GXBool clear) {
     u32 reg;
     u32 tempPeCtrl;
@@ -517,6 +578,11 @@ void GXCopyDisp(void* dest, GXBool clear) {
     __GXData->bpSentNot = 0;
 }
 
+/**
+ * Copies the EFB region set by GXSetTexCopySrc into main memory at dest as a texture in the format given by
+ * GXSetTexCopyDst; Z formats switch the pixel format to Z for the copy.
+ * With clear set it also clears the EFB, as GXCopyDisp does.
+ */
 void GXCopyTex(void* dest, GXBool clear) {
     u32 reg;
     u32 tempPeCtrl;
@@ -584,6 +650,10 @@ void GXCopyTex(void* dest, GXBool clear) {
     __GXData->bpSentNot = 0;
 }
 
+/**
+ * Writes the initial value 0x3FF to the two bounding-box BP registers (0x55 and 0x56)
+ * so the next read covers only later drawing.
+ */
 void GXClearBoundingBox(void) {
     u32 reg;
 
@@ -595,6 +665,10 @@ void GXClearBoundingBox(void) {
     __GXData->bpSentNot = 0;
 }
 
+/**
+ * Reads the bounding box of pixels drawn since GXClearBoundingBox from the pixel-engine registers into *left,
+ * *top, *right and *bottom.
+ */
 void GXReadBoundingBox(u16* left, u16* top, u16* right, u16* bottom) {
     *left = GX_GET_PE_REG(8);
     *top = GX_GET_PE_REG(10);

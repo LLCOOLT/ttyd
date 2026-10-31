@@ -17,6 +17,11 @@ static BeroEntry bero_entry_data[6];
 static BeroEntry w_bero_mapchg[1];
 static HitDamageReturn dmgRetPoint[6];
 
+/**
+ * Door animation script (closing) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_l_01 and S_doa_l_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l_01"), 0, LW(0), 0)
@@ -25,6 +30,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_l_01 and S_doa_l_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l_01"), 0, LW(0), 0)
@@ -33,6 +43,12 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (closing) for the east (door 1) door,
+ * used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_r_01 and S_doa_r_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(e1_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r_01"), 0, LW(0), 0)
@@ -41,6 +57,12 @@ static EVT_BEGIN(e1_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the east (door 1) door,
+ * used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_r_01 and S_doa_r_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(e1_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r_01"), 0, LW(0), 0)
@@ -49,6 +71,12 @@ static EVT_BEGIN(e1_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (closing) for the east (door 2) door,
+ * used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_r2_01
+ * and S_doa_r2_02 by it, the second one the opposite way.
+ */
 static EVT_BEGIN(e2_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r2_01"), 0, LW(0), 0)
@@ -57,6 +85,12 @@ static EVT_BEGIN(e2_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the east (door 2) door,
+ * used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_r2_01
+ * and S_doa_r2_02 by it, the second one the opposite way.
+ */
 static EVT_BEGIN(e2_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r2_01"), 0, LW(0), 0)
@@ -185,6 +219,12 @@ static HitDamageReturn dmgRetPoint[] = {
     {0},
 };
 
+/**
+ * Map init script for las_23, a junction room of the Palace:
+ * music (first or third Palace theme by story), the doors, return points for the bottomless pits,
+ * and before STORY_STG8_06_MOVING_PLANETS it hides the lower floor and pipe;
+ * afterwards it switches to the moved layout with the west door leading to a different room (w_bero_mapchg).
+ */
 EVT_BEGIN(las_23_init_evt)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG8_06_MOVING_PLANETS)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST1"))

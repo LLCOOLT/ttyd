@@ -43,18 +43,25 @@ static int fioPacketWrite(int fd, void* buffer, int size, int async);
 static int fioPacketResultRead(void* buffer, u32 dataSize);
 static int fioPacketResultWrite(void* buffer, u32 dataSize);
 
+/** Returns whether the FIO channel is open (gChID is non-zero). */
 static BOOL fioIsInitialized(void) {
     return !!gChID;
 }
 
+/** Byte-swaps a 16-bit value (the host PC is little-endian). */
 static u16 EndianConvert16(u16 n) {
     return ((n & 0x00FF) << 8) | ((n & 0xFF00) >> 8);
 }
 
+/** Byte-swaps a 32-bit value (the host PC is little-endian). */
 static u32 EndianConvert32(u32 n) {
     return EndianConvert16((n >> 16) & 0xFFFF) | (EndianConvert16(n & 0xFFFF) << 0x10);
 }
 
+/**
+ * Spins until *flag equals value, giving up after timeout seconds;
+ * prints an error and returns 0 on timeout, 1 otherwise.
+ */
 static int MPDWaiting(int timeout, volatile int* flag, int value) {
     OSTick tickStart;
     OSTick tickDist;
@@ -72,6 +79,7 @@ static int MPDWaiting(int timeout, volatile int* flag, int value) {
     return 1;
 }
 
+/** Prints an MCC channel's first block, block count, connection state and lock state with OSReport. */
 static void ShowChannelInfo(MCC_CHANNEL chID) {
     MCC_Info info;
 
@@ -86,10 +94,17 @@ static void ShowChannelInfo(MCC_CHANNEL chID) {
              (info.isLocked == TRUE)                    ? "LOCKED" : "UNKNOWN");
 }
 
+/** Prints "[fio] Error: <msg>" with OSReport. */
 static void fioErrorReport(char* msg) {
     OSReport("[fio] Error: %s\n", msg);
 }
 
+/**
+ * MCC event callback for the FIO channel: records the channel on connect and clears it on disconnect,
+ * sets gQuery when the host answers a query (protocol 0x120),
+ * and marks the packet exchange (and a pending async transfer) done when the host sends the 0xF00000 notify;
+ * read and write events set gStreamReady to 0x10 and 0x20.
+ */
 static void fioMccChannelEvent(MCC_CHANNEL chID, u32 event, u32 value) {
     u32 notify;
 
@@ -126,6 +141,11 @@ static void fioMccChannelEvent(MCC_CHANNEL chID, u32 event, u32 value) {
     }
 }
 
+/**
+ * Starts file I/O over the PC link: MCCInit with a 10 second timeout,
+ * then MCCOpen of the given channel with blockSize 8 KB blocks, and resets the packet and async state.
+ * Returns 1 when ready; the error is in FIOGetLastError.
+ */
 int FIOInit(MCC_EXI exiChannel, MCC_CHANNEL chID, u8 blockSize) {
     OSRegisterVersion(__FIOVersion);
 
@@ -155,6 +175,7 @@ exit:;
     return 0;
 }
 
+/** Closes the FIO channel and resets the packet and async state (does nothing further if MCCClose fails). */
 void FIOExit(void) {
     if (MCCClose(gChID) == 0) {
         gLastErr = FIO_ERROR_MCC;
@@ -172,6 +193,11 @@ void FIOExit(void) {
     bAsyncIsRead = FALSE;
 }
 
+/**
+ * Asks the host whether its file server is present:
+ * sends notify 0x100120 and waits up to 10 seconds for the reply.
+ * On failure it also stalls for 5 seconds before returning 0.
+ */
 int FIOQuery(void) {
     OSTick tick;
 
@@ -195,10 +221,15 @@ exit:;
     return 0;
 }
 
+/** Returns the error code of the last FIO call (FIO_ERROR_*; 0 means no error). */
 u8 FIOGetLastError(void) {
     return gLastErr;
 }
 
+/**
+ * Opens filename on the host PC with the mode flags (only bits 0xE03 are valid):
+ * sends request 0 and returns the host's file descriptor, or -1 on error.
+ */
 int FIOFopen(const char* filename, u32 mode) {
     struct FIO_Code {
         /* 0x00 */ u32 flag;
@@ -241,6 +272,10 @@ exit:;
     return -1;
 }
 
+/**
+ * Closes a host file descriptor (request 2); returns 1 once the host answered,
+ * with the host's result in the last error.
+ */
 int FIOFclose(int handle) {
     struct FIO_Code {
         /* 0x00 */ u32 descriptor;
@@ -277,6 +312,10 @@ exit:;
     return 0;
 }
 
+/**
+ * Reads size bytes from a host file into data (which must be 32-byte aligned) through fioPacketRead;
+ * returns the byte count or -1.
+ */
 u32 FIOFread(int handle, void* data, u32 size) {
     char* pBuf;
     volatile int nSizeRemain;
@@ -321,6 +360,10 @@ exit:;
     return -1;
 }
 
+/**
+ * Writes size bytes from data (32-byte aligned) to a host file through fioPacketWrite;
+ * returns the byte count or -1.
+ */
 u32 FIOFwrite(int handle, void* data, u32 size) {
     volatile int nSizeRemain;
     int nResult;
@@ -363,6 +406,10 @@ exit:;
     return -1;
 }
 
+/**
+ * Seeks a host file (request 8): mode 0 from the start, 1 from the current position, 2 from the end;
+ * rejects negative offsets from start and positive ones from end. Returns the new position or -1.
+ */
 u32 FIOFseek(int handle, s32 offset, u32 mode) {
     struct FIO_Code {
         /* 0x00 */ u32 descriptor;
@@ -416,6 +463,10 @@ exit:
     return -1;
 }
 
+/**
+ * printf into a host file: formats into a 256 byte buffer (truncating at 255 characters)
+ * and writes the text with FIOFwrite.
+ */
 int FIOFprintf(int handle, const char* format, ...) {
     char* str;
     int length;
@@ -462,6 +513,7 @@ exit:;
     return -1;
 }
 
+/** Asks the host to flush a file to disk (request 10); returns 1 on success. */
 int FIOFflush(int handle) {
     struct FIO_Code {
         /* 0x00 */ u32 descriptor;
@@ -502,6 +554,7 @@ exit:
     return 0;
 }
 
+/** Fetches the host's FIO_Stat for an open file (request 12); returns 1 on success. */
 int FIOFstat(int handle, FIO_Stat* stat) {
     struct FIO_Code {
         /* 0x00 */ u32 descriptor;
@@ -552,6 +605,10 @@ exit:;
     return 0;
 }
 
+/**
+ * Asks the host for the error state of a file descriptor (request 14);
+ * returns the error code, which is also stored as the last error.
+ */
 int FIOFerror(int handle) {
     struct FIO_Code {
         /* 0x00 */ u32 descriptor;
@@ -592,6 +649,10 @@ exit:;
     return gLastErr;
 }
 
+/**
+ * Starts a directory search on the host for a path pattern (request 16) and copies the first FIO_Finddata;
+ * returns 1 on success.
+ */
 int FIOFindFirst(const char* filename, FIO_Finddata* finddata) {
     struct FIO_Code {
         /* 0x00 */ u8 filename; // dynamic length
@@ -638,6 +699,7 @@ exit:;
     return 0;
 }
 
+/** Fetches the next match of the search begun by FIOFindFirst (request 18). */
 int FIOFindNext(FIO_Finddata* finddata) {
     struct FIO_Code {
         /* 0x00 */ u32 reserved;
@@ -680,6 +742,7 @@ exit:;
     return 0;
 }
 
+/** Opens a directory on the host (request 20) and stores its descriptor in *dir; returns 1 on success. */
 int FIOOpenDir(const char* dirname, int* dir) {
     struct FIO_Code {
         /* 0x00 */ s8 filename;
@@ -723,6 +786,7 @@ exit:;
     return 0;
 }
 
+/** Closes a host directory descriptor (request 22). */
 int FIOCloseDir(int dir) {
     struct FIO_Code {
         /* 0x00 */ u32 descriptor;
@@ -754,6 +818,7 @@ int FIOCloseDir(int dir) {
     return 0;
 }
 
+/** Returns the number of entries in an open host directory (request 24), or -1. */
 s32 FIOGetDirSize(int dir) {
     struct FIO_Code {
         /* 0x00 */ u32 descriptor;
@@ -786,6 +851,11 @@ s32 FIOGetDirSize(int dir) {
     return -1;
 }
 
+/**
+ * Reads up to numOfData directory entries (request 26):
+ * the host returns the count and the FIO_Finddata records are
+ * then read through FIOFread on the directory descriptor. Returns the count or -1.
+ */
 s32 FIOReadDir(int dir, FIO_Finddata* data, s32 numOfData) {
     struct FIO_Code {
         /* 0x00 */ u32 descriptor;
@@ -834,6 +904,11 @@ s32 FIOReadDir(int dir, FIO_Finddata* data, s32 numOfData) {
     return -1;
 }
 
+/**
+ * Returns the largest transfer the async calls accept:
+ * the channel's block size times 8 KB minus a 0x18 byte header,
+ * rounded down to 32 bytes (0 if no channel is open).
+ */
 u32 FIOGetAsyncBufferSize(void) {
     int nPacketSize;
     int nHeaderSize;
@@ -850,6 +925,10 @@ u32 FIOGetAsyncBufferSize(void) {
     return !(nResult & 0x1F) ? nResult : nResult & ~0x1F;
 }
 
+/**
+ * Starts a non-blocking host file read (buffer 32-byte aligned, at most FIOGetAsyncBufferSize bytes);
+ * poll FIOCheckAsyncDone for completion. Returns 1 if the request was sent.
+ */
 int FIOFreadAsync(int handle, void* data, u32 size) {
     if (handle == 0) {
         gLastErr = FIO_ERROR_INVALID_PARAMETERS;
@@ -886,6 +965,10 @@ exit:;
     return 0;
 }
 
+/**
+ * Starts a non-blocking host file write (buffer 32-byte aligned, at most FIOGetAsyncBufferSize bytes);
+ * poll FIOCheckAsyncDone for completion. Returns 1 if the request was sent.
+ */
 int FIOFwriteAsync(int handle, void* data, u32 size) {
     if (handle == 0) {
         gLastErr = FIO_ERROR_INVALID_PARAMETERS;
@@ -922,6 +1005,10 @@ exit:
     return 0;
 }
 
+/**
+ * Returns 1 and the byte count in *result once the pending async read
+ * or write has finished (the host's 0xF00000 notify arrived); 0 while it is still running.
+ */
 int FIOCheckAsyncDone(u32* result) {
     if (bAsyncBusy) {
         if (bAsyncIsRead) {
@@ -939,6 +1026,10 @@ int FIOCheckAsyncDone(u32* result) {
     return 0;
 }
 
+/**
+ * Fills the shared 8 KB buffer's header (protocol 0x120, length, the request code and a new sequence number)
+ * and returns where the request payload goes.
+ */
 static void* fioPacketMakeHeader(u32 fioCode, u32 dataSize, BOOL bEndianConvert) {
     MCC_Hdr* hdrDpci;
     MCC_HdrFio* hdrFio;
@@ -964,6 +1055,10 @@ static void* fioPacketMakeHeader(u32 fioCode, u32 dataSize, BOOL bEndianConvert)
     return data;
 }
 
+/**
+ * Writes the request buffer to the host with MCCWrite (one 8 KB block, or more with the data following),
+ * waiting for the previous exchange to finish, then notifies the host with 0xF00000.
+ */
 static int fioPacketSendPacket(u8 sizeOfBlocks, void* pTopOfSecondBlockData) {
     u32 oldMaskWrite;
     u8 indexOfBlocks;
@@ -1001,6 +1096,10 @@ static int fioPacketSendPacket(u8 sizeOfBlocks, void* pTopOfSecondBlockData) {
     return 1;
 }
 
+/**
+ * Waits up to 10 seconds for the host's reply, reads it into the buffer and checks the reply code
+ * and sequence number; returns the payload pointer or NULL (and sets the last error).
+ */
 static void* fioPacketReceiveResult(u32 fioCode, BOOL bDone) {
     u32 oldMaskRead;
     MCC_Hdr* hdrDpci;
@@ -1045,10 +1144,15 @@ exit:;
     return NULL;
 }
 
+/** Clears gProcBusy so the next request may use the shared buffer. */
 static void fioPacketReceiveDone(void) {
     gProcBusy = 0;
 }
 
+/**
+ * Sends a read request (code 4) for nbytes of descriptor fd;
+ * synchronously it then receives the data, asynchronously it only remembers the size.
+ */
 static int fioPacketRead(int fd, void* buffer, int size, int async) {
     struct FIO_Code {
         /* 0x00 */ u32 descriptor;
@@ -1071,6 +1175,10 @@ static int fioPacketRead(int fd, void* buffer, int size, int async) {
     return -1;
 }
 
+/**
+ * Sends a write request (code 6) for nbytes of descriptor fd;
+ * synchronously it then sends the data, asynchronously it only remembers the size.
+ */
 static int fioPacketWrite(int fd, void* buffer, int size, int async) {
     struct FIO_Code {
         /* 0x00 */ u32 descriptor;
@@ -1093,6 +1201,11 @@ static int fioPacketWrite(int fd, void* buffer, int size, int async) {
     return -1;
 }
 
+/**
+ * Receives the data of a read request: the sub-block part comes through MCCRead,
+ * whole blocks through a temporary MCC stream (the channel is closed, reopened as a stream,
+ * read with MCCStreamRead and reopened normally); then reads the reply code 5 and returns the byte count or -1.
+ */
 static int fioPacketResultRead(void* buffer, u32 dataSize) {
     int bResult;
     MCC_CHANNEL nChID;
@@ -1204,6 +1317,11 @@ exit:;
     return -1;
 }
 
+/**
+ * Sends the data of a write request through a temporary MCC stream (channel closed, reopened as a stream,
+ * MCCStreamWrite, reopened normally), then receives reply code 7 and returns the host's written byte count
+ * or -1.
+ */
 static int fioPacketResultWrite(void* buffer, u32 dataSize) {
     register int nResult = 0;
     MCC_CHANNEL nChID;

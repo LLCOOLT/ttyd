@@ -14,6 +14,15 @@ DSPTaskInfo* __DSP_tmp_task;
 DSPTaskInfo* __DSP_rude_task;
 int __DSP_rude_task_pending;
 
+/**
+ * DSP interrupt handler.
+ * Reads the mail the DSP sent and acts on it: 0xDCD10000 (task initialised)
+ * and 0xDCD10001 (task resumed) call the task's init or resume callback;
+ * 0xDCD10002 (task yielded) switches to the "rude" task, the next task in the queue or the first task again,
+ * saving this one's state; 0xDCD10003 (task done) calls done_cb,
+ * loads the next task and removes the finished one; 0xDCD10004 calls req_cb.
+ * A task cancelled with DSPCancelTask has its yield mail turned into done. Runs on its own OSContext.
+ */
 void __DSPHandler(__OSInterrupt intr, OSContext* context) {
     u8 unused[4];
     OSContext exceptionContext;
@@ -155,6 +164,11 @@ void __DSPHandler(__OSInterrupt intr, OSContext* context) {
     OSSetCurrentContext(context);
 }
 
+/**
+ * Sends the DSP the mails that switch tasks: where to save the current task's data memory (or zeros),
+ * where to load the next task's instruction memory from, its length and DSP address,
+ * then either its init vector (first run) or its resume vector plus the saved data memory.
+ */
 void __DSP_exec_task(DSPTaskInfo* curr, DSPTaskInfo* next) {
     ASSERTMSGLINE(552, next != NULL, "__DSP_exec_task(): NULL task. It is to weep.\n");
 
@@ -224,6 +238,11 @@ void __DSP_exec_task(DSPTaskInfo* curr, DSPTaskInfo* next) {
     }
 }
 
+/**
+ * Boots the DSP with its first task: waits for the DSP's ready mail,
+ * then writes the boot protocol (0x80F3Axxx and neighbouring command words) giving the task's instruction memory
+ * source, destination and length, and finally its init vector.
+ */
 void __DSP_boot_task(DSPTaskInfo* task) {
     volatile u32 mail;
 
@@ -282,6 +301,10 @@ void __DSP_boot_task(DSPTaskInfo* task) {
     __DSP_debug_printf("__DSP_boot_task()  : Start Vector  : 0x%08X\n", task->dsp_init_vector);
 }
 
+/**
+ * Inserts a task into the doubly linked task list ordered by priority (lower number first, after tasks of equal
+ * priority).
+ */
 void __DSP_insert_task(DSPTaskInfo* task) {
     DSPTaskInfo* temp;
 
@@ -315,6 +338,7 @@ void __DSP_insert_task(DSPTaskInfo* task) {
     }
 }
 
+/** Appends a task to the end of the list with state 0, ignoring priority. */
 void __DSP_add_task(DSPTaskInfo* task) {
     ASSERTMSGLINE(771, task != NULL, "__DSP_add_task(): Why are you adding a NULL task?\n");
 
@@ -334,6 +358,10 @@ void __DSP_add_task(DSPTaskInfo* task) {
     __DSP_debug_printf("__DSP_add_task() : Added task    : 0x%08X\n", (u32)task);
 }
 
+/**
+ * Unlinks a task from the list, clears its flags and sets state 3 (done), updating the first,
+ * last and current task pointers.
+ */
 void __DSP_remove_task(DSPTaskInfo* task) {
     ASSERTMSGLINE(813, task != NULL, "__DSP_remove_task(): NULL task! Why? WHY?!?!\n");
     task->flags = 0;

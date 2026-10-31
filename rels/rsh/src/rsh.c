@@ -121,6 +121,11 @@ extern EvtWord debug_print_rnd_npc[];
 NpcSetupInfo rsh_03_rnd_npc_2_ent[2];
 NpcSetupInfo rsh_04_rnd_npc_3_ent[2];
 
+/**
+ * Shows the stained floor object (s_yuka_simi, probably the spilled stew) in rsh_02_a
+ * and rsh_03_a from the start of chapter 6 until the end of day 1,
+ * and the clean floor (s_yuka) at every other story stage.
+ */
 EVT_BEGIN(simi_check)
     SET_VALUE(LF(0), 0)
     CALL(evt_sub_get_mapname, LW(10))
@@ -143,6 +148,10 @@ EVT_BEGIN(simi_check)
     RETURN
 EVT_END()
 
+/**
+ * Companion of simi_check: clears the offscreen-capture binding of whichever floor object (s_yuka or
+ * s_yuka_simi) is the visible one, so the door transition shows the right floor in rsh_02_a and rsh_03_a.
+ */
 EVT_BEGIN(simi_offscreen_check)
     SET_VALUE(LF(0), 0)
     CALL(evt_sub_get_mapname, LW(10))
@@ -163,6 +172,11 @@ EVT_BEGIN(simi_offscreen_check)
     RETURN
 EVT_END()
 
+/**
+ * Swaps the floor objects that carry the stolen paper in rsh_01_a (yuka_3_kami,
+ * while the story is at the document stage) and rsh_02_a (yuka_5_kami, during the vital clue stages) with their
+ * plain floors.
+ */
 EVT_BEGIN(kami_check)
     CALL(evt_sub_get_mapname, LW(10))
     IF_STR_EQUAL(LW(10), STRING("rsh_01_a"))
@@ -189,6 +203,10 @@ EVT_BEGIN(kami_check)
     RETURN
 EVT_END()
 
+/**
+ * Companion of kami_check: clears the offscreen-capture binding of whichever paper
+ * or plain floor object is currently visible in rsh_01_a and rsh_02_a.
+ */
 EVT_BEGIN(kami_offscreen_check)
     CALL(evt_sub_get_mapname, LW(10))
     IF_STR_EQUAL(LW(10), STRING("rsh_01_a"))
@@ -209,6 +227,10 @@ EVT_BEGIN(kami_offscreen_check)
     RETURN
 EVT_END()
 
+/**
+ * Sets up the cabin-door transition for a car: registers the OFF_d_meku page-turn paper,
+ * the capture_img image used to animate the door, and the offscreen buffer, with the image switched off.
+ */
 EVT_BEGIN(evt_rsh_door_init)
     CALL(evt_paper_entry, STRING("OFF_d_meku"))
     CALL(evt_img_entry, STRING("capture_img"))
@@ -219,6 +241,13 @@ EVT_BEGIN(evt_rsh_door_init)
     RETURN
 EVT_END()
 
+/**
+ * Registers one cabin door.
+ * LW(0) points to a table of seven entries (room, backdrop, door object, outside hit, open animation,
+ * inside hit, close animation).
+ * Hides the room and its backdrop and wires evt_rsh_door_open to the outside hit
+ * and evt_rsh_door_close to the inside hit.
+ */
 EVT_BEGIN(evt_rsh_door_entry)
     SET_INT_READ_ADDR(LW(0))
     READ_INT(LW(1))
@@ -235,6 +264,14 @@ EVT_BEGIN(evt_rsh_door_entry)
     RETURN
 EVT_END()
 
+/**
+ * Runs when Mario walks into a cabin door (LW(0) is the door table of evt_rsh_door_entry):
+ * locks input, plays the door slide sound and animation, walks Mario in,
+ * then plays the page-turn capture while the cabin is revealed.
+ * Also plays the story reactions that happen on entering a cabin:
+ * the partner comments in cabin 5 at the blanket and conductor stages,
+ * the BGM dip in cabins 5 and 4 for the ghost scenes, and Zip Toad becoming touchable.
+ */
 EVT_BEGIN(evt_rsh_door_open)
     SET_INT_READ_ADDR(LW(0))
     READ_INT(LW(1))
@@ -446,6 +483,12 @@ EVT_BEGIN(evt_rsh_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Runs when Mario leaves a cabin (LW(0) is the door table of evt_rsh_door_entry):
+ * locks input, captures the cabin, walks Mario back out to the corridor and plays the page-turn in reverse.
+ * Also starts the scripted rsh_04 map changes at the Pennington's assistant and give-autograph stages,
+ * and plays the ghost voice in rsh_02_c once.
+ */
 EVT_BEGIN(evt_rsh_door_close)
     SET_INT_READ_ADDR(LW(0))
     READ_INT(LW(1))
@@ -616,6 +659,12 @@ EVT_BEGIN(evt_rsh_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Sets up the moving scenery in the train windows.
+ * LW(0) points to a zero-terminated list of map object names;
+ * each gets the rsh_window_tev TEV callback and has its display list disabled
+ * so the window shows the screen capture of the scenery.
+ */
 EVT_BEGIN(evt_rsh_window)
     CALL(evt_map_set_tevcallback, 1, PTR(rsh_window_tev))
     SET_INT_READ_ADDR(LW(0))
@@ -703,11 +752,19 @@ RshRndNpc rsh_04_rnd_npc_4[] = {
     {"c_kinopiko", "キノピオ女", evt_rsh_rnd_npc_5_7_talk},
 };
 
+/**
+ * Talk script for passenger 2-1, a purple Toadette that car rsh_01 can seat as passenger group 1 (drawn at
+ * random per save; message stg6_rsh_c_15). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_2_1_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_15"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 2-2, a blue Toad that car rsh_01 can seat as passenger group 1 (drawn at random per
+ * save; message stg6_rsh_c_16). It ends with a choice menu (stg6_rsh_c_16_sel) and a reply.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_2_2_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_16"), 0, STRING("me"))
     CALL(evt_msg_select, 0, STRING("stg6_rsh_c_16_sel"))
@@ -715,6 +772,10 @@ EVT_BEGIN(evt_rsh_rnd_npc_2_2_talk)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 2-3, a green Toad that car rsh_01 can seat as passenger group 1 (drawn at random per
+ * save; message stg6_rsh_c_17). It ends with a choice menu (stg6_rsh_c_17_sel) and a reply.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_2_3_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_17"), 0, STRING("me"))
     CALL(evt_msg_select, 0, STRING("stg6_rsh_c_17_sel"))
@@ -722,61 +783,110 @@ EVT_BEGIN(evt_rsh_rnd_npc_2_3_talk)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 2-4, a Koopa that car rsh_01 can seat as passenger group 1 (drawn at random per
+ * save; message stg6_rsh_c_18). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_2_4_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_18"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 2-5, a Goomba that car rsh_01 can seat as passenger group 1 (drawn at random per
+ * save; message stg6_rsh_c_19). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_2_5_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_19"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 2-6, a pink Toadette that car rsh_01 can seat as passenger group 2 (drawn at random
+ * per save; message stg6_rsh_c_20). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_2_6_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_20"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 2-7, a yellow-green child Toad that car rsh_01 can seat as passenger group 3 (drawn
+ * at random per save; message stg6_rsh_c_21). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_2_7_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_21"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 2-8, a blue Toad that car rsh_01 can seat as passenger group 2 (drawn at random per
+ * save; message stg6_rsh_c_22). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_2_8_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_22"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 2-9, a Toadette that car rsh_01 can seat as passenger group 2 (drawn at random per
+ * save; message stg6_rsh_c_23). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_2_9_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_23"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 2-10, a blue child Toad that car rsh_01 can seat as passenger group 3 (drawn at
+ * random per save; message stg6_rsh_c_24). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_2_10_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_24"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 3-1, a Toad that car rsh_03 can seat as passenger group 1 (drawn at random per save;
+ * message stg6_rsh_c_25). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_3_1_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_25"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 3-2, a pink Toadette that car rsh_03 can seat as passenger group 1 (drawn at random
+ * per save; message stg6_rsh_c_26). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_3_2_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_26"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 3-3, a purple Toadette that car rsh_03 can seat as passenger group 1 (drawn at
+ * random per save; message stg6_rsh_c_27). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_3_3_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_27"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 3-4, a blue Toad that car rsh_03 can seat as passenger group 1 (drawn at random per
+ * save; message stg6_rsh_c_28). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_3_4_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_28"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 3-5, a pink Toadette that car rsh_03 can seat as passenger group 1 (drawn at random
+ * per save; message stg6_rsh_c_29).
+ * It asks a two-way question (stg6_rsh_c_29_sel) and answers differently for each choice.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_3_5_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_29"), 0, STRING("me"))
     CALL(evt_msg_select, 0, STRING("stg6_rsh_c_29_sel"))
@@ -788,41 +898,73 @@ EVT_BEGIN(evt_rsh_rnd_npc_3_5_talk)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 3-6, a green child Toad that car rsh_03 can seat as passenger group 2 (drawn at
+ * random per save; message stg6_rsh_c_30). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_3_6_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_30"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 3-7, a purple Toadette that car rsh_03 can seat as passenger group 1 (drawn at
+ * random per save; message stg6_rsh_c_31). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_3_7_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_31"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 3-8, a Koopa that car rsh_03 can seat as passenger group 1 (drawn at random per
+ * save; message stg6_rsh_c_32). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_3_8_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_32"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 3-9, a Yoshi that car rsh_03 can seat as passenger group 1 (drawn at random per
+ * save; message stg6_rsh_c_33). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_3_9_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_33"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 3-10, a yellow-green child Toad that car rsh_03 can seat as passenger group 2 (drawn
+ * at random per save; message stg6_rsh_c_34). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_3_10_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_34"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 4-1, a Koopa that car rsh_03 can seat as passenger group 1 (drawn at random per
+ * save; message stg6_rsh_c_35). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_4_1_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_35"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 4-2, a Yoshi that car rsh_03 can seat as passenger group 1 (drawn at random per
+ * save; message stg6_rsh_c_36). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_4_2_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_36"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 4-3, a Lakitu that car rsh_03 can seat as passenger group 1 (drawn at random per
+ * save; message stg6_rsh_c_37). It ends with a choice menu (stg6_rsh_c_37_sel) and a reply.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_4_3_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_37"), 0, STRING("me"))
     CALL(evt_msg_select, 0, STRING("stg6_rsh_c_37_sel"))
@@ -830,26 +972,48 @@ EVT_BEGIN(evt_rsh_rnd_npc_4_3_talk)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 4-4, a blue Toad that car rsh_03 can seat as passenger group 1 (drawn at random per
+ * save; message stg6_rsh_c_38). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_4_4_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_38"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 4-5, a Koopa that car rsh_03 can seat as passenger group 1 (drawn at random per
+ * save; message stg6_rsh_c_39). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_4_5_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_39"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 4-6, a Toad that car rsh_03 can seat as passenger group 2 (drawn at random per save;
+ * message stg6_rsh_c_40). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_4_6_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_40"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 4-7, a green child Toad that car rsh_03 can seat as passenger group 2 (drawn at
+ * random per save; message stg6_rsh_c_41). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_4_7_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_41"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 4-8, a Goomba that car rsh_03 can seat as passenger group 2 (drawn at random per
+ * save; message stg6_rsh_c_42).
+ * The first time it asks a two-way question; answering the first option sets GSWF_RSH_PASSENGER_4_8_ANSWERED
+ * and later talks only play the closing line (stg6_rsh_c_42_03).
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_4_8_talk)
     IF_INT_EQUAL(GSWF(GSWF_RSH_PASSENGER_4_8_ANSWERED), 0)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_c_42"), 0, STRING("me"))
@@ -866,26 +1030,48 @@ EVT_BEGIN(evt_rsh_rnd_npc_4_8_talk)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 4-9, a green Toad that car rsh_03 can seat as passenger group 2 (drawn at random per
+ * save; message stg6_rsh_c_43). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_4_9_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_43"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 4-10, a Koopa that car rsh_03 can seat as passenger group 2 (drawn at random per
+ * save; message stg6_rsh_c_44). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_4_10_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_44"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 5-1, a blue child Toad that car rsh_04 can seat as passenger group 4 (drawn at
+ * random per save; message stg6_rsh_c_45). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_5_1_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_45"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 5-2, a green Toad that car rsh_04 can seat as passenger group 1 (drawn at random per
+ * save; message stg6_rsh_c_46). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_5_2_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_46"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 5-3, a yellow-green child Toad that car rsh_04 can seat as passenger group 4 (drawn
+ * at random per save; message stg6_rsh_c_47).
+ * The first time it offers a three-way choice and sets GSWF_RSH_PASSENGER_5_3_ANSWERED;
+ * later talks only print the closing line (stg6_rsh_c_47_04).
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_5_3_talk)
     IF_INT_EQUAL(GSWF(GSWF_RSH_PASSENGER_5_3_ANSWERED), 0)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_c_47"), 0, STRING("me"))
@@ -905,36 +1091,64 @@ EVT_BEGIN(evt_rsh_rnd_npc_5_3_talk)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 5-4, a blue child Toad that car rsh_04 can seat as passenger group 4 (drawn at
+ * random per save; message stg6_rsh_c_48). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_5_4_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_48"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 5-5, a green child Toad that car rsh_04 can seat as passenger group 3 (drawn at
+ * random per save; message stg6_rsh_c_49). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_5_5_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_49"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 5-6, a child Toad that car rsh_04 can seat as passenger group 3 (drawn at random per
+ * save; message stg6_rsh_c_50). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_5_6_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_50"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 5-7, a Toadette that car rsh_04 can seat as passenger group 4 (drawn at random per
+ * save; message stg6_rsh_c_51). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_5_7_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_51"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 5-8, a Koopa that car rsh_04 can seat as passenger group 2 (drawn at random per
+ * save; message stg6_rsh_c_52). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_5_8_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_52"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 5-9, a Toad that car rsh_04 can seat as passenger group 2 (drawn at random per save;
+ * message stg6_rsh_c_53). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_5_9_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_53"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for passenger 5-10, a blue Toad that car rsh_04 can seat as passenger group 1 (drawn at random per
+ * save; message stg6_rsh_c_54). The passenger says one line and nothing changes.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_5_10_talk)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_54"), 0, STRING("me"))
     RETURN
@@ -1007,6 +1221,10 @@ const char* rsh_04_rnd_npc_4_list[] = {
     /*"５−７"*/"\x82\x54\x81\x7C\x82\x56",
 };
 
+/**
+ * Debug leftover: loops over the nine random passenger slots and calls debug_print_func for each,
+ * which only formats a string and prints nothing.
+ */
 EVT_BEGIN(debug_print_rnd_npc)
     SET_VALUE(LW(0), 0)
     LOOP(9)
@@ -1037,6 +1255,11 @@ typedef struct RshDebugStr {
 
 static const RshDebugStr rsh_debug_str_init = {0};
 
+/**
+ * Rolls the random passengers of the whole train on a new game:
+ * clears the three packed state words GSW_RSH_RANDOM_NPC_STATE_A..C, then for each passenger slot of rsh_01,
+ * rsh_03 and rsh_04 picks a random candidate and stores it with evt_rsh_set_rnd_npc.
+ */
 EVT_BEGIN(evt_rsh_rnd_npc_init)
     SET_VALUE(GSW(GSW_RSH_RANDOM_NPC_STATE_A), 0)
     SET_VALUE(GSW(GSW_RSH_RANDOM_NPC_STATE_B), 0)
@@ -1063,6 +1286,11 @@ EVT_BEGIN(evt_rsh_rnd_npc_init)
     RETURN
 EVT_END()
 
+/**
+ * Spawns the three random passengers of rsh_01 (Passenger 1..3):
+ * looks up each stored pick, entries the NPC with its model, places and turns it at a fixed spot,
+ * turns talk animation on and hooks its talk script.
+ */
 EVT_BEGIN(evt_rsh_01_rnd_npc_entry)
     CALL(evt_rsh_get_rnd_npc, 0, 0, LW(0))
     CALL(evt_rsh_get_rnd_npc_data, 0, 0, LW(0), LW(1), LW(2))
@@ -1112,6 +1340,11 @@ NpcSetupInfo rsh_03_rnd_npc_2_ent[] = {
     {0},
 };
 
+/**
+ * Spawns the two random passengers of rsh_03.
+ * Passenger 2 additionally gets rsh_03_rnd_npc_2_ent,
+ * which makes it wander near (-360, -10) with the generic npc_urouro events.
+ */
 EVT_BEGIN(evt_rsh_03_rnd_npc_entry)
     CALL(evt_rsh_get_rnd_npc, 1, 0, LW(0))
     CALL(evt_rsh_get_rnd_npc_data, 1, 0, LW(0), LW(1), LW(2))
@@ -1153,6 +1386,11 @@ NpcSetupInfo rsh_04_rnd_npc_3_ent[] = {
     {0},
 };
 
+/**
+ * Spawns the four random passengers of rsh_04.
+ * Passenger 3 wanders near (-180, -145) with the generic npc_urouro events;
+ * passenger 4 stands at a different spot in the demo than in the releases.
+ */
 EVT_BEGIN(evt_rsh_04_rnd_npc_entry)
     CALL(evt_rsh_get_rnd_npc, 2, 0, LW(0))
     CALL(evt_rsh_get_rnd_npc_data, 2, 0, LW(0), LW(1), LW(2))
@@ -1198,6 +1436,10 @@ EVT_BEGIN(evt_rsh_04_rnd_npc_entry)
     RETURN
 EVT_END()
 
+/**
+ * Debug leftover: formats the "RSH_xx:group(label, value)" line for a passenger pick into a stack buffer
+ * but never prints it. Args: room, group, index, value.
+ */
 static USER_FUNC(debug_print_func) {
     EvtWord* args = event->args;
     s32 room = evtGetValue(event, args[0]);
@@ -1258,6 +1500,7 @@ static USER_FUNC(debug_print_func) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets the talkEvt of the named NPC. Args: [0] NPC name, [1] event script to run when Mario talks to it. */
 static USER_FUNC(evt_rsh_set_rnd_npc_talk_evt) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1267,6 +1510,10 @@ static USER_FUNC(evt_rsh_set_rnd_npc_talk_evt) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Looks up the talk script of a passenger candidate.
+ * Args: [0] room (0 = rsh_01, 1 = rsh_03, 2 = rsh_04), [1] group, [2] index; [3] receives the script address.
+ */
 static USER_FUNC(evt_rsh_get_rnd_npc_talk_evt) {
     EvtWord* args = event->args;
     s32 room = evtGetValue(event, args[0]);
@@ -1277,6 +1524,10 @@ static USER_FUNC(evt_rsh_get_rnd_npc_talk_evt) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Looks up the model data of a passenger candidate.
+ * Args: [0] room, [1] group, [2] index; [3] receives the NPC type name, [4] its Japanese model name.
+ */
 static USER_FUNC(evt_rsh_get_rnd_npc_data) {
     EvtWord* args = event->args;
     s32 room = evtGetValue(event, args[0]);
@@ -1289,6 +1540,10 @@ static USER_FUNC(evt_rsh_get_rnd_npc_data) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Returns the candidate table entry for a room (0 = rsh_01, 1 = rsh_03, 2 = rsh_04), passenger group and index;
+ * unknown room/group falls back to the first rsh_01 candidate.
+ */
 static RshRndNpc* _get_rnd_npc_data(s32 room, s32 group, s32 index) {
     RshRndNpc* data = NULL;
 
@@ -1340,6 +1595,13 @@ static RshRndNpc* _get_rnd_npc_data(s32 room, s32 group, s32 index) {
     return &data[index];
 }
 
+/**
+ * Stores a random passenger pick in the packed save word of its car.
+ * Args: [0] room, [1] group, [2] candidate index.
+ * The state words GSW_RSH_RANDOM_NPC_STATE_A (rsh_01),
+ * B (rsh_03) and C (rsh_04) hold each group's index in a few bits;
+ * the index is ORed in, so the words must be cleared first.
+ */
 static USER_FUNC(evt_rsh_set_rnd_npc) {
     EvtWord* args = event->args;
     s32 room = evtGetValue(event, args[0]);
@@ -1397,6 +1659,10 @@ static USER_FUNC(evt_rsh_set_rnd_npc) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Reads a random passenger pick back out of the packed state word.
+ * Args: [0] room, [1] group; [2] receives the candidate index (0 for unknown groups).
+ */
 static USER_FUNC(evt_rsh_get_rnd_npc) {
     EvtWord* args = event->args;
     s32 room = evtGetValue(event, args[0]);
@@ -1461,6 +1727,13 @@ static USER_FUNC(evt_rsh_get_rnd_npc) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * TEV callback for the train windows: copies the part of the frame buffer behind the window object into a
+ * half-size RGB5A3 texture and re-applies it as a projected texture with a frustum matched to the 3D camera,
+ * so the scenery seems to flow past the glass.
+ * Returns early on the first frame (it only marks the object to get a screen bounding box) and
+ * when the box is empty.
+ */
 static void rsh_window_tev(MapTevCallbackInfo* info) {
     MapObject* p;
     u32 flags;
@@ -1562,6 +1835,11 @@ static void rsh_window_tev(MapTevCallbackInfo* info) {
     info->texCoord = texMap;
 }
 
+/**
+ * Script helper polled by evt_rsh_door_open/close:
+ * returns TRUE once the capture_img door animation has ended (flag 2 set or one loop done),
+ * FALSE while it is still playing.
+ */
 static BOOL img_wait(void) {
     ImageEntry* img = imgNameToPtr("capture_img", gp->inBattle != 0);
 
@@ -1571,9 +1849,11 @@ static BOOL img_wait(void) {
     return TRUE;
 }
 
+/** Linker stub for unresolved references in the relocatable module; does nothing. */
 void _unresolved(void) {
 }
 
+/** REL epilog: runs the module's global destructors from the _dtors table when the module is unloaded. */
 void _epilog(void) {
     voidfunctionptr* dtor;
 
@@ -1582,6 +1862,12 @@ void _epilog(void) {
     }
 }
 
+/**
+ * REL entry point: runs the global constructors,
+ * then registers each map's init script with relSetEvtAddr (the first-visit scripts until the story reaches
+ * STORY_STG6_54_WELCOME_BACK, the "nidome" second-visit scripts afterwards)
+ * and installs the battle setup table for the rsh module.
+ */
 void _prolog(void) {
     voidfunctionptr* ctor;
 

@@ -44,6 +44,13 @@ void BtlActRec_AddCount(u8* count);
 // FAKE: local prototype: BtlActRec_AddPoint takes the points as u8 (battle_actrecord.h: s32); this file was compiled with it and the header prototype changes the code.
 void BtlActRec_AddPoint(u8* rec, u8 points);
 
+/**
+ * Applies a finished hit to target: clamps damage to +-99, credits the attacker's totals,
+ * spawns the damage-star popups (HP, and FP for Mario's side), plays the Attack FX,
+ * guard or element damage sound, lowers HP and FP (negative damage heals),
+ * may wake a sleeping target (half the time, when flag is set) and tells the audience about big hits,
+ * KOs and partner downs. unitId -5 means no attacker (counter damage, hazards).
+ */
 void BattleDamageDirect(s32 unitId, BattleUnit* target, BattleUnitPart* part, s32 damage, s32 fpDamage, u32 result, u32 pattern, s32 flag) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* attacker;
@@ -323,6 +330,11 @@ void BattleDamageDirect(s32 unitId, BattleUnit* target, BattleUnitPart* part, s3
     BattleRunHitEvent(target, result);
 }
 
+/**
+ * Picks the Attack FX sound for a hammer/jump hit:
+ * with several Attack FX badges equipped one is chosen at random,
+ * and its DAMAGE_FLAG_ATTACK_FX_* bit is returned added to *flags. "Pikkyoro" is the squeaky toy-hammer sound.
+ */
 static u32 BattleCheckPikkyoro(BattleWeapon* weapon, u32* flags) {
     BattleWork* wp = _battleWorkPointer;
     s32 table[5] = {0};
@@ -397,6 +409,15 @@ static u32 BattleCheckPikkyoro(BattleWeapon* weapon, u32* flags) {
     return result;
 }
 
+/**
+ * Computes the HP damage weapon deals to target's part:
+ * base power from the weapon's damage function plus attacker boosts (Power Plus, P-Up D-Down, All or Nothing,
+ * Mega/Power Rush, Ice Power, Charge, Huge, Attack Up, minus Tiny, Attack Down, HP/FP Drain),
+ * minus the part's defence for the element plus Defend Plus, Damage Dodge, Defense Up/Down and defending,
+ * then guard reduction, Double Pain and Last Stand.
+ * Elements the part absorbs set DAMAGE_FLAG_HEAL and return the heal amount;
+ * zero when All or Nothing missed its command.
+ */
 static s32 BattleCalculateDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, u32* result, u32 flags) {
     u32 defaultResult;
     BattleWork* wp = _battleWorkPointer;
@@ -632,6 +653,10 @@ skip:
     return damage;
 }
 
+/**
+ * Computes the FP damage weapon deals (its fpDamageFn), reduced by one when guarded;
+ * zero for heals, immune parts and an All or Nothing miss.
+ */
 static s32 BattleCalculateFpDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, u32* resultFlags, u32 flags) {
     BattleWork* wp = _battleWorkPointer;
     s32 damage = 0;
@@ -668,6 +693,10 @@ static s32 BattleCalculateFpDamage(BattleUnit* attacker, BattleUnit* target, Bat
     return damage;
 }
 
+/**
+ * Returns weapon's base chance (percent) of inflicting status type (1 sleep, 2 stop, 3 dizzy, 4 poison,
+ * 5 confuse, 6 electric, 7 dodgy, 8 burn, 9 freeze, ... in the order of BattleSetStatusDamageFromWeapon).
+ */
 static s32 _getSickStatusRate(BattleWeapon* weapon, s32 type) {
     BattleWeapon* w = weapon;
     switch (type) {
@@ -756,6 +785,11 @@ static s32 _getSickStatusRate(BattleWeapon* weapon, s32 type) {
     return 0;
 }
 
+/**
+ * Returns the turns and strength weapon gives status type, from its time/strength fields.
+ * Each extra copy of the badge move equipped adds 2 turns (Shrink Stomp, Sleepy Stomp, Soft Stomp, Head Rattle,
+ * Ice Smash), extra unused Defend badges add strength, and extra Charge badges raise the charge.
+ */
 static void _getSickStatusParam(BattleUnit* unit, BattleWeapon* weapon, u32 type, s8* outTime, s8* outStrength) {
     BattleWeapon* w = weapon;
     s32 time;
@@ -955,6 +989,7 @@ static void _getSickStatusParam(BattleUnit* unit, BattleWeapon* weapon, u32 type
     *outStrength = strength;
 }
 
+/** Returns unit's resistance rate (percent of the base chance that still lands) against status type. */
 static u8 _getRegistStatus(BattleUnit* unit, s32 type) {
     BattleVulnerableStatus* v = unit->vulnStatus;
     switch (type) {
@@ -1018,6 +1053,13 @@ EffectEntry* effUpdownEntry(s32 type, s32 strength, s32 time, f32 x, f32 y, f32 
     ((EffStampN64Work*)(e)->userdata)->g2 = (g1); \
     ((EffStampN64Work*)(e)->userdata)->b2 = (b1)
 
+/**
+ * Tries to inflict status type on unit with base chance rate (scaled by the unit's resistance and level
+ * difference), for time turns at strength; on success sets the status, plays its effect and announcement,
+ * and records it in *result.
+ * Also handles the stat buffs (charge, attack/defence up/down, size, fast/slow, HP/FP regen) and their stacking.
+ * Returns whether it took.
+ */
 static s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u32 special, s32 type, s32 rate, s32 levelDiff, s8 time, s8 strength) {
     s32 ok;
     s32 announce;
@@ -1504,6 +1546,10 @@ static s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* 
     return 1;
 }
 
+/**
+ * Rolls every status the weapon can inflict (unless DAMAGE_FLAG_NO_STATUS) against target
+ * and returns the result flags of those that took.
+ */
 s32 BattleSetStatusDamageFromWeapon(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, u32 flags) {
     s32 rate;
     u32 i;
@@ -1551,6 +1597,12 @@ s32 BattleSetStatusDamageFromWeapon(BattleUnit* attacker, BattleUnit* target, Ba
     return result;
 }
 
+/**
+ * Decides whether an attack connects before any damage:
+ * 1 hits, 2 misses (evasive part or the accuracy roll, halved when the attacker is Dizzy or in fog),
+ * 3 dodged by Pretty Lucky, Lucky Day or Close Call, 4 cannot touch the target (invisible, veiled, intangible),
+ * 5 stopped by a pre-emptive spike, 6 dodged through the Dodgy status.
+ */
 s32 BattlePreCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, u32 flags) {
     BattleWork* wp = _battleWorkPointer;
     s32 n;
@@ -1619,6 +1671,10 @@ s32 BattlePreCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPar
     return 1;
 }
 
+/**
+ * Adds DAMAGE_FLAG_LIFE_SHROOM to a KO code and returns 1 when the falling unit will be revived:
+ * Mario or a partner with a Life Shroom in the pouch, or an enemy holding one.
+ */
 static s32 _checkDamageCode_EmergencyRevival(BattleUnit* unit, u32* flags) {
     s32 kind = unit->currentKind;
     if (kind == 0xDE) {
@@ -1642,6 +1698,14 @@ static s32 _checkDamageCode_EmergencyRevival(BattleUnit* unit, u32* flags) {
     return 0;
 }
 
+/**
+ * Resolves one hit of weapon on target's part: Superguards (with their counter),
+ * contact counters (spikes, fire, ice, electric, explosions, poison, Payback, Return Postage, Hold Fast),
+ * damage and status calculation, KO and Life Shroom revival,
+ * then applies it through BattleDamageDirect and starts the target's hit event.
+ * Returns 18 when the hit landed, 19 when it had no effect, 21 when Superguarded without a counter,
+ * -1 when the attacker was countered.
+ */
 s32 BattleCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, s32 flags) {
     BattleWork* wp = _battleWorkPointer;
     u32 pattern;
@@ -1884,6 +1948,8 @@ s32 BattleCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* 
     return ret;
 }
 
+// Redirects an attack on *unitIdx to its bodyguard: the first unit whose protectId names the target, is able to guard
+// and has a guard-cover part steps in; both run their guard hit events and *unitIdx/*partIdx become the guard's.
 void BattleAttackDeclare(s32* unitIdx, s32* partIdx) {
     s32 i;
     BattleUnit* unit;
@@ -1939,6 +2005,10 @@ void BattleAttackDeclare(s32* unitIdx, s32* partIdx) {
     }
 }
 
+/**
+ * Finds the bodyguard covering unitIdx (as BattleAttackDeclare) and returns it in outUnit/outPart,
+ * -1 when there is none, starting the same guard events.
+ */
 static void __declare(s32 unitIdx, s32 partIdx, s32* outUnit, s32* outPart) {
     s32 i;
     BattleUnit* unit;
@@ -1996,6 +2066,10 @@ static void __declare(s32 unitIdx, s32 partIdx, s32* outUnit, s32* outPart) {
     }
 }
 
+/**
+ * For multi-target attacks: swaps every target that has a bodyguard for the guard
+ * and drops duplicate entries from the target list.
+ */
 void BattleAttackDeclareAll(BattleWork* wp) {
     s32 i;
     BattleWorkWeaponTargets* wt = &wp->weaponTargets;
@@ -2028,11 +2102,18 @@ void BattleAttackDeclareAll(BattleWork* wp) {
     wt->currentTarget = 0;
 }
 
+/** Clears a counter-check record before a hit (noHazard = 1: nothing hurts the attacker). */
 void BattleInitCounterPreCheckWork(CounterWork* work) {
     memset(work, 0, sizeof(CounterWork));
     work->noHazard = 1;
 }
 
+/**
+ * Fills work with the contact hazard the attacker meets on part:
+ * top or pre-emptive spikes, fire, ice, electric, explosion, poison, Payback, Hold Fast, Return Postage,
+ * each unless the weapon resists it or a badge (Spike Shield, Ice Power) protects the attacker.
+ * Sets the counter's damage, message, hit event and status side effects; returns 0 without an attacker.
+ */
 s32 BattleCheckCounter(CounterWork* work, BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, u32* flags) {
     if (!attacker) {
         return 0;

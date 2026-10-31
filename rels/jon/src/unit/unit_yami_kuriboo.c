@@ -172,6 +172,10 @@ static BattleWeapon weapon_kuriboo_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init event of the Gloomba: installs its wait, attack, damage and confusion events and sets its run,
+ * walk and jump sounds.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -184,6 +188,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Gloomba: runs the default damage handling with LW(10) = -2 and LW(11) = 1. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -191,10 +196,19 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Phase event of the Gloomba: does nothing. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: attack event of the Gloomba: picks a target (the first attack target in the forced case),
+ * flusters if there is none, and uses an enemy item first if it has one.
+ * Otherwise it runs at the target, then tumbles in a spin (krb_get_dir gives the rotation from its path) with a
+ * 32-unit jump onto the target.
+ * A miss lands it nearby; a hit applies weapon_kuriboo_attack with the action command defence check.
+ * It then hops back to its place.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -328,11 +342,17 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle event: shows the unit's table pose for state 1. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0..1] = x, z of the first point, args[2..3] = x, z of the second,
+ * args[4] = angle in and out.
+ * Returns the angle (degrees) from the first point towards the second; unchanged if the points coincide.
+ */
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);

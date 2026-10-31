@@ -53,6 +53,11 @@ extern EvtWord peach_evt_kou2_in[];
 extern EvtWord peach_evt_kou2_out[];
 extern EvtWord s_bero_out[];
 
+/**
+ * Door open animation step: moves the two door leaves S_door1_2
+ * and S_door1_1 in opposite directions along X by the animation value in LW(0) times 0.16601563;
+ * the open and close scripts apply the same transform.
+ */
 static EVT_BEGIN(s_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.16601563f))
     CALL(evt_mapobj_trans, 1, STRING("S_door1_2"), LW(0), 0, 0)
@@ -61,6 +66,11 @@ static EVT_BEGIN(s_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door close animation step: moves the two door leaves S_door1_2
+ * and S_door1_1 in opposite directions along X by the animation value in LW(0) times 0.16601563;
+ * the open and close scripts apply the same transform.
+ */
 static EVT_BEGIN(s_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.16601563f))
     CALL(evt_mapobj_trans, 1, STRING("S_door1_2"), LW(0), 0, 0)
@@ -91,6 +101,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Exit event of the first exit (hit area on the changing-room side) in Peach's section:
+ * without the X-Naut disguise (GSWF_AJI09_PEACH3_DISGUISED = 0) she says she cannot go out like this
+ * (peach_aji_133) and LW(0) = 1 tells the exit to be cancelled; disguised, LW(0) = 0 lets her through.
+ */
 EVT_BEGIN(peach_evt_bero_out1)
     IF_INT_EQUAL(GSWF(GSWF_AJI09_PEACH3_DISGUISED), 0)
         CALL(evt_mario_key_onoff, 0)
@@ -125,6 +140,11 @@ BeroEntry bero_data_peach1[] = {
     {0},
 };
 
+/**
+ * Exit event of the second exit in Peach's section, the mirror of peach_evt_bero_out1:
+ * while disguised she says peach_aji_155_01 (she should not leave in the disguise)
+ * and LW(0) = 1 cancels the exit; undisguised, LW(0) = 0 lets her through.
+ */
 EVT_BEGIN(peach_evt_bero_out2)
     IF_INT_EQUAL(GSWF(GSWF_AJI09_PEACH3_DISGUISED), 0)
         SET_VALUE(LW(0), 0)
@@ -159,6 +179,10 @@ BeroEntry bero_data_peach2[] = {
     {0},
 };
 
+/**
+ * Case script for the first changing booth's curtain (A_kou1_ka_omo and A_kou1_ka_ura):
+ * rolls the curtain S_kou1_ka open or closed depending on GF(0), toggling it each time.
+ */
 EVT_BEGIN(evt_kou1)
     CALL(evt_hit_bind_mapobj, STRING("A_kou1_ka_omo"), STRING("S_kou1_ka"))
     CALL(evt_hit_bind_mapobj, STRING("A_kou1_ka_ura"), STRING("S_kou1_ka"))
@@ -196,6 +220,12 @@ EVT_BEGIN(evt_kou1)
     RETURN
 EVT_END()
 
+/**
+ * Case script for the second changing booth's curtain (A_kou2_ka_omo and A_kou2_ka_ura),
+ * which also toggles open and closed through GF(1).
+ * When the map is entered from the ceiling ("tenjo") Mario turns into 8-bit pixel Mario (dot_mario,
+ * GSWF_AJI09_PIXEL_MARIO_ACTIVE) and BGM_EVT_DOT_MARIO1 plays while he stays in that form.
+ */
 EVT_BEGIN(evt_kou2)
     CALL(evt_hit_bind_mapobj, STRING("A_kou2_ka_omo"), STRING("S_kou2_ka"))
     CALL(evt_hit_bind_mapobj, STRING("A_kou2_ka_ura"), STRING("S_kou2_ka"))
@@ -277,6 +307,10 @@ const char* rokka_data[] = {
     NULL,
 };
 
+/**
+ * Opens a locker door: swings the locker (map object LW(0)) open by 120 degrees over 40 frames with
+ * SFX_PEACH_LOCKER_OPEN1, then attaches evt_rokka_close to its push and stand-on areas so that it closes again.
+ */
 EVT_BEGIN(evt_rokka_open)
     CALL(evt_mario_get_pos, 0, LW(13), LW(14), LW(15))
     CALL(evt_snd_sfxon_3d, STRING("SFX_PEACH_LOCKER_OPEN1"), LW(13), LW(14), LW(15), 0)
@@ -314,6 +348,10 @@ EVT_BEGIN(evt_rokka_open)
     RETURN
 EVT_END()
 
+/**
+ * Closes a locker door again (the reverse swing, 40 or 20 frames depending on LW(10))
+ * and attaches evt_rokka_open to the locker's front area again.
+ */
 EVT_BEGIN(evt_rokka_close)
     IF_INT_EQUAL(LW(10), 0)
         CALL(evt_del_case_evt, 0, LW(12))
@@ -364,6 +402,10 @@ EVT_BEGIN(evt_rokka_close)
     RETURN
 EVT_END()
 
+/**
+ * Attaches evt_rokka_open to every locker listed in rokka_data (read until a 0 entry),
+ * so Mario can open each one from the front.
+ */
 EVT_BEGIN(evt_rokka_init)
     SET_INT_READ_ADDR(PTR(&rokka_data))
     LOOP(0)
@@ -379,6 +421,10 @@ EVT_BEGIN(evt_rokka_init)
     RETURN
 EVT_END()
 
+/**
+ * Peach finds the X-Naut uniform in the locker:
+ * she and the narrator comment (peach_aji_134 and 135), and GSWF_AJI09_PEACH3_UNIFORM_TAKEN is set.
+ */
 EVT_BEGIN(peach_evt_fuku_g)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("peach_aji_134"), 0, STRING("mario"))
@@ -391,6 +437,10 @@ EVT_BEGIN(peach_evt_fuku_g)
     RETURN
 EVT_END()
 
+/**
+ * Opens a changing-booth curtain (map object LW(0)):
+ * plays SFX_PEACH_CURTAIN_OPEN1 and scales it down along X from full width to a tenth over half a second.
+ */
 EVT_BEGIN(peach_evt_ka_open)
     SET_VALUE(LW(2), LW(0))
     CALL(evt_mapobj_get_position, LW(0), LW(1), LW(3), LW(4))
@@ -407,6 +457,10 @@ EVT_BEGIN(peach_evt_ka_open)
     RETURN
 EVT_END()
 
+/**
+ * Closes a changing-booth curtain (map object LW(0)):
+ * the reverse of peach_evt_ka_open, scaling it back to full width.
+ */
 EVT_BEGIN(peach_evt_ka_close)
     SET_VALUE(LW(2), LW(0))
     CALL(evt_mapobj_get_position, LW(0), LW(1), LW(3), LW(4))
@@ -423,6 +477,12 @@ EVT_BEGIN(peach_evt_ka_close)
     RETURN
 EVT_END()
 
+/**
+ * Peach steps into a changing booth: the curtain opens and closes,
+ * and Peach comments depending on the story point (peach_aji_136, 137, 137_02 for the disguise,
+ * 154 on the way back) and on which of the two booths she used (GSWF_AJI09_PEACH3_CHANGED_IN_BOOTH1).
+ * Returns in LW(15) whether she changes clothes.
+ */
 EVT_BEGIN(peach_evt_kou_in)
     SET_VALUE(LW(10), LW(0))
     SET_VALUE(LW(9), LW(1))
@@ -486,6 +546,11 @@ EVT_BEGIN(peach_evt_kou_in)
     RETURN
 EVT_END()
 
+/**
+ * Peach steps out of a changing booth: the curtain opens and closes again,
+ * the music resumes and she remarks on the change (peach_aji_137_01, 155) depending on the story point
+ * and the booth.
+ */
 EVT_BEGIN(peach_evt_kou_out)
     SET_VALUE(LW(10), LW(0))
     SET_VALUE(LW(9), LW(1))
@@ -522,6 +587,12 @@ EVT_BEGIN(peach_evt_kou_out)
     RETURN
 EVT_END()
 
+/**
+ * Case script for stepping into the first changing booth from the front (A_kou1_ka_omo):
+ * check_kou_evt decides if the letter box is lifted, runs peach_evt_kou_in with the curtain S_kou1_ka, and,
+ * if she has the uniform, swaps the clothes shown in the booth (S_fuku1_g, the X-Naut uniform, and S_fuku1_p,
+ * her dress).
+ */
 EVT_BEGIN(peach_evt_kou1_in)
     CALL(check_kou_evt, 0, 1, LF(0))
     IF_INT_EQUAL(LF(0), 0)
@@ -549,6 +620,11 @@ EVT_BEGIN(peach_evt_kou1_in)
     RETURN
 EVT_END()
 
+/**
+ * Case script for stepping out of the first changing booth (A_kou1_ka_ura):
+ * runs peach_evt_kou_out and, when this was the booth that mattered (LF(0)),
+ * moves the story from STORY_STG3_33_01_PEACH_TECS_REQUEST to STORY_STG3_33_02_PEACH_INCOGNITO.
+ */
 EVT_BEGIN(peach_evt_kou1_out)
     CALL(check_kou_evt, 1, 1, LF(0))
     IF_INT_EQUAL(LF(0), 0)
@@ -569,6 +645,10 @@ EVT_BEGIN(peach_evt_kou1_out)
     RETURN
 EVT_END()
 
+/**
+ * Case script for stepping into the second changing booth from the front (A_kou2_ka_omo):
+ * the same as peach_evt_kou1_in for the curtain S_kou2_ka.
+ */
 EVT_BEGIN(peach_evt_kou2_in)
     CALL(check_kou_evt, 0, 0, LF(0))
     IF_INT_EQUAL(LF(0), 0)
@@ -596,6 +676,10 @@ EVT_BEGIN(peach_evt_kou2_in)
     RETURN
 EVT_END()
 
+/**
+ * Case script for stepping out of the second changing booth (A_kou2_ka_ura):
+ * the same as peach_evt_kou1_out for the other booth.
+ */
 EVT_BEGIN(peach_evt_kou2_out)
     CALL(check_kou_evt, 1, 0, LF(0))
     IF_INT_EQUAL(LF(0), 0)
@@ -616,6 +700,11 @@ EVT_BEGIN(peach_evt_kou2_out)
     RETURN
 EVT_END()
 
+/**
+ * Exit event of the door s_bero: Peach in her disguise leaves the changing room through the door
+ * and the map changes to aji_17 (entering at w_bero), after the door opens and the screen fades out;
+ * without the disguise she says peach_aji_155_01 and stays.
+ */
 EVT_BEGIN(s_bero_out)
 #if VERSION >= VERSION_US
     CALL(evt_mario_key_onoff, 0)
@@ -660,6 +749,14 @@ EVT_BEGIN(s_bero_out)
     RETURN
 EVT_END()
 
+/**
+ * Peach's chapter 3 setup of the locker room: depending on the story point (before
+ * STORY_STG3_33_02_PEACH_INCOGNITO, in disguise or not,
+ * and which changing booth she last used) it shows the right outfit models (S_fuku*),
+ * attaches the booth entrance and exit scripts (peach_evt_kou1_in/out, kou2_in/out) and rewires the s_bero exit;
+ * at STORY_STG3_33_01_PEACH_TECS_REQUEST it shows peach_aji_132
+ * and at STORY_STG3_33_03_PEACH_GRODUS peach_aji_152 and 153 with a camera move.
+ */
 static EVT_BEGIN(peach_evt_stg3)
     CALL(evt_mario_key_onoff, 0)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_02_PEACH_INCOGNITO)
@@ -728,6 +825,10 @@ static EVT_BEGIN(peach_evt_stg3)
     RETURN
 EVT_END()
 
+/**
+ * Reading the memo that contains today's password:
+ * shows stg7_aji_33 and, if the story is earlier, advances it to STORY_STG7_11_PASSWORD_FOR_TODAY.
+ */
 static EVT_BEGIN(evt_memo1)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("stg7_aji_33"), 0, 0)
@@ -738,6 +839,7 @@ static EVT_BEGIN(evt_memo1)
     RETURN
 EVT_END()
 
+/** Reading a second memo: shows stg7_aji_33_01. */
 static EVT_BEGIN(evt_memo2)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("stg7_aji_33_01"), 0, 0)
@@ -745,6 +847,13 @@ static EVT_BEGIN(evt_memo2)
     RETURN
 EVT_END()
 
+/**
+ * Init script of aji_09, the changing room: sets up the exits and the lockers;
+ * during Peach's X-Naut disguise scenes (STORY_STG3_33_01 to 03) it starts peach_evt_stg3,
+ * otherwise it attaches the curtain scripts to both booths and the wall notes.
+ * Entered as "tenjo" Mario drops in from the ceiling.
+ * BGM_STG7_DUN2 plays for Mario and BGM_EVT_PEACH1 for Peach.
+ */
 EVT_BEGIN(aji_09_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -833,6 +942,11 @@ EVT_END()
 
 void partySetFamicomMode(PartyEntry* party, s32 mode);
 
+/**
+ * Script function: loads the pixel-Mario animation group "d_mario" and then switches Mario
+ * and his first partner to Famicom (8-bit) mode with marioSetFamicomMode and partySetFamicomMode.
+ * Blocks until the animation is loaded.
+ */
 static USER_FUNC(dot_mario) {
     PartyEntry* party = partyGetPtr(0);
 
@@ -844,12 +958,19 @@ static USER_FUNC(dot_mario) {
     return EVT_RETURN_DONE;
 }
 
+/** Script function: sets Mario's pose to the animation named in args[0]; used while Mario is Peach. */
 static USER_FUNC(peach_set_pose) {
     const char* pose = (const char*)evtGetValue(event, event->args[0]);
     MarioWork* mario = marioGetPtr();
     marioChgPose(pose);
     return EVT_RETURN_DONE;
 }
+/**
+ * Script function: returns in args[2] whether the booth entered is the one that matters for the current story
+ * point: 1 when Peach has taken the uniform at STORY_STG3_33_01_PEACH_TECS_REQUEST,
+ * or when at STORY_STG3_33_03_PEACH_GRODUS the change-back remark has not yet been made
+ * and the booth number args[1] equals the booth she changed in.
+ */
 static USER_FUNC(check_kou_evt) {
     EvtWord* args = event->args;
     s32 value;

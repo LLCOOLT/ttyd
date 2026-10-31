@@ -21,6 +21,8 @@ static GSROOT* gsRoot;
 static GSROOT* gsCurrent;
 static s32 gsNextID;
 
+/** Resets the sound-group stack: makes the default group root (id -2, empty) own ARAM from aramBase to aramBase +
+ * aramSize, ready for sndPushGroup. */
 void dataInitStack(unsigned long aramBase, unsigned long aramSize) {
   gsRoot = NULL;
   gsDefault.id = -2;
@@ -34,8 +36,11 @@ void dataInitStack(unsigned long aramBase, unsigned long aramSize) {
   gsCurrent = &gsDefault;
 }
 
+/** Returns the ARAM allocation info (base, write pointer, top) of the default group. */
 ARAMInfo* dataARAMDefaultGetInfo() { return &gsDefault.aramInfo; }
 
+/** Walks a chain of MEM_DATA records (linked by nextOff, ended by 0xFFFFFFFF) and returns the one with the given id, or
+ * NULL. */
 static inline MEM_DATA* GetPoolAddr(u16 id, MEM_DATA* m) {
   while (m->nextOff != 0xFFFFFFFF) {
     if (m->id == id) {
@@ -47,20 +52,27 @@ static inline MEM_DATA* GetPoolAddr(u16 id, MEM_DATA* m) {
   return NULL;
 }
 
+/** Finds macro id in the pool's macro list; NULL if there is no pool or no such macro. */
 static inline MEM_DATA* GetMacroAddr(u16 id, POOL_DATA* pool) {
   return pool == NULL ? NULL : GetPoolAddr(id, (MEM_DATA*)((u8*)pool + pool->macroOff));
 }
 
+/** Finds curve id in the pool's curve list; NULL if there is no pool or no such curve. */
 static inline MEM_DATA* GetCurveAddr(u16 id, POOL_DATA* pool) {
   return pool == NULL ? NULL : GetPoolAddr(id, (MEM_DATA*)((u8*)pool + pool->curveOff));
 }
+/** Finds keymap id in the pool's keymap list; NULL if there is no pool or no such keymap. */
 static inline MEM_DATA* GetKeymapAddr(u16 id, POOL_DATA* pool) {
   return pool == NULL ? NULL : GetPoolAddr(id, (MEM_DATA*)((u8*)pool + pool->keymapOff));
 }
+/** Finds layer id in the pool's layer list; NULL if there is no pool or no such layer. */
 static inline MEM_DATA* GetLayerAddr(u16 id, POOL_DATA* pool) {
   return pool == NULL ? NULL : GetPoolAddr(id, (MEM_DATA*)((u8*)pool + pool->layerOff));
 }
 
+/** Adds one item to, or removes it from, the global data tables. dataType: 0 macro, 1 sample (reference-counted), 2
+ * keymap (id | 0x4000), 3 layer (id | 0x8000), 4 curve. When inserting, items missing from the pool are registered as
+ * NULL entries. */
 void InsertData(u16 id, void* data, u8 dataType, u32 remove) {
   MEM_DATA* m; // r30
 
@@ -130,6 +142,8 @@ void InsertData(u16 id, void* data, u8 dataType, u32 remove) {
   }
 }
 
+/** Applies InsertData to every ID in a list ended by 0xFFFF. An entry with bit 15 set starts a range: the low 14 bits
+ * to the next entry inclusive. */
 static inline void ScanIDList(u16* ref, void* data, u8 dataType, u32 remove) {
   u16 id; // r30
 
@@ -148,6 +162,8 @@ static inline void ScanIDList(u16* ref, void* data, u8 dataType, u32 remove) {
   }
 }
 
+/** Same list format as ScanIDList but walks it from the end to the start, so samples are released in the reverse order
+ * they were added. */
 static inline void ScanIDListReverse(u16* refBase, void* data, u8 dataType, u32 remove) {
   s16 id;
   u16* ref;
@@ -180,22 +196,32 @@ static inline void ScanIDListReverse(u16* refBase, void* data, u8 dataType, u32 
   }
 }
 
+/** Registers every macro in the group's macro ID list, taking the data from pool. */
 static inline void InsertMacros(unsigned short* ref, void* pool) { ScanIDList(ref, pool, 0, 0); }
 
+/** Registers every curve in the group's curve ID list, taking the data from pool. */
 static inline void InsertCurves(unsigned short* ref, void* pool) { ScanIDList(ref, pool, 4, 0); }
 
+/** Registers every keymap in the group's keymap ID list, taking the data from pool. */
 static inline void InsertKeymaps(unsigned short* ref, void* pool) { ScanIDList(ref, pool, 2, 0); }
 
+/** Registers every layer in the group's layer ID list, taking the data from pool. */
 static inline void InsertLayers(unsigned short* ref, void* pool) { ScanIDList(ref, pool, 3, 0); }
 
+/** Unregisters every macro in the group's macro ID list. */
 static inline void RemoveMacros(unsigned short* ref) { ScanIDList(ref, NULL, 0, 1); }
 
+/** Unregisters every curve in the group's curve ID list. */
 static inline void RemoveCurves(unsigned short* ref) { ScanIDList(ref, NULL, 4, 1); }
 
+/** Unregisters every keymap in the group's keymap ID list. */
 static inline void RemoveKeymaps(unsigned short* ref) { ScanIDList(ref, NULL, 2, 1); }
 
+/** Unregisters every layer in the group's layer ID list. */
 static inline void RemoveLayers(unsigned short* ref) { ScanIDList(ref, NULL, 3, 1); }
 
+/** Registers the sample directory sdir (with its sample data translated by hwTransAddr) and then adds a reference for
+ * every sample ID in ref. */
 static inline void InsertSamples(u16* ref, void* samples, void* sdir) {
   samples = hwTransAddr(samples);
   if (dataInsertSDir((SDIR_DATA*)sdir, samples)) {
@@ -203,19 +229,27 @@ static inline void InsertSamples(u16* ref, void* samples, void* sdir) {
   }
 }
 
+/** Drops the references of every sample ID in ref (last to first) and removes the sample directory. */
 static inline void RemoveSamples(unsigned short* ref, void* sdir) {
   ScanIDListReverse(ref, NULL, 1, 1);
   dataRemoveSDir(sdir);
 }
 
+/** Registers a song group's sound-effect table under the group ID gid. */
 static inline void InsertFXTab(unsigned short gid, FX_DATA* fd) { dataInsertFX(gid, fd->fx, fd->num); }
 
+/** Unregisters the sound-effect table of group gid. */
 static inline void RemoveFXTab(unsigned short gid) { dataRemoveFX(gid); }
 
+/** Public: sets the callback that fetches sample data in chunkSize pieces when it is copied to ARAM (see
+ * aramStoreData). */
 void sndSetSampleDataUploadCallback(void* (*callback)(u32, u32), u32 chunckSize) {
   hwSetSaveSampleCallback(callback, chunckSize);
 }
 
+/** Public: loads group gid from the project data prj_data on top of the group stack: registers its samples, macros,
+ * curves, keymaps, layers and (for type 1 groups) its sound-effect table, then waits for the ARAM uploads. Returns
+ * FALSE if the sound system is off, the stack (128 deep) is full or the group is not found. */
 bool sndPushGroup(void* prj_data, u16 gid, void* samples, void* sdir, void* pool) {
   GROUP_DATA* g; // r31
   MUSY_ASSERT_MSG(prj_data != NULL, "Project data pointer is NULL");
@@ -311,6 +345,9 @@ bool sndPopGroup() {
 
 */
 
+/** Looks up song group sgid on the stack, finds song sid in its MIDI setup list and starts it with seqStartPlay on the
+ * given studio (disabling interrupts around it unless irq_call). Returns the sequence ID, or 0xFFFFFFFF if the group or
+ * song is missing or the group is not a song group. */
 u32 seqPlaySong(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 irq_call, u8 studio) {
   int i;
   GROUP_DATA* g;
@@ -364,6 +401,8 @@ done:
   return seqId;
 }
 
+/** Public: starts song sid of song group sgid on the given studio (always with interrupts disabled around
+ * seqStartPlay). Returns the sequence ID, or 0xFFFFFFFF if the group or song is not found. */
 u32 sndSeqPlayEx(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 studio) {
   int i;
   u32 seqId;

@@ -45,6 +45,11 @@ static float pan_tab_dpl2[4] = {
     1.f,
 };
 
+/**
+ * MusyX volume helper for the stereo/surround path:
+ * interpolates the volume table at vol, then scales it by the interpolated pan tables to produce left,
+ * right and surround gains (surround is also scaled by 0.7079).
+ */
 static void CalcBus(float* vol_tab, float* vl, float* vr, float* vs, float vol,
                     struct SAL_PANINFO* pi) {
   u32 i;   // r29
@@ -61,6 +66,11 @@ static void CalcBus(float* vol_tab, float* vl, float* vr, float* vs, float vol,
   *vl = f * ((1.f - pi->pan_fm) * pan_tab[pi->pan_im] + pi->pan_fm * pan_tab[pi->pan_im + 1]);
 }
 
+/**
+ * Same as CalcBus for Dolby Pro Logic II output:
+ * produces front left/right gains from the pan and surround-pan tables
+ * and rear left/right gains from the DPL2 rear pan table.
+ */
 static void CalcBusDPL2(float* vol_tab, float* fvl, float* fvr, float* rvl, float* rvr, float vol,
                         SAL_PANINFO* pi) {
   u32 i;    // r29
@@ -81,6 +91,12 @@ static void CalcBusDPL2(float* vol_tab, float* fvl, float* fvr, float* rvl, floa
          ((1.f - pi->rpan_fm) * pan_tab_dpl2[pi->rpan_im] + pi->rpan_fm * pan_tab[pi->rpan_im + 1]);
 }
 
+/**
+ * MusyX hardware-layer volume conversion: turns a voice's volume, pan,
+ * surround pan and the two aux send levels into the DSP's per-bus gains in a SAL_VOLINFO.
+ * voltab_index picks the MusyX or DLS volume curve, itd narrows the pan range for interaural time delay,
+ * and dpl2 switches to the Pro Logic II bus layout (aux B then carries the rear channels).
+ */
 void salCalcVolume(u8 voltab_index, SAL_VOLINFO* vi, float vol, u32 pan, u32 span, float auxa,
                    float auxb, u32 itd, u32 dpl2) {
   float* vol_tab; // r30

@@ -11,10 +11,15 @@ static u32 __AXCommandListCycles;
 static u32 __AXCompressor;
 u32 __AXClMode;
 
+/** Returns the DSP cycle estimate accumulated while the current command list was built. */
 u32 __AXGetCommandListCycles(void) {
     return __AXCommandListCycles;
 }
 
+/**
+ * Returns the address of the command list built last frame (for the DSP to run now)
+ * and switches to the other of the two command list buffers for writing the next one.
+ */
 u32 __AXGetCommandListAddress(void) {
     u32 address;
 
@@ -25,11 +30,20 @@ u32 __AXGetCommandListAddress(void) {
     return address;
 }
 
+/** Appends one 16-bit word to the command list being built. */
 void __AXWriteToCommandList(u16 data) {
     *__AXClWrite = data;
     __AXClWrite++;
 }
 
+/**
+ * Builds the DSP command list for the next audio frame:
+ * the studio block address, the output mix command for the current mode (mode 0 and 1 write a mix to the
+ * surround buffer, mode 2 is Dolby Pro Logic II), the voice parameter block address,
+ * commands for each active auxiliary bus (buffers, in Pro Logic II mode the four-channel variants),
+ * the compressor if enabled, and the final output command with the surround and stereo buffers.
+ * It tracks an estimate of the DSP cycles used and flushes the list to memory.
+ */
 void __AXNextFrame(void* sbuffer, void* buffer) {
     u32 data;
     u16* pCommandList;
@@ -143,6 +157,7 @@ void __AXNextFrame(void* sbuffer, void* buffer) {
     DCFlushRange(pCommandList, 0x300);
 }
 
+/** Initialises the command list module: output mode 0, first buffer, compressor on. */
 void __AXClInit(void) {
 #ifdef DEBUG
     OSReport("Initializing AXCL code module\n");
@@ -155,22 +170,26 @@ void __AXClInit(void) {
     __AXCompressor = 1;
 }
 
+/** Shutdown hook of the command list module; only logs in debug builds. */
 void __AXClQuit(void) {
 #ifdef DEBUG
     OSReport("Shutting down AXCL code module\n");
 #endif
 }
 
+/** Selects the output mode used when building command lists (0 stereo, 1 surround, 2 Dolby Pro Logic II). */
 void AXSetMode(u32 mode) {
     if (__AXClMode != mode) {
         __AXClMode = mode;
     }
 }
 
+/** Returns the current output mode. */
 u32 AXGetMode(void) {
     return __AXClMode;
 }
 
+/** Turns the output compressor on (nonzero) or off. */
 void AXSetCompressor(u32 i) {
     __AXCompressor = i;
 }

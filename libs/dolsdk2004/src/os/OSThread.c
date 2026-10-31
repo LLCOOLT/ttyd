@@ -94,9 +94,14 @@ static int CheckThreadQueue(OSThreadQueue* queue);
 static int IsMember(OSThreadQueue* queue, OSThread* thread);
 static void OSSetCurrentThread(OSThread* thread);
 
+/** Empty default for the thread-switch hook. */
 static void DefaultSwitchThreadCallback(OSThread* from, OSThread* to) {}
 static OSSwitchThreadCallback SwitchThreadCallback = DefaultSwitchThreadCallback;
 
+/**
+ * Installs a function called on every thread switch (with the outgoing and incoming threads)
+ * and returns the old one (NULL if it was the default); passing NULL restores the empty default.
+ */
 OSSwitchThreadCallback OSSetSwitchThreadCallback(OSSwitchThreadCallback callback) {
     OSSwitchThreadCallback prev;
     BOOL enabled;
@@ -114,11 +119,20 @@ OSSwitchThreadCallback OSSetSwitchThreadCallback(OSSwitchThreadCallback callback
     return prev;
 }
 
+/**
+ * Calls the switch-thread callback with the old and new thread,
+ * then makes thread the current thread (__OSCurrentThread).
+ */
 static inline void OSSetCurrentThread(OSThread* thread) {
     SwitchThreadCallback(__OSCurrentThread, thread);
     __OSCurrentThread = thread;
 }
 
+/**
+ * Sets up the OS threading system: turns the boot context into the default thread (priority 16, detached,
+ * stack from the linker symbols with a stack-overflow magic word),
+ * clears the 32 run queues and the active-thread queue, and enables the scheduler.
+ */
 void __OSThreadInit() {
     OSThread* thread = &DefaultThread;
     OSPriority prio;
@@ -162,25 +176,30 @@ void __OSThreadInit() {
 }
 
 #if DEBUG
+/** Initialises an empty mutex queue (a thread's list of owned mutexes). Debug builds only. */
 static void OSInitMutexQueue(OSMutexQueue* queue) {
     queue->head = queue->tail = 0;
 }
 #endif
 
+/** Initialises an empty thread queue, used for OSSleepThread and OSWakeupThread. */
 void OSInitThreadQueue(OSThreadQueue* queue) {
     queue->head = queue->tail = 0;
 }
 
+/** Returns the thread that is running now. */
 OSThread* OSGetCurrentThread() {
     return __OSCurrentThread;
 }
 
+/** Makes nextThread the current thread and loads its saved context; control continues in that thread. */
 static void __OSSwitchThread(OSThread* nextThread) {
     OSSetCurrentThread(nextThread);
     OSSetCurrentContext(&nextThread->context);
     OSLoadContext(&nextThread->context);
 }
 
+/** Returns TRUE when the thread's suspend count is above zero. */
 BOOL OSIsThreadSuspended(OSThread* thread) {
     if (thread->suspend > 0) {
         return TRUE;
@@ -188,10 +207,12 @@ BOOL OSIsThreadSuspended(OSThread* thread) {
     return FALSE;
 }
 
+/** Returns TRUE when the thread is moribund (finished, waiting to be joined) or has state 0 (not in use). */
 BOOL OSIsThreadTerminated(OSThread* thread) {
     return (thread->state == OS_THREAD_STATE_MORIBUND || thread->state == 0) ? TRUE : FALSE;
 }
 
+/** Returns TRUE when the thread has a nonzero state and is on the list of active threads. */
 static BOOL __OSIsThreadActive(OSThread* thread) {
     OSThread* active;
 
@@ -207,6 +228,7 @@ static BOOL __OSIsThreadActive(OSThread* thread) {
     return FALSE;
 }
 
+/** Increments the reschedule counter so no thread switch happens until it is re-enabled; returns the previous count. */
 s32 OSDisableScheduler(void) {
     register BOOL enabled;
     s32 count;
@@ -218,6 +240,7 @@ s32 OSDisableScheduler(void) {
     return count;
 }
 
+/** Decrements the reschedule counter; returns the previous count. */
 s32 OSEnableScheduler(void) {
     register BOOL enabled;
     s32 count;
@@ -229,6 +252,10 @@ s32 OSEnableScheduler(void) {
     return count;
 }
 
+/**
+ * Puts a thread on the run queue for its priority, sets that priority's bit in RunQueueBits,
+ * and flags that a reschedule is needed.
+ */
 static void SetRun(OSThread* thread) {
     ASSERTLINE(LINE(536, 554, 554), !IsSuspended(thread->suspend));
     ASSERTLINE(LINE(537, 555, 555), thread->state == OS_THREAD_STATE_READY);
@@ -243,6 +270,7 @@ static void SetRun(OSThread* thread) {
     RunQueueHint = 1;
 }
 
+/** Takes a thread off its run queue and clears the priority's bit when the queue becomes empty. */
 static void UnsetRun(OSThread* thread) {
     OSThreadQueue* queue;
 
@@ -261,6 +289,10 @@ static void UnsetRun(OSThread* thread) {
     thread->queue = NULL;
 }
 
+/**
+ * Returns the thread's priority after priority inheritance:
+ * its base priority or the best priority among the first waiters of the mutexes it owns.
+ */
 s32 __OSGetEffectivePriority(OSThread* thread) {
     s32 priority = thread->base;
     OSMutex* mutex;
@@ -274,6 +306,10 @@ s32 __OSGetEffectivePriority(OSThread* thread) {
     return priority;
 }
 
+/**
+ * Applies a new effective priority to a thread according to its state (re-queueing a ready or waiting thread).
+ * For a thread waiting on a mutex it returns the mutex owner so the change can propagate; otherwise 0.
+ */
 static OSThread* SetEffectivePriority(OSThread* thread, s32 priority) {
     ASSERTLINE(LINE(614, 632, 632), !IsSuspended(thread->suspend));
 
@@ -302,6 +338,10 @@ static OSThread* SetEffectivePriority(OSThread* thread, s32 priority) {
     return 0;
 }
 
+/**
+ * Recomputes a thread's effective priority and applies it,
+ * following the chain of mutex owners until nothing changes. Suspended threads are left alone.
+ */
 static void UpdatePriority(OSThread* thread) {
     s32 priority;
 
@@ -320,6 +360,10 @@ static void UpdatePriority(OSThread* thread) {
     }
 }
 
+/**
+ * Raises a thread, and the mutex owners it is blocked behind, to at least the given priority;
+ * used by OSLockMutex for priority inheritance.
+ */
 void __OSPromoteThread(OSThread* thread, s32 priority) {
     while (1) {
         if (thread->suspend > 0 || thread->priority <= priority) {
@@ -332,6 +376,12 @@ void __OSPromoteThread(OSThread* thread, s32 priority) {
     }
 }
 
+/**
+ * The scheduler. Does nothing when the scheduler is disabled or when called from an interrupt context.
+ * Otherwise saves the current thread, picks the highest-priority ready thread and switches to it;
+ * when nothing is ready it spins in a special idle context with interrupts enabled.
+ * With yield set, equal-priority threads get a turn.
+ */
 static OSThread* SelectThread(int yield) {
     OSContext* currentContext;
     OSThread* currentThread;
@@ -397,12 +447,14 @@ static OSThread* SelectThread(int yield) {
     return nextThread;
 }
 
+/** Runs the scheduler if something has changed since the last pick (RunQueueHint set). */
 void __OSReschedule(void) {
     if (RunQueueHint != 0) {
         SelectThread(0);
     }
 }
 
+/** Gives up the CPU so another thread of the same priority can run. */
 void OSYieldThread(void) {
     BOOL enabled = OSDisableInterrupts();
 
@@ -410,6 +462,12 @@ void OSYieldThread(void) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Initialises a thread with its entry function, argument, stack top, stack size,
+ * priority (0 to 31, otherwise returns
+ * 0) and attributes (bit 0: detached). The thread starts suspended with a suspend count of 1; call OSResumeThread to
+ * run it. Entry function returns into OSExitThread.
+ */
 int OSCreateThread(OSThread* thread, void* (*func)(void*), void* param, void* stack, u32 stackSize, OSPriority priority, u16 attr) {
     BOOL enabled;
     u32 sp;
@@ -470,6 +528,10 @@ int OSCreateThread(OSThread* thread, void* (*func)(void*), void* param, void* st
     return 1;
 }
 
+/**
+ * Ends the calling thread: unlocks its mutexes and wakes joiners.
+ * A detached thread is freed at once; otherwise it becomes moribund holding the exit value val until joined.
+ */
 void OSExitThread(void* val) {
     BOOL enabled = OSDisableInterrupts();
     OSThread* currentThread = OSGetCurrentThread();
@@ -502,6 +564,10 @@ void OSExitThread(void* val) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Terminates another thread: removes it from its run or wait queue, unlocks its mutexes,
+ * wakes joiners and frees it (detached) or makes it moribund.
+ */
 void OSCancelThread(OSThread* thread) {
     BOOL enabled = OSDisableInterrupts();
 
@@ -542,6 +608,10 @@ void OSCancelThread(OSThread* thread) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Waits for a thread to finish, then stores its exit value in val and frees it;
+ * returns 1 on success, 0 if the thread is detached or went away.
+ */
 int OSJoinThread(OSThread* thread, void* val) {
     BOOL enabled = OSDisableInterrupts();
 
@@ -567,6 +637,10 @@ int OSJoinThread(OSThread* thread, void* val) {
     return 0;
 }
 
+/**
+ * Marks a thread as detached so it is freed when it exits (immediately if it is already moribund),
+ * waking any joiner.
+ */
 void OSDetachThread(OSThread* thread) {
     BOOL enabled = OSDisableInterrupts();
 
@@ -581,6 +655,10 @@ void OSDetachThread(OSThread* thread) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Decrements the thread's suspend count and, on reaching zero,
+ * makes it ready to run (or re-queues it on its wait queue) and reschedules. Returns the previous count.
+ */
 s32 OSResumeThread(OSThread* thread) {
     BOOL enabled = OSDisableInterrupts();
     s32 suspendCount;
@@ -612,6 +690,10 @@ s32 OSResumeThread(OSThread* thread) {
     return suspendCount;
 }
 
+/**
+ * Increments the thread's suspend count; on the first suspend it takes the thread off the run queue (or moves a
+ * waiting one to the back of its queue) and reschedules. Returns the previous count.
+ */
 s32 OSSuspendThread(OSThread* thread) {
     BOOL enabled = OSDisableInterrupts();
     s32 suspendCount;
@@ -645,6 +727,7 @@ s32 OSSuspendThread(OSThread* thread) {
     return suspendCount;
 }
 
+/** Blocks the current thread on queue (queued in priority order) until another thread calls OSWakeupThread on it. */
 void OSSleepThread(OSThreadQueue* queue) {
     BOOL enabled = OSDisableInterrupts();
     OSThread* currentThread = OSGetCurrentThread();
@@ -662,6 +745,7 @@ void OSSleepThread(OSThreadQueue* queue) {
     OSRestoreInterrupts(enabled);
 }
 
+/** Makes every thread sleeping on queue ready to run (unless suspended) and reschedules. */
 void OSWakeupThread(OSThreadQueue* queue) {
     BOOL enabled = OSDisableInterrupts();
 
@@ -682,6 +766,10 @@ void OSWakeupThread(OSThreadQueue* queue) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Changes a thread's base priority (0 highest to 31 lowest; returns 0 if out of range),
+ * updates its effective priority and reschedules.
+ */
 int OSSetThreadPriority(OSThread* thread, s32 priority) {
     BOOL enabled;
 
@@ -704,10 +792,15 @@ int OSSetThreadPriority(OSThread* thread, s32 priority) {
     return 1;
 }
 
+/** Returns the thread's base priority, ignoring priority inheritance. */
 s32 OSGetThreadPriority(OSThread* thread) {
     return thread->base;
 }
 
+/**
+ * Starts a real idle thread at the lowest priority (31) running idleFunction on the given stack, if none exists,
+ * and returns it; with a NULL function it cancels an existing idle thread. Returns NULL otherwise.
+ */
 OSThread* OSSetIdleFunction(OSIdleFunction idleFunction, void* param, void* stack, u32 stackSize) {
     if (idleFunction) {
         if (IdleThread.state == 0) {
@@ -721,6 +814,7 @@ OSThread* OSSetIdleFunction(OSIdleFunction idleFunction, void* param, void* stac
     return NULL;
 }
 
+/** Returns the idle thread started by OSSetIdleFunction, or NULL if none is running. */
 OSThread* OSGetIdleFunction(void) {
     if (IdleThread.state != 0) {
         return &IdleThread;
@@ -728,6 +822,7 @@ OSThread* OSGetIdleFunction(void) {
     return NULL;
 }
 
+/** Consistency check of a thread queue's doubly linked list; returns 1 when the links agree. */
 static int CheckThreadQueue(OSThreadQueue* queue) {
     OSThread* thread;
 
@@ -750,6 +845,7 @@ static int CheckThreadQueue(OSThreadQueue* queue) {
     return 1;
 }
 
+/** Returns TRUE when thread is on queue. */
 static BOOL IsMember(OSThreadQueue* queue, OSThread* thread) {
     OSThread* member = queue->head;
 
@@ -769,6 +865,10 @@ static BOOL IsMember(OSThreadQueue* queue, OSThread* thread) {
         OSPanic(__FILE__, line, ""); \
     }
 
+/**
+ * Debug check that walks the run queues and all active threads, panicking on an inconsistent state,
+ * and returns the number of active threads.
+ */
 s32 OSCheckActiveThreads(void) {
     OSThread* thread;
     s32 prio;
@@ -838,6 +938,10 @@ s32 OSCheckActiveThreads(void) {
     return cThread;
 }
 
+/**
+ * Fills the unused part of the current thread's stack (from just above its stack-end marker up to the stack
+ * pointer) with the byte val, to measure stack use later.
+ */
 void OSClearStack(u8 val) {
     register u32 sp;
     register u32* p;
@@ -850,6 +954,7 @@ void OSClearStack(u8 val) {
     }
 }
 
+/** Stores ptr in the current thread's per-thread data slot index (ignored if out of range). */
 void OSSetThreadSpecific(s32 index, void* ptr) {
     OSThread* thread;
 
@@ -861,6 +966,7 @@ void OSSetThreadSpecific(s32 index, void* ptr) {
     }
 }
 
+/** Returns the pointer in the current thread's per-thread data slot index, or NULL if out of range. */
 void* OSGetThreadSpecific(s32 index) {
     OSThread* thread;
 

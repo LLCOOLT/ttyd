@@ -6,6 +6,7 @@
 #include "dmo.h"
 #include "rel_module.h"
 
+/** REL module prolog, run when dmo.rel is loaded: runs the static constructors and registers the dmo_00 init script. */
 void _prolog(void) {
     voidfunctionptr* ctor;
 
@@ -15,6 +16,10 @@ void _prolog(void) {
     relSetEvtAddr("dmo_00", dmo_00_init_evt);
 }
 
+/**
+ * REL module epilog, run when dmo.rel is unloaded:
+ * runs the static destructors and releases the demo's resources (demo_exit).
+ */
 void _epilog(void) {
     voidfunctionptr* dtor;
 
@@ -23,5 +28,9 @@ void _epilog(void) {
     }
     demo_exit();
 }
+/**
+ * Module unresolved-symbol stub: if a relocation could not be resolved the REL linker points it here;
+ * it does nothing.
+ */
 void _unresolved(void) {
 }

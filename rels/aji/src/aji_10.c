@@ -54,6 +54,11 @@ extern EvtWord eff_test[];
 extern EvtWord kanbu_init[];
 static NpcSetupInfo npcEnt[9];
 
+/**
+ * Door close animation step: moves the two door leaves door_w_A
+ * and door_w_B in opposite directions along Z by the animation value in LW(0) times 0.25;
+ * the open and close scripts apply the same transform. The demo builds use 0.2217.
+ */
 static EVT_BEGIN(w_door_close)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -66,6 +71,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door open animation step: moves the two door leaves door_w_A
+ * and door_w_B in opposite directions along Z by the animation value in LW(0) times 0.25;
+ * the open and close scripts apply the same transform. The demo builds use 0.2217.
+ */
 static EVT_BEGIN(w_door_open)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -78,6 +88,11 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door close animation step: moves the two door leaves door_e_A
+ * and door_e_B in opposite directions along Z by the animation value in LW(0) times -0.25;
+ * the open and close scripts apply the same transform. The demo builds use -0.2217.
+ */
 static EVT_BEGIN(e_door_close)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
@@ -90,6 +105,11 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door open animation step: moves the two door leaves door_e_A
+ * and door_e_B in opposite directions along Z by the animation value in LW(0) times -0.25;
+ * the open and close scripts apply the same transform. The demo builds use -0.2217.
+ */
 static EVT_BEGIN(e_door_open)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
@@ -142,6 +162,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Exit event of Peach's door in Grodus's room: the guard (みはり) turns toward her
+ * and gets an exclamation balloon for about 1.5 seconds; leaves LW(0) = 0 for the door code.
+ */
 static EVT_BEGIN(bero_peach_evt)
     BEGIN_INLINE_EVENT
         WAIT_MS(200)
@@ -176,6 +200,11 @@ static BeroEntry bero_peach_data[] = {
     {0},
 };
 
+/**
+ * Script function: allocates the monitor's work area
+ * and a 608 by 480 intensity texture buffer for the live image on Sir Grodus's monitor,
+ * and clears its ready and officer flags.
+ */
 static USER_FUNC(monitor_cap_init) {
     u32 size = GXGetTexBufferSize(0x260, 0x1E0, GX_TF_I4, GX_FALSE, 0);
 
@@ -186,11 +215,21 @@ static USER_FUNC(monitor_cap_init) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script function: sets monitor_wp->kanbu from args[0]:
+ * nonzero makes the monitor show the officer (カンブー) instead of the grunt (手下１).
+ */
 static USER_FUNC(monitor_kanbu_flag_onoff) {
     monitor_wp->kanbu = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Draw callback that renders the picture for the monitor:
+ * sets up a perspective camera close to the NPC chosen by monitor_wp->kanbu (the officer or the first grunt),
+ * draws that NPC's poses into the frame buffer and copies the result into the monitor texture (0x130 by 0xF0,
+ * RGB565). Sets monitor_wp->ready when done.
+ */
 static void monitor_cap_capture(CameraId cameraId, void* param) {
     CameraEntry saved = *camGetCurPtr();
     Mtx44 projMtx;
@@ -262,11 +301,20 @@ static void monitor_cap_capture(CameraId cameraId, void* param) {
     monitor_wp->ready = 1;
 }
 
+/**
+ * Script function that queues monitor_cap_capture every frame so the monitor picture stays live;
+ * never finishes (blocks).
+ */
 static USER_FUNC(monitor_cap_evt) {
     dispEntry(CAMERA_3D, 1000.0f, 0, monitor_cap_capture, NULL);
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Texture-environment callback of the monitor screen (map object monitor_1):
+ * once the picture is ready, binds the captured texture with a projective texture matrix aimed at the screen,
+ * so the screen shows the captured NPC.
+ */
 static void monitor_cap_tev(MapTevCallbackInfo* info) {
     Mtx proj;
     Mtx view;
@@ -303,6 +351,7 @@ static void monitor_cap_tev(MapTevCallbackInfo* info) {
     }
 }
 
+/** Script function: sets Mario's (Peach's) pose to the animation named in args[0]. */
 static USER_FUNC(peach_set_pose) {
     const char* pose = (const char*)evtGetValue(event, event->args[0]);
     MarioWork* mario = marioGetPtr();
@@ -310,6 +359,10 @@ static USER_FUNC(peach_set_pose) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script function: sets the 3D camera's viewport and scissor and the 2D camera's viewport to x, y,
+ * width and height from args[0] to args[3].
+ */
 static USER_FUNC(viewport) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
@@ -335,6 +388,7 @@ static USER_FUNC(viewport) {
     return EVT_RETURN_DONE;
 }
 
+/** Script function: sets Mario's scale to 0 on all axes, making the player (Peach) invisible. */
 static USER_FUNC(peach_evt_toumei) {
     MarioWork* mario = marioGetPtr();
 
@@ -342,6 +396,10 @@ static USER_FUNC(peach_evt_toumei) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Opens Sir Grodus's monitor: unhides it, plays SFX_PEACH_SCREEN_OPEN1 and the opening animation monitore_1,
+ * and waits for it to finish.
+ */
 EVT_BEGIN(monitor_on)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("monitor"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_get_position, STRING("monitor"), LW(0), LW(1), LW(2))
@@ -352,6 +410,10 @@ EVT_BEGIN(monitor_on)
     RETURN
 EVT_END()
 
+/**
+ * Closes the monitor: plays the closing animation monitore_2 with SFX_PEACH_SCREEN_SHUT1
+ * and hides the monitor afterwards.
+ */
 EVT_BEGIN(monitor_off)
     CALL(evt_map_playanim, STRING("monitore_2"), 0, 0)
     CALL(evt_map_checkanim, STRING("monitore_2"), LW(0), LW(1))
@@ -362,6 +424,11 @@ EVT_BEGIN(monitor_off)
     RETURN
 EVT_END()
 
+/**
+ * Prepares the monitor: hides it, allocates the capture buffers,
+ * chooses the officer or the grunt as the picture by story point (the officer at STORY_STG5_43_X_NAUTS_RETREAT),
+ * starts the capture and installs the texture callback on monitor_1.
+ */
 EVT_BEGIN(monitor_init)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("monitor"), MAPOBJ_FLAG_HIDE)
     CALL(monitor_cap_init)
@@ -379,6 +446,12 @@ EVT_BEGIN(monitor_init)
     RETURN
 EVT_END()
 
+/**
+ * Peach's first scene in Grodus's room (STORY_STG1):
+ * the screen opens on Grodus (シュリョー), Lord Crump (カンブー) and the X-Nauts around the monitor,
+ * 37 messages (peach_aji_00_01 to peach_aji_33) play,
+ * and the map then changes to aji_01 at the peach_evt_stg1 entrance.
+ */
 static EVT_BEGIN(peach_evt_stg1)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_fade_tec_onoff, 1, 0)
@@ -722,6 +795,11 @@ static EVT_BEGIN(peach_evt_stg1)
     RETURN
 EVT_END()
 
+/**
+ * Peach's second scene: Mario's slot is parked at y=-1000,
+ * Grodus and a researcher (研究員) are placed in front of the camera,
+ * the 14 messages peach_aji_72_01 to 72_14 play, and the map changes to aji_16 with an iris fade.
+ */
 static EVT_BEGIN(peach_evt_stg2)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -833,6 +911,10 @@ static EVT_BEGIN(peach_evt_stg2)
     RETURN
 EVT_END()
 
+/**
+ * Peach's chapter 3 scene: Grodus talks with the Shadow Sirens (Beldam, Marilyn and Vivian, マジョリン, マリリン, ビビアン);
+ * messages peach_aji_103 to 111 play and the map changes to aji_16 at the peach_evt_stg3 entrance.
+ */
 static EVT_BEGIN(peach_evt_stg3)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, -420, 0, 0)
@@ -893,6 +975,10 @@ static EVT_BEGIN(peach_evt_stg3)
     RETURN
 EVT_END()
 
+/**
+ * Walks Peach (Mario) from where she stands to the spot in front of Sir Grodus's chair:
+ * around him if she is behind him on his side, then to x = -130 and finally to (-150, 0).
+ */
 EVT_BEGIN(peach_move)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_npc_get_position, STRING("シュリョー"), LW(3), LW(4), LW(5))
@@ -918,6 +1004,11 @@ EVT_BEGIN(peach_move)
     RETURN
 EVT_END()
 
+/**
+ * Peach's talk with Sir Grodus (シュリョー) in her disguise during STORY_STG3_33_02_PEACH_INCOGNITO (peach_aji_141 to
+ * 151); afterwards the story becomes STORY_STG3_33_03_PEACH_GRODUS
+ * and she is sent to the changing room aji_09 through s_bero.
+ */
 EVT_BEGIN(peach_evt_stg3_syuryo_talk)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_mario_key_onoff, 0)
@@ -952,6 +1043,10 @@ EVT_BEGIN(peach_evt_stg3_syuryo_talk)
     RETURN
 EVT_END()
 
+/**
+ * Peach's fourth scene: Grodus and a researcher (研究員) speak peach_aji_166_00_01 to 07
+ * and the map changes to aji_17 with an iris fade.
+ */
 static EVT_BEGIN(peach_evt_stg4)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -1003,6 +1098,10 @@ static EVT_BEGIN(peach_evt_stg4)
     RETURN
 EVT_END()
 
+/**
+ * Peach's fifth scene: Grodus and an X-Naut (手下１) in front of the monitor (monitore_1 animation);
+ * messages peach_aji_196 to 205 play and the map changes to aji_17 with an iris fade.
+ */
 static EVT_BEGIN(peach_evt_stg5)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, -420, 0, 0)
@@ -1068,6 +1167,10 @@ static EVT_BEGIN(peach_evt_stg5)
     RETURN
 EVT_END()
 
+/**
+ * Peach's sixth scene: Grodus and an X-Naut (手下１) speak peach_aji_269 to 279
+ * and the map changes to aji_16 at the peach_evt_stg6 entrance.
+ */
 static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, -420, 0, 0)
@@ -1145,6 +1248,10 @@ static EVT_BEGIN(peach_evt_stg6)
     RETURN
 EVT_END()
 
+/**
+ * Test script for the N64-style charge effect (akari_charge_n64) with the tec fade; the map never starts it.
+ * Guess: leftover from development.
+ */
 EVT_BEGIN(eff_test)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_fade_tec_onoff, 1, 0)
@@ -1156,30 +1263,41 @@ EVT_BEGIN(eff_test)
     RETURN
 EVT_END()
 
+/** Init of the first X-Naut underling in Grodus's room: runs the common NPC init and sets NPC status 2 for "me". */
 static EVT_BEGIN(teshita1_init)
     CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/** Init of the second X-Naut underling in Grodus's room: common NPC init plus NPC status 2. */
 static EVT_BEGIN(teshita2_init)
     CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/** Init of the third X-Naut underling in Grodus's room: common NPC init plus NPC status 2. */
 static EVT_BEGIN(teshita3_init)
     CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/**
+ * Initialisation of the officer NPC (カンブー): runs the common NPC set-up (npc_init_evt)
+ * and sets status flag 2 on the NPC named "me".
+ */
 EVT_BEGIN(kanbu_init)
     CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/**
+ * Init of Grodus (シュリョー): common NPC init; during STORY_STG3_33_02_PEACH_INCOGNITO he stands at (-100, 0, 0),
+ * is solid and talks through peach_evt_stg3_syuryo_talk when Peach interacts with him.
+ */
 static EVT_BEGIN(syuryo_init)
     CALL_CHILD(npc_init_evt)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_02_PEACH_INCOGNITO)
@@ -1270,6 +1388,15 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Init script of aji_10, Sir Grodus's room: plays BGM_STG7_DUN1 before STORY_STG7_00_START and BGM_STG7_DUN2
+ * after, lights up the control wall and the monitor animations,
+ * and then starts the scene for Peach's current story point:
+ * peach_evt_stg1 (the first Peach scene at STORY_STG1_17), peach_evt_stg2, stg3,
+ * stg4 (Shadow Sirens and Doopliss), peach_evt_stg5 (at STORY_STG5_43 with the monitor),
+ * the invisible watch at STORY_STG5_45 and 46, and peach_evt_stg6 at STORY_STG6_54_WELCOME_BACK.
+ * The Barriern Custom guard is removed once Lord Crump is beaten.
+ */
 EVT_BEGIN(aji_10_init_evt)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_00_START)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN1"))

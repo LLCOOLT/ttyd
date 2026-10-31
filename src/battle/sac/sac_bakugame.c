@@ -180,16 +180,23 @@ static BattleWeapon weapon = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Clock Out's work area (BakuWork), kept in the battle's shared action-command work buffer. */
 BakuWork* GetBakuGamePtr(void) {
     return (BakuWork*)_battleWorkPointer->actionCommands.work;
 }
 
+/** Starts the Crystal Star appearing above Mario (main_star state 1). */
 static USER_FUNC(star_stone_appear) {
     BakuWork* w = GetBakuGamePtr();
     w->starState = 1;
     return 2;
 }
 
+/**
+ * Runs for the whole move: the Crystal Star rises 50 units above Mario,
+ * grows to double size while spinning six turns over 120 frames,
+ * then flies up off screen (y 300) over 60 frames. Drives the star-stone effect each frame.
+ */
 static USER_FUNC(main_star) {
     BakuWork* w = GetBakuGamePtr();
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
@@ -254,11 +261,13 @@ static USER_FUNC(main_star) {
     return 0;
 }
 
+/** Clears Clock Out's work area at the start of the move. */
 static USER_FUNC(init_bakugame) {
     memset(GetBakuGamePtr(), 0, 0x2B8);
     return 2;
 }
 
+/** Deletes the Crystal Star effect and its dust once the bomb game is over. */
 static USER_FUNC(end_bakugame) {
     BakuWork* w = GetBakuGamePtr();
     effDelete(((EffStarStoneWork*)w->eff->userdata)->dust);
@@ -266,6 +275,13 @@ static USER_FUNC(end_bakugame) {
     return 2;
 }
 
+/**
+ * Builds the move's weapon from the game result.
+ * args[0] is the gauge (read but unused), args[1] the stop level from bakuGameMain (-1 = gauge empty: no Stop),
+ * args[2] receives the weapon.
+ * Stop lasts level - 1 turns (1 to 3); the chance is 100,
+ * or 127 with a full gauge (Guess: 127 gets past Stop resistance).
+ */
 static s32 bakuGameDecideWeapon(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     s32 v;
@@ -300,6 +316,7 @@ static s32 bakuGameDecideWeapon(EventEntry* event, BOOL isFirstCall) {
     return 2;
 }
 
+/** Loads the c_star_bom model (the ticking bomb) and creates its pose; yields until the model has loaded. */
 USER_FUNC(bakuGameBombEntry) {
     BakuWork* w = GetBakuGamePtr();
     if (!animGroupBaseAsync("c_star_bom", 2, NULL)) {
@@ -310,6 +327,15 @@ USER_FUNC(bakuGameBombEntry) {
     return 2;
 }
 
+/**
+ * The Clock Out bomb game.
+ * The bomb drops on Mario's side; the A/B/X buttons are shown over Mario's side,
+ * the enemies and the audience (reshuffled now and then), and pressing one throws the bomb there.
+ * Enemies or the crowd throw it back after a while. Mashing A/B/X fills the gauge.
+ * When the fuse (540-659 frames) runs out the bomb explodes on whoever holds it.
+ * Returns args[0] holder (0 Mario's side, 1 enemies, 2 audience), args[1] gauge,
+ * args[2] stop level (-1, or 2/3/4 for gauge under 33/66/above). The US+ releases halve the throw-back rate.
+ */
 USER_FUNC(bakuGameMain) {
     s32 unused[8] = {0, 1, 2, 3, 4, 5, 6, 7}; // unused; kept because the original emits its initialiser
     BakuWork* w = GetBakuGamePtr();
@@ -1117,6 +1143,10 @@ main_end:
     return 0;
 }
 
+/**
+ * After the game, the stand-in Shy Guy (heiho) who caught the bomb for big
+ * or ceiling enemies drops back to the floor and walks off to the right. Does nothing when no stand-in was used.
+ */
 USER_FUNC(bakuGameHeihoReturn) {
     BakuWork* w = GetBakuGamePtr();
 
@@ -1172,6 +1202,11 @@ USER_FUNC(bakuGameHeihoReturn) {
     return 0;
 }
 
+/**
+ * Shuffles which of A, B and X aims at Mario's side,
+ * the enemies and the audience (one of the six orders at random) and moves the button icons there.
+ * After the first call it also blocks presses for 60 frames.
+ */
 static void bakuGameDecideButton(s32 first) {
     BakuWork* w = GetBakuGamePtr();
     Vec pos[3] = {
@@ -1200,6 +1235,7 @@ static void bakuGameDecideButton(s32 first) {
     }
 }
 
+/** TRUE when the partner exists, is not KO'd (STATUS_INSTANT_KILL) and can act. */
 static BOOL bakuGamePartyExist(BattleUnit* unit) {
     if (unit == NULL) {
         return FALSE;
@@ -1210,6 +1246,10 @@ static BOOL bakuGamePartyExist(BattleUnit* unit) {
     return BtlUnit_CanActStatus(unit) != 0;
 }
 
+/**
+ * TRUE for the audience seats that can catch and throw the bomb:
+ * indices 8-11, 28-31 and 48-51 (the four middle seats of each of the first three rows, Guess from the layout).
+ */
 static BOOL bakuGameAudienceCanThrowPos(s32 idx) {
     s32 i;
     for (i = 0; i < 3; i++) {
@@ -1220,6 +1260,7 @@ static BOOL bakuGameAudienceCanThrowPos(s32 idx) {
     return FALSE;
 }
 
+/** Returns Mario and the partner from their startled pose to their normal pose. */
 static void bakuGameMarioSurpriseReset(BattleUnit* mario, BattleUnit* party) {
     btlDispPoseAnime(BtlUnit_GetPartsPtr(mario, BtlUnit_GetBodyPartsId(mario)));
     if (bakuGamePartyExist(party)) {
@@ -1227,6 +1268,7 @@ static void bakuGameMarioSurpriseReset(BattleUnit* mario, BattleUnit* party) {
     }
 }
 
+/** Returns every active, living enemy from its startled pose to its normal pose. */
 static void bakuGameEnemySurpriseReset(void) {
     s32 i;
     BattleWork* wp = _battleWorkPointer;
@@ -1240,6 +1282,9 @@ static void bakuGameEnemySurpriseReset(void) {
     }
 }
 
+/**
+ * Turns every audience member back to face the stage and releases all but the throwing seats from event control.
+ */
 static void bakuGameAudienceSurpriseReset(void) {
     s32 i;
     BattleAudienceMember* m;
@@ -1255,6 +1300,11 @@ static void bakuGameAudienceSurpriseReset(void) {
     }
 }
 
+/**
+ * Mario and the partner react to the bomb landing on them:
+ * Mario M_N_7, and each partner (Goombella, Koops, Yoshi, Flurrie, Vivian, Bobbery,
+ * Ms. Mowz) its own startled animation.
+ */
 static void bakuGameMarioSurprise(BattleUnit* mario, BattleUnit* party) {
     BtlUnit_SetBodyAnim(mario, "M_N_7");
     if (bakuGamePartyExist(party)) {
@@ -1284,6 +1334,7 @@ static void bakuGameMarioSurprise(BattleUnit* mario, BattleUnit* party) {
     }
 }
 
+/** Every active, living enemy plays its startled animation (anim type 0x27) as the bomb lands on their side. */
 static void bakuGameEnemySurprise(void) {
     s32 i;
     BattleWork* wp = _battleWorkPointer;
@@ -1297,6 +1348,11 @@ static void bakuGameEnemySurprise(void) {
     }
 }
 
+/**
+ * The bomb lands in the crowd: waiting audience members come under event control;
+ * the throwing seats play anim 3, the others anim 7 facing a random way (Guess: the throwers get ready, the rest
+ * panic).
+ */
 static void bakuGameAudienceSurprise(void) {
     s32 i;
     BattleAudienceMember* m;
@@ -1320,6 +1376,7 @@ static void bakuGameAudienceSurprise(void) {
     }
 }
 
+/** Draws the A/B/X button icons over their targets and the mash gauge, which flashes once it reaches 100. */
 static void bakuGameDisp2D(CameraId cam, void* param) {
     BakuWork* w = GetBakuGamePtr();
     BattleACDispParams* disp = &_battleWorkPointer->actionCommands.disp;
@@ -1368,6 +1425,11 @@ static void bakuGameDisp2D(CameraId cam, void* param) {
 }
 
 #pragma dont_inline reset
+/**
+ * Draws the bomb model at its position, growing with the fuse (scale 2 to 6), and,
+ * when big or ceiling enemies need it, the Shy Guy stand-in as a textured quad from the audience texture
+ * palette.
+ */
 static void bakuGameDisp3D(CameraId cam, void* param) {
     BakuWork* w = GetBakuGamePtr();
     CameraEntry* camera = camGetPtr(CAMERA_3D);
@@ -1439,9 +1501,15 @@ static void bakuGameDisp3D(CameraId cam, void* param) {
     }
 }
 
+/** Empty display callback registered by main_star; the star-stone effect draws the Crystal Star itself. */
 static void bakuGameDispStar(CameraId cam, void* param) {
 }
 
+/**
+ * Clock Out's attack script (battle_mario's weapon):
+ * pays the Star Power, plays the shared Crystal Star opening, runs the bomb game,
+ * builds the Stop weapon from the result and stops whichever team held the bomb when it blew.
+ */
 EVT_BEGIN(marioAttackEvent_BakuGame)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
@@ -1495,6 +1563,10 @@ EVT_BEGIN(marioAttackEvent_BakuGame)
     RETURN
 EVT_END()
 
+/**
+ * The bomb blew up on Mario's side: the weapon (LW(9)) hits the partner, if alive, then Mario,
+ * who first spins back round if the game left him facing left. LW(2) is the success-effect level (-1 = none).
+ */
 EVT_BEGIN(hitCheck_MarioTeam)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_PARTNER, LW(3))
     IF_INT_EQUAL(LW(3), -1)
@@ -1541,6 +1613,7 @@ EVT_BEGIN(hitCheck_MarioTeam)
     RETURN
 EVT_END()
 
+/** The bomb blew up on the enemy side: the weapon (LW(9)) hits every targeted enemy part that is not evasive. */
 EVT_BEGIN(hitCheck_EnemyTeam)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     LABEL(10)
@@ -1559,6 +1632,10 @@ EVT_BEGIN(hitCheck_EnemyTeam)
     RETURN
 EVT_END()
 
+/**
+ * The bomb blew up in the crowd: every audience member under system control in a normal state switches to status
+ * 13 (evt_audience_abnormal_natural_all at 100%; Guess: knocked out or fleeing), and the success effect shows.
+ */
 EVT_BEGIN(hitCheck_AudienceTeam)
     CALL(evt_audience_abnormal_natural_all, 100)
     IF_INT_NOT_EQUAL(LW(2), -1)

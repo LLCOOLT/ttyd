@@ -52,6 +52,10 @@ extern EvtWord time_bomb[];
 extern EvtWord bomb_check[];
 static KusaAccess ueki_access_data[7];
 
+/**
+ * Screen flash: fades out over 20 frames, holds for 50 ms, then fades back in over 80 frames.
+ * Used for the light bursts while the Crystal Star appears.
+ */
 static USER_FUNC(evtflash) {
     if (isFirstCall) {
         event->userdata[2] = 0;
@@ -89,6 +93,12 @@ static USER_FUNC(evtflash) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Entry script of the west loading zone: at STORY_STG2_22_LORD_CRUMP_APPEARS,
+ * if the time bomb scene is still pending, Mario and his partner are placed inside the room,
+ * the loading zone flickers off and on, and they walk in; returns 1 in LW(0) to skip the normal entry.
+ * Otherwise returns 0.
+ */
 static EVT_BEGIN(first_time_w_bero)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_22_LORD_CRUMP_APPEARS)
         IF_INT_EQUAL(GSWF(GSWF_MRI14_TIME_BOMB_SCENE_PENDING), 1)
@@ -151,6 +161,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Spins the NPC named in LW(10) around its y axis.
+ * LW(1) and LW(2) are the start and end angles and LW(3) the time in ms; used to turn Lord Crump around.
+ */
 EVT_BEGIN(npc_rotate)
     CALL(evt_sub_intpl_msec_init, 0, LW(1), LW(2), LW(3))
     LOOP(0)
@@ -164,6 +178,10 @@ EVT_BEGIN(npc_rotate)
     RETURN
 EVT_END()
 
+/**
+ * Makes Lord Crump pace back and forth along z=-215 between x=30 and x=120 while the rest of the scene plays,
+ * until GF(0) is set and he stops at x=75. Clears GF(1) when it ends.
+ */
 EVT_BEGIN(kanbu_urouro)
     CALL(evt_npc_set_ry, LW(10), 270)
     WAIT_MS(200)
@@ -189,6 +207,12 @@ EVT_BEGIN(kanbu_urouro)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene when Mario first arrives in mri_14 after the elevator (story STG2_21_06_WATER_SWITCH):
+ * Lord Crump (the third-force executive) paces, notices Mario and speaks, then walks off.
+ * Sets GSWF_MRI14_TIME_BOMB_SCENE_PENDING and the story to STORY_STG2_22_LORD_CRUMP_APPEARS,
+ * and re-enters mri_14 through the west door so the bomb scene can start.
+ */
 EVT_BEGIN(dai3_kanbu)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -244,6 +268,7 @@ EVT_BEGIN(dai3_kanbu)
     RETURN
 EVT_END()
 
+/** Flashes the screen once with the light sound while GF(0) is set. */
 EVT_BEGIN(flash_and_wait)
     WAIT_WHILE(GF(0))
     SET_VALUE(GF(0), 1)
@@ -253,6 +278,10 @@ EVT_BEGIN(flash_and_wait)
     RETURN
 EVT_END()
 
+/**
+ * Sets the y rotation of the item named in args[0] (the Crystal Star) to the angle in args[1].
+ * Never finishes by itself (it blocks each frame).
+ */
 static USER_FUNC(starstone_rotate_func) {
     EvtWord* args = event->args;
     char* name = (char*)evtGetValue(event, args[0]);
@@ -262,6 +291,10 @@ static USER_FUNC(starstone_rotate_func) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Sets the animation time of the NPC named in args[0] to the float in args[1],
+ * to pose a paper animation frame by frame.
+ */
 static USER_FUNC(evt_npc_set_anim_localtime) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -271,6 +304,7 @@ static USER_FUNC(evt_npc_set_anim_localtime) {
     return EVT_RETURN_DONE;
 }
 
+/** Flashes the screen twice in a row with the light sound while GF(0) is set. */
 EVT_BEGIN(flash2_and_wait)
     WAIT_WHILE(GF(0))
     SET_VALUE(GF(0), 1)
@@ -285,11 +319,13 @@ EVT_BEGIN(flash2_and_wait)
     RETURN
 EVT_END()
 
+/** Rotates the Crystal Star item named in LW(0) to the angle held in GW(10). */
 EVT_BEGIN(starstone_rotate)
     CALL(starstone_rotate_func, LW(0), GW(10))
     RETURN
 EVT_END()
 
+/** Loops forever adding 6 degrees per frame to the rotation angle GW(10), so the Crystal Star spins. */
 EVT_BEGIN(starstone_rotate_exec)
     LOOP(0)
         ADD(GW(10), 6)
@@ -299,6 +335,7 @@ EVT_BEGIN(starstone_rotate_exec)
     RETURN
 EVT_END()
 
+/** Makes the Star Piece (item00) bob up and down by 5 units in a half-second cycle, forever. */
 static EVT_BEGIN(starstone_fuwafuwa)
     LOOP(0)
         CALL(evt_sub_intpl_msec_init, 11, 0, 500, 500)
@@ -326,6 +363,10 @@ static EVT_BEGIN(starstone_fuwafuwa)
     RETURN
 EVT_END()
 
+/**
+ * Plays Lord Crump's pipe trip: turns the NPC LW(10) into the paper pipe model p_dokan_x
+ * and flips through its frames (PM_D_1A and PM_D_1B), as if he were sucked into a pipe.
+ */
 EVT_BEGIN(npc_dokan)
     BEGIN_INLINE_EVENT
         CALL(evt_npc_set_paper, LW(10), STRING("p_dokan_x"))
@@ -398,6 +439,7 @@ EVT_BEGIN(npc_dokan)
     RETURN
 EVT_END()
 
+/** Holds Mario for up to 4 seconds (GF(11)) while the Puni switch is being set, ending early when GF(10) is cleared. */
 static EVT_BEGIN(punipuni_mario_halt)
     SET_VALUE(GF(11), 1)
     CALL(evt_mario_key_onoff, 0)
@@ -418,6 +460,12 @@ static EVT_BEGIN(punipuni_mario_halt)
     RETURN
 EVT_END()
 
+/**
+ * The time bomb scene (story 22 to 23): with the Puni still, the room shakes with growing quakes and flashes,
+ * the Crystal Star appears in a ripple of light, Lord Crump grabs it,
+ * sets a time bomb that switches on the countdown and flees through a pipe, and the party reacts.
+ * Sets the story to STORY_STG2_23_TIME_BOMB_ACTIVATED.
+ */
 EVT_BEGIN(time_bomb)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION >= VERSION_JP
@@ -664,6 +712,10 @@ EVT_BEGIN(time_bomb)
     RETURN
 EVT_END()
 
+/**
+ * Waits until the floor counter GW(0) reaches zero (enough Punies stand on the plate) and
+ * then starts the time bomb scene.
+ */
 EVT_BEGIN(bomb_check)
     LOOP(0)
         IF_INT_EQUAL(GW(0), 0)
@@ -675,6 +727,11 @@ EVT_BEGIN(bomb_check)
     RETURN
 EVT_END()
 
+/**
+ * Display event of the Puni weight counter: hides the unused drum covers
+ * and every frame turns the three drums (S_isk_02 ones, S_isk_03 tens, S_isk_04 hundreds) to show GW(0) (0 to
+ * 101), 36 degrees per digit; the tens cover is shown only while the value is below 10.
+ */
 static EVT_BEGIN(yuka_move)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_isk_02_c"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_isk_03_c"), MAPOBJ_FLAG_HIDE)
@@ -705,6 +762,11 @@ static EVT_BEGIN(yuka_move)
     RETURN
 EVT_END()
 
+/**
+ * Counts the Punies standing on the weight platform every frame (alive, not lost,
+ * within the platform's area and height band) and keeps GW(0), the number of Punies still missing,
+ * at 101 minus the count (clamped to 0 to 101). The counter click sound plays whenever the value changes.
+ */
 static EVT_BEGIN(yuka_check)
     SET_VALUE(LW(12), GW(0))
     CALL(evt_puni_wait_systemmode, 2)
@@ -761,6 +823,11 @@ static KusaAccess ueki_access_data[] = {
     {4, NULL, NULL, NULL},
 };
 
+/**
+ * Init script of the orb pedestal: runs the shared Puni-switch setup;
+ * if the orb is already on the pedestal it is shown there and its target is on,
+ * otherwise the beam of light is hidden. The target is placed in the middle of the room.
+ */
 static EVT_BEGIN(punipuni_ball00_init)
     CALL_CHILD(mri_punipuni_setup)
     IF_INT_EQUAL(GSWF(GSWF_MRI14_ORB_ON_PEDESTAL), 1)
@@ -774,6 +841,12 @@ static EVT_BEGIN(punipuni_ball00_init)
     RETURN
 EVT_END()
 
+/**
+ * Hit/talk script of the orb pedestal: if empty, Mario picks an item to put on it (cancel ends the script),
+ * the orb appears with the light beam; if full, Mario takes the orb back.
+ * In the demo, at STORY_STG2_22_LORD_CRUMP_APPEARS he is released at once
+ * and held by punipuni_mario_halt for the cutscene.
+ */
 static EVT_BEGIN(punipuni_ball00)
     CALL(evt_mario_key_onoff, 0)
     IF_INT_EQUAL(GSWF(GSWF_MRI14_ORB_ON_PEDESTAL), 0)
@@ -805,6 +878,13 @@ static EVT_BEGIN(punipuni_ball00)
     RETURN
 EVT_END()
 
+/**
+ * Map init script of mri_14, the Crystal Star room:
+ * sets up the Puni, planters, doors, counters and Puni Orb pedestal,
+ * plays the bomb-alarm music while the bomb is ticking,
+ * and starts the Lord Crump cutscene (dai3_kanbu)
+ * or the time bomb scene (bomb_check) depending on the story state.
+ */
 EVT_BEGIN(mri_14_init_evt)
     CALL(evt_puni_mem_init)
     CALL(evt_puni_set_yuka, 14, 0, -310, -1000, -1000, 0, 0)

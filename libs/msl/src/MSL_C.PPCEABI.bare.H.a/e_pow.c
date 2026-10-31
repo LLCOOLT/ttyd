@@ -34,6 +34,7 @@ ivln2 = 1.44269504088896338700e+00,
 ivln2_h = 1.44269502162933349609e+00,
 ivln2_l = 1.92596299112661746887e-08;
 
+/** x raised to the power y (fdlibm), with the IEEE special cases. */
 double __ieee754_pow(double x, double y) {
     double z, ax, z_h, z_l, p_h, p_l;
     double y1, t1, t2, r, s, t, u, v, w;

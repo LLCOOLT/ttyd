@@ -33,12 +33,20 @@ static NpcSetupInfo npcEnt[2];
 extern EvtWord item_get01[];
 extern EvtWord item_get02[];
 
+/**
+ * Door animation callback, closing for the e_bero exit to gon_08:
+ * rotates map object "door03" about Y by -0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door03"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the e_bero exit to gon_08:
+ * rotates map object "door03" about Y by 0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door03"), 0, LW(0), 0)
@@ -67,6 +75,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Script helper: spins Ms. Mowz (チュチュリーナ) once around her Z axis (a backward flip) over args[0] milliseconds,
+ * easing the rotation, then restores it to 0.
+ */
 static USER_FUNC(evt_chuchu_back_loop) {
     NpcEntry* npc;
     EvtWord* args = event->args;
@@ -95,6 +107,13 @@ static USER_FUNC(evt_chuchu_back_loop) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Cutscene of the first meeting with Ms. Mowz (chuchurina):
+ * Mario and his partner enter, she appears with her own music,
+ * they talk (stg1_gon_18_01 to _17) and she kisses Mario and jumps away (SFX_STG1_CHURINA_*).
+ * The story moves to STORY_STG1_15_MS_MOWZ and GSWF_GON12_MOWZ_MET_WITH_KOOPS is set;
+ * skipped when the story is already past it.
+ */
 static EVT_BEGIN(chuchurina_sogu)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_15_MS_MOWZ)
         CALL(evt_npc_set_position, STRING("チュチュリーナ"), 0, -1000, 0)
@@ -235,6 +254,7 @@ static EVT_BEGIN(chuchurina_sogu)
     RETURN
 EVT_END()
 
+/** Talk event for Ms. Mowz in gon_12; empty (her first meeting with Mario is the scripted scene chuchurina_sogu). */
 EVT_BEGIN(chuchurina_talk)
     RETURN
 EVT_END()
@@ -254,6 +274,10 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Opens chest mobj_box00 and gives Mario the Castle Key (ITEM_CASTLE_KEY_0x0F),
+ * then sets the story to STORY_STG1_15_01_KEY_3.
+ */
 static EVT_BEGIN(item_get00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
@@ -266,6 +290,7 @@ static EVT_BEGIN(item_get00)
     RETURN
 EVT_END()
 
+/** Runs when Mario opens the chest mobj_box01: shows the Mushroom coming out and gives it to him. */
 EVT_BEGIN(item_get01)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box01"), LW(0), LW(1), LW(2))
@@ -277,6 +302,7 @@ EVT_BEGIN(item_get01)
     RETURN
 EVT_END()
 
+/** Runs when Mario opens the chest mobj_box02: shows the Honey Syrup coming out and gives it to him. */
 EVT_BEGIN(item_get02)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box02"), LW(0), LW(1), LW(2))
@@ -288,6 +314,11 @@ EVT_BEGIN(item_get02)
     RETURN
 EVT_END()
 
+/**
+ * Map init for gon_12: sets up the door, the Ms. Mowz NPC and her first-meeting scene (chuchurina_sogu),
+ * the Castle Key 0x0F chest (STORY_STG1_15_01_KEY_3), the Mushroom and Honey Syrup chests,
+ * an empty chest and the Shine Sprite power-up block.
+ */
 EVT_BEGIN(gon_12_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)

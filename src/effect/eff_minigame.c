@@ -72,6 +72,10 @@ u8 poyon_scale[] = {0x64, 0x64, 0x69, 0x5E, 0x6E, 0x59, 0x75, 0x52, 0x7B, 0x4C, 
                     0x8C, 0x3B, 0x8C, 0x3C, 0x85, 0x42, 0x77, 0x50, 0x67, 0x60, 0x58, 0x6F, 0x50, 0x78, 0x4E, 0x79,
                     0x52, 0x75, 0x58, 0x6F, 0x5E, 0x69, 0x64, 0x64};
 
+/**
+ * Spawns the mini-game banner at (x, y, z); type 0-2 selects start, finish or retire.
+ * Called by the Rogueport (gor) event scripts in evt_goryuugijo.c and by the yuu event evt_yuuminigame.c.
+ */
 EffectEntry* effMiniGameEntry(s32 type, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
     EffMiniGameWork* work;
@@ -184,6 +188,10 @@ EffectEntry* effMiniGameEntry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
+/**
+ * Per frame: runs the banner's state machine with its sounds (SFX ids 0x8D1/0x8D2),
+ * deletes the effect when finished, and registers the 2D draw callback.
+ */
 static void effMiniGameMain(EffectEntry* effect) {
     EffMiniGameWork* work = effect->userdata;
     Vec pos;
@@ -428,6 +436,7 @@ static void effMiniGameMain(EffectEntry* effect) {
     }
 }
 
+/** Draws the banner text pieces as 2D textured quads, choosing the texture set for the current language. */
 static void effMiniGameDisp(CameraId cameraId, EffectEntry* effect) {
     EffMiniGameWork* work = effect->userdata;
     CameraEntry* cam;

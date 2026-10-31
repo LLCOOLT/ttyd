@@ -1,6 +1,11 @@
 #include <dolphin/gd.h>
 #include <dolphin/os.h>
 
+/**
+ * Computes the fog parameters from the start and end depth and the near
+ * and far planes (for a perspective or orthographic projection, from the fog type)
+ * and writes the fog BP registers and the fog color.
+ */
 void GDSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor color) {
     f32 A;
     f32 B;
@@ -70,6 +75,10 @@ void GDSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor
     GDWriteBPCmd(BP_FOG_COLOR(color.r, color.g, color.b, 0xF2));
 }
 
+/**
+ * Writes only the blend, logic op, subtract and factor fields of the BP blend mode register (a masked write);
+ * dither and the update flags are left alone.
+ */
 void GDSetBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor dst_factor, GXLogicOp logic_op) {
     GDWriteBPCmd(0xFE00FFE3);
     GDWriteBPCmd(BP_BLEND_MODE(
@@ -86,6 +95,10 @@ void GDSetBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor ds
     ));
 }
 
+/**
+ * Writes the whole BP blend mode register: blend type, factors, logic op,
+ * dither and the color and alpha update enables.
+ */
 void GDSetBlendModeEtc(GXBlendMode type, GXBlendFactor src_factor,
                        GXBlendFactor dst_factor, GXLogicOp logic_op,
                        u8 color_update_enable, u8 alpha_update_enable,
@@ -104,14 +117,20 @@ void GDSetBlendModeEtc(GXBlendMode type, GXBlendFactor src_factor,
     ));
 }
 
+/** Writes the depth test enable, comparison and depth write enable. */
 void GDSetZMode(u8 compare_enable, GXCompare func, u8 update_enable) {
     GDWriteBPCmd(BP_Z_MODE(compare_enable, func, update_enable, 0x40));
 }
 
+/** Writes the constant destination alpha enable and value. */
 void GDSetDstAlpha(u8 enable, u8 alpha) {
     GDWriteBPCmd(BP_DST_ALPHA(alpha, enable, 0x42));
 }
 
+/**
+ * Writes the two BP token registers with the same token,
+ * so the GPU raises its draw-sync token interrupt when it reaches this point.
+ */
 void GDSetDrawSync(u16 token) {
     GDWriteBPCmd(BP_TOKEN(token, 0x48));
     GDWriteBPCmd(BP_TOKEN(token, 0x47));

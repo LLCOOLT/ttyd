@@ -89,11 +89,16 @@ static BeroEntry bero_data_c[] = {
     {0},
 };
 
+/** Guess: init event of the driver in rsh_07; nothing special. */
 static EVT_BEGIN(init_unten)
     CALL(evt_npc_set_ry, STRING("me"), 270)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the driver in rsh_07: stg6_rsh_c_08 on the outbound trip or, on the return trip,
+ * stg6_rsh_c_08_1 once the train is at Rogueport.
+ */
 static EVT_BEGIN(talk_unten)
 #if VERSION <= VERSION_DEMO_US
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_08"), 0, 0)
@@ -131,6 +136,7 @@ static const char* access_tbl[] = {
     NULL,
 };
 
+/** Trigger script for the signboards: locks input, prints the message in LW(1) and unlocks. */
 static EVT_BEGIN(evt_access)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, LW(1), 0, 0)
@@ -138,6 +144,7 @@ static EVT_BEGIN(evt_access)
     RETURN
 EVT_END()
 
+/** Registers the signboard triggers from access_tbl (hit name, message rows). */
 static EVT_BEGIN(evt_access_entry)
     SET_INT_READ_ADDR(PTR(&access_tbl))
     LOOP(0)
@@ -150,6 +157,12 @@ static EVT_BEGIN(evt_access_entry)
     RETURN
 EVT_END()
 
+/**
+ * Shared map init for the three variants of rsh_07 (a small room off rsh_04 with a driver NPC):
+ * starts the scenery animation unless the train is at a station, sets up the driver NPC,
+ * the signboards and the save block (mobj_save at 210, 60, -145),
+ * and the music and ambience for the station the train has reached or the per-variant train theme.
+ */
 EVT_BEGIN(rsh_07_init_evt)
     IF_INT_EQUAL(GSWF(GSWF_TRAIN_AT_RIVERSIDE), 0)
         IF_INT_EQUAL(GSWF(GSWF_TRAIN_AT_POSHLEY), 0)
@@ -195,6 +208,10 @@ EVT_BEGIN(rsh_07_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Init script of rsh_07_a: sets up the door to rsh_04_a and runs the shared init.
+ * Used on both the first trip and the second visit.
+ */
 EVT_BEGIN(rsh_07_a_init_evt)
     SET_VALUE(LW(0), PTR(bero_data_a))
     CALL(evt_bero_get_info)
@@ -203,6 +220,10 @@ EVT_BEGIN(rsh_07_a_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Init script of rsh_07_b: sets up the door to rsh_04_b and runs the shared init.
+ * Used on both the first trip and the second visit.
+ */
 EVT_BEGIN(rsh_07_b_init_evt)
     SET_VALUE(LW(0), PTR(bero_data_b))
     CALL(evt_bero_get_info)
@@ -219,6 +240,11 @@ static const char* window_tbl[] = {
     NULL,
 };
 
+/**
+ * Init script of rsh_07_c: sets up the door to rsh_04_c,
+ * runs the shared init and the window scenery (mado_uturi_1 to 4).
+ * Used on both the first trip and the second visit.
+ */
 EVT_BEGIN(rsh_07_c_init_evt)
     SET_VALUE(LW(0), PTR(bero_data_c))
     CALL(evt_bero_get_info)

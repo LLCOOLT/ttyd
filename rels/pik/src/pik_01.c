@@ -51,6 +51,10 @@ s32 iri_29_item_tbl2[2];
 s32 iri_29_item_tbl3[2];
 static NpcSetupInfo npc_data[8];
 
+/**
+ * Script helper: stores 1 in args[0] if Mario is wearing the green Luigi colours (marioGetColor() == 1), else 0.
+ * The souvenir shop owner reacts to Mario looking like Luigi.
+ */
 static USER_FUNC(chk_luigi_color) {
     EvtWord* args = event->args;
 
@@ -74,6 +78,11 @@ static HitDamageReturn dmgReturnPt[] = {
     {0},
 };
 
+/**
+ * Door callback of the Pennington's office door (evtIn):
+ * rotates the double door objects door_1_b and door_1_a in opposite directions by the angle in LW(0) scaled by
+ * 0.38867188.
+ */
 static EVT_BEGIN(n_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1_b"), 0, LW(0), 0)
@@ -82,6 +91,7 @@ static EVT_BEGIN(n_door_open)
     RETURN
 EVT_END()
 
+/** Door callback of the same door (evtOut): the reverse of n_door_open. */
 static EVT_BEGIN(n_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1_b"), 0, LW(0), 0)
@@ -150,6 +160,12 @@ static const char* name_tbl[] = {
     "yajirusi_2",
 };
 
+/**
+ * Cutscene at the notice board in the square (case event when Mario faces a_harigami before the sanctum is
+ * opened): Detective Pennington (ポワン探偵) hops in, the partner comments,
+ * and Pennington leads Mario to the padlocked sanctum gate and unlocks it.
+ * Sets the story to STORY_STG6_50_THE_SANCTUM_MANAGER and switches the gate's bero on.
+ */
 EVT_BEGIN(evt_powan)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
@@ -249,6 +265,10 @@ EVT_BEGIN(evt_powan)
     RETURN
 EVT_END()
 
+/**
+ * Guess: init for Pennington (ポワン探偵, powan): during the sanctum manager story point (STORY_STG6_50) he stands at
+ * (165, 20, -190) and may jump and land on floors; at other times he stays where the map put him.
+ */
 static EVT_BEGIN(init_powan)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG6_50_THE_SANCTUM_MANAGER)
@@ -258,11 +278,21 @@ static EVT_BEGIN(init_powan)
     RETURN
 EVT_END()
 
+/** Talk script for Pennington in the square: always stg6_pik_11. */
 static EVT_BEGIN(talk_powan)
     CALL(evt_msg_print, 0, STRING("stg6_pik_11"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Talk script for the souvenir shop owner (土産屋).
+ * During Trouble Center request 27 the owner first asks for help;
+ * once Mario looks like Luigi (chk_luigi_color) a longer scene plays in which the real Luigi (ルイージ) shows up,
+ * the owner gives Mario a Choco Cake (handed over, or put on the shop counter if the inventory is full)
+ * and the request is marked solved.
+ * Otherwise story-progress dependent chatter, with a special line during the Bowser interlude (STORY_STG7_20 to
+ * 25).
+ */
 EVT_BEGIN(miyageya_talk)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 27)
         CALL(chk_luigi_color, LW(0))
@@ -414,6 +444,11 @@ EVT_BEGIN(miyageya_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init for the souvenir shop owner: puts him at (-270, -5, 260),
+ * switches his walk animation off during the Bowser interlude (STORY_STG7_20 to 25)
+ * and hooks up miyageya_talk as his talk event.
+ */
 EVT_BEGIN(miyageya_init)
     CALL(evt_npc_set_position, STRING("me"), -270, -5, 260)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -436,6 +471,14 @@ s32 iri_29_item_tbl3[] = {
     ITEM_FRIGHT_MASK, -1,
 };
 
+/**
+ * Talk script for Little Narikin (コナリキン).
+ * During Trouble Center request 29 he asks for a gift:
+ * the choice made in the first question (stored in GSW_TROUBLE_WORK_FIRST) decides whether he wants a Shroom
+ * Cake, Keelhaul Mango or Fright Mask; Mario hands the item over, receives a Present for it,
+ * and on the second visit gets 3 coins and the request is solved.
+ * During the Bowser interlude he reacts to Bowser, and depending on the answer runs away.
+ */
 EVT_BEGIN(konarikin_talk)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 29)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_1), 0)
@@ -567,6 +610,10 @@ EVT_BEGIN(konarikin_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init for Little Narikin: standard NPC init, then places him at (-62, -5, -367) during request 29,
+ * or at (145, 0, 380) during the Bowser interlude.
+ */
 EVT_BEGIN(konarikin_init)
     CALL_CHILD(npc_init_evt)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 29)
@@ -581,6 +628,10 @@ EVT_BEGIN(konarikin_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for the Narikin parents during the Bowser interlude:
+ * the camera pans in on them, they exchange a few lines, and Bowser replies.
+ */
 EVT_BEGIN(narikin_papa_mama_talk)
     CALL(evt_cam3d_evt_set, -109, 163, 752, -109, 67, 211, 800, 11)
     WAIT_MS(800)
@@ -595,6 +646,10 @@ EVT_BEGIN(narikin_papa_mama_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init for Narikin Papa: Standard NPC init, does not turn towards Mario,
+ * and moves to (-6, -5, 161) during the Bowser interlude.
+ */
 EVT_BEGIN(narikin_papa_init)
     CALL_CHILD(npc_init_evt)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_TURN_TO_MARIO)
@@ -606,6 +661,10 @@ EVT_BEGIN(narikin_papa_init)
     RETURN
 EVT_END()
 
+/**
+ * Init for Narikin Mama: standard NPC init, does not turn towards Mario,
+ * and moves to (18, -5, 185) during the Bowser interlude.
+ */
 EVT_BEGIN(narikin_mama_init)
     CALL_CHILD(npc_init_evt)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_TURN_TO_MARIO)
@@ -617,6 +676,7 @@ EVT_BEGIN(narikin_mama_init)
     RETURN
 EVT_END()
 
+/** Talk script for the madam (the lady NPC) during the Bowser interlude: she speaks, Bowser answers. */
 EVT_BEGIN(madam_talk)
     CALL(evt_msg_print, 0, STRING("kpa_stg7_011_1"), 0, STRING("me"))
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("KPA_S_1"), STRING("KPA_T_1"))
@@ -624,6 +684,7 @@ EVT_BEGIN(madam_talk)
     RETURN
 EVT_END()
 
+/** Init for the madam: standard NPC init, and she moves to (-395, 0, -72) during the Bowser interlude. */
 EVT_BEGIN(madam_init)
     CALL_CHILD(npc_init_evt)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_20_LORD_CRUMP_DEFEATED)
@@ -634,22 +695,29 @@ EVT_BEGIN(madam_init)
     RETURN
 EVT_END()
 
+/** Guess: talk script for the NPC ババ (baba): kpa_stg7_003_1. */
 static EVT_BEGIN(baba_talk)
     CALL(evt_msg_print, 0, STRING("kpa_stg7_003_1"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/** Guess: init for the NPC ババ: runs the standard NPC init, then sets NPC status bit 2 on her. */
 static EVT_BEGIN(baba_init)
     CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/** Init for Tar-kun 4 (ターくん４): turns on the walk and talk animations. */
 EVT_BEGIN(takun4_init)
     CALL(evt_npc_flag_onoff, 1, STRING("ターくん４"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for Tar-kun 4: story-progress dependent line (before the Thousand-Year Door, the Bowser interlude,
+ * up to the end of chapter 8, and afterwards).
+ */
 EVT_BEGIN(takun4_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_70_THOUSAND_YEAR_DOOR)
@@ -664,6 +732,10 @@ EVT_BEGIN(takun4_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init for Tar-kun 5: walk and talk animations on;
+ * hides him during the Bowser interlude, otherwise lets him hop on the floor.
+ */
 EVT_BEGIN(takun5_init)
     CALL(evt_npc_flag_onoff, 1, STRING("ターくん５"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -675,6 +747,10 @@ EVT_BEGIN(takun5_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for Tar-kun 5: story-progress dependent line (before the Thousand-Year Door,
+ * up to the end of chapter 8, and afterwards).
+ */
 EVT_BEGIN(takun5_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_70_THOUSAND_YEAR_DOOR)
@@ -687,6 +763,10 @@ EVT_BEGIN(takun5_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init for Tar-kun 6: walk and talk animations on;
+ * hides him during the Bowser interlude, otherwise lets him hop on the floor.
+ */
 EVT_BEGIN(takun6_init)
     CALL(evt_npc_flag_onoff, 1, STRING("ターくん６"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -698,6 +778,10 @@ EVT_BEGIN(takun6_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for Tar-kun 6: story-progress dependent line (before the Thousand-Year Door,
+ * up to the end of chapter 8, and afterwards).
+ */
 EVT_BEGIN(takun6_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_70_THOUSAND_YEAR_DOOR)
@@ -791,6 +875,11 @@ static NpcSetupInfo npc_data[] = {
     {0},
 };
 
+/**
+ * Regular script of the ghost NPCs Resaresa and Sebaschan in the epilogue:
+ * bobs up and down by 1.5 units with a sine wave (3 degrees per frame),
+ * after a random delay so they do not move in step.
+ */
 EVT_BEGIN(teresa_fuwafuwa)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     SET_VALUE(LW(3), 0)
@@ -811,11 +900,16 @@ EVT_BEGIN(teresa_fuwafuwa)
     RETURN
 EVT_END()
 
+/** Talk script for Resaresa (レサレサ), the ghost in the epilogue square. */
 EVT_BEGIN(resaresa_talk)
     CALL(evt_msg_print, 0, STRING("stg7_pik_clear_03_2_01"), 0, 0)
     RETURN
 EVT_END()
 
+/**
+ * Creates Resaresa (model c_resaresa) at (30, 15, 120) for the epilogue
+ * and gives her the floating regular script and her talk script.
+ */
 EVT_BEGIN(resaresa_entry)
     CALL(evt_npc_entry, STRING("レサレサ"), STRING("c_resaresa"))
     CALL(evt_npc_set_tribe, STRING("レサレサ"), STRING("レサレサ"))
@@ -827,11 +921,16 @@ EVT_BEGIN(resaresa_entry)
     RETURN
 EVT_END()
 
+/** Talk script for Sebaschan (セバスチャン), the ghost butler in the epilogue square. */
 EVT_BEGIN(sebaschan_talk)
     CALL(evt_msg_print, 0, STRING("stg7_pik_clear_03_2_02"), 0, 0)
     RETURN
 EVT_END()
 
+/**
+ * Creates Sebaschan (model c_sebaschan) at (75, 4, 90) for the epilogue
+ * and gives him the floating regular script and his talk script.
+ */
 EVT_BEGIN(sebaschan_entry)
     CALL(evt_npc_entry, STRING("セバスチャン"), STRING("c_sebaschan"))
     CALL(evt_npc_set_tribe, STRING("セバスチャン"), STRING("セバスチャン"))
@@ -843,6 +942,10 @@ EVT_BEGIN(sebaschan_entry)
     RETURN
 EVT_END()
 
+/**
+ * Bowser interlude: Bowser walks up to the padlock ("lock") on the sanctum gate, roars at it,
+ * the lock is opened and the gate swings open, and the scene continues into the sanctum map (pik_02).
+ */
 EVT_BEGIN(koopa_door_evt)
     CALL(evt_snd_bgm_scope, 0, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -937,6 +1040,11 @@ EVT_BEGIN(koopa_door_evt)
     RETURN
 EVT_END()
 
+/**
+ * Bowser interlude opening (STORY_STG7_20_LORD_CRUMP_DEFEATED):
+ * Kammy (ババ) flies in beside Bowser in the town square, they exchange a few lines about the sanctum,
+ * and then the story moves to STORY_STG7_25_00_BOWSER_POSHLEY_HEIGHTS.
+ */
 EVT_BEGIN(pik_01_koopa_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, -325, -5, -325)
@@ -1008,6 +1116,11 @@ EVT_BEGIN(pik_01_koopa_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script helper for the chapter 8 darkness scenes:
+ * sets the "yami" (darkness) overlay view (envSetYamiView) to look from (0, 100, 100 + z) at (0, 0, z),
+ * where z is args[0] (a float).
+ */
 static USER_FUNC(yami_view) {
     f32 z = evtGetFloat(event, event->args[0]);
     Mtx mtx;
@@ -1017,6 +1130,10 @@ static USER_FUNC(yami_view) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: turns on a TEV callback material flag of an NPC's model.
+ * args[0] is the NPC name, args[1] the callback number (low four bits). Does nothing if the NPC does not exist.
+ */
 static USER_FUNC(anim_tevcallback) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1030,6 +1147,10 @@ static USER_FUNC(anim_tevcallback) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: creates a star stone effect (effStarStoneEntry) at position args[1..3] (floats)
+ * and registers it under the effect name args[0].
+ */
 static USER_FUNC(starstone_entry) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1041,6 +1162,7 @@ static USER_FUNC(starstone_entry) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: moves the star stone effect named args[0] to the position args[1..3] (floats). */
 static USER_FUNC(starstone_set_pos) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1055,6 +1177,7 @@ static USER_FUNC(starstone_set_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: sets the Y rotation of the star stone effect named args[0] to args[1] (float, degrees). */
 static USER_FUNC(starstone_set_ry) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1064,6 +1187,7 @@ static USER_FUNC(starstone_set_ry) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: turns the sanctum gate's "lock" map object to Y rotation -45 degrees. */
 static USER_FUNC(set_r) {
     MapObjectEntry* mobj = mobjNameToPtr("lock");
 
@@ -1071,6 +1195,10 @@ static USER_FUNC(set_r) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: doubles the x and y scale of the "lock" map object's hit area and recalculates its matrix,
+ * so Bowser can reach the padlock.
+ */
 static USER_FUNC(kpa_lock_hit_scale) {
     MapObjectEntry* mobj = mobjNameToPtr("lock");
 
@@ -1081,14 +1209,26 @@ static USER_FUNC(kpa_lock_hit_scale) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Map TEV callback registered with evt_map_set_tevcallback in the init script:
+ * forwards the map object's TEV info to envAddTev with index 4.
+ */
 static void test_tev(MapTevCallbackInfo* info) {
     envAddTev(4, info);
 }
 
+/**
+ * Second map TEV callback of this map (used for the opuku and HEIPO objects):
+ * forwards the TEV info to envAddTev with index 7.
+ */
 static void test_tev2(MapTevCallbackInfo* info) {
     envAddTev(7, info);
 }
 
+/**
+ * Guess: stops the regular scripts of the three NPCs ターくん４, ５ and ６:
+ * finds each one's running script, removes its regular- script hook and deletes the script.
+ */
 static EVT_BEGIN(delete_npc_regl_evt)
     CALL(evt_npc_get_reglid, STRING("ターくん４"), LW(0))
     CALL(evt_npc_change_interrupt, STRING("ターくん４"), 1, 0)
@@ -1102,6 +1242,7 @@ static EVT_BEGIN(delete_npc_regl_evt)
     RETURN
 EVT_END()
 
+/** Shakes the 3D camera sideways by a small amount every 500 ms, forever; used in the dark ending scene. */
 static EVT_BEGIN(sekai_yami_shake)
     LOOP(0)
         CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.009765625f), 500)
@@ -1109,6 +1250,13 @@ static EVT_BEGIN(sekai_yami_shake)
     RETURN
 EVT_END()
 
+/**
+ * Guess: cutscene of the world going dark (chapter 8):
+ * the controls are locked, Mario and the partner are hidden,
+ * the square and Pennington are set to the dark look (envSetYami) with the camera at yami_view -800
+ * while the ground shakes (sekai_yami_shake) with the quake sound,
+ * Pennington looks around and says stg8_dark_07, then the map changes to bom_02 (entrance sekai_yami2).
+ */
 static EVT_BEGIN(sekai_yami_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -1155,6 +1303,12 @@ static EVT_BEGIN(sekai_yami_evt)
     RETURN
 EVT_END()
 
+/**
+ * Guess: cutscene of "everyone's voices" in the chapter 8 finale:
+ * Pennington, the madam and the Goldbob family are placed in the dark square,
+ * the camera moves and they speak the stg8_las_148 lines in turn,
+ * and then the game changes to bom_02 (entrance minnnanokoe).
+ */
 static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -1268,6 +1422,10 @@ static EVT_BEGIN(minnnanokoe_evt)
     RETURN
 EVT_END()
 
+/**
+ * Hides the pipe object S_dakan and disables its collision A_dokan unless GSWF_TIK17_PIPE_PIK_OPEN is set,
+ * i.e. until the pipe to the Rogueport Sewers has been opened from the other side.
+ */
 static EVT_BEGIN(evt_switch_init)
     IF_INT_EQUAL(GSWF(GSWF_TIK17_PIPE_PIK_OPEN), 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_dakan"), MAPOBJ_FLAG_HIDE)
@@ -1276,6 +1434,10 @@ static EVT_BEGIN(evt_switch_init)
     RETURN
 EVT_END()
 
+/**
+ * Creates the Luigi NPC (ルイージ, model c_luigi) for Trouble Center request 27
+ * and parks him off screen at (0, -1000, 0) until the shop scene calls for him.
+ */
 EVT_BEGIN(iri_27_npc_entry)
     CALL(evt_npc_entry, STRING("ルイージ"), STRING("c_luigi"))
     CALL(evt_npc_set_tribe, STRING("ルイージ"), STRING("ルイージ"))
@@ -1285,6 +1447,13 @@ EVT_BEGIN(iri_27_npc_entry)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for pik_01: sets the Bowser-interlude state when the story is between Lord Crump's defeat
+ * and the sanctum; loads the entrances, Shine Sprite block, music (including the chapter 8 finale tracks),
+ * water animations, arrow signs, NPCs (Luigi for request 27, the epilogue ghosts),
+ * the sanctum gate's lock and the case events that open it for Mario (Pennington's scene) or for Bowser,
+ * and the pipe switch.
+ */
 EVT_BEGIN(pik_01_init_evt)
     SET_VALUE(LF(0), 0)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_20_LORD_CRUMP_DEFEATED)

@@ -44,6 +44,14 @@ static EvtWord _borodo_steal_attack[610];
 static EvtWord escape_event[115];
 static EvtWord wait_event[26];
 
+/**
+ * Script helper for the Badge Bandit's steal attack:
+ * args[0] = thief, args[1] = target, args[2..4] = variables that receive the stolen item id,
+ * its icon and a coin count.
+ * 40% of the time it takes up to 10 coins; otherwise it picks at random among all the badges
+ * and held items in the pouch, removes the chosen one (unequipping it from Mario or a partner if it was worn and
+ * refreshing their stats) and keeps it in the unit's heldItem.
+ */
 static USER_FUNC(_steal_item) {
     EvtWord* args = event->args;
     PouchData* pouch = pouchGetPtr();
@@ -342,6 +350,12 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_badge_borodo", "c_borodo_t", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
+/**
+ * Init script of the Badge Bandit: registers its wait, attack,
+ * damage and confusion handlers (confusion reuses the attack script), sets its run and walk sounds,
+ * and picks the carrying-loot pose table if unit flag 0x40000000 (it has stolen something) is already set,
+ * otherwise the normal one.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -359,6 +373,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage script of the Badge Bandit: runs the default damage handling on itself. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -366,10 +381,17 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Empty phase script (just returns). Nothing in the unit's tables refers to it. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the Badge Bandit.
+ * If it already carries loot (unit flag 0x40000000) it runs escape_event and leaves the battle.
+ * Otherwise it checks for an item use, always uses the plain attack while confused,
+ * and else draws a random number to choose between the plain attack (about 70 in 209) and the steal attack.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_CheckUnitFlag, BTL_UNIT_SELF, 1073741824, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -398,6 +420,13 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Badge Bandit's plain attack: it runs up behind the chosen target,
+ * turns and dashes into it with SFX_ENM_BORODO_ATT1.
+ * A hit deals damage and sends it spinning back in a flip;
+ * if it is dodged or blocked it hops away twice instead. It then walks back home.
+ * When confused with no target it is flustered.
+ */
 static EVT_BEGIN(_borodo_normal_attack)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_borodo_attack))
@@ -531,6 +560,13 @@ static EVT_BEGIN(_borodo_normal_attack)
     RETURN
 EVT_END()
 
+/**
+ * The Badge Bandit's steal attack: the same run-up and dash as the plain attack.
+ * If it lands and the action command result is 3 or less, _steal_item takes something from the target;
+ * on success it shows btl_msg_steal_item_lost, the stolen item's icon flies off,
+ * it flags itself as carrying loot (unit flag 0x40000000), laughs and switches to the loot-holding poses.
+ * If nothing was taken it just bows, then returns home.
+ */
 static EVT_BEGIN(_borodo_steal_attack)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_borodo_attack))
@@ -686,6 +722,11 @@ static EVT_BEGIN(_borodo_steal_attack)
     RETURN
 EVT_END()
 
+/**
+ * The Badge Bandit flees with its loot: it turns,
+ * jumps and dashes off the right side of the stage with a blur trail (SFX_ENM_BORODO_ESCAPE1),
+ * then removes itself from the battle without giving a reward.
+ */
 static EVT_BEGIN(escape_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BORODO_WAIT1"), EVT_NULLPTR, 0, LW(15))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("R_3"))
@@ -708,6 +749,7 @@ static EVT_BEGIN(escape_event)
     RETURN
 EVT_END()
 
+/** Wait script: plays the Badge Bandit's idle pose, using the loot-holding pose table once it has stolen something. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_CheckUnitFlag, BTL_UNIT_SELF, 1073741824, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -719,6 +761,11 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 #if VERSION >= VERSION_US
+/**
+ * Reaction event when the Badge Bandit is knocked out:
+ * spins in place, shows a Life Shroom icon, is revived with 10 HP, then jumps back to its pose and resumes.
+ * Guess: it consumes a reserve Life Shroom (item id 151) that it carries.
+ */
 EVT_BEGIN(_badge_borodo_emergency_revival_event)
     CALL(btlevtcmd_OnUnitFlag, LW(10), 134217728)
     SET_VALUE(LW(0), 48)

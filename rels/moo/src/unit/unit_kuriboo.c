@@ -172,6 +172,10 @@ static BattleWeapon weapon_kuriboo_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init event of the Goomba: installs its wait, attack, damage and confusion events and its walk,
+ * run and jump sounds.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -184,6 +188,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Goomba: default damage handling on its body part. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -191,10 +196,16 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Phase event of the Goomba: does nothing (an empty script). */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the Goomba: picks a target, runs at it
+ * and jumps on it (weapon_kuriboo_attack) in a series of hops with the dodge or action command defence check,
+ * then runs back to its home position.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -328,6 +339,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: stores in args[4] the direction angle from the point (args[0], args[1]) to (args[2], args[3])
+ * (X and Z coordinates), or leaves args[4] unchanged if the two points are the same.
+ */
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);
@@ -346,6 +361,7 @@ static USER_FUNC(krb_get_dir) {
     return EVT_RETURN_DONE;
 }
 
+/** Wait event of the Goomba: plays its idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

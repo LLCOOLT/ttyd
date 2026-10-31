@@ -57,7 +57,7 @@ static EvtWord fumituke_attack_event[386];
 extern EvtWord firebreath_attack_event[];
 static EvtWord wait_event[6];
 
-// Hooktail's attack power: the weapon's base power minus the attack drop in the attacker's work[0] (at least 1).
+/** Hooktail's attack power: the weapon's base power minus the attack drop in the attacker's work[0] (at least 1). */
 static s32 weaponGetPower_Gonbaba(BattleUnit* attacker, BattleWeapon* weapon, BattleUnit* target, BattleUnitPart* part) {
     s32 power = weapon->hpDamageWork[0];
 
@@ -70,6 +70,10 @@ static s32 weaponGetPower_Gonbaba(BattleUnit* attacker, BattleWeapon* weapon, Ba
 
 struct EffectEntry* effKemuri9N64Entry(s32 type, s32 count, s32 life, f32 x, f32 y, f32 z, f32 radiusEnd, f32 angle);
 
+/**
+ * Script helper: spawns a puff of dust (an N64-style kemuri effect) at the position (args[0], args[1], args[2]);
+ * used for Hooktail's footsteps.
+ */
 static USER_FUNC(_leg_smoke_effect) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
@@ -324,6 +328,13 @@ static BattleUnitKindPart parts[] = {
     {3, "btl_un_gonbaba", "c_gonbaba4", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x1010000, 0, pose_table},
 };
 
+/**
+ * Entry event of the Hooktail fight (replays the "dontyo" map animation):
+ * the camera moves in while Mario and his partner are placed off-stage,
+ * then walk in and strike a startled pose (M_I_Y/M_I_O, SFX_VOICE_MARIO_SURPRISED2_2),
+ * Hooktail rises (GNB_F_3, SFX_BOSS_GNB_APPEAR1) and speaks the opening line stg1_gon_20_3
+ * before the battle starts.
+ */
 static EVT_BEGIN(battle_entry_event)
     CALL(evt_btl_camera_set_prilimit, 1)
     CALL(evt_map_replayanim, 0, STRING("dontyo"))
@@ -414,6 +425,12 @@ static EVT_BEGIN(battle_entry_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: picks how a spectator flees when Hooktail eats the audience:
+ * from the position (args[0], args[1]) it works out a direction away from the stage (clamped to 90 to 270
+ * degrees) and writes a 500-unit offset into the variables args[2] and args[3]
+ * and a random speed (about 4 to 8) into args[4].
+ */
 static USER_FUNC(_btlgon_get_escape_param) {
     EvtWord* args = event->args;
     s32 x = evtGetValue(event, args[0]);
@@ -442,6 +459,13 @@ static USER_FUNC(_btlgon_get_escape_param) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Guess: Hooktail's talk when she would be defeated the first time (called from dead_event while unit work 3 is
+ * 0).
+ * She speaks over a battle camera shot and puts yes/no questions to the player (stg1_gon_24 to stg1_gon_31),
+ * the answers choose which lines and which damage follow,
+ * and unit work 3 is set so the real defeat plays next time.
+ */
 EVT_BEGIN(negotiation_event)
     CALL(evt_btl_camera_set_prilimit, 1)
     CALL(evt_btl_camera_wait_move_end)
@@ -910,6 +934,10 @@ EVT_BEGIN(negotiation_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: moves the battle's paper-craft light to a fixed spot scaled up by 3,
+ * giving Hooktail her scene lighting.
+ */
 static USER_FUNC(_set_gonbaba_light) {
     u8* light = lightGetPaperCraft();
     Mtx mtx;
@@ -920,6 +948,11 @@ static USER_FUNC(_set_gonbaba_light) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Plays one spectator being swallowed in Hooktail's finishing scene:
+ * the audience member jumps up, is lifted toward her mouth and spins as it goes in.
+ * The defeat event starts it eight times for different spectators.
+ */
 EVT_BEGIN(gon_extra_eaten_event)
     WAIT_FRAMES(14)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, 6)
@@ -1030,6 +1063,10 @@ EVT_BEGIN(gon_extra_eaten_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: blocks while the battle unit in args[0] (translated battle id) still has a running damage
+ * event, so a scene can wait for the hurt reaction to finish.
+ */
 static USER_FUNC(_wait_damage_event_end) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -1048,6 +1085,7 @@ static USER_FUNC(_wait_damage_event_end) {
     return EVT_RETURN_DONE;
 }
 
+/** Guess: damage event of a sword: runs the default damage reaction. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -1055,6 +1093,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Hooktail's damage sub-event (registered in her event table):
+ * counts hits on her weak spot (damage code 0x1000000), switches her to the weak pose table,
+ * plays the matching hurt pose and, when the head is hit, sends spectators running from the stage.
+ */
 EVT_BEGIN(gonbaba_damage_sub_event)
     CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 16777216, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -1222,6 +1265,11 @@ EVT_BEGIN(gonbaba_damage_sub_event)
     RETURN
 EVT_END()
 
+/**
+ * Dead event of Hooktail. The first time she would die (unit work 3 is 0) it runs negotiation_event instead.
+ * Otherwise she collapses (GNB_X_1), the camera closes in on her, she speaks her last line (stg1_gon_32),
+ * the death animation plays (GNB_D_3, GNB_H_1), exp and coins are stored and the unit is removed with KillUnit.
+ */
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -1298,6 +1346,13 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Hooktail.
+ * Installs her wait, attack, damage and entry events (confusion uses the default confusion script),
+ * registers the audience entries 13, 14, 32 to 35, 53 and 54 with flag 512,
+ * sets the audience base flag (32768 in the US demo and earlier, 16384 otherwise),
+ * sets her base scale and clears unit works 0 to 5.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
@@ -1346,10 +1401,16 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Guess: phase event of Hooktail (empty). */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of Hooktail: can use an item.
+ * Unit work 5 tracks her opening: the first turn is the fire breath, the second the stomp,
+ * and from then on she picks the stomp or the fire breath at random (50 percent each).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -1376,6 +1437,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Stomp attack of Hooktail (fumituke): she steps forward with two leg-smoke steps and camera shakes,
+ * raises a foot (GNB_A_3) and stamps on one target (weapon_gonbaba_fumituke_attack),
+ * which avoids it or takes the damage according to the action command defence check; she then steps back.
+ */
 static EVT_BEGIN(fumituke_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_gonbaba_fumituke_attack))
@@ -1484,6 +1550,11 @@ static EVT_BEGIN(fumituke_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Hooktail's fire breath: picks targets, lets her wind up (neck rises, roar),
+ * spawns the gonbaba_breath flame effect and deals the weapon_gonbaba_firebreath_attack damage to Mario
+ * and the partner (all targets), then returns her to her normal pose.
+ */
 EVT_BEGIN(firebreath_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_gonbaba_firebreath_attack))
@@ -1572,6 +1643,7 @@ EVT_BEGIN(firebreath_attack_event)
     RETURN
 EVT_END()
 
+/** Guess: wait (idle) event of Cortez: sets the idle pose from the current mode's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

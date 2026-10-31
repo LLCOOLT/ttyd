@@ -19,6 +19,12 @@
 void* ptr; // but why
 u32 size;
 
+/**
+ * Loads the map's enemy setup file (m/<map>/s; setup/<map>/setup.xml in the demos) from the map archive
+ * or the disc into ptr/size.
+ * Skipped for muj_20 while the story progress (GSW 0, written as the raw value 0xF5DE0180) is 2,
+ * leaving ptr NULL. Called by the map-change sequence.
+ */
 void setupDataLoad(const char* mapName) {
     char path[64];
     DVDEntry* dvd;
@@ -57,6 +63,11 @@ extern MapAttrEntry _map_attr_data[];
 
 #include "mario/mariost.h"
 
+/**
+ * Starts the async load of every enemy model the setup file names;
+ * returns FALSE until they are all resident, TRUE at once when the map has no setup file.
+ * Polled by the map-change sequence before setupDataBase.
+ */
 BOOL setupDataCheck(void) {
     char tribeName[64];
     BOOL b;
@@ -74,6 +85,7 @@ BOOL setupDataCheck(void) {
     parsePop();
     return TRUE;
 }
+/** Looks up mapName in _map_attr_data; returns the NULL-named terminator entry when the map is not listed. */
 static inline MapAttrEntry* findMapAttr(const char* name) {
     MapAttrEntry* p = _map_attr_data;
     for (;;) {
@@ -84,6 +96,13 @@ static inline MapAttrEntry* findMapAttr(const char* name) {
     return p;
 }
 
+/**
+ * Spawns the field enemies listed in the map's setup file:
+ * moves this map's defeated-enemy record to the front of the 64-entry list,
+ * resets the records when the map's area changes (map attribute flags),
+ * then creates each enemy not yet marked defeated with its tribe model, AI scripts, territory,
+ * search ranges and battle setup.
+ */
 void setupDataBase(const char* areaName, const char* mapName) {
     char npcName[64];
     char tribeName[64];

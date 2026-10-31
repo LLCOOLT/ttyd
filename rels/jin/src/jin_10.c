@@ -25,6 +25,7 @@ static BeroEntry bero_entry_data[3];
 extern EvtWord unpush_evt[];
 extern EvtWord vivi_chk[];
 
+/** Script helper: returns Mario's current position in args[0..2]. */
 static USER_FUNC(get_pos) {
     EvtWord* args = event->args;
     MarioWork* mario = marioGetPtr();
@@ -35,12 +36,20 @@ static USER_FUNC(get_pos) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Door animation callback: closes door11 as Mario arrives through n_bero (from jin_11);
+ * LW(0) is the door angle and the door turns around Y by 0.44 times it, negated.
+ */
 static EVT_BEGIN(door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door11"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback: opens door11 as Mario leaves through n_bero (to jin_11);
+ * LW(0) is the door angle and the door turns around Y by 0.44 times it.
+ */
 static EVT_BEGIN(door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door11"), 0, LW(0), 0)
@@ -85,6 +94,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Script helper: moves Mario directly to the position (args[0], args[1], args[2]). */
 static USER_FUNC(set_pos) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
@@ -96,6 +106,12 @@ static USER_FUNC(set_pos) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Case script run every frame while Mario pushes the sliding gate (saku):
+ * the gate and Mario move together (grid-move sound loop SFX_STG4_GRID_MOVE1) up to 265 units,
+ * advancing 0.5 per frame when Mario is on the left and moving back at 1 unit per frame otherwise;
+ * GW(10) holds the offset and the gate's hit area follows it.
+ */
 static EVT_BEGIN(push_evt)
     IF_INT_EQUAL(GF(0), 0)
         CALL(evt_mapobj_get_position, STRING("saku"), LW(0), LW(1), LW(2))
@@ -144,6 +160,11 @@ static EVT_BEGIN(push_evt)
     RETURN
 EVT_END()
 
+/**
+ * Looping script that moves the sliding gate (saku) back toward its resting place when Mario stops pushing:
+ * the gate slides back at 0.5 units per frame unless Mario, his partner or Vivian is blocking it,
+ * and plays the grid-movement sound while it moves.
+ */
 EVT_BEGIN(unpush_evt)
     LOOP(0)
         LOOP(0)
@@ -237,6 +258,10 @@ EVT_BEGIN(unpush_evt)
     RETURN
 EVT_END()
 
+/**
+ * Looping script that checks, while Vivian is out as the partner, how far the gate is from Mario;
+ * the checks themselves currently do nothing.
+ */
 EVT_BEGIN(vivi_chk)
     LOOP(0)
         CALL(evt_party_get_status, 6, LW(0))
@@ -256,6 +281,10 @@ EVT_BEGIN(vivi_chk)
     RETURN
 EVT_END()
 
+/**
+ * Creepy Steeple jin_10 map init: sets music, the shadow-Mario tint and the exits,
+ * adds the Tornado Jump badge block and the pushable sliding gate (saku) with its push and release scripts.
+ */
 EVT_BEGIN(jin_10_init_evt)
     SET_VALUE(GF(0), 0)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_JIN1"))
@@ -276,6 +305,10 @@ EVT_BEGIN(jin_10_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: returns 0.8 times the width of the partner args[0] in args[1],
+ * used as the distance from the gate that counts as blocking it.
+ */
 static USER_FUNC(get_width) {
     EvtWord* args = event->args;
     PartyEntry* party = partyGetPtr(evtGetValue(event, args[0]));

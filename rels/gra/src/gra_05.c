@@ -24,11 +24,17 @@ static USER_FUNC(camera_curve_on);
 static BeroEntry bero_entry_data[7];
 static const char* fukitobashi_tbl[4];
 
+/** Enter event of the first hole (in_01) of gra_05: just returns 1 in LW(0). */
 EVT_BEGIN(gra_05_in_01)
     SET_VALUE(LW(0), 1)
     RETURN
 EVT_END()
 
+/**
+ * Guess: exit event of the first hole (A_ana_1) of gra_05:
+ * the partner walks to the hole, then Mario and both partners are placed at (250, -50, 0) and jump out to x 310,
+ * with the camera released.
+ */
 EVT_BEGIN(gra_05_out_01)
 #if VERSION >= VERSION_JP
     CALL(evt_mario_key_onoff, 0)
@@ -88,11 +94,16 @@ EVT_BEGIN(gra_05_out_01)
     RETURN
 EVT_END()
 
+/** Enter event of the second hole (in_02) of gra_05: just returns 1 in LW(0). */
 EVT_BEGIN(gra_05_in_02)
     SET_VALUE(LW(0), 1)
     RETURN
 EVT_END()
 
+/**
+ * Guess: exit event of the second hole (A_ana_2) of gra_05, like gra_05_out_01:
+ * the partner walks to the hole, then Mario and both partners are placed below the floor at x 0 and jump out.
+ */
 EVT_BEGIN(gra_05_out_02)
 #if VERSION >= VERSION_JP
     CALL(evt_mario_key_onoff, 0)
@@ -152,11 +163,17 @@ EVT_BEGIN(gra_05_out_02)
     RETURN
 EVT_END()
 
+/** Enter event of the ana_1 and ana_2 holes: just returns 1 in LW(0) so the transition goes ahead. */
 static EVT_BEGIN(in_evt)
     SET_VALUE(LW(0), 1)
     RETURN
 EVT_END()
 
+/**
+ * Exit event of the hole ana_1: the partners walk to the hole and are removed,
+ * Mario enters background mode and reappears at the other hole ana_2 (50 units lower) with the jump voice,
+ * hopping out to (-140, 60, -450) before control returns. Returns 1 in LW(0).
+ */
 static EVT_BEGIN(out_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -225,6 +242,11 @@ static EVT_BEGIN(out_evt)
     RETURN
 EVT_END()
 
+/**
+ * Exit event of the hole ana_2: Mario jumps into the hole with the jump voice,
+ * leaves background mode and reappears at about (-260, -60, 0) with the partners;
+ * they jump out one after the other to (-190, 0, ...) and the camera is released. Returns 1 in LW(0).
+ */
 static EVT_BEGIN(out_evt2)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -375,6 +397,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Callback run when Flurrie's wind has blown the lid (A_futa) off the hole:
+ * plays a jingle, switches the lid's collision off and advances the story to STORY_STG4_06_01_BLOW_THE_FLOOR.
+ */
 EVT_BEGIN(gra_05_futa_open_evt)
     BEGIN_INLINE_EVENT
         CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
@@ -388,6 +414,11 @@ EVT_BEGIN(gra_05_futa_open_evt)
     RETURN
 EVT_END()
 
+/**
+ * Initial state of the pushable boulder (A_iwa / S_iwa):
+ * binds its collision to the model and, if the story is already at STORY_STG4_07_TRICK_ROCK,
+ * puts it in its pushed position (120 units over) and hides the lid.
+ */
 EVT_BEGIN(evt_gra_05iwa_move_init)
     CALL(evt_hit_bind_mapobj, STRING("A_iwa"), STRING("S_iwa"))
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG4_07_TRICK_ROCK)
@@ -399,6 +430,11 @@ EVT_BEGIN(evt_gra_05iwa_move_init)
     RETURN
 EVT_END()
 
+/**
+ * Event run when Mario has pushed the boulder long enough:
+ * the boulder slides 120 units sideways over 3 seconds with dust puffs and camera shake, carrying Mario along,
+ * then the story is set to STORY_STG4_07_TRICK_ROCK.
+ */
 EVT_BEGIN(evt_gra_05iwa_move_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mapobj_get_position, STRING("S_iwa"), LW(0), LW(1), LW(2))
@@ -451,6 +487,10 @@ EVT_BEGIN(evt_gra_05iwa_move_evt)
     RETURN
 EVT_END()
 
+/**
+ * Callback of the breaking floor: advances the story to STORY_STG4_06_02_THROUGH_THE_HOLE
+ * and turns the camera curve on.
+ */
 EVT_BEGIN(evt_break_floor)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG4_06_02_THROUGH_THE_HOLE)
     CALL(camera_curve_on)
@@ -464,6 +504,10 @@ static const char* fukitobashi_tbl[] = {
     NULL,
 };
 
+/**
+ * Init script of gra_05: trail music and ambience, a hidden coin brick and the Shine Sprite block,
+ * the blow-away lid and the breaking floor (until their story steps are done), and the boulder Mario can push.
+ */
 EVT_BEGIN(gra_05_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_GRA1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_GRA1"))
@@ -499,11 +543,13 @@ EVT_END()
 
 void camRoadCurveOff(const char* name);
 
+/** Script helper: turns the camera road curve "curve2" off so the camera stops following it. */
 static USER_FUNC(camera_curve_off) {
     camRoadCurveOff("|MarioSt_CameraRoad|curve2");
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: turns the camera road curve "curve2" back on. */
 static USER_FUNC(camera_curve_on) {
     camRoadCurveOn("|MarioSt_CameraRoad|curve2");
     return EVT_RETURN_DONE;

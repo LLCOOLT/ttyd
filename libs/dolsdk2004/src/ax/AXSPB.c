@@ -15,10 +15,16 @@ static s32 __AXSpbABL;
 static s32 __AXSpbABR;
 static s32 __AXSpbABS;
 
+/** Returns the address of the studio parameter block (the mixer-wide data block shared with the DSP). */
 u32 __AXGetStudio(void) {
     return (u32)&__AXStudio;
 }
 
+/**
+ * Spreads a leftover DC offset (hostSum, left behind by voices that were stopped) over time to avoid a click:
+ * it gives the DSP the starting volume and a per-sample step of at most 20 that fades it out over later frames,
+ * reducing hostSum by what the DSP will remove in this frame (160 samples).
+ */
 void __AXDepopFade(s32* hostSum, s32* dspVolume, s16* dspDelta) {
     int frames;
     s32 delta;
@@ -44,6 +50,11 @@ void __AXDepopFade(s32* hostSum, s32* dspVolume, s16* dspDelta) {
     *dspDelta = 0;
 }
 
+/**
+ * Applies __AXDepopFade to each of the studio's nine depop accumulators (left,
+ * right and surround for the main bus and for auxiliary buses A and B),
+ * then flushes the studio block to memory so the DSP sees it.
+ */
 void __AXPrintStudio(void) {
     __AXDepopFade(&__AXSpbAL, (void*)&__AXStudio.dpopLHi, &__AXStudio.dpopLDelta);
     __AXDepopFade(&__AXSpbAR, (void*)&__AXStudio.dpopRHi, &__AXStudio.dpopRDelta);
@@ -57,6 +68,7 @@ void __AXPrintStudio(void) {
     DCFlushRange(&__AXStudio, sizeof(__AXStudio));
 }
 
+/** Initialises the studio module by zeroing its nine depop accumulators. */
 void __AXSPBInit(void) {
 #ifdef DEBUG
     OSReport("Initializing AXSPB code module\n");
@@ -72,12 +84,17 @@ void __AXSPBInit(void) {
     __AXSpbABS = 0;
 }
 
+/** Shutdown hook of the studio module; only logs in debug builds. */
 void __AXSPBQuit(void) {
 #ifdef DEBUG
     OSReport("Shutting down AXSPB code module\n");
 #endif
 }
 
+/**
+ * Adds a stopped voice's final output levels (the depop values for the main bus and auxiliary buses A and B,
+ * in left, right and surround) to the studio's accumulators, so they can be faded out by __AXDepopFade.
+ */
 void __AXDepopVoice(AXPB* p) {
     __AXSpbAL += p->dpop.aL;
     __AXSpbAAL += p->dpop.aAuxAL;

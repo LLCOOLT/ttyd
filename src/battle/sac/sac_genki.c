@@ -143,6 +143,12 @@ static void disp_3D(CameraId cam, void* param);
 static void disp_2D(CameraId cam, void* param);
 static GenkiWork* get_ptr(void);
 
+/**
+ * Per-frame driver of the Sweet Treat / Sweet Feast minigame, run as a sibling event by genki_evt_common.
+ * args[0] is the partner's unit id (-1 when there is none or it is KO'd),
+ * args[1] the mode (0 Sweet Treat, 1 Sweet Feast).
+ * The first call clears the work, sets the 900-frame time limit and makes the effects; it never finishes itself.
+ */
 static USER_FUNC(main_genki) {
     GenkiWork* w = get_ptr();
     s32 i;
@@ -192,6 +198,12 @@ static USER_FUNC(main_genki) {
     return 0;
 }
 
+/**
+ * Game state machine: counts the three totals shown over the heads toward their scores (blinking while they
+ * change), shuffles the deck of items to drop when the game starts,
+ * drops a new item every 37 frames (18 in Sweet Feast) until time runs out,
+ * then ends the game once no shots or items are left in the air.
+ */
 static void main_base(void) {
     GenkiWork* w = get_ptr();
     s32 i;
@@ -330,6 +342,12 @@ static void main_base(void) {
     }
 }
 
+/**
+ * Mario's input: pulling the Control Stick left aims
+ * and releasing it fires a star (holding it in Sweet Feast fires one every 10 frames).
+ * Hitting a poison mushroom (state 3) leaves him dizzy and unable to shoot for 180 frames;
+ * when time is up and the last item is gone he stops and the aim reticle is hidden.
+ */
 static void main_mario(void) {
     GenkiWork* w = get_ptr();
     s32 stick = keyGetStickX(0);
@@ -398,6 +416,10 @@ static void main_mario(void) {
 
 // inlining off for main_target, as in the original (the object differs without it)
 #pragma dont_inline on
+/**
+ * Swings the aim reticle between 0 and 60 degrees and back, 1.25 degrees a frame;
+ * main_weapon launches stars in that direction. targetAngle only spins the reticle texture.
+ */
 static void main_target(void) {
     GenkiWork* w = get_ptr();
     switch (w->targetState) {
@@ -438,6 +460,12 @@ static void main_target(void) {
 }
 #pragma dont_inline reset
 
+/**
+ * Moves one of Mario's shots (with a three-point trail):
+ * launches it from Mario at the reticle angle under gravity, and when it comes close to a falling item pops it:
+ * hearts add 1 to Mario's HP total (big ones 3), partner icons to the partner's HP, flowers to FP,
+ * and a poison mushroom makes Mario dizzy. The audience cheers or boos.
+ */
 static void main_weapon(s32 idx) {
     GenkiWork* w = get_ptr();
     GenkiWeapon* wp = &w->weapon[idx];
@@ -643,6 +671,11 @@ static void main_weapon(s32 idx) {
     }
 }
 
+/**
+ * Moves one falling item: on spawn takes the next kind from the shuffled deck (after the deck, a random heart,
+ * flower or partner icon, in Sweet Feast sometimes a big one, or a poison mushroom) and starts under a star;
+ * it then falls until it reaches Mario's feet, where it vanishes in stardust without scoring.
+ */
 static void main_object(s32 idx) {
     GenkiWork* w = get_ptr();
     GenkiObject* o = &w->object[idx];
@@ -727,6 +760,7 @@ static void main_object(s32 idx) {
 
 // inlining off for main_star, as in the original (the object differs without it)
 #pragma dont_inline on
+/** Animates the stars that drop the items: seven small stars in Sweet Treat, one big star in Sweet Feast. */
 static void main_star(void) {
     GenkiWork* w = get_ptr();
     s32 i;
@@ -740,6 +774,11 @@ static void main_star(void) {
 }
 #pragma dont_inline reset
 
+/**
+ * Sweet Treat star idx: rises spinning out of Mario's head,
+ * flies to a random spot along the top of the stage and sways back
+ * and forth there (items drop from its position) until time runs out, then hides.
+ */
 static void main_star0(s32 idx) {
     GenkiWork* w = get_ptr();
     GenkiStar* s = &w->star[idx];
@@ -841,6 +880,7 @@ static void main_star0(s32 idx) {
     }
 }
 
+/** Sweet Feast's single big star: the same rise, fly-up and sway as main_star0, larger and alone. */
 static void main_star1(void) {
     GenkiWork* w = get_ptr();
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
@@ -934,6 +974,7 @@ static void main_star1(void) {
     }
 }
 
+/** Cleanup when the move ends: deletes the star, shot and score effects and frees the shuffled item deck. */
 static USER_FUNC(end_genki) {
     GenkiWork* w = get_ptr();
     GenkiStar* s;
@@ -965,11 +1006,18 @@ static USER_FUNC(end_genki) {
     return 2;
 }
 
+/** Empty 2D display callback, registered every frame by main_genki. */
 static void disp_2D(CameraId cam, void* param) {
 }
 
 #define genki_blink(t) ((t) % 12 >= 0 && (t) % 12 <= 5)
 
+/**
+ * Draws the game: the running HP / partner HP / FP totals over Mario's
+ * and the partner's heads (blinking when they change),
+ * each falling item's icon (big items at double size and flashing,
+ * the partner icon picked per partner and Yoshi colour), and the spinning aim reticle in front of Mario.
+ */
 static void disp_3D(CameraId cam, void* param) {
     GenkiWork* w;
     GenkiObject* o;
@@ -1169,12 +1217,18 @@ static void disp_3D(CameraId cam, void* param) {
     }
 }
 
+/** Empty translucent 3D display callback, registered every frame by main_genki. */
 static void disp_3D_alpha(CameraId cam, void* param) {
 }
 
 static USER_FUNC(start_game);
 
 static GenkiWork* get_ptr(void);
+/**
+ * Shared body of Sweet Treat and Sweet Feast; LW(15) is the mode (0 or 1).
+ * Pays the Star Power, plays the star intro, moves Mario left, runs the shooting game, then restores Mario's HP,
+ * the partner's HP and FP by the three scores, cures both of bad statuses and slides the enemies back.
+ */
 EVT_BEGIN(genki_evt_common)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_PARTNER, LW(13))
     CALL(btlevtcmd_GetBodyId, LW(13), LW(14))
@@ -1275,19 +1329,24 @@ EVT_BEGIN(genki_evt_common)
     RETURN
 EVT_END()
 
-// After genki_evt_common, where the demo's .data places them (retail keeps them in .sdata).
+/** After genki_evt_common, where the demo's .data places them (retail keeps them in .sdata). */
 EVT_BEGIN(marioAttackEvent_Genki0)
     SET_VALUE(LW(15), 0)
     CALL_CHILD(genki_evt_common)
     RETURN
 EVT_END()
 
+/** Attack event of Sweet Feast (marioWeapon_Genki1): runs genki_evt_common in mode 1. */
 EVT_BEGIN(marioAttackEvent_Genki1)
     SET_VALUE(LW(15), 1)
     CALL_CHILD(genki_evt_common)
     RETURN
 EVT_END()
 
+/**
+ * Cures the unit in LW(9) of sleep, stop, dizzy, poison, confusion, burn, freeze, tiny, attack down,
+ * defense down and slow, then clears the command-blocking turns (recover_cmd_disable).
+ */
 EVT_BEGIN(status_recover_evt)
     CALL(btlevtcmd_CheckStatus, LW(9), 1, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -1339,11 +1398,16 @@ EVT_END()
 
 // inlining off for get_ptr, as in the original (the object differs without it)
 #pragma dont_inline on
+/** The minigame's work area, kept in the battle's shared action-command work buffer. */
 static GenkiWork* get_ptr(void) {
     return (GenkiWork*)_battleWorkPointer->actionCommands.work;
 }
 #pragma dont_inline reset
 
+/**
+ * Fires a star: picks a random idle shot slot (3 in Sweet Treat, 7 in Sweet Feast),
+ * arms it with a 7-frame delay and plays Mario's throwing pose; does nothing when every slot is in flight.
+ */
 static void weapon_entry(void) {
     GenkiWork* w = get_ptr();
     s32 cnt = 0;
@@ -1368,8 +1432,11 @@ static void weapon_entry(void) {
     }
 }
 
-// Starts the first idle object. main_genki calls it directly, not from a script, so it is called through a
-// cast; it returns nothing (r3 still holds the work pointer), which main_genki ignores.
+/**
+ * Starts the first idle object.
+ * main_genki calls it directly, not from a script, so it is called through a cast;
+ * it returns nothing (r3 still holds the work pointer), which main_genki ignores.
+ */
 static USER_FUNC(object_entry) {
     GenkiWork* w = get_ptr();
     s32 i;
@@ -1382,7 +1449,7 @@ static USER_FUNC(object_entry) {
     }
 }
 
-// Counts the objects in state 2 (called directly by main_genki through a cast).
+/** Counts the objects in state 2 (called directly by main_genki through a cast). */
 static USER_FUNC(object_get_num) {
     GenkiWork* w = get_ptr();
     s32 i;
@@ -1395,16 +1462,19 @@ static USER_FUNC(object_get_num) {
     return n;
 }
 
+/** Starts the shooting game (main_base state 1) after the intro. */
 static USER_FUNC(start_game) {
     GenkiWork* w = get_ptr();
     w->state = 1;
     return 2;
 }
 
+/** Waits until main_base reports the game is over (state 3). */
 static USER_FUNC(wait_game_end) {
     return get_ptr()->state == 3 ? 2 : 0;
 }
 
+/** Returns the three scores to the script: args[0] Mario's HP, args[1] the partner's HP, args[2] FP. */
 static USER_FUNC(get_score) {
     GenkiWork* w = get_ptr();
     EvtWord* args = event->args;
@@ -1414,11 +1484,13 @@ static USER_FUNC(get_score) {
     return 2;
 }
 
+/** Opens the HP / FP status window again for the healing that follows. */
 static USER_FUNC(status_on) {
     statusWinOpen();
     return 2;
 }
 
+/** Starts the seven Sweet Treat stars rising out of Mario (main_star0). */
 static USER_FUNC(star_appear) {
     GenkiWork* w = get_ptr();
     s32 i;
@@ -1430,6 +1502,7 @@ static USER_FUNC(star_appear) {
     return 2;
 }
 
+/** Starts Sweet Feast's single big star (main_star1). */
 static USER_FUNC(star_stone_appear) {
     GenkiWork* w = get_ptr();
     w->star[0].state = 1;
@@ -1437,6 +1510,10 @@ static USER_FUNC(star_stone_appear) {
     return 2;
 }
 
+/**
+ * Clears the turns left on the command blocks set by Bowser's command-blocking attacks (US and PAL keep two of
+ * them on the partner unit); part of status_recover_evt's cure.
+ */
 static USER_FUNC(recover_cmd_disable) {
     BattleWork* w = _battleWorkPointer;
     w->commandDisabled[0] = 0;

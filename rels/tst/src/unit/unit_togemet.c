@@ -307,6 +307,7 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_togemet", "c_met", 0.0f, 0.0f, 0.0f, 0.0f, 23.0f, 0.0f, 0.0f, 28.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0x1, pose_table},
 };
 
+/** Init script of the Spike Top: sets up the floor or ceiling form through init_event2 and starts the wait script. */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(15))
     CALL_CHILD(init_event2)
@@ -314,6 +315,12 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Sets up the Spike Top for its current form.
+ * Unit work 0 = 0: on the floor, with the normal scripts and no ceiling-fall script.
+ * Otherwise it hangs from the ceiling at y 130 with the ceiling poses, data table, scripts and hit offsets.
+ * Both set the run and walk sounds and clear the overturn count. Rerun whenever it drops to the floor.
+ */
 static EVT_BEGIN(init_event2)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(15))
     IF_INT_EQUAL(LW(15), 0)
@@ -351,6 +358,10 @@ static EVT_BEGIN(init_event2)
     RETURN
 EVT_END()
 
+/**
+ * Run when a stomp is stopped by the Spike Top's spike (data event 37):
+ * after half a second it flashes toge_flush on the spike, placed higher when it is Huge and lower when Tiny.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -371,6 +382,7 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/** Damage reaction of the Spike Top on the floor: the default damage script. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -378,6 +390,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Flip-over reaction (data event 13): switches to the flipped defence, defence-attribute and pose tables,
+ * sets the flipped status flag and an overturn count of 1,
+ * bounces twice with SFX_ENM_INSIDE1 and turns its top spike off.
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -398,6 +415,10 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Run instead of an attack while flipped: counts the overturn count down and, when it reaches 0,
+ * restores the normal tables, hops upright with SFX_ENM_INSIDE2 and turns its top spike back on.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -424,6 +445,12 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * The Spike Top's shell attack on the floor (weapon_met_attack): while flipped it tries to get up instead.
+ * It may use an item first; otherwise it hops, withdraws into its shell
+ * and spins across the floor at the target, kicking up dust.
+ * A hit applies the guard result and damage and bounces it back; a miss slides it past. Then it walks home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -570,11 +597,17 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait script of the Spike Top on the floor: shows its idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction of the Spike Top on the ceiling: the default damage script;
+ * then, unless the hit knocked it out with no Life Shroom to revive it,
+ * any damage while still on the ceiling makes it fall off through ceil_fall_ready_event.
+ */
 static EVT_BEGIN(damage_event_ceil)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -597,6 +630,11 @@ static EVT_BEGIN(damage_event_ceil)
     RETURN
 EVT_END()
 
+/**
+ * Run on the ceiling Spike Top for the counter-damage data events 25 to 36:
+ * it drops to the floor form (normal poses, data table, hit offsets, home on the ground, init_event2 rerun) and
+ * then plays the common counter-damage reaction.
+ */
 static EVT_BEGIN(counter_damage_event_ceil)
     CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 2)
     CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 4194304)
@@ -619,6 +657,11 @@ static EVT_BEGIN(counter_damage_event_ceil)
     RETURN
 EVT_END()
 
+/**
+ * Knocks the Spike Top off the ceiling (also its ceiling-fall script, Guess: for quakes and similar):
+ * it falls with SFX_ENM_FALL1, lands on its back with SFX_ENM_TOGEMET_LANDING1
+ * and is set up flipped like dmg_turn_event.
+ */
 static EVT_BEGIN(ceil_fall_ready_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_FALL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, 0)
@@ -656,6 +699,13 @@ static EVT_BEGIN(ceil_fall_ready_event)
     RETURN
 EVT_END()
 
+/**
+ * The ceiling Spike Top's attack (weapon_met_ceil_attack): may use an item first;
+ * otherwise it crawls along the ceiling above the target and drops onto it spike first.
+ * A hit applies the guard result and damage.
+ * Either way it then becomes a floor Spike Top,
+ * hops off the target twice and walks to the spot below where it hung.
+ */
 static EVT_BEGIN(attack_event_ceil)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -770,6 +820,7 @@ static EVT_BEGIN(attack_event_ceil)
     RETURN
 EVT_END()
 
+/** Wait script of the Spike Top on the ceiling: shows its idle pose from the ceiling pose table. */
 static EVT_BEGIN(wait_event_ceil)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

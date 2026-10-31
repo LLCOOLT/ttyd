@@ -223,16 +223,26 @@ s32* irai_item_table[] = {
     irai_item_data25, irai_item_null, irai_item_null, irai_item_null, irai_item_data29, irai_item_null,
 };
 
+/**
+ * Start event of a Trouble Center request that needs no setup on taking it (the default entry of
+ * irai_start_event): does nothing.
+ */
 EVT_BEGIN(irai_start_event_null)
     RETURN
 EVT_END()
 
+/**
+ * Start event of Trouble 1: moves the 盗賊団２ NPC (the second copy of the bandit gang) to (445, 0, 120)
+ * and gives the door parameter in GW(11) the _npc_01 door data,
+ * i.e. the blocked state while the request is active.
+ */
 EVT_BEGIN(irai_start_event01)
     CALL(evt_npc_set_position, STRING("盗賊団２"), 445, 0, 120)
     CALL(evt_door_set_param, GW(11), 0, PTR(&door_data_05_npc_01))
     RETURN
 EVT_END()
 
+/** Start event of Trouble 4: moves the ボロドー２ NPC (the second copy of Borodo) to (-475, 0, -180). */
 EVT_BEGIN(irai_start_event04)
     CALL(evt_npc_set_position, STRING("ボロドー２"), -475, 0, -180)
     RETURN
@@ -249,22 +259,35 @@ EvtWord* irai_start_event[] = {
     irai_start_event_null,
 };
 
+/**
+ * End event of a Trouble Center request that needs no cleanup when it is cancelled
+ * or solved (the default entry of irai_end_event): does nothing.
+ */
 EVT_BEGIN(irai_end_event_null)
     RETURN
 EVT_END()
 
+/**
+ * End event of Trouble 1: puts the 盗賊団２ NPC back at (10, 0, -460)
+ * and restores the door parameter in GW(11) to the normal door data.
+ */
 EVT_BEGIN(irai_end_event01)
     CALL(evt_npc_set_position, STRING("盗賊団２"), 10, 0, -460)
     CALL(evt_door_set_param, GW(11), 0, PTR(&door_data_05_npc))
     RETURN
 EVT_END()
 
+/** End event of Trouble 4: puts the ボロドー２ NPC at (-475, 0, -180). */
 EVT_BEGIN(irai_end_event04)
     CALL(evt_npc_set_position, STRING("ボロドー２"), -475, 0, -180)
     RETURN
 EVT_END()
 
 #if VERSION >= VERSION_US
+/**
+ * End event of Trouble 19 (the request of ピートン, from its debug message):
+ * if Mario still has the field item "wr", removes it. US and PAL only.
+ */
 EVT_BEGIN(irai_end_event19)
     DEBUG_PUT_MSG(STRING("ピートンの依頼キャンセル"))
     CALL(evt_item_delete_check, STRING("wr"), LW(0))
@@ -286,12 +309,22 @@ EvtWord* irai_end_event[] = {
     irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null, irai_end_event_null,
 };
 
+/**
+ * Init event of the Trouble Center: makes the notice board (A_i04_keizi) open the request window with
+ * gor_irai_main when Mario presses A in front of it,
+ * and the Trouble Center manager (A_i04_kunter) run gor_irai_tenshu_main.
+ */
 EVT_BEGIN(gor_irai_init)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_i04_keizi"), 0, PTR(gor_irai_main), 0)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_i04_kunter"), 0, PTR(gor_irai_tenshu_main), 0)
     RETURN
 EVT_END()
 
+/**
+ * The first-visit explanation of the Trouble Center, with a yes/no menu:
+ * irai_00, then irai_03 and GSWF_TROUBLE_LECTURE_HEARD set when Mario wants to hear it,
+ * or irai_02 when he declines.
+ */
 EVT_BEGIN(gor_irai_lecture)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_toge, 2, 150, 12, -156)
@@ -307,6 +340,12 @@ EVT_BEGIN(gor_irai_lecture)
     RETURN
 EVT_END()
 
+/**
+ * Reading the Trouble Center's notice board: until the lecture has been heard it plays gor_irai_lecture.
+ * Then it opens the request window (irai_init_func, irai_main_func) with the requests available at the current
+ * story progress; when a request is chosen it shows its description, asks irai_01 to accept,
+ * and on yes marks it active in GSW_TROUBLE_ACTIVE and spawns its start event.
+ */
 EVT_BEGIN(gor_irai_main)
     IF_INT_EQUAL(GSWF(GSWF_TROUBLE_LECTURE_HEARD), 0)
 #if VERSION >= VERSION_US
@@ -360,6 +399,13 @@ EVT_BEGIN(gor_irai_main)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of the Trouble Center's manager (A_i04_kunter): after all 30 requests are solved he says irai_74;
+ * before the lecture is heard he gives it; with no active request he says irai_06;
+ * otherwise he asks about the active one, giving its current status,
+ * or lets Mario cancel it for 30 coins (irai_09 to irai_12, which clears its flags,
+ * takes back its items and runs its end event).
+ */
 EVT_BEGIN(gor_irai_tenshu_main)
     SET_VALUE(LW(0), GSWF(GSWF_TROUBLE_01_SOLVED))
     ADD(LW(0), GSWF(GSWF_TROUBLE_02_SOLVED))
@@ -455,6 +501,10 @@ EVT_BEGIN(gor_irai_tenshu_main)
     RETURN
 EVT_END()
 
+/**
+ * Clears the working story flags and bytes of the request in progress (the GSWF_TROUBLE_WORK range and the
+ * GSW_TROUBLE_WORK range), so a new request starts clean.
+ */
 static void irai_flag_clear(void) {
     s32 i;
 
@@ -466,6 +516,7 @@ static void irai_flag_clear(void) {
     }
 }
 
+/** Empty loops over the request work flags and bytes; the debug print they once contained is gone. */
 static void irai_flag_disp(void) {
     s32 i;
 
@@ -475,15 +526,21 @@ static void irai_flag_disp(void) {
     }
 }
 
+/** Script helper that starts a request: clears its working flags. */
 static USER_FUNC(irai_start_func) {
     irai_flag_clear();
     return EVT_RETURN_DONE;
 }
 
+/** Returns the zero-based request index from the script argument, which holds the request number counted from 1. */
 static inline s32 irai_get_no(EventEntry* event) {
     return evtGetValue(event, event->args[0]) - 1;
 }
 
+/**
+ * Script helper that cancels request args[0]: clears the working flags
+ * and removes every copy of each of its items (irai_item_table) from Mario's pouch.
+ */
 static USER_FUNC(irai_cancel_func) {
     s32 no = irai_get_no(event);
     s32* items;
@@ -507,6 +564,12 @@ static USER_FUNC(irai_cancel_func) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper that prepares the request window:
+ * allocates the work block, fills the list with the requests that exist at the current story progress (6 at the
+ * start, then 3 more at story progress 56, 112, 164, 215, 261 (2 requests), 281, 339, 373 and 401),
+ * copies each request's client and contents text, and stores the work block in LW(10).
+ */
 static USER_FUNC(irai_init_func) {
     IraiWork* wp;
     s32 seq;
@@ -591,6 +654,13 @@ static USER_FUNC(irai_init_func) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper that runs the request window each frame (work block in LW(10)):
+ * first creates the pointer hand, scroll arrow and L/R button icons,
+ * then A picks the highlighted request (only when no request is active and it is not solved yet), B cancels,
+ * the stick moves the cursor and L and R page through the list.
+ * Finishes with LW(0) set to the chosen request number, or -1 if cancelled.
+ */
 static USER_FUNC(irai_main_func) {
     IraiWork* wp = (IraiWork*)event->lwData[10];
     s32 prev;
@@ -740,6 +810,11 @@ static USER_FUNC(irai_main_func) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper that sets up the text for the chosen request:
+ * LW(12) is the confirmation message irai_msg_kakunin for the request in LW(0) and LW(11) the request number,
+ * or 0 and -1 when the window was cancelled.
+ */
 static USER_FUNC(irai_check_func) {
     if (event->lwData[0] != -1) {
         event->lwData[12] = (EvtWord)irai_msg_kakunin[event->lwData[0] - 1];
@@ -751,6 +826,7 @@ static USER_FUNC(irai_check_func) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper that frees the request window's work block (LW(10)). */
 static USER_FUNC(irai_end_func) {
     _mapFree((void*)event->lwData[10]);
     return EVT_RETURN_DONE;
@@ -785,6 +861,12 @@ static USER_FUNC(irai_end_func) {
         FontDrawString(x, v, msg);                                                          \
     }
 
+/**
+ * Draw callback of the request window (US and PAL):
+ * draws the blue title frames and header texts,
+ * the list of requests (client and contents columns) clipped to the window,
+ * with texts centred or squeezed to fit; solved requests are grey and the active one is red.
+ */
 static void irai_window_disp(CameraId camera, void* param) {
     IraiWork* wp = param;
     u32 left;
@@ -848,10 +930,20 @@ static void irai_window_disp(CameraId camera, void* param) {
     GXSetScissor(left, top, width, height);
 }
 #else
+/**
+ * Adds an integer to a float; kept as a separate function
+ * so the draw code's arithmetic compiles as in the original.
+ */
 static inline f32 iraiAddI(f32 a, s32 b) {
     return a + b;
 }
 
+/**
+ * Draw callback of the request window (JP and the demos):
+ * draws the blue title frames and header texts,
+ * the list of requests (client and contents columns) clipped to the window with the texts as they are;
+ * solved requests are grey and the active one is red.
+ */
 static void irai_window_disp(CameraId camera, void* param) {
     f32 negX;
     IraiWork* wp = param;

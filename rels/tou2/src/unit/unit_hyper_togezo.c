@@ -278,6 +278,11 @@ static BattleWeapon weapon_togezo_charge = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init event of the Hyper Spiny: registers its wait, attack, damage and confusion events,
+ * clears unit work 0 (guarding) and 3 (charged), and sets its run, walk and jump sounds,
+ * then starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -292,6 +297,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Data event 37 (the thorn counter): after 30 frames flashes the "toge_flush" spike effect above the unit,
+ * 45 units up when Huge (status 10), 25 when Tiny (status 11) and 35 otherwise.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -312,6 +321,7 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_event)
     RETURN
 EVT_END()
 
+/** Damage event: runs the default battle damage reaction on the unit itself (part 1). */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -319,6 +329,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Data event 13 (the Hyper Spiny is flipped over):
+ * switches to the flipped defence, attribute, status-resist, pose and data tables,
+ * sets STATUS_FLAG_FLIPPED with the over-turn counter at 1 and removes its counterattack attributes,
+ * plays the "inside" sound and hops twice.
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -340,6 +356,11 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs in place of a flipped Hyper Spiny's attack: counts the over-turn counter down;
+ * at zero it restores the upright tables, clears STATUS_FLAG_FLIPPED,
+ * turns the counterattack attributes back on and hops back on its feet.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -366,6 +387,15 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the Hyper Spiny: a flipped unit runs wakeup_event;
+ * otherwise it uses an enemy item if one fits.
+ * While curled up guarding (unit work 0 = 1) it runs guard_cancel_event;
+ * after a charge (unit work 3 = 1) it does the rolling attack.
+ * Otherwise it draws among the rolling attack (normal_attack_event),
+ * curling up to guard (guard_event) and charging up (charge_event), with weights 40, 40, 20 on turn 1 and 40,
+ * 40, 6 later.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -411,6 +441,15 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Hyper Spiny's rolling attack (weapon_togezo_attack):
+ * it curls up with the turn sounds, spins faster and faster and rolls along the floor into the target.
+ * A miss rolls past and winds down; a hit shakes the camera,
+ * knocks the target and the Spiny rebounds in two hops.
+ * After a hit there is a 50% chance that it keeps rolling home
+ * and ends curled up in its guard state (guard tables and unit work 0 = 1);
+ * otherwise it unrolls, returns home and stands up.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -634,6 +673,10 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Hyper Spiny curls up to guard: spins into its ball pose "TGZ_P_1", switches to the guard defence,
+ * attribute, status-resist, pose and data tables and sets unit work 0 to 1.
+ */
 static EVT_BEGIN(guard_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -661,6 +704,10 @@ static EVT_BEGIN(guard_event)
     RETURN
 EVT_END()
 
+/**
+ * The Hyper Spiny uncurls: spins back to "TGZ_S_1", restores the normal defence, attribute, status-resist,
+ * pose and data tables and sets unit work 0 to 0.
+ */
 static EVT_BEGIN(guard_cancel_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -687,6 +734,12 @@ static EVT_BEGIN(guard_cancel_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the Hyper Spiny charges up: pays the weapon cost (LW(9) is weapon_togezo_charge), zooms in,
+ * plays the charge sound and a "crystal_n64" crystal effect for a second,
+ * hops once and applies the weapon to itself (CheckDamage with itself as the target) to give itself the charge
+ * status.
+ */
 static EVT_BEGIN(charge_event)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(evt_btl_camera_set_mode, 0, 7)
@@ -712,6 +765,7 @@ static EVT_BEGIN(charge_event)
     RETURN
 EVT_END()
 
+/** Wait event: sets the idle animation from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

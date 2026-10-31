@@ -48,6 +48,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Init script of dou_06, the short room between dou_05 and dou_10:
+ * music and ambience, exits, waves and a spinning floor panel that hides a Star Piece.
+ */
 EVT_BEGIN(dou_06_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_DOU1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_DOU9"))

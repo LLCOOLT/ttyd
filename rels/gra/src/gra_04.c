@@ -17,17 +17,25 @@
 #include "driver/mapdrv.h"
 
 #if VERSION >= VERSION_JP
+// Declaration of roll_release_check, defined at the bottom of the file (JP and later).
 USER_FUNC(roll_release_check);
 #endif
 
 static BeroEntry bero_entry_data[5];
 static const char* fukitobashi_tbl[6];
 
+/** Enter event of the w_bero_1 and w_bero_2 doors: just returns 1 in LW(0) so the door transition goes ahead. */
 static EVT_BEGIN(in_evt)
     SET_VALUE(LW(0), 1)
     RETURN
 EVT_END()
 
+/**
+ * Exit event of w_bero_1, the door leading into the back lane of the same map:
+ * Mario (after releasing a roll in JP and later) and the partners walk to the door while the camera holds,
+ * the partners are removed, Mario is switched to background mode (bgmode_on, camera y off),
+ * placed at (-242, 10, -450) and walks on with the camera released. Returns 1 in LW(0).
+ */
 static EVT_BEGIN(out_evt)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION >= VERSION_JP
@@ -95,6 +103,11 @@ static EVT_BEGIN(out_evt)
     RETURN
 EVT_END()
 
+/**
+ * Exit event of the return door from the back lane (w_bero_2): the reverse of out_evt.
+ * Mario leaves background mode, appears at (-380, 0, -10) with both partners next to him,
+ * they run out and walk to (-280, -10) while the camera and shift are released. Returns 1 in LW(0).
+ */
 static EVT_BEGIN(out_evt2)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION <= VERSION_DEMO_US
@@ -210,6 +223,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Callback run when Flurrie's wind has blown the tree away from the trail:
+ * plays a short jingle, waits until Mario's partner is no longer in use,
+ * opens the w_bero_1 exit and advances the story to STORY_STG4_06_TREE_TRUNK.
+ */
 EVT_BEGIN(gra_04_tree_open_evt)
     BEGIN_INLINE_EVENT
         CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
@@ -239,6 +257,11 @@ static const char* fukitobashi_tbl[] = {
     NULL,
 };
 
+/**
+ * Init script of gra_04: trail music, the exits and the shadow Mario party removal;
+ * while the story is before STORY_STG4_06_TREE_TRUNK the w_bero_1 exit stays closed;
+ * places the Hammer Throw badge block.
+ */
 EVT_BEGIN(gra_04_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_GRA1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_GRA1"))
@@ -263,6 +286,11 @@ EVT_END()
 #if VERSION >= VERSION_JP
 s32 marioRollCancelDisable(void);
 
+/**
+ * Script helper used by the exit scripts of this map:
+ * stores 1 in args[0] when marioRollCancelDisable() is 0, i.e. when Mario's roll may be cancelled,
+ * and 0 otherwise. JP and later only.
+ */
 USER_FUNC(roll_release_check) {
     EvtWord* args = event->args;
     evtSetValue(event, args[0], marioRollCancelDisable() == 0);

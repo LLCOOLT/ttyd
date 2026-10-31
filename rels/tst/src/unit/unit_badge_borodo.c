@@ -219,6 +219,11 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_badge_borodo", "c_borodo_t", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
+/**
+ * Init script of the Bandit: registers its wait, attack, damage and confusion handlers,
+ * sets the running and walking sounds, and picks the pose table with the stolen-item bag
+ * when the unit flag 0x40000000 (it carries a stolen item) is already set.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -236,6 +241,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction: runs the default damage handling (btldefaultevt_Damage) with LW(10) = -2 (the unit itself)
+ * and LW(11) = 1.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -243,10 +252,17 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Phase event: empty, it does nothing. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Chooses the Badge Bandit's action: if it carries a stolen item (unit flag 0x40000000) it runs away with it
+ * (escape_event); otherwise it uses an item if it has one, a confused Bandit makes a plain attack,
+ * and normally it makes the plain attack (_borodo_normal_attack) about 33% of the time
+ * and the stealing attack (_borodo_steal_attack) otherwise.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_CheckUnitFlag, BTL_UNIT_SELF, 1073741824, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -275,6 +291,12 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Bandit's plain attack: it runs up to the target (SFX_ENM_BORODO_MOVE1L/R),
+ * bumps it (SFX_ENM_BORODO_ATT1) and either misses or applies the damage with the action-command defence;
+ * afterwards it falls over or recovers and runs back home.
+ * A special pre-damage result of 5 skips the miss handling.
+ */
 static EVT_BEGIN(_borodo_normal_attack)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_borodo_attack))
@@ -412,6 +434,14 @@ static EVT_BEGIN(_borodo_normal_attack)
     RETURN
 EVT_END()
 
+/**
+ * The Bandit's stealing attack: it runs at the target and bumps it like the plain attack;
+ * on a hit where Mario's action command result (LW(7)) was 3 or less,
+ * _steal_item takes an item from Mario's pouch (LW(8) = the item, LW(9) = its icon),
+ * which flies out of the target while btl_msg_steal_item_lost is announced and sets the unit flag 0x40000000,
+ * and the Bandit laughs (SFX_ENM_BORODO_LAUGH1) and switches to the pose table showing the loot.
+ * If nothing was stolen it sulks (SFX_ENM_BORODO_INCLINE1) and walks home.
+ */
 static EVT_BEGIN(_borodo_steal_attack)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_borodo_attack))
@@ -571,6 +601,11 @@ static EVT_BEGIN(_borodo_steal_attack)
     RETURN
 EVT_END()
 
+/**
+ * The Bandit runs away with the stolen item: it turns around (SFX_ENM_BORODO_WAIT1, pose R_3), hops,
+ * blurs with SFX_ENM_BORODO_ESCAPE1 and dashes 300 units off the stage at speed 9,
+ * then removes itself from the battle (KillUnit), taking the item with it.
+ */
 static EVT_BEGIN(escape_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BORODO_WAIT1"), EVT_NULLPTR, 0, LW(15))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("R_3"))
@@ -593,6 +628,10 @@ static EVT_BEGIN(escape_event)
     RETURN
 EVT_END()
 
+/**
+ * Idle event of the Bandit: uses the plain pose table,
+ * or the one showing the stolen item bag if the unit flag 0x40000000 is set, and shows the matching idle pose.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_CheckUnitFlag, BTL_UNIT_SELF, 1073741824, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -604,6 +643,12 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper for the Badge Bandit's steal.
+ * args[0] is the thief, args[1] the victim; args[2]-args[4] receive the item id, its icon and the amount taken.
+ * 40% of the time it takes up to 10 coins, otherwise it picks among the held badges (the item branch is skipped
+ * because held is 0).
+ */
 static USER_FUNC(_steal_item) {
     EvtWord* args = event->args;
     s32 count;

@@ -63,6 +63,14 @@ static s32 _power_table[] = {80, 60, 50, 40, 28, 16, 8};
 static s32 _power_table[] = {55, 50, 45, 40, 35, 30, 25};
 #endif
 
+/**
+ * Reads the script parameters: params[0] picks the input (A by default; 2 B, 3 X, 4 Y, 5 R, 6 stick left,
+ * 8 stick left while holding A, 9 unplugging the controller,
+ * 10 the console's Reset button (which then stops resetting the game), 11 A/B and 12 X/Y alternately,
+ * 16 whichever of A or B is lit, swapping every 60-89 frames).
+ * [1] is the time limit, [2] the target mark ([3] non-zero makes it start at random and move),
+ * [5] the gain per press, [6] the drain, [7] the starting fill.
+ */
 static void _init_param(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
     RepeatWork* r = (RepeatWork*)ac->work;
@@ -128,6 +136,12 @@ static void _init_param(BattleWork* work) {
     work->actionCommands.outputParams[0] = 0;
 }
 
+/**
+ * Per-frame driver of action command 5, used when running away from battle and by Goombella's Rally Wink.
+ * Each press adds params[5] x a difficulty factor (higher in the demos) to the gauge, which drains every frame;
+ * the gauge locks once full.
+ * After the time limit it succeeds when the gauge has reached the target mark or filled.
+ */
 s32 battleAcMain_Repeatedly(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
     RepeatWork* r = (RepeatWork*)ac->work;
@@ -296,10 +310,15 @@ s32 battleAcMain_Repeatedly(BattleWork* work) {
     return 1;
 }
 
+/** Returns the result word: 1 while running, 2 on success, 0 on failure. */
 s32 battleAcResult_Repeatedly(BattleWork* work) {
     return work->actionCommands.result;
 }
 
+/**
+ * Display callback: slides the gauge in from the left over 20 frames,
+ * and once the command ends keeps it up for 40 frames before sliding it back out.
+ */
 void battleAcDisp_Repeatedly(CameraId cameraId, BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
     BattleACDispParams* disp = (BattleACDispParams*)&ac->disp;
@@ -331,6 +350,10 @@ void battleAcDisp_Repeatedly(CameraId cameraId, BattleWork* work) {
 
 // inlining off for battleAcDelete_Repeatedly, as in the original (the object differs without it)
 #pragma dont_inline on
+/**
+ * Ends the command (also called from main when time runs out):
+ * lets the Reset button reset the game again, stops the gauge sound and starts the 60-frame end wait.
+ */
 void battleAcDelete_Repeatedly(BattleWork* work) {
     switch (work->actionCommands.params[0]) {
         case 10:
@@ -342,6 +365,11 @@ void battleAcDelete_Repeatedly(BattleWork* work) {
 }
 #pragma dont_inline reset
 
+/**
+ * Draws the flashing button icon (both A and B, the live one lit, for input 16),
+ * the gauge eased toward its value (pulsing red once full) with its target mark (acFlags bit 1 puts it at 100)
+ * and the target marker.
+ */
 static void actionCommandDisp(f32 x, f32 y) {
     RepeatWork* r;
     RepeatDisp* d;

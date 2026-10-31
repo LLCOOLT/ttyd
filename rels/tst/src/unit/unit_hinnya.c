@@ -166,6 +166,10 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
+/**
+ * Init script: sets unit flag 0x1000000 (guess: a flag for this form's pose or targeting), installs the wait,
+ * attack, damage and confusion handlers (confusion reuses the attack) and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
@@ -176,6 +180,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Spike spark shown when an attacker is hurt by (or avoids) the spiked head:
+ * plays pose type 31, waits 30 frames, spawns the toge_flush effect above the unit's head (53 up when Huge, 33
+ * when Tiny, else 43) and waits another 60 frames.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 31)
     WAIT_FRAMES(30)
@@ -198,6 +207,10 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: runs the shared default damage script (btldefaultevt_Damage) with its default parameters
+ * (LW(10) = -2, LW(11) = 1).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -205,6 +218,14 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the Spania family (Spania, Spunia and Spinia share it):
+ * it picks a target, charges up trembling in place (A_1 pose, 10 shakes of 4 frames),
+ * then rushes along the ground at speed 10 through the target's position (A_3 pose with the move sound).
+ * A miss lets it run past; a hit shakes the camera and applies the damage with the guard-timing check.
+ * It then runs off stage, reappears at x = 300 and slows down in steps (speed 5, 2, 1) back to its home
+ * position.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -328,6 +349,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

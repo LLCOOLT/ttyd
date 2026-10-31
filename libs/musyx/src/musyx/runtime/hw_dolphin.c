@@ -41,6 +41,8 @@ static SND_SOME_CALLBACK userCallback = NULL;
 #define DMA_BUFFER_LEN 0x280
 
 u32 salGetStartDelay();
+/** Runs the registered per-frame callback (snd_handle_irq) with interrupts enabled, unless it is already running
+ * (salLogicActive guards against re-entry). */
 static void callUserCallback() {
   if (salLogicActive) {
     return;
@@ -52,6 +54,9 @@ static void callUserCallback() {
   salLogicActive = 0;
 }
 
+/** AI DMA-complete interrupt: advances to the next of the four 0x280-byte output buffers and queues it with AIInitDMA,
+ * records the tick, then runs the frame callback if the DSP has finished its previous frame; otherwise marks it as
+ * waiting for the DSP. */
 void salCallback() {
   salAIBufferIndex = (salAIBufferIndex + 1) % 4;
   AIInitDMA(OSCachedToPhysical(salAIBufferBase) + (salAIBufferIndex * DMA_BUFFER_LEN),
@@ -64,11 +69,14 @@ void salCallback() {
   }
 }
 
+// DSP task init callback: marks the DSP as done and booted (salDspInitIsDone), which releases the wait in salInitDsp.
 void dspInitCallback() {
   salDspIsDone = TRUE;
   salDspInitIsDone = TRUE;
 }
 
+/** DSP task resume callback, fired when the DSP finishes a frame: marks it done and, if the AI interrupt came in
+ * meanwhile, runs the frame callback now. */
 void dspResumeCallback() {
   salDspIsDone = TRUE;
   if (salLogicIsWaiting) {
@@ -78,9 +86,13 @@ void dspResumeCallback() {
 }
 
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 3)
+/** DSP task done callback: wakes the threads waiting on salWaitForDSPThreadQueue. */
 void dspDoneCallback() { OSWakeupThread(&salWaitForDSPThreadQueue); }
 #endif
 
+/** Allocates four 0x280-byte AI output buffers (5 ms of 32 kHz stereo each), registers salCallback as the AI DMA
+ * callback, queues the first buffer, sets 32 samples per synth step and returns 32000 through outFreq. Returns FALSE if
+ * the allocation fails. */
 u32 salInitAi(SND_SOME_CALLBACK callback, u32 unk, u32* outFreq) {
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 3)
   if ((salAIBufferBase = salMallocPhysical(DMA_BUFFER_LEN * 4)) != NULL) {
@@ -105,8 +117,10 @@ u32 salInitAi(SND_SOME_CALLBACK callback, u32 unk, u32* outFreq) {
   return FALSE;
 }
 
+/** Starts AI DMA. */
 u32 salStartAi() { AIStartDMA(); }
 
+/** Unregisters the AI callback, stops AI DMA and frees the buffers. */
 u32 salExitAi() {
   AIRegisterDMACallback(NULL);
   AIStopDMA();
@@ -114,12 +128,15 @@ u32 salExitAi() {
   return TRUE;
 }
 
+/** Returns the AI buffer two slots ahead of the one now playing; the DSP mixes the next frame into it. */
 void* salAiGetDest() {
   u8 index; // r31
   index = (salAIBufferIndex + 2) % 4;
   return (void*)((u8*)salAIBufferBase + index * DMA_BUFFER_LEN);
 }
 
+/** Fills in the DSP task (MusyX slave microcode in IRAM, 0x2000-word DRAM image), initializes the DSP, adds the task
+ * and waits (with interrupts enabled) until dspInitCallback reports it has booted. */
 u32 salInitDsp() {
   u8 _[8];
   dsp_task.iram_mmem_addr = (u16*)dspSlave;
@@ -152,6 +169,7 @@ u32 salInitDsp() {
   return TRUE;
 }
 
+/** Halts the DSP, waits for outstanding DSP DMA and resets it. */
 u32 salExitDsp() {
   DSPHalt();
   while (DSPGetDMAStatus())
@@ -160,6 +178,8 @@ u32 salExitDsp() {
 
   return TRUE;
 }
+/** Starts one DSP frame: clears the done flag and sends the DSP two mailbox words, the command list size tagged 0xBABE
+ * and the (32-byte aligned) command list address. */
 void salStartDsp(u16* cmdList) {
   salDspIsDone = FALSE;
   PPCSync();
@@ -175,33 +195,42 @@ void salStartDsp(u16* cmdList) {
     ;
 }
 
+/** Builds this frame's command list for the output buffer dest, passing the time since the last AI interrupt, and sends
+ * it to the DSP. */
 void salCtrlDsp(s16* dest) {
   salBuildCommandList(dest, salGetStartDelay());
   salStartDsp(dspCmdList);
 }
 
+/** Returns the microseconds since the last AI DMA interrupt. */
 u32 salGetStartDelay() { return OSTicksToMicroseconds(OSGetTick() - salLastTick); }
 
+/** Disables interrupts and sets the nesting level to 1; hwEnableIrq undoes it when the init finishes. */
 void hwInitIrq() {
   oldState = OSDisableInterrupts();
   hwIrqLevel = 1;
 }
 
+/** Empty. */
 void hwExitIrq() {}
 
+/** Drops one level of interrupt disable nesting and restores the saved interrupt state when it reaches 0. */
 void hwEnableIrq() {
   if (--hwIrqLevel == 0) {
     OSRestoreInterrupts(oldState);
   }
 }
 
+/** Adds one level of interrupt disable nesting, saving the interrupt state on the first. */
 void hwDisableIrq() {
   if ((hwIrqLevel++) == 0) {
     oldState = OSDisableInterrupts();
   }
 }
 
+/** Disables interrupts (the return value is not kept; hwIRQLeaveCritical just enables them again). */
 void hwIRQEnterCritical() { OSDisableInterrupts(); }
 
+/** Enables interrupts. */
 void hwIRQLeaveCritical() { OSEnableInterrupts(); }
 #endif

@@ -342,6 +342,7 @@ static BattleWeapon weapon_togenoko_charge = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Init script of the Koopatrol. Registers its scripts and sets its run and walk sounds. */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -353,6 +354,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage reaction of the Koopatrol: the default damage script. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -360,6 +362,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs when an attack on the Koopatrol is stopped by its spiked helmet. Checks statuses 10 and 11 of the unit.
+ * Guess: it is the counter for stomps on the spike.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -380,6 +386,11 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Reaction when a flipped Koopatrol is struck:
+ * it is turned over (pose table for the turned state, SFX_ENM_INSIDE1), hops,
+ * and rests helpless on its back (unit work 0 set).
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -409,6 +420,10 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Recovery when the Koopatrol gets up from the turned state:
+ * restores the normal pose table and counter attribute with SFX_ENM_INSIDE2, hops, and clears unit work 0.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -448,6 +463,14 @@ static BattleUnitSetup entry_togenoko = {
     NULL, // itemDropTable
 };
 
+/**
+ * The Koopatrol ace's action: it wakes up first if it is on its back;
+ * while guarding (unit work 0 = 1) it mostly (80%) stands up again (guard_cancel_event);
+ * when confused it makes a normal or shell attack;
+ * otherwise it uses an item, or, when a free spot exists beside it and fewer Koopatrols are on the field,
+ * may call a friend (friend_event), and otherwise picks between the normal attack, the shell attack,
+ * the charge (charge_event) and curling into guard (guard_event) by weighted chance.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -582,6 +605,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Koopatrol's normal attack: it runs up to the target (R_3), thrusts (A_2) with SFX_ENM_TOGENOKO_MOVE5,
+ * and the pre-damage check decides between a miss and a hit; then it hops back.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -693,6 +720,11 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: The Koopatrol's shell attack: it pulls into its shell
+ * and spins at the target (A_1, SFX_ENM_TOGENOKO_SHELL1), the pre-damage check decides between a miss and a hit,
+ * and it comes back and pops out of the shell (SHELL2).
+ */
 static EVT_BEGIN(shell_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -824,6 +856,10 @@ static EVT_BEGIN(shell_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: The Koopatrol's charge: it winds up with SFX_ENM_TOGENOKO_CHARGE1 and runs at the target;
+ * the action-command result and damage are applied through the charge weapon.
+ */
 static EVT_BEGIN(charge_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -855,6 +891,10 @@ static EVT_BEGIN(charge_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: The Koopatrol pulls into its shell to guard (SHELL1, A_1):
+ * it takes the guarding pose table and resistances (regist_guard) and sets unit work 0.
+ */
 static EVT_BEGIN(guard_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -890,6 +930,10 @@ static EVT_BEGIN(guard_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: The Koopatrol comes out of guard (SHELL2, S_1):
+ * restores the normal pose table and resistances and clears unit work 0.
+ */
 static EVT_BEGIN(guard_cancel_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -914,6 +958,10 @@ static EVT_BEGIN(guard_cancel_event)
     RETURN
 EVT_END()
 
+/**
+ * The Koopatrol calls a friend (SFX_ENM_TOGENOKO_CALL1, pose B_1):
+ * another Koopatrol is spawned (entry_togenoko), runs in and takes its place.
+ */
 static EVT_BEGIN(friend_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -937,11 +985,13 @@ static EVT_BEGIN(friend_event)
     RETURN
 EVT_END()
 
+/** Wait script of the Koopatrol: shows its idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/** Script helper: arg0 receives how many battle units are of kind 0x3C (Dark Koopatrols). */
 static USER_FUNC(togenoko_getnum) {
     EvtWord* args = event->args;
     s32 num = 0;

@@ -43,6 +43,10 @@ static NpcSetupInfo npcEnt[5];
 extern EvtWord syuryo_evt[];
 extern EvtWord koopa_evt[];
 
+/**
+ * Script helper: creates the glowing barrier ("baria", the Shuryo effect at double scale) around Princess
+ * Peach's NPC so she is shown held inside it.
+ */
 static USER_FUNC(syuryo_baria) {
     // ピーチ姫
     NpcEntry* npc = npcNameToPtr("\x83\x73\x81\x5B\x83\x60\x95\x50");
@@ -53,6 +57,11 @@ static USER_FUNC(syuryo_baria) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Door animation script (closing) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_door2_1 and S_door2_2 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door2_1"), 0, LW(0), 0)
@@ -61,6 +70,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_door2_1 and S_door2_2 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door2_1"), 0, LW(0), 0)
@@ -107,6 +121,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Init of Princess Peach's NPC in las_28: sets status bit 2 (Unknown: its exact meaning).
+ * Between STORY_STG8_14_LOCK and STORY_STG8_14_01_QUEENS_CHAMBER she is placed at (410, 25, 0), facing left,
+ * and jumping is allowed.
+ */
 static EVT_BEGIN(syuryo_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_14_LOCK)
@@ -119,21 +138,25 @@ static EVT_BEGIN(syuryo_init)
     RETURN
 EVT_END()
 
+/** Init event of Bowser (クッパ): sets the invisible status bit so he is hidden until his entrance. */
 EVT_BEGIN(koopa_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/** Talk event of Bowser after the fight; prints stg8_las_107. */
 EVT_BEGIN(koopa_talk)
     CALL(evt_msg_print, 0, STRING("stg8_las_107"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/** Init of Kammy Koopa's NPC (ババ): sets status bit 2 (Guess: it keeps her hidden at first, as for Bowser). */
 static EVT_BEGIN(baba_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/** Talk event of Kammy Koopa (ババ); prints stg8_las_107_01. */
 static EVT_BEGIN(baba_talk)
     CALL(evt_msg_print, 0, STRING("stg8_las_107_01"), 0, STRING("me"))
     RETURN
@@ -182,6 +205,12 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Event script: the first entry to the Queen's chamber.
+ * Mario and the partner enter through the west door, the camera sweeps over,
+ * the door swings open and shut behind them, the partner remarks (stg8_las_50),
+ * Peach's scene (syuryo_evt) starts and the story progress is set to STORY_STG8_14_01_QUEENS_CHAMBER.
+ */
 static EVT_BEGIN(first_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, 314, 606, 1081, -353, 240, -148, 0, 11)
@@ -240,6 +269,10 @@ static EVT_BEGIN(first_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: moves Peach's barrier effect to sit just behind her relative to the camera,
+ * rotating its offset by the camera's angle to her, so the bubble follows her as the camera moves.
+ */
 static USER_FUNC(syuryo_baria_recalc_pos) {
     // ピーチ姫
     NpcEntry* npc = npcNameToPtr("\x83\x73\x81\x5B\x83\x60\x95\x50");
@@ -259,6 +292,11 @@ static USER_FUNC(syuryo_baria_recalc_pos) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Event script: Sir Grodus shocks Mario and the partner with a bolt of lightning:
+ * hit effects on both, a thunder effect between them, camera shake,
+ * then Mario and the partner fall into their hurt poses.
+ */
 EVT_BEGIN(syuryo_thunder)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
@@ -400,6 +438,13 @@ EVT_BEGIN(syuryo_thunder)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the Sir Grodus scene in the Queen's Chamber (las_28).
+ * Grodus (シュリョー) gloats over the imprisoned Peach and the third-force music plays; he fights Mario in battle 15.
+ * Afterwards Peach, held in her barrier, speaks to Mario,
+ * Grodus shocks Mario and the partner with lightning (syuryo_thunder), and Mario answers a yes/no question.
+ * The scene ends by starting koopa_evt.
+ */
 EVT_BEGIN(syuryo_evt)
     LOOP(0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -735,6 +780,10 @@ EVT_BEGIN(syuryo_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: starts the spinning star ring effect ("guruguru") at args[1..3] with radius args[4],
+ * named args[0], so it can be deleted later (used to show a dazed character).
+ */
 static USER_FUNC(eff_guruguru) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -749,6 +798,10 @@ static USER_FUNC(eff_guruguru) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Event script: a chunk of ceiling rubble (map object LW(0)) falls from 350 units up over LW(3) ms;
+ * LW(1) and LW(2) are its landing parameters.
+ */
 EVT_BEGIN(gareki_fall)
     SET_VALUE(LW(7), LW(0))
     SET_VALUE(LW(8), LW(1))
@@ -767,6 +820,13 @@ EVT_BEGIN(gareki_fall)
     RETURN
 EVT_END()
 
+/**
+ * Event script: Bowser crashes through the ceiling of the Queen's Chamber in a rain of rubble,
+ * landing on top of Sir Grodus, and quarrels with him while Kammy Koopa (ババ) flies in.
+ * Mario fights Bowser and Kammy in battle 13; the barrier around Peach drops afterwards,
+ * Bowser and Kammy are left dazed with spinning stars, Grodus (now cracked) staggers away,
+ * and the story moves to STORY_STG8_15_GRODUS. Bowser and Kammy get talk events (koopa_talk/baba_talk).
+ */
 EVT_BEGIN(koopa_evt)
     CALL(evt_party_stop, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_KOOPA_QUAKE1"), 75, 300, 0, LW(0))
@@ -1240,6 +1300,10 @@ EVT_BEGIN(koopa_evt)
     RETURN
 EVT_END()
 
+/**
+ * Init of Peach's glow: while the story is between STORY_STG8_14_LOCK and STORY_STG8_15_GRODUS,
+ * sets up the glow effect around Peach and runs it with the normal power, head and staff tables.
+ */
 static EVT_BEGIN(shuryolight_init)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_14_LOCK)
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
@@ -1250,6 +1314,10 @@ static EVT_BEGIN(shuryolight_init)
     RETURN
 EVT_END()
 
+/**
+ * Map-init helper: hides the 20 numbered torch map objects (names from make_name)
+ * and puts a small flame effect 9 units below the origin of each one.
+ */
 static EVT_BEGIN(shan_init)
     SET_VALUE(LW(0), 1)
     LOOP(20)
@@ -1267,6 +1335,12 @@ static EVT_BEGIN(shan_init)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for las_28, the Queen's Chamber with Sir Grodus and Bowser:
+ * music and ambience by story, the doors, the NPCs (Grodus, Bowser, Kammy, Peach), the throne parts,
+ * the torches, and the cutscene for the current story step (first entry at STORY_STG8_14_LOCK,
+ * or resuming Grodus's and Bowser's scenes). When entering from las_26 the player drops into the room.
+ */
 EVT_BEGIN(las_28_init_evt)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER2"))
@@ -1351,6 +1425,7 @@ EVT_BEGIN(las_28_init_evt)
     RETURN
 EVT_END()
 
+/** Script helper: builds the torch map-object name "hi<args[0]>" and returns it in args[1]. */
 static USER_FUNC(make_name) {
     EvtWord* args = event->args;
 #if VERSION <= VERSION_DEMO_US

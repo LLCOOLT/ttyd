@@ -187,6 +187,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init event of the first Iron Cleft: unit work 0 = 0
+ * and unit work 1 is the other Iron Cleft's unit id (the second id from get_id),
+ * then the shared setup init_event_sub.
+ */
 static EVT_BEGIN(init_event1)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     CALL(get_id, LW(0), LW(1))
@@ -195,6 +200,11 @@ static EVT_BEGIN(init_event1)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the second Iron Cleft: unit work 0 = 1
+ * and unit work 1 is the other Iron Cleft's unit id (the first id from get_id),
+ * then the shared setup init_event_sub.
+ */
 static EVT_BEGIN(init_event2)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
     CALL(get_id, LW(0), LW(1))
@@ -203,6 +213,10 @@ static EVT_BEGIN(init_event2)
     RETURN
 EVT_END()
 
+/**
+ * Shared setup of both Iron Clefts: registers the wait, phase, attack, damage and confusion events,
+ * sets the body scale to 1.5 by 1.5 by 1 and the boss walk and run sounds, and starts the wait event.
+ */
 static EVT_BEGIN(init_event_sub)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
@@ -216,6 +230,10 @@ static EVT_BEGIN(init_event_sub)
     RETURN
 EVT_END()
 
+/**
+ * Data event 37 (the thorn-head counter): after 30 frames flashes the "toge_flush" spike effect near its head,
+ * placed 67 units up when Huge (status 10), 37 when Tiny (status 11) and 52 otherwise.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -239,6 +257,12 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage event of an Iron Cleft: default damage reaction.
+ * The first time the first Iron Cleft (unit work 0 = 0) takes damage (GSWF_TOU_IRON_CLEFTS_WEAKNESS_SEEN not yet
+ * set) the battle pauses on a close-up and both Clefts comment on it (stg3_tou_272 and 273),
+ * and the flag is set so it only happens once.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -275,6 +299,13 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Phase event of the first Iron Cleft only (unit work 0 = 0),
+ * run before the player's phase of turn 1 unless GSWF_TOU_IRON_CLEFTS_BEATEN is set:
+ * the camera pans over to the two Clefts and the partner talks with them (stg3_tou_266 the first time,
+ * stg3_tou_267 on a retry), then the Clefts answer with stg3_tou_268 and 269,
+ * or 270 and 271 when Yoshi is in the party. It sets GSWF_TOU_IRON_CLEFTS_INTRO_SEEN.
+ */
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -346,6 +377,12 @@ static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of an Iron Cleft: uses an enemy item if one fits, otherwise picks a target,
+ * walks up beside it with stamping steps, rears up for 750 ms and charges into it (weapon_iron_sinemon_attack).
+ * A miss runs past it; a hit shakes the camera and it bounces off in two heavy hops, each with a camera shake.
+ * Then it returns home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -452,11 +489,16 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait event: sets the idle animation from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: finds the battle unit ids of the red (0x3D) and green (0x3E) Iron Cleft fighters in the battle;
+ * arg0 receives the red one's id, arg1 the green one's.
+ */
 static USER_FUNC(get_id) {
     EvtWord* args = event->args;
     s32 i;
@@ -478,6 +520,7 @@ static USER_FUNC(get_id) {
     evtSetValue(event, args[1], id2);
     return EVT_RETURN_DONE;
 }
+/** Script helper: arg0 receives 1 if Yoshi is in Mario's party data, else 0. */
 static USER_FUNC(yoshi_exist) {
     EvtWord* args = event->args;
     PouchData* pouch = pouchGetPtr();

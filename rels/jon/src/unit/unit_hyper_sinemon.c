@@ -236,6 +236,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init script of the Hyper Cleft: registers its wait, attack,
+ * damage and confusion handlers (confusion reuses the attack script) and sets its walk,
+ * run and jump/landing sounds (SFX_ENM_EMON_*).
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -248,6 +253,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Plays the "toge_flush" spark effect over the Hyper Cleft 30 frames after it is hit,
+ * at a position that depends on its size statuses 10 and 11 (Guess: the big and small size changes).
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -271,6 +280,10 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage script of the Hyper Cleft: if the hit does damage it plays the hurt pose (SIN_D_1, or SIN_D_2 when it
+ * is flipped over) and hops twice, then runs the default damage handling.
+ */
 static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_GetDamage, BTL_UNIT_SELF, LW(15))
     IF_INT_GREATER_OR_EQUAL(LW(15), 1)
@@ -289,6 +302,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Reaction when the Hyper Cleft is flipped onto its back:
+ * swaps in the flipped defence and pose tables, sets status flag 1 and a flip count of 2 turns,
+ * plays SIN_D_2 with SFX_ENM_INSIDE1, bounces twice,
+ * settles at y 7 as its home and removes the counter attribute on part 1.
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -311,6 +330,11 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Called on the Hyper Cleft's turn while it is flipped over.
+ * It counts the flip counter down; at 0 it restores the normal defence and pose tables, clears status flag 1,
+ * restores the hit offset and counter attribute on part 1 and hops upright with SFX_ENM_INSIDE2.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -338,6 +362,16 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the Hyper Cleft. If it is flipped over it gets up first.
+ * After an item check (skipped on a first strike,
+ * when it also waits 800 ms) it draws lots for charging up (SFX_ENM_CHARGE1, a "crystal_n64" effect,
+ * then the charge weapon is applied to itself):
+ * weights 25 to attack and 75 to charge on the first turn, 25 and 25 afterwards.
+ * The attack is a dash: it runs round behind the target,
+ * then rushes through it (SFX_ENM_EMON_DASH1) and the target takes the damage;
+ * afterwards it hops back past the target to its home position.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -498,6 +532,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait script: plays the Hyper Cleft's idle pose from its current pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

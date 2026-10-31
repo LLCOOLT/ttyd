@@ -25,6 +25,11 @@ static USER_FUNC(make_name);
 
 static BeroEntry bero_entry_data[3];
 
+/**
+ * Door animation script (closing) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_door2_1 and S_door2_2 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door2_1"), 0, LW(0), 0)
@@ -33,6 +38,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_door2_1 and S_door2_2 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door2_1"), 0, LW(0), 0)
@@ -41,6 +51,11 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (closing) for the east door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels door_1_1 and door_1_2 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1_1"), 0, LW(0), 0)
@@ -49,6 +64,11 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the east door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels door_1_1 and door_1_2 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(e_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1_1"), 0, LW(0), 0)
@@ -95,6 +115,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Map-init helper: hides the 12 numbered torch map objects (names from make_name)
+ * and puts a flame effect 7 units below the origin of each one.
+ */
 static EVT_BEGIN(rousoku_init)
     SET_VALUE(LW(0), 1)
     LOOP(12)
@@ -112,6 +136,7 @@ static EVT_BEGIN(rousoku_init)
     RETURN
 EVT_END()
 
+/** Event script: the first treasure chest of las_30 opens and Mario receives an Ultra Shroom. */
 static EVT_BEGIN(mobj_box01)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box01"), LW(0), LW(1), LW(2))
@@ -123,6 +148,7 @@ static EVT_BEGIN(mobj_box01)
     RETURN
 EVT_END()
 
+/** Event script: the second treasure chest of las_30 opens and Mario receives a Jammin' Jelly. */
 static EVT_BEGIN(mobj_box02)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box02"), LW(0), LW(1), LW(2))
@@ -134,6 +160,11 @@ static EVT_BEGIN(mobj_box02)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for las_30, the long stairs between las_28 and las_29:
+ * at STORY_STG8_15_GRODUS the danger music plays, otherwise silence with the Palace ambience;
+ * a save block, a recovery block, two chests (an Ultra Shroom and a Jammin' Jelly) and the torches.
+ */
 EVT_BEGIN(las_30_init_evt)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER2"))
@@ -170,6 +201,7 @@ EVT_END()
 EVT_END_PAD()
 #endif
 
+/** Script helper: builds the torch map-object name "hi<args[0]>" and returns it in args[1]. */
 static USER_FUNC(make_name) {
     EvtWord* args = event->args;
 #if VERSION <= VERSION_DEMO_US

@@ -88,6 +88,10 @@ extern EvtWord pukapuka_watari_init02[];
 HitDamageReturn hitDmgRetPoints_1st[17];
 static HitDamageReturn hitDmgRetPoints[17];
 
+/**
+ * Recursive helper for hitIsGroup: returns TRUE if the hit entry target has the same joint name as node,
+ * or as one of node's descendants (and, below the first level, its siblings).
+ */
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling) {
     if (strcmp(target->joint->name, node->joint->name) == 0) {
         return TRUE;
@@ -101,6 +105,10 @@ static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling) 
     return FALSE;
 }
 
+/**
+ * Returns whether the hit entry target is the hit group (or one of the hit entries below it), by joint name;
+ * used so the swaying ship's rotation moves Mario while he stands on any of its hit parts.
+ */
 static BOOL hitIsGroup(HitEntry* target, HitEntry* group) {
     // whether target is group or one of its descendants
     return _hitIsGroupSub(target, group, FALSE);
@@ -155,6 +163,10 @@ static s16 suifu_run_animtbl[] = {
     28, 28, 29, 29, -1, 0,
 };
 
+/**
+ * Init of sailor C (水夫C): from STORY_STG5_30_SHIPWRECKED_SAILORS to STORY_STG5_35_ESCAPE_ROUTE he stands at
+ * (825, 100, -125), facing east at STORY_STG5_34_KICKED_OFF.
+ */
 static EVT_BEGIN(suifu_c_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_35_ESCAPE_ROUTE)
@@ -166,6 +178,10 @@ static EVT_BEGIN(suifu_c_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of sailor C: stg5_dou_16_09 while the sailors are shipwrecked (STORY_STG5_30 to 34),
+ * stg5_dou_17_09 at STORY_STG5_35_ESCAPE_ROUTE.
+ */
 static EVT_BEGIN(suifu_c_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_34_KICKED_OFF)
@@ -176,6 +192,10 @@ static EVT_BEGIN(suifu_c_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init of sailor D (水夫D): from STORY_STG5_30_SHIPWRECKED_SAILORS to STORY_STG5_35_ESCAPE_ROUTE he stands at
+ * (775, 50, 50), facing east at STORY_STG5_34_KICKED_OFF.
+ */
 static EVT_BEGIN(suifu_d_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_35_ESCAPE_ROUTE)
@@ -187,6 +207,10 @@ static EVT_BEGIN(suifu_d_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of sailor D: stg5_dou_16_07 while the sailors are shipwrecked (STORY_STG5_30 to 34),
+ * stg5_dou_17_07 at STORY_STG5_35_ESCAPE_ROUTE.
+ */
 static EVT_BEGIN(suifu_d_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_34_KICKED_OFF)
@@ -197,6 +221,11 @@ static EVT_BEGIN(suifu_d_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init of sailor E (水夫E): from STORY_STG5_30_SHIPWRECKED_SAILORS to STORY_STG5_35_ESCAPE_ROUTE he stands at
+ * (736, 50,
+ * 113) in the US and PAL releases and at (750, 50, -25) in the earlier ones, facing east at STORY_STG5_34_KICKED_OFF.
+ */
 static EVT_BEGIN(suifu_e_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_35_ESCAPE_ROUTE)
@@ -216,6 +245,10 @@ static EVT_BEGIN(suifu_e_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of sailor E: stg5_dou_16_08 while the sailors are shipwrecked (STORY_STG5_30 to 34),
+ * stg5_dou_17_08 at STORY_STG5_35_ESCAPE_ROUTE.
+ */
 static EVT_BEGIN(suifu_e_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_34_KICKED_OFF)
@@ -226,6 +259,10 @@ static EVT_BEGIN(suifu_e_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init of Monie (モニー): from STORY_STG5_30_SHIPWRECKED_SAILORS to STORY_STG5_35_ESCAPE_ROUTE she stands at (700,
+ * 50, 0).
+ */
 static EVT_BEGIN(mony_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_35_ESCAPE_ROUTE)
@@ -234,6 +271,11 @@ static EVT_BEGIN(mony_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of Monie: she and Peeton (ピートン) speak in turn,
+ * stg5_dou_16_10 and 16_11 while the sailors are shipwrecked and stg5_dou_17_10
+ * and 17_11 at STORY_STG5_35_ESCAPE_ROUTE.
+ */
 static EVT_BEGIN(mony_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_34_KICKED_OFF)
@@ -248,6 +290,10 @@ static EVT_BEGIN(mony_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init of Peeton (ピートン): from STORY_STG5_30_SHIPWRECKED_SAILORS to STORY_STG5_35_ESCAPE_ROUTE he stands at (750,
+ * 50, 0).
+ */
 static EVT_BEGIN(peton_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_35_ESCAPE_ROUTE)
@@ -256,6 +302,11 @@ static EVT_BEGIN(peton_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of Peeton: turns Monie to face Mario and the two speak in turn,
+ * stg5_dou_16_10 and 16_11 while the sailors are shipwrecked and stg5_dou_17_10
+ * and 17_11 at STORY_STG5_35_ESCAPE_ROUTE.
+ */
 static EVT_BEGIN(peton_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_34_KICKED_OFF)
@@ -626,6 +677,11 @@ s32 suifudata_after[] = {
     0, -1000, 0, 0, 0, -1000, 0, 0,
 };
 
+/**
+ * Creates the crowd of 95 sailors (nannpc extension sprites c_boro_k) at their resting places on the right-hand
+ * platform (suifudata_after) when they have already crossed or the story is past that point,
+ * faces them and gives them a hit size; also adds one invisible blocker (id 100) that follows Mario.
+ */
 EVT_BEGIN(watarikiri_suifu_init)
     CALL(evt_nannpc_init, PTR(ext_entry_data), 0, 0, 0, 101)
     CALL(evt_nannpc_set_subfunc, 1, PTR(nannpc_ext_main_sub_fast))
@@ -668,6 +724,12 @@ EVT_BEGIN(watarikiri_suifu_init)
     RETURN
 EVT_END()
 
+/**
+ * Script for one sailor (nannpc id in LW(0)) of the crowd crossing the floating islands:
+ * hops across the barrels in six random-sized jumps, pausing between them,
+ * and finally lands on the right-hand platform; the last three sailors (97 to
+ * 99) are swapped for the named NPCs Sailor C, D and E, the others go to their resting place from suifudata_after.
+ */
 EVT_BEGIN(ukishima_watari_run)
     CALL(evt_nannpc_set_work, LW(0), 0, 0)
     CALL(evt_nannpc_set_dir, LW(0), 90)
@@ -791,6 +853,14 @@ EVT_BEGIN(ukishima_watari_run)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene when both island switches have been pressed:
+ * the camera pans over the islands, the crowd speaks (stg5_dou_14 and 15),
+ * then the 95 sailors cross one after another (each is released once it is standing high enough on the bobbing
+ * barrels) until all have crossed.
+ * Sets GSWF_DOU11_SAILORS_CROSSED, removes the invisible ship hit area (fune_atari),
+ * gives control back and starts suifu_orei.
+ */
 EVT_BEGIN(ukishima_watari)
     CALL(evt_cam3d_evt_set, 160, 174, 527, 160, 79, -14, 500, 11)
     WAIT_MS(1000)
@@ -850,6 +920,10 @@ EVT_BEGIN(ukishima_watari)
     RETURN
 EVT_END()
 
+/**
+ * Checks the two island switches (A and B) after one is pressed: if only one is down the camera goes back;
+ * if both are down, plays the success jingle and starts the sailors' crossing (ukishima_watari).
+ */
 EVT_BEGIN(ukishima_check)
     SET_VALUE(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
     ADD(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED))
@@ -868,6 +942,11 @@ EVT_BEGIN(ukishima_check)
     RETURN
 EVT_END()
 
+/**
+ * Makes a floating island or barrel appear: after 0.5 seconds it plays SFX_STG5_BARREL_APPEAR1
+ * and shows two ripple effects on the water at its position,
+ * then unhides the map object in LW(2) and enables its hit area LW(3).
+ */
 static EVT_BEGIN(ukishima_apper)
     BEGIN_INLINE_EVENT
         WAIT_MS(500)
@@ -956,6 +1035,10 @@ static EVT_BEGIN(ukishima_apper)
     RETURN
 EVT_END()
 
+/**
+ * At map load: hides the first pair of barrels (S_taru_n01, n02) and their hit areas
+ * until the first island switch has been pressed.
+ */
 EVT_BEGIN(ukishima_init1)
 #if VERSION <= VERSION_DEMO_US
     IF_INT_EQUAL(GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED), 0)
@@ -972,6 +1055,11 @@ EVT_BEGIN(ukishima_init1)
     RETURN
 EVT_END()
 
+/**
+ * First blue island switch pressed: the camera looks at the first stretch,
+ * the first pair of barrels pops up out of the water (ukishima_apper) and starts bobbing,
+ * then ukishima_check runs.
+ */
 EVT_BEGIN(ukishima_part1)
     CALL(evt_mario_key_onoff, 0)
     WAIT_MS(500)
@@ -997,6 +1085,10 @@ EVT_BEGIN(ukishima_part1)
     RETURN
 EVT_END()
 
+/**
+ * At map load: hides the second pair of barrels (S_taru_n03, n04) and their hit areas
+ * until both island switches have been pressed (or in the demos, the second switch).
+ */
 EVT_BEGIN(ukishima_init2)
 #if VERSION <= VERSION_DEMO_US
     IF_INT_EQUAL(GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED), 0)
@@ -1013,6 +1105,10 @@ EVT_BEGIN(ukishima_init2)
     RETURN
 EVT_END()
 
+/**
+ * Second blue island switch pressed: the camera looks at the second stretch,
+ * the second pair of barrels pops up out of the water and starts bobbing, then ukishima_check runs.
+ */
 EVT_BEGIN(ukishima_part2)
     CALL(evt_mario_key_onoff, 0)
     WAIT_MS(500)
@@ -1039,6 +1135,11 @@ EVT_BEGIN(ukishima_part2)
 EVT_END()
 
 #if VERSION >= VERSION_JP
+/**
+ * Event of the first blue island switch (mobj01):
+ * sets its flag and runs ukishima_part1 or ukishima_part2 depending on how many switches are now down.
+ * (JP and later; the demos call ukishima_part1 directly.)
+ */
 EVT_BEGIN(ukishima_switch1_evt)
     SET_VALUE(GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED), 1)
     SET_VALUE(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
@@ -1052,6 +1153,11 @@ EVT_BEGIN(ukishima_switch1_evt)
     RETURN
 EVT_END()
 
+/**
+ * Event of the second blue island switch (mobj02):
+ * sets its flag and runs ukishima_part1 or ukishima_part2 depending on how many switches are now down.
+ * (JP and later.)
+ */
 EVT_BEGIN(ukishima_switch2_evt)
     SET_VALUE(GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED), 1)
     SET_VALUE(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
@@ -1066,6 +1172,11 @@ EVT_BEGIN(ukishima_switch2_evt)
 EVT_END()
 #endif
 
+/**
+ * Keeps the stranded sailors bobbing with the barrels:
+ * for every sailor with work flag 0 set, offsets it by GW(0) vertically
+ * and puts its shadow at the matching height (higher for sailors on the Z <= 0 side).
+ */
 EVT_BEGIN(torinoko_suifu_pukapuka)
     LOOP(0)
         SET_VALUE(LW(0), 0)
@@ -1093,6 +1204,11 @@ EVT_BEGIN(torinoko_suifu_pukapuka)
     RETURN
 EVT_END()
 
+/**
+ * The stranded sailors keep shouting for help: forever shows six speech bubbles at fixed positions
+ * (stg5_dou_13_01 to
+ * 06) over the crowd, one after another.
+ */
 EVT_BEGIN(_suifu_sakebu)
     LOOP(0)
         WAIT_MS(700)
@@ -1129,6 +1245,11 @@ EVT_BEGIN(_suifu_sakebu)
     RETURN
 EVT_END()
 
+/**
+ * Runs while the sailors are still stranded: whenever Mario stands on the left platform (X 0 to 300, Z -140 to
+ * 140, on the ground) it runs the shouting (_suifu_sakebu), and stops it when he leaves.
+ * Ends once both island switches are pressed.
+ */
 EVT_BEGIN(torinoko_suifu_sakebu)
     LOOP(0)
         LOOP(0)
@@ -1181,6 +1302,13 @@ EVT_BEGIN(torinoko_suifu_sakebu)
     RETURN
 EVT_END()
 
+/**
+ * Set-up of the stranded sailors for STORY_STG5_29_WAVE_DODGING:
+ * makes Sailors C, D, E and Monie and Peeton intangible,
+ * spawns the crowd of 95 sailors from suifudata on the left platform with their animations,
+ * adds a blocker that follows Mario, and keeps Monie
+ * and Peeton at the tracked position (Guess: they are hidden among the crowd).
+ */
 EVT_BEGIN(torinoko_suifu_init)
     CALL(evt_npc_flag_onoff, 1, STRING("水夫C"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("水夫D"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
@@ -1237,6 +1365,11 @@ EVT_BEGIN(torinoko_suifu_init)
     RETURN
 EVT_END()
 
+/**
+ * First-sight cutscene of the stranded sailors:
+ * hides Sailors C to E, Mario sees the crowd shouting (stg5_dou_11 and the small_00 to 05 lines),
+ * the camera pans over them, and then the message stg5_dou_13. Sets GSWF_DOU11_STRANDED_SAILORS_SEEN.
+ */
 EVT_BEGIN(torinoko_suifu)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_npc_set_position, STRING("水夫C"), 0, -1000, 0)
@@ -1287,6 +1420,11 @@ EVT_BEGIN(torinoko_suifu)
     RETURN
 EVT_END()
 
+/**
+ * After the sailors have crossed: Mario walks to the right platform, the sailors thank him (stg5_dou_16),
+ * Monie runs in and begs for help, Peeton follows, Mario reacts, and then both stand ready for conversation.
+ * Sets STORY_STG5_30_SHIPWRECKED_SAILORS.
+ */
 EVT_BEGIN(suifu_orei)
     CALL(evt_npc_set_position, STRING("水夫C"), 825, 100, -125)
     CALL(evt_npc_set_ry, STRING("水夫C"), 270)
@@ -1386,6 +1524,11 @@ EVT_BEGIN(suifu_orei)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene on entering at STORY_STG5_34_KICKED_OFF:
+ * Sailors D, E and C discuss the situation with Mario (stg5_dou_17_01 to 06),
+ * then the story moves to STORY_STG5_35_ESCAPE_ROUTE.
+ */
 EVT_BEGIN(escapeway_event)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION <= VERSION_DEMO_US
@@ -1420,6 +1563,10 @@ EVT_BEGIN(escapeway_event)
 EVT_END()
 
 #if VERSION >= VERSION_JP
+/**
+ * After the wall is blown open: Sailor C is made intangible and Mario
+ * and the partner are walked to their places at (730, -120) and (712, -126) to watch. JP and later only.
+ */
 EVT_BEGIN(bombwall_escape_move)
     CALL(evt_npc_flag_onoff, 1, STRING("水夫C"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     BEGIN_INLINE_EVENT
@@ -1442,6 +1589,11 @@ EVT_BEGIN(bombwall_escape_move)
 EVT_END()
 #endif
 
+/**
+ * Case script run when Bobbery bombs the cracked wall at n_bero in the grotto's big room:
+ * breaks the wall, starts the sailors' escape (bombwall_escape_move and bombwall_after),
+ * enables the n_bero exit and sets the story progress to STORY_STG5_36_HOLE_IN_THE_WALL.
+ */
 static EVT_BEGIN(bombwall_bomb)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION <= VERSION_DEMO_US
@@ -1508,6 +1660,11 @@ static EVT_BEGIN(bombwall_bomb)
     RETURN
 EVT_END()
 
+/**
+ * Sets up the bomb wall by story progress: up to STORY_STG5_33_CORTEZ_AND_THE_TREASURE the n_bero exit is
+ * closed, from STORY_STG5_34_KICKED_OFF to STORY_STG5_35_ESCAPE_ROUTE it is closed
+ * and Bobbery's bomb triggers bombwall_bomb, and from STORY_STG5_36_HOLE_IN_THE_WALL on it is open.
+ */
 static EVT_BEGIN(bombwall_init)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana_after"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana_before"), MAPOBJ_FLAG_HIDE)
@@ -1540,6 +1697,10 @@ static EVT_BEGIN(bombwall_init)
     RETURN
 EVT_END()
 
+/**
+ * Sound loop for the sailors streaming out through the hole:
+ * plays the crowd-moving sound while any sailor is still moving (work flag 0 set) and stops it when none is.
+ */
 EVT_BEGIN(bombwall_suifuout_secheck)
     LOOP(0)
         SET_VALUE(LW(0), 0)
@@ -1573,6 +1734,11 @@ EVT_BEGIN(bombwall_suifuout_secheck)
     RETURN
 EVT_END()
 
+/**
+ * Script for one sailor (nannpc id in LW(0)) fleeing through the new hole in the wall:
+ * walks to the hole, jumps over it in two or three hops with random spacing and speed,
+ * runs off along Z = -50 and is moved below the map.
+ */
 EVT_BEGIN(bombwall_suifuout)
     CALL(evt_nannpc_set_work, LW(0), 0, 0)
     CALL(evt_nannpc_get_position, LW(0), LW(1), LW(2), LW(3))
@@ -1633,6 +1799,11 @@ EVT_BEGIN(bombwall_suifuout)
     RETURN
 EVT_END()
 
+/**
+ * After Bobbery has blown the wall: the camera shows Sailor C, D, Peeton,
+ * Monie and the crowd (95 sailors) leaving through the hole one
+ * after another with thanks (stg5_dou_17_12 to 15), then Sailor E; the camera returns to Mario.
+ */
 EVT_BEGIN(bombwall_after)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -1738,6 +1909,11 @@ EVT_BEGIN(bombwall_after)
     RETURN
 EVT_END()
 
+/**
+ * Loop that, after the third raid (dai3 shurai),
+ * every few seconds shakes the camera and drops dust (hokori effect) from above Mario.
+ * Guess: the grotto rumbling after the sailors cross.
+ */
 static EVT_BEGIN(dai3_shurai_after)
     LOOP(0)
         CALL(evt_sub_random, 2500, LW(10))
@@ -1753,6 +1929,11 @@ static EVT_BEGIN(dai3_shurai_after)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0] is the name of a hit group (the swaying ship A_h_fune);
+ * while Mario stands on it, rotates his position around the ship's centre by the amount the ship tilted since
+ * the last frame, so he moves with it. Never finishes.
+ */
 static USER_FUNC(dou_mario_kaiten_hosei) {
     const char* name = (const char*)evtGetValue(event, event->args[0]);
     HitEntry* hit = hitNameToPtr(name);
@@ -1793,6 +1974,10 @@ static USER_FUNC(dou_mario_kaiten_hosei) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Rocks the background ship (S_h_fune) between -10 and +10 degrees every 3 seconds forever with a shaking sound,
+ * keeping its hit area bound and carrying Mario.
+ */
 EVT_BEGIN(haikei_funeyure)
     BEGIN_INLINE_EVENT
         CALL(dou_mario_kaiten_hosei, STRING("A_h_fune"))
@@ -1827,12 +2012,21 @@ EVT_BEGIN(haikei_funeyure)
     RETURN
 EVT_END()
 
+/**
+ * Extra callback when Mario steps onto a floating barrel platform:
+ * plays SFX_STG5_BARREL_ON1 at the map object named in LW(0).
+ */
 static EVT_BEGIN(evt_ride_taru)
     CALL(evt_mapobj_get_position, LW(0), LW(10), LW(11), LW(12))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_BARREL_ON1"), LW(10), LW(11), LW(12), 0)
     RETURN
 EVT_END()
 
+/**
+ * Bobbing loop for floating object 0: binds the hit area in LW(1) (if any) to the map object in LW(0),
+ * waits a random 0.2 to 0.6 seconds, then every 130 ms steps through the 16 heights of the bobbing table
+ * (evt_dou_normal_puka), moves the object to that height and updates the hit area.
+ */
 static EVT_BEGIN(dou_puka_event_main0)
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_hit_bind_mapobj, LW(1), LW(0))
@@ -1858,6 +2052,10 @@ static EVT_BEGIN(dou_puka_event_main0)
     RETURN
 EVT_END()
 
+/**
+ * Bobbing barrel 1 (object name in LW(0), hit area in LW(1), 0 for none):
+ * after a random delay it bobs up and down forever using the shared dou_normal_puka table.
+ */
 EVT_BEGIN(dou_puka_event_main10)
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_hit_bind_mapobj, LW(1), LW(0))
@@ -1883,6 +2081,7 @@ EVT_BEGIN(dou_puka_event_main10)
     RETURN
 EVT_END()
 
+/** Bobbing barrel 2: same as dou_puka_event_main10 for its own object. */
 EVT_BEGIN(dou_puka_event_main11)
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_hit_bind_mapobj, LW(1), LW(0))
@@ -1908,6 +2107,7 @@ EVT_BEGIN(dou_puka_event_main11)
     RETURN
 EVT_END()
 
+/** Bobbing barrel 3: same as dou_puka_event_main10 for its own object. */
 EVT_BEGIN(dou_puka_event_main12)
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_hit_bind_mapobj, LW(1), LW(0))
@@ -1933,6 +2133,7 @@ EVT_BEGIN(dou_puka_event_main12)
     RETURN
 EVT_END()
 
+/** Bobbing barrel 4: same as dou_puka_event_main10 for its own object. */
 EVT_BEGIN(dou_puka_event_main13)
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_hit_bind_mapobj, LW(1), LW(0))
@@ -1958,6 +2159,7 @@ EVT_BEGIN(dou_puka_event_main13)
     RETURN
 EVT_END()
 
+/** Bobbing bottle 1: same as dou_puka_event_main10 for its own object. */
 EVT_BEGIN(dou_puka_event_main14)
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_hit_bind_mapobj, LW(1), LW(0))
@@ -1983,6 +2185,7 @@ EVT_BEGIN(dou_puka_event_main14)
     RETURN
 EVT_END()
 
+/** Bobbing bottle 2: same as dou_puka_event_main10 for its own object. */
 EVT_BEGIN(dou_puka_event_main15)
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_hit_bind_mapobj, LW(1), LW(0))
@@ -2008,6 +2211,7 @@ EVT_BEGIN(dou_puka_event_main15)
     RETURN
 EVT_END()
 
+/** Bobbing bottle 3: same as dou_puka_event_main10 for its own object. */
 EVT_BEGIN(dou_puka_event_main16)
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_hit_bind_mapobj, LW(1), LW(0))
@@ -2033,6 +2237,7 @@ EVT_BEGIN(dou_puka_event_main16)
     RETURN
 EVT_END()
 
+/** Bobbing bottle 4: same as dou_puka_event_main10 for its own object. */
 EVT_BEGIN(dou_puka_event_main17)
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_hit_bind_mapobj, LW(1), LW(0))
@@ -2058,12 +2263,22 @@ EVT_BEGIN(dou_puka_event_main17)
     RETURN
 EVT_END()
 
+/**
+ * Clears the state and offset registers of floating platform 1 (state 0 = idle, 1 = being ridden,
+ * 2 = stepped off; offset = its current height).
+ */
 static EVT_BEGIN(dou_puka_event_init1)
     SET_VALUE(GW(1), 0)
     SET_VALUE(GW(2), 0)
     RETURN
 EVT_END()
 
+/**
+ * Stand-on case script for floating platform 1:
+ * if idle it marks the platform as ridden, runs the extra callback in LW(3)
+ * when there is one (e.g. the boat or barrel creak sound), then the shared dip animation dou_puka_event,
+ * and marks it as stepped off.
+ */
 static EVT_BEGIN(dou_puka_event_1)
     IF_INT_NOT_EQUAL(GW(1), 0)
         RETURN
@@ -2078,6 +2293,10 @@ static EVT_BEGIN(dou_puka_event_1)
     RETURN
 EVT_END()
 
+/**
+ * Step-off case script for floating platform 1:
+ * once the dip has finished (state 2) it sets the platform back to idle so it can bob again.
+ */
 static EVT_BEGIN(dou_puka_event_rev_1)
     IF_INT_NOT_EQUAL(GW(1), 2)
         RETURN
@@ -2086,6 +2305,11 @@ static EVT_BEGIN(dou_puka_event_rev_1)
     RETURN
 EVT_END()
 
+/**
+ * Frame loop for floating platform 1: binds the hit area in LW(1) to the map object in LW(0),
+ * then every frame moves the object to the height held in the platform's offset register
+ * and updates the hit area.
+ */
 static EVT_BEGIN(dou_puka_event_main1)
     CALL(evt_hit_bind_mapobj, LW(1), LW(0))
     LOOP(0)
@@ -2096,6 +2320,10 @@ static EVT_BEGIN(dou_puka_event_main1)
     RETURN
 EVT_END()
 
+/**
+ * Idle bobbing of floating platform 1: after a random 0.2 to 0.6 second delay it runs the shared bobbing loop
+ * dou_normal_puka, pauses it while the platform is being ridden and restarts it once Mario steps off.
+ */
 static EVT_BEGIN(dou_puka_event_sub1)
     CALL(evt_sub_random, 400, LW(0))
     ADD(LW(0), 200)
@@ -2121,12 +2349,22 @@ static EVT_BEGIN(dou_puka_event_sub1)
     RETURN
 EVT_END()
 
+/**
+ * Clears the state and offset registers of floating platform 2 (state 0 = idle, 1 = being ridden,
+ * 2 = stepped off; offset = its current height).
+ */
 static EVT_BEGIN(dou_puka_event_init2)
     SET_VALUE(GW(3), 0)
     SET_VALUE(GW(4), 0)
     RETURN
 EVT_END()
 
+/**
+ * Stand-on case script for floating platform 2:
+ * if idle it marks the platform as ridden, runs the extra callback in LW(3)
+ * when there is one (e.g. the boat or barrel creak sound), then the shared dip animation dou_puka_event,
+ * and marks it as stepped off.
+ */
 static EVT_BEGIN(dou_puka_event_2)
     IF_INT_NOT_EQUAL(GW(3), 0)
         RETURN
@@ -2141,6 +2379,10 @@ static EVT_BEGIN(dou_puka_event_2)
     RETURN
 EVT_END()
 
+/**
+ * Step-off case script for floating platform 2:
+ * once the dip has finished (state 2) it sets the platform back to idle so it can bob again.
+ */
 static EVT_BEGIN(dou_puka_event_rev_2)
     IF_INT_NOT_EQUAL(GW(3), 2)
         RETURN
@@ -2149,6 +2391,11 @@ static EVT_BEGIN(dou_puka_event_rev_2)
     RETURN
 EVT_END()
 
+/**
+ * Frame loop for floating platform 2: binds the hit area in LW(1) to the map object in LW(0),
+ * then every frame moves the object to the height held in the platform's offset register
+ * and updates the hit area.
+ */
 static EVT_BEGIN(dou_puka_event_main2)
     CALL(evt_hit_bind_mapobj, LW(1), LW(0))
     LOOP(0)
@@ -2159,6 +2406,10 @@ static EVT_BEGIN(dou_puka_event_main2)
     RETURN
 EVT_END()
 
+/**
+ * Idle bobbing of floating platform 2: after a random 0.2 to 0.6 second delay it runs the shared bobbing loop
+ * dou_normal_puka, pauses it while the platform is being ridden and restarts it once Mario steps off.
+ */
 static EVT_BEGIN(dou_puka_event_sub2)
     CALL(evt_sub_random, 400, LW(0))
     ADD(LW(0), 200)
@@ -2184,12 +2435,22 @@ static EVT_BEGIN(dou_puka_event_sub2)
     RETURN
 EVT_END()
 
+/**
+ * Clears the state and offset registers of floating platform 3 (state 0 = idle, 1 = being ridden,
+ * 2 = stepped off; offset = its current height).
+ */
 static EVT_BEGIN(dou_puka_event_init3)
     SET_VALUE(GW(5), 0)
     SET_VALUE(GW(6), 0)
     RETURN
 EVT_END()
 
+/**
+ * Stand-on case script for floating platform 3:
+ * if idle it marks the platform as ridden, runs the extra callback in LW(3)
+ * when there is one (e.g. the boat or barrel creak sound), then the shared dip animation dou_puka_event,
+ * and marks it as stepped off.
+ */
 static EVT_BEGIN(dou_puka_event_3)
     IF_INT_NOT_EQUAL(GW(5), 0)
         RETURN
@@ -2204,6 +2465,10 @@ static EVT_BEGIN(dou_puka_event_3)
     RETURN
 EVT_END()
 
+/**
+ * Step-off case script for floating platform 3:
+ * once the dip has finished (state 2) it sets the platform back to idle so it can bob again.
+ */
 static EVT_BEGIN(dou_puka_event_rev_3)
     IF_INT_NOT_EQUAL(GW(5), 2)
         RETURN
@@ -2212,6 +2477,11 @@ static EVT_BEGIN(dou_puka_event_rev_3)
     RETURN
 EVT_END()
 
+/**
+ * Frame loop for floating platform 3: binds the hit area in LW(1) to the map object in LW(0),
+ * then every frame moves the object to the height held in the platform's offset register
+ * and updates the hit area.
+ */
 static EVT_BEGIN(dou_puka_event_main3)
     CALL(evt_hit_bind_mapobj, LW(1), LW(0))
     LOOP(0)
@@ -2222,6 +2492,10 @@ static EVT_BEGIN(dou_puka_event_main3)
     RETURN
 EVT_END()
 
+/**
+ * Idle bobbing of floating platform 3: after a random 0.2 to 0.6 second delay it runs the shared bobbing loop
+ * dou_normal_puka, pauses it while the platform is being ridden and restarts it once Mario steps off.
+ */
 static EVT_BEGIN(dou_puka_event_sub3)
     CALL(evt_sub_random, 400, LW(0))
     ADD(LW(0), 200)
@@ -2247,12 +2521,18 @@ static EVT_BEGIN(dou_puka_event_sub3)
     RETURN
 EVT_END()
 
+/** Resets the state registers (GW(7), GW(8)) of the fifth dipping platform to 0. */
 EVT_BEGIN(dou_puka_event_init4)
     SET_VALUE(GW(7), 0)
     SET_VALUE(GW(8), 0)
     RETURN
 EVT_END()
 
+/**
+ * Case event for standing on the fifth dipping platform:
+ * runs the shared dip once (guarded by GW(7)) with the offset register GW(8),
+ * and plays the sound given in LW(3) first.
+ */
 EVT_BEGIN(dou_puka_event_4)
     IF_INT_NOT_EQUAL(GW(7), 0)
         RETURN
@@ -2267,6 +2547,7 @@ EVT_BEGIN(dou_puka_event_4)
     RETURN
 EVT_END()
 
+/** Case event for leaving the fifth platform: resets GW(7) to 0 once the dip has finished (GW(7) = 2). */
 EVT_BEGIN(dou_puka_event_rev_4)
     IF_INT_NOT_EQUAL(GW(7), 2)
         RETURN
@@ -2275,6 +2556,10 @@ EVT_BEGIN(dou_puka_event_rev_4)
     RETURN
 EVT_END()
 
+/**
+ * Applies the fifth platform's offset GW(8) to its map object every frame,
+ * binding the hit area LW(1) to the object LW(0).
+ */
 EVT_BEGIN(dou_puka_event_main4)
     CALL(evt_hit_bind_mapobj, LW(1), LW(0))
     LOOP(0)
@@ -2285,6 +2570,10 @@ EVT_BEGIN(dou_puka_event_main4)
     RETURN
 EVT_END()
 
+/**
+ * Idle bobbing of the fifth platform: after a random delay runs dou_normal_puka on GW(8),
+ * and pauses it while Mario stands on it (GW(7) = 1) until he leaves.
+ */
 EVT_BEGIN(dou_puka_event_sub4)
     CALL(evt_sub_random, 400, LW(0))
     ADD(LW(0), 200)
@@ -2310,6 +2599,10 @@ EVT_BEGIN(dou_puka_event_sub4)
     RETURN
 EVT_END()
 
+/**
+ * Makes the first two barrels (S_taru_n01 and n02) dip when stood on, using the shared dip scripts,
+ * after the first island switch has been pressed.
+ */
 EVT_BEGIN(pukapuka_watari_init01)
     SET_VALUE(LW(0), STRING("S_taru_n01"))
     SET_VALUE(LW(1), STRING("A_taru_n01"))
@@ -2332,6 +2625,10 @@ EVT_BEGIN(pukapuka_watari_init01)
     RETURN
 EVT_END()
 
+/**
+ * Makes the second two barrels (S_taru_n03 and n04) dip when stood on,
+ * after the second island switch has been pressed.
+ */
 EVT_BEGIN(pukapuka_watari_init02)
     SET_VALUE(LW(0), STRING("S_taru_n03"))
     SET_VALUE(LW(1), STRING("A_taru_n03"))
@@ -2394,6 +2691,13 @@ static HitDamageReturn hitDmgRetPoints[] = {
     {0},
 };
 
+/**
+ * Init script of dou_11, the big room with the stranded sailors:
+ * music and ambience, exits, NPCs (Sailors C, D, E, Monie and Peeton wearing their ring models),
+ * the bombable wall by story step, the stranded-sailors cutscenes (STORY_STG5_29_WAVE_DODGING and
+ * STORY_STG5_34_KICKED_OFF), the two blue island switches, the swaying background ship,
+ * bobbing barrels and bottles, and the dust shaking after Cortez's attack (STORY_STG5_40_TRUE_IDENTITY).
+ */
 EVT_BEGIN(dou_11_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_DOU1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_DOU12"))

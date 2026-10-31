@@ -45,6 +45,7 @@ USER_FUNC(tou_07_belt_camid);
 
 #if VERSION >= VERSION_US
 
+/** Script helper: args[0] receives 1 if Mario's key input or control is currently disabled, else 0. */
 USER_FUNC(tou_07_mario_keyoff_check) {
     EvtWord* args = event->args;
 
@@ -58,6 +59,7 @@ USER_FUNC(tou_07_mario_keyoff_check) {
 #endif
 
 #if VERSION >= VERSION_JP
+/** Script helper: re-enables sound effects (clears the SFX mute flag). */
 USER_FUNC(tou_07_snd_on) {
     psndClearFlag(PSND_FLAG_MUTE_SFX);
     return EVT_RETURN_DONE;
@@ -65,29 +67,40 @@ USER_FUNC(tou_07_snd_on) {
 #endif
 
 #if VERSION >= VERSION_JP
+/** Script helper: mutes sound effects (sets the SFX mute flag), used while Mario sleeps in the bed. */
 USER_FUNC(tou_07_snd_off) {
     psndSetFlag(PSND_FLAG_MUTE_SFX);
     return EVT_RETURN_DONE;
 }
 #endif
 
+/** Script helper: restores Mario's HP and FP to their maximums (the bed's rest). */
 static USER_FUNC(mario_recovery) {
     pouchSetHP(pouchGetMaxHP());
     pouchSetFP(pouchGetMaxFP());
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: ends the paper-slit transformation on Mario (marioPaperOff). */
 static USER_FUNC(paper_off) {
     marioPaperOff();
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Door animation callback for the room door (door_1), opening: LW(0) is the swing angle;
+ * turns door_1 about the Y axis by 0.44 times the angle.
+ */
 static EVT_BEGIN(n_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the room door (door_1), closing:
+ * turns door_1 about the Y axis by -0.44 times the angle.
+ */
 static EVT_BEGIN(n_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
@@ -131,10 +144,12 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
+/** NPC init for Grubba (ガンス) in this room: does nothing. */
 static EVT_BEGIN(init_gans)
     RETURN
 EVT_END()
 
+/** Talk script of Grubba in this room: does nothing. */
 static EVT_BEGIN(talk_gans)
     RETURN
 EVT_END()
@@ -179,6 +194,11 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Guess: scene when Mario is first shown into the fighters' room (run from the map init):
+ * Grubba (ガンス) opens the door and walks in ahead of Mario, the door shuts and he says stg3_tou_49,
+ * then the screen changes to tou_08 with a page-flip transition.
+ */
 static EVT_BEGIN(evt_sensyu)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -230,6 +250,13 @@ static EVT_BEGIN(evt_sensyu)
     RETURN
 EVT_END()
 
+/**
+ * Scene when Mario is led to the champion's room after the title match:
+ * Jolene (キノシコワ) shows Mario and the partner in, says stg3_tou_449, and leaves;
+ * the partner and Mario puzzle over what they find (stg3_tou_450 to 450_05)
+ * until Mario's mail arrives with the vibration jingle and a "!" balloon, he reads it (stg3_tou_450_06, 450_07),
+ * mail 43 is received and opened, and the story advances to STORY_STG3_30_NEW_CHAMPION.
+ */
 static EVT_BEGIN(evt_champion)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, 0, 0, -160)
@@ -399,6 +426,11 @@ static EVT_BEGIN(evt_champion)
     RETURN
 EVT_END()
 
+/**
+ * Guess: scene when Mario returns as champion after Chapter 3:
+ * Jolene (キノシコワ) hands over the Champ's Belt, which appears as a belt item and NPC,
+ * and the scene ends with a short exchange.
+ */
 EVT_BEGIN(evt_champion_re)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, 65, 0, -95)
@@ -489,6 +521,12 @@ EVT_BEGIN(evt_champion_re)
     RETURN
 EVT_END()
 
+/**
+ * Air duct scene: the duct cover is knocked off with a camera shake and clang,
+ * the vent cover object kankikuti is hidden and the wall hit object win_kabe switched off.
+ * The first time the story advances to STORY_STG3_30_01_AIR_DUCT_ENTRANCE;
+ * on later visits GSWF_TOU07_DUCT_ENTRY_OPEN_REVISIT is set instead. The case event then exits.
+ */
 static EVT_BEGIN(evt_dakuto)
     CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.049804688f), FLOAT(0.0f), 500)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_DUCT_KOUSHI_HIT1"), 135, 80, -95, 0)
@@ -503,6 +541,7 @@ static EVT_BEGIN(evt_dakuto)
     RETURN
 EVT_END()
 
+/** Guess: air duct cover scene: the duct lid (anm_futa) opens with a shaking sound so Mario can climb in. */
 EVT_BEGIN(evt_dakuto2)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -519,6 +558,11 @@ EVT_BEGIN(evt_dakuto2)
     RETURN
 EVT_END()
 
+/**
+ * Rest in the Glitz Pit bed (stg3_yado_00/01, with a yes/no prompt):
+ * partners leave, Mario hops in and sleeps with the sound muted, HP and FP are restored,
+ * and the partners return.
+ */
 EVT_BEGIN(evt_tou_bed)
 #if VERSION >= VERSION_US
     CALL(tou_07_mario_keyoff_check, LW(0))
@@ -654,11 +698,16 @@ EVT_BEGIN(evt_tou_bed)
     RETURN
 EVT_END()
 
+/** Bed entry point: registers evt_tou_bed to run when Mario presses A in front of the bed named in LW(0). */
 static EVT_BEGIN(bed_entry)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, LW(0), 0, PTR(evt_tou_bed), 0)
     RETURN
 EVT_END()
 
+/**
+ * Opens the room's item box (mobj_box00): takes control from Mario,
+ * the box pops an item (ITEM_POWER_PLUS, the Power Plus badge) and Mario receives it.
+ */
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
@@ -670,6 +719,10 @@ static EVT_BEGIN(mobj_box00)
     RETURN
 EVT_END()
 
+/**
+ * Map init for tou_07, the champion's room: bed collision, the paper-slit animation, NPCs,
+ * the champion's belt and the air duct entrance, depending on story progress (including the new champion stage).
+ */
 EVT_BEGIN(tou_07_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
@@ -783,6 +836,10 @@ EVT_BEGIN(tou_07_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0] = display direction; turns Mario into his paper-slit pose (p_slit) on the first call
+ * and holds that direction for the rest of the scene.
+ */
 static USER_FUNC(paper_on) {
     f32 value = evtGetFloat(event, event->args[0]);
     MarioWork* mario = marioGetPtr();
@@ -797,6 +854,7 @@ static USER_FUNC(paper_on) {
 }
 
 #if VERSION >= VERSION_JP
+/** Script helper: hides the belt item's icon. */
 USER_FUNC(tou_07_icon_off) {
     iconFlagOn(itemNameToPtr("belt")->name, 2);
     return EVT_RETURN_DONE;
@@ -804,6 +862,10 @@ USER_FUNC(tou_07_icon_off) {
 #endif
 
 #if VERSION >= VERSION_JP
+/**
+ * Guess: script helper: switches the champion belt effect and its NPC to camera id 7
+ * so they render over the cutscene.
+ */
 USER_FUNC(tou_07_belt_camid) {
     EffectEntry* eff = effNameToPtr("belt");
     // ベルト

@@ -54,6 +54,10 @@ static EvtWord explosion_event[254];
 static EvtWord explosion_event[247];
 #endif
 
+/**
+ * Script helper: hooks _fire_point_callback onto the Bob-omb's body animation and hides part 2, the spark model,
+ * which is then drawn only at the fuse.
+ */
 static USER_FUNC(_set_draw_callback) {
     BattleWork* wp = _battleWorkPointer;
     s32 id = BattleTransID(event, -2);
@@ -529,6 +533,12 @@ static BattleUnitKindPart parts[] = {
     {2, "ヘビーボム", "c_heavy", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x2010000, 0, pose_table_3},
 };
 
+/**
+ * Init script of the Bulky Bob-omb: installs the wait, phase,
+ * attack and damage handlers (confusion uses the default Confuse script),
+ * sets its work values (0 = fuse lit flag 0, 1 = fuse length 3, 2 = fuse sound -1, 3 = guard cycle 0),
+ * poses part 2 as F_1 (the fuse), sets the pose sound table and the draw callback, and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
@@ -546,6 +556,14 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler of the Bulky Bob-omb.
+ * If it is frozen with its fuse lit, the fuse is put out (sound stopped, flag cleared,
+ * pose table for the remaining fuse length restored).
+ * A knock-out hit by fire, explosion, electric or one of the counter damage codes (24, 25, 27, 46, 50, 52, 54)
+ * makes it explode instead of dying normally (pose type 29, then dead_event);
+ * anything else runs the default damage script.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -591,6 +609,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Phase script run after the player's turn: if its fuse is lit, it burns one step.
+ * With no fuse left it plays K_4 and queues the explosion reaction (52);
+ * otherwise it plays the fuse sound and the pose table that shortens the fuse by one (3 to 2, 2 to 1, 1 to 0),
+ * waits 40 frames, lowers the fuse length in unit work 1 and installs the matching burning pose table.
+ */
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -634,6 +658,13 @@ static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the Bulky Bob-omb: it does no damage itself.
+ * The first time it lights its fuse (G_n pose for the current fuse length, fuse and light sounds,
+ * unit work 0 = 1).
+ * Afterwards it just holds the G_n pose and cycles through its three guard weapons (weapon_heavy_bomb_guard, _2,
+ * _3) with a self check.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_HEAVYB_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
@@ -687,11 +718,17 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Death script of the Bulky Bob-omb: stops the fuse sound, then if the killing blow was fire, explosion,
+ * electric or one of the counter damage codes it queues the explosion reaction (52);
+ * otherwise it runs the shared death script (subsetevt_dead_core).
+ */
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
     IF_INT_NOT_EQUAL(LW(0), -1)
@@ -718,6 +755,12 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * The Bulky Bob-omb's big explosion (weapon_heavy_bomb_super_explosion):
+ * stops the fuse sound, shakes the camera, spawns the bomb effects around the stage, clears the fog,
+ * and applies the explosion to every target in turn (avoid check, then damage),
+ * then runs the shared death script and removes the unit.
+ */
 static EVT_BEGIN(explosion_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
     CALL(evt_snd_sfxoff, LW(0))
@@ -778,6 +821,11 @@ EVT_END()
 
 void animPoseDrawShape(s32 poseId, s32 shapeIdx);
 
+/**
+ * Animation draw callback: when the fuse is lit (work[0] != 0),
+ * draws the fuse's spark shape (pPlaneShape3 of part 2) at the locator picked by the fuse stage in work[1]
+ * (locator11 down to locator8).
+ */
 static void _fire_point_callback(BattleUnitPart* part, s32 group) {
     BattleUnit* unit = part->owner;
     const char* name;

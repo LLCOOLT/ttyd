@@ -589,6 +589,7 @@ NpcTerritoryInfo btl_bom_setup_no_tbl[] = {
     {0},
 };
 
+/** Background event of the Fahr Outpost battle stage: starts the snowfall effect for the whole battle. */
 EVT_BEGIN(bgset_bom_snow_event)
     CALL(_snow_control)
     RETURN
@@ -596,6 +597,10 @@ EVT_END()
 
 struct EffEntry* effSnowfallN64Entry(s32 type, s32 count);
 
+/**
+ * Starts the 64-particle snowfall effect once, then keeps the event blocked
+ * so the effect stays alive for the battle.
+ */
 static USER_FUNC(_snow_control) {
     if (isFirstCall) {
         effSnowfallN64Entry(0, 64);

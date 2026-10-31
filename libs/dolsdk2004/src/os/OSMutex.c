@@ -49,12 +49,18 @@ int __OSCheckMutex(OSMutex* mutex);
 int __OSCheckDeadLock(OSThread* thread);
 int __OSCheckMutexes(OSThread* thread);
 
+/** Initializes a mutex: empty wait queue, no owner, lock count 0. */
 void OSInitMutex(OSMutex* mutex) {
     OSInitThreadQueue(&mutex->queue);
     mutex->thread = 0;
     mutex->count = 0;
 }
 
+/**
+ * Locks the mutex for the current thread, recursively.
+ * If another thread owns it, raises that owner's priority to the caller's (priority inheritance) and sleeps
+ * until the mutex is released.
+ */
 void OSLockMutex(OSMutex* mutex) {
     BOOL enabled = OSDisableInterrupts();
     OSThread* currentThread = OSGetCurrentThread();
@@ -83,6 +89,10 @@ void OSLockMutex(OSMutex* mutex) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Decrements the lock count of a mutex the current thread owns;
+ * at zero it releases the mutex, restores the thread's priority if it had been boosted and wakes the waiters.
+ */
 void OSUnlockMutex(OSMutex* mutex) {
     BOOL enabled = OSDisableInterrupts();
     OSThread* currentThread = OSGetCurrentThread();
@@ -105,6 +115,7 @@ void OSUnlockMutex(OSMutex* mutex) {
     OSRestoreInterrupts(enabled);
 }
 
+/** Releases every mutex a thread still owns and wakes their waiters; used when a thread exits or is cancelled. */
 void __OSUnlockAllMutex(OSThread* thread) {
     OSMutex* mutex;
 
@@ -118,6 +129,10 @@ void __OSUnlockAllMutex(OSThread* thread) {
     }
 }
 
+/**
+ * Locks the mutex if it is free or already owned by the current thread and returns TRUE;
+ * returns FALSE without waiting if another thread owns it.
+ */
 BOOL OSTryLockMutex(OSMutex* mutex) {
     BOOL enabled = OSDisableInterrupts();
     OSThread* currentThread = OSGetCurrentThread();
@@ -141,10 +156,15 @@ BOOL OSTryLockMutex(OSMutex* mutex) {
     return locked;
 }
 
+/** Initializes a condition variable with an empty wait queue. */
 void OSInitCond(OSCond* cond) {
     OSInitThreadQueue(&cond->queue);
 }
 
+/**
+ * Releases a mutex the caller owns completely, sleeps on the condition variable until OSSignalCond,
+ * then relocks the mutex with the lock count it had.
+ */
 void OSWaitCond(OSCond* cond, OSMutex* mutex) {
     BOOL enabled = OSDisableInterrupts();
     OSThread* currentThread = OSGetCurrentThread();
@@ -171,10 +191,12 @@ void OSWaitCond(OSCond* cond, OSMutex* mutex) {
     OSRestoreInterrupts(enabled);
 }
 
+/** Wakes all threads sleeping on a condition variable. */
 void OSSignalCond(OSCond* cond) {
     OSWakeupThread(&cond->queue);
 }
 
+/** Returns 1 if a mutex is on the given mutex queue; used by the mutex consistency checks. */
 static int IsMember(OSMutexQueue* queue, OSMutex* mutex) {
     OSMutex* member = queue->head;
 
@@ -187,6 +209,10 @@ static int IsMember(OSMutexQueue* queue, OSMutex* mutex) {
     return 0;
 }
 
+/**
+ * Debug check of one mutex: its wait queue links, thread states and priority ordering,
+ * and that the lock count matches whether it has an owner; returns 0 if inconsistent.
+ */
 int __OSCheckMutex(OSMutex* mutex) {
     OSThread* thread;
     OSThreadQueue* queue;
@@ -228,6 +254,7 @@ int __OSCheckMutex(OSMutex* mutex) {
     return 1;
 }
 
+/** Follows the chain of mutex owners from a thread and returns 1 if it leads back to that thread, a deadlock. */
 int __OSCheckDeadLock(OSThread* thread) {
     OSMutex* mutex = thread->mutex;
 
@@ -240,6 +267,7 @@ int __OSCheckDeadLock(OSThread* thread) {
     return 0;
 }
 
+/** Debug check of all mutexes a thread owns; returns 0 if one is inconsistent or not owned by the thread. */
 int __OSCheckMutexes(OSThread* thread) {
     OSMutex* mutex = thread->queueMutex.head;
 

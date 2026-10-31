@@ -34,6 +34,11 @@ static u8 palRange1[38] = {
 
 static u8 value3a = 19;
 
+/**
+ * Writes the register set of the Philips SAA7120 video encoder over I2C (device address 0x88):
+ * registers 0 to 37 and 42 to 57 cleared, 38 to 41 from range0, register 0x3A from value3a,
+ * and 90 to 127 from range1.
+ */
 static void send7120Data(u8 *range0, u8 *range1) {
     u8 i;
     u8 buffer[2];
@@ -67,6 +72,10 @@ static void send7120Data(u8 *range0, u8 *range1) {
     }
 }
 
+/**
+ * Resets and programs the Philips SAA7120 digital video encoder with the NTSC register tables.
+ * Not used by this build, because getEncoderType() returns 1.
+ */
 void __VIInitPhilips(void) {
     __VIInitI2C();
     send7120Data(ntscRange0, ntscRange1);

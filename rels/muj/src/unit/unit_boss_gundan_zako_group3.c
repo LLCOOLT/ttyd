@@ -50,12 +50,18 @@ static EvtWord attack_event[287];
 static EvtWord hit_check_event[119];
 static EvtWord wait_event[6];
 
+/** Script helper: puts the horde leader on top of the formation centre, 45 units above it. */
 static USER_FUNC(zakogun_kanbu_on_ball) {
     BattleUnit* kanbu = BattleGetUnitPtr(_battleWorkPointer, zakogun_get_kanbu_id());
     BtlUnit_SetPos(kanbu, work->pos.x, 45.0f + work->pos.y, work->pos.z);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: starts formation 3 (the 500 X-Nauts in a ring):
+ * selects it (work->flag = 2), places each member on a circle with random offsets around the leader
+ * and initialises its pose.
+ */
 USER_FUNC(zakogun_ext_init3) {
     s32 i;
     ExtdrvPose* pose = extGetPosePtr();
@@ -221,6 +227,7 @@ BattleWeapon weapon_gundan_zako_group3_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Guess: init event of horde group 3: sets its work values and spawns the horde display. */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -230,6 +237,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Guess: damage event of horde group 3: plays the horde hurt animation, then runs the default damage flow. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -271,6 +279,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: death event of horde group 3: the 500 X-Nauts fall (zakogun_dead3)
+ * and the group is removed from the battle.
+ */
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
     CALL(zakogun_dead3)
@@ -307,6 +319,10 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: attack event of horde group 3: the ring of X-Nauts (zakogun_attack3_1 to 3) forms
+ * and rolls over the target for the weapon damage.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     SET_VALUE(LW(9), PTR(&weapon_gundan_zako_group3_attack))
@@ -415,6 +431,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Per-frame update of formation 3: moves the ring of 500 X-Nauts around the formation centre (radius, angle,
+ * speed) and turns each one along the ring.
+ */
 void zakogun_ext_main3(void) {
     s32 i;
     BattleUnit* unit = zakogun_get_ptr();
@@ -630,6 +650,10 @@ void zakogun_ext_main3(void) {
     }
 }
 
+/**
+ * Script helper, first step of group 3 attack: sets the formation centre at (0, 55, 0) with radius 25
+ * and builds up the ring; blocks until it is formed.
+ */
 USER_FUNC(zakogun_attack3_1) {
     s32 i;
     s32 n;
@@ -652,6 +676,10 @@ USER_FUNC(zakogun_attack3_1) {
     return n == 500 ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper, second step of group 3 attack (args[0] = sound id):
+ * moves the ring toward the target with a sound until it arrives.
+ */
 USER_FUNC(zakogun_attack3_2) {
     BattleUnit* unit = zakogun_get_ptr();
     s32 sfx = evtGetValue(event, event->args[0]);
@@ -714,6 +742,7 @@ USER_FUNC(zakogun_attack3_2) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper, last step of group 3 attack: sets all 500 X-Nauts to state 50 and blocks until they have finished. */
 USER_FUNC(zakogun_attack3_3) {
     s32 i;
     s32 n;
@@ -731,6 +760,7 @@ USER_FUNC(zakogun_attack3_3) {
     return n == 500 ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
+/** Script helper: puts the 500 X-Nauts of group 3 into their death state (80). */
 USER_FUNC(zakogun_dead3) {
     s32 i;
 
@@ -740,6 +770,10 @@ USER_FUNC(zakogun_dead3) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: sends the 500 X-Nauts of group 3 running away (state 90, escape animation) and blocks
+ * until they are gone.
+ */
 USER_FUNC(zakogun_escape3) {
     s32 i;
     s32 n;
@@ -759,6 +793,10 @@ USER_FUNC(zakogun_escape3) {
     return n == 500 ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
+/**
+ * Guess: hit check event of horde group 3: before damage,
+ * starts the avoid animation of a target that dodges the attack.
+ */
 static EVT_BEGIN(hit_check_event)
     LABEL(10)
     LOOP(0)
@@ -810,6 +848,7 @@ static EVT_BEGIN(hit_check_event)
     RETURN
 EVT_END()
 
+/** Guess: wait (idle) event of horde group 3: keeps the default idle pose. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

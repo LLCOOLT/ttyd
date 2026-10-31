@@ -162,18 +162,25 @@ void TRK_ppc_memcpy(void* dest, const void* src, int n, u32 param_4, u32 param_5
 void ReadFPSCR(void* data);
 void WriteFPSCR(void* data);
 
+/** Assembly: returns the CPU's machine state register. */
 asm u32 __TRK_get_MSR(void) {
     nofralloc
     mfmsr r3
     blr
 }
 
+/** Assembly: writes the CPU's machine state register. */
 asm void __TRK_set_MSR(register u32 msr) {
     nofralloc
     mtmsr r3
     blr
 }
 
+/**
+ * Assembly: copies n bytes one byte at a time, switching the MSR to param_5 around each load
+ * and to param_4 around each store, so source and destination can use different address translation;
+ * restores the MSR when done.
+ */
 asm void TRK_ppc_memcpy(register void* dest, register const void* src, register int n, register u32 param_4, register u32 param_5) {
     nofralloc
     mfmsr r8
@@ -195,6 +202,13 @@ L_8025B0A4:
     blr
 }
 
+/**
+ * Assembly entry for exceptions that reach the stub:
+ * saves SRR0/SRR1 and CR scratch, switches to the stub's MSR and records the exception id.
+ * For an external interrupt (0x500) it first runs TRKUARTInterruptHandler and returns to the game
+ * if no debug input is pending.
+ * Otherwise it saves the game's registers into gTRKCPUState and posts an interrupt event.
+ */
 asm void TRKInterruptHandler(void) {
     nofralloc
     mtspr 26, r2
@@ -302,6 +316,12 @@ L_8025B178:
     b TRKPostInterruptEvent
 }
 
+/**
+ * Assembly: handles an exception that happens inside the stub itself (such as a bad memory access):
+ * records the id and PC in gTRKExceptionStatus,
+ * steps the PC past the faulting instruction for the data/instruction fault types and returns,
+ * leaving exceptionDetected set so the memory/register accessors report error 0x702.
+ */
 asm void TRKExceptionHandler(void) {
     nofralloc
     lis r2, gTRKExceptionStatus@h
@@ -347,6 +367,11 @@ L_8025B2BC:
     rfi
 }
 
+/**
+ * Assembly: saves the stub's own registers into gTRKState,
+ * restores the game's context from gTRKCPUState (including the extended block)
+ * and returns into the game with rfi. If input is pending when it starts it goes back to post an event.
+ */
 asm void TRKSwapAndGo(void) {
     nofralloc
     lis r3, gTRKState@h
@@ -401,6 +426,10 @@ L_8025B35C:
     rfi
 }
 
+/**
+ * Assembly: the tail used by TRKSwapAndGo when debug input is pending:
+ * restores the stub's registers, saved SRRs and CR and jumps to TRKPostInterruptEvent.
+ */
 asm void TRKInterruptHandlerEnableInterrupts(void) {
     nofralloc
     lis r2, gTRKState@h
@@ -426,6 +455,7 @@ asm void TRKInterruptHandlerEnableInterrupts(void) {
     b TRKPostInterruptEvent
 }
 
+/** Assembly: stores the FPSCR (via mffs) as a double at data, preserving f31. */
 asm void ReadFPSCR(register void* data) {
     nofralloc
     stwu r1, -0x40(r1)
@@ -439,6 +469,7 @@ asm void ReadFPSCR(register void* data) {
     blr
 }
 
+/** Assembly: loads a double from data and writes it to the FPSCR (mtfsf), preserving f31. */
 asm void WriteFPSCR(register void* data) {
     nofralloc
     stwu r1, -0x40(r1)
@@ -453,6 +484,11 @@ asm void WriteFPSCR(register void* data) {
 }
 
 
+/**
+ * Checks that [addr, addr+length) lies in readable (readWriteable 0)
+ * or writeable (1) memory according to gTRKMemMap, which covers the whole 32-bit space.
+ * Returns 0 if valid, 0x700 if not.
+ */
 DSError TRKValidMemory32(const void* addr, size_t length, int readWriteable) {
     DSError err = 0x700;
     const u8* start;
@@ -487,6 +523,11 @@ DSError TRKValidMemory32(const void* addr, size_t length, int readWriteable) {
     return err;
 }
 
+/**
+ * Reads or writes target memory for the debugger:
+ * translates the address, validates it, copies with TRK_ppc_memcpy under the right MSR and, after a write,
+ * flushes the caches. A fault while copying gives 0x702; *length is set to 0 on failure.
+ */
 DSError TRKTargetAccessMemory(void* data, u32 start, size_t* length, int accessOptions, BOOL read) {
     DSError error;
     u32 target_msr;
@@ -525,6 +566,7 @@ DSError TRKTargetAccessMemory(void* data, u32 start, size_t* length, int accessO
     return error;
 }
 
+/** Reads one 4-byte instruction word at start into *data; returns 0x700 if the read fails or comes up short. */
 DSError TRKTargetReadInstruction(void* data, u32 start) {
     DSError error;
     size_t registersLength = 4;
@@ -537,6 +579,11 @@ DSError TRKTargetReadInstruction(void* data, u32 start) {
     return error;
 }
 
+/**
+ * Reads or writes the debugger's "default" register block (GPR0-31 plus the next few registers,
+ * up to index 0x24) in the saved CPU state, moving the words to or from the message buffer.
+ * Error 0x701 means the range is out of bounds and 0x702 means a memory exception happened during the access.
+ */
 DSError TRKTargetAccessDefault(u32 firstRegister, u32 lastRegister, TRKBuffer* b, size_t* registersLengthPtr,
                                BOOL read) {
     DSError error;
@@ -567,6 +614,11 @@ DSError TRKTargetAccessDefault(u32 firstRegister, u32 lastRegister, TRKBuffer* b
     return error;
 }
 
+/**
+ * Runs a tiny instruction sequence (built in a stack array,
+ * flushed to the instruction cache) that moves a register to or from memory at the given pointer;
+ * the shared back end of the SPR, floating point and paired-single accessors.
+ */
 static inline DSError TRKPPCAccessSpecialReg(void* value, u32* access_func, BOOL read) {
     typedef void (*asm_access_type)(void*, void*);
     asm_access_type asm_access;
@@ -578,6 +630,10 @@ static inline DSError TRKPPCAccessSpecialReg(void* value, u32* access_func, BOOL
     return 0;
 }
 
+/**
+ * Reads or writes the special-purpose register with the given number by assembling mfspr+stw or lwz+mtspr
+ * and running it.
+ */
 static inline DSError TRKPPCAccessSPR(void* value, u32 spr_register_num, BOOL read) {
     u32 access_func[10] = {INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
                            INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP};
@@ -593,6 +649,7 @@ static inline DSError TRKPPCAccessSPR(void* value, u32 spr_register_num, BOOL re
     return TRKPPCAccessSpecialReg(value, access_func, read);
 }
 
+/** Reads or writes one Gekko paired-single register by assembling a psq_st or psq_l for it and running it. */
 static inline DSError TRKPPCAccessPairedSingleRegister(void* srcDestPtr, u32 psr, BOOL read) {
     u32 access_func[10] = {INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
                            INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP};
@@ -605,6 +662,11 @@ static inline DSError TRKPPCAccessPairedSingleRegister(void* srcDestPtr, u32 psr
     return TRKPPCAccessSpecialReg(srcDestPtr, access_func, read);
 }
 
+/**
+ * Reads or writes floating point register 0-31 by assembling stfd/lfd;
+ * index 0x20 is the FPSCR and 0x21 is the FPECR (SPR 1022),
+ * both returned as 64-bit values with the upper half zero.
+ */
 static inline DSError TRKPPCAccessFPRegister(void* srcDestPtr, u32 fpr, BOOL read) {
     DSError error = 0;
     u32 access_func[10] = {INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP, INSTR_NOP,
@@ -637,6 +699,10 @@ static inline DSError TRKPPCAccessFPRegister(void* srcDestPtr, u32 fpr, BOOL rea
     return error;
 }
 
+/**
+ * Reads or writes floating point registers firstRegister to lastRegister (up to 0x21: f0-f31, FPSCR, FPECR) as
+ * 64-bit values, after enabling the FPU in the MSR; 0x701 for a bad range, 0x702 on a fault.
+ */
 DSError TRKTargetAccessFP(u32 firstRegister, u32 lastRegister, TRKBuffer* b, size_t* registerStorageSize, BOOL read) {
     u64 temp;
     DSError error;
@@ -674,6 +740,12 @@ DSError TRKTargetAccessFP(u32 firstRegister, u32 lastRegister, TRKBuffer* b, siz
     return error;
 }
 
+/**
+ * Reads or writes the "extended 1" register block (special-purpose registers, indices 0-0x60) in the saved CPU
+ * state.
+ * Writes that touch the time base or the decrementer set a restore flag so the value is applied
+ * when the game resumes. Errors: 0x701 out of range, 0x702 exception during access.
+ */
 DSError TRKTargetAccessExtended1(u32 firstRegister, u32 lastRegister, TRKBuffer* b, size_t* registersLengthPtr,
                                  BOOL read) {
     TRKExceptionStatus tempExceptionStatus;
@@ -716,6 +788,12 @@ DSError TRKTargetAccessExtended1(u32 firstRegister, u32 lastRegister, TRKBuffer*
     return error;
 }
 
+/**
+ * Reads or writes the Gekko paired-single registers ps0-ps31 (64 bits each, indices 0-0x1F):
+ * it first enables paired-single quantized load/store through HID2 and clears GQR0,
+ * then moves each register through the message buffer.
+ * Errors: 0x701 out of range, 0x702 exception during access.
+ */
 DSError TRKTargetAccessExtended2(u32 firstRegister, u32 lastRegister, TRKBuffer* b, size_t* registerStorageSize,
                                  BOOL read) {
     TRKExceptionStatus tempExceptionStatus;
@@ -759,6 +837,11 @@ DSError TRKTargetAccessExtended2(u32 firstRegister, u32 lastRegister, TRKBuffer*
     return error;
 }
 
+/**
+ * Called after the game's context is saved: if the stub itself caused the interrupt (inputActivated) it just
+ * clears that; otherwise posts an event, type 5 for the support-request instruction 0x0FE00000 at a program
+ * or trace exception, type 3 for other program/trace exceptions and type 4 for the rest.
+ */
 void TRKPostInterruptEvent(void) {
     int eventType;
     u32 inst;
@@ -787,10 +870,16 @@ void TRKPostInterruptEvent(void) {
     }
 }
 
+/** Sets the stub's stopped flag (the inline form of TRKTargetSetStopped). */
 static inline void TRKTargetSetStopped_inline(u32 stopped) {
     gTRKState.isStopped = stopped;
 }
 
+/**
+ * Decides whether a step is finished: not done while a single-step still has instructions left,
+ * or while a range- step's PC is still inside the range;
+ * also true when no step is active or the trap was not a trace exception (0xD00).
+ */
 static inline BOOL TRKTargetStepDone(void) {
     BOOL result = 1;
 
@@ -813,6 +902,10 @@ static inline BOOL TRKTargetStepDone(void) {
     return result;
 }
 
+/**
+ * Starts one step: sets the trace-enable bit (0x400) in the saved MSR,
+ * counts down a single-step's instructions and marks the game as running.
+ */
 static inline DSError TRKTargetDoStep(void) {
     gTRKStepStatus.active = 1;
     MWTRACE(1, "TargetDoStep()\n");
@@ -825,6 +918,10 @@ static inline DSError TRKTargetDoStep(void) {
     return 0;
 }
 
+/**
+ * Called when a trap arrives during a step: clears the trace bit,
+ * then ends the step if it is done or restarts it if not. Returns whether a step is still active.
+ */
 static inline BOOL TRKTargetCheckStep(void) {
     if (gTRKStepStatus.active) {
         gTRKCPUState.Extended1.MSR &= ~0x400;
@@ -838,6 +935,10 @@ static inline BOOL TRKTargetCheckStep(void) {
     return gTRKStepStatus.active;
 }
 
+/**
+ * Handles an interrupt event (types 3 and 4): unless it is the middle of a step,
+ * marks the game stopped and notifies the host with a stop report. Returns the notification status.
+ */
 DSError TRKTargetInterrupt(TRKEvent* event) {
     DSError result = 0;
 
@@ -866,6 +967,7 @@ typedef struct NotifyInfo {
     u8 pad14[0x2C];
 } NotifyInfo;
 
+/** Appends a stop notification (command 0x90: PC, the instruction at the PC, exception id) to a message buffer. */
 void TRKTargetAddStopInfo(TRKBuffer* buffer) {
     u32 instruction;
     NotifyInfo info;
@@ -880,6 +982,7 @@ void TRKTargetAddStopInfo(TRKBuffer* buffer) {
     TRKAppendBuffer_ui8(buffer, (u8*)&info, sizeof(NotifyInfo));
 }
 
+/** Appends an exception notification (command 0x91) using the PC and exception id recorded in gTRKExceptionStatus. */
 void TRKTargetAddExceptionInfo(TRKBuffer* buffer) {
     u32 instruction;
     NotifyInfo info;
@@ -894,6 +997,7 @@ void TRKTargetAddExceptionInfo(TRKBuffer* buffer) {
     TRKAppendBuffer_ui8(buffer, (u8*)&info, sizeof(NotifyInfo));
 }
 
+/** Starts a single-step of count instructions; step-over is not supported and returns 0x703. */
 DSError TRKTargetSingleStep(u32 count, BOOL stepOver) {
     if (stepOver)
         return 0x703;
@@ -904,6 +1008,7 @@ DSError TRKTargetSingleStep(u32 count, BOOL stepOver) {
     return 0;
 }
 
+/** Starts a step that runs until the PC leaves [rangeStart, rangeEnd]; step-over is not supported and returns 0x703. */
 DSError TRKTargetStepOutOfRange(u32 rangeStart, u32 rangeEnd, BOOL stepOver) {
     if (stepOver)
         return 0x703;
@@ -915,10 +1020,18 @@ DSError TRKTargetStepOutOfRange(u32 rangeStart, u32 rangeEnd, BOOL stepOver) {
     return 0;
 }
 
+/** Returns the stopped game's saved program counter. */
 u32 TRKTargetGetPC(void) {
     return gTRKCPUState.Default.PC;
 }
 
+/**
+ * Handles a request the game raised through the support instruction:
+ * GPR3 holds the command (0xD0 write, 0xD1 read, 0xD2 open, 0xD3 close, 0xD4 position),
+ * the other GPRs its arguments.
+ * It forwards it to the host, puts the result in GPR3 and skips the trap instruction;
+ * an unknown command is turned into an ordinary interrupt event.
+ */
 DSError TRKTargetSupportRequest(void) {
     DSError error;
     size_t* length;
@@ -969,23 +1082,31 @@ DSError TRKTargetSupportRequest(void) {
     return error;
 }
 
+/** Returns whether the game is currently stopped under the debugger. */
 BOOL TRKTargetStopped(void) {
     return gTRKState.isStopped;
 }
 
+/** Sets or clears the stopped flag. */
 void TRKTargetSetStopped(u32 stopped) {
     gTRKState.isStopped = stopped;
 }
 
+/** Marks the game stopped; always returns 0. */
 DSError TRKTargetStop(void) {
     gTRKState.isStopped = 1;
     return 0;
 }
 
+/** Remembers the pointer to the flag byte that says debug input is pending. */
 void TRKTargetSetInputPendingPtr(void* ptr) {
     gTRKState.inputPendingPtr = ptr;
 }
 
+/**
+ * Reads or writes auxiliary RAM for the debugger via TRK__read_aram / TRK__write_aram;
+ * a fault gives 0x702 with length 0.
+ */
 DSError TRKTargetAccessARAM(void* data, u32 start, size_t* length, BOOL read) {
     DSError error = 0;
     TRKExceptionStatus tempExceptionStatus = gTRKExceptionStatus;

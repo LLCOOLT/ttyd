@@ -17,18 +17,30 @@
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
 
+/**
+ * Door animation callback for the room door (door_1), opening: LW(0) is the swing angle;
+ * turns door_1 about the Y axis by 0.44 times the angle.
+ */
 static EVT_BEGIN(n_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the room door (door_1), closing:
+ * turns door_1 about the Y axis by -0.44 times the angle.
+ */
 static EVT_BEGIN(n_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Entrance script for the toilet pipe: clears the two "arrived from toilet" flags
+ * (GSWF_TOU04_ARRIVED_FROM_TOILET_A and B); LW(0) is set to 0.
+ */
 static EVT_BEGIN(toile_in)
     SET_VALUE(GSWF(GSWF_TOU04_ARRIVED_FROM_TOILET_A), 0)
     SET_VALUE(GSWF(GSWF_TOU04_ARRIVED_FROM_TOILET_B), 0)
@@ -36,6 +48,11 @@ static EVT_BEGIN(toile_in)
     RETURN
 EVT_END()
 
+/**
+ * Exit script for the toilet pipe: plays the water ("anm_mizu") and, a second later,
+ * the lid ("anm_futa") animation with the flush sound,
+ * sets GSWF_TOU04_ARRIVED_FROM_TOILET_A (so tou_04 knows Mario came out of this pipe) and sets LW(0) to 0.
+ */
 static EVT_BEGIN(toile_out)
     CALL(evt_map_playanim, STRING("anm_mizu"), 0, 0)
     BEGIN_INLINE_EVENT
@@ -49,18 +66,30 @@ static EVT_BEGIN(toile_out)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the west door (R_door_9), opening: LW(0) is the swing angle;
+ * turns R_door_9 about the Y axis by -0.44 times the angle.
+ */
 static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("R_door_9"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the west door (R_door_9), closing:
+ * turns R_door_9 about the Y axis by 0.44 times the angle.
+ */
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("R_door_9"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Guess: entrance scene for tou_09: Mario and the partner are placed by the door and walk in,
+ * with the partner facing right.
+ */
 EVT_BEGIN(evt_in)
     CALL(evt_mario_set_pos, -235, 12, 135)
     CALL(evt_party_set_pos, 0, -235, 12, 120)
@@ -146,6 +175,12 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
+/**
+ * Toilet stall scene (going in): control is taken, the stall doors' hit objects are disabled,
+ * Mario and the partner walk to the stall door (200, 130),
+ * the wooden door (door_2) swings open and shut behind them as they walk to (270, 130),
+ * the doors are re-enabled and control returns. The pre-JP versions use slightly different coordinates.
+ */
 static EVT_BEGIN(evt_toile)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -223,6 +258,10 @@ static EVT_BEGIN(evt_toile)
     RETURN
 EVT_END()
 
+/**
+ * Toilet stall scene (coming out): the wooden door (door_2) swings open and shut again while Mario
+ * and the partner walk to (200, 130), then control returns.
+ */
 static EVT_BEGIN(evt_toile2)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -264,6 +303,7 @@ static EVT_BEGIN(evt_toile2)
     RETURN
 EVT_END()
 
+/** Message for a door that will not open: plays the door-locked sound and the partner remarks stg3_tou_421_02. */
 static EVT_BEGIN(evt_tojikome_msg)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -275,6 +315,10 @@ static EVT_BEGIN(evt_tojikome_msg)
     RETURN
 EVT_END()
 
+/**
+ * Map init for tou_09, the side corridor: music by story stage, door and restroom case scripts,
+ * and the "shut in" message at the n_bero exit.
+ */
 EVT_BEGIN(tou_09_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG3_00_WELCOME_TO_GLITZVILLE, STORY_STG3_12_MINI_YOSHI_EGG)

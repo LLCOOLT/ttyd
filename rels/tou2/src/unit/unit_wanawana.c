@@ -32,6 +32,7 @@ static EvtWord damage_event[10];
 static EvtWord attack_event[19];
 static EvtWord wait_event[6];
 
+/** Out-of-line f32 wrapper of tan. */
 static f32 tanFloat(f32 x) {
     return tan(x);
 }
@@ -123,6 +124,10 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_wanawana", "nakayama_test4", 0.0f, 0.0f, 0.0f, 0.0f, 40.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
+/**
+ * Guess: draw callback that renders the floor under the trap from above into a texture (a top-down camera over
+ * the part's bounding box) so the trap can show the ground it sits on.
+ */
 static void replace_disp(CameraId camera, void* param) {
     WanaWork* wp = param;
     CameraEntry saved;
@@ -167,6 +172,10 @@ static void replace_disp(CameraId camera, void* param) {
     wp->ready = 1;
 }
 
+/**
+ * Guess: part display callback: while the floor texture is ready,
+ * binds it as the part's paper texture (type 0) and resets the paper texture afterwards.
+ */
 static void replace_callback(BattleUnitPart* part, s32 type) {
     WanaWork* wp = (WanaWork*)part->owner->countersetWeapon;
 
@@ -184,6 +193,10 @@ static void replace_callback(BattleUnitPart* part, s32 type) {
     }
 }
 
+/**
+ * Guess: script helper that sets up the wanawana trap's floor-copy texture:
+ * allocates the texture and work area, enables the texture overlay on the part and queues replace_disp.
+ */
 static USER_FUNC(replace_evt) {
     BattleUnitPart* part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 1);
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, BattleTransID(event, -2));
@@ -220,6 +233,12 @@ static USER_FUNC(replace_evt) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Init script of the unused wanawana trap unit:
+ * registers its wait, attack and damage handlers (confusion uses the default handler),
+ * turns on the MAPOBJ_FLAG_KURURING_PASS flag of the S_yuka map object group,
+ * runs replace_evt and starts the idle event. Guess: the map object flag is about the floor the trap sits on.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -231,6 +250,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction: runs the default damage handling (btldefaultevt_Damage) with LW(10) = -2 (the unit itself)
+ * and LW(11) = 1.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -238,10 +261,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Phase event: empty, it does nothing. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/** Attack event: uses an item if it has one; otherwise it does nothing and goes back to idling. */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -253,6 +278,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle event: sets the unit's body part 1 to the pose given by its pose table for its current state. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

@@ -271,6 +271,7 @@ BattleUnitSetup entry_group3 = {
     NULL, // itemDropTable
 };
 
+/** Guess: init event of Lord Crump: sets his work values (formation, guard and charge state) and his pose tables. */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventEntry, BTL_UNIT_SELF, PTR(entry_event))
@@ -288,6 +289,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Guess: entry event of Lord Crump: his entrance into the battle. */
 static EVT_BEGIN(entry_event)
     WAIT_FRAMES(120)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
@@ -303,6 +305,10 @@ static EVT_BEGIN(entry_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: damage event of Lord Crump: chooses the reaction by damage and whether he is guarding;
+ * a heavy hit cancels his guard.
+ */
 static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 2)
@@ -411,6 +417,7 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Guess: death event of Lord Crump: he is defeated, his horde runs away and the battle ends. */
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -516,6 +523,10 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: phase event of Lord Crump: at the start of each turn decides whether he calls his horde,
+ * guards or charges.
+ */
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_EQUAL(LW(0), 0)
@@ -541,6 +552,10 @@ static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Lord Crump calls his horde (call_event): if no horde unit is on the stage yet,
+ * he plays the call-back sound and pose C_1 and brings in horde group 1, 2 or 3 according to unit work 0.
+ */
 EVT_BEGIN(call_event)
     CALL(check_exist_group, LW(15))
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
@@ -634,6 +649,10 @@ EVT_BEGIN(call_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: attack event of Lord Crump: chooses between calling the horde (call_event), guarding,
+ * charging and his normal attack.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -694,6 +713,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Guess: lord Crump raises his guard: plays the guard pose and marks him as guarding. */
 static EVT_BEGIN(guard_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -712,6 +732,7 @@ static EVT_BEGIN(guard_event)
     RETURN
 EVT_END()
 
+/** Guess: lord Crump lowers his guard again and returns to his normal pose. */
 static EVT_BEGIN(guard_cancel_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -731,6 +752,10 @@ static EVT_BEGIN(guard_cancel_event)
     RETURN
 EVT_END()
 
+/**
+ * Lord Crump's idle event for turns without an action:
+ * aims the battle camera at him and zooms in to 200, then returns the camera to its default mode.
+ */
 EVT_BEGIN(no_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -742,6 +767,7 @@ EVT_BEGIN(no_event)
     RETURN
 EVT_END()
 
+/** Guess: lord Crump charges up for his next attack. */
 static EVT_BEGIN(charge_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -765,6 +791,7 @@ static EVT_BEGIN(charge_event)
     RETURN
 EVT_END()
 
+/** Guess: wait (idle) event of Lord Crump: sets the idle pose for his current stance. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -812,6 +839,7 @@ static PoseTableEntry pose_table_guard[] = {
     {BTL_POSE_STAY_DEFAULT, "G_2"},
 };
 
+/** Guess: lord Crump's normal attack: he runs at one target and hits it for the weapon damage. */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -909,6 +937,10 @@ static EVT_BEGIN(normal_attack_event)
         RETURN
 EVT_END()
 
+/**
+ * Script helper: writes the battle unit id of the horde (the unit of kind 0x64, 0x65 or 0x66) to args[0],
+ * or -1 if none is on the stage.
+ */
 USER_FUNC(check_exist_group) {
     s32 i;
     EvtWord* args = event->args;
@@ -924,6 +956,10 @@ USER_FUNC(check_exist_group) {
     evtSetValue(event, args[0], id);
     return EVT_RETURN_DONE;
 }
+/**
+ * Script helper: writes the battle unit id of the unit of kind 0x77 to args[0],
+ * or -1 if none exists (the name suggests a researcher unit).
+ */
 static USER_FUNC(check_exist_kenkyu) {
     s32 i;
     EvtWord* args = event->args;

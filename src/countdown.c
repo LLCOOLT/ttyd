@@ -29,11 +29,18 @@ static CountdownWork* wp;
 #endif
 static void countDownDisp(CameraId cameraId, void* param);
 
+/** Points the countdown at gp->countdown and clears it. Called during game initialisation. */
 void countDownInit(void) {
     wp = &gp->countdown;
     memset(&gp->countdown, 0, sizeof(gp->countdown));
 }
 
+/**
+ * Resumes a countdown that was running when the game was saved (called by seq_load):
+ * if less than the restart time remains, sets the clock back so exactly the restart time (ms) remains,
+ * then restarts the ticking sound (the bomb timer before chapter 7, the alarm from chapter 7 on).
+ * The US and PAL releases clamp the remaining time at zero first and clear the time-up flag.
+ */
 void countDownSaveReStart(void) {
     CountdownWork* work = wp;
     if ((work->flags & 1) != 0) {
@@ -62,6 +69,11 @@ void countDownSaveReStart(void) {
     }
 }
 
+/**
+ * Starts a countdown of limit milliseconds (restart is the minimum time a resumed save gets back),
+ * slides the display in from the right at (180, -180)
+ * and starts the ticking sound (bomb timer before chapter 7, alarm after).
+ */
 void countDownStart(u32 limit, u32 restart) {
     wp->limit = limit;
     wp->restart = restart;
@@ -82,10 +94,17 @@ void countDownStart(u32 limit, u32 restart) {
     }
 }
 
+/** Changes the minimum time (ms) a countdown gets back when a save is loaded mid-countdown. */
 void countDownSetRestartTime(u32 restart) {
     wp->restart = restart;
 }
 
+/**
+ * Per frame: slides the display in or out over 30 frames,
+ * adds the elapsed render time unless stopped (flag 8) or the game is paused,
+ * sets the time-up flag (2) once the limit is reached and queues the draw.
+ * JP and later releases also stop the ticking sound at time-up.
+ */
 void countDownMain(void) {
     if ((wp->flags & 1) != 0) {
         switch (wp->state) {
@@ -132,6 +151,11 @@ void countDownMain(void) {
 
 // The demo draws the countdown icons with icon flag 0x4, retail with 0x10.
 
+/**
+ * Draws the timer in the 2D camera: a shadow bar, three second digits,
+ * a separator and two smaller hundredths digits, all from the icon set (the US and PAL icon ids are 7 higher).
+ * Hidden while flag 4 is set.
+ */
 static void countDownDisp(CameraId cameraId, void* param) {
     GXColor white = sWhite;
     GXColor white2;
@@ -186,26 +210,31 @@ static void countDownDisp(CameraId cameraId, void* param) {
     }
 }
 
+/** Returns -1 when no countdown is running, 1 when its time is up and 0 while it is still counting. */
 s32 countDownGetStatus(void) {
     CountdownWork* work = wp;
     return !(work->flags & 1) ? -1 : (work->flags >> 1) & 1;
 }
 
+/** Slides a running countdown off screen and stops its sound (state 2 of countDownMain). */
 void countDownEnd(void) {
     if ((wp->flags & 1) != 0) {
         wp->state = 2;
     }
 }
 
+/** Freezes the countdown (flag 8) and stops its sound; the display stays up. */
 void countDownStop(void) {
     wp->flags |= 8;
     psndSFXOff(wp->sfxId);
 }
 
+/** Sets countdown flags (1 running, 2 time up, 4 hidden, 8 frozen). */
 void countDownFlagOn(u16 flag) {
     wp->flags |= flag;
 }
 
+/** Clears countdown flags (1 running, 2 time up, 4 hidden, 8 frozen). */
 void countDownFlagOff(u16 flag) {
     wp->flags &= ~flag;
 }

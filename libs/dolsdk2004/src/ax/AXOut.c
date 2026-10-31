@@ -27,6 +27,13 @@ static void __AXDSPInitCallback(void* task);
 static void __AXDSPResumeCallback(void* task);
 static void __AXDSPDoneCallback(void* task);
 
+/**
+ * Produces one audio frame: synchronises the voice parameter blocks with the DSP (allowing for DSP cycles
+ * already used), applies the studio depop, sends the DSP the command list address by mailbox,
+ * services the callback stack and aux buses, runs the user frame callback,
+ * builds the next command list pointing at the next output buffer and rotates the buffer,
+ * and finally copies a 56-byte profile record into the profile ring if profiling is enabled.
+ */
 void __AXOutNewFrame(u32 lessDspCycles) {
     u32 cl;
     AXPROFILE* profile;
@@ -84,6 +91,12 @@ void __AXOutNewFrame(u32 lessDspCycles) {
     }
 }
 
+/**
+ * Audio DMA callback: runs when the AI finishes playing an output buffer.
+ * If the DSP has already finished the previous frame it builds the next frame immediately,
+ * otherwise it marks the frame as waiting and asks the DSP to resume.
+ * In three-buffer mode it also points the DMA at the next output buffer.
+ */
 void __AXOutAiCallback(void) {
     if (__AXOutDspReady == 0) {
         __AXOsTime = OSGetTime();
@@ -104,14 +117,21 @@ void __AXOutAiCallback(void) {
     }
 }
 
+/** Called when the DSP task starts for the first time; sets the init flag that __AXOutInitDSP waits for. */
 static void __AXDSPInitCallback(void* task) {
     __AXDSPInitFlag = 1;
 }
 
+/** Sets the debug single-stepping mode flag (used only in debug builds). */
 void AXSetStepMode(u32 i) {
     __AXDebugSteppingMode = i;
 }
 
+/**
+ * Called when the DSP finishes its frame: if the AI callback was already waiting it builds the next frame right
+ * away (passing a quarter of the elapsed ticks as the DSP time already used),
+ * otherwise it records that the DSP is ready.
+ */
 static void __AXDSPResumeCallback(void* task) {
 #if DEBUG
     if (__AXDebugSteppingMode != 0) {
@@ -128,6 +148,7 @@ static void __AXDSPResumeCallback(void* task) {
     __AXOutDspReady = 1;
 }
 
+/** Called when the AX DSP task ends; sets the done flag and wakes the thread waiting in __AXOutQuit. */
 static void __AXDSPDoneCallback(void* task) {
     __AXDSPDoneFlag = 1;
     OSWakeupThread(&__AXOutThreadQueue);
@@ -143,6 +164,11 @@ static void __AXDSPDoneCallback(void* task) {
         }                              \
     }
 
+/**
+ * Describes the AX DSP task (the axDspSlave microcode, its data image,
+ * entry and resume vectors and the three callbacks), initialises the DSP if needed,
+ * adds the task and waits until the DSP signals that it has started.
+ */
 void __AXOutInitDSP(void) {
     __AXDSPTask.iram_mmem_addr = axDspSlave;
     __AXDSPTask.iram_length = axDspSlaveLength;
@@ -169,6 +195,11 @@ void __AXOutInitDSP(void) {
     do {} while (__AXDSPInitFlag == 0);
 }
 
+/**
+ * Initialises audio output: records the buffer mode, clears and flushes the output buffers, starts the DSP task,
+ * registers __AXOutAiCallback as the audio DMA callback, builds the first command list,
+ * sets up the first output DMA and starts it.
+ */
 void __AXOutInit(u32 outputBufferMode) {
 #ifdef DEBUG
     OSReport("Initializing AXOut code module\n");
@@ -212,6 +243,10 @@ void __AXOutInit(u32 outputBufferMode) {
     AIStartDMA();
 }
 
+/**
+ * Stops audio output: removes the frame callback, cancels the DSP task,
+ * waits until it has ended and stops the audio DMA.
+ */
 void __AXOutQuit(void) {
     BOOL old;
 #ifdef DEBUG
@@ -225,6 +260,10 @@ void __AXOutQuit(void) {
     OSRestoreInterrupts(old);
 }
 
+/**
+ * Registers the function called every audio frame (about every 5 ms) from the AX frame processing,
+ * and returns the previous one.
+ */
 AXCallback AXRegisterCallback(AXCallback callback) {
     BOOL enabled;
     AXCallback oldCB;

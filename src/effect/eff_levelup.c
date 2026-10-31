@@ -36,11 +36,16 @@ u16 y_trans[] = {500, 500, 479, 458, 437, 416, 395, 375, 354, 333, 312, 291, 270
 #endif
 u8 y_scale[] = {0, 13, 40, 69, 98, 126, 149, 166, 175, 165, 136, 100, 67, 50, 73, 117, 130, 113, 100};
 
+/** Shakes the camera slightly for 50 frames each time the first Level Up letter touches down (it bounces). */
 static EVT_BEGIN(evt_shake)
     CALL(evt_cam_shake, 4, FLOAT(0.001953125f), FLOAT(0.001953125f), 50)
     RETURN
 EVT_END()
 
+/**
+ * Spawns the level-up banner at (x, y, z), laid out from the current language's letter textures;
+ * limit is how many frames it holds. Spawned by the end-of-battle sequence (battle_seq_end.c).
+ */
 EffectEntry* effLevelupEntry(s32 type, f32 x, f32 y, f32 z, s32 limit) {
     EffectEntry* effect;
     EffLevelupWork* work;
@@ -101,6 +106,10 @@ EffectEntry* effLevelupEntry(s32 type, f32 x, f32 y, f32 z, s32 limit) {
     return effect;
 }
 
+/**
+ * Drops the letters in along y_trans (shaking the screen on landing), squashes them, holds,
+ * slides them off sideways and deletes the effect.
+ */
 static void effLevelupMain(EffectEntry* effect) {
     EffLevelupWork* work = effect->userdata;
     Vec position2;
@@ -172,6 +181,7 @@ static void effLevelupMain(EffectEntry* effect) {
     }
 }
 
+/** Draws the banner letters in 2D at their offsets and scales. */
 static void effLevelupDisp(CameraId cameraId, EffectEntry* effect) {
     s32 ofs;
     s32 tofs;

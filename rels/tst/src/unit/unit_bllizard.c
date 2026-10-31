@@ -40,6 +40,7 @@ static EvtWord normal_attack_event[386];
 static EvtWord charge_event[58];
 static EvtWord wait_event[12];
 
+/** Script helper: deletes the icy cloud effect eff_ice_barrier left in work[1]. */
 static USER_FUNC(eff_ice_barrier_end) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -221,6 +222,12 @@ static BattleWeapon weapon_bllizard_bllizard_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Attack script of the Ice Puff: item use first;
+ * if it is charged (part counter attribute 64) it fires the blizzard (bllizard_event);
+ * otherwise 70% of the time it uses its normal attack (normal_attack_event) and
+ * otherwise it charges up (charge_event).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -251,6 +258,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Ice Puff's charged blizzard attack with the weapon in LW(9):
+ * it clears the charged flag, blows kumokumo_n64 clouds at the target (mirrored when facing the other way) and
+ * then runs the pre-damage and damage checks on each target in turn before returning to its rest pose.
+ */
 static EVT_BEGIN(bllizard_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -380,6 +392,10 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init script of a Puff: registers its wait, unison-phase, attack, damage and confusion handlers,
+ * clears unit work 0 and 1, spawns barrier_event to show its charged state and starts the idle event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventUnisonPhase, BTL_UNIT_SELF, PTR(unison_phase_event))
@@ -393,6 +409,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Loops every frame while the Ice Puff exists: shows the ice barrier effect
+ * while it is charged (part counter attribute 64) and ends the effect when it is not.
+ */
 static EVT_BEGIN(barrier_event)
     LABEL(0)
     WAIT_FRAMES(1)
@@ -411,6 +431,7 @@ static EVT_BEGIN(barrier_event)
     RETURN
 EVT_END()
 
+/** Position event for a first strike on this unit: sets its height to 10 and waits for the attack to finish. */
 static EVT_BEGIN(dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -419,6 +440,11 @@ static EVT_BEGIN(dmg_first_attack_pos)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction of the Ice Puff: if the hit has damage code bit 512 and not bit 2048,
+ * its charge is lost (part counter attribute 64 off, ice barrier effect ended);
+ * then the default damage handling runs.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -434,10 +460,18 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Counter event of the Puff: empty, it does nothing. */
 static EVT_BEGIN(counter_event)
     RETURN
 EVT_END()
 
+/**
+ * Start-of-turn event of the Ice Puff (not while it is charged or unable to act):
+ * 50% of the time it toggles between two states,
+ * switching the attribute bits 0x600000 of its body part off with SFX_ENM_KUMO_MOVE5 (unit work 0 = 1)
+ * or back on with SFX_ENM_KUMO_MOVE4 (work 0 = 0).
+ * Guess: this makes the Puff drift out of and back into range of ground attacks.
+ */
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_EQUAL(LW(0), 0)
@@ -476,6 +510,11 @@ static EVT_BEGIN(unison_phase_event)
     RETURN
 EVT_END()
 
+/**
+ * The Puff's plain attack with the weapon in LW(9):
+ * picks a target and plays the A_2A and A_1A attack poses with SFX_ENM_KUMO_MOVE1 to 3 without leaving its spot;
+ * the damage check decides between a miss and a hit, then it returns to S_1.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -583,6 +622,10 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: keeps an icy cloud effect (effKumokumoN64) around the Ice Puff,
+ * creating it on the first call and tracking the unit's position and size each call.
+ */
 static USER_FUNC(eff_ice_barrier) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -601,6 +644,11 @@ static USER_FUNC(eff_ice_barrier) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Charges the Ice Puff: zooms the camera onto it,
+ * sets the charged flag (part counter attribute 64) with SFX_ENM_BLIZ_KUMO_CHARGE1 and the A_2A/A_2B poses,
+ * so its next attack is the blizzard.
+ */
 static EVT_BEGIN(charge_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -619,6 +667,7 @@ static EVT_BEGIN(charge_event)
     RETURN
 EVT_END()
 
+/** Idle event of the Puff: sets the pose from the pose table and resets its scale to 1. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, 1, 1, 1)

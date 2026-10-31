@@ -46,6 +46,10 @@ extern EvtWord waterfall_init[];
 extern EvtWord ride_waterfall[];
 extern EvtWord nonride_waterfall[];
 
+/**
+ * Map TEV callback that fades the waterfall: adds a TEV stage that multiplies the surface alpha by the byte
+ * stored in _ap.
+ */
 static void alpha_tev(MapTevCallbackInfo* info) {
     s32 stage = info->tevStage;
     u8* alpha = _ap;
@@ -59,17 +63,23 @@ static void alpha_tev(MapTevCallbackInfo* info) {
     info->tevStage++;
 }
 
+/** Script helper: allocates the one-byte waterfall alpha and sets it to 255 (opaque). */
 static USER_FUNC(alpha_init_func) {
     _ap = _mapAlloc(1);
     *_ap = 255;
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: sets the waterfall alpha byte to args[0] (0 to 255). */
 static USER_FUNC(alpha_set_func) {
     *_ap = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: sets a camera-road parameter (work->f_19c[10]) to 1.7;
+ * Guess: widens or shifts the camera displacement for this room.
+ */
 static USER_FUNC(cam_displacement) {
     CamRoadWork* work = camRoadGetWorkPtr();
 
@@ -151,6 +161,11 @@ static s32 key_tbl[] = {
     ITEM_GROTTO_KEY, -1,
 };
 
+/**
+ * Check run when Mario tries the Grotto Key door:
+ * if he has a Grotto Key (ITEM_GROTTO_KEY) it opens the item menu (key_tbl) and cancels the door action
+ * if he backs out of it.
+ */
 static EVT_BEGIN(evt_chk)
     CALL(evt_pouch_check_item, ITEM_GROTTO_KEY, LW(0))
     IF_INT_GREATER(LW(0), 0)
@@ -166,12 +181,17 @@ static EVT_BEGIN(evt_chk)
     RETURN
 EVT_END()
 
+/** Unlocks the e_bero exit after the Grotto Key was used. */
 static EVT_BEGIN(evt_unlock)
     SET_VALUE(LW(0), STRING("e_bero"))
     CALL_CHILD(bero_case_switch_on)
     RETURN
 EVT_END()
 
+/**
+ * Sets up the big door at map load: before STORY_STG5_20_THE_BLUE_BLOCK the way west (w_bero_3) is closed
+ * and the door slab (tetu) is down; afterwards the door is already open.
+ */
 EVT_BEGIN(bigdoor_event_init)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG5_20_THE_BLUE_BLOCK)
 #if VERSION >= VERSION_JP
@@ -190,6 +210,11 @@ EVT_BEGIN(bigdoor_event_init)
     RETURN
 EVT_END()
 
+/**
+ * Event of the blue switch: the camera looks at the big door, the screen shakes,
+ * the door slab rises (2 s) and drops back with a thud, Cortez speaks (stg5_dou_10),
+ * the exit w_bero_3 is enabled and STORY_STG5_20_THE_BLUE_BLOCK is set.
+ */
 EVT_BEGIN(bigdoor_event)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION >= VERSION_JP
@@ -249,6 +274,10 @@ static HitDamageReturn hitDmgRetPoints[] = {
     {0},
 };
 
+/**
+ * Item-box script for the chest mobj_box00: gives the Defend Plus P badge in the US and PAL releases
+ * and the Damage Dodge P badge in the Japanese ones (and demos), picked up with the chest-open animation.
+ */
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION >= VERSION_US
@@ -269,6 +298,10 @@ static EVT_BEGIN(mobj_box00)
     RETURN
 EVT_END()
 
+/**
+ * Waterfall fade loop: every frame adds GW(0) to the waterfall alpha (clamped to 0 through 255),
+ * so a negative GW(0) makes it fade out and a positive one fade in.
+ */
 EVT_BEGIN(waterfall_main)
     SET_VALUE(LW(0), 255)
     LOOP(0)
@@ -285,6 +318,10 @@ EVT_BEGIN(waterfall_main)
     RETURN
 EVT_END()
 
+/**
+ * Initialises the waterfall: allocates the alpha byte, installs the fade callback on S_mizu_ata,
+ * sets GW(0) to 0 and starts waterfall_main.
+ */
 EVT_BEGIN(waterfall_init)
     CALL(alpha_init_func)
     CALL(evt_map_set_tevcallback, 1, PTR(alpha_tev))
@@ -295,11 +332,13 @@ EVT_BEGIN(waterfall_init)
     RETURN
 EVT_END()
 
+/** Case event for standing on the waterfall (mizu_atari): sets GW(0) to -4 so the waterfall fades out. */
 EVT_BEGIN(ride_waterfall)
     SET_VALUE(GW(0), -4)
     RETURN
 EVT_END()
 
+/** Case event for leaving the waterfall: fades it out (-4) if Mario is at Z <= -700, otherwise back in (+4). */
 EVT_BEGIN(nonride_waterfall)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     IF_INT_LESS_OR_EQUAL(LW(2), -700)
@@ -310,6 +349,12 @@ EVT_BEGIN(nonride_waterfall)
     RETURN
 EVT_END()
 
+/**
+ * Init script of dou_05, the waterfall room: music and ambience, exits, save block, the Grotto Key lock,
+ * the blue switch for the big door, a badge chest (Defend Plus P in the US and PAL releases,
+ * Damage Dodge P in the JP and demo versions), Shine Sprite block, hidden coin brick,
+ * waterfalls and the ship-change platform.
+ */
 EVT_BEGIN(dou_05_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_DOU1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_DOU5"))

@@ -368,6 +368,12 @@ BattleWeapon weapon_atmic_teresa_breath = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init script of the Atomic Boo boss: registers its wait,
+ * attack and damage handlers (confusion uses the default handler),
+ * assigns the unit ids of its small Boos (atmic_teresa_id_set),
+ * builds the flock of small Boos (teresa_entry) and starts the idle event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -379,6 +385,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction: runs the default damage handling (btldefaultevt_Damage) with LW(10) = -2 (the unit itself)
+ * and LW(11) = 1.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -386,6 +396,13 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Chooses the Atomic Boo's attack: item use first;
+ * while its face is visible (unit work 0 = 0) it covers its face 30 times in 70,
+ * uses the Press 20 in 70 and the Startle (bikkuri_event) 20 in 70;
+ * while its face is covered (unit work 0 = 1) it picks the Surprise (surprise_event)
+ * or the Breath (breath_event) with equal chance.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -430,6 +447,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: atomic Boo covers its face ('kaokakusi'):
+ * it shies away with a dive, turns 180 degrees, spins back around and settles on the hands-over-face pose table,
+ * with unit work 0 set to 1. Runs when the Boo is hit or flustered.
+ */
 EVT_BEGIN(kaokakusi_event)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_MOVE2"), EVT_NULLPTR, 0, LW(15))
@@ -456,6 +478,11 @@ EVT_BEGIN(kaokakusi_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: atomic Boo's Press attack: it picks all targets, flies up behind the party (x -125),
+ * slams down on them and shakes the camera, resolving each target with the weapon_atmic_teresa_press damage
+ * check and its action-command block, then glides back home to its waiting pose.
+ */
 EVT_BEGIN(press_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_atmic_teresa_press))
@@ -538,6 +565,11 @@ EVT_BEGIN(press_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: atomic Boo's Surprise attack: it turns its back (pose type 40),
+ * whirls around with a loud cry and a camera shake, and hits every target with weapon_atmic_teresa_surprise;
+ * avoided or blocked hits play the matching reactions.
+ */
 EVT_BEGIN(surprise_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_atmic_teresa_surprise))
@@ -626,6 +658,12 @@ EVT_BEGIN(surprise_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: atomic Boo's Startle attack ('bikkuri' = surprise):
+ * eight small Boos appear around the target and the camera pulls back;
+ * the targets take weapon_atmic_teresa_bikkuri damage,
+ * then the small Boos merge back into the big one with a puff of smoke.
+ */
 EVT_BEGIN(bikkuri_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_atmic_teresa_bikkuri))
@@ -720,6 +758,13 @@ EVT_BEGIN(bikkuri_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the Atomic Boo's breath attack, used while it has its face covered:
+ * it turns around and uncovers its face (SFX_BOSS_ATMTLSA_FACE_HIDE1, pose A_3),
+ * blows (SFX_BOSS_ATMTLSA_BLOW2) a wind at the targets one after another,
+ * checking the weapon_atmic_teresa_breath damage on each,
+ * and then whistles back into its idle pose (SFX_BOSS_ATMTLSA_WHISTLE1, UNION1) in a puff of smoke.
+ */
 static EVT_BEGIN(breath_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_atmic_teresa_breath))
@@ -785,6 +830,11 @@ static EVT_BEGIN(breath_event)
     RETURN
 EVT_END()
 
+/**
+ * One target of Atomic Boo's breath attack: runs the pre-damage check,
+ * then deals three ticks of weapon_atmic_teresa_breath damage 15, 30 and 30 frames apart,
+ * each with its own action-command check, or plays the avoid reaction.
+ */
 EVT_BEGIN(breath_event_sub)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_breath), 0, LW(5))
     SWITCH(LW(5))
@@ -824,6 +874,7 @@ EVT_BEGIN(breath_event_sub)
     RETURN
 EVT_END()
 
+/** Idle event: sets the unit's body part 1 to the pose given by its pose table for its current state. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -863,6 +914,11 @@ ExtTexInfo teresa_ext_entry_data[] = {
     {0},
 };
 
+/**
+ * Creates the flock of small Atomic Boos used by the boss's attacks:
+ * adds the hidden NPC model ext_teresa (c_teresa) parked at y = -1000
+ * and registers a 30-pose extdrv object driven by teresa_ext_init and teresa_ext_main.
+ */
 EVT_BEGIN(teresa_entry)
     CALL(evt_npc_entry, STRING("ext_teresa"), STRING("c_teresa"))
     CALL(evt_npc_set_position, STRING("ext_teresa"), 0, -1000, 0)
@@ -870,6 +926,10 @@ EVT_BEGIN(teresa_entry)
     RETURN
 EVT_END()
 
+/**
+ * Initialises the 30 small Atomic Boos: allocates their AtmTeresa state records
+ * and parks every pose off screen at (0, -1000, 0), facing 90 degrees, in state 0.
+ */
 void teresa_ext_init(void) {
     s32 i;
     ExtdrvPose* pose = extGetPosePtr();
@@ -892,6 +952,12 @@ void teresa_ext_init(void) {
     }
 }
 
+/**
+ * Guess: per-frame update of the 30 small Atomic Boos:
+ * a state machine per Boo (states 1-31 for the Startle gather,
+ * 51-71 for the breath swarm) that flies them in around the Atomic Boo and target unit,
+ * then queues teresa_ext_disp.
+ */
 void teresa_ext_main(void) {
     s32 i;
     s32 j;
@@ -1235,6 +1301,10 @@ void teresa_ext_main(void) {
     dispEntry(4, 0.0f, 1, teresa_ext_disp, NULL);
 }
 
+/**
+ * Draw callback for the small Atomic Boos: sets up the extdrv render mode, vertices, texture and TEV,
+ * then draws all poses.
+ */
 void teresa_ext_disp(CameraId camera, void* param) {
     extLoadRenderMode();
     extLoadVertex();
@@ -1244,6 +1314,10 @@ void teresa_ext_disp(CameraId camera, void* param) {
     extLoadTextureExit();
 }
 
+/**
+ * Script helper: stores the unit id in args[0] (BattleTransID) as the Atomic Boo whose position the small Boos
+ * follow.
+ */
 USER_FUNC(atmic_teresa_id_set) {
     s32 id = evtGetValue(event, event->args[0]);
 
@@ -1251,6 +1325,10 @@ USER_FUNC(atmic_teresa_id_set) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: stores the target unit id (args[0], BattleTransID)
+ * and target part id (args[1]) the small Boos fly toward.
+ */
 USER_FUNC(target_id_set) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -1261,6 +1339,7 @@ USER_FUNC(target_id_set) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: starts the first eight small Boos on their appearance (state 1) for the Startle attack. */
 USER_FUNC(teresa_appear_bikkuri) {
     s32 i;
 
@@ -1270,6 +1349,7 @@ USER_FUNC(teresa_appear_bikkuri) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: blocks until all eight Startle Boos have reached state 15 (in position). */
 USER_FUNC(teresa_wait_bikkuri) {
     s32 i;
 
@@ -1281,6 +1361,10 @@ USER_FUNC(teresa_wait_bikkuri) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: blocks until all eight Startle Boos have reached state 30,
+ * then sends them back toward the big Boo (state 31) and resets ATMIC_TERESA_SCALE to 1.0.
+ */
 USER_FUNC(teresa_wait_bikkuri2) {
     s32 i;
 
@@ -1296,6 +1380,10 @@ USER_FUNC(teresa_wait_bikkuri2) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] picks the breath swarm variant (1 starts every small Boo in state 51,
+ * anything else in state 52).
+ */
 USER_FUNC(teresa_appear_breath) {
     s32 type = evtGetValue(event, event->args[0]);
     s32 i;
@@ -1307,6 +1395,10 @@ USER_FUNC(teresa_appear_breath) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: blocks until all 30 small Boos have reached state 60,
+ * then moves them on to state 63 with a 30-frame wait.
+ */
 USER_FUNC(teresa_wait_breath) {
     s32 i;
 
@@ -1323,6 +1415,10 @@ USER_FUNC(teresa_wait_breath) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: blocks until all 30 small Boos have reached state 70,
+ * then moves them to state 71 and resets ATMIC_TERESA_SCALE to 1.0.
+ */
 USER_FUNC(teresa_wait_breath2) {
     s32 i;
 

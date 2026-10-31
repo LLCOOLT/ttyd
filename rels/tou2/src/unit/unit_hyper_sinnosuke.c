@@ -225,6 +225,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init event of the Hyper Bald Cleft (hyper_sinnosuke):
+ * registers its wait, attack, damage and confusion events and its walk, run and jump sounds,
+ * then starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -237,6 +242,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage event of the Hyper Bald Cleft: plays the "SIS_D_1" hurt pose when the hit did damage;
+ * if it is flipped over (over-turn counter above 0) it also plays the flipped hurt pose "SIS_D_2" with two small
+ * hops; then the default damage reaction.
+ */
 static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_GetDamage, BTL_UNIT_SELF, LW(15))
     IF_INT_GREATER_OR_EQUAL(LW(15), 1)
@@ -255,6 +265,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * The first half of damage_event on its own (hurt pose when damaged,
+ * and the flipped hurt pose with two hops when it is flipped over), without the default damage reaction.
+ * Nothing in this file points at it.
+ */
 static EVT_BEGIN(damage_event_sub)
     CALL(btlevtcmd_GetDamage, BTL_UNIT_SELF, LW(15))
     IF_INT_GREATER_OR_EQUAL(LW(15), 1)
@@ -271,6 +286,12 @@ static EVT_BEGIN(damage_event_sub)
     RETURN
 EVT_END()
 
+/**
+ * Data event 13 (the Hyper Bald Cleft is flipped over):
+ * switches to the flipped defence and pose tables, sets STATUS_FLAG_FLIPPED with the over-turn counter at 2,
+ * plays the shell sound and "SIS_D_2", hops, and moves its position
+ * and home to a height of 5 with a lowered hit offset.
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -292,6 +313,11 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs in place of a flipped Hyper Bald Cleft's attack: counts the over-turn counter down;
+ * at zero it restores the upright defence and pose tables, clears STATUS_FLAG_FLIPPED, plays "SIS_S_1",
+ * sets it back on the floor and hops up with the get-up sound.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -318,6 +344,13 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the Hyper Bald Cleft: a flipped unit runs wakeup_event.
+ * Otherwise it uses an enemy item if one fits, or picks a target (the first-strike target in a first strike),
+ * walks around behind the target with stamping steps,
+ * rears up and dashes along the floor into the target (weapon_sinnosuke_attack).
+ * A miss runs on past it; a hit shakes the camera and the Cleft bounces off in two hops. Then it returns home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -478,6 +511,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait event: sets the idle animation from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

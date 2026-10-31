@@ -290,6 +290,11 @@ static BattleWeapon weapon_togezo_charge = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init script of the Sky-Blue Spiny: installs the wait, attack,
+ * damage and confusion handlers (confusion reuses the attack), clears unit work 0 (guarding) and 3,
+ * sets its run, walk and jump sounds and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -304,6 +309,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Spike spark shown when an attacker is hurt by (or avoids) the spiked head:
+ * waits 30 frames, then spawns the toge_flush effect above the unit (45 up when Huge, 25 when Tiny, else 35).
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -324,6 +333,10 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: runs the shared default damage script (btldefaultevt_Damage) with its default parameters
+ * (LW(10) = -2, LW(11) = 1).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -331,6 +344,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Flips the Sky-Blue Spiny onto its back: swaps in the flipped defence, resistance, pose and data tables,
+ * marks status flag 1 (flipped) with a flipped-over count of 1, turns off its spike counters on part 1,
+ * plays the flip sound and drops it in two bounces.
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -352,6 +370,11 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Turn-over recovery of the Sky-Blue Spiny: counts down the flipped-over count;
+ * at 0 it restores the normal defence, resistance, pose and data tables, clears status flag 1,
+ * turns the spike counters on part 1 back on and hops to the ground.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -378,6 +401,13 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Attack script of the Sky-Blue Spiny: if it is flipped it gets up (wakeup_event);
+ * after the item-use check, if it is guarding (unit work 0 = 1) it drops the guard (guard_cancel_event) and,
+ * when unit work 3 is set, uses its normal attack.
+ * Otherwise it draws lots (btlevtcmd_DrawLots, different weights on turn 1) among the normal attack,
+ * going into a guard (guard_event) and charging up (charge_event).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -423,6 +453,12 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: The Sky-Blue Spiny's normal attack (weapon_togezo_attack):
+ * it curls into a ball (TGZ_P_1), rolls toward the target with the roll sounds at speed 9 and slows down,
+ * and a hit shakes the camera and applies the damage with the guard-timing check.
+ * It then hops back and half the time ends by curling into a guard stance (guarding tables, unit work 0 = 1).
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -646,6 +682,11 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: The Sky-Blue Spiny curls up into its guard stance:
+ * plays the curl sound and spin, then swaps in the guarding defence, resistance,
+ * pose and data tables and sets unit work 0 to 1.
+ */
 static EVT_BEGIN(guard_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -673,6 +714,11 @@ static EVT_BEGIN(guard_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: The Sky-Blue Spiny uncurls from its guard stance:
+ * plays the uncurl sound and spin, restores the normal defence, resistance, pose and data tables,
+ * and clears unit work 0.
+ */
 static EVT_BEGIN(guard_cancel_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -699,6 +745,10 @@ static EVT_BEGIN(guard_cancel_event)
     RETURN
 EVT_END()
 
+/**
+ * The Sky-Blue Spiny charges up: plays the charge sound and a crystal effect, waits a second while it hops up,
+ * then applies the charge weapon (LW(9)) to itself with the guard-timing result.
+ */
 static EVT_BEGIN(charge_event)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(evt_btl_camera_set_mode, 0, 7)
@@ -724,6 +774,7 @@ static EVT_BEGIN(charge_event)
     RETURN
 EVT_END()
 
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

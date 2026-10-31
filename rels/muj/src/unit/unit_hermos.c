@@ -48,6 +48,11 @@ static EvtWord fire_attack_event[365];
 static EvtWord all_fire_attack_event[321];
 static EvtWord wait_event[6];
 
+/**
+ * Script helper: copies the current HP (capped to the max HP),
+ * size change turns and strength of unit args[0] to unit args[1] and resets the second unit's HP gauge;
+ * used to carry damage over when one Ember form replaces another.
+ */
 static USER_FUNC(bubble_copy_status) {
     EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));
@@ -320,6 +325,7 @@ static BattleUnitSetup entry_bubble = {
     NULL, // itemDropTable
 };
 
+/** Guess: init event of the Ember: sets its work values and pose tables. */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -332,6 +338,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Guess: damage event of the Ember: runs the default damage flow. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -339,6 +346,7 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Event run when the Ember is hit by fire: plays its fire sound and the A_2B pose. */
 static EVT_BEGIN(avoid_fire_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_FIRE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
@@ -346,6 +354,7 @@ static EVT_BEGIN(avoid_fire_event)
     RETURN
 EVT_END()
 
+/** Guess: explosion damage event of the Ember: plays the A_2B pose and flings it back, checking the space behind it. */
 static EVT_BEGIN(damage_fire_explosion_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -384,6 +393,10 @@ static EVT_BEGIN(damage_fire_explosion_event)
     RETURN
 EVT_END()
 
+/**
+ * Splitting event of the Ember: when it is hit it splits,
+ * spawning a bubble unit (entry_bubble) at its position with the same HP and size status.
+ */
 static EVT_BEGIN(friend_event)
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("S_1"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(12), LW(13), LW(14))
@@ -412,6 +425,7 @@ static EVT_BEGIN(friend_event)
     RETURN
 EVT_END()
 
+/** Guess: attack event of the Ember: chooses between its normal attack and its fire attacks. */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -444,6 +458,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Guess: normal attack of the Ember: it flies at one target and hits it for the weapon damage. */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -561,6 +576,10 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper, per frame: keeps a fire effect on the Ember (part 2)
+ * and grows it to the unit's size over about ten frames; the effect lives 90 frames (106 on US and later).
+ */
 static USER_FUNC(eff_fire) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -595,6 +614,7 @@ static USER_FUNC(eff_fire) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Guess: fire attack of the Ember: it spits fire at one target (eff_fire) for the weapon damage. */
 static EVT_BEGIN(fire_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -695,6 +715,10 @@ static EVT_BEGIN(fire_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper, per frame: keeps fire effect number args[1] (0 to 9) lined up in a row in front of the Ember,
+ * each larger than the last by the scales table, for the fire-wall attack.
+ */
 static USER_FUNC(eff_all_fire) {
     EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
@@ -719,6 +743,7 @@ static USER_FUNC(eff_all_fire) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Guess: sub-event of the fire wall attack: lights one fire (eff_all_fire) in the row. */
 static EVT_BEGIN(all_fire_attackEvent_sub)
     BEGIN_SIBLING_EVENT
         CALL(eff_all_fire, BTL_UNIT_SELF, LW(0))
@@ -727,6 +752,10 @@ static EVT_BEGIN(all_fire_attackEvent_sub)
     RETURN
 EVT_END()
 
+/**
+ * Guess: fire wall attack of the Ember: lights a row of ten growing fires in front of itself that burn everyone
+ * on the other side.
+ */
 static EVT_BEGIN(all_fire_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -833,6 +862,7 @@ static EVT_BEGIN(all_fire_attack_event)
     RETURN
 EVT_END()
 
+/** Guess: wait (idle) event of the Ember: sets the idle pose. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

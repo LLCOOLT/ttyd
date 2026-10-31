@@ -33,6 +33,10 @@ static USER_FUNC(npc_set_pos);
 
 const char* kemuri_name[5];
 
+/**
+ * Script helper: moves the 3D camera's start time back 2 s and the event's saved time back 3.5 s,
+ * so the blimp fly-in scripted to a fixed duration lines up with the camera move.
+ */
 static USER_FUNC(time_shift) {
     CameraEntry* cam = camGetPtr(CAMERA_3D);
 
@@ -41,6 +45,10 @@ static USER_FUNC(time_shift) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Decoration loop for the Glitz Pit exterior: every 0.3 to 0.8 seconds a random "balloon_heiho_n64" balloon
+ * effect floats out from a point near the tou_enkei arena object.
+ */
 static EVT_BEGIN(evt_tou_balloon)
     CALL(evt_mapobj_get_position, STRING("tou_enkei"), LW(13), LW(14), LW(15))
     SUBTRACT(LW(14), 20)
@@ -67,6 +75,10 @@ static EVT_BEGIN(evt_tou_balloon)
     RETURN
 EVT_END()
 
+/**
+ * Searchlight sway loop: rocks the map object whose name is in LW(0) between -20
+ * and +20 degrees about the Z axis over 60 frames each way, with a random pause between swings.
+ */
 static EVT_BEGIN(evt_light)
     SET_VALUE(LW(9), LW(0))
     LOOP(0)
@@ -92,6 +104,12 @@ static EVT_BEGIN(evt_light)
     RETURN
 EVT_END()
 
+/**
+ * Wing flap loop for the arena's decoration: the map objects hane_1 and hane_2 swing back
+ * and forth about Z by 10 degrees.
+ * 20% of the time they flutter three quick strokes (10 frames each way),
+ * otherwise they take one slow stroke (30 frames each way).
+ */
 static EVT_BEGIN(evt_wing)
     LOOP(0)
         CALL(evt_sub_random, 100, LW(0))
@@ -132,6 +150,11 @@ static EVT_BEGIN(evt_wing)
     RETURN
 EVT_END()
 
+/**
+ * Arrival cutscene when Mario comes from Rogueport by blimp:
+ * Glitz Pit music starts, controls are locked, the camera holds on the blimp over the arena and
+ * then pulls to tou_01 (Glitzville's entrance square).
+ */
 EVT_BEGIN(evt_to_tou)
     CALL(evt_cam3d_evt_set, -2000, 241, 534, -2000, 145, -8, 0, 11)
     WAIT_FRAMES(1)
@@ -211,6 +234,7 @@ EVT_BEGIN(evt_to_tou)
     RETURN
 EVT_END()
 
+/** Loop that glues Mario and his partner to the blimp gondola (gondora_1/gondora_2 map objects) while it moves. */
 EVT_BEGIN(evt_pos_keep)
     LOOP(0)
         CALL(evt_mapobj_get_position, STRING("gondora_1"), LW(0), LW(1), LW(2))
@@ -225,6 +249,10 @@ EVT_BEGIN(evt_pos_keep)
     RETURN
 EVT_END()
 
+/**
+ * Departure cutscene for the blimp ride back to Rogueport:
+ * sets GSWF_TOU00_BLIMP_RETURNED and changes map to gor_04 ("hikousen_return" entrance).
+ */
 EVT_BEGIN(evt_to_gor)
     CALL(evt_cam3d_evt_set, 0, 241, 534, 0, 145, -8, 0, 0)
     CALL(evt_mario_key_onoff, 0)
@@ -288,6 +316,7 @@ EVT_BEGIN(evt_to_gor)
     RETURN
 EVT_END()
 
+/** Script helper: args[0] = NPC name, args[1..3] = x, y, z; places the NPC and its previous position there. */
 static USER_FUNC(npc_set_pos) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -309,6 +338,7 @@ const char* kemuri_name[] = {
     "kosyo05",
 };
 
+/** Script helper: args[0] = height; sets the y offset of Bowser's flying fortress NPC (the 飛クッパ NPC) to make it bob. */
 static USER_FUNC(kpa_hikousen_yure) {
     f32 y = evtGetFloat(event, event->args[0]);
 
@@ -317,6 +347,11 @@ static USER_FUNC(kpa_hikousen_yure) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Chapter 4 interlude (after the Peach/X-Naut report):
+ * Bowser's flying fortress passes over Glitzville with the sky scrolling.
+ * Bowser talks (kpa_stg4_008, kpa_stg4_009) and the script then changes map to muj_20.
+ */
 EVT_BEGIN(tou_00_koopa_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -543,11 +578,17 @@ EVT_BEGIN(tou_00_koopa_evt)
     RETURN
 EVT_END()
 
+/**
+ * Guess: init event of the flying Koopa NPC ("飛クッパ") on the blimp:
+ * sets bit 2 of its jumpFlags field (evt_npc_status_onoff),
+ * which other scripts clear while an NPC is walking around.
+ */
 static EVT_BEGIN(hkoopa_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/** Script helper: args[0] = smoke effect name, args[1] = distance; shifts that smoke puff effect along x each call. */
 static USER_FUNC(kemuri_move) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -578,6 +619,10 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Lets the player skip the blimp scene: after 1.1 s,
+ * A or B ends the scene and changes map (tou_01 normally, or back to gor_04 on the return trip).
+ */
 EVT_BEGIN(evt_skip)
     CALL(evt_seq_wait, 2)
     WAIT_MS(1100)
@@ -599,6 +644,12 @@ EVT_BEGIN(evt_skip)
     RETURN
 EVT_END()
 
+/**
+ * Map init for tou_00, the blimp landing outside the arena:
+ * sets up the NPCs and, normally, the blimp lights, wing and ambient sound.
+ * Plays evt_to_gor when entered as "modoru", else evt_to_tou.
+ * In Chapter 4 (after the Peach X-Naut PhD report) it runs Bowser's fortress scene instead.
+ */
 EVT_BEGIN(tou_00_init_evt)
     SET_VALUE(GW(11), 0)
     CALL(evt_npc_setup, PTR(npcEnt))

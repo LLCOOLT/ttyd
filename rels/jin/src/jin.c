@@ -13,6 +13,10 @@
 
 static void* pose_buf;
 
+/**
+ * Script helper: sets entry args[0] of Vivian's pose table (partyPoseTbl[6]) to the animation name args[1],
+ * so Vivian uses different poses inside the steeple; the original table is restored when the REL unloads.
+ */
 USER_FUNC(evt_jin_vivian_pose_set) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -20,6 +24,11 @@ USER_FUNC(evt_jin_vivian_pose_set) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Module entry point of jin.rel: runs the static constructors,
+ * registers the init scripts of jin_00..jin_11 and the area's battle tables,
+ * and keeps a copy of Vivian's pose table so scripts can change it.
+ */
 void _prolog(void) {
     voidfunctionptr* ctor;
 
@@ -43,6 +52,7 @@ void _prolog(void) {
     memcpy(pose_buf, partyPoseTbl[6], sizeof(partyPoseTbl[6]));
 }
 
+/** Module exit point of jin.rel: runs the static destructors and restores Vivian's original pose table. */
 void _epilog(void) {
     voidfunctionptr* dtor;
 
@@ -53,5 +63,6 @@ void _epilog(void) {
     _mapFree(pose_buf);
 }
 
+/** Linker stub for unresolved symbols; does nothing. */
 void _unresolved(void) {
 }

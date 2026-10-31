@@ -151,6 +151,10 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_gesso_right_arm", "c_gesso2", 0.0f, 0.0f, 0.0f, 85.0f, -110.0f, 0.0f, 85.0f, -110.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, VERSION_PICK(0x680009, 0x2680009), 0, pose_table},
 };
 
+/**
+ * Init script of the Blooper's right tentacle.
+ * Registers its damage, phase and attack scripts and starts it waiting.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -161,6 +165,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction of the right tentacle: runs the default damage,
+ * then tells the body (unit work 0) to go back to its wait script if it is idle.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -176,6 +184,7 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 #if VERSION >= VERSION_JP
+/** Damage reaction of the Blooper's right tentacle (JP and later); the same as the left tentacle's damage event. */
 EVT_BEGIN(gesso_right_arm_damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -214,6 +223,7 @@ EVT_BEGIN(gesso_right_arm_damage_event)
 EVT_END()
 #endif
 
+/** Phase script of the right tentacle; does nothing. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
@@ -290,6 +300,10 @@ BattleWeapon weapon_gesso_right_arm_rear_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Attack script of the right tentacle; the tentacle never attacks, so it only returns.
+ * Guess: the weapon is kept for the unit definition.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -384,11 +398,18 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait script of the right tentacle: shows its idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Death script shared by the two tentacles.
+ * Plays the arm's retreat sound and pose (GSO_F1_1),
+ * clears the body's slot that pointed to this arm (the left arm waits 50 frames, the right 80) and
+ * then runs the fall check; finally kills the arm unit.
+ */
 EVT_BEGIN(gesso_arm_dead_event)
     CALL(btlevtcmd_GetUnitKind, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 10)
@@ -434,6 +455,13 @@ EVT_BEGIN(gesso_arm_dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Called when a tentacle has died.
+ * If both tentacles are gone and the Blooper is not already falling, it makes the Blooper fall:
+ * it plays the fall poses with the fall and down sounds, shakes the camera,
+ * then switches the Blooper to the "turned" state with its own defence table,
+ * status resistances and hit offsets so it can be attacked from the front.
+ */
 EVT_BEGIN(gesso_fall_check)
     CALL(btlevtcmd_GetUnitWork, LW(3), 1, LW(0))
     CALL(btlevtcmd_GetUnitId, LW(0), LW(0))
@@ -491,6 +519,7 @@ EVT_BEGIN(gesso_fall_check)
     RETURN
 EVT_END()
 
+/** When a tentacle is hit, makes the Blooper body (unit work 0) stop waiting and take the same damage pose (LW(14)). */
 EVT_BEGIN(gesso_arm_damage_pose_event)
     CALL(btlevtcmd_GetUnitKind, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 10)
@@ -507,6 +536,11 @@ EVT_BEGIN(gesso_arm_damage_pose_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper.
+ * Sets args[1] to 0 if the unit args[0] stands at X >= -120 and to 1 if it is farther to the left.
+ * Guess: zenei and kouei mean front guard and rear guard, so it says which side of the stage the unit is on.
+ */
 static USER_FUNC(_check_zenei_kouei) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;

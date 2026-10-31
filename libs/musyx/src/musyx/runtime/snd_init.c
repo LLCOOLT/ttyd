@@ -167,6 +167,8 @@ SND_PLAYBACKINFO* sndGetPlayBackInfo() {
 }
 
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 3)
+/** Public: sets the default low and high cutoff frequencies (Hz) of the per-voice low-pass filter sweep; new channels
+ * start with them (forwards to inpSetLPFDefaultRange). */
 void sndSetLowPassFilterDefaultRange(unsigned long lowFrq, unsigned long highFrq) {
   inpSetLPFDefaultRange(lowFrq, highFrq);
 }

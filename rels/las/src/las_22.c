@@ -27,6 +27,11 @@ static const char* haguruma_kage[11];
 static const char* haguruma_kage2[6];
 static s32 key_tbl[2];
 
+/**
+ * Door animation script (closing) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_l_01 and S_doa_l_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l_01"), 0, LW(0), 0)
@@ -35,6 +40,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_l_01 and S_doa_l_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l_01"), 0, LW(0), 0)
@@ -43,6 +53,11 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (closing) for the east door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_r_01 and S_doa_r_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r_01"), 0, LW(0), 0)
@@ -51,6 +66,11 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the east door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_r_01 and S_doa_r_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(e_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r_01"), 0, LW(0), 0)
@@ -59,6 +79,7 @@ static EVT_BEGIN(e_door_open)
     RETURN
 EVT_END()
 
+/** Door animation script that does nothing; the west door of this room is animated by the lock event instead. */
 EVT_BEGIN(door_dummy)
     RETURN
 EVT_END()
@@ -168,6 +189,12 @@ static const char* haguruma_kage2[] = {
     "S_hgm_17b",
 };
 
+/**
+ * Event script: runs for the whole time the room is loaded and spins the gears of the turntable room.
+ * Four groups of gear map objects (haguruma_hontai/kage and the second pair,
+ * plus their shadow copies) turn at 20 degrees to start, one pair clockwise and one anticlockwise,
+ * and three more gear pairs (S_hgm_21..23) rock on a sine wave at different speeds.
+ */
 static EVT_BEGIN(haguruma_evt)
     SET_FLOAT_VALUE(LW(0), FLOAT(20.0f))
     SET_FLOAT_VALUE(LW(1), FLOAT(0.0f))
@@ -232,6 +259,12 @@ static EVT_BEGIN(haguruma_evt)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the turntable (kaitendai) of the gear room.
+ * Spins the big centre platform and four smaller platforms in opposite directions at half a degree per frame,
+ * and carries Mario and the partner with whichever platform they stand on by adding the platform's movement each
+ * frame.
+ */
 EVT_BEGIN(kaitendai_evt)
     SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
     SET_FLOAT_VALUE(LW(1), FLOAT(0.009765625f))
@@ -324,6 +357,10 @@ EVT_BEGIN(kaitendai_evt)
     RETURN
 EVT_END()
 
+/**
+ * Event script: starts the moving platform S_move_dai (hit object A_move_dai) of the room via move_dai,
+ * with a movement time of 2200.
+ */
 static EVT_BEGIN(dai_evt)
     SET_VALUE(LW(0), STRING("S_move_dai"))
     SET_VALUE(LW(1), STRING("A_move_dai"))
@@ -336,11 +373,17 @@ static s32 key_tbl[] = {
     ITEM_PALACE_KEY_0x2F, -1,
 };
 
+/** Event script: run when the key is used in the lock of the door; sets the story progress to STORY_STG8_09_KEY. */
 static EVT_BEGIN(key_evt)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_09_KEY)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the lock check of the door.
+ * If Mario carries Palace Key 0x2F it opens the item selection window (key_tbl) and cancels the use
+ * if the player backs out.
+ */
 static EVT_BEGIN(key_check_evt)
     CALL(evt_pouch_check_item, ITEM_PALACE_KEY_0x2F, LW(0))
     IF_INT_GREATER(LW(0), 0)
@@ -356,6 +399,10 @@ static EVT_BEGIN(key_check_evt)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the door is unlocked.
+ * Sets the story progress to STORY_STG8_10_LOCK and switches the w_bero door on.
+ */
 static EVT_BEGIN(unlock_evt)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_10_LOCK)
     SET_VALUE(LW(0), STRING("w_bero"))
@@ -363,6 +410,7 @@ static EVT_BEGIN(unlock_evt)
     RETURN
 EVT_END()
 
+/** Event script: the treasure chest of las_22 opens and Mario receives a Shooting Star. */
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
@@ -374,6 +422,13 @@ static EVT_BEGIN(mobj_box00)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for las_22, the gear room: music and ambience,
+ * removes the Elite Wizzerd (Super Mahorn) before the planets scene,
+ * starts the turntable once the star puzzle is solved, the gear animation,
+ * a moving platform with its red switch, an item chest with a Shooting Star, a Life Shroom block, a save block,
+ * the Palace Key 0x2F lying on the floor and the locked west door.
+ */
 EVT_BEGIN(las_22_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST3"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS6"))

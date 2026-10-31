@@ -35,6 +35,11 @@ extern EvtWord bar_shikake_up[];
 extern EvtWord switch_up_down[];
 static HitDamageReturn hitDmgRetPoints[5];
 
+/**
+ * Reads the bar-switch state ssf for the script:
+ * returns it as a float in args[0] (0 idle, 1 Mario is riding the bar switch, 2 he left it).
+ * The odd extra statements only keep the compiled order of the original.
+ */
 static USER_FUNC(ss_check) {
     s32 dest;
     s32 notSet;
@@ -49,11 +54,13 @@ static USER_FUNC(ss_check) {
     return EVT_RETURN_DONE;
 }
 
+/** Stores the bar-switch state ssf from args[0] (0 idle, 1 ridden, 2 released). */
 static USER_FUNC(ss_set) {
     ssf = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
+/** Returns in args[1] the index stored in the Puni data of the slot args[0]. */
 static USER_FUNC(puni_get_id) {
     s32 offset;
     EvtWord* args = event->args;
@@ -167,6 +174,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Starts a camera shake that builds up over half a second (strength 0 to 0.007),
+ * used as the water starts to drain; it then leaves a small steady shake on.
+ */
 static EVT_BEGIN(cam_shake)
     CALL(evt_sub_intpl_msec_init, 11, 0, 7, 500)
     LABEL(0)
@@ -180,6 +191,7 @@ static EVT_BEGIN(cam_shake)
     RETURN
 EVT_END()
 
+/** Fades the camera shake out over half a second (strength 0.007 to 0). */
 static EVT_BEGIN(cam_shake2)
     CALL(evt_sub_intpl_msec_init, 11, 7, 0, 500)
     LABEL(0)
@@ -192,6 +204,12 @@ static EVT_BEGIN(cam_shake2)
     RETURN
 EVT_END()
 
+/**
+ * Blue switch pressed: drains the water in the room.
+ * Punies already on the lower level are re-placed at fixed spots there,
+ * the water level drops with a quake and a flowing-water sound while the camera follows it down,
+ * the stairs and ledges of the drained room become solid, and a jingle plays.
+ */
 EVT_BEGIN(water_shikake)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION >= VERSION_JP
@@ -287,18 +305,25 @@ EVT_BEGIN(water_shikake)
     RETURN
 EVT_END()
 
+/** Hit script of the light-blue bar switch when Mario rides it: sets the bar-switch state to 1 so the bar sinks. */
 EVT_BEGIN(bar_shikake)
     DEBUG_PUT_MSG(STRING("のったとき"))
     CALL(ss_set, 1)
     RETURN
 EVT_END()
 
+/** Hit script of the bar switch when Mario gets off it: sets the bar-switch state to 2 so the bar rises again. */
 EVT_BEGIN(bar_shikake_up)
     DEBUG_PUT_MSG(STRING("のらなかったとき"))
     CALL(ss_set, 2)
     RETURN
 EVT_END()
 
+/**
+ * Per-frame control of the bar (S_sikake): sinks it up to 10 units while Mario rides the bar switch (state 1)
+ * and lets it rise back (state 2), moving the blue switch box (mobj00) with it
+ * until the water switch is pressed.
+ */
 EVT_BEGIN(switch_up_down)
     SET_FLOAT_VALUE(LW(2), FLOAT(0.0f))
     IF_INT_EQUAL(GSWF(GSWF_MRI16_WATER_SWITCH_PRESSED), 0)
@@ -350,6 +375,11 @@ static HitDamageReturn hitDmgRetPoints[] = {
     {0},
 };
 
+/**
+ * Script when the treasure chest is opened: the Shrink Stomp badge appears above the chest
+ * and Mario collects it with the normal item fanfare.
+ * From US on the badge can return to the chest if Mario leaves it.
+ */
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
@@ -365,6 +395,11 @@ static EVT_BEGIN(mobj_box00)
     RETURN
 EVT_END()
 
+/**
+ * Map init script of mri_16, the water room: sets up the Puni, the blue water switch, the bar switch and bar,
+ * the water level or drained water depending on GSWF_MRI16_WATER_SWITCH_PRESSED, the Dizzy Dial,
+ * the Shrink Stomp chest (the badge) and a Shine Sprite block.
+ */
 EVT_BEGIN(mri_16_init_evt)
     CALL(evt_puni_mem_init)
     CALL(evt_puni_set_yuka, 16, 80, -319, -1000, -1000, 4, 3)

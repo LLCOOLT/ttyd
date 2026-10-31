@@ -99,6 +99,8 @@ static USER_FUNC(setmertn);
 static USER_FUNC(status_gauge_force_off);
 static USER_FUNC(stonechangertn);
 #if VERSION >= VERSION_JP
+// Returns in args[0] the direction Mario's sprite is turning toward (displayDirectionTarget: 0 for facing right, other
+// for left). JP and later; powerupya_orb_use uses it to place the offered item beside him.
 USER_FUNC(get_mario_dir_target);
 #endif
 static void kuragarisan_msgcb(s32 type, void* param);
@@ -113,6 +115,10 @@ static USER_FUNC(wariai_enzan_1);
 static USER_FUNC(alpha_set_func);
 static USER_FUNC(alpha_init_func);
 
+/**
+ * Map TEV callback that adds the door colour (the first colour set by _door_color_main_func) as a flat tint
+ * pass. Installed by the door darkening scripts.
+ */
 static void _door_color_tev(MapTevCallbackInfo* info) {
     GXTevStageID stage = info->tevStage;
     DoorColorWork* door = _door;
@@ -126,6 +132,7 @@ static void _door_color_tev(MapTevCallbackInfo* info) {
     info->tevStage++;
 }
 
+/** Same as _door_color_tev for the second door colour set by _door_color2_main_func. */
 static void _door_color2_tev(MapTevCallbackInfo* info) {
     GXTevStageID stage = info->tevStage;
     DoorColorWork* door = _door;
@@ -139,6 +146,7 @@ static void _door_color2_tev(MapTevCallbackInfo* info) {
     info->tevStage++;
 }
 
+/** Allocates the door tint state and sets both colours to opaque white. Run once from the map init. */
 static USER_FUNC(_door_color_init_func) {
     _door = _mapAlloc(sizeof(DoorColorWork));
     _door->color.r = 255;
@@ -152,6 +160,7 @@ static USER_FUNC(_door_color_init_func) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets the first door tint colour from args[0] to args[3] (red, green, blue, alpha). */
 static USER_FUNC(_door_color_main_func) {
     EvtWord* args = event->args;
     DoorColorWork* door = _door;
@@ -163,6 +172,7 @@ static USER_FUNC(_door_color_main_func) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets the second door tint colour from args[0] to args[3] (red, green, blue, alpha). */
 static USER_FUNC(_door_color2_main_func) {
     EvtWord* args = event->args;
     DoorColorWork* door = _door;
@@ -174,6 +184,10 @@ static USER_FUNC(_door_color2_main_func) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Map TEV callback that blends the polygon with a flat colour whose alpha is the single byte set by
+ * alpha_set_func (used to fade a map object).
+ */
 static void alpha_tev(MapTevCallbackInfo* info) {
     s32 stage = info->tevStage;
     u8* alpha = _ap;
@@ -232,6 +246,11 @@ MonosiriFollow follow[8];
 #endif
 
 #if VERSION >= VERSION_JP
+/**
+ * Turns off the east side's collision pieces ("A_kabe", "A_saku", "A_kmn", "A_gomi", "A_l_ura_gomi")
+ * so Mario can pass through them. Guess: the callers are the scenes that move him across the fence area.
+ * JP and later.
+ */
 EVT_BEGIN(gor_02_hitobj_off)
     CALL(evt_hitobj_onoff, STRING("A_kabe"), 1, 0)
     CALL(evt_hitobj_onoff, STRING("A_saku"), 1, 0)
@@ -241,6 +260,11 @@ EVT_BEGIN(gor_02_hitobj_off)
     RETURN
 EVT_END()
 
+/**
+ * Turns the east side's collision pieces back on after gor_02_hitobj_off,
+ * then reopens the ones that must stay open: the fence piece "A_saku_04" once the fence has been removed,
+ * and the center wall "A_center_kabe_atr" once Gus has been beaten or paid off.
+ */
 EVT_BEGIN(gor_02_hitobj_on)
     CALL(evt_hitobj_onoff, STRING("A_kabe"), 1, 1)
     CALL(evt_hitobj_onoff, STRING("A_saku"), 1, 1)
@@ -260,6 +284,11 @@ EVT_BEGIN(gor_02_hitobj_on)
 EVT_END()
 #endif
 
+/**
+ * Enter event of the west exit "w_bero" (from the plaza):
+ * while the story is at STORY_STG0_07_GOOMBELLA_JOINS it locks Mario's controls,
+ * starts steel_coin and returns 1 in LW(0); otherwise returns 0.
+ */
 EVT_BEGIN(gor_02_event_00)
     IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG0_07_GOOMBELLA_JOINS)
         SET_VALUE(LW(0), 0)
@@ -271,6 +300,11 @@ EVT_BEGIN(gor_02_event_00)
     RETURN
 EVT_END()
 
+/**
+ * Exit event of the pipe "dokan" (to tik_01): the first time through,
+ * parks the partner out of sight below the map and sets GSWF_GOR02_FRANKLY_INTRO_SEEN.
+ * Returns 0 in LW(0) so the pipe still works.
+ */
 EVT_BEGIN(gor_02_event_01)
     IF_INT_EQUAL(GSWF(GSWF_GOR02_FRANKLY_INTRO_SEEN), 1)
         SET_VALUE(LW(0), 0)
@@ -321,17 +355,23 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Allocates the one-byte alpha used by alpha_tev and sets it to 255 (opaque). */
 static USER_FUNC(alpha_init_func) {
     _ap = _mapAlloc(1);
     *_ap = 255;
     return EVT_RETURN_DONE;
 }
 
+/** Sets the alpha byte used by alpha_tev to args[0]. */
 static USER_FUNC(alpha_set_func) {
     *_ap = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Starts a Stardust particle effect: args[0] type, args[1] to args[3] position,
+ * args[4] and args[5] horizontal and vertical spread, args[6] particle count, args[7] camera.
+ */
 static USER_FUNC(effect_stardust) {
     EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
@@ -347,6 +387,10 @@ static USER_FUNC(effect_stardust) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Integer proportion helper: stores in args[4] (a*c + d*(b-a)) / b, where a is args[0] minus 1 and b, c,
+ * d are args[1] to args[3]. Used by the Chapter 8 camera scripts to blend between two values.
+ */
 static USER_FUNC(wariai_enzan_1) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
@@ -358,6 +402,7 @@ static USER_FUNC(wariai_enzan_1) {
     return EVT_RETURN_DONE;
 }
 
+/** Float version of wariai_enzan_1, storing the result in args[4] as a float. */
 static USER_FUNC(wariai_enzan_1f) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
@@ -369,6 +414,11 @@ static USER_FUNC(wariai_enzan_1f) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Float proportion with a ramp: args[5] is a time value in frames.
+ * For t below 14 it eases from args[2] to args[3], between 14 and 28 it eases back,
+ * and from 28 on it holds args[2]; the result goes to args[4].
+ */
 static USER_FUNC(wariai_enzan_1f_intpl) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
@@ -393,6 +443,7 @@ static USER_FUNC(wariai_enzan_1f_intpl) {
     return EVT_RETURN_DONE;
 }
 
+/** Same as wariai_enzan_1 but with b also reduced by 1 (an inclusive range). Integer result in args[4]. */
 static USER_FUNC(wariai_enzan_0) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
@@ -404,6 +455,7 @@ static USER_FUNC(wariai_enzan_0) {
     return EVT_RETURN_DONE;
 }
 
+/** Float version of wariai_enzan_0, storing the result in args[4]. */
 static USER_FUNC(wariai_enzan_0f) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
@@ -415,6 +467,10 @@ static USER_FUNC(wariai_enzan_0f) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Rotates the point (args[1], args[2]) around the center (args[3], args[4]) by args[0] degrees about the Y axis,
+ * writing the new x and z back to the two variables.
+ */
 static USER_FUNC(enzan_cam_turn_keisan) {
     EvtWord* args = event->args;
     f32 angle = evtGetValue(event, args[0]) % 360;
@@ -439,6 +495,11 @@ static USER_FUNC(enzan_cam_turn_keisan) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Moves the 3D camera for the power-up ceremony: args[0] is 0 to 100 percent.
+ * It places the camera on a spiral around (-362, 37, -200),
+ * rising and pulling back while turning two full circles, and starts a zero-length camera move there.
+ */
 static USER_FUNC(enzan_cam_turn_keisan_f) {
     f32 t = evtGetFloat(event, event->args[0]) / 100.0f;
     CameraEntry* cam = camGetPtr(CAMERA_3D);
@@ -466,6 +527,13 @@ static USER_FUNC(enzan_cam_turn_keisan_f) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Merlon's partner rank up ceremony in the power-up shop:
+ * the stone glows, Merlon talks (powerup_12 and 14),
+ * the shop interior fades and a lens flare and crystals gather while the partner shakes,
+ * then a bright release and star dust finish. Each partner is posed in turn (case on partner id 1 to 7).
+ * Ends by restoring the music and the interior.
+ */
 EVT_BEGIN(powerupya_party_lank_rtn)
     BEGIN_SIBLING_EVENT
         LOOP(0)
@@ -700,6 +768,11 @@ EVT_BEGIN(powerupya_party_lank_rtn)
     RETURN
 EVT_END()
 
+/**
+ * Merlon's partner rank up menu: lets Mario pick a partner from the other-party window,
+ * takes 3 Shine Sprites (supercoins) for each rank up, runs powerupya_party_lank_rtn,
+ * and loops until Mario stops, has fewer than 3 sprites or nothing is left to raise.
+ */
 EVT_BEGIN(powerupya_party_rtn)
     CALL(evt_win_coin_on, 1, LW(12))
     LOOP(0)
@@ -769,6 +842,12 @@ EVT_BEGIN(powerupya_party_rtn)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of Merlon at his table.
+ * Greets Mario (powerup_00, 00_01, 00_02), says if no partner can be raised (JP and later),
+ * and otherwise offers the rank up through powerupya_party_rtn while Mario has at least 3 Shine Sprites.
+ * Locks controls for the talk and frees them at the end.
+ */
 EVT_BEGIN(powerupya_table_talk)
     CALL(setmertn, STRING("パワーアップ屋"))
     CALL(evt_mario_key_onoff, 0)
@@ -809,8 +888,10 @@ EVT_BEGIN(powerupya_table_talk)
 EVT_END()
 
 #if VERSION <= VERSION_DEMO_US
-// The demo has no Up Arrow trade: Merlon takes the item and turns the star chart himself. This talk event has the
-// name that retail gives to its door animation.
+/**
+ * The demo has no Up Arrow trade: Merlon takes the item and turns the star chart himself.
+ * This talk event has the name that retail gives to its door animation.
+ */
 EVT_BEGIN(powerupya_direct_talk)
     IF_INT_EQUAL(GSWF(GSWF_GOR02_MERLON_PORTENT_PENDING), 1)
         IF_INT_EQUAL(GSWF(GSWF_GOR02_MERLON_PORTENT_TOLD), 0)
@@ -842,6 +923,12 @@ EVT_BEGIN(powerupya_direct_talk)
     RETURN
 EVT_END()
 #else
+/**
+ * Demo/JP version: the portent scene in which Merlon takes the Up Arrow,
+ * tells Mario of the omen (powerup_ev_01 to 07), turns the stone red and sets GSWF_MERLON_FIRST_UPGRADE_DONE.
+ * Retail version: the shop door animation, opening to 104 degrees and back,
+ * with the interior shown while it moves.
+ */
 EVT_BEGIN(powerupya_direct_talk)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ie_01_naka"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_get_position, STRING("S_ie_01_doa"), LW(0), LW(1), LW(2))
@@ -875,6 +962,10 @@ s32 powerupya_item_tbl[] = {
     108, -1,
 };
 
+/**
+ * Loops forever spawning a Stardust particle burst above Merlon's NPC every frame;
+ * spawned while he spins up in the air in powerupya_orb_use and stopped with DELETE_EVENT.
+ */
 EVT_BEGIN(powerupya_stardust)
     LOOP(0)
         CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
@@ -885,6 +976,10 @@ EVT_BEGIN(powerupya_stardust)
     RETURN
 EVT_END()
 
+/**
+ * Walks Mario to the spot beside the stone (-395, -160) or (-404, -220),
+ * depending on whether he is south of z=-210, and faces him right.
+ */
 EVT_BEGIN(powerupya_mario_move)
     WAIT_MS(200)
     CALL(evt_mario_dispflag_onoff, 0, 2)
@@ -901,6 +996,10 @@ EVT_BEGIN(powerupya_mario_move)
     RETURN
 EVT_END()
 
+/**
+ * Walks the active partner to the spot beside the stone (-425, -186),
+ * by the same two routes as powerupya_mario_move.
+ */
 EVT_BEGIN(powerupya_party_move)
     WAIT_MS(200)
     CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
@@ -914,6 +1013,12 @@ EVT_BEGIN(powerupya_party_move)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene when Mario hands Merlon the Up Arrow:
+ * the arrow is passed over, Merlon spins up into the air with star dust, drops the Ultra Stone,
+ * and returns with the stone turning red.
+ * It sets GSWF_MERLON_FIRST_UPGRADE_DONE, removes the Up Arrow and clears GSWF_GOR02_MERLON_PORTENT_PENDING.
+ */
 EVT_BEGIN(powerupya_orb_use)
     CALL(evt_mario_dispflag_onoff, 1, 2)
     CALL(evt_mario_set_pose, STRING("M_C_3"))
@@ -1066,6 +1171,12 @@ EVT_BEGIN(powerupya_orb_use)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of Merlon in the retail versions, run when the player talks to him at the portent point.
+ * If the portent is pending he describes it (powerup_ev_01 and 02) while the door opens;
+ * otherwise, if Mario has the Up Arrow, asks him to hand it over and runs powerupya_orb_use.
+ * Falls back to powerup_ev_03 or powerup_05.
+ */
 EVT_BEGIN(powerupya_talk)
     IF_INT_EQUAL(GSWF(GSWF_GOR02_MERLON_PORTENT_PENDING), 1)
         IF_INT_EQUAL(GSWF(GSWF_GOR02_MERLON_PORTENT_TOLD), 0)
@@ -1112,6 +1223,10 @@ EVT_BEGIN(powerupya_talk)
 EVT_END()
 #endif
 
+/**
+ * Map init for the shop's crystal: hides the red one ("S_i01_sui_aka") until the first rank-up has been done,
+ * hides the blue one afterwards.
+ */
 EVT_BEGIN(mapball_init)
     IF_INT_EQUAL(GSWF(GSWF_MERLON_FIRST_UPGRADE_DONE), 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_i01_sui_aka"), MAPOBJ_FLAG_HIDE)
@@ -1121,6 +1236,11 @@ EVT_BEGIN(mapball_init)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Merlon in his shop: registers the front-facing case event that runs powerupya_table_talk
+ * when Mario speaks to him at "A_power_up", and while the Up Arrow portent is pending lines up Merlon
+ * and the shop door for the scene.
+ */
 EVT_BEGIN(powerupya_init)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_power_up"), 0, PTR(powerupya_table_talk), 0)
     IF_INT_EQUAL(GSWF(GSWF_GOR02_MERLON_PORTENT_PENDING), 1)
@@ -1142,6 +1262,12 @@ EVT_BEGIN(powerupya_init)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Talk event of the information shop's complete-data service:
+ * loads the hint data (johoya_data_alloc), looks up the price,
+ * offers to sell Mario the missing hints for coins (johoyaperfect_01 and 02), takes the coins,
+ * marks the hint as read, and frees the data. The loop repeats on JP and later.
+ */
 EVT_BEGIN(johoyaperfect_talk)
     IF_INT_EQUAL(GSWF(GSWF_GOR02_GRIFTY_FIRST_TALK), 0)
         CALL(evt_msg_print, 0, STRING("johoyaperfect_00"), 0, STRING("me"))
@@ -1214,6 +1340,13 @@ EVT_BEGIN(johoyaperfect_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Professor Frankly (Kuri-hakase): lets him pass through walls and places him by story stage:
+ * in the street at (-135, 0, -240) at STORY_STG0_08_STOLEN_COINS and at (-220, 0, 305)
+ * while he waits to start his tutorial (unless GSWF_GOR02_FRANKLY_INTRO_SEEN is set),
+ * hidden below the map during the early scenes and the late story,
+ * and at (-140, 0, -225) in his house from the Pedestal step on and at each Thousand-Year Door step.
+ */
 static EVT_BEGIN(kurihakase_init)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_WALL_HIT)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -1253,6 +1386,12 @@ static EVT_BEGIN(kurihakase_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of Professor Frankly in his house:
+ * one line per story stage, from the tutorial (mac_0_085) through every chapter (gor_02_013 to gor_02_021,
+ * mac_N_000 at the Thousand-Year Door steps) and the Chapter 4 steps around Bobbery (mac_4_048, mac_4_060),
+ * picked with the story progress.
+ */
 static EVT_BEGIN(kurihakase_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG0_10_01_FRANKLYS_TUTORIAL)
@@ -1386,11 +1525,18 @@ static EVT_BEGIN(kurihakase_talk)
     RETURN
 EVT_END()
 
+/** Init event of the bandit gang's boss ("盗賊団親分"): lets him walk through walls. */
 EVT_BEGIN(oyabun_init)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_WALL_HIT)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of the bandit gang's boss.
+ * Before STORY_STG2_41 gives a first line then a repeat line;
+ * at STORY_STG2_41 he sells Mario the hint about the Pianta Parlor (mac_2_012 to 039, 64 coins)
+ * and sets GSWF_GOR02_ROBBO_BOSS_PARLOR_HINT; afterwards a line per story stage.
+ */
 EVT_BEGIN(oyabun_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS_OR_EQUAL(STORY_STG2_40_THOUSAND_YEAR_DOOR)
@@ -1510,6 +1656,11 @@ EVT_BEGIN(oyabun_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Gus, the bandit gang member who blocks the way in the east alley:
+ * before he is beaten he stands at (-82, 0, 134);
+ * afterwards at (-153, 0, -459) facing right with the center wall open. Clears GW(10).
+ */
 EVT_BEGIN(tozokudan1_init)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_WALL_HIT)
     IF_INT_EQUAL(GSWF(GSWF_GOR02_GUS_DEFEATED), 1)
@@ -1523,6 +1674,12 @@ EVT_BEGIN(tozokudan1_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of Gus.
+ * Before he is beaten, offers to open the barrier for 10 coins (sets GW(10), takes the coins),
+ * tells Mario to leave, or fights him; winning sends him running off and sets GSWF_GOR02_GUS_DEFEATED.
+ * Afterwards a line per story stage.
+ */
 EVT_BEGIN(tozokudan1_talk)
     IF_INT_EQUAL(GSWF(GSWF_GOR02_GUS_DEFEATED), 0)
         IF_INT_EQUAL(GW(10), 1)
@@ -1605,6 +1762,10 @@ EVT_BEGIN(tozokudan1_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the thief at the house with the lock (Trouble Center job 1):
+ * at (445, 0, 120) while the job is active, otherwise at (10, 0, -460).
+ */
 EVT_BEGIN(tozokudan2_init)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_WALL_HIT)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 1)
@@ -1619,6 +1780,11 @@ static s32 key_tbl[] = {
     ITEM_HOUSE_KEY, -1,
 };
 
+/**
+ * Check for the thief's house door lock ("me"):
+ * if Mario carries the House Key (ITEM_HOUSE_KEY), opens the item select window with key_tbl;
+ * cancelling it cancels the lock execution so the door stays locked.
+ */
 static EVT_BEGIN(evt_chk)
     CALL(evt_pouch_check_item, ITEM_HOUSE_KEY, LW(0))
     IF_INT_GREATER(LW(0), 0)
@@ -1634,6 +1800,10 @@ static EVT_BEGIN(evt_chk)
     RETURN
 EVT_END()
 
+/**
+ * Animation of the thief's house door (door_data_06) opening to 180 degrees
+ * and closing again over about a second, with door sounds, hiding the interior when finished.
+ */
 EVT_BEGIN(tozokudan2_house_door)
     SET_VALUE(GF(0), 1)
     SET_VALUE(GF(1), 1)
@@ -1686,6 +1856,10 @@ EVT_BEGIN(tozokudan2_house_door)
     RETURN
 EVT_END()
 
+/**
+ * Pushes Mario and the partners out of the way, to (415, 300) or (480, 300),
+ * when they stand in the thief's path as he jumps down; picks the side by Mario's x relative to the thief.
+ */
 EVT_BEGIN(mario_yokeru)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_npc_get_position, STRING("盗賊団２"), LW(10), LW(11), LW(12))
@@ -1729,6 +1903,11 @@ EVT_BEGIN(mario_yokeru)
     RETURN
 EVT_END()
 
+/**
+ * Trouble Center job 1 ending when Mario opens the lock without the key (the lock is hit open):
+ * the thief thanks him, pays 20 coins, jumps down, goes into his house,
+ * and the job is marked solved (GSWF_TROUBLE_01_SOLVED).
+ */
 EVT_BEGIN(evt_unlock_mario)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_npc_flag_onoff, 1, STRING("盗賊団２"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
@@ -1753,12 +1932,21 @@ EVT_BEGIN(evt_unlock_mario)
     RETURN
 EVT_END()
 
+/**
+ * Runs when the thief's house lock is opened: waits 500 ms and starts evt_unlock_mario,
+ * the ending of Trouble Center job 1.
+ */
 static EVT_BEGIN(evt_unlock)
     WAIT_MS(500)
     SPAWN_EVENT(evt_unlock_mario)
     RETURN
 EVT_END()
 
+/**
+ * Trouble Center job 1 ending when Mario hands over the House Key:
+ * the thief thanks him, pays 20 coins, the lock opens and he goes in;
+ * the key is removed and the job marked solved.
+ */
 EVT_BEGIN(evt_unlock_npc)
     CALL(evt_npc_flag_onoff, 1, STRING("盗賊団２"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_msg_print, 0, STRING("irai_01_03"), 0, STRING("盗賊団２"))
@@ -1785,6 +1973,11 @@ EVT_BEGIN(evt_unlock_npc)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of the thief at the locked house.
+ * While Trouble Center job 1 is active, asks for the House Key (irai_01_00 to 02)
+ * and lets Mario hand it over (evt_unlock_npc); otherwise a line per story stage.
+ */
 EVT_BEGIN(tozokudan2_talk)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 1)
         CALL(evt_pouch_check_item, ITEM_HOUSE_KEY, LW(0))
@@ -1830,6 +2023,7 @@ EVT_BEGIN(tozokudan2_talk)
     RETURN
 EVT_END()
 
+/** Init event of the gang member at the back door of the Trouble Center: stands at (220, 0, -185) facing right. */
 EVT_BEGIN(tozokudan3_init)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_WALL_HIT)
     CALL(evt_npc_set_position, STRING("me"), 220, 0, -185)
@@ -1837,6 +2031,7 @@ EVT_BEGIN(tozokudan3_init)
     RETURN
 EVT_END()
 
+/** Talk event of the gang member at the back door: first line, then a repeat line (irai_oku_00 and 01). */
 EVT_BEGIN(tozokudan3_talk)
     IF_INT_EQUAL(GSWF(GSWF_GOR02_TROUBLE_BACKDOOR_TALK), 0)
         CALL(evt_msg_print, 0, STRING("irai_oku_00"), 0, STRING("me"))
@@ -1847,6 +2042,10 @@ EVT_BEGIN(tozokudan3_talk)
     RETURN
 EVT_END()
 
+/**
+ * Makes Sanders walk to Bobbery's door and open it (50, 25) and sets GSWF_GOR02_BOBBERY_DOOR_OPEN,
+ * then says mac_4_056_01. Does nothing if the door is already open.
+ */
 EVT_BEGIN(sanders_open_door)
     IF_INT_EQUAL(GSWF(GSWF_GOR02_BOBBERY_DOOR_OPEN), 1)
         RETURN
@@ -1865,6 +2064,11 @@ EVT_BEGIN(sanders_open_door)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Sanders (Bobbery) at his house: lets him pass through walls and places him by story stage:
+ * at (0, 0, -50) before Mario meets Bobbery, and until his decision at (0, 0, -50)
+ * or (50, 0, -30) depending on GSWF_GOR02_BOBBERY_DOOR_OPEN (whether the door has been opened).
+ */
 static EVT_BEGIN(sanders_init)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_WALL_HIT)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -1880,6 +2084,14 @@ static EVT_BEGIN(sanders_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of Sanders (Bobbery) at his house, by Chapter 4 story step:
+ * before STORY_STG4_33_MEET_BOBBERY he speaks mac_4_049_01 and opens the door (sanders_open_door);
+ * at STORY_STG4_33_MEET_BOBBERY the first visit is mac_4_050 plus opening the door,
+ * and later visits run the Bobbery talk (mac_4_051 to mac_4_056) with the partner,
+ * leading to STORY_STG4_34_BOBBERY_DECLINES; at the later steps he hands Mario a letter (item00, "tegami")
+ * and the letter is read (mac_4_077 to mac_4_083).
+ */
 static EVT_BEGIN(sanders_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG4_33_MEET_BOBBERY)
@@ -2040,12 +2252,14 @@ static EVT_BEGIN(sanders_talk)
     RETURN
 EVT_END()
 
+/** Init event of the fourth Goomba villager: placed at (-370, 0, 130). */
 EVT_BEGIN(kuribo4_init)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_WALL_HIT)
     CALL(evt_npc_set_position, STRING("me"), -370, 0, 130)
     RETURN
 EVT_END()
 
+/** Regular event of the fourth Goomba villager: wanders around his post using urouro_main_func. */
 EVT_BEGIN(kuribo4_regl)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     CALL(urouro_init_func, STRING("me"), LW(0), LW(2), FLOAT(70.0f), FLOAT(30.0f), 0)
@@ -2057,6 +2271,12 @@ static s32 item_tbl[] = {
     ITEM_BOX, -1,
 };
 
+/**
+ * Talk event of the fourth Goomba villager.
+ * During Trouble Center jobs 2 and 13 he receives the box
+ * or the Battle Trunks (irai_02 and irai_13: takes as many trunks as Mario hands over);
+ * otherwise a line per story stage (gor_02_030_xx).
+ */
 EVT_BEGIN(kuribo4_talk)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 2)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_BASE), 1)
@@ -2162,10 +2382,12 @@ EVT_BEGIN(kuribo4_talk)
     RETURN
 EVT_END()
 
+/** Init event of the third Chusan: empty. */
 EVT_BEGIN(chusan3_init)
     RETURN
 EVT_END()
 
+/** Talk event of the third Chusan: one line per story stage (gor_02_031_00 to _08). */
 EVT_BEGIN(chusan3_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_17_FATHER_AND_SON_REUNITED)
@@ -2190,10 +2412,16 @@ EVT_BEGIN(chusan3_talk)
     RETURN
 EVT_END()
 
+/** Init event of the third street-stall seller: empty. */
 EVT_BEGIN(roten3_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of the third street-stall seller.
+ * During Trouble Center job 3 he asks three questions (irai_03_xx), pays 20 coins and solves the job;
+ * otherwise a line per story stage (gor_02_032).
+ */
 EVT_BEGIN(roten3_talk)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 3)
         SET_VALUE(LW(1), 0)
@@ -2251,6 +2479,10 @@ EVT_BEGIN(roten3_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the first 'borodo' villager: stands at (90, 0, 150),
+ * or at (475, 0, 275) (550 in earlier releases) between Chapters 4 and 5.
+ */
 EVT_BEGIN(borodo1_init)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_WALL_HIT)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -2266,6 +2498,10 @@ EVT_BEGIN(borodo1_init)
     RETURN
 EVT_END()
 
+/**
+ * Regular event of the first 'borodo' villager:
+ * wanders around his post, except during Chapter 4 to 5 when he stays put.
+ */
 EVT_BEGIN(borodo1_regl)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG4_15_05_PEACH_X_NAUT_PHD_REPORT, STORY_STG5_43_X_NAUTS_RETREAT)
@@ -2277,6 +2513,7 @@ EVT_BEGIN(borodo1_regl)
     RETURN
 EVT_END()
 
+/** Talk event of the first 'borodo' villager: one line per story stage (gor_02_033_00 to _08). */
 EVT_BEGIN(borodo1_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_17_FATHER_AND_SON_REUNITED)
@@ -2301,6 +2538,11 @@ EVT_BEGIN(borodo1_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the thief Borodo: lets him pass through walls;
+ * during Trouble Center job 4 with WORK_1 set he is hidden below the map,
+ * otherwise he stands at (-475, 0, -180).
+ */
 static EVT_BEGIN(borodo2_init)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_WALL_HIT)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 4)
@@ -2315,6 +2557,10 @@ static EVT_BEGIN(borodo2_init)
     RETURN
 EVT_END()
 
+/**
+ * Borodo runs away: with Mario's controls locked he becomes intangible and faces 180, runs to (-475, -85),
+ * (-530, -85) and (-530, 20) at speed 240, vanishes below the map and Mario gets control back after 1.5 seconds.
+ */
 static EVT_BEGIN(borodo2_escape)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
@@ -2330,6 +2576,10 @@ static EVT_BEGIN(borodo2_escape)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of Borodo: for Trouble Center job 4 (WORK_BASE set, WORK_1 clear) he speaks irai_04_003,
+ * sets WORK_1 and runs borodo2_escape; otherwise one line per story stage (gor_02_033_00_2 and on).
+ */
 static EVT_BEGIN(borodo2_talk)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 4)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_BASE), 1)
@@ -2364,11 +2614,18 @@ static EVT_BEGIN(borodo2_talk)
     RETURN
 EVT_END()
 
+/** Init event of Kuragarisan (Darkly): lets him walk through walls. */
 EVT_BEGIN(kuragarisan_init)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_WALL_HIT)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Cutscene at STORY_STG3_51_FRANKLYS_HOUSE in which Kuragarisan (Darkly) talks to Mario and the partner,
+ * then writes with a pen (animations A_1A to A_1C, mac_3_011 to 017);
+ * with Yoshi in the party his chosen name is inserted into the line.
+ * The partner's walk to him times out after 10 seconds.
+ */
 EVT_BEGIN(kuragarisan_write_name)
     CALL(evt_npc_get_position, STRING("me"), LW(13), LW(14), LW(15))
     CALL(evt_npc_get_dir, STRING("me"), LW(12))
@@ -2494,6 +2751,11 @@ EVT_BEGIN(kuragarisan_write_name)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of Kuragarisan.
+ * At STORY_STG3_51_FRANKLYS_HOUSE, once Mario has reached the Twilight Town pipe,
+ * he runs kuragarisan_write_name; otherwise a line per story stage (gor_02_034_00 to _10).
+ */
 EVT_BEGIN(kuragarisan_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG3_51_FRANKLYS_HOUSE)
@@ -2528,6 +2790,10 @@ EVT_BEGIN(kuragarisan_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Luigi on the east side: from STORY_STG1_17_FATHER_AND_SON_REUNITED to STORY_STG2_24_BOSS_BATTLE
+ * he stands at (-400, 0, 0) facing right.
+ */
 static EVT_BEGIN(luigi_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG1_17_FATHER_AND_SON_REUNITED, STORY_STG2_24_BOSS_BATTLE)
@@ -2537,6 +2803,7 @@ static EVT_BEGIN(luigi_init)
     RETURN
 EVT_END()
 
+/** Talk event of Luigi: runs the shared first-talk scene luigi_gor_first_talk. */
 static EVT_BEGIN(luigi_talk)
     CALL_CHILD(luigi_gor_first_talk)
     RETURN
@@ -2730,18 +2997,24 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Door animation callback of the house 01 door (the power-up shop):
+ * rotates the door "S_ie_01_doa" about Y by 0.6 times the value in LW(0).
+ */
 static EVT_BEGIN(evt_door_01_00)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5996094f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie_01_doa"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Second door callback of house 01: rotates the door "S_ie_01_doa" about X by 0.5 times the value in LW(0). */
 static EVT_BEGIN(evt_door_01_01)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie_01_doa"), LW(0), 0, 0)
     RETURN
 EVT_END()
 
+/** Wall callback of house 01: rotates the wall piece "S_ie_01B" about X by LW(0). */
 static EVT_BEGIN(evt_wall_01)
     SET_FLOAT_VALUE(LW(2), LW(0))
     MULTIPLY_FLOAT(LW(2), FLOAT(1.0f))
@@ -2754,6 +3027,13 @@ static const char* door_data_01_npc[] = {
     NULL,
 };
 
+/**
+ * Called when the power-up shop door opens: dips the music and ambience to 50 percent
+ * and low-passes the ambience, sets up the shop's crystal (mapball_init),
+ * moves the Star Piece items item_star1 to item_star3 (those that still exist) 1000 units down
+ * so they are out of sight inside, and clears GSWF_GOR02_MERLON_GREETED_THIS_VISIT.
+ * The JP and later releases also turn off the outside hit objects.
+ */
 static EVT_BEGIN(evt_door_01_open)
 #if VERSION >= VERSION_JP
     SPAWN_EVENT(gor_02_hitobj_off)
@@ -2784,6 +3064,10 @@ static EVT_BEGIN(evt_door_01_open)
     RETURN
 EVT_END()
 
+/**
+ * Called when the power-up shop door closes: brings the music and ambience back
+ * and moves the Star Pieces up again. The JP and later releases also turn the outside hit objects back on.
+ */
 static EVT_BEGIN(evt_door_01_close)
 #if VERSION >= VERSION_JP
     SPAWN_EVENT(gor_02_hitobj_on)
@@ -2832,18 +3116,27 @@ static DoorParam door_data_01 = {
     evt_door_01_close, // evtClose
 };
 
+/**
+ * Door animation callback of the house 02 door (Professor Frankly's house):
+ * rotates the door "S_i02_doa" about Y by 0.6 times the value in LW(0).
+ */
 static EVT_BEGIN(evt_door_02_00)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5996094f))
     CALL(evt_mapobj_rotate, 1, STRING("S_i02_doa"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door-out callback for the Professor Frankly house door (door_data_02):
+ * rotates "S_i02_doa" by LW(0) degrees as it swings open from the inside.
+ */
 EVT_BEGIN(evt_door_02_01)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("S_i02_doa"), LW(0), 0, 0)
     RETURN
 EVT_END()
 
+/** Wall callback of house 02: rotates the wall piece "S_ie_02B" about X by LW(0). */
 static EVT_BEGIN(evt_wall_02)
     SET_FLOAT_VALUE(LW(2), LW(0))
     MULTIPLY_FLOAT(LW(2), FLOAT(1.0f))
@@ -2856,6 +3149,12 @@ static const char* door_data_02_npc[] = {
     NULL,
 };
 
+/**
+ * Guess: open callback for Professor Frankly's house:
+ * dips the ambience and low-passes it, switches the music to the house theme for the story stage,
+ * starts kurihakase_first_talk at STORY_STG0_08_STOLEN_COINS,
+ * and sets up the open book and the map on his table by story stage.
+ */
 EVT_BEGIN(evt_door_02_open)
 #if VERSION >= VERSION_JP
     SPAWN_EVENT(gor_02_hitobj_off)
@@ -2904,6 +3203,12 @@ EVT_BEGIN(evt_door_02_open)
     RETURN
 EVT_END()
 
+/**
+ * Close callback for Professor Frankly's house:
+ * brings the Rogueport music and ambience back, clears the Chapter 6 research flag,
+ * and starts kurihakase_wall_remove (STORY_STG0_09) or kurihakase_lecture_badge (STORY_STG0_16)
+ * when those steps are pending.
+ */
 EVT_BEGIN(evt_door_02_close)
 #if VERSION >= VERSION_JP
     SPAWN_EVENT(gor_02_hitobj_on)
@@ -2958,6 +3263,11 @@ static DoorParam door_data_02 = {
     evt_door_02_close, // evtClose
 };
 
+/**
+ * Guess: entry for Frankly's house through door_data_02:
+ * registers the case events that run evt_door_close and evt_door_open when Mario stands in front of the door,
+ * and spawns the door entry sequence.
+ */
 EVT_BEGIN(evt_door_02_entry)
     CALL(evt_door_param, LW(0), 3, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
@@ -2978,18 +3288,27 @@ EVT_BEGIN(evt_door_02_entry)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback of the house 03 door (Bobbery's house):
+ * rotates the door "S_ie_03_doam" about Y by 0.6 times the value in LW(0).
+ */
 static EVT_BEGIN(evt_door_03_00)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5996094f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie_03_doam"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door-out callback for house 03 (Bobbery's house, door_data_03):
+ * rotates "S_ie_03_doam" by LW(0) degrees as it swings open from the inside.
+ */
 EVT_BEGIN(evt_door_03_01)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie_03_doam"), LW(0), 0, 0)
     RETURN
 EVT_END()
 
+/** Wall callback of house 03: rotates the wall piece "S_ie_03B" about X by 0.5 times LW(0). */
 static EVT_BEGIN(evt_wall_03)
     SET_FLOAT_VALUE(LW(2), LW(0))
     MULTIPLY_FLOAT(LW(2), FLOAT(0.5f))
@@ -3007,6 +3326,14 @@ static const char* door_data_03_mobj[] = {
     NULL,
 };
 
+/**
+ * Called when the house 03 door closes: brings the music and ambience back.
+ * At STORY_STG4_34_BOBBERY_DECLINES, once (GSWF_GOR02_BOBBERY_DECLINE_SCENE_DONE),
+ * the partner comments on Bobbery declining (mac_4_058, mac_4_059).
+ * At STORY_STG4_36_BOBBERYS_DECISION it runs the scene where Bobbery decides to join,
+ * moving the party members (mac_4_087) and advancing the story to STORY_STG4_37_TO_THE_PORT.
+ * The JP and later releases also turn the outside hit objects back on.
+ */
 static EVT_BEGIN(evt_door_03_close)
 #if VERSION >= VERSION_JP
     SPAWN_EVENT(gor_02_hitobj_on)
@@ -3079,6 +3406,10 @@ static EVT_BEGIN(evt_door_03_close)
     RETURN
 EVT_END()
 
+/**
+ * Called when the house 03 door opens: dips the music and ambience to 50 percent and low-passes the ambience.
+ * The JP and later releases also turn off the outside hit objects.
+ */
 static EVT_BEGIN(evt_door_03_open)
 #if VERSION >= VERSION_JP
     SPAWN_EVENT(gor_02_hitobj_off)
@@ -3110,6 +3441,11 @@ static DoorParam door_data_03 = {
     evt_door_03_close, // evtClose
 };
 
+/**
+ * Door-open handler used with Sanders's door (house 03):
+ * if Sanders has not opened the door yet (GSWF_GOR02_BOBBERY_DOOR_OPEN is 0) shows gor_02_012 and stays shut;
+ * otherwise runs the normal evt_door_open.
+ */
 EVT_BEGIN(evt_door_sanders_open)
     IF_INT_EQUAL(GSWF(GSWF_GOR02_BOBBERY_DOOR_OPEN), 0)
         CALL(evt_mario_key_onoff, 0)
@@ -3122,6 +3458,10 @@ EVT_BEGIN(evt_door_sanders_open)
     RETURN
 EVT_END()
 
+/**
+ * Door-close handler for house 03: shows gor_02_012 while the door was never opened by Sanders;
+ * otherwise runs the normal evt_door_close.
+ */
 EVT_BEGIN(evt_door_sanders_close)
     IF_INT_EQUAL(GSWF(GSWF_GOR02_BOBBERY_DOOR_OPEN), 0)
         CALL(evt_mario_key_onoff, 0)
@@ -3134,6 +3474,11 @@ EVT_BEGIN(evt_door_sanders_close)
     RETURN
 EVT_END()
 
+/**
+ * Entry for house 03's door: hides the wall piece and switches off the hit object named in the door parameters,
+ * and registers stand-on case events that run evt_door_sanders_close
+ * and evt_door_sanders_open in front of the door's two spots.
+ */
 static EVT_BEGIN(evt_door_03_entry)
     CALL(evt_door_param, LW(0), 3, LW(1), LW(2))
     IF_INT_NOT_EQUAL(LW(1), 0)
@@ -3154,6 +3499,11 @@ static EVT_BEGIN(evt_door_03_entry)
     RETURN
 EVT_END()
 
+/**
+ * Case event for the rolling-shutter entrance of house 03:
+ * locks the controls, switches off the "A_i03_rol" hit object, shakes the camera,
+ * plays the roll-down sounds (SFX_STG4_MARIO_ROLL_DOWN1 and 2) and runs evt_door_open_roll.
+ */
 static EVT_BEGIN(evt_door_03_caseopen)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -3173,6 +3523,11 @@ static EVT_BEGIN(evt_door_03_caseopen)
     RETURN
 EVT_END()
 
+/**
+ * Guess: open callback for the rolling-shutter entrance of house 03:
+ * smoke puffs rise at the "S_i01_dan_mC" box while the shutter rolls up, the ambience dips and low-passes,
+ * and Sanders speaks mac_4_049 if the door was not opened yet.
+ */
 EVT_BEGIN(evt_door_03_roll_open)
 #if VERSION >= VERSION_JP
     SPAWN_EVENT(gor_02_hitobj_off)
@@ -3234,6 +3589,10 @@ EVT_BEGIN(evt_door_03_roll_open)
     RETURN
 EVT_END()
 
+/**
+ * Close callback for the rolling-shutter entrance of house 03:
+ * dips the music and ambience and low-passes it again (no door animation).
+ */
 EVT_BEGIN(evt_door_03_roll_close)
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
@@ -3241,6 +3600,7 @@ EVT_BEGIN(evt_door_03_roll_close)
     RETURN
 EVT_END()
 
+/** Wall callback for the rolling-shutter entrance of house 03: tilts the wall "S_ie_03B" open by LW(2) degrees. */
 EVT_BEGIN(evt_wall_03_roll)
     SET_FLOAT_VALUE(LW(2), LW(0))
     MULTIPLY_FLOAT(LW(2), FLOAT(0.5f))
@@ -3269,6 +3629,10 @@ static DoorParam door_data_03_roll = {
     evt_door_03_roll_close, // evtClose
 };
 
+/**
+ * Entry for the rolling-shutter entrance of house 03:
+ * registers the stand-on case event (evt_door_03_caseopen) that opens it when Mario steps on the spot in front.
+ */
 EVT_BEGIN(evt_door_03_roll_entry)
     CALL(evt_door_param, LW(0), 1, LW(1), LW(2), LW(3))
     SET_VALUE(LW(15), 0)
@@ -3276,18 +3640,27 @@ EVT_BEGIN(evt_door_03_roll_entry)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback of the house 04 door (the thieves' house):
+ * rotates the door "S_ie_04_doa" about Y by 0.6 times the value in LW(0).
+ */
 static EVT_BEGIN(evt_door_04_00)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5996094f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie_04_doa"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Second door callback of house 04: rotates the door "S_ie_04_doa" about X by 0.5 times the value in LW(0). */
 static EVT_BEGIN(evt_door_04_01)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie_04_doa"), LW(0), 0, 0)
     RETURN
 EVT_END()
 
+/**
+ * Wall callback of house 04: when entering (LW(6) is 0) it sets NO_BLEND2 on the mask "S_i04_msk",
+ * and it rotates the wall pieces "S_ie_04_B" and "S_ie_04_ura_B" about X by 0.5 and -0.5 times LW(0).
+ */
 static EVT_BEGIN(evt_wall_04)
     IF_INT_EQUAL(LW(6), 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_i04_msk"), MAPOBJ_FLAG_NO_BLEND2)
@@ -3301,6 +3674,11 @@ static EVT_BEGIN(evt_wall_04)
     RETURN
 EVT_END()
 
+/**
+ * Called when the house 04 door opens: dips the music and ambience to 50 percent and low-passes the ambience.
+ * The JP and later releases also turn off the outside hit objects,
+ * and the US and later releases switch off the hit object polySurface1317.
+ */
 static EVT_BEGIN(evt_door_04_open)
 #if VERSION >= VERSION_JP
     SPAWN_EVENT(gor_02_hitobj_off)
@@ -3314,6 +3692,11 @@ static EVT_BEGIN(evt_door_04_open)
     RETURN
 EVT_END()
 
+/**
+ * Called when the house 04 door closes: brings the music and ambience back.
+ * The JP and later releases also turn the outside hit objects back on,
+ * and the US and later releases switch polySurface1317 back on.
+ */
 static EVT_BEGIN(evt_door_04_close)
 #if VERSION >= VERSION_JP
     SPAWN_EVENT(gor_02_hitobj_on)
@@ -3359,6 +3742,10 @@ static DoorParam door_data_04 = {
     evt_door_04_close, // evtClose
 };
 
+/**
+ * Message shown when the Trouble Center's door is tried while the shop is not ready ("preparing", gor_02_035):
+ * locks the controls for the line, then frees them.
+ */
 EVT_BEGIN(evt_door_04_junbi)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_toge, 1, 0, 0, 0)
@@ -3367,18 +3754,27 @@ EVT_BEGIN(evt_door_04_junbi)
     RETURN
 EVT_END()
 
+/**
+ * Door-in callback for the Trouble Center's back door (door_data_04_ura):
+ * rotates "S_ie_04_doa_02" by LW(0) degrees.
+ */
 EVT_BEGIN(evt_door_04_00_ura)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5996094f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie_04_doa_02"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door-out callback for the Trouble Center's back door (door_data_04_ura):
+ * rotates "S_ie_04_doa_02" the other way by LW(0) degrees.
+ */
 EVT_BEGIN(evt_door_04_01_ura)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie_04_doa_02"), LW(0), 0, 0)
     RETURN
 EVT_END()
 
+/** Wall callback for the back of the Trouble Center: tilts the wall "S_ie_04_ura_B" open by LW(3) degrees. */
 EVT_BEGIN(evt_wall_04_ura)
     SET_FLOAT_VALUE(LW(2), LW(0))
     SET_FLOAT_VALUE(LW(3), LW(0))
@@ -3409,12 +3805,14 @@ DoorParam door_data_04_ura = {
     evt_door_04_close, // evtClose
 };
 
+/** Door callback for house 05 (door_data_05): rotates "S_ie_05_doa" by LW(0) degrees as it opens. */
 EVT_BEGIN(evt_door_05_00)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5996094f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie_05_doa"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Wall callback for house 05: tilts "S_ie_05sB" by LW(2) degrees and "S_ie_05uB" by LW(3) degrees open. */
 EVT_BEGIN(evt_wall_05)
     SET_FLOAT_VALUE(LW(2), LW(0))
     SET_FLOAT_VALUE(LW(3), LW(0))
@@ -3438,6 +3836,10 @@ const char* door_data_05_npc_01[] = {
     NULL,
 };
 
+/**
+ * Open callback for house 05: turns off the east side's collision pieces and dips the music
+ * and ambience with a low- pass filter.
+ */
 EVT_BEGIN(evt_door_05_open)
 #if VERSION >= VERSION_JP
     SPAWN_EVENT(gor_02_hitobj_off)
@@ -3448,6 +3850,10 @@ EVT_BEGIN(evt_door_05_open)
     RETURN
 EVT_END()
 
+/**
+ * Close callback for house 05: turns the east side's collision back on and restores the music
+ * and ambience (plus the saved music on channel 1).
+ */
 EVT_BEGIN(evt_door_05_close)
 #if VERSION >= VERSION_JP
     SPAWN_EVENT(gor_02_hitobj_on)
@@ -3480,12 +3886,17 @@ DoorParam door_data_05 = {
     evt_door_05_close, // evtClose
 };
 
+/** Door callback for house 06, the thief's house (door_data_06): rotates "S_ie_06_doa" by LW(0) degrees as it opens. */
 EVT_BEGIN(evt_door_06_00)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5996094f))
     CALL(evt_mapobj_rotate, 1, STRING("S_ie_06_doa"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Guess: wall piece 0 of house 06: swings "S_i06mB" down by 180 degrees (or back up) over half a second with a
+ * thump, so the roof opens when Mario enters.
+ */
 EVT_BEGIN(evt_wall_06_00)
     BEGIN_INLINE_EVENT
         IF_INT_EQUAL(LW(1), 0)
@@ -3512,6 +3923,10 @@ EVT_BEGIN(evt_wall_06_00)
     RETURN
 EVT_END()
 
+/**
+ * Wall piece 1 of house 06: swings "S_i06nB" down by 180 degrees (or back up) over half a second with a thump,
+ * slightly after piece 0.
+ */
 EVT_BEGIN(evt_wall_06_01)
     BEGIN_INLINE_EVENT
         WAIT_MS(100)
@@ -3536,6 +3951,10 @@ EVT_BEGIN(evt_wall_06_01)
     RETURN
 EVT_END()
 
+/**
+ * Wall piece 2 of house 06: swings "S_i06oB" down by 180 degrees (or back up) over half a second with a thump,
+ * slightly after piece 1.
+ */
 EVT_BEGIN(evt_wall_06_02)
     BEGIN_INLINE_EVENT
         IF_INT_EQUAL(LW(1), 0)
@@ -3562,6 +3981,7 @@ EVT_BEGIN(evt_wall_06_02)
     RETURN
 EVT_END()
 
+/** Wall callback for house 06: spawns the three wall pieces (evt_wall_06_00 to 02) together. */
 EVT_BEGIN(evt_wall_06)
     IF_INT_EQUAL(LW(6), 0)
         SPAWN_EVENT(evt_wall_06_00)
@@ -3580,6 +4000,10 @@ const char* door_data_06_npc_01[] = {
     NULL,
 };
 
+/**
+ * Open callback for house 06: turns off the east side's collision pieces and dips the music
+ * and ambience with a low- pass filter.
+ */
 EVT_BEGIN(evt_door_06_open)
 #if VERSION >= VERSION_JP
     SPAWN_EVENT(gor_02_hitobj_off)
@@ -3590,6 +4014,7 @@ EVT_BEGIN(evt_door_06_open)
     RETURN
 EVT_END()
 
+/** Close callback for house 06: turns the east side's collision back on and restores the music and ambience. */
 EVT_BEGIN(evt_door_06_close)
 #if VERSION >= VERSION_JP
     SPAWN_EVENT(gor_02_hitobj_on)
@@ -3620,6 +4045,10 @@ DoorParam door_data_06 = {
     evt_door_06_close, // evtClose
 };
 
+/**
+ * Guess: animation of Sanders's door ("S_ie_03_doao") opening to 100 degrees with a door sound
+ * and swinging back to shut with a closing thump.
+ */
 EVT_BEGIN(evt_gor_door_open_sanders)
     CALL(evt_mapobj_get_position, STRING("S_ie_03_doao"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN1"), LW(0), LW(1), LW(2), 0)
@@ -3647,6 +4076,10 @@ EVT_BEGIN(evt_gor_door_open_sanders)
     RETURN
 EVT_END()
 
+/**
+ * Guess: opens the back door "S_ie_03_doao" with its sound, as the first half of the dark-room entry;
+ * waits until the door has swung open, then plays the shut thump when closed again.
+ */
 EVT_BEGIN(evt_gor_door_open_sub)
     CALL_CHILD(evt_gor_door_open_sanders)
     WAIT_MS(500)
@@ -3664,6 +4097,7 @@ EVT_BEGIN(evt_gor_door_open_sub)
     RETURN
 EVT_END()
 
+/** Stores the float args[1] into the integer variable args[0] (float to integer conversion). */
 static USER_FUNC(enzan_set_i_f) {
     EvtWord* args = event->args;
     s32 var = args[0];
@@ -3672,6 +4106,7 @@ static USER_FUNC(enzan_set_i_f) {
     return EVT_RETURN_DONE;
 }
 
+/** Stores the integer args[1] into the float variable args[0] (integer to float conversion). */
 static USER_FUNC(enzan_set_f_i) {
     EvtWord* args = event->args;
     s32 var = args[0];
@@ -3680,6 +4115,7 @@ static USER_FUNC(enzan_set_f_i) {
     return EVT_RETURN_DONE;
 }
 
+/** Copies the event's 16 local words (LW) into a map-wide buffer so a nested script can reuse them. */
 static USER_FUNC(enzan_lw_save) {
     s32 i;
 
@@ -3689,6 +4125,7 @@ static USER_FUNC(enzan_lw_save) {
     return EVT_RETURN_DONE;
 }
 
+/** Restores the 16 local words saved by enzan_lw_save. */
 static USER_FUNC(enzan_lw_load) {
     s32 i;
 
@@ -3698,6 +4135,10 @@ static USER_FUNC(enzan_lw_load) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Switches the map background texture to the file named by args[0] (the current map's name if NULL),
+ * from "./bg/" in the demos and "./b/" in the retail versions.
+ */
 static USER_FUNC(evt_set_bgtpl) {
     char path[64];
     const char* name = (const char*)evtGetValue(event, event->args[0]);
@@ -3714,6 +4155,10 @@ static USER_FUNC(evt_set_bgtpl) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Turns the background scroll offset on (args[0] non-zero) or off (zero);
+ * the power-up ceremony turns it off while the interior is hidden.
+ */
 static USER_FUNC(bgScrollControll) {
     if (evtGetValue(event, event->args[0]) == 0) {
         bgTransOffsetOff();
@@ -3723,15 +4168,21 @@ static USER_FUNC(bgScrollControll) {
     return EVT_RETURN_DONE;
 }
 
+/** Blocks the script until the BGM on channel 1 has actually started playing. */
 static USER_FUNC(bgm_start_wait) {
     return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
+/** Sets the event's owner NPC to the NPC named in args[0]; used so that "me" refers to Merlon in his shop scripts. */
 static USER_FUNC(setmertn) {
     event->ownerNPC = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Swaps the crystal on the shop's floor: for the name "S_i01_sui_ao" shows the red one,
+ * for "S_i01_sui_aka" shows the blue one (the other is hidden).
+ */
 static USER_FUNC(stonechangertn) {
     const char* name = (const char*)evtGetValue(event, event->args[0]);
 
@@ -3746,6 +4197,10 @@ static USER_FUNC(stonechangertn) {
 }
 
 #if VERSION >= VERSION_JP
+/**
+ * Returns in args[0] the direction Mario's sprite is turning toward (displayDirectionTarget: 0 for facing right,
+ * other for left). JP and later; powerupya_orb_use uses it to place the offered item beside him.
+ */
 USER_FUNC(get_mario_dir_target) {
     EvtWord* args = event->args;
 
@@ -3754,11 +4209,13 @@ USER_FUNC(get_mario_dir_target) {
 }
 #endif
 
+/** Forces the HP/FP/coin status window off the screen. */
 static USER_FUNC(status_gauge_force_off) {
     statusWinForceOff();
     return EVT_RETURN_DONE;
 }
 
+/** Sets Sanders's remembered facing (the direction he turns back to after talking) to 270 degrees. */
 static USER_FUNC(set_talk_memory_ry) {
     NpcEntry* npc = npcNameToPtr("サンダース");
 
@@ -3766,6 +4223,10 @@ static USER_FUNC(set_talk_memory_ry) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Trouble Center job 13: allocates a list with room for as many Battle Trunks (item 0x6B) as Mario carries,
+ * plus a -1 end mark.
+ */
 static USER_FUNC(iri_13_make_item_tbl) {
     s32 count = pouchCheckItem(0x6B);
 
@@ -3775,6 +4236,10 @@ static USER_FUNC(iri_13_make_item_tbl) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Trouble Center job 13: rebuilds the Battle Trunks list for the item select window
+ * and returns its pointer in args[0] and the count in args[1].
+ */
 static USER_FUNC(iri_13_update_item_tbl) {
     EvtWord* args = event->args;
     s32 count = pouchCheckItem(0x6B);
@@ -3791,12 +4256,17 @@ static USER_FUNC(iri_13_update_item_tbl) {
     return EVT_RETURN_DONE;
 }
 
+/** Trouble Center job 13: frees the Battle Trunks list and clears the pointer. */
 static USER_FUNC(iri_13_free_item_tbl) {
     _mapFree(iri_13_item_tbl);
     iri_13_item_tbl = NULL;
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Message callback for Kuragarisan's text: when text of type 3 is shown with a word value of 1 at offset 8,
+ * it turns him to face 90 degrees.
+ */
 static void kuragarisan_msgcb(s32 type, void* param) {
     u8* msg = *(u8**)param;
     NpcEntry* npc;
@@ -3811,6 +4281,10 @@ static void kuragarisan_msgcb(s32 type, void* param) {
     }
 }
 
+/**
+ * Returns in args[0] to args[2] the position just outside the Trouble Center's back door (door "S_ie_03_doao")
+ * by door_position_sub.
+ */
 static USER_FUNC(evt_gor_door_in_info) {
     EvtWord* args = event->args;
     Vec outPos = {0.0f, 0.0f, 0.0f};
@@ -3823,6 +4297,10 @@ static USER_FUNC(evt_gor_door_in_info) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Returns in args[0] to args[2] the position just inside the Trouble Center's back door (door "S_ie_03_doao") by
+ * door_position_sub.
+ */
 static USER_FUNC(evt_gor_door_out_info) {
     EvtWord* args = event->args;
     Vec outPos = {0.0f, 0.0f, 0.0f};
@@ -3835,16 +4313,19 @@ static USER_FUNC(evt_gor_door_out_info) {
     return EVT_RETURN_DONE;
 }
 
+/** Forces the status window open. */
 static USER_FUNC(evt_StatusOpen) {
     statusWinForceOpen();
     return EVT_RETURN_DONE;
 }
 
+/** Closes the status window opened by evt_StatusOpen. */
 static USER_FUNC(evt_StatusClose) {
     statusWinForceOff();
     return EVT_RETURN_DONE;
 }
 
+/** Sets the depth offset (Z) of the background image named in args[0] to args[1]. */
 static USER_FUNC(set_depthPlaneOffset) {
     EvtWord* args = event->args;
     ImageEntry* img = imgNameToPtr((const char*)evtGetValue(event, args[0]), gp->inBattle != 0);
@@ -3853,6 +4334,7 @@ static USER_FUNC(set_depthPlaneOffset) {
     return EVT_RETURN_DONE;
 }
 
+/** Starts the lecture window and blocks until the player closes it. */
 static USER_FUNC(lecture) {
     if (isFirstCall) {
         winLectureOn();
@@ -3863,6 +4345,11 @@ static USER_FUNC(lecture) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Finds the next enemy tattle that Mario can still learn at this story stage:
+ * returns in args[0] 1 if one exists, and its enemy id in args[1].
+ * Gus, Bonetail and the Atomic Boo are checked after the per-stage lists.
+ */
 static USER_FUNC(monosiri_check) {
     EvtWord* args = event->args;
     s32 seq = evtGetValue(event, GSW(GSW_STORY_PROGRESS));
@@ -3904,6 +4391,7 @@ static USER_FUNC(monosiri_check) {
     return EVT_RETURN_DONE;
 }
 
+/** Marks tattle entry args[0] as learned and returns in args[1] the pointer to its message. */
 static USER_FUNC(monosiri_on) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -3914,6 +4402,10 @@ static USER_FUNC(monosiri_on) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Returns in args[0] whether the 3D camera is facing the front of the house (yaw below 90 or above 270 degrees),
+ * 1 for yes. US and later return 0 when Mario is west of x=-300.
+ */
 static USER_FUNC(camera_front_check) {
     EvtWord* args = event->args;
     f32 angle = reviseAngle((100.0f * camGetPtr(CAMERA_3D)->viewYaw + 5.0f) / 100.0f);
@@ -3936,12 +4428,17 @@ static USER_FUNC(camera_front_check) {
     return EVT_RETURN_DONE;
 }
 
+/** Allocates the 256-byte buffer that remembers the previous camera road name. */
 static USER_FUNC(get_camcurve_init) {
     camstring = _mapAlloc(0x100);
     camstring[0] = '\0';
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Returns in args[0] 1 when Mario has just moved from the ground camera road "C_ground_ok" to the upper road
+ * "C_ue", else 0; remembers the road name for the next call.
+ */
 static USER_FUNC(get_camcurve) {
     EvtWord* args = event->args;
     CamRoadWork* road = camRoadGetWorkPtr();
@@ -3957,6 +4454,10 @@ static USER_FUNC(get_camcurve) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Blocks (returns not-done) for every frame the camera yaw has changed since the last call;
+ * returns done when the camera has held still.
+ */
 static USER_FUNC(camera_move_check) {
     f32 angle;
 
@@ -3971,6 +4472,12 @@ static USER_FUNC(camera_move_check) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Guess: darkens the rooms behind Sanders's door as Mario walks through:
+ * installs the two door TEV colour callbacks on the room pieces and fades them
+ * and Sanders's NPC colour to black over 0.3 seconds, hides them,
+ * folds the divider "S_i03_sikiri_mC" away by 90 degrees and fades it out too.
+ */
 EVT_BEGIN(evt_gor_door_dark_sub)
     CALL(evt_map_set_tevcallback, 1, PTR(_door_color_tev))
     CALL(evt_map_set_tevcallback, 2, PTR(_door_color2_tev))
@@ -4030,6 +4537,11 @@ EVT_BEGIN(evt_gor_door_dark_sub)
     RETURN
 EVT_END()
 
+/**
+ * Open handler for Sanders's secret door: locks Mario, spawns evt_gor_door_open_sub and evt_gor_door_dark_sub,
+ * walks Mario and his partners from the in-position to the out-position of the door
+ * and moves the 3D camera along with him, then frees the controls and letterbox.
+ */
 EVT_BEGIN(evt_gor_door_open)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -4059,6 +4571,10 @@ EVT_BEGIN(evt_gor_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Animation of Sanders's door ("S_ie_03_doao") opening to 100 degrees with a door sound
+ * and swinging back to shut with a closing thump.
+ */
 EVT_BEGIN(evt_gor_door_close_sanders)
     CALL(evt_mapobj_get_position, STRING("S_ie_03_doao"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN1"), LW(0), LW(1), LW(2), 0)
@@ -4086,6 +4602,10 @@ EVT_BEGIN(evt_gor_door_close_sanders)
     RETURN
 EVT_END()
 
+/**
+ * Guess: closing half of the dark-room walk: folds the door "S_ie_03_doao" back from 90 degrees to shut over
+ * half a second, then plays the closing animation of Sanders's door (evt_gor_door_close_sanders).
+ */
 EVT_BEGIN(evt_gor_door_close_sub)
     CALL(evt_sub_intpl_msec_init, 2, 90, 0, 500)
     LOOP(0)
@@ -4101,6 +4621,12 @@ EVT_BEGIN(evt_gor_door_close_sub)
     RETURN
 EVT_END()
 
+/**
+ * Guess: undoes evt_gor_door_dark_sub when Mario walks back out through Sanders's door:
+ * unfolds the divider "S_i03_sikiri_mC" and fades the room pieces
+ * and Sanders's NPC colour back up to full over 0.3 seconds,
+ * then removes the TEV callbacks and puts the pieces back in the display list.
+ */
 EVT_BEGIN(evt_gor_door_light_sub)
     BEGIN_INLINE_EVENT
         CALL(evt_sub_intpl_msec_init, 0, 0, 255, 300)
@@ -4160,6 +4686,12 @@ EVT_BEGIN(evt_gor_door_light_sub)
     RETURN
 EVT_END()
 
+/**
+ * Close handler for Sanders's secret door, when Mario walks back out:
+ * locks the controls, spawns evt_gor_door_close_sub and evt_gor_door_light_sub,
+ * walks Mario and his partners to the in-position of the door while the 3D camera follows,
+ * then frees the controls.
+ */
 EVT_BEGIN(evt_gor_door_close)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -4185,6 +4717,11 @@ EVT_BEGIN(evt_gor_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Sets up Sanders's secret door "A_ie_03_doa_02" and "A_ie_03_doa_04":
+ * initialises the door tint state (_door_color_init_func) and registers evt_gor_door_open
+ * and evt_gor_door_close as the front-facing case events of the two doors.
+ */
 EVT_BEGIN(evt_gor_offscren_door_entry)
     CALL(_door_color_init_func)
     SET_VALUE(LW(4), STRING("A_ie_03_doa_02"))
@@ -4194,6 +4731,11 @@ EVT_BEGIN(evt_gor_offscren_door_entry)
     RETURN
 EVT_END()
 
+/**
+ * Mario is spun around when the thief bumps into him in the Chapter 0 coin-stealing scene:
+ * he plays pose M_N_H with SFX_STG0_MARIO_ROUND1 and a surprised voice,
+ * turns five full circles (1800 degrees of display direction) in one second, then returns to his idle pose.
+ */
 static EVT_BEGIN(mario_kirimomi_event)
     CALL(evt_mario_set_pose, STRING("M_N_H"))
     CALL(evt_snd_sfxon, STRING("SFX_STG0_MARIO_ROUND1"), 0)
@@ -4220,11 +4762,18 @@ static EVT_BEGIN(mario_kirimomi_event)
     RETURN
 EVT_END()
 
+/** Shakes the camera briefly (0.1 second) for the bump in steel_coin. */
 EVT_BEGIN(cam_yurasu_event)
     CALL(evt_cam_shake, 4, FLOAT(0.01953125f), FLOAT(0.0f), 100)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene at STORY_STG0_07_GOOMBELLA_JOINS when Mario first walks into the east side:
+ * a thief runs into him from the right, knocks him spinning
+ * and steals half of Mario's coins (the amount is kept in GSW_GOR_STOLEN_COINS_LO and _HI for thief_talk to give
+ * back; skipped if Mario has none), then sets STORY_STG0_08_STOLEN_COINS.
+ */
 EVT_BEGIN(steel_coin)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_kmn"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_npc_set_ry, STRING("盗賊"), 270)
@@ -4341,6 +4890,12 @@ EVT_BEGIN(steel_coin)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene when Mario and Goombella first enter Professor Frankly's house (STORY_STG0_08):
+ * Frankly appears, introduces himself, takes the Magical Map,
+ * and sends them off to find the Thousand-Year Door pedestal. Ends by setting STORY_STG0_09_PROF_FRANKLY.
+ * Frankly's talk uses the mac_0_066 to mac_0_082 lines.
+ */
 EVT_BEGIN(kurihakase_first_talk)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ie_02_naka"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_npc_set_position, STRING("クリハカセ"), -115, 0, -225)
@@ -4523,6 +5078,12 @@ EVT_BEGIN(kurihakase_first_talk)
     RETURN
 EVT_END()
 
+/**
+ * Guess: cutscene when Mario returns to Frankly's house:
+ * Frankly takes a hammer to the fence "S_saku04" in front of his house
+ * and removes it (the piece slides offscreen), then sets STORY_STG0_10_REMOVING_THE_FENCE
+ * and spawns kurihakase_lecture.
+ */
 EVT_BEGIN(kurihakase_wall_remove)
     CALL(evt_door_end_wait)
     CALL(evt_mario_key_onoff, 0)
@@ -4588,6 +5149,11 @@ EVT_BEGIN(kurihakase_wall_remove)
     RETURN
 EVT_END()
 
+/**
+ * Frankly's tutorial lecture after the fence is gone:
+ * asks whether Mario wants the lesson (mac_0_084_02), lets Goombella chip in,
+ * and sets STORY_STG0_10_01_FRANKLYS_TUTORIAL. If he declines twice he cuts the lecture short.
+ */
 EVT_BEGIN(kurihakase_lecture)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     SET_FLOAT_VALUE(LW(3), LW(0))
@@ -4665,6 +5231,10 @@ EVT_BEGIN(kurihakase_lecture)
     RETURN
 EVT_END()
 
+/**
+ * Guess: opens Frankly's door ("S_i02_doa") to its angle and closes it again with sounds;
+ * used when his house changes scenes.
+ */
 EVT_BEGIN(kurihakase_door)
     CALL(evt_mapobj_get_position, STRING("S_i02_doa"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN1"), LW(0), LW(1), LW(2), 0)
@@ -4692,6 +5262,11 @@ EVT_BEGIN(kurihakase_door)
     RETURN
 EVT_END()
 
+/**
+ * Badge tutorial at STORY_STG0_16_FRANKLYS_HOUSE:
+ * Frankly gives Mario a Power Smash badge, asks whether he wants a lesson on badges (mac_0_121_02 to 05)
+ * and runs the lecture window (lecture) if he does, then sets STORY_STG0_17_BADGE_TUTORIAL.
+ */
 EVT_BEGIN(kurihakase_lecture_badge)
     CALL(evt_door_end_wait)
     SET_VALUE(GF(0), 1)
@@ -4780,6 +5355,7 @@ EVT_BEGIN(kurihakase_lecture_badge)
     RETURN
 EVT_END()
 
+/** Guess: moves Mario and the active partner to their standing places in Frankly's study for the epigraphy scenes. */
 EVT_BEGIN(Mario_Party_position)
     CALL(evt_mario_set_pos, -190, 0, -215)
     CALL(evt_mario_set_dir, 90, 0, 0)
@@ -4791,6 +5367,7 @@ EVT_BEGIN(Mario_Party_position)
     RETURN
 EVT_END()
 
+/** Guess: animation of the book on Frankly's table opening, with its sound; used by the epigraphy scenes. */
 EVT_BEGIN(book_open)
     CALL(evt_mapobj_get_position, STRING("S_open_book_r"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG0_OPEN_BOOK1"), LW(0), LW(1), LW(2), 0)
@@ -4807,6 +5384,7 @@ EVT_BEGIN(book_open)
     RETURN
 EVT_END()
 
+/** Guess: animation of the book on Frankly's table closing, with its sound; used by the epigraphy scenes. */
 EVT_BEGIN(book_close)
     CALL(evt_sub_intpl_msec_init, 11, 180, 360, 500)
     LOOP(0)
@@ -4823,6 +5401,7 @@ EVT_BEGIN(book_close)
     RETURN
 EVT_END()
 
+/** Guess: hides the open book "S_open_book" and sets it to its closed resting position (-15, 0, 0) on the table. */
 EVT_BEGIN(book_center_init)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_open_book"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_trans, 1, STRING("S_open_book"), -15, 0, 0)
@@ -4830,6 +5409,12 @@ EVT_BEGIN(book_center_init)
     RETURN
 EVT_END()
 
+/**
+ * Guess: cutscene when Mario brings back the first Crystal Star's pedestal clue (STORY_STG0_15_THE_PEDESTAL):
+ * the pouch's AP is set to its maximum, Frankly reads the Magical Map (mac_0_102 to 120) with Goombella's help,
+ * the map flies up and shows the path to the next stage, and the story advances to STORY_STG0_16_FRANKLYS_HOUSE.
+ * Plays the house music, then the Rogueport theme at the end.
+ */
 EVT_BEGIN(epigraphy_map)
     CALL(evt_pouch_get_max_ap, LW(0))
     CALL(evt_pouch_set_ap, LW(0))
@@ -5000,6 +5585,11 @@ EVT_BEGIN(epigraphy_map)
     RETURN
 EVT_END()
 
+/**
+ * Frankly's cutscene after Chapter 1 (STORY_STG1_30_ZESS_T):
+ * he deciphers the Magical Map for the next Crystal Star (mac_1_004 to 010_03)
+ * and sets STORY_STG1_31_FRANKLYS_HOUSE.
+ */
 EVT_BEGIN(epigraphy_map_after_stage1)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -5067,6 +5657,10 @@ EVT_BEGIN(epigraphy_map_after_stage1)
     RETURN
 EVT_END()
 
+/**
+ * Frankly's cutscene after Chapter 2 (STORY_STG2_40_THOUSAND_YEAR_DOOR):
+ * he deciphers the map for the next star (mac_2_002_01 to 06) and sets STORY_STG2_41_FRANKLYS_HOUSE.
+ */
 EVT_BEGIN(epigraphy_map_after_stage2)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -5168,6 +5762,11 @@ EVT_BEGIN(epigraphy_map_after_stage2)
     RETURN
 EVT_END()
 
+/**
+ * Frankly's cutscene after Chapter 3 (STORY_STG3_50_THOUSAND_YEAR_DOOR):
+ * he deciphers the map for the next star (mac_3_001_01 on);
+ * if the Twilight Town pipe has not been reached he adds a hint. Sets STORY_STG3_51_FRANKLYS_HOUSE.
+ */
 EVT_BEGIN(epigraphy_map_after_stage3)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -5259,6 +5858,10 @@ EVT_BEGIN(epigraphy_map_after_stage3)
     RETURN
 EVT_END()
 
+/**
+ * Guess: frankly's cutscene after Chapter 4 (STORY_STG4_30_THOUSAND_YEAR_DOOR):
+ * he deciphers the map for the next star (mac_4_001_01 on) and sets STORY_STG4_31_FRANKLYS_HOUSE.
+ */
 EVT_BEGIN(epigraphy_map_after_stage4)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -5330,6 +5933,10 @@ EVT_BEGIN(epigraphy_map_after_stage4)
     RETURN
 EVT_END()
 
+/**
+ * Guess: frankly's cutscene after Chapter 5 (STORY_STG5_60_RETURN_TO_KEELHAUL):
+ * he deciphers the map for the next star and sets STORY_STG5_61_FRANKLYS_HOUSE.
+ */
 EVT_BEGIN(epigraphy_map_after_stage5)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -5391,6 +5998,12 @@ EVT_BEGIN(epigraphy_map_after_stage5)
     RETURN
 EVT_END()
 
+/**
+ * Frankly's cutscene after Chapter 6 (STORY_STG6_70_THOUSAND_YEAR_DOOR):
+ * he starts the final research, saves the play time to GSW_GOR02_FRANKLY_STG6_TIME
+ * and sets GSWF_GOR02_FRANKLY_STG6_RESEARCH, then sets STORY_STG6_71_FRANKLYS_HOUSE.
+ * His talk then counts three minutes of play time.
+ */
 EVT_BEGIN(epigraphy_map_after_stage6)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -5460,6 +6073,12 @@ EVT_BEGIN(epigraphy_map_after_stage6)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene when Frankly finishes the Chapter 6 research after three minutes of play time:
+ * Frankly and the partner discuss it (mac_6_007 to 015),
+ * with a different line depending on whether Mario has the Ultra Hammer,
+ * then sets STORY_STG6_72_THREE_MINUTES_LATER and restores the controls and music.
+ */
 EVT_BEGIN(kurihakase_after3minutes)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("mac_6_007"), 0, STRING("クリハカセ"))
@@ -5530,6 +6149,11 @@ static HitDamageReturn hitDmgRetPoints[] = {
     {0},
 };
 
+/**
+ * Loops forever, making the cockroach object S_goki_01 scuttle around:
+ * it picks random loiter targets, avoids villagers (gor_villager_urouro_check_func),
+ * moves in 50 steps and faces its direction of travel.
+ */
 static EVT_BEGIN(gor_goki1_urouro)
     SET_VALUE(LW(4), 0)
     SET_VALUE(LW(5), 0)
@@ -5566,6 +6190,7 @@ static EVT_BEGIN(gor_goki1_urouro)
     RETURN
 EVT_END()
 
+/** Same as gor_goki1_urouro for the second cockroach object, S_goki_02 (a different base offset). */
 static EVT_BEGIN(gor_goki2_urouro)
     SET_VALUE(LW(4), 0)
     SET_VALUE(LW(5), 0)
@@ -5601,6 +6226,10 @@ static EVT_BEGIN(gor_goki2_urouro)
     RETURN
 EVT_END()
 
+/**
+ * Opens the chest mobj_box01 and gives Mario the Double Dip badge (ITEM_DOUBLE_DIP;
+ * the US and later releases add ITEM_FLAG_BADGE_RETURN).
+ */
 static EVT_BEGIN(mobj_box01)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box01"), LW(0), LW(1), LW(2))
@@ -5694,6 +6323,11 @@ MonosiriFollow follow[] = {
 #endif
 };
 
+/**
+ * Case event for the wastebasket in Frankly's house ("A_i02_gomibako"):
+ * shows the next tattle Mario can still learn (monosiri_follow_00), marks it as learned,
+ * and removes the note "S_i02_memo" when none are left.
+ */
 EVT_BEGIN(evt_monosiri)
     CALL(evt_mario_key_onoff, 0)
     CALL(monosiri_check, LW(0), LW(1))
@@ -5708,6 +6342,10 @@ EVT_BEGIN(evt_monosiri)
     RETURN
 EVT_END()
 
+/**
+ * Guess: sets up the case event for the wastebasket (evt_monosiri)
+ * when a tattle entry is still unlearned for the current story stage.
+ */
 EVT_BEGIN(evt_monosiri_follow)
     CALL(monosiri_check, LW(0), LW(1))
     IF_INT_EQUAL(LW(0), 1)
@@ -5716,6 +6354,10 @@ EVT_BEGIN(evt_monosiri_follow)
     RETURN
 EVT_END()
 
+/**
+ * Guess: run when the smoke cloud clears the wall covering the Trouble Center's back door:
+ * sets GSWF_GOR02_WALL_COVER_BLOWN and re-enters door_data_04_ura so the door works.
+ */
 EVT_BEGIN(evt_cloud)
     SET_VALUE(GSWF(GSWF_GOR02_WALL_COVER_BLOWN), 1)
     SET_VALUE(LW(0), PTR(&door_data_04_ura))
@@ -5723,6 +6365,11 @@ EVT_BEGIN(evt_cloud)
     RETURN
 EVT_END()
 
+/**
+ * Init for Trouble Center job 19: while it is active and the ring has been lost (GSWF_TROUBLE_WORK_BASE),
+ * places the Wedding Ring on the ground in the east side,
+ * at (525, 0, 160) in US and later and at (-65, 120, 196) in earlier releases.
+ */
 EVT_BEGIN(iri_19_init)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 19)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_BASE), 1)
@@ -5736,6 +6383,10 @@ EVT_BEGIN(iri_19_init)
     RETURN
 EVT_END()
 
+/**
+ * Enters Goombella ("c_pkr") at (-240, 0, -260) facing 270 for the ending scene at Professor Frankly's house,
+ * intangible, with move animation and blending off.
+ */
 static EVT_BEGIN(epilogue_npc_entry)
     CALL(evt_npc_entry, STRING("クリスチーヌ"), STRING("c_pkr"))
     CALL(evt_npc_set_tribe, STRING("クリスチーヌ"), STRING("クリスチーヌ"))
@@ -5748,6 +6399,11 @@ static EVT_BEGIN(epilogue_npc_entry)
     RETURN
 EVT_END()
 
+/**
+ * Background part of the ending scene in Professor Frankly's house:
+ * loops Goombella walking back and forth in front of the professor,
+ * with their talk animations (PKR_T_1 and T_1) alternating so they appear to talk.
+ */
 static EVT_BEGIN(epilogue_evt_sub)
     WAIT_MS(2000)
     LOOP(0)
@@ -5768,6 +6424,12 @@ static EVT_BEGIN(epilogue_evt_sub)
     RETURN
 EVT_END()
 
+/**
+ * The ending scene at Professor Frankly's house:
+ * the music changes to BGM_STG0_GOR1, the book and map on the table are hidden,
+ * the professor stands at (-140, 0, -225), the door opens, the camera frames the room while epilogue_sub runs,
+ * ep_36 plays, and the game fades to hei_00.
+ */
 static EVT_BEGIN(epilogue_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_GOR1"))
     CALL(evt_snd_envoff, PSND_FADE_OUT)
@@ -5795,6 +6457,10 @@ static EVT_BEGIN(epilogue_evt)
     RETURN
 EVT_END()
 
+/**
+ * Sets GSWF_GOR02_MERLON_PORTENT_PENDING if Merlon's first rank up has not been done yet, otherwise clears it.
+ * Run once the story reaches STORY_STG5_58_FAIR_WINDS.
+ */
 EVT_BEGIN(dearu_event)
     IF_INT_EQUAL(GSWF(GSWF_MERLON_FIRST_UPGRADE_DONE), 0)
         SET_VALUE(GSWF(GSWF_GOR02_MERLON_PORTENT_PENDING), 1)
@@ -5804,6 +6470,10 @@ EVT_BEGIN(dearu_event)
     RETURN
 EVT_END()
 
+/**
+ * Loops forever hiding the outer wall "S_gai_kabe_mae"
+ * when the camera looks at it from the front (camera_front_check) and showing it otherwise.
+ */
 EVT_BEGIN(front_wall_keshi)
     LOOP(0)
         CALL(camera_front_check, LF(0))
@@ -5817,6 +6487,10 @@ EVT_BEGIN(front_wall_keshi)
     RETURN
 EVT_END()
 
+/**
+ * Loops forever: when the camera road changes from the ground road to the upper one and Mario is at x >= 370,
+ * hides the house 05 exterior "S_ie_05_soto" until the camera has finished turning, then shows it again.
+ */
 EVT_BEGIN(tobiori_check)
     CALL(get_camcurve_init)
     LOOP(0)
@@ -5839,6 +6513,12 @@ EVT_BEGIN(tobiori_check)
     RETURN
 EVT_END()
 
+/**
+ * Map init for gor_02 (Rogueport east side).
+ * Picks the music by story stage, sets the exits, creates the NPCs, houses and their doors, the item box,
+ * the Shine Sprite blocks and the Star Pieces, and starts whichever story cutscene belongs to the current stage
+ * (the epigraphy scenes at Professor Frankly's, Frankly's lecture, the Chapter 6 research, the epilogue).
+ */
 EVT_BEGIN(gor_02_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_OR_EQUAL(STORY_STG0_15_THE_PEDESTAL)

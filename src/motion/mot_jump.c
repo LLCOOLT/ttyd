@@ -26,17 +26,24 @@
 static f32 marioJumpStandData[] = {1.52f, -0.188f, 2.925f, -0.847f, -0.1f, -0.4f, 0.024f, -0.004f, 0.125f, 0.7f};
 f32 marioJumpSwData[] = {2.5f, -0.1f, 0.02f, -0.01f, -0.08f, -0.4f, 0.0f, -0.002f};
 
+/** Switches to the rising jump pose M_J_1B, only for plain Mario (not Bowser, and not while carrying Bobbery). */
 static inline void chgPoseB(MarioWork* mario) {
     if (!(mario->flags & MARIO_FLAG_IS_CARRYING_BOBBERY) && mario->characterId == 0) {
         marioChgPose("M_J_1B");
     }
 }
+/** Switches to the falling jump pose M_J_1C, only for plain Mario (not Bowser, and not while carrying Bobbery). */
 static inline void chgPoseC(MarioWork* mario) {
     if (!(mario->flags & MARIO_FLAG_IS_CARRYING_BOBBERY) && mario->characterId == 0) {
         marioChgPose("M_J_1C");
     }
 }
 
+/**
+ * Common take-off for every jump: sets the jumping flag, clears the air timers, remembers the floor jumped from,
+ * detaches from riding objects, loads the jump parameters and the take-off position.
+ * The US and later releases also record the run speed at take-off for the Spring Jump check in mot_fall.
+ */
 void marioPreJump(void) {
     MarioWork* mario = marioGetPtr();
     mario->flags &= ~MARIO_FLAG_IS_FALLING;
@@ -52,11 +59,18 @@ void marioPreJump(void) {
 #endif
 }
 
+/** Height the current jump-stand launch will reach (mario->mot.jump.standHeight). */
 f32 marioGetJumpHeight(void) {
     MarioWork* mario = marioGetPtr();
     return mario->mot.jump.standHeight;
 }
 
+/**
+ * Launch off a blue jump stand (springboard mobj) up to mario->mot.jump.standHeight,
+ * set by marioChgJumpStandMotion: a 3-frame squat,
+ * a rise with marioJumpStandData's curve until 70% of the height, an ease-out to the peak, then a fall.
+ * Leaves paper mode unless the paper button is held.
+ */
 void mot_jumpStand(void) {
     MarioWork* mario = marioGetPtr();
     f32 prev;
@@ -143,6 +157,11 @@ void mot_jumpStand(void) {
     }
 }
 
+/**
+ * Bounce off a switch after stepping or spin-jumping on it (set by the switch mobjs in evt_mobj.c):
+ * jumps off with the marioJumpSwData curve, nudging Mario off the switch's centre
+ * so he does not land back on it.
+ */
 void mot_jumpSw(void) {
     MarioWork* mario = marioGetPtr();
     void* mobj;
@@ -221,6 +240,10 @@ void mot_jumpSw(void) {
     mario->airTimer++;
 }
 
+/**
+ * Guess: bounce off an enemy after stomping it, like mot_jumpSw but from the hit object;
+ * Bowser runs kpa_jumpNpc (his field stage switches here when he lands on an enemy).
+ */
 void mot_jumpNpc(void) {
     MarioWork* mario = marioGetPtr();
     f32 s, c;
@@ -316,6 +339,7 @@ void mot_jumpNpc(void) {
     mario->airTimer++;
 }
 
+/** Plays one of Mario's five jump voice clips (0x9D-0xA1) at random, 20% each. */
 static inline void jumpSfx(MarioWork* mario) {
     s32 r = irand(10000);
     s32 id;
@@ -334,6 +358,10 @@ static inline void jumpSfx(MarioWork* mario) {
 }
 
 #if VERSION >= VERSION_US
+/**
+ * Turns camera y-follow back on when the mot_jumpNpc bounce ends on gon_10 (Hooktail Castle),
+ * where it would otherwise stay off. US and later only.
+ */
 void N_mot_jumpNpc_post(void) {
     MarioWork* mario = marioGetPtr();
     if (!strcmp(gp->currentMapName, "gon_10") && (mario->dispFlags & MARIO_DISP_FLAG_CAM_FOLLOW_Y_OFF)) {
@@ -341,6 +369,12 @@ void N_mot_jumpNpc_post(void) {
     }
 }
 #endif
+/**
+ * Normal A-button jump (also MARIO_MOTION_JUMP_2 and the script-driven JUMP_3):
+ * jump voice and sound, rising pose, stops camera y-follow (JUMP_3 turns it on from the US release),
+ * and records where the fall starts. The arc itself is run by the shared jump code in mario_motion.c.
+ * Bowser runs kpa_jump.
+ */
 void mot_jump(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->characterId == 2) {
@@ -386,6 +420,7 @@ void mot_jump(void) {
     mario->airTimer++;
 }
 
+/** Small jump: the same set-up as mot_jump for the lower jump arc (MARIO_MOTION_JUMP_SMALL). */
 void mot_jumpSmall(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->characterId == 2) {
@@ -423,6 +458,10 @@ void mot_jumpSmall(void) {
     mario->airTimer++;
 }
 
+/**
+ * Steps Mario up onto a ledge to mario->stepUpY over 3 frames, then returns to the paper,
+ * sideways or normal motion he was in.
+ */
 void mot_upstairs(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->trigFlags & MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION) {
@@ -457,6 +496,13 @@ void mot_upstairs(void) {
     }
 }
 
+/**
+ * Falling off a ledge or after a jump peak: falling pose (not for FALL_2, which also stops air steering),
+ * camera y-follow back on once below the take-off height,
+ * and faster camera follow near the bottom of the screen.
+ * From the US release it also arms the mid-air Spring Jump input
+ * when Mario fell from standing with the Ultra Boots. Bowser runs kpa_fall.
+ */
 void mot_fall(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->characterId == 2) {
@@ -526,6 +572,7 @@ void mot_fall(void) {
     }
 }
 
+/** Stops the looping sound in mario->soundId[2] when the fall motion ends. */
 void mot_fall_post(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->soundId[2] != (u32)-1) {
@@ -534,6 +581,10 @@ void mot_fall_post(void) {
     }
 }
 
+/**
+ * Landing: clears the jump state and the looping sound,
+ * then goes to the stay motion at once or after mario->multiTimer frames.
+ */
 void mot_land(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->trigFlags & MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION) {

@@ -142,6 +142,7 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_gesso_left_arm", "c_gesso3", 0.0f, 0.0f, 0.0f, 270.0f, 20.0f, 0.0f, 270.0f, 20.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, VERSION_PICK(0x80009, 0x2080009), 0, pose_table},
 };
 
+/** Init script of the Blooper's left tentacle. Registers its damage, phase and attack scripts and starts it waiting. */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -152,6 +153,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction of the left tentacle: runs the default damage, then,
+ * if the body (unit work 0) is idle (work 4 not above 0), tells the body to go back to its wait script.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -167,6 +172,12 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 #if VERSION >= VERSION_JP
+/**
+ * Damage reaction of the Blooper's left tentacle (JP and later).
+ * Plays the hit pose (38 or 39 depending on the damage pattern), runs the damage and,
+ * if the tentacle was defeated, the death event; otherwise it returns to the wait pose.
+ * Afterwards the body is told to wait again when no tentacle fall is in progress.
+ */
 EVT_BEGIN(gesso_left_arm_damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -205,6 +216,7 @@ EVT_BEGIN(gesso_left_arm_damage_event)
 EVT_END()
 #endif
 
+/** Phase script of the left tentacle; does nothing. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
@@ -245,6 +257,10 @@ BattleWeapon weapon_gesso_left_arm_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Attack script of the left tentacle; the tentacle never attacks, so it only returns.
+ * Guess: the weapon is kept for the unit definition.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -307,6 +323,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait script of the left tentacle: shows its idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

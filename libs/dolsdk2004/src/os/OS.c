@@ -77,6 +77,10 @@ void __OSDBINTEND(void);
 void __OSDBJUMPSTART(void);
 void __OSDBJUMPEND(void);
 
+/**
+ * Reads the debugger-present word the boot ROM leaves at physical address 0x40;
+ * nonzero means a debugger is attached.
+ */
 u32 __OSIsDebuggerPresent(void) {
     return *(u32*)OSPhysicalToCached(0x40);
 }
@@ -170,6 +174,10 @@ skip_ps_init:
 }
 #endif
 
+/**
+ * Clears the WPE bit (0x40000000) in HID2 so stores to the write-gather address are no longer gathered;
+ * OSInit calls it after the other subsystems are up.
+ */
 static void DisableWriteGatherPipe(void) {
     u32 hid2;
 
@@ -178,6 +186,10 @@ static void DisableWriteGatherPipe(void) {
     PPCMthid2(hid2);
 }
 
+/**
+ * Returns the console type word from the boot info at the start of memory,
+ * or OS_CONSOLE_ARTHUR when there is no boot info or it is zero.
+ */
 u32 OSGetConsoleType(void) {
     if (!BootInfo || BootInfo->consoleType == 0) {
         return OS_CONSOLE_ARTHUR;
@@ -189,6 +201,11 @@ u32 OSGetConsoleType(void) {
 #undef NULL
 #define NULL 0
 
+/**
+ * Zeroes the arena at the end of OSInit.
+ * After a reset that keeps a saved region it zeroes only the parts below and above that region,
+ * so the saved memory survives.
+ */
 static void ClearArena(void) {
     if (!((OSGetResetCode() & 0x80000000) ? TRUE : FALSE)) {
         memset(OSGetArenaLo(), 0, (u32)OSGetArenaHi() - (u32)OSGetArenaLo());
@@ -216,6 +233,10 @@ static void ClearArena(void) {
     }
 }
 
+/**
+ * Completion callback for the DVD drive inquiry started in OSInit:
+ * stores 0x8000 plus the drive's device code in __OSDeviceCode, or 1 if the inquiry failed.
+ */
 static void InquiryCallback(s32, DVDCommandBlock* block) {
     switch (block->state) {
     case 0:
@@ -227,6 +248,14 @@ static void InquiryCallback(s32, DVDCommandBlock* block) {
     }
 }
 
+/**
+ * Boots the Dolphin OS (the game calls it first):
+ * saves the exec parameters, finds the arena from the boot info or the link script,
+ * installs the exception vectors, and initializes alarms, modules, interrupts, contexts, caches, EXI, SI, SRAM,
+ * threads, the DSP audio system and memory protection.
+ * It then prints the console type, memory size and arena range, clears the arena,
+ * enables interrupts and starts DVDInit with a drive inquiry. Runs only once.
+ */
 void OSInit(void) {
     u32 consoleType;
     void* bi2StartAddr;
@@ -382,6 +411,12 @@ char * __OSExceptionNames[17] = {
 };
 #endif
 
+/**
+ * Copies the first-level exception vector code into each exception's slot in low memory,
+ * patching in that slot's exception number (leaving out those TRK has claimed),
+ * installs the debugger integrator stub on first boot,
+ * and points every exception handler at OSDefaultExceptionHandler.
+ */
 static void OSExceptionInit(void) {
     __OSException exception;
     void* destAddr;
@@ -462,6 +497,11 @@ static void OSExceptionInit(void) {
     DBPrintf("Exceptions initialized...\n");
 }
 
+/**
+ * Assembly stub copied to the debugger jump page:
+ * saves the return address in the debugger interface,
+ * turns on instruction and data address translation and returns to the debugger's destination address.
+ */
 #ifdef __GEKKO__
 static asm void __OSDBIntegrator(void) {
     nofralloc
@@ -479,6 +519,10 @@ entry __OSDBINTEND
 }
 #endif
 
+/**
+ * Assembly stub copied over __DBVECTOR for an exception the debugger has claimed:
+ * branches to the debugger jump point at address 0x60.
+ */
 #ifdef __GEKKO__
 static asm void __OSDBJump(void) {
     nofralloc
@@ -488,6 +532,7 @@ entry __OSDBJUMPEND
 }
 #endif
 
+/** Installs a handler for one PowerPC exception number and returns the previous handler. */
 __OSExceptionHandler __OSSetExceptionHandler(__OSException exception, __OSExceptionHandler handler) {
     __OSExceptionHandler oldHandler;
     
@@ -498,11 +543,18 @@ __OSExceptionHandler __OSSetExceptionHandler(__OSException exception, __OSExcept
     return oldHandler;
 }
 
+/** Returns the handler installed for one PowerPC exception number. */
 __OSExceptionHandler __OSGetExceptionHandler(__OSException exception) {
     ASSERTMSGLINE(1228, exception < __OS_EXCEPTION_MAX, "__OSGetExceptionHandler(): unknown exception.");
     return OSExceptionTable[exception];
 }
 
+/**
+ * Assembly template for every exception vector:
+ * saves r3-r5, CR, LR, CTR, XER, SRR0 and SRR1 into the current OSContext,
+ * turns address translation back on and jumps through the exception table to the handler (or to
+ * OSDefaultExceptionHandler if the exception was not recoverable).
+ */
 #ifdef __GEKKO__
 static asm void OSExceptionVector(void) {
     nofralloc
@@ -589,6 +641,10 @@ entry __OSEVEnd
 
 void __OSUnhandledException(__OSException exception, OSContext* context, u32 dsisr, u32 dar);
 
+/**
+ * Assembly default handler for any exception nobody claimed:
+ * saves the GPRs into the context and branches to __OSUnhandledException with DSISR and DAR.
+ */
 #ifdef __GEKKO__
 asm void OSDefaultExceptionHandler(register __OSException exception, register OSContext* context) {
     nofralloc
@@ -601,6 +657,10 @@ asm void OSDefaultExceptionHandler(register __OSException exception, register OS
 }
 #endif
 
+/**
+ * Enables paired-single mode and quantized load/store in HID2 (bits 0x80000000 and 0x20000000),
+ * invalidates the instruction cache and clears the eight GQR registers.
+ */
 #ifdef __GEKKO__
 void __OSPSInit(void) {
 	PPCMthid2(PPCMfhid2() | 0x80000000 | 0x20000000);
@@ -622,10 +682,12 @@ void __OSPSInit(void) {
 }
 #endif
 
+/** Returns the low byte of DI register 9, the DVD interface configuration. */
 u32 __OSGetDIConfig(void) {
     return (__DIRegs[9] & 0xFF);
 }
 
+/** Prints a library's version string to the debug console; each SDK library calls it from its init function. */
 void OSRegisterVersion(const char* id) {
     OSReport("%s\n", id);
 }

@@ -178,6 +178,10 @@ static BattleWeapon weapon_kuriboo_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init script of the Goomba: registers its wait, phase, attack, damage and confusion handlers,
+ * sets the walk/run/jump sounds (SFX_ENM_KURI_*) and starts the idle event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
@@ -191,6 +195,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction: runs the default damage handling (btldefaultevt_Damage) with LW(10) = -2 (the unit itself)
+ * and LW(11) = 1.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -198,6 +206,13 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Intro of the Goomba pair in the Glitz Pit (runs once, on turn 1, for the unit with work 0 set,
+ * while GSWF_TOU_GOOMBA_BROS_FIRST_STRIKE_SEEN is clear):
+ * pans the camera, has the partner say a line chosen by its kind (224 stg3_tou_83_kur, 225 stg3_tou_83_nok,
+ * 227 stg3_tou_83_win; Guess: Goombella, Koops and Flurrie) and the Goomba answer with stg3_tou_84,
+ * then sets the flag.
+ */
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -236,6 +251,12 @@ static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * The Goomba's attack: picks a target (or uses an item), tumbles through the air with its body rotated,
+ * then comes back to its stance.
+ * A miss ends the move with the pose reset; a hit plays SFX_ENM_KURI_ATTACK1
+ * and applies the damage (Guess: the rolling attack of a Goomba Bros. fighter).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -369,11 +390,17 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle event: sets the unit's body part 1 to the pose given by its pose table for its current state. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Guess: script helper: arg0/arg1 = x/z of one point, arg2/arg3 = x/z of another;
+ * arg4 receives the angle (degrees) of the vector between them,
+ * or keeps its incoming value when the points coincide.
+ */
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);

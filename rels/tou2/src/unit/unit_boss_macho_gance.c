@@ -510,6 +510,10 @@ BattleWeapon weapon_gance_body_attack = {
     {0, 25, 25, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Battle camera move to frame Macho Grubba: LW(0) = 2 snaps instantly, anything else moves in over 30 frames;
+ * the framing depends on how big he currently is. LW(0) = 1 also waits 600 ms for the camera to settle.
+ */
 EVT_BEGIN(macho_gance_zoom)
     CALL(btlevtcmd_GetStatusMg, BTL_UNIT_SELF, LW(2))
     MULTIPLY_FLOAT(LW(2), FLOAT(10.0f))
@@ -532,6 +536,10 @@ EVT_BEGIN(macho_gance_zoom)
     RETURN
 EVT_END()
 
+/**
+ * Same idea as macho_gance_zoom but with a screen blur:
+ * moves the camera close to Macho Grubba and starts a radial blur; LW(0) = 1 waits 900 ms.
+ */
 EVT_BEGIN(macho_gance_blur_zoom)
     CALL(evt_btl_camera_set_mode, 0, 3)
     IF_INT_NOT_EQUAL(LW(0), 2)
@@ -551,6 +559,10 @@ EVT_BEGIN(macho_gance_blur_zoom)
     RETURN
 EVT_END()
 
+/**
+ * Camera helper: frames Mario and the partner from the left side.
+ * LW(0) = 2 snaps there in 1 frame, anything else takes 30 frames; LW(0) = 1 also waits 600 ms.
+ */
 static EVT_BEGIN(mario_party_zoom)
     CALL(evt_btl_camera_set_mode, 0, 3)
     IF_INT_NOT_EQUAL(LW(0), 2)
@@ -565,6 +577,13 @@ static EVT_BEGIN(mario_party_zoom)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Macho Grubba: sets his run and walk sounds, registers his wait, phase, attack,
+ * damage and entry events (confusion uses the default confuse event), clears unit work 0 to 2,
+ * sets work 3 (his size factor) to 1.0, zeroes the hit and cursor offsets and starts the wait event.
+ * Unit work 0 counts his actions this turn, 1 is his HP phase (0 to
+ * 3) and 2 the pose move he is in.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetRunSound, BTL_UNIT_SELF, STRING("SFX_BOSS_GANSU_MOVE1L"), STRING("SFX_BOSS_GANSU_MOVE1R"), 0, 10, 10)
     CALL(btlevtcmd_SetWalkSound, BTL_UNIT_SELF, STRING("SFX_BOSS_GANSU_MOVE1L"), STRING("SFX_BOSS_GANSU_MOVE1R"), 0, 20, 20)
@@ -584,6 +603,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Macho Grubba's entrance: the camera zooms in on him while he stands in his entry pose ("E_1A") for 1.5 s,
+ * he says stg3_tou_469 and the party partner answers with stg3_tou_470.
+ */
 static EVT_BEGIN(entry_event)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     SET_VALUE(LW(0), 2)
@@ -606,6 +629,11 @@ static EVT_BEGIN(entry_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage event of Macho Grubba: default damage reaction, then,
+ * if he was hit in the middle of one of his pose moves (unit work 2 is 1, 2, 3, 4 or 6) a short pause is added,
+ * and unit work 2 is cleared.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -644,6 +672,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: resizes Macho Grubba: LW(0) is the new base size factor (stored as unit work 3);
+ * the hit offsets, cursor and other size-dependent offsets are rescaled by the ratio against the old size.
+ */
 EVT_BEGIN(base_size_change)
     CALL(btlevtcmd_GetUnitWorkFloat, BTL_UNIT_SELF, 3, LW(1))
     CALL(btlevtcmd_SetUnitWorkFloat, BTL_UNIT_SELF, 3, LW(0))
@@ -675,6 +707,15 @@ EVT_BEGIN(base_size_change)
     RETURN
 EVT_END()
 
+/**
+ * Macho Grubba's HP phases, checked after the player's phase while he can act (unit work 1 is the phase,
+ * unit work 0 is reset to 0).
+ * At 75% HP or below (phase 0 to 1) he strikes his entry pose and says stg3_tou_471_17.
+ * At 50% or below (1 to 2) he says stg3_tou_471_18,
+ * then swells in two spinning steps to 1.3 times his size (with the blur camera and the growth sounds)
+ * and jumps twice, shaking the camera with each landing.
+ * At 25% or below (2 to 3) he switches to the wobbly pose table (pose_table_furafura) and says stg3_tou_471_19.
+ */
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_EQUAL(LW(0), 0)
@@ -826,6 +867,11 @@ static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Macho Grubba's defeat: waits for the current attack to end, zooms the camera onto him,
+ * plays his fall ("D_2") with the down sound and a camera shake,
+ * and has him say stg3_tou_471_20 before the common no-spin death.
+ */
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_WaitAttackEnd)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
@@ -849,6 +895,11 @@ static EVT_BEGIN(dead_event)
 EVT_END()
 
 #if VERSION >= VERSION_JP
+/**
+ * Guess: damage reaction of Macho Grubba when he hurts or is hurt through this path:
+ * picks the hurt pose by damage type, plays Mario's damage voice when Mario is hit,
+ * flings the unit up and back to its home position, then runs the damage data event.
+ */
 EVT_BEGIN(macho_gance_damage_event)
     CALL(btlevtcmd_ResetFaceDirection, LW(10))
     CALL(btlevtcmd_OnUnitFlag, LW(10), 1)
@@ -924,6 +975,15 @@ EVT_BEGIN(macho_gance_damage_event)
 EVT_END()
 #endif
 
+/**
+ * Macho Grubba's move choice, run once per action.
+ * Unit work 0 counts the actions this turn (reset by phase_event) and unit work 1 is the HP phase.
+ * While he is not Fast (status 19) he uses Macho Speed.
+ * Otherwise his first action of the turn is a pose move drawn at random (Build Up, Body, Footwork,
+ * and in phase 2 or later also Posing) and his second is a real attack:
+ * Attack in phases 0 and 1, and in phases 2 and 3 a draw between Lariat and Body Attack.
+ * LW(9) receives the weapon each sub-event uses.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(1))
     ADD(LW(1), 1)
@@ -986,6 +1046,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: macho Speed pose: Grubba flexes with a light flare,
+ * then pays the weapon cost and flags this as move 1 for the main attack script (a self-buff pose;
+ * it checks damage on himself only).
+ */
 EVT_BEGIN(gance_macho_speed_attack_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -1015,6 +1080,10 @@ EVT_BEGIN(gance_macho_speed_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: build Up pose: a flexing animation with a light flare,
+ * then flags this as move 2 for the main attack script (a self-buff pose).
+ */
 EVT_BEGIN(gance_build_up_attack_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -1044,6 +1113,10 @@ EVT_BEGIN(gance_build_up_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: body pose: a flexing animation with a light flare,
+ * then flags this as move 3 for the main attack script (a self-buff pose).
+ */
 EVT_BEGIN(gance_body_attack_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -1075,6 +1148,10 @@ EVT_BEGIN(gance_body_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: footwork pose: a flexing animation with a light flare,
+ * then flags this as move 4 for the main attack script (a self-buff pose).
+ */
 EVT_BEGIN(gance_footwork_attack_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -1104,6 +1181,10 @@ EVT_BEGIN(gance_footwork_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: attack pose followed by the real strike:
+ * Grubba flexes with a flare, then jumps and hits a sampled enemy target.
+ */
 EVT_BEGIN(gance_attack_attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_GANSU_PAUSING1"), EVT_NULLPTR, 0, LW(15))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("E_1A"))
@@ -1246,6 +1327,10 @@ EVT_BEGIN(gance_attack_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: posing: a final victory-style flex with fist sounds and a light flare,
+ * flagged as move 6 for the main attack script (a self-buff pose).
+ */
 EVT_BEGIN(gance_posing_attack_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -1279,6 +1364,10 @@ EVT_BEGIN(gance_posing_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: lariat (rariat) attack: Grubba flexes,
+ * then spins with an outstretched arm and hits the enemy target(s) in his path.
+ */
 EVT_BEGIN(gance_rariat_attack_attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_GANSU_PAUSING1"), EVT_NULLPTR, 0, LW(15))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("E_1A"))
@@ -1412,6 +1501,7 @@ EVT_BEGIN(gance_rariat_attack_attack_event)
     RETURN
 EVT_END()
 
+/** Guess: body Attack: Grubba flexes, then spins around and slams into the enemy with his body. */
 EVT_BEGIN(gance_body_attack_attack_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_GANSU_PAUSING1"), EVT_NULLPTR, 0, LW(15))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("E_1A"))
@@ -1550,11 +1640,16 @@ EVT_BEGIN(gance_body_attack_attack_event)
     RETURN
 EVT_END()
 
+/** Wait event: sets the idle animation from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: blocks until x_flag_data[arg0] equals arg1 (a small array of flags the Macho Grubba scripts use
+ * to synchronise their sibling events).
+ */
 static USER_FUNC(x_flag_wait) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -1566,6 +1661,7 @@ static USER_FUNC(x_flag_wait) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper: arg1 receives x_flag_data[arg0]. */
 static USER_FUNC(x_flag_get) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -1574,6 +1670,7 @@ static USER_FUNC(x_flag_get) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: adds arg1 to x_flag_data[arg0]. */
 static USER_FUNC(x_flag_add) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -1582,6 +1679,7 @@ static USER_FUNC(x_flag_add) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: sets x_flag_data[arg0] to arg1. */
 static USER_FUNC(x_flag_set) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -1590,6 +1688,10 @@ static USER_FUNC(x_flag_set) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Guess: ratio helper (wariai = proportion) for the Macho Grubba animations:
+ * with a = arg0-1 and b = arg1-1, arg4 (float) receives (a*arg2 + (b-a)*arg3) / b, a blend from arg3 to arg2.
+ */
 static USER_FUNC(wariai_enzan_0f) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
@@ -1601,6 +1703,10 @@ static USER_FUNC(wariai_enzan_0f) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Guess: integer-result version of wariai_enzan_0f:
+ * arg4 receives (a*arg2 + (b-a)*arg3) / b with a = arg0-1 and b = arg1-1.
+ */
 static USER_FUNC(wariai_enzan_0) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
@@ -1612,6 +1718,11 @@ static USER_FUNC(wariai_enzan_0) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Guess: blend of arg2 and arg3 weighted by two eased ratios of arg5
+ * and arg6 (each ramps up then down over 14 steps);
+ * writes the float result to arg4, or arg2 once a timer is past 28.
+ */
 static USER_FUNC(wariai_enzan_1f_intpl_w) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
@@ -1650,6 +1761,10 @@ static USER_FUNC(wariai_enzan_1f_intpl_w) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Guess: blend of arg2 and arg3 with an eased ratio from arg5 (ramping up over 14 steps and back down);
+ * writes the float result to arg4, or arg2 once past 28.
+ */
 static USER_FUNC(wariai_enzan_1f_intpl) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
@@ -1674,6 +1789,7 @@ static USER_FUNC(wariai_enzan_1f_intpl) {
     return EVT_RETURN_DONE;
 }
 
+/** Guess: linear blend helper: with a = arg0-1 and b = arg1, arg4 (float) receives (a*arg2 + (b-a)*arg3) / b. */
 static USER_FUNC(wariai_enzan_1f) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
@@ -1685,6 +1801,7 @@ static USER_FUNC(wariai_enzan_1f) {
     return EVT_RETURN_DONE;
 }
 
+/** Guess: integer-result version of wariai_enzan_1f: arg4 receives (a*arg2 + (b-a)*arg3) / b with a = arg0-1. */
 static USER_FUNC(wariai_enzan_1) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;

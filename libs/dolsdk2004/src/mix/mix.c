@@ -336,6 +336,10 @@ static void __MIXResetChannel(MIXChannel* channel);
 static void __MIXSetPan(MIXChannel* channel);
 static int __MIXClampPan(int pan);
 
+/**
+ * Looks up the AX volume for an attenuation in tenths of a dB:
+ * 0 at or below -0x388 (-88.8 dB), 0xFF64 at or above +6.0 dB, otherwise from __MIXVolumeTable.
+ */
 static u16 __MIXGetVolume(int db_) {
     int db = db_;
     if (db <= -0x388) {
@@ -347,6 +351,10 @@ static u16 __MIXGetVolume(int db_) {
     return __MIXVolumeTable[db + 0x388];
 }
 
+/**
+ * Fills in the channel's left/right (l, r) and front/rear (f, b) pan attenuations from its pan and surround pan;
+ * Pro Logic II mode uses the DPL2 front/rear tables and also sets l1/r1, other modes use the plain pan table.
+ */
 static void __MIXSetPan(MIXChannel* channel) {
     int pan, span;
     int ipan, ispan;
@@ -374,6 +382,10 @@ static void __MIXSetPan(MIXChannel* channel) {
     }
 }
 
+/**
+ * Puts a MIX channel at its defaults: input 0 dB, aux A and B at -96 dB, fader 0, centre pan (0x40),
+ * surround pan 0x7F, all current volumes zero.
+ */
 static void __MIXResetChannel(MIXChannel* channel) {
     channel->mode = 0x50000000;
     channel->input = 0;
@@ -389,6 +401,7 @@ static void __MIXResetChannel(MIXChannel* channel) {
     __MIXSetPan(channel);
 }
 
+/** Clamps a pan value to 0..127. */
 static int __MIXClampPan(int pan) {
     if (pan < 0) {
         return 0;
@@ -399,6 +412,7 @@ static int __MIXClampPan(int pan) {
     return pan;    
 }
 
+/** Resets all 64 MIX channels, clears the DVD stream attenuation and sets the sound mode to stereo. */
 void MIXInit(void) {
     int i;
 
@@ -411,18 +425,29 @@ void MIXInit(void) {
     __MIXSoundMode = MIX_SOUND_MODE_STEREO;
 }
 
+/** Shuts the MIX layer down. Does nothing in this SDK build. */
 void MIXQuit(void) {}
 
+/**
+ * Selects mono, stereo, surround or Dolby Pro Logic II mixing;
+ * MIXInitChannel and MIXUpdateSettings compute their volumes by this mode.
+ */
 void MIXSetSoundMode(u32 mode) {
     ASSERTLINE(421, (mode == MIX_SOUND_MODE_MONO) || (mode == MIX_SOUND_MODE_STEREO) ||
                     (mode == MIX_SOUND_MODE_SURROUND) || (mode == MIX_SOUND_MODE_DPL2));
     __MIXSoundMode = mode;
 }
 
+/** Returns the sound mode last set with MIXSetSoundMode. */
 u32 MIXGetSoundMode(void) {
     return __MIXSoundMode;
 }
 
+/**
+ * Binds an AX voice to its MIX channel, stores the given mode flags, input, aux A/B, pan,
+ * surround pan and fader levels, computes the starting volumes for the current sound mode
+ * and writes them straight into the voice's mixer block.
+ */
 void MIXInitChannel(AXVPB* axvpb, u32 mode, int input, int auxA, int auxB, int pan, int span, int fader) {
     BOOL old;
     MIXChannel* c;
@@ -573,15 +598,18 @@ void MIXInitChannel(AXVPB* axvpb, u32 mode, int input, int auxA, int auxB, int p
     OSRestoreInterrupts(old);
 }
 
+/** Detaches the AX voice from its MIX channel so MIXUpdateSettings skips it. */
 void MIXReleaseChannel(AXVPB* axvpb) {
     ASSERTLINE(657, axvpb);
     __MIXChannel[axvpb->index].axvpb = 0;
 }
 
+/** Resets the voice's MIX channel to the defaults of __MIXResetChannel. */
 void MIXResetControls(AXVPB* p) {
     __MIXResetChannel(&__MIXChannel[p->index]);
 }
 
+/** Sets the voice's input attenuation in tenths of a dB and flags it for MIXUpdateSettings. */
 void MIXSetInput(AXVPB* p, int dB) {
     MIXChannel* channel;
 
@@ -590,6 +618,7 @@ void MIXSetInput(AXVPB* p, int dB) {
     channel->mode |= 0x10000000;
 }
 
+/** Adds a delta in tenths of a dB to the voice's input attenuation and flags it for MIXUpdateSettings. */
 void MIXAdjustInput(AXVPB* p, int dB) {
     MIXChannel* channel;
 
@@ -598,6 +627,7 @@ void MIXAdjustInput(AXVPB* p, int dB) {
     channel->mode |= 0x10000000;
 }
 
+/** Returns the voice's input attenuation in tenths of a dB. */
 int MIXGetInput(AXVPB* p) {
     MIXChannel* channel;
 
@@ -605,6 +635,7 @@ int MIXGetInput(AXVPB* p) {
     return channel->input;
 }
 
+/** Makes the aux A send follow the fader (the fader level is added to the send). */
 void MIXAuxAPostFader(AXVPB* p) {
     MIXChannel* channel;
 
@@ -613,6 +644,7 @@ void MIXAuxAPostFader(AXVPB* p) {
     channel->mode |= 0x40000000;
 }
 
+/** Makes the aux A send ignore the fader (set before the fader). */
 void MIXAuxAPreFader(AXVPB* p) {
     MIXChannel* channel;
 
@@ -620,6 +652,7 @@ void MIXAuxAPreFader(AXVPB* p) {
     channel->mode |= 0x40000001;
 }
 
+/** Returns 1 when aux A is post-fader, 0 when it is pre-fader. */
 int MIXAuxAIsPostFader(AXVPB* p) {
     MIXChannel* channel;
 
@@ -630,6 +663,7 @@ int MIXAuxAIsPostFader(AXVPB* p) {
     return 1;
 }
 
+/** Sets the aux A send attenuation in tenths of a dB and flags the mix for update. */
 void MIXSetAuxA(AXVPB* p, int dB) {
     MIXChannel* channel;
 
@@ -638,6 +672,7 @@ void MIXSetAuxA(AXVPB* p, int dB) {
     channel->mode |= 0x40000000;
 }
 
+/** Adds a delta in tenths of a dB to the aux A send and flags the mix for update. */
 void MIXAdjustAuxA(AXVPB* p, int dB) {
     MIXChannel* channel;
 
@@ -646,6 +681,7 @@ void MIXAdjustAuxA(AXVPB* p, int dB) {
     channel->mode |= 0x40000000;
 }
 
+/** Returns the aux A send attenuation in tenths of a dB. */
 int MIXGetAuxA(AXVPB* p) {
     MIXChannel* channel;
 
@@ -653,6 +689,7 @@ int MIXGetAuxA(AXVPB* p) {
     return channel->auxA;
 }
 
+/** Makes the aux B send follow the fader. */
 void MIXAuxBPostFader(AXVPB* p) {
     MIXChannel* channel;
 
@@ -661,6 +698,7 @@ void MIXAuxBPostFader(AXVPB* p) {
     channel->mode |= 0x40000000;
 }
 
+/** Makes the aux B send ignore the fader (set before the fader). */
 void MIXAuxBPreFader(AXVPB* p) {
     MIXChannel* channel;
 
@@ -668,6 +706,7 @@ void MIXAuxBPreFader(AXVPB* p) {
     channel->mode |= 0x40000002;
 }
 
+/** Returns 1 when aux B is post-fader, 0 when it is pre-fader. */
 int MIXAuxBIsPostFader(AXVPB* p) {
     MIXChannel* channel;
 
@@ -678,6 +717,10 @@ int MIXAuxBIsPostFader(AXVPB* p) {
     return 1;
 }
 
+/**
+ * Sets the aux B send attenuation in tenths of a dB;
+ * ignored in Pro Logic II mode, where aux B carries the rear channels.
+ */
 void MIXSetAuxB(AXVPB* p, int dB) {
     MIXChannel* channel;
     if (__MIXSoundMode == MIX_SOUND_MODE_DPL2)
@@ -688,6 +731,7 @@ void MIXSetAuxB(AXVPB* p, int dB) {
     channel->mode |= 0x40000000;
 }
 
+/** Adds a delta to the aux B send; ignored in Pro Logic II mode. */
 void MIXAdjustAuxB(AXVPB* p, int dB) {
     MIXChannel* channel;
     if (__MIXSoundMode == MIX_SOUND_MODE_DPL2)
@@ -698,6 +742,7 @@ void MIXAdjustAuxB(AXVPB* p, int dB) {
     channel->mode |= 0x40000000;
 }
 
+/** Returns the aux B send attenuation in tenths of a dB, or -96 dB in Pro Logic II mode. */
 int MIXGetAuxB(AXVPB* p) {
     MIXChannel* channel;
     if (__MIXSoundMode == MIX_SOUND_MODE_DPL2)
@@ -707,6 +752,7 @@ int MIXGetAuxB(AXVPB* p) {
     return channel->auxB;
 }
 
+/** Sets the voice's left/right pan (0 left, 64 centre, 127 right), clamped, and flags the mix for update. */
 void MIXSetPan(AXVPB* p, int pan) {
     MIXChannel* channel;
 
@@ -716,6 +762,7 @@ void MIXSetPan(AXVPB* p, int pan) {
     channel->mode |= 0x40000000;
 }
 
+/** Adds a delta to the voice's pan, clamped to 0..127, and flags the mix for update. */
 void MIXAdjustPan(AXVPB* p, int pan) {
     MIXChannel* channel;
 
@@ -725,6 +772,7 @@ void MIXAdjustPan(AXVPB* p, int pan) {
     channel->mode |= 0x40000000;
 }
 
+/** Returns the voice's left/right pan, 0..127. */
 int MIXGetPan(AXVPB* p) {
     MIXChannel* channel;
 
@@ -732,6 +780,7 @@ int MIXGetPan(AXVPB* p) {
     return channel->pan;
 }
 
+/** Sets the voice's surround pan (front to rear), clamped to 0..127, and flags the mix for update. */
 void MIXSetSPan(AXVPB* p, int span) {
     MIXChannel* channel;
 
@@ -741,6 +790,7 @@ void MIXSetSPan(AXVPB* p, int span) {
     channel->mode |= 0x40000000;
 }
 
+/** Adds a delta to the voice's surround pan, clamped to 0..127, and flags the mix for update. */
 void MIXAdjustSPan(AXVPB* p, int span) {
     MIXChannel* channel;
 
@@ -750,6 +800,7 @@ void MIXAdjustSPan(AXVPB* p, int span) {
     channel->mode |= 0x40000000;
 }
 
+/** Returns the voice's surround pan, 0..127. */
 int MIXGetSPan(AXVPB* p) {
     MIXChannel* channel;
 
@@ -757,6 +808,7 @@ int MIXGetSPan(AXVPB* p) {
     return channel->span;
 }
 
+/** Mutes the voice's input (its input volume becomes 0 on the next update) without changing its stored levels. */
 void MIXMute(AXVPB* p) {
     MIXChannel* channel;
 
@@ -764,6 +816,7 @@ void MIXMute(AXVPB* p) {
     channel->mode |= 0x10000004;
 }
 
+/** Clears the mute so the voice plays at its stored input level again after the next update. */
 void MIXUnMute(AXVPB* p) {
     MIXChannel* channel;
 
@@ -772,6 +825,7 @@ void MIXUnMute(AXVPB* p) {
     channel->mode |= 0x10000000;
 }
 
+/** Returns 1 when the voice is muted. */
 int MIXIsMute(AXVPB* p) {
     MIXChannel* channel;
 
@@ -782,6 +836,10 @@ int MIXIsMute(AXVPB* p) {
     return 0;
 }
 
+/**
+ * Sets the voice's fader attenuation in tenths of a dB (the level a game fades a sound with)
+ * and flags the mix for update.
+ */
 void MIXSetFader(AXVPB* p, int dB) {
     MIXChannel* channel;
 
@@ -790,6 +848,7 @@ void MIXSetFader(AXVPB* p, int dB) {
     channel->mode |= 0x40000000;
 }
 
+/** Adds a delta in tenths of a dB to the voice's fader and flags the mix for update. */
 void MIXAdjustFader(AXVPB* p, int dB) {
     MIXChannel* channel;
 
@@ -798,6 +857,7 @@ void MIXAdjustFader(AXVPB* p, int dB) {
     channel->mode |= 0x40000000;
 }
 
+/** Returns the voice's fader attenuation in tenths of a dB. */
 int MIXGetFader(AXVPB* p) {
     MIXChannel* channel;
 
@@ -805,6 +865,10 @@ int MIXGetFader(AXVPB* p) {
     return channel->fader;
 }
 
+/**
+ * Sets the target attenuation of the DVD audio stream (clamped to -49..0 steps);
+ * MIXUpdateSettings moves the real AI stream volume toward it one step per call.
+ */
 void MIXSetDvdStreamFader(int dB) {
     int db;
 
@@ -818,10 +882,16 @@ void MIXSetDvdStreamFader(int dB) {
     __MIXDvdStreamAttenUser = db;
 }
 
+/** Returns the target DVD audio stream attenuation set by MIXSetDvdStreamFader. */
 int MIXGetDvdStreamFader(void) {
     return __MIXDvdStreamAttenUser;
 }
 
+/**
+ * Run once per audio frame: for every bound voice with changed input or mix settings,
+ * recomputes the target volumes and writes the current volume plus a per-sample ramp step (difference / 160)
+ * into the AX voice block; then steps the AI stream volume one notch toward the DVD stream target.
+ */
 void MIXUpdateSettings(void) {
     int i;
     int setNewMixLevel;

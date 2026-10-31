@@ -30,10 +30,12 @@ static EvtWord phase_event[160];
 static EvtWord damage_event[10];
 static EvtWord wait_event[6];
 
+/** Script helper for the lecture Goomba's init script; does nothing. */
 static USER_FUNC(lecture_init) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Stores args[0] in the battle's lectureUnitId, the unit that the lecture is aimed at. */
 static USER_FUNC(_battle_set_lecture_unit_id) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -132,6 +134,10 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_frankli", "c_kuri_h", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x890009, 0, pose_table},
 };
 
+/**
+ * Init script of the Goomba in Professor Frankly's lecture battle.
+ * It uses the default confusion script, clears its work flag and starts waiting.
+ */
 static EVT_BEGIN(init_event)
     CALL(lecture_init)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
@@ -149,6 +155,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Entrance of the lecture Goomba: it runs in (R_1) and settles into its idle pose (S_1). */
 static EVT_BEGIN(entry_event)
     WAIT_MS(900)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, -250, 0, -30)
@@ -158,6 +165,7 @@ static EVT_BEGIN(entry_event)
     RETURN
 EVT_END()
 
+/** Phase script of the lecture Goomba: puts Mario back in his idle pose (M_S_1) during the lecture's phases. */
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -203,6 +211,7 @@ static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/** Damage reaction of the lecture Goomba: the default damage script. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -210,6 +219,7 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Wait script of the lecture Goomba: shows its idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

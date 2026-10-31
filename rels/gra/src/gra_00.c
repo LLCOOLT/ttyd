@@ -37,6 +37,10 @@ static BeroEntry bero_entry_data[3];
 static NpcSetupInfo npcEnt[2];
 static TreeAccess tree_tbl[2];
 
+/**
+ * Doopliss's torn-paper entrance: loads the torn-paper cutout (OFF_d_yabu_small) as an image,
+ * plays the Doopliss (Lanpel) appear sound, shakes the camera for 20 frames and starts the tear animation.
+ */
 EVT_BEGIN(evt_yabure_on)
     CALL(evt_paper_entry, STRING("OFF_d_yabu_small"))
     CALL(evt_snd_sfxon_3d, STRING("SFX_OFF4_LANPEL_APPEAR1"), -145, 270, -25, 0)
@@ -54,11 +58,17 @@ EVT_BEGIN(evt_yabure_on)
     RETURN
 EVT_END()
 
+/** Releases the image entry created by evt_yabure_on once the torn-paper effect is finished. */
 EVT_BEGIN(evt_yabure_off)
     CALL(evt_img_release, STRING("img"))
     RETURN
 EVT_END()
 
+/**
+ * Name-entry screen for the "guess my name" test:
+ * shows the OFF_d_roll scroll cutout, opens the name-entry window, waits for the player to type a name,
+ * plays the entry sounds, then closes everything. The name entered is read back with evt_win_nameent_name.
+ */
 EVT_BEGIN(evt_nameent)
     CALL(evt_paper_entry, STRING("OFF_d_roll"))
     CALL(evt_img_entry, STRING("img"))
@@ -94,6 +104,10 @@ EVT_BEGIN(evt_nameent)
     RETURN
 EVT_END()
 
+/**
+ * Doopliss's (the fake Mario) reaction when the player guessed his name right:
+ * he gasps, switches to his surprised pose and talk poses, and the camera is released.
+ */
 EVT_BEGIN(name_seikai)
     CALL(evt_npc_get_position, STRING("にせマリオ"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_NM_SURPRISED2_3"), LW(0), LW(1), LW(2), 0)
@@ -297,6 +311,13 @@ EVT_BEGIN(name_seikai)
     RETURN
 EVT_END()
 
+/**
+ * Ambush on the first trail screen, spawned from the init script
+ * while the story is between STORY_STG4_11_SUPERBOMBBOMB_LOST and STORY_STG4_13_04_THE_LETTER_P.
+ * Waits until Mario walks into the strip x in [-126, 30], fades the music out,
+ * then the fake Mario appears at (-125, 240, -25) and talks (stg4_gra_00 to stg4_gra_16).
+ * The later rounds use the name-entry screen and move the story to STORY_STG4_14_NAME_GUESSING.
+ */
 EVT_BEGIN(evt_machibuse)
     SET_VALUE(LF(0), 0)
     LOOP(0)
@@ -562,11 +583,18 @@ static TreeAccess tree_tbl[] = {
     {7, NULL, NULL, NULL, 0, NULL},
 };
 
+/** Pickup callback of the Black Key: sets GSWF_GRA00_BLACK_KEY_TAKEN so the key is not spawned again. */
 EVT_BEGIN(evt_majin_key)
     SET_VALUE(GSWF(GSWF_GRA00_BLACK_KEY_TAKEN), 1)
     RETURN
 EVT_END()
 
+/**
+ * Init script of gra_00, the first Twilight Trail map:
+ * starts the trail music and Twilight Town ambience, sets up the shadow Mario effect, the exits,
+ * the shake-tree spots, two brick blocks, the Black Key (if not taken yet)
+ * and the ambush for the story range around the lost Superbomb.
+ */
 EVT_BEGIN(gra_00_init_evt)
 #if VERSION >= VERSION_JP
     SET_VALUE(GSWF(GSWF_LOG_MAP_GRA_ROUTE_SHOWN), 1)
@@ -593,6 +621,11 @@ EVT_BEGIN(gra_00_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script helper that rolls the 3D camera: args[0] is the roll angle in degrees (0 resets the camera).
+ * While rolled it also bobs the camera with the frame counter and lowers the camera to y 97 looking at y 45.
+ * Used for the tilted camera in Doopliss's scenes.
+ */
 static USER_FUNC(cam_r) {
     f32 roll = evtGetFloat(event, event->args[0]);
     CameraEntry* cam = camGetPtr(CAMERA_3D);
@@ -611,6 +644,11 @@ static USER_FUNC(cam_r) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Guess: message window callback for Doopliss's lines,
+ * from the type codes it handles (0 resets, 1 and 3 set the flags GW(1) and GW(0),
+ * 5 counts lines and freezes Mario's input at the fourth). Nothing in this file installs it.
+ */
 static void msg_callback(s32 type, void* param) {
     EventEntry* ev = (*(MsgWinData**)param)->event;
 
@@ -635,6 +673,11 @@ static void msg_callback(s32 type, void* param) {
     }
 }
 
+/**
+ * Script helper that works out a camera framing close to the current camera:
+ * writes the point 60 percent of the way from the camera target back to the camera into args[0..2]
+ * and the current camera target into args[3..5], ready for evt_cam3d_evt_set.
+ */
 static USER_FUNC(zoom) {
     EvtWord* args = event->args;
     CameraEntry* cam = camGetPtr(CAMERA_3D);
@@ -652,6 +695,11 @@ static USER_FUNC(zoom) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper that shakes the camera for args[0] frames:
+ * a three-cycle sine that fades out over the duration,
+ * applied as a view offset to both the 3D camera and the 3D image camera. Blocks until the frames are used up.
+ */
 static USER_FUNC(camera_yure) {
     s32 frames = evtGetValue(event, event->args[0]);
     CameraEntry* cam = camGetPtr(CAMERA_3D);

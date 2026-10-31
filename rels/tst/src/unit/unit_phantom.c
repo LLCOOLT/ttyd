@@ -44,6 +44,12 @@ static EvtWord normal_attack_event[412];
 static EvtWord fire_attack_event[365];
 static EvtWord wait_event[6];
 
+/**
+ * Script helper: args[0] and args[1] are unit ids (BattleTransID).
+ * Copies the first unit's HP (capped at the second one's maximum) and its size-change (Mini/Mega) turns
+ * and strength to the second, then resets the second one's HP gauge to match.
+ * Called with the newly spawned unit (LW(3)) from the unit's own scripts.
+ */
 static USER_FUNC(bubble_copy_status) {
     EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));
@@ -269,6 +275,10 @@ static BattleUnitSetup entry_bubble = {
     NULL, // itemDropTable
 };
 
+/**
+ * Battle init script for the Phantom Ember: installs the wait, attack, damage and confusion handlers,
+ * sets the unit and its home position to y = 10 and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -281,6 +291,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: selects this unit (-2) and its part 1
+ * and runs the shared default damage reaction (btldefaultevt_Damage).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -288,6 +302,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Data-table event (slot 40) that runs when a fire attack is avoided:
+ * plays the fire sound and the A_2B pose for a second.
+ */
 static EVT_BEGIN(avoid_fire_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_FIRE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
@@ -295,6 +313,11 @@ static EVT_BEGIN(avoid_fire_event)
     RETURN
 EVT_END()
 
+/**
+ * Data-table event (slot 11) that runs when the Phantom Ember is hit by fire:
+ * plays the A_2B pose, then walks round it in 40 degree steps (first one way, then the other) looking for a free
+ * spot, and where there is room splits off a new Phantom Ember there with friend_event.
+ */
 static EVT_BEGIN(damage_fire_explosion_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -333,6 +356,11 @@ static EVT_BEGIN(damage_fire_explosion_event)
     RETURN
 EVT_END()
 
+/**
+ * Splits a new Phantom Ember off this one: spawns entry_bubble (another Phantom Ember) at the same position with
+ * this unit's status copied by bubble_copy_status, plays the split sound,
+ * spins it for 30 frames and hops it to the free position in LW(0) to LW(2), which becomes its home position.
+ */
 static EVT_BEGIN(friend_event)
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("S_1"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(12), LW(13), LW(14))
@@ -361,6 +389,10 @@ static EVT_BEGIN(friend_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack AI of the Phantom Ember: uses an enemy item if it has one,
+ * otherwise draws a body-slam attack (70%) or a fire shot (30%).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -385,6 +417,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Body-slam on one target (the fixed first target in a flag-2 battle, otherwise a sampled enemy):
+ * the Ember sweeps in a short curve to the target, bumps into it twice, with the attack sound,
+ * and then flies back to its home position. A hit shakes the camera; a miss plays the avoid animation.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -502,6 +539,11 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper called every frame: keeps a flame effect on part 2 of the unit,
+ * growing it to the unit's size (0.1 per frame).
+ * Creates the effect on the first call and blocks until the script is stopped.
+ */
 static USER_FUNC(eff_fire) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -536,6 +578,11 @@ static USER_FUNC(eff_fire) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Fire shot at one target: the Ember turns to face it
+ * and launches a fireball (part 2, the eff_fire effect) in three stages, easing it towards the target,
+ * with an impact smoke effect on a hit; the target's avoid animation plays on a miss.
+ */
 static EVT_BEGIN(fire_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -636,6 +683,12 @@ static EVT_BEGIN(fire_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper called every frame: args[0] is the unit,
+ * args[1] the index (0-9) of one of the flames of the all-targets fire attack.
+ * The first call creates the flame; each frame it is placed 24 units further along the facing direction per
+ * index, with a size taken from a 1.0-2.25 table. Blocks until the script is stopped.
+ */
 static USER_FUNC(eff_all_fire) {
     EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
@@ -660,6 +713,10 @@ static USER_FUNC(eff_all_fire) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Helper of all_fire_attack_event: starts the fire effect (eff_all_fire) for the index in LW(0)
+ * and waits 120 frames.
+ */
 static EVT_BEGIN(all_fire_attackEvent_sub)
     BEGIN_SIBLING_EVENT
         CALL(eff_all_fire, BTL_UNIT_SELF, LW(0))
@@ -668,6 +725,12 @@ static EVT_BEGIN(all_fire_attackEvent_sub)
     RETURN
 EVT_END()
 
+/**
+ * Fire attack on every target: the Ember moves to x = -40,
+ * shakes for 20 beats while ten fire effects are spawned (one every 2 frames),
+ * then every target is checked in turn for avoid or damage (the attack defence result is taken once).
+ * Afterwards it returns home. The unit's attack AI never selects it.
+ */
 static EVT_BEGIN(all_fire_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -774,6 +837,10 @@ static EVT_BEGIN(all_fire_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Wait (idle) event: refreshes the body animation (part 1) from the unit's pose table
+ * so it matches the current state, then returns; the battle system runs it whenever the unit is idle.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

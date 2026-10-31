@@ -157,6 +157,10 @@ static BattleWeapon weapon_ice_pakkun_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Attack script of the Frost Piranha: if battle flag 2 is set it uses the normal attack;
+ * otherwise lets an enemy item be used if ready, else uses the normal attack with weapon_ice_pakkun_attack.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -237,6 +241,10 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Battle init for the Frost Piranha: registers its wait, attack, damage and confusion events,
+ * sets the hit cursor offset and stores the shadow scale (shadow_scale_memory) before starting the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -248,6 +256,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Reaction when an attack is avoided or countered by its thorny head:
+ * it flinches, returns to pose PKF_S_1 and flashes the "toge_flush" spike effect above its head (higher when it
+ * is large, lower when small).
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 31)
     WAIT_MS(250)
@@ -270,6 +283,7 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Frost Piranha: runs the default damage script with LW(10) = -2 and LW(11) = 1. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -277,6 +291,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Reaction when the Frost Piranha is hurt by a counter:
+ * plays the damage pose PKF_D_1 for a second and, if the hit carries damage code 512 (and not 2048),
+ * returns to its place via return_event.
+ */
 static EVT_BEGIN(counter_damage_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_D_1"))
     WAIT_MS(1000)
@@ -291,6 +310,11 @@ static EVT_BEGIN(counter_damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Script run when the ceiling-hanging Frost Piranha is made to fall (the ceil-fall hook):
+ * it ducks, drops to the ground at its home position with its ground hit offsets and pose table restored,
+ * and settles in pose PKF_S_1.
+ */
 static EVT_BEGIN(ceil_fall_ready_event)
     CALL(btlevtcmd_SetEventCeilFall, BTL_UNIT_SELF, 0)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PAKKUN_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -325,6 +349,12 @@ static EVT_BEGIN(ceil_fall_ready_event)
     RETURN
 EVT_END()
 
+/**
+ * Brings the Frost Piranha back to its place after an attack:
+ * if a ceiling exists (pakkun_ceil_exist) it randomly goes back to the ground
+ * or hangs from the ceiling at height 130 (upside-down hit offsets, ceiling pose table and the ceil-fall hook),
+ * otherwise it returns to the ground.
+ */
 static EVT_BEGIN(return_event)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(pakkun_ceil_exist, LW(0))
@@ -391,6 +421,12 @@ static EVT_BEGIN(return_event)
     RETURN
 EVT_END()
 
+/**
+ * The Frost Piranha's bite: picks a target (the first-attack target on a pre-emptive strike),
+ * rises from its position (ground or ceiling), swings its head in the bite poses (PKF_A_1A to 1C,
+ * SFX_ENM_PAKKUN_ATTACK1) and checks the damage;
+ * a miss makes the target dodge, a hit applies it with guard flag 256; then it returns via return_event.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -490,11 +526,17 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/** Wait script of the Frost Piranha: shows its idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper (args[0] is a battle unit): grows part 1's shadow back from zero to the scale saved by
+ * shadow_scale_memory over 15 frames; blocks until done.
+ * Guess: used when the Frost Piranha comes back out of the ceiling.
+ */
 static USER_FUNC(shadow_scale_return) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -511,6 +553,10 @@ static USER_FUNC(shadow_scale_return) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper (args[0] is a battle unit): shrinks part 1's shadow from the saved scale to zero over 15 frames;
+ * blocks until done. Guess: used while the Frost Piranha pulls back into the ceiling.
+ */
 static USER_FUNC(shadow_scale_small) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -527,6 +573,10 @@ static USER_FUNC(shadow_scale_small) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper (args[0] is a battle unit): saves part 1's current shadow scale into unit->work[0] for the two
+ * shadow_scale helpers.
+ */
 static USER_FUNC(shadow_scale_memory) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -536,6 +586,10 @@ static USER_FUNC(shadow_scale_memory) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: returns in args[0] 0 if the stage's iron frame (the ceiling the piranha hangs from) has been
+ * destroyed, otherwise 1.
+ */
 static USER_FUNC(pakkun_ceil_exist) {
     EvtWord* args = event->args;
 

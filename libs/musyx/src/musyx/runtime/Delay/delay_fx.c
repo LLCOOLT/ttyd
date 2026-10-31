@@ -14,6 +14,9 @@
 #include "musyx/assert.h"
 #include "musyx/sal.h"
 
+/** Aux effect callback for the delay: for each channel it takes the oldest 160-sample block out of a circular buffer as
+ * the delayed output (scaled by the output level) and stores the incoming block plus the delayed one times the feedback
+ * level in its place. Levels are 0..100 percent in 7-bit fixed point. */
 void sndAuxCallbackDelay(u8 reason, SND_AUX_INFO* info, void* user) {
   s32 l;           // r30
   s32 r;           // r29
@@ -63,6 +66,8 @@ void sndAuxCallbackDelay(u8 reason, SND_AUX_INFO* info, void* user) {
   }
 }
 
+/** Rebuilds the delay: frees the old buffers, computes each channel's length in 5 ms frames from its delay (ms), the
+ * feedback and output levels (percent to 7-bit fixed point), and allocates cleared buffers. Returns TRUE. */
 bool sndAuxCallbackUpdateSettingsDelay(SND_AUX_DELAY* delay) {
   u32 i;
   s32* left;
@@ -103,11 +108,13 @@ bool sndAuxCallbackUpdateSettingsDelay(SND_AUX_DELAY* delay) {
   return TRUE;
 }
 
+/** Starts the delay effect from the user's settings. Returns TRUE. */
 bool sndAuxCallbackPrepareDelay(SND_AUX_DELAY* delay) {
   delay->left = NULL;
   return sndAuxCallbackUpdateSettingsDelay(delay);
 }
 
+/** Frees the delay buffers if they were allocated. Returns TRUE. */
 bool sndAuxCallbackShutdownDelay(SND_AUX_DELAY* delay) {
   if (delay->left != NULL) {
     salFree(delay->left);

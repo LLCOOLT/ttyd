@@ -345,6 +345,15 @@ static BattleUnitSetup entry_majolyne = {
     NULL, // itemDropTable
 };
 
+/**
+ * Event script: Doopliss's transformation.
+ * He strikes a pose (A_3A/A_3B), flashes his eyes and vanishes in smoke,
+ * then scans either Mario or the current partner (the scan effect and transformation sounds play)
+ * and rebuilds himself as that character: work[12] records the form (1 fake Mario, 2 Goombella, 3 Koops,
+ * 4 Yoshi, 5 Flurrie, 6 Vivian, 7 Bobbery, 8 Ms. Mowz) by running the matching init_event_*,
+ * and he rises out of the floor in the new shape.
+ * He copies Mario when he is not currently Mario, otherwise the partner.
+ */
 EVT_BEGIN(mutate_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 12, LW(0))
     SWITCH(LW(0))
@@ -502,6 +511,11 @@ EVT_BEGIN(mutate_event)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Doopliss in his own form: installs his wait, phase, attack, damage,
+ * confusion and entry events and clears his unit work,
+ * including the form record (unit work 4) and the shadow state.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
@@ -547,6 +561,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Entry event of the Shadow Sirens fight: the status window is hidden and Beldam (btl_majo3_00),
+ * Marilyn (btl_majo3_01) and Doopliss (btl_majo3_02) speak in turn with the camera cutting between them.
+ */
 static EVT_BEGIN(entry_event)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     WAIT_FRAMES(60)
@@ -565,6 +583,10 @@ static EVT_BEGIN(entry_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage event of the Doopliss forms: runs the default damage handling only
+ * when the damage code 1024 is set (Guess: the damage that can defeat him); other hits do nothing to his HP.
+ */
 static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 1024, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -576,6 +598,13 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Dead event of Doopliss in any form: he returns to his own look,
+ * the camera moves to him and he speaks his last line (btl_majo3_13 when a Siren is already down,
+ * otherwise btl_majo3_10), then the slow death sequence runs.
+ * It also respawns Beldam as a ghost (entry_majolyne) when the fight is not over
+ * and sets the shared Siren state in GW.
+ */
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(3), LW(4), LW(5))
@@ -669,6 +698,12 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Phase event of the Sirens' unison move for Doopliss:
+ * after the player phase it lets the shared unison event run,
+ * and when the ranking of the Sirens' HP (unit work 4 and 5) changes he sinks into his shadow
+ * and comes up in the spot matching his new rank.
+ */
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -702,6 +737,11 @@ static EVT_BEGIN(unison_phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Phase event of Doopliss: after the player phase it checks whether Mario's shadow guard is in effect
+ * (mario_shadow_guard_check) and manages the transformation,
+ * so that he changes into another character at the right time.
+ */
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -735,6 +775,10 @@ static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of Doopliss in his own form: can use an item;
+ * otherwise it sets unit work 13 to 1 and runs the ogg attack with weapon_rampell_attack.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -749,6 +793,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack of Doopliss in his own form (ogg_attack_event):
+ * he walks up to one target and hits it, which can dodge
+ * or takes the damage with the action command defence check, then walks back.
+ */
 static EVT_BEGIN(ogg_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -887,6 +936,7 @@ static EVT_BEGIN(ogg_attack_event)
     RETURN
 EVT_END()
 
+/** Wait event of Doopliss in his own form: plays his idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -1096,6 +1146,7 @@ static BattleWeapon weapon_masao_kaiten_hammer = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Camera helper: moves the battle camera to a close view of Mario's side (X -110). */
 static EVT_BEGIN(mario_zoom)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, -110, 65, 332, -110, 30, -340, 30, 11)
@@ -1103,6 +1154,7 @@ static EVT_BEGIN(mario_zoom)
     RETURN
 EVT_END()
 
+/** Camera helper: moves the battle camera to a close view of the enemy side (X 115). */
 static EVT_BEGIN(enemy_zoom)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 115, 65, 332, 115, 30, -340, 30, 11)
@@ -1110,6 +1162,7 @@ static EVT_BEGIN(enemy_zoom)
     RETURN
 EVT_END()
 
+/** Camera helper: moves the battle camera to a close view of the fake Mario (X 90). */
 static EVT_BEGIN(fmario_zoom)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 90, 65, 332, 90, 30, -340, 30, 11)
@@ -1117,6 +1170,7 @@ static EVT_BEGIN(fmario_zoom)
     RETURN
 EVT_END()
 
+/** Camera helper: moves the battle camera to a close view of the party's partner (X 130). */
 static EVT_BEGIN(gparty_zoom)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 130, 65, 332, 130, 30, -340, 30, 11)
@@ -1124,6 +1178,10 @@ static EVT_BEGIN(gparty_zoom)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Doopliss as Mario: sets Mario's vulnerability table (regist_fmario), clears all statuses,
+ * installs the wait, attack, damage and confusion events for the Mario form and sets the walk and run sounds.
+ */
 static EVT_BEGIN(init_event_fmario)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, LW(11), PTR(pose_table_fmario_stay))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_fmario))
@@ -1143,6 +1201,7 @@ static EVT_BEGIN(init_event_fmario)
     RETURN
 EVT_END()
 
+/** Dead event of Doopliss as Mario: he flies off (EM_K_1, EM_D_2) and the common dead_event runs. */
 static EVT_BEGIN(dead_event_fmario)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(3), LW(4), LW(5))
@@ -1169,6 +1228,11 @@ static EVT_BEGIN(dead_event_fmario)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of Doopliss as Mario: can use an item;
+ * otherwise it picks, from a random number, one of Mario's moves:
+ * a normal jump (weapon_masao_jump), a spin jump (Kururin), or a hammer attack (normal or spin hammer).
+ */
 static EVT_BEGIN(attack_event_fmario)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -1195,6 +1259,7 @@ static EVT_BEGIN(attack_event_fmario)
     RETURN
 EVT_END()
 
+/** Plays one of Mario's three jump voice clips, chosen by LW(15). */
 static EVT_BEGIN(jump_attack_voice)
     CALL(evt_sub_random, 2, LW(15))
     SWITCH(LW(15))
@@ -1208,6 +1273,10 @@ static EVT_BEGIN(jump_attack_voice)
     RETURN
 EVT_END()
 
+/**
+ * Doopliss as Mario jumps on one target (marioAttackEvent_NormalJump):
+ * a stomp with the action command defence check on the target, or a dodge.
+ */
 static EVT_BEGIN(marioAttackEvent_NormalJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -1296,6 +1365,10 @@ static EVT_BEGIN(marioAttackEvent_NormalJump)
     RETURN
 EVT_END()
 
+/**
+ * Doopliss as Mario does a spin jump on one target (marioAttackEvent_KururinJump):
+ * a spinning stomp, with the dodge or defence check.
+ */
 static EVT_BEGIN(marioAttackEvent_KururinJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -1412,6 +1485,10 @@ static EVT_BEGIN(marioAttackEvent_KururinJump)
     RETURN
 EVT_END()
 
+/**
+ * Doopliss as Mario hits one target with the hammer (marioAttackEvent_NormalHammer):
+ * the target dodges or takes the damage with the action command defence check.
+ */
 static EVT_BEGIN(marioAttackEvent_NormalHammer)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -1497,6 +1574,10 @@ static EVT_BEGIN(marioAttackEvent_NormalHammer)
     RETURN
 EVT_END()
 
+/**
+ * Doopliss as Mario hits one target with a spinning hammer (marioAttackEvent_KaitenHammer):
+ * the target dodges or takes the damage with the action command defence check.
+ */
 static EVT_BEGIN(marioAttackEvent_KaitenHammer)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -1582,6 +1663,7 @@ static EVT_BEGIN(marioAttackEvent_KaitenHammer)
     RETURN
 EVT_END()
 
+/** Wait event of Doopliss as Mario: plays Mario's idle pose from the pose table. */
 static EVT_BEGIN(wait_event_fmario)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -1657,6 +1739,7 @@ static BattleUnitKindPart parts_christine[] = {
     },
 };
 
+/** Camera helper: moves the battle camera to a close view of the fake Goombella (Christine) at X 90. */
 static EVT_BEGIN(fmario_zoom_christine)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 90, 58, 228, 90, 38, -20, 30, 11)
@@ -1664,6 +1747,7 @@ static EVT_BEGIN(fmario_zoom_christine)
     RETURN
 EVT_END()
 
+/** Camera helper: moves the battle camera to a close view of the party's partner for the Goombella form (X 130). */
 static EVT_BEGIN(gparty_zoom_christine)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 130, 58, 228, 130, 38, -20, 30, 11)
@@ -1671,6 +1755,10 @@ static EVT_BEGIN(gparty_zoom_christine)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Doopliss as Goombella: sets her vulnerability table (regist_christine),
+ * clears all statuses and installs the Goombella-form events.
+ */
 static EVT_BEGIN(init_event_christine)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, LW(11), PTR(pose_table_christine_stay))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_christine))
@@ -1690,6 +1778,7 @@ static EVT_BEGIN(init_event_christine)
     RETURN
 EVT_END()
 
+/** Dead event of Doopliss as Goombella: plays her fall pose (PKR_D_3) and runs the common dead_event. */
 static EVT_BEGIN(dead_event_christine)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(3), LW(4), LW(5))
@@ -1717,6 +1806,11 @@ static EVT_BEGIN(dead_event_christine)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of Doopliss as Goombella: can use an item;
+ * otherwise she headbonks one target (enemyWeapon_ChristineNormalAttack), walking up to it,
+ * with the dodge or defence check, and walks back.
+ */
 static EVT_BEGIN(attack_event_christine)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -1910,6 +2004,7 @@ static EVT_BEGIN(attack_event_christine)
     RETURN
 EVT_END()
 
+/** Wait event of Doopliss as Goombella: plays her idle pose from the pose table. */
 static EVT_BEGIN(wait_event_christine)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -2026,6 +2121,10 @@ static BattleUnitKindPart parts_nokotarou[] = {
     },
 };
 
+/**
+ * Event run when a Doopliss partner form is knocked down:
+ * sets status flag 1 and plays the knocked down pose (PNK_D_1) on the part in LW(11).
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -2042,6 +2141,10 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Event run when a knocked-down partner form gets up again:
+ * clears status flag 1 and returns to the stand pose (PNK_S_1).
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -2063,6 +2166,10 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Doopliss as Koops (Nokotarou): sets his vulnerability table (regist_nokotarou),
+ * clears all statuses and installs the Koops-form events, with unit work 8 (the shell spinning flag) cleared.
+ */
 static EVT_BEGIN(init_event_nokotarou)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, LW(11), PTR(pose_table_nokotarou_stay))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_nokotarou))
@@ -2086,12 +2193,14 @@ static EVT_BEGIN(init_event_nokotarou)
     RETURN
 EVT_END()
 
+/** Damage event of Doopliss as Koops: stops the shell spin (_koura_rotate_stop) and runs the default damage event. */
 static EVT_BEGIN(damage_event_nokotarou)
     CALL_CHILD(_koura_rotate_stop)
     CALL_CHILD(damage_event)
     RETURN
 EVT_END()
 
+/** Dead event of Doopliss as Koops: plays his fall pose (PNK_D_3) and runs the common dead_event. */
 static EVT_BEGIN(dead_event_nokotarou)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(3), LW(4), LW(5))
@@ -2119,6 +2228,7 @@ static EVT_BEGIN(dead_event_nokotarou)
     RETURN
 EVT_END()
 
+/** Event script: Koops pulls into his shell (PNK_K_2 then PNK_K_1), at normal speed. */
 static EVT_BEGIN(_change_koura_pose)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PNK_K_2"))
     LOOP(18)
@@ -2133,6 +2243,10 @@ static EVT_BEGIN(_change_koura_pose)
     RETURN
 EVT_END()
 
+/**
+ * Event script: Koops pulls into his shell (PNK_K_2 then PNK_K_1),
+ * at the faster speed used during the shell attack.
+ */
 static EVT_BEGIN(_change_koura_pose_fast)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PNK_K_2"))
     LOOP(10)
@@ -2147,6 +2261,7 @@ static EVT_BEGIN(_change_koura_pose_fast)
     RETURN
 EVT_END()
 
+/** Event script: Koops comes back out of his shell (PNK_K_1 then PNK_K_2) and clears the spin flag (unit work 8). */
 static EVT_BEGIN(_restore_koura_pose)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 0)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
@@ -2164,6 +2279,10 @@ static EVT_BEGIN(_restore_koura_pose)
     RETURN
 EVT_END()
 
+/**
+ * Event script: starts the Koops shell spin, which keeps rotating the shell part every frame
+ * while unit work 8 is 1.
+ */
 static EVT_BEGIN(_koura_rotate_start)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 1)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 10, 0)
@@ -2201,12 +2320,17 @@ static EVT_BEGIN(_koura_rotate_start)
     RETURN
 EVT_END()
 
+/** Event script: stops the Koops shell spin by clearing unit work 8. */
 static EVT_BEGIN(_koura_rotate_stop)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 0)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of Doopliss as Koops: can use an item;
+ * otherwise it picks the shell attack or the shell toss (shubibin) of Koops.
+ */
 static EVT_BEGIN(attack_event_nokotarou)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -2228,6 +2352,10 @@ static EVT_BEGIN(attack_event_nokotarou)
     RETURN
 EVT_END()
 
+/**
+ * Shell attack of Doopliss as Koops (enemyWeapon_NokotarouKouraAttack):
+ * Koops withdraws into his shell and slams into one target, with the dodge or defence check, and comes back.
+ */
 static EVT_BEGIN(attack_event_nokotarou_koura)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -2330,6 +2458,10 @@ static EVT_BEGIN(attack_event_nokotarou_koura)
     RETURN
 EVT_END()
 
+/**
+ * Shell toss attack of Doopliss as Koops (enemyWeapon_NokotarouShubibinAttack, "shubibin"):
+ * he spins his shell and throws it at one target, with the dodge or defence check.
+ */
 static EVT_BEGIN(attack_event_nokotarou_shubibin)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -2424,6 +2556,7 @@ static EVT_BEGIN(attack_event_nokotarou_shubibin)
     RETURN
 EVT_END()
 
+/** Wait event of Doopliss as Koops: plays his idle pose from the pose table. */
 static EVT_BEGIN(wait_event_nokotarou)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -2500,6 +2633,10 @@ static BattleUnitKindPart parts_clauda[] = {
     },
 };
 
+/**
+ * Init event of Doopliss as Flurrie (Clauda): sets her vulnerability table,
+ * clears all statuses and installs the Flurrie-form events.
+ */
 static EVT_BEGIN(init_event_clauda)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, LW(11), PTR(pose_table_clauda_stay))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_clauda))
@@ -2520,6 +2657,7 @@ static EVT_BEGIN(init_event_clauda)
     RETURN
 EVT_END()
 
+/** Dead event of Doopliss as Flurrie: plays her fall pose and runs the common dead_event. */
 static EVT_BEGIN(dead_event_clauda)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(3), LW(4), LW(5))
@@ -2547,6 +2685,11 @@ static EVT_BEGIN(dead_event_clauda)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of Doopliss as Flurrie: can use an item;
+ * otherwise she attacks one target with her body slam (enemyWeapon_ClaudaNormalAttack),
+ * with the dodge or defence check.
+ */
 static EVT_BEGIN(attack_event_clauda)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -2657,6 +2800,7 @@ static EVT_BEGIN(attack_event_clauda)
     RETURN
 EVT_END()
 
+/** Wait event of Doopliss as Flurrie: plays her idle pose from the pose table. */
 static EVT_BEGIN(wait_event_clauda)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -2732,6 +2876,10 @@ static BattleUnitKindPart parts_yoshi[] = {
     },
 };
 
+/**
+ * Init event of Doopliss as Yoshi: sets his vulnerability table,
+ * clears all statuses and installs the Yoshi-form events.
+ */
 static EVT_BEGIN(init_event_yoshi)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, LW(11), PTR(pose_table_yoshi_stay))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_yoshi))
@@ -2749,6 +2897,7 @@ static EVT_BEGIN(init_event_yoshi)
     RETURN
 EVT_END()
 
+/** Dead event of Doopliss as Yoshi: plays his fall pose and runs the common dead_event. */
 static EVT_BEGIN(dead_event_yoshi)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(3), LW(4), LW(5))
@@ -2776,6 +2925,10 @@ static EVT_BEGIN(dead_event_yoshi)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of Doopliss as Yoshi: can use an item;
+ * otherwise he attacks one target (enemyWeapon_YoshiNormalAttack), with the dodge or defence check.
+ */
 static EVT_BEGIN(attack_event_yoshi)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -2971,6 +3124,7 @@ static EVT_BEGIN(attack_event_yoshi)
     RETURN
 EVT_END()
 
+/** Wait event of Doopliss as Yoshi: plays his idle pose from the pose table. */
 static EVT_BEGIN(wait_event_yoshi)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -3046,6 +3200,10 @@ BattleWeapon weapon_vivian_kagenuke_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Event script: Doopliss, as Vivian, sinks into her shadow (sound SFX_BOSS_VIVI_SHADOW1 after 250 ms and
+ * battle_evt_majo_disp_off).
+ */
 static EVT_BEGIN(vivian_down)
     BEGIN_INLINE_EVENT
         WAIT_MS(250)
@@ -3055,6 +3213,10 @@ static EVT_BEGIN(vivian_down)
     RETURN
 EVT_END()
 
+/**
+ * Event script: Doopliss, as Vivian, rises out of her shadow at the position in LW(0..2) (sound
+ * SFX_BOSS_VIVI_SHADOW2, battle_evt_majo_disp_on and a move there).
+ */
 static EVT_BEGIN(vivian_up)
     BEGIN_INLINE_EVENT
         WAIT_MS(250)
@@ -3065,6 +3227,10 @@ static EVT_BEGIN(vivian_up)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Doopliss in Vivian's form: swaps in Vivian's pose table, data table, parts and kind (141),
+ * sets her defences and event handlers, starts the shadow-tail event and clears all statuses.
+ */
 EVT_BEGIN(init_event_vivian)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, LW(11), PTR(pose_table_vivian_stay))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_vivian))
@@ -3084,6 +3250,10 @@ EVT_BEGIN(init_event_vivian)
     RETURN
 EVT_END()
 
+/**
+ * Dead event of Doopliss as Vivian: walks back to his home position if needed,
+ * plays Vivian's fall pose (PTR_D_3), then runs the common dead_event.
+ */
 EVT_BEGIN(dead_event_vivian)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(3), LW(4), LW(5))
@@ -3111,6 +3281,10 @@ EVT_BEGIN(dead_event_vivian)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of Doopliss as Vivian: uses an enemy item if one is queued;
+ * otherwise plays Vivian's attack animations (PTR_A2_2 with its attack sound) and returns to the home position.
+ */
 EVT_BEGIN(attack_event_vivian)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -3187,6 +3361,7 @@ EVT_BEGIN(attack_event_vivian)
     RETURN
 EVT_END()
 
+/** Wait event of Doopliss as Vivian: plays her idle animation from the pose table. */
 EVT_BEGIN(wait_event_vivian)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -3267,6 +3442,7 @@ BattleWeapon enemyWeapon_SandersNormalAttack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Init event of Doopliss in Bobbery's form: swaps in Bobbery's tables, kind and handlers and clears all statuses. */
 EVT_BEGIN(init_event_sanders)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, LW(11), PTR(pose_table_sanders_stay))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_sanders))
@@ -3283,6 +3459,7 @@ EVT_BEGIN(init_event_sanders)
     RETURN
 EVT_END()
 
+/** Dead event of Doopliss as Bobbery: returns home if needed, plays the fall pose and runs the common dead_event. */
 EVT_BEGIN(dead_event_sanders)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(3), LW(4), LW(5))
@@ -3310,6 +3487,10 @@ EVT_BEGIN(dead_event_sanders)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of Doopliss as Bobbery: uses an enemy item if one is queued,
+ * otherwise runs attack_event_sanders_normal.
+ */
 EVT_BEGIN(attack_event_sanders)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -3323,6 +3504,11 @@ EVT_BEGIN(attack_event_sanders)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the normal attack of Doopliss as Bobbery:
+ * he charges at the chosen target and explodes (bomb effect and Bobbery's attack sounds),
+ * followed by the damage check.
+ */
 EVT_BEGIN(attack_event_sanders_normal)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
@@ -3404,6 +3590,7 @@ EVT_BEGIN(attack_event_sanders_normal)
     RETURN
 EVT_END()
 
+/** Wait event of Doopliss as Bobbery: plays his idle animation from the pose table. */
 EVT_BEGIN(wait_event_sanders)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -3599,6 +3786,7 @@ BattleWeapon enemyWeapon_ChuchurinaNormalAttackLlast = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Init event of Doopliss in Ms. Mowz's form: swaps in her tables, kind and handlers and clears all statuses. */
 EVT_BEGIN(init_event_chuchurina)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, LW(11), PTR(pose_table_chuchurina_stay))
     CALL(btlevtcmd_ChangeDataTable, BTL_UNIT_SELF, PTR(data_table_chuchurina))
@@ -3615,6 +3803,7 @@ EVT_BEGIN(init_event_chuchurina)
     RETURN
 EVT_END()
 
+/** Dead event of Doopliss as Ms. Mowz: returns home if needed, plays the fall pose and runs the common dead_event. */
 EVT_BEGIN(dead_event_chuchurina)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(3), LW(4), LW(5))
@@ -3642,6 +3831,10 @@ EVT_BEGIN(dead_event_chuchurina)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of Doopliss as Ms. Mowz: uses an enemy item if one is queued,
+ * otherwise runs attack_event_chuchurina_normal.
+ */
 EVT_BEGIN(attack_event_chuchurina)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -3655,6 +3848,10 @@ EVT_BEGIN(attack_event_chuchurina)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the normal attack of Doopliss as Ms. Mowz:
+ * he runs at the chosen target and attacks with her pose set (PCH_A1_1), followed by the damage check.
+ */
 EVT_BEGIN(attack_event_chuchurina_normal)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
@@ -3927,6 +4124,7 @@ EVT_BEGIN(attack_event_chuchurina_normal)
     RETURN
 EVT_END()
 
+/** Wait event of Doopliss as Ms. Mowz: plays her idle animation from the pose table. */
 EVT_BEGIN(wait_event_chuchurina)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -3934,6 +4132,10 @@ EVT_END()
 
 EffectEntry* effScanningEntry(s32 type, f32 x, f32 y, f32 z);
 
+/**
+ * Script helper: starts the scan effect (the blue sweep that precedes Doopliss's transformation) at (args[1],
+ * args[2], args[3]) over the unit args[0], scaled to that unit's size.
+ */
 static USER_FUNC(eff_scanning) {
     EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
@@ -3948,6 +4150,10 @@ static USER_FUNC(eff_scanning) {
 }
 
 #if VERSION >= VERSION_JP
+/**
+ * Script helper: returns 1 in args[0] if Mario currently has a shadow guard (the Vivian partner's protective
+ * status) and 0 otherwise. JP and later.
+ */
 USER_FUNC(mario_shadow_guard_check) {
     EvtWord* args = event->args;
 
@@ -3959,13 +4165,17 @@ USER_FUNC(mario_shadow_guard_check) {
     return EVT_RETURN_DONE;
 }
 #endif
+/**
+ * Script helper: clears flag 2 on Vivian's partner data so she can rejoin Mario's party
+ * after the fight (the pouch's partyData[6] flags).
+ */
 static USER_FUNC(vivian_comeback) {
     pouchGetPtr()->partyData[6].flags &= ~2;
     return 1;
 }
 
 #if VERSION >= VERSION_US
-// US only: restore the moves of the unit for this turn.
+/** US only: restore the moves of the unit for this turn. */
 USER_FUNC(boss_rampell_las_sync_max_moves) {
     BattleUnit* unit;
     s32 id = evtGetValue(event, event->args[0]);
@@ -3979,6 +4189,10 @@ USER_FUNC(boss_rampell_las_sync_max_moves) {
     return EVT_RETURN_DONE;
 }
 #endif
+/**
+ * Script helper: computes a facing direction in args[4] from the points (args[0], args[1])
+ * and (args[2], args[3]) (angle of the vector between them); keeps the old value if the points coincide.
+ */
 static USER_FUNC(_krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);

@@ -22,6 +22,11 @@
 static BeroEntry bero_entry_data[3];
 static NpcSetupInfo npcEnt[3];
 
+/**
+ * Door close animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times 0.25;
+ * the open and close scripts apply the same transform. The demo builds use 0.2217.
+ */
 static EVT_BEGIN(w_door_close)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -34,6 +39,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door open animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times 0.25;
+ * the open and close scripts apply the same transform. The demo builds use 0.2217.
+ */
 static EVT_BEGIN(w_door_open)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -46,6 +56,11 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door close animation step: moves the two door leaves S_door2_1
+ * and S_door2_2 in opposite directions along Z by the animation value in LW(0) times -0.25;
+ * the open and close scripts apply the same transform. The demo builds use -0.2217.
+ */
 static EVT_BEGIN(e_door_close)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
@@ -58,6 +73,11 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door open animation step: moves the two door leaves S_door2_1
+ * and S_door2_2 in opposite directions along Z by the animation value in LW(0) times -0.25;
+ * the open and close scripts apply the same transform. The demo builds use -0.2217.
+ */
 static EVT_BEGIN(e_door_open)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
@@ -110,6 +130,13 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Ambush at the west entrance: starts the danger BGM,
+ * places the two X-Naut underlings (手下１ and ２) in front of the door, Mario is startled (exclamation balloon),
+ * the grunts talk (stg7_aji_00_00_02 to 04) and attack in battle 6;
+ * after the fight Mario and the partner comment (stg7_aji_00_00_06 to 08)
+ * and the story moves to STORY_STG7_08_ELITE_X_NAUTS.
+ */
 static EVT_BEGIN(first_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER2"))
     CALL(evt_snd_envoff, PSND_FADE_OUT)
@@ -185,6 +212,10 @@ static EVT_BEGIN(first_evt)
     RETURN
 EVT_END()
 
+/**
+ * Case script on the shut west door w_bero (from STORY_STG7_25_THE_LAST_MAIL on):
+ * freezes Mario and shows the "door won't open" text stg7_aji_64.
+ */
 static EVT_BEGIN(evt_door_msg)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("stg7_aji_64"), 0, 0)
@@ -214,6 +245,13 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Init script of aji_00, the corridor between aji_19 and aji_01:
+ * starts the area music (BGM_STG7_DUN1 before STORY_STG7_08_ELITE_X_NAUTS, DUN2 after), sets up the exits,
+ * the save and recovery blocks and the two X-Naut grunts (手下).
+ * Before that story point it runs first_evt, the ambush where the two grunts attack Mario;
+ * from STORY_STG7_25_THE_LAST_MAIL on, the west door w_bero is shut with evt_door_msg.
+ */
 EVT_BEGIN(aji_00_init_evt)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_08_ELITE_X_NAUTS)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN1"))

@@ -72,6 +72,10 @@ static f32 __SYNLfo[64] = {
     -0.098020f,
 };
 
+/**
+ * Starts the voice's low-frequency oscillator from its articulation:
+ * rate, delay, and the depth of its volume and pitch effect, with the extra depth added by the mod wheel.
+ */
 void __SYNSetupLfo(SYNVOICE* voice) {
     ASSERTLINE(47, voice);
 
@@ -84,6 +88,11 @@ void __SYNSetupLfo(SYNVOICE* voice) {
     voice->lfoModCents = voice->art->lfoMod2Pitch;
 }
 
+/**
+ * Advances the LFO by one audio frame once its delay has run out:
+ * looks up the 64-step sine table and scales it by the depth (plus mod-wheel controller 1) to get the volume
+ * and pitch modulation.
+ */
 void __SYNRunLfo(SYNVOICE* voice) {
     f32 lfoAmplitude;
     f32 lfoModWheel;

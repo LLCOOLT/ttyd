@@ -24,6 +24,7 @@ typedef struct EffLaserWork {
     s32 alpha;    // 0x30
 } EffLaserWork;
 
+/** Spawns a laser strike on (x, y, z), starting 1000 units above the target. Spawned by an event script in tik. */
 EffectEntry* effLaserEntry(s32 type, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
     EffLaserWork* work;
@@ -51,6 +52,7 @@ EffectEntry* effLaserEntry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
+/** Eases the beam down over 60 frames, then flashes the screen white and fades the laser out. */
 static void effLaserMain(EffectEntry* effect) {
     EffLaserWork* work = effect->userdata;
     Vec position;
@@ -109,6 +111,7 @@ static void effLaserMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effLaserDisp, effect);
 }
 
+/** Draws the MOBJ_EFF_laser pose billboarded toward the camera. */
 static void effLaserDisp(CameraId cameraId, EffectEntry* effect) {
     EffLaserWork* work = effect->userdata;
     Mtx mtx;

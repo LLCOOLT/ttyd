@@ -56,6 +56,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Reward script for tree ki_6: if the coin has not been collected yet, a Coin falls out when Mario hits the tree. */
 EVT_BEGIN(evt_ki_6)
     CALL(evt_item_delete_check, STRING("item_ki_6"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -75,6 +76,10 @@ static TreeAccess ki_data[] = {
     {7, NULL, NULL, NULL, 0, NULL},
 };
 
+/**
+ * Reward script for bush a_kusa_1: if not yet taken,
+ * a Star Piece pops out of the bush when Mario hits it (GSWF_HEI02_STAR_PIECE_BUSH).
+ */
 static EVT_BEGIN(evt_kusa_1)
     CALL(evt_item_delete_check, STRING("item_kusa_1"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -102,6 +107,10 @@ static KusaAccess kusa_data[] = {
     {4, NULL, NULL, NULL},
 };
 
+/**
+ * Petal Meadows hei_02 map init: registers the exits, field music, the tree and grass rewards, wheat animation,
+ * the POW Block item block and the drifting grass clouds.
+ */
 EVT_BEGIN(hei_02_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)

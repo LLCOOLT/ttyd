@@ -17,6 +17,7 @@ qS2 = 2.02094576023350569471e+00,
 qS3 = -6.88283971605453293030e-01,
 qS4 = 7.70381505559019352791e-02;
 
+/** Arc sine of x in radians (fdlibm); NaN outside [-1, 1]. */
 double __ieee754_asin(double x) {
     double t, w, p, q, c, r, s;
     int hx, ix;

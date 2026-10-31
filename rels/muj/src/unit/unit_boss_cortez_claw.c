@@ -183,6 +183,12 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_cortez_claw", "c_buki4", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x3010009, 0, pose_table},
 };
 
+/**
+ * Init event of Cortez's claw weapon: sets the unit flag 0x1000000, installs its wait, phase, unison phase,
+ * attack, damage and (default) confusion events,
+ * stores weapon number 2 in unit work 2 and clears unit work 1 (the flag that makes it sit out its attack),
+ * and allows no movement.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
@@ -198,6 +204,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event of Cortez's claw: runs the default damage handling with LW(10) = -2 and LW(11) = 1. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -205,6 +212,14 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: attack event of Cortez's claw while it flies free (unit work 1 is 0;
+ * otherwise it just restarts the wait event): it picks a target with weapon_cortez_claw_float_attack,
+ * swings round to the side of it, dives onto it with the sword- dance sound,
+ * and hacks with a swing in z of 45 degrees.
+ * It plays the avoid pose on a dodge, or applies the damage with the action command defence check,
+ * then returns home and straightens.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -316,12 +331,20 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Idle event of Cortez's claw: waits for the loop timing of its animation
+ * and plays the pose table pose for state 1.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeWaitPlayLoopTiming, BTL_UNIT_SELF, 1)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Data event (entry 9) of Cortez's claw: when the weapon takes damage it plays the KRT_Z_1 pose on the unit in
+ * LW(10) and waits 30 frames.
+ */
 static EVT_BEGIN(cortez_damage_sub_event)
     CALL(btlevtcmd_GetDamage, LW(10), LW(0))
     IF_INT_EQUAL(LW(0), 0)

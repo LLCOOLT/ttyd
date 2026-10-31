@@ -6,6 +6,10 @@ typedef struct DestructorChain {
 
 DestructorChain* __global_destructor_chain;
 
+/**
+ * Runs at exit through the .dtors table: pops each registered global object off the destructor chain
+ * and calls its destructor (with the delete-flag argument -1), most recently registered first.
+ */
 void __destroy_global_chain(void) {
     DestructorChain* gdc;
 

@@ -25,10 +25,17 @@ DSError TRKDoStep(TRKBuffer* b);
 DSError TRKDoStop(TRKBuffer* b);
 DSError TRKDoSetOption(TRKBuffer* b);
 
+/** Dispatcher start-up hook; there is no state to set up, so it returns 0. */
 DSError TRKInitializeDispatcher(void) {
     return 0;
 }
 
+/**
+ * Rewinds the message buffer, reads the command byte (data[4]) and calls the matching handler:
+ * 0x01 connect, 0x02 disconnect, 0x03 reset, 0x04 versions, 0x05 support mask, 0x07 override,
+ * 0x10/0x11 read/write memory, 0x12/0x13 read/write registers, 0x17 set option, 0x18 continue, 0x19 step,
+ * 0x1A stop. An unknown command returns 0x500.
+ */
 DSError TRKDispatchMessage(TRKBuffer* buffer) {
     DSError error = 0x500;
 

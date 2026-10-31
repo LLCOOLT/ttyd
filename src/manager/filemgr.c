@@ -34,6 +34,7 @@ static void fileGarbageDataAdrSet(void* data, s32 type);
 static FileEntry* _fileAlloc(const char* filename, s32 type, void (*callback)(FileEntry*));
 static void dvdReadDoneCallBack(s32 error, DVDFileInfo* info);
 
+/** Boot-time setup: allocates the 1024 file entries and chains them all into the free list. */
 void fileInit(void) {
     FileEntry* ptr;
     int i;
@@ -77,6 +78,11 @@ typedef struct FileReloc9 {
 #define POSE(d) ((AnimationPoseData*)(d))
 #define ANIM(d) ((AnimData*)(d))
 
+/**
+ * Turns the absolute pointers inside a loaded file back into offsets from its start (per file type: animation
+ * poses, animation data, TPL textures and the other relocated formats), so the data can be moved;
+ * undone by fileGarbageDataAdrSet.
+ */
 static void fileGarbageDataAdrClear(FileEntry* entry) {
     u16 i;
     u32 off;
@@ -271,6 +277,10 @@ static void fileGarbageDataAdrClear(FileEntry* entry) {
     }
 }
 
+/**
+ * Relocates a freshly loaded or moved file: adds the data address to every offset field its type stores,
+ * unless the fields are already absolute. The textures' image and palette headers are fixed up here too.
+ */
 static void fileGarbageDataAdrSet(void* data, s32 type) {
     u16 i;
     u32 off;
@@ -466,6 +476,11 @@ static void fileGarbageDataAdrSet(void* data, s32 type) {
     }
 }
 
+/**
+ * Moves a file's data to data during smart-heap compaction (memory.c),
+ * unrelocating it first and relocating it at the new address.
+ * A file still being read from disc only gets its DVD read target moved.
+ */
 void fileGarbageMoveMem(void* data, FileEntry* file) {
     if (file->state == 3) {
         if (!file->entry) {
@@ -487,6 +502,13 @@ void fileGarbageMoveMem(void* data, FileEntry* file) {
     }
 }
 
+/**
+ * Releases cached files so their entries and memory can be reused;
+ * memory.c and the allocators call it when they run out.
+ * Mode 1 ages preloaded files (state 3) and drops them after two passes;
+ * mode 0 drops every preloaded file at once, waiting out reads in flight.
+ * Then all released files (state 2) are freed and their entries returned to the free list.
+ */
 void _fileGarbage(BOOL mode) {
     FileEntry* f;
     FileEntry* prev;
@@ -558,6 +580,7 @@ void _fileGarbage(BOOL mode) {
     afp->lastused = prev;
 }
 
+/** fileAlloc with a printf-style file name (formatted into the shared _filename buffer). */
 FileEntry* fileAllocf(s32 type, const char* format, ...) {
     va_list va;
 
@@ -566,10 +589,20 @@ FileEntry* fileAllocf(s32 type, const char* format, ...) {
     return _fileAlloc(_filename, type, NULL);
 }
 
+/**
+ * Loads a file synchronously, or reuses the cached copy of it, and takes a reference;
+ * returns NULL if it does not exist. type picks how its internal pointers are relocated.
+ */
 FileEntry* fileAlloc(const char* filename, s32 type) {
     return _fileAlloc(filename, type, NULL);
 }
 
+/**
+ * Shared body of fileAlloc: returns a cached entry with the same name (waiting for its read,
+ * reviving it if released or preloaded), otherwise looks the name up in the open archives and then on disc,
+ * reading it into a 32-byte-aligned smart heap block. Frees cached files when no entry is left.
+ * callback is unused.
+ */
 static FileEntry* _fileAlloc(const char* filename, s32 type, void (*callback)(FileEntry*)) {
     void* handle;
     FileEntry* search;
@@ -689,6 +722,10 @@ static FileEntry* _fileAlloc(const char* filename, s32 type, void (*callback)(Fi
     return newentry;
 }
 
+/**
+ * Drops a reference to a loaded file; at zero the file is marked released but stays cached
+ * until _fileGarbage frees it.
+ */
 void fileFree(FileEntry* handle) {
     if (handle) {
         if (handle->data) {
@@ -702,6 +739,11 @@ void fileFree(FileEntry* handle) {
     }
 }
 
+/**
+ * dvdmgr callback when an asynchronous file read ends:
+ * relocates the data and runs the file's callback,
+ * or on a canceled read (-3) marks the entry released with type 11.
+ */
 static void dvdReadDoneCallBack(s32 error, DVDFileInfo* info) {
     DVDEntry* entry;
     FileEntry* f;
@@ -727,6 +769,7 @@ static void dvdReadDoneCallBack(s32 error, DVDFileInfo* info) {
     }
 }
 
+/** fileAsync with a printf-style file name. */
 FileEntry* fileAsyncf(s32 type, FileCallback callback, const char* format, ...) {
     va_list va;
 
@@ -735,6 +778,12 @@ FileEntry* fileAsyncf(s32 type, FileCallback callback, const char* format, ...) 
     return fileAsync(_filename, type, callback);
 }
 
+/**
+ * Preloads a file in the background (state 3, no reference taken), mainly animdrv's models and textures.
+ * Returns the entry once the file is loaded, NULL while the read is pending (or just started),
+ * and FILE_ASYNC_MISSING if it is not on the disc.
+ * A later fileAlloc of the same name picks up the preloaded copy.
+ */
 FileEntry* fileAsync(const char* filename, s32 type, FileCallback callback) {
     FileEntry *search, *newentry, *temp;
     smartEntry* smart;
@@ -858,7 +907,7 @@ FileEntry* fileAsync(const char* filename, s32 type, FileCallback callback) {
     }
 }
 
-// Archive type 0-2: how many times _fileAlloc and fileAsync try arcOpen (0 once, 1 and 2 three times).
+/** Archive type 0-2: how many times _fileAlloc and fileAsync try arcOpen (0 once, 1 and 2 three times). */
 void fileSetCurrentArchiveType(s32 type) {
     afp->archiveType = type;
 }

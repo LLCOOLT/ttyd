@@ -69,6 +69,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Item-box callback: puts a Mushroom at the box, waits for the chest animation and gives it to Mario. */
 static EVT_BEGIN(item_get00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
@@ -80,6 +81,11 @@ static EVT_BEGIN(item_get00)
     RETURN
 EVT_END()
 
+/**
+ * Map init script of tik_10.
+ * Starts the music and ambience, sets up the exits
+ * and places the item box (a Mushroom, GSWF_TIK10_CHEST_OPENED).
+ */
 EVT_BEGIN(tik_10_init_evt)
     CALL(evt_hit_bind_mapobj, STRING("a_dokan_3"), STRING("dokan_1_s"))
     CALL(evt_mapobj_trans, 1, STRING("dokan_1_s"), 0, 30, 0)

@@ -88,6 +88,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Puts the plane-panel platform, pipe and tree wall in their already-extended state (175 units raised,
+ * the pipe and tree scaled to match) and rebinds their hit areas, for when the blue switch was already pressed.
+ */
 EVT_BEGIN(evt_hikou_nobiru_init)
     CALL(evt_hit_bind_mapobj, STRING("a_dai"), STRING("hikou"))
     CALL(evt_hit_bind_mapobj, STRING("a_hi"), STRING("hikou"))
@@ -122,6 +126,11 @@ EVT_BEGIN(evt_hikou_nobiru_init)
     RETURN
 EVT_END()
 
+/**
+ * Blue-switch cutscene: the camera pans while the paper-plane panel,
+ * the pipe and the tree wall stretch upward by 175 units over 3 seconds with a quake sound,
+ * then the hit areas are rebound.
+ */
 EVT_BEGIN(evt_hikou_nobiru)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_tree_ha04"), MAPOBJ_FLAG_HIDE)
@@ -196,6 +205,11 @@ static TreeAccess tree_access_data[] = {
     {7, NULL, NULL, NULL, 0, NULL},
 };
 
+/**
+ * Guess: map init script of Boggly Woods' third map (win_02):
+ * registers exits, trees and the plane-panel launch pad, places the Shine Sprite, hidden P-Down D-Up P block,
+ * Quake Hammer badge block and Star Piece, and sets the blue switch.
+ */
 EVT_BEGIN(win_02_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)

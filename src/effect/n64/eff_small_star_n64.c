@@ -29,6 +29,10 @@ typedef struct EffSmallStarN64Work {
 static void effSmallStarMain(EffectEntry* effect);
 static void effSmallStarDisp(CameraId cameraId, EffectEntry* effect);
 
+/**
+ * Spawns `count` small stars at (x, y, z); type picks the spread pattern and (dx, dy, dz) the base velocity.
+ * Used by the Koopa partner (party_nokonoko), eff_small_star.c and event scripts.
+ */
 EffectEntry* effSmallStarN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 dx, f32 dy, f32 dz) {
     static f32 kaiten;
     EffectEntry* effect;
@@ -175,6 +179,7 @@ EffectEntry* effSmallStarN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 
 #pragma opt_propagation off
 // lifetimes optimisation off for _cosf, alphaf, effSmallStarMain: the original register allocation and scheduling need it
 #pragma opt_lifetimes off
+/** Polynomial cosine approximation on [0, 2*pi), written out to match the original's inlined code. */
 static inline f32 _cosf(f32 x) {
     f32 a = 0.03705f;
     f32 b = 0.4967f;
@@ -208,9 +213,17 @@ static inline f32 _cosf(f32 x) {
     return a;
 }
 
+/** Multiplies an integer alpha value by a float factor. */
 inline f32 alphaf(f32 m, s32 x) {
     return x * m;
 }
+/**
+ * Type 2 stars bob (vy = 4*cos of 6 degrees per frame) while drifting outward,
+ * and fade 40% per frame and slow their spin once falling.
+ * Other types damp their velocity 20% per frame;
+ * type 0 also spins faster between 20 and 5 frames left, and all fade 40% per frame and slow over the last 5.
+ * Deletes at end of life; drawn on the work's camera.
+ */
 static void effSmallStarMain(EffectEntry* effect) {
     EffSmallStarN64Work* w = effect->userdata;
     Vec position;
@@ -283,10 +296,16 @@ static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, 8, 0, 0, 32, 0, 0, 0, 0xFF},
 };
 
+/** Reads one byte of the shared color rotation table, wrapping at 36 entries. */
 static inline u8 color_rot_get(s32 idx) {
     return color_rotation_data[idx % 36];
 }
 
+/**
+ * Draws each star as a 16x16 quad of texture 0x1D facing the camera and turned by its spin,
+ * with no depth test so it shows on top; the colour cycles through color_rotation_data,
+ * each star one step further along.
+ */
 static void effSmallStarDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     s32 a, b, c;
@@ -340,6 +359,7 @@ static void effSmallStarDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
+/** Sets the camera every star of the effect is drawn on. */
 void effSmallStarN64CamChg(EffectEntry* effect, s32 cameraId) {
     EffSmallStarN64Work* w = effect->userdata;
     s32 i;

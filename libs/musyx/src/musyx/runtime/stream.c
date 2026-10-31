@@ -20,6 +20,8 @@ static struct streamDefaults streamDefaults;
 #endif
 static u32 nextPublicID;
 
+/** Clears the 64 stream slots, resets the public ID counter, sets the update period to 4 calls (3 skipped) and the
+ * default low-pass stream filter to off. */
 void streamInit() {
   s32 i;
   streamCallCnt = 0;
@@ -35,12 +37,19 @@ void streamInit() {
 }
 
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(1, 5, 3)
+/** Pushes a stream's volume, pan, surround pan and aux A/B levels (0..127 scaled to 0..1) to its hardware voice with
+ * hwSetVolume. */
 static void SetHWMix(const STREAM_INFO* si) {
   hwSetVolume(si->voice, 0, si->vol * (1 / 127.f), (si->pan << 16), (si->span << 16),
               si->auxa * (1 / 127.f), si->auxb * (1 / 127.f));
 }
 #endif
 
+/** Per-frame stream service, run every few calls (see sndStreamCallbackFrq). A stream in state 1 gets its voice started
+ * on the ring buffer (PCM16 or ADPCM sample info, pitch, volume, optional low-pass filter) and its buffer copied to
+ * ARAM. A playing stream (state 2) reads the voice position, asks the update callback to refill the part of the ring
+ * buffer that has been played (handling wrap-around), flushes the new data to ARAM and updates the ADPCM loop predictor
+ * byte. */
 void streamHandle() {
   u32 i;              // r25
   u32 cpos;           // r30
@@ -276,8 +285,11 @@ void streamHandle() {
   }
 }
 
+/** Empty. */
 void streamCorrectLoops() {}
 
+/** Called when a stream's hardware voice is taken away: unblocks the voice if it was playing, sets the stream to
+ * inactive (state 3) and tells the update callback to stop by calling it with a NULL buffer. */
 void streamKill(u32 voice) {
 #if MUSY_VERSION <= MUSY_VERSION_CHECK(2, 0, 1)
   si = &streamInfo[voice];
@@ -312,6 +324,7 @@ void streamKill(u32 voice) {
 #endif
 }
 
+/** Finds the stream slot with public ID publicID, or -1. */
 static u32 GetPrivateIndex(u32 publicID) {
   u32 i; // r31
   for (i = 0; i < 64; ++i) {
@@ -323,6 +336,7 @@ static u32 GetPrivateIndex(u32 publicID) {
   return -1;
 }
 
+/** Returns a new stream ID (never -1) that no live stream uses. */
 static u32 GeneratePublicID() {
   u32 id; // r30
   u32 i;  // r31
@@ -342,6 +356,8 @@ static u32 GeneratePublicID() {
   return id;
 }
 
+/** Public: sets how often streams are serviced for a requested period in milliseconds (a multiple of 5 ms, one DSP
+ * frame each) and returns the period actually used. */
 u32 sndStreamCallbackFrq(u32 msTime) {
   s32 time; // r31
   time = ((msTime * 2 + 5) / 10) - 1;
@@ -350,6 +366,7 @@ u32 sndStreamCallbackFrq(u32 msTime) {
 }
 
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 2)
+/** Public: writes the ARAM address of the stream's buffer to *aramAddr; returns 1 if the stream exists, 0 otherwise. */
 u32 sndStreamGetARAMAddress(u32 stid, u32* aramAddr) {
   u32 i;
   u32 ret = 0;
@@ -366,6 +383,9 @@ u32 sndStreamGetARAMAddress(u32 stid, u32* aramAddr) {
 }
 #endif
 
+/** Public: for a stream whose data the game refills itself, flushes the two given ranges (offset and length in samples;
+ * converted to bytes for PCM16 or ADPCM) of its buffer to ARAM, refreshes the ADPCM loop predictor and does the same
+ * for the linked stereo partner. */
 void sndStreamARAMUpdate(u32 stid, u32 off1, u32 len1, u32 off2, u32 len2) {
   u32 i; // r30
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 2)
@@ -454,6 +474,8 @@ void sndStreamARAMUpdate(u32 stid, u32 off1, u32 len1, u32 off2, u32 len2) {
   hwEnableIrq();
 }
 
+/** Adjusts pan and surround pan to the output mode: mono forces centre pan and no surround, and stereo (no Pro Logic)
+ * forces no surround. */
 static void CheckOutputMode(u8* pan, u8* span) {
   if (synthFlags & 1) {
     *pan = 64;
@@ -464,6 +486,7 @@ static void CheckOutputMode(u8* pan, u8* span) {
 }
 
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 2)
+/** Stores a stream's volume and aux A/B sends. */
 static void SetupVolume(STREAM_INFO* si, u8 vol, u8 auxa, u8 auxb) {
   si->vol = vol;
   si->auxa = auxa;
@@ -472,6 +495,8 @@ static void SetupVolume(STREAM_INFO* si, u8 vol, u8 auxa, u8 auxb) {
 #endif
 
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(1, 5, 4)
+/** Stores a stream's volume, sends, and the requested pan and surround pan (the requested values are kept so they can
+ * be reapplied if the output mode changes). */
 static void SetupVolumeAndPan(STREAM_INFO* si, u8 vol, u8 pan, u8 span, u8 auxa, u8 auxb) {
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 2)
   SetupVolume(si, vol, auxa, auxb);
@@ -493,6 +518,8 @@ static void SetupVolumeAndPan(STREAM_INFO* si, u8 vol, u8 pan, u8 span, u8 auxa,
 #endif
 
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(1, 5, 4)
+/** Reapplies the output-mode adjustment to the pan of every stream and updates the hardware mix of those that have a
+ * voice. */
 void streamOutputModeChanged() {
   u32 i;
 
@@ -597,6 +624,9 @@ SND_STREAMID sndStreamAllocEx(u8 prio, void* buffer, u32 samples, u32 frq, u8 vo
   return stid;
 }
 
+/** Public: allocates a stereo stream as two linked mono streams: the left one with pan lowered by 64 and the right one
+ * raised by 64 (clamped to 0..127), each with its own buffer and user value. If the second fails, the first is freed
+ * and 0xFFFFFFFF returned; otherwise the left stream's ID stands for both. */
 u32 sndStreamAllocStereo(u8 prio, void* lBuffer, void* rBuffer, u32 samples, u32 frq, u8 vol,
                          u8 pan, u8 span, u8 auxa, u8 auxb, u8 studio, u32 flags,
                          SND_STREAM_UPDATE_CALLBACK updateFunction, u32 lUser, u32 rUser,
@@ -629,6 +659,8 @@ u32 sndStreamAllocStereo(u8 prio, void* lBuffer, void* rBuffer, u32 samples, u32
   return stid[0];
 }
 
+/** Public: returns the buffer size in bytes for num samples, rounded up to 32: ADPCM (flags bit 0) takes 8 bytes per 14
+ * samples, PCM16 takes 2 bytes per sample. */
 u32 sndStreamAllocLength(u32 num, u32 flags) {
   if (flags & 1) {
     return (((num + 13) / 14) * 8 + 31) & ~31;
@@ -637,6 +669,7 @@ u32 sndStreamAllocLength(u32 num, u32 flags) {
   return (num * 2 + 31) & ~31;
 }
 
+/** Public: sets the eight ADPCM coefficient pairs of a stream and of its stereo partner. */
 void sndStreamADPCMParameter(u32 stid, SND_ADPCMSTREAM_INFO* adpcmInfo) {
   u32 j; // r31
   u32 i; // r30
@@ -658,6 +691,8 @@ void sndStreamADPCMParameter(u32 stid, SND_ADPCMSTREAM_INFO* adpcmInfo) {
   hwEnableIrq();
 }
 
+/** Public: sets stream volume, pan, surround pan and a single effect (aux A) send, and updates the playing voice; also
+ * applies to the stereo partner. */
 void sndStreamMixParameter(u32 stid, u8 vol, u8 pan, u8 span, u8 fxvol) {
   u32 i; // r31
   MUSY_ASSERT_MSG(sndActive, "Sound system is not initialized.");
@@ -690,6 +725,7 @@ void sndStreamMixParameter(u32 stid, u8 vol, u8 pan, u8 span, u8 fxvol) {
   hwEnableIrq();
 }
 
+/** Public: like sndStreamMixParameter but with separate aux A and aux B sends. */
 void sndStreamMixParameterEx(u32 stid, u8 vol, u8 pan, u8 span, u8 auxa, u8 auxb) {
   u32 i; // r31
   MUSY_ASSERT_MSG(sndActive, "Sound system is not initialized.");
@@ -725,6 +761,7 @@ void sndStreamMixParameterEx(u32 stid, u8 vol, u8 pan, u8 span, u8 auxa, u8 auxb
 }
 
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 2)
+/** Public: sets only volume and the aux A/B sends of a stream (pan is kept) and its partner. */
 void sndStreamMixParameterVolume(u32 stid, u8 vol, u8 auxa, u8 auxb) {
   unsigned long i; // r31
   MUSY_ASSERT_MSG(sndActive, "Sound system is not initialized.");
@@ -747,6 +784,7 @@ void sndStreamMixParameterVolume(u32 stid, u8 vol, u8 auxa, u8 auxb) {
 
 #pragma push
 #pragma inline_depth(3)
+/** Public: sets a stream's sample rate in Hz and updates the voice's pitch if it is playing (and the partner's). */
 void sndStreamFrq(u32 stid, u32 frq) {
   u32 i;     // r31
   u16 pitch; // r27
@@ -772,6 +810,8 @@ void sndStreamFrq(u32 stid, u32 frq) {
 #pragma pop
 
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 2)
+/** Public: enables or disables the stream's low-pass filter and sets its cutoff frequency (converted to DSP
+ * coefficients); applied immediately if the stream is playing and also to the partner. */
 void sndStreamLPFParameter(u32 stid, u32 enable, u32 frq) {
   u32 i; // r31
 
@@ -801,6 +841,7 @@ void sndStreamLPFParameter(u32 stid, u32 enable, u32 frq) {
   hwEnableIrq();
 }
 
+/** Public: sets whether new streams get a low-pass filter and the default cutoff frequency. */
 void sndStreamLPFDefaultParameter(u32 enable, u32 frq) {
   MUSY_ASSERT_MSG(sndActive, "Sound system is not initialized.");
   hwDisableIrq();
@@ -810,6 +851,7 @@ void sndStreamLPFDefaultParameter(u32 enable, u32 frq) {
 }
 #endif
 
+/** Public: deactivates a stream, releases its ARAM buffer and slot, and does the same for its stereo partner. */
 void sndStreamFree(SND_STREAMID stid) {
   u32 i; // r31
   MUSY_ASSERT_MSG(sndActive, "Sound system is not initialized.");
@@ -830,6 +872,8 @@ void sndStreamFree(SND_STREAMID stid) {
   hwEnableIrq();
 }
 
+/** Public: for an inactive stream, blocks a hardware voice at the stream's priority and marks it ready to start (state
+ * 1). Returns FALSE if no voice is available (also for the stereo partner). */
 bool sndStreamActivate(SND_STREAMID stid) {
   u32 i;            // r31
   bool ret = FALSE; // r28
@@ -863,6 +907,8 @@ bool sndStreamActivate(SND_STREAMID stid) {
   return ret;
 }
 
+/** Public: releases the voice of a starting or playing stream and sets it inactive, together with its partner; the
+ * stream keeps its slot and buffer. */
 void sndStreamDeactivate(u32 stid) {
   u32 i; // r31
   MUSY_ASSERT_MSG(sndActive, "Sound system is not initialized.");

@@ -220,12 +220,19 @@ static BattleUnitKindPart parts[] = {
 };
 
 #if VERSION <= VERSION_JP
+/** Debug event (JP and earlier): runs _test_rtn forever. Not referenced by the unit's normal scripts. */
 EVT_BEGIN(test_event)
     CALL(_test_rtn)
     RETURN
 EVT_END()
 #endif
 
+/**
+ * Guess: Entrance of the Blooper (Gesso) boss.
+ * The Blooper surfaces (SFX_BOSS_GESSO_APPEAR1), takes its talking and idle poses,
+ * and the battle camera shows it while both tentacles (left and right arm units) are spawned
+ * and linked to it through unit work 1 and 2.
+ */
 static EVT_BEGIN(battle_entry_event)
     CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, 16777216)
     WAIT_MS(1000)
@@ -301,6 +308,11 @@ static EVT_BEGIN(battle_entry_event)
     RETURN
 EVT_END()
 
+/**
+ * Init script of the Blooper body.
+ * Registers the phase and entry scripts, clears its work flags (4 and 5)
+ * and starts it in the ceiling pose table.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
@@ -352,6 +364,11 @@ BattleUnitSetup entry_gesso_right_arm_entry_data = {
     NULL, // itemDropTable
 };
 
+/**
+ * Damage reaction of the Blooper body.
+ * Marks the body as being hit in unit work 4 (1, or 3 for a special damage pattern),
+ * runs the default damage script and clears the mark.
+ */
 static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, 1)
     CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 1024, LW(0))
@@ -365,6 +382,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Phase script of the Blooper.
+ * Before the player's turn and after the enemy's turn it counts turns in work 3;
+ * after two it wakes up (GSO_U_1 with the wake sounds),
+ * switches to the normal pose table and changes its state in work 0 (1 to 2, then on).
+ */
 static EVT_BEGIN(phase_event)
 #if VERSION >= VERSION_US
     CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
@@ -495,6 +518,11 @@ static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the Blooper body.
+ * If it is not yet awake it does nothing or runs the queued script;
+ * once awake (state 2) it uses the ink attack gesso_ikasumi_attack.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -559,6 +587,12 @@ BattleWeapon weapon_gesso_ikasumi_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * The Blooper's ink attack (ikasumi = squid ink).
+ * It picks the opposing side, aims at all targets, winds up with the GSO_A2_1 animation,
+ * spits black ink (_ikasumi_effect with the ink sound) and deals damage to each target,
+ * whose action command can reduce it; it ends by returning the Blooper to its wait pose.
+ */
 EVT_BEGIN(gesso_ikasumi_attack)
     SET_VALUE(LW(12), PTR(&weapon_gesso_ikasumi_attack))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -622,6 +656,11 @@ EVT_BEGIN(gesso_ikasumi_attack)
     RETURN
 EVT_END()
 
+/**
+ * Script helper.
+ * Spawns the black ink spray (OpukuJetw effect) at 95 units left and 75 above the unit args[0],
+ * lasting args[1] frames and rotated 135 degrees.
+ */
 static USER_FUNC(_ikasumi_effect) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -646,6 +685,11 @@ static USER_FUNC(_ikasumi_effect) {
 }
 
 #if VERSION <= VERSION_JP
+/**
+ * Debug routine (JP and earlier).
+ * Lets the d-pad select the Blooper or one of its two tentacles,
+ * then resizes the unit with the buttons and moves it with the sticks, every frame.
+ */
 static USER_FUNC(_test_rtn) {
     BattleWork* wp = _battleWorkPointer;
     s32 id = BattleTransID(event, -2);
@@ -707,11 +751,17 @@ static USER_FUNC(_test_rtn) {
 }
 #endif
 
+/** Wait script of the Blooper body: shows its idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Runs when the Blooper dies.
+ * It kills both tentacles (the units held in its work slots 1 and 2), each in a parallel event,
+ * and waits for both to finish.
+ */
 EVT_BEGIN(dead_subevent)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(3))
     CALL(btlevtcmd_GetUnitId, LW(3), LW(3))

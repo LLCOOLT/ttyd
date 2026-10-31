@@ -193,6 +193,12 @@ static BattleWeapon weapon_kurokumorn_thunder_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Attack script of the Dark Puff.
+ * After an item check, if its charge is up (counter attribute 1024 on part 1) it unleashes the thunder attack on
+ * all enemies (thunder_event).
+ * Otherwise it picks with equal odds between the normal ramming attack and charging up (charge_event).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -223,6 +229,13 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Puff's thunderstorm: it clears its charge (counter attribute 1024),
+ * then rains lightning bolts (the "pokopi_thunder_n64" effect,
+ * SFX_ENM_KUMO_CHARGE_ATTACK1) in four waves of two bolts over the party's side of the stage,
+ * then checks every target in turn and damages it (the defence action command result is read once,
+ * at the first hit).
+ */
 static EVT_BEGIN(thunder_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -382,6 +395,10 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init script of the Dark Puff: registers its wait, unison-phase, attack, damage and confusion handlers,
+ * clears unit work 0 and 1 and starts barrier_event to show its charge.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventUnisonPhase, BTL_UNIT_SELF, PTR(unison_phase_event))
@@ -395,6 +412,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Background loop of the Dark Puff, run for as long as it exists:
+ * every 31 frames, while part 1 carries counter attribute 1024 (it is charged),
+ * it spawns the "akari_charge_n64" effect above it, scaled to its size.
+ */
 static EVT_BEGIN(barrier_event)
     LABEL(0)
     WAIT_FRAMES(31)
@@ -414,6 +436,7 @@ static EVT_BEGIN(barrier_event)
     RETURN
 EVT_END()
 
+/** Data event 48 of the Dark Puff: after a first strike it is set to y 10 and waits for the attack to end. */
 static EVT_BEGIN(dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -422,6 +445,7 @@ static EVT_BEGIN(dmg_first_attack_pos)
     RETURN
 EVT_END()
 
+/** Damage script of the Dark Puff: runs the default damage handling on itself. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -429,10 +453,17 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Empty counter script (just returns). */
 static EVT_BEGIN(counter_event)
     RETURN
 EVT_END()
 
+/**
+ * Before the player's phase, if the Dark Puff can act and is not charged,
+ * it has a 50 percent chance to swap height: from the low position (unit work 0 set) it rises to y 40
+ * and sets part attributes 0x600000, otherwise it drops to y 10 and clears them.
+ * The new height becomes its home position.
+ */
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_EQUAL(LW(0), 0)
@@ -471,6 +502,11 @@ static EVT_BEGIN(unison_phase_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Puff's ramming attack: it picks a target (the one hit first on a first strike),
+ * shrinks while rattling, rises and lunges into the target, which takes the damage;
+ * it then floats back up and home.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -578,6 +614,10 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Puff builds up a charge: it sets counter attribute 1024 on part 1,
+ * plays the charge pose and sound for 80 frames and goes back to its idle pose.
+ */
 static EVT_BEGIN(charge_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -596,6 +636,7 @@ static EVT_BEGIN(charge_event)
     RETURN
 EVT_END()
 
+/** Wait script: plays the Dark Puff's idle pose from its pose table and resets its scale. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, 1, 1, 1)

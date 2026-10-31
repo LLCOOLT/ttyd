@@ -16,6 +16,10 @@
 static void effCloudMain(EffectEntry* effect);
 static void effCloudDisp(CameraId cameraId, EffectEntry* effect);
 
+/**
+ * Spawns a ribbon-like cloud trail whose head starts at (x, y, z) and keeps a 30-point history of its path.
+ * Types 0-3 set the two tint colours (white, cream/brown, red, orange); lifetime <= 0 means until soft-deleted.
+ */
 EffectEntry* effCloudN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffCloudN64Work* work;
@@ -122,6 +126,12 @@ EffectEntry* effCloudN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 s
     return effect;
 }
 
+/**
+ * Fades out over the last 16 frames.
+ * Type 3 moves the head by a random-walk velocity each frame;
+ * whenever the head moved, a new trail point is added to the ring buffer along with its age
+ * and the running path length.
+ */
 static void effCloudMain(EffectEntry* effect) {
     EffCloudN64Work* work = effect->userdata;
     Vec position;
@@ -191,6 +201,11 @@ static void effCloudMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effCloudDisp, effect);
 }
 
+/**
+ * Builds a camera-facing triangle strip along the trail (width grows with the age of each point)
+ * and draws it with texture 0x83 scrolling along the path length;
+ * older points shift in colour toward the second tint.
+ */
 static void effCloudDisp(CameraId cameraId, EffectEntry* effect) {
     EffCloudN64Work* work;
     f32 scale;

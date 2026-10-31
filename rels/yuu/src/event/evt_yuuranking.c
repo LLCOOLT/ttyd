@@ -37,6 +37,11 @@ static YuuRankingWork* _wp;
 static USER_FUNC(evt_yuuranking_main_func);
 static s32 yuu_kesan(s32 type, s32 score, s32 bonus, s32 mul, s32 max);
 
+/**
+ * Returns the pixel width of str when drawn with a fixed character pitch:
+ * the number of characters (a double-byte lead byte plus its trail byte counts as one) times pitch,
+ * or the proportional message width when pitch is 0.
+ */
 static s32 fontlenpitch(const char* str, s32 pitch) {
     s32 i;
     s32 n;
@@ -56,7 +61,7 @@ static s32 fontlenpitch(const char* str, s32 pitch) {
 }
 
 #if VERSION >= VERSION_US
-// US: centered in [x, x + width], squeezed to fit width.
+/** US: centered in [x, x + width], squeezed to fit width. */
 static inline void yuuDrawCenter(f32 x, f32 y, f32 scale, const char* msg, s32 width) {
     Mtx trans;
     Mtx scl;
@@ -78,7 +83,7 @@ static inline void yuuDrawCenter(f32 x, f32 y, f32 scale, const char* msg, s32 w
 #endif
 
 #if VERSION >= VERSION_US
-// US: left-aligned at x, squeezed to fit width.
+/** US: left-aligned at x, squeezed to fit width. */
 static inline void yuuDrawLeft(f32 x, f32 y, f32 scale, const char* msg, s32 width) {
     Mtx trans;
     Mtx scl;
@@ -119,7 +124,7 @@ static inline void yuuDrawRight(f32 xo, f32 y, f32 scale, const char* msg, s32 w
 #endif
 
 #if VERSION >= VERSION_JP
-// Squeezes a label to `width`. The demo has no such function: it draws the labels unscaled with FontDrawMessage.
+/** Squeezes a label to `width`. The demo has no such function: it draws the labels unscaled with FontDrawMessage. */
 void yuuranking_draw_msg_fit(f32 x, f32 y, f32 scale, const char* msg, s32 width) {
     Mtx trans;
     Mtx scl;
@@ -139,7 +144,7 @@ void yuuranking_draw_msg_fit(f32 x, f32 y, f32 scale, const char* msg, s32 width
 #endif
 
 #if VERSION >= VERSION_US
-// US: centered text, squeezed to fit width.
+/** US: centered text, squeezed to fit width. */
 void yuuranking_draw_msg_fit_center(f32 x, f32 y, f32 scale, const char* msg, s32 width) {
     Mtx trans;
     Mtx scl;
@@ -159,7 +164,7 @@ void yuuranking_draw_msg_fit_center(f32 x, f32 y, f32 scale, const char* msg, s3
     FontDrawMessageMtx(mtx, msg);
 }
 
-// US: right-aligned text, squeezed to fit width.
+/** US: right-aligned text, squeezed to fit width. */
 void yuuranking_draw_msg_fit_right(f32 x, f32 y, f32 scale, const char* msg, s32 width) {
     Mtx trans;
     Mtx scl;
@@ -180,11 +185,19 @@ void yuuranking_draw_msg_fit_right(f32 x, f32 y, f32 scale, const char* msg, s32
 }
 #endif
 
+/** The ranking board's per-frame event, started by evt_yuuranking_alloc; runs evt_yuuranking_main_func. */
 static EVT_BEGIN(main_evt)
     CALL(evt_yuuranking_main_func)
     RETURN
 EVT_END()
 
+/**
+ * Draws the minigame score/ranking window.
+ * In mode 0 it shows the title and the score tally for the finished round (score,
+ * the monte earned and the bonus multiplier, revealed phase by phase);
+ * in modes 1 and 2 it lists the top five records of the minigame type (score or time, and the monte earned),
+ * highlighting the new entry in red.
+ */
 static void evt_yuuranking_disp_func(CameraId camera, void* param) {
 #if VERSION >= VERSION_US
     const char* head;
@@ -695,6 +708,12 @@ static void evt_yuuranking_disp_func(CameraId camera, void* param) {
     }
 }
 
+/**
+ * Body of the ranking event, run every frame.
+ * In mode 0 it steps the score tally through its phases (wait, count the score up with a sound, show the bonus,
+ * count the monte up, apply the multiplier, finish);
+ * it always queues the draw callback and stops once the free request flag is set.
+ */
 static USER_FUNC(evt_yuuranking_main_func) {
     YuuRankingWork* wp = (YuuRankingWork*)event->lwData[0];
 
@@ -864,6 +883,14 @@ static USER_FUNC(evt_yuuranking_main_func) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Converts a result into monte (the medals paid out):
+ * type 0 (Plane Mode) is the score divided by 30000,
+ * types 3 and 2 (Boat and Tube Mode) count the time beyond a fixed par per 2 seconds,
+ * type 1 (Paper Mode) gives 15 times the fraction of the score limit not used.
+ * Then it adds the bonus, applies the multiplier (below 256 multiplies, 256 and above adds mul - 256,
+ * negative values subtract) and clamps at 0. ("kesan" is calculation.)
+ */
 static s32 yuu_kesan(s32 type, s32 score, s32 bonus, s32 mul, s32 max) {
     s32 ret;
 
@@ -920,6 +947,13 @@ static s32 yuu_kesan(s32 type, s32 score, s32 bonus, s32 mul, s32 max) {
     return ret;
 }
 
+/**
+ * args: [0], [1] = window x, y; [2] = minigame type (0 Plane, 3 Boat, 2 Tube, 1 Paper);
+ * [3] = mode (0 tally, 1 ranking and record the result, 2 ranking only); [4] = score; [5] = bonus;
+ * [6] = multiplier; [7] = score limit (Paper Mode only).
+ * In mode 1 it inserts the result into the saved top-five record table (separate rows for 50Hz on US and later),
+ * sets the minigame's record story flag when it takes first place, then starts the display event.
+ */
 USER_FUNC(evt_yuuranking_alloc) {
     EvtWord* args = event->args;
     YuuRankingWork* wp = _mapAlloc(sizeof(YuuRankingWork));
@@ -1143,6 +1177,7 @@ USER_FUNC(evt_yuuranking_alloc) {
     return EVT_RETURN_DONE;
 }
 
+/** Script call that asks the ranking event to stop, blocks until it has, then frees the ranking work area. */
 USER_FUNC(evt_yuuranking_free) {
     YuuRankingWork* wp = _wp;
 
@@ -1160,6 +1195,7 @@ USER_FUNC(evt_yuuranking_free) {
     return EVT_RETURN_DONE;
 }
 
+/** Script call that blocks until the player presses A or B (after the tally has finished), playing a click sound. */
 USER_FUNC(yuuranking_wait_button) {
     YuuRankingWork* wp = _wp;
 
@@ -1174,6 +1210,7 @@ USER_FUNC(yuuranking_wait_button) {
     return EVT_RETURN_BLOCK;
 }
 
+/** args[0] = output. Returns the monte (medals) earned in the current tally. */
 USER_FUNC(yuuranking_get_monte) {
     evtSetValue(event, event->args[0], _wp->monte);
     return EVT_RETURN_DONE;

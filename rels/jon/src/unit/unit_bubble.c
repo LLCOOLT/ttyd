@@ -45,6 +45,13 @@ static EvtWord normal_attack_event[412];
 static EvtWord fire_attack_event[365];
 static EvtWord wait_event[6];
 
+/**
+ * Script helper: args[0] = source unit, args[1] = destination unit.
+ * Copies the current HP (clamped to the destination's maximum)
+ * and the size-change status from one Ember to another, and resets the destination's HP gauge to match.
+ * The Ember's friend_event calls it right after spawning a second Ember (the split),
+ * so the new one starts with the same HP.
+ */
 static USER_FUNC(bubble_copy_status) {
     EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));
@@ -270,6 +277,10 @@ static BattleUnitSetup entry_bubble = {
     NULL, // itemDropTable
 };
 
+/**
+ * Init script of the Ember: registers its wait, attack, damage and confusion handlers and puts it at y 10,
+ * which is also its home position.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -282,6 +293,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage script of the Ember: runs the default damage handling on itself. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -289,6 +301,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Data event 40 of the Ember: plays SFX_ENM_BUBBLE_FIRE1 and its A_2B pose for a second
+ * when it avoids a fire attack.
+ */
 static EVT_BEGIN(avoid_fire_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_FIRE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
@@ -296,6 +312,12 @@ static EVT_BEGIN(avoid_fire_event)
     RETURN
 EVT_END()
 
+/**
+ * Data event 11 of the Ember: when hit by fire or an explosion it splits.
+ * It first checks the space next to it, stepping the position right (up to x 170) and then left (down to x 10),
+ * and calls friend_event for the first free slot, so one Ember becomes two.
+ * The loops stop as soon as nothing more fits.
+ */
 static EVT_BEGIN(damage_fire_explosion_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -334,6 +356,11 @@ static EVT_BEGIN(damage_fire_explosion_event)
     RETURN
 EVT_END()
 
+/**
+ * Splits the Ember: spawns a new Ember at its position (copying HP and size status with bubble_copy_status),
+ * plays SFX_ENM_BUBBLE_SPLIT1, spins the newcomer once and has it hop to the free spot in LW(0..2),
+ * which becomes its home.
+ */
 static EVT_BEGIN(friend_event)
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("S_1"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(12), LW(13), LW(14))
@@ -362,6 +389,10 @@ static EVT_BEGIN(friend_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the Ember.
+ * After an item check it picks between the normal attack (70 in 100) and the fire attack (30 in 100).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -386,6 +417,12 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Ember's contact attack: it floats up to the target (SFX_ENM_BUBBLE_MOVE1)
+ * and bursts into flame in front of it, with several flame pulses (A_1B) and SFX_ENM_BUBBLE_FIRE1 sounds;
+ * the damage is dealt on the last burst. It then hops over and behind the target and floats back home.
+ * When confused with no target it is flustered.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -503,6 +540,11 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0] = unit.
+ * Keeps a blue flame effect on part 2 of the Ember, growing to the unit's size over about 10 calls;
+ * blocks forever (the script ends it).
+ */
 static USER_FUNC(eff_fire) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -537,6 +579,12 @@ static USER_FUNC(eff_fire) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * The Ember's fireball: it pauses to talk to itself (pose T_1),
+ * then detaches its fire part (part 2) and throws it at the target on a curved path in three stages,
+ * with SFX_ENM_BUBBLE_ATTACK2 and ATTACK3.
+ * The ball bursts into smoke on the target and deals the burning damage.
+ */
 static EVT_BEGIN(fire_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -637,6 +685,11 @@ static EVT_BEGIN(fire_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0] = unit, args[1] = flame index 0-9.
+ * Places one of a row of ten flames in front of the Ember (the attack's fire trail),
+ * each scaled from a table that peaks at index 5; blocks forever.
+ */
 static USER_FUNC(eff_all_fire) {
     EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
@@ -661,6 +714,10 @@ static USER_FUNC(eff_all_fire) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Helper of all_fire_attack_event: starts the all-targets flame effect for one of its flames
+ * and waits 120 frames. Not called by any unit table in this file.
+ */
 static EVT_BEGIN(all_fire_attackEvent_sub)
     BEGIN_SIBLING_EVENT
         CALL(eff_all_fire, BTL_UNIT_SELF, LW(0))
@@ -669,6 +726,13 @@ static EVT_BEGIN(all_fire_attackEvent_sub)
     RETURN
 EVT_END()
 
+/**
+ * An attack that sets all of the party on fire:
+ * it moves to x -40, shakes in place for 20 rounds while spawning ten flames (all_fire_attackEvent_sub),
+ * then checks every target in turn and damages them (the defence action command result is taken once,
+ * for the first target). It then returns home.
+ * Nothing in the unit's tables or attack_event calls it, so it is unused.
+ */
 static EVT_BEGIN(all_fire_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -775,6 +839,7 @@ static EVT_BEGIN(all_fire_attack_event)
     RETURN
 EVT_END()
 
+/** Wait script: plays the Ember's idle pose from its pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

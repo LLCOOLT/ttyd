@@ -249,6 +249,12 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Brings a Swooper down from the ceiling when it is first hit or attacks:
+ * if its ceiling attribute is still set (attribute 2) it clears it, sets the flying attribute (4),
+ * switches to the flying pose table and moves it 30 units down with new hit, cursor,
+ * kiss and status icon offsets. Leaves its home position in LW(0) to LW(2).
+ */
 static EVT_BEGIN(ceil_sky_event)
     CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -274,6 +280,11 @@ static EVT_BEGIN(ceil_sky_event)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the Swooper: installs wait, attack, ceiling damage (damage_event_ceil),
+ * confusion and ceiling-fall (ceil_fall_ready_event) events and the hang-from-ceiling hit offsets;
+ * if unit work 0 is 1 it starts already in flight (ceil_sky_event).
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -295,6 +306,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Position the Swooper takes for a first-strike reaction:
+ * drops from the ceiling (ceil_sky_event), sets its height to 10 and waits for the attack to end. Guess.
+ */
 static EVT_BEGIN(dmg_first_attack_pos)
     CALL_CHILD(ceil_sky_event)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), 10, LW(2))
@@ -302,6 +317,7 @@ static EVT_BEGIN(dmg_first_attack_pos)
     RETURN
 EVT_END()
 
+/** Damage event of the Swooper: runs the default damage handling. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -309,6 +325,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage event of the Swooper while it hangs from the ceiling:
+ * runs the default damage handling and then, unless the hit was a counter-type hit (512 without 2048)
+ * or did no damage, makes it drop to its flying position (ceil_sky_event) and dive down.
+ */
 static EVT_BEGIN(damage_event_ceil)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -329,6 +350,11 @@ static EVT_BEGIN(damage_event_ceil)
     RETURN
 EVT_END()
 
+/**
+ * Damage event used for the Swooper's counter-damage case:
+ * drops it from the ceiling (ceil_sky_event) and runs the shared counter damage handling
+ * (subsetevt_counter_damage).
+ */
 static EVT_BEGIN(counter_damage_event)
     CALL_CHILD(ceil_sky_event)
     SET_VALUE(LW(10), -2)
@@ -338,6 +364,10 @@ static EVT_BEGIN(counter_damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Event run when the ceiling-fall hit lands on a hanging Swooper:
+ * runs the default damage handling, then drops it to its flying position (ceil_sky_event) and dives down.
+ */
 static EVT_BEGIN(ceil_fall_ready_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -347,6 +377,12 @@ static EVT_BEGIN(ceil_fall_ready_event)
     RETURN
 EVT_END()
 
+/**
+ * The Swooper's swoop attack (weapon_basabasa_attack): uses an enemy item if it has one;
+ * otherwise, dropping from the ceiling first if it still hangs there,
+ * it flaps up and down twice and dives into one target.
+ * The pre-damage check decides between a dodge and a hit, then it flies back home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -468,6 +504,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait (idle) event of the Swooper: shows the idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

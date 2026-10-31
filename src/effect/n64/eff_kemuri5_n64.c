@@ -39,6 +39,7 @@ static effN64Vtx kmr_a_1_v[] = {
 };
 
 static void effKemuri5Main(EffectEntry* effect);
+/** Returns the brown-yellow puff tint with the given alpha. */
 static inline GXColor mkc(u8 a) {
     GXColor c = {0x70, 0x60, 0x18, 0};
     c.a = a;
@@ -49,6 +50,12 @@ static void effKemuri5Disp(CameraId cameraId, EffectEntry* effect);
 
 // Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
+/**
+ * Spawns eight dust puffs at (x, y, z) fanned 45 degrees apart from the angle, with randomized sizes; 30 frames.
+ * Called via evt_eff "kemuri5".
+ * Spawns eight cloud-smoke puffs ("landing" in the effect table) at (x, y, z), 45 degrees apart from the angle,
+ * with randomized sizes; 30 frames. Called via evt_eff64 "kemuri5_n64".
+ */
 EffectEntry* effKemuri5N64Entry(f32 x, f32 y, f32 z, f32 angle) {
     s32 ang;
     EffectEntry* effect;
@@ -92,6 +99,7 @@ EffectEntry* effKemuri5N64Entry(f32 x, f32 y, f32 z, f32 angle) {
     return effect;
 }
 
+/** Pulses each puff size with a sine/cosine of its angle, drifts it outward and up, shrinks it, fades late in life. */
 static void effKemuri5Main(EffectEntry* effect) {
     EffKemuri5N64Work* work = effect->userdata;
     Vec position;
@@ -145,6 +153,7 @@ static void effKemuri5Main(EffectEntry* effect) {
 
 #pragma opt_propagation reset
 
+/** Draws each puff as a camera-facing (Y-billboarded) textured quad using effect texture 0x4E. */
 static void effKemuri5Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera = camGetPtr(cameraId);
     EffKemuri5N64Work* work = effect->userdata;

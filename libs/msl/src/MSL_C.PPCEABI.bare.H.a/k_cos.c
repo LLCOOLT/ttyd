@@ -9,6 +9,7 @@ C4 = -2.75573143513906633035e-07,
 C5 = 2.08757232129817482790e-09,
 C6 = -1.13596475577881948265e-11;
 
+/** Cosine on the reduced range |x| <= pi/4 by polynomial (fdlibm); y is the tail of x. */
 double __kernel_cos(double x, double y) {
     double a, hz, z, r, qx;
     int ix;

@@ -20,6 +20,10 @@ int __atexit_curr_func = 0;
 void (*__stdio_exit)(void) = 0;
 void (*__console_exit)(void) = 0;
 
+/**
+ * Standard exit(): runs the registered atexit handlers, flushes and closes all open streams,
+ * then terminates the program.
+ */
 void exit(int status) {
     int i;
     void (**dtor)(void);

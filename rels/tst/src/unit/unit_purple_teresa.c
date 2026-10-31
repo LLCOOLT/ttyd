@@ -292,6 +292,10 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Battle init script for the Dark Boo: installs the wait, attack, damage and confusion handlers,
+ * clears unit work 0, lifts the unit and its home position to y = 15 and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -306,6 +310,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: selects this unit (-2) and its part 1
+ * and runs the shared default damage reaction (btldefaultevt_Damage).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -313,6 +321,15 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack AI of the Dark Boo: in a fixed-attack battle it just attacks.
+ * Otherwise it uses an enemy item if it has one,
+ * then checks what it can do (it can make itself invisible only if it is not already,
+ * make another Boo invisible only if one is eligible,
+ * and change places with the other Boos only when teresa_check_move allows) and draws:
+ * make itself invisible (25), make another Boo invisible (25),
+ * move (15) or a normal attack (the rest of the 115).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -378,6 +395,12 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Boo's normal attack on one target (the fixed first target in a flag-2 battle,
+ * otherwise a sampled enemy): it fades out, drifts to the target and fades back in beside it,
+ * lunges (A_2) and hits. An avoided attack makes it shy away (pose X_1); a hit shakes the camera.
+ * It then turns away and floats back home.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -484,6 +507,12 @@ static EVT_BEGIN(normal_attack_event)
         RETURN
 EVT_END()
 
+/**
+ * The Dark Boo turns itself invisible: flies back a little,
+ * fades out (when it is not already invisible, status 18),
+ * turns round with its back to the camera while it spins, then reappears at its home position.
+ * The invisible status is applied through the trans_myself weapon's damage calls.
+ */
 static EVT_BEGIN(trans_myself_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -536,6 +565,10 @@ static EVT_BEGIN(trans_myself_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Boo turns another Boo invisible: samples allies until it finds a Boo that is not already invisible,
+ * fades out, reappears next to it and applies the trans weapon's invisible status to it, then floats back home.
+ */
 static EVT_BEGIN(trans_event)
     LABEL(0)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -609,7 +642,7 @@ static EVT_BEGIN(trans_event)
     RETURN
 EVT_END()
 
-// tst has the JP/US move_event, without the PAL two-teresa wait minimum
+/** tst has the JP/US move_event, without the PAL two-teresa wait minimum */
 static EVT_BEGIN(move_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_teresa_move))
@@ -643,6 +676,12 @@ static EVT_BEGIN(move_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: one Boo's part of the Boos' shuffle (move_event) for the unit in LW(3):
+ * after a short random delay (none for the Dark Boo itself) it is made unhittable and spun round for 60 frames,
+ * plays its talk pose if it is the Dark Boo, then floats to a new spot at y = 40,
+ * which becomes its home position.
+ */
 static EVT_BEGIN(move_event_sub)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(1))
     IF_INT_EQUAL(LW(3), LW(1))
@@ -677,11 +716,20 @@ static EVT_BEGIN(move_event_sub)
     RETURN
 EVT_END()
 
+/**
+ * Wait (idle) event: refreshes the body animation (part 1) from the unit's pose table
+ * so it matches the current state, then returns; the battle system runs it whenever the unit is idle.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0] is the Boo itself; args[1] receives 1 when some other Boo
+ * or Dark Boo (kinds 0x4B, 0x6A) is not invisible (status 0x12),
+ * i.e. there is another one that can still turn visible or invisible, else 0.
+ */
 static USER_FUNC(teresa_check_trans) {
     EvtWord* args = event->args;
     s32 num = 0;
@@ -709,6 +757,10 @@ static USER_FUNC(teresa_check_trans) {
     }
     return EVT_RETURN_DONE;
 }
+/**
+ * Script helper: args[0] receives 1 when at least one Boo
+ * or Dark Boo (kinds 0x4B, 0x6A) is still free to act (its work[0] is 0), else 0.
+ */
 static USER_FUNC(teresa_check_move) {
     EvtWord* args = event->args;
     s32 num = 0;
@@ -732,6 +784,10 @@ static USER_FUNC(teresa_check_move) {
     }
     return EVT_RETURN_DONE;
 }
+/**
+ * Script helper: args[0] is a unit id; args[1] receives 1 when that unit is a Boo
+ * or Dark Boo (kinds 0x4B and 0x6A), else 0.
+ */
 static USER_FUNC(teresa_check_teresa) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);

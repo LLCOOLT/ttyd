@@ -22,6 +22,12 @@ f32 dou_normal_puka_data[] = {
     -2.7f, -2.7f, -2.5f, -2.2f, -2.0f, -1.5f, -1.0f, -0.5f,
 };
 
+/**
+ * Idle bobbing of a Pirate's Grotto floating platform (puka):
+ * LW(6) holds a reference to the register that stores the platform's height offset.
+ * Every 130 ms it writes the next of 16 offsets from dou_normal_puka_data into it,
+ * a slow sinking and rising cycle, forever. The map script translates the platform by that register.
+ */
 EVT_BEGIN(dou_normal_puka)
     SET_VALUE(LW(0), 1)
     LOOP(0)
@@ -33,6 +39,10 @@ EVT_BEGIN(dou_normal_puka)
     RETURN
 EVT_END()
 
+/**
+ * One dip of a floating platform: sinks the offset in LW(6) to LW(2) over 300 ms, holds for LW(3) ms,
+ * then rises back to 0 over 300 ms. The debug messages are "sink" and "float" in Japanese.
+ */
 EVT_BEGIN(dou_puka_event_sub)
     DEBUG_PUT_MSG(STRING("しずむ"))
     CALL(evt_sub_intpl_msec_init, 4, 0, LW(2), 300)
@@ -58,6 +68,11 @@ EVT_BEGIN(dou_puka_event_sub)
     RETURN
 EVT_END()
 
+/**
+ * REL module prolog, run when dou.rel is loaded:
+ * runs the static constructors, registers the init scripts of dou_00 to dou_13
+ * and the Pirate's Grotto battle setup tables.
+ */
 void _prolog(void) {
     voidfunctionptr* ctor;
 
@@ -81,6 +96,12 @@ void _prolog(void) {
     relSetBtlAddr("dou", btlsetup_dou_tbl, btl_dou_setup_no_tbl);
 }
 
+/**
+ * Shared reaction of a floating platform when Mario steps on it:
+ * four dips of shrinking depth and length (-10 for 200 ms, -8 for 150, -5 for 100, -2 for 50),
+ * so the platform settles like a boat taking a weight.
+ * LW(6) must hold the reference to the platform's offset register (set by the caller).
+ */
 EVT_BEGIN(dou_puka_event)
     SET_VALUE(LW(7), LW(0))
     SET_VALUE(LW(8), LW(1))
@@ -99,11 +120,13 @@ EVT_BEGIN(dou_puka_event)
     RETURN
 EVT_END()
 
+/** Debug script, not used by any map: calls dou_mario_pos_osreport_func. */
 EVT_BEGIN(dou_mario_pos_osreport)
     CALL(dou_mario_pos_osreport_func)
     RETURN
 EVT_END()
 
+/** REL module epilog, run when dou.rel is unloaded: runs the static destructors. */
 void _epilog(void) {
     voidfunctionptr* dtor;
 
@@ -111,12 +134,25 @@ void _epilog(void) {
         (*dtor)();
     }
 }
+/**
+ * Module unresolved-symbol stub: if a relocation could not be resolved the REL linker points it here;
+ * it does nothing.
+ */
 void _unresolved(void) {
 }
+/**
+ * Script helper: stores the bobbing offset for step LW(0) (taken modulo 16) from dou_normal_puka_data into
+ * args[0] as a float.
+ */
 USER_FUNC(evt_dou_normal_puka) {
     evtSetFloat(event, event->args[0], dou_normal_puka_data[event->lwData[0] & 0xF]);
     return EVT_RETURN_DONE;
 }
+/**
+ * Unknown: leftover debug helper that looks up Mario and reads the controller button trigger
+ * but prints nothing in this build; it only keeps the event blocked.
+ * Used only by the unused dou_mario_pos_osreport.
+ */
 static USER_FUNC(dou_mario_pos_osreport_func) {
     MarioWork* mario = marioGetPtr();
 

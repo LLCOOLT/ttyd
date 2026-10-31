@@ -50,6 +50,13 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
+/**
+ * Air duct scene: the duct cover is knocked off with a camera shake and clang,
+ * the vent cover s_deguti is hidden and its hit object deguti switched off,
+ * and the entrance switch is turned on.
+ * The first time the story advances to STORY_STG3_30_04_AIR_DUCT_EXIT;
+ * on later visits GSWF_TOU13_DUCT_EXIT_OPEN_REVISIT is set instead. The case event then exits.
+ */
 static EVT_BEGIN(evt_dakuto)
     CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.049804688f), FLOAT(0.0f), 500)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_DUCT_KOUSHI_HIT1"), 188, 0, 0, 0)
@@ -66,6 +73,10 @@ static EVT_BEGIN(evt_dakuto)
     RETURN
 EVT_END()
 
+/**
+ * Guess: scene where Mario catches a thief (nusumi) in the passage:
+ * the camera pans, Mario and the partner react (stg3_tou_455_01, 455_02 and following).
+ */
 EVT_BEGIN(evt_nusumi)
     LABEL(0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -111,6 +122,10 @@ EVT_BEGIN(evt_nusumi)
     RETURN
 EVT_END()
 
+/**
+ * First visit to the passage: waits until Mario has walked past x=-120, then stops him,
+ * the partner remarks stg3_tou_455 and the story advances to STORY_STG3_30_02_AIR_DUCT_1ST_TIME.
+ */
 static EVT_BEGIN(evt_first)
     LABEL(0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -130,6 +145,11 @@ static EVT_BEGIN(evt_first)
     RETURN
 EVT_END()
 
+/**
+ * Map init for tou_13, the passage between Grubba's office and the champion's room:
+ * music by story stage, the air-duct exit (deguti, broken with the hammer)
+ * and the entry scenes by story progress.
+ */
 EVT_BEGIN(tou_13_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG3_00_WELCOME_TO_GLITZVILLE, STORY_STG3_12_MINI_YOSHI_EGG)

@@ -143,10 +143,15 @@ int __VIGetLatch1Position(s16* px, s16* py);
 int __VIGetLatchPosition(u32 port, s16* px, s16* py);
 
 
+/** Returns the video encoder type; always 1 in this build, so the Philips encoder setup is never used. */
 static u32 getEncoderType(void) {
     return 1;
 }
 
+/**
+ * Counts the leading zero bits of a 64-bit value, using cntlzw on each half;
+ * used to find the lowest-numbered changed VI register.
+ */
 static s32 cntlzd(u64 bit) {
     u32 hi;
     u32 lo;
@@ -161,6 +166,12 @@ static s32 cntlzd(u64 bit) {
     return __cntlzw(lo) + 32;
 }
 
+/**
+ * Applies the flushed register changes at the right moment:
+ * for each register flagged in shdwChanged (a 64-bit mask) writes the shadow value to the hardware,
+ * then updates the current timing, TV mode and frame buffer.
+ * Waits for the odd field when the mode changed; returns 1 when done and 0 to retry on the next retrace.
+ */
 static int VISetRegs(void) {
     s32 regIndex;
 
@@ -181,6 +192,13 @@ static int VISetRegs(void) {
     return 0;
 }
 
+/**
+ * Handler for the VI interrupt (exception 0x18), which fires on the four display interrupt registers.
+ * Position interrupts (3 and 4) call the position callback;
+ * the retrace interrupts bump the retrace count, call the pre-retrace callback,
+ * apply flushed registers with VISetRegs (and refresh the SI sampling rate),
+ * call the post-retrace callback and wake threads waiting in VIWaitForRetrace.
+ */
 static void __VIRetraceHandler(__OSInterrupt unused, OSContext* context) {
     OSContext exceptionContext;
     u16 reg;
@@ -268,6 +286,10 @@ static void __VIRetraceHandler(__OSInterrupt unused, OSContext* context) {
     OSSetCurrentContext(context);
 }
 
+/**
+ * Registers a function called at the start of each retrace, before the VI registers are updated,
+ * with the retrace count; returns the previous one.
+ */
 VIRetraceCallback VISetPreRetraceCallback(VIRetraceCallback cb) {
     BOOL enabled;
     VIRetraceCallback oldcb;
@@ -279,6 +301,10 @@ VIRetraceCallback VISetPreRetraceCallback(VIRetraceCallback cb) {
     return oldcb;
 }
 
+/**
+ * Registers a function called at each retrace after the VI registers were updated (the usual place to swap frame
+ * buffers), with the retrace count; returns the previous one.
+ */
 VIRetraceCallback VISetPostRetraceCallback(VIRetraceCallback cb) {
     BOOL enabled;
     VIRetraceCallback oldcb;
@@ -290,6 +316,7 @@ VIRetraceCallback VISetPostRetraceCallback(VIRetraceCallback cb) {
     return oldcb;
 }
 
+/** Sets the custom VITiming table used by the extra TV modes (28, 29 and 30); returns the previous one. */
 VITiming* __VISetExtraTiming(VITiming* t) {
     VITiming* old = timingExtra;
 
@@ -298,6 +325,10 @@ VITiming* __VISetExtraTiming(VITiming* t) {
 }
 
 #pragma dont_inline on
+/**
+ * Returns the timing table for a TV mode: NTSC (also used for EuRGB60), PAL, MPAL,
+ * progressive and the DEBUG_PAL variants, with interlaced and double-strike entries; NULL for an unknown mode.
+ */
 static VITiming* getTiming(VITVMode mode) {
     switch (mode) {
     case VI_TVMODE_NTSC_INT:        return &timing[0];
@@ -324,6 +355,11 @@ static VITiming* getTiming(VITVMode mode) {
 }
 #pragma dont_inline reset
 
+/**
+ * Resets the VI and programs the timing registers of TV mode mode (horizontal and vertical sync, blanking,
+ * equalisation, burst intervals) and the display configuration;
+ * also stores the TV format in low memory at 0xCC for the OS.
+ */
 void __VIInit(VITVMode mode) {
     VITiming* tm;
     u32 nonInter;
@@ -401,6 +437,10 @@ void __VIInit(VITVMode mode) {
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define CLAMP(val, min, max) ((val) > (max) ? (max) : (val) < (min) ? (min) : (val))
 
+/**
+ * Applies the user's screen offset (displayOffsetH and V) to the display and pan rectangle,
+ * clamping so the picture stays inside the active video lines acv.
+ */
 static void AdjustPosition(u16 acv) {
     s32 coeff;
     s32 frac;
@@ -419,6 +459,10 @@ static void AdjustPosition(u16 acv) {
                             - (MAX((s16)HorVer.DispPosY + (s16)HorVer.DispSizeY + displayOffsetV - (((s16)acv * 2) - frac), 0) / coeff);
 }
 
+/**
+ * Reads the saved horizontal display offset from SRAM (the system menu's screen position setting);
+ * the vertical offset is set to 0.
+ */
 static void ImportAdjustingValues(void) {
     OSSram* sram = __OSLockSram();
 
@@ -428,6 +472,12 @@ static void ImportAdjustingValues(void) {
     __OSUnlockSram(0);
 }
 
+/**
+ * Initialises the video interface once: if the VI is not running, starts it in NTSC interlaced mode;
+ * loads the video filter coefficients, imports the display offset,
+ * detects the TV mode from the VI and the boot ROM (PAL boot ROM with an NTSC register means EuRGB60),
+ * sets the default 640x(2*acv) display and installs the retrace interrupt handler.
+ */
 void VIInit(void) {
     u16 dspCfg;
     u32 value;
@@ -524,6 +574,7 @@ void VIInit(void) {
     __OSUnmaskInterrupts(0x80);
 }
 
+/** Puts the calling thread to sleep until the next vertical retrace. */
 void VIWaitForRetrace(void) {
     BOOL enabled;
     u32 count;
@@ -536,6 +587,10 @@ void VIWaitForRetrace(void) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Sets the VI display interrupt position registers (horizontal and vertical count) to the middle of the frame
+ * from the timing table.
+ */
 static void setInterruptRegs(VITiming* tm) {
 #if DEBUG
     u16 vct, hct;
@@ -561,6 +616,11 @@ static void setInterruptRegs(VITiming* tm) {
     vct;  // fixes regalloc
 }
 
+/**
+ * Calculates the picture configuration: words per frame buffer line (fbSizeX / 16 rounded up),
+ * the stride (doubled for double-field buffers),
+ * the pan x-offset within a 16-pixel block and the words to read per line.
+ */
 static void setPicConfig(u16 fbSizeX, VIXFBMode xfbMode, u16 panPosX, u16 panSizeX, u8* wordPerLine, u8* std, u8* wpl, u8* xof) {
     *wordPerLine = (fbSizeX + 15) / 16;
     *std = (xfbMode == VI_XFBMODE_SF) ? *wordPerLine : (u8)(*wordPerLine * 2);
@@ -570,6 +630,7 @@ static void setPicConfig(u16 fbSizeX, VIXFBMode xfbMode, u16 panPosX, u16 panSiz
     changed |= 0x8000000;
 }
 
+/** Sets the four burst-blanking interval registers from the timing table. */
 static void setBBIntervalRegs(VITiming* tm) {
     u16 val;
 
@@ -590,6 +651,10 @@ static void setBBIntervalRegs(VITiming* tm) {
     changed |= (1LL << (63-12));
 }
 
+/**
+ * Sets the horizontal scaling register so panSizeX source pixels (doubled in 3D mode) are stretched to dispSizeX
+ * display pixels; no scaling when the source is not narrower.
+ */
 static void setScalingRegs(u16 panSizeX, u16 dispSizeX, BOOL threeD) {
     u32 scale;
 
@@ -606,6 +671,11 @@ static void setScalingRegs(u16 panSizeX, u16 dispSizeX, BOOL threeD) {
     }
 }
 
+/**
+ * Computes the physical top and bottom field frame buffer addresses for the pan position (a single-field buffer
+ * uses the same lines for both, a double-field buffer starts the bottom one line later) and swaps them
+ * when the display starts on an odd line.
+ */
 static void calcFbbs(u32 bufAddr, u16 panPosX, u16 panPosY, u8 wordPerLine, VIXFBMode xfbMode, u16 dispPosY, u32* tfbb, u32* bfbb) {
     u32 bytesPerLine;
     u32 xoffInWords;
@@ -624,6 +694,10 @@ static void calcFbbs(u32 bufAddr, u16 panPosX, u16 panPosY, u8 wordPerLine, VIXF
     *bfbb &= 0x3FFFFFFF;
 }
 
+/**
+ * Writes the top and bottom (and, in 3D mode, right-eye) frame buffer address registers.
+ * Addresses that do not fit in 24 bits are stored shifted right by 5 with a flag.
+ */
 static void setFbbRegs(SomeVIStruct* HorVer, u32* tfbb, u32* bfbb, u32* rtfbb, u32* rbfbb) {
     u32 shifted;
 
@@ -666,6 +740,10 @@ static void setFbbRegs(SomeVIStruct* HorVer, u32* tfbb, u32* bfbb, u32* rtfbb, u
     }
 }
 
+/**
+ * Sets the horizontal timing registers (line width, colour burst, sync,
+ * blanking start and end) from the timing table and the display position and width.
+ */
 static void setHorizontalRegs(VITiming* tm, u16 dispPosX, u16 dispSizeX) {
     u32 hbe;
     u32 hbs;
@@ -686,6 +764,11 @@ static void setHorizontalRegs(VITiming* tm, u16 dispPosX, u16 dispSizeX) {
     MARK_CHANGED(4);
 }
 
+/**
+ * Sets the vertical timing registers (equalisation, active lines,
+ * pre- and post-blanking for the odd and even fields) for the display position and height;
+ * in black mode it sets the active lines to 0 so the screen is black.
+ */
 static void setVerticalRegs(u16 dispPosY, u16 dispSizeY, u8 equ, u16 acv, u16 prbOdd, u16 prbEven, u16 psbOdd, u16 psbEven, BOOL black) {
     u16 actualPrbOdd;
     u16 actualPrbEven;
@@ -737,6 +820,10 @@ static void setVerticalRegs(u16 dispPosY, u16 dispSizeY, u8 equ, u16 acv, u16 pr
     MARK_CHANGED(8);
 }
 
+/**
+ * Prints, once, a warning through OSReport that the DEBUG_PAL TV format is a temporary solution
+ * and not for use in real games.
+ */
 static void PrintDebugPalCaution(void) {
     static u32 message;
 
@@ -752,6 +839,12 @@ static void PrintDebugPalCaution(void) {
     }
 }
 
+/**
+ * Configures the VI from a GXRenderModeObj: scan mode (interlaced, non-interlaced, progressive or 3D),
+ * display position and size, frame buffer size and XFB mode.
+ * Panics if the mode would change between NTSC-type and PAL-type formats of the boot ROM.
+ * Updates the shadow registers; call VIFlush to apply them at the next retrace.
+ */
 void VIConfigure(const GXRenderModeObj* rm) {
     VITiming* tm;
     u32 regDspCfg;
@@ -888,6 +981,10 @@ void VIConfigure(const GXRenderModeObj* rm) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Chooses which part of the frame buffer is displayed (pan origin and size) and updates the scaling,
+ * picture configuration, frame buffer and vertical registers; applied at the next VIFlush.
+ */
 void VIConfigurePan(u16 xOrg, u16 yOrg, u16 width, u16 height) {
     BOOL enabled;
     VITiming* tm;
@@ -922,6 +1019,10 @@ void VIConfigurePan(u16 xOrg, u16 yOrg, u16 width, u16 height) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Commits all VI register changes made since the last flush by copying them to the shadow registers
+ * and flagging the next retrace to write them to the hardware.
+ */
 void VIFlush(void) {
     BOOL enabled;
     s32 regIndex;
@@ -942,6 +1043,10 @@ void VIFlush(void) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Sets the frame buffer (32-byte aligned) the VI will display from the next flush and retrace on,
+ * and updates the frame buffer address registers.
+ */
 void VISetNextFrameBuffer(void* fb) {
     BOOL enabled;
 
@@ -955,14 +1060,17 @@ void VISetNextFrameBuffer(void* fb) {
     OSRestoreInterrupts(enabled);
 }
 
+/** Returns the frame buffer that has been flushed to be displayed next. */
 void* VIGetNextFrameBuffer(void) {
     return *(void**)(&NextBufAddr);
 }
 
+/** Returns the frame buffer being displayed now. */
 void* VIGetCurrentFrameBuffer(void) {
     return *(void**)(&CurrBufAddr);
 }
 
+/** Sets the right-eye frame buffer for stereoscopic (3D) mode and updates the frame buffer address registers. */
 void VISetNextRightFrameBuffer(void* fb) {
     BOOL enabled;
 
@@ -976,6 +1084,10 @@ void VISetNextRightFrameBuffer(void* fb) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Turns the display black (no active lines) or back on by rewriting the vertical registers;
+ * applied at the next VIFlush.
+ */
 void VISetBlack(BOOL black) {
     BOOL enabled;
     VITiming* tm;
@@ -987,6 +1099,10 @@ void VISetBlack(BOOL black) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Turns the stereoscopic 3D display mode flag on or off and recalculates the horizontal scaling;
+ * applied at the next VIFlush.
+ */
 void VISet3D(BOOL threeD) {
     BOOL enabled;
     u32 reg;
@@ -1001,10 +1117,15 @@ void VISet3D(BOOL threeD) {
     OSRestoreInterrupts(enabled);
 }
 
+/** Returns the number of vertical retraces counted since VIInit. */
 u32 VIGetRetraceCount(void) {
     return retraceCount;
 }
 
+/**
+ * Reads the beam position from the VI horizontal and vertical counters (hct, vct),
+ * rereading until the vertical count is stable.
+ */
 static void GetCurrentDisplayPosition(u32* hct, u32* vct) {
     u32 hcount, vcount0, vcount;
     vcount = __VIRegs[VI_VERT_COUNT] & 0x7FF;
@@ -1019,6 +1140,10 @@ static void GetCurrentDisplayPosition(u32* hct, u32* vct) {
     *vct = vcount;
 }
 
+/**
+ * Returns the beam position in half-lines from the start of the frame,
+ * computed from the horizontal and vertical counters and the line width of the current timing.
+ */
 static u32 getCurrentHalfLine(void) {
     u32 hcount, vcount;
     GetCurrentDisplayPosition(&hcount, &vcount);
@@ -1026,10 +1151,15 @@ static u32 getCurrentHalfLine(void) {
     return ((vcount - 1) << 1) + ((hcount - 1) / CurrTiming->hlw);
 }
 
+/** Returns 1 when the beam is in the first field of the frame (the odd field) and 0 in the second. */
 static u32 getCurrentFieldEvenOdd(void) {
     return (getCurrentHalfLine() < CurrTiming->nhlines) ? 1 : 0;
 }
 
+/**
+ * Returns which field (0 or 1) will be displayed next,
+ * taking into account whether the display starts on an odd line.
+ */
 u32 VIGetNextField(void) {
     s32 nextField;
     BOOL enabled;
@@ -1043,6 +1173,7 @@ u32 VIGetNextField(void) {
     return nextField ^ (HorVer.AdjustedDispPosY & 1);
 }
 
+/** Returns the line the beam is on now, counted from the start of the current field. */
 u32 VIGetCurrentLine(void) {
     u32 halfLine;
     VITiming* tm;
@@ -1058,6 +1189,7 @@ u32 VIGetCurrentLine(void) {
     return halfLine >> 1U;
 }
 
+/** Returns the active TV format: NTSC (also for DEBUG and modes 6 and 7), PAL (also DEBUG_PAL), EuRGB60 or MPAL. */
 u32 VIGetTvFormat(void) {
     u32 format;
     BOOL enabled;
@@ -1087,6 +1219,7 @@ u32 VIGetTvFormat(void) {
     return format;
 }
 
+/** Returns the scan mode from the VI registers: 2 progressive, 1 non-interlaced, 0 interlaced. */
 u32 VIGetScanMode(void) {
     u32 scanMode;
     BOOL enabled = OSDisableInterrupts();
@@ -1103,6 +1236,10 @@ u32 VIGetScanMode(void) {
     return scanMode;
 }
 
+/**
+ * Returns bit 0 of the VI digital TV status register,
+ * which reports whether the component (digital TV) cable is connected.
+ */
 u32 VIGetDTVStatus(void) {
     u32 dtvStatus;
     BOOL enabled = OSDisableInterrupts();
@@ -1112,6 +1249,7 @@ u32 VIGetDTVStatus(void) {
     return dtvStatus & 1;
 }
 
+/** Sets the screen position offset (x, y) and applies it to the horizontal, frame buffer and vertical registers. */
 void __VISetAdjustingValues(s16 x, s16 y) {
     BOOL enabled;
     VITiming* tm;
@@ -1130,6 +1268,7 @@ void __VISetAdjustingValues(s16 x, s16 y) {
     OSRestoreInterrupts(enabled);
 }
 
+/** Returns the screen position offset (x, y). */
 void __VIGetAdjustingValues(s16* x, s16* y) {
     BOOL enabled;
 
@@ -1139,7 +1278,7 @@ void __VIGetAdjustingValues(s16* x, s16* y) {
     OSRestoreInterrupts(enabled);
 }
 
-// DEBUG NONMATCHING - wrong reg use, equivalent
+/** DEBUG NONMATCHING - wrong reg use, equivalent */
 void __VIEnableRawPositionInterrupt(s16 x, s16 y, void (*callback)(s16, s16)) {
     BOOL enabled;
     u32 halfLine;
@@ -1186,6 +1325,11 @@ void (*__VIDisableRawPositionInterrupt())(s16, s16) {
     return old;
 }
 
+/**
+ * Converts a beam position (hct, vct) to screen pixel coordinates:
+ * x is hct - 1, y is the line within the active area for the current scan mode,
+ * or -1 if the beam is in blanking.
+ */
 void __VIDisplayPositionToXY(u32 hct, u32 vct, s16* x, s16* y) {
     u32 halfLine = ((vct - 1) << 1) + ((hct - 1) / CurrTiming->hlw);
 
@@ -1245,12 +1389,17 @@ void __VIDisplayPositionToXY(u32 hct, u32 vct, s16* x, s16* y) {
     *x = (s16)(hct - 1);
 }
 
+/** Returns the current beam position as screen coordinates (x, y). */
 void __VIGetCurrentPosition(s16* x, s16* y) {
     u32 hcount, vcount;
     GetCurrentDisplayPosition(&hcount, &vcount);
     __VIDisplayPositionToXY(hcount, vcount, x, y);
 }
 
+/**
+ * Sets the mode of both light-pen/gun latch inputs (fields 4 to 5 and 6 to 7 of the display configuration
+ * register) to mode.
+ */
 void __VISetLatchMode(u32 mode) {
     u32 reg;
 
@@ -1261,6 +1410,10 @@ void __VISetLatchMode(u32 mode) {
 }
 
 #pragma dont_inline on
+/**
+ * If latch 0 has triggered, returns 1 and its screen position (clearing the latch);
+ * otherwise returns 0 with (-1, -1).
+ */
 int __VIGetLatch0Position(s16* px, s16* py) {
     u32 hcount;
     u32 vcount;
@@ -1280,6 +1433,10 @@ int __VIGetLatch0Position(s16* px, s16* py) {
 #pragma dont_inline reset
 
 #pragma dont_inline on
+/**
+ * If latch 1 has triggered, returns 1 and its screen position (clearing the latch);
+ * otherwise returns 0 with (-1, -1).
+ */
 int __VIGetLatch1Position(s16* px, s16* py) {
     u32 hcount;
     u32 vcount;
@@ -1298,6 +1455,7 @@ int __VIGetLatch1Position(s16* px, s16* py) {
 }
 #pragma dont_inline reset
 
+/** Returns the position of latch 0 or 1 depending on port, through __VIGetLatch0Position or __VIGetLatch1Position. */
 int __VIGetLatchPosition(u32 port, s16* px, s16* py) {
     if (port == 0) {
         return __VIGetLatch0Position(px, py);

@@ -3,6 +3,10 @@
 
 #include "__os.h"
 
+/**
+ * SI callback after a steering transfer: stores the result (0 ok, -1 no response, -3 transfer error),
+ * runs the follow-up procedure, then the user's callback in a scratch context.
+ */
 static void __SISteeringHandler(s32 chan, u32 error, OSContext* context) {
     SISteeringControl* sc;
     void (*proc)(s32);
@@ -37,6 +41,7 @@ static void __SISteeringHandler(s32 chan, u32 error, OSContext* context) {
     }
 }
 
+/** Callback that wakes the thread waiting in __SISteeringSync. */
 void __SISteeringSyncCallback(s32 chan) {
     SISteeringControl* sc;
 
@@ -44,6 +49,7 @@ void __SISteeringSyncCallback(s32 chan) {
     OSWakeupThread(&sc->threadQueue);
 }
 
+/** Sleeps until the steering operation on chan has finished and returns its result. */
 s32 __SISteeringSync(s32 chan) {
     SISteeringControl* sc;
     s32 ret;
@@ -61,6 +67,11 @@ s32 __SISteeringSync(s32 chan) {
     return ret;
 }
 
+/**
+ * Callback for the device-type query that precedes a steering transfer:
+ * if the device is a steering wheel it sends the queued command;
+ * otherwise (or if the SI is busy) it records -1 (-2) and runs the procedure and callback.
+ */
 static void TypeAndStatusCallback(s32 chan, u32 type) {
     SISteeringControl* sc;
     void (*proc)(s32);
@@ -101,6 +112,10 @@ static void TypeAndStatusCallback(s32 chan, u32 type) {
     }
 }
 
+/**
+ * Starts a transfer to the steering wheel on chan:
+ * queries its type first, then sends outputBytes and reads inputBytes; proc runs when it is done. Returns 0.
+ */
 s32 __SISteeringTransfer(s32 chan, u32 outputBytes, u32 inputBytes, void (*proc)(s32)) {
     BOOL enabled;
     SISteeringControl* sc;

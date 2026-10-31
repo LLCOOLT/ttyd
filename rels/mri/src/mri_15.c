@@ -25,6 +25,7 @@ extern EvtWord dai3_battle[];
 extern EvtWord ueki_evt_01[];
 static KusaAccess ueki_access_data[7];
 
+/** Closes the south door (S_doa); used as the door-close script of the south loading zone. */
 static EVT_BEGIN(bero_s_doa_close)
     SET_VALUE(LW(9), 0)
     SET_VALUE(LW(10), STRING("S_doa"))
@@ -32,6 +33,7 @@ static EVT_BEGIN(bero_s_doa_close)
     RETURN
 EVT_END()
 
+/** Opens the south door (S_doa); used as the door-open script of the south loading zone. */
 static EVT_BEGIN(bero_s_doa_open)
     SET_VALUE(LW(9), 0)
     SET_VALUE(LW(10), STRING("S_doa"))
@@ -39,6 +41,7 @@ static EVT_BEGIN(bero_s_doa_open)
     RETURN
 EVT_END()
 
+/** Exit script of the pipe back to mri_14: marks Lord Crump as gone (GSWF_MRI15_CRUMP_GONE) and returns 0. */
 EVT_BEGIN(evt_dokan)
     IF_INT_EQUAL(GSWF(GSWF_MRI15_CRUMP_GONE), 0)
         SET_VALUE(GSWF(GSWF_MRI15_CRUMP_GONE), 1)
@@ -86,6 +89,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Init script of the west door lamp: while the west door is locked (GSWF_MRI15_WEST_DOOR_UNLOCKED is 0) its
+ * loading zone is switched off, otherwise the lamp animation is shown lit.
+ */
 static EVT_BEGIN(door_switch_init)
     IF_INT_EQUAL(GSWF(GSWF_MRI15_WEST_DOOR_UNLOCKED), 0)
         SET_VALUE(LW(0), STRING("w_bero"))
@@ -96,6 +103,11 @@ static EVT_BEGIN(door_switch_init)
     RETURN
 EVT_END()
 
+/**
+ * Hit script of the door switch: plays the unlock sound and, half a second later, the lamp sound,
+ * then toggles GSWF_MRI15_WEST_DOOR_UNLOCKED: unlocks the west loading zone and lights the lamp,
+ * or locks it again and pauses the lamp animation.
+ */
 static EVT_BEGIN(door_switch)
     CALL(evt_mapobj_get_position, STRING("S_lights"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_DOOR_UNLOCK"), LW(0), LW(1), LW(2), 0)
@@ -116,6 +128,10 @@ static EVT_BEGIN(door_switch)
     RETURN
 EVT_END()
 
+/**
+ * Lord Crump flees the room: the west door closes behind him and he runs out of the left side,
+ * then is parked out of sight.
+ */
 EVT_BEGIN(dai3_escape)
     WAIT_MS(800)
     BEGIN_INLINE_EVENT
@@ -130,6 +146,7 @@ EVT_BEGIN(dai3_escape)
     RETURN
 EVT_END()
 
+/** Positions the two X-Naut grunts and, if he has not left yet, Lord Crump for the fight in the Puni room. */
 EVT_BEGIN(dai3_battle_init)
     CALL(evt_npc_set_position, STRING("第三勢力部下Ａ"), -119, 0, 29)
     CALL(evt_npc_set_ry, STRING("第三勢力部下Ａ"), 90)
@@ -148,6 +165,11 @@ EVT_BEGIN(dai3_battle_init)
     RETURN
 EVT_END()
 
+/**
+ * The chase and fight in mri_15 (story 23): Lord Crump runs off,
+ * then when Mario steps onto the platform the two X-Naut grunts (battle info 11) attack;
+ * afterwards they are removed. Sets the story to STORY_STG2_23_01_X_NAUT_BATTLE.
+ */
 EVT_BEGIN(dai3_battle)
     CALL(evt_seq_wait, 2)
     IF_INT_EQUAL(GSWF(GSWF_MRI15_CRUMP_GONE), 0)
@@ -199,6 +221,7 @@ EVT_BEGIN(dai3_battle)
     RETURN
 EVT_END()
 
+/** Planter hit script: drops a Star Piece once (GSWF_MRI15_STAR_PIECE_PLANTER). */
 EVT_BEGIN(ueki_evt_01)
     CALL(evt_item_delete_check, STRING("item_ueki01"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -217,6 +240,11 @@ static KusaAccess ueki_access_data[] = {
     {4, NULL, NULL, NULL},
 };
 
+/**
+ * Map init script of mri_15, the room behind the Crystal Star room:
+ * sets up the Puni, planters, waterfalls, the light-locked door and, right after the time bomb is set,
+ * the X-Naut fight.
+ */
 EVT_BEGIN(mri_15_init_evt)
     CALL(evt_puni_mem_init)
     CALL(evt_puni_set_yuka, 15, 0, -310, -1000, -1000, 0, 0)

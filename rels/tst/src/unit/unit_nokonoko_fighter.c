@@ -196,6 +196,10 @@ static BattleWeapon weapon_nokonoko_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Battle init script: installs the wait, attack, damage and confusion handlers, clears the overturn count,
+ * sets the walk and run sounds and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -208,6 +212,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: selects this unit (-2) and its part 1
+ * and runs the shared default damage reaction (btldefaultevt_Damage).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -215,6 +223,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs when the Koopa is flipped onto its back:
+ * lowers its hit offset, switches part 1 to the upside-down defence table and pose table,
+ * sets the overturn status flag and an overturn count of 2,
+ * plays the flip pose (NKT_D_1) and sound and lets it fall back with two bounces.
+ */
 static EVT_BEGIN(dmg_turn_event)
     CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, -15, 0)
     SET_VALUE(LW(10), -2)
@@ -234,6 +248,12 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs on the Koopa's turn while it is on its back: counts the overturn count down.
+ * While it is still above 0 the Koopa only wiggles (NKT_S_3) and goes back to waiting;
+ * at 0 it restores the normal defence table and pose table, clears the overturn flag, plays the wake-up sound,
+ * hops upright and restarts the wait event.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -259,6 +279,11 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * Pre-emptive attack when the enemy gets the first strike on the player (it uses the fixed first target):
+ * the Koopa hops, curls into its shell and spins up (unit work 1 sets the spin speed),
+ * rolls into the target and always hits it, then bounces off twice and walks home.
+ */
 static EVT_BEGIN(first_attack_event)
     CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -327,6 +352,14 @@ static EVT_BEGIN(first_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack AI: if the Koopa is on its back it wakes up first (wakeup_event).
+ * Then picks a target (the fixed first target in a flag-2 battle, otherwise a sampled enemy;
+ * uses an enemy item first if it has one) and does the shell charge:
+ * hops, curls into its shell, spins up in two steps and rolls into the target with a trail of smoke.
+ * A miss makes it roll past and jump back; a hit shakes the camera and the Koopa bounces off the target twice.
+ * It then walks home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -473,6 +506,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Wait (idle) event: refreshes the body animation (part 1) from the unit's pose table
+ * so it matches the current state, then returns; the battle system runs it whenever the unit is idle.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

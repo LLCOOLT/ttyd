@@ -86,6 +86,7 @@ typedef struct FanData {
     f32 rate;
 } FanData;
 FanWork* fan_wp;
+/** Polynomial sine approximation (x in radians, 0 to 2 pi) used for the lobby crowd's movement. */
 static inline f32 fan_sin(f32 x) {
     f32 a = 0.00761f;
     f32 b = 0.16605f;
@@ -122,6 +123,7 @@ static inline f32 fan_sin(f32 x) {
     }
     return a;
 }
+/** Polynomial cosine approximation (x in radians, 0 to 2 pi) used for the lobby crowd's movement. */
 static inline f32 fan_cos(f32 x) {
     f32 a = 0.03705f;
     f32 b = 0.4967f;
@@ -172,6 +174,11 @@ void PSVECScale(const Vec* src, Vec* dst, f32 scale);
 f32 PSVECSquareDistance(const Vec* a, const Vec* b);
 void PSVECSubtract(const Vec* a, const Vec* b, Vec* a_b);
 int __cvt_ull_flt();
+/**
+ * Builds the fan crowd's animation table (FanAnim) from ext_fan_data:
+ * groups the per-frame texture entries by model name and animation,
+ * recording each animation's first texture and frame count.
+ */
 static void pose_init(void) {
     char name[32];
     char anim[32];
@@ -204,6 +211,10 @@ static void pose_init(void) {
     fan_wp->animNum++;
 }
 
+/**
+ * Per-frame update of the crowd's sprites: picks each fan's current texture frame from its animation
+ * and the render time.
+ */
 static void pose_main(void) {
     s32 i;
     ExtdrvPose* pose;
@@ -225,6 +236,7 @@ static void pose_main(void) {
     }
 }
 
+/** Switches a fan to the animation named `anim` of model `name` (if it exists and differs) and restarts its timer. */
 static void pose_change(Fan* fan, const char* name, const char* anim) {
     FanAnim* a;
     s32 i;
@@ -240,12 +252,20 @@ static void pose_change(Fan* fan, const char* name, const char* anim) {
     }
 }
 
+/** Returns a random float between min and max. */
 static f32 randf(f32 min, f32 max) {
     f32 r = rand() / 32767.0f;
 
     return r * (max - min) + min;
 }
 
+/**
+ * Door animation callback for the lobby's automatic double door on the street side (the exit animation of the
+ * bero back to tou_01): LW(0) is the swing angle 0 to 180.
+ * At the start it plays the automatic door sound at Mario's position (GW(13) keeps its handle)
+ * unless the door is busy (GSWF_TOU_DOOR_BUSY), and at 180 it clears the flag and stops the sound.
+ * It slides door_1_b by a third of the angle along X and door_1_a the opposite way.
+ */
 static EVT_BEGIN(s_door_open)
     IF_FLOAT_EQUAL(LW(0), FLOAT((0.0f)))
         IF_INT_EQUAL(GSWF(GSWF_TOU_DOOR_BUSY), 0)
@@ -267,6 +287,12 @@ static EVT_BEGIN(s_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the same automatic double door (the enter animation):
+ * the mirror image of s_door_open, run as the angle goes from 180 back to 0.
+ * It plays the door sound at the start, stops it and clears GSWF_TOU_DOOR_BUSY at 0,
+ * and slides door_1_a and door_1_b shut.
+ */
 static EVT_BEGIN(s_door_close)
     IF_FLOAT_EQUAL(LW(0), FLOAT(180.0f))
         IF_INT_EQUAL(GSWF(GSWF_TOU_DOOR_BUSY), 0)
@@ -288,6 +314,7 @@ static EVT_BEGIN(s_door_close)
     RETURN
 EVT_END()
 
+/** Swings open the double doors door_2_a / door_2_b (the first lobby door pair). */
 EVT_BEGIN(n_1_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("door_2_b"), 0, LW(0), 0)
@@ -296,6 +323,7 @@ EVT_BEGIN(n_1_door_open)
     RETURN
 EVT_END()
 
+/** Swings the double doors door_2_a / door_2_b closed again. */
 EVT_BEGIN(n_1_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("door_2_b"), 0, LW(0), 0)
@@ -304,6 +332,10 @@ EVT_BEGIN(n_1_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the lobby's second double door (door_3_a and door_3_b): LW(0) is the swing angle;
+ * the two leaves turn about the Y axis in opposite directions by 0.39 times the angle.
+ */
 static EVT_BEGIN(n_2_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("door_3_b"), 0, LW(0), 0)
@@ -312,6 +344,10 @@ static EVT_BEGIN(n_2_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the second double door going shut:
+ * like n_2_door_open with the angle direction reversed.
+ */
 static EVT_BEGIN(n_2_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("door_3_b"), 0, LW(0), 0)
@@ -320,24 +356,28 @@ static EVT_BEGIN(n_2_door_close)
     RETURN
 EVT_END()
 
+/** Swings open the lobby door door_4. */
 EVT_BEGIN(n_3_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_4"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Swings the lobby door door_4 closed again. */
 EVT_BEGIN(n_3_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_4"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Swings open the lobby door door_5. */
 EVT_BEGIN(n_4_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_5"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Swings the lobby door door_5 closed again. */
 EVT_BEGIN(n_4_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_5"), 0, LW(0), 0)
@@ -438,6 +478,11 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
+/**
+ * The two guards step aside to x = -530 and x = 530 and face Mario;
+ * sets GSWF_TOU02_GUARDS_STEP_ASIDE and advances the story to STORY_STG3_02_THE_GUARD_BACKS_OFF
+ * if it was earlier.
+ */
 EVT_BEGIN(evt_move_g)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     ADD(LW(2), 100)
@@ -460,6 +505,10 @@ EVT_BEGIN(evt_move_g)
     RETURN
 EVT_END()
 
+/**
+ * NPC init for the left guard: stands at x = -470 until the guards step aside, then at -530;
+ * absent when the story has moved on.
+ */
 EVT_BEGIN(init_gard1)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_02_THE_GUARD_BACKS_OFF)
@@ -476,6 +525,10 @@ EVT_BEGIN(init_gard1)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the left guard: lines depend on story progress (before the arena intro, after he steps aside,
+ * after Mario's gone champion).
+ */
 EVT_BEGIN(talk_gard1)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_01_ARENA_INTRO)
@@ -502,6 +555,7 @@ EVT_BEGIN(talk_gard1)
     RETURN
 EVT_END()
 
+/** NPC init for the right guard: stands at x = 470 until the guards step aside, then at 530. */
 EVT_BEGIN(init_gard2)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_02_THE_GUARD_BACKS_OFF)
@@ -518,6 +572,7 @@ EVT_BEGIN(init_gard2)
     RETURN
 EVT_END()
 
+/** Talk script of the right guard: same lines as talk_gard1. */
 EVT_BEGIN(talk_gard2)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_01_ARENA_INTRO)
@@ -544,6 +599,11 @@ EVT_BEGIN(talk_gard2)
     RETURN
 EVT_END()
 
+/**
+ * NPC init for the madam: stands at (525, 0, 0)
+ * until STORY_STG3_34_RETURN_TO_ROGUEPORT (and at that stage when Mario has not left as champion),
+ * and is hidden below the map afterwards.
+ */
 static EVT_BEGIN(init_madam)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_34_RETURN_TO_ROGUEPORT)
@@ -560,6 +620,11 @@ static EVT_BEGIN(init_madam)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the madam: a line before STORY_STG3_04_GONZALES_IS_BORN,
+ * lines chosen by Mario's Glitz Pit ranking until STORY_STG3_32_BOSS_BATTLE (above 15, 10, 5, 0, or 0),
+ * and one line afterwards.
+ */
 static EVT_BEGIN(talk_madam)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
@@ -584,11 +649,16 @@ static EVT_BEGIN(talk_madam)
     RETURN
 EVT_END()
 
+/** NPC init for the reporter: stands at (-100, 0, -25). */
 EVT_BEGIN(init_repo)
     CALL(evt_npc_set_position, STRING("me"), -100, 0, -25)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the reporter: story-dependent lines (before Gonzales, until the boss battle,
+ * then after the league reopens).
+ */
 EVT_BEGIN(talk_repo)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
@@ -629,11 +699,13 @@ EVT_BEGIN(talk_repo)
     RETURN
 EVT_END()
 
+/** NPC init for the first camera operator: stands at (-150, 0, 0). */
 EVT_BEGIN(init_cam1)
     CALL(evt_npc_set_position, STRING("me"), -150, 0, 0)
     RETURN
 EVT_END()
 
+/** Talk script of the first camera operator: story-dependent lines. */
 EVT_BEGIN(talk_cam1)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
@@ -674,6 +746,7 @@ EVT_BEGIN(talk_cam1)
     RETURN
 EVT_END()
 
+/** NPC init for the second camera operator: stands at (80, 200, -125), or (30, 200, -60) before the arena intro. */
 EVT_BEGIN(init_cam2)
 #if VERSION <= VERSION_DEMO_US
     CALL(evt_npc_set_position, STRING("me"), 80, 200, -125)
@@ -687,6 +760,7 @@ EVT_BEGIN(init_cam2)
     RETURN
 EVT_END()
 
+/** Talk script of the second camera operator: story-dependent lines. */
 EVT_BEGIN(talk_cam2)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
@@ -727,12 +801,14 @@ EVT_BEGIN(talk_cam2)
     RETURN
 EVT_END()
 
+/** NPC init for the fourth Toad: placed at (-350, 0, 75). */
 EVT_BEGIN(init_kino4)
     CALL(evt_npc_set_position, STRING("me"), -350, 0, 75)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/** Regular (idle) script of the fourth Toad: paces between x = -350 and 350. */
 EVT_BEGIN(reg_kino4)
     LOOP(0)
         CALL(evt_npc_move_position, STRING("me"), -350, 75, 0, FLOAT(48.0f), 0)
@@ -745,6 +821,7 @@ EVT_BEGIN(reg_kino4)
     RETURN
 EVT_END()
 
+/** Talk script of the fourth Toad: story-dependent lines. */
 EVT_BEGIN(talk_kino4)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
@@ -785,11 +862,16 @@ EVT_BEGIN(talk_kino4)
     RETURN
 EVT_END()
 
+/** NPC init for the fifth Toad: placed at (-520, 0, 25). */
 EVT_BEGIN(init_kino5)
     CALL(evt_npc_set_position, STRING("me"), -520, 0, 25)
     RETURN
 EVT_END()
 
+/**
+ * Guess: talk script of the fifth Toad: story-dependent lines;
+ * one of them mentions the current partner (Yoshi has its own variant).
+ */
 EVT_BEGIN(talk_kino5)
     CALL(evt_pouch_get_yoshiname, LW(10))
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -891,11 +973,13 @@ EVT_BEGIN(talk_kino5)
     RETURN
 EVT_END()
 
+/** NPC init for Toadette (kinopiko): placed at (-490, 0, 25). */
 EVT_BEGIN(init_kinopiko)
     CALL(evt_npc_set_position, STRING("me"), -490, 0, 25)
     RETURN
 EVT_END()
 
+/** Talk script of Toadette: story-dependent lines. */
 EVT_BEGIN(talk_kinopiko)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
@@ -936,11 +1020,13 @@ EVT_BEGIN(talk_kinopiko)
     RETURN
 EVT_END()
 
+/** NPC init for the female Toad: placed at (100, 0, 0). */
 EVT_BEGIN(init_kinopio_f)
     CALL(evt_npc_set_position, STRING("キノピオ女"), 100, 0, 0)
     RETURN
 EVT_END()
 
+/** Talk script of the female Toad: story-dependent lines. */
 EVT_BEGIN(talk_kinopio_f)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
@@ -981,6 +1067,10 @@ EVT_BEGIN(talk_kinopio_f)
     RETURN
 EVT_END()
 
+/**
+ * NPC init for the mouse (chu): placed at (245, 0, 125) from Ms. Mowz's introduction,
+ * otherwise hidden at y = -1000.
+ */
 EVT_BEGIN(init_chu)
     SWITCH(GSW(GSW_STORY_PROGRESS))
 #if VERSION <= VERSION_DEMO_US
@@ -995,6 +1085,7 @@ EVT_BEGIN(init_chu)
     RETURN
 EVT_END()
 
+/** Talk script of the mouse (chu): story-dependent lines. */
 EVT_BEGIN(talk_chu)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
@@ -1019,6 +1110,11 @@ EVT_BEGIN(talk_chu)
     RETURN
 EVT_END()
 
+/**
+ * NPC init for the champion (Rawk Hawk) in the lobby:
+ * only at story stage STORY_STG3_33_06_BOWSER_PUNI_ELDER, when Mario did not leave as champion,
+ * he stands at (-15, 0, 25) and faces Mario instantly until the first sequence frame has passed.
+ */
 static EVT_BEGIN(init_champ)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG3_33_06_BOWSER_PUNI_ELDER)
@@ -1041,6 +1137,10 @@ s32 move_pos[] = {
     110, -40,
 };
 
+/**
+ * Guess: scene where the champion walks along the points in move_pos
+ * while talking (stg3_tou_182 to 189) in the lobby.
+ */
 EVT_BEGIN(move_champ)
     SET_VALUE(LW(10), 0)
     LOOP(0)
@@ -1094,6 +1194,7 @@ EVT_BEGIN(move_champ)
     RETURN
 EVT_END()
 
+/** Talk script of the champion in the lobby (stg3_tou_190), with the post-Chapter 3 line stg3_tou_479_02. */
 EVT_BEGIN(talk_champ)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_33_06_BOWSER_PUNI_ELDER)
@@ -1109,6 +1210,10 @@ EVT_BEGIN(talk_champ)
     RETURN
 EVT_END()
 
+/**
+ * Guess: NPC init for the "Shikowa" NPC: in the late Chapter 3 scene (STORY_STG3_33_06_BOWSER_PUNI_ELDER) he is
+ * placed at (-25, 0, 75) unless Mario left as champion.
+ */
 EVT_BEGIN(init_shikowa)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG3_33_06_BOWSER_PUNI_ELDER)
@@ -1124,6 +1229,7 @@ EVT_BEGIN(init_shikowa)
     RETURN
 EVT_END()
 
+/** Guess: talk script for the NPC above in the late Chapter 3 scene (stg3_tou_479_01). */
 EVT_BEGIN(talk_shikowa)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG3_33_06_BOWSER_PUNI_ELDER)
@@ -1132,6 +1238,11 @@ EVT_BEGIN(talk_shikowa)
     RETURN
 EVT_END()
 
+/**
+ * NPC init for the Shady Koopa (ウラノコ) in the lobby:
+ * only at story stage STORY_STG3_33_06_BOWSER_PUNI_ELDER, when Mario did not leave as champion,
+ * he stands at (-75, 0, 50) and faces Mario instantly until the first sequence frame has passed.
+ */
 static EVT_BEGIN(init_uranoko)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG3_33_06_BOWSER_PUNI_ELDER)
@@ -1147,6 +1258,10 @@ static EVT_BEGIN(init_uranoko)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the Shady Koopa: at story stage STORY_STG3_33_06_BOWSER_PUNI_ELDER he says stg3_tou_479_03;
+ * otherwise nothing.
+ */
 static EVT_BEGIN(talk_uranoko)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG3_33_06_BOWSER_PUNI_ELDER)
@@ -1155,6 +1270,10 @@ static EVT_BEGIN(talk_uranoko)
     RETURN
 EVT_END()
 
+/**
+ * Guess: NPC init for the first of two big "iron" NPCs, scaled 1.5x,
+ * placed at (-30, 0, -50) in the late Chapter 3 scene.
+ */
 EVT_BEGIN(init_ironA)
     CALL(evt_npc_set_scale, STRING("me"), FLOAT(1.5f), FLOAT(1.5f), FLOAT((1.0f)))
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -1171,6 +1290,7 @@ EVT_BEGIN(init_ironA)
     RETURN
 EVT_END()
 
+/** Guess: talk script of the first iron NPC (stg3_tou_479_04). */
 EVT_BEGIN(talk_ironA)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG3_33_06_BOWSER_PUNI_ELDER)
@@ -1179,6 +1299,7 @@ EVT_BEGIN(talk_ironA)
     RETURN
 EVT_END()
 
+/** Guess: NPC init for the second iron NPC, scaled 1.5x, placed at (-60, 0, -25) in the late Chapter 3 scene. */
 EVT_BEGIN(init_ironB)
     CALL(evt_npc_set_scale, STRING("me"), FLOAT(1.5f), FLOAT(1.5f), FLOAT((1.0f)))
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -1195,6 +1316,7 @@ EVT_BEGIN(init_ironB)
     RETURN
 EVT_END()
 
+/** Guess: talk script of the second iron NPC (stg3_tou_479_05). */
 EVT_BEGIN(talk_ironB)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG3_33_06_BOWSER_PUNI_ELDER)
@@ -1203,6 +1325,7 @@ EVT_BEGIN(talk_ironB)
     RETURN
 EVT_END()
 
+/** NPC init for the Bandit (borodo): placed at (-100, 0, 100) in the late Chapter 3 scene. */
 EVT_BEGIN(init_borodo)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG3_33_06_BOWSER_PUNI_ELDER)
@@ -1218,6 +1341,7 @@ EVT_BEGIN(init_borodo)
     RETURN
 EVT_END()
 
+/** Talk script of the Bandit in the late Chapter 3 scene (stg3_tou_479_06). */
 EVT_BEGIN(talk_borodo)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG3_33_06_BOWSER_PUNI_ELDER)
@@ -1422,6 +1546,10 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Guess: arrival cutscene for the lobby when Mario first enters from the plaza:
+ * Mario and the partner walk in, the camera pans and the story is set to STORY_STG3_01_ARENA_INTRO.
+ */
 EVT_BEGIN(evt_tougi2)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -1556,6 +1684,10 @@ ExtTexInfo ext_fan_data[] = {
     {0},
 };
 
+/**
+ * Guess: initializes the lobby's cheering fan crowd (extdrv sprites):
+ * allocates the work area, builds the animation table and places the fans.
+ */
 static void ext_fan_init(void) {
     s32 i;
     ExtdrvPose* pose;
@@ -1608,6 +1740,7 @@ static void ext_fan_init(void) {
     fan_wp->vol = psndSFX_get_vol(fan_wp->sfxId);
 }
 
+/** Display callback of the fan crowd: loads render mode, vertices, textures and TEV, and draws all fan sprites. */
 static void fan_disp(CameraId camera, void* param) {
     extLoadRenderMode();
     extLoadVertex();
@@ -1621,6 +1754,11 @@ static void fan_disp(CameraId camera, void* param) {
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 static Vec fan_zero;
+/**
+ * Guess: per-frame update of the fan crowd: moves the fans, reacts to Mario's hammer,
+ * and handles the fans leaving the lobby; the crowd's sound volume follows the number remaining.
+ * Different versions use different update logic.
+ */
 static void ext_fan_main(void) {
     MarioWork* mario = marioGetPtr();
     Fan* fan;
@@ -2043,6 +2181,10 @@ static __declspec(section ".rodata") Vec fan_zero = {0.0f, 0.0f, 0.0f};
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
+/**
+ * Guess: loop that, every 2 to 6 seconds, pops a message at a random spot near Mario
+ * while the fans crowd him (stg3_tou_236 to 240).
+ */
 EVT_BEGIN(mario_momikucha_msg)
     SET_VALUE(LW(10), 0)
     LOOP(0)
@@ -2095,6 +2237,11 @@ EVT_BEGIN(mario_momikucha_msg)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the lobby crowd scene: after the first match the fans mob Mario until they are shoved away,
+ * with the "Lobby poster" story step set at the end (STORY_STG3_20_14_LOBBY_POSTER).
+ * Spawns the ext_fan entry with its init/main/display callbacks.
+ */
 EVT_BEGIN(evt_momikucha)
     SET_VALUE(LF(0), 0)
     SET_VALUE(GF(10), 0)
@@ -2136,6 +2283,12 @@ EVT_BEGIN(evt_momikucha)
     RETURN
 EVT_END()
 
+/**
+ * Pickup callback of the Storage Key that pops out of poster 8:
+ * takes control, sets the story stage to STORY_STG3_20_14_LOBBY_POSTER, the partner remarks (stg3_tou_307_08),
+ * then Mario gets a mail notification (vibration, jingle, "!" balloon until A is pressed), says stg3_tou_307_09,
+ * receives mail 15 and opens it, and control returns.
+ */
 static EVT_BEGIN(evt_key)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -2194,6 +2347,7 @@ static EVT_BEGIN(evt_key)
     RETURN
 EVT_END()
 
+/** Display-entry callback of the crowd: updates the poses (JP and later) and queues fan_disp. */
 static void ext_fan_dispent(void) {
 #if VERSION >= VERSION_JP
     pose_main();
@@ -2204,6 +2358,10 @@ static void ext_fan_dispent(void) {
 // Optimisation pragmas: without them the function's code differs from the original (checked by removing them).
 #pragma opt_propagation off
 #pragma opt_lifetimes off
+/**
+ * Guess: checks whether Mario's (or the partner's) hammer swing hits a given fan:
+ * within range and angle in front of the attacker, below the hit height.
+ */
 static s32 check_hammer(Fan* fan) {
     MarioWork* mario = marioGetPtr();
     PartyEntry* party;
@@ -2250,46 +2408,60 @@ static s32 check_hammer(Fan* fan) {
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
+/** Script helper: args[0] receives the number of fans still in the lobby crowd. */
 static s32 evt_end_count(EventEntry* event, BOOL isFirstCall) {
     evtSetValue(event, event->args[0], fan_wp->count);
     return EVT_RETURN_DONE;
 }
 
+/** Run when Flurrie blows lobby poster 1 away (registered with evt_cloud_ent): sets GSWF_TOU02_POSTER_1_SEEN. */
 static EVT_BEGIN(evt_poster_1)
     SET_VALUE(GSWF(GSWF_TOU02_POSTER_1_SEEN), 1)
     RETURN
 EVT_END()
 
+/** Run when Flurrie blows lobby poster 2 away (registered with evt_cloud_ent): sets GSWF_TOU02_POSTER_2_SEEN. */
 static EVT_BEGIN(evt_poster_2)
     SET_VALUE(GSWF(GSWF_TOU02_POSTER_2_SEEN), 1)
     RETURN
 EVT_END()
 
+/** Run when Flurrie blows lobby poster 3 away (registered with evt_cloud_ent): sets GSWF_TOU02_POSTER_3_SEEN. */
 static EVT_BEGIN(evt_poster_3)
     SET_VALUE(GSWF(GSWF_TOU02_POSTER_3_SEEN), 1)
     RETURN
 EVT_END()
 
+/** Run when Flurrie blows lobby poster 4 away (registered with evt_cloud_ent): sets GSWF_TOU02_POSTER_4_SEEN. */
 static EVT_BEGIN(evt_poster_4)
     SET_VALUE(GSWF(GSWF_TOU02_POSTER_4_SEEN), 1)
     RETURN
 EVT_END()
 
+/** Run when Flurrie blows lobby poster 5 away (registered with evt_cloud_ent): sets GSWF_TOU02_POSTER_5_SEEN. */
 static EVT_BEGIN(evt_poster_5)
     SET_VALUE(GSWF(GSWF_TOU02_POSTER_5_SEEN), 1)
     RETURN
 EVT_END()
 
+/** Run when Flurrie blows lobby poster 6 away (registered with evt_cloud_ent): sets GSWF_TOU02_POSTER_6_SEEN. */
 static EVT_BEGIN(evt_poster_6)
     SET_VALUE(GSWF(GSWF_TOU02_POSTER_6_SEEN), 1)
     RETURN
 EVT_END()
 
+/** Run when Flurrie blows lobby poster 7 away (registered with evt_cloud_ent): sets GSWF_TOU02_POSTER_7_SEEN. */
 static EVT_BEGIN(evt_poster_7)
     SET_VALUE(GSWF(GSWF_TOU02_POSTER_7_SEEN), 1)
     RETURN
 EVT_END()
 
+/**
+ * Run when Flurrie blows lobby poster 8 away (registered with evt_cloud_ent): sets GSWF_TOU02_POSTER_8_SEEN;
+ * at STORY_STG3_20_13_MAJORS_1ST_PL it also makes the Storage Key (ITEM_STORAGE_KEY_0x13) pop out of the poster
+ * (the English poster object p_m_8_e in non-Japanese languages from the US version on),
+ * launched up and bouncing, with evt_key as its pickup callback.
+ */
 static EVT_BEGIN(evt_poster_8)
     SET_VALUE(GSWF(GSWF_TOU02_POSTER_8_SEEN), 1)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_20_13_MAJORS_1ST_PL)
@@ -2313,11 +2485,18 @@ static EVT_BEGIN(evt_poster_8)
     RETURN
 EVT_END()
 
+/** Run when Flurrie blows lobby poster 9 away (registered with evt_cloud_ent): sets GSWF_TOU02_POSTER_9_SEEN. */
 static EVT_BEGIN(evt_poster_9)
     SET_VALUE(GSWF(GSWF_TOU02_POSTER_9_SEEN), 1)
     RETURN
 EVT_END()
 
+/**
+ * Lobby scene spawned right after the Champ's Belt is taken away and the party healed (the Peach interlude):
+ * Mario and the partner appear in the lobby with the doors hidden,
+ * the Toad guide (キノシコワ) speaks (stg3_tou_479_00_01 to 05) with the champion and the Shady Koopa answering,
+ * Mario nods and cheers, then they walk out and the map changes to tou_01 (bero a_door_mon).
+ */
 static EVT_BEGIN(evt_after_peach)
     CALL(evt_cam3d_evt_set, 0, 120, 494, 0, 40, 0, 0, 11)
     CALL(evt_mario_key_onoff, 0)
@@ -2363,6 +2542,11 @@ static EVT_BEGIN(evt_after_peach)
     RETURN
 EVT_END()
 
+/**
+ * Map init for tou_02, the lobby: music and ambience by story stage,
+ * NPCs (guards, reporters, spectators, the champion),
+ * and the first-visit scenes (evt_tougi2, evt_momikucha, doors to tou_01, tou_03 and tou_04).
+ */
 EVT_BEGIN(tou_02_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG3_00_WELCOME_TO_GLITZVILLE, STORY_STG3_12_MINI_YOSHI_EGG)

@@ -172,6 +172,10 @@ extern EvtWord tec_talk[];
 
 // This function is generated in source order, not deferred like the rest of the REL (removal tested).
 #pragma defer_codegen off
+/**
+ * Script function: returns row args[0] of the quiz table peach_evt_stg4_quiz_data in args[1] to args[4] (the
+ * four values of one question).
+ */
 static s32 peach_evt_stg4_read_quiz_data(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     s32 no = evtGetValue(event, args[0]);
@@ -183,11 +187,15 @@ static s32 peach_evt_stg4_read_quiz_data(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script function: waits until the channel 1 background music has actually started (psndBGMStartCheck),
+ * so the dance can be timed to the waltz.
+ */
 static s32 bgm_start_wait(EventEntry* event, BOOL isFirstCall) {
     return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 #if VERSION == VERSION_EU
-// PAL: at 50 Hz the next dance move waits for the previous one to end (dance_dt flag 4)
+/** PAL: at 50 Hz the next dance move waits for the previous one to end (dance_dt flag 4) */
 static s32 wait_move_end_50hz(EventEntry* event, BOOL isFirstCall) {
     if (gp->framerate != 50) {
         return EVT_RETURN_DONE;
@@ -197,6 +205,11 @@ static s32 wait_move_end_50hz(EventEntry* event, BOOL isFirstCall) {
 #endif
 #pragma defer_codegen on
 
+/**
+ * Door close animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times 0.25;
+ * the open and close scripts apply the same transform. The demo builds use 0.2217.
+ */
 static EVT_BEGIN(w_door_close)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -209,6 +222,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door open animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times 0.25;
+ * the open and close scripts apply the same transform. The demo builds use 0.2217.
+ */
 static EVT_BEGIN(w_door_open)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -242,6 +260,7 @@ static BeroEntry bero_entry_data[] = {
     },
     {0},
 };
+/** Script function: sets the viewport of the 3D and 2D cameras to x, y, width and height from args[0] to args[3]. */
 static s32 viewport(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
@@ -263,6 +282,11 @@ static s32 viewport(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Draw callback of the TV-noise effect used in TEC's last scene:
+ * fills a 64 by 64 texture with random horizontal streaks
+ * and draws it over the screen with the alpha passed as the callback parameter.
+ */
 static void noiseDisp(CameraId cameraId, void* param) {
     s32 x;
     s32 ry;
@@ -342,6 +366,11 @@ static void noiseDisp(CameraId cameraId, void* param) {
     GXTexCoord2s16(0, 0);
 }
 
+/**
+ * Emergency lighting: waits until the story reaches STORY_STG7_25_THE_LAST_MAIL,
+ * then fades the map's blend colour from white down to a red tint (green and blue to 96, 32 in the demos) over
+ * one second and keeps it. Already at that story point it sets the tint at once. Every fortress map starts it.
+ */
 EVT_BEGIN(evt_emergency)
     IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_25_THE_LAST_MAIL)
         LOOP(0)
@@ -371,6 +400,13 @@ EVT_BEGIN(evt_emergency)
     RETURN
 EVT_END()
 
+/**
+ * First scene when the party returns to TEC's room at STORY_STG7_25_00_1_BOWSER_POSHLEY_SANCTUM:
+ * TEC's lights flicker, the party reacts (stg7_aji_46),
+ * and TEC speaks over its screen with noise and fades (stg7_aji_47 to 57)
+ * before the map changes to aji_16 entered as "peach" for the Last Mail scene.
+ * Guess: the wording of the scene is TEC's farewell.
+ */
 EVT_BEGIN(evt_last)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
@@ -587,6 +623,12 @@ EVT_BEGIN(evt_last)
     RETURN
 EVT_END()
 
+/**
+ * Second scene in TEC's room, after the Last Mail was shown in aji_16:
+ * the party reacts to the machine (stg7_aji_59 to 62), the screen mosaic plays,
+ * the emergency lights start (evt_emergency) and the story becomes STORY_STG7_25_THE_LAST_MAIL
+ * before control returns. The partner follows once Mario moves.
+ */
 EVT_BEGIN(evt_last2)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
@@ -690,6 +732,10 @@ EVT_BEGIN(evt_last2)
     RETURN
 EVT_END()
 
+/**
+ * Camera sweep for the TEC room: slides the camera between two positions given in LW(0) to LW(2) over two
+ * seconds, back and forth, forever.
+ */
 EVT_BEGIN(evt_camera)
     SET_VALUE(LW(5), LW(0))
     SET_VALUE(LW(6), LW(1))
@@ -717,6 +763,10 @@ EVT_BEGIN(evt_camera)
     RETURN
 EVT_END()
 
+/**
+ * Plays the mail-sent sound effects of the message animation:
+ * SFX_PEACH_MAIL_SOUSIN1 three times and SFX_PEACH_MAIL_SOUSIN2 at the end, in 600, 600 and 900 ms steps.
+ */
 EVT_BEGIN(mail_sousin_se)
     CALL(evt_snd_sfxon_3d, STRING("SFX_PEACH_MAIL_SOUSIN1"), 0, 0, -100, 0)
     WAIT_MS(600)
@@ -728,6 +778,11 @@ EVT_BEGIN(mail_sousin_se)
     RETURN
 EVT_END()
 
+/**
+ * Peach's first meeting with TEC (chapter 1): doors open and close with sound,
+ * dialogue peach_aji_42 to 48 plays, the story progress becomes STORY_STG1_19_PEACH_TEC
+ * and the map changes to kpa_00 with the story-change fade.
+ */
 static EVT_BEGIN(peach_evt_stg1)
     CALL(evt_mario_set_mode, 1)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
@@ -1041,6 +1096,12 @@ f32 move_pos_list[15][2] = {
     {-39.30409f, -74.71887f},
 };
 
+/**
+ * Moves the dance one beat: advances the dancing couple's center to the next point of the waltz path
+ * (move_center) over 0.6 seconds while the camera follows,
+ * and every frame places Peach and her hologram partner around the center (compute_peach_pos,
+ * compute_horogram_pos).
+ */
 EVT_BEGIN(peach_dance_move)
     CALL(get_center, LW(2), LW(3))
     CALL(compute_move_pos, LW(4), LW(5))
@@ -1070,6 +1131,10 @@ EVT_BEGIN(peach_dance_move)
     RETURN
 EVT_END()
 
+/**
+ * Sets Peach's and the hologram's dance pose for the current beat:
+ * P_O_F_1, P_O_R_1 or P_O_N_1 for dance step 0, 1 or 2 (skipped during a failed move).
+ */
 EVT_BEGIN(peach_dance_pose)
     CALL(dance_flag_check, 8, LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -1092,10 +1157,15 @@ EVT_BEGIN(peach_dance_pose)
     RETURN
 EVT_END()
 
+/** Dance action for pressing the step button (A): nothing extra; the couple only takes the next waltz step. */
 EVT_BEGIN(peach_dance_action_step)
     RETURN
 EVT_END()
 
+/**
+ * Common part of the dance turn: Peach and the hologram swing around their center by half a turn in 0.4 seconds
+ * with SFX_PEACH_DANCE_TURN1, and the local rotation angle turns by pi.
+ */
 EVT_BEGIN(dance_action_turn_sub)
     CALL(evt_mario_get_dispdir, LW(6))
     IF_INT_EQUAL(LW(6), 0)
@@ -1136,6 +1206,7 @@ EVT_BEGIN(dance_action_turn_sub)
     RETURN
 EVT_END()
 
+/** Dance action for a turn (button B): marks an action in progress (flag 2), does the half turn and clears the mark. */
 EVT_BEGIN(peach_dance_action_turn)
     CALL(dance_flag_onoff, 2, 1)
     CALL_CHILD(dance_action_turn_sub)
@@ -1143,6 +1214,10 @@ EVT_BEGIN(peach_dance_action_turn)
     RETURN
 EVT_END()
 
+/**
+ * Dance action for a reverse (button X): half turn as in a turn,
+ * then the waltz path is run backwards (dance_reverse) from the next beat.
+ */
 EVT_BEGIN(peach_dance_action_reverse)
     CALL(dance_flag_onoff, 2, 1)
     CALL_CHILD(dance_action_turn_sub)
@@ -1152,6 +1227,11 @@ EVT_BEGIN(peach_dance_action_reverse)
     RETURN
 EVT_END()
 
+/**
+ * Dance action for a wrong button or none: marks the action,
+ * switches Peach to the fall pose P_O_D_1 and then back to P_O_F_1 (peach_dance_after_fail),
+ * with flags 2 and 8 set meanwhile.
+ */
 EVT_BEGIN(peach_dance_action_fail)
     CALL(dance_flag_onoff, 2, 1)
     CALL(dance_flag_onoff, 8, 1)
@@ -1164,6 +1244,11 @@ EVT_BEGIN(peach_dance_action_fail)
     RETURN
 EVT_END()
 
+/**
+ * Spawns the speech-bubble effect for a dance prompt on the dummy NPC ダミー:
+ * LW(1) (0 to 2) picks the effect name btn_01 to btn_03 and LW(2) (0 to 2) the bubble type,
+ * which also sets the bubble's tilt (0, +45 or -45 degrees).
+ */
 EVT_BEGIN(dance_btn_disp_sub)
     SWITCH(LW(1))
         CASE_EQUAL(0)
@@ -1185,6 +1270,11 @@ EVT_BEGIN(dance_btn_disp_sub)
     RETURN
 EVT_END()
 
+/**
+ * Shows a button prompt for the dance: sets the flag for the bubble that is used (4096, 8192 or 16384 for LW(1)
+ * = 0, 1,
+ * 2) and spawns it with dance_btn_disp_sub.
+ */
 EVT_BEGIN(dance_btn_disp)
     SWITCH(LW(1))
         CASE_EQUAL(0)
@@ -1198,6 +1288,7 @@ EVT_BEGIN(dance_btn_disp)
     RETURN
 EVT_END()
 
+/** Marks the button bubble shown with a cross (batu = X mark) when the player pressed the wrong button. */
 EVT_BEGIN(dance_btn_batu)
     SWITCH(LW(1))
         CASE_EQUAL(0)
@@ -1210,6 +1301,10 @@ EVT_BEGIN(dance_btn_batu)
     RETURN
 EVT_END()
 
+/**
+ * Removes the button bubble of the dance prompt LW(1) (btn_01, btn_02 or btn_03) if it is shown,
+ * and clears its flag.
+ */
 EVT_BEGIN(dance_btn_clear)
     SWITCH(LW(1))
         CASE_EQUAL(0)
@@ -1234,6 +1329,7 @@ EVT_BEGIN(dance_btn_clear)
     RETURN
 EVT_END()
 
+/** Removes every button bubble of the dance that is still shown. */
 EVT_BEGIN(dance_btn_clear_all)
     CALL(dance_flag_check, 4096, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -1253,6 +1349,7 @@ EVT_BEGIN(dance_btn_clear_all)
     RETURN
 EVT_END()
 
+/** Waits until the timer in LW(4) reaches 660 ms, the length of one dance move. */
 EVT_BEGIN(wait_action_time)
     LOOP(0)
         CALL(evt_sub_get_stopwatch, LW(12), LW(4))
@@ -1264,6 +1361,7 @@ EVT_BEGIN(wait_action_time)
     RETURN
 EVT_END()
 
+/** Dims the room for the dance: the map blend colour fades from 255 down to 192 over half a second. */
 EVT_BEGIN(peach_dance_dark)
     CALL(evt_sub_intpl_msec_init, 11, 255, 192, 500)
     LOOP(0)
@@ -1277,6 +1375,7 @@ EVT_BEGIN(peach_dance_dark)
     RETURN
 EVT_END()
 
+/** Brightens the room again after the dance: the map blend colour fades from 192 back up to 255 over half a second. */
 EVT_BEGIN(peach_dance_light)
     CALL(evt_sub_intpl_msec_init, 11, 192, 255, 500)
     LOOP(0)
@@ -1290,6 +1389,13 @@ EVT_BEGIN(peach_dance_light)
     RETURN
 EVT_END()
 
+/**
+ * Peach's waltz with her hologram (the dance minigame in TEC's room):
+ * to BGM_EVT_PEACH_WALTZ1, for 32 seconds, a random button prompt (A: step, B: turn, X: reverse) appears every
+ * second beat; pressing the right button in time makes the couple do it and counts a point in LW(15),
+ * a wrong or missing press makes Peach stumble (SFX_PEACH_DANCE_NG1).
+ * Afterwards the hologram fades out and the score is evaluated.
+ */
 EVT_BEGIN(peach_evt_dance)
     CALL(evt_npc_pera_onoff, STRING("ホログラム"), 0)
     CALL(evt_npc_set_ry, STRING("ホログラム"), 180)
@@ -1490,6 +1596,11 @@ EVT_BEGIN(peach_evt_dance)
     RETURN
 EVT_END()
 
+/**
+ * Peach and TEC in chapter 2: places dummy and hologram NPCs of Peach (ダミー, ホログラム, ホログラム2),
+ * plays peach_aji_76 to 77, sets the story progress to STORY_STG2_25_02_PEACH_SHALL_WE_DANCE
+ * and changes map to hei_00.
+ */
 static EVT_BEGIN(peach_evt_stg2)
     CALL(evt_mario_set_mode, 1)
     CALL(evt_npc_entry, STRING("ダミー"), STRING("c_peach"))
@@ -1722,6 +1833,10 @@ static EVT_BEGIN(peach_evt_stg2)
     RETURN
 EVT_END()
 
+/**
+ * Peach's chapter 3 scene with TEC: peach_aji_115 to 119_02 play,
+ * then the map changes to aji_01 at the e_bero_5 entrance with a black fade.
+ */
 static EVT_BEGIN(peach_evt_stg3)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
@@ -1808,6 +1923,10 @@ static EVT_BEGIN(peach_evt_stg3)
     RETURN
 EVT_END()
 
+/**
+ * Peach's second chapter 3 scene with TEC: doors open and close with sound, peach_aji_156 to 157_03 play,
+ * the story progress becomes STORY_STG3_33_04_PEACH_BACK_TO_TEC and the map changes to mri_01.
+ */
 static EVT_BEGIN(peach_evt_stg3_1)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
@@ -1992,6 +2111,10 @@ EvtWord peach_evt_stg4_quiz_data[5][4] = {
     (EvtWord)("peach_aji_186"), (EvtWord)("peach_aji_187"), (EvtWord)("peach_aji_187_sel"), 2,
 };
 
+/**
+ * Peach's chapter 4 scene with TEC: peach_aji_166_01 to 166_05 play,
+ * the story progress becomes STORY_STG4_15_05_PEACH_X_NAUT_PHD_REPORT and the map changes to gor_04.
+ */
 static EVT_BEGIN(peach_evt_stg4)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
@@ -2262,6 +2385,12 @@ static EVT_BEGIN(peach_evt_stg4)
     RETURN
 EVT_END()
 
+/**
+ * Peach's chapter 5 scene with TEC: peach_aji_206 to 210 play,
+ * then (peach_aji_216 and 217 are shown with the map animation moza playing,
+ * Guess: TEC's screen) the story progress becomes STORY_STG5_44_PEACH_TECS_REQUEST_2
+ * and control returns to the player.
+ */
 static EVT_BEGIN(peach_evt_stg5)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
@@ -2363,6 +2492,10 @@ static EVT_BEGIN(peach_evt_stg5)
     RETURN
 EVT_END()
 
+/**
+ * Peach's second chapter 5 scene with TEC: peach_aji_260 to 264 play,
+ * the story progress becomes STORY_STG5_47_PEACH_TEC_TALK and the map changes to usu_00.
+ */
 static EVT_BEGIN(peach_evt_stg5_1)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
@@ -2518,6 +2651,11 @@ static EVT_BEGIN(peach_evt_stg5_1)
     RETURN
 EVT_END()
 
+/**
+ * Peach's chapter 6 scene with TEC (the shutdown):
+ * peach_aji_282 to 284 and more play, the story progress becomes STORY_STG6_55_01_PEACH_TEC_DELETED
+ * and the map changes to gor_01.
+ */
 static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
@@ -2874,18 +3012,21 @@ static EVT_BEGIN(peach_evt_stg6)
     RETURN
 EVT_END()
 
+/** Init of an X-Naut underling in TEC's room: runs the common NPC init and sets NPC status 2. */
 static EVT_BEGIN(teshita1_init)
     CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/** Init of a second X-Naut underling in TEC's room: common NPC init plus NPC status 2. */
 static EVT_BEGIN(teshita2_init)
     CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/** Init of Grodus (シュリョー) in TEC's room: common NPC init plus NPC status 2. */
 static EVT_BEGIN(syuryo_init)
     CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
@@ -2923,6 +3064,10 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Case script for talking to TEC's terminal: the first time it shows stg7_aji_tec_00
+ * (GSWF_AJI17_TEC_TERMINAL_FIRST_TALK), later stg7_aji_tec_01.
+ */
 EVT_BEGIN(tec_talk)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_map_replayanim, 0, STRING("moza"))
@@ -2937,6 +3082,15 @@ EVT_BEGIN(tec_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init script of aji_17, TEC's room: starts the camera sweep and, for Peach,
+ * the scene of her current story point (peach_evt_stg1 at STORY_STG1_18_01, stg2 at STORY_STG2_25_01,
+ * stg3 at STORY_STG3_33, stg3_1 at 33_03, stg4, stg5, stg5_1 at STORY_STG5_46,
+ * stg6 with the Grodus lights at STORY_STG6_55).
+ * For Mario, at STORY_STG7_25_00_1_BOWSER_POSHLEY_SANCTUM the first visit restores HP and starts evt_last
+ * and the second runs evt_last2; later it starts the emergency lights and, after the final battle,
+ * the TEC terminal talk.
+ */
 EVT_BEGIN(aji_17_init_evt)
     SET_VALUE(LW(0), STRING("S_camera_1"))
     SET_VALUE(LW(1), -30)
@@ -3041,12 +3195,14 @@ EVT_END()
 
 // target .data tail pad word
 
+/** Script function: draws the TV noise overlay (noiseDisp) on the 2D camera at the alpha in args[0]. */
 static s32 noise(EventEntry* event, BOOL isFirstCall) {
     EvtWord alpha = evtGetValue(event, event->args[0]);
     dispEntry(CAMERA_2D, 1100.0f, 0, noiseDisp, (void*)alpha);
     return EVT_RETURN_DONE;
 }
 
+/** Script function: sets Mario's (Peach's) pose to the animation named in args[0]. */
 static s32 peach_set_pose(EventEntry* event, BOOL isFirstCall) {
     const char* pose = (const char*)evtGetValue(event, event->args[0]);
     MarioWork* mario = marioGetPtr();
@@ -3054,6 +3210,10 @@ static s32 peach_set_pose(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Draws one textured quad of width w and height h with its top-left corner at (x, y)
+ * and texture coordinates up to s and t.
+ */
 static void polygon(f32 x, f32 y, f32 w, f32 h, f32 s, f32 t) {
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(x, y, 0.0f);
@@ -3066,6 +3226,11 @@ static void polygon(f32 x, f32 y, f32 w, f32 h, f32 s, f32 t) {
     GXTexCoord2f32(0.0f, t);
 }
 
+/**
+ * Draw callback that draws the dance hologram: the captured Peach picture (colour texture buf0, depth-like buf1)
+ * on a quad at the hologram NPC's position, turned to face the camera (rotated 180 degrees when flag 4 is set),
+ * blended with the NPC's colour.
+ */
 static void disp_horogram(CameraId cameraId, void* param) {
     GXCullMode cull;
     Mtx mtx;
@@ -3129,11 +3294,18 @@ static void disp_horogram(CameraId cameraId, void* param) {
     }
 }
 
+/** Script function that queues disp_horogram for the 3D camera every frame; never finishes. */
 static s32 disp_horogram_evt(EventEntry* event, BOOL isFirstCall) {
     dispEntry(CAMERA_3D, 0.0f, 2, disp_horogram, NULL);
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Draw callback that renders the picture of the hologram:
+ * picks the normal or the mirrored hologram NPC (ホログラム or ホログラム2) by its facing direction,
+ * sets up a 608 by 480 viewport and a close camera,
+ * draws the NPC's pose into the frame buffer and copies the colour and depth into horogram_wp->buf0 and buf1.
+ */
 static void peach_capture(CameraId cameraId, void* param) {
     CameraEntry saved = *camGetCurPtr();
     Mtx44 projMtx;
@@ -3203,11 +3375,17 @@ static void peach_capture(CameraId cameraId, void* param) {
     horogram_wp->ready = 1;
 }
 
+/** Script function that queues the capture of the hologram (peach_capture) every frame; blocks forever. */
 static s32 horogram_cap_evt(EventEntry* event, BOOL isFirstCall) {
     dispEntry(CAMERA_3D, 1000.0f, 0, peach_capture, NULL);
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script function: allocates the hologram's work area
+ * and its two texture buffers (RGBA8 colour and Z8 depth, 0x260 by 0x1E0 each) and clears its ready
+ * and flag words.
+ */
 static s32 horogram_init(EventEntry* event, BOOL isFirstCall) {
     u32 size = GXGetTexBufferSize(0x260, 0x1E0, GX_TF_RGBA8, GX_FALSE, 0);
 
@@ -3224,6 +3402,7 @@ static s32 horogram_init(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/** Script function: turns the hologram flag mask args[1] on (args[0] nonzero) or off. */
 static s32 horogram_flag_onoff(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
@@ -3237,6 +3416,7 @@ static s32 horogram_flag_onoff(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/** Script function: returns the dance's center point (dance_dt.cx, dance_dt.cy) in args[0] and args[1]. */
 static s32 get_center(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
 
@@ -3245,11 +3425,13 @@ static s32 get_center(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/** Script function: returns the dance's local rotation angle (radians) in args[0]. */
 static s32 get_local_rotate(EventEntry* event, BOOL isFirstCall) {
     evtSetFloat(event, event->args[0], dance_dt.rot);
     return EVT_RETURN_DONE;
 }
 
+/** Script function: sets the dance's local rotation angle to args[0] (radians), wrapped into 0 to 2 pi. */
 static s32 set_local_rotate(EventEntry* event, BOOL isFirstCall) {
     f32 r;
 
@@ -3264,11 +3446,16 @@ static s32 set_local_rotate(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/** Script function: returns the current dance step (0 to 2) in args[0]. */
 static s32 dance_get_step(EventEntry* event, BOOL isFirstCall) {
     evtSetValue(event, event->args[0], dance_dt.step);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script function: resets the dance data: flags cleared, center at (0, -80),
+ * rotation -0.471 radians (-27 degrees), step 0, waltz path index 0.
+ */
 static s32 dance_data_init(EventEntry* event, BOOL isFirstCall) {
     dance_dt.flags = 0;
     dance_dt.cx = 0.0f;
@@ -3279,6 +3466,11 @@ static s32 dance_data_init(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script function: turns the dance flag mask args[0] on (args[1] nonzero) or off.
+ * Flags: 1 = path runs backwards, 2 = action in progress, 4 = couple moving, 8 = stumbling, 4096,
+ * 8192 and 16384 = button bubbles shown.
+ */
 static s32 dance_flag_onoff(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     s32 mask = evtGetValue(event, args[0]);
@@ -3292,6 +3484,7 @@ static s32 dance_flag_onoff(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/** Script function: returns 1 in args[1] if any bit of the dance flag mask args[0] is set, else 0. */
 static s32 dance_flag_check(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     s32 mask = evtGetValue(event, args[0]);
@@ -3304,6 +3497,7 @@ static s32 dance_flag_check(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/** Script function: toggles the dance flag 1 (the waltz path runs backwards). */
 static s32 dance_reverse(EventEntry* event, BOOL isFirstCall) {
     if (dance_dt.flags & 1) {
         dance_dt.flags &= ~1;
@@ -3313,6 +3507,10 @@ static s32 dance_reverse(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script function: moves the dance center from (args[0], args[1]) to (args[2], args[3]) over args[4] ms with
+ * smooth interpolation (flag 4 while moving), then advances the dance step modulo 3. Blocks until done.
+ */
 static s32 move_center(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     f32 x0 = evtGetFloat(event, args[0]);
@@ -3344,6 +3542,10 @@ static s32 move_center(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script function: moves the waltz path pointer one point forward (or backward in reverse mode) around the 15
+ * points of move_pos_list and returns that point in args[0] and args[1].
+ */
 static s32 compute_move_pos(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
 
@@ -3359,6 +3561,11 @@ static s32 compute_move_pos(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script function: converts the dance center args[0],
+ * args[1] to Peach's position by offsetting 5.5 units along the dance rotation;
+ * returns it in args[2] and args[3].
+ */
 static s32 compute_peach_pos(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
@@ -3371,6 +3578,10 @@ static s32 compute_peach_pos(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script function: converts the dance center args[0], args[1] to the hologram partner's position,
+ * 5.5 units on the opposite side from Peach; returns it in args[2] and args[3].
+ */
 static s32 compute_horogram_pos(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
@@ -3383,18 +3594,26 @@ static s32 compute_horogram_pos(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/** Script function: blocks while a dance action (flag 2) is in progress. */
 static s32 wait_action_end(EventEntry* event, BOOL isFirstCall) {
     return (dance_dt.flags & 2) ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
 
+/** Script function: blocks until a dance action (flag 2) begins. */
 static s32 wait_action_begin(EventEntry* event, BOOL isFirstCall) {
     return (dance_dt.flags & 2) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
+/** Script function: blocks while the couple is moving (flag 4). */
 static s32 wait_move_end(EventEntry* event, BOOL isFirstCall) {
     return (dance_dt.flags & 4) ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
 
+/**
+ * Script function: reads the controller's new button presses
+ * and compares them with the expected button args[0] (1 = A, 2 = B, 0 = X).
+ * Returns in args[1] 0 for nothing, 1 for the right button alone and 2 for any wrong button.
+ */
 static s32 btn_check(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     s32 dir = evtGetValue(event, args[0]);
@@ -3436,6 +3655,10 @@ static s32 btn_check(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script function: sets the NPC named in args[0] to (args[1], args[2], args[3]),
+ * both its current and previous position.
+ */
 static s32 set_npc_pos(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -3450,11 +3673,17 @@ static s32 set_npc_pos(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/** Script function: after a stumble puts Peach back into pose P_O_F_1 over 20 frames. */
 static s32 peach_dance_after_fail(EventEntry* event, BOOL isFirstCall) {
     marioChgPoseTime("P_O_F_1", 20);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script function: creates a speech-bubble effect for the button prompt (effPeachFukidashiEntry):
+ * args[0] picks the bubble type, args[1] gives the effect a name,
+ * args[2] names the NPC it is attached to ("me" means the script's own NPC) and args[7] is the angle.
+ */
 static s32 evt_fuki_btn(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
@@ -3481,12 +3710,17 @@ static s32 evt_fuki_btn(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/** Script function: marks the named button bubble effect (args[0]) with the cross used for wrong presses. */
 static s32 evt_fuki_btn_set_batu(EventEntry* event, BOOL isFirstCall) {
     effSetPeachFukiBatu((const char*)evtGetValue(event, event->args[0]));
     return EVT_RETURN_DONE;
 }
 
 static const char horogram_pose_suffix[] = "R";
+/**
+ * Script function: sets the pose args[0] on the hologram NPC
+ * and the matching mirrored pose (name plus "R") on the second hologram.
+ */
 static s32 horogram_set_pose(EventEntry* event, BOOL isFirstCall) {
     char name[24];
     const char* pose = (const char*)evtGetValue(event, event->args[0]);

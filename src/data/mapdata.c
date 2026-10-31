@@ -489,6 +489,7 @@ WorldData* worldDataPtr(void);
 int maxMapInArea(const char* areaName);
 int maxAreaInWorld(void);
 
+/** Finds a map's MapData by name (e.g. "gor_01") by scanning every map of every area in world_data; NULL if none. */
 MapData* mapDataPtr(const char* mapName) {
     WorldData* wp = worldDataPtr();
     int i;
@@ -505,6 +506,7 @@ MapData* mapDataPtr(const char* mapName) {
     return NULL;
 }
 
+/** Finds an area's AreaData by its short name (e.g. "gor"); NULL if no area has that name. */
 AreaData* areaDataPtr(const char* areaName) {
     WorldData* wp = worldDataPtr();
     int max = maxAreaInWorld();
@@ -518,10 +520,12 @@ AreaData* areaDataPtr(const char* areaName) {
     return NULL;
 }
 
+/** Returns the global world_data table that lists every area and its maps. */
 WorldData* worldDataPtr(void) {
     return &world_data;
 }
 
+/** Counts the maps listed for the named area (its NULL-terminated maps array). The area must exist. */
 int maxMapInArea(const char* areaName) {
     AreaData* ap = areaDataPtr(areaName);
     int n = 0;
@@ -532,6 +536,7 @@ int maxMapInArea(const char* areaName) {
     return n;
 }
 
+/** Counts the areas listed in world_data (its NULL-terminated areas array). */
 int maxAreaInWorld(void) {
     WorldData* wp = worldDataPtr();
     int n = 0;
@@ -542,6 +547,11 @@ int maxAreaInWorld(void) {
     return n;
 }
 
+/**
+ * Records where a map's event script table lives once its REL is loaded,
+ * so the map change code can start its scripts.
+ * No caller in this tree; Guess: the map RELs call it from their prolog.
+ */
 void relSetEvtAddr(const char* mapName, EvtWord* eventAddr) {
     MapData* map = mapDataPtr(mapName);
     if (map != NULL) {
@@ -549,6 +559,10 @@ void relSetEvtAddr(const char* mapName, EvtWord* eventAddr) {
     }
 }
 
+/**
+ * Records an area's battle setup tables (by encounter and by battle number) once its REL is loaded.
+ * No caller in this tree; Guess: the area RELs call it from their prolog, like relSetEvtAddr.
+ */
 void relSetBtlAddr(const char* areaName, void* btlSetupTbl, void* btlSetupNoTbl) {
     AreaData* area = areaDataPtr(areaName);
     if (area != NULL) {

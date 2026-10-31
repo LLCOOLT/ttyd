@@ -104,6 +104,10 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_black_heiho", "c_kuribo", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
+/**
+ * Init script of the placeholder unit: registers its wait,
+ * attack and damage handlers (confusion uses the default handler) and starts the idle event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -113,6 +117,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage reaction: runs the default damage handling with LW(10) = -2 (the unit itself) and LW(11) = 1. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -122,6 +127,7 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Attack event: uses an item if it has one; otherwise it does nothing and goes back to idling. */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -133,6 +139,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle event: sets the unit's body part 1 to the pose given by its pose table for its current state. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

@@ -32,12 +32,20 @@ static void sw_cntup(MapObjectEntry* mobj);
 static BeroEntry bero_data[3];
 extern EvtWord evt_box_open[];
 
+/**
+ * Door animation callback, closing for the e_bero_1 exit to eki_05:
+ * rotates map object "door" about Y by -0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(e_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the e_bero_1 exit to eki_05:
+ * rotates map object "door" about Y by 0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(e_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door"), 0, LW(0), 0)
@@ -82,6 +90,12 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
+/**
+ * Spawned by the map init: waits until the partner has stopped reacting,
+ * then plays the box (anm_hako) opening with a camera shot
+ * and creates the three counting switches (MOBJ_eki_06_su1 to su3) it reveals,
+ * and advances the story to STORY_STG6_34_3_BLUE_BLOCKS. Does nothing when that step has already been reached.
+ */
 EVT_BEGIN(evt_box_open)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_34_3_BLUE_BLOCKS)
         RETURN
@@ -116,6 +130,12 @@ EVT_BEGIN(evt_box_open)
     RETURN
 EVT_END()
 
+/**
+ * Runs when the three counting switches have been hit the right number of times:
+ * plays their completion animations and sounds, removes them,
+ * unfolds the origami stairs (anm_kaidan167, one step at a time) with a camera shot,
+ * plays the success jingle and sets the story to STORY_STG6_35_ORIGAMI_STAIRS.
+ */
 EVT_BEGIN(evt_sw_complete)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, -140, 152, 528, -140, 57, -12, 500, 11)
@@ -194,6 +214,10 @@ EVT_BEGIN(evt_sw_complete)
     RETURN
 EVT_END()
 
+/**
+ * Adds one to the hit counter (GW(0), GW(1) or GW(2)) of the counting switch that was just hit,
+ * chosen by the switch's name.
+ */
 static void sw_cntup(MapObjectEntry* mobj) {
     if (strcmp(mobj->name, "MOBJ_eki_06_su1") == 0) {
         evtSetValue(NULL, GW(0), evtGetValue(NULL, GW(0)) + 1);
@@ -204,6 +228,7 @@ static void sw_cntup(MapObjectEntry* mobj) {
     }
 }
 
+/** Returns the hit counter (GW(0) to GW(2)) of the counting switch named by mobj, or 0 for any other object. */
 static s32 sw_cnt(MapObjectEntry* mobj) {
     if (strcmp(mobj->name, "MOBJ_eki_06_su1") == 0) {
         return evtGetValue(NULL, GW(0));
@@ -217,6 +242,11 @@ static s32 sw_cnt(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Called when a switch has been hit too many times:
+ * sets the switches back to their idle poses and clears the counters of the ones that were at their trigger
+ * count (1, 10 and 3 hits).
+ */
 static void sw_reset(void) {
     MapObjectEntry* mobj;
 
@@ -248,6 +278,13 @@ static void sw_reset(void) {
     }
 }
 
+/**
+ * Per-frame function of each counting switch.
+ * When hit (stomp, hammer or partner action) it counts the hit and plays its press animation,
+ * locking the other switches meanwhile; the puzzle is solved when the three switches have been hit exactly 1,
+ * 10 and 3 times (evt_sw_complete is then started), otherwise the switch pops back up,
+ * and an overcount resets all counters.
+ */
 static s32 sw_main(MapObjectEntry* mobj) {
     switch (mobj->state) {
         case 2:
@@ -333,6 +370,11 @@ static s32 sw_main(MapObjectEntry* mobj) {
     return 0;
 }
 
+/**
+ * Script helper: loads the switch model named by args[0]
+ * and spawns it as a map object at (args[1], args[2], args[3]) with sw_main as its per-frame function.
+ * Blocks until the model has finished loading.
+ */
 static USER_FUNC(sw_entry) {
     EvtWord* args = event->args;
     const char* name;
@@ -364,6 +406,12 @@ static USER_FUNC(sw_entry) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Map init for eki_06: sets up the door to eki_05,
+ * the box and the three counting switches according to the story step (before STORY_STG6_34_3_BLUE_BLOCKS the
+ * stairs are hidden; at that step the switches exist;
+ * later the stairs are already unfolded), and the Shine Sprite power-up block.
+ */
 EVT_BEGIN(eki_06_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)

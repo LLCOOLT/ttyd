@@ -96,7 +96,7 @@ BattleUnitKind unit_hatty = {
     data_table,
 };
 
-// Spawned by init_event like the UFO's btlevtcmd_UFOAction, but left as a stub: it looks the unit up and blocks.
+/** Spawned by init_event like the UFO's btlevtcmd_UFOAction, but left as a stub: it looks the unit up and blocks. */
 USER_FUNC(hatty_main) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -200,11 +200,19 @@ static BattleWeapon weapon_hatty_attack2 = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Background script of the test enemy hatty: calls the hatty_main user function, which is a stub,
+ * so it does nothing.
+ */
 static EVT_BEGIN(main_event)
     CALL(hatty_main, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
+/**
+ * Init script of hatty: installs the wait, attack
+ * and damage handlers (confusion uses the default Confuse script), spawns main_event and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -215,6 +223,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: runs the shared default damage script (btldefaultevt_Damage) with its default parameters
+ * (LW(10) = -2, LW(11) = 1).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -235,6 +247,10 @@ static BattleUnitSetup entry_kohatty = {
     NULL, // itemDropTable
 };
 
+/**
+ * Spawns a kohatty (entry_kohatty) at the unit's position (LW(7), 10, LW(2)) with no fall acceleration,
+ * makes it hop to (LW(0), 10, LW(2)) and sets that as its home position. LW(3) receives the new unit's id.
+ */
 static EVT_BEGIN(kohatty_spawn_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(7), LW(8), LW(9))
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_kohatty), 0)
@@ -246,6 +262,12 @@ static EVT_BEGIN(kohatty_spawn_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: attack script of hatty: after the item-use check it looks along its row for free space
+ * (btlevtcmd_CheckSpace) and spawns up to three kohatty helpers with kohatty_spawn_event,
+ * then picks weapon_hatty_attack or weapon_hatty_attack2 (50 percent each), dives at a target with a pause,
+ * applies the damage with the guard-timing check and flies home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -359,6 +381,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

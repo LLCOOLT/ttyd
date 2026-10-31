@@ -234,6 +234,10 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Init script of the Paragoomba.
+ * Registers its wait, attack, damage and fall scripts, sets the flying movement sounds and starts waiting.
+ */
 static EVT_BEGIN(init_event_patakuri)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event_patakuri))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_patakuri))
@@ -244,6 +248,11 @@ static EVT_BEGIN(init_event_patakuri)
     RETURN
 EVT_END()
 
+/**
+ * Reaction when the Hyper Paragoomba loses its wings:
+ * it drops with SFX_ENM_FALL1, lands with a hop and its pose table
+ * and data switch to those of the walking Hyper Goomba form (kind 66).
+ */
 static EVT_BEGIN(dmg_fall_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -272,6 +281,7 @@ static EVT_BEGIN(dmg_fall_event)
     RETURN
 EVT_END()
 
+/** Position the Paragoomba takes for a first-strike reaction. Guess. */
 static EVT_BEGIN(patakuri_dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -280,6 +290,10 @@ static EVT_BEGIN(patakuri_dmg_first_attack_pos)
     RETURN
 EVT_END()
 
+/**
+ * The Hyper Paragoomba's attack: like the Paragoomba's dive attack,
+ * it can instead spend its turn charging (weapon_patakuri_charge) unless it is already charged (status 16).
+ */
 static EVT_BEGIN(attack_event_patakuri)
     CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -417,6 +431,7 @@ static EVT_BEGIN(attack_event_patakuri)
     RETURN
 EVT_END()
 
+/** Wait script of the Hyper Paragoomba: shows its flying idle pose from the pose table. */
 static EVT_BEGIN(wait_event_patakuri)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     LABEL(0)
@@ -553,6 +568,10 @@ static BattleWeapon weapon_kuriboo_charge = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init script of the walking form of the Hyper Paragoomba (after losing its wings).
+ * Registers its wait, attack and damage scripts and the walking sounds.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -566,6 +585,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Hyper Paragoomba: runs the default damage handling. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -573,10 +593,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Phase event of the Hyper Paragoomba: does nothing. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/** The Hyper Goomba-form attack: the Goomba headbutt, with the same charge option as the winged form. */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -747,11 +769,16 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait (idle) event of the Hyper Paragoomba: shows the idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: computes the facing direction (degrees) from point (args[0], args[1]) to (args[2], args[3])
+ * and stores it in args[4]; if both points coincide args[4] is left as it was.
+ */
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);

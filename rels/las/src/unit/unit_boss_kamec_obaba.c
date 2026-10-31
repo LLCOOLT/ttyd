@@ -414,6 +414,10 @@ static BattleUnitKindPart parts[] = {
     {2, "btl_un_kamec_obaba", "c_kamek_bb", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
 };
 
+/**
+ * Camera helper of the Bowser fight: moves the battle camera to a close view of Kammy Koopa (the unit in GW(9));
+ * the view is higher when her unit work 0 is 1 (she is flying on her broom).
+ */
 static EVT_BEGIN(kamec_obaba_zoom)
     CALL(btlevtcmd_GetUnitWork, GW(9), 0, LW(1))
     CALL(evt_btl_camera_set_mode, 0, 3)
@@ -426,6 +430,10 @@ static EVT_BEGIN(kamec_obaba_zoom)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Kammy Koopa: installs her wait, phase, attack,
+ * damage and confusion events and sets her unit work: 0 = 1 (flying), 1 and 2 = 0 (turn counters).
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
@@ -441,6 +449,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage event of Kammy Koopa: default damage handling,
+ * then if she is flying and the hit is strong enough (total damage compared to a limit) she is knocked off her
+ * broom and dmg_fall_event runs.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -470,6 +483,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Event run when Kammy Koopa is knocked off her broom:
+ * she falls to the ground (D_2) and her broom (part 2) drops separately,
+ * then she stands on the ground (unit work 0 = 0) and can be hit normally.
+ */
 static EVT_BEGIN(dmg_fall_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -508,6 +526,11 @@ static EVT_BEGIN(dmg_fall_event)
     RETURN
 EVT_END()
 
+/**
+ * Dead event of Kammy Koopa: if she was still flying she first falls.
+ * Depending on how far the fight has gone (GW(10)), she says stg8_las_100_01 or stg8_las_100_03,
+ * sets GW(11) so Bowser reacts to it, and the common slow death sequence runs.
+ */
 static EVT_BEGIN(dead_event)
     DEBUG_PUT_MSG(STRING("カメックオババ　死亡"))
     SET_VALUE(GW(11), 1)
@@ -565,6 +588,10 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Phase event of Kammy Koopa: before the player phase, if she is not in a state that stops her acting,
+ * it manages her flying state (unit work 0) and counters, getting back on her broom after a few turns.
+ */
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_EQUAL(LW(0), 0)
@@ -628,6 +655,12 @@ static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of Kammy Koopa: can use an item;
+ * otherwise draws a number to pick her action, preferring support spells for Bowser (magic_select_pri_koopa)
+ * or herself (magic_select_pri_obaba): Dekadeka, Katikati, Biribiri, Trans, Recover,
+ * or the magic attack on the party.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -766,6 +799,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Casting animation, ground version, first half:
+ * Kammy raises her wand through the A_1A to A_1E poses with the spell sparkles,
+ * and a different effect is shown when the spell is the attack magic.
+ */
 static EVT_BEGIN(ground_magic_common_event1)
     BEGIN_SIBLING_EVENT
         LOOP(2)
@@ -797,6 +835,7 @@ static EVT_BEGIN(ground_magic_common_event1)
     RETURN
 EVT_END()
 
+/** Casting animation, ground version, second half (A_2A to A_2C). */
 static EVT_BEGIN(ground_magic_common_event2)
     BEGIN_SIBLING_EVENT
         LOOP(2)
@@ -823,6 +862,7 @@ static EVT_BEGIN(ground_magic_common_event2)
     RETURN
 EVT_END()
 
+/** Casting animation in the air (A_3A to A_3D) when she is flying on her broom. */
 static EVT_BEGIN(sky_magic_common_event)
     BEGIN_SIBLING_EVENT
         LOOP(2)
@@ -849,6 +889,10 @@ static EVT_BEGIN(sky_magic_common_event)
     RETURN
 EVT_END()
 
+/**
+ * Common casting script of Kammy Koopa when the target is a different unit than the caster:
+ * runs the ground or the air animation depending on whether she is flying (unit work 0).
+ */
 static EVT_BEGIN(magic_common_event1)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -864,6 +908,10 @@ static EVT_BEGIN(magic_common_event1)
     RETURN
 EVT_END()
 
+/**
+ * Common casting script of Kammy Koopa for the second half of a spell:
+ * runs the ground or air second half depending on whether she is flying.
+ */
 static EVT_BEGIN(magic_common_event2)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -874,6 +922,10 @@ static EVT_BEGIN(magic_common_event2)
     RETURN
 EVT_END()
 
+/**
+ * Helper child script of the Kammy attacks: given the pre-check result in LW(5),
+ * makes the target start its dodge reaction (avoid type 38, 39 or 40).
+ */
 static EVT_BEGIN(start_avoid)
     IF_INT_EQUAL(LW(5), 3)
         CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -887,6 +939,11 @@ static EVT_BEGIN(start_avoid)
     RETURN
 EVT_END()
 
+/**
+ * Magic attack of Kammy Koopa (weapon_kamec_obaba_attack_magic):
+ * she casts a blast at one party member, who can dodge it
+ * or takes the damage with the action command defence check.
+ */
 static EVT_BEGIN(attack_magic_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -978,6 +1035,12 @@ static EVT_BEGIN(attack_magic_event)
         RETURN
 EVT_END()
 
+/**
+ * Event script: Kammy Koopa picks the target of her support magic in her own favour.
+ * Bowser (unit GW(8), eligible while GW(10) is 0) gets weight 25
+ * and Kammy herself (-2, eligible while GW(11) is 0) weight 75.
+ * Returns the target unit in LW(3) and the part 1 in LW(4).
+ */
 EVT_BEGIN(magic_select_pri_obaba)
     SET_VALUE(LW(5), 0)
     SET_VALUE(LW(6), 0)
@@ -1001,6 +1064,11 @@ EVT_BEGIN(magic_select_pri_obaba)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the same choice weighted in Bowser's favour:
+ * Bowser (GW(8)) has weight 75 and Kammy herself (-2) weight 25, each only while GW(10) / GW(11) is 0.
+ * Returns the target unit in LW(3) and the part 1 in LW(4).
+ */
 EVT_BEGIN(magic_select_pri_koopa)
     SET_VALUE(LW(5), 0)
     SET_VALUE(LW(6), 0)
@@ -1024,6 +1092,11 @@ EVT_BEGIN(magic_select_pri_koopa)
     RETURN
 EVT_END()
 
+/**
+ * Dekadeka spell of Kammy Koopa (weapon_kamec_obaba_dekadeka_magic):
+ * she casts it on one target, Bowser or herself (Guess: it makes the target grow,
+ * as for the Elite Wizzerd's spell of the same name).
+ */
 static EVT_BEGIN(dekadeka_magic_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
@@ -1050,21 +1123,37 @@ static EVT_BEGIN(dekadeka_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * Katikati spell of Kammy Koopa: uses the same casting script as dekadeka_magic_event with
+ * weapon_kamec_obaba_katikati_magic (Guess: a defence boost).
+ */
 static EVT_BEGIN(katikati_magic_event)
     CALL_CHILD(dekadeka_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * Biribiri spell of Kammy Koopa: uses the same casting script as dekadeka_magic_event with
+ * weapon_kamec_obaba_biribiri_magic (Guess: an electric charge, from the name "biribiri").
+ */
 static EVT_BEGIN(biribiri_magic_event)
     CALL_CHILD(dekadeka_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * Trans spell of Kammy Koopa: uses the same casting script as dekadeka_magic_event with
+ * weapon_kamec_obaba_trans_magic (Guess: makes the target transparent).
+ */
 static EVT_BEGIN(trans_magic_event)
     CALL_CHILD(dekadeka_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * Recover spell of Kammy Koopa: she heals the target by 8 HP with the recovery effect;
+ * if the target is the unit in GW(8) (Bowser) the effect is shown on him.
+ */
 static EVT_BEGIN(recover_magic_event)
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
@@ -1092,6 +1181,10 @@ static EVT_BEGIN(recover_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: plays a ring of stardust sparkles near the unit args[0] on a support cast:
+ * type 0 at 10 units high and type 1 at 50 units high, 30 units in front of it.
+ */
 static USER_FUNC(eff_magic_support) {
     EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
@@ -1119,6 +1212,10 @@ static USER_FUNC(eff_magic_support) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: returns in args[1] the current X offset of the magic effect stored in the unit args[0]
+ * (unit->work[4]), so the script can wait for the spell to reach a position.
+ */
 static USER_FUNC(eff_magic_get_posX) {
     EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
@@ -1128,6 +1225,10 @@ static USER_FUNC(eff_magic_get_posX) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: starts Kammy's magic bolt (N64 magic effect of kind args[4]) from the tip of her wand towards
+ * the point (args[1], args[2], args[3]) and stores it in unit->work[4].
+ */
 static USER_FUNC(eff_magic) {
     EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
@@ -1152,6 +1253,11 @@ static USER_FUNC(eff_magic) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper (runs every frame while blocked):
+ * keeps a Thunder Flare charging effect on the tip of Kammy's staff, following her position and size,
+ * until the effect ends.
+ */
 static USER_FUNC(eff_staff) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -1175,6 +1281,7 @@ static USER_FUNC(eff_staff) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Wait event of Kammy Koopa: plays her idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

@@ -245,6 +245,11 @@ static BattleWeapon weapon_gundan_zako_dekadeka_bottle = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init script of the X-Naut (shared by the Elite X-Naut):
+ * installs the wait, attack, damage and confusion handlers (confusion reuses the attack), sets its run,
+ * walk and jump sounds and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -257,6 +262,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: runs the shared default damage script (btldefaultevt_Damage) with its default parameters
+ * (LW(10) = -2, LW(11) = 1).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -264,6 +273,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the X-Naut: when battle flag 2 is set it just uses the normal attack;
+ * otherwise, after the item-use check, it rolls 0 to 99 and uses the normal attack (50 percent),
+ * the jump attack (30 percent) or, if it is not already Huge, the dekadeka bottle (20 percent);
+ * when the roll lands on the bottle but it is already Huge, it rolls again.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -307,6 +322,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Shared approach of the X-Naut's two attacks: declares the attack on the target,
+ * then runs toward it (R_2 pose with step sounds and dust puffs along the way)
+ * and stops in front of it with the A_1 pose.
+ */
 static EVT_BEGIN(attack_common_event1)
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
@@ -353,6 +373,10 @@ static EVT_BEGIN(attack_common_event1)
     RETURN
 EVT_END()
 
+/**
+ * Shared return of the X-Naut's attacks: runs back to its home position at speed 7 (R_1 pose)
+ * and resets its facing.
+ */
 static EVT_BEGIN(attack_common_event2)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("R_1"))
@@ -363,6 +387,11 @@ static EVT_BEGIN(attack_common_event2)
     RETURN
 EVT_END()
 
+/**
+ * The X-Naut's normal attack (weapon_gundan_zako_attack):
+ * runs up with attack_common_event1, plays the A_3 attack pose with its attack sound and hops onto the target;
+ * the usual avoid, guard and hit check then follows, and it runs back (attack_common_event2).
+ */
 static EVT_BEGIN(normal_attack_event)
     SET_VALUE(LW(9), PTR(&weapon_gundan_zako_attack))
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
@@ -458,6 +487,11 @@ static EVT_BEGIN(normal_attack_event)
         RETURN
 EVT_END()
 
+/**
+ * The X-Naut's jump attack (weapon_gundan_zako_jump_attack):
+ * runs up with attack_common_event1, then jumps (A_2 pose, higher arc) onto the target with the attack sound;
+ * the usual avoid, guard and hit check follows and it runs back.
+ */
 static EVT_BEGIN(jump_attack_event)
     SET_VALUE(LW(9), PTR(&weapon_gundan_zako_jump_attack))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -540,6 +574,11 @@ static EVT_BEGIN(jump_attack_event)
         RETURN
 EVT_END()
 
+/**
+ * The X-Naut drinks the dekadeka bottle (weapon_gundan_zako_dekadeka_bottle, which targets only itself):
+ * plays the bottle sounds with the A_4A and A_4B poses, then applies the weapon with the guard-timing result.
+ * Guess: dekadeka means the Huge status is given to itself.
+ */
 static EVT_BEGIN(dekadeka_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -580,6 +619,7 @@ static EVT_BEGIN(dekadeka_event)
     RETURN
 EVT_END()
 
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

@@ -30,6 +30,10 @@
 #include "pmario_sound.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
+/**
+ * Sine of x (radians, 0 to 2*pi) by a short odd polynomial after folding x into the first quadrant.
+ * Used by depthDisp to place its eight shifted copies of the screen.
+ */
 static inline f32 dd_sin(f32 x) {
     f32 a = 0.00761f;
     f32 b = 0.16605f;
@@ -67,6 +71,10 @@ static inline f32 dd_sin(f32 x) {
     return a;
 }
 
+/**
+ * Cosine of x (radians, 0 to 2*pi) by a short even polynomial after folding x into the first quadrant.
+ * The companion of dd_sin.
+ */
 static inline f32 dd_cos(f32 x) {
     f32 a = 0.03705f;
     f32 b = 0.4967f;
@@ -112,11 +120,20 @@ static TegamiWork* wp;
 
 static USER_FUNC(depth);
 
+/**
+ * Draw callback of the letter: draws the letter picture (from mariost.tpl, texture 4) centred at y -74 with the
+ * work block's alpha.
+ */
 static void draw(CameraId camera, void* param) {
     winTexInit(*(TEXPalette**)wp->tpl->data);
     winTexSet(4, (Vec){0.0f, -74.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, wp->alpha});
 }
 
+/**
+ * Script helper that fades in the prologue letter:
+ * on the first call loads mariost.tpl into the work block,
+ * then each call raises the alpha by 2 up to 128 and queues the 2D draw of the letter. Never finishes.
+ */
 static USER_FUNC(tegami) {
     if (isFirstCall) {
         wp = _mapAlloc(sizeof(TegamiWork));
@@ -132,6 +149,7 @@ static USER_FUNC(tegami) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Frees the loaded mariost.tpl of the letter. Called from gor.rel's _epilog when leaving gor_10. */
 void tegami_delete(void) {
     if (wp != NULL && wp->tpl != NULL) {
         fileFree(wp->tpl);
@@ -141,6 +159,12 @@ void tegami_delete(void) {
 // Optimisation pragmas: without them the function's code differs from the original (checked by removing them).
 #pragma opt_propagation off
 #pragma opt_lifetimes off
+/**
+ * Draw callback of the wake-up blur: copies the frame to a texture
+ * and draws eight copies of it shifted in a circle by GW(0)/100 units, each at 1/8 weight,
+ * giving the dizzy double vision of Mario waking up.
+ * Compiled with propagation and lifetime optimisations off to match the original.
+ */
 static void depthDisp(CameraId camera, void* param) {
     f32 amp = evtGetFloat(NULL, GW(0)) / 100.0f;
     CameraEntry* cam = camGetPtr(camera);
@@ -210,11 +234,17 @@ static void depthDisp(CameraId camera, void* param) {
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
+/** Script helper that queues depthDisp every frame (priority 1200). Never finishes. */
 static USER_FUNC(depth) {
     dispEntry(CAMERA_2D, 1200.0f, 0, depthDisp, NULL);
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Prologue of the game (before STORY_STG0_02_MARIOS_HOUSE):
+ * ambience fades down, Mario and the partner are hidden, the letter fades in,
+ * the diary text "pro_04" is shown over it, then a white fade changes the map to aaa_00 ("prologue2").
+ */
 EVT_BEGIN(tegami_init_evt)
     CALL(evt_snd_envoff, PSND_FADE_HOLD)
     CALL(evt_snd_envon, PSND_FADE_IN | PSND_CH(1), STRING("ENV_STG0_GOR6"))
@@ -247,6 +277,10 @@ EVT_BEGIN(tegami_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Draw callback of the eyelids: draws two black bars from the top and bottom of the screen,
+ * each GW(1) units tall (240 is closed).
+ */
 static void mabutaDisp(CameraId camera, void* param) {
     f32 h = evtGetFloat(NULL, GW(1));
     CameraEntry* cam = camGetPtr(camera);
@@ -277,11 +311,17 @@ static void mabutaDisp(CameraId camera, void* param) {
     GXEnd();
 }
 
+/** Script helper that queues mabutaDisp every frame (priority 1100). Never finishes. */
 static USER_FUNC(mabuta) {
     dispEntry(CAMERA_2D, 1100.0f, 0, mabutaDisp, NULL);
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper that makes the camera sway like a ship at sea:
+ * nudges the 3D camera's vertical view offset with a slow sine
+ * and plays a ship creak each time it crosses its start height. Never finishes.
+ */
 static USER_FUNC(cam_yure) {
     CameraEntry* cam = camGetPtr(CAMERA_3D);
     f32 s;
@@ -303,6 +343,11 @@ static USER_FUNC(cam_yure) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Mario wakes up on the ship at the start of the game:
+ * snoring, the first lines (mac_0_012 and mac_0_013), the eyelids open and blink while the blur clears,
+ * the last line mac_0_013_01, then the map changes to gor_00 (Rogueport).
+ */
 EVT_BEGIN(evt_mezame)
     CALL(evt_seq_wait, 2)
     WAIT_MS(1000)
@@ -397,6 +442,11 @@ EVT_BEGIN(evt_mezame)
     RETURN
 EVT_END()
 
+/**
+ * Sets up the waking-up scene: music and ambience off, Mario and his partner hidden,
+ * the town models (marukongou, densha, pukupuku) hidden, the blur and eyelid effects and the ship sway started,
+ * then starts evt_mezame.
+ */
 EVT_BEGIN(mezame_init_evt)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envoff, PSND_FADE_OUT)
@@ -426,6 +476,11 @@ EVT_BEGIN(mezame_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Init script of gor_10: before STORY_STG0_02_MARIOS_HOUSE it plays the prologue letter,
+ * afterwards the waking-up scene on the ship.
+ * In JP and later it starts the sea animations and does nothing else if map events are being skipped.
+ */
 EVT_BEGIN(gor_10_init_evt)
 #if VERSION >= VERSION_JP
     CALL(evt_map_playanim, STRING("anm_umi"), 1, 0)

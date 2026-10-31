@@ -2657,8 +2657,10 @@ NpcTerritoryInfo btl_tst_setup_no_tbl[] = {
     {0},
 };
 
-// Moves a stage object along two sine waves: x = ampX * sin(stepX / periodX), y = ampY * (1 + sin(...)).
-// Args: object name, x step var, x period, x amplitude, y step var, y period, y amplitude.
+/**
+ * Moves a stage object along two sine waves: x = ampX * sin(stepX / periodX), y = ampY * (1 + sin(...)).
+ * Args: object name, x step var, x period, x amplitude, y step var, y period, y amplitude.
+ */
 static USER_FUNC(_wave_offset) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -2696,6 +2698,10 @@ static USER_FUNC(_wave_offset) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Endless loop for the test battle stage: each frame calls _wave_offset on stage object B to make it sway on a
+ * wave (800-unit x period, 300-unit y period).
+ */
 EVT_BEGIN(bgset_tst_wave_event)
     SET_VALUE(LW(0), 0)
     SET_VALUE(LW(1), 0)

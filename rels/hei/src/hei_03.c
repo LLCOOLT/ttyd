@@ -56,6 +56,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Death event of the first Shinnosuke guard (シンノスケ1):
+ * marks both pillar guards as defeated (GSWF_HEI03_PILLAR_ENEMY_A/B_DEFEATED, since they are linked)
+ * and runs the common enemy death handling.
+ */
 static EVT_BEGIN(dead_evt1)
     SET_VALUE(GSWF(GSWF_HEI03_PILLAR_ENEMY_A_DEFEATED), 1)
     SET_VALUE(GSWF(GSWF_HEI03_PILLAR_ENEMY_B_DEFEATED), 1)
@@ -63,6 +68,11 @@ static EVT_BEGIN(dead_evt1)
     RETURN
 EVT_END()
 
+/**
+ * Death event of the second Shinnosuke guard (シンノスケ2):
+ * marks both pillar guards as defeated (GSWF_HEI03_PILLAR_ENEMY_A/B_DEFEATED, since they are linked)
+ * and runs the common enemy death handling.
+ */
 static EVT_BEGIN(dead_evt2)
     SET_VALUE(GSWF(GSWF_HEI03_PILLAR_ENEMY_B_DEFEATED), 1)
     SET_VALUE(GSWF(GSWF_HEI03_PILLAR_ENEMY_A_DEFEATED), 1)
@@ -112,6 +122,11 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Opens the gate once both guards are beaten: the ground quakes (SFX_STG1_QUAKE3)
+ * and the camera looks at the gate, the grid rises with SFX_STG1_GRID_UP sounds (anm_mon animation),
+ * its collision (a_mon) turns off and story progress becomes STORY_STG1_04_BALD_CLEFT.
+ */
 static EVT_BEGIN(door_open)
     CALL(evt_mario_key_onoff, 0)
     WAIT_MS(800)
@@ -144,6 +159,10 @@ static EVT_BEGIN(door_open)
     RETURN
 EVT_END()
 
+/**
+ * Shakes the NPC named in LW(0) from side to side by one unit every two frames, forever;
+ * deleted by hashira_evt when the shaking should stop.
+ */
 static EVT_BEGIN(shake_evt)
     CALL(evt_npc_get_position, LW(0), LW(10), LW(11), LW(12))
     LOOP(0)
@@ -159,6 +178,10 @@ static EVT_BEGIN(shake_evt)
     RETURN
 EVT_END()
 
+/**
+ * Makes the guard in LW(0) jump 50 units towards the middle from its pillar with SFX_STG1_SINNOSUKE_JUMP1
+ * and landing sound and a small camera shake, then makes it flat (evt_npc_pera_onoff).
+ */
 static EVT_BEGIN(hashira_evt_sub)
     CALL(evt_npc_flag_onoff, 0, LW(0), NPC_FLAG_INSTANT_TURN)
     CALL(evt_npc_get_position, LW(0), LW(10), LW(11), LW(12))
@@ -175,6 +198,13 @@ static EVT_BEGIN(hashira_evt_sub)
     RETURN
 EVT_END()
 
+/**
+ * Case script run when Mario hits pillar a_hasira_1 or a_hasira_2 (LW(0) is the guard on it, LW(1) the other):
+ * the pillar shakes with a quake while the camera looks at it, the guard jumps down (hashira_evt_sub),
+ * the other guard too unless it was already beaten,
+ * then both guards are set up as linked enemies (evt_npc_setup, evt_npc_set_link)
+ * and the battle mode is switched on. Removes the case event of the pillar that was used.
+ */
 static EVT_BEGIN(hashira_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_npc_get_position, LW(0), LW(10), LW(11), LW(12))
@@ -225,6 +255,7 @@ static EVT_BEGIN(hashira_evt)
     RETURN
 EVT_END()
 
+/** Talk script for the closed gate (a_mon): Goombella remarks that the gate will not open (stg1_hei_15). */
 EVT_BEGIN(mon_msg)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("stg1_hei_15"), 0, STRING("party"))
@@ -232,6 +263,11 @@ EVT_BEGIN(mon_msg)
     RETURN
 EVT_END()
 
+/**
+ * Petal Meadows hei_03 map init: puts the two Shinnosuke enemies on their pillars (only until the "Bald Cleft"
+ * story step and until each has been defeated), wires the gate to open when both are beaten,
+ * otherwise leaves the gate open; sets music and reverb.
+ */
 EVT_BEGIN(hei_03_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)

@@ -37,24 +37,40 @@ extern EvtWord evt_ori_open[];
 extern EvtWord tsuritenjo_event[];
 static s32 key_tbl[2];
 
+/**
+ * Door animation callback, closing for the w_bero exit to gon_05:
+ * rotates map object "door01" about Y by 0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(door01_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door01"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the w_bero exit to gon_05:
+ * rotates map object "door01" about Y by -0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(door01_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door01"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, closing for the e_bero exit to gon_07:
+ * rotates map object "door02" about Y by -0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(door02_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door02"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the e_bero exit to gon_07:
+ * rotates map object "door02" about Y by 0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(door02_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door02"), 0, LW(0), 0)
@@ -101,6 +117,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Runs when Mario steps on the red switch: slides the bar grid ori02 up with its sound, waits,
+ * slides it back down and shakes the camera when it lands, while its hit areas follow it.
+ */
 EVT_BEGIN(evt_ori_open)
     SET_VALUE(LW(0), 0)
     SET_VALUE(LW(1), 2)
@@ -143,6 +163,13 @@ EVT_BEGIN(evt_ori_open)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene run when Mario comes into gon_06 at the STORY_STG1_13_A_SUSPICIOUS_ROOM step, that is,
+ * after escaping the spiked ceiling trap set off in gon_07:
+ * he and the partner walk in through the door, the partner speaks (stg1_gon_18_00), Mario nods,
+ * the music resumes and the story moves to STORY_STG1_13_01_50_SECONDS_TO_ESCAPE.
+ * Guess: tsuritenjo (hanging ceiling) names that trap.
+ */
 EVT_BEGIN(tsuritenjo_event)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envoff, PSND_FADE_OUT)
@@ -196,6 +223,10 @@ EVT_BEGIN(tsuritenjo_event)
     RETURN
 EVT_END()
 
+/**
+ * Message callback for the chest's lines: switches the chest between its talking (A_2)
+ * and idle (S_1) animations as the text reaches the marked points.
+ */
 static void majin_callback(s32 type) {
     MapObjectEntry* mobj = mobjNameToPtr("box");
 
@@ -210,6 +241,7 @@ static void majin_callback(s32 type) {
     }
 }
 
+/** Script helper: blocks until the lecture/cutscene music (BGM channel 1) has actually started. */
 static USER_FUNC(bgm_start_wait) {
     return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
@@ -218,6 +250,11 @@ static s32 key_tbl[] = {
     ITEM_BLACK_KEY_0x22, -1,
 };
 
+/**
+ * Pre-open event of the black chest ("box"): the chest swings and speaks to Mario (stg1_gon_12_01 to _07)
+ * while Mario reacts, and once Mario carries the Black Key (ITEM_BLACK_KEY_0) the chest takes it (stg1_gon_12_08
+ * to _11) and opens. GSWF_GON06_BLACK_CHEST_TALKED makes the first talk play only once.
+ */
 static EVT_BEGIN(evt_majin)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -333,6 +370,14 @@ static EVT_BEGIN(evt_majin)
     RETURN
 EVT_END()
 
+/**
+ * Event after the black chest is opened: Mario receives the Paper Curse item (ITEM_PAPER_CURSE),
+ * the Paper Mage's music starts and the Paper Mage appears from the paper image OFF_d_kusya
+ * and gives his lecture (slit_majin_lecture), then leaves.
+ * The story advances to STORY_STG1_13_01_01_PAPER_MAGE_2 (or STORY_STG1_13_A_SUSPICIOUS_ROOM if it is already
+ * past that), the bero case and ceiling events are started,
+ * five Dry Bones NPCs (KRN_Z_2) are entered in the cell and the red cell switch (mobj_switch1) is placed.
+ */
 static EVT_BEGIN(evt_majin2)
     CALL(evt_npc_change_fbat_mode, 7)
     CALL(evt_npc_stop_for_event)
@@ -410,6 +455,11 @@ static EVT_BEGIN(evt_majin2)
     RETURN
 EVT_END()
 
+/**
+ * Map init for gon_06: sets up the doors, six dormant Dry Bones, the red switch for the bar grid,
+ * the Attack FX R badge, and the black chest (box) that speaks to Mario and holds the Paper Curse;
+ * once the story is past STORY_STG1_13_01_01_PAPER_MAGE_2 the chest counts as already opened.
+ */
 EVT_BEGIN(gon_06_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)

@@ -16,6 +16,10 @@
 #include "driver/mapdrv.h"
 #include "mario/mario.h"
 
+/**
+ * Decoration loop for the chapter title scene: every 0.3 to 0.8 seconds a random "balloon_heiho_n64" balloon
+ * effect floats out from a point near the tou_enkei1 arena object.
+ */
 static EVT_BEGIN(evt_tou_balloon)
     CALL(evt_mapobj_get_position, STRING("tou_enkei1"), LW(13), LW(14), LW(15))
     SUBTRACT(LW(14), 20)
@@ -42,6 +46,10 @@ static EVT_BEGIN(evt_tou_balloon)
     RETURN
 EVT_END()
 
+/**
+ * Guess: chapter 3 title sequence, first part: the blimp rises past the camera
+ * and the script changes to the title map sys_01 ("stg_3").
+ */
 EVT_BEGIN(evt_anim)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("tou_enkei1"), MAPOBJ_FLAG_HIDE)
     BEGIN_INLINE_EVENT
@@ -70,6 +78,10 @@ static f32 spline_dt[] = {
     3982.0f,
 };
 
+/**
+ * Guess: chapter 3 title sequence: Mario and the partner are hidden
+ * while the blimp flies along a spline path (spline_dt), and the script then changes map to tou_00.
+ */
 EVT_BEGIN(evt_anim2)
     CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_HIDDEN)
     CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 1)
@@ -119,6 +131,10 @@ EVT_BEGIN(evt_anim2)
     RETURN
 EVT_END()
 
+/**
+ * Map init for tou_20, the chapter title scene:
+ * locks controls, plays the light and jet animations, positions the camera and starts the blimp flight.
+ */
 EVT_BEGIN(tou_20_init_evt)
     CALL(evt_snd_envoff, PSND_FADE_OUT)
     CALL(evt_mario_key_onoff, 0)

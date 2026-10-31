@@ -367,6 +367,10 @@ BattleWeapon weapon_atmic_teresa_breath = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init event of the Atomic Boo: installs wait, attack and damage events and the default confusion event,
+ * registers its battle id (atmic_teresa_id_set) and runs teresa_entry, which sets up the boss.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -378,6 +382,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Atomic Boo: runs the default damage handling. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -385,6 +390,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the Atomic Boo: uses an enemy item if it has one.
+ * While its face is visible (unit work 0 is 0) it picks 30/70 kaokakusi_event (hides its face),
+ * 20/70 press_event and 20/70 bikkuri_event; while its face is hidden it picks 50/50 between surprise_event
+ * and breath_event.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -429,6 +440,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Battle script: the Atomic Boo hides its face (a Boo habit):
+ * it swoops down a little, turns its back to the party and hides,
+ * which sets unit work 0 to 1 and switches to the face-hiding pose table.
+ */
 EVT_BEGIN(kaokakusi_event)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_ATMTLSA_MOVE2"), EVT_NULLPTR, 0, LW(15))
@@ -455,6 +471,10 @@ EVT_BEGIN(kaokakusi_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script "press": the Atomic Boo targets the party, rises and dives to the left of the stage,
+ * then drops straight down onto the targets with a camera shake, dealing 4 damage with its press weapon.
+ */
 EVT_BEGIN(press_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_atmic_teresa_press))
@@ -537,6 +557,10 @@ EVT_BEGIN(press_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script "surprise": the Atomic Boo hides its face, then lunges at the target from behind;
+ * hits with the surprise weapon.
+ */
 EVT_BEGIN(surprise_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_atmic_teresa_surprise))
@@ -625,6 +649,10 @@ EVT_BEGIN(surprise_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script "bikkuri": eight small Boos pop out one after another around the target (teresa_appear_bikkuri),
+ * the camera homes in on the target and the Boos rush it together; uses the bikkuri weapon.
+ */
 EVT_BEGIN(bikkuri_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_atmic_teresa_bikkuri))
@@ -719,6 +747,12 @@ EVT_BEGIN(bikkuri_event)
     RETURN
 EVT_END()
 
+/**
+ * The Atomic Boo's breath attack (weapon_atmic_teresa_breath):
+ * it turns its back, swoops down, spins round and reveals its face,
+ * then blows on every enemy at once (breath_event_sub is spawned per target) for about two seconds with
+ * SFX_BOSS_ATMTLSA_BLOW2. A whistle and three puffs of smoke follow before it settles back.
+ */
 static EVT_BEGIN(breath_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_atmic_teresa_breath))
@@ -784,6 +818,11 @@ static EVT_BEGIN(breath_event)
     RETURN
 EVT_END()
 
+/**
+ * Sub-script for one target of the Atomic Boo's breath attack:
+ * checks whether the breath would hit, plays the avoid animation (38, 39 or 40) when the target dodges,
+ * or applies the damage.
+ */
 EVT_BEGIN(breath_event_sub)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_atmic_teresa_breath), 0, LW(5))
     SWITCH(LW(5))
@@ -823,6 +862,7 @@ EVT_BEGIN(breath_event_sub)
     RETURN
 EVT_END()
 
+/** Wait (idle) event of the Atomic Boo: shows the idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -862,6 +902,10 @@ ExtTexInfo teresa_ext_entry_data[] = {
     {0},
 };
 
+/**
+ * Battle-start script: creates the hidden "ext_teresa" NPC
+ * and registers the 30-sprite small-Boo effect (init and per- frame update callbacks).
+ */
 EVT_BEGIN(teresa_entry)
     CALL(evt_npc_entry, STRING("ext_teresa"), STRING("c_teresa"))
     CALL(evt_npc_set_position, STRING("ext_teresa"), 0, -1000, 0)
@@ -869,6 +913,7 @@ EVT_BEGIN(teresa_entry)
     RETURN
 EVT_END()
 
+/** Init callback of the small-Boo effect: allocates the state for 30 Boos and hides them below the floor. */
 static void teresa_ext_init(void) {
     s32 i;
     ExtdrvPose* pose = extGetPosePtr();
@@ -891,6 +936,11 @@ static void teresa_ext_init(void) {
     }
 }
 
+/**
+ * Per-frame update of the 30 small Boos: runs each Boo's state machine for the bikkuri attack (8 Boos appear at
+ * staggered times and move toward the target) and the breath attack (all 30 stream out of the Atomic Boo),
+ * with scaling and animation frames.
+ */
 static void teresa_ext_main(void) {
     s32 i;
     s32 j;
@@ -1234,6 +1284,10 @@ static void teresa_ext_main(void) {
     dispEntry(4, 0.0f, 1, teresa_ext_disp, NULL);
 }
 
+/**
+ * Draw callback of the small-Boo effect: loads the render setup, vertices,
+ * textures and TEV setup and draws the sprites.
+ */
 static void teresa_ext_disp(CameraId camera, void* param) {
     extLoadRenderMode();
     extLoadVertex();
@@ -1243,6 +1297,10 @@ static void teresa_ext_disp(CameraId camera, void* param) {
     extLoadTextureExit();
 }
 
+/**
+ * Battle script helper: remembers the Atomic Boo's battle unit id (translated from args[0]) in a global for the
+ * effect callbacks.
+ */
 static USER_FUNC(atmic_teresa_id_set) {
     s32 id = evtGetValue(event, event->args[0]);
 
@@ -1250,6 +1308,10 @@ static USER_FUNC(atmic_teresa_id_set) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Battle script helper: remembers the attack target's unit id (args[0])
+ * and part id (args[1]) for the effect callbacks.
+ */
 static USER_FUNC(target_id_set) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -1260,6 +1322,7 @@ static USER_FUNC(target_id_set) {
     return EVT_RETURN_DONE;
 }
 
+/** Battle script helper: starts the eight small Boos of the bikkuri attack appearing (state 1). */
 static USER_FUNC(teresa_appear_bikkuri) {
     s32 i;
 
@@ -1269,6 +1332,7 @@ static USER_FUNC(teresa_appear_bikkuri) {
     return EVT_RETURN_DONE;
 }
 
+/** Battle script helper: blocks until all eight small Boos have reached the end of their appear state (15). */
 static USER_FUNC(teresa_wait_bikkuri) {
     s32 i;
 
@@ -1280,6 +1344,10 @@ static USER_FUNC(teresa_wait_bikkuri) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Battle script helper: blocks until all eight small Boos have reached state 30,
+ * then releases them (state 31) and resets the Atomic Boo's scale to 1.
+ */
 static USER_FUNC(teresa_wait_bikkuri2) {
     s32 i;
 
@@ -1295,6 +1363,10 @@ static USER_FUNC(teresa_wait_bikkuri2) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Battle script helper: starts all small Boos of the breath attack;
+ * args[0] of 1 selects state 51, anything else state 52.
+ */
 static USER_FUNC(teresa_appear_breath) {
     s32 type = evtGetValue(event, event->args[0]);
     s32 i;
@@ -1306,6 +1378,10 @@ static USER_FUNC(teresa_appear_breath) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Battle script helper: blocks until all 30 small Boos have reached state 60,
+ * then makes them continue (state 63) after a 30 frame wait.
+ */
 static USER_FUNC(teresa_wait_breath) {
     s32 i;
 
@@ -1322,6 +1398,10 @@ static USER_FUNC(teresa_wait_breath) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Battle script helper: blocks until all 30 small Boos have reached state 70,
+ * then releases them (state 71) and resets the Atomic Boo's scale to 1.
+ */
 static USER_FUNC(teresa_wait_breath2) {
     s32 i;
 

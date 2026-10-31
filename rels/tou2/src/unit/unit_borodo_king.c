@@ -44,6 +44,12 @@ static EvtWord _borodo_steal_attack[610];
 static EvtWord escape_event[115];
 static EvtWord wait_event[26];
 
+/**
+ * Script helper for the Big Bandit's steal attack: arg0 = thief unit, arg1 = victim unit;
+ * arg2/arg3/arg4 receive the stolen item id, icon id and count.
+ * With a 40% chance it takes up to 10 coins, otherwise it takes a random item or badge from Mario's pouch
+ * and equips the victim without it.
+ */
 static USER_FUNC(_steal_item) {
     EvtWord* args = event->args;
     s32 coins;
@@ -344,6 +350,13 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_borodo_king", "c_borodo_g", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
+/**
+ * Init event of the Big Bandit: registers its wait, attack,
+ * damage and confusion events and its run and walk footstep sounds, and picks the pose table:
+ * the one with the loot bag (pose_table_item_have)
+ * when unit flag 0x40000000 (it already holds stolen goods) is set, the plain one otherwise.
+ * Then starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -361,6 +374,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event: runs the default battle damage reaction on the unit itself (part 1). */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -368,10 +382,16 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Phase event of the Big Bandit: does nothing. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the Big Bandit: same as the Bandit's,
+ * but a roll of 0-213 under 75 picks the plain attack (about 35%) and the rest the steal attack.
+ * A Big Bandit already carrying loot runs away with escape_event.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_CheckUnitFlag, BTL_UNIT_SELF, 1073741824, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -400,6 +420,13 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Big Bandit's plain attack: walks around behind the target, then runs at it for a shoulder charge,
+ * stepping with the run sounds.
+ * If the pre-check says a pre-emptive spike stops it (result 5) it still charges in and takes the damage check.
+ * A miss makes it hop past and trot home; a hit knocks the Big Bandit tumbling head over heels away from the
+ * target before it gets up. The weapon is weapon_borodo_attack.
+ */
 static EVT_BEGIN(_borodo_normal_attack)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_borodo_attack))
@@ -533,6 +560,13 @@ static EVT_BEGIN(_borodo_normal_attack)
     RETURN
 EVT_END()
 
+/**
+ * The Big Bandit's steal attack: charges the target like the plain attack.
+ * On a hit where the guard result is 3 or less (GetResultACDefence) it runs _steal_item;
+ * if something was taken it plays the success sound, announces "btl_msg_steal_item_lost",
+ * has the item icon jump away, sets unit flag 0x40000000 and switches to the loot-bag pose table with a laugh.
+ * A failed steal makes it fall over, get up and glare before walking home.
+ */
 static EVT_BEGIN(_borodo_steal_attack)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_borodo_attack))
@@ -688,6 +722,11 @@ static EVT_BEGIN(_borodo_steal_attack)
     RETURN
 EVT_END()
 
+/**
+ * The Big Bandit runs away with its loot: turns its back, hops,
+ * then leaves the screen to x=300 in a blur at speed 9 with the escape sound
+ * and removes itself from the battle (KillUnit).
+ */
 static EVT_BEGIN(escape_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BORODO_WAIT1"), EVT_NULLPTR, 0, LW(15))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("R_3"))
@@ -710,6 +749,10 @@ static EVT_BEGIN(escape_event)
     RETURN
 EVT_END()
 
+/**
+ * Wait event of the Big Bandit: picks the plain or loot-bag pose table by unit flag 0x40000000
+ * and sets the idle pose from it.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_CheckUnitFlag, BTL_UNIT_SELF, 1073741824, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -721,6 +764,11 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 #if VERSION >= VERSION_US
+/**
+ * Revival when the Big Bandit holds a Life Shroom (US and later):
+ * the knocked-out unit spins, uses the item, is cured of all status, recovers HP and gets back up.
+ * LW(10) is the unit, LW(11) the part.
+ */
 EVT_BEGIN(_borodo_king_emergency_revival_event)
     CALL(btlevtcmd_OnUnitFlag, LW(10), 134217728)
     SET_VALUE(LW(0), 48)

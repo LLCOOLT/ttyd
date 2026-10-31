@@ -64,6 +64,11 @@ static HouseParam ie_data;
 static HitDamageReturn hitDmgRetPoints[13];
 static KusaAccess kusa_data[4];
 
+/**
+ * Message callback for the Trouble Center request 8 (irai_08_001) text:
+ * when the text reaches character 9 it clears GF(0),
+ * which releases the parallel thread that puts Mario to sleep (evt_mario_sleep_on) while Mayor Kroop talks.
+ */
 static void iri_08_msg(s32 type, void** work) {
     u16* msg = *work;
 
@@ -72,6 +77,10 @@ static void iri_08_msg(s32 type, void** work) {
     }
 }
 
+/**
+ * Regular script for Koopa G: wanders at random within 100 units of
+ * where he stands (urouro_init_func / urouro_main_func).
+ */
 EVT_BEGIN(nokonoko_G_regl)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     CALL(urouro_init_func, STRING("me"), LW(0), LW(2), FLOAT(100.0f), FLOAT(30.0f), 0)
@@ -79,6 +88,10 @@ EVT_BEGIN(nokonoko_G_regl)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for Koopa G: story-progress dependent chatter (before the Gold Fuzzy,
+ * before the father and son reunite, before Frankly's house, up to the end of chapter 8, and afterwards).
+ */
 EVT_BEGIN(nokonoko_G_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_06_01_GOLD_FUZZY)
@@ -95,6 +108,7 @@ EVT_BEGIN(nokonoko_G_talk)
     RETURN
 EVT_END()
 
+/** Regular script for Koopa H: wanders at random within 100 units of his spot. */
 EVT_BEGIN(nokonoko_H_regl)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     CALL(urouro_init_func, STRING("me"), LW(0), LW(2), FLOAT(100.0f), FLOAT(30.0f), 0)
@@ -102,6 +116,10 @@ EVT_BEGIN(nokonoko_H_regl)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for Koopa H: story-progress dependent chatter;
+ * before Frankly's house he asks a yes/no question and follows up on the answer.
+ */
 EVT_BEGIN(nokonoko_H_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_06_01_GOLD_FUZZY)
@@ -120,6 +138,7 @@ EVT_BEGIN(nokonoko_H_talk)
     RETURN
 EVT_END()
 
+/** Regular script for Koopa I: wanders at random within 100 units of his spot. */
 EVT_BEGIN(nokonoko_I_regl)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     CALL(urouro_init_func, STRING("me"), LW(0), LW(2), FLOAT(100.0f), FLOAT(30.0f), 0)
@@ -127,6 +146,7 @@ EVT_BEGIN(nokonoko_I_regl)
     RETURN
 EVT_END()
 
+/** Talk script for Koopa I: story-progress dependent chatter, same schedule as Koopa G. */
 EVT_BEGIN(nokonoko_I_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_06_01_GOLD_FUZZY)
@@ -143,6 +163,12 @@ EVT_BEGIN(nokonoko_I_talk)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene when Mario first talks to the gatekeeper (monban) after meeting Kroop:
+ * the gatekeeper opens the village gate and Koops, standing outside,
+ * runs in and has a short exchange with Mario and the partner before walking off.
+ * Sets the story to STORY_STG1_03_PETALBURG_GATEKEEPER.
+ */
 EVT_BEGIN(open_gate)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_INTANGIBLE)
     CALL(evt_msg_print, 0, STRING("stg1_nok_28"), 0, STRING("me"))
@@ -201,6 +227,10 @@ EVT_BEGIN(open_gate)
     RETURN
 EVT_END()
 
+/**
+ * Init for the gatekeeper Koopa (門番ノコノコ): once the gate has been opened (STORY_STG1_03 and later) he stands
+ * beside the gate at (370, 0, -76) instead of in front of it.
+ */
 EVT_BEGIN(monban_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_03_PETALBURG_GATEKEEPER)
@@ -210,6 +240,10 @@ EVT_BEGIN(monban_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for the gatekeeper: refuses to open the gate until Mario has spoken with Kroop,
+ * runs open_gate the first time after that, and afterwards has story-progress dependent lines.
+ */
 EVT_BEGIN(monban_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_02_TALKING_WITH_KROOP)
@@ -230,6 +264,11 @@ EVT_BEGIN(monban_talk)
     RETURN
 EVT_END()
 
+/**
+ * Guess: init of Nokotarou (Koops) in the village:
+ * runs the standard NPC init, then, before the Gold Fuzzy (STORY_STG1_06_01),
+ * stands him at (-35, 65, -425) facing 90; after that it sends him off the map to (0, -1000, 0).
+ */
 static EVT_BEGIN(nokotarou_init)
     CALL_CHILD(npc_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -242,6 +281,10 @@ static EVT_BEGIN(nokotarou_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of Nokotarou before he joins: stg1_nok_27 before the talk with Kroop,
+ * _27_01 before the gatekeeper, stg1_nok_31 before the Bald Cleft and _31_01 after.
+ */
 static EVT_BEGIN(nokotarou_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_02_TALKING_WITH_KROOP)
@@ -256,6 +299,10 @@ static EVT_BEGIN(nokotarou_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init for Koops's father (nokopapa): after Hooktail is defeated he moves to a spot by the house at (92, 50,
+ * -308), facing west.
+ */
 EVT_BEGIN(nokopapa_init)
     CALL_CHILD(npc_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -266,6 +313,11 @@ EVT_BEGIN(nokopapa_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for Koops's father.
+ * After Hooktail, the line depends on the chapter
+ * and on whether Koops (party id 2) is currently Mario's partner.
+ */
 EVT_BEGIN(nokopapa_talk)
     CALL(evt_mario_get_party, LW(0))
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -293,6 +345,10 @@ EVT_BEGIN(nokopapa_talk)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for Koopa K. If Trouble Center request 14 is active he gives it the first time he is spoken to and
+ * repeats a reminder afterwards; otherwise story-progress dependent chatter.
+ */
 EVT_BEGIN(nokonoko_K_talk)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 14)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_BASE), 0)
@@ -318,6 +374,12 @@ EVT_BEGIN(nokonoko_K_talk)
     RETURN
 EVT_END()
 
+/**
+ * Mario's first conversation with Mayor Kroop (boss_noko):
+ * Mario jumps back in surprise, then Kroop quizzes him with a string of yes/no questions.
+ * Shows the dialogue with Mario's reaction poses,
+ * and finally sets the story to STORY_STG1_02_TALKING_WITH_KROOP.
+ */
 EVT_BEGIN(boss_noko_open_gate)
     CALL(evt_msg_print, 0, STRING("stg1_nok_37"), 0, STRING("me"))
     CALL(evt_mario_dispflag_onoff, 1, 2)
@@ -374,6 +436,14 @@ static s32 iri_17_item_tbl[] = {
     ITEM_ROUTING_SLIP, -1,
 };
 
+/**
+ * Talk script for Mayor Kroop.
+ * In order of priority: Trouble Center request 8 (he asks for help and gives a Turtley Leaf,
+ * handed over directly if Mario has room, otherwise he hops to a ledge and drops it as a pickup;
+ * the request is then marked solved), request 17 (he takes the Routing Slip from Mario and returns it),
+ * then the story schedule: the first meeting (boss_noko_open_gate), the Sun Stone / Moon Stone errand,
+ * and chatter up to the end of chapter 8. In chapter 7 he gives the white Petalburg hint (JP and later).
+ */
 EVT_BEGIN(boss_noko_talk)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 8)
         CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_INTANGIBLE)
@@ -488,6 +558,11 @@ EVT_BEGIN(boss_noko_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init for Koopie Koo (ノコリン): places her at (-85, 50, -300);
+ * while Koops has joined but she has not yet spoken to him (STORY_STG1_07 up to 17) she stands at (30, 50, -315)
+ * instead.
+ */
 EVT_BEGIN(nokorin_init)
     CALL(evt_npc_set_position, STRING("me"), -85, 50, -300)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_17_FATHER_AND_SON_REUNITED)
@@ -501,6 +576,12 @@ EVT_BEGIN(nokorin_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for Koopie Koo.
+ * Before the Gold Fuzzy she meets Mario, then confides in him;
+ * once Koops is in the party she reacts to him (sets GSWF_NOK01_KOOPIE_KOO_TALKED_TO_KOOPS and hops away);
+ * later chapters have chatter that depends on whether Koops is the active partner.
+ */
 EVT_BEGIN(nokorin_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_06_01_GOLD_FUZZY)
@@ -591,6 +672,11 @@ END_SWITCH
 RETURN
 EVT_END()
 
+/**
+ * Talk script of the first dancer (踊り子１, the red one):
+ * before the Gold Fuzzy the three dancers talk in turn (stg1_nok_34, 35, 36),
+ * afterwards they use the second set (stg1_nok_36_01 to 03).
+ */
 static EVT_BEGIN(odoriko_1_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_06_01_GOLD_FUZZY)
@@ -605,6 +691,10 @@ static EVT_BEGIN(odoriko_1_talk)
     RETURN
 EVT_END()
 
+/**
+ * Entry of the first dancer (踊り子１, model c_dance_r) at (27, 0, 370) facing 270,
+ * with her talk script and the move/talk animations.
+ */
 static EVT_BEGIN(odoriko_1_init)
     SET_VALUE(LW(0), STRING("踊り子１"))
     CALL(evt_npc_entry, LW(0), STRING("c_dance_r"))
@@ -616,6 +706,7 @@ static EVT_BEGIN(odoriko_1_init)
     RETURN
 EVT_END()
 
+/** Talk script of the second dancer (踊り子２, pink): the same three-dancer conversation as odoriko_1_talk. */
 static EVT_BEGIN(odoriko_2_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_06_01_GOLD_FUZZY)
@@ -630,6 +721,10 @@ static EVT_BEGIN(odoriko_2_talk)
     RETURN
 EVT_END()
 
+/**
+ * Entry of the second dancer (踊り子２, model c_dance_p) at (67, 0, 340) facing 270,
+ * with her talk script and the move/talk animations.
+ */
 static EVT_BEGIN(odoriko_2_init)
     SET_VALUE(LW(0), STRING("踊り子２"))
     CALL(evt_npc_entry, LW(0), STRING("c_dance_p"))
@@ -641,6 +736,7 @@ static EVT_BEGIN(odoriko_2_init)
     RETURN
 EVT_END()
 
+/** Talk script of the third dancer (踊り子３, yellow-green): the same three-dancer conversation as odoriko_1_talk. */
 static EVT_BEGIN(odoriko_3_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_06_01_GOLD_FUZZY)
@@ -655,6 +751,10 @@ static EVT_BEGIN(odoriko_3_talk)
     RETURN
 EVT_END()
 
+/**
+ * Entry of the third dancer (踊り子３, model c_dance_k) at (85, 0, 390) facing 270,
+ * with her talk script and the move/talk animations.
+ */
 static EVT_BEGIN(odoriko_3_init)
     SET_VALUE(LW(0), STRING("踊り子３"))
     CALL(evt_npc_entry, LW(0), STRING("c_dance_k"))
@@ -938,6 +1038,12 @@ static HitDamageReturn hitDmgRetPoints[] = {
     {0},
 };
 
+/**
+ * Cutscene after Mario returns from Hooktail: Mario, Koops's father, Koopie Koo,
+ * Kroop and Goombella gather in Petalburg and Koops says goodbye.
+ * Both partners are walked off and deleted, the story becomes STORY_STG1_20_KOOPS_LEAVES,
+ * the party is cleared and control is returned (JP and later also record the respawn position).
+ */
 EVT_BEGIN(nokotarou_tabidachi)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, 0, 142, 453, 0, 47, -86, 0, 11)
@@ -1016,6 +1122,10 @@ EVT_BEGIN(nokotarou_tabidachi)
     RETURN
 EVT_END()
 
+/**
+ * Set-up for nokotarou_tabidachi: creates the Goombella NPC (クリスチーヌ), positions Mario, Koops, his father,
+ * Koopie Koo and the mayor in a line, removes the active partner and starts the scene.
+ */
 EVT_BEGIN(nokotarou_tabidachi_init)
     CALL(evt_npc_entry, STRING("クリスチーヌ"), STRING("c_pkr"))
     CALL(evt_npc_set_anim, STRING("クリスチーヌ"), STRING("PKR_S_1"))
@@ -1039,6 +1149,10 @@ EVT_BEGIN(nokotarou_tabidachi_init)
     RETURN
 EVT_END()
 
+/**
+ * Guess: sets the view matrix of the "yami" (darkness) overlay (envSetYamiView) to look along x from a point
+ * offset by args[0] (a float z), used by the chapter 8 darkness scenes.
+ */
 static USER_FUNC(yami_view) {
     f32 z = evtGetFloat(event, event->args[0]);
     Mtx mtx;
@@ -1048,6 +1162,11 @@ static USER_FUNC(yami_view) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Guess: reaction of one villager (name in LW(0)) in the darkening-world cutscene:
+ * waits until Mario's position GW(0) passes him, stops his regular script,
+ * shows an exclamation bubble and then turns around at random intervals (100 to 499 ms) forever.
+ */
 static EVT_BEGIN(sekai_yami_npc)
     LOOP(0)
         CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
@@ -1071,6 +1190,13 @@ static EVT_BEGIN(sekai_yami_npc)
     RETURN
 EVT_END()
 
+/**
+ * Guess: cutscene of the world going dark (chapter 8, the Shadow Queen's darkness):
+ * locks the controls, hides Mario and the partner,
+ * fades the map and the villagers (mayor, Koopas G, H, I and Nokorin) to dark with the envSetYami callback
+ * while the camera pans (yami_view), plays the world-dark sound,
+ * has the mayor say stg8_dark_01 and then goes to mri_00 (entrance sekai_yami1).
+ */
 static EVT_BEGIN(sekai_yami_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -1144,6 +1270,12 @@ static EVT_BEGIN(sekai_yami_evt)
     RETURN
 EVT_END()
 
+/**
+ * Guess: cutscene of "everyone's voices" in the chapter 8 finale:
+ * Mario and the partner are hidden, the mayor, Koops's father and Nokorin are placed in the dark village,
+ * a Crystal Star-like "starstone" rises and turns in the sky while the camera moves,
+ * and the mayor and Koops's father speak the stg8_las_148 lines before the scene moves on.
+ */
 static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -1254,6 +1386,11 @@ static EVT_BEGIN(minnnanokoe_evt)
     RETURN
 EVT_END()
 
+/**
+ * Guess: hides the pipe object S_dakan and disables its collision A_dokan
+ * unless GSWF_TIK16_PIPE_NOK_OPEN is set, i.e. until the pipe to the Rogueport Sewers has been opened from the
+ * other side.
+ */
 static EVT_BEGIN(evt_switch_init)
     IF_INT_EQUAL(GSWF(GSWF_TIK16_PIPE_NOK_OPEN), 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_dakan"), MAPOBJ_FLAG_HIDE)
@@ -1262,12 +1399,22 @@ static EVT_BEGIN(evt_switch_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script used at the E3 kiosk demo (when GLOBAL_FLAG_KIOSK is set):
+ * prints the "nok_01_for_E3" message and warps to kpa_02.
+ */
 EVT_BEGIN(e3_talk)
     CALL(evt_msg_print, 0, STRING("nok_01_for_E3"), 0, 0)
     CALL(evt_bero_mapchange, STRING("kpa_02"), 0)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: turns on a TEV callback material flag of an NPC's model.
+ * args[0] is the NPC name, args[1] the callback number (low four bits).
+ * Guess: used to light up the villagers during the chapter 8 darkness scenes.
+ * Does nothing if the NPC does not exist.
+ */
 static USER_FUNC(anim_tevcallback) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1281,6 +1428,10 @@ static USER_FUNC(anim_tevcallback) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: creates a star stone effect (effStarStoneEntry) at position args[1..3] (floats)
+ * and registers it under the effect name args[0] so later helpers can find it.
+ */
 static USER_FUNC(starstone_entry) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1292,6 +1443,7 @@ static USER_FUNC(starstone_entry) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: moves the star stone effect named args[0] to the position args[1..3] (floats). */
 static USER_FUNC(starstone_set_pos) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1306,6 +1458,7 @@ static USER_FUNC(starstone_set_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: sets the Y rotation of the star stone effect named args[0] to args[1] (float, degrees). */
 static USER_FUNC(starstone_set_ry) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1315,6 +1468,10 @@ static USER_FUNC(starstone_set_ry) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Guess: creates the epilogue's extra NPC クリスチーヌ (Christine, model c_pkr) at (-200, 0, -65) facing 90,
+ * intangible, and moves Koopa H off the map.
+ */
 static EVT_BEGIN(epilogue_npc_entry)
     CALL(evt_npc_entry, STRING("クリスチーヌ"), STRING("c_pkr"))
     CALL(evt_npc_set_tribe, STRING("クリスチーヌ"), STRING("クリスチーヌ"))
@@ -1325,6 +1482,11 @@ static EVT_BEGIN(epilogue_npc_entry)
     RETURN
 EVT_END()
 
+/**
+ * Guess: choreography run beside the epilogue: Nokotarou, Nokorin, Christine and the others turn,
+ * talk and walk across the village (the animations PNK_*, T_1, PKR_*), the father and the mayor walk in,
+ * and Christine takes part in the conversation.
+ */
 static EVT_BEGIN(epilogue_evt_sub)
     CALL(evt_npc_set_anim, STRING("ノコタロウ"), STRING("PNK_T_1"))
     WAIT_MS(1000)
@@ -1384,6 +1546,11 @@ static EVT_BEGIN(epilogue_evt_sub)
     RETURN
 EVT_END()
 
+/**
+ * Guess: epilogue cutscene in Petalburg: fades out the music, positions Nokotarou, Nokorin,
+ * Koops's father and the mayor, runs epilogue_evt_sub, prints ep_38, then starts a battle with Koopa H,
+ * and after it fades out and changes to tou_08.
+ */
 static EVT_BEGIN(epilogue_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_NOK1"))
     CALL(evt_snd_bgm_scope, 0, 1)
@@ -1421,6 +1588,12 @@ static EVT_BEGIN(epilogue_evt)
     RETURN
 EVT_END()
 
+/**
+ * Guess: re-creates the Turtley Leaf of bush 4 at (-407, 70, -160) when the leaf slot LSW(1) is 0
+ * and the leaf object was collected (evt_item_delete_check);
+ * the item launches out of the bush and sets LSWF(4) when picked up.
+ * In the US demo and earlier it appears at z = -148 instead.
+ */
 static EVT_BEGIN(evt_kusa_4)
     IF_INT_NOT_EQUAL(LSW(1), 0)
         RETURN
@@ -1436,6 +1609,10 @@ static EVT_BEGIN(evt_kusa_4)
     RETURN
 EVT_END()
 
+/**
+ * Guess: re-creates the Turtley Leaf of bush 5 at (-452, 70, -160) when the leaf slot LSW(1) is 1;
+ * same behaviour as evt_kusa_4.
+ */
 static EVT_BEGIN(evt_kusa_5)
     IF_INT_NOT_EQUAL(LSW(1), 1)
         RETURN
@@ -1451,6 +1628,10 @@ static EVT_BEGIN(evt_kusa_5)
     RETURN
 EVT_END()
 
+/**
+ * Guess: re-creates the Turtley Leaf of bush 6 at (-362, 70, -160) when the leaf slot LSW(1) is 2;
+ * same behaviour as evt_kusa_4.
+ */
 static EVT_BEGIN(evt_kusa_6)
     IF_INT_NOT_EQUAL(LSW(1), 2)
         RETURN
@@ -1473,6 +1654,14 @@ static KusaAccess kusa_data[] = {
     {4, NULL, NULL, NULL},
 };
 
+/**
+ * Map init script for nok_01: loads the entrances and music (the quiet village theme,
+ * or the dark chapter 8 finale tracks when entering through "sekai_yami1" or "minnnanokoe"), spawns the NPCs,
+ * the dancers (from Petal Meadows until the father and son reunite), the house doors, the gate state,
+ * grass and the star piece panel, the Mega Rush P badge and the Turtley Leaf, butterflies, and the pipe switch.
+ * Entering through "nokotarou" heals Mario and the partners and starts the Koops goodbye scene;
+ * the chapter 8 finale and epilogue scenes are started here too.
+ */
 EVT_BEGIN(nok_01_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)

@@ -95,10 +95,12 @@ static void hitObjGetPosSub(HitEntry* hit, Vec* position, s32* counter, BOOL rec
 static void hitDamageReturnSet(HitEntry* hit, HitDamageReturn* damage, BOOL recursion);
 s32 hitGetEntNum(HitEntry* hitObject);
 
+/** Boot setup for the collision driver; empty, all state lives with the loaded maps. */
 void hitInit(void) {
     ; // stubbed in retail
 }
 
+/** Frees the collision objects and their triangle lists of every loaded map, e.g. before a map change. */
 void hitReInit(void) {
     MapEntry* entry;
     MapWork* wp;
@@ -123,7 +125,7 @@ void hitReInit(void) {
     }
 }
 
-// This function is cursed, managed to hit 99% - https://decomp.me/scratch/FjwSA
+/** This function is cursed, managed to hit 99% - https://decomp.me/scratch/FjwSA */
 static HitEntry* _hitEnt(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, s32 mapIndex) {
     MapWork* wp = mapGetWork();
     HitEntry* hit = wp->entries[mapIndex].hitEntries;
@@ -211,6 +213,10 @@ static HitEntry* _hitEnt(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, s
     return hit;
 }
 
+/**
+ * Builds collision objects for joint and its children (and, unless ignoreSiblings,
+ * its following siblings) below parent, recursively; returns the object for joint.
+ */
 static HitEntry* hitEntrySub(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, BOOL ignoreSiblings, s32 mapIndex) {
     HitEntry* entry = _hitEnt(joint, parent, parentMtx, mapIndex);
     if (joint->child != NULL) {
@@ -222,6 +228,11 @@ static HitEntry* hitEntrySub(MapFileJoint* joint, HitEntry* parent, Mtx parentMt
     return entry;
 }
 
+/**
+ * Builds the collision objects for a whole map model from its root joint,
+ * allocating room for its joints plus 128 spare objects (used by the map objects added later).
+ * Called by the map driver when map mapIndex loads.
+ */
 HitEntry* hitEntry(MapFileJoint* root, Mtx rootMtx, s32 mapIndex) {
     MapWork* wp = mapGetWork();
     u32 size;
@@ -233,6 +244,10 @@ HitEntry* hitEntry(MapFileJoint* root, Mtx rootMtx, s32 mapIndex) {
     return hitEntrySub(root, NULL, rootMtx, TRUE, mapIndex);
 }
 
+/**
+ * Adds collision objects for a map object's model (a block, switch or other mobj) to map 0,
+ * using the spare room hitEntry reserved.
+ */
 HitEntry* hitEntryMOBJ(MapFileJoint* joint, Mtx mtx) {
     MapWork* wp = mapGetWork();
 
@@ -245,8 +260,10 @@ typedef struct HitAnimJointList {
     void* joints[1];
 } HitAnimJointList;
 
-// Builds the list of hit objects the checks walk (hitActiveListTop). The demo has no active list: hit objects
-// without parts are flagged 0x8000 and skipped by the checks.
+/**
+ * Builds the list of hit objects the checks walk (hitActiveListTop).
+ * The demo has no active list: hit objects without parts are flagged 0x8000 and skipped by the checks.
+ */
 inline void hitPreCheck(void) {
     MapEntry* entry;
     s32 i;
@@ -287,6 +304,7 @@ inline void hitPreCheck(void) {
     }
 #endif
 }
+/** hitNameToPtr without its NULL check: the first live collision object named name in any loaded map, or NULL. */
 inline HitEntry* hitNameToPtrNoChk(const char* name) {
     MapWork* wp = mapGetWork();
     MapEntry* map;
@@ -305,6 +323,10 @@ inline HitEntry* hitNameToPtrNoChk(const char* name) {
     return NULL;
 }
 
+/**
+ * Removes the collision object named name: it is flagged deleted (0x80) and the checks skip it from then on;
+ * the JP and later releases also rebuild the active list.
+ */
 void hitDelete(const char* name) {
     MapWork* wp = mapGetWork();
     s32 j;
@@ -328,6 +350,11 @@ void hitDelete(const char* name) {
     }
 }
 
+/**
+ * Once per frame: rebuilds the list of collision objects the checks walk,
+ * applies the current frame of every playing map animation to the collision objects it moves,
+ * and recomputes the world matrices and triangles of the maps that changed.
+ */
 void hitMain(void) {
     void** joints;
     MapEntry* entry;
@@ -380,6 +407,7 @@ static void hitFlgOff(HitEntry* hit, u16 mask, s32 r);
 static void hitAtrOn(HitEntry* hit, u32 mask, s32 r);
 static void hitAtrOff(HitEntry* hit, u32 mask, s32 r);
 
+/** Sets flag bits mask on the collision object named name (reports a map error if there is none). */
 void hitObjFlagOn(const char* name, u16 mask) {
     HitEntry* hit = hitNameToPtr(name);
     if (hit == NULL) {
@@ -389,6 +417,7 @@ void hitObjFlagOn(const char* name, u16 mask) {
     hit->flags |= mask;
 }
 
+/** Clears flag bits mask on the collision object named name. */
 void hitObjFlagOff(const char* name, u16 mask) {
     HitEntry* hit = hitNameToPtr(name);
     if (hit == NULL) {
@@ -398,6 +427,7 @@ void hitObjFlagOff(const char* name, u16 mask) {
     hit->flags &= ~mask;
 }
 
+/** Sets flag bits mask on hit and all its descendants, and on its following siblings too when r is set. */
 static void hitFlgOn(HitEntry* hit, u16 mask, s32 r) {
     hit->flags |= mask;
     if (hit->child != NULL) {
@@ -408,6 +438,7 @@ static void hitFlgOn(HitEntry* hit, u16 mask, s32 r) {
     }
 }
 
+/** Clears flag bits mask on hit and all its descendants, and on its following siblings too when r is set. */
 static void hitFlgOff(HitEntry* hit, u16 mask, s32 r) {
     hit->flags &= ~mask;
     if (hit->child != NULL) {
@@ -418,6 +449,10 @@ static void hitFlgOff(HitEntry* hit, u16 mask, s32 r) {
     }
 }
 
+/**
+ * Sets flag bits mask on the collision object named name and everything below it,
+ * e.g. to turn off the collision of a whole group.
+ */
 void hitGrpFlagOn(const char* name, u16 mask) {
     HitEntry* hit = hitNameToPtr(name);
     if (hit == NULL) {
@@ -427,6 +462,7 @@ void hitGrpFlagOn(const char* name, u16 mask) {
     hitFlgOn(hit, mask, 0);
 }
 
+/** Clears flag bits mask on the collision object named name and everything below it. */
 void hitGrpFlagOff(const char* name, u16 mask) {
     HitEntry* hit = hitNameToPtr(name);
     if (hit == NULL) {
@@ -436,6 +472,7 @@ void hitGrpFlagOff(const char* name, u16 mask) {
     hitFlgOff(hit, mask, 0);
 }
 
+/** Sets attribute bits mask (surface kinds the checks filter on) on the collision object named name. */
 void hitObjAttrOn(const char* name, u32 mask) {
     HitEntry* hit = hitNameToPtr(name);
     if (hit == NULL) {
@@ -445,6 +482,7 @@ void hitObjAttrOn(const char* name, u32 mask) {
     hit->attributes |= mask;
 }
 
+/** Clears attribute bits mask on the collision object named name. */
 void hitObjAttrOff(const char* name, u32 mask) {
     HitEntry* hit = hitNameToPtr(name);
     if (hit == NULL) {
@@ -454,6 +492,7 @@ void hitObjAttrOff(const char* name, u32 mask) {
     hit->attributes &= ~mask;
 }
 
+/** Sets attribute bits mask on hit and all its descendants, and on its following siblings too when r is set. */
 static void hitAtrOn(HitEntry* hit, u32 mask, s32 r) {
     hit->attributes |= mask;
     if (hit->child != NULL) {
@@ -464,6 +503,7 @@ static void hitAtrOn(HitEntry* hit, u32 mask, s32 r) {
     }
 }
 
+/** Clears attribute bits mask on hit and all its descendants, and on its following siblings too when r is set. */
 static void hitAtrOff(HitEntry* hit, u32 mask, s32 r) {
     hit->attributes &= ~mask;
     if (hit->child != NULL) {
@@ -474,6 +514,7 @@ static void hitAtrOff(HitEntry* hit, u32 mask, s32 r) {
     }
 }
 
+/** Sets attribute bits mask on the collision object named name and everything below it. */
 void hitGrpAttrOn(const char* name, u32 mask) {
     HitEntry* hit = hitNameToPtr(name);
     if (hit == NULL) {
@@ -483,6 +524,7 @@ void hitGrpAttrOn(const char* name, u32 mask) {
     hitAtrOn(hit, mask, 0);
 }
 
+/** Clears attribute bits mask on the collision object named name and everything below it. */
 void hitGrpAttrOff(const char* name, u32 mask) {
     HitEntry* hit = hitNameToPtr(name);
     if (hit == NULL) {
@@ -492,6 +534,10 @@ void hitGrpAttrOff(const char* name, u32 mask) {
     hitAtrOff(hit, mask, 0);
 }
 
+/**
+ * Moves collision object hit (and everything below it) to parent matrix mtx:
+ * recomputes its world matrix, triangles and bounding radius. Used when a map object or bound joint moves.
+ */
 void hitReCalcMatrix(HitEntry* hit, Mtx mtx) {
     Vec world;
 
@@ -501,6 +547,10 @@ void hitReCalcMatrix(HitEntry* hit, Mtx mtx) {
     hit->radius = PSVECDistance(&world, &hit->centerWorld);
 }
 
+/**
+ * Recomputes world matrices and triangles down the tree from hit for the objects flagged dirty (0x40)
+ * and everything below them, applying an animation matrix (0x10) or a bound map object's transform (0x20).
+ */
 static void hitReCalcMatrix2(HitEntry* hit, Mtx mtx, BOOL recursion) {
     int doCalc;
 
@@ -539,10 +589,15 @@ static void hitReCalcMatrix2(HitEntry* hit, Mtx mtx, BOOL recursion) {
     }
 }
 
+/** Reads a fixed-point vertex component through the GQR the map vertex data uses. */
 static inline f32 hitDequant(s16* base, s32 idx) {
     return __OSs16tof32(base + idx);
 }
 
+/**
+ * Transforms all of hit's map triangles to world space and stores each with its edges and normal;
+ * returns how many have a non-zero normal.
+ */
 static s32 hitCalcVtxPosition(HitEntry* hit) {
     s32 i;
     Vec a;
@@ -662,6 +717,11 @@ static s32 hitCalcVtxPosition(HitEntry* hit) {
     return count;
 }
 
+/**
+ * Ray test for a straight-down ray against one triangle, using its XZ projection:
+ * on a hit closer than the best so far it stores the distance,
+ * hit point and normal (flipped to face the ray) in query. Single-sided triangles only count from the front.
+ */
 inline BOOL tempfunc(HitCheckQuery* query, HitVector* vector) {
     Vec toV0;
     Vec toV1;
@@ -721,6 +781,10 @@ inline BOOL tempfunc(HitCheckQuery* query, HitVector* vector) {
     return 1;
 }
 
+/**
+ * Like tempfunc, for a straight-up ray (ceilings):
+ * stores the distance, hit point and facing normal in query on a closer hit.
+ */
 inline BOOL tempfunc2(HitCheckQuery* query, HitVector* vector) {
     Vec toV0;
     Vec toV1;
@@ -777,6 +841,11 @@ inline BOOL tempfunc2(HitCheckQuery* query, HitVector* vector) {
     return 1;
 }
 
+/**
+ * Ray test for a ray in any direction against one triangle:
+ * on a hit within range and closer than the best so far stores the distance,
+ * hit point and facing normal in query.
+ */
 inline BOOL tempfunc3(HitCheckQuery* query, HitVector* vector) {
     Vec toV0;
     Vec toV1;
@@ -845,7 +914,7 @@ inline BOOL tempfunc3(HitCheckQuery* query, HitVector* vector) {
 }
 
 #if VERSION <= VERSION_DEMO_US
-// The demo walks every map entry's hit objects (no active list) and has no separate straight-up case.
+/** The demo walks every map entry's hit objects (no active list) and has no separate straight-up case. */
 HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) {
     HitVector* vector2;
     HitVector* vector3;
@@ -986,6 +1055,13 @@ HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) {
     return &map[mapIdx].hitEntries[hitIdx];
 }
 #else
+/**
+ * Casts the ray in query (targetPos, targetDir, targetDistance) against every collision object on the active
+ * list that callback accepts, skipping objects whose bounding sphere is out of reach,
+ * and returns the closest object hit with its point, normal and distance in query; NULL if nothing is hit.
+ * Horizontal, straight-down and straight-up rays use the cheaper special-case tests.
+ * The demo version above walks every object instead.
+ */
 HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) { // 1:1
     f32 temp;
     HitVector* vector;
@@ -1153,6 +1229,10 @@ HitEntry* hitCheckFilter(HitFilterCallback callback, f32* hitX, f32* hitY, f32* 
     return entry;
 }
 
+/**
+ * Ray test for a horizontal ray against one triangle (walls):
+ * on a hit closer than the best so far stores the distance, hit point and facing normal in query.
+ */
 static BOOL checkTriVec_xz(HitCheckQuery* query, HitVector* vector) {
     Vec v1, v2, v3;
     f32 cosAngle;
@@ -1229,6 +1309,7 @@ static BOOL checkTriVec_xz(HitCheckQuery* query, HitVector* vector) {
     return TRUE;
 }
 
+/** Tells whether the horizontal ray in query hits any triangle of collision object entry. */
 BOOL hitCheckVecHitObjXZ(HitCheckQuery* query, HitEntry* entry) { // 1:1
     int i;
     HitVector* vector;
@@ -1248,6 +1329,7 @@ BOOL hitCheckVecHitObjXZ(HitCheckQuery* query, HitEntry* entry) { // 1:1
     return 0;
 }
 
+/** hitCheckAttr's filter: accepts collision objects that have none of the attribute bits in query->user0. */
 static BOOL chkFilterAttr(HitCheckQuery* query, HitEntry* entry) { // 1:1
     return (entry->attributes & query->user0) == 0;
 }
@@ -1361,6 +1443,7 @@ HitEntry* hitCheckSphereFilter(HitFilterCallback callback, f32 x, f32 y, f32 z,
     return &map->hitEntries[objectId];
 }
 
+/** Returns the live (not deleted) collision object named name in any loaded map, or NULL (also for a NULL name). */
 HitEntry* hitNameToPtr(const char* name) { // 1:1
     MapEntry* map;
     MapWork* wp = mapGetWork();
@@ -1384,6 +1467,10 @@ HitEntry* hitNameToPtr(const char* name) { // 1:1
     return NULL;
 }
 
+/**
+ * Adds the world centres of the leaf objects below hit (and of its following siblings when recursing) to
+ * position and counts them.
+ */
 static void hitObjGetPosSub(HitEntry* hit, Vec* position, s32* counter, BOOL recursion) { // 1:1, awful inlining
     Vec center;
 
@@ -1401,6 +1488,10 @@ static void hitObjGetPosSub(HitEntry* hit, Vec* position, s32* counter, BOOL rec
     }
 }
 
+/**
+ * Stores in position the average centre of the collision object named name and its leaf objects,
+ * e.g. to place an effect or Mario on it; the origin if there is no such object.
+ */
 void hitObjGetPos(const char* name, Vec* position) { // 1:1
     Vec sum;
     s32 counter;
@@ -1417,6 +1508,10 @@ void hitObjGetPos(const char* name, Vec* position) { // 1:1
     PSVECScale(&sum, position, 1.0f / (f32)counter);
 }
 
+/**
+ * Stores the normal of the first triangle of the collision object named name, normalised;
+ * leaves normal unchanged if the object has no geometry.
+ */
 void hitObjGetNormal(const char* name, Vec* normal) { // 1:1
     HitEntry* hit;
 
@@ -1427,6 +1522,7 @@ void hitObjGetNormal(const char* name, Vec* normal) { // 1:1
 }
 
 #if VERSION <= VERSION_DEMO_US
+/** Returns hit's joint name, or NULL for NULL (the demo has no range check). */
 const char* hitGetName(HitEntry* hit) {
     if (hit != NULL) {
         return hit->joint->name;
@@ -1434,6 +1530,11 @@ const char* hitGetName(HitEntry* hit) {
     return NULL;
 }
 #else
+/**
+ * Returns hit's joint name (what cases and scripts compare against), or NULL for NULL.
+ * The JP and later releases first check that hit lies inside a loaded map's collision table and return NULL
+ * otherwise.
+ */
 const char* hitGetName(HitEntry* hit) { // 1:1
     MapEntry* map;
     s32 count;
@@ -1460,10 +1561,15 @@ const char* hitGetName(HitEntry* hit) { // 1:1
 }
 #endif
 
+/** Returns hit's attribute bits, 0 for NULL. */
 s32 hitGetAttr(HitEntry* hit) { // 1:1
     return hit != NULL ? hit->attributes : 0;
 }
 
+/**
+ * Marks hit and its descendants (and following siblings when recursing) as a damaging surface (attribute
+ * 0x40000000) with damage as its return point. Guess: hazards such as spikes, lava or pits.
+ */
 static void hitDamageReturnSet(HitEntry* hit, HitDamageReturn* damage, BOOL recursion) { // 1:1
     hit->attributes |= 0x40000000;
     hit->damage = damage;
@@ -1477,6 +1583,10 @@ static void hitDamageReturnSet(HitEntry* hit, HitDamageReturn* damage, BOOL recu
     }
 }
 
+/**
+ * Marks the collision object named name and everything below it as a damaging surface using damage (the spot
+ * Mario is put back at afterwards, given as a map object and position).
+ */
 void hitGrpDamageReturnSet(const char* name, HitDamageReturn* damage) { // 1:1
     HitEntry* hit;
 
@@ -1486,10 +1596,16 @@ void hitGrpDamageReturnSet(const char* name, HitDamageReturn* damage) { // 1:1
     }
 }
 
+/** Returns the position Mario is put back at after touching damaging surface hit. */
 Vec* hitGetDamageReturnPos(HitEntry* hit) {
     return &hit->damage->position;
 }
 
+/**
+ * Ties the collision object hitName to map object mapobjName,
+ * so it follows that object's transform when the object moves (hitBindUpdate);
+ * reports a map error for a missing name.
+ */
 void hitBindMapObj(const char* hitName, const char* mapobjName) {
     HitEntry* hit;
     MapObject* mapObj;
@@ -1508,6 +1624,7 @@ void hitBindMapObj(const char* hitName, const char* mapobjName) {
     hit->flags |= 0x20;
 }
 
+/** Recomputes the collision object name after its bound map object moved (only if it was bound by hitBindMapObj). */
 void hitBindUpdate(const char* name) {
     HitEntry* parent;
     HitEntry* hit;
@@ -1529,6 +1646,8 @@ void hitBindUpdate(const char* name) {
     }
 }
 /*
+// Counts the triangles in hit's map meshes (the size of its triangle list). Unused and stripped from the game; kept
+// here as a reference.
 s32 hitGetEntNum(HitEntry* hit) {
     s32 numVectors;
     s32 i, j;

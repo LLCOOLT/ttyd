@@ -21,6 +21,11 @@ static char* TevRegNames[8] = {0};
 #define SOME_GET_REG_MACRO(reg, size, shift) ((u32)((reg) << (shift)) & ((1 << (size)) - 2))
 #define SOME_GET_REG_MACRO2(reg, size, shift) ((u32)((reg) >> (shift)) & ((1 << (size)) - 2))
 
+/**
+ * Debug verifier for the setup unit's scissor: warns when the cached scissor rectangle starts left of
+ * or above 0, or extends past the frame buffer size for the current pixel mode (719 x 575 in YUV mode,
+ * 639 x 527 RGB, 639 x 263 for the multisample mode).
+ */
 void __GXVerifySU(void) {
     s32 scis_l;
     s32 scis_r;
@@ -79,6 +84,13 @@ void __GXVerifySU(void) {
     }
 }
 
+/**
+ * Debug verifier for indirect texturing (bump mapping):
+ * warns about TEV stages whose indirect command was never set
+ * or that name an indirect stage that is not enabled, indirect matrices that were never set,
+ * missing texture coordinate scales, bad texture coordinate numbers for the indirect stages,
+ * and a missing indirect mask, using the cached BP registers.
+ */
 void __GXVerifyBUMP(void) {
     u32 i;
     u32 nBmp;
@@ -169,6 +181,13 @@ void __GXVerifyBUMP(void) {
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
+/**
+ * Debug verifier for texture maps: warns about textures that are never configured or used as both direct
+ * and indirect, missing cache base pointers or palettes,
+ * non-power-of-2 sizes with mipmaps or wrap modes other than clamp,
+ * filters incompatible with colour-indexed formats, minimum LOD above maximum LOD,
+ * LOD bias clamp without edge LOD, bad anisotropic mipmap and field prediction setups, and rounding modes.
+ */
 void __GXVerifyTEX(void) {
     u32 i;
     u32 nBmp;
@@ -378,6 +397,12 @@ void __GXVerifyTEX(void) {
     }
 }
 
+/**
+ * Debug verifier for the TEV: warns about stages not fully set up, invalid colour channels,
+ * inputs that select a null texture, inputs that read a TEV register that may be dirty
+ * or last written unclamped, Z texturing without an offset or texture,
+ * a final stage that does not write GX_TEVPREV, and missing clamping on the final stage.
+ */
 void __GXVerifyTEV(void) {
     u32 i; // r31
     u32 nTev; // r29
@@ -598,6 +623,12 @@ void __GXVerifyTEV(void) {
     }
 }
 
+/**
+ * Debug verifier for the pixel engine: warns about Z compare before texturing together with alpha compare,
+ * blend and logic op both enabled, dithering on an unsupported pixel format,
+ * multisample mode not matching the RGB565 pixel format,
+ * and multisample locations in the wrong order for the antialias filter.
+ */
 void __GXVerifyPE(void) {
     u32 i;
 

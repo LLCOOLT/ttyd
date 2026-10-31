@@ -30,6 +30,11 @@ static EvtWord friend_event[244];
 static EvtWord friend_event_sky[318];
 static EvtWord wait_event[6];
 
+/**
+ * Script helper: args[0] and args[1] are unit ids (BattleTransID).
+ * Copies the size-change (Mini/Mega) turns and strength from the first unit to the second,
+ * so a unit spawned or replaced mid-battle keeps the size it had. Called with the new unit (LW(3)).
+ */
 static USER_FUNC(killer_copy_status) {
     EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));
@@ -167,6 +172,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Battle init script for the Bill Blaster: installs the wait, attack, damage and confusion handlers,
+ * starts the wait event, shifts the unit and its home position 20 units in x,
+ * sets the poses of its parts 2 and 3 and sets attribute flags on them.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -184,6 +194,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: selects this unit (-2) and its part 1
+ * and runs the shared default damage reaction (btldefaultevt_Damage).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -191,6 +205,13 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack AI of the Bill Blaster: uses an enemy item if it has one,
+ * otherwise draws a weighted random choice (15, 0, 10, 20, 0, 10) of firing a Bullet Bill from the front cannon
+ * (friend_event) or the "sky" cannon (part 2, friend_event_sky), in a normal or a charged form (LW(12) = 1).
+ * It tries three firing positions (changing the fall-off angle and distance)
+ * and fires from the first one with room for the Bullet Bill; if none is free it does nothing this turn.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -431,6 +452,14 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Fires a Bullet Bill from the Bill Blaster's main cannon: LW(12) = 1 plays a longer charge-up first.
+ * After a pause the cannon flashes (KTA_A_1) and the shot sound plays;
+ * the smoke size depends on whether the Blaster is Huge (status 10) or Tiny (status 11).
+ * The camera shakes and a new Bullet Bill (entry_killer) is spawned with the Blaster's status copied
+ * (killer_copy_status), flies to the free position LW(0), LW(2) at y = 10 and becomes its home position.
+ * A charged shot gives it status 16.
+ */
 static EVT_BEGIN(friend_event)
     IF_INT_EQUAL(LW(12), 1)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KILLER_CANNON_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -487,6 +516,12 @@ static EVT_BEGIN(friend_event)
     RETURN
 EVT_END()
 
+/**
+ * Same as friend_event for the "sky" cannon (part 2):
+ * first lowers the cannon's angle (part 2 rotation) to aim at the free spot, then charges (if LW(12) = 1),
+ * fires, shakes the camera and spawns a Bullet Bill that flies down to the position at y = 40,
+ * rotated to match the barrel angle during the launch.
+ */
 static EVT_BEGIN(friend_event_sky)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(7), LW(8), LW(9))
     CALL(evt_sub_get_dir, LW(7), LW(8), LW(0), 40, LW(10))
@@ -564,6 +599,11 @@ EVT_END()
 
 double atan(double x);
 
+/**
+ * Script helper: args[0]-args[1] and args[2]-args[3] are two points;
+ * args[4] receives the angle of the line between them in degrees (atan of the slope),
+ * used to aim the Bullet Bill.
+ */
 static USER_FUNC(killer_get_angle) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);
@@ -576,6 +616,10 @@ static USER_FUNC(killer_get_angle) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Wait (idle) event: refreshes the body animation (part 1) from the unit's pose table
+ * so it matches the current state, then returns; the battle system runs it whenever the unit is idle.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

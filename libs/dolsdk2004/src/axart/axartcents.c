@@ -256,6 +256,11 @@ static f32 __AXLFOSemitonesTableDown[128] = {
     0.000652f,
 };
 
+/**
+ * Converts a pitch offset in cents to a frequency ratio.
+ * Positive offsets multiply an octave table (cents / 1200), a semitone table and a 100-entry cents table;
+ * negative offsets use a semitone-down table and the cents table; 0 gives 1.0.
+ */
 f32 AXARTCents(s32 cents) {
     if (cents > 0) {
         s32 octaves = cents / 1200;

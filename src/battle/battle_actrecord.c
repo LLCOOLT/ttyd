@@ -11,12 +11,14 @@ static s32 _check_turn_count_0_turn(s32 n);
 static s32 _check_use(s32 n);
 static s32 _check_no_use(s32 n);
 
+/** Increments one battle action-record counter (moves used, items used, ...), capped at 100. */
 void BtlActRec_AddCount(u8* count) {
     if (*count < 100) {
         *count = *count + 1;
     }
 }
 
+/** Adds amount to an action-record point total, capped at 100. */
 void BtlActRec_AddPoint(u8* point, s32 amount) {
     *point += amount;
     if (*point > 100) {
@@ -24,6 +26,11 @@ void BtlActRec_AddPoint(u8* point, s32 amount) {
     }
 }
 
+/**
+ * Re-judges the battle's turn-based condition (the Glitz Pit "don't act/attack for N turns" kind) at the end of
+ * each turn from battle_seq, by counting the relevant actions so far;
+ * other condition types are judged at battle end.
+ */
 void BtlActRec_JudgeTurnRuleKeep(void) {
     s32 v;
     BattleWork* wp = _battleWorkPointer;
@@ -57,6 +64,12 @@ void BtlActRec_JudgeTurnRuleKeep(void) {
     }
 }
 
+/**
+ * Judges the battle condition (fbatInfo->ruleType, e.g. "don't use the hammer",
+ * "use 3 items") from the action record when the battle ends
+ * and stores the outcome in fbatInfo->ruleKeepResult (6 = condition kept, 1/2 = broken),
+ * which field scripts read back to decide the Glitz Pit bonus.
+ */
 void BtlActRec_JudgeRuleKeep(void) {
     s32 v;
     BattleWork* wp = _battleWorkPointer;
@@ -309,6 +322,10 @@ void BtlActRec_JudgeRuleKeep(void) {
     }
 }
 
+/**
+ * Judges a "do it at least ruleParam times" condition:
+ * 6 when count n reached ruleParam, otherwise 2 if it reached ruleParam2, else 1.
+ */
 static s32 _check_use(s32 n) {
     FieldBattleInfo* rec = _battleWorkPointer->fbatInfo;
     if (n >= rec->ruleParam) {
@@ -317,6 +334,10 @@ static s32 _check_use(s32 n) {
     return (n >= rec->ruleParam2) + 1;
 }
 
+/**
+ * Judges a "do it fewer than N times" condition:
+ * 1 when count n reached ruleParam2, 2 when it reached ruleParam, else 6 (kept).
+ */
 static s32 _check_no_use(s32 n) {
     FieldBattleInfo* rec = _battleWorkPointer->fbatInfo;
     if (n >= rec->ruleParam2) {
@@ -325,6 +346,11 @@ static s32 _check_no_use(s32 n) {
     return n >= rec->ruleParam ? 2 : 6;
 }
 
+/**
+ * Judges a "no such actions within the first N turns" condition for count n:
+ * kept (6) while still inside ruleParam turns with n == 0; 0xFF in a turn limit means no limit.
+ * Stores and returns fbatInfo->ruleKeepResult.
+ */
 static s32 _check_turn_count_0_turn(s32 n) {
     BattleWork* wp = _battleWorkPointer;
     FieldBattleInfo* rec = wp->fbatInfo;
@@ -346,6 +372,7 @@ static s32 _check_turn_count_0_turn(s32 n) {
     return rec->ruleKeepResult;
 }
 
+/** Same check as _check_turn_count_0_turn, used for the end-of-battle judgement. */
 static s32 _check_turn_count_0_end(s32 n) {
     BattleWork* wp = _battleWorkPointer;
     FieldBattleInfo* rec = wp->fbatInfo;

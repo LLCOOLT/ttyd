@@ -28,6 +28,11 @@ static effN64Vtx size48x48_tex32x32_vtx[5] = {
 static void effGlassDisp(CameraId cameraId, EffectEntry* effect);
 static void effGlassMain(EffectEntry* effect);
 
+/**
+ * Spawns one tumbling glass shard at (x, y, z) with a random velocity and spin.
+ * Types 0-1 are white and 2-3 are green; the type parity picks the texture column.
+ * Used by effFreezeMain, barrier units in aji/las/moo, evt_eff.
+ */
 EffectEntry* effGlassN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffGlassN64Work* work;
@@ -84,6 +89,7 @@ EffectEntry* effGlassN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 s
     return effect;
 }
 
+/** Applies gravity to the shard, spins it in Z, scrolls its glint texture and fades it out over the last 16 frames. */
 static void effGlassMain(EffectEntry* effect) {
     EffGlassN64Work* work = effect->userdata;
     Vec position;
@@ -123,6 +129,10 @@ static void effGlassMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effGlassDisp, effect);
 }
 
+/**
+ * Draws the shard as a 16x16 sprite using texture 0x59, blending two glint rows;
+ * at the end of the glint cycle the odd type adds a larger flash.
+ */
 static void effGlassDisp(CameraId cameraId, EffectEntry* effect) {
     s32 type;
     EffGlassN64Work* work;

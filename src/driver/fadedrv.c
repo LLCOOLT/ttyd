@@ -38,6 +38,10 @@ static void disp_maku(CameraId camId, void* param);
 static void disp_tec(CameraId camId, void* param);
 static void disp_dummy_black(CameraId camId, void* param);
 
+/**
+ * DVD read callback for the asynchronous fade.tpl load:
+ * unpacks the palette, closes the file and marks the fade textures ready.
+ */
 static void _callback(s32 error, DVDFileInfo* info) {
     DVDEntry* entry = info->cb.userData;
     UnpackTexPalette(wp->texture);
@@ -45,6 +49,7 @@ static void _callback(s32 error, DVDFileInfo* info) {
     wp->loaded = TRUE;
 }
 
+/** Boot setup: allocates the fade work and resets its five fade slots (no animation poses, centred spot, scale 1). */
 void fadeInit(void) {
     FadeEntry* entry;
     int i;
@@ -71,6 +76,11 @@ void fadeInit(void) {
     wp->loaded = FALSE;
 }
 
+/**
+ * Loads fade.tpl, the iris, spot and overlay textures:
+ * from the startup archive if it holds it, else asynchronously from the disc.
+ * Called from the logo sequence at boot.
+ */
 void fadeTexSetup(void) {
     DVDEntry* dvd;
     u32 size;
@@ -91,6 +101,13 @@ void fadeTexSetup(void) {
     }
 }
 
+/**
+ * Starts screen transition type over duration milliseconds in color.
+ * The white fades become the colour fades in light grey; iris and spot fades last at least one second.
+ * Slot 0 takes iris, spot and colour fades, slot 1 the curtain and stage animations,
+ * slot 2 the pipe transitions, and the later slots the page flips
+ * and the story-book frames (Mario, Peach, Bowser), each with the animation file it plays.
+ */
 void fadeEntry(s32 type, s32 duration, GXColor color) {
     FadeEntry* entry;
     s32 id;
@@ -415,64 +432,89 @@ void fadeEntry(s32 type, s32 duration, GXColor color) {
     }
 }
 
+/**
+ * Turns on the tec screen overlay (fade.tpl image 2 drawn over the 2D layer).
+ * Guess: the scan-line monitor look of the scenes on TEC's screens, from the name; set by the evt_fade helpers.
+ */
 void fadeTecOn(void) {
     wp->flags |= FADE_WORK_TEC;
 }
 
+/** Turns the tec overlay off at once. */
 void fadeTecOff(void) {
     wp->flags &= ~FADE_WORK_TEC;
 }
 
+/** Turns the tec overlay on, fading it in over about 25 frames. */
 void fadeTecSoftOn(void) {
     wp->flags |= FADE_WORK_TEC | FADE_WORK_TEC_SOFT_IN;
     wp->softness = 0.0f;
 }
 
+/** Fades the tec overlay out over about 25 frames. */
 void fadeTecSoftOff(void) {
     wp->flags |= FADE_WORK_TEC | FADE_WORK_TEC_SOFT_OUT;
     wp->softness = 1.0f;
 }
 
+/** Turns on the soft-focus overlay (fade.tpl image 3 over the 2D layer), used by the evt_fade helpers. */
 void fadeSoftFocusOn(void) {
     wp->flags |= FADE_WORK_SOFT_FOCUS;
 }
 
+/** Turns the soft-focus overlay off. */
 void fadeSoftFocusOff(void) {
     wp->flags &= ~FADE_WORK_SOFT_FOCUS;
 }
 
+/** Covers the 3D scene with white (no fade in this driver); no caller in this tree. */
 void fadeWhiteOutOn(void) {
     wp->flags |= FADE_WORK_WHITE_OUT;
 }
 
+/** Removes the white cover from fadeWhiteOutOn. */
 void fadeWhiteOutOff(void) {
     wp->flags &= ~FADE_WORK_WHITE_OUT;
 }
 
+/**
+ * Sets the screen position the spot fades close on or open from (e.g. where Mario stands);
+ * used by the evt_fade helpers.
+ */
 void fadeSetSpotPos(f32 x, f32 y) {
     FadeEntry* entry = &wp->entries[0];
     entry->fadeSpotX = x;
     entry->fadeSpotY = y;
 }
 
+/** Sets the screen offset of the curtain and stage animations in slot 1. */
 void fadeSetAnimOfsPos(f32 x, f32 y) {
     FadeEntry* entry = &wp->entries[1];
     entry->animOffsetX = x;
     entry->animOffsetY = y;
 }
 
+/** Places the curtain and stage animation of slot 1 at a world position, so it sorts in depth with the 3D scene. */
 void fadeSetAnimVirtualPos(f32 x, f32 y, f32 z) {
     FadeEntry* entry = &wp->entries[1];
     entry->VirtualPos = (Vec){x, y, z};
     entry->flags |= FADE_ENTRY_VIRTUAL_POS;
 }
 
+/**
+ * Sets the callback slot 3's page-flip transitions call to draw into the offscreen image;
+ * used by the E3 demo sequence.
+ */
 void fadeSetOffscreenCallback(OffscreenCallback callback, void* param) {
     FadeEntry* entry = &wp->entries[3];
     entry->callback = callback;
     entry->offparam = param;
 }
 
+/**
+ * Captures the current frame (608x480) into image name through the evt_img capture helper,
+ * for the pipe and page-flip transitions to animate.
+ */
 static inline void fadeCapture(const char* name, const char* off, s32 mode) {
     EventEntry evt;
     EvtWord args[10];
@@ -489,6 +531,12 @@ static inline void fadeCapture(const char* name, const char* off, s32 mode) {
     evt_img_alloc_capture(&evt, TRUE);
 }
 
+/**
+ * Once per frame: advances every active fade slot (progress from the render clock,
+ * the pipe and page-flip sounds and captures, posing the curtain and story-book animations),
+ * marks fades finished, and queues their draw callbacks plus the tec,
+ * soft-focus and black or white cover overlays.
+ */
 void fadeMain(void) {
     FadeEntry* entry;
     s32 i;
@@ -1097,6 +1145,11 @@ void fadeMain(void) {
     }
 }
 
+/**
+ * Draws slot 0's fade on the fade camera: the iris
+ * or spot texture scaled around the spot position (growing with the fifth power of progress) or a flat colour,
+ * and nothing more once a fade-in has finished.
+ */
 static void disp_texture(CameraId camId, void* param) {
     static u8 i4tex[1] ATTRIBUTE_ALIGN(32) = {0xFF}; // GX texture data; 32-aligned in every version
     FadeWork* work;
@@ -1225,6 +1278,11 @@ static void disp_texture(CameraId camId, void* param) {
 
 // FAKE: #pragma dont_inline on: keeps z out of line as in the target; without it z is inlined into disp_maku (206 -> 258 instructions)
 #pragma dont_inline on
+/**
+ * Depth scale for the curtain animation drawn at a world position:
+ * how its depth on the 3D camera compares with its depth on the fade camera, so it hides behind closer scenery.
+ * 1 when the 3D camera is perspective.
+ */
 static f32 z(void) {
     FadeWork* work = wp;
     CameraEntry* camera;
@@ -1251,6 +1309,10 @@ static f32 z(void) {
 
 #pragma dont_inline reset
 
+/**
+ * Writes the far depth into the depth buffer over the whole camera view without touching colour,
+ * so an animation drawn afterwards is never hidden by the scene.
+ */
 static void zFill(void) {
     static s32 depth_image[32] __attribute__((aligned(32))) = {
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -1305,9 +1367,15 @@ static void zFill(void) {
     GXSetColorUpdate(GX_TRUE);
 }
 
+/** Returns a * b + c; an inline helper of disp_maku. */
 static inline f32 fadeMadd(f32 a, f32 b, f32 c) {
     return a * b + c;
 }
+/**
+ * Draws slot 1's curtain or stage animation (maku is Japanese for curtain) on its camera,
+ * scaled to the screen and offset by fadeSetAnimOfsPos or placed at the virtual world position,
+ * with the depth set up by z or zFill.
+ */
 static void disp_maku(CameraId camId, void* param) {
     FadeEntry* entry = param;
     CameraEntry* camera;
@@ -1396,16 +1464,25 @@ static void disp_maku(CameraId camId, void* param) {
     sysWaitDrawSync();
 }
 
+/**
+ * Unknown: stores pi into f[0]; nothing calls it.
+ * It probably exists only so a constant lands in the file's constant pool.
+ */
 void fadeStrippedPool(f32* f) {
     f[0] = 3.141592f;
 }
 
+/** The colour whose alpha is a (0..1 scaled to 0..255), used for the tec overlay's fade. */
 static inline GXColor fadeTecAlpha(f32 a) {
     GXColor c = (GXColor){0, 0, 0, 0};
     c.a = 255.0f * a;
     return c;
 }
 
+/**
+ * Draws the tec or soft-focus overlay as a full-screen texture on the 2D camera,
+ * fading the tec overlay in or out by 0.04 per frame when asked to.
+ */
 static void disp_tec(CameraId camId, void* param) {
     CameraEntry* camera;
     GXTexObj obj;
@@ -1478,6 +1555,10 @@ static void disp_tec(CameraId camId, void* param) {
     GXTexCoord2f32(0.0f, 2.0f);
 }
 
+/**
+ * Draws a black (while a pipe transition holds the screen black) or white rectangle over the whole camera view,
+ * for the black screen and the white-out cover.
+ */
 static void disp_dummy_black(CameraId camId, void* param) {
     CameraEntry* camera;
     f32 proj[7];
@@ -1516,6 +1597,10 @@ static void disp_dummy_black(CameraId camId, void* param) {
     GXSetProjectionv(proj);
 }
 
+/**
+ * Tells whether the most recently started fade has finished (TRUE when none was started);
+ * scripts and sequences wait on it.
+ */
 BOOL fadeIsFinish(void) {
     FadeEntry* entry;
 
@@ -1526,6 +1611,7 @@ BOOL fadeIsFinish(void) {
     return (entry->flags >> 1) & 1; // FADE_ENTRY_FINISHED
 }
 
+/** Stops fade slot id at once: releases its animation poses and captured image and resets it to the defaults. */
 void fadeReset(s32 id) {
     FadeEntry* entry;
 
@@ -1549,10 +1635,12 @@ void fadeReset(s32 id) {
     entry->scale = 1.0f;
 }
 
+/** Returns fade.tpl; the name entry screen draws its frame textures from it. */
 TEXPalette* fadeGetTpl(void) {
     return wp->texture;
 }
 
+/** Makes the next curtain or stage animation in slot 1 play fast; used by the title screen. */
 void fadeSetNarrowFast(void) {
     wp->entries[1].flags |= FADE_ENTRY_FAST;
 }

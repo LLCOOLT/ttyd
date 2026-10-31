@@ -121,6 +121,16 @@ extern EvtWord evt_iri_30_touch_rakugaki[];
 extern EvtWord evt_iri_30_bomb_rakugaki[];
 extern EvtWord zonbaba_first_event[];
 
+/**
+ * Map init shared by all seven Pit of 100 Trials maps (jon_00..jon_06 all register it).
+ * GSW_JON_FLOOR is the 0-based floor; a debug map warp resets it to the map's floor.
+ * Also records the deepest floor reached, sets up the signboard, the mover, the peddler and the floor's enemy,
+ * then fits the pipes to the floor.
+ * Floor 100 is the Bonetail room, every 10th floor is a rest room with a chest,
+ * the floor before one leads into it, and the rest are plain floors.
+ * On floor 50's map it also handles the graffiti wall of Trouble Center job 30.
+ * Plays BGM_STG0_100DN1 (the boss floor has ambience only).
+ */
 EVT_BEGIN(jon_init_evt)
     CALL(evt_sub_get_system_flag, LW(0))
     IF_BITS_SET(LW(0), GLOBAL_FLAG_SKIP_MAP_EVENTS)
@@ -1020,6 +1030,17 @@ NpcSetupInfo npcEnt_zonbaba[] = {
     {0},
 };
 
+/**
+ * Spawns the floor's single enemy ("敵"), skipped when the mover is on the floor
+ * and on rest-room floors (every 10th except 100).
+ * enemy_info picks the species for the floor from enemy_100;
+ * the enemy appears on a random side of the room
+ * and gets the NPC setup of its kind (walker, flyer, plant, Spiny, Chain Chomp ...).
+ * Floor 100 is Bonetail and starts zonbaba_first_event.
+ * When the enemy is beaten the exit pipe rises (dokan_open);
+ * on floor 100 GSWF_JON_BONETAIL_DEFEATED is set instead.
+ * Also notifies the sailor job (iri_12_enemy_dead_event).
+ */
 EVT_BEGIN(enemy_setup)
     CALL(evt_npc_check, STRING("移動屋"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -1364,6 +1385,10 @@ s32 treasure_tbl[] = {
     303, 291,
 };
 
+/**
+ * Opens a rest-room chest: locks controls, takes the reward for this floor from treasure_tbl (entry (floor + 1)
+ * / 10 - 1, so one reward per tenth floor), has the item pop out of the chest and gives it to Mario.
+ */
 EVT_BEGIN(evt_open_box)
     CALL(evt_mario_key_onoff, 0)
     SET_VALUE(LW(0), GSW(GSW_JON_FLOOR))
@@ -1381,6 +1406,12 @@ EVT_BEGIN(evt_open_box)
     RETURN
 EVT_END()
 
+/**
+ * Regular (idle) event of the mover and the trader NPCs:
+ * sets them as jumping, floor-landing and animated, then loops forever:
+ * turns around, waits, turns back and wanders 100 units in a random direction between 120
+ * and 240 degrees of the loiter direction at speed 40, so they pace around the room.
+ */
 static EVT_BEGIN(move_event)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_JUMPING | NPC_FLAG_MOVE_ANIM | NPC_FLAG_LAND_ON_FLOOR)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
@@ -1398,6 +1429,11 @@ static EVT_BEGIN(move_event)
     RETURN
 EVT_END()
 
+/**
+ * Returns in LW(0) the map name for the floor number GSW_JON_FLOOR + 1:
+ * jon_00 for floors 1-49, jon_01 for 51-79, jon_02 for 81-99, rest rooms jon_03 (10-40), jon_04 (50-70),
+ * jon_05 (80, 90) and jon_06 for floor 100. Used by the mover after he advances the floor counter.
+ */
 EVT_BEGIN(get_map_name)
     SET_VALUE(LW(0), GSW(GSW_JON_FLOOR))
     ADD(LW(0), 1)
@@ -1447,7 +1483,7 @@ EVT_BEGIN(get_map_name)
 EVT_END()
 
 #if VERSION <= VERSION_DEMO_US
-// The demo's mover takes 10 coins for every trip and picks the destination before checking the coins.
+/** The demo's mover takes 10 coins for every trip and picks the destination before checking the coins. */
 EVT_BEGIN(talk_idouya)
     CALL(evt_msg_print, 0, STRING("msg_jon_mover"), 0, 0)
     CALL(evt_msg_select, 0, STRING("msg_jon_mover_select"))
@@ -1497,6 +1533,15 @@ EVT_BEGIN(talk_idouya)
     RETURN
 EVT_END()
 #else
+/**
+ * Talk script of the mover, a Puni (the 移動屋 NPC):
+ * offers to skip 2 floors for 10 coins, 5 floors for 30 coins,
+ * or send Mario back to Rogueport (tik_06, resets the floor to 0) for 10 coins. He refuses without enough coins.
+ * Otherwise he takes the coins, shows the warp message with the wavy screen effect (evt_raster),
+ * fades out for 5 s and changes map.
+ * Returning to Rogueport with Trouble Center job 12 under way marks the sailor as brought home
+ * (GSWF_TROUBLE_WORK_2).
+ */
 EVT_BEGIN(talk_idouya)
     CALL(evt_msg_print, 0, STRING("msg_jon_mover"), 0, 0)
     CALL(evt_msg_select, 0, STRING("msg_jon_mover_select"))
@@ -1570,6 +1615,10 @@ NpcSetupInfo npcEnt_idouya[] = {
     {0},
 };
 
+/**
+ * Gives each floor a 5% chance of a mover Puni (c_pjoho model) standing at x = -100.
+ * Never on floor 100 or from floor 95 on.
+ */
 EVT_BEGIN(idouya_setup)
     IF_INT_EQUAL(GSW(GSW_JON_FLOOR), 99)
         RETURN
@@ -1588,6 +1637,14 @@ EVT_BEGIN(idouya_setup)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the peddler (行商人, tribe ボッタクール, a rip-off merchant):
+ * offers an item shop window with coin display.
+ * Mario picks an item at its price, the peddler checks the coins and the item pouch,
+ * and he can keep buying until he declines or is out of coins.
+ * Non-Japanese versions word the price message by language order (US and later use a format string for
+ * non-English).
+ */
 EVT_BEGIN(talk_gyousyou)
     CALL(evt_msg_print, 0, STRING("100kai_item_01"), 0, STRING("me"))
     CALL(evt_msg_select, 0, STRING("100kai_item_00"))
@@ -1721,6 +1778,7 @@ NpcSetupInfo npcEnt_gyousyou[] = {
     {0},
 };
 
+/** Gives each rest-room floor (every 10th except 100) a 33% chance of a peddler (c_botta model) standing at x = 100. */
 EVT_BEGIN(gyousyou_setup)
     IF_INT_EQUAL(GSW(GSW_JON_FLOOR), 99)
         RETURN
@@ -1742,6 +1800,13 @@ EVT_BEGIN(gyousyou_setup)
     RETURN
 EVT_END()
 
+/**
+ * Guess: a floor trap ("shikake") that is never started in this tree.
+ * 20% of the time, when the floor has an enemy,
+ * it would flash the screen white on arrival and show one of four trick messages,
+ * each setting a battle restriction on the enemy (no partner change, no hammer, no jump,
+ * or first-strike bonus) via shikakeFlag.
+ */
 EVT_BEGIN(shikake_setup)
     IF_INT_EQUAL(GSW(GSW_JON_FLOOR), 99)
         RETURN
@@ -1787,6 +1852,11 @@ EVT_BEGIN(shikake_setup)
     RETURN
 EVT_END()
 
+/**
+ * Raises the exit pipe (a_dokan_1 / dokan_1_s) 30 units out of the floor over half a second,
+ * with the pipe-appear sound, once the floor's enemy is beaten. Controls are locked meanwhile.
+ * Spawned from enemy_setup.
+ */
 EVT_BEGIN(dokan_open)
 #if VERSION <= VERSION_DEMO_US
     WAIT_MS(1000)
@@ -1821,6 +1891,10 @@ EVT_BEGIN(dokan_open)
     RETURN
 EVT_END()
 
+/**
+ * Variant used in rest rooms: pressing the blue float switch ("sw") raises the exit pipe a_dokan_3 the same way
+ * after a 0.4 s pause.
+ */
 EVT_BEGIN(dokan_open2)
     CALL(evt_mario_key_onoff, 0)
     WAIT_MS(400)
@@ -1844,6 +1918,11 @@ EVT_BEGIN(dokan_open2)
     RETURN
 EVT_END()
 
+/**
+ * Signpost event of the floor's entrance (case event on a_kanban, front A):
+ * stops NPC events, shows msg_jon_kanban_1 with the current floor number (GSW_JON_FLOOR plus one) inserted,
+ * and gives control back.
+ */
 static EVT_BEGIN(evt_kanban)
     CALL(evt_npc_stop_for_event)
     CALL(evt_mario_key_onoff, 0)
@@ -1855,6 +1934,10 @@ static EVT_BEGIN(evt_kanban)
     RETURN
 EVT_END()
 
+/**
+ * Signboard event of the floor's wall board (the "board" signboard set in the map's setup):
+ * stops NPC events, shows msg_jon_kanban_2 and gives control back.
+ */
 static EVT_BEGIN(evt_kanban2)
     CALL(evt_npc_stop_for_event)
     CALL(evt_mario_key_onoff, 0)
@@ -1865,6 +1948,10 @@ static EVT_BEGIN(evt_kanban2)
     RETURN
 EVT_END()
 
+/**
+ * Exit event of the downward pipes: starts the sailor's pipe-jump if his job is running,
+ * then advances GSW_JON_FLOOR by one. Returns 0 in LW(0).
+ */
 EVT_BEGIN(floor_inc)
     SPAWN_EVENT(iri_12_dokan_in)
     ADD(GSW(GSW_JON_FLOOR), 1)
@@ -1872,6 +1959,7 @@ EVT_BEGIN(floor_inc)
     RETURN
 EVT_END()
 
+/** Exit event of the pipe back to Rogueport: resets GSW_JON_FLOOR to 0. Returns 0 in LW(0). */
 EVT_BEGIN(floor_clear)
     SET_VALUE(GSW(GSW_JON_FLOOR), 0)
     SET_VALUE(LW(0), 0)
@@ -1914,6 +2002,10 @@ BeroEntry bero_boss[] = {
     {0},
 };
 
+/**
+ * Floor 100 pipes: registers the entry pipe (dokan_2)
+ * and the exit pipe to Rogueport (dokan_1 to tik_06, which resets the floor counter).
+ */
 EVT_BEGIN(setup_boss)
     SET_VALUE(LW(0), PTR(bero_boss))
     CALL(evt_bero_get_info)
@@ -2016,6 +2108,11 @@ BeroEntry bero_return3[] = {
     {0},
 };
 
+/**
+ * Rest-room setup (floors 10, 20, ... 100): registers the pipes,
+ * points the downward pipe at the next map (jon_00, or jon_01 after floor 50, jon_02 after floor 70),
+ * and places that floor's treasure chest (own opened flag per floor, running evt_open_box) and the signboard.
+ */
 EVT_BEGIN(setup_return)
     SET_VALUE(LW(0), PTR(bero_return))
     CALL(evt_bero_get_info)
@@ -2164,6 +2261,11 @@ BeroEntry bero_prev_return4[] = {
     {0},
 };
 
+/**
+ * Setup for the floor before a rest room: registers the pipes
+ * and sends exit pipe dokan_1 to the rest-room map for that stretch:
+ * jon_03 up to floor 48, jon_04 for floors 49-69, jon_05 for floors 70-98 and jon_06 (Bonetail) for floor 99.
+ */
 EVT_BEGIN(setup_prev_return)
     SET_VALUE(LW(0), PTR(bero_prev_return))
     CALL(evt_bero_get_info)
@@ -2272,6 +2374,10 @@ BeroEntry bero_normal3[] = {
     {0},
 };
 
+/**
+ * Setup for ordinary floors: registers the pipes and points exit pipe dokan_1 at the next map of the stretch:
+ * jon_00 up to floor 49, jon_01 for floors 50-80 and jon_02 beyond.
+ */
 EVT_BEGIN(setup_normal)
     SET_VALUE(LW(0), PTR(bero_normal))
     CALL(evt_bero_get_info)
@@ -2296,6 +2402,11 @@ EVT_BEGIN(setup_normal)
     RETURN
 EVT_END()
 
+/**
+ * Trouble Center job 12 (the lost sailor, マッキノ):
+ * when Mario enters a pipe with the sailor following, he hops in too, spinning and shrinking as a paper model,
+ * and sinks into the pipe.
+ */
 EVT_BEGIN(iri_12_dokan_in_sub)
     LOOP(0)
         CALL(evt_npc_get_unitwork, STRING("マッキノ"), 0, LW(0))
@@ -2376,6 +2487,10 @@ EVT_BEGIN(iri_12_dokan_in_sub)
     RETURN
 EVT_END()
 
+/**
+ * Starts iri_12_dokan_in_sub when job 12 is active,
+ * the sailor has been found (GSWF_TROUBLE_WORK_1) and not yet returned (WORK_2).
+ */
 EVT_BEGIN(iri_12_dokan_in)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 12)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_1), 1)
@@ -2387,6 +2502,11 @@ EVT_BEGIN(iri_12_dokan_in)
     RETURN
 EVT_END()
 
+/**
+ * Shared tail of the sailor's farewell scripts:
+ * he turns into a paper model, walks into the pipe to the side spinning and shrinking,
+ * and is moved far below the map.
+ */
 EVT_BEGIN(iri_12_makkino_return_dokan)
     CALL(evt_npc_set_ry, STRING("マッキノ"), 90)
     WAIT_FRAMES(1)
@@ -2449,6 +2569,7 @@ EVT_BEGIN(iri_12_makkino_return_dokan)
     RETURN
 EVT_END()
 
+/** Sailor's farewell at a rest room: he walks over, thanks Mario (irai_12_011) and leaves through the pipe. */
 EVT_BEGIN(iri_12_makkino_return)
     CALL(evt_npc_flag_onoff, 1, STRING("マッキノ"), NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_move_position, STRING("マッキノ"), 72, 0, 0, 120, 4)
@@ -2458,6 +2579,10 @@ EVT_BEGIN(iri_12_makkino_return)
     RETURN
 EVT_END()
 
+/**
+ * Sailor's farewell on floor 100 after Bonetail:
+ * he walks over, thanks Mario (irai_12_011), controls return, and he leaves through the pipe.
+ */
 EVT_BEGIN(iri_12_makkino_return_b100)
     CALL(evt_npc_flag_onoff, 1, STRING("マッキノ"), NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_move_position, STRING("マッキノ"), -205, -75, 0, 120, 4)
@@ -2469,6 +2594,10 @@ EVT_BEGIN(iri_12_makkino_return_b100)
     RETURN
 EVT_END()
 
+/**
+ * Sailor's farewell when Bonetail falls while the job is running:
+ * he walks up, thanks Mario (irai_12_011), then leaves through the pipe.
+ */
 EVT_BEGIN(iri_12_makkino_return_zonbaba)
     CALL(evt_npc_flag_onoff, 1, STRING("マッキノ"), NPC_FLAG_INTANGIBLE)
     WAIT_MS(500)
@@ -2481,6 +2610,10 @@ EVT_BEGIN(iri_12_makkino_return_zonbaba)
     RETURN
 EVT_END()
 
+/**
+ * Moves the sailor to the side of the exit pipe (x = -40), stopping his own movement script first.
+ * If Mario stands in the way he is nudged aside. Afterwards the sailor talks again (iri_12_makkino_talk).
+ */
 EVT_BEGIN(iri_12_makkino_move_dokan_side)
     CALL(evt_npc_set_unitwork, STRING("マッキノ"), 0, 1)
     CALL(evt_npc_get_reglid, STRING("マッキノ"), LW(0))
@@ -2510,6 +2643,10 @@ EVT_BEGIN(iri_12_makkino_move_dokan_side)
     RETURN
 EVT_END()
 
+/**
+ * Death hook of the floor's enemy: while job 12 is on and the sailor follows Mario,
+ * wait 0.8 s and send the sailor to the pipe (iri_12_makkino_move_dokan_side).
+ */
 EVT_BEGIN(iri_12_enemy_dead_event)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 12)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_1), 1)
@@ -2522,6 +2659,7 @@ EVT_BEGIN(iri_12_enemy_dead_event)
     RETURN
 EVT_END()
 
+/** Sailor's nervous pacing while an enemy is still alive: walks back and forth between x = -175 and x = -73 forever. */
 EVT_BEGIN(iri_12_makkino_urouro)
     LOOP(0)
         CALL(evt_npc_move_position, STRING("マッキノ"), -175, 109, 0, 120, 4)
@@ -2532,6 +2670,7 @@ EVT_BEGIN(iri_12_makkino_urouro)
     RETURN
 EVT_END()
 
+/** Sailor trembling in fear on floor 100 before Bonetail is beaten: walks to x = -440, then shakes sideways forever. */
 EVT_BEGIN(iri_12_makkino_buruburu)
     CALL(evt_npc_move_position, STRING("マッキノ"), -440, -124, 0, 120, 4)
     CALL(evt_npc_get_position, STRING("マッキノ"), LW(0), LW(1), LW(2))
@@ -2547,6 +2686,11 @@ EVT_BEGIN(iri_12_makkino_buruburu)
     RETURN
 EVT_END()
 
+/**
+ * Wakes the sailor: plays his wake-up animation,
+ * restores normal talk and move animations and turns him toward Mario.
+ * Started by the message callback when his text reaches page 2.
+ */
 EVT_BEGIN(iri_12_makkino_okiru)
     CALL(evt_npc_set_anim, STRING("マッキノ"), STRING("O_1"))
     CALL(evt_npc_wait_anim, STRING("マッキノ"), 1)
@@ -2558,6 +2702,12 @@ EVT_BEGIN(iri_12_makkino_okiru)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the sailor Makkino (マッキノ) in Trouble Center job 12.
+ * With no enemy left on the floor, his first talk plays irai_12_008, sets GSWF_TROUBLE_WORK_1,
+ * drops his talk script and sends him to the pipe side; later talks play irai_12_010.
+ * With an enemy still around he says irai_12_007 before the first talk and irai_12_009 after it.
+ */
 static EVT_BEGIN(iri_12_makkino_talk)
     CALL(evt_npc_check, STRING("敵"), LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -2579,6 +2729,11 @@ static EVT_BEGIN(iri_12_makkino_talk)
     RETURN
 EVT_END()
 
+/**
+ * Sailor drops in on an ordinary floor after Mario descends:
+ * appears at the pipe start, lands, and either walks to the pipe side (no enemy) or paces nervously
+ * until the enemy is beaten. Re-enables his talk script.
+ */
 EVT_BEGIN(iri_12_makkino_fall)
     CALL(evt_seq_wait, 2)
     CALL(evt_bero_exec_wait, 2)
@@ -2604,6 +2759,10 @@ EVT_BEGIN(iri_12_makkino_fall)
     RETURN
 EVT_END()
 
+/**
+ * Sailor drops in on a rest-room floor: lands, then does his farewell (iri_12_makkino_return),
+ * or the Bonetail variants on floor 100, and marks the job's return flag (GSWF_TROUBLE_WORK_2).
+ */
 EVT_BEGIN(iri_12_makkino_fall_return)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_seq_wait, 2)
@@ -2631,6 +2790,11 @@ EVT_BEGIN(iri_12_makkino_fall_return)
     RETURN
 EVT_END()
 
+/**
+ * Sets up the sailor model (c_suifu_k, tribe 水夫)
+ * and starts the drop-in script for a rest room (iri_12_makkino_fall_return)
+ * or an ordinary floor (iri_12_makkino_fall).
+ */
 EVT_BEGIN(iri_12_init_fall)
     CALL(evt_npc_entry, STRING("マッキノ"), STRING("c_suifu_k"))
     CALL(evt_npc_set_tribe, STRING("マッキノ"), STRING("水夫"))
@@ -2647,6 +2811,13 @@ EVT_BEGIN(iri_12_init_fall)
     RETURN
 EVT_END()
 
+/**
+ * Map-init hook of Trouble Center job 12 (only while GSW_TROUBLE_ACTIVE is 12).
+ * On floor 18 (GSW_JON_FLOOR 17) before the job is started,
+ * Makkino is set up lying asleep (D_2) with iri_12_makkino_talk as his talk script;
+ * once started, or on other floors while the job is running and not finished,
+ * he drops in through iri_12_init_fall.
+ */
 static EVT_BEGIN(iri_12_init)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 12)
         SWITCH(GSW(GSW_JON_FLOOR))
@@ -2674,6 +2845,10 @@ static EVT_BEGIN(iri_12_init)
     RETURN
 EVT_END()
 
+/**
+ * Examining the graffiti wall on floor 50 (Trouble Center job 30):
+ * a short message (irai_30_007), then control is returned.
+ */
 EVT_BEGIN(evt_iri_30_touch_rakugaki)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("irai_30_007"), 0, 0)
@@ -2681,6 +2856,12 @@ EVT_BEGIN(evt_iri_30_touch_rakugaki)
     RETURN
 EVT_END()
 
+/**
+ * Bobbery's bomb hits the floor-50 graffiti (job 30):
+ * closes the message, plays the wall-break sound,
+ * captures the wall into an offscreen image and animates it away,
+ * swapping the "before" objects for the "after" ones. Sets GSWF_TROUBLE_WORK_1.
+ */
 EVT_BEGIN(evt_iri_30_bomb_rakugaki)
     CALL(evt_msg_close, STRING("irai_30_007"))
     CALL(evt_del_case_evt, 1, LW(15))
@@ -2726,6 +2907,10 @@ EVT_BEGIN(evt_iri_30_bomb_rakugaki)
     RETURN
 EVT_END()
 
+/**
+ * Part of the Bonetail (Gonbaba) intro: 3.7 seconds in,
+ * plays its footstep sound at the enemy and shakes the camera for 800 ms.
+ */
 static EVT_BEGIN(gonbaba_standup_shake)
     WAIT_MS(3700)
     CALL(evt_npc_get_position, STRING("敵"), LW(0), LW(1), LW(2))
@@ -2734,6 +2919,10 @@ static EVT_BEGIN(gonbaba_standup_shake)
     RETURN
 EVT_END()
 
+/**
+ * Part of the Bonetail intro: over 8 seconds it pushes the map fog's near
+ * and far distances out (by 400 and 1600 units), so the room's fog thins as he rises.
+ */
 static EVT_BEGIN(gonbaba_fog_change)
     CALL(evt_map_get_fog, LW(4), LW(5), LW(6), LW(7), LW(8), LW(9))
     SET_VALUE(GW(0), LW(5))
@@ -2771,6 +2960,11 @@ static EVT_BEGIN(gonbaba_fog_change)
     RETURN
 EVT_END()
 
+/**
+ * Bonetail slumping to the ground after it is beaten on floor 100:
+ * plays its two falling sounds (the second is positional and fades out over 10 seconds) and shakes the camera,
+ * starting strong and dying down to a rumble.
+ */
 static EVT_BEGIN(gonbaba_down_shake)
     CALL(evt_npc_get_position, STRING("敵"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon, STRING("SFX_STG1_GNB_DOWN1"), 0)
@@ -2800,6 +2994,15 @@ static EVT_BEGIN(gonbaba_down_shake)
     RETURN
 EVT_END()
 
+/**
+ * Floor 100 opening and fight with Bonetail (Zonbaba, the 51st battle setup).
+ * If it was already beaten, only the chest and the exit remain.
+ * Otherwise Mario is startled, Bonetail rises with a roar, fog thickens and the camera shakes,
+ * then the battle starts.
+ * After it, Bonetail slumps, the chest slides out of its mouth, Mario notices it,
+ * and GSWF_JON_BONETAIL_DEFEATED is set.
+ * With the sailor's job active he leaves via iri_12_makkino_return_zonbaba.
+ */
 EVT_BEGIN(zonbaba_first_event)
     IF_INT_EQUAL(GSWF(GSWF_JON_BONETAIL_DEFEATED), 1)
         CALL(evt_npc_set_position, STRING("敵"), 0, -1000, 0)
@@ -2984,13 +3187,17 @@ EVT_BEGIN(zonbaba_first_event)
     RETURN
 EVT_END()
 
+/** Script helper: blocks until Bonetail's NPC is standing on the ground (groundHit set). */
 static USER_FUNC(gonbaba_wait_landon) {
     // 敵
     return npcNameToPtr("敵")->groundHit ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
-// Message window callback (msgdrv calls it with the window's smart-heap block): starts
-// iri_12_makkino_okiru (マッキノ wakes up) when the message turns to its second page (type 3 = page advanced).
+/**
+ * Message window callback (msgdrv calls it with the window's smart-heap block):
+ * starts iri_12_makkino_okiru (マッキノ wakes up) when the message turns to its second page (type 3 = page
+ * advanced).
+ */
 static void iri_12_msgcb(s32 type, smartEntry* smart) {
     MsgWinData* data = smart->address;
 
@@ -2999,6 +3206,7 @@ static void iri_12_msgcb(s32 type, smartEntry* smart) {
     }
 }
 
+/** Script helper: blocks until the sailor NPC has landed on the floor (returns at once if he cannot land). */
 static USER_FUNC(wait_landon) {
     // マッキノ
     NpcEntry* npc = npcNameToPtr("マッキノ");
@@ -3009,6 +3217,7 @@ static USER_FUNC(wait_landon) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper: args[0] = y; sets the sailor NPC's height directly. */
 static USER_FUNC(iri_12_makkino_set_y) {
     f32 y = evtGetFloat(event, event->args[0]);
 
@@ -3016,6 +3225,7 @@ static USER_FUNC(iri_12_makkino_set_y) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: turns off paper-peraform bending and paper lighting on the sailor's model, for the pipe jump. */
 static USER_FUNC(iri_12_paper_init) {
     NpcEntry* npc = npcNameToPtr("マッキノ");
 
@@ -3024,6 +3234,10 @@ static USER_FUNC(iri_12_paper_init) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] = 0..3 picks the battle restriction put on the floor's enemy:
+ * 0 no party change, 1 no hammer, 2 no jump, 3 first-strike bonus.
+ */
 static USER_FUNC(shikakeFlag) {
     s32 type = evtGetValue(event, event->args[0]);
     NpcEntry* npc = npcNameToPtr("敵");
@@ -3045,6 +3259,7 @@ static USER_FUNC(shikakeFlag) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: args[0..2] = x, y, z; writes them into the Chain Chomp setup's territoryBase before it is spawned. */
 static USER_FUNC(wanwan_set_home_pos) {
     EvtWord* args = event->args;
     s32 x = evtGetValue(event, args[0]);
@@ -3057,6 +3272,10 @@ static USER_FUNC(wanwan_set_home_pos) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] = NPC name; sets its loiter height to 50 and homing height to 180
+ * so flyers can chase over the room.
+ */
 static USER_FUNC(setup_npc_ex_para) {
     const char* name = (const char*)evtGetValue(event, event->args[0]);
     NpcEntry* npc = evtNpcNameToPtr(event, name);
@@ -3066,11 +3285,18 @@ static USER_FUNC(setup_npc_ex_para) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: sets NPC_BATTLE_NO_BUMP_ATTACK on the floor enemy's battle info. */
 static USER_FUNC(yattukeFlag) {
     npcNameToPtr("敵")->battleInfo.battleFlags |= NPC_BATTLE_NO_BUMP_ATTACK;
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] = floor index (0-99).
+ * Looks up its battle number in enemy_100 and returns the tribe's model name (args[1]),
+ * Japanese name (args[2]) and battle setup number (args[3]) from btlsetup_jon_tbl;
+ * falls back to Goomba when the name is not a tribe.
+ */
 static USER_FUNC(enemy_info) {
     EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
@@ -3099,6 +3325,11 @@ static USER_FUNC(enemy_info) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: the warp wobble shown during the mover's trip.
+ * Blocks forever, growing the amplitude 0.2 and phase 0.01 per frame,
+ * and queues raster_disp each frame on the 2D camera.
+ */
 static USER_FUNC(evt_raster) {
     f32* work = event->lwDataF;
 
@@ -3112,6 +3343,10 @@ static USER_FUNC(evt_raster) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Offset of the pixel (x, y) in a 4x4-tiled IA8 texture of 8 tiles per row;
+ * raster_disp writes the same arithmetic out by hand.
+ */
 inline s32 ia8_ofs(s32 x, s32 y) {
     int off = (y / 4) << 5;
     off += (x / 4) << 9;
@@ -3119,6 +3354,11 @@ inline s32 ia8_ofs(s32 x, s32 y) {
     return off;
 }
 
+/**
+ * Draw callback of the mover's warp: copies the screen to a texture
+ * and draws it back through a 64x64 sine-wave indirect texture (amplitude capped at 127),
+ * producing the wavy distortion.
+ */
 static void raster_disp(CameraId cameraId, void* param) {
     EventEntry* event = param;
     CameraEntry* cam = camGetPtr(cameraId);
@@ -3209,9 +3449,11 @@ static void raster_disp(CameraId cameraId, void* param) {
     GXSetTevDirect(GX_TEVSTAGE0);
 }
 
+/** Unresolved-import stub for the REL (empty). */
 void _unresolved(void) {
 }
 
+/** REL exit point: runs the static destructors. */
 void _epilog(void) {
     voidfunctionptr* dtor;
 
@@ -3220,6 +3462,10 @@ void _epilog(void) {
     }
 }
 
+/**
+ * REL entry point: runs the static constructors
+ * and registers jon_init_evt as the init script of the seven jon maps (jon_00..jon_06).
+ */
 void _prolog(void) {
     voidfunctionptr* ctor;
 

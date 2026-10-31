@@ -18,12 +18,20 @@
 
 static BeroEntry bero_data[2];
 
+/**
+ * Door animation callback, closing for the s_bero exit to eki_01:
+ * rotates map object "door" about Y by 0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(s_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the s_bero exit to eki_01:
+ * rotates map object "door" about Y by -0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(s_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door"), 0, LW(0), 0)
@@ -52,6 +60,11 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
+/**
+ * Per-frame script helper (started inline from the map init, never finishes):
+ * while Mario stands on a rotating contraption piece (a hit object flagged 0x30),
+ * carries him around with it by turning the piece's rotation since the last frame into mario->floorMove.
+ */
 static USER_FUNC(hit_move) {
     MarioWork* mario = marioGetPtr();
     HitEntry* hit = mario->hitobjStandOn;
@@ -96,11 +109,17 @@ static USER_FUNC(hit_move) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Runs when Mario picks up the station key (ITEM_STATION_KEY_0x19): sets the story to STORY_STG6_31_KEY. */
 static EVT_BEGIN(evt_key)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_31_KEY)
     RETURN
 EVT_END()
 
+/**
+ * Map init for eki_02: sets up the door back to eki_01, starts the contraption (sikake) animations,
+ * places the Station Key until it has been picked up (picking it up sets STORY_STG6_31_KEY),
+ * places the Star Piece, and starts hit_move so Mario rides the moving platforms.
+ */
 EVT_BEGIN(eki_02_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)

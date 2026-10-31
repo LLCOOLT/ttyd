@@ -45,6 +45,11 @@ static EvtWord normal_attack_event[412];
 static EvtWord fire_attack_event[365];
 static EvtWord wait_event[6];
 
+/**
+ * Script helper: copies HP (clamped to the target's maximum),
+ * shrink/grow status and the HP gauge's displayed HP from the unit in args[0] to the unit in args[1],
+ * so a Phantom Ember's flame keeps its source's HP.
+ */
 static USER_FUNC(bubble_copy_status) {
     EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));
@@ -270,6 +275,10 @@ static BattleUnitSetup entry_bubble = {
     NULL, // itemDropTable
 };
 
+/**
+ * Init event of the Phantom Ember: installs its wait, attack,
+ * damage and confusion events and puts it 10 units above the ground.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -282,6 +291,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Phantom Ember: default damage handling on its body part. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -289,6 +299,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Event (data table entry) for when the Phantom Ember is hit by fire and shrugs it off:
+ * plays the fire sound and the A_2B pose for a second.
+ */
 static EVT_BEGIN(avoid_fire_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BUBBLE_FIRE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
@@ -296,6 +310,11 @@ static EVT_BEGIN(avoid_fire_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: event (data table entry 11) run when the Phantom Ember is hit by an explosion or fire and splits:
+ * it waits, then looks for free space beside it on either side (btlevtcmd_CheckSpace)
+ * and calls friend_event there.
+ */
 static EVT_BEGIN(damage_fire_explosion_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("A_2B"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -334,6 +353,10 @@ static EVT_BEGIN(damage_fire_explosion_event)
     RETURN
 EVT_END()
 
+/**
+ * Splitting move of the Phantom Ember: a new Ember (entry_bubble, a normal Ember) is spawned at its position,
+ * copies its status (bubble_copy_status), spins and jumps to the free spot found by the caller.
+ */
 static EVT_BEGIN(friend_event)
     CALL(btlevtcmd_AnimeChangePose, LW(10), LW(11), STRING("S_1"))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(12), LW(13), LW(14))
@@ -362,6 +385,11 @@ static EVT_BEGIN(friend_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the Phantom Ember: can use an item;
+ * otherwise draws 0 to 99 and uses the body charge (weapon_bubble_attack) for 70
+ * and the fire ball (weapon_bubble_fire_attack) for 30.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -386,6 +414,12 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack of the Phantom Ember: the body charge.
+ * It flies at the target in two dives, gives off the fire sound,
+ * and either misses (with the dodge reaction) or hits with the action command defence check,
+ * then flies back to its home position.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -503,6 +537,11 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper (runs every frame while blocked):
+ * keeps a fire effect on the Phantom Ember's part 2
+ * and grows it by 0.1 per frame up to the unit's size multiplier. The first call creates the effect.
+ */
 static USER_FUNC(eff_fire) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -537,6 +576,11 @@ static USER_FUNC(eff_fire) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Attack of the Phantom Ember: the fire ball.
+ * It shoots a fire ball (part 2, with the fire effect) in an arc to the target,
+ * which either dodges it or takes the damage with a smoke puff at the hit point.
+ */
 static EVT_BEGIN(fire_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -637,6 +681,11 @@ static EVT_BEGIN(fire_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper (runs every frame while blocked):
+ * keeps one flame of the all-fire attack, index args[1], in front of the unit at 24 units per index;
+ * the flame sizes follow a rising and falling table (1.0 to 2.25). The first call creates the effect.
+ */
 static USER_FUNC(eff_all_fire) {
     EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
@@ -661,6 +710,10 @@ static USER_FUNC(eff_all_fire) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Helper of all_fire_attack_event: spawns the fire shower effect (eff_all_fire) for the count in LW(0)
+ * and waits 120 frames.
+ */
 static EVT_BEGIN(all_fire_attackEvent_sub)
     BEGIN_SIBLING_EVENT
         CALL(eff_all_fire, BTL_UNIT_SELF, LW(0))
@@ -669,6 +722,11 @@ static EVT_BEGIN(all_fire_attackEvent_sub)
     RETURN
 EVT_END()
 
+/**
+ * Attack of the Phantom Ember on every target (Guess: unused, nothing calls it):
+ * it shakes while charging, then fire rains on the whole opposing side (ten eff_all_fire showers),
+ * and each target gets its dodge or hit check in turn. It then returns to its home position.
+ */
 static EVT_BEGIN(all_fire_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -775,6 +833,7 @@ static EVT_BEGIN(all_fire_attack_event)
     RETURN
 EVT_END()
 
+/** Wait event of the Phantom Ember: plays its idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

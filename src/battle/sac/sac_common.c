@@ -20,6 +20,10 @@ s32 handBeatEnable;
 s32 cheerEnable;
 u8 volPer;
 
+/**
+ * Opening camera of every special move: homes the battle camera on Mario and sets zoom 300,
+ * or 100 while he is huge (STATUS_HUGE).
+ */
 EVT_BEGIN(sac_start_camera_evt)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -34,6 +38,11 @@ EVT_BEGIN(sac_start_camera_evt)
     RETURN
 EVT_END()
 
+/**
+ * Mario steps 15 units forward with a happy shout and the crowd cheers;
+ * he strikes pose M_P_2 and the Magical Map (treasure_map effect) and an item-get glow appear above his head,
+ * removed again by sac_mario_item_on_end_evt.
+ */
 EVT_BEGIN(sac_mario_item_on_evt)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -56,7 +65,7 @@ EVT_BEGIN(sac_mario_item_on_evt)
     RETURN
 EVT_END()
 
-// The demo places this script after sac_start_stardust in its data (see the second copy below).
+/** The demo places this script after sac_start_stardust in its data (see the second copy below). */
 #if VERSION >= VERSION_JP
 EVT_BEGIN(sac_mario_item_on_end_evt)
     CALL(evt_eff_delete, STRING("sac_itemget"))
@@ -65,6 +74,7 @@ EVT_BEGIN(sac_mario_item_on_end_evt)
 EVT_END()
 #endif
 
+/** Six bursts of stardust 50 units above Mario, 10 frames apart, while the Crystal Star appears. */
 EVT_BEGIN(sac_start_stardust)
     LOOP(6)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -75,7 +85,7 @@ EVT_BEGIN(sac_start_stardust)
     RETURN
 EVT_END()
 
-// Same script, at its place in the demo's data.
+/** Same script, at its place in the demo's data. */
 #if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(sac_mario_item_on_end_evt)
     CALL(evt_eff_delete, STRING("sac_itemget"))
@@ -84,6 +94,7 @@ EVT_BEGIN(sac_mario_item_on_end_evt)
 EVT_END()
 #endif
 
+/** Walks Mario back to his home position after the opening pose. */
 EVT_BEGIN(sac_mario_back_home)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -91,6 +102,7 @@ EVT_BEGIN(sac_mario_back_home)
     RETURN
 EVT_END()
 
+/** Per-enemy script of sac_enemy_slide_go: slides the unit 480 units to the right (off stage) at speed 5. */
 EVT_BEGIN(enemy_slide_go_evt)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(0), 480)
@@ -99,6 +111,7 @@ EVT_BEGIN(enemy_slide_go_evt)
     RETURN
 EVT_END()
 
+/** Per-enemy script of sac_enemy_slide_return: slides the unit back to its home position at speed 7. */
 EVT_BEGIN(enemy_slide_return_evt)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(7.0f))
@@ -108,6 +121,7 @@ EVT_END()
 
 // functions are emitted in reverse definition order (-inline deferred)
 
+/** Crowd "wow" reaction: claps, plus a cheer that is bigger (with a whistle) once the audience reaches 150. */
 USER_FUNC(sac_wao) {
     s32 num = BattleAudience_GetAudienceNum();
 
@@ -122,6 +136,11 @@ USER_FUNC(sac_wao) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Runs until sac_handbeat_end: the crowd claps along in time,
+ * starting every 60 frames and speeding up to every 20 while the clap volume rises to 100%.
+ * Stops audience sounds 4 and 5 first; fades out over 180 frames.
+ */
 USER_FUNC(sac_handbeat) {
     BattleAudienceSound* sound;
 
@@ -162,11 +181,17 @@ USER_FUNC(sac_handbeat) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Tells a running sac_handbeat to fade the clapping out and finish. */
 USER_FUNC(sac_handbeat_end) {
     handBeatEnable = 0;
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Runs until sac_cheer_end: a crowd cheer whose volume rises 5% per beat.
+ * args[0] nonzero leaves the volume alone.
+ * Same timer as sac_handbeat but without the claps; fades out over 180 frames when ended.
+ */
 USER_FUNC(sac_cheer) {
     BattleAudienceSound* sound;
     s32 flag = evtGetValue(event, event->args[0]);
@@ -209,11 +234,13 @@ USER_FUNC(sac_cheer) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Tells a running sac_cheer to fade the cheer out and finish. */
 USER_FUNC(sac_cheer_end) {
     cheerEnable = 0;
     return EVT_RETURN_DONE;
 }
 
+/** Starts enemy_slide_go_evt on every enemy-side unit, sliding the whole enemy party off stage. */
 USER_FUNC(sac_enemy_slide_go) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -230,6 +257,11 @@ USER_FUNC(sac_enemy_slide_go) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Starts enemy_slide_return_evt on every enemy-side unit to slide them home.
+ * The PAL release also records each script's id in the unit (slideReturnEventId)
+ * so battle_seq can wait for the slide to finish.
+ */
 USER_FUNC(sac_enemy_slide_return) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -249,11 +281,13 @@ USER_FUNC(sac_enemy_slide_return) {
     return EVT_RETURN_DONE;
 }
 
+/** Switches the action-command help display to the special-move style (type 2), which hides the audience window. */
 USER_FUNC(sac_ac_help_on) {
     BattleAcHelpSetDispType(2);
     return EVT_RETURN_DONE;
 }
 
+/** Restores the normal action-command help display (type 0) and shows the audience window again. */
 USER_FUNC(sac_ac_help_off) {
     BattleAcHelpSetDispType(0);
     return EVT_RETURN_DONE;

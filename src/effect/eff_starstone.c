@@ -229,6 +229,11 @@ static u8* color_tbl[] = {diamond_1_color0_tbl, diamond_2_color0_tbl, diamond_3_
 
 f32 edge_color[] = {0.331f, 0.314999998f, 0.231999993f, 0.158999994f, 0.261000007f, 0.162f, 0.287f, 0.240999997f, 0.0930000022f, 0.324999988f, 0.131999999f, 0.141000003f, 0.144999996f, 0.202999994f, 0.305999994f, 0.312000006f, 0.181999996f, 0.115000002f, 0.256000012f, 0.312999994f, 0.344000012f};
 
+/**
+ * Spawns Crystal Star type % 7 (0 Diamond, 1 Emerald, 2 Gold, 3 Ruby, 4 Sapphire, 5 Garnet,
+ * 6 Crystal) at (x, y, z). Types 7 and up are the same stars without the dust trail or shine sound.
+ * Callers: Star Power moves (battle/sac).
+ */
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffStarStoneWork* work;
@@ -290,6 +295,11 @@ EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     return effect;
 }
 
+/**
+ * State 0 spins the texture and trails dust, with a looping shine sound when allowed.
+ * States 1-5 are the drop: it falls under gravity, bounces on the ground (jump sound, puffs),
+ * then the halves separate and tilt.
+ */
 static void effStarStoneMain(EffectEntry* effect) {
     EffStarStoneWork* w = effect->userdata;
     Vec pos;
@@ -445,8 +455,11 @@ static void effStarStoneMain(EffectEntry* effect) {
     }
 }
 
-// Points the vertex descriptor at a model's indexed arrays: s16 positions (11 fraction bits), s8 normals,
-// RGBA8 colours and s16 texture coordinates. Without setColors the colour array already set is kept.
+/**
+ * Points the vertex descriptor at a model's indexed arrays:
+ * s16 positions (11 fraction bits), s8 normals, RGBA8 colours and s16 texture coordinates.
+ * Without setColors the colour array already set is kept.
+ */
 static inline void starStoneSetVtx(s16* pos, s8* nrm, BOOL setColors, u8* clr, s16* tex, u8 texFrac) {
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_INDEX8);
@@ -465,6 +478,7 @@ static inline void starStoneSetVtx(s16* pos, s8* nrm, BOOL setColors, u8* clr, s
     GXSetArray(GX_VA_TEX0, tex, 4);
 }
 
+/** Sets standard alpha blending with depth testing on and depth writes off. */
 static inline void starStoneSetBlend(void) {
     GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
     GXSetZCompLoc(GX_TRUE);
@@ -472,10 +486,13 @@ static inline void starStoneSetBlend(void) {
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
 }
 
-// Draws the round stone (types 0 and 6): a 10% larger untextured shell, then the textured stone.
-// Each loop walks a display-list table and its size table (32-byte units). The loops are written the way the
-// compiler saw them: some share the function's loop variables, others have their own block, and the demo orders
-// the loop variables differently; each form gives the original register allocation.
+/**
+ * Draws the round stone (types 0 and 6): a 10% larger untextured shell, then the textured stone.
+ * Each loop walks a display-list table and its size table (32-byte units).
+ * The loops are written the way the compiler saw them:
+ * some share the function's loop variables, others have their own block,
+ * and the demo orders the loop variables differently; each form gives the original register allocation.
+ */
 static void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
 #if VERSION <= VERSION_DEMO_US
     u32 i;
@@ -673,7 +690,7 @@ static void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-// Draws one half of the split stone; list 0 only once the stone has been dropped.
+/** Draws one half of the split stone; list 0 only once the stone has been dropped. */
 static inline void starStoneCallHalfLists(EffStarStoneWork* w, u8** tbl, u8* sz, u32 n) {
     s32 i;
     for (i = 0; i < n; i++) {
@@ -683,7 +700,7 @@ static inline void starStoneCallHalfLists(EffStarStoneWork* w, u8** tbl, u8* sz,
     }
 }
 
-// Draws the stones that split in two (types 1-5): an untextured shell for each half, then each half textured.
+/** Draws the stones that split in two (types 1-5): an untextured shell for each half, then each half textured. */
 static void effStarStoneDisp_2(CameraId cameraId, EffectEntry* effect) {
     Mtx m;
     Mtx s;
@@ -796,6 +813,7 @@ static void effStarStoneDisp_2(CameraId cameraId, EffectEntry* effect) {
     starStoneCallHalfLists(w, diamond_2_2_dl_1_tbl, diamond_2_2_dl_1_size_tbl, sizeof(diamond_2_2_dl_1_tbl) / sizeof(diamond_2_2_dl_1_tbl[0]));
 }
 
+/** Draws the star with the right model: the round stone for types 0 and 6, the two-half stone otherwise. */
 void effStarStoneDraw(CameraId cameraId, EffectEntry* effect) {
     EffStarStoneWork* w = effect->userdata;
     switch (w->type) {

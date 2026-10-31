@@ -31,6 +31,11 @@ static s32 gor_inemuri_snd_id;
 static char* gor_msg_cat_buf;
 #endif
 
+/**
+ * REL prolog for the Rogueport module: runs the static constructors
+ * and registers the init event of each Rogueport map (gor_00 to gor_04, gor_10 to gor_12)
+ * and the area's battle setup tables.
+ */
 void _prolog(void) {
     voidfunctionptr* ctor;
 
@@ -48,6 +53,10 @@ void _prolog(void) {
     relSetBtlAddr("gor", btlsetup_gor_tbl, btl_gor_setup_no_tbl);
 }
 
+/**
+ * REL epilog: when the module is unloaded from gor_10 it deletes the letter object (tegami_delete),
+ * then runs the static destructors.
+ */
 void _epilog(void) {
     voidfunctionptr* dtor;
 
@@ -59,10 +68,12 @@ void _epilog(void) {
     }
 }
 
+/** Target of unresolved relocations; the module has no code to run for them, so it is empty. */
 void _unresolved(void) {
 }
 
 #if VERSION >= VERSION_JP
+/** Script helper (Japanese release and later): frees the string built by evt_gor_msg_cat_alloc, if there is one. */
 USER_FUNC(evt_gor_msg_cat_free) {
     if (gor_msg_cat_buf == NULL) {
         return EVT_RETURN_DONE;
@@ -72,6 +83,12 @@ USER_FUNC(evt_gor_msg_cat_free) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper (Japanese release and later): builds one string out of args[0],
+ * the message named args[1] and args[2], in a map-allocated buffer,
+ * and writes the buffer's address into args[3].
+ * Used to put fixed text around a looked-up message in Rogueport scripts.
+ */
 USER_FUNC(evt_gor_msg_cat_alloc) {
     EvtWord* args = event->args;
     const char* head = (const char*)evtGetValue(event, args[0]);
@@ -87,6 +104,13 @@ USER_FUNC(evt_gor_msg_cat_alloc) {
 }
 #endif
 
+/**
+ * Script helper for the wandering Rogueport villagers:
+ * args[0] and args[1] are the script variables holding the villager's target x and z, args[2],
+ * args[3] the centre of its wander area and args[4] the radius.
+ * If the target is outside the circle it is moved back to the centre,
+ * so a villager never wanders out of its zone.
+ */
 USER_FUNC(evt_gor_villager_urouro_check_func) {
     EvtWord* args = event->args;
     s32 xVar = args[0];
@@ -109,6 +133,11 @@ USER_FUNC(evt_gor_villager_urouro_check_func) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: starts a two-value interpolation in the script's LW(9) to LW(15):
+ * args[0] is the curve mode, args[1] and args[2] the start and end of the first value,
+ * args[3] and args[4] those of the second, args[5] the number of steps. Used with evt_goki_sub_intpl_get_value.
+ */
 USER_FUNC(evt_goki_sub_intpl_init) {
     EvtWord* args = event->args;
     s32 mode = evtGetValue(event, args[0]);
@@ -128,6 +157,10 @@ USER_FUNC(evt_goki_sub_intpl_init) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: advances the interpolation started by evt_goki_sub_intpl_init by one step
+ * and returns the two interpolated values in LW(0) and LW(1).
+ */
 USER_FUNC(evt_goki_sub_intpl_get_value) {
     event->lwData[0] = intplGetValue(event->lwData[9], event->lwData[10], event->lwData[11], event->lwData[14], event->lwData[15]);
     event->lwData[1] = intplGetValue(event->lwData[9], event->lwData[12], event->lwData[13], event->lwData[14], event->lwData[15]);
@@ -136,11 +169,19 @@ USER_FUNC(evt_goki_sub_intpl_get_value) {
 }
 
 #if VERSION >= VERSION_JP
+/**
+ * Script helper (Japanese release and later): remembers the sound effect id args[0] of Mario's snoring
+ * so it can be stopped later (-1 for none).
+ */
 USER_FUNC(evt_gor_inemuri_snd_set) {
     gor_inemuri_snd_id = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper (Japanese release and later): stops the snoring sound effect saved by evt_gor_inemuri_snd_set,
+ * if any.
+ */
 USER_FUNC(evt_gor_inemuri_snd_off) {
     if (gor_inemuri_snd_id != -1) {
         psndSFXOff(gor_inemuri_snd_id);
@@ -149,6 +190,10 @@ USER_FUNC(evt_gor_inemuri_snd_off) {
 }
 #endif
 
+/**
+ * NPC regular event shared by Rogueport villagers:
+ * lets the NPC wander (urouro) within 100 units of where it starts, with a 30 unit step.
+ */
 EVT_BEGIN(gor_villager_urouro)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     CALL(urouro_init_func, STRING("me"), LW(0), LW(2), FLOAT(100.0f), FLOAT(30.0f), 0)
@@ -156,6 +201,10 @@ EVT_BEGIN(gor_villager_urouro)
     RETURN
 EVT_END()
 
+/**
+ * Looping helper: plays Mario's sleeping voice at his position every 140 frames.
+ * The Japanese release and later also remember the sound's id so it can be cut off when he wakes.
+ */
 EVT_BEGIN(inemuri_snd)
 #if VERSION >= VERSION_JP
     CALL(evt_gor_inemuri_snd_set, -1)
@@ -173,6 +222,12 @@ EVT_BEGIN(inemuri_snd)
     RETURN
 EVT_END()
 
+/**
+ * Plays while Mario listens to Luigi's long talk (started by luigi_gor_first_talk):
+ * after 1200 frames (20 s) Mario dozes off and snores, after 900 frames the partner falls asleep too,
+ * and after 600 frames Mario yawns and stretches.
+ * It runs until GF(0) is set, then wakes Mario (and the partner) up, with a wake-up voice and a short stretch.
+ */
 EVT_BEGIN(mario_and_party_sleep)
     SET_VALUE(LW(1), 1200)
     SET_VALUE(LW(2), 900)
@@ -276,6 +331,15 @@ EVT_BEGIN(mario_and_party_sleep)
     RETURN
 EVT_END()
 
+/**
+ * Talk event for Luigi in Rogueport.
+ * The first time he greets Mario (gor_luigi_00 and 01);
+ * then he says a line that depends on the story chapter (gor_luigi_02 to 09)
+ * and asks whether Mario wants to hear his stories (gor_luigi_yesno).
+ * If so, Mario picks stories from a list (the johoya data gor_luigi_talk);
+ * each plays with the long-talk music while Mario and the partner fall asleep (mario_and_party_sleep),
+ * until he picks nothing or says no.
+ */
 EVT_BEGIN(luigi_gor_first_talk)
     CALL(evt_party_stop, 0)
     IF_INT_EQUAL(GSWF(GSWF_GOR_LUIGI_FIRST_TALK), 0)

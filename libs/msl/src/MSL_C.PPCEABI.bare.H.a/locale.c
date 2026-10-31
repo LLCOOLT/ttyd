@@ -36,6 +36,7 @@ struct lconv __lconv = {
 
 int strcmp(const char*, const char*);
 
+/** Standard setlocale(): only the C locale exists, so it accepts 'C', '' or NULL and returns 'C', otherwise null. */
 char* setlocale(int category, const char* locale) {
     if (locale == 0 || !strcmp(locale, "C") || !strcmp(locale, ""))
         return "C";

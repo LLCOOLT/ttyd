@@ -189,6 +189,10 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init event of the Shinnosuke: installs wait, attack, damage and confusion events and sets its walk,
+ * run and jump sounds (SFX_ENM_EMON_*).
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -201,6 +205,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event of Shinnosuke: runs damage_event_sub (hurt and flipped poses), then the default damage handling. */
 static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_GetDamage, BTL_UNIT_SELF, LW(15))
     IF_INT_GREATER_OR_EQUAL(LW(15), 1)
@@ -219,6 +224,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Pose part of Shinnosuke's damage reaction: shows the hurt pose (SIS_D_1) when damage was dealt,
+ * and while he lies flipped over shows SIS_D_2 and hops twice.
+ */
 static EVT_BEGIN(damage_event_sub)
     CALL(btlevtcmd_GetDamage, BTL_UNIT_SELF, LW(15))
     IF_INT_GREATER_OR_EQUAL(LW(15), 1)
@@ -235,6 +244,10 @@ static EVT_BEGIN(damage_event_sub)
     RETURN
 EVT_END()
 
+/**
+ * Reaction when Shinnosuke is flipped over: switches to the flipped defence and pose tables,
+ * sets the over-turn count to 2 (SFX_ENM_INSIDE1), hops and rests on his back at y = 5.
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -256,6 +269,12 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Recovery of Shinnosuke at the start of his turn:
+ * counts the over-turn count down and, when it reaches 0,
+ * restores the normal defence and pose tables and ground position with SFX_ENM_INSIDE2 and a hop;
+ * while still flipped he just goes back to waiting.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -282,6 +301,10 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of Shinnosuke: like Shinemon's dash attack (gets up first if flipped,
+ * otherwise uses an item or dashes at one target with weapon_sinnosuke_attack) but with faster movement speeds.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -406,6 +429,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait (idle) event of the Shinnosuke: shows the idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

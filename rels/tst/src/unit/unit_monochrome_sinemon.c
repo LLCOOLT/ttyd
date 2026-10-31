@@ -191,6 +191,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Battle init script for the Monochrome Shinemon:
+ * installs the wait, attack, damage and confusion handlers, the walk,
+ * run and jump sounds and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -203,6 +208,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Plays the spike flash effect (toge_flush) at the top of the Shinemon after 30 frames,
+ * when an attack is stopped by its spiked head.
+ * The effect is placed 35 above it, or 25 when it is Tiny (status 11) and 45 when it is Huge (status 10).
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -226,6 +236,11 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: if the hit did damage it plays the SIN_D_1 hit pose;
+ * if the Shinemon is on its back it plays SIN_D_2 and hops twice.
+ * Then it runs the default damage reaction on this unit's part 1.
+ */
 static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_GetDamage, BTL_UNIT_SELF, LW(15))
     IF_INT_GREATER_OR_EQUAL(LW(15), 1)
@@ -244,6 +259,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs when the Shinemon is flipped onto its back:
+ * switches part 1 to the upside-down defence table and pose table,
+ * sets the overturn status flag and an overturn count of 2, plays SIN_D_2 and the flip sound, bounces twice,
+ * rests at y = 7 and clears the part's counter attribute so the spikes no longer hurt attackers.
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -266,6 +287,13 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs on the Shinemon's turn while it is on its back:
+ * counts the overturn count down and, if it is still above 0, goes back to waiting.
+ * At 0 it restores the normal defence table and pose table, clears the overturn flag,
+ * puts the unit back on the ground (y = 0), restores the counter attribute,
+ * plays the wake-up sound and hops upright before restarting the wait event.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -293,6 +321,13 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack AI of the Shinemon: wakes up first if it is on its back.
+ * Then picks a target (a flag-2 battle uses the fixed first target after a pause;
+ * otherwise it uses an enemy item if it has one, or a sampled enemy) and charges:
+ * runs round behind the target with a stomping sound, crouches, then dashes into it.
+ * A hit shakes the camera and it bounces off the target twice; a miss makes it run past. It then returns home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -417,6 +452,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Wait (idle) event: refreshes the body animation (part 1) from the unit's pose table
+ * so it matches the current state, then returns; the battle system runs it whenever the unit is idle.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

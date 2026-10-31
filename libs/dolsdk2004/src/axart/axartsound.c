@@ -2,6 +2,12 @@
 #include <dolphin/os.h>
 #include <dolphin/mix.h>
 
+/**
+ * Per-tick update of one sound: steps each envelope and LFO articulator, sums the pitch cents,
+ * attenuation and aux send contributions, then writes the SRC type and ratio and ITD target to the voice
+ * and the volume, aux A/B levels, pan and surround pan through MIXSetInput, MIXSetAuxA, MIXSetAuxB,
+ * MIXSetPan and MIXSetSPan.
+ */
 void AXARTServiceSound(AXART_SOUND* sound) {
     AXART_ART* articulator;
     AXVPB* axvpb;
@@ -113,6 +119,7 @@ void AXARTServiceSound(AXART_SOUND* sound) {
     MIXSetSPan(axvpb, span);
 }
 
+/** Links an articulator at the head of a sound's articulator list. */
 void AXARTAddArticulator(AXART_SOUND* sound, AXART_ART* articulator) {
     ASSERTLINE(232, sound);
     ASSERTLINE(233, articulator);

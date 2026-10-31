@@ -6,11 +6,17 @@
 static void WriteCallback(s32 chan, s32 result);
 static void EraseCallback(s32 chan, s32 result);
 
+/** Returns the directory copy (in the mount work area) that is currently valid. */
 CARDDir* __CARDGetDirBlock(CARDControl* card) {
     ASSERTLINE(54, card->currentDir);
     return card->currentDir;
 }
 
+/**
+ * Completion callback for the directory write: on success duplicates the block just written over the other
+ * directory copy and makes it the current one, releases the channel unless an API callback is pending,
+ * and calls the user callback saved in eraseCallback.
+ */
 static void WriteCallback(s32 chan, s32 result) {
     CARDControl* card = &__CARDBlock[chan];
     CARDCallback callback;
@@ -41,6 +47,10 @@ static void WriteCallback(s32 chan, s32 result) {
     }
 }
 
+/**
+ * Completion callback for the directory sector erase:
+ * writes the current 8 KiB directory block into that sector, or reports the error.
+ */
 static void EraseCallback(s32 chan, s32 result) {
     CARDControl* card = &__CARDBlock[chan];
     CARDCallback callback;
@@ -65,6 +75,10 @@ static void EraseCallback(s32 chan, s32 result) {
     }
 }
 
+/**
+ * Saves the directory: bumps its check code, recomputes its checksums,
+ * flushes it from the data cache and erases its sector; EraseCallback then writes it out.
+ */
 s32 __CARDUpdateDir(s32 chan, CARDCallback callback) {
     CARDControl* card;
     CARDDirCheck* check;

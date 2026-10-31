@@ -63,6 +63,10 @@ static EvtWord wait_event[6];
 static EvtWord wait_event[7];
 #endif
 
+/**
+ * Script helper: allocates the yarn work block (a PidersYarn) for the calling Pider
+ * and keeps it in the unit's countersetWeapon slot.
+ */
 static USER_FUNC(piders_yarn_init) {
     s32 id = BattleTransID(event, -2);
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -188,6 +192,10 @@ static BattleUnitKindPart parts[] = {
     {5, "btl_un_piders", "c_paid", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
 };
 
+/**
+ * Draw callback for the Pider's thread: one thin white quad from the unit's hanging height up to the ceiling (y
+ * = 400), with the alpha from the yarn work block.
+ */
 static void piders_draw_yarn_sub(CameraId camera, void* param) {
     PidersYarn* yarn = param;
     CameraEntry* cam = camGetPtr(CAMERA_3D);
@@ -215,6 +223,11 @@ static void piders_draw_yarn_sub(CameraId camera, void* param) {
     GXEnd();
 }
 
+/**
+ * Script helper: args[0] = alpha.
+ * Sets the thread's two end points above the Pider's home position (the Pider's hanging height from work[2] up
+ * to y = 400) and queues the draw callback.
+ */
 static USER_FUNC(piders_draw_yarn) {
     u8 alpha = evtGetValue(event, event->args[0]);
     s32 id = BattleTransID(event, -2);
@@ -231,6 +244,10 @@ static USER_FUNC(piders_draw_yarn) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: returns in args[0] how many Piders and Arantulas (kinds 0x1B and 0xA4) are still on the field
+ * and not knocked out.
+ */
 static USER_FUNC(piders_get_num) {
     BattleUnit* unit;
     s32 i;
@@ -248,6 +265,10 @@ static USER_FUNC(piders_get_num) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] = unit; returns in args[1] its order (zyun) among the living Piders and Arantulas,
+ * counting from 1.
+ */
 static USER_FUNC(piders_get_zyun) {
     s32 id;
     s32 i;
@@ -274,6 +295,10 @@ static USER_FUNC(piders_get_zyun) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: returns in args[0] the 0/1 position attribute (work[0]) of the first living Pider or Arantula,
+ * flipped when that unit can act, so the group knows which side to take.
+ */
 static USER_FUNC(piders_get_first_pos_attr) {
     s32 i;
     EvtWord* args = event->args;
@@ -300,6 +325,11 @@ static USER_FUNC(piders_get_first_pos_attr) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper for the chained attack (renzoku):
+ * collects the current weapon's target list and picks three targets at random,
+ * writing each pick's unit and part indices into args[0..5] in order.
+ */
 static USER_FUNC(piders_renzoku_attack_set_target) {
     EvtWord* args = event->args;
     s32 unitIdx[20];
@@ -326,6 +356,7 @@ static USER_FUNC(piders_renzoku_attack_set_target) {
     return EVT_RETURN_DONE;
 }
 
+/** Reads the current entry of the weapon target list: unit index in *unitIdx and part index in *partIdx. */
 static void piders_get_target(s32* unitIdx, s32* partIdx) {
     BattleWorkWeaponTargets* wt = &_battleWorkPointer->weaponTargets;
     BattleWorkTarget* target = &wt->targets[wt->targetIndices[wt->currentTarget]];
@@ -334,6 +365,10 @@ static void piders_get_target(s32* unitIdx, s32* partIdx) {
     *partIdx = target->partIdx;
 }
 
+/**
+ * Advances to the next entry of the weapon target list and reads it;
+ * returns unit -1 and part 0 at the end of the list.
+ */
 static void piders_get_next_target(s32* unitIdx, s32* partIdx) {
     BattleWorkWeaponTargets* wt = &_battleWorkPointer->weaponTargets;
 
@@ -420,6 +455,11 @@ static BattleWeapon weapon_piders_renzoku_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init script of the Pider: sets its wait, unison phase, attack, damage, confusion and entry events,
+ * clears its height state and thread height, sets the thread to fully opaque (work 1 = 255)
+ * and the footstep flag (work 3), allocates the thread data, starts the thread event and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventUnisonPhase, BTL_UNIT_SELF, PTR(unison_phase_event))
@@ -437,6 +477,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Data-table hook (entry 48) for the Pider: sets its y position to 10 and waits for the attack to end. */
 static EVT_BEGIN(dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -445,6 +486,11 @@ static EVT_BEGIN(dmg_first_attack_pos)
     RETURN
 EVT_END()
 
+/**
+ * Loop that runs for as long as the Pider exists:
+ * fades the thread by 2 per frame when work 1 is between 3
+ * and 254 (the thread fades out at the end of the battle) and draws the thread.
+ */
 static EVT_BEGIN(yarn_event)
     LABEL(0)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))
@@ -465,6 +511,11 @@ static EVT_BEGIN(yarn_event)
     RETURN
 EVT_END()
 
+/**
+ * Entry event of the Pider: starts it at y=180, with the thread at y=400,
+ * waits a delay depending on its x position, then lowers the thread from 400 to 0 over 40 frames as the Pider
+ * drops to the ground.
+ */
 static EVT_BEGIN(entry_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 180)
@@ -482,6 +533,7 @@ static EVT_BEGIN(entry_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Pider: runs the default damage reaction. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -489,6 +541,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Death of the Pider: plays the die sound, spins it three times (48 frames), plays an explosion effect,
+ * hands out its coins and experience, shows the star points, tilts it over for 30 frames,
+ * hides it and kills the unit.
+ */
 static EVT_BEGIN(dead_event)
     SET_VALUE(LW(0), 48)
     CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -539,6 +596,11 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Death of the Pider when it is blown away: plays the wind sound,
+ * spins it in the death pose while it flies toward the edge of the stage,
+ * gives out its coins and experience and removes the unit.
+ */
 static EVT_BEGIN(blow_dead_event)
     CALL(evt_snd_sfxon, STRING("SFX_BTL_CLAUD_BREATH3"), 0)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(0))
@@ -570,11 +632,16 @@ static EVT_BEGIN(blow_dead_event)
     RETURN
 EVT_END()
 
+/** Battle-end hook for the Pider: sets work 1 to 254, which makes the thread fade out. */
 static EVT_BEGIN(battle_end_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 254)
     RETURN
 EVT_END()
 
+/**
+ * Wobble of the Pider: swings it left and right on the thread with a rotation that settles down over about 90
+ * frames.
+ */
 static EVT_BEGIN(yure_event)
     BEGIN_INLINE_EVENT
         LOOP(10)
@@ -606,6 +673,11 @@ static EVT_BEGIN(yure_event)
     RETURN
 EVT_END()
 
+/**
+ * Moves the Pider to the ground (y 10) with a 4-footstep sound pattern and a wobble, sets its home there,
+ * clears the part attributes 6291456 (that made it untargetable in the air) and sets its height state to 1.
+ * The first time it uses a different step sound.
+ */
 static EVT_BEGIN(move_kuutei_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -634,6 +706,10 @@ static EVT_BEGIN(move_kuutei_event)
     RETURN
 EVT_END()
 
+/**
+ * Moves the Pider up into the air (y 70) with a wobble and a step sound, sets its home there,
+ * sets the part attributes 6291456 (untargetable while hanging) and its height state to 0.
+ */
 static EVT_BEGIN(move_kuuchu_event)
     SPAWN_EVENT(yure_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -651,6 +727,12 @@ static EVT_BEGIN(move_kuuchu_event)
     RETURN
 EVT_END()
 
+/**
+ * Unison-phase event: before the player phase, if the Pider can act it moves to the ground or into the air
+ * so that the group alternates.
+ * Guess: the first Pider always switches state, and the others choose by their order,
+ * the number of Piders and the first one's state.
+ */
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_EQUAL(LW(0), 0)
@@ -709,6 +791,11 @@ static EVT_BEGIN(unison_phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the Pider. Uses an enemy item if it has one.
+ * Otherwise a 50 percent chance for the single bite (normal_attack_event)
+ * and 50 percent for the three-target combo (renzoku_attack_event).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 11, 0)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 12, 0)
@@ -738,6 +825,12 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Checks the result of one hit against the target (LW(3), LW(4)):
+ * a miss, guard or dodge (results 2, 3, 4 and 6) starts the dodge pose on the target (38, 39 or 40)
+ * and lets the attack part continue; a hit applies the damage check, remembering which target was hit,
+ * with the action-command guard bonus when it applies.
+ */
 static EVT_BEGIN(damage_check_event_sub)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(0))
     SWITCH(LW(0))
@@ -797,6 +890,12 @@ static EVT_BEGIN(damage_check_event_sub)
     RETURN
 EVT_END()
 
+/**
+ * First part of the Pider's attack: shows the attack pose and puts part 2 (the attack part) at the unit,
+ * then swings it back in three beats with the attack sound (rotation 0 to 110, 110 to 70,
+ * 70 to 100 over 5 frames each, mirrored by the facing in LW(8)).
+ * The part's pivot height depends on the unit's size status, and the final angle is stored in unit work 4.
+ */
 static EVT_BEGIN(piders_attack_common_event1)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(8))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(8))
@@ -855,6 +954,11 @@ static EVT_BEGIN(piders_attack_common_event1)
     RETURN
 EVT_END()
 
+/**
+ * Variant of piders_attack_common_event1 that skips the first two beats:
+ * it starts from the angle saved in unit work 4
+ * and swings the attack part to 100 over 5 frames with the attack sound, then stores the angle again.
+ */
 static EVT_BEGIN(piders_attack_common_event1_2)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(8))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(8))
@@ -896,6 +1000,10 @@ static EVT_BEGIN(piders_attack_common_event1_2)
     RETURN
 EVT_END()
 
+/**
+ * Second part of the Pider's attack: turns to face the target and rotates part 2 back down over 15 frames,
+ * then returns to the idle pose.
+ */
 static EVT_BEGIN(piders_attack_common_event2)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(8))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(8))
@@ -911,6 +1019,11 @@ static EVT_BEGIN(piders_attack_common_event2)
     RETURN
 EVT_END()
 
+/**
+ * Third part of the Pider's attack: plays the attack sound
+ * and sends the attack part flying to the target (a jump of speed 6 with gravity 0.25);
+ * used for each shot of the combo.
+ */
 static EVT_BEGIN(piders_attack_common_event3)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PAIDA_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, LW(7), STRING("PAI_A_3a"))
@@ -926,6 +1039,11 @@ static EVT_BEGIN(piders_attack_common_event3)
     RETURN
 EVT_END()
 
+/**
+ * The Pider's single attack: picks a target, declares the attack, winds up (common event 1),
+ * swings back (event 2) while the attack part flies out (event 3) and the damage check runs,
+ * then waits half a second.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -961,6 +1079,11 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Pider's combo attack: picks three random targets from the group, stores them in its unit work,
+ * declares the attack and winds up, then shoots three times, 30 frames apart, each with its own damage check,
+ * and finally swings back.
+ */
 static EVT_BEGIN(renzoku_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -1008,6 +1131,10 @@ static EVT_BEGIN(renzoku_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Resolves one shot of the combo (target slots in work):
+ * checks whether it is the last shot and picks the version for the last shot or for an earlier one.
+ */
 static EVT_BEGIN(renzoku_attack_event_sub)
     SET_VALUE(LW(0), LW(5))
     SET_VALUE(LW(1), LW(6))
@@ -1032,6 +1159,7 @@ static EVT_BEGIN(renzoku_attack_event_sub)
     RETURN
 EVT_END()
 
+/** Resolves a shot that is not the last: runs the common damage check. */
 static EVT_BEGIN(renzoku_attack_event_sub_no_last)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(10), 1)
@@ -1039,6 +1167,10 @@ static EVT_BEGIN(renzoku_attack_event_sub_no_last)
     RETURN
 EVT_END()
 
+/**
+ * Resolves the last shot of the combo: waits for its target slot and runs the common damage check;
+ * the check applies the damage and result for that last target.
+ */
 static EVT_BEGIN(renzoku_attack_event_sub_last)
     SET_VALUE(LW(0), 5)
     SET_VALUE(LW(1), 8)
@@ -1068,6 +1200,7 @@ static EVT_BEGIN(renzoku_attack_event_sub_last)
     RETURN
 EVT_END()
 
+/** Idle script of the Pider: plays its idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

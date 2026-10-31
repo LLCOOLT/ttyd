@@ -491,6 +491,11 @@ static BattleUnitKindPart parts[] = {
     {5, "btl_un_sambo", "c_sanbo", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table_parts},
 };
 
+/**
+ * Init script of a Pokey: registers its wait, attack, damage and confusion handlers,
+ * starts it with four body segments (unit work 0 = 4, applied through _body_param_set),
+ * clears unit work 1 (the count of summons it has made) and sets the rustling walk/run sounds.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -506,6 +511,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs when an attack on the Pokey is stopped by its spikes:
+ * it plays the toge_flush spark effect at the side of the Pokey,
+ * at a height that follows its body height and size, and holds the pose for 60 frames.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_side_event)
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 47)
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
@@ -520,6 +530,10 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_side_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction of the Pokey: picks the part that takes the hit from its segment count (unit work 0: 1 segment
+ * is part 4, 2 is part 3, 3 is part 2, 4 is part 1) and runs the default damage handling.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
@@ -537,6 +551,13 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction used when the hit can knock off body segments:
+ * if only the head is left (unit work 0 = 1) it reacts as a plain hit,
+ * otherwise the segment count goes down by one and the parts, status icon height,
+ * kiss hit offset and swallow attribute are rebuilt for the shorter Pokey (_body_param_set),
+ * then subset_dmg_sambo_fall makes the lost segment fall.
+ */
 static EVT_BEGIN(damage_event_bodylost)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -611,6 +632,10 @@ static EVT_BEGIN(damage_event_bodylost)
     RETURN
 EVT_END()
 
+/**
+ * Makes the lost Pokey segment fall: switches the pose of the dropped part (LW(14), pose type 39)
+ * and plays the fall.
+ */
 static EVT_BEGIN(subset_dmg_sambo_fall)
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
@@ -654,6 +679,13 @@ static EVT_BEGIN(subset_dmg_sambo_fall)
     RETURN
 EVT_END()
 
+/**
+ * Guess: damage reaction for a Pokey that can lose segments to a blow: a lone head just takes the shot damage;
+ * otherwise the segment count goes down and the parts are rebuilt as in damage_event_bodylost,
+ * subset_dmg_sambo_fall drops the segment, and the falling segment
+ * then damages the other units with Mario's Spin Hammer
+ * or Ultra Hammer involved-weapon data (chosen from the damage pattern).
+ */
 static EVT_BEGIN(damage_event_bodylost_blow)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -751,6 +783,11 @@ static EVT_BEGIN(damage_event_bodylost_blow)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction when the Pokey is swallowed by Yoshi:
+ * like damage_event_bodylost, a lone head just reacts to the damage,
+ * otherwise it loses a segment (unit work 0 down by one) and its parts are rebuilt for the shorter body.
+ */
 static EVT_BEGIN(damage_swallow_body)
     SET_VALUE(LW(14), 39)
     SET_VALUE(LW(15), -1)
@@ -822,6 +859,14 @@ static EVT_BEGIN(damage_swallow_body)
     RETURN
 EVT_END()
 
+/**
+ * Chooses the Pokey's attack from its segment count (unit work 0): item use first;
+ * with 4 segments and a summon count (unit work 1) of at most 1 there is a 30% chance it calls a friend
+ * (call_friend_event, when a free spot exists);
+ * with 2 or more segments a 30% chance of the top-heavy attack (attack_head_2_event) and
+ * otherwise the spike attack (attack_spike_event); a lone head uses attack_head_1_event.
+ * Guess: the exact thresholds, read from the script.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 0, 0)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
@@ -891,6 +936,12 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the Pokey's attack with its tall body (2 to 4 segments):
+ * picks a target with the weapon for its current height and topples its whole body onto it,
+ * tilting it about its base; a miss lets it keep rotating past, a hit applies the damage,
+ * then it straightens up again.
+ */
 static EVT_BEGIN(attack_head_2_event)
     SET_VALUE(LW(6), LW(11))
     CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(5))
@@ -1077,6 +1128,11 @@ static EVT_BEGIN(attack_head_2_event)
     RETURN
 EVT_END()
 
+/**
+ * The attack of a Pokey that has only its head left:
+ * it hops toward the target (sambo_rabbit_move), rolls into it, applies the damage or misses,
+ * and hops back home.
+ */
 static EVT_BEGIN(attack_head_1_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_sambo_head_attack_1))
@@ -1239,6 +1295,13 @@ static EVT_BEGIN(attack_head_1_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the Pokey's spike attack: it tilts back
+ * and hurls its top segment as a spiked ball at the target with SFX_ENM_SAMBO_ATTACK3 to 5,
+ * losing a segment (the segment count and parts are rebuilt);
+ * the damage check handles a miss or a hit, and a result of 21 (Guess: the spikes were countered) damages the
+ * Pokey itself.
+ */
 static EVT_BEGIN(attack_spike_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(10))
     SWITCH(LW(10))
@@ -1448,6 +1511,10 @@ static EVT_BEGIN(attack_spike_event)
     RETURN
 EVT_END()
 
+/**
+ * The Pokey calls a friend: it signals with SFX_ENM_SAMBO_SEND_GROUP1_1 to 3 and SEND_GROUP2,
+ * then spawns another Pokey (entry_sambo) in a puff of kemuri_test smoke and copies its call count into it.
+ */
 static EVT_BEGIN(call_friend_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("SNB_S_1"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_SAMBO_SEND_GROUP1_3"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -1545,6 +1612,10 @@ static BattleUnitSetup entry_sambo = {
     NULL, // itemDropTable
 };
 
+/**
+ * Idle event of the Pokey: sets the idle pose of the part that is currently its top segment,
+ * chosen from the segment count in unit work 0.
+ */
 static EVT_BEGIN(wait_event)
     SET_VALUE(LW(10), -2)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
@@ -1562,6 +1633,11 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+/**
+ * Hops the Pokey along the ground in steps of LW(8) units toward the position (LW(5), LW(6), LW(7)),
+ * playing SFX_ENM_SAMBO_MOVE2 on each hop, until it is within one step,
+ * then makes a final hop onto the position. Used by the head-only attack. Guess: "rabbit" refers to the hopping.
+ */
 static EVT_BEGIN(sambo_rabbit_move)
     LABEL(0)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -1587,6 +1663,10 @@ static EVT_BEGIN(sambo_rabbit_move)
     RETURN
 EVT_END()
 
+/**
+ * Sets the Pokey's height and cut height (20, 40, 60 or 80) from the number of body segments left in unit work 0
+ * (1 to 4).
+ */
 static EVT_BEGIN(_body_param_set)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     SWITCH(LW(0))

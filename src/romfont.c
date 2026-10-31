@@ -233,6 +233,11 @@ static const char** msg_tbl[2] = { msg_jp, msg_us };
 // local prototypes
 static void romFontMake(void);
 
+/**
+ * Returns system message msg (progressive-scan prompt, disc errors, language names) in the console's language.
+ * Non-JP releases fall back to the English table when the IPL font is ASCII but gp->language is Japanese;
+ * JP always returns the Japanese text. Used by seq_logo and the disc-error screen in mariost.
+ */
 const char* romFontGetMessage(s32 msg) {
 #if VERSION != VERSION_JP
     if (wp->language != 0 && (u32)gp->language == 0) {
@@ -244,6 +249,7 @@ const char* romFontGetMessage(s32 msg) {
 #endif
 }
 
+/** Called once at boot from mariost: picks Japanese (SJIS IPL font) or Western text and bakes the glyph cache. */
 void romFontInit(void) {
     wp->glyphs = 0;
     wp->uniqueChars = 0;
@@ -255,6 +261,11 @@ void romFontInit(void) {
     romFontMake();
 }
 
+/**
+ * Builds the glyph cache: collects every character used by the message tables, sorts and dedups them,
+ * loads the IPL font from ROM and stores one texel glyph and width per character in wp->glyphs.
+ * The temporary buffers are freed.
+ */
 static void romFontMake(void) {
     char c[16];
     s32 width;
@@ -377,6 +388,7 @@ static void romFontMake(void) {
 }
 
 
+/** Looks a character code up in the glyph cache; falls back to the first glyph when the code was not baked. */
 static inline RomFontChar* romFontFindChar(u16 code) {
     RomFontWork* w = wp;
     RomFontChar* table = w->glyphs;
@@ -389,7 +401,7 @@ static inline RomFontChar* romFontFindChar(u16 code) {
     return table; // not found
 }
 
-// Not quite matched, see: https://decomp.me/scratch/cdEUS
+/** Not quite matched, see: https://decomp.me/scratch/cdEUS */
 void romFontPrintGX(f32 x, f32 y, f32 scale, GXColor* color, const char* msg, ...) {
     char buf[1024];  // 0x158
     Mtx mtx;         // 0x128
@@ -502,6 +514,10 @@ void romFontPrintGX(f32 x, f32 y, f32 scale, GXColor* color, const char* msg, ..
     }
 }
 
+/**
+ * Returns the pixel width of the widest line of message (lines split on '\n'), using the cached glyph widths.
+ * SJIS double-byte codes count as one glyph unless the US/PAL ASCII font is active.
+ */
 s32 romFontGetWidth(const char* message) {
 #if VERSION >= VERSION_US
     s32 width = 0;

@@ -240,11 +240,16 @@ s32 __SYNAttackAttnTable[100] = {
     0x00000000
 };
 
+/** Computes the voice's base attenuation from the region's attenuation and the note velocity. */
 void __SYNSetupVolume(SYNVOICE* voice) {
     ASSERTLINE(85, voice);
     voice->attn = (voice->region->attn + __SYNVolumeAttenuation[voice->keyVel]);
 }
 
+/**
+ * Sets the voice's pan: from the articulation for percussion (channel 9),
+ * otherwise from the channel's pan controller (10).
+ */
 void __SYNSetupPan(SYNVOICE* voice) {
     ASSERTLINE(98, voice);
     if (voice->midiChannel == 9) {
@@ -254,14 +259,23 @@ void __SYNSetupPan(SYNVOICE* voice) {
     }
 }
 
+/** Returns the voice's input level for the mixer: base attenuation plus LFO and volume envelope attenuation. */
 s32 __SYNGetVoiceInput(SYNVOICE* voice) {
     return (voice->attn + voice->lfoAttn + voice->veAttn) >> 0x10;
 }
 
+/**
+ * Returns the voice's fader level for the mixer:
+ * channel volume plus expression plus the synthesizer's master volume.
+ */
 s32 __SYNGetVoiceFader(SYNVOICE* voice) {
     return (voice->synth->volAttn[voice->midiChannel] + voice->synth->expAttn[voice->midiChannel] + voice->synth->masterVolume) >> 0x10;
 }
 
+/**
+ * Pushes the voice's current input level, aux A and B sends,
+ * fader and (except on the drum channel) pan to the mixer (MIX) every frame.
+ */
 void __SYNUpdateMix(SYNVOICE* voice) {
     MIXSetInput(voice->axvpb, __SYNGetVoiceInput(voice));
     MIXSetAuxA(voice->axvpb, voice->synth->auxAAttn[voice->midiChannel] >> 0x10);

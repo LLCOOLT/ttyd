@@ -217,6 +217,10 @@ extern EvtWord stg_08_1_init_event[];
 extern EvtWord stg_08_6_init_event[];
 
 #if VERSION >= VERSION_JP
+/**
+ * Script helper: raises hi_fire_end_flag so hi_fire_main stops
+ * and deletes the six torch flame effects at the end of a battle (JP and later).
+ */
 static USER_FUNC(hi_fire_end) {
     hi_fire_end_flag[0] = 1;
     return EVT_RETURN_DONE;
@@ -3430,6 +3434,10 @@ NpcTerritoryInfo btl_las_setup_no_tbl[] = {
     {0},
 };
 
+/**
+ * Battle background event for the gear stage: turns three pairs of gear objects (gear_01..03) forever,
+ * at different speeds and directions, one step per frame.
+ */
 EVT_BEGIN(bgset_las_gear_event)
     SET_VALUE(LW(0), 0)
     SET_VALUE(LW(1), 0)
@@ -3443,6 +3451,10 @@ EVT_BEGIN(bgset_las_gear_event)
     RETURN
 EVT_END()
 
+/**
+ * Battle stage event for stage stg_08_1: lights three torch flames (hi1..hi3) on the stage's torch map objects
+ * and removes them softly when the battle ends.
+ */
 EVT_BEGIN(stg_08_1_init_sub_event)
     CALL(evt_mapobj_get_position, STRING("hi1"), LW(0), LW(1), LW(2))
     CALL(evt_eff, STRING("_hi1"), STRING("fire"), 3, LW(0), LW(1), LW(2), FLOAT(1.0f), 1000, 0, 0, 0, 0, 0, 0)
@@ -3462,11 +3474,16 @@ EVT_BEGIN(stg_08_1_init_sub_event)
     RETURN
 EVT_END()
 
+/** Init event of battle stage stg_08_1: starts the torch flame event. */
 EVT_BEGIN(stg_08_1_init_event)
     SPAWN_EVENT(stg_08_1_init_sub_event)
     RETURN
 EVT_END()
 
+/**
+ * Battle stage event for stage stg_08_6: lights six dark-flame torches (hi1..hi6);
+ * in JP and later the flames follow the torch objects through hi_fire_main, and all are removed at battle end.
+ */
 EVT_BEGIN(stg_08_6_init_sub_event)
 #if VERSION <= VERSION_DEMO_US
     CALL(evt_mapobj_get_position, STRING("hi1"), LW(0), LW(1), LW(2))
@@ -3507,6 +3524,11 @@ EVT_BEGIN(stg_08_6_init_sub_event)
 EVT_END()
 
 #if VERSION >= VERSION_JP
+/**
+ * Script helper (runs every frame until hi_fire_end_flag is set):
+ * creates six dark flame effects and keeps each one over the torch object hi1..hi6 whenever that torch is above
+ * the floor; deletes them softly when the end flag is raised. JP and later.
+ */
 USER_FUNC(hi_fire_main) {
     const char* names[6] = {"hi1", "hi2", "hi3", "hi4", "hi5", "hi6"};
     Vec pos;
@@ -3538,10 +3560,16 @@ USER_FUNC(hi_fire_main) {
 }
 #endif
 
+/** Script helper: blocks until the battle sequence has ended. */
 static USER_FUNC(check_battle_end) {
     return battleSeqEndCheck() ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper: turns a pair of gear objects (names args[0] and args[1]) to the angle given by a frame counter:
+ * the counter is in the variable args[2], the full turn takes args[3] frames and args[4] is the step (+1 or -1);
+ * the counter wraps around.
+ */
 static USER_FUNC(_gear_rotate) {
     EvtWord* args = event->args;
     const char* name1 = (const char*)evtGetValue(event, args[0]);
@@ -3565,6 +3593,7 @@ static USER_FUNC(_gear_rotate) {
     return EVT_RETURN_DONE;
 }
 
+/** Init event of battle stage stg_08_6: starts the six-torch flame event. */
 EVT_BEGIN(stg_08_6_init_event)
     SPAWN_EVENT(stg_08_6_init_sub_event)
     RETURN

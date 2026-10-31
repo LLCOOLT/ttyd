@@ -199,6 +199,10 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Battle init script for the Red Bones: installs the wait, attack, damage and confusion handlers,
+ * clears unit work 1 and sets the bone-landing jump sound.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -210,6 +214,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: selects this unit (-2) and its part 1
+ * and runs the shared default damage reaction (btldefaultevt_Damage).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -217,6 +225,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Death script for the Red Bones: spins the unit (15 degrees per frame for 48 frames) with the death sound,
+ * puffs smoke, banks its coins and experience and shows the star points (only the first time, tracked in unit
+ * work 1), then tips the unit over for 30 frames,
+ * takes its back item and kills it (kill mode 0 if the damage code says it was blown away, otherwise 2).
+ */
 static EVT_BEGIN(dead_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(0), 48)
@@ -269,6 +283,12 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Called when the Red Bones is knocked down but not truly defeated:
+ * it walks back to its home position, and the first time awards its coins, experience and star points.
+ * Then it collapses into a pile of bones (KRN_D_2 pose with the crumble sound),
+ * picks 2 or 3 turns to stay down in unit work 2, lowers its hit offset and restarts the wait event.
+ */
 static EVT_BEGIN(fake_dead_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(2), LW(3), LW(4))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
@@ -307,6 +327,12 @@ static EVT_BEGIN(fake_dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs on the Red Bones' turn while it lies collapsed:
+ * counts the stay-down turns in unit work 2 down,
+ * and when they run out plays the reassembling poses (KRN_D_3 and KRN_D_4) with the unite sounds,
+ * clears the attribute flag that marked it down and restores its HP to the maximum.
+ */
 static EVT_BEGIN(rebirth_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
     SUBTRACT(LW(0), 1)
@@ -327,6 +353,12 @@ static EVT_BEGIN(rebirth_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack AI. In a fixed-attack battle it throws a bone (normal_attack_event).
+ * If it is collapsed (unit work 2 at least
+ * 1) it takes its turn to rebuild itself with rebirth_event. Otherwise it uses an enemy item if it has one, then draws
+ * a bone throw (60) or calling a Dull Bones (40) if there is room beside it.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -396,6 +428,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Starts the avoid animation of the target LW(3) for the pre-damage check result in LW(5):
+ * 3, 6 and 2 select avoid types 38, 39 and 40.
+ */
 static EVT_BEGIN(start_avoid)
     IF_INT_EQUAL(LW(5), 3)
         CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -409,6 +445,12 @@ static EVT_BEGIN(start_avoid)
     RETURN
 EVT_END()
 
+/**
+ * Bone throw at one target: faces it, raises the bone part (part 2) and spins it
+ * while it flies as a projectile to the target.
+ * A sibling event starts the target's avoid animation when the bone passes it.
+ * On a hit the bone lands, the damage is resolved and it bounces back; the bone part is hidden again at the end.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -535,6 +577,13 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Summons a friend: zooms the camera on the Red Bones,
+ * then six times raises a bone and throws it into the air (parts 3 and 4 with KRN_H and KRN_C poses),
+ * piling up the bones.
+ * They reassemble with the unite sounds and a new Dull Bones (entry_honenoko, unit_honenoko) is spawned at the
+ * position in LW(0) to LW(2) with this unit's status copied by honenoko_copy_status.
+ */
 static EVT_BEGIN(call_friend_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -619,11 +668,20 @@ static EVT_BEGIN(call_friend_event)
     RETURN
 EVT_END()
 
+/**
+ * Wait (idle) event: refreshes the body animation (part 1) from the unit's pose table
+ * so it matches the current state, then returns; the battle system runs it whenever the unit is idle.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0] and args[1] are unit ids (BattleTransID).
+ * Copies the size-change (Mini/Mega) turns and strength from the first unit to the second,
+ * so a unit spawned or replaced mid-battle keeps the size it had. Called with the new unit (LW(3)).
+ */
 static USER_FUNC(honenoko_copy_status) {
     EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));

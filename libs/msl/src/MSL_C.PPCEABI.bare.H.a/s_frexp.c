@@ -2,6 +2,10 @@
 
 static const double two54 = 1.80143985094819840000e+16;
 
+/**
+ * Splits x into a mantissa in [0.5, 1) and a power-of-two exponent stored in *eptr, scaling subnormals up first;
+ * zero, NaN and infinity return unchanged with exponent 0.
+ */
 double frexp(double x, int* eptr) {
     int hx, ix, lx;
     hx = __HI(x);

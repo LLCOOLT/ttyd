@@ -53,16 +53,22 @@ __declspec(section ".init") static u8 __get_debug_bba(void);
 static void __init_registers(void);
 static void __init_data(void);
 
+/**
+ * Start-up check of the button word the IPL left at 0x800030E4 (controller 3):
+ * if the buttons in mask 0xEEF are all held, the system restarts through OSResetSystem.
+ */
 static void __check_pad3(void) {
 	if ((Pad3Button & 0xEEF) == 0xEEF) {
 		OSResetSystem(OS_RESET_RESTART, 0, FALSE);
 	}
 }
 
+/** Sets the Debug_BBA flag, recorded when the boot debug flag asks for a debugger over the Broadband Adapter. */
 static void __set_debug_bba(void) { 
     Debug_BBA = 1;
 }
 
+/** Returns the Debug_BBA flag; __start uses it to decide whether to call InitMetroTRK_BBA. */
 static u8 __get_debug_bba(void) { 
     return Debug_BBA;
 }
@@ -186,6 +192,10 @@ _goto_skip_init_bba:
 }
 #endif
 
+/**
+ * Copies size bytes from the ROM image to dst and flushes the cache over it;
+ * does nothing for a zero size or when source and destination are the same.
+ */
 static void __copy_rom_section(void* dst, const void* src, unsigned long size) {
 	if (size && dst != src) {
 		memcpy(dst, src, size);
@@ -193,6 +203,7 @@ static void __copy_rom_section(void* dst, const void* src, unsigned long size) {
 	}
 }
 
+/** Zeroes a bss section of size bytes. */
 static void __init_bss_section(void* dst, unsigned long size) {
 	if (size) {
 		memset(dst, 0, size);
@@ -200,6 +211,10 @@ static void __init_bss_section(void* dst, unsigned long size) {
 }
 
 #ifdef __GEKKO__
+/**
+ * Assembly: zeroes the general registers and loads the stack pointer (r1)
+ * and the two small-data base registers (r2, r13) from the linker symbols before any C code runs.
+ */
 asm static void __init_registers(void) {
 	nofralloc
 	li r0, 0
@@ -241,6 +256,10 @@ asm static void __init_registers(void) {
 }
 #endif
 
+/**
+ * Walks the linker's _rom_copy_info table to copy initialised data to RAM,
+ * then the _bss_init_info table to zero the bss sections.
+ */
 static void __init_data(void) {
     __rom_copy_info* dci;
     __bss_init_info* bii;

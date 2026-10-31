@@ -26,6 +26,10 @@ typedef struct UfoWork {
 // The functions are in reverse order of the binary: the compiler emits them last to first.
 static void _UFOItemAction(EventEntry* event);
 
+/**
+ * Places the UFO at its home position plus a vertical bob of +-8 units (a 60-frame sine cycle);
+ * advance steps the bob forward a frame, FALSE just re-applies the current offset.
+ */
 static void _SetUfoPos_Float(BattleUnit* unit, BOOL advance) {
     UfoWork* work;
     f32 x, y, z;
@@ -39,6 +43,13 @@ static void _SetUfoPos_Float(BattleUnit* unit, BOOL advance) {
     BtlUnit_SetPos(unit, x, y, z);
 }
 
+/**
+ * Runs the whole UFO sequence for the calling unit, blocking every frame until it ends:
+ * flies in from x 300 to 60, picks a target, slides over it, drops part 2 as an item, waits 60 frames,
+ * then flies off to x -300 and deletes itself.
+ * Pauses while an action is being decided; btlevtcmd_UFODamageOn freezes it
+ * and btlevtcmd_UFOEscapeOn sends it away.
+ */
 USER_FUNC(btlevtcmd_UFOAction) {
     BattleWorkWeaponTargets targets;
     s32 targetId;
@@ -209,6 +220,11 @@ USER_FUNC(btlevtcmd_UFOAction) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Puts the calling UFO into state 8, which settles into the idle state 9:
+ * the UFO stops moving and only the dropped item keeps updating.
+ * Called from the test UFO unit's damage event (rels/tst unit_ufo.c).
+ */
 USER_FUNC(btlevtcmd_UFODamageOn) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -228,6 +244,10 @@ USER_FUNC(btlevtcmd_UFODamageOn) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Makes the calling UFO untargetable and starts its fly-away (state 10, then 6).
+ * Called from the test UFO unit's damage event (rels/tst unit_ufo.c).
+ */
 USER_FUNC(btlevtcmd_UFOEscapeOn) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -247,6 +267,13 @@ USER_FUNC(btlevtcmd_UFOEscapeOn) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Per-frame update of the item the UFO dropped (part 2):
+ * falls with gravity -0.25, drifts 2 units a frame toward the target and bounces off the floor at 0.6 speed,
+ * and hides once its box overlaps the target part.
+ * The 120-frame blink (dropState 3) is never started in this file.
+ * Called at the end of each btlevtcmd_UFOAction frame.
+ */
 static void _UFOItemAction(EventEntry* event) {
     f32 ux, uy, uz;
     f32 tx, ty, tz;

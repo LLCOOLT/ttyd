@@ -189,6 +189,11 @@ ExtTexInfo ext_kyaku_data[] = {
 // Seed of __tou_rand, the arena's own copy of the C library's rand(); starts at 1 like the library's.
 u32 x = 1;
 
+/**
+ * Script helper that arms a scripted first attack for the next field battle:
+ * sets the pending hit kind to 0x10000000 with attack parameter 0x10 and turns the attack announcement on.
+ * evt_match calls it before a match while GSWF_TOU_GOOMBA_BROS_FIRST_STRIKE_SEEN is clear.
+ */
 static s32 _firstattack_setting(EventEntry* event, BOOL isFirstCall) {
     FieldBattleData* fbat = fbatGetPointer();
 
@@ -203,6 +208,11 @@ static s32 _firstattack_setting(EventEntry* event, BOOL isFirstCall) {
 // The unit is built -inline auto,deferred, but the original keeps these helpers as real calls: without
 // dont_inline MWCC inlines them (tried -inline auto and noauto for the unit: both reorder the text).
 #pragma dont_inline on
+/**
+ * Builds the audience animation table (kyaku_wp->anim) from ext_kyaku_data:
+ * consecutive texture frames with the same model
+ * and animation name are grouped into one entry holding the first frame, the frame count and the playback rate.
+ */
 static void pose_init(void) {
     char name[32];
     char anim[32];
@@ -235,6 +245,10 @@ static void pose_init(void) {
     kyaku_wp->animNum++;
 }
 
+/**
+ * Per-frame update of every spectator billboard:
+ * advances each one's animation by elapsed render time and picks the matching texture frame (pose->texId).
+ */
 static void pose_main(void) {
     s32 i;
     ExtdrvPose* pose;
@@ -256,6 +270,10 @@ static void pose_main(void) {
     }
 }
 
+/**
+ * Switches one spectator to the animation with the given model and animation name,
+ * restarting it at a random time offset so the crowd does not move in step.
+ */
 static void pose_change(Kyaku* kyaku, const char* name, const char* anim) {
     KyakuAnim* a;
     s32 i;
@@ -271,15 +289,21 @@ static void pose_change(Kyaku* kyaku, const char* name, const char* anim) {
     }
 }
 
+/** Seeds the arena's private random number generator used to scatter the audience. */
 static void __tou_srand(u32 seed) {
     x = seed;
 }
 
+/**
+ * The arena's own copy of the C library's linear congruential rand():
+ * returns 0..32767 and keeps the crowd layout reproducible.
+ */
 static u32 __tou_rand(void) {
     x = x * 1103515245 + 12345;
     return (x >> 16) & 0x7FFF;
 }
 
+/** Returns a random float between min and max (either order) from __tou_rand. */
 static f32 randf(f32 min, f32 max) {
     f32 r = __tou_rand() / 32767.0f;
 
@@ -287,6 +311,13 @@ static f32 randf(f32 min, f32 max) {
 }
 #pragma dont_inline reset
 
+/**
+ * Init callback of the audience (kyaku) billboard set.
+ * Places every spectator at a random spot in the stands:
+ * 30% are near the ring floor, the rest on the high rows, found by dropping a ray onto the map hit geometry;
+ * turns each toward the ring, hides those blocking the entrance view,
+ * and gives each a random animation (Toad, Toadette, vendor Toad or Lakitu).
+ */
 static void ext_kyaku_init(void) {
     s32 far;
     s32 i;
@@ -381,6 +412,12 @@ static void ext_kyaku_init(void) {
     }
 }
 
+/**
+ * Spawns the four spectators the player can talk to (kyaku1 Toad, kyaku2 Toadette, kyaku3 vendor Toad,
+ * kyaku4 Lakitu) near the entrance, with their position depending on
+ * which door Mario came through (s_bero_2 is the upper balcony),
+ * and registers the crowd billboard set with the extdrv drawer.
+ */
 EVT_BEGIN(evt_kyaku)
     CALL(evt_npc_entry, STRING("kyaku1"), STRING("c_kinopio"))
     CALL(evt_npc_entry, STRING("kyaku2"), STRING("c_kinopiko"))
@@ -419,6 +456,11 @@ static s32 inta_tex[] __attribute__((aligned(32))) = {
     -1, 0, -1, 0, -1, 0, -1, 0,
 };
 
+/**
+ * Door-open animation shared by the two south doors:
+ * waits for the door transition, swings the two door map objects named in LW(8)
+ * and LW(9) from 0 to 90 degrees over 500 ms and plays the door-fall sound at Mario.
+ */
 EVT_BEGIN(open_main)
     CALL(evt_bero_exec_wait, 65536)
     CALL(evt_sub_intpl_msec_init, 2, 0, 180, 500)
@@ -436,6 +478,10 @@ EVT_BEGIN(open_main)
     RETURN
 EVT_END()
 
+/**
+ * Door-close animation shared by the two south doors:
+ * swings the map objects named in LW(8) and LW(9) from 90 back to 0 degrees over 500 ms.
+ */
 EVT_BEGIN(close_main)
     CALL(evt_sub_intpl_msec_init, 2, 180, 0, 500)
     LABEL(0)
@@ -450,6 +496,10 @@ EVT_BEGIN(close_main)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the red double door (aka_door_a and aka_door_b), opening:
+ * LW(0) is the swing angle; the two leaves turn about the Y axis in opposite directions by 0.39 times the angle.
+ */
 static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("aka_door_a"), 0, LW(0), 0)
@@ -458,6 +508,10 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the red double door (aka_door_a and aka_door_b), closing:
+ * the leaves turn the opposite way to w_door_open.
+ */
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("aka_door_a"), 0, LW(0), 0)
@@ -466,16 +520,23 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/** Guess: bero open callback for the red door; sets LW(0) to 0 and does nothing else. */
 static EVT_BEGIN(w_open)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
 
+/** Guess: bero close callback for the red door; sets LW(0) to 0 and does nothing else. */
 static EVT_BEGIN(w_close)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the blue double door (ao_door_a and ao_ddor_b,
+ * the second name is spelled that way in the map), opening: LW(0) is the swing angle;
+ * the two leaves turn about the Y axis in opposite directions by 0.39 times the angle.
+ */
 static EVT_BEGIN(e_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("ao_door_a"), 0, LW(0), 0)
@@ -484,6 +545,10 @@ static EVT_BEGIN(e_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the blue double door (ao_door_a and ao_ddor_b), closing:
+ * the leaves turn the opposite way to e_door_open.
+ */
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("ao_door_a"), 0, LW(0), 0)
@@ -492,16 +557,22 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
+/** Guess: bero open callback for the blue door; sets LW(0) to 0 and does nothing else. */
 static EVT_BEGIN(e_open)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
 
+/** Guess: bero close callback for the blue door; sets LW(0) to 0 and does nothing else. */
 static EVT_BEGIN(e_close)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door callback for door_2 (the s_bero_1 exit to the Glitz Pit lobby):
+ * LW(0) is the swing angle, applied to door_2_a and mirrored on door_2_b.
+ */
 EVT_BEGIN(s1_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("door_2_a"), 0, LW(0), 0)
@@ -510,6 +581,7 @@ EVT_BEGIN(s1_door_open)
     RETURN
 EVT_END()
 
+/** Opposite swing of s1_door_open for door_2_a and door_2_b. */
 EVT_BEGIN(s1_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("door_2_a"), 0, LW(0), 0)
@@ -518,6 +590,10 @@ EVT_BEGIN(s1_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Variant of the door_2 swing that rotates both leaves about the other axis by half of LW(0);
+ * used by evt_tougi for the final closing flap.
+ */
 EVT_BEGIN(s1_door_open2)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("door_2_a"), LW(0), 0, 0)
@@ -525,6 +601,10 @@ EVT_BEGIN(s1_door_open2)
     RETURN
 EVT_END()
 
+/**
+ * Guess: open callback for the stage-side door pair door_2_a and door_2_b:
+ * waits for the bero entrance (evt_bero_exec_wait), opens the pair with open_main and sets LW(0) to 0.
+ */
 static EVT_BEGIN(s1_open)
     BEGIN_INLINE_EVENT
         CALL(evt_bero_exec_wait, 65536)
@@ -536,6 +616,10 @@ static EVT_BEGIN(s1_open)
     RETURN
 EVT_END()
 
+/**
+ * Guess: close callback for the door pair door_2_a and door_2_b:
+ * closes them with close_main, waits half a second and sets LW(0) to 0.
+ */
 static EVT_BEGIN(s1_close)
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(8), STRING("door_2_a"))
@@ -547,6 +631,10 @@ static EVT_BEGIN(s1_close)
     RETURN
 EVT_END()
 
+/**
+ * Door callback for door_3 (the s_bero_2 balcony exit):
+ * LW(0) is the swing angle, applied to door_3_a and mirrored on door_3_b.
+ */
 EVT_BEGIN(s2_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("door_3_a"), 0, LW(0), 0)
@@ -555,6 +643,7 @@ EVT_BEGIN(s2_door_open)
     RETURN
 EVT_END()
 
+/** Opposite swing of s2_door_open for door_3_a and door_3_b. */
 EVT_BEGIN(s2_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("door_3_a"), 0, LW(0), 0)
@@ -563,6 +652,10 @@ EVT_BEGIN(s2_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Variant of the door_3 swing that rotates both leaves by half of LW(0);
+ * used by evt_tougi for the final closing flap.
+ */
 EVT_BEGIN(s2_door_open2)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("door_3_a"), LW(0), 0, 0)
@@ -570,6 +663,10 @@ EVT_BEGIN(s2_door_open2)
     RETURN
 EVT_END()
 
+/**
+ * Guess: open callback for the stage-side door pair door_3_a and door_3_b:
+ * waits for the bero entrance (evt_bero_exec_wait), opens the pair with open_main and sets LW(0) to 0.
+ */
 static EVT_BEGIN(s2_open)
     BEGIN_INLINE_EVENT
         CALL(evt_bero_exec_wait, 65536)
@@ -581,6 +678,10 @@ static EVT_BEGIN(s2_open)
     RETURN
 EVT_END()
 
+/**
+ * Guess: close callback for the door pair door_3_a and door_3_b:
+ * closes them with close_main, waits half a second and sets LW(0) to 0.
+ */
 static EVT_BEGIN(s2_close)
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(8), STRING("door_3_a"))
@@ -668,6 +769,13 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
+/**
+ * Cutscene that plays the first time Mario enters the ring (story before STORY_STG3_01_ARENA_INTRO).
+ * Mario and his partner come in through the door,
+ * Rawk Hawk knocks out a Dark Koopatrol (Togenoko Ace) with a flying body slam, Grubba walks in and talks,
+ * a Champ's Belt appears with a star sparkle, and the party comments on it.
+ * It then fades out to the lobby (tou_02) and sets GSWF_TOU_ARENA_INTRO_TO_LOBBY.
+ */
 EVT_BEGIN(evt_tougi)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -871,6 +979,11 @@ EVT_BEGIN(evt_tougi)
     RETURN
 EVT_END()
 
+/**
+ * Init script of the announcer NPC (Kinosikowa).
+ * After the Rogueport return story point she is switched to her microphone variant
+ * and kept in her idle animation.
+ */
 EVT_BEGIN(init_kinosikowa)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
         CALL(evt_npc_set_tribe, STRING("キノシコワ"), STRING("キノシコワ（マイク）"))
@@ -920,6 +1033,10 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Puts Mario in his hurt pose (M_D_2) and the current partner in its matching defeated pose;
+ * played after Mario loses a match. Also unlocks the pose lock on versions from JP on.
+ */
 EVT_BEGIN(evt_damage_pose)
 #if VERSION >= VERSION_JP
     CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_POSE_LOCK)
@@ -947,6 +1064,10 @@ EVT_BEGIN(evt_damage_pose)
     RETURN
 EVT_END()
 
+/**
+ * Gives the current partner their victory pose ("Y_1" variants, such as PKR_Y_1 for Goombella) after a win;
+ * with no partner out it does nothing. Party control is switched off first.
+ */
 static EVT_BEGIN(evt_kime_pose)
     CALL(evt_party_cont_onoff, 0, 0)
     CALL(evt_mario_get_party, LW(0))
@@ -970,6 +1091,15 @@ static EVT_BEGIN(evt_kime_pose)
     RETURN
 EVT_END()
 
+/**
+ * Spawns the NPCs for the ring map, depending on story progress.
+ * Before the intro it places Rawk Hawk and the Spiked Goomba-type opponent;
+ * in the regular story it creates two random sparring fighters for watch mode (unless a match is reserved);
+ * and when GSWF_TOU_MATCH_RESERVED is set it creates the opponent team as NPCs "enemy 1..5" hidden under the
+ * floor, with their tribes from evt_tou_get_fighter_tribe,
+ * plus the special extra NPCs used by the random ambush fights ("Ran": Bowser at rank 6,
+ * otherwise a pair of Iron Cleft-type fighters).
+ */
 EVT_BEGIN(npc_entry)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_01_ARENA_INTRO)
         CALL(evt_npc_entry, STRING("チャンピョン"), PTR("c_bred_h"))
@@ -1189,6 +1319,11 @@ EVT_BEGIN(npc_entry)
     RETURN
 EVT_END()
 
+/**
+ * Ambush played after a won match at rank 7 until the second mail is read:
+ * two Iron Cleft-type fighters ("Ran") burst in, Grubba comments,
+ * a gong rings and a battle starts (battle setup 10); afterwards Grubba reacts to whether Mario won or lost.
+ */
 EVT_BEGIN(evt_random_battle)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FIND1_3"), LW(0), LW(1), LW(2), 0)
@@ -1281,6 +1416,12 @@ EVT_BEGIN(evt_random_battle)
     RETURN
 EVT_END()
 
+/**
+ * Bowser's ambush, played after a won match at rank 5 until GSWF_TOU_BOWSER_RAID_DONE is set:
+ * Bowser crashes in (Bowser theme), taunts Mario and the battle starts (battle setup 24);
+ * after it Grubba and Bowser comment on the result
+ * and the music fades out (with story progress temporarily set so the right fade plays).
+ */
 EVT_BEGIN(evt_random_battle2)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FIND1_3"), LW(0), LW(1), LW(2), 0)
@@ -1375,6 +1516,12 @@ EVT_BEGIN(evt_random_battle2)
     RETURN
 EVT_END()
 
+/**
+ * Entrance walk of one opponent into the ring: LW(0) = NPC name,
+ * LW(1) = index in the team (picks its resting x and z lane).
+ * It walks in from the east, waits, hops down three steps and stops at its place.
+ * Used for the Iron Cleft-type opening (see evt_shinemon_opening).
+ */
 EVT_BEGIN(evt_teki_nyuujyou)
     SWITCH(LW(1))
         CASE_EQUAL(0)
@@ -1407,6 +1554,12 @@ EVT_BEGIN(evt_teki_nyuujyou)
     RETURN
 EVT_END()
 
+/**
+ * Entrance walk used by the default opening: LW(0) = NPC name, LW(1) = index in the team,
+ * LW(2) = non-zero for the one-enemy layout.
+ * The fighter walks in from the east and hops down three steps to its place (flying green Magikoopas hover and
+ * drop in instead). A Burst Wanwan then starts burst_wangwang.
+ */
 EVT_BEGIN(evt_teki_nyuujyou_default)
     SWITCH(LW(1))
         CASE_EQUAL(0)
@@ -1460,6 +1613,12 @@ EVT_BEGIN(evt_teki_nyuujyou_default)
     RETURN
 EVT_END()
 
+/**
+ * Creates the chain links for a Chain Chomp-type fighter:
+ * LW(0) selects which one (0 and 1 = team members "enemy 1" and "enemy 2", 6 and 7 = the sparring fighters).
+ * Five link NPCs are spawned with the Burst Wanwan model
+ * and burst_chain pulls them along behind the head every frame.
+ */
 EVT_BEGIN(burst_chain_entry)
     SWITCH(LW(0))
         CASE_EQUAL(0)
@@ -1534,6 +1693,10 @@ EVT_BEGIN(burst_chain_entry)
     RETURN
 EVT_END()
 
+/**
+ * Forever loop that makes the Burst Wanwan named in LW(0) hop around its spot in random directions,
+ * landing with a thud sound each time.
+ */
 EVT_BEGIN(burst_wangwang)
     SET_VALUE(LW(10), LW(0))
     CALL(evt_npc_get_position, LW(10), LW(0), LW(1), LW(2))
@@ -1555,6 +1718,14 @@ EVT_BEGIN(burst_wangwang)
     RETURN
 EVT_END()
 
+/**
+ * Main script of a match, run when the ring is entered with a match reserved.
+ * It plays the matching opening (special scenes the first time for the Goomba Bros, Iron Clefts and Rawk Hawk,
+ * otherwise the default one), starts the battle with the reserved rule, handles the rule result,
+ * plays the win or lose scene, updates the ranking, advances story progress after the first match,
+ * may trigger the rank 7 and rank 5 ambushes, and finally warps to the locker room map (tou_07, tou_08 or tou_10
+ * by the player's rank).
+ */
 EVT_BEGIN(evt_match)
 #if VERSION <= VERSION_DEMO_US
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_FF_ENV_TOU1"))
@@ -1729,6 +1900,11 @@ EVT_BEGIN(evt_match)
     RETURN
 EVT_END()
 
+/**
+ * First-time opening against the Goomba Bros.
+ * (fighter 19): Grubba announces the match, Mario and partner walk in through the west door
+ * and hop down the steps, and the lead Goomba Bro. jumps in from the crowd with a spin attack.
+ */
 EVT_BEGIN(evt_kurikuri_opening)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_npc_status_onoff, 1, STRING("ガンス"), 2)
@@ -1835,6 +2011,11 @@ EVT_BEGIN(evt_kurikuri_opening)
     RETURN
 EVT_END()
 
+/**
+ * First-time victory scene against the Goomba Bros.:
+ * the defeated Goombas lie dazed, Mario strikes his victory pose,
+ * Grubba asks a yes/no question and confetti and crowd cheers close the scene.
+ */
 EVT_BEGIN(evt_kurikuri_win)
     CALL(evt_cam3d_evt_set, 70, 138, 263, 70, 90, -8, 0, 11)
     CALL(evt_npc_set_position, STRING("敵１"), 50, 60, 0)
@@ -1885,6 +2066,10 @@ EVT_BEGIN(evt_kurikuri_win)
     RETURN
 EVT_END()
 
+/**
+ * Scene after losing to the Goomba Bros.: Mario is hurt, confetti falls on the winners,
+ * the announcer declares them winners and the lead Goomba Bro. speaks.
+ */
 EVT_BEGIN(evt_kurikuri_lose)
     CALL_CHILD(evt_damage_pose)
     CALL(evt_npc_set_rotate, STRING("敵１"), 0, 0, 0)
@@ -1925,6 +2110,11 @@ EVT_BEGIN(evt_kurikuri_lose)
     RETURN
 EVT_END()
 
+/**
+ * First-time opening against the Iron Cleft fighters (the Armored Harriers, fighter 10):
+ * Grubba explains the rules, spectators shout comments,
+ * the Iron Clefts march in through the east door and Grubba and both fighters exchange lines before the match.
+ */
 EVT_BEGIN(evt_shinemon_opening)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_npc_status_onoff, 1, STRING("ガンス"), 2)
@@ -2111,6 +2301,10 @@ EVT_BEGIN(evt_shinemon_opening)
     RETURN
 EVT_END()
 
+/**
+ * Victory scene against the Iron Clefts: sets GSWF_TOU_IRON_CLEFTS_BEATEN,
+ * the defeated fighters and Grubba speak, then confetti and a high camera shot.
+ */
 EVT_BEGIN(evt_shinemon_win)
     SET_VALUE(GSWF(GSWF_TOU_IRON_CLEFTS_BEATEN), 1)
     CALL(evt_cam3d_evt_set, 60, 143, 263, 60, 95, -8, 0, 0)
@@ -2159,6 +2353,10 @@ EVT_BEGIN(evt_shinemon_win)
     RETURN
 EVT_END()
 
+/**
+ * Scene after losing to the Iron Clefts: the announcer names the winners,
+ * confetti falls and the two Iron Clefts gloat.
+ */
 EVT_BEGIN(evt_shinemon_lose)
     CALL_CHILD(evt_damage_pose)
     CALL(evt_npc_get_position, STRING("敵１"), LW(0), LW(1), LW(2))
@@ -2193,6 +2391,12 @@ EVT_BEGIN(evt_shinemon_lose)
     RETURN
 EVT_END()
 
+/**
+ * First-time opening of the title match against Rawk Hawk:
+ * his belt effect is attached, the crowd and Grubba hype the match,
+ * the audience reacts (the speech bubbles come from spots in the stands), the party comments,
+ * and Rawk Hawk enters.
+ */
 EVT_BEGIN(evt_champ_opening)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_npc_status_onoff, 1, STRING("ガンス"), 2)
@@ -2353,6 +2557,10 @@ EVT_BEGIN(evt_champ_opening)
     RETURN
 EVT_END()
 
+/**
+ * Opening of the first Rawk Hawk rematch after the return to Rogueport:
+ * the announcer and Rawk Hawk talk, the crowd reacts and the champion enters.
+ */
 EVT_BEGIN(evt_champ_opening_re)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_npc_status_onoff, 1, STRING("キノシコワ"), 2)
@@ -2591,6 +2799,11 @@ EVT_BEGIN(evt_champ_opening_re)
     RETURN
 EVT_END()
 
+/**
+ * Victory scene after beating Rawk Hawk: his belt is hidden,
+ * the winner and loser exchange lines (texts picked by story progress),
+ * confetti falls and the crowd speaks from the stands.
+ */
 EVT_BEGIN(evt_champ_win)
     CALL(tou_champion_belt_onoff, 1)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
@@ -2682,6 +2895,10 @@ EVT_BEGIN(evt_champ_win)
     RETURN
 EVT_END()
 
+/**
+ * Scene after losing to Rawk Hawk: the announcer names the winner,
+ * with different text when the title match was reserved, then Rawk Hawk speaks.
+ */
 EVT_BEGIN(evt_champ_lose)
     CALL_CHILD(evt_damage_pose)
     CALL(evt_npc_get_position, STRING("敵１"), LW(0), LW(1), LW(2))
@@ -2733,6 +2950,13 @@ EVT_BEGIN(evt_champ_lose)
     RETURN
 EVT_END()
 
+/**
+ * Opening used for every match without a special scene:
+ * the camera surveys the ring, the opponent team walks in,
+ * and the announcer introduces the fighters with texts from the fighter tables (different lines before and after
+ * the return to Rogueport; Rawk Hawk is introduced with his belt).
+ * The party may comment on first appearances, then both sides speak their pre-match lines.
+ */
 EVT_BEGIN(evt_default_opening)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -2979,6 +3203,11 @@ EVT_BEGIN(evt_default_opening)
     RETURN
 EVT_END()
 
+/**
+ * Victory scene for every ordinary match: the belt is hidden when the champion lost, confetti falls,
+ * Mario strikes his victory pose, the announcer declares Mario winner
+ * and the party (or announcer after the story point) comments.
+ */
 EVT_BEGIN(evt_default_win)
     CALL(evt_cam3d_evt_set, 0, 220, 533, 0, 125, -8, 0, 0)
     WAIT_FRAMES(1)
@@ -3064,6 +3293,10 @@ EVT_BEGIN(evt_default_win)
     RETURN
 EVT_END()
 
+/**
+ * Scene after losing an ordinary match: Mario and partner are hurt, confetti falls,
+ * the announcer names the winning team, and the opponent speaks its victory line.
+ */
 EVT_BEGIN(evt_default_lose)
     CALL(evt_cam3d_evt_set, 0, 220, 533, 0, 125, -8, 0, 0)
     CALL_CHILD(evt_damage_pose)
@@ -3112,6 +3345,17 @@ EVT_BEGIN(evt_default_lose)
     RETURN
 EVT_END()
 
+/**
+ * Scene after Mario is crowned champion: the arena music fades,
+ * the champion's belt is put on the opponent (tou_champion_belt) and Grubba (ガンス) speaks (stg3_tou_411, 412).
+ * The east door opens and the opponent (敵１) walks to the ring, jumping up onto it,
+ * while the audience calls out (stg3_tou_413_01 to 04).
+ * Grubba and the opponent then trade lines (stg3_tou_414 to 417),
+ * GSWF_TOU03_CHAMPION_CROWNED_SEEN is set and the map changes to tou_11 (bero nidome) with an iris fade.
+ * GF(0) signals that the opponent has reached the ring.
+ * The door sound is only played from the JP version on,
+ * and the US versions on also reposition Mario and the partner.
+ */
 static EVT_BEGIN(evt_champion)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -3216,6 +3460,10 @@ static EVT_BEGIN(evt_champion)
     RETURN
 EVT_END()
 
+/**
+ * Short scene on later visits after Mario has been crowned (GSWF_TOU03_CHAMPION_CROWNED_SEEN set):
+ * Grubba and Rawk Hawk speak once more and the map changes to tou_11 at the "sandome" entry.
+ */
 EVT_BEGIN(evt_champion2)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -3263,6 +3511,10 @@ EVT_BEGIN(evt_champion2)
     RETURN
 EVT_END()
 
+/**
+ * Draw callback for the crowd billboard set: loads the extdrv render mode, vertices,
+ * texture and TEV setup and draws all spectators.
+ */
 static void kyaku_disp(CameraId camera, void* param) {
     extLoadRenderMode();
     extLoadVertex();
@@ -3272,14 +3524,20 @@ static void kyaku_disp(CameraId camera, void* param) {
     extLoadTextureExit();
 }
 
+/** Per-frame callback of the crowd billboard set: just runs pose_main. */
 static void ext_kyaku_main(void) {
     pose_main();
 }
 
+/** Display callback of the crowd billboard set: queues kyaku_disp on the 3D camera. */
 static void ext_kyaku_dispent(void) {
     dispEntry(CAMERA_3D, 0.0f, 1, kyaku_disp, NULL);
 }
 
+/**
+ * 2D draw callback that copies the current 608x480 frame buffer into the monitor texture
+ * and marks it ready for screen_tev.
+ */
 static void screen_capture(CameraId cameraId, void* param) {
     GXSetTexCopySrc(0, 0, 0x260, 0x1E0);
     GXSetTexCopyDst(0x130, 0xF0, GX_TF_RGB565, GX_TRUE);
@@ -3288,6 +3546,10 @@ static void screen_capture(CameraId cameraId, void* param) {
     screen_wp->ready = 1;
 }
 
+/**
+ * Script helper that allocates the big arena monitor's work area, texture buffers and noise texture;
+ * the monitor starts in static mode during STORY_STG3_31_GRUBBAS_PLANS.
+ */
 static s32 screen_init(EventEntry* event, BOOL isFirstCall) {
     u32 size = GXGetTexBufferSize(0x260, 0x1E0, GX_TF_I4, GX_FALSE, 0);
 
@@ -3311,6 +3573,10 @@ static s32 screen_init(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper that queues screen_capture every frame (blocks forever)
+ * so the monitor shows the live arena picture.
+ */
 static s32 screen_evt(EventEntry* event, BOOL isFirstCall) {
     dispEntry(CAMERA_2D, 1000.0f, 0, screen_capture, NULL);
     return EVT_RETURN_BLOCK;
@@ -3319,11 +3585,17 @@ static s32 screen_evt(EventEntry* event, BOOL isFirstCall) {
 // The unit's own out-of-line copy of the SDK inline (the header version is renamed away at the top of the
 // file); dont_inline keeps it a real call as in the original.
 #pragma dont_inline on
+/** The unit's own out-of-line copy of the SDK's GXSetTexCoordGen, calling GXSetTexCoordGen2 with no normalisation. */
 static void GXSetTexCoordGen(GXTexCoordID dst, GXTexGenType func, GXTexGenSrc src, u32 mtx) {
     GXSetTexCoordGen2(dst, func, src, mtx, GX_FALSE, GX_PTIDENTITY);
 }
 #pragma dont_inline reset
 
+/**
+ * TEV callback for the "monittor" map object, the big arena monitor.
+ * It draws the captured frame (or, in Grubba's finale, scrolling static noise) with scan-line texture,
+ * and zooms and pans the picture to random targets every 200 frames.
+ */
 static void screen_tev(MapTevCallbackInfo* info) {
     GXTexObj tex;
     Mtx mtx;
@@ -3437,6 +3709,7 @@ static void screen_tev(MapTevCallbackInfo* info) {
     }
 }
 
+/** Script helper: arg0 = NPC name, arg1 = tribe name (Japanese); arg2 receives 1 if the NPC's tribe matches, else 0. */
 static s32 tribe_chk(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -3450,6 +3723,11 @@ static s32 tribe_chk(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper (blocks forever) that moves the chain links of the Chain Chomp NPC in arg0 (arg1 = chain
+ * number): link 0 follows the head and each next link is dragged to within 10 units of the one before it,
+ * sagging 3 units each frame but kept above the floor.
+ */
 static s32 burst_chain(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -3488,11 +3766,13 @@ static s32 burst_chain(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper that stops the map's sound effects (psndMapChange) before leaving the ring. */
 static s32 snd_sfx_stop(EventEntry* event, BOOL isFirstCall) {
     psndMapChange();
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: arg0 = NPC name; arg1 receives that NPC tribe's confused animation name. */
 static s32 confupose(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     NpcEntry* npc = npcNameToPtr((const char*)evtGetValue(event, args[0]));
@@ -3503,16 +3783,23 @@ static s32 confupose(EventEntry* event, BOOL isFirstCall) {
 
 // f32 wrappers of sin/cos (the unit's own sinf/cosf), called out of line as in the original.
 #pragma dont_inline on
+/** Out-of-line f32 wrapper of sin. */
 static f32 sinFloat(f32 x) {
     return sin(x);
 }
 
+/** Out-of-line f32 wrapper of cos. */
 static f32 cosFloat(f32 x) {
     return cos(x);
 }
 #pragma dont_inline reset
 
 static const Vec item_jump_zero = {0.0f, 0.0f, 0.0f};
+/**
+ * Moves the item named "stone" (the Star Stone) along a ballistic arc towards the target (arg0..arg2) at the
+ * given horizontal speed and gravity, each frame, and plays the Star Stone jump sound on landing.
+ * Returns EVT_RETURN_BLOCK until it arrives.
+ */
 static inline s32 item_jump_sub(EventEntry* event, BOOL isFirstCall, f32 speed, f32 g) {
     EvtWord* args = event->args;
     f32 z;
@@ -3566,6 +3853,7 @@ static inline s32 item_jump_sub(EventEntry* event, BOOL isFirstCall, f32 speed, 
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper: makes the Star Stone item jump to the position in arg0..arg2 (speed 1, gravity 0.5). */
 static s32 item_jump(EventEntry* event, BOOL isFirstCall) {
     return item_jump_sub(event, isFirstCall, 1.0f, 0.5f);
 }
@@ -3575,6 +3863,10 @@ const char* block_data[] = {
     "block_9",
 };
 
+/**
+ * Endless loop that makes Grubba (ガンス) tremble: moves him 2 units right and 2 left every 2 frames.
+ * Spawned during the transformation and deleted afterwards.
+ */
 static EVT_BEGIN(evt_shake)
     LOOP(0)
         CALL(evt_npc_get_position, STRING("ガンス"), LW(0), LW(1), LW(2))
@@ -3589,6 +3881,11 @@ static EVT_BEGIN(evt_shake)
     RETURN
 EVT_END()
 
+/**
+ * Grubba boss scene: creates the floating Gold Star item "stone"
+ * and keeps it hovering above the rotating machine (kaiten_souti),
+ * bobbing with a sine wave and muting the star's sound when it is low.
+ */
 EVT_BEGIN(evt_boss_stone)
     SET_VALUE(LW(10), 0)
     CALL(evt_item_entry, STRING("stone"), ITEM_GOLD_STAR, 0, 0, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
@@ -3611,6 +3908,10 @@ EVT_BEGIN(evt_boss_stone)
     RETURN
 EVT_END()
 
+/**
+ * Script helper that stands Grubba on the moving block_5 (100 above it) or,
+ * when the block has sunk below the ground group, back at the ground height at the centre.
+ */
 static s32 getY(EventEntry* event, BOOL isFirstCall) {
     NpcEntry* npc = npcNameToPtr("ガンス");
     MapObject* obj = mapGetMapObj("block_5");
@@ -3628,6 +3929,7 @@ static s32 getY(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: arg0 = 0 mutes, 1 enables the humming sound flag of the "stone" item's star-stone effect. */
 static s32 starstone_sound_onoff(EventEntry* event, BOOL isFirstCall) {
     s32 flag = evtGetValue(event, event->args[0]);
     EffectEntry* eff = itemNameToPtr("stone")->effect;
@@ -3643,6 +3945,7 @@ static s32 starstone_sound_onoff(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: sets the rotation (arg0, degrees) of the "stone" item's star-stone effect. */
 static s32 evt_boss_stone_r(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     EffectEntry* eff = itemNameToPtr("stone")->effect;
@@ -3651,6 +3954,10 @@ static s32 evt_boss_stone_r(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper (blocks forever) that keeps the two charge effects eff_1
+ * and eff_2 hovering 15 units above the "stone" item.
+ */
 static s32 eff_pos(EventEntry* event, BOOL isFirstCall) {
     ItemEntry* item = itemNameToPtr("stone");
     EffectEntry* eff1 = effNameToPtr("eff_1");
@@ -3671,6 +3978,7 @@ static s32 eff_pos(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Loads TEV register 0 with white at the given alpha, the fade amount of Grubba's white-out. */
 static inline void cb_set_color(u8 a) {
     GXColor color = {255, 255, 255, 0};
 
@@ -3678,6 +3986,10 @@ static inline void cb_set_color(u8 a) {
     GXSetTevColor(GX_TEVREG0, color);
 }
 
+/**
+ * TEV callback that adds the white-out colour (gans_alpha) on top of the model it is attached to;
+ * used to flash Grubba white.
+ */
 static void callback(MapTevCallbackInfo* info) {
     s32 stage = info->tevStage;
     s32 texCoord = info->texCoord;
@@ -3697,6 +4009,10 @@ static void callback(MapTevCallbackInfo* info) {
     info->texCoord = texCoord;
 }
 
+/**
+ * Script helper that fades Grubba to white: attaches the TEV callback to his model
+ * and raises gans_alpha by 5 per frame until it reaches 255.
+ */
 static s32 gans_white_on(EventEntry* event, BOOL isFirstCall) {
     NpcEntry* npc = npcNameToPtr("ガンス");
 
@@ -3713,6 +4029,7 @@ static s32 gans_white_on(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper that removes the white-out TEV callback from Grubba's model. */
 static s32 gans_white_off(EventEntry* event, BOOL isFirstCall) {
     NpcEntry* npc = npcNameToPtr("ガンス");
 
@@ -3721,6 +4038,23 @@ static s32 gans_white_off(EventEntry* event, BOOL isFirstCall) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Scene that leads into the Macho Grubba fight (the Chapter 3 finale in the Glitz Pit),
+ * run when Mario steps onto the ring (a_butai).
+ * The stage props are hidden, the exit is switched off
+ * and Grubba (ガンス) starts the power-absorbing machine (evt_boss_stone spins the stone; souti, tyuubu,
+ * guruguru and hakkou are the machine's map animations) with a ground-shaking sound;
+ * the partner and Mario are startled (stg3_tou_463 to 466).
+ * Grubba swells and turns into Macho Grubba (マッチョガンス, paper model OFF_d_bom) while the machine speeds up
+ * and the screen shakes (evt_shake), then the battle starts (battle setup 23).
+ * Afterwards Grubba is back to normal, collapses (D_1 pose) and says stg3_tou_473.
+ * Jolene (キノシコワ) and the Star Stone keeper (キノシチョフ, Guess) arrive with music-box music;
+ * they discuss the machine and the Star Stone (stg3_tou_473_01 to 11), the stone pops out with item jumps,
+ * Mario nods and the story advances to STORY_STG3_32_BOSS_BATTLE.
+ * Then evt_sub_starstone shows the stone (LW(1) = "stone", LW(0) = 3).
+ * The objects used before the fight differ in the demo versions (polySurface731_q00050 and polySurface729_q00048
+ * for a_kai_right and a_butai), and the partner is only killed off after the battle from the US version on.
+ */
 static EVT_BEGIN(evt_boss)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("group34"), MAPOBJ_FLAG_HIDE)
 #if VERSION <= VERSION_DEMO_US
@@ -4274,6 +4608,11 @@ static EVT_BEGIN(evt_boss)
     RETURN
 EVT_END()
 
+/**
+ * Idle ring loop when no match is reserved: two sparring fighters ("player 1" and "player 2") repeat one of
+ * three brawl routines at random (hit-and-retreat, chase with several hits, or a mid-air clash),
+ * with hit effects and sounds. The announcer is placed at the ring edge.
+ */
 EVT_BEGIN(evt_watch_match)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
         CALL(evt_npc_set_position, STRING("ガンス"), 0, 60, -130)
@@ -4406,6 +4745,11 @@ EVT_BEGIN(evt_watch_match)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of audience Toad kyaku1.
+ * The line depends on story progress and the player's rank (before the Gonzales story point, rank over 10,
+ * rank 1 to 10, or champion).
+ */
 EVT_BEGIN(evt_kyaku_1)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_set_dir_to_target, STRING("kyaku1"), STRING("mario"))
@@ -4428,6 +4772,7 @@ EVT_BEGIN(evt_kyaku_1)
     RETURN
 EVT_END()
 
+/** Talk script of audience Toadette kyaku2, with different lines by story progress and the player's rank. */
 EVT_BEGIN(evt_kyaku_2)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_set_dir_to_target, STRING("kyaku2"), STRING("mario"))
@@ -4450,6 +4795,7 @@ EVT_BEGIN(evt_kyaku_2)
     RETURN
 EVT_END()
 
+/** Talk script of audience vendor Toad kyaku3, with different lines by story progress and the player's rank. */
 EVT_BEGIN(evt_kyaku_3)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_set_dir_to_target, STRING("kyaku3"), STRING("mario"))
@@ -4472,6 +4818,7 @@ EVT_BEGIN(evt_kyaku_3)
     RETURN
 EVT_END()
 
+/** Talk script of audience Lakitu kyaku4: a line by story and rank, followed by a yes/no style choice and a reply. */
 EVT_BEGIN(evt_kyaku_4)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_set_dir_to_target, STRING("kyaku4"), STRING("mario"))
@@ -4502,6 +4849,10 @@ EVT_BEGIN(evt_kyaku_4)
     RETURN
 EVT_END()
 
+/**
+ * Second talk script for a Toad spectator (kyaku1 slot),
+ * with different lines by story progress and the player's rank.
+ */
 EVT_BEGIN(evt_kyaku_5)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_set_dir_to_target, STRING("kyaku1"), STRING("mario"))
@@ -4524,6 +4875,10 @@ EVT_BEGIN(evt_kyaku_5)
     RETURN
 EVT_END()
 
+/**
+ * Second talk script for the Toadette spectator (kyaku2 slot),
+ * with different lines by story progress and the player's rank.
+ */
 EVT_BEGIN(evt_kyaku_6)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_set_dir_to_target, STRING("kyaku2"), STRING("mario"))
@@ -4546,6 +4901,10 @@ EVT_BEGIN(evt_kyaku_6)
     RETURN
 EVT_END()
 
+/**
+ * Second talk script for the vendor Toad spectator (kyaku3 slot),
+ * with different lines by story progress and the player's rank.
+ */
 EVT_BEGIN(evt_kyaku_7)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_set_dir_to_target, STRING("kyaku3"), STRING("mario"))
@@ -4568,6 +4927,10 @@ EVT_BEGIN(evt_kyaku_7)
     RETURN
 EVT_END()
 
+/**
+ * Second talk script for the Lakitu spectator (kyaku4 slot):
+ * a line by story and rank followed by a choice and a reply.
+ */
 EVT_BEGIN(evt_kyaku_8)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_set_dir_to_target, STRING("kyaku4"), STRING("mario"))
@@ -4599,6 +4962,10 @@ EVT_BEGIN(evt_kyaku_8)
 EVT_END()
 
 #if VERSION >= VERSION_US
+/**
+ * Background loop (US and later) that shows Mario's "..." balloon whenever he stands in front of a talkable
+ * spectator and nobody is using a partner action, and removes it when he turns away.
+ */
 EVT_BEGIN(evt_kyaku_check)
     SET_VALUE(LW(0), 0)
     LOOP(0)
@@ -4659,6 +5026,14 @@ EVT_BEGIN(evt_kyaku_check)
 EVT_END()
 #endif
 
+/**
+ * Map init script of tou_03, the Glitz Pit ring.
+ * It sets the ambience, lights and the monitor, spawns the audience, registers the exit doors,
+ * and then by story: the intro cutscene (evt_tougi), the Grubba finale setup (evt_boss),
+ * the title-match scenes (evt_champion / evt_champion2), a reserved match (evt_match),
+ * or the idle sparring (evt_watch_match).
+ * It also removes the partners if they are still poisoned and wires up the spectator talk scripts.
+ */
 EVT_BEGIN(tou_03_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG3_31_GRUBBAS_PLANS)

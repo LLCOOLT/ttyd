@@ -18,6 +18,10 @@ static void aramCallbackGarbage(u32 request);
 static void arqCallbackToAram(u32 request);
 static void arqCallbackToMram(u32 request);
 
+/**
+ * Boot-time setup from mariost.c: starts AR/ARQ, claims a 0x3FC000-byte ARAM region and a table of 64 entries.
+ * mapdrv parks map data, textures and archives there between areas.
+ */
 void aramMgrInit(void) {
     memset(wp, 0, sizeof(ARAMWork));
     if (!ARCheckInit()) {
@@ -34,12 +38,21 @@ void aramMgrInit(void) {
     wp->tail = NULL;
 }
 
+/**
+ * ARQ completion for the compaction copies: clears the busy flag the copy loop spins on
+ * and invalidates the bounce buffer.
+ */
 static void aramCallbackGarbage(u32 request) {
     wp->busy = 0;
     DCInvalidateRange(wp->buffer, wp->bufferSize);
     ICInvalidateRange(wp->buffer, wp->bufferSize);
 }
 
+/**
+ * Compacts ARAM when the bump allocator runs off the end:
+ * waits for transfers in flight, unlinks entries already copied back to main RAM (flag 0x20),
+ * then slides the live ones down through a 32 KB main-RAM bounce buffer.
+ */
 static void aramMgrGarbage(void) {
     ARAMEntry* head;
     ARAMEntry* entry;
@@ -106,6 +119,7 @@ static void aramMgrGarbage(void) {
     wp->nextAddr = addr;
 }
 
+/** ARQ completion for an upload: marks the matching entry's copy to ARAM as finished (flag 4). */
 static void arqCallbackToAram(u32 request) {
     ARAMEntry* entry;
 
@@ -116,6 +130,11 @@ static void arqCallbackToAram(u32 request) {
     entry->flags |= 4;
 }
 
+/**
+ * Starts copying size bytes (rounded up to 32) from main RAM to the next free ARAM space
+ * and returns the entry tracking it; compacts ARAM first if the region is full.
+ * Does not check for a free entry slot.
+ */
 ARAMEntry* aramMgrToAramAsync(void* src, u32 size) {
     ARAMEntry* entry = NULL;
     ARAMEntry* curr;
@@ -156,12 +175,17 @@ ARAMEntry* aramMgrToAramAsync(void* src, u32 size) {
     return entry;
 }
 
+/** Copies a block to ARAM and spins until the transfer is done; mapdrv uses it to stash the previous map's data. */
 ARAMEntry* aramMgrToAram(void* src, u32 size) {
     ARAMEntry* entry = aramMgrToAramAsync(src, size);
     while (!(entry->flags & 4)) {}
     return entry;
 }
 
+/**
+ * ARQ completion for a download: marks the entry as back in main RAM and spent (flags 0x10 and 0x20,
+ * so the next compaction frees it), then invalidates the caches over the destination.
+ */
 static void arqCallbackToMram(u32 request) {
     ARAMEntry* entry;
 
@@ -175,6 +199,10 @@ static void arqCallbackToMram(u32 request) {
     ICInvalidateRange(entry->dest, entry->size);
 }
 
+/**
+ * Copies an entry back from ARAM to dest, waiting for its upload to finish first and then for the copy itself.
+ * Each entry is read back once; mapdrv restores a stashed map with it.
+ */
 void aramMgrToMram(ARAMEntry* entry, void* dest) {
     while (!(entry->flags & 4)) {}
     ARQPostRequest(&entry->request, ARAM_OWNER, ARQ_TYPE_ARAM_TO_MRAM, ARQ_PRIORITY_LOW,

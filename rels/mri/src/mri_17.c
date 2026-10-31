@@ -48,6 +48,11 @@ extern EvtWord trap_check[];
 extern EvtWord strange_statue[];
 extern EvtWord switch_event[];
 
+/**
+ * Enter script of the east pipe: the first time Mario comes in,
+ * it starts the strange statue scene (strange_statue) and records it with GSWF_MRI17_STRANGE_STATUE_SEEN.
+ * Returns 0 in LW(0).
+ */
 EVT_BEGIN(bero_02_into_event)
     IF_INT_EQUAL(GSWF(GSWF_MRI17_STRANGE_STATUE_SEEN), 0)
         SPAWN_EVENT(strange_statue)
@@ -109,28 +114,34 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Init script of Punio in the trap room: nothing to do, he is placed by the Puni system. */
 static EVT_BEGIN(guide_init)
     RETURN
 EVT_END()
 
+/** Talk script of Punio in the trap room: his line stg2_mri_e18_00_06 (he is trapped with the crowd). */
 static EVT_BEGIN(guide_talk)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e18_00_06"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/** Init script of Punio's sister in the trap room: nothing to do, she is placed by the Puni system. */
 static EVT_BEGIN(sister_init)
     RETURN
 EVT_END()
 
+/** Talk script of Punio's sister in the trap room: her line stg2_mri_e18_00_07. */
 static EVT_BEGIN(sister_talk)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e18_00_07"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/** Init script of the rival Puni in the trap room: nothing to do, he is placed by the Puni system. */
 static EVT_BEGIN(rival_init)
     RETURN
 EVT_END()
 
+/** Talk script of the rival Puni in the trap room: his line stg2_mri_e18_00_08. */
 static EVT_BEGIN(rival_talk)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e18_00_08"), 0, STRING("me"))
     RETURN
@@ -212,6 +223,11 @@ s16 trap_position[] = {
     41, -35, 49, -58,
 };
 
+/**
+ * After the cage trap has sprung (stories STG2_21 to 21_03):
+ * puts every Puni that was caught (trap index 1) back inside the trap at its saved position, and moves Punio,
+ * his sister and the rival Puni NPCs to the cage with the Puni of the same slot.
+ */
 EVT_BEGIN(trap_main)
     CALL(evt_puni_wait_systemmode, 2)
     SET_VALUE(LW(10), 1)
@@ -250,6 +266,11 @@ EVT_BEGIN(trap_main)
 EVT_END()
 
 #if VERSION >= VERSION_JP
+/**
+ * After the escape (story STG2_21_04 to 21_06; JP and later):
+ * puts the Punies that were trapped back into the room at their saved trap positions
+ * so they can join Mario again.
+ */
 EVT_BEGIN(trap_restore)
     CALL(evt_puni_wait_systemmode, 2)
     SET_VALUE(LW(10), 1)
@@ -273,6 +294,7 @@ EVT_BEGIN(trap_restore)
 EVT_END()
 #endif
 
+/** Dust puffs along the base of the trap cage at eight fixed positions when it drops. */
 EVT_BEGIN(wana_kemuri)
     CALL(evt_eff, 0, STRING("kemuri_test"), 0, -18, 25, 76, FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_eff, 0, STRING("kemuri_test"), 0, 5, 10, 70, FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
@@ -285,6 +307,11 @@ EVT_BEGIN(wana_kemuri)
     RETURN
 EVT_END()
 
+/**
+ * The trap's two paper animations: the cage (S_hako) drops over the Punies with grid sounds,
+ * dust and a camera shake, then the pipe (S_dokan1) pops out of the floor next to it with its appearing sounds.
+ * Both are played as captured paper animations, and the solid cage and pipe replace them at the end.
+ */
 EVT_BEGIN(wana_offscreen)
     CALL(evt_img_entry, STRING("capture_img"))
     CALL(evt_img_set_paper, STRING("capture_img"), STRING("OFF_d_batan"))
@@ -341,6 +368,11 @@ EVT_BEGIN(wana_offscreen)
     RETURN
 EVT_END()
 
+/**
+ * The cage trap (story up to STG2_20): when Mario and his partner walk in with the Puni Orb in place,
+ * the cage falls on the Punies, Lord Crump and two X-Nauts drop in front of it and taunt the party,
+ * and the guide Puni answers. Sets the story to STORY_STG2_21_PUNIES_VS_JABBIES_2.
+ */
 EVT_BEGIN(trap_event)
     WAIT_WHILE(GF(15))
     CALL(evt_npc_flag_onoff, 1, STRING("第三勢力幹部"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
@@ -526,6 +558,11 @@ EVT_BEGIN(trap_event)
     RETURN
 EVT_END()
 
+/**
+ * Waits for the trap condition: at least 10 Punies standing in the area,
+ * the Puni Orb on its pedestal (GSWF_MRI17_ORB_ON_PEDESTAL) and Mario and his partner both in the trigger area;
+ * then starts trap_event.
+ */
 EVT_BEGIN(trap_check)
     SET_VALUE(LW(10), 50)
     SET_VALUE(LW(11), 0)
@@ -597,6 +634,11 @@ EVT_BEGIN(trap_check)
     RETURN
 EVT_END()
 
+/**
+ * Init script of the orb pedestal in the trap room: the light beam model is hidden;
+ * the shared Puni-switch setup runs; if the orb is already on the pedestal it is placed there
+ * and its target is on. The target is placed in front of the pedestal.
+ */
 static EVT_BEGIN(punipuni_ball00_init)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_sui_hikari"), MAPOBJ_FLAG_HIDE)
     CALL_CHILD(mri_punipuni_setup)
@@ -609,6 +651,11 @@ static EVT_BEGIN(punipuni_ball00_init)
     RETURN
 EVT_END()
 
+/**
+ * Hit/talk script of the orb pedestal: if empty,
+ * Mario picks an item to put on it (cancel ends the script) and the orb is placed; if full, Mario takes it back.
+ * Mario is frozen during this.
+ */
 static EVT_BEGIN(punipuni_ball00)
     CALL(evt_mario_key_onoff, 0)
     IF_INT_EQUAL(GSWF(GSWF_MRI17_ORB_ON_PEDESTAL), 0)
@@ -630,6 +677,10 @@ static EVT_BEGIN(punipuni_ball00)
     RETURN
 EVT_END()
 
+/**
+ * Init script of the breaking floor: until the floor has fallen (GSWF_MRI17_FLOOR_BROKEN is 0) the lower floor
+ * piece (A_f2_rak_01) has its collision off.
+ */
 static EVT_BEGIN(breakyuka_init)
     IF_INT_EQUAL(GSWF(GSWF_MRI17_FLOOR_BROKEN), 0)
         CALL(evt_hitobj_onoff, STRING("A_f2_rak_01"), 1, 0)
@@ -637,6 +688,13 @@ static EVT_BEGIN(breakyuka_init)
     RETURN
 EVT_END()
 
+/**
+ * Scene when the floor gives way under the Puni weight:
+ * Mario is frozen, the floor collision is turned on, the Punies fall and Mario lands.
+ * Punio speaks (stg2_mri_e18_00_13); Punio, his sister and the rival are flagged
+ * and their stand-in NPCs moved out of sight when they are with the crowd.
+ * Every trapped Puni becomes lost (hagure), and the story is set to STORY_STG2_21_04_ESCAPE.
+ */
 static EVT_BEGIN(breakyuka_main)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_hitobj_onoff, STRING("A_f2_rak_01"), 1, 1)
@@ -684,6 +742,10 @@ static EVT_BEGIN(breakyuka_main)
     RETURN
 EVT_END()
 
+/**
+ * Scene on first arrival in the pipe room: the partner walks to the strange statue,
+ * looks left and right and comments on it (stg2_mri_e18_00_11).
+ */
 EVT_BEGIN(strange_statue)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_bero_exec_wait, 65536)
@@ -704,6 +766,10 @@ EVT_BEGIN(strange_statue)
     RETURN
 EVT_END()
 
+/**
+ * Blue switch pressed in mri_17 (just before the mystery pillar): a quake and shake, the party comments.
+ * Sets the story to STORY_STG2_21_01_MYSTERY_PILLAR.
+ */
 EVT_BEGIN(switch_event)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -725,6 +791,11 @@ EVT_BEGIN(switch_event)
     RETURN
 EVT_END()
 
+/**
+ * Map init script of mri_17, the cage trap room:
+ * sets up the Puni, the Puni Orb pedestal, the breaking floor, the blue switch and a Star Piece,
+ * and starts trap_check, trap_main or trap_restore according to the story state.
+ */
 EVT_BEGIN(mri_17_init_evt)
     CALL(evt_puni_mem_init)
     CALL(evt_puni_set_yuka, 17, 0, -309, -1000, -1000, 6, 0)
@@ -790,6 +861,7 @@ EVT_BEGIN(mri_17_init_evt)
     RETURN
 EVT_END()
 
+/** Sets the z-offset used to order the image named in args[0] (in the battle or field list) to the float in args[1]. */
 static USER_FUNC(set_depthPlaneOffset) {
     EvtWord* args = event->args;
     ImageEntry* img = imgNameToPtr((const char*)evtGetValue(event, args[0]), gp->inBattle != 0);

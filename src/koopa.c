@@ -45,6 +45,11 @@ s32 kpaPauseSeTable[28] = {0x10C, 0x10D, 0x10E, 0x10F, 0x111, 0x112, 0x113, 0x11
                            0x127, 0x128, 0x129, 0x12A, 0x12C, 0x12D, 0x12E, 0x12F};
 static EffectEntry* fireefp;
 
+/**
+ * Spawns Bowser's fire breath (the Hooktail breath effect) in front of his mouth if none is active:
+ * offset by his size and facing, flame size by level (level 3 uses the big flame type),
+ * both flame layers turned to his facing.
+ */
 static inline void kpaFireEntry2(Vec pos) {
     MarioWork* mario = marioGetPtr();
     if (fireefp == NULL) {
@@ -100,11 +105,13 @@ static inline void kpaFireEntry2(Vec pos) {
     }
 }
 
+/** Spawns the fire breath at pos (see kpaFireEntry2). */
 static inline void kpaFireEntry(Vec pos) {
     MarioWork* mario = marioGetPtr();
     kpaFireEntry2(pos);
 }
 
+/** Starts the looping fire breath sound plus a roar at Bowser's position, unless the loop is already playing. */
 static inline void kpaFireSEOn(void) {
     MarioWork* mario = marioGetPtr();
     if (KPW(mario)->fireSfxId == 0xFFFFFFFFU) {
@@ -113,11 +120,13 @@ static inline void kpaFireSEOn(void) {
     }
 }
 
+/** Marks the fire breath sound as not playing. */
 static inline void kpaFireSEInit(void) {
     MarioWork* mario = marioGetPtr();
     KPW(mario)->fireSfxId = -1;
 }
 
+/** Stops the looping fire breath sound if it is playing. */
 static inline void kpaFireSEOff(void) {
     MarioWork* mario = marioGetPtr();
     if (KPW(mario)->fireSfxId != 0xFFFFFFFFU) {
@@ -126,41 +135,52 @@ static inline void kpaFireSEOff(void) {
     }
 }
 
+/** Returns the active fire breath effect, or NULL. koopa_hit reads it to test the flame against objects. */
 EffectEntry* getKoopaFireEfp(void) {
     return fireefp;
 }
 
+/** Returns the frames left in which enemies cannot hit Bowser (after taking damage). */
 s32 kpaNoHitEnemyCheck(void) {
     return marioGetPtr()->kpaNoHitTimer;
 }
 
+/** TRUE while Bowser is invincible (muteki) from a star (KpaWork flag 0x10000). */
 s32 kpaMutekiCheck(void) {
     return (KPW(marioGetPtr())->flags >> 16) & 1;
 }
 
+/** Makes Bowser invincible and turns on his highlight material. */
 void kpaMutekiOn(void) {
     MarioWork* mario = marioGetPtr();
     animPoseSetMaterialFlagOn(mario->paperAnimGroupId[0], ANIM_MATERIAL_FLAG_HIGHLIGHT);
     KPW(mario)->flags |= 0x10000;
 }
 
+/** Ends Bowser's invincibility and his highlight. */
 void kpaMutekiOff(void) {
     MarioWork* mario = marioGetPtr();
     animPoseSetMaterialFlagOff(mario->paperAnimGroupId[0], ANIM_MATERIAL_FLAG_HIGHLIGHT);
     KPW(mario)->flags &= ~0x10000;
 }
 
+/**
+ * Starts the 12-second star invincibility timer and clears the post-damage timer;
+ * the side-scrolling update calls kpaMutekiOff when it runs out.
+ */
 void kpaMSetMutekiTimer(void) {
     MarioWork* mario = marioGetPtr();
     KPW(mario)->mutekiTimer = sysMsec2Frame(12000);
     mario->kpaNoHitTimer = 0;
 }
 
+/** Sets Bowser's pose: a in the 3D maps, b in the side-scrolling stages (the KPA2_ poses). */
 void kpaChgPose(const char* a, const char* b) {
     s32 v = (marioGetPtr()->stageFlags & 1) ^ 1;
     marioChgPose(v == 1 ? a : b);
 }
 
+/** Bowser's power-up level (0 small, 1 normal, 2 big, 3 giant); 0 when the player is not Bowser. */
 s32 kpaGetLevel(void) {
     s32 lv = 0;
     MarioWork* mario = marioGetPtr();
@@ -170,6 +190,10 @@ s32 kpaGetLevel(void) {
     return lv;
 }
 
+/**
+ * Sets Bowser's power-up level and his matching scale (baseScaleTbl) and collision (kpaSetSpec).
+ * Only while the player is Bowser.
+ */
 void kpaSetLevel(s32 lv) {
     MarioWork* mario = marioGetPtr();
     if (mario->characterId == 2 && KPW(mario) != NULL) {
@@ -182,10 +206,15 @@ void kpaSetLevel(s32 lv) {
     }
 }
 
+/** Bowser's width for power-up level lv (20, 60, 84, 186). */
 f32 kpaGetWidth(s32 lv) {
     return kpaWidthDat[lv];
 }
 
+/**
+ * Where Bowser is relative to the water in kpa_03 (surface at y 370): 0 above, 1 partly in, 2 fully under;
+ * always 0 on other maps and -1 when the player is not Bowser. Underwater he moves and jumps slower.
+ */
 s32 kpaGetBodyStatus(void) {
     MarioWork* mario = marioGetPtr();
     s32 st;
@@ -206,6 +235,7 @@ s32 kpaGetBodyStatus(void) {
     return st;
 }
 
+/** 1 in kpa_03, the seaside stage with water (stageFlags bit 2), else 0. */
 s32 kpaGetStageType(void) {
     return (marioGetPtr()->stageFlags >> 1) & 1;
 }
@@ -219,10 +249,15 @@ s32 kpaGetStageType(void) {
         JP(m, 3) = (d);     \
     } while (0)
 
+/** 1 in the 3D maps, 0 in the side-scrolling stages kpa_02 to kpa_06 (stageFlags bit 1). */
 s32 kpaGetStageViewType(void) {
     return !(marioGetPtr()->stageFlags & 1);
 }
 
+/**
+ * In the side-scrolling stages, lets the camera follow Bowser vertically once he is above y 76;
+ * returns 0 and does nothing in 3D maps or in background mode.
+ */
 s32 kpaCamFollow(void) {
     MarioWork* mario = marioGetPtr();
     s32 v;
@@ -235,6 +270,11 @@ s32 kpaCamFollow(void) {
     return 1;
 }
 
+/**
+ * Prepares the player for becoming Bowser (marioSetCharMode 2):
+ * allocates and clears the Bowser work at level 1,
+ * and sets the stage flags for the side-scrolling (kpa_02 to kpa_06) and seaside (kpa_03) stages.
+ */
 void kpaPreInit(void) {
     MarioWork* mario = marioGetPtr();
     if (KPW(mario) == NULL) {
@@ -265,6 +305,7 @@ void kpaPreInit(void) {
 
 f32 __fabsf(f32);
 
+/** Per-frame player update while playing as Bowser: the side-scrolling or the 3D version. */
 void kpaMain(void) {
     if (marioGetPtr()->stageFlags & 1) {
         kpa2DMain();
@@ -273,6 +314,11 @@ void kpaMain(void) {
     }
 }
 
+/**
+ * Side-scrolling Bowser update: hit checks, item pickup, the fire attack, the star timer,
+ * horizontal movement limited by his dash speed and walls, jumping and falling, floors and ceilings,
+ * then the shared player effects, balloon and camera.
+ */
 static void kpa2DMain(void) {
     MarioWork* mp = marioGetPtr();
     Vec diff;
@@ -378,6 +424,11 @@ static void kpa2DMain(void) {
     mp->floorMove.z = 0.0f;
 }
 
+/**
+ * 3D Bowser update (kpa_00, kpa_01 and other maps):
+ * hit checks, item pickup, the fire attack, the star timer and the normal player movement,
+ * floor and fall checks, then partner, effects and camera. Damage and plane motions skip the movement.
+ */
 static void kpa3DMain(void) {
     MarioWork* mp = marioGetPtr();
     struct HitEntry* h = kpaHitCheck();
@@ -468,6 +519,10 @@ static void kpa3DMain(void) {
     mp->floorMove.z = 0.0f;
 }
 
+/**
+ * Loads Bowser's jump physics (initial speed, acceleration, jerk, snap) for his level:
+ * 7.0, 8.1, 8.4 or 10.5 units per frame upward. Returns the initial speed.
+ */
 f32 kpaSetJumpPara(void) {
     f32* jd = marioJumpData;
     MarioWork* mario = marioGetPtr();
@@ -492,8 +547,11 @@ f32 kpaSetJumpPara(void) {
     return JP(mario, 0);
 }
 
-// No return statement: the original falls off the end (callers ignore the result). Declared void, the
-// constants load into other float registers, so the f32 return type stays.
+/**
+ * Sets Bowser's fall physics: a slower, floatier fall while A is held.
+ * No return statement: the original falls off the end (callers ignore the result).
+ * Declared void, the constants load into other float registers, so the f32 return type stays.
+ */
 f32 kpaSetFallPara(void) {
     MarioWork* mario = marioGetPtr();
     if ((mario->buttonHold & PAD_BUTTON_A)) {
@@ -503,6 +561,10 @@ f32 kpaSetFallPara(void) {
     }
 }
 
+/**
+ * Player motion for being bounced off an NPC: a small fixed jump (2.6 up) that turns into a fall at the peak.
+ * Mario also gets his jump poses. Run from mot_jump.
+ */
 void kpa_jumpNpc(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->trigFlags & MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION) {
@@ -538,6 +600,11 @@ void kpa_jumpNpc(void) {
     mario->airTimer++;
 }
 
+/**
+ * Falling for Bowser: in kpa_03 a simple capped fall onto platforms with a landing sound;
+ * elsewhere also slows his forward speed and floats while A is held,
+ * landing on floors and ride objects (and passing through hits with attribute 0x200).
+ */
 static void kpaFall(void) {
     MarioWork* mario = marioGetPtr();
     f32 fs;
@@ -614,6 +681,11 @@ static void kpaFall(void) {
     }
 }
 
+/**
+ * Nothing calls it.
+ * Guess: stands in for a stripped function so the fall constants (the two kpaSetFallPara sets) keep their place
+ * in the literal pool.
+ */
 void kpaStrippedFallPool(f32* f) {
     f[0] = -0.05f;
     f[1] = -0.08f;
@@ -625,6 +697,10 @@ void kpaStrippedFallPool(f32* f) {
     f[7] = -0.01f;
 }
 
+/**
+ * TRUE while Bowser's fire breath is coming out (attack states 20-23 or 40-43) and the player is active.
+ * Used for flame hits and to block other actions.
+ */
 s32 kpaFireAttackCheck(void) {
     s32 m;
     MarioWork* mario = marioGetPtr();
@@ -638,6 +714,10 @@ s32 kpaFireAttackCheck(void) {
     return 0;
 }
 
+/**
+ * Starts the standing fire breath attack (state 1) if Bowser is not already attacking:
+ * stops his movement and switches him to standing.
+ */
 void kpaAttackStart(void) {
     MarioWork* mario = marioGetPtr();
     if (KPW(mario)->attackState == 0) {
@@ -646,6 +726,7 @@ void kpaAttackStart(void) {
     }
 }
 
+/** Starts the fire breath attack without changing motion (state 30), used while moving or jumping. */
 void kpaAttackStart2(void) {
     KpaWork* w = KPW(marioGetPtr());
     if (w->attackState == 0) {
@@ -653,6 +734,11 @@ void kpaAttackStart2(void) {
     }
 }
 
+/**
+ * Runs the fire breath attack: wind-up pose, then flames every frame for at least 400 ms and for as long as B
+ * or fireHold is held, then the closing pose and back to the motion's normal pose.
+ * States 1-24 are the standing attack, 30-44 the moving one; the looping sound plays while flames come out.
+ */
 static void kpaFireAttack(void) {
     MarioWork* mario = marioGetPtr();
     switch (KPW(mario)->attackState) {
@@ -786,6 +872,7 @@ static void kpaFireAttack(void) {
     }
 }
 
+/** Ends any fire attack at once and stops its sound. */
 void kpaCancelAttackMode(void) {
     MarioWork* mario;
     KpaWork* w = KPW(marioGetPtr());
@@ -797,10 +884,12 @@ void kpaCancelAttackMode(void) {
     }
 }
 
+/** TRUE while any fire attack state is active. */
 s32 kpaGetAttackMode(void) {
     return KPW(marioGetPtr())->attackState != 0;
 }
 
+/** Removes the fire breath effect and stops its sound. Called by the kpa map scripts. */
 void kpaFireDelete(void) {
     if (fireefp) {
         MarioWork* mario;
@@ -814,10 +903,20 @@ void kpaFireDelete(void) {
     }
 }
 
+/**
+ * Nothing calls it.
+ * Guess: stands in for a stripped function so its int-to-float conversion constant keeps its place in the pool.
+ */
 void kpaStrippedPool(f32* f, s32 i) {
     *f = (f32)i;
 }
 
+/**
+ * Keeps the fire breath effect at Bowser's mouth
+ * and tests every fourth live flame puff against objects (kpaFlameHitCheck), storing the first hit in flameHit.
+ * Retail skips the test at level 0 and for puffs smaller than 7 units; the demo tests them all.
+ * Deletes the effect when the attack ends.
+ */
 static void kpaFireMain(void) {
     MarioWork* mario = marioGetPtr();
     Mtx mb0;
@@ -947,10 +1046,12 @@ static void kpaFireMain(void) {
     }
 }
 
+/** Bowser's scale for power-up level lv (0.3, 1.0, 1.4, 3.1). */
 f32 kpaGetBaseScale(s32 lv) {
     return baseScaleTbl[lv];
 }
 
+/** TRUE while the player is Bowser doing a ground pound (MARIO_MOTION_HIP_2). Used to break blocks (mobjdrv). */
 s32 kpaHipAttackCheck(void) {
     s32 r = 0;
     MarioWork* mario = marioGetPtr();
@@ -963,10 +1064,15 @@ s32 kpaHipAttackCheck(void) {
     return r;
 }
 
+/** TRUE while Bowser is in the air (airTimer not zero). */
 s32 kpaJumpChk(void) {
     return ((MarioWork*)marioGetPtr())->airTimer != 0;
 }
 
+/**
+ * Plays one of Bowser's 28 random voice clips (kpaPauseSeTable) when the pause menu is opened as Bowser and
+ * when Start is pressed in it.
+ */
 void kpaPauseSE2(void) {
     psndSFXOn(SFX_NAME_WORD(kpaPauseSeTable[irand(28)] | 0x20000));
 }

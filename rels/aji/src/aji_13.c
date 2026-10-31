@@ -50,6 +50,7 @@ typedef struct {
 static USER_FUNC(bg_cam_chk);
 static USER_FUNC(mario_chk);
 #if VERSION >= VERSION_JP
+// Declaration of hit_group_chk (JP and later), the script function defined at the end of this file.
 USER_FUNC(hit_group_chk);
 #endif
 static BOOL hitIsGroup(HitEntry* target, HitEntry* group);
@@ -90,6 +91,10 @@ extern EvtWord evt_bcv_sw[];
 extern EvtWord evt_key_get[];
 static s32 key_tbl[2];
 
+/**
+ * Recursive helper of hitIsGroup: whether the joint name of target equals that of node,
+ * of any of node's descendants, or (when checkSibling is TRUE) of the siblings that follow.
+ */
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling) {
     if (strcmp(target->joint->name, node->joint->name) == 0) {
         return TRUE;
@@ -103,11 +108,17 @@ static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling) 
     return FALSE;
 }
 
+/** Whether the hit area target is group itself or one of its descendants. */
 static BOOL hitIsGroup(HitEntry* target, HitEntry* group) {
     // whether target is group or one of its descendants
     return _hitIsGroupSub(target, group, FALSE);
 }
 
+/**
+ * Door close animation step: moves the two door leaves S_door2_1
+ * and S_door2_2 in opposite directions along Z by the animation value in LW(0) times 0.25;
+ * the open and close scripts apply the same transform. The demo builds use 0.2217.
+ */
 static EVT_BEGIN(w_door_close)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -120,6 +131,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door open animation step: moves the two door leaves S_door2_1
+ * and S_door2_2 in opposite directions along Z by the animation value in LW(0) times 0.25;
+ * the open and close scripts apply the same transform. The demo builds use 0.2217.
+ */
 static EVT_BEGIN(w_door_open)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -132,6 +148,11 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door close animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times -0.25;
+ * the open and close scripts apply the same transform. The demo builds use -0.2217.
+ */
 static EVT_BEGIN(e_door_close)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
@@ -144,6 +165,11 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door open animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times -0.25;
+ * the open and close scripts apply the same transform. The demo builds use -0.2217.
+ */
 static EVT_BEGIN(e_door_open)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
@@ -156,6 +182,10 @@ static EVT_BEGIN(e_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Script that silences the conveyor sound handle in GW(11) once the story has reached
+ * STORY_STG7_17_CONVEYOR_BELT; returns LW(0) = 0.
+ */
 EVT_BEGIN(evt_snd_stop)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_17_CONVEYOR_BELT)
         CALL(evt_snd_sfxoff, GW(11))
@@ -164,6 +194,11 @@ EVT_BEGIN(evt_snd_stop)
     RETURN
 EVT_END()
 
+/**
+ * Entry event of the background-camera section:
+ * after the entrance finishes it releases the keep-camera mode and switches on Y-following for Mario's camera,
+ * and returns LW(0) = 1 (Guess: the door code reads it as "handled").
+ */
 static EVT_BEGIN(evt_haikei_in)
     BEGIN_INLINE_EVENT
         CALL(evt_bero_exec_wait, 65536)
@@ -432,6 +467,14 @@ const char* name_tbl2[] = {
     "A_zenmai6",
 };
 
+/**
+ * Script function that carries Mario and his partner on the moving platforms of the room:
+ * every frame it measures how far each of the 13 platform groups in name_tbl moved
+ * and adds that to the floor motion of whoever stands on it;
+ * after STORY_STG7_17_CONVEYOR_BELT it pushes them along the conveyor belt A_bel at 0.6 per frame (scaled for
+ * the frame rate on PAL); and on the six rotating platforms in name_tbl2 it moves Mario around the platform's
+ * pivot by the angle the platform turned. Blocks forever.
+ */
 static USER_FUNC(mario_chk) {
     BeltWork* work;
     s32 i;
@@ -527,6 +570,11 @@ static USER_FUNC(mario_chk) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script for one sliding platform of left_right_tbl (row values in LW(0) to LW(4): hit area, map object,
+ * two positions, time in ms): binds the hit area to the map object and slides it back
+ * and forth between the two positions. Guess: the global flag GF(0) pauses the movement between passes.
+ */
 EVT_BEGIN(move_left_right)
     SET_VALUE(LW(5), LW(0))
     SET_VALUE(LW(6), LW(1))
@@ -581,6 +629,12 @@ EVT_BEGIN(move_left_right)
     RETURN
 EVT_END()
 
+/**
+ * Script for one platform of up_down_tbl: binds the hit area to the map object
+ * and moves it between two heights over the row's time.
+ * In the JP and later releases the platform A_ugoku_2 only starts
+ * after something is standing on it (GF(1) is set once its movement value passes a small threshold).
+ */
 EVT_BEGIN(move_up_down)
     SET_VALUE(LW(5), LW(0))
     SET_VALUE(LW(6), LW(1))
@@ -694,6 +748,10 @@ EVT_BEGIN(move_up_down)
     RETURN
 EVT_END()
 
+/**
+ * Script for one platform of r_tbl: binds the hit area to the map object
+ * and turns it between two angles over the row's time. Guess: GF(0) pauses the turning between swings.
+ */
 EVT_BEGIN(move_r)
     SET_VALUE(LW(5), LW(0))
     SET_VALUE(LW(6), LW(1))
@@ -782,6 +840,10 @@ ShikakeMoveTbl15 r_tbl = {
     {NULL, NULL},
 };
 
+/**
+ * Starts all the moving platforms of the room: reads left_right_tbl,
+ * up_down_tbl and r_tbl and spawns move_left_right, move_up_down and move_r for each row.
+ */
 EVT_BEGIN(shikake_init)
     SET_VALUE(GF(0), 0)
     SET_INT_READ_ADDR(PTR(&left_right_tbl))
@@ -817,6 +879,11 @@ EVT_BEGIN(shikake_init)
     RETURN
 EVT_END()
 
+/**
+ * Clockwork switch script that reveals the off-screen staircase:
+ * pans the camera to the stairs, builds a paper-and-offscreen image of S_kaidan (OFF_hei_07) that unfolds,
+ * and sets the story progress to STORY_STG7_18_OFF_SCREEN_STAIRS.
+ */
 static EVT_BEGIN(evt_sw)
     CALL(evt_mario_key_onoff, 0)
     SET_VALUE(GF(0), 1)
@@ -854,6 +921,10 @@ static EVT_BEGIN(evt_sw)
     RETURN
 EVT_END()
 
+/**
+ * Swings the needle map object whose name is in LW(0) around its Z axis with random target angles and durations,
+ * the same effect as evt_hari in aji_03 (Guess: it animates a gauge needle on the conveyor machinery).
+ */
 static EVT_BEGIN(evt_hari)
     SET_VALUE(LW(8), LW(0))
     SET_VALUE(LW(2), 0)
@@ -882,6 +953,10 @@ static EVT_BEGIN(evt_hari)
     RETURN
 EVT_END()
 
+/**
+ * Starts the conveyor-belt machinery: plays SFX_STG7_CONVEYER_MOVE1 at the belt (S_bel),
+ * shows and spins the warning beacon S_pato1 (10 degrees per frame), and spawns four evt_hari needle swings.
+ */
 static EVT_BEGIN(evt_ramp)
     CALL(evt_mapobj_get_position, STRING("S_bel"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_CONVEYER_MOVE1"), LW(0), LW(1), LW(2), GW(11))
@@ -908,6 +983,11 @@ static EVT_BEGIN(evt_ramp)
     RETURN
 EVT_END()
 
+/**
+ * Case script of the blue switch bcv_sw: sets the story to STORY_STG7_17_CONVEYOR_BELT,
+ * pans the camera to the machine, switches the lamp objects meta_1 to 4 from state 1 to state 2,
+ * starts the conveyor sound and animation (kon) and the ramp (evt_ramp).
+ */
 EVT_BEGIN(evt_bcv_sw)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_17_CONVEYOR_BELT)
     CALL(evt_mario_key_onoff, 0)
@@ -932,6 +1012,7 @@ EVT_BEGIN(evt_bcv_sw)
     RETURN
 EVT_END()
 
+/** Pick-up event of the Card Key (ITEM_CARD_KEY_0x20): sets GSWF_AJI13_CARD_KEY_TAKEN. */
 EVT_BEGIN(evt_key_get)
     SET_VALUE(GSWF(GSWF_AJI13_CARD_KEY_TAKEN), 1)
     RETURN
@@ -941,6 +1022,12 @@ static s32 key_tbl[] = {
     ITEM_CARD_KEY_0x20, -1,
 };
 
+/**
+ * Case script on the locked door to Lord Crump: without the Card Key (ITEM_CARD_KEY_0x20) it shows stg7_aji_67;
+ * with it, opens the item menu, and if the key is chosen removes it,
+ * unlocks the door's entrance and sets the story progress to STORY_STG7_19_THE_DOOR_TO_LORD_CRUMP.
+ * Menu argument layout differs between the demos and the final game.
+ */
 static EVT_BEGIN(evt_door_msg)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_pouch_check_item, ITEM_CARD_KEY_0x20, LW(0))
@@ -971,6 +1058,14 @@ static EVT_BEGIN(evt_door_msg)
     RETURN
 EVT_END()
 
+/**
+ * Init script of aji_13, the conveyor-belt room:
+ * plays BGM_STG7_DUN2, sets up the exits and the moving platforms,
+ * places the blue switches (bcv_sw for the conveyor until STORY_STG7_17_CONVEYOR_BELT,
+ * sw for the stairs until STORY_STG7_18_OFF_SCREEN_STAIRS), the Card Key, a save block,
+ * a recovery block and an Ultra Shroom, and locks the exit e_bero
+ * until STORY_STG7_19_THE_DOOR_TO_LORD_CRUMP (the key door A_kagi1, evt_door_msg).
+ */
 EVT_BEGIN(aji_13_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI7"))
@@ -1044,6 +1139,10 @@ EVT_BEGIN(aji_13_init_evt)
 EVT_END()
 
 #if VERSION >= VERSION_JP
+/**
+ * Script function: returns TRUE in args[2] if the hit area named by args[0] is the area named by args[1]
+ * or one of its descendants (hitIsGroup), otherwise FALSE (JP and later).
+ */
 USER_FUNC(hit_group_chk) {
     EvtWord* args = event->args;
     const char* name1 = (const char*)evtGetValue(event, args[0]);
@@ -1060,6 +1159,11 @@ USER_FUNC(hit_group_chk) {
 }
 #endif
 
+/**
+ * Script function that keeps the camera following Mario's height:
+ * when Mario is in background mode, the camera's Y-follow is off
+ * and he is on the ground (in the JP and later releases), it turns Y-follow back on. Blocks forever.
+ */
 static USER_FUNC(bg_cam_chk) {
     CameraEntry* camera = camGetPtr(CAMERA_3D);
 

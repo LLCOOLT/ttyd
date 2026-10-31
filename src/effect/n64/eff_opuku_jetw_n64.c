@@ -136,6 +136,11 @@ effN64Vtx size6x22_tex32x32_vtx[] = {
 static void effOpukuJetwMain(EffectEntry* effect);
 static void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect);
 
+/**
+ * Spawns a spray of blobs at (x, y, z) scaled by scale, lasting lifetime frames (<= 0 until deleted).
+ * Type 0 uses the longer 20-step tables, other types 11 steps.
+ * Default blue; the Blooper boss (unit_boss_gesso) recolors it black as ink and rotates it. Soft-deletable.
+ */
 EffectEntry* effOpukuJetwN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffOpukuJetwN64Work* work;
@@ -171,6 +176,10 @@ EffectEntry* effOpukuJetwN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f
     return effect;
 }
 
+/**
+ * Fades the spray in over the first 8 frames and counts down its lifetime;
+ * a delete request starts a 16-frame wind-down.
+ */
 static void effOpukuJetwMain(EffectEntry* effect) {
     EffOpukuJetwN64Work* work = effect->userdata;
     Vec position;
@@ -198,6 +207,10 @@ static void effOpukuJetwMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effOpukuJetwDisp, effect);
 }
 
+/**
+ * Draws a central blob, then three streams of 16x16 sprites (texture 0x34) whose positions, sizes,
+ * rotations and alphas come from step tables and advance with the frame.
+ */
 static void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx mtx;
     Mtx scale;

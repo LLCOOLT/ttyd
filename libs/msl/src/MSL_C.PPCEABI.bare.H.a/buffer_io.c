@@ -1,5 +1,10 @@
 #include "ansi_files.h"
 
+/**
+ * Empties the stream buffer: resets the buffer pointer to the start
+ * and sets the usable length to the buffer size less the file position's offset within the buffer alignment,
+ * recording the position the buffer starts at.
+ */
 void __prep_buffer(FILE* file) {
     file->buffer_ptr = file->buffer;
     file->buffer_len = file->buffer_size;
@@ -7,6 +12,11 @@ void __prep_buffer(FILE* file) {
     file->buffer_pos = file->position;
 }
 
+/**
+ * Writes the bytes between buffer and buffer_ptr through the stream's write_proc,
+ * advances the file position by what was written (reported in *bytes_flushed if given),
+ * then re-empties the buffer; returns the handler's error code if the write failed.
+ */
 int __flush_buffer(FILE* file, size_t* bytes_flushed) {
     size_t buffer_len;
     int ioresult;

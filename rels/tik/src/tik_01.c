@@ -35,6 +35,10 @@ extern EvtWord gorotuki_sanninngumi[];
 extern EvtWord wall_bomb00[];
 extern EvtWord wall_bomb01[];
 
+/**
+ * Short scene after Goombella's badge lecture: Mario's partner walks to (-375, -105),
+ * turns left and says lecture_badge_after_00, a reminder to equip a badge.
+ */
 EVT_BEGIN(lecture_badge_after_00_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_bero_exec_wait, 65536)
@@ -47,6 +51,11 @@ EVT_BEGIN(lecture_badge_after_00_evt)
     RETURN
 EVT_END()
 
+/**
+ * Runs when Mario enters the second pipe.
+ * During the badge tutorial (STORY_STG0_17_BADGE_TUTORIAL up to the Blooper battle),
+ * if he has no badge equipped yet, it plays lecture_badge_after_00_evt. Returns 0 in LW(0).
+ */
 EVT_BEGIN(dokan_2_in_evt)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG0_17_BADGE_TUTORIAL)
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG0_19_BLOOPER_BATTLE)
@@ -240,6 +249,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Footstep sound loop for the first Goomba bully:
+ * alternates the left and right KURI_MOVE sounds at his position every 50 ms.
+ * Started and stopped by the escape scene.
+ */
 EVT_BEGIN(ashioto)
     LOOP(0)
         CALL(evt_npc_get_position, STRING("クリボー１"), LW(0), LW(1), LW(2))
@@ -252,6 +266,14 @@ EVT_BEGIN(ashioto)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene with the three Goomba bullies (gorotuki sanninngumi, the "three thugs") that triggers
+ * when Mario walks past X = -100 before the tutorial is over.
+ * They taunt Mario and his partner (mac_0_086 to mac_0_092),
+ * jump at him and start a battle (battle info 4) against Goomba 1.
+ * After the fight they run away off the left edge, the partner comments (mac_0_094),
+ * story progress is set to STORY_STG0_11_3_GOOMBA_GOONS, the save-block hit area opens and the music returns.
+ */
 EVT_BEGIN(gorotuki_sanninngumi)
     CALL(evt_npc_set_position, STRING("クリボー１"), 110, 75, 65)
     CALL(evt_npc_set_position, STRING("クリボー２"), 140, 95, 35)
@@ -415,6 +437,11 @@ EVT_BEGIN(gorotuki_sanninngumi)
     RETURN
 EVT_END()
 
+/**
+ * Bobbery bomb trigger for the first cracked wall (bom_kabe_1) in the room.
+ * Plays the break sound, swaps the wall's hit areas from closed to open,
+ * sets GSWF_TIK01_WALL1_BOMBED and plays the paper-style collapse animation (OFF_d_bom_ver2) over the wall.
+ */
 EVT_BEGIN(wall_bomb00)
     BEGIN_INLINE_EVENT
         WAIT_MS(200)
@@ -455,6 +482,10 @@ EVT_BEGIN(wall_bomb00)
     RETURN
 EVT_END()
 
+/**
+ * Bobbery bomb trigger for the second cracked wall (bom_kabe_3), which hides the e_bero_2 exit.
+ * The same as wall_bomb00, but it also enables the exit's door trigger and sets GSWF_TIK01_WALL2_BOMBED.
+ */
 EVT_BEGIN(wall_bomb01)
     BEGIN_INLINE_EVENT
         WAIT_MS(200)
@@ -496,6 +527,10 @@ EVT_BEGIN(wall_bomb01)
     RETURN
 EVT_END()
 
+/**
+ * Item-box callback for the Defend Plus P chest:
+ * takes control, puts the badge at the chest, waits for the chest animation and hands it to Mario.
+ */
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
@@ -511,6 +546,13 @@ static EVT_BEGIN(mobj_box00)
     RETURN
 EVT_END()
 
+/**
+ * Map init script of tik_01.
+ * Starts the sewer music (fading in only the first time, via GSWF_TIK01_BGM_STARTED) and ambience,
+ * sets up the exits, the two bombable walls, the Defend Plus P chest, the Star Piece panel,
+ * the save block and the moving floor, and registers the airport harbor.
+ * Removes the spiked Goomba before Frankly's house; runs the bully scene until the tutorial step is passed.
+ */
 EVT_BEGIN(tik_01_init_evt)
 #if VERSION >= VERSION_JP
     SET_VALUE(GSWF(GSWF_LOG_MAP_TIK_ROUTE_SHOWN), 1)

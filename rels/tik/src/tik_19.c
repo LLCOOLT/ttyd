@@ -54,6 +54,12 @@ static s32 key_tbl[] = {
     ITEM_BLACK_KEY_0x21, -1,
 };
 
+/**
+ * The black chest's paper demon (peramajin) talks to Mario (mac_majin_01 to 12).
+ * The first time he introduces himself and sets GSWF_TIK19_BLACK_CHEST_TALKED;
+ * if Mario has no Black Key he refuses to open,
+ * otherwise Mario picks the key from his items and it is used up (mac_majin_09 to 12).
+ */
 static EVT_BEGIN(evt_majin)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -188,6 +194,12 @@ static EVT_BEGIN(evt_majin)
     RETURN
 EVT_END()
 
+/**
+ * Opens the black chest after the key is used: Mario receives the Plane Curse,
+ * the demon's plane-mode lecture runs (plane_majin_lecture_init, plane_majin_lecture),
+ * the partner comments (mac_majin_20), story progress becomes STORY_STG0_12_02_PAPER_MAGE_1
+ * and GSWF_TIK19_BLACK_CHEST_OPENED is set.
+ */
 static EVT_BEGIN(evt_majin2)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION <= VERSION_DEMO_US
@@ -263,6 +275,11 @@ static EVT_BEGIN(evt_majin2)
     RETURN
 EVT_END()
 
+/**
+ * Map init script of tik_19, the black chest room.
+ * Registers the airport harbor, the curse-demon paper animation (OFF_d_kusya),
+ * places the black chest whose paper demon (peramajin) gives Mario the airplane power, and the Star Piece panel.
+ */
 EVT_BEGIN(tik_19_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK1"))
@@ -278,6 +295,11 @@ EVT_BEGIN(tik_19_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Callback for the paper demon's black chest.
+ * Changes the chest's pose by event type: type 0 plays A_2, type 5 replays A_2 once a loop has finished,
+ * type 2 plays S_1.
+ */
 static void majin_callback(s32 type) {
     MapObjectEntry* mobj = mobjNameToPtr("box");
 
@@ -292,6 +314,7 @@ static void majin_callback(s32 type) {
     }
 }
 
+/** Script helper. Blocks until the music on channel 1 has started. */
 static USER_FUNC(bgm_start_wait) {
     return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }

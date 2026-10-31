@@ -11,13 +11,19 @@
 BOOL dbg_lotteryinfo;
 static s32 lotteryUnused;
 
+/** Returns the lottery state kept in the save data (gp->lotteryInfo); the shop menus read the ticket number from it. */
 lottery_info* lotteryGetPtr(void) {
     return &gp->lotteryInfo;
 }
 
+// Updates the lottery from the console clock when a seller (args[0] = 0 or 1) is visited: once a day draws today's
+// number (todayNum), and on the ticket's secret prize days makes it match 4/3/2/1 digits (flags 0x1000-0x8000).
+// Flag 4 marks a clock set backwards. Writes the flags to args[1] and today's number to args[2].
 #if VERSION <= VERSION_DEMO_US
-// the demo checks the draw day before the per-shop times, never rerolls a prize number
-// and keeps the buy times when the clock went back
+/**
+ * the demo checks the draw day before the per-shop times,
+ * never rerolls a prize number and keeps the buy times when the clock went back
+ */
 USER_FUNC(evt_lottery) {
     lottery_info* lot;
     s32 day;
@@ -164,6 +170,10 @@ USER_FUNC(evt_lottery) {
     return EVT_RETURN_DONE;
 }
 #else
+/**
+ * Retail evt_lottery: as the demo version, but checks the seller's daily visit first
+ * and redraws numbers that match the ticket by accident.
+ */
 USER_FUNC(evt_lottery) {
     lottery_info* lot;
     s32 day;
@@ -323,8 +333,10 @@ USER_FUNC(evt_lottery) {
 }
 #endif
 
+// Buys a ticket: draws its number (written to args[0]), records the buy time and the four prize days (336-395,
+// 86-115, 26-35 and 5-10 days out), and sets flag 2. Retail draws a number sharing no trailing digits with today's.
 #if VERSION <= VERSION_DEMO_US
-// the demo only marks a purchase made with a broken clock
+/** the demo only marks a purchase made with a broken clock */
 USER_FUNC(evt_lottery_buy) {
     EvtWord* args = event->args;
     OSTime now = OSGetTime();
@@ -346,6 +358,7 @@ USER_FUNC(evt_lottery_buy) {
     return EVT_RETURN_DONE;
 }
 #else
+/** Retail evt_lottery_buy: also resets the stored visit times when buying after a clock error or over an old ticket. */
 USER_FUNC(evt_lottery_buy) {
     EvtWord* args = event->args;
     OSTime now = OSGetTime();
@@ -378,16 +391,22 @@ USER_FUNC(evt_lottery_buy) {
 }
 #endif
 
+/** Writes the lottery flags (gp->lotteryInfo.flags) to args[0]. */
 USER_FUNC(evt_lottery_flag) {
     evtSetValue(event, event->args[0], (&gp->lotteryInfo)->flags);
     return EVT_RETURN_DONE;
 }
 
+/** Writes today's drawn number to args[0] (-1 after a clock error). */
 USER_FUNC(evt_lottery_todaynum) {
     evtSetValue(event, event->args[0], (&gp->lotteryInfo)->todayNum);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Writes TRUE to args[0] when the console clock looks set backwards (flag 4, or now before any stored time),
+ * unless a ticket was bought under that error on an earlier day.
+ */
 USER_FUNC(evt_lottery_error_check) {
     OSCalendarTime a, b;
     GlobalWork* g = gp;

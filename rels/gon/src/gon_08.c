@@ -29,36 +29,60 @@ extern EvtWord nokkosu_init[];
 extern EvtWord nokkosu_talk[];
 static NpcSetupInfo npcEnt[2];
 
+/**
+ * Door animation callback, closing for the e_bero_1 exit to gon_04:
+ * rotates map object "door__01" about Y by -0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(door01_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door__01"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the e_bero_1 exit to gon_04:
+ * rotates map object "door__01" about Y by 0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(door01_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door__01"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, closing for the e_bero_2 exit to gon_09:
+ * rotates map object "door__02" about Y by -0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(door02_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door__02"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the e_bero_2 exit to gon_09:
+ * rotates map object "door__02" about Y by 0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(door02_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door__02"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, closing for the w_bero exit to gon_12:
+ * rotates map object "door__03" about Y by 0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(door03_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door__03"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the w_bero exit to gon_12:
+ * rotates map object "door__03" about Y by -0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(door03_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door__03"), 0, LW(0), 0)
@@ -123,6 +147,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Map-init helper for the floating block blk_0 and its switch (sw_0):
+ * if the local flag LSWF(3) says the switch has been used,
+ * it lifts the block 600 units above its resting height.
+ */
 static EVT_BEGIN(init_0)
     IF_INT_EQUAL(0, 0)
         IF_INT_NOT_EQUAL(LSWF(3), 0)
@@ -140,6 +169,13 @@ static EVT_BEGIN(init_0)
     RETURN
 EVT_END()
 
+/**
+ * Handler of the sw_0 switch for the floating block blk_0:
+ * the camera shakes with rumble while the block rises
+ * or falls 600 units (the direction follows LSWF(3), which is toggled), with block-float sounds;
+ * if Mario or his partner bumps the block with the head during the move,
+ * it reverses and the switch is cancelled.
+ */
 static EVT_BEGIN(main_0)
 #if VERSION >= VERSION_JP
     SET_TYPE(239)
@@ -357,6 +393,10 @@ static s32 key_tbl[] = {
     ITEM_CASTLE_KEY_0x0F, -1,
 };
 
+/**
+ * Check for the locked door ("me"): if Mario carries a Castle Key (ITEM_CASTLE_KEY_0x0F),
+ * opens the item select window with key_tbl; cancelling it cancels the lock execution so the door stays locked.
+ */
 static EVT_BEGIN(evt_chk)
     CALL(evt_pouch_check_item, ITEM_CASTLE_KEY_0x0F, LW(0))
     IF_INT_GREATER(LW(0), 0)
@@ -372,6 +412,10 @@ static EVT_BEGIN(evt_chk)
     RETURN
 EVT_END()
 
+/**
+ * Runs when the door lock is opened with the Castle Key:
+ * switches on the e_bero_2 bero case and sets the story to STORY_STG1_15_02_LOCK_3.
+ */
 static EVT_BEGIN(evt_unlock)
     SET_VALUE(LW(0), STRING("e_bero_2"))
     CALL_CHILD(bero_case_switch_on)
@@ -379,6 +423,11 @@ static EVT_BEGIN(evt_unlock)
     RETURN
 EVT_END()
 
+/**
+ * NPC init for Nokkos (ノッコス), the Koopa who asks for Mario's help in the Trouble Center request 7:
+ * when that request is active he is placed on the high ledge (y 500) and faces right;
+ * otherwise he stays where the map put him.
+ */
 EVT_BEGIN(nokkosu_init)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 7)
 #if VERSION >= VERSION_US
@@ -391,6 +440,13 @@ EVT_BEGIN(nokkosu_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk event for Nokkos, the request-7 client: Mario
+ * and the partner walk up (Koops is swapped in if someone else was along)
+ * and hear his request (irai_07_00 to irai_07_06), he hands over a Special Card, jumps down to the floor,
+ * the play time is saved in GSW_GON08_TROUBLE07_TIME and the request is marked solved (GSWF_TROUBLE_07_SOLVED,
+ * GSW_TROUBLE_ACTIVE cleared).
+ */
 EVT_BEGIN(nokkosu_talk)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
 #if VERSION >= VERSION_US
@@ -493,6 +549,11 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Map init for gon_08: sets up the doors, Nokkos, the dormant Dry Bones, the Life Shroom,
+ * the floating block and switch (blk_0 and sw_0),
+ * and the lock that Castle Key 0x0F opens (STORY_STG1_15_02_LOCK_3).
+ */
 EVT_BEGIN(gon_08_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)

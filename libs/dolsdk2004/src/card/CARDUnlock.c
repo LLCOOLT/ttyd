@@ -38,15 +38,24 @@ static s32 DummyLen(void);
 static void InitCallback(void* _task);
 static void DoneCallback(void* _task);
 
+/**
+ * Small linear congruential generator (multiplier 0x41C64E6D, increment 0x3039), returning 15 bits,
+ * used by the unlock handshake.
+ */
 static int CARDRand(void) {
     next = (next * 0x41C64E6D) + 0x3039;
     return (next / 0x10000) & 0x7FFF;
 }
 
+/** Seeds CARDRand. */
 static void CARDSrand(unsigned int seed) {
     next = seed;
 }
 
+/**
+ * Runs 'rshift' steps of a shift-right register with XNOR feedback of bits 0, 7,
+ * 15 and 23 (a step of the unlock handshake's scrambler).
+ */
 static u32 exnor_1st(u32 data, u32 rshift) {
     u32 wk;
     u32 work;
@@ -61,6 +70,7 @@ static u32 exnor_1st(u32 data, u32 rshift) {
     return work;
 }
 
+/** Runs 'lshift' steps of the left-shifting version of the same XNOR feedback register. */
 static u32 exnor(u32 data, u32 lshift) {
     u32 wk;
     u32 work;
@@ -76,6 +86,7 @@ static u32 exnor(u32 data, u32 lshift) {
     return work;
 }
 
+/** Reverses the bit order of a 32-bit word (done as two halves). */
 static u32 bitrev(u32 data) {
     u32 wk;
     u32 i;
@@ -105,6 +116,11 @@ static u32 bitrev(u32 data) {
 #define SEC_AD3(x) ((u8)(((x) >> 19) & 0x03))
 #define SEC_BA(x) ((u8)(((x) >> 12) & 0x7f))
 
+/**
+ * Sends the memory card a read command (0x52) whose address bytes are built from 'data' (the format depends on
+ * 'mode'), then the latency bytes, and reads back 'rlen' bytes.
+ * This is the handshake's way of feeding values to the card.
+ */
 static s32 ReadArrayUnlock(s32 chan, u32 data, void* rbuf, s32 rlen, int mode) {
     CARDControl* card;
     BOOL err;
@@ -138,6 +154,10 @@ static s32 ReadArrayUnlock(s32 chan, u32 data, void* rbuf, s32 rlen, int mode) {
     return err ? CARD_RESULT_NOCARD : CARD_RESULT_READY;
 }
 
+/**
+ * Produces the handshake's starting value: 0x7FEC8000 ORed with a random 15-bit number seeded from the tick
+ * counter, with the low 12 bits cleared.
+ */
 static u32 GetInitVal(void) {
     u32 tmp;
     u32 tick;
@@ -150,6 +170,10 @@ static u32 GetInitVal(void) {
     return tmp;
 }
 
+/**
+ * Picks a random number of dummy bytes from 4 to 32 (retrying a few times to avoid values below 4) for the
+ * handshake's reads.
+ */
 static s32 DummyLen(void) {
     u32 tick;
     u32 wk;
@@ -183,6 +207,13 @@ static s32 DummyLen(void) {
     return tmp;
 }
 
+/**
+ * First half of the memory card unlock handshake.
+ * Sends a random starting value, derives a scrambler, reads the card's challenge values,
+ * decodes them with the scrambler, and queues a DSP task (microcode CardData) that computes the answer from two
+ * of them. Stores the first three decoded words in 'flashID' (the card's 12-byte ID).
+ * The rest is finished by DoneCallback.
+ */
 s32 __CARDUnlock(s32 chan, u8 flashID[12]) {
     u32 init_val;
     u32 data;
@@ -306,6 +337,10 @@ s32 __CARDUnlock(s32 chan, u8 flashID[12]) {
     return CARD_RESULT_READY;
 }
 
+/**
+ * DSP task init callback: sends the DSP the mail 0xFF000000 and the address of the CARDDecParam block,
+ * waiting for the mailbox to drain between the two.
+ */
 static void InitCallback(void* _task) {
     s32 chan;
     CARDControl* card;
@@ -332,6 +367,13 @@ static void InitCallback(void* _task) {
         ;
 }
 
+/**
+ * DSP task done callback and second half of the handshake:
+ * takes the DSP's 32-bit answer from the output buffer,
+ * sends it back to the card in two halves (masked with the scrambler), reads the card status and,
+ * if the card is not unlocked (status bit 0x40 clear), reports IOERROR.
+ * Then calls __CARDMountCallback with the result.
+ */
 static void DoneCallback(void* _task) {
     u8 rbuf[64];
     u32 data;

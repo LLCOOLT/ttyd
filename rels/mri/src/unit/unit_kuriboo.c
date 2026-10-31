@@ -166,6 +166,10 @@ static BattleWeapon weapon_kuriboo_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init script of the Goomba: sets its wait, attack, damage and confusion events and its run,
+ * walk and jump sounds, then starts its wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -178,6 +182,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Gets the direction angle from point (args[0], args[1]) to (args[2], args[3]) into args[4];
+ * if both points are the same it keeps the old angle. Used to turn the rolling Goomba toward where it is moving.
+ */
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);
@@ -196,6 +204,7 @@ static USER_FUNC(krb_get_dir) {
     return EVT_RETURN_DONE;
 }
 
+/** Damage event of the Goomba: runs the default damage reaction. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -203,10 +212,18 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Phase event of the Goomba: nothing. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the Goomba.
+ * It picks a target (the first-strike target when it ambushes Mario), uses an enemy item if it has one,
+ * runs to a point 100 units behind the target, then leaps at it in a 32-frame arc to hit it.
+ * Guess: it tumbles as it goes, since krb_get_dir sets its roll angle from its travel direction every frame;
+ * the damage and result checks follow, then it returns home. If confused with no target it is flustered.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -340,6 +357,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle script of the Goomba: plays its idle pose. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

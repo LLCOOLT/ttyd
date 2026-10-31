@@ -1,5 +1,9 @@
 #include <charPipeline/structures/Tree.h>
 
+/**
+ * Removes obj from the tree but promotes its children:
+ * they are appended to obj's parent, then obj itself is unlinked.
+ */
 void DSExtractBranch(DSTreePtr tree, Ptr obj) {
     DSBranchPtr branch = (DSBranchPtr)(obj + tree->Offset);
     Ptr cursor = branch->Children;
@@ -13,11 +17,13 @@ void DSExtractBranch(DSTreePtr tree, Ptr obj) {
     DSRemoveBranch(tree, obj);
 }
 
+/** Initialises an empty tree; Offset records where the branch node sits inside each object. */
 void DSInitTree(DSTreePtr tree, Ptr obj, DSBranchPtr branch) {
     tree->Root = NULL;
     tree->Offset = (Ptr)branch - obj;
 }
 
+/** Adds obj as the last child of cursor (or as the last root when cursor is NULL). */
 void DSInsertBranchBelow(DSTreePtr tree, Ptr cursor, Ptr obj) {
     DSBranchPtr branch;
     DSBranchPtr objBranch = (DSBranchPtr)(obj + tree->Offset);
@@ -50,6 +56,10 @@ void DSInsertBranchBelow(DSTreePtr tree, Ptr cursor, Ptr obj) {
     objBranch->Parent = cursor;
 }
 
+/**
+ * Adds obj as a new last sibling in cursor's sibling chain (the root chain when cursor is NULL),
+ * sharing its parent.
+ */
 void DSInsertBranchBeside(DSTreePtr tree, Ptr cursor, Ptr obj) {
     DSBranchPtr parent;
     DSBranchPtr branch;
@@ -78,6 +88,7 @@ void DSInsertBranchBeside(DSTreePtr tree, Ptr cursor, Ptr obj) {
     branch->Parent = parent->Parent;
 }
 
+/** Unlinks obj from its parent and siblings; its own children stay attached to it. */
 void DSRemoveBranch(DSTreePtr tree, Ptr obj) {
     DSBranchPtr branch;
     DSBranchPtr parent;

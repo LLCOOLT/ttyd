@@ -1,5 +1,6 @@
 #include "fdlibm.h"
 
+/** Euclidean length sqrt(x*x + y*y) without intermediate overflow (fdlibm). */
 double __ieee754_hypot(double x, double y) {
     double a = x, b = y, t1, t2, y1, y2, w;
     int j, k, ha, hb;

@@ -40,6 +40,7 @@ static inline void DEMOSwapBuffers(void);
 static inline void DEMOSetGPHangMetric(GXBool enable);
 void DEMOReInit(GXRenderModeObj* mode);
 
+/** Carves the two external frame buffers off the bottom of the arena, sized for the render mode. */
 static inline void __DEMOInitMem(void) {
     void *arenaLo, *arenaHi;
     u32 fbSize;
@@ -57,6 +58,7 @@ static inline void __DEMOInitMem(void) {
     // newer SDKs have more stuff here
 }
 
+/** Shows the first frame buffer and waits for a retrace (two in non-interlaced modes). */
 static inline void __DEMOInitVI(void) {
     VISetNextFrameBuffer(DemoFrameBuffer1);
     DemoCurrentBuffer = DemoFrameBuffer2;
@@ -66,6 +68,10 @@ static inline void __DEMOInitVI(void) {
         VIWaitForRetrace();
 }
 
+/**
+ * Sets GX's viewport, scissor, display copy scale and filter and pixel format (RGB565 when anti-aliased),
+ * then copies the cleared EFB into the back buffer.
+ */
 static inline void __DEMOInitGX(void) {
     u16 xfbHeight;
     f32 yScale;
@@ -88,6 +94,11 @@ static inline void __DEMOInitGX(void) {
     GXSetDispCopyGamma(GX_GM_1_0);
 }
 
+/**
+ * Picks the render mode: a copy of the given one,
+ * or the default for the console's TV format (NTSC, PAL, EURGB60, MPAL) adjusted for overscan.
+ * Panics on an unknown format.
+ */
 static inline void __DEMOInitRenderMode(GXRenderModeObj* mode) {
     if (mode != NULL) {
         rmodeobj = *mode; // inline copy
@@ -119,6 +130,10 @@ static inline void __DEMOInitRenderMode(GXRenderModeObj* mode) {
     }
 }
 
+/**
+ * Boot-time setup: OS, DVD, VI, pads, render mode, frame buffers,
+ * the game's heaps (memInit) and GX with its FIFO (0x60000 bytes in the demo, 0x64000 later).
+ */
 void DEMOInit(GXRenderModeObj* mode) {
     OSInit();
     DVDInit();
@@ -139,6 +154,10 @@ void DEMOInit(GXRenderModeObj* mode) {
     __DEMOInitVI();
 }
 
+/**
+ * Start of a frame: arms the hang-watch draw sync if enabled,
+ * sets the viewport (jittered per field in field rendering) and invalidates the vertex and texture caches.
+ */
 void DEMOBeforeRender(void) {
     if (GPHangWorkaround) {
         GXSetDrawSync(sysGetToken());
@@ -154,6 +173,11 @@ void DEMOBeforeRender(void) {
     GXInvalidateTexAll();
 }
 
+/**
+ * End of a frame: optional stats, resets the Z, colour and alpha state,
+ * copies the EFB to the back buffer and swaps.
+ * With the GP-hang workaround on it uses the watched variant instead.
+ */
 void DEMODoneRender(void) {
     if (GPHangWorkaround) {
         __NoHangDoneRender();
@@ -177,6 +201,7 @@ void DEMODoneRender(void) {
     DEMOSwapBuffers();
 }
 
+/** Queues the finished buffer for display (unblanking on the first frame), waits for retrace and flips buffers. */
 static inline void DEMOSwapBuffers(void) {
     VISetNextFrameBuffer(DemoCurrentBuffer);
     if (DemoFirstFrame) {
@@ -191,14 +216,17 @@ static inline void DEMOSwapBuffers(void) {
         DemoCurrentBuffer = DemoFrameBuffer1;
 }
 
+/** Returns the render mode in use. */
 GXRenderModeObj* DEMOGetRenderModeObj(void) {
     return rmode;
 }
 
+/** Returns the frame buffer currently being drawn to. */
 void* L_DEMOGetCurrentBuffer(void) {
     return DemoCurrentBuffer;
 }
 
+/** Turns the GP hang watchdog on (timeout in frames) or off (0), installing the retrace callback and metrics. */
 void DEMOEnableGPHangWorkaround(u32 timeoutFrames) {
     if (timeoutFrames) {
         GPHangWorkaround = TRUE;
@@ -213,6 +241,10 @@ void DEMOEnableGPHangWorkaround(u32 timeoutFrames) {
     }
 }
 
+/**
+ * Retrace callback for the hang watchdog: counts frames and reports a hang
+ * when the FIFO stays over the high watermark without progress for the timeout.
+ */
 static void __NoHangRetraceCallback(u32 count) {
     static u32 ovFrameCount = 0;
     static u32 lastOvc = 0;
@@ -234,6 +266,10 @@ static void __NoHangRetraceCallback(u32 count) {
     }
 }
 
+/**
+ * Hang-safe frame end: copies the frame, then waits on a draw-sync token;
+ * if the timeout passes, diagnoses the hang, re-initialises GX and continues.
+ */
 static void __NoHangDoneRender(void) {
     BOOL abort = FALSE;
     u16 token = sysGetToken();
@@ -257,6 +293,7 @@ static void __NoHangDoneRender(void) {
     DEMOSwapBuffers();
 }
 
+/** Reads the GP performance counters twice and writes a guess at the hang's cause into __GXErrorMessage. */
 static void __DEMODiagnoseHang(void) {
     u32 xfTop0, xfBot0, suRdy0, r0Rdy0;
     u32 xfTop1, xfBot1, suRdy1, r0Rdy1;
@@ -294,6 +331,7 @@ static void __DEMODiagnoseHang(void) {
     strcpy(__GXErrorMessage, newmsg);
 }
 
+/** Enables or disables the raw GP metric registers the hang diagnosis reads. */
 static inline void DEMOSetGPHangMetric(GXBool enable) {
     if (enable) {
         GXSetGPMetric(GX_PERF0_NONE, GX_PERF1_NONE);
@@ -322,6 +360,10 @@ static inline void DEMOSetGPHangMetric(GXBool enable) {
     }
 }
 
+/**
+ * Recovers from a GP hang: aborts the frame, swaps in a temporary FIFO,
+ * then re-initialises GX and VI with the original FIFO.
+ */
 void DEMOReInit(GXRenderModeObj* mode) {
     GXFifoObj tmpobj;
     void* tmpFifo = __memAlloc(HEAP_DEFAULT, 64 * 1024);

@@ -10,6 +10,11 @@ static GXDrawDoneCallback DrawDoneCB;
 static u8 DrawDone;
 static OSThreadQueue FinishQueue;
 
+/**
+ * Sets a miscellaneous GX option by token: the XF flush vertex count (GX_MT_XF_FLUSH),
+ * whether display lists save and restore the context (GX_MT_DL_SAVE_CONTEXT),
+ * and the abort-wait-for-copy setting.
+ */
 void GXSetMisc(GXMiscToken token, u32 val) {
     switch (token) {
     case GX_MT_XF_FLUSH:
@@ -38,6 +43,10 @@ void GXSetMisc(GXMiscToken token, u32 val) {
     }
 }
 
+/**
+ * Flushes pending dirty state, then writes eight zero words (32 bytes) to the FIFO and syncs
+ * so the CPU's write-gather buffer is pushed out to the GPU.
+ */
 void GXFlush(void) {
     CHECK_GXBEGIN(270, "GXFlush");
     if (__GXData->dirtyState) {
@@ -56,12 +65,17 @@ void GXFlush(void) {
     PPCSync();
 }
 
+/**
+ * Waits until the write-gather pipe reports empty, then reloads WPAR with the FIFO address,
+ * which discards the gather position.
+ */
 void GXResetWriteGatherPipe(void) {
     while (PPCMfwpar() & 1) {
     }
     PPCMtwpar(OSUncachedToPhysical((void *)GXFIFO_ADDR));
 }
 
+/** Busy-waits until the time base has advanced by clocks / 4 ticks. */
 static void __GXAbortWait(u32 clocks) {
     OSTime time0;
     OSTime time1;
@@ -72,6 +86,10 @@ static void __GXAbortWait(u32 clocks) {
     } while (time1 - time0 <= (clocks / 4));
 }
 
+/**
+ * Polls the memory-controller pixel-engine counter every 32 clocks until it stops changing,
+ * i.e. the EFB copy in flight has finished.
+ */
 static void __GXAbortWaitPECopyDone(void) {
     u32 peCnt0;
     u32 peCnt1;
@@ -85,6 +103,10 @@ static void __GXAbortWaitPECopyDone(void) {
     } while (peCnt0 != peCnt1);
 }
 
+/**
+ * Resets the graphics pipeline: optionally waits for a pending EFB copy,
+ * then sets the reset bit in PI register 0x18 for 200 clocks, clears it and waits 20 more.
+ */
 void __GXAbort(void) {
     if (__GXData->abtWaitPECopy && GXGetGPFifo() != (GXFifoObj*)NULL) {
         __GXAbortWaitPECopyDone();
@@ -96,6 +118,10 @@ void __GXAbort(void) {
     __GXAbortWait(20);
 }
 
+/**
+ * Abandons the frame in progress: resets the GPU with __GXAbort, and if a GP FIFO exists cleans it,
+ * re-applies the revision bits, clears the dirty state and flushes.
+ */
 void GXAbortFrame(void) {
     __GXAbort();
 
@@ -107,6 +133,11 @@ void GXAbortFrame(void) {
     }
 }
 
+/**
+ * With interrupts off, writes a 16-bit token to the pixel engine through two BP registers (0x48 and 0x47)
+ * and flushes; when the GPU gets there the token register changes
+ * and the token interrupt calls the draw-sync callback.
+ */
 void GXSetDrawSync(u16 token) {
     BOOL enabled;
     u32 reg;
@@ -124,11 +155,16 @@ void GXSetDrawSync(u16 token) {
     __GXData->bpSentNot = 0;
 }
 
+/** Returns the last token the GPU has processed (pixel-engine register 7). */
 u16 GXReadDrawSync(void) {
     u16 token = GX_GET_PE_REG(7);
     return token;
 }
 
+/**
+ * With interrupts off, clears the draw-done flag, writes the finish command (BP 0x45000002) and flushes;
+ * the GPU raises the finish interrupt when it has drained everything before it.
+ */
 void GXSetDrawDone(void) {
     u32 reg;
     BOOL enabled;
@@ -142,6 +178,7 @@ void GXSetDrawDone(void) {
     OSRestoreInterrupts(enabled);
 }
 
+/** Sleeps the calling thread on a queue until the finish interrupt handler sets the draw-done flag. */
 void GXWaitDrawDone(void) {
     BOOL enabled;
 
@@ -154,18 +191,24 @@ void GXWaitDrawDone(void) {
     OSRestoreInterrupts(enabled);
 }
 
+/** Waits for the GPU to finish all queued drawing (GXSetDrawDone then GXWaitDrawDone). */
 void GXDrawDone(void) {
     CHECK_GXBEGIN(566, "GXDrawDone");
     GXSetDrawDone();
     GXWaitDrawDone();
 }
 
+/**
+ * Rewrites the cached pixel-engine control register (BP 0x43),
+ * which makes the pixel engine wait for earlier draws before applying the mode.
+ */
 void GXPixModeSync(void) {
     CHECK_GXBEGIN(601, "GXPixModeSync");
     GX_WRITE_RAS_REG(__GXData->peCtrl);
     __GXData->bpSentNot = 0;
 }
 
+/** Writes BP 0x63000000, which makes the texture unit wait for earlier draws before texture state changes. */
 void GXTexModeSync(void) {
     u32 reg;
 
@@ -176,17 +219,20 @@ void GXTexModeSync(void) {
 }
 
 #if DEBUG
+/** Debug builds only: writes an arbitrary BP register word to the FIFO. */
 void __GXBypass(u32 reg) {
     CHECK_GXBEGIN(647, "__GXBypass");
     GX_WRITE_RAS_REG(reg);
     __GXData->bpSentNot = 0;
 }
 
+/** Debug builds only: reads a 16-bit pixel-engine register. */
 u16 __GXReadPEReg(u32 reg) {
     return GX_GET_PE_REG(reg);
 }
 #endif
 
+/** Writes the alpha compare function and threshold used for CPU pokes to the EFB into pixel-engine register 3. */
 void GXPokeAlphaMode(GXCompare func, u8 threshold) {
     u32 reg;
 
@@ -194,6 +240,7 @@ void GXPokeAlphaMode(GXCompare func, u8 threshold) {
     GX_SET_PE_REG(3, reg);
 }
 
+/** Sets how alpha is read back from the EFB for pokes (pixel-engine register 4). */
 void GXPokeAlphaRead(GXAlphaReadMode mode) {
     u32 reg;
 
@@ -203,6 +250,7 @@ void GXPokeAlphaRead(GXAlphaReadMode mode) {
     GX_SET_PE_REG(4, reg);
 }
 
+/** Enables or disables alpha writes (bit 4 of pixel-engine register 1) for CPU pokes. */
 void GXPokeAlphaUpdate(GXBool update_enable) {
     u32 reg;
 
@@ -211,6 +259,10 @@ void GXPokeAlphaUpdate(GXBool update_enable) {
     GX_SET_PE_REG(1, reg);
 }
 
+/**
+ * Sets the blend mode (blend or subtract enable, logic op enable,
+ * factors and logic op) used for CPU pokes in pixel- engine register 1.
+ */
 void GXPokeBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor dst_factor, GXLogicOp op) {
     u32 reg;
 
@@ -225,6 +277,7 @@ void GXPokeBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor d
     GX_SET_PE_REG(1, reg);
 }
 
+/** Enables or disables colour writes (bit 3 of pixel-engine register 1) for CPU pokes. */
 void GXPokeColorUpdate(GXBool update_enable) {
     u32 reg;
 
@@ -233,6 +286,7 @@ void GXPokeColorUpdate(GXBool update_enable) {
     GX_SET_PE_REG(1, reg);
 }
 
+/** Sets whether a constant alpha is written for CPU pokes, and its value (pixel-engine register 2). */
 void GXPokeDstAlpha(GXBool enable, u8 alpha) {
     u32 reg = 0;
 
@@ -241,6 +295,7 @@ void GXPokeDstAlpha(GXBool enable, u8 alpha) {
     GX_SET_PE_REG(2, reg);
 }
 
+/** Enables or disables dithering (bit 2 of pixel-engine register 1) for CPU pokes. */
 void GXPokeDither(GXBool dither) {
     u32 reg;
 
@@ -249,6 +304,7 @@ void GXPokeDither(GXBool dither) {
     GX_SET_PE_REG(1, reg);
 }
 
+/** Sets the Z compare enable, function and update flag used for CPU pokes (pixel-engine register 0). */
 void GXPokeZMode(GXBool compare_enable, GXCompare func, GXBool update_enable) {
     u32 reg = 0;
 
@@ -258,6 +314,10 @@ void GXPokeZMode(GXBool compare_enable, GXCompare func, GXBool update_enable) {
     GX_SET_PE_REG(0, reg);
 }
 
+/**
+ * Reads one EFB pixel as ARGB: the CPU loads from the EFB window at physical 0x08000000 with x in bits 2-11
+ * and y in bits 12-21 of the address.
+ */
 void GXPeekARGB(u16 x, u16 y, u32* color) {
     u32 addr = (u32)OSPhysicalToUncached(0x08000000);
 
@@ -267,6 +327,10 @@ void GXPeekARGB(u16 x, u16 y, u32* color) {
     *color = *(u32*)addr;
 }
 
+/**
+ * Writes one EFB pixel as ARGB through the EFB window at physical 0x08000000 (x in bits 2-11, y in bits 12-21 of
+ * the address).
+ */
 void GXPokeARGB(u16 x, u16 y, u32 color) {
     u32 addr = (u32)OSPhysicalToUncached(0x08000000);
 
@@ -276,6 +340,10 @@ void GXPokeARGB(u16 x, u16 y, u32 color) {
     *(u32*)addr = color;
 }
 
+/**
+ * Reads one EFB pixel's Z value through the EFB window (the same window,
+ * with the Z select bits set in the address).
+ */
 void GXPeekZ(u16 x, u16 y, u32* z) {
     u32 addr = (u32)OSPhysicalToUncached(0x08000000);
 
@@ -285,6 +353,10 @@ void GXPeekZ(u16 x, u16 y, u32* z) {
     *z = *(u32*)addr;
 }
 
+/**
+ * Writes one EFB pixel's Z value through the EFB window (the same window,
+ * with the Z select bits set in the address).
+ */
 void GXPokeZ(u16 x, u16 y, u32 z) {
     u32 addr = (u32)OSPhysicalToUncached(0x08000000);
 
@@ -294,6 +366,10 @@ void GXPokeZ(u16 x, u16 y, u32 z) {
     *(u32*)addr = z;
 }
 
+/**
+ * Installs the callback run from the token interrupt with each token the GPU reaches;
+ * interrupts are off while swapping. Returns the previous callback.
+ */
 GXDrawSyncCallback GXSetDrawSyncCallback(GXDrawSyncCallback cb) {
     GXDrawSyncCallback oldcb;
     BOOL enabled;
@@ -305,6 +381,11 @@ GXDrawSyncCallback GXSetDrawSyncCallback(GXDrawSyncCallback cb) {
     return oldcb;
 }
 
+/**
+ * Interrupt handler (OS interrupt 0x12) for the pixel-engine token:
+ * reads the token, calls TokenCB with it inside a scratch OS context,
+ * then acknowledges the interrupt in pixel-engine register 5.
+ */
 static void GXTokenInterruptHandler(__OSInterrupt interrupt, OSContext* context) {
     u16 token;
     OSContext exceptionContext;
@@ -323,6 +404,10 @@ static void GXTokenInterruptHandler(__OSInterrupt interrupt, OSContext* context)
     GX_SET_PE_REG(5, reg);
 }
 
+/**
+ * Installs the callback run when the finish interrupt fires; interrupts are off while swapping.
+ * Returns the previous callback.
+ */
 GXDrawDoneCallback GXSetDrawDoneCallback(GXDrawDoneCallback cb) {
     GXDrawDoneCallback oldcb;
     BOOL enabled;
@@ -334,6 +419,11 @@ GXDrawDoneCallback GXSetDrawDoneCallback(GXDrawDoneCallback cb) {
     return oldcb;
 }
 
+/**
+ * Interrupt handler (OS interrupt 0x13) for the pixel-engine finish:
+ * acknowledges it, sets the draw-done flag, calls the draw-done callback in a scratch OS context
+ * and wakes threads sleeping in GXWaitDrawDone.
+ */
 static void GXFinishInterruptHandler(__OSInterrupt interrupt, OSContext* context) {
     OSContext exceptionContext;
     u32 reg;
@@ -352,6 +442,10 @@ static void GXFinishInterruptHandler(__OSInterrupt interrupt, OSContext* context
     OSWakeupThread(&FinishQueue);
 }
 
+/**
+ * Installs the token and finish interrupt handlers (OS interrupts 0x12 and 0x13),
+ * initialises the finish thread queue, unmasks both interrupts and enables them in pixel-engine register 5.
+ */
 void __GXPEInit(void) {
     u32 reg;
     __OSSetInterruptHandler(0x12, GXTokenInterruptHandler);
@@ -367,6 +461,11 @@ void __GXPEInit(void) {
     GX_SET_PE_REG(5, reg);
 }
 
+/**
+ * Converts a 24-bit Z to the 16-bit copy format: GX_ZC_LINEAR keeps the top 16 bits;
+ * NEAR, MID and FAR use a 2-, 3- or 4-bit exponent (the count of leading ones of z24, capped) in the top bits
+ * and the next mantissa bits below.
+ */
 u32 GXCompressZ16(u32 z24, GXZFmt16 zfmt) {
     u32 z16;
     u32 z24n;
@@ -431,6 +530,10 @@ u32 GXCompressZ16(u32 z24, GXZFmt16 zfmt) {
     return z16;
 }
 
+/**
+ * Expands a 16-bit Z of the given format back to 24 bits,
+ * the inverse of GXCompressZ16 (the dropped low bits come back as zero).
+ */
 u32 GXDecompressZ16(u32 z16, GXZFmt16 zfmt) {
     u32 z24;
     u32 cb1;

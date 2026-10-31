@@ -162,6 +162,10 @@ static BattleWeapon weapon_test_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init script of the test enemy: registers its wait, attack and damage scripts and the default confusion script,
+ * clears unit work 0 (not flipped) and starts the wait script.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -172,6 +176,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage reaction of the test enemy: the default damage script. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -179,6 +184,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Flip-over reaction (data event 13): switches to the flipped defence and pose tables,
+ * sets unit work 0 to 2 (turns left on its back), takes pose NKT_D_1 and bounces twice in place.
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -193,6 +202,11 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Run instead of an attack while flipped: counts unit work 0 down and, when it reaches 0,
+ * restores the normal defence and pose tables and hops back onto its feet (pose NK_S_1).
+ * Otherwise it just stays down for another turn.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -215,6 +229,12 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * The test enemy's only attack (weapon_test_attack): while flipped it tries to get up instead.
+ * Otherwise it picks a target, jumps onto it in 30 frames,
+ * and on a hit applies the guard result and damage before jumping home;
+ * on a miss it bounces past the target, waits half a second and jumps home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -266,6 +286,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait script of the test enemy: shows its idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

@@ -178,6 +178,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init script of the Spiky Goomba: registers its wait,
+ * attack and damage scripts (confused, it runs the normal attack script), sets its run,
+ * walk and jump sounds and starts the wait script.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -190,6 +195,12 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Run when a stomp is stopped by the Spiky Goomba's spike (data event 37): flashes toge_flush on the spike.
+ * If the lecture unit is in the battle and has not given its tip yet (work 0 is 0) and Mario
+ * or Goombella was hurt, it turns round after 2.5 s,
+ * says mac_0_092_06 (Mario) or mac_0_092_07 (Goombella) and marks the tip as given.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -232,6 +243,7 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/** Damage reaction of the Spiky Goomba: the default damage script. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -254,6 +266,12 @@ static f32 SinTable[] = {
     0.999391f, 0.999848f, 1.0f,
 };
 
+/**
+ * The Spiky Goomba's headbonk (weapon_togekuri_attack): may use an item first;
+ * otherwise it walks up beside the target and leaps onto it head first, tilting along its arc.
+ * A hit squashes it, applies the guard result and damage and bounces it back three times;
+ * a miss lands it on the floor (TGK_D_1) before it hops back. Then it walks home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -418,6 +436,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper for the Goomba family: args[0], args[1] are the x and z of one point and args[2],
+ * args[3] those of another; args[4] receives the angle between them (angleABf of the x/z difference, degrees).
+ * When the two points coincide, args[4] keeps the value it already held.
+ */
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);
@@ -436,6 +459,11 @@ static USER_FUNC(krb_get_dir) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Direction of the vector (x, z) in whole degrees (0-359):
+ * binary-searches SinTable (0-90 degrees) for |z| / length and mirrors the result into the quadrant that x
+ * and z select.
+ */
 static u16 krb_comp_dir(f32 x, f32 z) {
     f32 dist = hypot(x, z);
     f32 s = __fabs(z) / dist;
@@ -466,6 +494,11 @@ static u16 krb_comp_dir(f32 x, f32 z) {
     return (u16)mid;
 }
 
+/**
+ * Script helper: writes to args[0] who the active unit is:
+ * 0 for kind 0xDE (222, Mario), 1 for kind 0xE0 (224, the first partner slot) and 2 for anyone else.
+ * Guess: the damage event reacts differently per attacker.
+ */
 static USER_FUNC(get_attacker) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -481,6 +514,7 @@ static USER_FUNC(get_attacker) {
     return EVT_RETURN_DONE;
 }
 
+/** Wait script of the Spiky Goomba: shows its idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

@@ -39,10 +39,16 @@ extern EvtWord apper_elmos[];
 extern EvtWord peramajin_before[];
 extern EvtWord peramajin_after[];
 
+/** Registration script of the Ember (エルモス, erumosu) enemy: does nothing. */
 static EVT_BEGIN(erumosu_regl)
     RETURN
 EVT_END()
 
+/**
+ * Death event of the Ember in dou_07: sets GSWF_DOU07_EMBER_DEFEATED,
+ * plays the normal enemy death effect and drops the Black Key (0x24) at its position (it falls in the US and PAL
+ * releases, is launched upwards in the JP and demo versions).
+ */
 EVT_BEGIN(erumosu_dead)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     SET_VALUE(GSWF(GSWF_DOU07_EMBER_DEFEATED), 1)
@@ -106,6 +112,7 @@ static s32 key_tbl[] = {
     ITEM_BLACK_KEY_0x24, -1,
 };
 
+/** The Ember appears: sets GSWF_DOU07_EMBER_APPEARED and fades its NPC in over one second. */
 EVT_BEGIN(apper_elmos)
     SET_VALUE(GSWF(GSWF_DOU07_EMBER_APPEARED), 1)
     CALL(evt_npc_set_position, STRING("エルモス"), 100, -6, -37)
@@ -122,6 +129,13 @@ EVT_BEGIN(apper_elmos)
     RETURN
 EVT_END()
 
+/**
+ * Interact event of the black chest (mobj_box00), run before it opens.
+ * The first time the chest speaks to Mario and the partner (messages stg1_gon_majin4_01 to 07,
+ * with its lid wobbling), the Ember appears and the story moves to STORY_STG5_21_GROTTO_KEY.
+ * After that it asks for the Black Key (0x24) from the item menu: no key or a cancel closes the chest again;
+ * choosing the key removes it from the pouch so the chest can open.
+ */
 EVT_BEGIN(peramajin_before)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_21_GROTTO_KEY)
         CALL(evt_mario_key_onoff, 0)
@@ -241,6 +255,12 @@ EVT_BEGIN(peramajin_before)
     RETURN
 EVT_END()
 
+/**
+ * Runs after the black chest opens: gives the Boat Curse, plays the paper genie's (peramajin) music,
+ * makes the genie unfold from the chest and runs the boat-mode lecture (ship_majin_lecture, evt_lect_dou.c) with
+ * Mario flickering in and out, then the genie folds away and the partner comments (stg1_gon_majin4_19).
+ * Sets STORY_STG5_21_01_BOAT_MOD_OBTAINED.
+ */
 EVT_BEGIN(peramajin_after)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION <= VERSION_DEMO_US
@@ -336,6 +356,11 @@ EVT_BEGIN(peramajin_after)
     RETURN
 EVT_END()
 
+/**
+ * Init script of dou_07, the black chest room: music and ambience, exit, a ship-change platform, waves,
+ * the black chest, the P-Down D-Up item, the Ember (once it has appeared and not been defeated)
+ * and the Black Key item once the Ember is beaten.
+ */
 EVT_BEGIN(dou_07_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_DOU1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_DOU7"))
@@ -363,6 +388,11 @@ EVT_BEGIN(dou_07_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Message callback for the black chest's speech:
+ * type 0 (text starts) plays the chest's talking animation A_2,
+ * type 5 (while text runs) restarts it once it has looped, type 2 (text ends) returns it to the idle S_1.
+ */
 static void majin_callback(s32 type) {
     MapObjectEntry* mobj = mobjNameToPtr("mobj_box00");
 
@@ -377,6 +407,10 @@ static void majin_callback(s32 type) {
     }
 }
 
+/**
+ * Script helper: blocks until music channel 1 has started playing,
+ * so the genie's music is audible before the scene continues.
+ */
 static USER_FUNC(bgm_start_wait) {
     return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }

@@ -219,6 +219,7 @@ BattleWeapon weapon_gundan_zako_group2_yusuri_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Guess: init event of horde group 2: sets its work values and spawns the horde display. */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -228,6 +229,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Guess: damage event of horde group 2: plays the horde hurt animation, then runs the default damage flow. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -269,6 +271,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: death event of horde group 2: the 25 X-Nauts fall (zakogun_dead2)
+ * and the group is removed from the battle.
+ */
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 1)
     BEGIN_INLINE_EVENT
@@ -309,6 +315,10 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: attack event of horde group 2: picks a target and runs the group attack (zakogun_attack2),
+ * dealing the weapon damage.
+ */
 static EVT_BEGIN(attack_event)
     SET_VALUE(LW(0), 50)
     ADD(LW(0), 50)
@@ -325,6 +335,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the fall attack of group 2: a target is chosen, the group drops something on it from above,
+ * with a dodge window for the player.
+ */
 EVT_BEGIN(fall_attack_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
@@ -358,6 +372,7 @@ EVT_BEGIN(fall_attack_event)
     RETURN
 EVT_END()
 
+/** Guess: shaking attack of horde group 2 (zakogun_attack2_yusuri): the group rocks the stage and strikes everyone. */
 static EVT_BEGIN(shake_attack_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     SET_VALUE(LW(9), PTR(&weapon_gundan_zako_group2_yusuri_attack))
@@ -436,6 +451,10 @@ static EVT_BEGIN(shake_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: lowers the stage objects if_body and
+ * if_wire from height 250 to 130 over 120 frames (the ceiling the horde stands on comes down).
+ */
 USER_FUNC(down_ceil) {
     u8* ceil = &_battleWorkPointer->stageObjectWork.flags;
     BattleStageObject* body = BattleSearchObjectPtr("if_body");
@@ -458,6 +477,7 @@ USER_FUNC(down_ceil) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper: raises the stage objects if_body and if_wire from 130 back to 250 over 120 frames. */
 USER_FUNC(up_ceil) {
     u8* ceil = &_battleWorkPointer->stageObjectWork.flags;
     BattleStageObject* body = BattleSearchObjectPtr("if_body");
@@ -480,6 +500,10 @@ USER_FUNC(up_ceil) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper: makes the lowered stage objects if_body and if_wire shudder between height 130
+ * and 135 over 9 frames.
+ */
 USER_FUNC(shake_ceil) {
     BattleStageObject* body = BattleSearchObjectPtr("if_body");
     BattleStageObject* wire = BattleSearchObjectPtr("if_wire");
@@ -498,6 +522,7 @@ USER_FUNC(shake_ceil) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper: starts formation 2: selects it (work->flag = 1) and initialises the first 25 X-Nauts of the pool. */
 USER_FUNC(zakogun_ext_init2) {
     s32 i;
     ExtdrvPose* pose = extGetPosePtr();
@@ -509,6 +534,10 @@ USER_FUNC(zakogun_ext_init2) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Per-frame update of formation 2 (25 X-Nauts):
+ * moves each member through its state machine and updates its pose matrix and sounds.
+ */
 void zakogun_ext_main2(void) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit = zakogun_get_ptr();
@@ -794,6 +823,7 @@ void zakogun_ext_main2(void) {
     }
 }
 
+/** Script helper for group 2 attack: sets the 25 X-Nauts to attack state 20 and blocks until they finish. */
 USER_FUNC(zakogun_attack2) {
     s32 i;
     s32 n;
@@ -814,6 +844,7 @@ USER_FUNC(zakogun_attack2) {
     return n == 25 ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
+/** Script helper for group 2 shaking attack (yusuri): sets the 25 X-Nauts to state 60 and blocks until they finish. */
 USER_FUNC(zakogun_attack2_yusuri) {
     s32 i;
     s32 n;
@@ -833,6 +864,7 @@ USER_FUNC(zakogun_attack2_yusuri) {
     return n == 25 ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
+/** Script helper: puts the 25 X-Nauts of group 2 into their death state (80). */
 USER_FUNC(zakogun_dead2) {
     s32 i;
 
@@ -842,6 +874,7 @@ USER_FUNC(zakogun_dead2) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: sends the 25 X-Nauts of group 2 running away (state 90) and blocks until they have left. */
 USER_FUNC(zakogun_escape2) {
     s32 i;
     s32 n;
@@ -861,6 +894,7 @@ USER_FUNC(zakogun_escape2) {
     return n == 25 ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
+/** Guess: hit check event of horde group 2: checks the pending damage through hit_check_event_sub. */
 static EVT_BEGIN(hit_check_event)
     WAIT_FRAMES(10)
     LOOP(4)
@@ -880,12 +914,18 @@ static EVT_BEGIN(hit_check_event)
     RETURN
 EVT_END()
 
+/** Hit check event for group 2: runs hit_check_event_sub whenever the group is about to hit someone. */
 EVT_BEGIN(hit_check_event2)
     SET_VALUE(LW(15), 1)
     CALL_CHILD(hit_check_event_sub)
     RETURN
 EVT_END()
 
+/**
+ * Guess: pre-damage check for the group 2 attack weapon:
+ * looks at the predicted damage result for the target and, for the avoid results (3 and 4),
+ * starts the target avoid animation.
+ */
 EVT_BEGIN(hit_check_event_sub)
     IF_INT_EQUAL(LW(9), PTR(&weapon_gundan_zako_group2_attack))
         IF_INT_EQUAL(LW(15), 1)
@@ -937,6 +977,7 @@ EVT_BEGIN(hit_check_event_sub)
     RETURN
 EVT_END()
 
+/** Guess: wait (idle) event of horde group 2: keeps the default idle pose. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

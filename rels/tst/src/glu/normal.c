@@ -52,6 +52,7 @@ double sqrt(double x);
 
 #define Dot(u, v) (u[0] * v[0] + u[1] * v[1] + u[2] * v[2])
 
+/** GLU tessellator: scales a 3-vector to unit length. */
 static void Normalize(GLdouble v[3]) {
     GLdouble len = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
 
@@ -64,6 +65,7 @@ static void Normalize(GLdouble v[3]) {
 #undef ABS
 #define ABS(x) ((x) < 0 ? -(x) : (x))
 
+/** GLU tessellator: returns the index (0, 1 or 2) of the vector component with the largest absolute value. */
 static int LongAxis(GLdouble v[3]) {
     int i = 0;
 
@@ -76,6 +78,12 @@ static int LongAxis(GLdouble v[3]) {
     return i;
 }
 
+/**
+ * GLU tessellator: computes a plane normal for the contours when the caller did not supply one (gluTessNormal).
+ * It picks the two extreme vertices along the widest axis,
+ * then the vertex that makes the largest triangle with them;
+ * for collinear points it returns a unit vector on the long axis.
+ */
 static void ComputeNormal(GLUtesselator* tess, GLdouble norm[3]) {
     GLUvertex *v, *v1, *v2;
     GLdouble c, tLen2, maxLen2;
@@ -151,6 +159,10 @@ static void ComputeNormal(GLUtesselator* tess, GLdouble norm[3]) {
     }
 }
 
+/**
+ * GLU tessellator: after projecting onto the plane, sums the signed area of the contours and, if it is negative,
+ * flips every t coordinate (and the t unit vector) so the contours wind counter-clockwise.
+ */
 static void CheckOrientation(GLUtesselator* tess) {
     GLdouble area;
     GLUface *f, *fHead = &tess->mesh->fHead;

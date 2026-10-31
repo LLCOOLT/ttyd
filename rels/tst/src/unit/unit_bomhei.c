@@ -251,6 +251,14 @@ static BattleWeapon weapon_bomhei_bomb = {
     {0, 25, 25, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * The Bob-omb explodes: it shakes the camera, hides itself,
+ * stops the fuse hiss (unit work 0 is the sound handle, then -1),
+ * plays SFX_BTL_ENEMY_DIE1_2 and SFX_BTL_ENM_BOMB_ATTACK2 with the sandars blast effect, clears any fog,
+ * stores its coin and experience rewards, waits one second and removes itself from the battle.
+ * When it was set off by its own attack (LW(15) = 1 in the later versions) it first waits for that attack to
+ * end.
+ */
 static EVT_BEGIN(bomb_event)
     CALL(evt_btl_camera_shake_w, 0, 5, 0, 15, 0)
     CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, 16777216)
@@ -285,6 +293,10 @@ static EVT_BEGIN(bomb_event)
     RETURN
 EVT_END()
 
+/**
+ * Init script of the Bob-omb: registers its wait, attack, damage and confusion handlers,
+ * sets unit work 0 to -1 (fuse not lit yet) and sets the walk and run sounds.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -297,6 +309,12 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction of the Bob-omb: a hit with damage code bit 256 of type 24,
+ * 25 or 27 (Guess: fire and explosions) sets it off at once (bomb_event);
+ * otherwise it takes the default damage and, if it is still alive and able to act,
+ * lights its fuse (change_spark_event).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -326,6 +344,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Switches the Bob-omb to its lit-fuse state after it was hurt:
+ * plays SFX_ENM_BOMB_SPARK1, installs the spark wait, attack,
+ * damage and confusion handlers (wait_event_spark and so on), the spark pose table and data table,
+ * and sets the counter attribute 8192 on its body. Does nothing if the hit was the 256 type or did no HP damage.
+ */
 static EVT_BEGIN(change_spark_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 39)
     CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 256, LW(0))
@@ -348,6 +372,11 @@ static EVT_BEGIN(change_spark_event)
     RETURN
 EVT_END()
 
+/**
+ * The Bob-omb's attack with the fuse unlit: uses an item or picks a target,
+ * scurries toward it (SFX_ENM_BOMB_MOVE1, pose type 42) and rams it;
+ * a miss lets it dodge past, a hit applies the damage with SFX_ENM_BOMB_MOVE3, and it walks back.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -467,11 +496,16 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle event: sets the unit's body part 1 to the pose given by its pose table for its current state. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction of the lit Bob-omb: a hit with damage code bit 256 sets it off at once (bomb_event);
+ * anything else is the default damage handling.
+ */
 static EVT_BEGIN(damage_event_spark)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -487,6 +521,10 @@ static EVT_BEGIN(damage_event_spark)
     RETURN
 EVT_END()
 
+/**
+ * The lit Bob-omb's attack: it picks a target with weapon_bomhei_bomb,
+ * runs at it with the fuse sparking and explodes (bomb_event) on it, whether the attack hits or is avoided.
+ */
 static EVT_BEGIN(attack_event_spark)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -584,6 +622,11 @@ static EVT_BEGIN(attack_event_spark)
     RETURN
 EVT_END()
 
+/**
+ * Idle event of the lit Bob-omb: shows its pose from the spark pose table and,
+ * while the fuse has not gone off (unit work 0 = -1),
+ * plays the SFX_ENM_BOMB_WAIT1 fuse hiss and stores the sound handle in unit work 0.
+ */
 static EVT_BEGIN(wait_event_spark)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(15))

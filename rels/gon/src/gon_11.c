@@ -62,12 +62,18 @@ extern EvtWord iri_16_box_evt[];
 extern EvtWord iri_16_cloud_evt[];
 extern EvtWord iri_16_touch_evt[];
 
+/** Exit event of the lair door: fades out the cutscene music on channel 1 and returns 0 to the door code. */
 EVT_BEGIN(evt_sound)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, closing for the w_bero exit to gon_10:
+ * rotates map objects "door03" and "door04" about Y by 0.389 and -0.389 times the value in LW(0),
+ * so the two leaves swing opposite ways.
+ */
 static EVT_BEGIN(door01_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("door03"), 0, LW(0), 0)
@@ -76,6 +82,11 @@ static EVT_BEGIN(door01_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the w_bero exit to gon_10:
+ * rotates map objects "door03" and "door04" about Y by -0.389 and 0.389 times the value in LW(0),
+ * so the two leaves swing opposite ways.
+ */
 static EVT_BEGIN(door01_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("door03"), 0, LW(0), 0)
@@ -106,11 +117,16 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Script helper: blocks until Hooktail (ゴンババ) has touched the ground. */
 static USER_FUNC(gonbaba_wait_landon) {
     // ゴンババ
     return npcNameToPtr("ゴンババ")->groundHit ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
+/**
+ * Waits 3.7 seconds into the Hooktail entrance cutscene,
+ * then plays SFX_STG1_GNB_STEP1 at her position and shakes the camera when she stands up.
+ */
 static EVT_BEGIN(gonbaba_standup_shake)
     WAIT_MS(3700)
     CALL(evt_npc_get_position, STRING("ゴンババ"), LW(0), LW(1), LW(2))
@@ -119,6 +135,10 @@ static EVT_BEGIN(gonbaba_standup_shake)
     RETURN
 EVT_END()
 
+/**
+ * Fog fade during Hooktail's entrance: over 8 seconds it moves the map fog's two distance parameters outward by
+ * 400 and 1600 units from their current values.
+ */
 static EVT_BEGIN(gonbaba_fog_change)
     CALL(evt_map_get_fog, LW(4), LW(5), LW(6), LW(7), LW(8), LW(9))
     SET_VALUE(GW(0), LW(5))
@@ -156,6 +176,11 @@ static EVT_BEGIN(gonbaba_fog_change)
     RETURN
 EVT_END()
 
+/**
+ * Shake for Hooktail collapsing: plays SFX_STG1_GNB_DOWN1
+ * and DOWN2 at her position (the second fading out over 10 seconds) while the camera shakes strongly and
+ * then settles to a small rumble.
+ */
 static EVT_BEGIN(gonbaba_down_shake)
     CALL(evt_npc_get_position, STRING("ゴンババ"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon, STRING("SFX_STG1_GNB_DOWN1"), 0)
@@ -185,6 +210,14 @@ static EVT_BEGIN(gonbaba_down_shake)
     RETURN
 EVT_END()
 
+/**
+ * The Hooktail boss scene, run when Mario enters the lair:
+ * Mario walks in, Hooktail wakes and speaks (stg1_gon_19 to 20_2) while the fog thickens and the floor shakes,
+ * then the boss battle starts.
+ * After the battle (or at once when the intro is skipped) Hooktail collapses,
+ * Koops' father (ノコタロウ父) appears and talks with the partner and Mario (stg1_gon_33_01 to 33_17),
+ * and the story moves to STORY_STG1_16_HOOKTAIL and then STORY_STG1_17_FATHER_AND_SON_REUNITED.
+ */
 EVT_BEGIN(gonbaba_event)
     CALL(evt_hitobj_onoff, STRING("baba"), 1, 0)
     CALL(evt_npc_pera_onoff, STRING("ゴンババ"), 0)
@@ -565,11 +598,19 @@ static Vec v_list[] = {
     {-50.0f, 0.0f, -50.0f},
 };
 
+/**
+ * Event script: runs the cloud-blowing mechanism (evt_cloud_main) of las_14,
+ * the room where Flurrie's gust uncovers the way.
+ */
 static EVT_BEGIN(evt_cloud_main_evt)
     CALL(evt_cloud_main)
     RETURN
 EVT_END()
 
+/**
+ * Calls evt_img_alloc_capture directly from C by building a throwaway event with the eight arguments;
+ * used so the cloud effect can capture the screen area it needs.
+ */
 static void _img_alloc_capture(const char* name, s32 shadowId, const char* offscreenName, s32 allocMode, s32 x, s32 y, s32 w, s32 h) {
     EventEntry event;
     EvtWord args[10];
@@ -586,6 +627,11 @@ static void _img_alloc_capture(const char* name, s32 shadowId, const char* offsc
     evt_img_alloc_capture(&event, TRUE);
 }
 
+/**
+ * Projects the eight corners of a box (v_list) around the named hit object to screen coordinates
+ * and returns their bounding rectangle (x, y, width, height) in image space, clipped to the 608 x 480 screen.
+ * Used to size the capture image for the dark cloud.
+ */
 static BOOL _get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h) {
     Vec pos;
     Vec screen;
@@ -645,6 +691,10 @@ static BOOL _get_boundingbox(const char* name, s32* x, s32* y, s32* w, s32* h) {
     return TRUE;
 }
 
+/**
+ * Sends every map group of the cloud effect (up to 8) to its offscreen buffer,
+ * so the scenery under the cloud can be drawn into it.
+ */
 static void _mapsetofs_all(CloudMapWork* wp) {
     s32 i;
 
@@ -656,6 +706,7 @@ static void _mapsetofs_all(CloudMapWork* wp) {
     }
 }
 
+/** Undoes _mapsetofs_all: returns the cloud effect's map groups to normal drawing. */
 static void _mapclsofs_all(CloudMapWork* wp) {
     s32 i;
 
@@ -669,6 +720,12 @@ static void _mapclsofs_all(CloudMapWork* wp) {
 
 // Kept out of line (removal tested: the code differs).
 #pragma dont_inline on
+/**
+ * Running script of one dark cloud entry: waits for Flurrie's breath to touch the cloud's hit area,
+ * then builds a paper-cloud image of the scenery under it and counts how long the breath keeps hitting it;
+ * when the count reaches the limit the cloud plays its blow-away animation,
+ * runs the end event (iri_16_cloud_evt) and the entry is released. If the breath stops first the cloud resets.
+ */
 static USER_FUNC(evt_cloud_main) {
     CloudMapWork* wp = (CloudMapWork*)event->lwData[0];
     s32 group = gp->inBattle != 0;
@@ -828,6 +885,10 @@ static USER_FUNC(evt_cloud_main) {
 }
 #pragma dont_inline reset
 
+/**
+ * Script helper: allocates the 16 cloud entries and names their images
+ * and offscreen buffers (i_name_N, o_name_N). Used by Trouble Center request 16.
+ */
 static USER_FUNC(evt_iri_16_cloud_init) {
     s32 i;
 
@@ -841,6 +902,11 @@ static USER_FUNC(evt_iri_16_cloud_init) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: registers one blowable cloud: args[0] is the list of map groups it hides,
+ * args[1] the hit object name, args[2] the script to run when it has been blown away.
+ * Starts evt_cloud_main for it.
+ */
 static USER_FUNC(evt_iri_16_cloud_ent) {
     EvtWord* args = event->args;
     char** groups;
@@ -882,6 +948,10 @@ static USER_FUNC(evt_iri_16_cloud_ent) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Opens the chest that appears after the cloud is gone
+ * and gives Mario the Attack FX B key item (the Trouble Center request 16 reward item).
+ */
 EVT_BEGIN(iri_16_box_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
@@ -893,6 +963,10 @@ EVT_BEGIN(iri_16_box_evt)
     RETURN
 EVT_END()
 
+/**
+ * End event of the request-16 cloud: places the chest (box), switches off the cloud's hit area,
+ * plays the success jingle and sets GSWF_TROUBLE_WORK_1.
+ */
 EVT_BEGIN(iri_16_cloud_evt)
     CALL(evt_mobj_itembox, STRING("box"), 0, 0, 0, 0, 0, PTR(iri_16_box_evt), GSWF(GSWF_TROUBLE_WORK_2))
     CALL(evt_hitobj_onoff, STRING("A_kura"), 1, 0)
@@ -905,10 +979,16 @@ EVT_BEGIN(iri_16_cloud_evt)
     RETURN
 EVT_END()
 
+/** Case event on the request-16 cloud (front-A); does nothing. */
 EVT_BEGIN(iri_16_touch_evt)
     RETURN
 EVT_END()
 
+/**
+ * Map-init part of Trouble Center request 16: while the request is active it sets up the cloud (A_kura) with its
+ * case event and the capture map, or, once the cloud is cleared (GSWF_TROUBLE_WORK_1), the reward chest (box);
+ * when the request is not active it disables the hit objects A_taka and A_kura.
+ */
 static EVT_BEGIN(iri_16_init)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 16)
         CALL(evt_hitobj_onoff, STRING("A_taka"), 1, 0)
@@ -927,6 +1007,13 @@ static EVT_BEGIN(iri_16_init)
     RETURN
 EVT_END()
 
+/**
+ * Map init for gon_11 (Hooktail's lair): sets up the door back to gon_10, the music and ambience,
+ * and the Hooktail and Koops' father NPCs.
+ * Before Hooktail is beaten (STORY_STG1_16_HOOKTAIL) it enlarges Hooktail and starts gonbaba_event;
+ * afterwards both NPCs are moved off the map.
+ * Also sets up the Trouble Center request 16 cloud and chest (iri_16_init).
+ */
 EVT_BEGIN(gon_11_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)

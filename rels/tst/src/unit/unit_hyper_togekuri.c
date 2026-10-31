@@ -214,6 +214,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init script of the Hyper Spiky Goomba: installs the wait, attack,
+ * damage and confusion handlers (confusion reuses the attack), sets its run,
+ * walk and jump sounds and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -226,6 +231,15 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Spike spark shown when an attacker is hurt by (or avoids) the spiked head:
+ * waits 30 frames, then spawns the toge_flush effect above the unit (50 up when Huge, 30 when Tiny, else 40).
+ * If the lecture unit (BTL_UNIT_LECTURE) exists and has not yet spoken (its unit work 0 is 0)
+ * and the attacker is Mario or the partner (get_attacker returns 0 or 1),
+ * it waits 2.5 seconds with the status window hidden,
+ * prints the lecture unit's message mac_0_092_06 (Mario) or mac_0_092_07 (partner)
+ * and sets its unit work 0 to 1.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -268,6 +282,10 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: runs the shared default damage script (btldefaultevt_Damage) with its default parameters
+ * (LW(10) = -2, LW(11) = 1).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -290,6 +308,14 @@ static f32 SinTable[] = {
     0.999391f, 0.999848f, 1.0f,
 };
 
+/**
+ * Guess: Attack script of the Hyper Spiky Goomba:
+ * after the item-use check it may charge up first (charge sound, crystal effect and a self-applied buff),
+ * then rolls up (pose type 50) and tumbles toward the target (turning with krb_get_dir over 28 steps) with a
+ * jump (weapon_togekuri_attack).
+ * A miss lets it land and skid past; a hit shakes the camera and applies the damage with the guard-timing check.
+ * It then hops back toward its home position.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -490,6 +516,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper for the Goomba family: args[0], args[1] are the x and z of one point and args[2],
+ * args[3] those of another; args[4] receives the angle between them (angleABf of the x/z difference, degrees).
+ * When the two points coincide, args[4] keeps the value it already held.
+ */
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);
@@ -508,6 +539,11 @@ static USER_FUNC(krb_get_dir) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Direction of the vector (x, z) in whole degrees (0-359):
+ * binary-searches SinTable (0-90 degrees) for |z| / length and mirrors the result into the quadrant that x
+ * and z select.
+ */
 static u16 krb_comp_dir(f32 x, f32 z) {
     f32 dist = hypot(x, z);
     f32 s = __fabs(z) / dist;
@@ -538,6 +574,11 @@ static u16 krb_comp_dir(f32 x, f32 z) {
     return (u16)mid;
 }
 
+/**
+ * Script helper: writes to args[0] who the active unit is:
+ * 0 for kind 0xDE (222, Mario), 1 for kind 0xE0 (224, the first partner slot) and 2 for anyone else.
+ * Guess: the damage event reacts differently per attacker.
+ */
 static USER_FUNC(get_attacker) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -553,6 +594,7 @@ static USER_FUNC(get_attacker) {
     return EVT_RETURN_DONE;
 }
 
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

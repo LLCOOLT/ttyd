@@ -25,6 +25,10 @@ static NpcSetupInfo npcEnt[2];
 static BeroEntry bero_entry_data[5];
 static const char* booboo_name[1];
 
+/**
+ * Init event of the pig shopkeeper NPC: before the Doopliss battle (STORY_STG4_10_DOOPLISS_BATTLE) he stays
+ * where he is; from then on he is moved out of sight to y -2000.
+ */
 EVT_BEGIN(shopmaster_pig_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG4_10_DOOPLISS_BATTLE)
@@ -34,6 +38,10 @@ EVT_BEGIN(shopmaster_pig_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of the pig shopkeeper (the shop owner Doopliss turned into a pig):
+ * before the Doopliss battle he oinks and says stg4_gra_17, afterwards stg4_gra_18.
+ */
 EVT_BEGIN(shopmaster_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG4_10_DOOPLISS_BATTLE)
@@ -46,6 +54,10 @@ EVT_BEGIN(shopmaster_talk)
     RETURN
 EVT_END()
 
+/**
+ * Regular event of the pig shopkeeper (ブタお店の主人):
+ * clears his no-wall-hit flag and makes him wander within a 50-unit radius of his starting spot.
+ */
 static EVT_BEGIN(urouro_move)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_NO_WALL_HIT)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
@@ -70,6 +82,7 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/** Enter event of the w_bero_2 door: just returns 0 in LW(0), so the door acts as a plain transition. */
 EVT_BEGIN(w_bero_2_in)
     SET_VALUE(LW(0), 0)
     RETURN
@@ -144,11 +157,16 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Pickup callback of the Shop Key lying on the ground: advances the story to STORY_STG4_03_SHOP_KEY. */
 EVT_BEGIN(gra02_get_key)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG4_03_SHOP_KEY)
     RETURN
 EVT_END()
 
+/**
+ * Callback run when Flurrie's wind has blown the straw off the hut:
+ * plays a short success jingle over the music and advances the story to STORY_STG4_05_STRAW_TEPEE.
+ */
 EVT_BEGIN(gra02_straw_blow_evt)
     BEGIN_INLINE_EVENT
         CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
@@ -165,6 +183,11 @@ static const char* booboo_name[] = {
     "ブタお店の主人",
 };
 
+/**
+ * Init script of gra_02, the pig's shed: trail music and ambience, the exits, two Star Pieces,
+ * the Shop Key (until the story passes STORY_STG4_03_SHOP_KEY),
+ * the straw (S_wara) that Flurrie can blow away (until STORY_STG4_05_STRAW_TEPEE) and the pig NPC's lighting.
+ */
 EVT_BEGIN(gra_02_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_GRA1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_USU1"))
@@ -192,6 +215,10 @@ EVT_BEGIN(gra_02_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script helper run once from the init script: switches on paper-style no-ambient lighting for the pig
+ * shopkeeper's model.
+ */
 static USER_FUNC(booboo_main) {
     animPoseSetMaterialLightFlagOn(npcNameToPtr((const char*)booboo_name[0])->poseId, ANIM_MATERIAL_LIGHT_PAPER_NO_AMB);
     return EVT_RETURN_DONE;

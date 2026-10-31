@@ -159,6 +159,10 @@ extern EvtWord ItemEvent_Sukkiri_Drink[];
 extern EvtWord ItemEvent_Shikaeshino_Kona[];
 extern EvtWord ItemEvent_Kameno_Noroi[];
 
+/**
+ * Walks the item user back to its home position (if it moved), at walking speed;
+ * the common ending of the item scripts.
+ */
 EVT_BEGIN(_return_home_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     LABEL(95)
@@ -174,6 +178,11 @@ EVT_BEGIN(_return_home_event)
     RETURN
 EVT_END()
 
+/**
+ * Picks the target in LW(10)/LW(11) for the item in LW(8):
+ * the player's selected target when a player unit uses it,
+ * otherwise one chosen from the candidates (enemies using items).
+ */
 EVT_BEGIN(ItemEvent_Automatic_Target)
     CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -188,6 +197,11 @@ EVT_BEGIN(ItemEvent_Automatic_Target)
     RETURN
 EVT_END()
 
+/**
+ * The healing part of a recovery item on target LW(10)/LW(11):
+ * reads the item's HP and FP restore from item LW(9),
+ * shows the heart and flower effects over the target and restores the HP, then the FP.
+ */
 EVT_BEGIN(ItemEvent_Recovery_Core_Effect)
     CALL(evt_btl_camera_set_homing_unit, 0, LW(10), BTL_UNIT_NONE)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -220,6 +234,10 @@ EVT_BEGIN(ItemEvent_Recovery_Core_Effect)
     RETURN
 EVT_END()
 
+/**
+ * Heals the target with ItemEvent_Recovery_Core_Effect, resets the camera,
+ * returns the user home and ends both units' turns.
+ */
 EVT_BEGIN(ItemEvent_Recovery_Core)
     CALL_CHILD(ItemEvent_Recovery_Core_Effect)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -231,6 +249,12 @@ EVT_BEGIN(ItemEvent_Recovery_Core)
     RETURN
 EVT_END()
 
+/**
+ * Recovery items (Mushroom, Super and Ultra Shroom, Life Shroom, Dried Shroom, Honey and Maple Syrup,
+ * Jammin' Jelly, the plain cooked dishes and so on):
+ * the user steps forward, holds the item up and uses it on the chosen ally,
+ * restoring the HP and FP the item table gives.
+ */
 EVT_BEGIN(ItemEvent_Recovery)
     CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(8))
     CALL(btlevtcmd_WeaponAftereffect, LW(8))
@@ -268,6 +292,10 @@ EVT_BEGIN(ItemEvent_Recovery)
     RETURN
 EVT_END()
 
+/**
+ * The common opening of the support items: the camera closes in, Mario steps forward (enemies stay put),
+ * holds the item up and it is consumed.
+ */
 EVT_BEGIN(ItemEvent_Support_Sub_UseDeclere)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -292,6 +320,11 @@ EVT_BEGIN(ItemEvent_Support_Sub_UseDeclere)
     RETURN
 EVT_END()
 
+/**
+ * Picks the target in LW(10)/LW(11) for weapon LW(12):
+ * the first of all targets for items that hit several, the selected one for player units,
+ * otherwise one chosen from the candidates.
+ */
 EVT_BEGIN(ItemEvent_GetTarget)
     CALL(btlevtcmd_CheckCommandUnit, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -316,6 +349,10 @@ EVT_BEGIN(ItemEvent_GetTarget)
     RETURN
 EVT_END()
 
+/**
+ * Applies weapon LW(12) to each of its targets in turn:
+ * missed or dodged targets play their dodge, the rest take the item's damage and status.
+ */
 EVT_BEGIN(ItemEvent_Support_Sub_Effect)
     CALL_CHILD(ItemEvent_GetTarget)
     LABEL(10)
@@ -344,6 +381,10 @@ EVT_BEGIN(ItemEvent_Support_Sub_Effect)
     RETURN
 EVT_END()
 
+/**
+ * Support items with no effect of their own (Power Punch, Courage Shell, Mini Mr. Mini, Mr. Softener,
+ * Ruin Powder, Spite Pouch, Koopa Curse): use, apply weapon LW(12) to its targets, audience boost, return home.
+ */
 EVT_BEGIN(ItemEvent_Support_NoEffect)
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
     CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
@@ -356,6 +397,10 @@ EVT_BEGIN(ItemEvent_Support_NoEffect)
     RETURN
 EVT_END()
 
+/**
+ * Status-curing support items (Tasty Tonic): like ItemEvent_Support_NoEffect,
+ * with the cleansing sound on each target hit.
+ */
 EVT_BEGIN(ItemEvent_Support_RefreshEffect)
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
     CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
@@ -747,6 +792,7 @@ BattleWeapon ItemWeaponData_Tankobu = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** POW Block: a POW Block appears above Mario, he hits it and every enemy takes 2 damage as the stage shakes. */
 EVT_BEGIN(ItemEvent_Pow_Block)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -893,6 +939,7 @@ BattleWeapon ItemWeaponData_Pow_Block = {
     {0, 100, 100, 100, 75, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 
+/** Fire Flower's attack: the fire effect rains on the enemies with its sound, then each enemy takes 3 fire damage. */
 EVT_BEGIN(ItemEvent_Fire_Flower_Core)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -953,6 +1000,7 @@ EVT_BEGIN(ItemEvent_Fire_Flower_Core)
     RETURN
 EVT_END()
 
+/** Fire Flower: the use animation, then ItemEvent_Fire_Flower_Core. */
 EVT_BEGIN(ItemEvent_Fire_Flower)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -1003,6 +1051,10 @@ BattleWeapon ItemWeaponData_Fire_Flower = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Thunder attack for weapon LW(12): lightning strikes each target (one or all) and deals the weapon's damage,
+ * then the user returns home.
+ */
 EVT_BEGIN(ItemEvent_Kaminari_Core)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -1070,6 +1122,7 @@ EVT_BEGIN(ItemEvent_Kaminari_Core)
     RETURN
 EVT_END()
 
+/** The thunder items' use animation (weapon LW(12)), then ItemEvent_Kaminari_Core. */
 EVT_BEGIN(ItemEvent_Kaminari)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -1094,6 +1147,7 @@ EVT_BEGIN(ItemEvent_Kaminari)
     RETURN
 EVT_END()
 
+/** Thunder Rage: 5 lightning damage to every enemy. */
 EVT_BEGIN(ItemEvent_Kaminari_Dokkan)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Kaminari_Dokkan))
     CALL_CHILD(ItemEvent_Kaminari)
@@ -1137,6 +1191,7 @@ BattleWeapon ItemWeaponData_Kaminari_Dokkan = {
     {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
+/** Thunder Bolt: 5 lightning damage to one enemy. */
 EVT_BEGIN(ItemEvent_Kaminari_Gorogoro)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Kaminari_Gorogoro))
     CALL_CHILD(ItemEvent_Kaminari)
@@ -1180,6 +1235,10 @@ BattleWeapon ItemWeaponData_Kaminari_Gorogoro = {
     {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Shooting Star's attack: stars fall over the enemies one after another (to random targets),
+ * then every enemy takes 6 damage.
+ */
 EVT_BEGIN(ItemEvent_Kirakira_Otoshi_Core)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -1319,6 +1378,7 @@ EVT_BEGIN(ItemEvent_Kirakira_Otoshi_Core)
     RETURN
 EVT_END()
 
+/** Shooting Star: the use animation, then ItemEvent_Kirakira_Otoshi_Core. */
 EVT_BEGIN(ItemEvent_Kirakira_Otoshi)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Kirakira_Otoshi))
     CALL(evt_btl_camera_set_mode, 0, 7)
@@ -1367,6 +1427,7 @@ BattleWeapon ItemWeaponData_Kirakira_Otoshi = {
     {0, 10, 10, 100, 10, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Ice Storm: an icy wind blows over the enemies for 3 ice damage each, with a chance to freeze them for two turns. */
 EVT_BEGIN(ItemEvent_Koorino_Ibuki)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Koorino_Ibuki))
     CALL(evt_btl_camera_set_mode, 0, 7)
@@ -1500,6 +1561,7 @@ BattleWeapon ItemWeaponData_Koorino_Ibuki = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Earthquake: the stage shakes and dust falls, and every enemy that is not floating takes 5 damage. */
 EVT_BEGIN(ItemEvent_Yurayura_Jishin)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Yurayura_Jishin))
     CALL(evt_btl_camera_set_mode, 0, 7)
@@ -1627,6 +1689,7 @@ BattleWeapon ItemWeaponData_Yurayura_Jishin = {
     {0, 100, 100, 100, 75, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 
+/** Boo's Sheet: makes the chosen ally invisible for two turns. */
 EVT_BEGIN(ItemEvent_Teresano_Fuku)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Teresano_Fuku))
     CALL(evt_btl_camera_set_mode, 0, 7)
@@ -1739,6 +1802,7 @@ BattleWeapon ItemWeaponData_Teresano_Fuku = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Volt Shroom's effect on its target (electrified for five turns), then the user returns home. */
 EVT_BEGIN(ItemEvent_Biribiri_Kinoko_Core)
     CALL_CHILD(ItemEvent_Support_Sub_Effect)
     CALL(evt_audience_ap_recovery)
@@ -1748,6 +1812,7 @@ EVT_BEGIN(ItemEvent_Biribiri_Kinoko_Core)
     RETURN
 EVT_END()
 
+/** Volt Shroom: the use animation, then ItemEvent_Biribiri_Kinoko_Core. */
 EVT_BEGIN(ItemEvent_Biribiri_Kinoko)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Biribiri_Kinoko))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
@@ -1796,6 +1861,7 @@ BattleWeapon ItemWeaponData_Biribiri_Kinoko = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Repel Cape's effect on its target (dodgy for four turns), then the user returns home. */
 EVT_BEGIN(ItemEvent_Teki_Yokeeru_Core)
     CALL_CHILD(ItemEvent_Support_Sub_Effect)
     CALL(evt_audience_ap_recovery)
@@ -1805,6 +1871,7 @@ EVT_BEGIN(ItemEvent_Teki_Yokeeru_Core)
     RETURN
 EVT_END()
 
+/** Repel Cape: the use animation, then ItemEvent_Teki_Yokeeru_Core. */
 EVT_BEGIN(ItemEvent_Teki_Yokeeru)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Teki_Yokeeru))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
@@ -1852,6 +1919,7 @@ BattleWeapon ItemWeaponData_Teki_Yokeeru = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Ruin Powder: confuses every enemy for three turns. */
 EVT_BEGIN(ItemEvent_Madowaseno_Kona)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Madowaseno_Kona))
     CALL_CHILD(ItemEvent_Support_NoEffect)
@@ -1897,6 +1965,7 @@ BattleWeapon ItemWeaponData_Madowaseno_Kona = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Sleepy Sheep: a flock of sheep runs across the enemies, putting them to sleep for five turns. */
 EVT_BEGIN(ItemEvent_Nemure_Yoikoyo)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Nemure_Yoikoyo))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
@@ -1969,6 +2038,7 @@ BattleWeapon ItemWeaponData_Nemure_Yoikoyo = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Stopwatch's effect: the clock effect over the stage, then every enemy is stopped for three turns. */
 EVT_BEGIN(ItemEvent_Stop_Watch_Core)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
@@ -2014,6 +2084,7 @@ EVT_BEGIN(ItemEvent_Stop_Watch_Core)
     RETURN
 EVT_END()
 
+/** Stopwatch: the use animation, then ItemEvent_Stop_Watch_Core. */
 EVT_BEGIN(ItemEvent_Stop_Watch)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Stop_Watch))
     CALL(evt_btl_camera_set_mode, 0, 7)
@@ -2082,6 +2153,7 @@ BattleWeapon ItemWeaponData_Stop_Watch = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Dizzy Dial: the camera rolls around twice (_cam_rot) and every enemy becomes dizzy for three turns. */
 EVT_BEGIN(ItemEvent_Guruguru_Memawashi)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Guruguru_Memawashi))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
@@ -2138,6 +2210,7 @@ BattleWeapon ItemWeaponData_Guruguru_Memawashi = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Power Punch: makes the chosen ally huge (attack up) for three turns. */
 EVT_BEGIN(ItemEvent_Dekadeka_Drink)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Dekadeka_Drink))
     CALL_CHILD(ItemEvent_Support_NoEffect)
@@ -2183,6 +2256,7 @@ BattleWeapon ItemWeaponData_Dekadeka_Drink = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Courage Shell: raises the chosen ally's defence by 3 for three turns. */
 EVT_BEGIN(ItemEvent_Katikati_Koura)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Katikati_Koura))
     CALL_CHILD(ItemEvent_Support_NoEffect)
@@ -2229,6 +2303,7 @@ BattleWeapon ItemWeaponData_Katikati_Koura = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** HP Drain: deals 5 damage to one enemy and restores as much HP to the user as it dealt. */
 EVT_BEGIN(ItemEvent_Suitooru)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Suitooru))
     CALL(evt_btl_camera_set_mode, 0, 7)
@@ -2348,6 +2423,7 @@ BattleWeapon ItemWeaponData_Suitooru = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Trade Off: raises the enemies' level by 5 (_rank_up), which raises the Star Points they are worth. */
 EVT_BEGIN(ItemEvent_Teki_Kyouka)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Teki_Kyouka))
     CALL(evt_btl_camera_set_mode, 0, 7)
@@ -2453,6 +2529,7 @@ BattleWeapon ItemWeaponData_Teki_Kyouka = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Mini Mr. Mini: shrinks every enemy (attack down) for three turns. */
 EVT_BEGIN(ItemEvent_Minimini_Kun)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Minimini_Kun))
     CALL_CHILD(ItemEvent_Support_NoEffect)
@@ -2498,6 +2575,7 @@ BattleWeapon ItemWeaponData_Minimini_Kun = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Mr. Softener: lowers every enemy's defence by 3 for three turns. */
 EVT_BEGIN(ItemEvent_Funyafunya_Kun)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Funyafunya_Kun))
     CALL_CHILD(ItemEvent_Support_NoEffect)
@@ -2544,6 +2622,7 @@ BattleWeapon ItemWeaponData_Funyafunya_Kun = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Tasty Tonic: cures the chosen ally's bad status effects. */
 EVT_BEGIN(ItemEvent_Sukkiri_Drink)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Sukkiri_Drink))
     CALL_CHILD(ItemEvent_Support_RefreshEffect)
@@ -2603,6 +2682,7 @@ BattleWeapon ItemWeaponData_Sukkiri_Drink = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Slow Shroom's effect on its target (HP regained over several turns), then the user returns home. */
 EVT_BEGIN(ItemEvent_Jiwajiwa_Kinoko_Core)
     CALL_CHILD(ItemEvent_Support_Sub_Effect)
     CALL(evt_audience_ap_recovery)
@@ -2612,6 +2692,7 @@ EVT_BEGIN(ItemEvent_Jiwajiwa_Kinoko_Core)
     RETURN
 EVT_END()
 
+/** Slow Shroom: the use animation, then ItemEvent_Jiwajiwa_Kinoko_Core. */
 EVT_BEGIN(ItemEvent_Jiwajiwa_Kinoko)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Jiwajiwa_Kinoko))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
@@ -2660,6 +2741,7 @@ BattleWeapon ItemWeaponData_Jiwajiwa_Kinoko = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Gradual Syrup's effect on its target (FP regained over several turns), then the user returns home. */
 EVT_BEGIN(ItemEvent_Jiwajiwa_Syrup_Core)
     CALL_CHILD(ItemEvent_Support_Sub_Effect)
     CALL(evt_audience_ap_recovery)
@@ -2669,6 +2751,7 @@ EVT_BEGIN(ItemEvent_Jiwajiwa_Syrup_Core)
     RETURN
 EVT_END()
 
+/** Gradual Syrup: the use animation, then ItemEvent_Jiwajiwa_Syrup_Core. */
 EVT_BEGIN(ItemEvent_Jiwajiwa_Syrup)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Jiwajiwa_Syrup))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
@@ -2716,6 +2799,7 @@ BattleWeapon ItemWeaponData_Jiwajiwa_Syrup = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Point Swap: swaps the target's HP and FP, blinking the HP and FP in the status window. */
 EVT_BEGIN(ItemEvent_Irekaeeru)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Irekaeeru))
     CALL_CHILD(ItemEvent_GetTarget)
@@ -2802,6 +2886,7 @@ BattleWeapon ItemWeaponData_Irekaeeru = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Fright Mask: a scary hologram appears twice and frightens the enemies, which can make them flee. */
 EVT_BEGIN(ItemEvent_Attiike_Shisshi)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Attiike_Shisshi))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
@@ -2891,6 +2976,10 @@ BattleWeapon ItemWeaponData_Attiike_Shisshi = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Mystery: a roulette picks a random item (_naniga_okorukana_check) and its effect is played:
+ * one of the recovery, status or attack item scripts on a fitting target.
+ */
 EVT_BEGIN(ItemEvent_Naniga_Okorukana)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Naniga_Okorukana))
     CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
@@ -3024,6 +3113,7 @@ static s32 _item_table[] = {
     152, 129, 132, 130, 140, 0,
 };
 
+/** Spite Pouch: gives the chosen ally payback for three turns. */
 EVT_BEGIN(ItemEvent_Shikaeshino_Kona)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Shikaeshino_Kona))
     CALL_CHILD(ItemEvent_Support_NoEffect)
@@ -3067,6 +3157,7 @@ BattleWeapon ItemWeaponData_Shikaeshino_Kona = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Koopa Curse: slows the chosen enemy for three turns. */
 EVT_BEGIN(ItemEvent_Kameno_Noroi)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Kameno_Noroi))
     CALL_CHILD(ItemEvent_Support_NoEffect)
@@ -3112,6 +3203,11 @@ BattleWeapon ItemWeaponData_Kameno_Noroi = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Cooked dishes that heal and also apply a status (Space Food, Icicle Pop, Snow Bunny, Love Pudding,
+ * Peach Tart and others): heal as ItemEvent_Recovery, then apply the dish's weapon;
+ * Love Pudding and Peach Tart pick one of three effects at random (40/40/20%).
+ */
 EVT_BEGIN(ItemEvent_RecoveryAndStatus)
     CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(8))
     CALL(btlevtcmd_WeaponAftereffect, LW(8))
@@ -3996,6 +4092,11 @@ BattleWeapon ItemWeaponData_FireCandy = {
 };
 
 #endif
+/**
+ * Thrown cooked dishes (Zess Dynamite, Coconut Bomb, Egg Bomb and others):
+ * the dish's icon is thrown in an arc at the target, which takes the dish's damage;
+ * Zess Dynamite also shows fire pillars and the cook's ghostly image, the bombs explode.
+ */
 EVT_BEGIN(ItemEvent_ThrowAttack)
     CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(12))
     CALL(evt_btl_camera_set_mode, 0, 7)
@@ -4266,6 +4367,7 @@ BattleWeapon ItemWeaponData_BomberEgg = {
     {0, 0, 0, 100, 0, 5, 5, 5, 5, 0, 0, 0}, // stageEffectRates
 };
 
+/** Poison Shroom: 80% of the time the target is poisoned; otherwise the target's HP is fully restored. */
 EVT_BEGIN(ItemEvent_Poison_Kinoko)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_PoisonKinoko))
     CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
@@ -4348,6 +4450,11 @@ typedef struct ThrowWork {
     u8 reserved_34[0x7C - 0x34]; // 0x34, never accessed (keeps the 0x7C-byte BattleAlloc)
 } ThrowWork;
 
+/**
+ * Picks a random target of weapon args[0] among the alliance args[3]'s opponents
+ * and returns it in args[1] (unit) and args[2] (part), or -1 and -1 if there is none.
+ * Used by Shooting Star's falling stars.
+ */
 static USER_FUNC(_sampling_random_target) {
     BattleWorkWeaponTargets targets;
     BattleWork* wp;
@@ -4380,6 +4487,7 @@ static USER_FUNC(_sampling_random_target) {
     return EVT_RETURN_DONE;
 }
 
+/** Spins the 3D camera's roll from 720 degrees back to 0 over two seconds, for Dizzy Dial. */
 static USER_FUNC(_cam_rot) {
     f32 rot;
 
@@ -4397,6 +4505,7 @@ static USER_FUNC(_cam_rot) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Raises unit args[0]'s level by 5 (at most 99), for Trade Off. */
 static USER_FUNC(_rank_up) {
     s32 id = evtGetValue(event, event->args[0]);
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, BattleTransID(event, id));
@@ -4410,6 +4519,10 @@ static USER_FUNC(_rank_up) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Opens the battle status window when unit args[0] is Mario or a partner,
+ * before Point Swap changes their HP and FP.
+ */
 static USER_FUNC(_hpfp_change_declare_1) {
     BattleWork* wp = _battleWorkPointer;
     s32 id = evtGetValue(event, event->args[0]);
@@ -4425,6 +4538,10 @@ static USER_FUNC(_hpfp_change_declare_1) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Blinks the HP and FP readouts for 120 frames when unit args[0] is Mario or a partner, after Point Swap.
+ * The JP and later releases clear any earlier blink first.
+ */
 static USER_FUNC(_hpfp_change_declare_2) {
     BattleWork* wp = _battleWorkPointer;
     s32 id = evtGetValue(event, event->args[0]);
@@ -4448,6 +4565,12 @@ static USER_FUNC(_hpfp_change_declare_2) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Runs Mystery's roulette over unit args[0]: picks a random item from _item_table,
+ * starts the roulette effect showing it and returns the item id in args[1];
+ * waits until the roulette effect is gone.
+ * The JP and later releases also count the item in the battle's attack or support item record.
+ */
 static USER_FUNC(_naniga_okorukana_check) {
     Vec pos;
     BattleWork* wp = _battleWorkPointer;
@@ -4509,6 +4632,7 @@ end:
     return EVT_RETURN_DONE;
 }
 
+/** Returns in args[1..3] where a thrown item starts: just above unit args[0]'s head (just below for ceiling units). */
 static USER_FUNC(_get_throw_first_pos) {
     BattleUnit* unit;
     Vec pos;
@@ -4535,6 +4659,10 @@ static USER_FUNC(_get_throw_first_pos) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Throws the icon of item args[0] from args[1..3] to args[4..6] in an arc (a few frames longer the farther it
+ * goes), with the throwing sound; finishes when it lands.
+ */
 static USER_FUNC(_throw_item_icon) {
     EvtWord* args = event->args;
     ThrowWork* wk;
@@ -4587,11 +4715,16 @@ static USER_FUNC(_throw_item_icon) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Draws the thrown item's icon at its current position. */
 static void _disp_item_icon(CameraId cameraId, void* param) {
     EventEntry* event = param;
     iconDispGx(&((ThrowWork*)event->userdatap[0])->pos, 0, itemDataTable[event->userdata[1]].icon_id, 1.0f);
 }
 
+/**
+ * Shows the cook's ghostly image (c_cook) at args[0..2] for 60 frames, fading and growing in the last 30,
+ * for Zess Dynamite.
+ */
 static USER_FUNC(_nancy_mirage) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
@@ -4622,6 +4755,7 @@ static USER_FUNC(_nancy_mirage) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Draws the cook's image for _nancy_mirage, scaled up and translucent as it fades. */
 static void _nancy_disp(CameraId cameraId, void* param) {
     EventEntry* event = param;
     Mtx mtx;
@@ -4651,6 +4785,7 @@ static void _nancy_disp(CameraId cameraId, void* param) {
     animPoseDrawMtx(event->userdata[1], mtx, 3, 0.0f, 2.0f);
 }
 
+/** Fills the party's Star Power when unit args[0] is on the player's side, for Trial Stew. */
 static USER_FUNC(_full_ap_recover) {
     BattleWork* wp = _battleWorkPointer;
     s32 id = evtGetValue(event, event->args[0]);
@@ -4662,6 +4797,11 @@ static USER_FUNC(_full_ap_recover) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Trial Stew: a dark cloud over the target, then its HP drops to 1,
+ * its FP to 0 and the party's Star Power fills;
+ * the demos play the cooking sound once, the releases after each hit.
+ */
 EVT_BEGIN(ItemEvent_LastDinner)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_PoisonKinoko))
     CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)

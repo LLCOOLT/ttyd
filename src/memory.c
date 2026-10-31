@@ -88,7 +88,7 @@ static u16 count; // JP/demo: id stamped on each map heap allocation (MapAllocEn
 // local prototypes
 void smartGarbage(void);
 
-// Size of the smart heap's block: the demo takes a fixed 7 MiB, later versions use their whole heap minus 32 bytes.
+/** Size of the smart heap's block: the demo takes a fixed 7 MiB, later versions use their whole heap minus 32 bytes. */
 static inline u32 smartHeapSize(void) {
 #if VERSION <= VERSION_DEMO_US
     return 0x700000;
@@ -97,6 +97,11 @@ static inline u32 smartHeapSize(void) {
 #endif
 }
 
+/**
+ * Carves the OS arena into the game's heaps from size_table:
+ * fixed-size heaps (size in KiB) first, then the rest shared out by percentage (the last heap takes 100%).
+ * Creates each OS heap and clears it, which also sets up the map heap allocator. Called once at boot.
+ */
 void memInit(void) { // almost 1:1, stubborn regalloc at the end
     MapAllocEntry* entry;
     void* arenaLo;
@@ -142,6 +147,10 @@ void memInit(void) { // almost 1:1, stubborn regalloc at the end
     }
 }
 
+/**
+ * Turns the whole HEAP_MALLOC heap into one free map heap block for _mapAlloc.
+ * JP and the demo also reset the allocation id counter.
+ */
 static inline void mapallocInit(void) {
     // the declaration order differs per version (it sets which callee-saved register holds each)
 #if VERSION >= VERSION_US
@@ -179,6 +188,10 @@ static inline void mapallocInit(void) {
 #endif
 }
 
+/**
+ * Throws away everything in a heap by destroying and recreating it;
+ * for HEAP_MALLOC also resets the map heap allocator.
+ */
 void memClear(HEAP_TYPE heap) {
     OSDestroyHeap(heapHandle[heap]);
     OSCreateHeap(heapStart[heap], heapEnd[heap]);
@@ -187,6 +200,10 @@ void memClear(HEAP_TYPE heap) {
     }
 }
 
+/**
+ * Allocates size bytes from one of the game heaps, zeroed and flushed from the data cache;
+ * NULL when the heap is full.
+ */
 void* __memAlloc(HEAP_TYPE heap, u32 size) {
     void* ptr;
 
@@ -198,11 +215,16 @@ void* __memAlloc(HEAP_TYPE heap, u32 size) {
     return ptr;
 }
 
+/** Returns a block from __memAlloc to its heap. */
 void __memFree(HEAP_TYPE heap, void* ptr) {
     OSFreeToHeap(heapHandle[heap], ptr);
 }
 
 #if VERSION >= VERSION_US
+/**
+ * US and PAL: carves a 0x64000-byte sub-heap out of the map heap for the battle's own map allocations (battle.c
+ * allocates from it). Called when a battle starts (seq_battle); replaces JP's fixed battle heap.
+ */
 void N_battleMapAlloc(void) {
     MapAllocEntry* entry;
     u32 size;
@@ -216,6 +238,7 @@ void N_battleMapAlloc(void) {
     entry->inuse = 0;
 }
 
+/** US and PAL: returns the battle map sub-heap to the map heap when the battle ends (seq_battle). */
 void N_battleMapFree(void) {
     (_mapFree)(mapalloc_base_ptr, R_battlemapalloc_base_ptr);
     R_battlemapalloc_base_ptr = NULL;
@@ -287,6 +310,8 @@ void*(_mapAlloc)(u32 size) {
     }
 }
 
+// Like _mapAlloc but takes the block from the end of the last free block that fits, keeping long-lived data at the top
+// of the map heap. Zeroed and flushed; NULL when nothing fits.
 #if VERSION >= VERSION_US
 void*(_mapAllocTail)(void* base, u32 size) {
 #else
@@ -354,6 +379,7 @@ void*(_mapAllocTail)(u32 size) {
 #if VERSION >= VERSION_US
 #pragma dont_inline on // US N_battleMapFree calls it
 #endif
+// Frees a map heap block and merges it with a free neighbour on either side. NULL and already-free blocks are ignored.
 #if VERSION >= VERSION_US
 void(_mapFree)(void* base, void* alloc) {
 #else
@@ -400,6 +426,11 @@ void(_mapFree)(void* alloc) {
 #pragma dont_inline reset
 #endif
 
+/**
+ * Allocates the smart heap (the US and PAL releases use their whole smart heap, the demo a fixed 7 MiB)
+ * and resets its 0x800 block descriptors: all free, nothing allocated.
+ * The first smartAlloc after this also frees group 3.
+ */
 void smartInit(void) {
     smartEntry* e;
     u32 size;
@@ -432,6 +463,10 @@ void smartInit(void) {
 }
 
 #if VERSION >= VERSION_JP
+/**
+ * JP and later: empties the smart heap again without reallocating it.
+ * Used by the crash screen to get memory for the ROM font.
+ */
 void L_smartReInit(void) {
     smartEntry* e;
     int i;
@@ -456,6 +491,10 @@ void L_smartReInit(void) {
 
 // FAKE: #pragma dont_inline on: keeps smartAutoFree out of line as in the target; without it smartAutoFree is inlined into smartAlloc (206 -> 228 instructions)
 #pragma dont_inline on
+/**
+ * Frees every smart heap block of group type; freeing group 3 also frees the group 4 blocks.
+ * Called with group 1 on map changes (and by the demo movie), group 2 when a battle starts and ends.
+ */
 void smartAutoFree(s32 group) {
     smartEntry* entry;
     smartEntry* next;
@@ -478,6 +517,12 @@ void smartAutoFree(s32 group) {
 }
 
 #pragma dont_inline reset
+/**
+ * Frees a smart heap block, giving its bytes to the block before it (or back to the start of the heap)
+ * and returning the descriptor to the free list.
+ * A group 4 block is only demoted to group 3, so it lives until the next group 3 free.
+ * The memory is compacted later by smartGarbage.
+ */
 void smartFree(smartEntry* entry) {
     u32 total;
 
@@ -523,6 +568,13 @@ void smartFree(smartEntry* entry) {
     wp->waitsync++;
 }
 
+/**
+ * Allocates size bytes (rounded to 32) in the smart heap, tagged with the auto-free group type.
+ * Tries the free space at the start and after each block;
+ * failing that, compacts the heap (smartGarbage),
+ * first plainly and then after the file manager drops unused files, and returns NULL if it still does not fit.
+ * Blocks can move during compaction, so callers keep the entry, not the address.
+ */
 smartEntry* smartAlloc(u32 size, u8 type) {
     smartEntry* entry1;
     smartEntry* entry2;
@@ -631,6 +683,11 @@ smartEntry* smartAlloc(u32 size, u8 type) {
     }
 }
 
+/**
+ * Compacts the smart heap: slides every block down to close the gaps (moving loaded files through
+ * fileGarbageMoveMem), leaving all free space after the last block.
+ * A file still being read by the DVD thread is not moved. Waits for the GPU first, since textures may be in use.
+ */
 void smartGarbage(void) {
     u8* addr;
     u8* ptr;
@@ -676,6 +733,10 @@ void smartGarbage(void) {
     DCFlushRange(wp->ptr, smartHeapSize());
 }
 
+/**
+ * Points a texture object at its smart heap image again (the data may have moved during compaction)
+ * and returns it; passing NULL leaves the object unchanged.
+ */
 GXTexObj* smartTexObj(GXTexObj* obj, void** image_ptr) {
     if (image_ptr) {
         GXInitTexObjData(obj, *image_ptr);

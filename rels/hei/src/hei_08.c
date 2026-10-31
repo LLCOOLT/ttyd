@@ -42,12 +42,20 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Script helper: makes the Fuzzy (Chorobon) NPC the owner of the running event, so its script commands act on it. */
 static USER_FUNC(npc_set_me) {
     // チョロボン
     event->ownerNPC = npcNameToPtr("\x83\x60\x83\x87\x83\x8D\x83\x7B\x83\x93");
     return EVT_RETURN_DONE;
 }
 
+/**
+ * The Fuzzy ambush at the Moon Stone: sets GSWF_HEI_MOON_STONE_TAKEN,
+ * then a Fuzzy (チョロボン) drops in on Mario with SFX_STG1_CHORO_FALL1 and Mario is startled.
+ * Battle starts (interrupt chorobon_move_event);
+ * if Mario flees, the Fuzzy is removed with the common dead event,
+ * otherwise the enemy flags are restored and field battle mode is switched on.
+ */
 static EVT_BEGIN(evt_chorobon)
     SET_VALUE(GSWF(GSWF_HEI_MOON_STONE_TAKEN), 1)
     CALL(evt_mario_wait_movable)
@@ -90,6 +98,11 @@ static EVT_BEGIN(evt_chorobon)
     RETURN
 EVT_END()
 
+/**
+ * Petal Meadows hei_08 map init: sets the fortress music and reverb and the water effect;
+ * until the Moon Stone is taken, parks the Fuzzy above the room
+ * and places the Moon Stone item whose pickup runs evt_chorobon; later the Fuzzy gets its battle info back.
+ */
 EVT_BEGIN(hei_08_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -124,6 +137,7 @@ EVT_BEGIN(hei_08_init_evt)
     RETURN
 EVT_END()
 
+/** Script helper: removes the whole Fuzzy (Chorobon) group from the map after the fight. */
 static USER_FUNC(npc_dead) {
     // チョロボン
     npcGroupDead(npcNameToPtr("\x83\x60\x83\x87\x83\x8D\x83\x7B\x83\x93"), FALSE);

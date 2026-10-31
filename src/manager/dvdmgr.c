@@ -20,6 +20,7 @@ BOOL dvdmgr_thread_on;
 static void* proc_main(void* param);
 static s32 compare(const void* a, const void* b);
 
+/** Body of the DVD manager thread: services the read queue once and yields, forever. */
 static void* proc_main(void* param) {
     while (1) {
         DVDMgrMain();
@@ -27,6 +28,10 @@ static void* proc_main(void* param) {
     }
 }
 
+/**
+ * Boot-time setup from mariost.c: allocates the 256-entry request queue
+ * and starts the manager thread (priority 16). Hangs if the thread cannot be created.
+ */
 void DVDMgrInit(void) {
     dvdq = __memAlloc(HEAP_DEFAULT, sizeof(DVDEntry) * DVDEntryCount);
     memset(dvdq, 0, sizeof(DVDEntry) * DVDEntryCount);
@@ -38,6 +43,7 @@ void DVDMgrInit(void) {
     OSResumeThread(&dvdmgr_thread);
 }
 
+/** Stops the manager thread; mariost.c calls it before a reset or returning to the menu. */
 void DVDMgrDelete(void) {
     if (dvdmgr_thread_on) {
         OSCancelThread(&dvdmgr_thread);
@@ -45,6 +51,10 @@ void DVDMgrDelete(void) {
     }
 }
 
+/**
+ * qqsort comparator over queue indices: lower priority values are served first.
+ * The demo compares the indices themselves, so it serves requests in queue order.
+ */
 static s32 compare(const void* a, const void* b) {
     u8 priorityA, priorityB;
 
@@ -63,6 +73,12 @@ static s32 compare(const void* a, const void* b) {
     }
 }
 
+/**
+ * One pass of the DVD thread: sorts the open requests by priority,
+ * issues the next chunk of the first pending read (prioritised reads in 256 KB pieces),
+ * fires the callback when a read completes, frees closed entries, then runs the hook from DVDMgrSetupCallback.
+ * Only one chunk is read per pass.
+ */
 void DVDMgrMain(void) {
     u8 array[0x100];
     u8* table;
@@ -139,6 +155,10 @@ void DVDMgrMain(void) {
     }
 }
 
+/**
+ * Opens a disc file into a free queue entry with the given read priority;
+ * NULL if the file does not exist, the queue is full or DVDOpen fails.
+ */
 DVDEntry* DVDMgrOpen(const char* path, u8 priority, u16 unknown) {
     DVDEntry* entry;
     int i;
@@ -177,7 +197,10 @@ DVDEntry* DVDMgrOpen(const char* path, u8 priority, u16 unknown) {
     return entry;
 }
 
-// return is s32 even though it cannot be negative
+/**
+ * Reads size bytes at offset into address through the DVD thread, yielding until it is done.
+ * Returns the file's length, not the byte count read. return is s32 even though it cannot be negative
+ */
 s32 DVDMgrRead(DVDEntry* entry, void* address, u32 size, s32 offset) {
     entry->address = address;
     entry->bytesLeft = size;
@@ -194,6 +217,10 @@ s32 DVDMgrRead(DVDEntry* entry, void* address, u32 size, s32 offset) {
     return entry->info.length;
 }
 
+/**
+ * Queues a read of size bytes at offset into address and returns at once;
+ * the DVD thread calls callback when it is done.
+ */
 void DVDMgrReadAsync(DVDEntry* entry, void* address, u32 size, s32 offset, DVDCallback callback) {
     entry->address = address;
     entry->bytesLeft = size;
@@ -204,14 +231,21 @@ void DVDMgrReadAsync(DVDEntry* entry, void* address, u32 size, s32 offset, DVDCa
     entry->position = 0;
 }
 
+/** Marks the entry for closing; the DVD thread closes the file and frees the entry on its next pass. */
 void DVDMgrClose(DVDEntry* entry) {
     entry->status |= DVDMGR_CLOSED;
 }
 
+/** Size in bytes of the opened file. */
 u32 DVDMgrGetLength(DVDEntry* entry) {
     return entry->info.length;
 }
 
+/**
+ * Sets a hook the DVD thread runs after every pass;
+ * the logo sequence installs psndPushGroup so sound groups load in the background,
+ * and clears it again when done.
+ */
 void DVDMgrSetupCallback(DVDMgrCallback callback) {
     _callback = callback;
 }

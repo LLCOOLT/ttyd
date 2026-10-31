@@ -159,6 +159,10 @@ static BattleWeapon weapon_moamoa_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init event of the Smorg's mouth part: installs its wait, attack,
+ * damage and default confusion events and moves its HP gauge to offset (50, 62).
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -169,6 +173,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Smorg's mouth: runs the default damage handling with LW(10) = -2 and LW(11) = 1. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -176,6 +181,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Death of the Smorg's mouth: it plays the arm-down sound and the L_2_6 pose,
+ * then clears the main body's mouth slot (unit work 6 = -1),
+ * gives the main body the no-parts defence table and its weakness pose table, moves its hit marker,
+ * plays the BIG sounds and the V_1 pose on it, and kills the mouth unit.
+ */
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MOA_G_ARM_DOWN2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("L_2_6"))
@@ -197,10 +208,12 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/** Phase event of the Smorg's mouth: does nothing. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/** Attack event of the Smorg's mouth: uses an enemy item if it has one, otherwise runs evt_attack. */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -213,6 +226,12 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: plays a list of poses (read with READ_INT from the table whose address is in LW(1),
+ * a NULL entry meaning a pause) on the other part named in LW(0), with the arm-move sound running,
+ * then waits until that part's unit work 0 is no longer 0 and plays the list again.
+ * Spawned by evt_attack for each part that moves with the attacker.
+ */
 static EVT_BEGIN(evt_attack_other_arm)
     SET_INT_READ_ADDR(LW(1))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MOA_G_ARM_MOVE1"), EVT_NULLPTR, 0, LW(15))
@@ -257,6 +276,11 @@ const char* mouth_Attack_front[] = {
     NULL,
 };
 
+/**
+ * Guess: the Smorg mouth's attack: marks the main body busy (unit work 0 = 0),
+ * runs the front pose list (mouth_Attack_front) with the arm-move sounds,
+ * damage-checks the targets and returns to the S_1_1 pose, setting unit work 0 back to 1 at the end.
+ */
 static EVT_BEGIN(evt_attack)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_moamoa_attack))
@@ -370,6 +394,7 @@ static EVT_BEGIN(evt_attack)
     RETURN
 EVT_END()
 
+/** Idle event: shows the unit's table pose for state 1. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

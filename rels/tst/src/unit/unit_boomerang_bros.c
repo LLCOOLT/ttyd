@@ -208,6 +208,7 @@ BattleWeapon weapon_boomerang_bros_renzoku_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Init script: registers the wait, attack, damage and confusion handlers and starts the idle event. */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -217,6 +218,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction: runs the default damage handling (btldefaultevt_Damage) with LW(10) = -2 (the unit itself)
+ * and LW(11) = 1.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -224,6 +229,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Chooses the Boomerang Bro's attack: in a battle with battle flag 2 set it always makes the normal throw;
+ * otherwise it uses an item if it has one, and with 3 HP
+ * or less has a 30% chance of the double-throw renzoku_attack_event,
+ * else the normal boomerang throw (normal_attack_event). Clears unit work 7 (damage already applied) first.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, 0)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
@@ -255,6 +266,12 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Resolves a boomerang hit on the target in LW(3) and LW(4) with the weapon in LW(6):
+ * runs the pre-damage check, and a hit applies the damage;
+ * only the first resolved hit of a throw is allowed to apply the action-command defence (unit work 7 marks that
+ * it has been used), with LW(7) = 1 for the last target of the pass.
+ */
 static EVT_BEGIN(damage_check_sub)
     SET_VALUE(LW(0), 0)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), 0, LW(5))
@@ -298,12 +315,18 @@ static EVT_BEGIN(damage_check_sub)
     RETURN
 EVT_END()
 
+/** Boomerang hit on a target that is not the last one of the pass: resolves it with damage_check_sub (LW(7) = 0). */
 static EVT_BEGIN(damage_check_no_last)
     SET_VALUE(LW(7), 0)
     CALL_CHILD(damage_check_sub)
     RETURN
 EVT_END()
 
+/**
+ * Boomerang hit on the last target of the pass:
+ * if the action-command result is still pending in unit work 7 it applies it (ResultACDefence and CheckDamage),
+ * otherwise it resolves the hit with damage_check_sub (LW(7) = 1).
+ */
 static EVT_BEGIN(damage_check_last)
     IF_INT_EQUAL(LW(0), 1)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(8))
@@ -319,6 +342,11 @@ static EVT_BEGIN(damage_check_last)
     RETURN
 EVT_END()
 
+/**
+ * Guess: flight of the Boomerang Bro's boomerang (part LW(15)):
+ * it spins out toward the target, hits it, and curves back to the thrower,
+ * with its sound and rotation animated each frame.
+ */
 EVT_BEGIN(boomerang_move_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_BOOME_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, LW(15), STRING("BRO_A_1B"))
@@ -432,6 +460,12 @@ EVT_BEGIN(boomerang_move_event)
     RETURN
 EVT_END()
 
+/**
+ * The Boomerang Bro's normal attack, aimed at all enemies:
+ * it records every target in unit work 1 to 4, winds up (BRO_A_2A),
+ * then spawns boomerang_move_event to fly the boomerang through the targets and waits
+ * until it has come back (unit work 0) before returning to BRO_S_1.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -495,6 +529,12 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Boomerang Bro's double throw (renzoku = chained):
+ * like the normal attack but with weapon_boomerang_bros_renzoku_attack,
+ * and the boomerang goes out and comes back twice (the second pass is the one that finishes the attack,
+ * unit work 0 = 2).
+ */
 static EVT_BEGIN(renzoku_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_boomerang_bros_renzoku_attack))
@@ -559,6 +599,11 @@ static EVT_BEGIN(renzoku_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the Boomerang Bro's attack when confused:
+ * the same throw as its normal attack, but with no target choice;
+ * it throws a boomerang that can hit its own side.
+ */
 EVT_BEGIN(normal_attack_event_confuse)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_boomerang_bros_attack))
@@ -652,6 +697,10 @@ EVT_BEGIN(normal_attack_event_confuse)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the Boomerang Bro's two-throw ('renzoku') attack when confused:
+ * two boomerang throws in a loop, with no target choice, so they can hit its own side.
+ */
 EVT_BEGIN(renzoku_attack_event_confuse)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_WeaponAftereffect, PTR(&weapon_boomerang_bros_renzoku_attack))
@@ -749,6 +798,7 @@ EVT_BEGIN(renzoku_attack_event_confuse)
     RETURN
 EVT_END()
 
+/** Idle event: sets the unit's body part 1 to the pose given by its pose table for its current state. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

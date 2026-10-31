@@ -13,18 +13,32 @@
 // this unit is size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
 
+/** Stores the battle mode in the info passed from the field to the battle. */
 void BattleInformationSetMode(FieldBattleInfo* info, u32 mode) {
     info->mode = mode;
 }
 
+/**
+ * Stores which partner (as a battle unit kind) joins Mario in the battle;
+ * set by seq_battle from the active party member.
+ */
 void BattleInformationSetParty(FieldBattleInfo* info, BattleUnitType party) {
     info->party = party;
 }
 
+/**
+ * Stores how the battle started: seq_battle passes 0 when no first strike happened, else 1, 2, 3, ...
+ * from the field hit kind (fbat->hitKind) that began it.
+ * The field is named partyId but holds this first-strike kind.
+ */
 void BattleInformationSetFirstAttack(FieldBattleInfo* info, u32 partyId) {
     info->partyId = partyId;
 }
 
+/**
+ * Resets the field-to-battle info: mode, partner, first strike and result 0, no setup,
+ * no coins and no special rule.
+ */
 void BattleInformationInit(FieldBattleInfo* info) {
     BattleInformationSetMode(info, 0);
     BattleInformationSetParty(info, 0);
@@ -38,14 +52,17 @@ void BattleInformationInit(FieldBattleInfo* info) {
     info->ruleParam2 = 0;
 }
 
+/** Links the field NPC's battle setup (enemy group, held items, drop results) to the battle info. */
 void BattleInfomationSetBattleSetupInfo(FieldBattleInfo* info, NpcBattleInfo* setup) {
     info->setup = setup;
 }
 
+/** Stores the battle result; battle_seq_end sets 1 for a win, 4 for running away, and so on. */
 void BattleInformationSetResult(FieldBattleInfo* info, u32 result) {
     info->result = result;
 }
 
+/** Returns the battle result read back by battle_seq_end, npcdrv and evt_npc after the fight (1 = won). */
 s32 BattleInformationGetResult(FieldBattleInfo* info) {
     return info->result;
 }
@@ -61,6 +78,15 @@ const ItemHogTable N_item_hog_table = {
     {0x98, 0x98, 0x98, 0xA2, 0x94, 0x9A, 0x99, 0x84, 0x87, 0x8B}
 };
 
+/**
+ * Rolls the drops after a won battle into the NPC's battle setup:
+ * hearts and flowers from the group's HP and FP drop tables according to Mario's remaining HP and FP percentage,
+ * then one item, chosen by weight between none,
+ * a random pick from the enemy's drop table and one of the enemy's held items.
+ * Item Hog multiplies the item weights (by 2n+2 for n badges in the demos, n+1 later)
+ * and adds a pick from N_item_hog_table: in the demos and JP only when the held-item roll finds nothing to drop,
+ * from US on whenever no item dropped. From JP on, nothing drops before Frankly's house.
+ */
 void BattleInformationSetDropMaterial(FieldBattleInfo* info) {
     NpcBattleInfo* setup = info->setup;
     BattleGroupSetup* group = setup->groupSetup;

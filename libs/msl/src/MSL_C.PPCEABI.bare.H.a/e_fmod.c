@@ -2,6 +2,7 @@
 
 static const double one = 1.0, Zero[] = {0.0, -0.0};
 
+/** Floating-point remainder of x/y with the sign of x (fdlibm), computed by integer long division on the mantissas. */
 double __ieee754_fmod(double x, double y) {
     int n, hx, hy, hz, ix, iy, sx, i;
     unsigned lx, ly, lz;

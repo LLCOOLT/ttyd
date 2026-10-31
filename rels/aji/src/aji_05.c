@@ -32,6 +32,11 @@ static EvtWord hikaru_off[4];
 static HitDamageReturn dmgReturnPt[2];
 static EvtWord hikaru_yuka_init[48];
 
+/**
+ * Door close animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times -0.25;
+ * the open and close scripts apply the same transform. The demo builds use -0.2217.
+ */
 static EVT_BEGIN(e_door_close)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
@@ -44,6 +49,11 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door open animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times -0.25;
+ * the open and close scripts apply the same transform. The demo builds use -0.2217.
+ */
 static EVT_BEGIN(e_door_open)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
@@ -78,6 +88,12 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Item-box script for the chest at "box": gives Mario the card key (ITEM_CARD_KEY_0x1D),
+ * sets GSWF_AJI05_CARD_KEY_TAKEN, clears the A_no1 hit flag 2048,
+ * switches off the floor lights and makes the floor visibly flash between two states five times
+ * while Mario turns to face east.
+ */
 static EVT_BEGIN(evt_box)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
@@ -106,11 +122,13 @@ static EVT_BEGIN(evt_box)
     RETURN
 EVT_END()
 
+/** Turns the glowing floor panels on by calling the _hikaru_on script function. */
 static EVT_BEGIN(hikaru_on)
     CALL(_hikaru_on)
     RETURN
 EVT_END()
 
+/** Turns the glowing floor panels off by calling the _hikaru_off script function. */
 static EVT_BEGIN(hikaru_off)
     CALL(_hikaru_off)
     RETURN
@@ -139,6 +157,13 @@ static EvtWord hikaru_yuka_init[] = {
     RETURN
 };
 
+/**
+ * Init script of aji_05, a second glowing-floor room like aji_02:
+ * plays BGM_STG7_DUN2, sets up the exits and a Sleepy Sheep badge block,
+ * and keeps the floor panels reacting to Mario (hikaru_yuka_init)
+ * until the chest's card key has been taken (GSWF_AJI05_CARD_KEY_TAKEN);
+ * afterwards the panel lights are all off.
+ */
 EVT_BEGIN(aji_05_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI1"))
@@ -164,6 +189,12 @@ EVT_BEGIN(aji_05_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script function that runs while the floor puzzle is active:
+ * lights the panel hikaru_NN under Mario (or under Yoshi when he is ridden),
+ * keeping each lit for 30 frames after the last touch and showing the dark twin nashi_NN otherwise.
+ * Finishes once GSWF_AJI05_CARD_KEY_TAKEN is set.
+ */
 static USER_FUNC(ride_chk) {
     static s32 onoff[24];
     char hitName[64];
@@ -231,6 +262,11 @@ static USER_FUNC(ride_chk) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script function that plays an electric shock when Mario is in the spike-damage motion
+ * (MARIO_MOTION_DAMAGE_TOGE): SFX_STG7_ELECTRIC_SHOCK1 and a blue-green spark effect at his position,
+ * once per hit.
+ */
 static USER_FUNC(thunder_main) {
     MarioWork* mario = marioGetPtr();
 
@@ -257,6 +293,7 @@ static USER_FUNC(thunder_main) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script function: hides all 24 panel lights (hikaru_NN and nashi_NN). */
 static USER_FUNC(_hikaru_off) {
     char name[64];
     s32 i;
@@ -270,6 +307,10 @@ static USER_FUNC(_hikaru_off) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script function: shows the dark panel objects nashi_01 to 24
+ * and hides the lit ones hikaru_01 to 24 (every panel in its unlit state).
+ */
 static USER_FUNC(_hikaru_on) {
     char name[64];
     s32 i;
@@ -283,6 +324,10 @@ static USER_FUNC(_hikaru_on) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script function that runs the panel light-up show:
+ * lights the panels one after another, twice, then finishes (timing in event->userdata).
+ */
 static USER_FUNC(loop_onoff) {
     char name[64];
     s32 i;

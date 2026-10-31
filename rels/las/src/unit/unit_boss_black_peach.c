@@ -959,7 +959,7 @@ f32 hair_offset[] = {
     0.0f, 13.0f, 0.0f, -21.0f,
 };
 
-// inline helper for pose_init: defined here so its Vec template lands at this .rodata position
+/** inline helper for pose_init: defined here so its Vec template lands at this .rodata position */
 inline void hand_light_init(void) {
     Mtx mtx;
     LightEntry* light = lightGetPaperCraft();
@@ -969,6 +969,12 @@ inline void hand_light_init(void) {
     PSMTXMultVec(mtx, &light->position, &light->position);
 }
 
+/**
+ * Event script: sets up the swarm of "small hand" ext poses (model c_s_hand, animation KRT_S_1) that the Shadow
+ * Queen uses for her many-hands attacks and her draining.
+ * It creates a hidden helper NPC "dummy" to read the animation,
+ * builds the pattern table with make_pattern and registers the ext drawing callbacks (hand_init, hand_main).
+ */
 EVT_BEGIN(shadow_queen_1000)
     CALL(evt_npc_entry, STRING("dummy"), STRING("c_s_hand"))
     CALL(evt_npc_set_anim, STRING("dummy"), STRING("KRT_S_1"))
@@ -1334,6 +1340,11 @@ BattleUnitSetup entry_shadow_hand_small = {
     NULL, // itemDropTable
 };
 
+/**
+ * Event script: init of the possessed Peach (Dark Peach, the first phase of the final fight):
+ * spawns the Shadow Queen unit that hides behind her, connects the queen's head and hand parts to her pose,
+ * starts the hand swarm, and plays the idle animation.
+ */
 EVT_BEGIN(peach_init_event)
     SET_VALUE(GW(8), -1)
     SET_VALUE(GW(9), -1)
@@ -1387,6 +1398,10 @@ EVT_BEGIN(peach_init_event)
     RETURN
 EVT_END()
 
+/**
+ * Event script: entry scene of Dark Peach: hides the status window, she speaks (stg8_las_140_02),
+ * the partner answers (stg8_las_141), and the break slot flag is set.
+ */
 EVT_BEGIN(peach_entry_event)
     WAIT_MS(2000)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
@@ -1408,6 +1423,7 @@ EVT_BEGIN(peach_entry_event)
     RETURN
 EVT_END()
 
+/** Damage event of Dark Peach: the default damage handling. */
 EVT_BEGIN(peach_damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -1419,6 +1435,13 @@ EVT_BEGIN(peach_damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the change from Dark Peach into the Shadow Queen's true form, played when Peach's HP is used up.
+ * The queen's mist and queen effect appear, her head, body and hand parts rise,
+ * two big hands (shadow_hand_1/2) are spawned, and the whole unit group turns invulnerable (queen_muteki
+ * defence, defence attributes and status table) while she speaks (stg8_las_141_01..03).
+ * The queen's phase, attack, damage and wait events replace Peach's.
+ */
 EVT_BEGIN(peach_change_evt)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL(evt_btl_camera_set_mode, 0, 3)
@@ -1553,6 +1576,10 @@ EVT_BEGIN(peach_change_evt)
     RETURN
 EVT_END()
 
+/**
+ * Phase event of Dark Peach: before the enemy phase checks her state in work[0] and runs peach_change_evt
+ * when the transformation is due.
+ */
 EVT_BEGIN(peach_phase_event)
     CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -1579,6 +1606,7 @@ EVT_BEGIN(peach_phase_event)
     RETURN
 EVT_END()
 
+/** Dead event of Dark Peach: instead of dying she runs peach_change_evt and becomes the Shadow Queen. */
 EVT_BEGIN(peach_dead_event)
     CALL(btlevtcmd_WaitAttackEnd)
     CALL_CHILD(peach_change_evt)
@@ -1587,6 +1615,10 @@ EVT_BEGIN(peach_dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Event script: Dark Peach's black thunder attack (weapon_peach_black_thunder_attack) on a sampled target:
+ * a pose and a thunder strike with the damage check.
+ */
 EVT_BEGIN(peack_attack_black_thunder)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_black_thunder_attack))
@@ -1641,6 +1673,10 @@ EVT_BEGIN(peack_attack_black_thunder)
     RETURN
 EVT_END()
 
+/**
+ * Event script: Dark Peach's black energy move (weapon_peach_black_energy_attack):
+ * she charges (charge effect, KRT_A_2) and the attack is paid for and checked against herself, a self-buff.
+ */
 EVT_BEGIN(peack_attack_black_energy)
     CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -1674,6 +1710,11 @@ EVT_BEGIN(peack_attack_black_energy)
     RETURN
 EVT_END()
 
+/**
+ * Event script: Dark Peach's dark drag attack (weapon_peach_dark_drag_attack):
+ * the swarm of small hands rises (peach_hand1000_dark_drag_1_evt) and drags at the target through mist,
+ * with three damage checks and a final hit (weapon_peach_dark_drag_last_attack).
+ */
 EVT_BEGIN(peack_attack_dark_drag)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_dark_drag_attack))
@@ -1816,6 +1857,10 @@ EVT_BEGIN(peack_attack_dark_drag)
     RETURN
 EVT_END()
 
+/**
+ * Event script: Dark Peach's drain attack (weapon_peach_drain_attack):
+ * a hand grabs the target and she recovers HP equal to the damage dealt, with the recovery effect.
+ */
 EVT_BEGIN(peack_attack_drain)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_drain_attack))
@@ -1962,6 +2007,7 @@ EVT_BEGIN(peack_attack_drain)
     RETURN
 EVT_END()
 
+/** Attack event of Dark Peach: picks one of her attacks with a random draw and runs it. */
 EVT_BEGIN(peach_attack_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     SWITCH(LW(0))
@@ -1997,11 +2043,17 @@ EVT_BEGIN(peach_attack_event)
     RETURN
 EVT_END()
 
+/** Wait event of Dark Peach: plays her idle pose from the pose table. */
 EVT_BEGIN(peach_wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the Shadow Queen unit (spawned behind Peach):
+ * sets the shared state in GW (GW(11) form, GW(12) attack counter, GW(8)/GW(9) the two big hands,
+ * GW(10) the small hand, GW(13) the queen), spawns the two big hands and starts the queen's mist.
+ */
 EVT_BEGIN(queen_init_event)
     CALL(btlevtcmd_GetMaxHp, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SetHp, BTL_UNIT_SELF, LW(0))
@@ -2064,6 +2116,7 @@ EVT_BEGIN(queen_init_event)
     RETURN
 EVT_END()
 
+/** Event script: the Shadow Queen's first attack message (stg8_las_142); sets the attack counter GW(12) to 100. */
 EVT_BEGIN(queen_first_attack_message_evt)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -2086,6 +2139,7 @@ EVT_BEGIN(queen_first_attack_message_evt)
     RETURN
 EVT_END()
 
+/** Event script: the Shadow Queen's second attack message (stg8_las_143); sets the attack counter GW(12) to 200. */
 EVT_BEGIN(queen_next_attack_message_evt)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 1)
@@ -2108,6 +2162,10 @@ EVT_BEGIN(queen_next_attack_message_evt)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the Shadow Queen's last attack message from the partner (stg8_las_145);
+ * sets the attack counter GW(12) to 300.
+ */
 EVT_BEGIN(queen_last_attack_message_evt)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 2)
@@ -2128,6 +2186,10 @@ EVT_BEGIN(queen_last_attack_message_evt)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the queen swaps her two big hands for the small hand swarm:
+ * kills the big hands, spawns entry_shadow_hand_small and sets the form GW(11) to 2.
+ */
 EVT_BEGIN(queen_change_hand_small_evt)
     CALL(btlevtcmd_GetUnitWork, GW(13), 0, LW(0))
     IF_INT_EQUAL(LW(0), 2)
@@ -2175,6 +2237,10 @@ EVT_BEGIN(queen_change_hand_small_evt)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the queen swaps the small hand swarm for her two big hands again:
+ * kills the small hand, respawns the big hands and sets the form GW(11) to 1.
+ */
 EVT_BEGIN(queen_change_hand_big_evt)
     CALL(btlevtcmd_GetUnitWork, GW(13), 0, LW(0))
     IF_INT_EQUAL(LW(0), 2)
@@ -2220,6 +2286,7 @@ EVT_BEGIN(queen_change_hand_big_evt)
     RETURN
 EVT_END()
 
+/** Event script: respawns whichever big hand (GW(8) or GW(9)) has been destroyed. */
 EVT_BEGIN(queen_hand_big_life_check_evt)
     CALL(btlevtcmd_GetUnitWork, GW(13), 0, LW(0))
     IF_INT_EQUAL(LW(0), 2)
@@ -2269,6 +2336,7 @@ EVT_BEGIN(queen_hand_big_life_check_evt)
     RETURN
 EVT_END()
 
+/** Event script: respawns the small hand unit (GW(10)) if it has been destroyed. */
 EVT_BEGIN(queen_hand_small_life_check_evt)
     CALL(btlevtcmd_GetUnitWork, GW(13), 0, LW(0))
     IF_INT_EQUAL(LW(0), 2)
@@ -2290,6 +2358,12 @@ EVT_BEGIN(queen_hand_small_life_check_evt)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the queen's HP drain scene.
+ * She says stg8_las_144, the swarm of hands rises (queen_hp_drain_1..4) and drags the audience under the floor,
+ * the queen heals to full HP (RecoverHp with her maximum HP) and speaks again (stg8_las_142_01);
+ * then the form is set to 2.
+ */
 EVT_BEGIN(queen_hp_drain_evt)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL(evt_btl_camera_set_mode, 0, 3)
@@ -2397,6 +2471,10 @@ EVT_BEGIN(queen_hp_drain_evt)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the HP drain scene when it fails to take hold:
+ * she says stg8_las_144 and the form is set to 2 without healing.
+ */
 EVT_BEGIN(queen_hp_drain_evt_miss)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL(evt_btl_camera_set_mode, 0, 3)
@@ -2415,6 +2493,10 @@ EVT_BEGIN(queen_hp_drain_evt_miss)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the queen's reaction the first time she is damaged (stg8_las_163,
+ * the partner's stg8_las_164 and stg8_las_165).
+ */
 EVT_BEGIN(queen_first_damage_evt)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -2441,6 +2523,7 @@ EVT_BEGIN(queen_first_damage_evt)
     RETURN
 EVT_END()
 
+/** Event script: the queen's line when her HP falls to the second threshold (stg8_las_166). */
 EVT_BEGIN(queen_2_hp_msg_evt)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL(evt_btl_camera_set_mode, 0, 3)
@@ -2458,6 +2541,7 @@ EVT_BEGIN(queen_2_hp_msg_evt)
     RETURN
 EVT_END()
 
+/** Event script: the queen's line when her HP falls to the fourth threshold (stg8_las_167). */
 EVT_BEGIN(queen_4_hp_msg_evt)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL(evt_btl_camera_set_mode, 0, 3)
@@ -2475,6 +2559,7 @@ EVT_BEGIN(queen_4_hp_msg_evt)
     RETURN
 EVT_END()
 
+/** Event script: the queen's line when she is about to die (stg8_las_168). */
 EVT_BEGIN(queen_dead_hp_msg_evt)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
 #if VERSION <= VERSION_DEMO_US
@@ -2512,6 +2597,11 @@ EVT_BEGIN(queen_dead_hp_msg_evt)
     RETURN
 EVT_END()
 
+/**
+ * Phase event of the Shadow Queen: updates her HP-stage counter (work[2] of the queen unit),
+ * runs the story messages in order as her HP drops, and decides when the HP drain or the hands swap happens;
+ * at the enemy phase it advances the form.
+ */
 EVT_BEGIN(queen_phase_event)
     CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -2601,6 +2691,10 @@ EVT_BEGIN(queen_phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the Shadow Queen's black thunder attack (weapon_peach_black_thunder_attack):
+ * calls lightning down on the target with queen_thunder and checks the damage.
+ */
 EVT_BEGIN(queen_attack_black_thunder)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_black_thunder_attack))
@@ -2663,6 +2757,7 @@ EVT_BEGIN(queen_attack_black_thunder)
     RETURN
 EVT_END()
 
+/** Event script: the Shadow Queen's dark charge (weapon_peach_dark_charge_attack): a self-targeted charge move. */
 EVT_BEGIN(queen_attack_charge)
     CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -2709,6 +2804,10 @@ EVT_BEGIN(queen_attack_charge)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the Shadow Queen's black wave attack (weapon_peach_black_wave_attack):
+ * a wave of dark energy over the party; kills the small hand first if it is out.
+ */
 EVT_BEGIN(queen_attack_black_wave)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_black_wave_attack))
@@ -2848,6 +2947,10 @@ EVT_BEGIN(queen_attack_black_wave)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the Shadow Queen's black energy move (weapon_peach_black_energy_attack),
+ * a self-targeted charge like Dark Peach's.
+ */
 EVT_BEGIN(queen_attack_black_energy)
     CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -2895,6 +2998,10 @@ EVT_BEGIN(queen_attack_black_energy)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the Shadow Queen's first breath attack (weapon_peach_black_sigh_attack, "sigh") on a sampled
+ * target.
+ */
 EVT_BEGIN(queen_attack_bress1)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_black_sigh_attack))
@@ -2981,6 +3088,10 @@ EVT_BEGIN(queen_attack_bress1)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the Shadow Queen's second breath attack (weapon_peach_black_temptation_attack,
+ * "temptation") on a sampled target.
+ */
 EVT_BEGIN(queen_attack_bress2)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_black_temptation_attack))
@@ -3067,6 +3178,10 @@ EVT_BEGIN(queen_attack_bress2)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the Shadow Queen's third breath attack (weapon_peach_black_poison_attack, "poison") on a sampled
+ * target.
+ */
 EVT_BEGIN(queen_attack_bress3)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_black_poison_attack))
@@ -3154,6 +3269,10 @@ EVT_BEGIN(queen_attack_bress3)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the Shadow Queen: chooses her next attack with weighted draws (btlevtcmd_DrawLots) depending
+ * on the current form and which stage she has reached (work[0]), then runs that attack script.
+ */
 EVT_BEGIN(queen_attack_event)
     IF_INT_EQUAL(GW(11), 0)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
@@ -3229,6 +3348,7 @@ EVT_BEGIN(queen_attack_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Shadow Queen: default damage handling. */
 EVT_BEGIN(queen_damage_event)
     CALL(btlevtcmd_GetDamageCode, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 22)
@@ -3256,6 +3376,7 @@ EVT_BEGIN(queen_damage_event)
     RETURN
 EVT_END()
 
+/** Dead event of the Shadow Queen: removes whichever big or small hands are still alive and kills the queen unit. */
 EVT_BEGIN(queen_dead_event)
     CALL(btlevtcmd_WaitAttackEnd)
     CALL_CHILD(queen_dead_hp_msg_evt)
@@ -3365,12 +3486,17 @@ EVT_BEGIN(queen_dead_event)
     RETURN
 EVT_END()
 
+/** Wait event of the Shadow Queen: plays her idle pose from the pose table. */
 EVT_BEGIN(queen_wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 3)
     RETURN
 EVT_END()
 
+/**
+ * Entry event of the Shadow Queen: hides the status window,
+ * the partner says stg8_las_161 and she says stg8_las_162 when she first appears.
+ */
 EVT_BEGIN(queen_entry_event)
     WAIT_MS(2000)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
@@ -3394,6 +3520,7 @@ EVT_BEGIN(queen_entry_event)
     RETURN
 EVT_END()
 
+/** Init event of the first big hand: sets its event handlers and pose. */
 EVT_BEGIN(queen_hand_1_init_event)
     CALL(btlevtcmd_SetBaseRotate, BTL_UNIT_SELF, 0, 315, 0)
     BEGIN_INLINE_EVENT
@@ -3424,6 +3551,10 @@ EVT_BEGIN(queen_hand_1_init_event)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the first big hand's press attack (weapon_peach_black_press_attack):
+ * it slams down on the chosen target.
+ */
 EVT_BEGIN(queen_hand_1_press_attack)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_black_press_attack))
@@ -3524,6 +3655,7 @@ EVT_BEGIN(queen_hand_1_press_attack)
     RETURN
 EVT_END()
 
+/** Event script: the first big hand's drain attack (weapon_peach_drain_attack): grabs the target and drains HP. */
 EVT_BEGIN(queen_hand_1_drain_attack)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_drain_attack))
@@ -3640,6 +3772,7 @@ EVT_BEGIN(queen_hand_1_drain_attack)
     RETURN
 EVT_END()
 
+/** Attack event of the first big hand: picks the press or the drain attack. */
 EVT_BEGIN(queen_hand_1_attack_event)
     CALL(btlevtcmd_GetUnitWork, GW(13), 0, LW(0))
     IF_INT_EQUAL(LW(0), 2)
@@ -3663,6 +3796,7 @@ EVT_BEGIN(queen_hand_1_attack_event)
     RETURN
 EVT_END()
 
+/** Damage event of the first big hand: default damage handling. */
 EVT_BEGIN(queen_hand_1_damage_event)
     IF_INT_EQUAL(GW(18), 0)
         SET_VALUE(GW(18), 1)
@@ -3675,6 +3809,7 @@ EVT_BEGIN(queen_hand_1_damage_event)
     RETURN
 EVT_END()
 
+/** Dead event of the first big hand: kills the unit GW(8). */
 EVT_BEGIN(queen_hand_1_dead_event)
     SET_VALUE(LW(0), 255)
     LOOP(15)
@@ -3696,11 +3831,13 @@ EVT_BEGIN(queen_hand_1_dead_event)
     RETURN
 EVT_END()
 
+/** Wait event of the first big hand: plays its idle pose. */
 EVT_BEGIN(queen_hand_1_wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/** Init event of the second big hand: sets its event handlers and pose. */
 EVT_BEGIN(queen_hand_2_init_event)
     CALL(btlevtcmd_SetBaseScale, BTL_UNIT_SELF, FLOAT(-1.0996094f), FLOAT(1.0996094f), FLOAT(1.0996094f))
     CALL(btlevtcmd_SetBaseRotate, BTL_UNIT_SELF, 0, 315, 0)
@@ -3732,6 +3869,7 @@ EVT_BEGIN(queen_hand_2_init_event)
     RETURN
 EVT_END()
 
+/** Attack event of the second big hand. */
 EVT_BEGIN(queen_hand_2_attack_event)
     CALL(btlevtcmd_GetUnitWork, GW(13), 0, LW(0))
     IF_INT_EQUAL(LW(0), 2)
@@ -3755,6 +3893,7 @@ EVT_BEGIN(queen_hand_2_attack_event)
     RETURN
 EVT_END()
 
+/** Damage event of the second big hand: default damage handling. */
 EVT_BEGIN(queen_hand_2_damage_event)
     IF_INT_EQUAL(GW(18), 0)
         SET_VALUE(GW(18), 1)
@@ -3767,6 +3906,7 @@ EVT_BEGIN(queen_hand_2_damage_event)
     RETURN
 EVT_END()
 
+/** Dead event of the second big hand: kills the unit GW(9). */
 EVT_BEGIN(queen_hand_2_dead_event)
     SET_VALUE(LW(0), 255)
     LOOP(15)
@@ -3788,11 +3928,13 @@ EVT_BEGIN(queen_hand_2_dead_event)
     RETURN
 EVT_END()
 
+/** Wait event of the second big hand: plays its idle pose. */
 EVT_BEGIN(queen_hand_2_wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/** Init event of the small hand unit (the swarm that replaces the big hands). */
 EVT_BEGIN(queen_hand_small_init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(queen_hand_small_wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(queen_hand_small_attack_event))
@@ -3813,6 +3955,10 @@ EVT_BEGIN(queen_hand_small_init_event)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the small hand's drag attack (weapon_peach_dark_drag_attack,
+ * with a last hit weapon_peach_dark_drag_last_attack).
+ */
 EVT_BEGIN(queen_hand_small_drag_attack)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_dark_drag_attack))
@@ -3928,6 +4074,10 @@ EVT_BEGIN(queen_hand_small_drag_attack)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the small hand's thousand-hands attack (weapon_peach_black_1000hand_attack):
+ * the swarm of c_s_hand poses sweeps over the party.
+ */
 EVT_BEGIN(queen_hand_small_1000hand_attack)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_peach_black_1000hand_attack))
@@ -4034,6 +4184,7 @@ EVT_BEGIN(queen_hand_small_1000hand_attack)
     RETURN
 EVT_END()
 
+/** Attack event of the small hand: picks the thousand-hands or the drag attack. */
 EVT_BEGIN(queen_hand_small_attack_event)
     CALL(btlevtcmd_GetUnitWork, GW(13), 0, LW(0))
     IF_INT_EQUAL(LW(0), 2)
@@ -4055,6 +4206,7 @@ EVT_BEGIN(queen_hand_small_attack_event)
     RETURN
 EVT_END()
 
+/** Damage event of the small hand: default damage handling. */
 EVT_BEGIN(queen_hand_small_damage_event)
     IF_INT_EQUAL(GW(18), 0)
         SET_VALUE(GW(18), 1)
@@ -4077,6 +4229,7 @@ CALL(evt_btl_camera_set_mode, 0, 0)
 RETURN
 EVT_END()
 
+/** Dead event of the small hand: kills the unit GW(10). */
 EVT_BEGIN(queen_hand_small_dead_event)
     CALL(evt_eff_softdelete, STRING("m_h_s1"))
     CALL(evt_eff_softdelete, STRING("m_h_s2"))
@@ -4095,11 +4248,13 @@ EVT_BEGIN(queen_hand_small_dead_event)
     RETURN
 EVT_END()
 
+/** Wait event of the small hand: plays its idle pose. */
 EVT_BEGIN(queen_hand_small_wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/** Script helper: shifts every hand of the swarm by (args[0], args[1], args[2]). */
 static USER_FUNC(queen_hand_small_1000hand_set_offset_evt) {
     EvtWord* args = event->args;
     s32 x = evtGetValue(event, args[0]);
@@ -4118,6 +4273,10 @@ static USER_FUNC(queen_hand_small_1000hand_set_offset_evt) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper (runs until done): raises the swarm of small hands from below the floor (y from -80 to 0) in
+ * randomised positions, ready for the thousand-hands attack.
+ */
 static USER_FUNC(queen_hand_small_1000hand_2_evt) {
     s32 i;
     ExtdrvPose* pose;
@@ -4171,6 +4330,11 @@ static USER_FUNC(queen_hand_small_1000hand_2_evt) {
     return 0;
 }
 
+/**
+ * Script helper (runs until done): the thousand-hands sweep:
+ * for 200 frames the hands move left along X in a wave, bobbing on a cosine,
+ * with columns starting one after another.
+ */
 static USER_FUNC(queen_hand_small_1000hand_1_evt) {
     s32 i;
     HandElem* elem;
@@ -4217,6 +4381,7 @@ static USER_FUNC(queen_hand_small_1000hand_1_evt) {
     return 0;
 }
 
+/** Script helper (runs until done): drags the hand swarm across the party for the drag attack (first stage). */
 static USER_FUNC(queen_hand_small_drag_1_evt) {
     s32 i;
     ExtdrvPose* pose;
@@ -4297,6 +4462,10 @@ static USER_FUNC(queen_hand_small_drag_1_evt) {
     return 0;
 }
 
+/**
+ * Script helper (runs until done): the second stage of the drag:
+ * sinks the swarm back below the floor (y from 0 to -80) and hides it.
+ */
 static USER_FUNC(queen_hand_small_drag_2_evt) {
     s32 i;
     ExtdrvPose* pose;
@@ -4332,6 +4501,7 @@ static USER_FUNC(queen_hand_small_drag_2_evt) {
     return 0;
 }
 
+/** Script helper (runs until done): the third stage: raises a fresh randomised swarm out of the floor. */
 static USER_FUNC(queen_hand_small_drag_3_evt) {
     s32 i;
     ExtdrvPose* pose;
@@ -4385,6 +4555,7 @@ static USER_FUNC(queen_hand_small_drag_3_evt) {
     return 0;
 }
 
+/** Script helper (runs until done): the fourth stage: sinks the swarm back below the floor and hides it. */
 static USER_FUNC(queen_hand_small_drag_4_evt) {
     s32 i;
     ExtdrvPose* pose;
@@ -4420,6 +4591,10 @@ static USER_FUNC(queen_hand_small_drag_4_evt) {
     return 0;
 }
 
+/**
+ * Script helper (runs until done): sinks the swarm of small hands under the floor (y 0 to -80) and hides it;
+ * used when the small hand unit dies.
+ */
 static USER_FUNC(queen_hand_small_dead_evt) {
     s32 i;
     ExtdrvPose* pose;
@@ -4455,6 +4630,10 @@ static USER_FUNC(queen_hand_small_dead_evt) {
     return 0;
 }
 
+/**
+ * Script helper (runs until done): raises the swarm of small hands out of the floor (y -80 to 0) at randomised
+ * positions; used when the small hand unit enters.
+ */
 static USER_FUNC(queen_hand_small_entry_evt) {
     s32 i;
     ExtdrvPose* pose;
@@ -4508,6 +4687,10 @@ static USER_FUNC(queen_hand_small_entry_evt) {
     return 0;
 }
 
+/**
+ * Script helper: sets a flag on the battle break slot (the slot machine's data) at the start of the fight (flag
+ * 4, or 2 in the demos).
+ */
 static USER_FUNC(slot_init) {
 #if VERSION <= VERSION_DEMO_US
     BattleBreakSlotGetPtr()->flags |= 2;
@@ -4517,6 +4700,7 @@ static USER_FUNC(slot_init) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: creates a dark shock effect at (args[0], args[1], args[2]) with random pale colours. */
 static USER_FUNC(peach_shock_evt) {
     EvtWord* args = event->args;
     s32 x = evtGetValue(event, args[0]);
@@ -4534,6 +4718,10 @@ static USER_FUNC(peach_shock_evt) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper (runs until done): the last stage of the HP drain:
+ * raises the hand swarm in front of the stage as the queen takes her heal.
+ */
 static USER_FUNC(queen_hp_drain_5_evt) {
     s32 i;
     ExtdrvPose* pose;
@@ -4587,6 +4775,10 @@ static USER_FUNC(queen_hp_drain_5_evt) {
     return 0;
 }
 
+/**
+ * Script helper (runs until done): the audience part of the HP drain:
+ * sets the audience members' animation, sinks them 80 units while they are pulled down, then deletes them.
+ */
 static USER_FUNC(queen_hp_drain_4_evt) {
     s32 i;
     f32 x, y, z;
@@ -4629,6 +4821,7 @@ static USER_FUNC(queen_hp_drain_4_evt) {
     return 0;
 }
 
+/** Script helper (runs until done): lowers the hand swarm from y -30 to -110 under the floor during the HP drain. */
 static USER_FUNC(queen_hp_drain_3_evt) {
     s32 i;
     ExtdrvPose* pose;
@@ -4664,6 +4857,10 @@ static USER_FUNC(queen_hp_drain_3_evt) {
     return 0;
 }
 
+/**
+ * Script helper (runs until done): raises a hand swarm from y -110 to -30 closer to the audience (Z 270) during
+ * the HP drain.
+ */
 static USER_FUNC(queen_hp_drain_2_evt) {
     s32 i;
     ExtdrvPose* pose;
@@ -4718,6 +4915,10 @@ static USER_FUNC(queen_hp_drain_2_evt) {
     return 0;
 }
 
+/**
+ * Script helper (runs until done): sinks the hand swarm from y 0 to -80 under the floor at the start of the HP
+ * drain.
+ */
 static USER_FUNC(queen_hp_drain_1_evt) {
     s32 i;
     ExtdrvPose* pose;
@@ -4753,6 +4954,7 @@ static USER_FUNC(queen_hp_drain_1_evt) {
     return 0;
 }
 
+/** Script helper: returns in args[0] how many audience members are in the stands. */
 static USER_FUNC(queen_get_aud_num) {
     EvtWord* args = event->args;
 
@@ -4761,6 +4963,7 @@ static USER_FUNC(queen_get_aud_num) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: deletes every audience member and reduces the audience's target count by one for each. */
 static USER_FUNC(queen_kankyaku_delete_evt) {
     s32 i;
 
@@ -4773,6 +4976,7 @@ static USER_FUNC(queen_kankyaku_delete_evt) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper (runs until done): raises the hand swarm for Dark Peach's dark drag attack, shifted 200 units left. */
 static USER_FUNC(peach_hand1000_dark_drag_1_evt) {
     s32 i;
     ExtdrvPose* pose;
@@ -4846,6 +5050,7 @@ static USER_FUNC(peach_hand1000_dark_drag_1_evt) {
     return 0;
 }
 
+/** Script helper: sets the alpha of the queen effect "m_q2" to args[0]. */
 static USER_FUNC(eff_queen_set_alpha_evt) {
     s32 alpha = evtGetValue(event, *event->args);
 
@@ -4854,12 +5059,17 @@ static USER_FUNC(eff_queen_set_alpha_evt) {
 }
 
 #if VERSION >= VERSION_JP
+/** Script helper: sets flag 2 on the battle break slot data (JP and later). */
 USER_FUNC(queen_break_slot_flag2_on) {
     BattleBreakSlotGetPtr()->flags |= 2;
     return EVT_RETURN_DONE;
 }
 #endif
 
+/**
+ * Script helper: plays the drain sound at (args[0], args[1], args[2]) with a stardust effect,
+ * used when the queen drains the party.
+ */
 static USER_FUNC(queen_drain) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
@@ -4875,6 +5085,10 @@ static USER_FUNC(queen_drain) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: calls a lightning strike down at (args[0], args[1], args[2]):
+ * a sound, a pink pokopi thunder bolt with a ground shock, and a camera shake.
+ */
 static USER_FUNC(queen_thunder) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
@@ -4905,6 +5119,7 @@ static USER_FUNC(queen_thunder) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: switches the animation index of every hand in the swarm to args[0]. */
 static USER_FUNC(change_pose) {
     s32 anim = evtGetValue(event, *event->args);
     s32 i;
@@ -4918,7 +5133,7 @@ static USER_FUNC(change_pose) {
     return EVT_RETURN_DONE;
 }
 
-// same body as pose_main; hand_main inlines it (register/stack order only match this way)
+/** same body as pose_main; hand_main inlines it (register/stack order only match this way) */
 inline void hand_pose_inl(void) {
     ExtdrvPose* pose;
     HandElem* elem;
@@ -4954,11 +5169,16 @@ inline void hand_pose_inl(void) {
         }
     }
 }
+/**
+ * Ext update callback of the hand swarm: advances every hand's animation and position (inlined hand_pose_inl),
+ * then queues the draw callback.
+ */
 static void hand_main(void) {
     hand_pose_inl();
     dispEntry(CAMERA_3D, 0.0f, 1, hand_draw, NULL);
 }
 
+/** Draw callback of the hand swarm: loads the ext render mode, vertex, texture and TEV set-up and draws all hands. */
 static void hand_draw(CameraId cameraId, void* param) {
     extLoadRenderMode();
     extLoadVertex();
@@ -4968,6 +5188,10 @@ static void hand_draw(CameraId cameraId, void* param) {
     extLoadTextureExit();
 }
 
+/**
+ * Ext init callback of the hand swarm: allocates the work area and the hand list,
+ * builds the animation table via pose_init and gives every hand a random animation start and flip.
+ */
 static void hand_init(void) {
     s32 i;
     ExtdrvPose* pose;
@@ -4990,6 +5214,10 @@ static void hand_init(void) {
     }
 }
 
+/**
+ * Advances every hand pose: computes the animation frame from the elapsed render time
+ * and places the hand at its position, offset by the position of the unit in GW(10) if there is one.
+ */
 static void pose_main(void) {
     ExtdrvPose* pose;
     HandElem* elem;
@@ -5026,6 +5254,11 @@ static void pose_main(void) {
     }
 }
 
+/**
+ * Builds the animation table of the hand swarm from hand_data:
+ * groups consecutive entries of the same model and animation into HandAnim ranges,
+ * and sets the paper-craft light position for the hands.
+ */
 static void pose_init(void) {
     char name[32];
     char anim[32];
@@ -5060,6 +5293,10 @@ static void pose_init(void) {
     hand_wp->animNum++;
 }
 
+/**
+ * Script helper: fills hand_data with one entry per third frame of the queen's KRT_S_1 animation,
+ * giving every hand its own animation start offset.
+ */
 static USER_FUNC(make_pattern) {
     HandData* d = hand_data;
     NpcEntry* npc = npcNameToPtr("dummy");
@@ -5078,6 +5315,10 @@ static USER_FUNC(make_pattern) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: keeps the queen's head (part 3) animation in step with Dark Peach's talking
+ * and damage animations (KRT_T_x, KRT_D_1) so the shadow head talks with her.
+ */
 static USER_FUNC(peach_talk_synchro_shadow_head_evt) {
     BattleUnitPart* part;
 
@@ -5116,6 +5357,11 @@ static USER_FUNC(peach_talk_synchro_shadow_head_evt) {
     return 0;
 }
 
+/**
+ * Script helper: positions the queen's head, hand
+ * and cape parts (parts 3, 4 and 5) on the world positions of the locators of her body poses;
+ * sets their display Z offsets.
+ */
 static USER_FUNC(shadow_queen_connect) {
     QueenConnect* wk;
     Vec* wpos;

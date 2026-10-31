@@ -179,6 +179,10 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init event of the Spiky Gloomba: installs its wait, attack, damage and confusion events and sets its run,
+ * walk and jump sounds.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -191,6 +195,13 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: waits half a second, then shows the toge_flush spike flash above the Spiky Gloomba's head (higher for a
+ * big, lower for a small one).
+ * If a tutorial lecture unit (BTL_UNIT_LECTURE) exists and has not spoken yet,
+ * it then hides the status window and prints one of two tutorial messages (mac_0_092_06 or _07, chosen by who
+ * attacked), unless the attacker was of side 2.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -233,6 +244,7 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Spiky Gloomba: runs the default damage handling with LW(10) = -2 and LW(11) = 1. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -255,6 +267,13 @@ static f32 SinTable[] = {
     0.999391f, 0.999848f, 1.0f,
 };
 
+/**
+ * Guess: attack event of the Spiky Gloomba: picks a target (the first attack target in the forced case),
+ * flusters if there is none, and uses an enemy item first if it has one.
+ * Otherwise it runs at the target and tumbles onto it with its spikes (krb_get_dir gives the spin).
+ * A miss makes it land on its back (TGK_D_1) and roll upright again (TGK_A_2, TGK_K_1);
+ * a hit applies the damage with the action command defence check. It then hops back to its place.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -419,6 +438,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0..1] = x, z of the first point, args[2..3] = x, z of the second,
+ * args[4] = angle in and out.
+ * Returns the angle (degrees) from the first point towards the second; unchanged if the points coincide.
+ */
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);
@@ -437,6 +461,11 @@ static USER_FUNC(krb_get_dir) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Angle in degrees (0-359) of the vector (x, z) from the sine table,
+ * found by a seven-step binary search of SinTable and then placed in the right quadrant.
+ * Not called anywhere in this file.
+ */
 static u16 krb_comp_dir(f32 x, f32 z) {
     f32 dist = hypot(x, z);
     f32 s = __fabs(z) / dist;
@@ -467,6 +496,11 @@ static u16 krb_comp_dir(f32 x, f32 z) {
     return (u16)mid;
 }
 
+/**
+ * Script helper: returns in args[0] which kind of unit acted:
+ * 0 if the active unit began as kind 0xDE, 1 if 0xE0, else
+ * 2. Guess: the Gloomba family the attack belongs to.
+ */
 static USER_FUNC(get_attacker) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -482,6 +516,7 @@ static USER_FUNC(get_attacker) {
     return EVT_RETURN_DONE;
 }
 
+/** Idle event: shows the unit's table pose for state 1. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

@@ -98,6 +98,11 @@ static KusaAccess ueki_access_data[] = {
     {4, NULL, NULL, NULL},
 };
 
+/**
+ * Wind event when Flurrie blows the cloud away:
+ * plays the success jingle for 2 seconds, then registers the hidden airport panel (hikou and hikou1) as
+ * plane-mode harbors, switches the panel's collision attribute on and sets GSWF_MRI19_GUST_REVEALED_PANEL.
+ */
 static EVT_BEGIN(cloud_wind_event)
     BEGIN_INLINE_EVENT
         CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
@@ -113,6 +118,12 @@ static EVT_BEGIN(cloud_wind_event)
     RETURN
 EVT_END()
 
+/**
+ * Map init script of mri_19, a pipe room with planters and a Shine Sprite block:
+ * sets up the Puni, the planters and the water animations;
+ * until Flurrie's wind has blown away the cloud (GSWF_MRI19_GUST_REVEALED_PANEL) it hides the plane panel
+ * (hikou) behind a cloud, afterwards the panel is open for the paper-plane ride.
+ */
 EVT_BEGIN(mri_19_init_evt)
     CALL(evt_puni_mem_init)
     CALL(evt_puni_set_yuka, 19, 110, -319, -1000, -1000, 0, 0)

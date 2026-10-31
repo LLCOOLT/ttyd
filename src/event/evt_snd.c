@@ -12,12 +12,17 @@ typedef BOOL (*PsndENVOnS32S32Fn)(s32, s32);
 
 // Functions are defined in reverse order (-inline deferred).
 
+/**
+ * Starts BGM args[1] (a name in the BGM list) at once on the slot/flags in args[0];
+ * arguments are taken as literals, not script variables.
+ */
 USER_FUNC(evt_snd_bgmon) {
     EvtWord* args = event->args;
     psndBGMOn(args[0], (char*)args[1]);
     return EVT_RETURN_DONE;
 }
 
+/** Starts BGM args[1] on slot/flags args[0], fading it in over args[2] milliseconds. */
 USER_FUNC(evt_snd_bgmon_f) {
     EvtWord* args = event->args;
     s32 flags = args[0];
@@ -32,6 +37,10 @@ USER_FUNC(evt_snd_bgmon_f) {
 }
 
 #if VERSION >= VERSION_JP
+/**
+ * Retail only: starts BGM args[1] on args[0] with fade-in args[2];
+ * args[3] is meant as the old BGM's fade-out time but is read and ignored, args[2] is used for both.
+ */
 USER_FUNC(evt_snd_bgmon_f_d) {
     EvtWord* args = event->args;
     s32 flags = args[0];
@@ -43,11 +52,13 @@ USER_FUNC(evt_snd_bgmon_f_d) {
 }
 #endif
 
+/** Stops the BGM on slot/flags args[0] at once. */
 USER_FUNC(evt_snd_bgmoff) {
     psndBGMOff(event->args[0]);
     return EVT_RETURN_DONE;
 }
 
+/** Fades out the BGM on slot/flags args[0] over args[1] milliseconds. */
 USER_FUNC(evt_snd_bgmoff_f) {
     EvtWord* args = event->args;
     s32 a = args[0];
@@ -56,6 +67,10 @@ USER_FUNC(evt_snd_bgmoff_f) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Sets the playback rate of the streamed BGM on slot args[0] to args[1] (only streamed tracks change);
+ * used to slow down or speed up music.
+ */
 USER_FUNC(evt_snd_bgm_freq) {
     EvtWord* args = event->args;
     s32 a = args[0];
@@ -64,6 +79,10 @@ USER_FUNC(evt_snd_bgm_freq) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Guess: muffles or restores the BGM on slot args[0].
+ * args[1] > 0 sets its scope timer to 255, < 0 clears it, 0 sets 30.
+ */
 USER_FUNC(evt_snd_bgm_scope) {
     EvtWord* args = event->args;
     s32 a = args[0];
@@ -72,6 +91,10 @@ USER_FUNC(evt_snd_bgm_scope) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Plays sound effect args[0] (a literal name) unpositioned;
+ * if args[1] names a variable it gets the sound id for later evt_snd_sfxoff/sfx_* calls.
+ */
 USER_FUNC(evt_snd_sfxon) {
     EvtWord* args = event->args;
     const char* name = (const char*)args[0];
@@ -84,6 +107,7 @@ USER_FUNC(evt_snd_sfxon) {
     return EVT_RETURN_DONE;
 }
 
+/** Like evt_snd_sfxon, but the sound name args[0] is read through a script variable. */
 USER_FUNC(evt_snd_sfxon__) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -96,6 +120,7 @@ USER_FUNC(evt_snd_sfxon__) {
     return EVT_RETURN_DONE;
 }
 
+/** Like evt_snd_sfxon, but the sound plays even while sound effects are switched off (PSND_FLAG_SFX_OFF). */
 USER_FUNC(evt_snd_sfxon_) {
     EvtWord* args = event->args;
     const char* name = (const char*)args[0];
@@ -108,6 +133,10 @@ USER_FUNC(evt_snd_sfxon_) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Plays sound effect args[0] at world position args[1..3], so it pans and fades with the camera;
+ * args[4], if a variable, gets the sound id.
+ */
 USER_FUNC(evt_snd_sfxon_3d) {
     EvtWord* args = event->args;
     const char* name = (const char*)args[0];
@@ -125,6 +154,10 @@ USER_FUNC(evt_snd_sfxon_3d) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Plays sound effect args[0] at position args[1..3] with volume args[4], pan args[5],
+ * pitch args[6] and audible distance args[7]; args[8], if a variable, gets the sound id.
+ */
 USER_FUNC(evt_snd_sfxon_3d_ex) {
     EvtWord* args = event->args;
     const char* name = (const char*)args[0];
@@ -147,17 +180,20 @@ USER_FUNC(evt_snd_sfxon_3d_ex) {
     return EVT_RETURN_DONE;
 }
 
+/** Stops the sound effect whose id is args[0] (from an evt_snd_sfxon call). */
 USER_FUNC(evt_snd_sfxoff) {
     psndSFXOff(evtGetValue(event, event->args[0]));
     return EVT_RETURN_DONE;
 }
 
+/** Writes to args[1] whether sound effect id args[0] is still playing, so scripts can wait for it. */
 USER_FUNC(evt_snd_sfxchk) {
     EvtWord* args = event->args;
     evtSetValue(event, args[1], psndSFXChk(evtGetValue(event, args[0])));
     return EVT_RETURN_DONE;
 }
 
+/** Changes the pitch of playing sound effect id args[0] to args[1]. */
 USER_FUNC(evt_snd_sfx_pit) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -166,6 +202,7 @@ USER_FUNC(evt_snd_sfx_pit) {
     return EVT_RETURN_DONE;
 }
 
+/** Changes the volume of playing sound effect id args[0] to args[1] (0-255). */
 USER_FUNC(evt_snd_sfx_vol) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -174,6 +211,7 @@ USER_FUNC(evt_snd_sfx_vol) {
     return EVT_RETURN_DONE;
 }
 
+/** Moves playing sound effect id args[0] to world position args[1..3], for sounds that follow a moving object. */
 USER_FUNC(evt_snd_sfx_pos) {
     EvtWord* args = event->args;
     Vec pos;
@@ -185,6 +223,7 @@ USER_FUNC(evt_snd_sfx_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets how far playing sound effect id args[0] can be heard (args[1]) before it fades out. */
 USER_FUNC(evt_snd_sfx_dist) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -192,12 +231,14 @@ USER_FUNC(evt_snd_sfx_dist) {
     return EVT_RETURN_DONE;
 }
 
+/** Starts environment (ambient) sound args[1] at once on slot/flags args[0], such as wind, water or crowds. */
 USER_FUNC(evt_snd_envon) {
     EvtWord* args = event->args;
     ((PsndENVOnS32S32Fn)psndENVOn)(args[0], args[1]);
     return EVT_RETURN_DONE;
 }
 
+/** Starts environment sound args[1] on slot/flags args[0], fading in over args[2] milliseconds. */
 USER_FUNC(evt_snd_envon_f) {
     EvtWord* args = event->args;
     s32 flags = args[0];
@@ -207,11 +248,13 @@ USER_FUNC(evt_snd_envon_f) {
     return EVT_RETURN_DONE;
 }
 
+/** Stops the environment sound on slot/flags args[0] at once. */
 USER_FUNC(evt_snd_envoff) {
     psndENVOff(event->args[0]);
     return EVT_RETURN_DONE;
 }
 
+/** Fades out the environment sound on slot/flags args[0] over args[1] milliseconds. */
 USER_FUNC(evt_snd_envoff_f) {
     EvtWord* args = event->args;
     s32 a = args[0];
@@ -220,6 +263,10 @@ USER_FUNC(evt_snd_envoff_f) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Sets the low-pass filter of the environment sound on slot args[0] to args[1],
+ * muffling it (for example when a door or wall is between Mario and the source).
+ */
 USER_FUNC(evt_snd_env_lpf) {
     EvtWord* args = event->args;
     s32 a = args[0];
@@ -227,11 +274,13 @@ USER_FUNC(evt_snd_env_lpf) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets the reverb level for the map: args[0] 0-3 selects 0, 20, 40 or 60. */
 USER_FUNC(evt_snd_set_rev_mode) {
     psndSetReverb(event->args[0]);
     return EVT_RETURN_DONE;
 }
 
+/** Stops every playing sound effect. */
 USER_FUNC(evt_snd_sfx_all_stop) {
     psndSFXAllOff();
     return EVT_RETURN_DONE;

@@ -25,36 +25,60 @@ extern EvtWord evt_kami_4[];
 extern EvtWord evt_kami_5[];
 extern EvtWord evt_kami_6[];
 
+/**
+ * Door animation callback, closing for the e_bero exit to eki_03:
+ * rotates map object "door_3" about Y by -0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(e_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door_3"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the e_bero exit to eki_03:
+ * rotates map object "door_3" about Y by 0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(e_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door_3"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, closing for the w_dero exit to eki_00:
+ * rotates map object "door_1" about Y by 0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(w_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the w_dero exit to eki_00:
+ * rotates map object "door_1" about Y by -0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(w_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, closing for the n_bero exit to eki_02:
+ * rotates map object "door_2" about Y by -0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(n_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door_2"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the n_bero exit to eki_02:
+ * rotates map object "door_2" about Y by 0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(n_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door_2"), 0, LW(0), 0)
@@ -119,6 +143,12 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
+/**
+ * Cutscene when Mario unfolds the paper staircase (Riverside Station):
+ * the camera moves to the stairs, the "dann" and "n_origami" map objects are hidden
+ * and the anm_kaidan animation plays while step sounds (SFX_STG6_PERA_KAI_DOWN1/2) play,
+ * and the story moves to STORY_STG6_30_ORIGAMI_STAIRS.
+ */
 static EVT_BEGIN(evt_origami)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, 516, 126, 408, 171, 90, -55, 1000, 11)
@@ -157,6 +187,10 @@ static s32 key_tbl[] = {
     ITEM_STATION_KEY_0x19, -1,
 };
 
+/**
+ * Check for the station door lock ("me"): if Mario carries the station key (ITEM_STATION_KEY_0x19),
+ * opens the item select window with key_tbl; cancelling it cancels the lock execution so the door stays locked.
+ */
 static EVT_BEGIN(evt_chk)
     CALL(evt_pouch_check_item, ITEM_STATION_KEY_0x19, LW(0))
     IF_INT_GREATER(LW(0), 0)
@@ -172,6 +206,10 @@ static EVT_BEGIN(evt_chk)
     RETURN
 EVT_END()
 
+/**
+ * Runs when the station door lock is opened with the key:
+ * switches on the bero case (the door can be used) and sets the story to STORY_STG6_32_UNLOCKING_THE_DOOR.
+ */
 static EVT_BEGIN(evt_lock)
     SET_VALUE(LW(0), 0)
     CALL_CHILD(bero_case_switch_on)
@@ -179,36 +217,51 @@ static EVT_BEGIN(evt_lock)
     RETURN
 EVT_END()
 
+/**
+ * Case event run when Flurrie's breath blows paper panel 1 off the wall:
+ * sets GSWF_EKI01_PAPER_1_BLOWN so it stays gone.
+ */
 EVT_BEGIN(evt_kami_1)
     SET_VALUE(GSWF(GSWF_EKI01_PAPER_1_BLOWN), 1)
     RETURN
 EVT_END()
 
+/** Case event run when Flurrie's breath blows paper panel 2 off the wall: sets GSWF_EKI01_PAPER_2_BLOWN. */
 EVT_BEGIN(evt_kami_2)
     SET_VALUE(GSWF(GSWF_EKI01_PAPER_2_BLOWN), 1)
     RETURN
 EVT_END()
 
+/** Case event run when Flurrie's breath blows paper panel 3 off the wall: sets GSWF_EKI01_PAPER_3_BLOWN. */
 EVT_BEGIN(evt_kami_3)
     SET_VALUE(GSWF(GSWF_EKI01_PAPER_3_BLOWN), 1)
     RETURN
 EVT_END()
 
+/** Case event run when Flurrie's breath blows paper panel 4 off the wall: sets GSWF_EKI01_PAPER_4_BLOWN. */
 EVT_BEGIN(evt_kami_4)
     SET_VALUE(GSWF(GSWF_EKI01_PAPER_4_BLOWN), 1)
     RETURN
 EVT_END()
 
+/** Case event run when Flurrie's breath blows paper panel 5 off the wall: sets GSWF_EKI01_PAPER_5_BLOWN. */
 EVT_BEGIN(evt_kami_5)
     SET_VALUE(GSWF(GSWF_EKI01_PAPER_5_BLOWN), 1)
     RETURN
 EVT_END()
 
+/** Case event run when Flurrie's breath blows paper panel 6 off the wall: sets GSWF_EKI01_PAPER_6_BLOWN. */
 EVT_BEGIN(evt_kami_6)
     SET_VALUE(GSWF(GSWF_EKI01_PAPER_6_BLOWN), 1)
     RETURN
 EVT_END()
 
+/**
+ * Map init for eki_01: sets up the doors (to eki_00, eki_02 and eki_03),
+ * the blue switch that unfolds the origami stairs until that story step is passed,
+ * the locked door that needs the Station Key until it has been unlocked,
+ * and the six paper panels that Flurrie can blow away (those already blown are hidden with their hit areas off).
+ */
 EVT_BEGIN(eki_01_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)

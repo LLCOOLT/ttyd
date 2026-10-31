@@ -179,6 +179,10 @@ static BattleWeapon weapon_kuriboo_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init event of the Gloomba: registers its wait, attack and damage events (attack_event also handles confusion),
+ * sets its walk, run and jump sounds and starts waiting.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -191,6 +195,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Gloomba: runs the default damage reaction (btldefaultevt_Damage) for its body part. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -198,10 +203,18 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Empty phase event; nothing in this file registers it. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * The Gloomba's headbonk: picks a target (the first-attack target on a first strike),
+ * then may use an item instead.
+ * It walks up to 100 units from the target and jumps onto it, its body tilting along the arc (krb_get_dir).
+ * A dodge or miss carries it past in two small hops;
+ * a hit shakes the camera, damages the target and bounces it back off in three hops. It then walks home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -335,11 +348,18 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait event of the Gloomba: plays the idle pose from its pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper for the Goomba family: args[0], args[1] are two coordinates of one point and args[2],
+ * args[3] those of another (the jump attacks pass x and y);
+ * args[4] receives the angle between them in degrees (angleABf of the difference),
+ * used to tilt the body along its arc. When the two points coincide, args[4] keeps its old value.
+ */
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);

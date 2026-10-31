@@ -148,6 +148,7 @@ static BattleWeapon weapon_pakkun_flower_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Attack event of the Piranha Plant: uses an enemy item if it has one, else it bites (normal_attack_event). */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -228,6 +229,10 @@ static BattleDataEntry data_table[] = {
     {0},
 };
 
+/**
+ * Init script of the Piranha Plant: sets its wait, attack, damage and confusion events, the hit cursor offset,
+ * remembers its shadow size and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -239,6 +244,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Returns in args[0] whether the iron frame ceiling above the plant is still there:
+ * 0 once it has fallen away, otherwise 1.
+ */
 static USER_FUNC(pakkun_ceil_exist) {
     EvtWord* args = event->args;
 
@@ -250,6 +259,7 @@ static USER_FUNC(pakkun_ceil_exist) {
     return EVT_RETURN_DONE;
 }
 
+/** Remembers the Piranha Plant's normal shadow scale in unit work 0, so that the shadow can be shrunk and restored. */
 static USER_FUNC(shadow_scale_memory) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -259,6 +269,10 @@ static USER_FUNC(shadow_scale_memory) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Shrinks the Piranha Plant's shadow to nothing over 15 frames as it burrows or goes up into the ceiling.
+ * Blocks until done.
+ */
 static USER_FUNC(shadow_scale_small) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -275,6 +289,10 @@ static USER_FUNC(shadow_scale_small) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Grows the Piranha Plant's shadow from nothing back to its remembered size over 15 frames as it comes out.
+ * Blocks until done.
+ */
 static USER_FUNC(shadow_scale_return) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -291,6 +309,12 @@ static USER_FUNC(shadow_scale_return) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Reaction when the Piranha Plant dodges and counters with its thorny head:
+ * plays pose type 31 for a quarter of a second,
+ * goes back to its idle pose and shows the thorn flash effect at head height.
+ * Guess: it plays when the plant avoids a hit that would hurt its attacker.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 31)
     WAIT_MS(250)
@@ -313,6 +337,7 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Piranha Plant: runs the default damage reaction. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -320,6 +345,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Event after the Piranha Plant takes a counter hit:
+ * plays the hurt pose for a second, then unless the damage code is a certain hit (codes 512 and 2048) it goes
+ * back to hiding (return_event).
+ */
 static EVT_BEGIN(counter_damage_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_D_1"))
     WAIT_MS(1000)
@@ -334,6 +364,10 @@ static EVT_BEGIN(counter_damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Called when the iron frame ceiling falls with the plant hanging in it:
+ * the plant drops down, burrows into the floor and comes out in its idle pose.
+ */
 static EVT_BEGIN(ceil_fall_ready_event)
     CALL(btlevtcmd_SetEventCeilFall, BTL_UNIT_SELF, 0)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PAKKUN_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -368,6 +402,12 @@ static EVT_BEGIN(ceil_fall_ready_event)
     RETURN
 EVT_END()
 
+/**
+ * Puts the Piranha Plant back in hiding after an attack:
+ * if the iron frame ceiling is still there it picks at random whether to burrow back into the floor
+ * or to go up into the ceiling; without the ceiling it always burrows into the floor.
+ * Either way it comes out again in the idle pose.
+ */
 static EVT_BEGIN(return_event)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(pakkun_ceil_exist, LW(0))
@@ -434,6 +474,11 @@ static EVT_BEGIN(return_event)
     RETURN
 EVT_END()
 
+/**
+ * The Piranha Plant's bite: it picks a target, burrows (shrinking its shadow), pops out next to the target,
+ * plays the bite poses with the bite sound, and the damage and result checks run;
+ * then it hides again (return_event). If confused with no target it is flustered.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -533,6 +578,7 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/** Idle script of the Piranha Plant: plays its idle pose. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

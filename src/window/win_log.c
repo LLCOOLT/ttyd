@@ -47,6 +47,10 @@ static f32 unusedSignTbl[16] = {-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.
 
 s32 stone_tbl[] = {ITEM_DIAMOND_STAR, ITEM_EMERALD_STAR, ITEM_GOLD_STAR, ITEM_RUBY_STAR, ITEM_SAPPHIRE_STAR, ITEM_GARNET_STAR, ITEM_CRYSTAL_STAR};
 
+/**
+ * Adds a Journal entry button (0 map, 1 Crystal Stars, 2 badge log, 3 recipe log,
+ * 4 Tattle log) with its help text, and re-spaces all buttons 45 units apart around the centre.
+ */
 static inline void winLogAddMenu(WindowWork* w, s32 id) {
     static const char* msg_help[] = {
         "msg_menu_kiroku_map",
@@ -181,6 +185,7 @@ TubuDt tubuDt[] = {
 #if VERSION >= VERSION_JP
 s32 stone_tbl[] = {ITEM_DIAMOND_STAR, ITEM_EMERALD_STAR, ITEM_GOLD_STAR, ITEM_RUBY_STAR, ITEM_SAPPHIRE_STAR, ITEM_GARNET_STAR, ITEM_CRYSTAL_STAR};
 
+/** Adds a Journal entry button and re-spaces the buttons (same as the demo copy above). */
 static inline void winLogAddMenu(WindowWork* w, s32 id) {
     static const char* msg_help[] = {
         "msg_menu_kiroku_map",
@@ -204,6 +209,14 @@ static inline void winLogAddMenu(WindowWork* w, s32 id) {
 }
 #endif
 
+/**
+ * Sets up the Journal when the pause menu opens:
+ * adds the entries unlocked by story progress (map always; Tattle log once Goombella joins;
+ * Crystal Stars at Frankly's; badge log after the badge tutorial;
+ * recipe log once unlocked), spawns the seven Crystal Star effects (unowned ones dark),
+ * finds Mario's spot on the world map for the current area, and builds the sorted badge,
+ * recipe and Tattle lists with their found counts.
+ */
 void winLogInit(WindowWork* w) {
 #if VERSION <= VERSION_DEMO_US
     s32 j;
@@ -434,6 +447,10 @@ void winLogInit(WindowWork* w) {
     }
 }
 
+/**
+ * Run from win_root.c each time the Journal comes to the front:
+ * hides the badge and recipe panels, restores their page scroll, and shows the selected entry's help text.
+ */
 void winLogInit2(WindowWork* w) {
     w->helpTgtX = -128.0f;
     w->helpTgtY = 8.0f + (45.0f * w->log.count / 2.0f - 45.0f * w->log.cursor);
@@ -450,6 +467,7 @@ void winLogInit2(WindowWork* w) {
     winMsgEntry(w, 0, w->log.menu[w->log.cursor].msg, 0);
 }
 
+/** Frees the Journal's map texture, the Mario map marker model and the seven Crystal Star effects. */
 void winLogExit(WindowWork* w) {
     s32 i;
     if (w->mapRes) {
@@ -465,6 +483,11 @@ void winLogExit(WindowWork* w) {
     }
 }
 
+/**
+ * TRUE if a map route dot of this type has been revealed early by its flag:
+ * 1 Boggly Woods, 2 the Rogueport Underground route, 3 Hooktail Castle, 4 Twilight Trail.
+ * Type 0 dots depend only on story progress.
+ */
 static inline BOOL tubuCheck(u8 type) {
     switch (type) {
         case 0:
@@ -489,6 +512,14 @@ static inline BOOL tubuCheck(u8 type) {
     return FALSE;
 }
 
+/**
+ * Journal input.
+ * State 0 picks an entry; 10 is the world map (load the map TPL, move the cursor with the stick or D-pad,
+ * snap to and name the nearest place); 11 turns the Crystal Star carousel;
+ * 12 and 13 browse the badge and recipe logs (7x4 grid pages);
+ * 14 the Tattle log, where A opens an entry (21/22); 1000/1001 run the Z sort menu.
+ * Returns -1 on B at the top level, -2 on Start, else 0.
+ */
 s32 winLogMain(WindowWork* w) {
     static char name[0x40];
     static char help[0x40];
@@ -999,6 +1030,10 @@ s32 winLogMain(WindowWork* w) {
     return 0;
 }
 
+/**
+ * Every frame: runs the entry buttons' slide animations (chosen one to the top-left, the rest off screen,
+ * and back) and eases the map, Crystal Star, badge and recipe panels toward their targets.
+ */
 void winLogMain2(WindowWork* w) {
     s32 i;
 
@@ -1074,6 +1109,12 @@ void winLogMain2(WindowWork* w) {
 static void mapGX(WindowWork* w, f32 x, f32 y);
 static void monoshiriGX(WindowWork* w, f32 x, f32 y);
 
+/**
+ * Draws the Journal (menu slot idx): the map panel,
+ * the Crystal Star carousel (positions the star effects with shadows),
+ * the badge and recipe boxes with the selected icon (and found counts from the US release on),
+ * the Tattle log list, and the entry buttons.
+ */
 void winLogDisp(s32 camId, void* param, s32 idx) {
     static const GXColor kW = {0xFF, 0xFF, 0xFF, 0xFF};
     WindowWork* w = param;
@@ -1189,6 +1230,11 @@ void winLogDisp(s32 camId, void* param, s32 idx) {
     }
 }
 
+/**
+ * Returns the world map texture for the story so far:
+ * map0.tpl to map7.tpl, one step per chapter, each switching at that chapter's visit to Frankly's house.
+ * Preloaded by winMain and loaded by the Journal map.
+ */
 const char* winGetMapTplName(void) {
     if (swByteGet(GSW_STORY_PROGRESS) < STORY_STG0_16_FRANKLYS_HOUSE)
         return "map0.tpl";
@@ -1208,10 +1254,16 @@ const char* winGetMapTplName(void) {
 }
 
 double __fabs(double);
+/** Local fabs on the __fabs intrinsic, used for the map arrows' bobbing offset. */
 static inline double fabs(double x) {
     return __fabs(x);
 }
 
+/**
+ * Draws the world map panel: the scrolled map texture,
+ * the route dots revealed so far (the hovered place blinks), the current chapter's goal icon,
+ * Mario's marker at his location, the frame, and bobbing arrows on the sides that can still scroll.
+ */
 static void mapGX(WindowWork* w, f32 x, f32 y) {
     static f32 pos_tbl[7][2] = {
         {165.0f, 68.0f},
@@ -1348,6 +1400,11 @@ static void mapGX(WindowWork* w, f32 x, f32 y) {
     }
 }
 
+/**
+ * Draws the Tattle log page: the known/total count,
+ * 16 entries in two columns with their log numbers (unknown enemies as "???",
+ * Doopliss as "?" until his name is guessed), page arrows and the Z sort hint.
+ */
 static void monoshiriGX(WindowWork* w, f32 x, f32 y) {
     GXColor k1;
     GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -1444,6 +1501,11 @@ static void monoshiriGX(WindowWork* w, f32 x, f32 y) {
     }
 }
 
+/**
+ * Creates a Tattle card for enemy kind id that slides in to (x, y).
+ * Used by the Journal's Tattle log and by Goombella's Tattle in battle;
+ * drive it with monosiriMain, monosiriClose/CloseWait and monosiriExit.
+ */
 MonosiriWork* monosiriInit(s32 id, f32 x, f32 y) {
     MonosiriWork* m = _mapAlloc(sizeof(MonosiriWork));
     memset(m, 0, sizeof(MonosiriWork));
@@ -1461,6 +1523,11 @@ MonosiriWork* monosiriInit(s32 id, f32 x, f32 y) {
     return m;
 }
 
+/**
+ * Per-frame Tattle card update: loads win.tpl and mono.dat (per-enemy framing), allocates the portrait buffer,
+ * loads the enemy's model (plus Smorg's extra part model) and fades it in,
+ * registers capture and the card's draw, and slides the card toward its target (off screen once closing).
+ */
 void monosiriMain(MonosiriWork* m) {
     s32 group = gp->inBattle ? 1 : 0;
 #if VERSION >= VERSION_US
@@ -1537,12 +1604,14 @@ void monosiriMain(MonosiriWork* m) {
     }
 }
 
+/** Starts the Tattle card sliding off screen. */
 void monosiriClose(MonosiriWork* m) {
     if (m) {
         m->state = 2;
     }
 }
 
+/** TRUE once the closing Tattle card is off screen (or there is no card). */
 BOOL monosiriCloseWait(MonosiriWork* m) {
     if (!m)
         return TRUE;
@@ -1551,6 +1620,7 @@ BOOL monosiriCloseWait(MonosiriWork* m) {
     return FALSE;
 }
 
+/** Frees a Tattle card: its files, models, portrait buffer and the work itself. */
 void monosiriExit(MonosiriWork* m) {
     // The release versions also reset each field after freeing it and check smart before freeing it
 #if VERSION <= VERSION_DEMO_US
@@ -1610,6 +1680,12 @@ typedef struct MonoDatFile {
     u32 size;         // 0x4
 } MonoDatFile;
 
+/**
+ * Renders the Tattle card's enemy portrait off screen:
+ * frames the model's bounding box (adjusted by its mono.dat entry), draws it,
+ * and copies the result into the card's RGB5A3 texture buffer.
+ * For Smorg (unit 0x6B) it also draws 500 small parts scattered along the body's chains.
+ */
 static void capture(CameraId camera, void* param) {
     MonosiriWork* m = param;
     AnimData* data;
@@ -1738,6 +1814,11 @@ static void capture(CameraId camera, void* param) {
     GXSetScissor(sx, sy, sw, sh);
 }
 
+/**
+ * Draws the Tattle card: the half-book page, the captured portrait with a soft edge and fade-in alpha,
+ * the enemy's log number and name (Doopliss as "?" until his name is guessed, not in the demos),
+ * and where it is found.
+ */
 static void monosiri_disp(CameraId camera, void* param) {
     MonosiriWork* m = param;
     GXColor black = {0x00, 0x00, 0x00, 0xFF};

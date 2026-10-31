@@ -62,6 +62,12 @@ static void effPturnDisp(CameraId cameraId, EffectEntry* effect);
 static void pturn_main_dispp(CameraId cameraId, EffectEntry* effect);
 static void pturn_num_dispp(CameraId cameraId, EffectEntry* effect);
 
+/**
+ * Guess: a status badge with a turn counter above (x, y, z) (effect table label: "unable to act").
+ * Type 0 steps its displayed count toward lifetime, type 1 shows the badge without digits,
+ * and type 10 is the short-lived badge that type 0 throws off when the count falls.
+ * Via evt_eff64 "pturn_n64"; no script callers found.
+ */
 EffectEntry* effPturnN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
     PturnElem* work;
@@ -112,6 +118,10 @@ EffectEntry* effPturnN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z) {
     return effect;
 }
 
+/**
+ * Steps the displayed count toward its target (one per 8 frames), bobs the badge,
+ * and on delete tumbles it away with gravity while fading.
+ */
 static void effPturnMain(EffectEntry* effect) {
     PturnElem* work = effect->userdata;
     Vec position;
@@ -213,6 +223,7 @@ static void effPturnMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effPturnDisp, effect);
 }
 
+/** Draws the badge, and the digits for every type except 1, while the effect is active. */
 static void effPturnDisp(CameraId cameraId, EffectEntry* effect) {
     PturnElem* work = effect->userdata;
     if (work->active != 0) {
@@ -223,6 +234,7 @@ static void effPturnDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
+/** Draws the badge sprite (texture 0x92) as a camera-facing quad with the bob offset, scale and alpha. */
 static void pturn_main_dispp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     PturnElem* p;
@@ -290,6 +302,7 @@ static void pturn_main_dispp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
+/** Draws the one- or two-digit count (texture 0x53, digits 32 rows apart) over the badge when it is above zero. */
 static void pturn_num_dispp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     GXTexObj texObj;

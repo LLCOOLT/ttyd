@@ -193,6 +193,12 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_cortez_saber", "c_buki1", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x3010009, 0x6, pose_table},
 };
 
+/**
+ * Init event of Cortez's saber weapon: sets the unit flag 0x1000000, installs its wait, phase, unison phase,
+ * attack, damage and (default) confusion events,
+ * stores weapon number 1 in unit work 2 and clears unit work 1 (the flag that makes it sit out its attack),
+ * and allows no movement.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_OnUnitFlag, BTL_UNIT_SELF, 16777216)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
@@ -208,6 +214,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event of Cortez's saber: runs the default damage handling with LW(10) = -2 and LW(11) = 1. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -215,6 +222,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: shows the toge_flush spike flash at the saber's hit position on part 1,
+ * offset forward by 40 and back by 5 in z, when a spiky attacker is avoided.
+ */
 static EVT_BEGIN(avoid_thorn_event)
     CALL(btlevtcmd_GetHitPos, BTL_UNIT_SELF, 1, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 40)
@@ -223,6 +234,14 @@ static EVT_BEGIN(avoid_thorn_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: attack event of Cortez's saber while it flies free (unit work 1 is 0;
+ * otherwise it just restarts the wait event): it picks a target with weapon_cortez_saber_float_attack,
+ * winds up with a tilt of 60 degrees and a swing of 135,
+ * dives onto the target and slashes down with the sword-dance sound.
+ * It plays the avoid pose on a dodge, or applies the damage with the action command defence check,
+ * then returns home and straightens.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -356,12 +375,20 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Idle event of Cortez's saber: waits for the loop timing of its animation
+ * and plays the pose table pose for state 1.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeWaitPlayLoopTiming, BTL_UNIT_SELF, 1)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Data event (entry 9) of Cortez's saber: when the weapon takes damage it plays the KRT_Z_1 pose on the unit in
+ * LW(10) and waits 30 frames.
+ */
 static EVT_BEGIN(cortez_damage_sub_event)
     CALL(btlevtcmd_GetDamage, LW(10), LW(0))
     IF_INT_EQUAL(LW(0), 0)

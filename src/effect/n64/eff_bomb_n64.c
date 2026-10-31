@@ -46,12 +46,18 @@ static effN64Vtx size8x8_tex32x32_vtx[] = {
 static void effBombMain(EffectEntry* effect);
 static void effBombDisp(CameraId cameraId, EffectEntry* effect);
 
+/** Changes which camera the bomb effect is drawn with (the default is CAMERA_3D). */
 void effBombN64SetCamId(EffectEntry* effect, s32 camId) {
     EffBombN64Work* work = effect->userdata;
 
     work->camId = camId;
 }
 
+/**
+ * Spawns an explosion at (x, y, z).
+ * Type 0, 1 or 2 is small, medium or large; adding 3 uses the alternate smoke style.
+ * Callers: effSandars, Bobbery's party unit (sanders) and Rampell's fight (las) via evt_eff64 "bomb_n64".
+ */
 EffectEntry* effBombN64Entry(s32 type, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
     EffBombN64Work* work;
@@ -101,6 +107,10 @@ EffectEntry* effBombN64Entry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
+/**
+ * On frame 1 starts the confetti burst and on frame 7 the smoke;
+ * grows and fades the flash and the burst sprite, and deletes the effect after 60 frames.
+ */
 static void effBombMain(EffectEntry* effect) {
     EffBombN64Work* work = effect->userdata;
     Vec position;
@@ -157,6 +167,7 @@ static void effBombMain(EffectEntry* effect) {
     dispEntry(camId, dispCalcZ(&position), 2, (DispCallback)effBombDisp, effect);
 }
 
+/** Draws the flash quad for types 1-2, then the burst sprite which cycles through three textures frame by frame. */
 static void effBombDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffBombN64Work* work;

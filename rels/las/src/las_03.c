@@ -26,6 +26,11 @@ static BeroEntry bero_entry_data[3];
 static HitDamageReturn dmgRetPoint[3];
 const char* toge_data[18];
 
+/**
+ * Door animation script (closing) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_l_01 and S_doa_l_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l_01"), 0, LW(0), 0)
@@ -34,6 +39,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_l_01 and S_doa_l_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l_01"), 0, LW(0), 0)
@@ -42,6 +52,11 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (closing) for the east door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_r_01 and S_doa_r_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r_01"), 0, LW(0), 0)
@@ -50,6 +65,11 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the east door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_r_01 and S_doa_r_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(e_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r_01"), 0, LW(0), 0)
@@ -125,6 +145,11 @@ const char* toge_data[] = {
     "A_toge_09",
 };
 
+/**
+ * Event script: one spike trap (index LW(0)) fires.
+ * If its busy bit is clear it sets the bit, pops the spikes up 30 units in 150 ms, holds them for a second,
+ * retracts them over 400 ms and clears the bit. Does nothing if that trap is already active.
+ */
 EVT_BEGIN(toge_evt_sub)
     SET_VALUE(LW(2), LW(0))
     CALL(get_toge_name, LW(2), LW(3), LW(4))
@@ -162,6 +187,12 @@ EVT_BEGIN(toge_evt_sub)
     RETURN
 EVT_END()
 
+/**
+ * Event script: runs the spike floor.
+ * Sets the damage-return points, binds the 9 trap hit objects to their map objects,
+ * then every frame checks whether Mario is within 90 units of one of the 9 traps (unless he is in motion 32)
+ * and spawns toge_evt_sub for it.
+ */
 EVT_BEGIN(toge_evt)
     CALL(evt_hit_damage_return_set, PTR(dmgRetPoint))
     CALL_CHILD(evt_gazigazi_entry)
@@ -196,6 +227,10 @@ EVT_BEGIN(toge_evt)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for las_03: music and ambience, the doors to las_02 and las_04,
+ * the All or Nothing badge block, and starts the spike trap event.
+ */
 EVT_BEGIN(las_03_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
@@ -210,6 +245,10 @@ EVT_BEGIN(las_03_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: for trap index args[0] returns the map object name in args[1]
+ * and the hit object name in args[2] from toge_data.
+ */
 static USER_FUNC(get_toge_name) {
     EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
@@ -217,6 +256,10 @@ static USER_FUNC(get_toge_name) {
     evtSetValue(event, args[2], (EvtWord)toge_data[idx * 2 + 1]);
     return EVT_RETURN_DONE;
 }
+/**
+ * Script helper: returns in args[1] whether bit args[0] (a trap index) of toge_flag is set,
+ * that is whether that spike trap is currently active.
+ */
 static USER_FUNC(toge_check_flag) {
     EvtWord* args = event->args;
     s32 bit = evtGetValue(event, args[0]);
@@ -224,6 +267,10 @@ static USER_FUNC(toge_check_flag) {
     evtSetValue(event, args[1], toge_flag & (1 << bit));
     return EVT_RETURN_DONE;
 }
+/**
+ * Script helper: sets (args[1] nonzero) or clears the bit args[0] in toge_flag,
+ * marking one spike trap as active or idle.
+ */
 static USER_FUNC(toge_flag_onoff) {
     EvtWord* args = event->args;
     s32 bit = evtGetValue(event, args[0]);

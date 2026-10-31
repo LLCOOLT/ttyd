@@ -9,6 +9,13 @@
 #include "battle/battle_sub.h"
 #include "system.h"
 
+/**
+ * Builds d->targets: one entry per targetable part of every living unit, with its cursor position,
+ * sort score and front/back side, then drops every entry the weapon's class
+ * and property flags rule out (only Mario, no partner, alliance, floating or ceiling units, jump/hammer reach,
+ * ...) and orders the rest in d->targetIndices by x along the attack direction.
+ * numTargets is -1 for weapons with TARGET_CLASS_NONE.
+ */
 static void _btlSamplingEnemy(BattleWorkWeaponTargets* d) {
     BattleUnitKindPart* kp;
     BattleWorkTarget* tg4;
@@ -489,6 +496,12 @@ static void _btlSamplingEnemy(BattleWorkWeaponTargets* d) {
     }
 }
 
+/**
+ * Fills d with the attack's parameters (weapon, attacker unitId, enemy side belong,
+ * target class and property flags, direction) and builds its target list with _btlSamplingEnemy.
+ * A confused attacker gets the "own side" and "opposing side" class flags swapped so it targets its allies;
+ * returns TRUE when that swap happened.
+ */
 BOOL BattleSamplingEnemy(BattleWorkWeaponTargets* d, BattleWeapon* weapon, s32 unitId, s8 belong, u32 classFlags, u32 propFlags,
                          s8 direction) {
     BOOL r = FALSE;
@@ -513,10 +526,20 @@ BOOL BattleSamplingEnemy(BattleWorkWeaponTargets* d, BattleWeapon* weapon, s32 u
     return r;
 }
 
+/**
+ * Rebuilds the target list for a weapon; the command menu calls it each time the selection cursor needs fresh
+ * targets.
+ */
 void BattleSamplingEnemyUpdate(BattleWorkWeaponTargets* d) {
     _btlSamplingEnemy(d);
 }
 
+/**
+ * Picks the unit and part an AI attack hits.
+ * Each candidate gets a weight from flags (TARGET_WEIGHT_PREFER_MARIO, low HP, in Peril, front/back, ...),
+ * then the heaviest wins, or with TARGET_WEIGHT_RANDOM one is drawn in proportion to the weights.
+ * Outputs -1/0 when there is no target. Used by enemy scripts, stage hazards and the UFO.
+ */
 void BattleChoiceSamplingEnemy(BattleWorkWeaponTargets* d, u32 flags, s32* unitOut, s32* partOut) {
     BattleUnit* unit;
     BattleWork* wp = _battleWorkPointer;
@@ -673,6 +696,11 @@ void BattleChoiceSamplingEnemy(BattleWorkWeaponTargets* d, u32 flags, s32* unitO
     }
 }
 
+/**
+ * Picks the attacker and victim of a First Strike from fbatInfo->partyId:
+ * 1-6 Mario strikes first, 7-8 his partner, 9 (and anything else) the first enemy strikes Mario.
+ * Called by battle_seq when the battle opens.
+ */
 void BattleGetFirstAttackUnit(BattleWork* wp, BattleUnit** a, BattleUnit** b) {
     BattleUnit* found;
     BattleUnit* other;

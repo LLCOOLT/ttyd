@@ -35,6 +35,12 @@ static BeroEntry bero_entry_data[3];
 extern EvtWord witchtrio_lose[];
 static TreeAccess tree_access_data[10];
 
+/**
+ * Guess: init script of Vivian in Boggly Woods:
+ * clears her battle-info flag and, between STORY_STG2_01 and STORY_STG2_05_02,
+ * places her at (-535, 0, -30) with the sulking idle pose "PTR_S_3" and talk pose "PTR_T_3";
+ * during the sketch scenes she is only placed.
+ */
 static EVT_BEGIN(vivian_init)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_HAS_BATTLE_INFO)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -48,11 +54,16 @@ static EVT_BEGIN(vivian_init)
     RETURN
 EVT_END()
 
+/** Talk script of Vivian: one line, "stg2_win_e01_18". */
 static EVT_BEGIN(vivian_talk)
     CALL(evt_msg_print, 0, STRING("stg2_win_e01_18"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Init script of Marilyn in Boggly Woods: clears her battle-info flag and,
+ * between STORY_STG2_01 and STORY_STG2_07, places her at (-495, 0, -60).
+ */
 static EVT_BEGIN(maririn_init)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_HAS_BATTLE_INFO)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -62,11 +73,17 @@ static EVT_BEGIN(maririn_init)
     RETURN
 EVT_END()
 
+/** Talk script of Marilyn, standing in the Boggly Woods clearing: one line, "stg2_win_e01_17". */
 EVT_BEGIN(maririn_talk)
     CALL(evt_msg_print, 0, STRING("stg2_win_e01_17"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Init script of Beldam (Majolyne) in Boggly Woods:
+ * clears her battle-info flag and, during the Shadow Sirens' first appearance (STORY_STG2_01 to STORY_STG2_07),
+ * moves her to (-455, 0, -30).
+ */
 EVT_BEGIN(majorin_init)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_HAS_BATTLE_INFO)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -76,11 +93,16 @@ EVT_BEGIN(majorin_init)
     RETURN
 EVT_END()
 
+/** Talk script of Beldam: one line, "stg2_win_e01_16". */
 EVT_BEGIN(majorin_talk)
     CALL(evt_msg_print, 0, STRING("stg2_win_e01_16"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Init script of Fabio, the client of trouble 28:
+ * while the request is active he is placed at (-455, 0, -30), facing west.
+ */
 static EVT_BEGIN(fabio_init)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 28)
         CALL(evt_npc_set_position, STRING("me"), -455, 0, -30)
@@ -90,6 +112,10 @@ static EVT_BEGIN(fabio_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of Fabio during trouble 28: the first talk gives the request ("irai_28_001")
+ * and sets GSWF_TROUBLE_WORK_BASE; later talks remind Mario ("irai_28_002").
+ */
 static EVT_BEGIN(fabio_talk)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 28)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_BASE), 0)
@@ -102,6 +128,7 @@ static EVT_BEGIN(fabio_talk)
     RETURN
 EVT_END()
 
+/** Regular behavior of the dandy in Boggly Woods: wanders around his start position (100 units across, 30 deep). */
 static EVT_BEGIN(kizayarou_regl)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     CALL(urouro_init_func, STRING("me"), LW(0), LW(2), FLOAT(100.0f), FLOAT(30.0f), 0)
@@ -109,11 +136,16 @@ static EVT_BEGIN(kizayarou_regl)
     RETURN
 EVT_END()
 
+/** Talk script of the dandy in Boggly Woods: one line, "stg2_win_00_01". */
 static EVT_BEGIN(kizayarou_talk)
     CALL(evt_msg_print, 0, STRING("stg2_win_00_01"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/**
+ * Spawns the dandy NPC ("キザ野郎", model c_kiza) at (-450, 0, -25) facing west and installs his talk
+ * and wander scripts.
+ */
 static EVT_BEGIN(kizayarou_init)
     SET_VALUE(LW(0), STRING("キザ野郎"))
     CALL(evt_npc_entry, LW(0), STRING("c_kiza"))
@@ -214,6 +246,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Guess: cutscene at the entry from the Great Tree side:
+ * the Shadow Sirens argue over a necklace (Vivian, Marilyn and Beldam stand at x -535 to -455,
+ * Beldam spawns the necklace item) with the Siren theme playing.
+ */
 EVT_BEGIN(witchtrio_momeru)
     CALL(evt_npc_set_position, STRING("ビビアン"), -535, 0, -30)
     CALL(evt_npc_set_position, STRING("マリリン"), -495, 0, -60)
@@ -430,6 +467,10 @@ EVT_BEGIN(witchtrio_momeru)
     RETURN
 EVT_END()
 
+/**
+ * Background loop that keeps the "picture" item (the Mario poster) glued to Beldam's position,
+ * 20 units above her, while she holds it.
+ */
 EVT_BEGIN(majorin_have_picture)
     LOOP(0)
         CALL(evt_npc_get_position, STRING("マジョリン"), LW(0), LW(1), LW(2))
@@ -441,6 +482,11 @@ EVT_BEGIN(majorin_have_picture)
     RETURN
 EVT_END()
 
+/**
+ * Guess: cutscene where the Sirens show the Mario poster ("stg2_win_e06_00" and on):
+ * Beldam and Marilyn tease Vivian, a poster item appears in Beldam's hands
+ * and the story moves on to the sketch scene.
+ */
 EVT_BEGIN(witchtrio_picture)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, -495, 165, 582, -495, 45, -108, 0, 11)
@@ -548,6 +594,10 @@ EVT_BEGIN(witchtrio_picture)
     RETURN
 EVT_END()
 
+/**
+ * Guess: trigger cutscene: when Mario crosses x <= -325 the Shadow Sirens challenge him ("stg2_win_e07_00" and
+ * on) before the boss battle.
+ */
 EVT_BEGIN(mario_vs_witchtrio)
     CALL(evt_npc_set_ry, STRING("マジョリン"), 270)
     CALL(evt_npc_flag_onoff, 1, STRING("ビビアン"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
@@ -692,6 +742,11 @@ EVT_BEGIN(mario_vs_witchtrio)
     RETURN
 EVT_END()
 
+/**
+ * Guess: pickup callback of the necklace item: waits until the item is not in use, stops NPCs,
+ * turns Mario and his partner toward each other and plays "stg2_win_e08_03" (spoken by the extra partner)
+ * when Mario takes it.
+ */
 EVT_BEGIN(get_necklace)
     CALL(item_check_necklace_exist)
     CALL(evt_npc_change_fbat_mode, 7)
@@ -731,6 +786,10 @@ EVT_BEGIN(get_necklace)
     RETURN
 EVT_END()
 
+/**
+ * Background loop that keeps the "necklace" item at the position of the dummy Beldam NPC ("ダミー")
+ * while she carries it.
+ */
 EVT_BEGIN(witchtrio_lose_item)
     LOOP(0)
         CALL(evt_npc_get_position, STRING("ダミー"), LW(0), LW(1), LW(2))
@@ -740,16 +799,23 @@ EVT_BEGIN(witchtrio_lose_item)
     RETURN
 EVT_END()
 
+/** Message helper: Vivian says "stg2_win_e08_02". */
 EVT_BEGIN(witchtrio_mess_vivi)
     CALL(evt_msg_print, 0, STRING("stg2_win_e08_02"), 0, STRING("ビビアン"))
     RETURN
 EVT_END()
 
+/** Message helper: Marilyn says "stg2_win_e08_01". */
 EVT_BEGIN(witchtrio_mess_mari)
     CALL(evt_msg_print, 0, STRING("stg2_win_e08_01"), 0, STRING("マリリン"))
     RETURN
 EVT_END()
 
+/**
+ * Cutscene after Mario beats the Shadow Sirens:
+ * they flee, the dummy Beldam drops the necklace for Mario to pick up (flag GSWF_WIN00_NECKLACE_TAKEN),
+ * BGM returns to the Boggly Woods theme and the story becomes STORY_STG2_08_SHADOW_SIRENS_LOSE.
+ */
 EVT_BEGIN(witchtrio_lose)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_npc_set_position, STRING("ビビアン"), -438, 0, -10)
@@ -874,6 +940,10 @@ EVT_BEGIN(witchtrio_lose)
     RETURN
 EVT_END()
 
+/**
+ * Tree hit script for the first tree: drops a Sleepy Sheep the first time it is hit
+ * (GSWF_WIN00_TREE_SLEEPY_SHEEP_TAKEN).
+ */
 static EVT_BEGIN(ki_data_evt_01)
     CALL(evt_item_delete_check, STRING("item_ki01"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -895,6 +965,10 @@ static TreeAccess tree_access_data[] = {
     {7, NULL, NULL, NULL, 0, NULL},
 };
 
+/**
+ * Trouble 28 completion: once all three target enemies are dead, Fabio ("ファビオ") walks up to Mario,
+ * thanks him ("irai_28_003", "irai_28_005"), pays 20 coins and sets GSWF_TROUBLE_28_SOLVED.
+ */
 EVT_BEGIN(iri_28_enemy_all_dead)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_wait_landon)
@@ -937,6 +1011,10 @@ EVT_BEGIN(iri_28_enemy_all_dead)
     RETURN
 EVT_END()
 
+/**
+ * Per-enemy death handler for trouble 28: runs the normal enemy death event,
+ * counts the kill in GSW_TROUBLE_WORK_FIRST and starts iri_28_enemy_all_dead when the count reaches 3.
+ */
 EVT_BEGIN(iri_28_enemy_dead)
     CALL_CHILD(enemy_common_dead_event)
     ADD(GSW(GSW_TROUBLE_WORK_FIRST), 1)
@@ -946,6 +1024,12 @@ EVT_BEGIN(iri_28_enemy_dead)
     RETURN
 EVT_END()
 
+/**
+ * Map-init helper for trouble 28: resets the kill counter
+ * and installs iri_28_enemy_dead as the death handler of the three target enemies (two Poison Puffs and a Pale
+ * Cleft in the demos, two Piranha Plants and a Cleft in the later releases);
+ * an enemy that is not on the map counts as already killed.
+ */
 EVT_BEGIN(iri_28_init)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 28)
         SET_VALUE(GSW(GSW_TROUBLE_WORK_FIRST), 0)
@@ -995,6 +1079,11 @@ EVT_BEGIN(iri_28_init)
     RETURN
 EVT_END()
 
+/**
+ * Guess: map init script of Boggly Woods entrance (win_00):
+ * registers exits, BGM and ambience, spawns NPCs, trees, the necklace and Honey Syrup items,
+ * Fabio and the Shadow Sirens scenes depending on story progress.
+ */
 EVT_BEGIN(win_00_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -1034,10 +1123,15 @@ EVT_BEGIN(win_00_init_evt)
     RETURN
 EVT_END()
 
+/** Script helper: blocks until Mario's forced-movement flag (MARIO_FLAG_FORCED_MOVEMENT) clears. */
 static USER_FUNC(mariowalk_wait) {
     return !(marioGetPtr()->flags & MARIO_FLAG_FORCED_MOVEMENT);
 }
 
+/**
+ * Script helper: slides the named item (args[0]) from its current position to (args[1], args[2], args[3]) over
+ * args[4] ms using interpolation mode args[5], plus a y offset args[6]; blocks until done.
+ */
 static USER_FUNC(win_item_move_3d_position) {
     EvtWord* args = event->args;
     char* name = (char*)evtGetValue(event, args[0]);
@@ -1074,6 +1168,10 @@ static USER_FUNC(win_item_move_3d_position) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: blocks while the "necklace" item exists and is still in use,
+ * so scenes wait until it has been picked up or removed.
+ */
 static USER_FUNC(item_check_necklace_exist) {
     ItemEntry* item = itemNameToPtr("necklace");
 

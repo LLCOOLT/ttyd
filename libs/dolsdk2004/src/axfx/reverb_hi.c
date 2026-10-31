@@ -15,6 +15,10 @@ static void HandleReverb(s32* sptr, AXFX_REVHI_WORK* rv, s32 k);
 static void ReverbHICallback(s32* left, s32* right, s32* surround, AXFX_REVHI_WORK* rv);
 static void ReverbHIFree(AXFX_REVHI_WORK* rv);
 
+/**
+ * Sets a delay line's read point to 'lag' samples behind its write point (4 bytes per sample),
+ * wrapping inside the buffer.
+ */
 static void DLsetdelay(AXFX_REVHI_DELAYLINE* dl, s32 lag) {
     dl->outPoint = dl->inPoint - (lag * 4);
     while (dl->outPoint < 0) {
@@ -22,6 +26,10 @@ static void DLsetdelay(AXFX_REVHI_DELAYLINE* dl, s32 lag) {
     }
 }
 
+/**
+ * Allocates and clears a delay line of max_length samples through the AXFX allocator
+ * and sets a default lag of half its length. Returns 0 if the allocation fails.
+ */
 static int DLcreate(AXFX_REVHI_DELAYLINE* dl, s32 max_length) {
     dl->length = (max_length * 4);
     dl->inputs = __AXFXAlloc(max_length << 2);
@@ -38,10 +46,17 @@ static int DLcreate(AXFX_REVHI_DELAYLINE* dl, s32 max_length) {
 	return 1;
 }
 
+/** Frees a delay line's sample buffer. */
 static void DLdelete(AXFX_REVHI_DELAYLINE* dl) {
     __AXFXFree(dl->inputs);
 }
 
+/**
+ * Validates the parameters (coloration, mix, crosstalk, damping 0-1; time 0.01-10 s; pre-delay 0-0.1 s)
+ * and builds the reverb: for each of the three outputs (left, right, surround) three comb-filter delay lines
+ * (feedback gain from the reverb time) and three all-pass delay lines, lengths from a fixed table,
+ * plus an optional pre-delay buffer (32 kHz samples). Returns 0 on bad parameters or allocation failure.
+ */
 static int ReverbHICreate(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 preDelay, f32 crosstalk) {
     u8 i;
     u8 k;
@@ -135,6 +150,11 @@ static int ReverbHICreate(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix
     return 1;
 }
 
+/**
+ * Validates the new parameters, stores coloration, mix, crosstalk and damping,
+ * then frees all delay lines and the pre- delay buffer
+ * and rebuilds them with ReverbHICreate (so changing settings reallocates). Returns 0 on bad parameters.
+ */
 static int ReverbHIModify(AXFX_REVHI_WORK* rv, f32 coloration, f32 time, f32 mix, f32 damping, f32 preDelay, f32 crosstalk) {
     u8 i;
 
@@ -186,6 +206,10 @@ const static f32 value1_0 = 1.0f;
 const static f32 value0_3 = 0.3f;
 const static f32 value0_6 = 0.6f;
 
+/**
+ * Assembly helper that mixes the left and right buffers into each other (each keeps invcross of itself and gets
+ * cross of the other) before the reverb runs. Guess: the exact mix, read from its arguments. Original assembly.
+ */
 asm static void DoCrossTalk(register s32* l, register s32* r, register f32 cross, register f32 invcross) {
     nofralloc
 	stwu r1, -48(r1)
@@ -291,6 +315,12 @@ loop:
 	blr
 }
 
+/**
+ * Assembly inner loop of the high-quality reverb for output k (0 left, 1 right, 2 surround) over the 160-sample
+ * buffer sptr: pre-delay, comb and all-pass delay lines and a damping low-pass,
+ * mixed with the dry signal by the mix level. Guess: the exact filter topology, read from the data it touches.
+ * Original assembly.
+ */
 asm static void HandleReverb(register s32* sptr, register AXFX_REVHI_WORK* rv, register s32 k) {
     nofralloc
 	stwu r1, -0xc0(r1)
@@ -648,6 +678,10 @@ L_00000C7C:
 	blr
 }
 
+/**
+ * Runs the high-quality reverb over the left, right and surround buffers:
+ * applies crosstalk to left and right first when it is nonzero, then HandleReverb for each output.
+ */
 static void ReverbHICallback(s32* left, s32* right, s32* surround, AXFX_REVHI_WORK* rv) {
     u8 k;
 
@@ -669,6 +703,7 @@ static void ReverbHICallback(s32* left, s32* right, s32* surround, AXFX_REVHI_WO
     }
 }
 
+/** Frees all nine all-pass and nine comb delay lines and the pre-delay buffers that exist. */
 static void ReverbHIFree(AXFX_REVHI_WORK* rv) {
     u8 i;
 
@@ -696,6 +731,10 @@ static void ReverbHIFree(AXFX_REVHI_WORK* rv) {
     }
 }
 
+/**
+ * Creates the high-quality reverb from the AXFX_REVERBHI parameters with interrupts disabled;
+ * returns nonzero on success.
+ */
 int AXFXReverbHiInit(AXFX_REVERBHI* rev) {
     int ret;
     BOOL old;
@@ -707,6 +746,7 @@ int AXFXReverbHiInit(AXFX_REVERBHI* rev) {
     return ret;
 }
 
+/** Frees the reverb's delay lines with interrupts disabled; always returns 1. */
 int AXFXReverbHiShutdown(AXFX_REVERBHI* rev) {
     BOOL old;
 
@@ -716,6 +756,10 @@ int AXFXReverbHiShutdown(AXFX_REVERBHI* rev) {
     return 1;
 }
 
+/**
+ * Applies changed reverb parameters: pauses processing (tempDisableFX)
+ * while ReverbHIModify rebuilds the delay lines, then resumes. Returns 0 on bad parameters.
+ */
 int AXFXReverbHiSettings(AXFX_REVERBHI* rev) {
 	int ret;
     BOOL old;
@@ -728,6 +772,10 @@ int AXFXReverbHiSettings(AXFX_REVERBHI* rev) {
     return ret;
 }
 
+/**
+ * AX aux-bus callback: runs the high-quality reverb on the left,
+ * right and surround aux buffers for one audio frame unless a settings change has it paused.
+ */
 void AXFXReverbHiCallback(AXFX_BUFFERUPDATE* bufferUpdate, AXFX_REVERBHI* reverb) {
     if (reverb->tempDisableFX == 0) {
         ReverbHICallback(bufferUpdate->left, bufferUpdate->right, bufferUpdate->surround, &reverb->rv);

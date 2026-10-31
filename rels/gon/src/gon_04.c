@@ -46,48 +46,80 @@ extern EvtWord evt_hashi_pera1[];
 extern EvtWord evt_hashi[];
 static s32 key_tbl[2];
 
+/**
+ * Door animation callback, closing for the w_bero_1 exit to gon_03:
+ * rotates map object "door01" about Y by 0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(w1_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door01"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the w_bero_1 exit to gon_03:
+ * rotates map object "door01" about Y by -0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(w1_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door01"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, closing for the w_bero_2 exit to gon_08:
+ * rotates map object "door02" about Y by 0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(w2_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door02"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the w_bero_2 exit to gon_08:
+ * rotates map object "door02" about Y by -0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(w2_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door02"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, closing for the e_bero_1 exit to gon_05:
+ * rotates map object "door03" about Y by -0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(e1_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door03"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the e_bero_1 exit to gon_05:
+ * rotates map object "door03" about Y by 0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(e1_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door03"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, closing for the e_bero_3 exit to gon_05:
+ * rotates map object "door04" about Y by -0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(e3_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door04"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the e_bero_3 exit to gon_05:
+ * rotates map object "door04" about Y by 0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(e3_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door04"), 0, LW(0), 0)
@@ -186,6 +218,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Map-init helper for the first floating block (mobj_fltbl01) and its switch:
+ * if the saved up/down state LSWF(6) is the raised one,
+ * moves the block 225 units up so it starts where it was left.
+ */
 EVT_BEGIN(evt_gon_04flowblock_updown1_init)
     IF_INT_EQUAL(1, 0)
         IF_INT_NOT_EQUAL(LSWF(6), 0)
@@ -203,6 +240,11 @@ EVT_BEGIN(evt_gon_04flowblock_updown1_init)
     RETURN
 EVT_END()
 
+/**
+ * Runs when Mario hits the floating-block switch for mobj_fltbl01:
+ * flips the block between its low and high position (225 units apart) with the floating-block sound
+ * and a camera shake, carries along anything standing on it, and flips the state flag LSWF(6).
+ */
 EVT_BEGIN(evt_gon_04flowblock_updown1)
 #if VERSION >= VERSION_JP
     SET_TYPE(239)
@@ -416,6 +458,10 @@ EVT_BEGIN(evt_gon_04flowblock_updown1)
     RETURN
 EVT_END()
 
+/**
+ * Map-init helper for the second floating block (mobj_fltbl02):
+ * moves it 200 units up if its saved state LSWF(7) says it was raised.
+ */
 EVT_BEGIN(evt_gon_04flowblock_updown2_init)
     IF_INT_EQUAL(0, 0)
         IF_INT_NOT_EQUAL(LSWF(7), 0)
@@ -433,6 +479,11 @@ EVT_BEGIN(evt_gon_04flowblock_updown2_init)
     RETURN
 EVT_END()
 
+/**
+ * Runs when Mario hits the floating-block switch for mobj_fltbl02:
+ * flips that block between its low and high position (200 units apart) with the floating-block sound
+ * and camera shake, and flips the state flag LSWF(7).
+ */
 EVT_BEGIN(evt_gon_04flowblock_updown2)
 #if VERSION >= VERSION_JP
     SET_TYPE(239)
@@ -662,6 +713,11 @@ KemuriPos kemuri_pos2[] = {
     {340, 20},
 };
 
+/**
+ * Plays one flip of the paper staircase (LW(0) = 0 flips the first stairs to the second, 1 flips back):
+ * the offscreen paper animation of the folding stairs, the step sounds,
+ * a camera shake and a few puffs of dust where the stairs land.
+ */
 EVT_BEGIN(evt_kaidan_pera_anime)
     CALL(evt_img_entry, STRING("img"))
     CALL(evt_img_set_paper, STRING("img"), STRING("OFF_gon_04_2"))
@@ -713,6 +769,10 @@ EVT_BEGIN(evt_kaidan_pera_anime)
     RETURN
 EVT_END()
 
+/**
+ * Map-init helper: shows only the stairs variant that matches GSWF_GON04_STAIRS_FLIPPED (neta_01 or neta_02)
+ * and switches off the hit area of the other.
+ */
 EVT_BEGIN(evt_kaidan_pera_init)
     IF_INT_EQUAL(GSWF(GSWF_GON04_STAIRS_FLIPPED), 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("neta_02"), MAPOBJ_FLAG_HIDE)
@@ -724,6 +784,12 @@ EVT_BEGIN(evt_kaidan_pera_init)
     RETURN
 EVT_END()
 
+/**
+ * Runs when Mario hits the red switch (mobj1): waits for any bridge animation to finish,
+ * waits for the partner to be in position, advances the story to STORY_STG1_12_PAPER_STAIRS, pulls in the fog,
+ * flips the paper stairs (evt_kaidan_pera_anime) with a camera shot,
+ * toggles GSWF_GON04_STAIRS_FLIPPED and pushes the fog back out.
+ */
 EVT_BEGIN(evt_kaidan_pera)
     CALL(evt_mobj_hitevt_onoff, STRING("me"), 0)
     CALL(evt_mario_key_onoff, 0)
@@ -805,6 +871,11 @@ EVT_BEGIN(evt_kaidan_pera)
     RETURN
 EVT_END()
 
+/**
+ * Plays the paper bridge unfolding for one side (LW(0) = 0 the right bridge tuuro_02,
+ * 1 the left bridge tuuro_01): waits for any partner action to end, shows a camera shot of the gap,
+ * animates the bridge model with a captured image and its sound, then turns the bridge's hit area on.
+ */
 EVT_BEGIN(evt_hashi_pera)
     CALL(evt_mario_key_onoff, 0)
     LOOP(0)
@@ -870,6 +941,10 @@ EVT_BEGIN(evt_hashi_pera)
     RETURN
 EVT_END()
 
+/**
+ * Runs when Mario presses the right-hand blue bridge switch (mobj_hashi0):
+ * unfolds the right paper bridge and sets the story to STORY_STG1_14_PAPER_BRIDGE_RIGHT.
+ */
 EVT_BEGIN(evt_hashi_pera0)
     SET_VALUE(GF(10), 1)
     SET_VALUE(LW(0), 0)
@@ -879,6 +954,10 @@ EVT_BEGIN(evt_hashi_pera0)
     RETURN
 EVT_END()
 
+/**
+ * Runs when Mario presses the left-hand blue bridge switch (mobj_hashi1):
+ * unfolds the left paper bridge and sets the story to STORY_STG1_14_01_PAPER_BRIDGE_LEFT.
+ */
 EVT_BEGIN(evt_hashi_pera1)
     SET_VALUE(GF(10), 1)
     SET_VALUE(LW(0), 1)
@@ -888,6 +967,11 @@ EVT_BEGIN(evt_hashi_pera1)
     RETURN
 EVT_END()
 
+/**
+ * Sets up the two paper bridges: while a bridge has not been unfolded (story below
+ * STORY_STG1_14_PAPER_BRIDGE_RIGHT or STORY_STG1_14_01_PAPER_BRIDGE_LEFT) it hides it,
+ * turns its hit area off and places the blue switch that unfolds it.
+ */
 EVT_BEGIN(evt_hashi)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_14_PAPER_BRIDGE_RIGHT)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("tuuro_02"), MAPOBJ_FLAG_HIDE)
@@ -906,6 +990,10 @@ static s32 key_tbl[] = {
     ITEM_CASTLE_KEY_0x0D, -1,
 };
 
+/**
+ * Check for the locked door ("me"): if Mario carries a Castle Key (ITEM_CASTLE_KEY_0x0D),
+ * opens the item select window with key_tbl; cancelling it cancels the lock execution so the door stays locked.
+ */
 static EVT_BEGIN(evt_chk)
     CALL(evt_pouch_check_item, ITEM_CASTLE_KEY_0x0D, LW(0))
     IF_INT_GREATER(LW(0), 0)
@@ -921,6 +1009,10 @@ static EVT_BEGIN(evt_chk)
     RETURN
 EVT_END()
 
+/**
+ * Runs when the door lock is opened with the Castle Key:
+ * switches on the e_bero_1 bero case (the exit can be used) and sets the story to STORY_STG1_12_02_LOCK.
+ */
 static EVT_BEGIN(evt_unlock)
     SET_VALUE(LW(0), STRING("e_bero_1"))
     CALL_CHILD(bero_case_switch_on)
@@ -928,11 +1020,18 @@ static EVT_BEGIN(evt_unlock)
     RETURN
 EVT_END()
 
+/** Runs when Mario picks up the Castle Key in this room: sets the story to STORY_STG1_12_01_KEY. */
 static EVT_BEGIN(key_get)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_12_01_KEY)
     RETURN
 EVT_END()
 
+/**
+ * Map init for gon_04: sets up the doors, the dormant Dry Bones NPCs, the red switch for the paper stairs,
+ * the two floating blocks and their switches, the paper bridges (evt_hashi),
+ * the Castle Key 0x0D until picked up (STORY_STG1_12_01_KEY),
+ * the locked door that key opens (STORY_STG1_12_02_LOCK) and the two Star Pieces.
+ */
 EVT_BEGIN(gon_04_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)

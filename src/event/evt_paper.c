@@ -4,7 +4,7 @@
 #include "driver/animdrv.h"
 #include "mario/mariost.h"
 
-// const char* animName
+/** const char* animName */
 USER_FUNC(evt_paper_entry) {
     const char* name;
     s32 group;
@@ -18,7 +18,7 @@ USER_FUNC(evt_paper_entry) {
     return EVT_RETURN_DONE;
 }
 
-// const char* animName
+/** const char* animName */
 USER_FUNC(evt_paper_delete) {
     const char* name;
 

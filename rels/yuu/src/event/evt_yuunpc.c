@@ -273,6 +273,12 @@ s32 chusan_act_tbl[] = {
     1, 2, 3, 3, 3, 2, 1, 0,
 };
 
+/**
+ * Decodes the course collision data (hitdata, a string of two-digit heights) into the NPC work area:
+ * hitY[72] is a per-column terrain code along the course,
+ * and hit[6][72] is a 6 by 72 grid of 50-unit cells holding the floor height,
+ * with cells marked in the string set to -500 (holes).
+ */
 static void yuunpc_maphit_init(void) {
     signed char key[3] = "\x81\xA1";
     s32 i;
@@ -299,6 +305,12 @@ static void yuunpc_maphit_init(void) {
     }
 }
 
+/**
+ * Builds the NPC pose table from an ExtTexInfo list:
+ * consecutive entries with the same character and animation name collapse into one pose spanning several texture
+ * frames, and the entries after the first terminator become frame-timed poses with explicit frame counts.
+ * Also finds the "c_tyusan" CHU_S_1 pose and gives it 224 frames.
+ */
 static void yuunpc_pose_init(YuuNpcData* data) {
     char name[32];
     char anim[32];
@@ -354,6 +366,7 @@ static void yuunpc_pose_init(YuuNpcData* data) {
     }
 }
 
+/** Returns the index in the pose table of the pose with this character name and animation name, or -1 if none. */
 static s32 yuunpc_pose_check(const char* name, const char* anim) {
     YuuNpcPose* pose = yuunpc_wp->pose;
     s32 i;
@@ -369,6 +382,10 @@ static s32 yuunpc_pose_check(const char* name, const char* anim) {
     return i;
 }
 
+/**
+ * Inline copy of yuunpc_pose_change used by the init functions:
+ * switches an NPC to pose id at the given animation speed and starting frame fraction.
+ */
 static inline void pose_change_inl(YuuNpc* npc, s16 id, f32 speed, f32 frame) {
     YuuNpcPose* cur = &yuunpc_wp->pose[npc->poseId];
     YuuNpcPose* pose = &yuunpc_wp->pose[id];
@@ -412,6 +429,13 @@ static inline void pose_change_inl(YuuNpc* npc, s16 id, f32 speed, f32 frame) {
     }
 }
 
+/**
+ * Switches an NPC to pose id.
+ * A speed of 0 or less freezes the pose at the given frame fraction (flag 4);
+ * a positive speed plays it at that speed from that fraction,
+ * keeping the current phase when only the speed of the same pose changes.
+ * For NPCs that have a real NPC entry it also restarts their animation.
+ */
 static void yuunpc_pose_change(YuuNpc* npc, s16 id, f32 speed, f32 frame) {
     YuuNpcPose* cur = &yuunpc_wp->pose[npc->poseId];
     YuuNpcPose* pose = &yuunpc_wp->pose[id];
@@ -455,10 +479,18 @@ static void yuunpc_pose_change(YuuNpc* npc, s16 id, f32 speed, f32 frame) {
     }
 }
 
+/**
+ * Switches an NPC to the pose named by name and anim,
+ * starting at a random frame so the crowd does not animate in step.
+ */
 static void yuunpc_pose_change2(YuuNpc* npc, const char* name, const char* anim, f32 speed) {
     pose_change_inl(npc, yuunpc_pose_check(name, anim), speed, rand() / 32767.0f);
 }
 
+/**
+ * Sets the frame at which the named pose is held while the NPC is in the air (the pose's jump value);
+ * does nothing if the pose does not exist.
+ */
 static void yuunpc_set_jump_pose(const char* name, const char* anim, f32 jump) {
     s32 id = yuunpc_pose_check(name, anim);
 
@@ -467,6 +499,12 @@ static void yuunpc_set_jump_pose(const char* name, const char* anim, f32 jump) {
     }
 }
 
+/**
+ * Per-frame pose update for one NPC: rotates its billboard matrix to face ext->dir,
+ * works out how far through the pose animation it is, and applies it:
+ * either as the texture frame of a sprite NPC or as the local time of a real NPC's animation,
+ * copying position and facing. Returns the animation phase t (0 to 1).
+ */
 static f32 yuunpc_pose_sub(ExtdrvPose* ext, YuuNpc* npc) {
     YuuNpcPose* pose = &yuunpc_wp->pose[npc->poseId];
     f32 t;
@@ -521,6 +559,11 @@ static f32 yuunpc_pose_sub(ExtdrvPose* ext, YuuNpc* npc) {
     return t;
 }
 
+/**
+ * Init callback of the Plane Mode crowd: allocates the NPC work area
+ * and places one sprite NPC per ext slot in rows of 5 on the stands, each a random Toad, Toadette,
+ * Roten or Lakitu (c_kinopio, c_kinopiko, c_roten, c_jugemu) spectator facing left or right.
+ */
 static void ext_yuunpc_minigame1_init(void) {
     f32 ytbl[5] = {260.0f, 220.0f, 180.0f, 140.0f, 100.0f};
     f32 ztbl[8] = {-7.0f, -1.0f, 5.0f, -5.0f, 1.0f, 7.0f, -3.0f, 3.0f};
@@ -575,6 +618,11 @@ static void ext_yuunpc_minigame1_init(void) {
     }
 }
 
+/**
+ * Per-frame update of the Plane Mode crowd: wraps spectators around the camera in x,
+ * moves them below the floor where the stands have gaps,
+ * and occasionally turns them to face the camera (or away from it); then updates each pose.
+ */
 static void yuunpc_pose_minigame1_main(void) {
     s32 i;
     ExtdrvPose* ext;
@@ -632,6 +680,7 @@ static void yuunpc_pose_minigame1_main(void) {
     }
 }
 
+/** Init callback of the Boat Mode crowd: like the Plane Mode crowd but in rows of 4 on the Boat Mode stands. */
 static void ext_yuunpc_minigame2_init(void) {
     f32 ytbl[4] = {170.0f, 130.0f, 90.0f, 50.0f};
     f32 ztbl[8] = {-7.0f, -1.0f, 5.0f, -5.0f, 1.0f, 7.0f, -3.0f, 3.0f};
@@ -686,6 +735,11 @@ static void ext_yuunpc_minigame2_init(void) {
     }
 }
 
+/**
+ * Per-frame update of the Boat Mode crowd: wraps spectators around the camera in x,
+ * moves them below the floor where the stands have gaps, occasionally turns them toward the camera,
+ * and updates each pose.
+ */
 static void yuunpc_pose_minigame2_main(void) {
     s32 i;
     ExtdrvPose* ext;
@@ -751,6 +805,10 @@ static void yuunpc_pose_minigame2_main(void) {
     }
 }
 
+/**
+ * Init callback of the Tube Mode crowd: rows of 4 spectators on the Tube Mode stands,
+ * each a random spectator type facing left or right.
+ */
 static void ext_yuunpc_minigame3_init(void) {
     f32 ytbl[4] = {200.0f, 160.0f, 120.0f, 80.0f};
     f32 ztbl[8] = {-7.0f, -1.0f, 5.0f, -5.0f, 1.0f, 7.0f, -3.0f, 3.0f};
@@ -805,6 +863,11 @@ static void ext_yuunpc_minigame3_init(void) {
     }
 }
 
+/**
+ * Per-frame update of the Tube Mode crowd: wraps spectators around the camera in x (1200-unit span),
+ * moves them below the floor where the stands have gaps, occasionally turns them toward the camera,
+ * and updates each pose.
+ */
 static void yuunpc_pose_minigame3_main(void) {
     s32 i;
     ExtdrvPose* ext;
@@ -862,6 +925,10 @@ static void yuunpc_pose_minigame3_main(void) {
     }
 }
 
+/**
+ * Returns the floor height of the Paper Mode course at (x, *zp) from the 50-unit cell grid,
+ * or -500 (a hole) outside the course.
+ */
 static inline s32 yuunpc_hit_get(f32 x, const f32* zp) {
     s32 out = 0;
 
@@ -874,6 +941,11 @@ static inline s32 yuunpc_hit_get(f32 x, const f32* zp) {
     return yuunpc_wp->hit[(s32)((*zp - -150.0f) / 50.0f) * 72 + (s32)((x - -1800.0f) / 50.0f)];
 }
 
+/**
+ * Moves a racing NPC horizontally by its speed and direction against the course collision grid,
+ * sliding it along cell edges if it would walk into a higher wall.
+ * Returns -1 when the NPC steps out over a drop (so it should start falling), else 0.
+ */
 static s32 hitcheck(YuuNpc* npc) {
     Vec v;
     Vec p;
@@ -946,6 +1018,10 @@ static s32 hitcheck(YuuNpc* npc) {
 #if VERSION >= VERSION_JP
 #pragma dont_inline on
 #endif
+/**
+ * Applies gravity to a racing NPC (0.533 per frame, terminal speed 16.7)
+ * and lands it on the floor height under it. Returns -1 when it lands, else 0.
+ */
 static s32 fallcheck(YuuNpc* npc) {
     s32 out = 0;
     s32 h;
@@ -976,6 +1052,11 @@ static s32 fallcheck(YuuNpc* npc) {
 #pragma dont_inline reset
 #endif
 
+/**
+ * Returns -1 and snaps the NPC to its destination
+ * when it has reached its final goal point (within one step of movement);
+ * reaching an intermediate destination just switches the target to the goal. Otherwise 0.
+ */
 static s32 goalincheck(YuuNpc* npc) {
     f32 r = npc->speed;
     f32 dz = npc->pos.z - npc->dest.z;
@@ -992,6 +1073,10 @@ static s32 goalincheck(YuuNpc* npc) {
     return 0;
 }
 
+/**
+ * Picks a random steering error rate for an NPC (between about -0.25 and +0.25,
+ * narrower for some states in the demos), so the Paper Mode racers do not all take the same line.
+ */
 static void errper_set_rtn(YuuNpc* npc) {
     switch (npc->state) {
         case 0:
@@ -1022,18 +1107,26 @@ static void errper_set_rtn(YuuNpc* npc) {
     }
 }
 
+/** Sets bits in the NPC work area's flags (bit 1 is cleared by yuunpc_go to let the racers start). */
 void yuunpc_wp_flag_on(u16 flag) {
     yuunpc_wp->flags |= flag;
 }
 
+/** Clears bits in the NPC work area's flags. */
 void yuunpc_wp_flag_off(u16 flag) {
     yuunpc_wp->flags &= ~flag;
 }
 
+/** Returns the masked bits of the NPC work area's flags. */
 u16 yuunpc_wp_flag_check(u16 flag) {
     return yuunpc_wp->flags & flag;
 }
 
+/**
+ * Returns Mario's current rank in the Paper Mode race:
+ * the number of racers that are still in the race and further along the course (larger x) than pos->x.
+ * ("juni" means rank.)
+ */
 s32 yuunpc_juni(Vec* pos) {
     f32 x = pos->x;
     s32 n = 0;
@@ -1048,6 +1141,13 @@ s32 yuunpc_juni(Vec* pos) {
     return n;
 }
 
+/**
+ * Sets up (or resets for a new round) the Paper Mode crowd and racers:
+ * rebuilds the pose table and course grid, parks the three special racers (yuusp0 to yuusp2) offstage,
+ * picks random slots for them in the field, then fills the first slots with sprite spectators
+ * and the rest with racers, each assigned a type (Toad, Bob-omb or tyusan),
+ * a start position on a grid behind the line, a goal and a steering error.
+ */
 void ext_yuunpc_minigame4_init_sub(void) {
     f32 ytbl[4] = {45.0f, 5.0f, -34.0f, -74.0f};
     f32 ztbl[8] = {-7.0f, -1.0f, 5.0f, -5.0f, 1.0f, 7.0f, -3.0f, 3.0f};
@@ -1304,6 +1404,7 @@ void ext_yuunpc_minigame4_init_sub(void) {
     }
 }
 
+/** Init callback of the Paper Mode crowd: allocates the NPC work area and calls ext_yuunpc_minigame4_init_sub. */
 static void ext_yuunpc_minigame4_init(void) {
     yuunpc_wp = _mapAlloc(sizeof(YuuNpcWork));
     memset(yuunpc_wp, 0, sizeof(YuuNpcWork));
@@ -1313,6 +1414,10 @@ static void ext_yuunpc_minigame4_init(void) {
     ext_yuunpc_minigame4_init_sub();
 }
 
+/**
+ * Returns the terrain code of the Paper Mode course at x (hitY, which tells racers what obstacle comes next),
+ * or 0 outside the course.
+ */
 static inline s32 yuunpc_hitY_get(f32 x) {
     s32 out = 0;
 
@@ -1386,6 +1491,13 @@ static inline f32 yuunpc_rnd10(YuuNpc* npc) /* */ {
         }                                                                                                      \
     } while (0)
 
+/**
+ * Per-frame update of the Paper Mode crowd and racers. Spectators are handled like the other games.
+ * Racers read the terrain code under them to pick a destination,
+ * react to the current wind state of the minigame by walking, running, stopping or jumping,
+ * move with hitcheck and fallcheck, are flagged out when they fall below y -100 or -500,
+ * and then update their pose.
+ */
 static void yuunpc_pose_minigame4_main(void) {
     s32 i;
     ExtdrvPose* ext;
@@ -2163,6 +2275,7 @@ static void yuunpc_pose_minigame4_main(void) {
     }
 }
 
+/** Draw callback that renders all ext sprites (the crowd and racers) with the ext driver. */
 static void yuunpc_disp(CameraId camera, void* param) {
     extLoadRenderMode();
     extLoadVertex();
@@ -2172,26 +2285,36 @@ static void yuunpc_disp(CameraId camera, void* param) {
     extLoadTextureExit();
 }
 
+/** Queues yuunpc_disp for drawing. */
 static void ext_yuunpc_dispent(void) {
     dispEntry(4, 0.0f, 1, yuunpc_disp, NULL);
 }
 
+/** Per-frame callback of the Plane Mode crowd ext; forwards to yuunpc_pose_minigame1_main. */
 static void ext_yuunpc_minigame1_main(void) {
     yuunpc_pose_minigame1_main();
 }
 
+/** Per-frame callback of the Boat Mode crowd ext; forwards to yuunpc_pose_minigame2_main. */
 static void ext_yuunpc_minigame2_main(void) {
     yuunpc_pose_minigame2_main();
 }
 
+/** Per-frame callback of the Tube Mode crowd ext; forwards to yuunpc_pose_minigame3_main. */
 static void ext_yuunpc_minigame3_main(void) {
     yuunpc_pose_minigame3_main();
 }
 
+/** Per-frame callback of the Paper Mode crowd ext; forwards to yuunpc_pose_minigame4_main. */
 static void ext_yuunpc_minigame4_main(void) {
     yuunpc_pose_minigame4_main();
 }
 
+/**
+ * Sets up the Plane Mode audience from the map init:
+ * creates four hidden template NPCs (c_kinopiko, c_roten, c_jugemu, c_kinopio)
+ * and registers the 300-sprite crowd ext with its init, main and draw callbacks.
+ */
 EVT_BEGIN(evt_yuunpc_minigame1)
     CALL(evt_npc_entry, STRING("yuunpc0"), STRING("c_kinopiko"))
     CALL(evt_npc_entry, STRING("yuunpc1"), STRING("c_roten"))
@@ -2209,6 +2332,7 @@ EVT_BEGIN(evt_yuunpc_minigame1)
     RETURN
 EVT_END()
 
+/** Sets up the Boat Mode audience from the map init: four hidden template NPCs and a 300-sprite crowd ext. */
 EVT_BEGIN(evt_yuunpc_minigame2)
     CALL(evt_npc_entry, STRING("yuunpc0"), STRING("c_kinopiko"))
     CALL(evt_npc_entry, STRING("yuunpc1"), STRING("c_roten"))
@@ -2226,6 +2350,7 @@ EVT_BEGIN(evt_yuunpc_minigame2)
     RETURN
 EVT_END()
 
+/** Sets up the Tube Mode audience from the map init: four hidden template NPCs and a 360-sprite crowd ext. */
 EVT_BEGIN(evt_yuunpc_minigame3)
     CALL(evt_npc_entry, STRING("yuunpc0"), STRING("c_kinopiko"))
     CALL(evt_npc_entry, STRING("yuunpc1"), STRING("c_roten"))
@@ -2243,6 +2368,12 @@ EVT_BEGIN(evt_yuunpc_minigame3)
     RETURN
 EVT_END()
 
+/**
+ * Sets up the Paper Mode audience and racers from the map init:
+ * creates the template NPCs (spectators, Bob-omb, tyusan and the special racers yuusp0 to yuusp2 for Luigi,
+ * nokorin and joho_a), registers the crowd ext (900 sprites, 1000 in the demos),
+ * then deletes the spectator templates once the sequence is ready.
+ */
 EVT_BEGIN(evt_yuunpc_minigame4)
     CALL(evt_npc_entry, STRING("yuunpc0"), STRING("c_kinopiko"))
     CALL(evt_npc_entry, STRING("yuunpc1"), STRING("c_roten"))

@@ -17,6 +17,7 @@ static OSContext FatalContext;
 // prototypes
 static void Halt();
 
+/** Fills a YUV422 framebuffer with a color; each 4-byte group holds two pixels (Y, Cb, Y, Cr). */
 static void ScreenClear(void* xfb, u16 xfbW, u16 xfbH, GXColor yuv) {
     int i;
     int j;
@@ -33,6 +34,10 @@ static void ScreenClear(void* xfb, u16 xfbW, u16 xfbH, GXColor yuv) {
     }
 }
 
+/**
+ * Draws a string into the framebuffer at (x, y) with the ROM font, in 24x24 glyphs,
+ * wrapping at the right margin and starting a new line (leading pixels down) at each newline.
+ */
 static void ScreenReport(void* xfb, u16 xfbW, u16 xfbH, GXColor yuv, s32 x, s32 y, s32 leading, const char* string) {
     u8* ptr;
     s32 width;
@@ -100,6 +105,10 @@ loop_1:
     }
 }
 
+/**
+ * Sets up a 640-wide video mode for the fatal screen according to the TV format (NTSC, PAL or EURGB60,
+ * interlaced or progressive) and applies it with VIConfigure.
+ */
 static void ConfigureVideo(u16 xfbW, u16 xfbH) {
     GXRenderModeObj mode;
     mode.fbWidth = xfbW;
@@ -138,6 +147,10 @@ static void ConfigureVideo(u16 xfbW, u16 xfbH) {
     VIConfigurePan(0, 0, 640, 480);
 }
 
+/**
+ * Converts an RGB color to the YCbCr values the framebuffer uses (BT.601), clamped to the legal ranges;
+ * returns them in the r, g, b fields.
+ */
 static GXColor RGB2YUV(GXColor rgb) {
     f32 Y;
     f32 Cb;
@@ -156,6 +169,11 @@ static GXColor RGB2YUV(GXColor rgb) {
     return yuv;
 }
 
+/**
+ * Fatal error screen: stops the system (interrupts, scheduler, audio, video,
+ * reset functions with a one second limit, EXI),
+ * then runs Halt on a fresh stack to show msg in the foreground color on the background color. Never returns.
+ */
 void OSFatal(GXColor fg, GXColor bg, const char* msg) {
     OSBootInfo* bootInfo;
     u32 count;
@@ -208,6 +226,10 @@ void OSFatal(GXColor fg, GXColor bg, const char* msg) {
     OSSwitchFiber((u32)&Halt, (u32)OSGetArenaHi());
 }
 
+/**
+ * Runs on the OSFatal stack: copies the message, loads the ROM font, allocates and clears a 640x480 framebuffer,
+ * draws the message at (48, 100), shows it, prints it to the debug console and halts the CPU.
+ */
 static void Halt() {
     u32 count;
     OSFontHeader* fontData;

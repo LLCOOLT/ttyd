@@ -49,6 +49,7 @@ u16 tex_id_list_small[5] = {0x2B, 0x2D, 0x2F, 0x2E, 0x2C};
 u16 tex_id_list_big[5] = {0x30, 0x32, 0x34, 0x33, 0x31};
 #endif
 
+/** BINGO! with three Mushrooms: fully restores Mario's HP and, unless the partner is knocked out, the partner's. */
 EVT_BEGIN(kinoko_effect)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_MARIO, LW(3))
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
@@ -74,6 +75,7 @@ EVT_BEGIN(kinoko_effect)
     RETURN
 EVT_END()
 
+/** BINGO! with three Fire Flowers: fully restores Mario's FP. */
 EVT_BEGIN(flower_effect)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_MARIO, LW(3))
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
@@ -85,6 +87,7 @@ EVT_BEGIN(flower_effect)
     RETURN
 EVT_END()
 
+/** BINGO! with three Shine Sprites: fully restores Mario's and the partner's HP, then a second later Mario's FP. */
 EVT_BEGIN(shine_effect)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_MARIO, LW(3))
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
@@ -176,6 +179,11 @@ BattleWeapon weapon_doku_kinoko_fp = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * BINGO!
+ * with three Poison Mushrooms: hits Mario and the partner with the HP-halving weapon,
+ * then a second later halves Mario's FP.
+ */
 EVT_BEGIN(doku_kinoko_effect)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_MARIO, LW(3))
     CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
@@ -206,30 +214,36 @@ u16 tex_id_list_big[5] = {0x30, 0x32, 0x34, 0x33, 0x31};
 #endif
 #endif
 
+/** BINGO! with three Stars: no script work; the Star Power refill and sound are done by BattleBreakSlot_Main. */
 EVT_BEGIN(star_effect)
     RETURN
 EVT_END()
 
+/** Announces the Mushroom BINGO! result (msg_slot_HP_max) for 120 frames. */
 EVT_BEGIN(msg_hp_max)
     CALL(btlevtcmd_AnnounceMessage, 0, 0, -205, STRING("msg_slot_HP_max"), 120)
     RETURN
 EVT_END()
 
+/** Announces the Fire Flower BINGO! result (msg_slot_FP_max). */
 EVT_BEGIN(msg_fp_max)
     CALL(btlevtcmd_AnnounceMessage, 0, 0, -205, STRING("msg_slot_FP_max"), 120)
     RETURN
 EVT_END()
 
+/** Announces the Star BINGO! result (msg_slot_SP_max). */
 EVT_BEGIN(msg_star_max)
     CALL(btlevtcmd_AnnounceMessage, 0, 0, -205, STRING("msg_slot_SP_max"), 120)
     RETURN
 EVT_END()
 
+/** Announces the Shine Sprite BINGO! result (msg_slot_HPFPSP_max). */
 EVT_BEGIN(msg_super_max)
     CALL(btlevtcmd_AnnounceMessage, 0, 0, -205, STRING("msg_slot_HPFPSP_max"), 120)
     RETURN
 EVT_END()
 
+/** Announces the Poison Mushroom BINGO! result (msg_slot_HPFPSP_half). */
 EVT_BEGIN(msg_fault)
     CALL(btlevtcmd_AnnounceMessage, 0, 0, -205, STRING("msg_slot_HPFPSP_half"), 120)
     RETURN
@@ -237,10 +251,12 @@ EVT_END()
 
 // inlining off for BattleBreakSlotGetPtr, BattleBreakSlotReelGetPtr, as in the original (the object differs without it)
 #pragma dont_inline on
+/** Returns the battle's Bingo slot state. */
 BreakSlotWork* BattleBreakSlotGetPtr(void) {
     return &_battleWorkPointer->breakSlot;
 }
 
+/** Returns Bingo reel no (0-2). */
 BreakSlotReel* BattleBreakSlotReelGetPtr(s32 no) {
     return &BattleBreakSlotGetPtr()->reels[no];
 }
@@ -250,6 +266,10 @@ const SlotCards8 R_slot_1_cards = {{0, 1, 2, 1, 2, 0, 3, 4}};
 const SlotCards8 R_slot_2_cards = {{3, 1, 0, 1, 4, 2, 0, 2}};
 const SlotCards5 R_slot_3_cards = {{0, 1, 2, 3, 4}};
 
+/**
+ * Resets the Bingo slots at battle start and gives each of the three reels its cards (0 Mushroom, 1 Fire Flower,
+ * 2 Star, 3 Shine Sprite, 4 Poison Mushroom): two eight-card reels and a five-card one.
+ */
 void BattleBreakSlot_Init(void) {
     BreakSlotWork* wp = BattleBreakSlotGetPtr();
     SlotCards8 c1 = R_slot_1_cards;
@@ -280,6 +300,14 @@ void BattleBreakSlot_Init(void) {
     memcpy(reel->cards, &c3, reel->numCards * 4);
 }
 
+/**
+ * Per-frame Bingo slot sequence: once three reels are filled the camera turns to the reels, they spin and stop,
+ * and on a match the BINGO!
+ * plays out: the matching recovery script runs,
+ * the crowd grows (to full for Shine Sprites, empties for Poison Mushrooms) and the result is announced;
+ * the boosted turns are set in breakTurn. A mismatch plays the failure sound.
+ * PAL plays a language-dependent number of break hits (one more in Italian).
+ */
 void BattleBreakSlot_Main(void) {
     static f32 updown;
     BattleWork* wp = _battleWorkPointer;
@@ -823,10 +851,15 @@ void BattleBreakSlot_Main(void) {
     }
 }
 
+/** Queues the Bingo reel drawing on the 2D camera. */
 void BattleBreakSlot_Disp(void) {
     dispEntry(CAMERA_2D, 490.0f, 0, BattleBreakSlotDispReel, NULL);
 }
 
+/**
+ * Draws the Bingo reels: the small card row while cards are being filled,
+ * the big spinning reels during the BINGO! sequence.
+ */
 static void BattleBreakSlotDispReel(CameraId camId, void* param) {
     Mtx trans;
     Mtx scale;
@@ -906,6 +939,7 @@ static void BattleBreakSlotDispReel(CameraId camId, void* param) {
     GXSetScissor(0, 0, gp->fbWidth, gp->efbHeight);
 }
 
+/** Frees the reels' card lists at battle end; empty in JP and the demos, which leak them with the battle heap. */
 void BattleBreakSlot_End(void) {
 #if VERSION >= VERSION_US
     BattleFree(BattleBreakSlotReelGetPtr(0)->cards);
@@ -916,6 +950,13 @@ void BattleBreakSlot_End(void) {
 #endif
 }
 
+/**
+ * Fills the next Bingo card with a random card from its reel;
+ * called from BattleAudience_ApRecoveryBuild with the weapon's bingoSlotChance,
+ * never before the first crystal star.
+ * The third card is always drawn different from the second (the real result comes from the spin).
+ * Debug flags and slot->flags force a card (Shine Sprite; the demos' bit 1 forces a Star).
+ */
 void BattleBreakSlot_PointInc(void) {
     BattleDebugCtrl* dbg = &_battleWorkPointer->debug;
     BreakSlotReel* reel;
@@ -990,6 +1031,7 @@ void BattleBreakSlot_PointInc(void) {
 
 // inlining off for BattleBreakSlot_Start, as in the original (the object differs without it)
 #pragma dont_inline on
+/** Starts the BINGO! spin once all three cards are filled. */
 void BattleBreakSlot_Start(void) {
     BreakSlotWork* slot = BattleBreakSlotGetPtr();
     BreakSlotReel* reel;
@@ -1007,6 +1049,10 @@ void BattleBreakSlot_Start(void) {
 }
 #pragma dont_inline reset
 
+/**
+ * Called between battle phases: starts a pending Bingo and returns TRUE while its sequence
+ * or announcement is still playing; afterwards resets the camera, settles the crowd size and returns FALSE.
+ */
 BOOL BattleBreakSlot_CheckReaction(void) {
     BreakSlotWork* slot = BattleBreakSlotGetPtr();
 
@@ -1024,10 +1070,15 @@ BOOL BattleBreakSlot_CheckReaction(void) {
     return FALSE;
 }
 
+/**
+ * Returns how many turns of the post-BINGO!
+ * boost remain (Star Power gains are multiplied and the crowd stays excited).
+ */
 s32 BattleBreakSlot_GetBreakTurn(void) {
     return BattleBreakSlotGetPtr()->breakTurn;
 }
 
+/** Counts one turn off the post-BINGO! boost, once per turn from the audience phase. */
 void BattleBreakSlot_DecBreakTurn(void) {
     BreakSlotWork* slot = BattleBreakSlotGetPtr();
 
@@ -1037,6 +1088,7 @@ void BattleBreakSlot_DecBreakTurn(void) {
     }
 }
 
+/** Hides the Bingo cards and clears the fill count when the battle ends. */
 void BattleBreakSlot_HideReel(void) {
     BreakSlotWork* slot = BattleBreakSlotGetPtr();
     BreakSlotReel* reel = BattleBreakSlotReelGetPtr(0);
@@ -1050,6 +1102,7 @@ void BattleBreakSlot_HideReel(void) {
 
 // inlining off for item_appear_force, as in the original (the object differs without it)
 #pragma dont_inline on
+/** Makes the reel land on card item next by moving its index to just before that card (debug forcing). */
 static void item_appear_force(BreakSlotReel* reel, s32 item) {
     s32 i;
 

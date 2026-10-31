@@ -34,6 +34,7 @@ typedef struct EffChargeWork {
 static void effChargeDisp(CameraId cameraId, EffectEntry* effect);
 static void effChargeMain(EffectEntry* effect);
 
+/** Draws the sparkles as additive billboards from texture 30, tinted between the two colours chosen by type. */
 static void effChargeDisp(CameraId cameraId, EffectEntry* effect) {
     EffChargeWork* work = effect->userdata;
     s32 i;
@@ -114,6 +115,10 @@ static void effChargeDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
+/**
+ * Ramps alpha up over the first 20 frames, moves the sparkles every other frame,
+ * and deletes the effect once the duration (1000 or more means endless) expires.
+ */
 static void effChargeMain(EffectEntry* effect) {
     s32 frame;
     s32 odd;
@@ -177,6 +182,10 @@ static void effChargeMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effChargeDisp, effect);
 }
 
+/**
+ * Spawns a charge glow with 30 sparkles at (x, y, z); type 0-2 select the colour pair.
+ * Spawned by Palace of Shadow boss units (las).
+ */
 EffectEntry* effChargeEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffChargeWork* work;

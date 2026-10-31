@@ -27,6 +27,11 @@ extern EvtWord honenoko_oidasare_evt[];
 extern EvtWord gon_01_GATEEVENT_evt[];
 static HitDamageReturn hitDmgRetPoints[17];
 
+/**
+ * Door animation callback, closing for the e_bero exit to gon_02:
+ * rotates map objects "door01" and "door02" about Y by -0.389 and 0.389 times the value in LW(0),
+ * so the two leaves swing opposite ways.
+ */
 static EVT_BEGIN(door01_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("door01"), 0, LW(0), 0)
@@ -35,6 +40,11 @@ static EVT_BEGIN(door01_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the e_bero exit to gon_02:
+ * rotates map objects "door01" and "door02" about Y by 0.389 and -0.389 times the value in LW(0),
+ * so the two leaves swing opposite ways.
+ */
 static EVT_BEGIN(door01_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("door01"), 0, LW(0), 0)
@@ -113,6 +123,12 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Cutscene run when Mario re-enters gon_01 after the Dry Bones swarm pushed him out of gon_03:
+ * the door bursts open and Mario and his partner are thrown out, tumble to the floor and get up.
+ * If he was pushed out a second time the partner (Goombella or Koops) comments on it (stg1_gon_13 and
+ * stg1_gon_14). Then the door to gon_02 is usable again.
+ */
 EVT_BEGIN(honenoko_oidasare_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_DIR_LOCK)
@@ -294,6 +310,13 @@ EVT_BEGIN(honenoko_oidasare_evt)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene played the first time Mario enters the castle courtyard:
+ * castle music and a slow camera pan, the chapter title card,
+ * then Mario and the partner walk up to the gate
+ * and the partner remarks on the castle (stg1_gon_00 and stg1_gon_01).
+ * If Mario had no partner, Goombella joins him.
+ */
 EVT_BEGIN(gon_01_GATEEVENT_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -365,6 +388,13 @@ static HitDamageReturn hitDmgRetPoints[] = {
     {0},
 };
 
+/**
+ * Map init for gon_01 (castle gate courtyard): after being pushed out of gon_03 it plays honenoko_oidasare_evt;
+ * otherwise it sets up the doors normally and, the first time,
+ * advances the story to STORY_STG1_09_HOOKTAIL_CASTLE and plays the gate cutscene.
+ * Also places the HP Plus item, the fall-return points for the pits, the moat water and the airplane panels,
+ * and raises the story to STORY_STG1_09_02_LOCK.
+ */
 EVT_BEGIN(gon_01_init_evt)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_GON2"))

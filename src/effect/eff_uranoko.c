@@ -9,6 +9,10 @@
 static void effUranokoDisp(CameraId cameraId, EffectEntry* effect);
 static void effUranokoMain(EffectEntry* effect);
 
+/**
+ * Spawns the black aura at (x, y, z) for `duration` frames (0 or less: until removed).
+ * Callers: the ura_noko and ura_pata enemy units (jon, tou2) and evt_eff "uranoko".
+ */
 EffectEntry* effUranokoEntry(s32 type, s32 duration, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
     EffUranokoWork* work;
@@ -37,6 +41,7 @@ EffectEntry* effUranokoEntry(s32 type, s32 duration, f32 x, f32 y, f32 z) {
     return effect;
 }
 
+/** Waits for the MOBJ_EFF_uranoko group, starts the A_1 animation, eases the scale up to 1 and fades out at the end. */
 static void effUranokoMain(EffectEntry* effect) {
     EffUranokoWork* work = effect->userdata;
     Vec position;
@@ -76,6 +81,7 @@ static void effUranokoMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effUranokoDisp, effect);
 }
 
+/** Draws the aura pose camera-facing, with the fade alpha as an event colour. */
 static void effUranokoDisp(CameraId cameraId, EffectEntry* effect) {
     EffUranokoWork* work = effect->userdata;
     Mtx mtx;

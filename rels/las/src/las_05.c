@@ -85,6 +85,10 @@ static NpcSetupInfo npcEnt[3];
 static EvtWord key_evt[5];
 static s32 key_tbl[2];
 
+/**
+ * Script helper: returns in args[1] the bits of kurokaron_move_flag selected by the mask args[0] (bit 2 is "Dark
+ * Bones is running from Mario").
+ */
 static USER_FUNC(kurokaron_flag_check) {
     EvtWord* args = event->args;
     s32 mask = evtGetValue(event, args[0]);
@@ -93,6 +97,10 @@ static USER_FUNC(kurokaron_flag_check) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: returns in args[0] and args[1] the X
+ * and Z of the current waypoint of Dark Bones' patrol (kurokaron_move_list[kurokaron_move_index]).
+ */
 static USER_FUNC(kurokaron_get_move_pos) {
     EvtWord* args = event->args;
 
@@ -101,6 +109,13 @@ static USER_FUNC(kurokaron_get_move_pos) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Picks the next waypoint for Dark Bones when Mario gets close:
+ * among the six patrol points, chooses one at random that lies more than 90 degrees away from the direction to
+ * Mario (x, z is Dark Bones, tx, tz is Mario), and flips the patrol direction
+ * if the current heading would run toward Mario.
+ * Known quirk: when no point qualifies and the current one is not worse, the result stays uninitialised.
+ */
 static s32 _kurokaron_run_away(f32 x, f32 z, f32 tx, f32 tz) {
     s32 cand[6];
     f32 base;
@@ -171,6 +186,12 @@ s32 kurokaron_vivian_prev_sts = 0;
 u8 kurokaron_stop_cnt = 0;
 u16 kurokaron_run_cnt = 0;
 
+/**
+ * Per-frame flee steering for Dark Bones (kurokaron_move_flag bit 2 set):
+ * if it is outside the room's walking limits it turns along the wall around Mario,
+ * if Mario is within 100 units it moves directly away from him (or along the edge),
+ * otherwise it picks a new waypoint once via _kurokaron_run_away. Returns 1 when a new waypoint was chosen.
+ */
 static s32 kurokaron_move2(NpcEntry* npc, MarioWork* mario) {
     static s32 flag = 0;
     static s32 count = 0;
@@ -227,6 +248,10 @@ static s32 kurokaron_move2(NpcEntry* npc, MarioWork* mario) {
     return 0;
 }
 
+/**
+ * Advances Dark Bones' patrol index to the next waypoint,
+ * forward or backward around the six points depending on kurokaron_move_flag bit 1.
+ */
 static void _kurokaron_next_move_index(void) {
     if (kurokaron_move_flag & 1) {
         if (kurokaron_move_index == 0) {
@@ -240,6 +265,13 @@ static void _kurokaron_next_move_index(void) {
     }
 }
 
+/**
+ * Script helper: walks the NPC named args[0] toward (args[1], args[2]) at speed args[3] each frame.
+ * It slows Dark Bones to a stop for a second after Vivian's shadow form ends next to him,
+ * starts the flee mode (350 frames at 1.8 times speed) when Mario comes within 80 units, handles wall hits,
+ * and finishes when the waypoint is reached; it also plays footsteps.
+ * Returns EVT_RETURN_DONE when a new waypoint is needed.
+ */
 static USER_FUNC(kurokaron_move_position) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -362,12 +394,18 @@ static USER_FUNC(kurokaron_move_position) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Returns a random float in [min, max] using rand(). */
 static f32 randf(f32 min, f32 max) {
     f32 r = rand() / 32767.0f;
 
     return r * (max - min) + min;
 }
 
+/**
+ * Init callback of the swarm: allocates the 1000-bone work area
+ * and puts every ext pose at a random spot in the room at height 250 (above the ceiling line) with a random
+ * delay of up to 200 frames before it falls.
+ */
 static void senkaron_ext_init(void) {
     s32 i;
     ExtdrvPose* pose = extGetPosePtr();
@@ -390,6 +428,10 @@ static void senkaron_ext_init(void) {
     }
 }
 
+/**
+ * Marks bones that overlap in the same floor cell (sk.area) by setting flag 2 on the one farther from Mario,
+ * so crowded bones get pushed apart.
+ */
 static void move_check(ExtdrvPose* pose, s32 idx) {
     MarioWork* mario;
     Senkaron* sk;
@@ -422,6 +464,7 @@ static void move_check(ExtdrvPose* pose, s32 idx) {
     }
 }
 
+/** Converts a bone's position to its floor cell index (40 unit cells, 29.5 per row) and stores it in sk[i].area. */
 static void calc_area(s32 i, f32 x, f32 z) {
     f32 fx = x - -570.0f;
     f32 fz = z - -270.0f;
@@ -435,6 +478,10 @@ static void calc_area(s32 i, f32 x, f32 z) {
     skwp->sk[i].area = ix + iz * 29.5f;
 }
 
+/**
+ * Checks whether the active partner (Koops shelling, Bobbery, or Flurrie's gale) hits a bone at (x, z);
+ * returns 1 and writes the push direction (+1 or -1 in X) to *dir.
+ */
 static s32 party_hit_check(f32 x, f32 z, f32* dir) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     s32 hit = 0;
@@ -495,6 +542,11 @@ static s32 party_hit_check(f32 x, f32 z, f32* dir) {
     return hit;
 }
 
+/**
+ * Door animation script (closing) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_l_01 and S_doa_l_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l_01"), 0, LW(0), 0)
@@ -503,6 +555,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_l_01 and S_doa_l_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l_01"), 0, LW(0), 0)
@@ -511,6 +568,11 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (closing) for the east door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_r_01 and S_doa_r_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r_01"), 0, LW(0), 0)
@@ -519,6 +581,11 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the east door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_r_01 and S_doa_r_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(e_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r_01"), 0, LW(0), 0)
@@ -573,6 +640,11 @@ f32 kurokaron_move_list[6][2] = {
     {500.0f, -130.0f}, {0.0f, -200.0f}, {-500.0f, -130.0f}, {-500.0f, 130.0f}, {0.0f, 200.0f}, {500.0f, 130.0f},
 };
 
+/**
+ * Event script: the patrol of Dark Bones in las_05. He moves between six waypoints, pausing when he runs.
+ * After 60 seconds (six ten-second periods) he gets faster
+ * and waits longer between runs (speed GW(0) 70 to 50 and waits GW(1) 200 to 300).
+ */
 EVT_BEGIN(kurokaron_move)
     SET_VALUE(LW(3), 0)
     SET_FLOAT_VALUE(GW(0), FLOAT(70.0f))
@@ -653,6 +725,12 @@ s32 move_check_list[] = {
     628, 703, 806, 1000,
 };
 
+/**
+ * Per-frame update callback of the bone swarm (senkaron_ext_main):
+ * lets each of the 1000 bones fall from the ceiling, run toward the room's centre and then toward Mario, bounce,
+ * and get knocked away by Mario's hammer, jumps or partner attacks;
+ * also pushes Mario sideways when the bones collide with him (marioPushed) and plays the clatter sounds.
+ */
 static void senkaron_ext_main(void) {
     MarioWork* mario;
     ExtdrvPose* pose;
@@ -1010,11 +1088,13 @@ static void senkaron_ext_main(void) {
     }
 }
 
+/** Queues the shadow draw callback of the bone swarm every frame. */
 static void senkaron_ext_dispent(void) {
     dispEntry(CAMERA_3D, 0.0f, 1, senkaron_ext_disp, NULL);
     dispEntry(CAMERA_3D, 0.0f, 2, senkaron_ext_shadow_disp, NULL);
 }
 
+/** Draw callback of the bone swarm: loads the ext vertex and TEV setup and draws every bone pose. */
 static void senkaron_ext_disp(CameraId camera, void* param) {
     extLoadRenderMode();
     extLoadVertex();
@@ -1024,6 +1104,7 @@ static void senkaron_ext_disp(CameraId camera, void* param) {
     extLoadTextureExit();
 }
 
+/** Draw callback for the bone swarm shadows: projects the bones flat onto the floor with a fixed shadow matrix. */
 static void senkaron_ext_shadow_disp(CameraId camera, void* param) {
     static Mtx mt = {
         {10.0f, 0.0f, 0.0f, 0.0f},
@@ -1038,6 +1119,14 @@ static void senkaron_ext_shadow_disp(CameraId camera, void* param) {
     extDrawShadow();
 }
 
+/**
+ * Event script: the Dark Bones ambush.
+ * When the story is at STORY_STG8_00_START, Dark Bones appears with a sound, speaks (stg8_las_02),
+ * a swarm of 1000 Dry Bones starts falling and rolling across the room (senkaron_ext_*),
+ * the partner reacts (stg8_las_03) and Dark Bones speaks again (stg8_las_04).
+ * Mario is pushed back along the floor until Dark Bones turns to chase him (kurokaron_move interrupt),
+ * after which the west door is opened for the escape.
+ */
 static EVT_BEGIN(senkaron_event)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_00_START)
         CALL(evt_mario_key_onoff, 0)
@@ -1364,6 +1453,11 @@ static EVT_BEGIN(senkaron_event)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Dark Bones: while the story is at STORY_STG8_00_START he is placed at the east edge of the room
+ * (X
+ * 570) facing west in his sleeping animation, to be woken by talking to him.
+ */
 EVT_BEGIN(kurokaron_init)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_00_START)
         CALL(evt_npc_set_position, STRING("me"), 570, 0, 0)
@@ -1375,31 +1469,40 @@ EVT_BEGIN(kurokaron_init)
     RETURN
 EVT_END()
 
+/** Script helper: tells the bone swarm to run away (escape mode). */
 static USER_FUNC(senkaronToEscape) {
     skwp->escape = 1;
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: sets the swarm's mesPushing flag,
+ * which stops the bones pushing Mario while a message is on screen.
+ */
 static USER_FUNC(senkaronFlagOnMesPushing) {
     skwp->mesPushing = 1;
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: clears the swarm's mesPushing flag. */
 static USER_FUNC(senkaronFlagOffMesPushing) {
     skwp->mesPushing = 0;
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: lets the bone swarm start attacking. */
 static USER_FUNC(senkaronAttackStart) {
     skwp->attackStart = 1;
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: returns in args[0] whether the swarm pushed Mario this frame. */
 static USER_FUNC(senkaronGetMarioPushedFlag) {
     evtSetValue(event, event->args[0], skwp->marioPushed);
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: returns Mario's Y position in args[0]. */
 static USER_FUNC(get_mario_y_pos) {
     EvtWord* args = event->args;
 
@@ -1407,6 +1510,7 @@ static USER_FUNC(get_mario_y_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: sets Mario's Y position to args[0]. */
 static USER_FUNC(set_mario_y_pos) {
     EvtWord* args = event->args;
     f32 y = evtGetFloat(event, args[0]);
@@ -1415,6 +1519,7 @@ static USER_FUNC(set_mario_y_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: returns the active partner's Y position in args[0]. */
 static USER_FUNC(get_party_y_pos) {
     EvtWord* args = event->args;
     PartyEntry* party = partyGetPtr(partyCtrlNo);
@@ -1425,6 +1530,7 @@ static USER_FUNC(get_party_y_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: sets the active partner's Y position to args[0]. */
 static USER_FUNC(set_party_y_pos) {
     EvtWord* args = event->args;
     f32 y = evtGetFloat(event, args[0]);
@@ -1436,6 +1542,7 @@ static USER_FUNC(set_party_y_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: puts Mario on the floor if he is below Y 0. */
 static USER_FUNC(mario_land_on) {
     MarioWork* mario = marioGetPtr();
 
@@ -1445,6 +1552,7 @@ static USER_FUNC(mario_land_on) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: puts the active partner on the floor if it is below Y 0. */
 static USER_FUNC(party_land_on) {
     PartyEntry* party = partyGetPtr(partyCtrlNo);
 
@@ -1454,6 +1562,7 @@ static USER_FUNC(party_land_on) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: returns in args[0] whether Mario's controls are currently off. */
 static USER_FUNC(chk_mario_ctrloff) {
     EvtWord* args = event->args;
 
@@ -1461,6 +1570,10 @@ static USER_FUNC(chk_mario_ctrloff) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: returns 1 in args[0] when the active partner (Koops or Bobbery) is hitting Dark Bones,
+ * otherwise 0.
+ */
 static USER_FUNC(party_hit) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     NpcEntry* npc = npcNameToPtr("\x8D\x95\x83\x4A\x83\x8D\x83\x93");
@@ -1476,6 +1589,11 @@ static USER_FUNC(party_hit) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Talk event of Dark Bones: starts the cutscene where a thousand Dry Bones fall into the room
+ * and Dark Bones hunts Mario, and switches an interrupt on the NPC "me"
+ * while the story is at the start of the Palace.
+ */
 EVT_BEGIN(kurokaron_talk)
     SPAWN_EVENT(senkaron_event)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_00_START)
@@ -1508,6 +1626,10 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Event script: run when the key is used in the lock of the east door;
+ * sets the story progress to STORY_STG8_01_01_KEY.
+ */
 static EVT_BEGIN(key_evt)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_01_01_KEY)
     RETURN
@@ -1517,6 +1639,11 @@ static s32 key_tbl[] = {
     ITEM_PALACE_KEY_0x2E, -1,
 };
 
+/**
+ * Event script: the lock check of the east door.
+ * If Mario carries Palace Key 0x2E it opens the item selection window (key_tbl) and cancels the use
+ * if the player backs out.
+ */
 static EVT_BEGIN(key_check_evt)
     CALL(evt_pouch_check_item, ITEM_PALACE_KEY_0x2E, LW(0))
     IF_INT_GREATER(LW(0), 0)
@@ -1532,6 +1659,10 @@ static EVT_BEGIN(key_check_evt)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the east door is unlocked.
+ * Sets the story progress to STORY_STG8_01_02_LOCK and switches the e_bero_1 door on.
+ */
 static EVT_BEGIN(unlock_evt)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_01_02_LOCK)
     SET_VALUE(LW(0), STRING("e_bero_1"))
@@ -1539,6 +1670,10 @@ static EVT_BEGIN(unlock_evt)
     RETURN
 EVT_END()
 
+/**
+ * Map-init helper: hides the numbered candle map objects of three rows (8, 4 and 4 of them; names from
+ * make_name) and puts a smaller flame effect 7 units below each one.
+ */
 static EVT_BEGIN(shan_init)
     SET_VALUE(LW(0), 1)
     LOOP(3)
@@ -1566,6 +1701,11 @@ static EVT_BEGIN(shan_init)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for las_05: music and ambience, the doors to las_04 and las_06,
+ * Dark Bones (until the story advances), the Palace Key, the lock that opens the east door (e_bero_1),
+ * and the torches.
+ */
 EVT_BEGIN(las_05_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
@@ -1590,6 +1730,7 @@ EVT_BEGIN(las_05_init_evt)
     RETURN
 EVT_END()
 
+/** Script helper: builds the torch map-object name "S_shan_<args[0]>_rou_<args[1]>" and returns it in args[2]. */
 static USER_FUNC(make_name) {
     static char name[20];
     EvtWord* args = event->args;

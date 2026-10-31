@@ -11,9 +11,15 @@
 #include "evt/evt_story.h"
 #include "rel_module.h"
 
+/** Stub the linker needs for unresolved symbols; does nothing. */
 void _unresolved(void) {
 }
 
+/**
+ * Module exit point of the X-Naut Fortress: if the pixel-Mario (Famicom mode) section of aji_09 was still active
+ * when the area is left, turns Famicom mode off for Mario and his partner
+ * and clears GSWF_AJI09_PIXEL_MARIO_ACTIVE; then runs the static destructors.
+ */
 void _epilog(void) {
     voidfunctionptr* dtor;
 
@@ -27,6 +33,10 @@ void _epilog(void) {
     }
 }
 
+/**
+ * Module entry point: runs the static constructors, registers the init script of each map aji_00 to aji_19,
+ * and registers the area's battle setup tables (btlsetup_aji_tbl, btl_aji_setup_no_tbl) with the battle system.
+ */
 void _prolog(void) {
     voidfunctionptr* ctor;
 

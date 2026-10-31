@@ -26,6 +26,15 @@ static inline void mario_kemuri_landon(void);
 void mario_kemuri_landon(void);
 #endif
 
+/**
+ * Per-frame footstep effects for the player character,
+ * run from marioMain and from Peach's and Bowser's main loops.
+ * Picks by the floor's hit attribute: 0x1000 floors use kemuri_mugi,
+ * water (0x100) splashes via mario_kemuri_landon,
+ * 0x100000 floors leave the N64-style kemuri7 puffs while walking,
+ * and other floors get the normal dust from kemuri (not for Peach).
+ * Nothing in tube mode, while entering a pipe or at a raised system level.
+ */
 void mario_kemuri(void) {
     static s32 ct = 8;
     static s32 left_or_right = 0;
@@ -79,6 +88,10 @@ void mario_kemuri(void) {
 out:;
 }
 
+/**
+ * Spawns a single dust puff at Mario's feet (smaller in background mode).
+ * Used by the damage motions in mot_damage.c when he hits the ground.
+ */
 void mario_simple_kemuri(void) {
     MarioWork* mario = marioGetPtr();
     EffectEntry* eff = effKemuriEntry(0, mario->position.x, mario->position.y, mario->position.z, 0.0f);
@@ -88,6 +101,11 @@ void mario_simple_kemuri(void) {
     }
 }
 
+/**
+ * Landing effect after a Spring Jump (mot_jabara.c):
+ * a 0x1000-floor effect, a water splash, or a dust puff, depending on the floor.
+ * Skipped once if MARIO_TRIG_FLAG_DISABLE_JUMP_KEMURI is set, which it clears.
+ */
 void mario_land_kemuri(void) {
     MarioWork* mario = marioGetPtr();
     HitEntry* hit = mario->hitobjStandOn;
@@ -153,6 +171,12 @@ static inline
     }
 }
 
+/**
+ * Effects for floors with hit attribute 0x1000.
+ * On the Great Tree maps (mri) it makes water-drop effects while standing and walking;
+ * elsewhere it throws up mugi (wheat) puffs on jumping and every few frames while walking or dashing.
+ * Guess: 0x1000 marks tall grass or wet ground, from the effects used.
+ */
 static void kemuri_mugi(void) {
     static f32 dir = 0;
     static s32 ct = 4;
@@ -194,6 +218,11 @@ static void kemuri_mugi(void) {
     }
 }
 
+/**
+ * Normal dust: a puff when Mario lands on a floor after being airborne,
+ * and trailing dust every 7 frames while dashing.
+ * For Bowser (characterId 2) the landing puff and the dash dust grow with his size level (kpaGetLevel).
+ */
 static void kemuri(void) {
     static f32 dir = 0;
     static s32 ct = 4;
@@ -266,7 +295,7 @@ static void kemuri(void) {
     }
 }
 
-// US and PAL make no dust at a raised system level, in run mode 10 or on hit attribute 0x100
+/** US and PAL make no dust at a raised system level, in run mode 10 or on hit attribute 0x100 */
 #if VERSION >= VERSION_US
 void party_kemuri(PartyEntry* party) {
 
@@ -313,6 +342,11 @@ void party_kemuri(PartyEntry* party) {
     }
 }
 #else
+/**
+ * Dust trail behind the partner, run each frame from party.c:
+ * every 7 frames while it walks at speed 2 or more, or while Yoshi carries Mario.
+ * The demo version also puffs over water and at any system level.
+ */
 void party_kemuri(PartyEntry* party) {
 
     if (party->moveKind != 1) {

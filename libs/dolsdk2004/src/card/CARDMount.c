@@ -16,6 +16,11 @@ static u32 LatencyTable[8] = {
 static s32 DoMount(s32 chan);
 static void DoUnmount(s32 chan, s32 result);
 
+/**
+ * Decides from the EXI ID read at attach time whether the device is a usable memory card:
+ * the ID bits, a capacity of 4 to 128 megabits, a known sector size and at least 8 sectors.
+ * The special ID 0x80000004 is accepted only if a vendor ID has been set.
+ */
 static BOOL IsCard(u32 id) {
     u32 size;
     s32 sectorSize;
@@ -53,6 +58,10 @@ static BOOL IsCard(u32 id) {
     return TRUE;
 }
 
+/**
+ * Sets or clears bit 0x80 of a byte in low memory (0x800030E3) that makes CARDProbe,
+ * CARDProbeEx and CARDMountAsync report no card.
+ */
 void __CARDDisable(BOOL disable) {
     BOOL enabled = OSDisableInterrupts();
 
@@ -64,6 +73,10 @@ void __CARDDisable(BOOL disable) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Returns nonzero if a device is plugged into the channel's slot (EXIProbe),
+ * or 0 if card access is disabled by __CARDDisable.
+ */
 int CARDProbe(s32 chan) {
     if (__gUnknown800030E3 & 0x80) {
         return 0;
@@ -72,6 +85,11 @@ int CARDProbe(s32 chan) {
     }
 }
 
+/**
+ * Like CARDProbe but with details: returns NOCARD, BUSY (not yet identified),
+ * WRONGDEVICE (not a memory card) or READY, and reports the card's capacity in megabits
+ * and sector size in bytes through the pointers (either may be NULL).
+ */
 s32 CARDProbeEx(s32 chan, s32* memSize, s32* sectorSize) {
     u32 id;
     CARDControl* card;
@@ -126,6 +144,14 @@ s32 CARDProbeEx(s32 chan, s32* memSize, s32* sectorSize) {
     return result;
 }
 
+/**
+ * One step of the mount sequence, repeated from __CARDMountCallback.
+ * Step 0 reads the EXI ID and derives size, sector size, block count and latency,
+ * reads the vendor ID (512-byte pages in fast mode on 0xEC cards, 128 otherwise), clears the status and,
+ * if the card is still locked, starts __CARDUnlock
+ * and saves the flash ID in SRAM (otherwise checks the saved ID's checksum). Step 1 enables the card interrupt.
+ * Later steps read the system blocks one at a time into the work area.
+ */
 static s32 DoMount(s32 chan) {
     CARDControl* card;
     u32 id;
@@ -255,6 +281,12 @@ error:
     return result;
 }
 
+/**
+ * Completion callback of each mount step: on READY it advances to the next step or,
+ * after the last block is read, verifies the card with __CARDVerify;
+ * on UNLOCKED it takes the channel and continues; on IOERROR or NOCARD it unmounts.
+ * When finished it releases the channel and calls the attach callback with the result.
+ */
 void __CARDMountCallback(s32 chan, s32 result) {
     CARDControl* card;
     CARDCallback callback;
@@ -295,6 +327,12 @@ void __CARDMountCallback(s32 chan, s32 result) {
     callback(chan, result);
 }
 
+/**
+ * Starts mounting the card in a channel using 'workArea' (CARD_WORKAREA_SIZE bytes) as scratch space
+ * and permanent storage for the directory and FAT.
+ * 'detachCallback' is called if the card is later removed; 'attachCallback' reports the result of the mount.
+ * Returns right away with BUSY, NOCARD, WRONGDEVICE or READY.
+ */
 s32 CARDMountAsync(s32 chan, void* workArea, CARDCallback detachCallback, CARDCallback attachCallback) {
     CARDControl* card;
     BOOL enabled;
@@ -352,6 +390,7 @@ s32 CARDMountAsync(s32 chan, void* workArea, CARDCallback detachCallback, CARDCa
     return DoMount(chan);
 }
 
+/** Blocking CARDMountAsync: attaches to the card and waits until the mount sequence finishes. Games call this first. */
 s32 CARDMount(s32 chan, void* workArea, CARDCallback detachCallback) {
     s32 result = CARDMountAsync(chan, workArea, detachCallback, __CARDSyncCallback);
 
@@ -360,6 +399,10 @@ s32 CARDMount(s32 chan, void* workArea, CARDCallback detachCallback) {
     return __CARDSync(chan);
 }
 
+/**
+ * Detaches a channel: clears the EXI callback, detaches from EXI, cancels the timeout alarm,
+ * marks the card not attached and records 'result' as the channel result.
+ */
 static void DoUnmount(s32 chan, s32 result) {
     CARDControl* card;
     BOOL enabled;
@@ -379,6 +422,7 @@ static void DoUnmount(s32 chan, s32 result) {
     OSRestoreInterrupts(enabled);
 }
 
+/** Unmounts the card in a channel (BUSY if an operation is running); the card must be mounted again before use. */
 s32 CARDUnmount(s32 chan) {
     CARDControl* card;
     s32 result;

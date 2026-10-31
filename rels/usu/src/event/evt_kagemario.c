@@ -20,6 +20,10 @@ static s32 color_change_evt(s32 on);
 
 static EvtWord evt_check[4];
 
+/**
+ * Map TEV callback 10 that draws Shadow Mario: appends a TEV stage that outputs a flat color,
+ * black when Mario is in the background (flipped) mode and dark purple (77, 9, 82) otherwise.
+ */
 static void callback(MapTevCallbackInfo* info) {
     s32 stage = info->tevStage;
     s32 texCoord = info->texCoord;
@@ -45,6 +49,11 @@ static void callback(MapTevCallbackInfo* info) {
     info->texCoord = texCoord;
 }
 
+/**
+ * Turns the Shadow Mario look on (nonzero) or off:
+ * sets up TEV callback 10 for Mario's three paper-anim groups and toggles MARIO_FLAG_IS_SHADOW_MARIO.
+ * Always returns 0.
+ */
 static s32 color_change_evt(s32 on) {
     s32 i;
 
@@ -63,6 +72,10 @@ static s32 color_change_evt(s32 on) {
     return 0;
 }
 
+/**
+ * Script helper that blocks forever after clearing the Shadow Mario tint from the active partner's pose,
+ * so the partner is not drawn dark.
+ */
 static USER_FUNC(check) {
     if (partyGetPtr(0) != NULL) {
         animPoseSetMaterialFlagOff(partyGetPtr(0)->paperAnimGroup, ANIM_MATERIAL_TEV_CALLBACK(10));
@@ -70,6 +83,10 @@ static USER_FUNC(check) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Called by the map init scripts: if the story progress byte is in the range 201 to 211 (Doopliss has Mario's
+ * name) it turns Shadow Mario on and starts the partner-tint cleaner, otherwise it turns it off.
+ */
 USER_FUNC(evt_kagemario_init) {
     s32 sequence = swByteGet(GSW_STORY_PROGRESS);
 
@@ -82,22 +99,36 @@ USER_FUNC(evt_kagemario_init) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: turns the Shadow Mario look on or off from args[0]. */
 static USER_FUNC(evt_kagemario_change) {
     color_change_evt(event->args[0]);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: clears the two remembered previous-partner ids in Mario's work area,
+ * so no partner is called back afterwards.
+ */
 static USER_FUNC(test) {
     marioGetPtr()->prevPartyMemberId[0] = 0;
     marioGetPtr()->prevPartyMemberId[1] = 0;
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script run once by evt_kagemario_init: calls the check helper,
+ * which keeps the partner free of the Shadow Mario tint.
+ */
 static EVT_BEGIN(evt_check)
     CALL(check)
     RETURN
 EVT_END()
 
+/**
+ * Between STORY_STG4_10_02_TRADING_PLACES and STORY_STG4_12_01_SUPERBOMBBOMB_FOUND (Mario has swapped places
+ * with Doopliss) it removes both partner slots:
+ * stops them, moves them out of the map, disables control and clears them from the party.
+ */
 EVT_BEGIN(evt_usu_kagemario_party_kill)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG4_10_02_TRADING_PLACES, STORY_STG4_12_01_SUPERBOMBBOMB_FOUND)

@@ -89,6 +89,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Runs when the wind blows the cloud off the window; sets GSWF_TIK18_CLOUD_BLOWN. */
 EVT_BEGIN(tik_18_cloud_evt)
     SET_VALUE(GSWF(GSWF_TIK18_CLOUD_BLOWN), 1)
     RETURN
@@ -110,6 +111,12 @@ static HitDamageReturn hitDmgRetPoints[] = {
     {0},
 };
 
+/**
+ * Map init script of tik_18, the passage between tik_06, tik_07 and tik_17.
+ * Sets up the cloud covering a window (hidden once blown away),
+ * removes the enemy NPCs that do not belong to the story step (before or after STORY_STG5_43_X_NAUTS_RETREAT),
+ * and places two badge blocks (Slow Shroom, Gradual Syrup).
+ */
 EVT_BEGIN(tik_18_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK7"))

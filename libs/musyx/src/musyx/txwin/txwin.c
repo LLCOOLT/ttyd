@@ -22,6 +22,8 @@ sWIN* __CurrNode = NULL;
 sWIN* __LastNode = NULL;  // size: 0x4
 sWIN* __FirstNode = NULL; // size: 0x4
 
+/** Initializes the text window system (a debug overlay drawn with the DEMO library): empties the window list, sets the
+ * 8 pixel font and fetches the render mode. */
 void winInit() {
   __FirstNode = NULL;
   __LastNode = NULL;
@@ -31,6 +33,8 @@ void winInit() {
   GXSetCopyClear((GXColor){0x0A, 0x10, 0x19, 0xFF}, 0xFFFFFF);
 }
 
+/** Creates a text window with the given pixel rectangle, caption and refresh function and adds it to the window list;
+ * the character grid is 8x8 pixels per cell. */
 sWIN* winOpenWindow(s32 x1, s32 y1, s32 x2, s32 y2, char* caption, void* func, u32 flags) {
   sWIN* handle; // r31
 #line 109
@@ -57,6 +61,7 @@ sWIN* winOpenWindow(s32 x1, s32 y1, s32 x2, s32 y2, char* caption, void* func, u
   return handle;
 }
 
+/** Creates a scrolling log window, which also keeps num_lines extra lines of history, with its own line buffers. */
 sWIN* winOpenLogWindow(s32 x1, s32 y1, s32 x2, s32 y2, char* caption, u16 num_lines, u32 flags) {
   sWIN* handle; // r31
   u16 i;        // r30
@@ -84,6 +89,7 @@ sWIN* winOpenLogWindow(s32 x1, s32 y1, s32 x2, s32 y2, char* caption, u16 num_li
   return handle;
 }
 
+/** Formats text and draws it at character cell (char_x, char_y) inside the window, cut to the window width. */
 void winPrintfXY(sWIN* handle, s16 char_x, s16 char_y, char* fmt, ...) {
   va_list args;
   char buffer[128];
@@ -102,6 +108,7 @@ void winPrintfXY(sWIN* handle, s16 char_x, s16 char_y, char* fmt, ...) {
   DEMOPrintf(x, y, 0, "%s", buffer);
 }
 
+/** Formats a line, cuts it to the window width and appends it to the log window's circular line buffer. */
 void winLogPrintf(sWIN* handle, char* fmt, ...) {
   va_list args;
   char buffer[128];
@@ -117,6 +124,7 @@ void winLogPrintf(sWIN* handle, char* fmt, ...) {
   handle->curr_output_line = (handle->curr_output_line + 1) % handle->total_lines;
 }
 
+/** Empties all lines of a log window and resets its output and view positions. */
 void winClearLogWindow(sWIN* handle) {
   u16 i;
   for (i = 0; i < handle->total_lines; ++i) {
@@ -127,6 +135,8 @@ void winClearLogWindow(sWIN* handle) {
   handle->curr_view_line = 0;
 }
 
+/** Sets the overlay resolution for a font size between 8 and 40 (smaller values give a larger screen area); other sizes
+ * give 640x480. */
 void winSetFontSize(u16 size) {
 
   if (size >= 8 && size <= 40) {
@@ -142,6 +152,7 @@ void winSetFontSize(u16 size) {
   }
 }
 
+/** Draws every open window by calling its refresh function (asserts the list is not empty). */
 void winRefresh() {
   sWIN* ptr;
 #line 338
@@ -158,6 +169,7 @@ void winRefresh() {
     ptr = ptr->next;
   }
 }
+/** Appends a window to the end of the window list. */
 void __win_add_node(sWIN* handle) {
 #line 390
   MUSY_ASSERT_MSG(handle != NULL, "__add_node(): you're adding a NULL node!\n");
@@ -183,6 +195,7 @@ void __win_add_node(sWIN* handle) {
   }
 }
 
+/** Unlinks a window from the list and frees it. */
 void __win_delete_node(sWIN* handle) {
 #line 434
   MUSY_ASSERT_MSG(handle != NULL, "__delete_node(): you're deleting a NULL node!\n");
@@ -212,6 +225,7 @@ void __win_delete_node(sWIN* handle) {
   }
 }
 
+/** Refresh function of log windows: draws the newest lines from the bottom up, one per 8 pixel row. */
 static void __win_log_refresh(struct STRUCT_WIN* handle /* r31 */) {
   // Local variables
   u16 n;     // r30

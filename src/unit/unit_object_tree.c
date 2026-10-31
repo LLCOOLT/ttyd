@@ -115,6 +115,10 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_tree", "b_mario", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER | PART_ATTR_HIDDEN | PART_ATTR_NO_SHADOW, 0, pose_table},
 };
 
+/**
+ * Init for a stage tree the player can hit (spawned by battle_stage_object.c as _entry_tree_data):
+ * registers the wait, attack and damage scripts, never moves, and idles. Its part is hidden and has no shadow.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -125,6 +129,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Hit reaction: wobbles the tree object up and down (_rumble_tree),
+ * then tips it over to 90 degrees and snaps it back upright (_turn_tree).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -133,6 +141,7 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** The tree never acts on its own turn; it just returns to its (empty) idle script. */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -150,10 +159,16 @@ static s32 _data[] = {
 #endif
 };
 
+/** Idle: nothing; the tree has no idle animation. */
 static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+/**
+ * Shakes the tree's stage object (args[0] unit) when it is hit:
+ * adds one entry of the _data offset table to its height each frame for 34 frames,
+ * a decaying up-and-down wobble. Run from damage_event before _turn_tree.
+ */
 static USER_FUNC(_rumble_tree) {
     BattleUnit* unit;
     BattleStageObject* object;
@@ -177,6 +192,10 @@ static USER_FUNC(_rumble_tree) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Tilts the tree's stage object (the running unit) about X by 3 degrees a frame up to 90 over 30 frames,
+ * then snaps it back upright. Run from damage_event after _rumble_tree.
+ */
 static USER_FUNC(_turn_tree) {
     BattleUnit* unit;
     BattleStageObject* object;

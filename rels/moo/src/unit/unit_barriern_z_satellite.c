@@ -138,6 +138,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init event of the Mini Z-Yux: installs its wait, unison phase, attack,
+ * damage and confusion events and sets unit flags 0x100000
+ * and 0x200000 (Guess: the flags that keep it out of normal targeting).
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventUnisonPhase, BTL_UNIT_SELF, PTR(unison_phase_event))
@@ -149,6 +154,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Mini Z-Yux: default damage handling on its body part. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -156,20 +162,31 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Phase event of the Mini Z-Yux: does nothing (an empty script). */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/** Unison phase event of the Mini Z-Yux: only restarts its wait event; the Z-Yux that owns it does the work. */
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the Mini Z-Yux: never attacks by itself;
+ * it only restarts its wait event (the Z-Yux uses it in its own attacks).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
+/**
+ * Wait event of the Mini Z-Yux: plays its idle pose and,
+ * from time to time (every 30 to 150 frames) while its unit work 1 flag is set and it can act and is not asleep,
+ * glows (S_4) for 180 frames.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     LABEL(0)
@@ -192,6 +209,12 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: returns where a Mini Z-Yux sits around its Z-Yux.
+ * args[0] is the Z-Yux, args[1] the number of satellites, args[2] the index of this one (0-based);
+ * the offset is returned in args[3], args[4] and args[5] (X mirrored by the Z-Yux's facing):
+ * 1 beside it, 2 on both sides, 3 above and two below, 4 on four corners, 25 units each way.
+ */
 static USER_FUNC(battleGetBarriernSatelliteInitPos) {
     EvtWord* args = event->args;
     BattleUnit* unit;

@@ -203,6 +203,11 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Init event of the Paragloomba: registers its wait,
+ * attack and damage events (attack_event_patakuri also handles confusion) and its wing-flap pose sounds,
+ * then starts waiting.
+ */
 static EVT_BEGIN(init_event_patakuri)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event_patakuri))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_patakuri))
@@ -213,6 +218,12 @@ static EVT_BEGIN(init_event_patakuri)
     RETURN
 EVT_END()
 
+/**
+ * Data-table event 14: the Paragloomba loses its wings.
+ * After the hit pose it switches to the Gloomba's pose table, data table and part,
+ * falls to the floor and makes that its home position,
+ * then becomes unit kind 153 (the Gloomba) and runs the Gloomba's init_event.
+ */
 static EVT_BEGIN(dmg_fall_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -241,6 +252,10 @@ static EVT_BEGIN(dmg_fall_event)
     RETURN
 EVT_END()
 
+/**
+ * Data-table event 48: when Mario's first strike hits the flying Paragloomba,
+ * drops it to height 10 and waits for the attack to end.
+ */
 static EVT_BEGIN(patakuri_dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -249,6 +264,12 @@ static EVT_BEGIN(patakuri_dmg_first_attack_pos)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the flying Paragloomba: uses an item if it decides to, otherwise picks a target,
+ * flies to a spot 50 units in front of and 40 above it and dives at it.
+ * A dodge or miss dives past to the far side; a hit shakes the camera and damages the target.
+ * It then flies home.
+ */
 static EVT_BEGIN(attack_event_patakuri)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -350,6 +371,7 @@ static EVT_BEGIN(attack_event_patakuri)
     RETURN
 EVT_END()
 
+/** Wait event of the flying Paragloomba: plays the idle pose from its pose table and then idles forever. */
 static EVT_BEGIN(wait_event_patakuri)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     LABEL(0)
@@ -451,6 +473,10 @@ static BattleWeapon weapon_kuriboo_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init event of the Gloomba the Paragloomba turns into (run from dmg_fall_event):
+ * registers its wait, attack and damage events, sets its walk, run and jump sounds and starts waiting.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -463,6 +489,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event shared by both forms: runs the default damage reaction (btldefaultevt_Damage) for the body part. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -470,10 +497,18 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Empty phase event; nothing in this file registers it. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * The grounded Gloomba's headbonk: picks a target (the first-attack target on a first strike),
+ * then may use an item instead.
+ * It walks up to 100 units from the target and jumps onto it, its body tilting along the arc (krb_get_dir).
+ * A dodge or miss carries it past in two small hops;
+ * a hit shakes the camera, damages the target and bounces it back off in three hops. It then walks home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -607,11 +642,18 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait event of the grounded Gloomba: plays the idle pose from its pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper for the Goomba family: args[0], args[1] are two coordinates of one point and args[2],
+ * args[3] those of another (the jump attacks pass x and y);
+ * args[4] receives the angle between them in degrees (angleABf of the difference),
+ * used to tilt the body along its arc. When the two points coincide, args[4] keeps its old value.
+ */
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);

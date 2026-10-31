@@ -40,6 +40,11 @@ static u32 TRK_ISR_OFFSETS[15] = {0x100, 0x200, 0x300, 0x400, 0x500, 0x600, 0x70
 
 u32 lc_base;
 
+/**
+ * Assembly entry point of the debug stub: saves the interrupted state (r0-r31, LR, CR, MSR, extended registers)
+ * into gTRKCPUState, switches to the stub's own stack, picks the debug hardware with InitMetroTRKCommTable and,
+ * unless that reports a stub, enters TRK_main.
+ */
 asm void InitMetroTRK(void) {
     nofralloc
     subi r1, r1, 0x4
@@ -84,6 +89,10 @@ L_8025D010:
 }
 
 #pragma weak InitMetroTRK_BBA
+/**
+ * Same entry as InitMetroTRK but for the Broadband Adapter:
+ * always selects hardware id 2 (the BBA/UDP channel) instead of taking the id from r5.
+ */
 asm void InitMetroTRK_BBA(void) {
     nofralloc
     subi r1, r1, 0x4
@@ -126,6 +135,10 @@ L_8025D0A4:
     blr
 }
 
+/**
+ * Writes *n bytes from src to auxiliary RAM (ARAM) address dst by DMA through a 32-byte aligned bounce copy;
+ * ignores addresses below 0x4000 or past the 128 MB ARAM end.
+ */
 asm void TRK__write_aram(register void* src, register u32 dst, register u32* n) {
     nofralloc
     clrlwi r11, r1, 27
@@ -265,10 +278,16 @@ L_8025D280:
     blr
 }
 
+/** Turns on the debug link's interrupt (forwards to EnableEXI2Interrupts). */
 void EnableMetroTRKInterrupts(void) {
     EnableEXI2Interrupts();
 }
 
+/**
+ * Maps a debugger address to a usable one: locked-cache addresses (lc_base)
+ * and 0x7E000000-0x80000000 are kept as they are,
+ * anything else is forced into cached memory at 0x80000000 plus the low 30 bits.
+ */
 u32 TRKTargetTranslate(u32 addr) {
     if (addr >= lc_base) {
         if ((addr < lc_base + 0x4000) && ((gTRKCPUState.DBAT3U & 3) != 0))
@@ -281,12 +300,20 @@ u32 TRKTargetTranslate(u32 addr) {
     return (addr & 0x3FFFFFFF) | 0x80000000;
 }
 
+/**
+ * Copies one 0x100-byte exception vector from the stub's vector table into low memory at the translated address
+ * and flushes the cache over it.
+ */
 static inline void TRK_copy_vector(u32 offset) {
     void* destPtr = (void*)TRKTargetTranslate(offset);
     TRK_memcpy(destPtr, gTRKInterruptVectorTable + offset, 0x100);
     TRK_flush_cache(destPtr, 0x100);
 }
 
+/**
+ * Installs the stub's handlers over the game's exception vectors for each exception whose bit is set in the mask
+ * word at address 0x44 (the mask is read through the locked cache if mapped); exception index 4 is never copied.
+ */
 void __TRK_copy_vectors(void) {
     int i;
     u32 mask;
@@ -305,6 +332,10 @@ void __TRK_copy_vectors(void) {
     }
 }
 
+/**
+ * Marks the target stopped, records the current MSR as the game's
+ * and sets lc_base to 0xE0000000 (the locked cache base).
+ */
 DSError TRKInitializeTarget(void) {
     gTRKState.isStopped = 1;
     gTRKState.msr = __TRK_get_MSR();
@@ -312,6 +343,11 @@ DSError TRKInitializeTarget(void) {
     return 0;
 }
 
+/**
+ * Reads *n bytes from auxiliary RAM (ARAM) address src into dst by DMA,
+ * widening to 32-byte alignment and invalidating the destination cache lines first;
+ * ignores addresses below 0x4000 or past the 128 MB ARAM end.
+ */
 void TRK__read_aram(register void* dst, register u32 src, register u32* n) {
     u32 start;
     u32 length;

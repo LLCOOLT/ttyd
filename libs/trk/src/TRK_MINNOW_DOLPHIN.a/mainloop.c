@@ -19,6 +19,11 @@ void TRKGetInput(void);
 BOOL TRKTargetStopped(void);
 DSError TRKTargetContinue(void);
 
+/**
+ * The stub's event loop: takes events off the queue and handles them (type 2 message goes to TRKDispatchMessage,
+ * 1 shuts the loop down, 3 and 4 are CPU interrupts for TRKTargetInterrupt, 5 is a game file-support request).
+ * With the queue empty it polls the host link for a packet, and resumes the game if it is not stopped.
+ */
 void TRKNubMainLoop(void) {
     void* msg;
     TRKEvent event;

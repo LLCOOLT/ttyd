@@ -11,6 +11,10 @@ static int LeapYearDays[MONTH_MAX] = {0,   31,  60,  91,  121, 152,
                                       182, 213, 244, 274, 305, 335};
 
 #ifdef __GEKKO__
+/**
+ * Assembly: reads the 64-bit CPU time base (TBU:TBL), which ticks at one quarter of the bus clock,
+ * rereading TBU until it does not change so a carry from TBL cannot corrupt the value.
+ */
 asm OSTime OSGetTime(void) {
 jump:
     nofralloc
@@ -26,6 +30,7 @@ jump:
     blr
 }
 
+/** Assembly: reads only the low 32 bits of the time base (TBL). */
 asm OSTick OSGetTick(void){
     nofralloc
 
@@ -33,6 +38,7 @@ asm OSTick OSGetTick(void){
     blr
 }
 
+/** Assembly: writes the 64-bit time base (TBL is zeroed first so a carry cannot disturb TBU). */
 asm static void __SetTime(OSTime time) {
     nofralloc
     li r5, 0
@@ -43,6 +49,11 @@ asm static void __SetTime(OSTime time) {
 }
 #endif
 
+/**
+ * Sets the time base to time.
+ * The difference from the old value is added to the system-time offset so __OSGetSystemTime stays continuous,
+ * and the EXI probe state is reset.
+ */
 void __OSSetTime(OSTime time) {
     BOOL enabled;
     OSTime * timeAdjustAddr;
@@ -56,6 +67,10 @@ void __OSSetTime(OSTime time) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Returns OSGetTime plus the system-time offset kept in low memory, read with interrupts disabled.
+ * Used by the OS for alarms and timeouts.
+ */
 OSTime __OSGetSystemTime() {
     BOOL enabled;
     OSTime* timeAdjustAddr;
@@ -69,6 +84,7 @@ OSTime __OSGetSystemTime() {
     return result;
 }
 
+/** Converts a raw time-base value to system time by adding the stored offset. */
 OSTime __OSTimeToSystemTime(OSTime time) {
     BOOL enabled;
     OSTime* timeAdjustAddr = __OSSystemTime;
@@ -81,6 +97,7 @@ OSTime __OSTimeToSystemTime(OSTime time) {
 }
 
 #ifdef __GEKKO__
+/** Assembly: writes the low time-base register (TBL). */
 asm void __OSSetTick(register OSTick newTicks) {
     nofralloc
     mttbl newTicks
@@ -88,16 +105,22 @@ asm void __OSSetTick(register OSTick newTicks) {
 }
 #endif
 
+/** Returns nonzero when year is a leap year in the Gregorian calendar. */
 static int IsLeapYear(int year) {
     return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
 }
 
+/**
+ * Returns the number of days from the start of the year up to the start of month mon (0 based),
+ * allowing for leap years.
+ */
 static int GetYearDays(int year, int mon) {
     int* md = (IsLeapYear(year)) ? LeapYearDays : YearDays;
 
     return md[mon];
 }
 
+/** Returns the number of leap days that have occurred before the given year, used to turn years into a day count. */
 static int GetLeapDays(int year) {
     ASSERTLINE(286, 0 <= year);
     
@@ -107,6 +130,7 @@ static int GetLeapDays(int year) {
     return (year + 3) / 4 - (year - 1) / 100 + (year - 1) / 400;
 }
 
+/** Turns a day count since year 0 into year, month, day of month, day of year and weekday in td. */
 static void GetDates(int days, OSCalendarTime* td) {
     int year;
     int n;
@@ -134,6 +158,10 @@ static void GetDates(int days, OSCalendarTime* td) {
     td->mday = days - md[month] + 1;
 }
 
+/**
+ * Converts time-base ticks (counted from the year 2000) into a calendar date and time (year, month, day, hour,
+ * minute, second, millisecond, microsecond) in td.
+ */
 void OSTicksToCalendarTime(OSTime ticks, OSCalendarTime* td) {
     int days;
     int secs;
@@ -170,6 +198,10 @@ void OSTicksToCalendarTime(OSTime ticks, OSCalendarTime* td) {
     td->sec = secs % 60;
 }
 
+/**
+ * Converts a calendar date and time in td back into time-base ticks counted from 2000.
+ * Out-of-range months are carried into the year.
+ */
 OSTime OSCalendarTimeToTicks(OSCalendarTime* td) {
     OSTime secs;
     int ov_mon;

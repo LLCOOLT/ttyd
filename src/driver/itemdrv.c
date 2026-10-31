@@ -42,10 +42,12 @@
 #include <dolphin/pad.h>
 #include "evt/evt_msg.h"
 
+/** Returns the zero vector. */
 inline Vec unknownVec0(void) {
     return (Vec){0.0f, 0.0f, 0.0f};
 }
 
+/** Builds a Vec from x, y, z (a twin of makeVecByValue that compiles the same). */
 inline Vec makeVecByValue2(f32 x, f32 y, f32 z) {
     Vec v = (Vec){0.0f, 0.0f, 0.0f};
     v.x = x;
@@ -54,6 +56,7 @@ inline Vec makeVecByValue2(f32 x, f32 y, f32 z) {
     return v;
 }
 
+/** Builds a Vec from x, y, z. */
 inline Vec makeVecByValue(f32 x, f32 y, f32 z) {
     Vec v = (Vec){0.0f, 0.0f, 0.0f};
     v.x = x;
@@ -90,13 +93,17 @@ WinMgrDesc itemdrv_window_desc[4] = {
 #define itemGetWork() (gp->inBattle ? &work[1] : &work[0])
 
 #if VERSION <= VERSION_DEMO_US
-// the demo returns a badge to the pouch when its 0x100 flag is clear, in or out of battle
+/** the demo returns a badge to the pouch when its 0x100 flag is clear, in or out of battle */
 inline void itemCheckBadge(ItemEntry* entry) {
     if (BADGE_MIN <= entry->itemId && entry->itemId < BADGE_MAX && !(entry->flags & ITEM_FLAG_BADGE_RETURN)) {
         pouchArriveBadge(entry->itemId);
     }
 }
 #else
+/**
+ * On the field, gives a badge back to the pouch when its item entry is removed
+ * while it carries ITEM_FLAG_BADGE_RETURN (a badge that was taken off and dropped).
+ */
 inline void itemCheckBadge(ItemEntry* entry) {
     if (!gp->inBattle) {
         if (BADGE_MIN <= entry->itemId && entry->itemId < BADGE_MAX) {
@@ -109,6 +116,10 @@ inline void itemCheckBadge(ItemEntry* entry) {
 #endif
 
 static void itemseq_Bound(ItemEntry* entry);
+/**
+ * Puts the item into the pouch; FALSE if the pouch is full.
+ * On success sets its collect flag (GSWF or LSWF) and starts its pickup script.
+ */
 static inline BOOL itemGetPouch(ItemEntry* entry) {
     EventEntry* evt;
 
@@ -130,6 +141,10 @@ static inline BOOL itemGetPouch(ItemEntry* entry) {
     return TRUE;
 }
 
+/**
+ * Ends an item get sequence: gives Mario back his controls and keys and unmutes the sound effects.
+ * Later versions also undo the control lock if the get set it.
+ */
 static inline void itemGetEnd(ItemEntry* entry) {
     marioStSystemLevel(0);
     psndClearFlag(PSND_FLAG_MUTE_SFX);
@@ -146,6 +161,7 @@ static inline void itemGetEnd(ItemEntry* entry) {
 
 void itemGetSound(ItemEntry* entry);
 
+/** Allocates the 32-entry field and battle item tables; called once at boot. */
 void itemInit(void) { // 1:1
     ItemWork* wp;
 
@@ -162,6 +178,10 @@ void itemInit(void) { // 1:1
     wp->currId = 0;
 }
 
+/**
+ * Clears the current item table on map change; on the field first returns dropped badges
+ * (ITEM_FLAG_BADGE_RETURN) to the pouch.
+ */
 void itemReInit(void) {
     ItemWork* wp = itemGetWork();
     ItemEntry* entry;
@@ -183,6 +203,10 @@ void itemReInit(void) {
     }
 }
 
+/**
+ * Takes one coin from Mario and drops it as a coin item that scatters and vanishes after 8 seconds;
+ * mario.c calls it when Mario loses coins.
+ */
 void itemCoinDrop(Vec* position) {
     ItemEntry* entry;
 
@@ -195,6 +219,12 @@ void itemCoinDrop(Vec* position) {
     }
 }
 
+/**
+ * Returns whether Mario may pick up this item now:
+ * not in water or lava, Mario has control (later versions skip that for Bowser when his stage flag bit 0 is
+ * set), no map event or other sequence runs, Mario is not on the boat or plane panel, hiding with Vivian,
+ * taking damage or holding Koops's item, no other get is in progress, and field battle state allows it.
+ */
 static BOOL itemGetCheck(ItemEntry* entry) {
 #if VERSION <= VERSION_DEMO_US
     // the demo has no N_fbatPreventMarioEventChk: only field battle modes 0 and 1 allow pick-ups
@@ -281,6 +311,7 @@ static BOOL itemGetCheck(ItemEntry* entry) {
     return FALSE;
 }
 
+/** Like itemGetCheck for an item fetched by Koops's shell: whether the item may be collected for Mario now. */
 static BOOL itemGetNokoCheck(ItemEntry* entry) {
 #if VERSION <= VERSION_DEMO_US
     s32 fbatMode = fbatGetPointer()->mode;
@@ -330,6 +361,7 @@ static BOOL itemGetNokoCheck(ItemEntry* entry) {
 #endif
 }
 
+/** Returns TRUE while any item is in its get sequence (mode 2); NPC updates, shops and menus wait on it. */
 BOOL N_itemPickUpFromFieldCheck(void) {
     ItemWork* wp = itemGetWork();
     ItemEntry* entry;
@@ -348,6 +380,11 @@ typedef struct ItemEffPos {
     Vec position;
 } ItemEffPos;
 
+/**
+ * Per-frame update of the field items: despawn timers and blinking before an item vanishes, then per mode:
+ * resting on the floor (1), falling (3, 4), bouncing (5, 6, 10),
+ * being collected (2) or carried by a partner (8); checks Mario touching items, queues drawing and shadows.
+ */
 void itemMain(void) {
     ItemWork* wp = itemGetWork();
     MarioWork* mario;
@@ -524,12 +561,17 @@ void itemMain(void) {
     }
 }
 
+/** Puts an item into mode (resting, collecting, falling, bouncing, carried, ...) and restarts that mode's sub-state. */
 void itemModeChange(ItemEntry* entry, s32 mode) {
     entry->mode = mode;
     entry->subState = 0;
 }
 
 #if VERSION >= VERSION_US
+/**
+ * Returns the first replaceable dropped item (coin, heart, flower) with this item id,
+ * so itemEntry can reuse its slot when the table is full; NULL if none.
+ */
 static inline ItemEntry* itemFindDeletable(ItemWork* wp, s32 itemId) {
     ItemEntry* entry;
     ItemEntry* found;
@@ -546,6 +588,12 @@ static inline ItemEntry* itemFindDeletable(ItemWork* wp, s32 itemId) {
 }
 #endif
 
+/**
+ * Spawns field item itemId at (x, y, z) named name (generated if NULL);
+ * type (ItemEntryType) picks how it appears and how long it stays,
+ * collectFlag is the GSWF or LSWF that marks it taken (-1 none), pickupEvt runs on collection.
+ * When the table is full a dropped coin, heart or flower is replaced. Returns the entry or NULL.
+ */
 ItemEntry* itemEntry(f32 x, f32 y, f32 z, const char* name, s32 itemId, u16 type, s32 collectFlag, EvtWord* pickupEvt) {
     ItemWork* wp = itemGetWork();
     int i;
@@ -783,6 +831,7 @@ ItemEntry* itemEntry(f32 x, f32 y, f32 z, const char* name, s32 itemId, u16 type
     return entry;
 }
 
+/** Removes the named field item (and its name windows); later versions first return a dropped badge to the pouch. */
 void itemDelete(const char* name) {
     ItemWork* wp = itemGetWork();
     ItemEntry* entry;
@@ -812,6 +861,7 @@ void itemDelete(const char* name) {
     }
 }
 
+/** Returns the field item with this name, or NULL. */
 ItemEntry* itemNameToPtr(char* name) {
     ItemWork* wp = itemGetWork();
     ItemEntry* entry;
@@ -825,6 +875,11 @@ ItemEntry* itemNameToPtr(char* name) {
     return NULL;
 }
 
+/**
+ * Returns an item that is within range of (x, y, z)
+ * and not cut off from it by a wall (checked with a collision ray), or NULL;
+ * evt_mobj uses it to see whether an item sits on a block.
+ */
 ItemEntry* itemHitCheck(f32 x, f32 y, f32 z, f32 range) {
     ItemWork* wp = itemGetWork();
     ItemEntry* entry;
@@ -874,6 +929,10 @@ ItemEntry* itemHitCheck(f32 x, f32 y, f32 z, f32 range) {
     return found;
 }
 
+/**
+ * Returns the nearest collectable item within range of (x, y, z), skipping items Koops's shell must ignore;
+ * Ms. Mowz and evt_mobj use it.
+ */
 ItemEntry* itemNearDistCheck(f32 x, f32 y, f32 z, f32 range) {
     MarioWork* mario = marioGetPtr();
     ItemWork* wp = itemGetWork();
@@ -927,6 +986,10 @@ ItemEntry* itemNearDistCheck(f32 x, f32 y, f32 z, f32 range) {
 // US and PAL format the message per language and size the window by its line count
 #if VERSION >= VERSION_US
 
+/**
+ * Draws the "You got X!" box during an item get, with "badge" wording for badges;
+ * this version formats the message per language and sizes the box by its line count.
+ */
 static void winNameDisp(WinMgrEntry* win) {
     ItemEntry* entry = win->param;
     const char* name;
@@ -963,6 +1026,7 @@ static void winNameDisp(WinMgrEntry* win) {
 }
 
 #else
+/** Draws the "You got X!" box during an item get, with "badge" wording for badges (JP and demo layout). */
 static void winNameDisp(WinMgrEntry* win) {
     ItemEntry* entry = win->param;
     const char* name;
@@ -989,7 +1053,7 @@ static void winNameDisp(WinMgrEntry* win) {
 
 #endif
 
-// US and PAL format the message per language and size the window by its line count
+/** US and PAL format the message per language and size the window by its line count */
 #if VERSION >= VERSION_US
 static void winNameDisp2(WinMgrEntry* win) {
     ItemEntry* entry = win->param;
@@ -1019,6 +1083,7 @@ static void winNameDisp2(WinMgrEntry* win) {
 }
 
 #else
+/** Draws the box that names an item Mario let go of (msg_window_item_release) when his pouch was full. */
 static void winNameDisp2(WinMgrEntry* win) {
     ItemEntry* entry = win->param;
     const char* name;
@@ -1041,10 +1106,12 @@ static void winNameDisp2(WinMgrEntry* win) {
 
 #endif
 
+/** Per-frame update of the item description box shown under the get box. */
 static void winHelpMain(WinMgrEntry* win) {
     winMgrHelpMain(win);
 }
 
+/** Draws the got item's description in the help box, once the name box has finished opening. */
 static void winHelpDisp(WinMgrEntry* win) {
     ItemEntry* entry = win->param;
 
@@ -1055,7 +1122,7 @@ static void winHelpDisp(WinMgrEntry* win) {
 }
 
 #if VERSION <= VERSION_DEMO_US
-// the demo has no badge-full message
+/** the demo has no badge-full message */
 static void winFullDisp(WinMgrEntry* win) {
     ItemEntry* entry;
     const char* msg;
@@ -1078,6 +1145,7 @@ static void winFullDisp(WinMgrEntry* win) {
     }
 }
 #else
+/** Draws the "you can't carry any more items/badges" box when the pouch is full. */
 static void winFullDisp(WinMgrEntry* win) {
     ItemEntry* entry = win->param;
     BOOL isBadge = FALSE;
@@ -1104,9 +1172,11 @@ static void winFullDisp(WinMgrEntry* win) {
 #endif
 
 #if VERSION <= VERSION_DEMO_US
-// The demo's item-get sequence: no retail sub-states 2 (control off) and 8 (motion abort), so retail 3-7 and 9
-// are 2-7 here; no badge flag bookkeeping, no item renaming after a swap, and the icon flags are 0x40/0x100
-// where retail has 0x100/0x200.
+/**
+ * The demo's item-get sequence: no retail sub-states 2 (control off) and 8 (motion abort),
+ * so retail 3-7 and 9 are 2-7 here; no badge flag bookkeeping, no item renaming after a swap,
+ * and the icon flags are 0x40/0x100 where retail has 0x100/0x200.
+ */
 static void itemseq_GetItem(ItemEntry* entry) {
     ItemWork* wp = itemGetWork();
     MarioWork* mario;
@@ -1381,6 +1451,12 @@ static void itemseq_GetItem(ItemEntry* entry) {
     }
 }
 #else
+/**
+ * The item get sequence, one sub-state per frame:
+ * freezes the field, plays Mario's get pose and the get jingle (or the coin/heart sound),
+ * shows the name and description boxes, puts the item in the pouch,
+ * and when the pouch is full asks which item to throw away; important items end with the key-item explanation.
+ */
 static void itemseq_GetItem(ItemEntry* entry) {
     ItemWork* wp = itemGetWork();
     MarioWork* mario;
@@ -1733,6 +1809,11 @@ static void itemseq_GetItem(ItemEntry* entry) {
 #endif
 
 static s32 _move_dir_1090;
+/**
+ * Moves a bouncing or falling item: gravity, bouncing off floors (with fewer, lower bounces each time),
+ * walls and ceilings, landing on map objects, water and lava, and despawning where needed;
+ * becomes resting when it stops.
+ */
 static void itemseq_Bound(ItemEntry* entry) {
     static s32 _move_dir;
     MarioWork* mario;
@@ -2051,12 +2132,17 @@ static void itemseq_Bound(ItemEntry* entry) {
     entry->status &= ~ITEM_STATUS_CUSTOM_LAUNCH;
 }
 
+/** Moves an item to (x, y, z). */
 void itemSetPosition(ItemEntry* entry, f32 x, f32 y, f32 z) {
     entry->position.x = x;
     entry->position.y = y;
     entry->position.z = z;
 }
 
+/**
+ * Plays an item's pickup sound and sparkle: coins, hearts and flowers have their own sounds;
+ * others use the default get sound.
+ */
 void itemGetSound(ItemEntry* entry) {
     Vec pos;
 
@@ -2081,6 +2167,10 @@ void itemGetSound(ItemEntry* entry) {
     }
 }
 
+/**
+ * Wall check for a moving item: casts a ray along its motion (dx, dz) and, on a wall,
+ * returns the hit and the corrected position and reflected direction (degrees) in outX, outZ and angle.
+ */
 static HitEntry* itemHitCheckSide(ItemEntry* entry, f32* outX, f32 dx, f32* outZ, f32 dz, s32* angle) {
     HitEntry* hit;
     f32 a, b;
@@ -2171,6 +2261,10 @@ itemHitCheckUp(ItemEntry* entry, f32 vy) {
     return NULL;
 }
 
+/**
+ * Starts the get sequence for an item at once (collected by a script or partner),
+ * without waiting for Mario's get motion.
+ */
 void itemForceGet(ItemEntry* entry) {
     entry->timer = 0;
     itemModeChange(entry, 2);
@@ -2178,6 +2272,10 @@ void itemForceGet(ItemEntry* entry) {
     entry->status &= ~ITEM_STATUS_GET_ENDED;
 }
 
+/**
+ * Koops's shell has fetched the item: starts the get sequence if Mario may collect now,
+ * else drops the item back to rest where it is.
+ */
 void itemNokoForceGet(ItemEntry* entry) {
     if (itemGetNokoCheck(entry)) {
         entry->timer = 0;
@@ -2194,26 +2292,32 @@ void itemNokoForceGet(ItemEntry* entry) {
     }
 }
 
+/** Sets ITEM_FLAG_* bits on an item. */
 void itemFlagOn(ItemEntry* entry, u16 flags) {
     entry->flags |= flags;
 }
 
+/** Clears ITEM_FLAG_* bits on an item. */
 void itemFlagOff(ItemEntry* entry, u16 flags) {
     entry->flags &= ~flags;
 }
 
+/** Returns which of the given ITEM_FLAG_* bits are set on an item. */
 u16 itemFlag(ItemEntry* entry, u16 flags) {
     return entry->flags & flags;
 }
 
+/** Sets ITEM_STATUS_* bits on an item. */
 void itemStatusOn(ItemEntry* entry, u32 flags) {
     entry->status |= flags;
 }
 
+/** Returns which of the given ITEM_STATUS_* bits are set on an item. */
 u32 itemStatus(ItemEntry* entry, u32 flags) {
     return entry->status & flags;
 }
 
+/** A partner picks up the item and carries it (mode 8, following above the partner); it stops blinking. */
 void itemPickUp(ItemEntry* entry) {
     entry->status |= ITEM_STATUS_PARTY_HOLD;
     itemModeChange(entry, 8);

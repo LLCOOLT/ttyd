@@ -1323,6 +1323,11 @@ NpcTerritoryInfo btl_aji_setup_no_tbl[] = {
     {0},
 };
 
+/**
+ * Background script of the space battle stage (bgset_aji_space):
+ * spins the three star layers star_01, star_02 and star_03 around the Z axis forever, one full turn per 7500,
+ * 6750 and 6000 frames.
+ */
 EVT_BEGIN(bgset_aji_space_event)
     SET_VALUE(LW(0), 0)
     SET_VALUE(LW(1), 0)
@@ -1337,6 +1342,11 @@ EVT_BEGIN(bgset_aji_space_event)
     RETURN
 EVT_END()
 
+/**
+ * Script function: advances the step counter in the variable args[1] by one (wrapping at args[2])
+ * and turns the battle stage object named args[0] to 360 degrees times step over total around Z. Used for the
+ * rotating star backdrops.
+ */
 static USER_FUNC(_space_rotate) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);

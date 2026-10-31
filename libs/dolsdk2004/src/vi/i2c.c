@@ -4,6 +4,10 @@
 
 static int lastError;
 
+/**
+ * Waits up to 1000 polls for the I2C clock line to go high (the device may stretch the clock);
+ * records error 2 and returns 0 on timeout.
+ */
 static int wait4ClkHigh(void) {
     int n;
 
@@ -17,6 +21,10 @@ static int wait4ClkHigh(void) {
     return 0;
 }
 
+/**
+ * Sends an I2C start condition and the 8-bit slave address byte (most significant bit first),
+ * then checks the acknowledge; records error 1 and returns 0 if the device did not acknowledge.
+ */
 static int sendSlaveAddr(u8 slaveAddr) {
     int i;
 
@@ -55,6 +63,11 @@ static int sendSlaveAddr(u8 slaveAddr) {
     return 1;
 }
 
+/**
+ * Writes nBytes of pData to the I2C device at slaveAddr by bit-banging the GPIO lines:
+ * start, address, each byte most significant bit first with an acknowledge check (skipped for the last byte),
+ * then the stop condition. Returns 1 on success.
+ */
 int __VISendI2CData(u8 slaveAddr, u8* pData, int nBytes) {
     s32 i;
     u8 data;

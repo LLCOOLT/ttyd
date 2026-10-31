@@ -239,6 +239,11 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Battle init script for the winged Spiky Parabuzzy:
+ * installs the flying wait, attack, damage and confusion handlers, the pose sound timing table,
+ * and starts the wait event.
+ */
 static EVT_BEGIN(init_event_pata)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event_pata))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_pata))
@@ -249,6 +254,11 @@ static EVT_BEGIN(init_event_pata)
     RETURN
 EVT_END()
 
+/**
+ * Plays the spike flash effect (toge_flush) over the Spiky Parabuzzy's head after 30 frames,
+ * when an attack is stopped by its spikes.
+ * The effect height is 50 above the unit, or 30 when it is Tiny and 50 when it is Huge (status 11 and 10).
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event_pata)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -269,6 +279,7 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event_pata)
     RETURN
 EVT_END()
 
+/** Damage handler of the flying Spiky Parabuzzy: selects this unit and part 1 and runs the default damage reaction. */
 static EVT_BEGIN(damage_event_pata)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -276,6 +287,13 @@ static EVT_BEGIN(damage_event_pata)
     RETURN
 EVT_END()
 
+/**
+ * Runs when the winged Spiky Parabuzzy is struck down:
+ * drops the flying attributes, changes its parts, pose table and data table to the ground ones,
+ * replaces its kind with the wingless Spiky Buzzy kind (kind 73),
+ * lands on the ground (y = 0) with a fall and restarts init_event.
+ * If it took more than one HP of damage it is also flipped over (dmg_turn_event).
+ */
 static EVT_BEGIN(dmg_fall_event_pata)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -307,6 +325,10 @@ static EVT_BEGIN(dmg_fall_event_pata)
     RETURN
 EVT_END()
 
+/**
+ * Guess: position setup for the first attack after being damaged:
+ * puts the unit at y = 10 and waits for the attack to end.
+ */
 static EVT_BEGIN(dmg_first_attack_pos_event_pata)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -315,6 +337,13 @@ static EVT_BEGIN(dmg_first_attack_pos_event_pata)
     RETURN
 EVT_END()
 
+/**
+ * Attack of the flying Spiky Parabuzzy: picks a target (the fixed first target in a flag-2 battle,
+ * otherwise a sampled enemy; uses an enemy item first if it has one), zooms the camera on it,
+ * rises 40 units and dives onto the target in shell form at speed 9.
+ * A miss lets it fly through and come back; a hit damages the target and plays the attack sound.
+ * Then it returns home.
+ */
 static EVT_BEGIN(attack_event_pata)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -410,6 +439,7 @@ static EVT_BEGIN(attack_event_pata)
     RETURN
 EVT_END()
 
+/** Wait (idle) event of the flying form: refreshes the body animation (part 1) from the pose table. */
 static EVT_BEGIN(wait_event_pata)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -613,6 +643,10 @@ static BattleUnitKindPart parts[] = {
     },
 };
 
+/**
+ * Battle init script: reads unit work 0 into LW(15), where a nonzero value places the unit on the ceiling,
+ * calls init_event2 to install the handlers for that state and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(15))
     CALL_CHILD(init_event2)
@@ -620,6 +654,13 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Installs the handlers for the Spiky Parabuzzy's current state.
+ * On the ground (work 0 = 0) it sets the normal wait, attack, damage and confusion handlers.
+ * On the ceiling it switches to the ceiling pose and data tables, moves the unit to y = 130,
+ * sets the ceiling versions of the handlers, the ceiling-fall handler and hit offsets.
+ * Both states set the run and walk sounds and clear the overturn count.
+ */
 static EVT_BEGIN(init_event2)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(15))
     IF_INT_EQUAL(LW(15), 0)
@@ -657,6 +698,11 @@ static EVT_BEGIN(init_event2)
     RETURN
 EVT_END()
 
+/**
+ * Plays the spike flash effect (toge_flush) over the Spiky Buzzy's head after 30 frames
+ * when an attack is stopped by its spikes.
+ * The height is 28 above the unit, or 18 when it is Tiny and 38 when it is Huge (status 11 and 10).
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -677,6 +723,10 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: selects this unit (-2) and its part 1
+ * and runs the shared default damage reaction (btldefaultevt_Damage).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -684,6 +734,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs when the Spiky Parabuzzy is flipped onto its back (its spiked head can no longer hurt: the part counter
+ * attribute is cleared): switches its part 1 to the upside-down defence tables and pose table,
+ * sets the overturn status flag and an overturn count of 1, plays the flip pose and sound,
+ * then lets it fall to the ground with two hops.
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -704,6 +760,13 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs on the Spiky Parabuzzy's turn while it is on its back:
+ * counts the overturn count down and, once it reaches 0, restores the normal defence tables and pose table,
+ * clears the overturn flag, plays the wake-up sound and drops it to the ground (y = 0).
+ * It also sets the part's counter attribute again, so its spikes hurt attackers once more,
+ * and restarts the wait event. While the count is still above 0 it just goes back to waiting.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -730,6 +793,14 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack AI of the Spiky Parabuzzy: if it is on its back it first wakes up (wakeup_event).
+ * Then picks a target (the fixed first target in a flag-2 battle, otherwise a sampled enemy;
+ * uses an enemy item first if it has one) and does the shell charge:
+ * hops, curls into its shell (pose 50), spins up in two steps and rolls to the target with smoke.
+ * A miss lets it roll past, jump and turn back; a hit has it bounce off the target twice.
+ * Afterwards it walks home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -876,11 +947,20 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Wait (idle) event: refreshes the body animation (part 1) from the unit's pose table
+ * so it matches the current state, then returns; the battle system runs it whenever the unit is idle.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler while the Spiky Parabuzzy hangs on the ceiling:
+ * runs the default damage reaction and, if the hit warrants it,
+ * calls ceil_fall_ready_event so the Spiky Parabuzzy drops to the ground.
+ */
 static EVT_BEGIN(damage_event_ceil)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -903,6 +983,11 @@ static EVT_BEGIN(damage_event_ceil)
     RETURN
 EVT_END()
 
+/**
+ * Runs when a counter-type attack hits the ceiling Spiky Parabuzzy:
+ * returns it to its normal ground state (pose and data tables, hit offsets, work 0 cleared,
+ * home position y = 0), reinstalls the ground handlers with init_event2 and applies the counter damage.
+ */
 static EVT_BEGIN(counter_damage_event_ceil)
     CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 2)
     CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 4194304)
@@ -925,6 +1010,11 @@ static EVT_BEGIN(counter_damage_event_ceil)
     RETURN
 EVT_END()
 
+/**
+ * The Spiky Parabuzzy falls from the ceiling: plays the fall sound, drops to y = 15 and lands,
+ * switches to the ground tables and handlers, and ends up upside down (overturn count 1) after two bounces,
+ * with its home position at y = 0.
+ */
 static EVT_BEGIN(ceil_fall_ready_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_FALL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, 0)
@@ -962,6 +1052,12 @@ static EVT_BEGIN(ceil_fall_ready_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack from the ceiling: picks a target as in attack_event,
+ * slides over it along the ceiling in shell form (pose 50), drops down with the fall sound,
+ * resolves avoid or damage, then hops back to its original spot (it has no swing).
+ * It lands on the ground in the process, so it returns to ground state via init_event2.
+ */
 static EVT_BEGIN(attack_event_ceil)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -1076,6 +1172,7 @@ static EVT_BEGIN(attack_event_ceil)
     RETURN
 EVT_END()
 
+/** Wait (idle) event while on the ceiling: refreshes the body animation (part 1) from the unit's pose table. */
 static EVT_BEGIN(wait_event_ceil)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

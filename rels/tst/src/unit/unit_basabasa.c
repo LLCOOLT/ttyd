@@ -257,6 +257,14 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Brings the bat down from the ceiling into the open air the first time it is needed:
+ * if it is still hanging (unit attribute 2 set) it clears that, sets attribute 4,
+ * restores the flying pose table (pose type 40),
+ * shifts the unit and its home position down 30 (then another 40 for its home), adjusts the hit,
+ * cursor and status icon offsets and hands the damage event over to damage_event.
+ * Leaves the home position in LW(0) to LW(2).
+ */
 static EVT_BEGIN(ceil_sky_event)
     CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -284,6 +292,12 @@ static EVT_BEGIN(ceil_sky_event)
     RETURN
 EVT_END()
 
+/**
+ * Init script of the bat: registers its wait, attack,
+ * damage (damage_event_ceil, for while it hangs) and confusion handlers and the ceiling-fall event,
+ * sets the pose sound table and the offsets of its hit, cursor and status icon for the upside-down pose,
+ * and if it starts in the sky (unit work 0 = 1) runs ceil_sky_event right away; then starts the idle event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -307,6 +321,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Position event for a first strike on the bat:
+ * brings it down from the ceiling (ceil_sky_event), sets its height to 10 and waits for the attack to finish.
+ */
 static EVT_BEGIN(dmg_first_attack_pos)
     CALL_CHILD(ceil_sky_event)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), 10, LW(2))
@@ -314,6 +332,10 @@ static EVT_BEGIN(dmg_first_attack_pos)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction: runs the default damage handling (btldefaultevt_Damage) with LW(10) = -2 (the unit itself)
+ * and LW(11) = 1.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -321,6 +343,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction of the bat while it still hangs from the ceiling:
+ * after the default damage handling, if the hit did damage (and was not of the kind that spares it,
+ * damage code bits 512 without 2048), it drops from the ceiling (ceil_sky_event)
+ * and glides down to its home position over 60 frames.
+ */
 static EVT_BEGIN(damage_event_ceil)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -341,6 +369,11 @@ static EVT_BEGIN(damage_event_ceil)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction when the bat is hurt by a counter effect on its victim:
+ * it comes down from the ceiling and then runs the standard counter-damage handling (subsetevt_counter_damage)
+ * with the damage code.
+ */
 static EVT_BEGIN(counter_damage_event)
     CALL_CHILD(ceil_sky_event)
     SET_VALUE(LW(10), -2)
@@ -350,6 +383,11 @@ static EVT_BEGIN(counter_damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs when the ceiling falls on the bat (an attack that drops the ceiling):
+ * default damage handling, then it comes down from the ceiling (ceil_sky_event)
+ * and glides to its home position over 60 frames.
+ */
 static EVT_BEGIN(ceil_fall_ready_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -359,6 +397,12 @@ static EVT_BEGIN(ceil_fall_ready_event)
     RETURN
 EVT_END()
 
+/**
+ * The Swooper's attack: it uses an item or picks a target, drops from the ceiling if it is still hanging,
+ * swoops in (pose types 40 and 42) and bites it;
+ * a miss lets it pass by, a hit applies the damage with the action-command defence;
+ * afterwards it returns to its idle pose BSA_S_1 (BSA_S_2 if it is still on the ceiling).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -480,6 +524,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle event: sets the unit's body part 1 to the pose given by its pose table for its current state. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

@@ -57,6 +57,10 @@ static BeroEntry bero_entry_data[] = {
 };
 
 #if VERSION <= VERSION_JP
+/**
+ * Rock-blasting script (JP only): the rock crumbles into an offscreen animation,
+ * then the model and collision of the rock in LW(10)/LW(11) are removed.
+ */
 static EVT_BEGIN(rock_main)
     BEGIN_INLINE_EVENT
         WAIT_MS(200)
@@ -81,6 +85,7 @@ static EVT_BEGIN(rock_main)
 EVT_END()
 #endif
 
+/** Event script: Bobbery blows up the first rock (S_iwa_01) of moo_06; sets GSWF_MOO06_ROCK_A_BOMBED. */
 static EVT_BEGIN(rock_evt0)
 #if VERSION >= VERSION_US
     SET_VALUE(GSWF(GSWF_MOO06_ROCK_A_BOMBED), 1)
@@ -98,6 +103,7 @@ static EVT_BEGIN(rock_evt0)
     RETURN
 EVT_END()
 
+/** Event script: Bobbery blows up the second rock (S_iwa_09) of moo_06; sets GSWF_MOO06_ROCK_B_BOMBED. */
 static EVT_BEGIN(rock_evt1)
 #if VERSION >= VERSION_US
     SET_VALUE(GSWF(GSWF_MOO06_ROCK_B_BOMBED), 1)
@@ -115,6 +121,10 @@ static EVT_BEGIN(rock_evt1)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for moo_06: entry bero, Moon music and ambience, star animations,
+ * the two Bobbery rocks (or their removal) and Ruin Powder at (410, 0, -50).
+ */
 EVT_BEGIN(moo_06_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)

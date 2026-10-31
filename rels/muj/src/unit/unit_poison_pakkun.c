@@ -206,6 +206,10 @@ BattleWeapon weapon_poison_pakkun_breath_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Guess: attack event of the Poison Piranha Plant:
+ * may use an item, otherwise chooses between its poison breath and a normal bite.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -241,6 +245,10 @@ static EVT_BEGIN(attack_event)
         RETURN
 EVT_END()
 
+/**
+ * Guess: poison breath of the Poison Piranha Plant:
+ * breathes poison gas across the stage, hitting everyone on the other side with the weapon damage and poison.
+ */
 static EVT_BEGIN(breath_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -427,6 +435,7 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/** Guess: init event of the Poison Piranha Plant: sets its work values, pose tables and shadow. */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -438,6 +447,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Guess: event run when the plant hits a spiked attacker or a counter: plays its hurt reaction. */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 31)
     WAIT_MS(250)
@@ -460,6 +470,7 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/** Guess: damage event of the Poison Piranha Plant: runs the default damage flow. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -467,6 +478,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: damage event for the counter case of the Poison Piranha Plant:
+ * reacts to the counter hit and runs the default damage flow.
+ */
 static EVT_BEGIN(counter_damage_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKF_D_1"))
     WAIT_MS(1000)
@@ -481,6 +496,7 @@ static EVT_BEGIN(counter_damage_event)
     RETURN
 EVT_END()
 
+/** Guess: preparation when the ceiling frame falls: the plant burrows, moves to ground level and pops back up. */
 static EVT_BEGIN(ceil_fall_ready_event)
     CALL(btlevtcmd_SetEventCeilFall, BTL_UNIT_SELF, 0)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PAKKUN_MOVE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -515,6 +531,7 @@ static EVT_BEGIN(ceil_fall_ready_event)
     RETURN
 EVT_END()
 
+/** Guess: return event of the Poison Piranha Plant: it burrows and re-emerges at its home position after attacking. */
 static EVT_BEGIN(return_event)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(pakkun_ceil_exist, LW(0))
@@ -581,6 +598,7 @@ static EVT_BEGIN(return_event)
     RETURN
 EVT_END()
 
+/** Guess: normal attack of the Poison Piranha Plant: it lunges at one target and bites it for the weapon damage. */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -680,11 +698,16 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/** Guess: wait (idle) event of the Poison Piranha Plant: sets the idle pose. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: grows the shadow of the plant's body part from 0 back to its stored size over 15 frames,
+ * after it comes out of the ground.
+ */
 static USER_FUNC(shadow_scale_return) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -701,6 +724,7 @@ static USER_FUNC(shadow_scale_return) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper: shrinks the plant's shadow from its stored size to 0 over 15 frames as it burrows. */
 static USER_FUNC(shadow_scale_small) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -717,6 +741,10 @@ static USER_FUNC(shadow_scale_small) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper: remembers the current shadow size of the plant's body part in unit work 0 for the shrink
+ * and grow helpers.
+ */
 static USER_FUNC(shadow_scale_memory) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -726,6 +754,11 @@ static USER_FUNC(shadow_scale_memory) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: writes 0 to args[0] if the stage ceiling frame has been knocked away
+ * (STAGE_OBJ_FLAG_IRON_FRAME_GONE), otherwise 1;
+ * the plant uses it to decide whether it can hang from the ceiling.
+ */
 static USER_FUNC(pakkun_ceil_exist) {
     EvtWord* args = event->args;
 
@@ -737,6 +770,10 @@ static USER_FUNC(pakkun_ceil_exist) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: spawns one green poison-breath puff (vapor effect, colour 32, 115, 100) at a random spot on the
+ * target side of the stage: x near -125 when args[0] is 0, otherwise near 125.
+ */
 static USER_FUNC(eff_poison_breath) {
     f32 x;
     f32 y;

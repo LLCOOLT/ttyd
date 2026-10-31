@@ -134,6 +134,11 @@ static HitDamageReturn hitDmgRetPoints[] = {
     {0},
 };
 
+/**
+ * Map-init part for the first pipe (to Poshley Heights).
+ * Binds the pipe's hit to its model and, if GSWF_TIK17_PIPE_PIK_OPEN is set,
+ * puts it already risen and hides its cover.
+ */
 static EVT_BEGIN(evt_switch_00_init)
     CALL(evt_hit_bind_mapobj, STRING("a_dokan_1"), STRING("S_dakan_1"))
     IF_INT_EQUAL(GSWF(GSWF_TIK17_PIPE_PIK_OPEN), 1)
@@ -144,6 +149,7 @@ static EVT_BEGIN(evt_switch_00_init)
     RETURN
 EVT_END()
 
+/** Switches the first pipe's exit off if its switch has not been pressed yet. */
 static EVT_BEGIN(evt_switch_00_after)
     IF_INT_EQUAL(GSWF(GSWF_TIK17_PIPE_PIK_OPEN), 0)
         SET_VALUE(LW(0), STRING("dokan_1"))
@@ -152,6 +158,10 @@ static EVT_BEGIN(evt_switch_00_after)
     RETURN
 EVT_END()
 
+/**
+ * Tornado switch handler for the first pipe (to Poshley Heights):
+ * the pipe rises 30 units over a second, its cover is hidden and the exit is switched on.
+ */
 static EVT_BEGIN(evt_switch_00)
     CALL(evt_mapobj_get_position, STRING("S_dakan_1"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_DOKAN_APPEAR1"), LW(0), LW(1), LW(2), 0)
@@ -171,6 +181,11 @@ static EVT_BEGIN(evt_switch_00)
     RETURN
 EVT_END()
 
+/**
+ * Map-init part for the second pipe (to Keelhaul Key).
+ * Binds the pipe's hit to its model and, if GSWF_TIK17_PIPE_MUJ_OPEN is set,
+ * puts it already risen and hides its cover.
+ */
 static EVT_BEGIN(evt_switch_01_init)
     CALL(evt_hit_bind_mapobj, STRING("a_dokan_2"), STRING("S_dakan_2"))
     IF_INT_EQUAL(GSWF(GSWF_TIK17_PIPE_MUJ_OPEN), 1)
@@ -181,6 +196,7 @@ static EVT_BEGIN(evt_switch_01_init)
     RETURN
 EVT_END()
 
+/** Switches the second pipe's exit off if its switch has not been pressed yet. */
 static EVT_BEGIN(evt_switch_01_after)
     IF_INT_EQUAL(GSWF(GSWF_TIK17_PIPE_MUJ_OPEN), 0)
         SET_VALUE(LW(0), STRING("dokan_2"))
@@ -189,6 +205,10 @@ static EVT_BEGIN(evt_switch_01_after)
     RETURN
 EVT_END()
 
+/**
+ * Tornado switch handler for the second pipe (to Keelhaul Key):
+ * the pipe rises 30 units over a second, its cover is hidden and the exit is switched on.
+ */
 static EVT_BEGIN(evt_switch_01)
     CALL(evt_mapobj_get_position, STRING("S_dakan_2"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_DOKAN_APPEAR1"), LW(0), LW(1), LW(2), 0)
@@ -208,6 +228,10 @@ static EVT_BEGIN(evt_switch_01)
     RETURN
 EVT_END()
 
+/**
+ * Item-box callback for the FP Plus chest: takes control, puts the badge at the chest,
+ * waits for the chest animation and hands it to Mario.
+ */
 static EVT_BEGIN(mobj_box01)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box01"), LW(0), LW(1), LW(2))
@@ -223,6 +247,11 @@ static EVT_BEGIN(mobj_box01)
     RETURN
 EVT_END()
 
+/**
+ * Map init script of tik_17, the room with the pipes to Poshley Heights (pik_01) and Keelhaul Key (muj_02).
+ * Sets up the two tornado switches that open each pipe (GSWF_TIK17_PIPE_PIK_OPEN and GSWF_TIK17_PIPE_MUJ_OPEN),
+ * the large block, the FP Plus chest and a moving floor, plus fall recovery and the water animation.
+ */
 EVT_BEGIN(tik_17_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK7"))

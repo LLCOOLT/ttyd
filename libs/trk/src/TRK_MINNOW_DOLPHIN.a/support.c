@@ -60,6 +60,10 @@ static const char sRequestSendStrings[] = "Calling MessageSend\n\0\0\0\0"
                                           "msg_error : 0x%02x\n\0"
                                           "RequestSend : Bad ack or non ack received msg_command : 0x%02x msg_error 0x%02x\n";
 
+/**
+ * Sends the host a file-position request (command 0xD4: file handle, offset, whence) and waits for the answer;
+ * returns the host's result code in *ioResult and the new file position in *position (-1 on failure).
+ */
 DSError HandlePositionFileSupportRequest(u32 file_handle, u32* position, u8 whence, u32* ioResult) {
     int replyBufferId;
     int bufferId;
@@ -100,6 +104,10 @@ DSError HandlePositionFileSupportRequest(u32 file_handle, u32* position, u8 when
     return error;
 }
 
+/**
+ * Sends the host a close-file request (0xD3) for a file handle and waits for the answer;
+ * the host's result goes in *ioResult.
+ */
 DSError HandleCloseFileSupportRequest(int file_handle, u32* ioResult) {
     int replyBufferId;
     int bufferId;
@@ -136,6 +144,10 @@ DSError HandleCloseFileSupportRequest(int file_handle, u32* ioResult) {
     return error;
 }
 
+/**
+ * Assembly: sends the host an open-file request (0xD2) with the path and mode, waits for the answer,
+ * and returns the host's file handle through param_3 and its result code through ioResult.
+ */
 asm DSError HandleOpenFileSupportRequest(const char* path, u8 replyError, u32* param_3, u32* ioResult) {
     nofralloc
     stwu r1, -0x70(r1)
@@ -214,6 +226,12 @@ L_8025AAA4:
     blr
 }
 
+/**
+ * Assembly: sends a buffer to the host and waits for the reply packet, resending up to p1 more times.
+ * Ordinary command packets that arrive meanwhile (below 0x80) are processed normally;
+ * a bad acknowledgement is reported and discarded.
+ * Returns 0 or an error (0x800 when no reply came); the reply buffer index goes in *bufferId.
+ */
 asm DSError TRKRequestSend(TRKBuffer* msgBuf, int* bufferId, u32 p1, u32 p2, int p3) {
     nofralloc
     stwu r1, -0x40(r1)
@@ -351,6 +369,10 @@ L_8025AC8C:
     blr
 }
 
+/**
+ * Assembly: reads or writes a block of a host file in chunks of up to 0x800 bytes using requests 0xD1 (read)
+ * and 0xD0 (write), updating *count with the bytes transferred and *io_result with the host's status.
+ */
 asm DSError TRKSuppAccessFile(u32 file_handle, u8* data, size_t* count, u32* io_result, BOOL need_reply, BOOL read) {
     nofralloc
     stwu r1, -0x90(r1)

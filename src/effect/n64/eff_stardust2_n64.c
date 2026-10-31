@@ -71,6 +71,10 @@ static effN64Vtx size8x8_tex22x22_vtx[] = {
 
 };
 
+/**
+ * Spawns `count` sparkle stars at (x, y, z) with velocity scale (vx, vy), drawn on `camera`.
+ * Used by eff_stardust.c, eff_kemutest, the Shadow Queen (black_peach) boss unit and event scripts.
+ */
 EffectEntry* effStardust2N64Entry(s32 type, s32 count, s32 camera, f32 x, f32 y, f32 z, f32 vx, f32 vy) {
     s32 n;
     EffectEntry* effect;
@@ -166,6 +170,14 @@ EffectEntry* effStardust2N64Entry(s32 type, s32 count, s32 camera, f32 x, f32 y,
 
 // Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
+/**
+ * Types 0/1: each sparkle bursts out along its direction (speed_data, scale_data) for 14 frames,
+ * then turns into type 10 and drifts outward in a fan, slowing 4% per frame, sinking and shrinking.
+ * Type 3 only pulses for 14 frames, then drifts as type 30. Types 0/1/3 end with the effect life.
+ * Other types run a staggered life per sparkle (hidden until its last 30 frames):
+ * it pops in, then falls (type 5 from the start), type 4 also circling the Y axis 12 degrees per frame;
+ * the effect ends when every sparkle is done. Each sparkle cycles through 8 shapes; drawn on the work's camera.
+ */
 static void effStardust2Main(EffectEntry* effect) {
     EffStardust2N64Work* w = effect->userdata;
     Vec position;
@@ -301,6 +313,11 @@ static void effStardust2Main(EffectEntry* effect) {
 }
 
 #pragma opt_propagation reset
+/**
+ * Draws each visible sparkle as a camera-facing 8x8 quad cut from the 8-frame sparkle strip (texture 0x20),
+ * coloured from color_rotation_data and tinted per type:
+ * orange for 0-2/10, pale peach for 3/30, yellow for 5, pink otherwise.
+ */
 static void effStardust2Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* cam;
     EffStardust2N64Work* w;
@@ -426,6 +443,7 @@ static void effStardust2Disp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
+/** Sets the camera the sparkles are drawn on (used by tik_05). */
 void effStardust2N64SetDrawCam(EffectEntry* effect, s32 camera) {
     EffStardust2N64Work* w = effect->userdata;
     w->camera = camera;

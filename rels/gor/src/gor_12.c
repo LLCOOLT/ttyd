@@ -16,6 +16,11 @@
 #include "mario/mariost.h"
 #include "evt/evt_story.h"
 
+/**
+ * Ending sequence on the final sea view: starts the sea ambience, freezes and hides Mario and the partner,
+ * waits 7 seconds while music and ambience fade out over 8 seconds,
+ * then fades to black and changes the map to aaa_00.
+ */
 static EVT_BEGIN(epilogue_evt)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_END_MUJ1"))
     CALL(evt_cam_ctrl_onoff, 4, 0)
@@ -32,6 +37,12 @@ static EVT_BEGIN(epilogue_evt)
     RETURN
 EVT_END()
 
+/**
+ * Init script of gor_12, the final sea view of the ending:
+ * plays the sea and sparkle animations and, when the story is at STORY_STG8_END_AFTER_THE_BATTLE,
+ * removes the partner and runs the epilogue (7 seconds, then everything fades out to aaa_00, the title).
+ * JP and later skip it if map events are being skipped.
+ */
 EVT_BEGIN(gor_12_init_evt)
     CALL(evt_map_playanim, STRING("anm_umi"), 1, 0)
     CALL(evt_map_playanim, STRING("anm_nami"), 1, 0)

@@ -65,6 +65,11 @@ extern EvtWord evt_action_fall[];
 extern EvtWord evt_action_walk[];
 extern EvtWord evt_action[];
 
+/**
+ * Prepares the THP movie player for demo.thp: initialises the simple THP decoder, opens the file,
+ * gives it a buffer from the map heap, preloads and starts the audio at volume 80.
+ * Skipped on a development unit with an IS-Viewer attached (EXI channel 0 device 2), which has no movie.
+ */
 void dig_thpInit(void) {
     u32 type;
 
@@ -80,6 +85,10 @@ void dig_thpInit(void) {
     }
 }
 
+/**
+ * Shuts the movie down in the opposite order: stops the audio and the loader,
+ * closes the file and quits the THP player. Skipped on an IS-Viewer unit.
+ */
 void dig_thpStop(void) {
     u32 type;
 
@@ -92,6 +101,12 @@ void dig_thpStop(void) {
     }
 }
 
+/**
+ * Draw callback for the digest map: decodes and draws the next frame of demo.thp over the whole screen
+ * and records the frame number in work[0].
+ * On an IS-Viewer unit it draws the line "the movie plays here" (in Japanese) instead and counts frames.
+ * The EU release logs a message when a frame fails to decode.
+ */
 static void movie_draw(CameraId camera, void* param) {
     u16 width;
     u16 height;
@@ -118,6 +133,12 @@ static void movie_draw(CameraId camera, void* param) {
     }
 }
 
+/**
+ * Script helper, started once by the map init: resets the frame counter and GF(0),
+ * then queues movie_draw every frame.
+ * Sets GF(0) to TRUE when the movie is within two frames of its end (or after 300 frames on an IS-Viewer unit).
+ * Never finishes by itself.
+ */
 static USER_FUNC(movie) {
     u32 type;
 
@@ -137,11 +158,16 @@ static USER_FUNC(movie) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper: fades the movie sound to zero over two seconds. */
 static USER_FUNC(sound_fade) {
     THPSimpleSetVolume(0, 2000);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] is an NPC name; sets its jump gravity to 0.1
+ * so it floats down slowly (the "fall" parade action).
+ */
 static USER_FUNC(gravity_scale) {
     NpcEntry* npc = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
 
@@ -149,6 +175,14 @@ static USER_FUNC(gravity_scale) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper that picks the next character of the parade.
+ * It chooses a random anim_tbl entry whose NPC is not already on screen,
+ * then a random action from that entry's mask.
+ * Returns the model name (args[0]), NPC name (args[1]),
+ * the chosen DIG_ACTION bit (args[2]) and the entry's spawn event (args[3]).
+ * On an IS-Viewer unit it always returns the dummy Mario instead.
+ */
 static USER_FUNC(evt_action_sub) {
     EvtWord* args = event->args;
     s32 idx;
@@ -197,8 +231,10 @@ static USER_FUNC(evt_action_sub) {
     return EVT_RETURN_DONE;
 }
 
-// LW(0) = the camera distance at which a 25-degree field of view shows 480 units of height (half height 240 over
-// tan(12.5 degrees)), as an event float; dig_00_init_evt places the camera there.
+/**
+ * LW(0) = the camera distance at which a 25-degree field of view shows 480 units of height (half height 240 over
+ * tan(12.5 degrees)), as an event float; dig_00_init_evt places the camera there.
+ */
 static USER_FUNC(z) {
     f32 t = tan(0.21816612780094147);
 
@@ -261,6 +297,11 @@ static DigAnim anim_tbl[DIG_ANIM_COUNT] = {
     {"チョロボン", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
 };
 
+/**
+ * Shared body of the two pop-up actions (NPC name in LW(10), LF(0) set means wait instead of look around):
+ * the character appears at a random X below the bottom of the screen facing a random side, rises for 0.7 s,
+ * then either turns left and right (LF(0) = 0) or just waits for a second, sinks away in 0.4 s and is deleted.
+ */
 EVT_BEGIN(evt_action_1_2)
     CALL(evt_sub_random, 400, LW(0))
     SUBTRACT(LW(0), 200)
@@ -316,18 +357,24 @@ EVT_BEGIN(evt_action_1_2)
     RETURN
 EVT_END()
 
+/** Parade action DIG_ACTION_POP_UP: the character pops up from below the screen and looks left and right. */
 EVT_BEGIN(evt_action_1)
     SET_VALUE(LF(0), 0)
     CALL_CHILD(evt_action_1_2)
     RETURN
 EVT_END()
 
+/** Parade action DIG_ACTION_POP_UP_WAIT: the character pops up from below the screen and waits. */
 EVT_BEGIN(evt_action_2)
     SET_VALUE(LF(0), 1)
     CALL_CHILD(evt_action_1_2)
     RETURN
 EVT_END()
 
+/**
+ * Parade action DIG_ACTION_JUMP: the character is put at a random X below the screen with a random facing
+ * and makes one long high jump (height 250) back to the same spot, then is deleted.
+ */
 EVT_BEGIN(evt_action_jump)
     CALL(evt_sub_random, 400, LW(0))
     SUBTRACT(LW(0), 200)
@@ -341,6 +388,10 @@ EVT_BEGIN(evt_action_jump)
     RETURN
 EVT_END()
 
+/**
+ * Parade action DIG_ACTION_FALL: the character starts above the top of the screen at a random X
+ * and falls under gravity 0.1 until it is below -300, then is deleted.
+ */
 EVT_BEGIN(evt_action_fall)
     CALL(evt_sub_random, 400, LW(0))
     SUBTRACT(LW(0), 200)
@@ -359,6 +410,10 @@ EVT_BEGIN(evt_action_fall)
     RETURN
 EVT_END()
 
+/**
+ * Parade action DIG_ACTION_WALK: the character walks across the whole screen at a random height,
+ * from either side, at speed 80, then is deleted.
+ */
 EVT_BEGIN(evt_action_walk)
     CALL(evt_sub_random, 320, LW(0))
     SUBTRACT(LW(0), 160)
@@ -376,6 +431,11 @@ EVT_BEGIN(evt_action_walk)
     RETURN
 EVT_END()
 
+/**
+ * Parade driver, spawned by the map init: forever creates one character (via evt_action_sub) at double size
+ * and spawns its action script, then waits 3 to 6 seconds.
+ * DIG_ACTION_EVENT entries run their own spawn event or are just deleted.
+ */
 EVT_BEGIN(evt_action)
     LOOP(0)
         CALL(evt_action_sub, LW(0), LW(1), LW(2), LW(3))
@@ -422,6 +482,13 @@ EVT_BEGIN(evt_action)
     RETURN
 EVT_END()
 
+/**
+ * Init script of dig_00, the digest movie map: hides Mario and the partner,
+ * places the camera so 480 units fill the screen height, starts the character parade and the movie,
+ * and fades in from white.
+ * A button press (A or Start) or the end of the movie fades the sound and screen out
+ * and returns to the title screen.
+ */
 EVT_BEGIN(dig_00_init_evt)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)

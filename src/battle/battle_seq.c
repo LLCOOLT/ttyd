@@ -65,6 +65,10 @@ static void _rule_disp(CameraId cameraId, void* param);
 static USER_FUNC(_set_effect_luck);
 
 static s32 _set_haikei_entry_scale(EventEntry* event, BOOL isFirstCall);
+/**
+ * Lucky Start event, started by btlseqFirstAct when any living unit wears the badge:
+ * applies the random luck status at once (_set_effect_luck) and holds the battle start for at least 60 frames.
+ */
 EVT_BEGIN(nanika_luck_event)
     BEGIN_SIBLING_EVENT_GET_ID(PTR(0xfe363c8f))
         WAIT_FRAMES(60)
@@ -159,11 +163,20 @@ const char* _rule_msg_table_after[] = {
     "stg3_tou_cp_053", "stg3_tou_cp_052", "a", "a",
 };
 
+/**
+ * Started by btlseqFirstAct on a normal battle start (no first strike):
+ * pops the stage background layers in with _set_haikei_entry_scale.
+ */
 EVT_BEGIN(_default_haikei_set_entry_event)
     CALL(_set_haikei_entry_scale)
     RETURN
 EVT_END()
 
+/**
+ * Per-frame driver of the battle flow, called from the battle main loop (battle.c):
+ * dispatches on the top-level SEQ_UNKNOWN step to setup (0), the opening act (1),
+ * the turn loop (2) and the end of battle (3); 4 means finished. Also keeps the low-HP warning beep running.
+ */
 void BattleSequenceManager(void) { // 1:1
     BattleWork* wp = _battleWorkPointer;
     switch (BattleGetSeq(wp, SEQ_UNKNOWN)) {
@@ -187,6 +200,12 @@ void BattleSequenceManager(void) { // 1:1
     }
 }
 
+/**
+ * Refreshes every unit's Danger/Peril state (a2 is passed on to BtlUnit_CheckPinchStatus;
+ * TRUE on the setup frame), then, while the action menu is open, beeps every 60 frames:
+ * SFX_BTL_DANGER1 if Mario or the partner is in Peril, else SFX_BTL_PINCH1 for Danger.
+ * Only the first unit with the flag is looked at. With neither, clears Mario's work[8] and the timer.
+ */
 static void BattleCheckAllPinchStatus(BattleWork* wp, BOOL a2) { // 1:1, needs stmw forced
     BattleUnit* unit;
     BOOL v6;
@@ -263,6 +282,12 @@ static void BattleCheckAllPinchStatus(BattleWork* wp, BOOL a2) { // 1:1, needs s
     }
 }
 
+/**
+ * SEQ_INIT steps: hides the field Mario and partner, sets up the battle units,
+ * waits for their init events and for the p_b_st,
+ * p_jyabara and p_kaiten_h animation effects and the Nice effect to load,
+ * then turns the status window on and moves on to SEQ_FIRST_ACT.
+ */
 static void btlseqInit(BattleWork* wp) { // 1:1, needs stmw
     MarioWork* mario;
     PartyEntry* party;
@@ -310,6 +335,12 @@ static void btlseqInit(BattleWork* wp) { // 1:1, needs stmw
     }
 }
 
+/**
+ * Weapon whose attack script opens the battle for a field first strike,
+ * by the type in FieldBattleInfo.partyId (set by BattleInformationSetFirstAttack):
+ * 1 and 3 Jump, 2 Spin Jump, 4 Hammer, 5 Super Hammer spin, 6 Ultra Hammer, 7 Koops, 8 Bobbery.
+ * 0 (no first strike) gives NULL.
+ */
 static BattleWeapon* _GetFirstAttackWeapon(s32 type) {
     switch (type) {
         case 1:
@@ -334,6 +365,13 @@ static BattleWeapon* _GetFirstAttackWeapon(s32 type) {
     }
 }
 
+/**
+ * SEQ_FIRST_ACT steps, the opening of the battle:
+ * runs every unit's entry event, or on a first strike the striker's first-attack script with the target's damage
+ * event and the audience's reaction; raises the curtain; settles status messages and audience reactions;
+ * closes the walls in no-escape battles; applies Lucky Start; runs the stage nozzle check;
+ * then starts the turn loop. Ends the battle at once if the first strike decided it.
+ */
 static void btlseqFirstAct(BattleWork* wp) {
     s32 type;
     int i;
@@ -611,6 +649,11 @@ static void btlseqFirstAct(BattleWork* wp) {
 
 //==== written below (reverse order) ====
 
+/**
+ * Lucky Start: for every living unit wearing the badge,
+ * applies one random status from N_weapon_lucky_start (Electrified, Dodgy, HP Regen or FP Regen, 3 turns) with
+ * SFX_SYSTEM_LUCKY1 and a Nice sparkle by the unit. No script arguments; run by nanika_luck_event.
+ */
 static USER_FUNC(_set_effect_luck) {
     BattleWork* wp = _battleWorkPointer;
     f32* pz;
@@ -760,6 +803,14 @@ static USER_FUNC(_set_effect_luck) {
     TURN_SKIP(wp);                        \
     break
 
+/**
+ * SEQ_TURN steps, one full turn: start-of-turn bookkeeping, the Glitz Pit bonus-condition banner on turn 1,
+ * poison and burn damage, HP and FP Regen, Happy Heart and Happy Flower (from turn 2),
+ * the per-status recovery checks with SFX_REST_CONDITION1, the command-disable countdowns,
+ * then the phase loop (btlseqPhase) and the audience's turn-end check before starting the next turn.
+ * A step with nothing to do skips its wait step.
+ * In the US and PAL releases two of the countdowns are per unit (usCommandDisabled).
+ */
 static void btlseqTurn(BattleWork* wp) {
     Vec pos;
     f32 hpX;
@@ -1923,6 +1974,13 @@ static void btlseqTurn(BattleWork* wp) {
     }
 }
 
+/**
+ * Draw callback for the Glitz Pit bonus-condition banner at the start of turn 1:
+ * picks the message by FieldBattleInfo.ruleType from the 1bu table while GSW_TOU_PLAYER_RANK is below 11,
+ * the 2bu table otherwise, and the 'after' table once the story is past chapter 3,
+ * formats ruleParam into it and draws it in a window at the top of the screen.
+ * Guess: 1bu and 2bu are the major and minor leagues.
+ */
 static void _rule_disp(CameraId cameraId, void* param) {
     FieldBattleInfo* info = _battleWorkPointer->fbatInfo;
     char buf[256];
@@ -1950,6 +2008,10 @@ static void _rule_disp(CameraId cameraId, void* param) {
     FontDrawMessage(x - (u16)width / 2, (s32)y - 29, buf);
 }
 
+/**
+ * SEQ_PHASE steps: runs btlseqMove through each of the turn's five phases (before player, player, after player,
+ * enemy, after enemy), then hands back to the next SEQ_TURN step.
+ */
 static void btlseqPhase(BattleWork* wp) {
     switch (BattleGetSeq(wp, SEQ_PHASE)) {
         case BATTLE_PHASE_INIT:
@@ -1970,6 +2032,15 @@ static void btlseqPhase(BattleWork* wp) {
     }
 }
 
+/**
+ * SEQ_MOVE steps inside one phase: queues the phase's units,
+ * applies Merlee's Defense charm at the start of the enemy phase,
+ * runs the units' unison phase events and then each unit's phase event in stage order,
+ * then repeatedly picks the next unit from movePriorityQueue and runs its action (btlseqAct)
+ * until none can move; ends with the per-phase audience reaction and status messages.
+ * For Mario it also sets BATTLE_FLAG_SINGLE_JUMP/HAMMER when he has no jump or hammer badge
+ * and only the basic boots or hammer.
+ */
 static void btlseqMove(BattleWork* wp) {
     int j;
     BattleUnit* unit;
@@ -2198,6 +2269,10 @@ static void btlseqMove(BattleWork* wp) {
     } while (loop);
 }
 
+/**
+ * TRUE when no unit in this phase's move queue can still act (done for the turn or KO'd).
+ * Outside the demos a unit also needs movesRemaining above 0.
+ */
 static BOOL BattlePhaseEndCheck(void) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -2222,6 +2297,14 @@ static BOOL BattlePhaseEndCheck(void) {
     return FALSE;
 }
 
+/**
+ * SEQ_ACT steps, one unit's action: Mario or the partner gets the command menu (BattleCommandInput)
+ * unless asleep, stopped, frozen or KO'd (turn skipped), veiled by Vivian or flipped (their own data scripts).
+ * Then runs the chosen attack script, or the zero-gravity can't-move script,
+ * or the confused action half the time when Confused;
+ * afterwards updates moves left, Charge, Double/Triple Dip progress,
+ * the audience reaction and the unit's act-end event, and returns to btlseqMove.
+ */
 static void btlseqAct(BattleWork* wp) {
     BattleUnit* unit;
     EventEntry* evt;
@@ -2477,6 +2560,12 @@ static void btlseqAct(BattleWork* wp) {
     }
 }
 
+/**
+ * Start-of-turn bookkeeping: judges the battle-rule record for the last turn,
+ * bumps turnCount (Merlee's charm check from turn 2), clears the status-change announce masks,
+ * rolls each unit's move priority from its kind's turnOrder and variance, drops Defending,
+ * and checks whether the fog ends.
+ */
 static void btlseqTurnFirstProcess(BattleWork* wp) {
     BattleUnitKind* kind;
     int i;
@@ -2505,6 +2594,11 @@ static void btlseqTurnFirstProcess(BattleWork* wp) {
     BattleFogEndCheck();
 }
 
+/**
+ * Start-of-phase bookkeeping: queues the units whose attackPhase is this phase into movePriorityQueue (skipping
+ * units done for the turn; outside the demos Slowed units are still queued),
+ * resets their protect target and pose sounds, then sorts the queue and builds the phase event order.
+ */
 static void btlseqPhaseFirstProcess(BattleWork* wp) {
     BattleUnit* unit;
     BattleUnitPart* part;
@@ -2545,6 +2639,11 @@ static void btlseqPhaseFirstProcess(BattleWork* wp) {
     battleMakePhaseEvtTable(wp);
 }
 
+/**
+ * Sorts movePriorityQueue: by distance of the home position from the stage centre, then by movePriority,
+ * highest first (both bubble sorts, so ties keep the first order).
+ * count <= 0 counts the queue itself; btlevtcmd_SortPhaseMoveTable re-sorts this way mid-phase.
+ */
 void battleSortPhaseMoveTable(BattleWork* wp, s32 count) {
     int i, j;
     BattleUnit* unit1;
@@ -2590,6 +2689,10 @@ void battleSortPhaseMoveTable(BattleWork* wp, s32 count) {
     }
 }
 
+/**
+ * Fills phaseEvtTable with every unit that takes turns, in the order their phase events run:
+ * units left of centre first, nearest the centre first, then units right of centre, nearest first.
+ */
 static void battleMakePhaseEvtTable(BattleWork* wp) {
     BattlePhaseEvtEntry* table;
     int i;
@@ -2629,6 +2732,11 @@ static void battleMakePhaseEvtTable(BattleWork* wp) {
     }
 }
 
+/**
+ * TRUE once every unit's events and the after-reaction are done (BattleWaitAllActiveEvtEnd_NoBgSetEndWait)
+ * and the stage's nozzle, falling-frame, background-collapse, falling-object and wall-closing events have ended;
+ * clears the ids of finished ones. The sequence steps poll it before moving on.
+ */
 BOOL BattleWaitAllActiveEvtEnd(BattleWork* wp) {
     BattleStageObjectWork* stage = STAGE_WORK(wp);
     BOOL ret = BattleWaitAllActiveEvtEnd_NoBgSetEndWait(wp);
@@ -2669,6 +2777,13 @@ BOOL BattleWaitAllActiveEvtEnd(BattleWork* wp) {
     return TRUE;
 }
 
+/**
+ * TRUE once no unit has a running phase, attack,
+ * damage or entry event (the PAL release also waits for the slide-return event)
+ * and BattleAfterReactionMain is idle; clears the ids of finished events.
+ * Unlike BattleWaitAllActiveEvtEnd it ignores the stage-object events,
+ * so battle_stage_object.c can use it while those run.
+ */
 BOOL BattleWaitAllActiveEvtEnd_NoBgSetEndWait(BattleWork* wp) {
     void* w;
     BattleUnit* unit;
@@ -2732,6 +2847,12 @@ BOOL BattleWaitAllActiveEvtEnd_NoBgSetEndWait(BattleWork* wp) {
     return done;
 }
 
+/**
+ * TRUE when the battle is over: at least two of the three alliances meet their clear condition (bit 1: no active
+ * member left standing; bit 2: no required member left;
+ * an unused alliance counts as met), or the party ran away or the battle was interrupted.
+ * Records clearConditionMet per alliance.
+ */
 BOOL BattleCheckConcluded(BattleWork* wp) {
     BattleUnit* unit;
     s32 count;
@@ -2784,6 +2905,10 @@ BOOL BattleCheckConcluded(BattleWork* wp) {
     return (wp->flags & (BATTLE_FLAG_ESCAPED | BATTLE_FLAG_INTERRUPTED)) != 0;
 }
 
+/**
+ * Sets flag 2 on every stage object on background layer `layer` (0 = map object A1, 1 = A2)
+ * after its scale was changed. Guess: flag 2 tells the stage code to reapply the object's scale.
+ */
 static void _mapobj_data_touch_scale(s32 layer) {
     BattleWork* wp = _battleWorkPointer;
     BattleStageObject* obj;
@@ -2799,6 +2924,12 @@ static void _mapobj_data_touch_scale(s32 layer) {
 
 // inlining off for the code below, as in the original (the object differs without it)
 #pragma dont_inline on
+/**
+ * Background pop-in at the start of a normal battle (run by _default_haikei_set_entry_event):
+ * keeps the background layers A1 and A2 flattened for 60 frames,
+ * then pops each in with a squash-and-stretch (A1 over frames 15-40, A2 over 20-45) together with the stage
+ * objects on that layer. No script arguments; blocks until both are done.
+ */
 static USER_FUNC(_set_haikei_entry_scale) {
     BattleWork* wp = _battleWorkPointer;
     BOOL busy = FALSE;

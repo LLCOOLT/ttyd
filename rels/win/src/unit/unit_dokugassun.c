@@ -209,6 +209,12 @@ static BattleWeapon weapon_dokugassun_poisongas_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Guess: poison Puff's turn: after an item-use check,
+ * if its poison barrier is up (counter attribute 512 on part 1) it breathes poison gas;
+ * otherwise it picks between a normal attack and charging up the barrier at random (a 65 to 35 split, 70 to 30
+ * in the demos).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -248,6 +254,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: poison gas attack (weapon_dokugassun_poisongas_attack, all targets):
+ * the Puff exhales, green vapor puffs spawn near both sides of the stage,
+ * and each target is hit or avoids it by the usual guard check.
+ */
 static EVT_BEGIN(poisongas_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -375,6 +386,10 @@ static BattleDataEntry data_table[] = {
     {0},
 };
 
+/**
+ * Init script of the Poison Puff: installs the wait, unison-phase, attack, damage and confusion handlers,
+ * clears its unit work 0 and 1, and starts barrier_event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventUnisonPhase, BTL_UNIT_SELF, PTR(unison_phase_event))
@@ -388,6 +403,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Background loop on the Poison Puff: every 31 frames, while its poison barrier is up,
+ * spawns the green poison cloud around it (eff_poison_barrier); ends when the unit is gone.
+ */
 static EVT_BEGIN(barrier_event)
     LABEL(0)
     WAIT_FRAMES(31)
@@ -404,6 +423,7 @@ static EVT_BEGIN(barrier_event)
     RETURN
 EVT_END()
 
+/** Guess: pre-attack positioning script: drops the Puff to height 10 and waits for the attack to end. */
 static EVT_BEGIN(dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -412,6 +432,10 @@ static EVT_BEGIN(dmg_first_attack_pos)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: runs the shared default damage script (btldefaultevt_Damage) with its default parameters
+ * (LW(10) = -2, LW(11) = 1).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -419,10 +443,15 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Counter handler of the Poison Puff: empty, it does nothing. */
 static EVT_BEGIN(counter_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: before the player's phase, if the Puff can act and its barrier is down,
+ * it has a 25 percent chance to swoop down and float back up with a movement sound.
+ */
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_EQUAL(LW(0), 0)
@@ -461,6 +490,10 @@ static EVT_BEGIN(unison_phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the Poison Puff's regular attack: picks a target (or the first-strike target), floats over and attacks,
+ * handles guard and miss results and returns home.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -568,6 +601,10 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: spawns three green vapor puffs around the Poison Puff (args[0]) at random offsets,
+ * sized by its size multiplier, as its poison cloud.
+ */
 static USER_FUNC(eff_poison_barrier) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -598,6 +635,10 @@ static USER_FUNC(eff_poison_barrier) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: spawns one green vapor puff at a random point near x = -125 (args[0] = 0)
+ * or x = 125 (otherwise) for the Poison Puff's breath attack.
+ */
 static USER_FUNC(eff_poison_breath) {
     f32 x;
     f32 y;
@@ -626,6 +667,10 @@ static USER_FUNC(eff_poison_breath) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Charge-up: the camera zooms on the Puff, a charge sound plays
+ * and the poison barrier is raised (counter attribute 512 on part 1) with its charge animations.
+ */
 static EVT_BEGIN(charge_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -644,6 +689,7 @@ static EVT_BEGIN(charge_event)
     RETURN
 EVT_END()
 
+/** Wait event of the Poison Puff: switches to its idle pose and resets its scale to 1. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, 1, 1, 1)

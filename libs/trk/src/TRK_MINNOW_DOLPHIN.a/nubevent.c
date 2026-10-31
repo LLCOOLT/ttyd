@@ -23,6 +23,7 @@ void TRKReleaseBuffer(int idx);
 
 TRKEventQueue gTRKEventQueue;
 
+/** Clears the (two-slot) event queue and starts event ids at 0x100. */
 DSError TRKInitializeEventQueue(void) {
     TRKInitializeMutex(&gTRKEventQueue);
     TRKAcquireMutex(&gTRKEventQueue);
@@ -33,6 +34,7 @@ DSError TRKInitializeEventQueue(void) {
     return 0;
 }
 
+/** Takes the oldest event off the queue into *event; returns 1 if there was one, 0 if the queue is empty. */
 BOOL TRKGetNextEvent(TRKEvent* event) {
     BOOL status = 0;
 
@@ -52,6 +54,7 @@ BOOL TRKGetNextEvent(TRKEvent* event) {
     return status;
 }
 
+/** Adds an event to the queue and gives it the next event id; returns 0x100 if both slots are taken. */
 DSError TRKPostEvent(TRKEvent* event) {
     DSError ret = 0;
     int nextEventID;
@@ -76,12 +79,14 @@ DSError TRKPostEvent(TRKEvent* event) {
     return ret;
 }
 
+/** Fills in an event with the given type, id 0 and no message buffer (-1). */
 void TRKConstructEvent(TRKEvent* event, int eventType) {
     event->eventType = eventType;
     event->eventID = 0;
     event->msgBufID = -1;
 }
 
+/** Frees the message buffer the event refers to (a no-op for buffer -1). */
 void TRKDestructEvent(TRKEvent* event) {
     TRKReleaseBuffer(event->msgBufID);
 }

@@ -19,7 +19,7 @@ typedef void (*WindowDispWakuColPtrFn)(u16, GXColor*, f32, f32, f32, f32, f32);
 
 static void _disp(CameraId cameraId, void* param);
 
-// s32 type, s32 x, s32 y, const char* msg, s32 frames
+/** s32 type, s32 x, s32 y, const char* msg, s32 frames */
 USER_FUNC(btlevtcmd_AnnounceMessage) {
     BattleAnnounce* announce = &_battleWorkPointer->announce;
 #if VERSION >= VERSION_US
@@ -75,6 +75,11 @@ USER_FUNC(btlevtcmd_AnnounceMessage) {
     return event->userdata[0] <= 0;
 }
 
+/**
+ * Draws the announcement banner each frame while btlevtcmd_AnnounceMessage runs:
+ * a white framed window sized to the text, centred on announce->x with its top near announce->y + 120,
+ * and the text inside it.
+ */
 static void _disp(CameraId cameraId, void* param) {
     BattleAnnounce* announce = &_battleWorkPointer->announce;
     GXColor* col;
@@ -95,7 +100,7 @@ static void _disp(CameraId cameraId, void* param) {
     FontDrawMessage(x, (s32)y - 29, announce->text);
 }
 
-// s32 index, s32 value
+/** s32 index, s32 value */
 USER_FUNC(btlevtcmd_AnnounceSetParam) {
     EvtWord* args = event->args;
     BattleAnnounce* announce = &_battleWorkPointer->announce;

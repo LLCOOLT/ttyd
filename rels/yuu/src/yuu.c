@@ -7,6 +7,11 @@
 #include "yuu.h"
 #include "rel_module.h"
 
+/**
+ * REL entry point: runs the static constructors,
+ * then registers the init event scripts of the four Pianta Parlor maps (yuu_00 to yuu_03) with relSetEvtAddr
+ * so the map loader can start them.
+ */
 void _prolog(void) {
     voidfunctionptr* ctor;
 
@@ -19,6 +24,7 @@ void _prolog(void) {
     relSetEvtAddr("yuu_03", yuu_03_init_evt);
 }
 
+/** REL exit point: runs the static destructors when the yuu module is unloaded. */
 void _epilog(void) {
     voidfunctionptr* dtor;
 
@@ -26,5 +32,6 @@ void _epilog(void) {
         (*dtor)();
     }
 }
+/** Linker stub for unresolved imports; does nothing. */
 void _unresolved(void) {
 }

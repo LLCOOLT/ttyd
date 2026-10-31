@@ -19,6 +19,7 @@ typedef struct KpaScore {
 
 KpaScore* ksdp;
 static USER_FUNC(kpa_score_disp_main);
+/** Endless loop that runs kpa_score_disp_main once a frame, keeping the Super Bowser score popups moving. */
 EVT_BEGIN(kpa_score_disp_evt)
     LOOP(0)
         CALL(kpa_score_disp_main)
@@ -29,6 +30,7 @@ EVT_END()
 
 static void kpaScoreDisp(void);
 
+/** Draws every active score popup as half-size white font text at its position. */
 static void kpaScoreDisp(void) {
     Mtx m;
     Mtx scale;
@@ -45,6 +47,10 @@ static void kpaScoreDisp(void) {
     }
 }
 
+/**
+ * Script helper run every frame by kpa_score_disp_evt:
+ * floats each active score popup up one unit, counts down its 30-frame timer and queues kpaScoreDisp.
+ */
 static USER_FUNC(kpa_score_disp_main) {
     s32 i;
     for (i = 0; i < 50; i++) {
@@ -57,6 +63,10 @@ static USER_FUNC(kpa_score_disp_main) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper for the Super Bowser stages: starts kpa_score_disp_evt as a child that copies the caller's LW/LF
+ * variables and owner, and allocates and clears the 50 score popup slots on the map heap. No arguments.
+ */
 USER_FUNC(kpa_score_disp_init) {
     EventEntry* e;
     u32 i;
@@ -80,6 +90,11 @@ USER_FUNC(kpa_score_disp_init) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Adds Super Bowser coins: every 100 coins also gives 1000 points, and each pickup scores 500 per coin,
+ * capped at
+ * 10000. Called when Bowser touches a coin (evt_mobj).
+ */
 void kpaAddCoin(s32 coins) {
     s32 score;
     if (pouchAddKpaCoin(coins)) {
@@ -92,6 +107,10 @@ void kpaAddCoin(s32 coins) {
     pouchAddKpaScore(score);
 }
 
+/**
+ * Takes the first free popup slot and shows score (without leading zeros) centred 20 units above pos for 30
+ * frames; does nothing when all 50 are in use.
+ */
 static inline void kpaSetScoreStr(s32 score, Vec* pos) {
     char* p;
     char* str;
@@ -129,6 +148,10 @@ static inline void kpaSetScoreStr(s32 score, Vec* pos) {
     }
 }
 
+/**
+ * Same as kpaAddCoin, and also shows the points scored as a popup above pos.
+ * Nothing in the decompiled code calls it.
+ */
 void kpaAddCoinPos(s32 coins, Vec* pos) {
     s32 score;
     if (pouchAddKpaCoin(coins)) {
@@ -142,6 +165,7 @@ void kpaAddCoinPos(s32 coins, Vec* pos) {
     kpaSetScoreStr(score, pos);
 }
 
+/** Adds score points (capped at 10000 per call) to the Super Bowser total. */
 void kpaAddScore(s32 score) {
     if (score > 10000) {
         score = 10000;
@@ -149,6 +173,10 @@ void kpaAddScore(s32 score) {
     pouchAddKpaScore(score);
 }
 
+/**
+ * Adds score points (capped at 10000 per call) to the Super Bowser total and shows them as a popup above pos.
+ * Used for stomped enemies (npcdrv) and power-ups (evt_mobj).
+ */
 void kpaAddScorePos(s32 score, Vec* pos) {
     s32 sc = score;
     if (score > 10000) {
@@ -158,6 +186,7 @@ void kpaAddScorePos(s32 score, Vec* pos) {
     kpaSetScoreStr(sc, pos);
 }
 
+/** Script helper: switches the player character's (Bowser's) animation to the pose named by args[0]. */
 USER_FUNC(kpa_chg_pose) {
     marioChgPose((const char*)evtGetValue(event, event->args[0]));
     return EVT_RETURN_DONE;

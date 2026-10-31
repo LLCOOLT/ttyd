@@ -26,6 +26,11 @@ static BOOL fillTexEdgeOn;
 static BOOL fillTexAlphaOff;
 static GXTexObj* pFillTexObj;
 
+/**
+ * Demo only.
+ * Records mode as the last applied GX setup; returns TRUE when it differs from the previous one,
+ * so the caller must set up GX again. -1 forces the next call to return TRUE.
+ */
 BOOL gxsubMiscSetGX(s32 mode) {
     if (mode != lastGX) {
         lastGX = mode;
@@ -34,6 +39,13 @@ BOOL gxsubMiscSetGX(s32 mode) {
     return FALSE;
 }
 
+/**
+ * Demo only.
+ * Draws a w x h quad at (x, y) in the current camera,
+ * textured with the texture set by gxsubFillSetTexObj (or a plain white texel) and tinted by color;
+ * height flips for the 2D camera.
+ * seq_demo uses it to draw mariost.tpl texture 5 over the demo movie (Guess: the logo).
+ */
 void gxsubFillGX(s32 x, s32 y, s32 w, s32 h, GXColor* color) {
     static u8 filltex[4] ATTRIBUTE_ALIGN(32) = {0xFF, 0xFF, 0x00, 0x00}; // 1x1 I4 texel used when no texture is set
     Mtx mtx;
@@ -96,6 +108,7 @@ void gxsubFillGX(s32 x, s32 y, s32 w, s32 h, GXColor* color) {
     GXTexCoord2f32(0.0f, 1.0f);
 }
 
+/** Demo only. Sets the texture gxsubFillGX draws with; NULL goes back to a plain fill. */
 void gxsubFillSetTexObj(GXTexObj* obj) {
     pFillTexObj = obj;
 }

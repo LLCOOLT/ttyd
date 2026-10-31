@@ -63,6 +63,11 @@ static effN64Vtx balloon_vtx[] = {
 static void effBalloonMain(EffectEntry* effect);
 static void effBalloonDisp(CameraId cameraId, EffectEntry* effect);
 
+/**
+ * Spawns the balloon at (x, y, z) that grows to `targetScale`,
+ * tilted by `rotation` degrees about Z. A 20-point outline wobbles around it.
+ * Reached through evt_eff64 ("balloon_n64").
+ */
 EffectEntry* effBalloonN64Entry(s32 type, f32 x, f32 y, f32 z, f32 targetScale, f32 rotation) {
     EffectEntry* effect;
     EffBalloonN64Work* work;
@@ -86,6 +91,10 @@ EffectEntry* effBalloonN64Entry(s32 type, f32 x, f32 y, f32 z, f32 targetScale, 
     return effect;
 }
 
+/**
+ * Eases the scale toward the target with a sine pulse and rebuilds the 20 wobbling outline points each frame.
+ * Once soft deleted it counts down 99 frames while its offset rises.
+ */
 static void effBalloonMain(EffectEntry* effect) {
     s32 lifetime;
     EffBalloonN64Work* work = effect->userdata;
@@ -140,6 +149,11 @@ static void effBalloonMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effBalloonDisp, effect);
 }
 
+/**
+ * Builds the vertices in a temporary buffer (from the template, via fast-cast conversions),
+ * then draws the outline as a fan of triangles around one vertex;
+ * the texture is chosen from the lifetime counter (Guess).
+ */
 static void effBalloonDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera = camGetPtr(cameraId);
     EffBalloonN64Work* work = effect->userdata;

@@ -57,6 +57,11 @@ static void effKemuri11Main(EffectEntry* effect);
 static void effKemuri11Disp(CameraId cameraId, EffectEntry* effect);
 static void main_dl(EffectEntry* effect, Mtx mtx);
 
+/**
+ * Spawns smoke effect 11 at (x, y, z).
+ * Script type 0-5 is remapped to an internal pattern (3, 2, 4, 5, 6, 7);
+ * it makes one to three smoke puffs, and the last two patterns also start effKemuri1 smoke. Event scripts only.
+ */
 EffectEntry* effKemuri11N64Entry(s32 type, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
     EffKemuri11N64Work* work;
@@ -197,6 +202,11 @@ EffectEntry* effKemuri11N64Entry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
+/**
+ * Runs for 60 frames.
+ * Each puff is released after its delay with its own scale and texture scroll speeds, then drifts;
+ * the whole effect fades after the first 8 frames.
+ */
 static void effKemuri11Main(EffectEntry* effect) {
     EffKemuri11N64Work* work = effect->userdata;
     s32 i;
@@ -316,6 +326,10 @@ static void effKemuri11Main(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effKemuri11Disp, effect);
 }
 
+/**
+ * Picks the smoke texture (0x23-0x25) for the pattern and draws the puffs twice,
+ * once culling back faces and once front faces, so both sides of the puffs show.
+ */
 static void effKemuri11Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffKemuri11N64Work* work;
@@ -413,6 +427,7 @@ static void effKemuri11Disp(CameraId cameraId, EffectEntry* effect) {
     main_dl(effect, mtx);
 }
 
+/** Draws every released puff as a 54-vertex smoke body under the matrix camMtx, scrolling its two textures. */
 static void main_dl(EffectEntry* effect, Mtx camMtx) {
     EffKemuri11N64Work* work = effect->userdata;
     s32 i;

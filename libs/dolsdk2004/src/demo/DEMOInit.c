@@ -33,6 +33,12 @@ static void __NoHangRetraceCallback(u32 count);
 static void __NoHangDoneRender(void);
 static void __DEMODiagnoseHang(void);
 
+/**
+ * Initializes everything a demo needs: OS, DVD, VI and the pad code,
+ * picks the render mode (the one passed in, or by TV format),
+ * sets up two frame buffers and the heap in the arena, configures VI,
+ * creates the 256 KiB GX FIFO and calls GXInit, then sets up the GX display copy and VI.
+ */
 void DEMOInit(GXRenderModeObj* mode) {
     OSInit();
     DVDInit();
@@ -47,6 +53,11 @@ void DEMOInit(GXRenderModeObj* mode) {
     __DEMOInitVI();
 }
 
+/**
+ * Chooses the render mode: copies the one passed in,
+ * or picks the 480-line (528 for PAL) interlaced deflicker mode that matches the TV format (NTSC, PAL, EURGB60,
+ * MPAL) and adjusts it for overscan. Panics on an unknown format.
+ */
 static void __DEMOInitRenderMode(GXRenderModeObj* mode) {
     if (mode != NULL) {
         rmodeobj = *mode;
@@ -76,6 +87,10 @@ static void __DEMOInitRenderMode(GXRenderModeObj* mode) {
     rmode = &rmodeobj;
 }
 
+/**
+ * Carves two external frame buffers (width rounded up to 16, two bytes per pixel) out of the bottom of the
+ * arena, creates the main heap in the rest, and makes the second buffer the current one.
+ */
 static void __DEMOInitMem(void) {
     void* arenaLo = OSGetArenaLo();
     void* arenaHi = OSGetArenaHi();
@@ -100,6 +115,11 @@ static void __DEMOInitMem(void) {
     OSSetArenaLo((arenaLo = arenaHi));
 }
 
+/**
+ * Sets the GX viewport, scissor, display copy source and destination scaling,
+ * copy filter and pixel format (with antialiasing if the mode asks for it) to match the render mode,
+ * and copies a first, cleared frame.
+ */
 static void __DEMOInitGX(void) {
     u16 xfbHeight;
     f32 yScale;
@@ -124,6 +144,10 @@ static void __DEMOInitGX(void) {
     GXSetDispCopyGamma(0);
 }
 
+/**
+ * Points VI at the first frame buffer, flushes and waits one retrace (two for non-interlaced modes)
+ * so the new setup is shown.
+ */
 static void __DEMOInitVI(void) {
     u32 nin;
 
@@ -137,8 +161,14 @@ static void __DEMOInitVI(void) {
     }
 }
 
+/** Empty stub for emulator-specific setup. */
 static void __DEMOInitForEmu(void) {}
 
+/**
+ * Call at the start of a frame: when the GP hang workaround is on it plants a draw-sync token
+ * and clears the GP metric, then it sets the full-screen viewport (with the field jitter for field rendering)
+ * and invalidates the vertex cache and textures.
+ */
 void DEMOBeforeRender(void) {
     if (GPHangWorkaround != 0) {
         GXSetDrawSync(0xFEEB);
@@ -155,6 +185,11 @@ void DEMOBeforeRender(void) {
     GXInvalidateTexAll();
 }
 
+/**
+ * Call at the end of a frame: draws the on-screen stats if enabled, restores the Z mode and colour update,
+ * copies the EFB to the current frame buffer, waits for the GP to finish (GXDrawDone) and swaps buffers.
+ * With the hang workaround it uses __NoHangDoneRender instead.
+ */
 void DEMODoneRender(void) {
     if (GPHangWorkaround != 0) {
         ASSERTMSGLINE(749, !DemoStatEnable, "DEMOStats and GP hang diagnosis are mutually exclusive");
@@ -177,6 +212,10 @@ void DEMODoneRender(void) {
     DEMOSwapBuffers();
 }
 
+/**
+ * Shows the just-rendered frame buffer through VI (unblanking the screen after the first frame),
+ * waits for the retrace and switches the current buffer to the other one.
+ */
 void DEMOSwapBuffers(void) {
     VISetNextFrameBuffer(DemoCurrentBuffer);
     if (DemoFirstFrame != 0) {
@@ -194,6 +233,10 @@ void DEMOSwapBuffers(void) {
     }
 }
 
+/**
+ * Like GXSetTevColorIn, but accepts the swizzled texture colour arguments (GX_CC_TEXRRR and similar):
+ * it replaces them with the plain texture colour and sets a TEV swap mode for the stage to get the swizzle.
+ */
 void DEMOSetTevColorIn(GXTevStageID stage, GXTevColorArg a, GXTevColorArg b, GXTevColorArg c, GXTevColorArg d) {
     u32 swap = 0;
 
@@ -231,6 +274,11 @@ void DEMOSetTevColorIn(GXTevStageID stage, GXTevColorArg a, GXTevColorArg b, GXT
     }
 }
 
+/**
+ * Sets a TEV stage's colour and alpha inputs for a classic texture environment mode (modulate, decal, blend,
+ * replace, pass colour).
+ * Stage 0 combines with the rasterised colour; later stages combine with the previous stage's output.
+ */
 void DEMOSetTevOp(GXTevStageID id, GXTevMode mode) {
     GXTevColorArg carg = GX_CC_RASC;
     GXTevAlphaArg aarg = GX_TEVSTAGE5;
@@ -270,14 +318,20 @@ void DEMOSetTevOp(GXTevStageID id, GXTevMode mode) {
     GXSetTevAlphaOp(id, 0, 0, 0, 1, 0);
 }
 
+/** Returns the render mode object in use. */
 GXRenderModeObj* DEMOGetRenderModeObj(void) {
     return rmode;
 }
 
+/** Returns the address of the frame buffer being drawn into. */
 u32 DEMOGetCurrentBuffer(void) {
     return (u32)DemoCurrentBuffer;
 }
 
+/**
+ * Turns the graphics-processor hang detector on (with a timeout in frames) or off (0).
+ * When on it installs a retrace callback that watches for a hang and enables the hang metrics.
+ */
 void DEMOEnableGPHangWorkaround(u32 timeoutFrames) {
     if (timeoutFrames != 0) {
         ASSERTMSGLINE(989, !DemoStatEnable, "DEMOStats and GP hang diagnosis are mutually exclusive");
@@ -293,6 +347,11 @@ void DEMOEnableGPHangWorkaround(u32 timeoutFrames) {
     }
 }
 
+/**
+ * Pre-retrace callback of the hang workaround: counts frames and
+ * if the GP's FIFO stays above its high watermark with no overflow change for the threshold number of frames,
+ * reports the hang, diagnoses it and panics.
+ */
 static void __NoHangRetraceCallback(u32 count) {
     static u32 ovFrameCount = 0;
     static u32 lastOvc = 0;
@@ -318,6 +377,11 @@ static void __NoHangRetraceCallback(u32 count) {
     }
 }
 
+/**
+ * Frame end used with the hang workaround: copies the EFB, plants a draw-sync token and waits for it;
+ * if it does not arrive within the threshold number of frames it reports the abort, diagnoses the hang,
+ * reinitialises the whole demo setup with DEMOReInit and swaps buffers.
+ */
 static void __NoHangDoneRender(void) {
     BOOL abort = FALSE;
 
@@ -339,6 +403,7 @@ static void __NoHangDoneRender(void) {
     DEMOSwapBuffers();
 }
 
+/** Programs (or clears) the GP registers that collect the hang metrics by writing raw BP and CP commands. */
 void DEMOSetGPHangMetric(u8 enable) {
     if (enable) {
         GXSetGPMetric(GX_PERF0_NONE, GX_PERF1_NONE);
@@ -367,6 +432,11 @@ void DEMOSetGPHangMetric(u8 enable) {
     }
 }
 
+/**
+ * Prints a diagnosis of a stuck GP: samples the transform and rasteriser metrics twice and the GP status,
+ * then reports an XF stall bug, an unterminated primitive, an illegal instruction, a GP that is just waiting,
+ * or an unknown state.
+ */
 static void __DEMODiagnoseHang(void) {
     u32 xfTop0, xfBot0, suRdy0, r0Rdy0;
     u32 xfTop1, xfBot1, suRdy1, r0Rdy1;
@@ -398,6 +468,10 @@ static void __DEMODiagnoseHang(void) {
     }
 }
 
+/**
+ * Recovers after an aborted frame: swaps in a temporary FIFO, calls GXAbortFrame, then rebuilds the render mode,
+ * GX state and VI configuration and the real FIFO.
+ */
 void DEMOReInit(GXRenderModeObj* mode) {
     u32 fbSize;
     GXFifoObj tmpobj;

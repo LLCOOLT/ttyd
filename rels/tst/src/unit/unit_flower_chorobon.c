@@ -231,6 +231,11 @@ static BattleWeapon weapon_chorobon_magic_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Attack script of the Flower Fuzzy: after the item-use check it looks at its FP.
+ * With under 2 FP it uses the drain attack to refill; at full FP it uses its magic attack;
+ * in between it picks randomly (about 5 in 6 for the drain attack, otherwise the magic).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -262,6 +267,12 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Flower Fuzzy's magic attack (weapon_chorobon_magic_attack, all targets):
+ * it recovers 2 FP, floats up on the spot and fires three shock rings with the magic sound
+ * while the camera shakes, then each target in turn gets the avoid, guard or hit check,
+ * with the guard-timing result for the first one.
+ */
 static EVT_BEGIN(magic_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_chorobon_magic_attack))
@@ -414,6 +425,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Hopping movement of the Flower Fuzzy: hops along the stage toward x = LW(5) in steps of LW(8) units,
+ * squashing and stretching on each landing, and makes a last hop onto (LW(5), LW(6), LW(7)) with the landing
+ * sound.
+ */
 static EVT_BEGIN(rabbit_move)
     LOOP(2)
         CALL(btlevtcmd_AddScale, BTL_UNIT_SELF, FLOAT(0.15917969f), FLOAT(-0.23925781f), 0)
@@ -463,6 +479,11 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Init script of the Flower Fuzzy: installs the wait, attack,
+ * damage and confusion handlers (confusion reuses the attack), sets its pose sound table and jump sound,
+ * gives it a maximum of 3 FP with 0 FP to start, and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -476,6 +497,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: runs the shared default damage script (btldefaultevt_Damage) with its default parameters
+ * (LW(10) = -2, LW(11) = 1).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -483,6 +508,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler for when the Flower Fuzzy was hit by a counter attack:
+ * resets its scale, runs the shared counter-damage script,
+ * and unless the hit knocked it out (damage flag 0x200) without a Life Shroom revive (0x800) it hops back home
+ * with return_event.
+ */
 static EVT_BEGIN(counter_damage_event)
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
     SET_VALUE(LW(10), -2)
@@ -500,6 +531,7 @@ static EVT_BEGIN(counter_damage_event)
     RETURN
 EVT_END()
 
+/** Hops the Flower Fuzzy back to its home position in 40-unit hops (rabbit_move) after an attack or a counter hit. */
 static EVT_BEGIN(return_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(4.0f), FLOAT(0.5996094f))
@@ -509,6 +541,14 @@ static EVT_BEGIN(return_event)
     RETURN
 EVT_END()
 
+/**
+ * The Flower Fuzzy's drain attack (weapon_chorobon_drain_attack): it hops up to the target and jumps on it.
+ * If the attack connects it clings on (the target shakes),
+ * and then it takes FP from the target when the target has any (weapon_chorobon_drain_attack_fp), otherwise HP,
+ * and heals itself by the amount drained with a recovery effect (HP or FP).
+ * A miss makes it bounce off; if the target counters with a shock,
+ * the Fuzzy takes weapon_chorobon_drain_attack_biribiri_counterd instead. It then hops home.
+ */
 static EVT_BEGIN(drain_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_chorobon_drain_attack))
@@ -755,6 +795,7 @@ static EVT_BEGIN(drain_attack_event)
     RETURN
 EVT_END()
 
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

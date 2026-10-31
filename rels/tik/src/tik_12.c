@@ -64,6 +64,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Lens-flare sparkle on Merlee's crystal ball: spawns a lensflare effect at the "uranai" object,
+ * 15 units above and 20 in front of it.
+ */
 EVT_BEGIN(suisyou_kirakira)
     CALL(evt_mapobj_get_position, STRING("uranai"), LW(0), LW(1), LW(2))
     ADD(LW(1), 15)
@@ -72,6 +76,15 @@ EVT_BEGIN(suisyou_kirakira)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Talk script at Merlee's table (majinaisi, the charm-caster).
+ * She greets Mario (majinaisi_01), offers the menu (majinaisi_02) and
+ * then the list of blessings with prices (majinaisi_05);
+ * the price and the number of battles come from majinaisi_ryokin_kaisu.
+ * If Mario cannot pay she refuses (majinaisi_06);
+ * otherwise she takes the coins, casts the charm (evt_pouch_majinai_set), the partners step back,
+ * a crystal effect plays, and she wishes him luck (majinaisi_08).
+ */
 EVT_BEGIN(majinaisi_table_talk)
     CALL(setmertn, STRING("まじない師"))
     CALL(evt_mario_key_onoff, 0)
@@ -334,6 +347,11 @@ s32 iri_14_item_tbl[] = {
     ITEM_CAKE_MIX, -1,
 };
 
+/**
+ * Talk script for Merlee when spoken to directly.
+ * During Trouble Center request 14 she asks for Cake Mix (irai_14_00 to irai_14_05):
+ * Mario hands one over, gets 30 coins and the request is marked solved. Otherwise she says majinaisi_00.
+ */
 EVT_BEGIN(majinaisi_direct_talk)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 14)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_BASE), 0)
@@ -374,6 +392,7 @@ EVT_BEGIN(majinaisi_direct_talk)
     RETURN
 EVT_END()
 
+/** Init script for Merlee (まじない師). Registers the table talk on the a_majinai hit area. */
 EVT_BEGIN(majinaisi_init)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_majinai"), 0, PTR(majinaisi_table_talk), 0)
     RETURN
@@ -395,6 +414,11 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Map init script of tik_12, Merlee's house.
+ * Starts the sewer music and ambience, sets up the exit to tik_01, places Merlee,
+ * turns off blending on her room's objects and hides her box, and starts the smoke animation.
+ */
 EVT_BEGIN(tik_12_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK1"))
@@ -412,6 +436,10 @@ EVT_BEGIN(tik_12_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script helper.
+ * Spawns a star-dust particle burst: args are the type, X, Y, Z, X and Y velocities, particle count and camera.
+ */
 static USER_FUNC(effect_stardust) {
     EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
@@ -426,10 +454,16 @@ static USER_FUNC(effect_stardust) {
     effStardustEntry(type, count, camera, x, y, z, vx, vy);
     return EVT_RETURN_DONE;
 }
+/** Script helper. Sets the running event's owner NPC to the NPC named by args[0] (Merlee). */
 static USER_FUNC(setmertn) {
     event->ownerNPC = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
     return EVT_RETURN_DONE;
 }
+/**
+ * Script helper.
+ * Reads Merlee's price list: for the menu index args[0],
+ * returns the fee in args[1] and the charm's number of uses in args[2] from majinaisi_ryokin_kaisu_tbl.
+ */
 static USER_FUNC(majinaisi_ryokin_kaisu) {
     EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);

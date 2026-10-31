@@ -165,6 +165,10 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Battle init script for the Bullet Bill: installs the wait, attack, damage and confusion handlers,
+ * starts the wait event and lifts the unit and its home position to y = 10 so it floats above the ground.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -177,6 +181,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: selects this unit (-2) and its part 1
+ * and runs the shared default damage reaction (btldefaultevt_Damage).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -184,6 +192,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Starts the avoid animation of the target LW(3) for the pre-damage check result in LW(5):
+ * 3, 6 and 2 select avoid types 38, 39 and 40.
+ */
 static EVT_BEGIN(start_avoid)
     IF_INT_EQUAL(LW(5), 3)
         CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -197,6 +209,14 @@ static EVT_BEGIN(start_avoid)
     RETURN
 EVT_END()
 
+/**
+ * Attack of the Bullet Bill: picks a target (the fixed first target in a flag-2 battle,
+ * otherwise a sampled enemy; uses an enemy item first if it has one), zooms the camera on it,
+ * charges for 30 frames and then flies into it.
+ * The Bill always ends up removed from the battle:
+ * after a miss it flies past the target and off, after a hit it explodes in smoke, banks its coins,
+ * experience and star points and is killed (KillUnit) once the damage has been dealt.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -309,6 +329,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Wait (idle) event: refreshes the body animation (part 1) from the unit's pose table
+ * so it matches the current state, then returns; the battle system runs it whenever the unit is idle.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

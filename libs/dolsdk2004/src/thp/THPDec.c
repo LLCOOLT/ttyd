@@ -44,6 +44,14 @@ static const f64 __THPAANScaleFactor[8] = {
 
 void __THPInverseDCTY8(register THPCoeff*, register u32);
 
+/**
+ * Decodes one THP video frame (a baseline JPEG-style frame) at file into YUV 4:2:0 planes tileY,
+ * tileU and tileV, using work as scratch memory and the locked cache.
+ * Walks the JPEG markers (Huffman tables, frame header, quantisation tables, restart interval, scan header),
+ * then decodes the scan.
+ * Returns 0, or an error code: 25 no input, 26 no work area, 27 no output, 28 locked cache not enabled,
+ * 29 THPInit not called, 3 bad syntax, 11 unsupported marker, or a header parser's code.
+ */
 s32 THPVideoDecode(void* file, void* tileY, void* tileU, void* tileV,
                    void* work)
 {
@@ -197,6 +205,10 @@ _err_exit:
 	return errorCode;
 }
 
+/**
+ * Carves the six 64-coefficient MCU buffers (four luma blocks, one U, one V) out of the 32-byte aligned decoder
+ * work area.
+ */
 static void __THPSetupBuffers(void)
 {
 	u8 i;
@@ -209,6 +221,12 @@ static void __THPSetupBuffers(void)
 	}
 }
 
+/**
+ * Parses the JPEG start-of-frame marker of a THP video frame:
+ * requires 8-bit precision and three components with 4:2:0 sampling (0x22 for luma, 0x11 for chroma),
+ * stores the image size and each component's quantisation table selector.
+ * Returns 0 or an error code (10, 12, 19).
+ */
 u8 __THPReadFrameHeader(void)
 {
 	u8 i, utmp8;
@@ -281,6 +299,10 @@ u8 __THPReadScaneHeader(void)
 	return 0;
 }
 
+/**
+ * Reads JPEG quantisation tables: undoes the zig-zag order and pre-multiplies by the AAN scale factors
+ * so the inverse DCT can run on floating-point values.
+ */
 u8 __THPReadQuantizationTable(void)
 {
 	u16 length, id, i, row, col;
@@ -316,6 +338,10 @@ u8 __THPReadQuantizationTable(void)
 	return 0;
 }
 
+/**
+ * Reads one or more JPEG Huffman table definitions (class DC or AC, id 0 or 1, code counts and values),
+ * generates their size, code and decoder tables, and marks them valid.
+ */
 u8 __THPReadHuffmanTableSpecification(void)
 {
 	u8 t_class, id, i, tab_index;
@@ -356,6 +382,10 @@ u8 __THPReadHuffmanTableSpecification(void)
 	return 0;
 }
 
+/**
+ * Builds the list of code lengths for the Huffman table being read,
+ * from the number of codes of each length 1 to 16 (JPEG spec figure C.1).
+ */
 static void __THPHuffGenerateSizeTable(void)
 {
 	s32 p, l, i;
@@ -371,6 +401,7 @@ static void __THPHuffGenerateSizeTable(void)
 	__THPHuffmanSizeTab[p] = 0;
 }
 
+/** Assigns the canonical Huffman code to each symbol, using the size table (JPEG spec figure C.2). */
 static void __THPHuffGenerateCodeTable(void)
 {
 	u8 si;
@@ -391,6 +422,10 @@ static void __THPHuffGenerateCodeTable(void)
 	}
 }
 
+/**
+ * Builds the maximum-code and value-pointer arrays for each code length of Huffman table tabIndex,
+ * used for decoding codes longer than 5 bits.
+ */
 static void __THPHuffGenerateDecoderTables(u8 tabIndex)
 {
 	s32 p, l;
@@ -412,6 +447,7 @@ static void __THPHuffGenerateDecoderTables(u8 tabIndex)
 	h->maxCode[17] = 0xfffffL;
 }
 
+/** Reads the JPEG restart interval (number of MCUs between restart points) and enables restart handling. */
 static void __THPRestartDefinition(void)
 {
 	__THPInfo->RST = TRUE;
@@ -421,6 +457,10 @@ static void __THPRestartDefinition(void)
 	__THPInfo->currMCU = __THPInfo->nMCU;
 }
 
+/**
+ * Saves GQR5 and GQR6 and programs them for the paired-single loads
+ * and stores the inverse DCT uses (GQR5 for 16-bit signed integer input, GQR6 for 8-bit unsigned output).
+ */
 static inline void __THPGQRSetup(void)
 {
 	register u32 tmp1, tmp2;
@@ -443,6 +483,7 @@ static inline void __THPGQRSetup(void)
 	}
 }
 
+/** Restores GQR5 and GQR6 saved by __THPGQRSetup. */
 static inline void __THPGQRRestore(void)
 {
 	register u32 tmp1, tmp2;
@@ -455,6 +496,11 @@ static inline void __THPGQRRestore(void)
 	}
 }
 
+/**
+ * Prepares the bit reader at the start of the scan data (aligns to a 32-bit word and loads the first word),
+ * builds the five-bit quick-lookup tables of every valid Huffman table, and sets the Y,
+ * U and V DC and AC table pointers.
+ */
 void __THPPrepBitStream(void)
 {
 	u32* ptr;
@@ -516,6 +562,11 @@ void __THPPrepBitStream(void)
 	}
 }
 
+/**
+ * Decodes the scan data into YUV 4:2:0 planes written through the locked cache to tileY, tileU and tileV,
+ * one 16-line macroblock row at a time, using routines specialised for 512x448 and 640x480 video
+ * and a generic one for other sizes.
+ */
 void __THPDecompressYUV(void* tileY, void* tileU, void* tileV)
 {
 	u16 currentY, targetY;
@@ -549,6 +600,12 @@ void __THPDecompressYUV(void* tileY, void* tileU, void* tileV)
 	__THPGQRRestore();
 }
 
+/**
+ * Inverse 8x8 DCT of one block (paired-single assembly):
+ * dequantises with the table in Gq, transforms through the workspace
+ * and writes 8-bit samples into the locked cache buffer Gbase at column xPos,
+ * starting at the first row of the macroblock.
+ */
 inline void __THPInverseDCTNoYPos(register THPCoeff* in, register u32 xPos)
 {
 	register f32 *q, *ws;
@@ -851,6 +908,10 @@ inline void __THPInverseDCTNoYPos(register THPCoeff* in, register u32 xPos)
 	}
 }
 
+/**
+ * Same as __THPInverseDCTNoYPos but writes the block starting at the eighth row of the macroblock (the lower
+ * pair of luma blocks).
+ */
 inline void __THPInverseDCTY8(register THPCoeff* in, register u32 xPos)
 {
 	register f32 *q, *ws;
@@ -1158,6 +1219,12 @@ inline void __THPInverseDCTY8(register THPCoeff* in, register u32 xPos)
 	}
 }
 
+/**
+ * Decodes one macroblock row of a 512x448 frame:
+ * Huffman-decodes four luma blocks and one U and one V block per MCU,
+ * inverse-transforms them into the locked-cache work area, handles restart intervals,
+ * then stores the three planes (0x2000, 0x800 and 0x800 bytes) to main memory.
+ */
 void __THPDecompressiMCURow512x448(void)
 {
 	u8 cl_num;
@@ -1220,6 +1287,12 @@ void __THPDecompressiMCURow512x448(void)
 	__THPInfo->dLC[2] += 0x800;
 }
 
+/**
+ * Decodes one Huffman symbol from the bit stream with table h and returns its value:
+ * a five-bit quick-lookup table handles short codes,
+ * longer codes fall back to a bit-by-bit search of the maximum-code table.
+ * Hand-written assembly, advancing the reader in info.
+ */
 inline s32 __THPHuffDecodeTab(register THPFileInfo* info,
                               register THPHuffmanTab* h)
 {
@@ -1457,6 +1530,7 @@ _FailedCheckNoBits1:
 	return (h->Vij[(s32)(code + h->valPtr[cnt])]);
 }
 
+/** Decodes one macroblock row of a 640x480 frame the same way, with a work area sized for that width. */
 void __THPDecompressiMCURow640x480(void)
 {
 	u8 cl_num;
@@ -1525,6 +1599,7 @@ void __THPDecompressiMCURow640x480(void)
 	__THPInfo->dLC[2] += 0xA00;
 }
 
+/** Decodes one macroblock row of a frame of any width the same way, using the frame's own width for the plane sizes. */
 void __THPDecompressiMCURowNxN(void)
 {
 	u8 cl_num;
@@ -1593,6 +1668,11 @@ void __THPDecompressiMCURowNxN(void)
 	__THPInfo->dLC[2] += ((sizeof(u8) * 64) * (x / 16));
 }
 
+/**
+ * Huffman-decodes one 8x8 luma block into block:
+ * the DC difference (added to the running DC predictor) followed by the run-length coded AC coefficients,
+ * placed in natural order (hand-written assembly bit reader).
+ */
 void __THPHuffDecodeDCTCompY(register THPFileInfo* info, THPCoeff* block)
 {
 	{
@@ -1966,6 +2046,7 @@ void __THPHuffDecodeDCTCompY(register THPFileInfo* info, THPCoeff* block)
 #undef cnt4
 }
 
+/** Huffman-decodes one 8x8 U (blue chroma) block into block, with its own DC predictor and Huffman tables. */
 void __THPHuffDecodeDCTCompU(register THPFileInfo* info, THPCoeff* block)
 {
 	register s32 t;
@@ -2086,6 +2167,7 @@ void __THPHuffDecodeDCTCompU(register THPFileInfo* info, THPCoeff* block)
 	}
 }
 
+/** Huffman-decodes one 8x8 V (red chroma) block into block, with its own DC predictor and Huffman tables. */
 void __THPHuffDecodeDCTCompV(register THPFileInfo* info, THPCoeff* block)
 {
 	register s32 t;
@@ -2209,6 +2291,12 @@ void __THPHuffDecodeDCTCompV(register THPFileInfo* info, THPCoeff* block)
 	}
 }
 
+/**
+ * Initialises the THP decoder: registers the version string,
+ * places the three work areas for 512-wide and 640-wide frames at the start of the locked cache (0xE0000000;
+ * the PAL release uses larger 640-wide planes), and initialises the fast-cast (quantised load/store) support.
+ * Returns TRUE.
+ */
 BOOL THPInit(void)
 {
 	u8* base;

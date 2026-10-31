@@ -32,6 +32,8 @@
 
 extern SEQ_INSTANCE* seqActiveRoot;
 
+/** Public: crossfades from sequence ci->seqId1 to a second sequence as described by ci (see seqCrossFade); interrupts
+ * are disabled while it runs and the new ID is stored in *new_seqId. */
 void sndSeqCrossFade(struct SND_CROSSFADE* ci, u32* new_seqId) {
   MUSY_ASSERT_MSG(sndActive, "Sound system is not initialized.");
 
@@ -60,6 +62,7 @@ bool sndSeqCrossFadeDone(SND_SEQID* new_seqId) {
   return TRUE;
 }
 
+/** Public: returns how many times the first section of sequence seqId has looped, or 0 if the ID is invalid. */
 u16 sndSeqGetLoopCnt(SND_SEQID seqId) {
   MUSY_ASSERT_MSG(sndActive, "Sound system is not initialized.");
 
@@ -354,9 +357,12 @@ bool sndSeqSetMidiCtrl14(SND_SEQID seqId, u8 channel, u8 ctrl, u16 value) {
   return ret;
 }
 
+/** Returns the voice priority override that the song set for a MIDI channel (0xFFFF when none). */
 u16 seqGetMIDIPriority(u8 set, u8 channel) { return seqMIDIPriority[set][channel]; }
 
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 2)
+/** Returns the public ID of the sequence that started voice vid, found by searching the active sequences' note lists,
+ * or SND_ID_ERROR. */
 u32 seqGetInstanceForVoice(u32 vid) {
   u32 i;             // r28
   u32 j;             // r29

@@ -32,6 +32,7 @@ SoundWork sound;
 u32 aramMemArray[8];
 #endif
 
+/** Returns the shared 256-byte buffer the loaders build file paths in. */
 static inline char* _ssGetStr(void) {
     static char str[0x100];
     return str;
@@ -50,14 +51,22 @@ static void SoundSSMain(void);
 
 static void SoundAIDMACallback(void);
 
+/** MusyX allocation hook: allocates from the default heap. */
 void* sndMalloc(size_t size) {
     return __memAlloc(HEAP_DEFAULT, size);
 }
 
+/** MusyX free hook: frees to the default heap. */
 void sndFree(void* ptr) {
     __memFree(HEAP_DEFAULT, ptr);
 }
 
+/**
+ * Boots the sound system: sets up ARAM and its queue, starts MusyX (64 voices, 12 MB of ARAM),
+ * prepares the reverb, chorus and delay effects, sets stereo output,
+ * hooks the audio DMA callback and allocates the song (4), effect (40),
+ * DVD audio (2) and stream (3) channel tables with their buffers. Fade in/out default to 10 and 500 ms.
+ */
 void SoundInit(void) {
     SND_HOOKS hooks = (SND_HOOKS){sndMalloc, sndFree};
     void* data;
@@ -256,6 +265,10 @@ void SoundInit(void) {
     slot->seqId = 0;
 }
 
+/**
+ * Per-frame sound update: notices songs that ended on their own (marks their group and frees the channel),
+ * then runs the effect, DVD-audio and stream updates.
+ */
 void SoundMain(void) {
     int i;
     SoundSong* song;
@@ -272,15 +285,21 @@ void SoundMain(void) {
     SoundSSMain();
 }
 
+/** Audio-interrupt update: services the streams' DVD reads (SoundSSMainInt). */
 void SoundMainInt(void) {
     SoundSSMainInt();
 }
 
+/** Sets the song and stream fade-in and fade-out times in milliseconds. */
 void SoundSetFadeTime(u16 in, u16 out) {
     sound.fadeIn = in;
     sound.fadeOut = out;
 }
 
+/**
+ * MusyX sample upload callback: reads bytes at offset of the current sample file (.samp) from the disc into the
+ * 128 KB staging buffer and returns it, or NULL on a read error.
+ */
 static void* loadDVD_callback(u32 offset, u32 bytes) {
     DVDFileInfo info;
 
@@ -294,6 +313,11 @@ static void* loadDVD_callback(u32 offset, u32 bytes) {
     return sound.filedata;
 }
 
+/**
+ * Loads a MusyX project from the disc: path + ".pool", ".proj" and ".sdir" into memory,
+ * and registers the ".samp" file for sample upload through loadDVD_callback.
+ * Up to 8 projects; returns FALSE when full or a file fails.
+ */
 BOOL SoundLoadDVD2(const char* path) {
     DVDEntry* entry;
 #if VERSION <= VERSION_DEMO_US
@@ -396,6 +420,10 @@ BOOL SoundLoadDVD2(const char* path) {
     return TRUE;
 }
 
+/**
+ * Pushes the sound groups listed in groupIds (0xFF-terminated) of the last loaded project into MusyX,
+ * uploading their samples to ARAM, and counts them for SoundDropData.
+ */
 BOOL SoundLoadDVD2PushGroup(u8* groupIds) {
     SND_GROUPID id;
     s32 temp;
@@ -427,6 +455,7 @@ BOOL SoundLoadDVD2PushGroup(u8* groupIds) {
     return TRUE;
 }
 
+/** Frees the sample upload staging buffer once loading is done. */
 void SoundLoadDVD2Free(void) {
     if (sound.filedata) {
         __memFree(HEAP_DEFAULT, sound.filedata);
@@ -434,6 +463,10 @@ void SoundLoadDVD2Free(void) {
     }
 }
 
+/**
+ * Loads the song library: path + ".slib" split into one SoundGroup per song (song ids are their order),
+ * plus the ".stbl" and ".etbl" tables. The game loads it once at boot for sound/proj/pmario.
+ */
 BOOL SoundSLibLoadDVD(const char* path) {
     SoundGroup* groupsHead;
     u32 length2;
@@ -566,6 +599,7 @@ BOOL SoundSLibLoadDVD(const char* path) {
     return TRUE;
 }
 
+/** Stops every song, effect, DVD-audio track and stream before sound data is dropped. */
 static inline void _ssDropStop(void) {
     u32 i;
 
@@ -642,6 +676,10 @@ static inline void _ssDropStop(void) {
     }
 }
 
+/**
+ * Unloads all sound data: stops everything, pops the pushed groups and frees the project, song library,
+ * stream and group memory. Returns TRUE.
+ */
 BOOL SoundDropData(void) {
     SoundGroup* group;
     SoundGroup* temp;
@@ -767,6 +805,7 @@ BOOL SoundDropData(void) {
     return TRUE;
 }
 
+/** Switches MusyX between mono, stereo and surround output (US and PAL only when it changes). */
 void SoundSetOutputMode(SND_OUTPUTMODE mode) {
 #if VERSION <= VERSION_DEMO_US
     sound.outputMode = mode;
@@ -779,12 +818,17 @@ void SoundSetOutputMode(SND_OUTPUTMODE mode) {
 #endif
 }
 
+/** Called when the disc cover opens: mutes sound until it is closed. */
 void SoundOpenCover(void) {
     if (!sound.coverState) {
         sound.coverState = 1;
     }
 }
 
+/**
+ * Called when the disc cover closes: unmutes, or waits (coverState 2)
+ * while a stream still has a disc read in flight.
+ */
 void SoundCloseCover(void) {
     SoundStream* stream;
     BOOL close;
@@ -811,6 +855,7 @@ void SoundCloseCover(void) {
     }
 }
 
+/** Returns the song library group with index, or NULL. */
 inline SoundGroup* SoundSongGetGroup(u8 index) {
     u16 key = index;
     SoundGroup* group;
@@ -826,6 +871,10 @@ inline SoundGroup* SoundSongGetGroup(u8 index) {
     return group;
 }
 
+/**
+ * Starts song songId (low byte: library index, bits 16-23: MusyX group id) on song channel chan at full volume,
+ * stopping what played there.
+ */
 void SoundSongPlayCh(s32 chan, u32 songId) {
     SoundSong* song;
     SoundGroup* group;
@@ -848,6 +897,7 @@ void SoundSongPlayCh(s32 chan, u32 songId) {
     }
 }
 
+/** Resumes a paused song on chan at its volume. */
 void SoundSongContinueCh(s32 chan) {
     SoundSong* song = &sound.songs[chan];
 
@@ -857,6 +907,7 @@ void SoundSongContinueCh(s32 chan) {
     }
 }
 
+/** Stops the song on chan at once. */
 void SoundSongStopCh(s32 chan) {
     SoundSong* song = &sound.songs[chan];
 
@@ -866,6 +917,7 @@ void SoundSongStopCh(s32 chan) {
     }
 }
 
+/** Fades the song on chan out over the fade-out time and releases the channel. */
 void SoundSongFadeoutCh(s32 chan) {
     SoundSong* song = &sound.songs[chan];
 
@@ -875,6 +927,7 @@ void SoundSongFadeoutCh(s32 chan) {
     }
 }
 
+/** Fades the song on chan in to its volume over the fade-in time. */
 void SoundSongFadeinCh(s32 chan) {
     SoundSong* song = &sound.songs[chan];
 
@@ -883,6 +936,7 @@ void SoundSongFadeinCh(s32 chan) {
     }
 }
 
+/** Sets the volume (0-127) of the song on chan. */
 void SoundSongSetVolCh(s32 chan, u8 vol) {
     SoundSong* song = &sound.songs[chan];
 
@@ -895,6 +949,7 @@ void SoundSongSetVolCh(s32 chan, u8 vol) {
     }
 }
 
+/** Returns the volume of the song on chan, 0 when none plays. */
 u8 SoundSongGetVolCh(s32 chan) {
     SoundSong* song = &sound.songs[chan];
 
@@ -904,11 +959,12 @@ u8 SoundSongGetVolCh(s32 chan) {
     return (u8)song->vol;
 }
 
+/** Returns whether a song is playing on chan. */
 u32 SoundSongCheck(s32 chan) {
     return sndSeqGetValid(sound.songs[chan].seqId) != 0;
 }
 
-// the live voice of an effect channel (its emitter's voice for 3D effects), or -1
+/** the live voice of an effect channel (its emitter's voice for 3D effects), or -1 */
 inline SND_VOICEID SoundEfxGetVoiceID(s32 chan) {
     SoundEffect* sfx = &sound.effects[chan];
     if (sfx->flags & 0x10) {
@@ -918,6 +974,7 @@ inline SND_VOICEID SoundEfxGetVoiceID(s32 chan) {
     }
 }
 
+/** Stops the sound effect on effect channel chan and frees the channel (and its 3D emitter). */
 inline void SoundEfxMuteCh(s32 chan) {
     SoundEffect* sfx = &sound.effects[chan];
     if (sfx->flags) {
@@ -929,6 +986,10 @@ inline void SoundEfxMuteCh(s32 chan) {
     }
 }
 
+/**
+ * Frees the first effect channel whose priority is at most priority and returns it (40 when none qualifies);
+ * used to make room for a new effect.
+ */
 inline s32 SoundEfxStopAll(u8 priority) {
     s32 chan;
     SoundEffect* sfx = sound.effects;
@@ -942,6 +1003,7 @@ inline s32 SoundEfxStopAll(u8 priority) {
     return chan;
 }
 
+/** Returns whether the effect on chan is still sounding, freeing the channel when it has ended. */
 inline u32 SoundEfxCheckPlay(s32 chan) {
     SoundEffect* sfx = &sound.effects[chan];
     SND_VOICEID vid;
@@ -963,6 +1025,10 @@ inline u32 SoundEfxCheckPlay(s32 chan) {
     return TRUE;
 }
 
+/**
+ * Plays MusyX effect fid on a free effect channel (or takes one from a lower-priority effect) with volume
+ * and pan; returns the channel, or -1 when none is available.
+ */
 s32 SoundEfxPlayEx(SND_FXID fid, u8 priority, u8 vol, u8 pan) {
     SoundEffect* sfx;
     s32 chan;
@@ -1013,6 +1079,7 @@ s32 SoundEfxPlayEx(SND_FXID fid, u8 priority, u8 vol, u8 pan) {
     return chan;
 }
 
+/** Stops the effect on chan and frees the channel. */
 void SoundEfxStop(s32 chan) {
     SoundEffect* sfx;
 
@@ -1026,6 +1093,7 @@ void SoundEfxStop(s32 chan) {
     }
 }
 
+/** Bends the pitch of the effect on chan (0 = unchanged; 0x2000 is MusyX's centre). */
 void SoundEfxSetPitch(s32 chan, s16 pitch) {
     SND_VOICEID vid;
 
@@ -1035,6 +1103,7 @@ void SoundEfxSetPitch(s32 chan, s16 pitch) {
     }
 }
 
+/** Sets the volume of the effect on chan (kept silent while the disc cover is open). */
 void SoundEfxSetVolume(s32 chan, u8 vol) {
     SoundEffect* sfx;
     SND_VOICEID vid;
@@ -1050,11 +1119,13 @@ void SoundEfxSetVolume(s32 chan, u8 vol) {
     }
 }
 
+/** Returns the volume last set for the effect on chan. */
 u8 SoundEfxGetVolume(s32 chan) {
     SoundEffect* sfx = &sound.effects[chan];
     return sfx->vol;
 }
 
+/** Sets the reverb send of the effect on chan. */
 void SoundEfxSetAux1(s32 chan, u8 reverb) {
     SND_VOICEID vid;
 
@@ -1064,6 +1135,7 @@ void SoundEfxSetAux1(s32 chan, u8 reverb) {
     }
 }
 
+/** Sets the left-right pan of the effect on chan (0-127, 64 centre). */
 void SoundEfxSetPan(s32 chan, u8 pan) {
     SoundEffect* sfx;
     SND_VOICEID vid;
@@ -1076,6 +1148,10 @@ void SoundEfxSetPan(s32 chan, u8 pan) {
     }
 }
 
+/**
+ * Sets the front-back surround pan of the effect on chan,
+ * lowering the pitch slightly (Doppler) the further it is from centre.
+ */
 void SoundEfxSetSrndPan(s32 chan, u8 span) {
     SoundEffect* sfx;
     SND_VOICEID vid;
@@ -1097,6 +1173,7 @@ void SoundEfxSetSrndPan(s32 chan, u8 span) {
     }
 }
 
+/** Applies a low-pass filter at freq to the effect on chan; 0 removes it. */
 void SoundEfxSetLPF(s32 chan, s16 freq) {
     SoundEffect* sfx;
     u32 voiceId;
@@ -1118,6 +1195,10 @@ void SoundEfxSetLPF(s32 chan, s16 freq) {
     }
 }
 
+/**
+ * Returns whether the effect on chan is still sounding (3D emitters count as sounding while they exist),
+ * freeing the channel when it has ended.
+ */
 u32 SoundEfxCheck(s32 chan) {
     SoundEffect* sfx;
 
@@ -1143,6 +1224,7 @@ u32 SoundEfxCheck(s32 chan) {
     return TRUE;
 }
 
+/** Frees the effect channel chan if its voice has ended. */
 inline void SoundEfxCheckCh(s32 chan) {
     SND_VOICEID vid;
 
@@ -1156,6 +1238,11 @@ inline void SoundEfxCheckCh(s32 chan) {
 // induction temp created before the loop's split temps and gets the highest register; the target has the effect
 // pointer (second web of the reused `effect`) r30, i r29, the offset r28.
 #pragma opt_strength_reduction off
+/**
+ * Per-frame effect update: moves the MusyX listener to sound.pos
+ * and heading (velocity from the last frame's move), updates every 3D emitter's position and volume,
+ * and frees channels whose sound has ended.
+ */
 static void SoundEfxMain(void) {
     SND_FVECTOR* dir;
     SoundEffect* effect;
@@ -1222,6 +1309,7 @@ static void SoundEfxMain(void) {
 }
 #pragma opt_strength_reduction reset
 
+/** Stops the DVD audio stream (the disc's streamed music) on chan and closes its file. */
 inline void SoundDVDStopCh(s32 chan) {
     SoundDVD* dvd = &sound.dvds[chan];
     if (dvd->flags & 3) {
@@ -1233,6 +1321,7 @@ inline void SoundDVDStopCh(s32 chan) {
     }
 }
 
+/** Applies pan and the current volume of DVD audio channel chan to the hardware stream volume. */
 inline void SoundDVDSetPanCh(s32 chan, u8 pan) { // I think this is the correct func name
     f32 left, right;
     SoundDVD* dvd;
@@ -1251,6 +1340,10 @@ inline void SoundDVDSetPanCh(s32 chan, u8 pan) { // I think this is the correct 
     AISetStreamVolRight((u8)right);
 }
 
+/**
+ * Per-frame DVD audio update: runs fade-outs (stopping or pausing at silence, remembering the sample position)
+ * and fade-ins.
+ */
 static void SoundDVDMain(void) {
     u32 i;
 
@@ -1302,6 +1395,7 @@ static void _ssDVDReadAsync_cache_aram(u32 pointerToARQRequest);
 static void _ssDVDReadAsync_cache_next(s32 result, DVDFileInfo* fileInfo);
 static void SoundSSPlayChEx_main(s32 result, DVDFileInfo* fileInfo);
 
+/** Disables interrupts for stream bookkeeping; nests. */
 inline void SoundIntOff(void) {
     if (!sound.interruptDepth) {
         sound.interrupts = OSDisableInterrupts();
@@ -1309,6 +1403,7 @@ inline void SoundIntOff(void) {
     sound.interruptDepth++;
 }
 
+/** Undoes one SoundIntOff, restoring interrupts at the outermost level. */
 inline void SoundIntOn(void) {
     if (sound.interruptDepth) {
         if (!--sound.interruptDepth) {
@@ -1317,10 +1412,15 @@ inline void SoundIntOn(void) {
     }
 }
 
+/** Rounds x up to a multiple of 32 bytes (DVD and DMA alignment). */
 static inline u32 _ssAlign32(u32 x) {
     return (x + 0x1F) & ~0x1F;
 }
 
+/**
+ * Returns how many bytes the next stream read loads:
+ * a full 32 KB buffer, or what is left before the end of the stream data.
+ */
 static inline u32 _ssCalcLen(SoundStreamEntry* entry) {
     u32 len;
 #if VERSION >= VERSION_JP
@@ -1349,6 +1449,10 @@ static inline u32 _ssCalcLen(SoundStreamEntry* entry) {
     return len;
 }
 
+/**
+ * Starts the asynchronous disc read of the next chunk of stream channel ch (0 or 1,
+ * the second channel's data follows the first's) into its load buffer.
+ */
 inline void _ssDVDReadAsync(SoundStream* stream, int ch) {
     SoundStreamEntry* entry;
     u32 extra;
@@ -1383,6 +1487,7 @@ inline void _ssDVDReadAsync(SoundStream* stream, int ch) {
     entry->requestLength = len;
 }
 
+/** Rewinds both channels of a stream to the start of their data. */
 inline void _ssResetEntries(SoundStream* stream) {
     stream->entries[0].curBuf = 0;
     stream->entries[0].srcPos = 0;
@@ -1404,8 +1509,11 @@ inline void _ssResetEntries(SoundStream* stream) {
     stream->entries[1].runCount = 0;
 }
 
-// Marks the stream entry whose DVD read finished as loaded, then starts the first stream whose entries are all
-// ready. The demo masks interrupts only around the updates, the later versions around the whole search.
+/**
+ * Marks the stream entry whose DVD read finished as loaded,
+ * then starts the first stream whose entries are all ready.
+ * The demo masks interrupts only around the updates, the later versions around the whole search.
+ */
 static void _ssDVDReadAsync_activeChk(s32 result, DVDFileInfo* fileInfo) {
     SoundStream* stream;
     SoundStreamEntry* entry;
@@ -1523,10 +1631,15 @@ end:
 #endif
 }
 
+/** ARQ callback after a stream chunk reached ARAM: continues the disc read loop for that stream. */
 static void cache_flush(u32 pointerToARQRequest) {
     _ssDVDReadAsync_activeChk(0, &((SoundStreamEntry*)((ARQRequest*)pointerToARQRequest)->owner)->dvd->info);
 }
 
+/**
+ * ARQ callback for ARAM-cached streams: when the whole stream is in ARAM,
+ * rewinds both channels and starts playing from the beginning; otherwise reads the next chunk.
+ */
 static void _ssDVDReadAsync_cache_aram(u32 pointerToARQRequest) {
     u32 len;
     SoundStream* stream;
@@ -1556,6 +1669,10 @@ static void _ssDVDReadAsync_cache_aram(u32 pointerToARQRequest) {
     }
 }
 
+/**
+ * Disc read callback while caching a stream into ARAM:
+ * copies the chunk just read into the stream's ARAM slot with an ARQ request and advances the offsets.
+ */
 static void _ssDVDReadAsync_cache_next(s32 result, DVDFileInfo* fileInfo) {
     static u32 owner_no;
     SoundStream* stream;
@@ -1581,6 +1698,10 @@ static void _ssDVDReadAsync_cache_next(s32 result, DVDFileInfo* fileInfo) {
 s16 dtbl[16] = { 0x0001, 0x0007, 0x0018, 0x003B, 0x0053, 0x006F, 0x00EC, 0x022B,
                  0x02E6, 0x0375, 0x041C, 0x08AD, 0x0CD5, 0x1150, 0x1B32, 0x2454 };
 
+/**
+ * Decodes count samples of the game's 4-bit DPCM stream format from src into out, with run-length scale changes,
+ * keeping the decoder state in entry; returns the new source pointer.
+ */
 static u8* ssDecodeDPCM(SoundStream* stream, SoundStreamEntry* entry, s16* out, u32 count, u8* src) {
     s8 delta;
     u32 b;
@@ -1656,10 +1777,16 @@ static u8* ssDecodeDPCM(SoundStream* stream, SoundStreamEntry* entry, s16* out, 
     }
     return src;
 }
+/**
+ * MusyX stream callback: fills the requested sample buffer(s) of stream user from its loaded data (16-bit PCM
+ * copied, DPCM decoded, ADPCM passed through), wrapping at the loop point and ending non-looping streams.
+ * The US and PAL version computes len1 itself.
+ */
 #if VERSION >= VERSION_US
 static u32 _sscallback(void* p_b1, u32 p_l1, void* p_b2, u32 p_l2, u32 user) {
     u32 len1;
 #else
+/** JP and demo signature of _sscallback: the first buffer's length arrives as len1. */
 static u32 _sscallback(void* p_b1, u32 len1, void* p_b2, u32 p_l2, u32 user) {
 #endif
     s16* dst;
@@ -1900,10 +2027,16 @@ f64 SoundDemoStrippedRate(const char* ext, f64 t) {
 
 void SoundSSPlayChEx(s32 chan, const char* name, s32 aram);
 
+/** Plays stream name on stream channel chan from the disc (see SoundSSPlayChEx). */
 void SoundSSPlayCh(s32 chan, const char* name) {
     SoundSSPlayChEx(chan, name, 0);
 }
 
+/**
+ * Starts stream file name + ".stm" on channel chan, stopping what played there;
+ * aram != 0 caches the whole stream in ARAM first.
+ * The header is read asynchronously and SoundSSPlayChEx_main finishes the setup.
+ */
 void SoundSSPlayChEx(s32 chan, const char* name, s32 aram) {
     SoundStream* stream;
     int i;
@@ -1963,6 +2096,11 @@ void SoundSSPlayChEx(s32 chan, const char* name, s32 aram) {
     DVDMgrReadAsync(stream->entries[0].dvd, stream->entries[0].buffer, 0x100, 0, SoundSSPlayChEx_main);
 }
 
+/**
+ * Disc read callback for a stream header: reads format (PCM16, DPCM or ADPCM with its coefficients),
+ * sample rate, channel count, loop points and sizes,
+ * allocates the MusyX stream(s) (one, or a left/right pair panned hard) and starts loading the data.
+ */
 static void SoundSSPlayChEx_main(s32 result, DVDFileInfo* fileInfo) {
     SoundStream* stream;
     u8* dst;
@@ -2109,6 +2247,10 @@ static void SoundSSPlayChEx_main(s32 result, DVDFileInfo* fileInfo) {
     }
 }
 
+/**
+ * Stops stream chan and frees its MusyX streams and files;
+ * the demo defers the stop when the stream has not started.
+ */
 void SoundSSStopCh(s32 chan) {
     SoundStream* stream;
 
@@ -2140,6 +2282,7 @@ void SoundSSStopCh(s32 chan) {
     }
 }
 
+/** Fades stream chan out over the fade-out time (converted to frames at the current frame rate in US and PAL). */
 void SoundSSFadeoutCh(s32 chan) {
     SoundStream* stream = &sound.streams[chan];
     f32 frames;
@@ -2158,6 +2301,7 @@ void SoundSSFadeoutCh(s32 chan) {
     }
 }
 
+/** Resumes a paused stream on chan and fades it back in to its volume. */
 void SoundSSContinueCh(s32 chan) {
     SoundStream* stream = &sound.streams[chan];
 
@@ -2168,6 +2312,10 @@ void SoundSSContinueCh(s32 chan) {
     }
 }
 
+/**
+ * Sets the pan of stream chan; a stereo stream keeps its two channels panned left
+ * and right with the balance applied.
+ */
 void SoundSSSetPanCh(s32 chan, u8 pan) {
     SoundStream* stream;
     f32 left, right;
@@ -2194,6 +2342,7 @@ void SoundSSSetPanCh(s32 chan, u8 pan) {
     }
 }
 
+/** Sets the volume of stream chan. */
 void SoundSSSetVolCh(s32 chan, u8 vol) {
     SoundStream* stream;
 
@@ -2206,6 +2355,7 @@ void SoundSSSetVolCh(s32 chan, u8 vol) {
     }
 }
 
+/** Returns the volume of stream chan, 0 when none plays. */
 s32 SoundSSGetVolCh(s32 chan) {
     SoundStream* stream;
 
@@ -2217,6 +2367,7 @@ s32 SoundSSGetVolCh(s32 chan) {
     }
 }
 
+/** Sets the surround (front-back) pan of stream chan. */
 void SoundSSSetSrndPanCh(s32 chan, u8 span) {
     SoundStream* stream = &sound.streams[chan];
 
@@ -2228,6 +2379,7 @@ void SoundSSSetSrndPanCh(s32 chan, u8 span) {
     }
 }
 
+/** Sets the playback sample rate of stream chan (both channels of a stereo stream). */
 void SoundSSSetPlayFreqCh(s32 chan, u16 freq) {
     SoundStream* stream = &sound.streams[chan];
 
@@ -2244,22 +2396,29 @@ void SoundSSSetPlayFreqCh(s32 chan, u16 freq) {
     }
 }
 
+/** Returns the state flags of stream chan, non-zero while it is in use. */
 u32 SoundSSCheck(s32 chan) {
     return sound.streams[chan].flags;
 }
 
+/** Pauses stream chan: while flagged it gets no fades or disc reads. */
 void SoundSSMuteOn(s32 chan) {
     if (sound.streams[chan].flags) {
         sound.streams[chan].flags |= 2;
     }
 }
 
+/** Lifts the pause flag of stream chan without the fade-in of SoundSSContinueCh. */
 void SoundSSMuteOff(s32 chan) {
     if (sound.streams[chan].flags) {
         sound.streams[chan].flags &= ~2;
     }
 }
 
+/**
+ * Per-frame stream update: carries out deferred stops and runs volume fades:
+ * fade-to-pause, fade-out (stopping at silence) and fade-in.
+ */
 static void SoundSSMain(void) {
     u32 i;
     SoundStream* stream;
@@ -2309,6 +2468,10 @@ static void SoundSSMain(void) {
     }
 }
 
+/**
+ * Audio-interrupt stream service: starts the disc read for whichever load buffer has been consumed (both
+ * channels of a stereo stream), so playback never runs dry.
+ */
 static void SoundSSMainInt(void) {
     int i;
     SoundStream* stream;
@@ -2371,6 +2534,11 @@ static void SoundSSMainInt(void) {
     }
 }
 
+/**
+ * Audio DMA interrupt: chains to the previous callback,
+ * then copies the frame's output (byte-swapped, one channel) into the two 1024-sample banks in sound.samples,
+ * a running record of what is being played.
+ */
 static void SoundAIDMACallback(void) {
     s32 length;
     u8* address;

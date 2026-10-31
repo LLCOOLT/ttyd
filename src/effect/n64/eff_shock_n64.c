@@ -114,6 +114,10 @@ effN64Vtx testsrc_shock_v[] = {
 static void effShockMain(EffectEntry* effect);
 static void effShockDisp(CameraId cameraId, EffectEntry* effect);
 
+/**
+ * Spawns a 30-frame shock flash at (x, y, z) with extents a and b.
+ * Used by the Shadow Queen (black_peach) battle code in las and by event scripts through evt_eff.
+ */
 EffectEntry* effShockN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a, f32 b) {
     EffectEntry* effect;
     EffShockN64Work* w;
@@ -163,6 +167,12 @@ EffectEntry* effShockN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a, f32 b) {
     return effect;
 }
 
+/**
+ * The 30-frame life counts down (a life of 100 or more would hold).
+ * Type 2 grows 10% per frame for 20 frames, other types ease their scale toward 8;
+ * the type-1 yellow layer fades 10% per frame and the main alpha fades 20% per frame over the last 5 frames.
+ * Deletes when the life runs out. CAMERA_3D, layer 2.
+ */
 static void effShockMain(EffectEntry* effect) {
     EffShockN64Work* w = effect->userdata;
     Vec position;
@@ -206,6 +216,11 @@ static void effShockMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effShockDisp, effect);
 }
 
+/**
+ * Types 1-3 draw the camera-facing shock-wave mesh (testsrc_shock_v) raised by half of `b`:
+ * an outer ring textured with 0x85 (yellow and fading for type 1) and an untextured inner pass,
+ * both in the work's two colours. Type 0 and types above 3 draw nothing.
+ */
 static void effShockDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffShockN64Work* w;

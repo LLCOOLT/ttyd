@@ -35,6 +35,11 @@ DSError TRKPostEvent(TRKEvent* event);
 static TRKFramingState gTRKFramingState;
 void* gTRKInputPendingPtr;
 
+/**
+ * If the host link has data, grabs a free buffer,
+ * reads a 0x40-byte packet header and then the rest of the packet (the header's size field gives the total) into
+ * it. Returns the buffer index, or -1 if nothing arrived or the read failed.
+ */
 int TRKTestForPacket(void) {
     int bytes;
     int id;
@@ -77,6 +82,7 @@ int TRKTestForPacket(void) {
 
 void TRKProcessInput(int bufferIdx);
 
+/** Polls for a packet and, if one arrived, hands its buffer on to TRKProcessInput. */
 void TRKGetInput(void) {
     int id;
 
@@ -88,6 +94,7 @@ void TRKGetInput(void) {
     }
 }
 
+/** Posts a message event (type 2) for the received buffer so the main loop dispatches it. */
 void TRKProcessInput(int bufferIdx) {
     TRKEvent event;
 
@@ -97,6 +104,7 @@ void TRKProcessInput(int bufferIdx) {
     TRKPostEvent(&event);
 }
 
+/** Resets the packet framing state and prints the sizes of the protocol structures; returns 0. */
 DSError TRKInitializeSerialHandler(void) {
     gTRKFramingState.msgBufID = -1;
     gTRKFramingState.receiveState = 0;
@@ -112,6 +120,7 @@ DSError TRKInitializeSerialHandler(void) {
     return 0;
 }
 
+/** Serial handler shutdown; nothing to do, returns 0. */
 DSError TRKTerminateSerialHandler(void) {
     return 0;
 }

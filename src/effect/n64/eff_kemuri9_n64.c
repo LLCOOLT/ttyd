@@ -52,6 +52,11 @@ static effN64Vtx size32x32_tex32x32_vtx[] = {
 static void effKemuri9Main(EffectEntry* effect);
 static void effKemuri9Disp(CameraId cameraId, EffectEntry* effect);
 
+/**
+ * Spawns a ring of count smoke puffs around (x, y, z), starting at the angle,
+ * that expand out to radiusEnd while rising, over life frames.
+ * Used for Hooktail/Gloomtail/Bonetail leg smoke (type 1) and via evt_eff64 "kemuri9_n64".
+ */
 EffectEntry* effKemuri9N64Entry(s32 type, s32 count, s32 life, f32 x, f32 y, f32 z, f32 radiusEnd, f32 angle) {
     EffectEntry* effect;
     EffKemuri9N64Work* work;
@@ -98,6 +103,7 @@ EffectEntry* effKemuri9N64Entry(s32 type, s32 count, s32 life, f32 x, f32 y, f32
     return effect;
 }
 
+/** Eases the ring radius toward radiusEnd, lifts each puff, advances the texture animation; deletes at end of life. */
 static void effKemuri9Main(EffectEntry* effect) {
     EffKemuri9N64Work* work = effect->userdata;
     s32 i;
@@ -145,8 +151,10 @@ static void effKemuri9Main(EffectEntry* effect) {
 }
 
 #if VERSION <= VERSION_DEMO_US
-// The demo draws the smoke as N64 quads, blending two frames of one texture strip; the later versions use a
-// 16-cell GX texture and draw the quads directly.
+/**
+ * The demo draws the smoke as N64 quads, blending two frames of one texture strip;
+ * the later versions use a 16-cell GX texture and draw the quads directly.
+ */
 static void effKemuri9Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera = camGetPtr(cameraId);
     EffKemuri9N64Work* work = effect->userdata;
@@ -227,6 +235,10 @@ static void effKemuri9Disp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 #else
+/**
+ * Draws each puff as a billboarded quad (16 wide for type 1, otherwise 32) using the 16-cell strip texture 0x28,
+ * blending the current and next cell.
+ */
 static void effKemuri9Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera = camGetPtr(cameraId);
     EffKemuri9N64Work* work = effect->userdata;

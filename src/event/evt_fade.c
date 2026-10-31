@@ -6,6 +6,7 @@
 #include "manager/evtmgr_cmd.h"
 #include <dolphin/gx.h>
 
+/** Fades in from black over args[0] frames and blocks until the fade is done. */
 USER_FUNC(evt_fade_in) {
     EvtWord* args = event->args;
     s32 duration;
@@ -20,6 +21,7 @@ USER_FUNC(evt_fade_in) {
     return EVT_RETURN_DONE;
 }
 
+/** Fades out to black over args[0] frames and blocks until the fade is done. */
 USER_FUNC(evt_fade_out) {
     EvtWord* args = event->args;
     s32 duration;
@@ -34,6 +36,7 @@ USER_FUNC(evt_fade_out) {
     return EVT_RETURN_DONE;
 }
 
+/** Starts a fade without waiting: args[0] FadeType, args[1] duration, args[2..4] colour (r, g, b). */
 USER_FUNC(evt_fade_entry) {
     EvtWord* args = event->args;
     FadeType type;
@@ -49,10 +52,12 @@ USER_FUNC(evt_fade_entry) {
     return EVT_RETURN_DONE;
 }
 
+/** Blocks the script until the last fade started has finished. */
 USER_FUNC(evt_fade_end_wait) {
     return fadeIsFinish() != TRUE ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
 
+/** Centres the spotlight fade on world point args[0..2] by projecting it through the 3D camera. */
 USER_FUNC(evt_fade_set_spot_pos) {
     EvtWord* args = event->args;
     CameraEntry* camera;
@@ -76,6 +81,7 @@ USER_FUNC(evt_fade_set_spot_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets the screen offset (floats args[0], args[1]) used by animated fades. */
 USER_FUNC(evt_fade_set_anim_ofs_pos) {
     EvtWord* args = event->args;
     f32 x, y;
@@ -86,6 +92,7 @@ USER_FUNC(evt_fade_set_anim_ofs_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets the world point (floats args[0..2]) that animated fades with FADE_ENTRY_VIRTUAL_POS are drawn at. */
 USER_FUNC(evt_fade_set_anim_virtual_pos) {
     EvtWord* args = event->args;
     f32 x, y, z;
@@ -97,6 +104,11 @@ USER_FUNC(evt_fade_set_anim_virtual_pos) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Sets the fades used on the next map change (args[0] 0) or area change (nonzero):
+ * args[1] fade-in type, args[2] its duration, args[3] fade-out type, args[4] its duration;
+ * -1 keeps the current value.
+ */
 USER_FUNC(evt_fade_set_mapchange_type) {
     EvtWord* args = event->args;
     s32 area, inType, inDuration, outType, outDuration;
@@ -136,6 +148,10 @@ USER_FUNC(evt_fade_set_mapchange_type) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Turns the dark screen overlay on or off (args[0]);
+ * args[1] nonzero eases it in or out instead of switching at once.
+ */
 USER_FUNC(evt_fade_tec_onoff) {
     EvtWord* args = event->args;
     s32 on, soft;
@@ -158,6 +174,7 @@ USER_FUNC(evt_fade_tec_onoff) {
     return EVT_RETURN_DONE;
 }
 
+/** Turns the soft-focus light overlay on or off (args[0]). */
 USER_FUNC(evt_fade_softfocus_onoff) {
     EvtWord* args = event->args;
 
@@ -169,6 +186,7 @@ USER_FUNC(evt_fade_softfocus_onoff) {
     return EVT_RETURN_DONE;
 }
 
+/** Stops fade slot args[0] and frees its pose, paper pose and image. */
 USER_FUNC(evt_fade_reset) {
     EvtWord* args = event->args;
 

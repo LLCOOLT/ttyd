@@ -6,13 +6,26 @@
 
 extern float powf(float, float);
 
+/**
+ * Converts an envelope's decibel-style index (16.16) to an index into dspAttenuationTab;
+ * the table is walked backwards from 193 and never goes below 0.
+ */
 static u32 adsrGetIndex(ADSR_VARS* adsr) {
   s32 i = 193 - ((adsr->currentIndex + 0x8000) >> 16);
   return i < 0 ? 0 : i;
 }
 
+/**
+ * Converts an envelope time in time-cents (1200 per octave) to milliseconds:
+ * 1000 * 2^(tc / 1200 / 65536) in the library's fixed point scaling.
+ */
 u32 adsrConvertTimeCents(s32 tc) { return 1000.f * powf(2.f, 1.2715658e-08f * tc); }
 
+/**
+ * Moves the envelope to its next state (attack, decay, sustain; skipping empty stages) and sets the volume,
+ * step per tick and tick count for it; mode 0 is linear and mode 1 is the DLS-style decibel curve.
+ * Returns TRUE when the envelope is finished and the voice is done.
+ */
 u32 salChangeADSRState(ADSR_VARS* adsr) {
   u32 VoiceDone; // r30
   VoiceDone = FALSE;
@@ -103,11 +116,16 @@ done:
   return VoiceDone;
 }
 
+/** Starts an envelope from the beginning (attack). Returns TRUE if it is already finished. */
 u32 adsrSetup(ADSR_VARS* adsr) {
   adsr->state = 0;
   return salChangeADSRState(adsr);
 }
 
+/**
+ * Starts the release stage over rtime ticks from the current level.
+ * A release time of 0 ends the voice immediately (returns 1).
+ */
 u32 adsrStartRelease(ADSR_VARS* adsr, u32 rtime) {
   switch (adsr->mode) {
   case 0:
@@ -140,6 +158,7 @@ u32 adsrStartRelease(ADSR_VARS* adsr, u32 rtime) {
   return 0;
 }
 
+/** Starts the release stage with the envelope's own release time (key-off). Returns 1 if the voice ends at once. */
 bool adsrRelease(ADSR_VARS* adsr) {
   switch (adsr->mode) {
   case 0:
@@ -150,6 +169,11 @@ bool adsrRelease(ADSR_VARS* adsr) {
   return FALSE;
 }
 
+/**
+ * Advances the envelope by one 5 ms step: outputs the DSP ramp start value and per-sample step in *adsr_start
+ * and *adsr_delta and changes state when the stage's count runs out.
+ * Returns TRUE when the envelope has finished.
+ */
 u32 adsrHandle(ADSR_VARS* adsr, u16* adsr_start, u16* adsr_delta) {
   s32 old_volume; // r29
   bool VoiceDone; // r28
@@ -206,6 +230,10 @@ u32 adsrHandle(ADSR_VARS* adsr, u16* adsr_start, u16* adsr_delta) {
 
   return VoiceDone;
 }
+/**
+ * Advances the envelope 15 steps at once for the slower (low precision) pitch envelope update;
+ * returns 1 if it finishes.
+ */
 u32 adsrHandleLowPrecision(ADSR_VARS* adsr, u16* adsr_start, u16* adsr_delta) {
   u8 i; // r31
 

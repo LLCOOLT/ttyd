@@ -49,8 +49,18 @@ static float tonedown_tab[128] = {
 
 };
 
+/**
+ * Returns note multiplied by the semitone ratio 1.0594631 (2^(1/12)), i.e. a pitch ratio one key higher;
+ * used to interpolate between keys.
+ */
 s32 sndPitchUpOne(u16 note) { return note * 1.0594631f; }
 
+/**
+ * Returns the DSP pitch ratio (4.12 fixed point) for playing a sample at the given key.
+ * sInfo packs the sample's root key in the top byte
+ * and its sample rate in Hz in the low 24 bits (0xFFFFFFFF means a default of key 0x40 at 22050 Hz);
+ * the rate is scaled by the semitone table and divided by the mix rate.
+ */
 u32 sndGetPitch(u8 key, u32 sInfo) {
   u8 okey;   // r31
   float frq; // r63

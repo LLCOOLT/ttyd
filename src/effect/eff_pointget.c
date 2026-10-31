@@ -71,6 +71,10 @@ static PointGetTexSet texid_tbl[6] = {
 static s32 texid_tbl[2][4] = {{0x98, 0x99, 0x9A, 0x9B}, {0x98, 0x99, 0x9A, 0x9B}};
 #endif
 
+/**
+ * Spawns the point display at (x, y, z) showing `number` for `duration` frames;
+ * battle_seq_end.c uses it for the Star Points earned after a battle.
+ */
 EffectEntry* effPointGetEntry(s32 type, f32 x, f32 y, f32 z, s32 number, s32 duration) {
     EffectEntry* effect;
     EffPointGetWork* work;
@@ -98,6 +102,7 @@ EffectEntry* effPointGetEntry(s32 type, f32 x, f32 y, f32 z, s32 number, s32 dur
     return effect;
 }
 
+/** Per frame: advances the display's state machine and deletes the effect when finished. */
 static void effPointGetMain(EffectEntry* effect) {
     EffPointGetWork* work = effect->userdata;
     Vec position;
@@ -148,7 +153,7 @@ static void effPointGetMain(EffectEntry* effect) {
 }
 
 #if VERSION <= VERSION_DEMO_US
-// The demo draws the point count as three fixed digit cells (leading zeros skipped) after the header.
+/** The demo draws the point count as three fixed digit cells (leading zeros skipped) after the header. */
 static void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     EffPointGetWork* work = effect->userdata;
     CameraEntry* camera = camGetPtr(cameraId);
@@ -257,6 +262,10 @@ static void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 #elif VERSION >= VERSION_US
+/**
+ * Draw callback (one of the per-version variants):
+ * draws the header and the number digits in 2D, with a shadow pass.
+ */
 static void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     f32 w;
     f32 w1;
@@ -402,6 +411,7 @@ static void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 #else
+/** Draw callback (one of the per-version variants): draws the header and the number digits in 2D. */
 static void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     EffPointGetWork* work = effect->userdata;
     CameraEntry* camera = camGetPtr(cameraId);

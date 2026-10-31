@@ -26,6 +26,11 @@ static const char* haguruma_kage[12];
 static const char* haguruma_kage2[5];
 const char* hosi_name[14];
 
+/**
+ * Door animation script (closing) for the east door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_01 and S_doa_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_01"), 0, LW(0), 0)
@@ -34,6 +39,11 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the east door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_01 and S_doa_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(e_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_01"), 0, LW(0), 0)
@@ -145,6 +155,11 @@ static const char* haguruma_kage2[] = {
     "S_hgm_17b",
 };
 
+/**
+ * Event script: spins the gear map objects of the room forever:
+ * two groups of gears turn in opposite directions at 1 degree per frame,
+ * and three more gears sway on sine curves.
+ */
 static EVT_BEGIN(haguruma_evt)
     SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
     SET_FLOAT_VALUE(LW(1), FLOAT(0.0f))
@@ -209,6 +224,7 @@ static EVT_BEGIN(haguruma_evt)
     RETURN
 EVT_END()
 
+/** Event script: the red switch dai_switch raises the moving platform (S_move_dai) for 2.7 seconds via move_dai. */
 static EVT_BEGIN(dai_evt)
     SET_VALUE(LW(0), STRING("S_move_dai"))
     SET_VALUE(LW(1), STRING("A_move_dai"))
@@ -234,6 +250,12 @@ const char* hosi_name[] = {
     "S_hosi_08b",
 };
 
+/**
+ * Event script: after each star switch press, checks whether the seven stars match the solution (switches 1, 3,
+ * 4 and 6 on, the rest off, as kept in LSWF(1..7)).
+ * When solved it flashes the stars in a running light, shakes the camera,
+ * removes the switches and sets the story to STORY_STG8_11_STAR_PUZZLE.
+ */
 EVT_BEGIN(hosi_sw_check)
     SET_VALUE(LW(0), 0)
     IF_INT_EQUAL(LSWF(1), 1)
@@ -328,6 +350,10 @@ EVT_BEGIN(hosi_sw_check)
     RETURN
 EVT_END()
 
+/**
+ * Event script: toggles one star (LW(0) lit model, LW(1) dark model, LW(2) the switch state flag in LSWF):
+ * lighting it plays a stardust effect and sound, switching it off hides the lit model again.
+ */
 EVT_BEGIN(hosi_onoff)
     GET_INT_INDEXED(LW(2), LW(3))
     IF_INT_EQUAL(LW(3), 0)
@@ -349,6 +375,7 @@ EVT_BEGIN(hosi_onoff)
     RETURN
 EVT_END()
 
+/** Event script: red switch for star 2. Toggles the star (LSWF(1)) and then checks the puzzle. */
 EVT_BEGIN(hosi_02_sw_evt)
     SET_VALUE(LW(0), STRING("S_hosi_02a"))
     SET_VALUE(LW(1), STRING("S_hosi_02b"))
@@ -358,6 +385,7 @@ EVT_BEGIN(hosi_02_sw_evt)
     RETURN
 EVT_END()
 
+/** Event script: red switch for star 3. Toggles the star (LSWF(2)) and then checks the puzzle. */
 EVT_BEGIN(hosi_03_sw_evt)
     SET_VALUE(LW(0), STRING("S_hosi_03a"))
     SET_VALUE(LW(1), STRING("S_hosi_03b"))
@@ -367,6 +395,7 @@ EVT_BEGIN(hosi_03_sw_evt)
     RETURN
 EVT_END()
 
+/** Event script: red switch for star 4. Toggles the star (LSWF(3)) and then checks the puzzle. */
 EVT_BEGIN(hosi_04_sw_evt)
     SET_VALUE(LW(0), STRING("S_hosi_04a"))
     SET_VALUE(LW(1), STRING("S_hosi_04b"))
@@ -376,6 +405,7 @@ EVT_BEGIN(hosi_04_sw_evt)
     RETURN
 EVT_END()
 
+/** Event script: red switch for star 5. Toggles the star (LSWF(4)) and then checks the puzzle. */
 EVT_BEGIN(hosi_05_sw_evt)
     SET_VALUE(LW(0), STRING("S_hosi_05a"))
     SET_VALUE(LW(1), STRING("S_hosi_05b"))
@@ -385,6 +415,7 @@ EVT_BEGIN(hosi_05_sw_evt)
     RETURN
 EVT_END()
 
+/** Event script: red switch for star 6. Toggles the star (LSWF(5)) and then checks the puzzle. */
 EVT_BEGIN(hosi_06_sw_evt)
     SET_VALUE(LW(0), STRING("S_hosi_06a"))
     SET_VALUE(LW(1), STRING("S_hosi_06b"))
@@ -394,6 +425,7 @@ EVT_BEGIN(hosi_06_sw_evt)
     RETURN
 EVT_END()
 
+/** Event script: red switch for star 7. Toggles the star (LSWF(6)) and then checks the puzzle. */
 EVT_BEGIN(hosi_07_sw_evt)
     SET_VALUE(LW(0), STRING("S_hosi_07a"))
     SET_VALUE(LW(1), STRING("S_hosi_07b"))
@@ -403,6 +435,7 @@ EVT_BEGIN(hosi_07_sw_evt)
     RETURN
 EVT_END()
 
+/** Event script: red switch for star 8. Toggles the star (LSWF(7)) and then checks the puzzle. */
 EVT_BEGIN(hosi_08_sw_evt)
     SET_VALUE(LW(0), STRING("S_hosi_08a"))
     SET_VALUE(LW(1), STRING("S_hosi_08b"))
@@ -412,6 +445,12 @@ EVT_BEGIN(hosi_08_sw_evt)
     RETURN
 EVT_END()
 
+/**
+ * Event script: sets up the star puzzle.
+ * Before STORY_STG8_11_STAR_PUZZLE it hides the lit stars,
+ * clears the seven switch flags and creates seven red floating switches;
+ * afterwards it shows the lit stars permanently.
+ */
 EVT_BEGIN(hosi_init)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG8_11_STAR_PUZZLE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_hosi_02a"), MAPOBJ_FLAG_HIDE)
@@ -447,6 +486,11 @@ EVT_BEGIN(hosi_init)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for las_20, the star switch room of the Palace:
+ * music and ambience, the door, the gear animation, the moving platform with its red switch, the star puzzle,
+ * and two hidden blocks with a Repel Cape and a Life Shroom.
+ */
 EVT_BEGIN(las_20_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST3"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS5"))
@@ -473,6 +517,10 @@ EVT_BEGIN(las_20_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: for star index args[0] returns the lit-star map object name in args[1]
+ * and the dark-star name in args[2].
+ */
 static USER_FUNC(get_hosi_name) {
     EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);

@@ -1,6 +1,10 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
+/**
+ * Decodes one UTF-8 character at utf8 into a UTF-32 code point;
+ * returns the pointer past it, or NULL for an invalid, overlong or surrogate sequence.
+ */
 char* OSUTF8to32(const char* utf8, u32* utf32) {
     u32 u;
     u8 c;
@@ -60,6 +64,10 @@ char* OSUTF8to32(const char* utf8, u32* utf32) {
     return (char*)utf8;
 }
 
+/**
+ * Encodes a UTF-32 code point as one to four UTF-8 bytes;
+ * returns the pointer past the bytes written, or NULL for a surrogate or a value above 0x10FFFF.
+ */
 char* OSUTF32to8(u32 utf32, char* utf8) {
     int len;
 
@@ -94,6 +102,10 @@ char* OSUTF32to8(u32 utf32, char* utf8) {
     return utf8;
 }
 
+/**
+ * Decodes one UTF-16 unit or a surrogate pair into a UTF-32 code point;
+ * returns the pointer past it, or NULL for an unpaired surrogate.
+ */
 u16* OSUTF16to32(const u16* utf16, u32* utf32) {
     u16 w1;
     u16 w2;
@@ -124,6 +136,10 @@ u16* OSUTF16to32(const u16* utf16, u32* utf32) {
     return (u16*)utf16;
 }
 
+/**
+ * Encodes a UTF-32 code point as one UTF-16 unit or a surrogate pair;
+ * returns the pointer past it, or NULL for a surrogate or a value above 0x10FFFF.
+ */
 u16* OSUTF32to16(u32 utf32, u16* utf16) {
     u16 w1;
     u16 w2;
@@ -162,6 +178,11 @@ static u16 UcsAnsiTable[32] = {
     0x017E, 0x0178,
 };
 
+/**
+ * Converts a code point to a single-byte Windows-1252 value.
+ * Returns 0 above 0xFF; values outside 0x80 to 0x9F are returned as they are.
+ * Surprising: the lookup in the 0x80 to 0x9F table is unreachable because of the earlier checks.
+ */
 u8 OSUTF32toANSI(u32 utf32) {
     int i;
 
@@ -184,6 +205,10 @@ u8 OSUTF32toANSI(u32 utf32) {
     return 0;
 }
 
+/**
+ * Converts a Windows-1252 byte to its UTF-32 code point (the 0x80 to 0x9F range through UcsAnsiTable,
+ * everything else unchanged).
+ */
 u32 OSANSItoUTF32(u8 ansi) {
     if (ansi >= 0x80 && ansi <= 0x9F) {
         return UcsAnsiTable[ansi - 0x80];
@@ -4472,6 +4497,10 @@ static u16 UcsFF[256] = {
 
 static u16* UcsSjisTable[256] = {0};
 
+/**
+ * Converts a code point to Shift-JIS through a two-level table keyed by its high byte.
+ * In this build the table of pages is empty, so it always returns 0.
+ */
 u16 OSUTF32toSJIS(u32 utf32) {
     u16* table;
 
@@ -6329,6 +6358,10 @@ static u16 SjisEA[256] = {
 
 static u16* SjisUcsTable[256] = {0};
 
+/**
+ * Converts a Shift-JIS character to UTF-32 through a two-level table keyed by its high byte.
+ * In this build the table of pages is empty, so it always returns 0.
+ */
 u32 OSSJIStoUTF32(u16 sjis) {
     u16* table;
 

@@ -14,6 +14,7 @@ Lg7 = 1.479819860511658591e-01;
 
 static double zero = 0.0;
 
+/** Natural logarithm of x (fdlibm). */
 double __ieee754_log(double x) {
     double hfsq, f, s, z, R, w, t1, t2, dk;
     int k, hx, i, j;

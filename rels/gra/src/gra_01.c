@@ -54,6 +54,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Cutscene on the first visit after Vivian has joined:
+ * Vivian is placed behind Mario, runs up and says her first trail line (stg4_gra_16_01);
+ * sets GSWF_GRA01_VIVIAN_FIRST_TRAIL_TALK so it plays once.
+ */
 EVT_BEGIN(gra_01_after_ranpel2)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_run, 0)
@@ -90,6 +95,11 @@ static TreeAccess tree_tbl[] = {
     {7, NULL, NULL, NULL, 0, NULL},
 };
 
+/**
+ * Init script of gra_01: trail music, the shake-tree spots and the exits, a coin block,
+ * a hidden Super Shroom block and a ten-coin brick,
+ * and Vivian's first-talk cutscene once the story reaches STORY_STG4_13_VIVIAN_JOINS.
+ */
 EVT_BEGIN(gra_01_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_GRA1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_USU1"))

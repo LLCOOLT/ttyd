@@ -59,6 +59,10 @@
 #include "driver/casedrv.h"
 #include "evt/evt_pouch.h"
 
+/**
+ * Identity function on a float (returns x).
+ * Used in the camera-angle math so the compiler loads the value the same way as the original.
+ */
 static inline f32 fid(f32 x) {
     return x;
 }
@@ -85,6 +89,11 @@ static KaitenParam* ckp1;
 static KaitenParam* ckpw;
 BrokenWork broken_work;
 s32 select;
+/**
+ * Sine of x radians (0 to 2 pi) by a short odd polynomial (x - 0.166 x^3 + 0.0076 x^5),
+ * folding the other quadrants onto the first.
+ * Used by the screen-shatter effect (tiz_broken) in place of the library sin.
+ */
 static inline f32 tb_sin(f32 x) {
     f32 a = 0.00761f;
     f32 b = 0.16605f;
@@ -121,6 +130,7 @@ static inline f32 tb_sin(f32 x) {
     }
     return a;
 }
+/** Cosine of x radians (0 to 2 pi) by an even polynomial, folding the quadrants. Companion of tb_sin for tiz_broken. */
 static inline f32 tb_cos(f32 x) {
     f32 a = 0.03705f;
     f32 b = 0.4967f;
@@ -207,6 +217,10 @@ extern EvtWord lastdungeon_init[];
 extern EvtWord lastdungeon[];
 extern EvtWord mahojin_event7[];
 
+/**
+ * Door callback of the Thousand-Year Door (bero n_bero):
+ * turns door_b by the progress times 0.389 degrees and door_a the opposite way.
+ */
 static EVT_BEGIN(n_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("door_b"), 0, LW(0), 0)
@@ -215,6 +229,10 @@ static EVT_BEGIN(n_door_close)
     RETURN
 EVT_END()
 
+/**
+ * The opening counterpart of n_door_close: turns door_b by progress times -0.389 and door_a the opposite way,
+ * used for the exit to the Palace of Shadow (las_00).
+ */
 static EVT_BEGIN(n_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("door_b"), 0, LW(0), 0)
@@ -277,6 +295,12 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Init script of Professor Frankly (クリハカセ) in the Thousand-Year Door room.
+ * Places him at (-30, 23, -190) facing the pedestal from STORY_STG7_50_A_WAITING_PROF_FRANKLY to
+ * STORY_STG7_51_THOUSAND_YEAR_DOOR, and at (-30, 23, -170) from STORY_STG7_52_THE_PEDESTAL to
+ * STORY_STG8_03_THE_PALACE_GARDEN.
+ */
 static EVT_BEGIN(kurihakase_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG7_50_A_WAITING_PROF_FRANKLY, STORY_STG7_51_THOUSAND_YEAR_DOOR)
@@ -288,6 +312,10 @@ static EVT_BEGIN(kurihakase_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of Professor Frankly: says mac_7_008 while the Door waits (chapter 7 steps 50 to 51)
+ * and mac_7_014 from STORY_STG7_52_THE_PEDESTAL on.
+ */
 static EVT_BEGIN(kurihakase_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG7_50_A_WAITING_PROF_FRANKLY, STORY_STG7_51_THOUSAND_YEAR_DOOR)
@@ -314,6 +342,7 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/** Script helper. Moves the named Crystal Star effect to the world position (args[1], args[2], args[3]). */
 static USER_FUNC(starstone_set_position) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -328,6 +357,7 @@ static USER_FUNC(starstone_set_position) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Reads the named Crystal Star effect's position into the variables args[1], args[2], args[3]. */
 static USER_FUNC(starstone_get_position) {
     EvtWord* args = event->args;
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
@@ -341,6 +371,7 @@ static USER_FUNC(starstone_get_position) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Sets the named Crystal Star effect's Y rotation to args[1] degrees, wrapped to 0..360. */
 static USER_FUNC(starstone_set_ry) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -351,6 +382,7 @@ static USER_FUNC(starstone_set_ry) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Sets the named Crystal Star effect's opacity to args[1] (0 to 255). */
 static USER_FUNC(starstone_set_alpha) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -360,6 +392,7 @@ static USER_FUNC(starstone_set_alpha) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Sets the named Crystal Star effect's scale to the float args[1]. */
 static USER_FUNC(starstone_set_scale) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -369,6 +402,12 @@ static USER_FUNC(starstone_set_scale) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper that places one of the seven Crystal Stars on a circle.
+ * args: [0] effect name, [1] star number 1 to 7, [2] to [4] the circle's centre,
+ * [5] the circle's rotation in degrees, [6] its radius.
+ * The stars sit 360/7 degrees apart; called every frame so the ring turns around the pedestal.
+ */
 static USER_FUNC(starstone_circle_link_func) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -394,11 +433,17 @@ static USER_FUNC(starstone_circle_link_func) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Clears the sound flag (bit 2) of the named Crystal Star effect so it stays silent. */
 static USER_FUNC(eff_starstone_sound_off) {
     ((EffStarStoneWork*)effNameToPtr((const char*)evtGetValue(event, event->args[0]))->userdata)->flags &= ~4;
     return EVT_RETURN_DONE;
 }
 
+/**
+ * TEV callback for the pedestal's star glow (hosi_2).
+ * Draws it with source-alpha blending and a constant alpha taken from the byte at _ap,
+ * so mahojin_alpha can fade it in and out.
+ */
 static void alpha_tev(MapTevCallbackInfo* info) {
     s32 stage = info->tevStage;
     u8* alpha = _ap;
@@ -416,6 +461,12 @@ static void alpha_tev(MapTevCallbackInfo* info) {
     info->tevStage++;
 }
 
+/**
+ * Runs the fade of the glowing star (hosi_2) on the pedestal.
+ * Every frame it adds the speed in GW(1) to an alpha clamped to 0..255 and stores it;
+ * stops when GF(10) is set, then removes the callback after a second.
+ * mahojin_alpha_up and mahojin_alpha_down set GW(1) when Mario steps on or off the pedestal (a_dai).
+ */
 EVT_BEGIN(mahojin_alpha)
     CALL(evt_map_set_tevcallback, 1, PTR(alpha_tev))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("hosi_2"), MAPOBJ_TEV_CALLBACK(1))
@@ -444,16 +495,25 @@ EVT_BEGIN(mahojin_alpha)
     RETURN
 EVT_END()
 
+/**
+ * Case trigger for stepping onto the pedestal; sets the fade speed GW(1) to +6 per frame
+ * so the star glows brighter.
+ */
 EVT_BEGIN(mahojin_alpha_up)
     SET_VALUE(GW(1), FLOAT(6.0f))
     RETURN
 EVT_END()
 
+/** Case trigger for stepping off the pedestal; sets the fade speed GW(1) to -6 per frame so the glow dims. */
 EVT_BEGIN(mahojin_alpha_down)
     SET_VALUE(GW(1), FLOAT(-6.0f))
     RETURN
 EVT_END()
 
+/**
+ * Map-init part for the prologue (STORY_STG0_12_02_PAPER_MAGE_1):
+ * takes control from Mario and holds the camera on the huge Thousand-Year Door high above.
+ */
 EVT_BEGIN(large_door_stg0_init)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -461,6 +521,11 @@ EVT_BEGIN(large_door_stg0_init)
     RETURN
 EVT_END()
 
+/**
+ * Prologue scene where Mario and his partners first see the Thousand-Year Door (look_large_door starts it).
+ * The camera pans down from the door over six seconds, the partners comment (mac_0_095_kur, mac_0_096_kur),
+ * and story progress becomes STORY_STG0_13_FIRST_FLIGHT.
+ */
 EVT_BEGIN(large_door_stg0)
     CALL(evt_snd_bgm_scope, 0, 1)
     CALL(evt_party_stop, 0)
@@ -496,6 +561,12 @@ EVT_BEGIN(large_door_stg0)
     RETURN
 EVT_END()
 
+/**
+ * Case trigger for looking at the big door.
+ * At STORY_STG0_12_02_PAPER_MAGE_1 it starts large_door_stg0 and returns 1 in LW(0);
+ * at STORY_STG7_50_A_WAITING_PROF_FRANKLY it advances to STORY_STG7_51_THOUSAND_YEAR_DOOR and returns 0;
+ * otherwise returns 0.
+ */
 EVT_BEGIN(look_large_door)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG0_12_02_PAPER_MAGE_1)
@@ -511,6 +582,10 @@ EVT_BEGIN(look_large_door)
     RETURN
 EVT_END()
 
+/**
+ * Waits until Mario walks up the stairs in front of the pedestal (|X| < 130, Z < 0),
+ * then stops him and the partner says mac_0_097. Sets story progress STORY_STG0_14_FRONT_OF_THE_PEDESTAL.
+ */
 EVT_BEGIN(kaidan_event)
     LOOP(0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -540,6 +615,10 @@ EVT_BEGIN(kaidan_event)
     RETURN
 EVT_END()
 
+/**
+ * Moves Mario to (-250 Z) facing right and his first partner to (30, -190) facing left,
+ * so both stand at the pedestal; waits until both have arrived. Sets GF(10) so the pedestal glow fade stops.
+ */
 EVT_BEGIN(evt_mahojin_move)
     SET_VALUE(GF(10), 1)
     SET_VALUE(GF(0), 1)
@@ -561,6 +640,10 @@ EVT_BEGIN(evt_mahojin_move)
     RETURN
 EVT_END()
 
+/**
+ * Puts the two partners at fixed spots beside the pedestal:
+ * (30, 19, -190) facing left and (-30, 19, -190) facing right.
+ */
 EVT_BEGIN(evt_mahojin_move2)
     CALL(evt_party_set_pos, 0, 30, 19, -190)
     CALL(evt_party_set_dir, 0, 270, 0)
@@ -569,6 +652,10 @@ EVT_BEGIN(evt_mahojin_move2)
     RETURN
 EVT_END()
 
+/**
+ * Pushes the map fog's end distance out by 600 to 1000 units over four seconds,
+ * so the room opens up during the Crystal Star scenes.
+ */
 EVT_BEGIN(evt_fogset)
     CALL(evt_map_get_fog, LW(4), LW(5), LW(6), LW(7), LW(8), LW(9))
     CALL(evt_sub_intpl_msec_init, 11, 600, 1000, 4000)
@@ -585,6 +672,7 @@ EVT_BEGIN(evt_fogset)
     RETURN
 EVT_END()
 
+/** Pulls the fog back to near 300 and far 1500 over two seconds, then holds it for three seconds. */
 EVT_BEGIN(evt_fogreset)
     CALL(evt_map_get_fog, LW(4), LW(5), LW(6), LW(7), LW(8), LW(9))
     SET_VALUE(GW(2), LW(5))
@@ -622,16 +710,25 @@ EVT_BEGIN(evt_fogreset)
     RETURN
 EVT_END()
 
+/**
+ * Sound-effect timing script for the magic circle scenes. Waits 3.5 s and then 1.6 s between its sound effects.
+ * Guess: the sounds were removed, leaving only the waits.
+ */
 EVT_BEGIN(mahojin_se_event)
     WAIT_MS(3500)
     WAIT_MS(1600)
     RETURN
 EVT_END()
 
+/** Sound-effect script that ends the circle sounds; only returns. */
 EVT_BEGIN(mahojin_se_event_end)
     RETURN
 EVT_END()
 
+/**
+ * Loop that keeps the glowing orb (map_ball) of the map scene on the Crystal Star item00,
+ * calling disp_lighteffect_func with the item's position each frame.
+ */
 EVT_BEGIN(disp_lighteffect)
     LOOP(0)
         CALL(evt_item_get_position, STRING("item00"), LW(0), LW(1), LW(2))
@@ -641,6 +738,10 @@ EVT_BEGIN(disp_lighteffect)
     RETURN
 EVT_END()
 
+/**
+ * Loop that keeps the treasure-map picture (map_map) of the map scene on item00,
+ * calling disp_treasure_map_func each frame.
+ */
 EVT_BEGIN(disp_treasure_map)
     LOOP(0)
         CALL(evt_item_get_position, STRING("item00"), LW(0), LW(1), LW(2))
@@ -650,17 +751,24 @@ EVT_BEGIN(disp_treasure_map)
     RETURN
 EVT_END()
 
+/** Script helper. Allocates the one-byte alpha used by alpha_tev and sets it to 255. */
 static USER_FUNC(alpha_init_func) {
     _ap = _mapAlloc(1);
     *_ap = 255;
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Sets the pedestal star's alpha byte to args[0]. */
 static USER_FUNC(alpha_set_func) {
     *_ap = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper that prepares the rotating camera of the map scene.
+ * args[0..5] and [6..11] are the position and target of two key camera views;
+ * the helper allocates three work areas and computes each key view's yaw and distance around the target.
+ */
 static USER_FUNC(cam_kaiten_init) {
     EvtWord* args = event->args;
     Vec target;
@@ -709,6 +817,7 @@ static USER_FUNC(cam_kaiten_init) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Applies the working camera view of the map scene (position, target) directly to the 3D camera. */
 static USER_FUNC(cam_kaiten_set_direct) {
     CameraEntry* camera = camGetPtr(CAMERA_3D);
     f32 s = sin(6.2831855f * ckpw->angle / 360.0f);
@@ -727,6 +836,11 @@ static USER_FUNC(cam_kaiten_set_direct) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper.
+ * Reads one of the three stored camera views (args[0]: 0, 1 or the working one) into the variables args[1..8]:
+ * position, target, yaw angle and distance.
+ */
 static USER_FUNC(cam_kaiten_get_para) {
     EvtWord* args = event->args;
     KaitenParam* p;
@@ -754,6 +868,10 @@ static USER_FUNC(cam_kaiten_get_para) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper.
+ * Writes the position, target, angle and distance in args[1..8] into the camera view selected by args[0].
+ */
 static USER_FUNC(cam_kaiten_set_para) {
     EvtWord* args = event->args;
     KaitenParam* p;
@@ -781,6 +899,11 @@ static USER_FUNC(cam_kaiten_set_para) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper.
+ * Places the orb effect args[0] at 30 units in front of (x, y, z) = args[1..3] along the Y rotation args[4],
+ * where the item sits.
+ */
 static USER_FUNC(disp_lighteffect_func) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -801,6 +924,11 @@ static USER_FUNC(disp_lighteffect_func) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper.
+ * Places the treasure map effect args[0] at (args[1], args[2], args[3]) with rotation 180 + args[4]
+ * and the alpha args[5].
+ */
 static USER_FUNC(disp_treasure_map_func) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -819,6 +947,7 @@ static USER_FUNC(disp_treasure_map_func) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Sets the alpha (args[1]) of the named magic-circle effect. */
 static USER_FUNC(mahojin_effect_alpha) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -828,6 +957,11 @@ static USER_FUNC(mahojin_effect_alpha) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper that keeps the map, orb and wave effects in front of the item (item00) as the camera turns,
+ * by offsetting them 5, 10 and 15 units along the camera's view direction.
+ * Returns EVT_RETURN_BLOCK so it runs every frame.
+ */
 static USER_FUNC(effect_position) {
     ItemEntry* item = itemNameToPtr("item00");
     f32 angle = -(6.2831855f * camGetPtr(CAMERA_3D)->viewYaw / 360.0f);
@@ -865,6 +999,11 @@ static USER_FUNC(effect_position) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper.
+ * Sets the overlay image "img" to white with the opacity args[0]
+ * and places it with a fixed transform (scale 0.9, tilted back 30 degrees).
+ */
 static USER_FUNC(img_alpha) {
     Mtx trans;
     Mtx scale;
@@ -882,6 +1021,11 @@ static USER_FUNC(img_alpha) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper for the map-appear scene.
+ * args[0] is a time 0..10000: it sets the star stone effect's opacity
+ * and spin from it (spinning five turns over the range) and puts the dust effects on camera 7.
+ */
 static USER_FUNC(tiz_stone) {
     f32 t = evtGetValue(event, event->args[0]);
     EffectEntry* eff;
@@ -904,6 +1048,11 @@ static USER_FUNC(tiz_stone) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Draw callback of the screen-shatter effect.
+ * On the first call it copies the frame to a texture, then draws it as a 38 by 30 grid of 16 pixel tiles;
+ * each tile whose delay is over is drawn flying off with its own rotation and velocity.
+ */
 static void tiz_broken_draw(CameraId cameraId, void* param) {
     GXTexObj tex;
     Mtx mtx;
@@ -1011,6 +1160,11 @@ static void tiz_broken_draw(CameraId cameraId, void* param) {
 // removing them).
 #pragma opt_propagation off
 #pragma opt_lifetimes off
+/**
+ * Guess: runs the screen-shatter effect (tiz_broken_draw) shown when the map appears;
+ * the script helper keeps its pieces' timers going and ends when they have all fallen.
+ * Parts of it are written with hand-expanded math to keep the original code.
+ */
 static USER_FUNC(tiz_broken) {
 #if VERSION >= VERSION_US
     f32 sq; // FAKE: tb_sqrtf expanded by hand (see below)
@@ -1173,6 +1327,11 @@ static const char* name_tbl[] = {
     "vr",
 };
 
+/**
+ * Script helper.
+ * Fades the screen to white over args[0] ms, holds for args[1] ms, then fades back over args[2] ms.
+ * Used for the flash when the magic circle appears.
+ */
 static USER_FUNC(evtflash) {
     EvtWord* args = event->args;
     s32 in = evtGetValue(event, args[0]);
@@ -1220,6 +1379,10 @@ static USER_FUNC(evtflash) {
 }
 
 #if VERSION >= VERSION_JP
+/**
+ * Script helper (JP and later).
+ * With a nonzero args[0] shows the map display (N_mapDispOn), otherwise hides it (N_mapDispOff).
+ */
 static USER_FUNC(map_disp_onoff) {
     if (evtGetValue(event, event->args[0])) {
         N_mapDispOn();
@@ -1230,6 +1393,7 @@ static USER_FUNC(map_disp_onoff) {
 }
 #endif
 
+/** Script helper. Draws the named crystal effect on camera 5, the camera that is drawn over the black overlay. */
 static USER_FUNC(crystal_bgmode) {
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
 
@@ -1237,6 +1401,12 @@ static USER_FUNC(crystal_bgmode) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper.
+ * Moves the item-get effect (args[0]) and the treasure map effect (args[1]) to camera 5
+ * and enlarges the item-get glow, so the map scene is drawn over the black background.
+ * Also puts Mario on camera 5.
+ */
 static USER_FUNC(map_bgmode) {
     EvtWord* args = event->args;
     const char* name1 = (const char*)evtGetValue(event, args[0]);
@@ -1251,6 +1421,7 @@ static USER_FUNC(map_bgmode) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Undoes map_bgmode: puts the item-get effect, the treasure map effect and Mario back on camera 4. */
 static USER_FUNC(map_bgmode_end) {
     EvtWord* args = event->args;
     const char* name1 = (const char*)evtGetValue(event, args[0]);
@@ -1265,6 +1436,12 @@ static USER_FUNC(map_bgmode_end) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper that turns the camera around the pedestal.
+ * args: [0] start angle, [1] end angle, [2] duration in ms, [3] receives the current angle,
+ * [4] receives 1 while still turning and 0 when done.
+ * The speed ramps up over the first 20 percent of the time and down over the last 20 percent.
+ */
 static USER_FUNC(cam_mahojin_kaiten_main) {
     s32 frames;
     s32 msec;
@@ -1324,6 +1501,12 @@ static USER_FUNC(cam_mahojin_kaiten_main) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper.
+ * Marks the named Crystal Star effect (args[0]) as not drawn by itself
+ * and hooks it into slot args[1] + 2 of the magic-circle (mahojin) effect,
+ * so the circle draws that star as part of its own pass.
+ */
 static USER_FUNC(starstone_setting) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1337,6 +1520,7 @@ static USER_FUNC(starstone_setting) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Moves the named smoke effect to (args[1], args[2], args[3]). */
 static USER_FUNC(kemuri_set_position) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1351,6 +1535,11 @@ static USER_FUNC(kemuri_set_position) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper.
+ * Sets the colour of the named smoke (kemuri) effect to (args[1], args[2], args[3])
+ * and gives it a random scale of 1.0 to 3.9.
+ */
 static USER_FUNC(kemuri_set_color) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1366,6 +1555,7 @@ static USER_FUNC(kemuri_set_color) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Moves the named charge-up effect to (args[1], args[2], args[3]). */
 static USER_FUNC(pcharge_set_position) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1380,6 +1570,7 @@ static USER_FUNC(pcharge_set_position) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Configures two star-dust effects, args[0] and args[1], to draw on camera 5. */
 static USER_FUNC(stardust_setting) {
     EvtWord* args = event->args;
     const char* name1 = (const char*)evtGetValue(event, args[0]);
@@ -1393,6 +1584,11 @@ static USER_FUNC(stardust_setting) {
 }
 
 #if VERSION <= VERSION_JP
+/**
+ * Script helper (JP and earlier).
+ * Checks whether an EXI device of ID 0x05070000 is attached to channel 0;
+ * if so, releases the big map-scene animations. Guess: a development kit or viewer memory saving.
+ */
 static USER_FUNC(is_dol_viewer) {
     u32 type;
 
@@ -1416,6 +1612,14 @@ static USER_FUNC(is_dol_viewer) {
 }
 #endif
 
+/**
+ * The treasure-map scene after a Crystal Star appears.
+ * Magic circle and wave effects rise, the camera turns around the pedestal,
+ * a map of the next chapter's area (TIZ_stg_N) is revealed with star dust,
+ * the screen shatters into the item-get view (tiz_broken)
+ * and the matching message (mac_0_099 or mac_N_00x) is shown.
+ * Guess: the details of the camera turns are only roughly traced.
+ */
 EVT_BEGIN(evt_mapwrite)
     WAIT_MS(800)
     IF_INT_EQUAL(GW(15), 0)
@@ -1818,6 +2022,10 @@ EVT_BEGIN(evt_mapwrite)
     RETURN
 EVT_END()
 
+/**
+ * Short camera move (0, 225, 469 looking at 0, 100, -270 in two seconds) used to end the Crystal Star scenes.
+ * Guess: it replaces a fade that was cut.
+ */
 EVT_BEGIN(fake_fade)
     CALL(evt_cam3d_evt_set, 0, 225, 469, 0, 100, -270, 2000, 11)
     WAIT_MS(1200)
@@ -1827,6 +2035,11 @@ EVT_BEGIN(fake_fade)
     RETURN
 EVT_END()
 
+/**
+ * A Crystal Star rises from Mario's raised hands.
+ * Plays the item-get light, the star stone effect (LW(0) = star number) and star dust,
+ * then removes the effects and returns Mario to his idle pose.
+ */
 EVT_BEGIN(evt_starstone_up)
     WAIT_MS(500)
     CALL(evt_mario_get_pos, 0, LW(4), LW(5), LW(6))
@@ -1852,6 +2065,10 @@ EVT_BEGIN(evt_starstone_up)
     RETURN
 EVT_END()
 
+/**
+ * Places the seven-star ring one star: spawns the star stone effect, sets its alpha and number,
+ * fades it in and then spins it until GF(11) is set, removing it at the end.
+ */
 EVT_BEGIN(evt_starstone_set)
     WAIT_MS(7000)
     SET_VALUE(LW(0), GW(15))
@@ -1889,6 +2106,12 @@ EVT_BEGIN(evt_starstone_set)
     RETURN
 EVT_END()
 
+/**
+ * First pedestal scene (STORY_STG0_14_FRONT_OF_THE_PEDESTAL):
+ * Mario steps on the pedestal, the magic circle appears with a flash,
+ * the map is written (evt_mapwrite) and the partner and Professor Frankly react (mac_0_100, mac_0_101).
+ * Sets story progress STORY_STG0_15_THE_PEDESTAL.
+ */
 EVT_BEGIN(mahojin_event)
     SET_VALUE(GW(15), 0)
     CALL(evt_mario_key_onoff, 0)
@@ -1992,6 +2215,11 @@ EVT_BEGIN(mahojin_event)
     RETURN
 EVT_END()
 
+/**
+ * Pedestal scene after the first Crystal Star (STORY_STG1_21_A_MAIL_FROM_PEACH).
+ * The star rises, the circle and map appear (evt_mapwrite),
+ * the partner reacts (mac_1_001 to mac_1_003) and story progress becomes STORY_STG1_30_ZESS_T.
+ */
 EVT_BEGIN(mahojin_event1)
     SET_VALUE(GW(15), 1)
     CALL(evt_mario_key_onoff, 0)
@@ -2026,6 +2254,11 @@ EVT_BEGIN(mahojin_event1)
     RETURN
 EVT_END()
 
+/**
+ * Pedestal scene after the second Crystal Star (STORY_STG2_27_A_MAIL_FROM_PEACH).
+ * The same sequence as mahojin_event1 with the second star (mac_2_001, mac_2_002);
+ * sets STORY_STG2_40_THOUSAND_YEAR_DOOR.
+ */
 EVT_BEGIN(mahojin_event2)
     SET_VALUE(GW(15), 2)
     CALL(evt_mario_key_onoff, 0)
@@ -2058,6 +2291,10 @@ EVT_BEGIN(mahojin_event2)
     RETURN
 EVT_END()
 
+/**
+ * Pedestal scene after the third Crystal Star (STORY_STG3_35_A_MAIL_FROM_PEACH); the same sequence (mac_3_001);
+ * sets STORY_STG3_50_THOUSAND_YEAR_DOOR.
+ */
 EVT_BEGIN(mahojin_event3)
     SET_VALUE(GW(15), 3)
     CALL(evt_mario_key_onoff, 0)
@@ -2089,6 +2326,10 @@ EVT_BEGIN(mahojin_event3)
     RETURN
 EVT_END()
 
+/**
+ * Pedestal scene after the fourth Crystal Star (STORY_STG4_17_A_MAIL_FROM_PEACH); the same sequence (mac_4_001);
+ * sets STORY_STG4_30_THOUSAND_YEAR_DOOR.
+ */
 EVT_BEGIN(mahojin_event4)
     SET_VALUE(GW(15), 4)
     CALL(evt_mario_key_onoff, 0)
@@ -2120,6 +2361,10 @@ EVT_BEGIN(mahojin_event4)
     RETURN
 EVT_END()
 
+/**
+ * Pedestal scene after the fifth Crystal Star (STORY_STG5_59_01_A_MAIL_FROM_PEACH);
+ * the same sequence (mac_5_001); sets STORY_STG5_60_RETURN_TO_KEELHAUL.
+ */
 EVT_BEGIN(mahojin_event5)
     SET_VALUE(GW(15), 5)
     CALL(evt_mario_key_onoff, 0)
@@ -2151,6 +2396,11 @@ EVT_BEGIN(mahojin_event5)
     RETURN
 EVT_END()
 
+/**
+ * Pedestal scene after the sixth Crystal Star (STORY_STG6_57_A_MAIL_FROM_PEACH).
+ * The same sequence (mac_6_001) with a longer wait;
+ * sets STORY_STG6_70_THOUSAND_YEAR_DOOR and sends Mario back to Rogueport (gor_02).
+ */
 EVT_BEGIN(mahojin_event6)
     SET_VALUE(GW(15), 6)
     CALL(evt_mario_key_onoff, 0)
@@ -2182,6 +2432,11 @@ EVT_BEGIN(mahojin_event6)
     RETURN
 EVT_END()
 
+/**
+ * Loop that keeps the seven Crystal Stars (stone01 to stone07) on a ring around the pedestal,
+ * calling starstone_circle_link_func each frame with the centre and radius held in GW(10) to GW(12)
+ * and the rotation in LW(0).
+ */
 EVT_BEGIN(starstone_circle_link)
     LOOP(0)
         CALL(starstone_circle_link_func, STRING("stone01"), 1, LW(0), GW(10), LW(2), GW(11), GW(12))
@@ -2196,6 +2451,10 @@ EVT_BEGIN(starstone_circle_link)
     RETURN
 EVT_END()
 
+/**
+ * Starts the looping map animations of the final door room:
+ * the cracks (anm_hibi), the seven stars (anm_hosi_1 to 7) and the door (anm_tobira).
+ */
 EVT_BEGIN(lastdungeon_anim_init)
     CALL(evt_map_playanim, STRING("anm_hibi"), 2, 0)
     CALL(evt_map_playanim, STRING("anm_hosi_1"), 2, 0)
@@ -2210,6 +2469,10 @@ EVT_BEGIN(lastdungeon_anim_init)
     RETURN
 EVT_END()
 
+/**
+ * Puts the Thousand-Year Door's two leaves (door_a, door_b) at 120 degrees (door_a at -120)
+ * and updates their hit areas; lastdungeon swings them from that pose.
+ */
 EVT_BEGIN(lastdungeon_init)
     CALL(evt_hit_bind_mapobj, STRING("a_door_a"), STRING("door_a"))
     CALL(evt_hit_bind_mapobj, STRING("a_door_b"), STRING("door_b"))
@@ -2221,6 +2484,13 @@ EVT_BEGIN(lastdungeon_init)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the entry into the final dungeon through the Thousand-Year Door (STORY_STG7_52_THE_PEDESTAL, push of
+ * n_bero).
+ * Mario walks in and is hidden, the camera shakes,
+ * the door leaves swing from 120 degrees to 0 over five seconds,
+ * and the game moves on to the chapter 8 title (sys_01, stg_8).
+ */
 EVT_BEGIN(lastdungeon)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam_ctrl_onoff, CAMERA_3D, 0)
@@ -2254,6 +2524,11 @@ EVT_BEGIN(lastdungeon)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the last pedestal scene, at STORY_STG7_50_A_WAITING_PROF_FRANKLY.
+ * Professor Frankly talks to Mario (mac_7_009) while the eighth magic circle forms with a crystal wave;
+ * the seven Crystal Stars appear on the pedestal and the circle charges.
+ */
 EVT_BEGIN(mahojin_event7)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -2795,6 +3070,13 @@ EVT_BEGIN(mahojin_event7)
     RETURN
 EVT_END()
 
+/**
+ * Map init script of tik_05, the Thousand-Year Door room.
+ * Starts the music, sets up Professor Frankly's NPC, the pedestal glow,
+ * the pedestal triggers chosen by story progress (mahojin_event to mahojin_event7),
+ * the doorway to the final dungeon, the Shine Sprite block,
+ * the save block and the animations needed for the map scenes.
+ */
 EVT_BEGIN(tik_05_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)

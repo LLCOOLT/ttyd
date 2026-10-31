@@ -76,6 +76,11 @@ static SharinData sharinDt[] = {
     {0},
 };
 
+/**
+ * Spins one wheel map object (LW(0)) of the train:
+ * LW(1) picks the wheel's radius and LW(2) picks which wheel speed, GW(0) or GW(1), drives it;
+ * every frame the angle grows by speed over radius and the object is rotated.
+ */
 static EVT_BEGIN(evt_sharin_main)
     SET_FLOAT_VALUE(LW(10), FLOAT(0.0f))
     SWITCH(LW(1))
@@ -116,6 +121,7 @@ static EVT_BEGIN(evt_sharin_main)
     RETURN
 EVT_END()
 
+/** Starts evt_sharin_main for every wheel listed in sharinDt (sha_1_1 and so on). */
 static EVT_BEGIN(evt_sharin)
     SET_INT_READ_ADDR(PTR(sharinDt))
     LOOP(0)
@@ -140,6 +146,10 @@ static ClankData clankDt[] = {
     {0},
 };
 
+/**
+ * Moves one connecting rod (bou_n) in a small circle every frame according to the wheel speed,
+ * so the rods move with the wheels.
+ */
 static EVT_BEGIN(evt_clank_main)
     SET_FLOAT_VALUE(LW(10), FLOAT(0.0f))
     SWITCH(LW(1))
@@ -185,6 +195,7 @@ static EVT_BEGIN(evt_clank_main)
     RETURN
 EVT_END()
 
+/** Starts evt_clank_main for every rod listed in clankDt. */
 static EVT_BEGIN(evt_clank)
     SET_INT_READ_ADDR(PTR(clankDt))
     LOOP(0)
@@ -198,6 +209,10 @@ static EVT_BEGIN(evt_clank)
     RETURN
 EVT_END()
 
+/**
+ * Scrolls the background layers (ground, mountains) sideways every frame by speeds derived from the train speed
+ * GW(0), so the scenery flows past the train.
+ */
 static EVT_BEGIN(evt_bg)
     SET_FLOAT_VALUE(LW(10), FLOAT(0.0f))
     SET_FLOAT_VALUE(LW(11), FLOAT(0.0f))
@@ -231,6 +246,10 @@ static EVT_BEGIN(evt_bg)
     RETURN
 EVT_END()
 
+/**
+ * Rotates the star objects (hosi_left, hosi_center,
+ * hosi_right and the _c copies) every frame by the train speed GW(0).
+ */
 static EVT_BEGIN(evt_hoshi)
     SET_FLOAT_VALUE(LW(10), FLOAT(0.0f))
     LOOP(0)
@@ -261,6 +280,10 @@ static EVT_BEGIN(evt_hoshi)
     RETURN
 EVT_END()
 
+/**
+ * Departure of the train outbound: clears the at-station flags, rings the bell,
+ * plays the engine sounds and ramps the wheel speeds GW(0) and GW(1) up to -15 (leftward).
+ */
 static EVT_BEGIN(hom_10_evt_resha_start)
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_RIVERSIDE), 0)
@@ -359,6 +382,10 @@ static EVT_BEGIN(hom_10_evt_resha_start)
     RETURN
 EVT_END()
 
+/**
+ * Departure of the train on the return trip: like hom_10_evt_resha_start
+ * but ramps the speeds up to +15 (rightward).
+ */
 static EVT_BEGIN(hom_10_evt_resha_start2)
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_VALUE(GSWF(GSWF_TRAIN_AT_RIVERSIDE), 0)
@@ -463,6 +490,7 @@ static EVT_BEGIN(hom_10_evt_resha_start2)
     RETURN
 EVT_END()
 
+/** Puts the train at full outbound speed at once: marks it moving and sets GW(0) and GW(1) to -15. */
 static EVT_BEGIN(hom_10_evt_resha_start3)
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(-15.0f))
@@ -470,6 +498,7 @@ static EVT_BEGIN(hom_10_evt_resha_start3)
     RETURN
 EVT_END()
 
+/** Puts the train at full return speed at once: marks it moving and sets GW(0) and GW(1) to +15. */
 static EVT_BEGIN(hom_10_evt_resha_start4)
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(15.0f))
@@ -477,6 +506,10 @@ static EVT_BEGIN(hom_10_evt_resha_start4)
     RETURN
 EVT_END()
 
+/**
+ * Arrival braking of the outbound train: plays the stop sounds and slows the wheel speeds to 0,
+ * then clears GSWF_TRAIN_MOVING.
+ */
 static EVT_BEGIN(stop_1)
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
@@ -511,6 +544,7 @@ static EVT_BEGIN(stop_1)
     RETURN
 EVT_END()
 
+/** Arrival braking of the return-trip train: like stop_1 with the return-trip sound variants. */
 static EVT_BEGIN(stop_2)
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
@@ -545,6 +579,7 @@ static EVT_BEGIN(stop_2)
     RETURN
 EVT_END()
 
+/** Stops the train: runs stop_1 or stop_2 depending on the trip direction (GSWF_TRAIN_RETURN_TRIP). */
 static EVT_BEGIN(hom_10_evt_resha_stop)
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("pik_00"))
@@ -565,6 +600,7 @@ static EVT_BEGIN(hom_10_evt_resha_stop)
     RETURN
 EVT_END()
 
+/** Keeps the lamp objects (ranpu, ranpu_c) swinging every frame by the amount from ramp_r while the train is moving. */
 static EVT_BEGIN(evt_ramp)
     LOOP(0)
         CALL(ramp_r)
@@ -612,6 +648,11 @@ static const char* pika_tbl_rsh_06[] = {
     NULL,
 };
 
+/**
+ * Common start of the train-exterior scenes: marks the train as not moving,
+ * zeroes the wheel speeds and spawns the wheel, rod,
+ * background and star scripts (plus lamp and sparks on the maps that have them).
+ */
 static EVT_BEGIN(hom_10_evt_resha_sub)
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 0)
     SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
@@ -655,6 +696,10 @@ static EVT_BEGIN(hom_10_evt_resha_sub)
     RETURN
 EVT_END()
 
+/**
+ * Sets up the train for the outbound view: runs hom_10_evt_resha_sub,
+ * then hides the rear cars (train_7, train_8) and couplings (renketu_6, renketu_7) unless the map is rsh_06_a.
+ */
 static EVT_BEGIN(hom_10_evt_resha_right)
     CALL_CHILD(hom_10_evt_resha_sub)
     CALL(evt_sub_get_mapname, LW(0))
@@ -667,6 +712,10 @@ static EVT_BEGIN(hom_10_evt_resha_right)
     RETURN
 EVT_END()
 
+/**
+ * Sets up the train for the return view: runs hom_10_evt_resha_sub,
+ * then hides the cars train_1 and train_6 and couplings renketu_1 and renketu_5.
+ */
 static EVT_BEGIN(hom_10_evt_resha_left)
     CALL_CHILD(hom_10_evt_resha_sub)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("train_1"), MAPOBJ_FLAG_HIDE)
@@ -676,6 +725,12 @@ static EVT_BEGIN(hom_10_evt_resha_left)
     RETURN
 EVT_END()
 
+/**
+ * Map init of the train-exterior scene: fades the music out, starts the Chapter 6 train ambience,
+ * parks Mario and the partners off-screen and sets up the train for the outbound
+ * or (GSWF_TRAIN_RETURN_TRIP) return view.
+ * A letterboxed camera pans along the train for 4 seconds, then the game changes to rsh_02_a ("nidome").
+ */
 static EVT_BEGIN(hom_10_init_evt)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_RSH2"))
@@ -716,6 +771,13 @@ static EVT_BEGIN(hom_10_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Boarding scene at Rogueport Station's train: the passenger door (tobira) slides open and shut while Mario
+ * and the partners walk in, they are hidden, the station attendant announces the departure (train_07),
+ * the train leaves (hom_10_evt_resha_start) and the train flags are reset (GSWF_TRAIN_DEPARTED set,
+ * GSW_TRAIN_LEG 0). It then changes map to sys_01 (stg_6) before Chapter 6 or to rsh_02_a otherwise.
+ * In the early demos it only resets the Dried Shroom shelf flag.
+ */
 static EVT_BEGIN(evt_train)
 #if VERSION <= VERSION_DEMO_US
     // The Dried Shroom on the passenger car shelf comes back for every trip
@@ -801,6 +863,14 @@ static EVT_BEGIN(evt_train)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene of the train arriving at Rogueport Station on the return trip:
+ * Mario and the partners are hidden while the station attendant stands in front, the train doors open (tobira),
+ * Mario and the partners step out onto the platform,
+ * the story is moved to STORY_STG6_56_ROGUEPORT_STATION if it was earlier,
+ * and the camera is released once Mario moves.
+ * Sets the train arrival flags and starts Peach's mail scene (peach_mail) until STORY_STG6_57_A_MAIL_FROM_PEACH.
+ */
 EVT_BEGIN(evt_train2)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -894,6 +964,12 @@ EVT_BEGIN(evt_train2)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene when Mario walks to x >= -275 at the station:
+ * the mail alert (vibrating exclamation), the partner comments (gor_04_mail6_00);
+ * after he presses A the mail is read (gor_04_mail6_01, 02),
+ * story progress becomes STORY_STG6_57_A_MAIL_FROM_PEACH and mail 5 is received and opened.
+ */
 static EVT_BEGIN(peach_mail)
     LOOP(0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -1038,11 +1114,17 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Init event of the blimp ticket attendant NPC: clears GF(10), so the booth is staffed on a normal visit. */
 EVT_BEGIN(hikosenkakari_init)
     SET_VALUE(GF(10), 0)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the blimp ticket attendant when the blimp is away (arriving from the Glitz Pit trip):
+ * places the attendant at the platform's edge, turns off the ticket-booth collision (A_tousenbo)
+ * and sets GF(10).
+ */
 EVT_BEGIN(hikosenkakari_init_ship)
     CALL(evt_npc_set_position, STRING("飛行船係員"), 315, 0, 160)
     CALL(evt_hitobj_onoff, STRING("A_tousenbo"), 1, 0)
@@ -1050,6 +1132,14 @@ EVT_BEGIN(hikosenkakari_init_ship)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of the blimp ticket attendant: offers the trip to Glitzville (hikou_00, menu hikou_01).
+ * On yes he asks for the Blimp Ticket (hikou_05 if Mario has none),
+ * Mario holds it up and hands it over (hikou_02),
+ * then Mario and the partners walk to the boarding spot at (285, 140)
+ * and the booth collision A_tousenbo is switched off (GF(10) set); no gives hikou_03.
+ * While GF(10) is set he only says hikou_06.
+ */
 EVT_BEGIN(hikosenkakari_talk)
     IF_INT_EQUAL(GF(10), 1)
         CALL(evt_msg_print, 0, STRING("hikou_06"), 0, STRING("me"))
@@ -1116,6 +1206,10 @@ EVT_BEGIN(hikosenkakari_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the station attendant (ekiin): when Mario arrives from the train or from the n_bero door,
+ * puts the attendant at the platform spot (-400, 80, 100).
+ */
 EVT_BEGIN(ekiin_init)
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("resha_return"))
@@ -1128,6 +1222,12 @@ EVT_BEGIN(ekiin_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of the station attendant: train_00 and a menu (train_01) for a ride on the Excess Express.
+ * On yes he asks for the Train Ticket (train_05 if Mario has none), Mario hands it over (train_04),
+ * the music fades out and the attendant steps aside before evt_train starts the ride; no gives train_02.
+ * Says train_06 when Mario has just arrived on the return trip.
+ */
 EVT_BEGIN(ekiin_talk)
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("resha_return"))
@@ -1185,6 +1285,10 @@ EVT_BEGIN(ekiin_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the Lakitu NPC (jugemu_a): puts him at (-80, 80, 85) except at
+ * STORY_STG4_15_05_PEACH_X_NAUT_PHD_REPORT, when he is not there.
+ */
 EVT_BEGIN(jugemu_a_init)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG4_15_05_PEACH_X_NAUT_PHD_REPORT)
         RETURN
@@ -1193,6 +1297,10 @@ EVT_BEGIN(jugemu_a_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of the Lakitu NPC: chapter-dependent small talk (gor_04_000 to gor_04_007) chosen by how far the
+ * story has progressed, from chapter 1 up to after the Shadow Queen.
+ */
 EVT_BEGIN(jugemu_a_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG2_25_AFTER_THE_BOSS_BATTLE)
@@ -1215,11 +1323,13 @@ EVT_BEGIN(jugemu_a_talk)
     RETURN
 EVT_END()
 
+/** Init event of the Toad b (キノピオ b): places him at (-575, 80, 120). */
 static EVT_BEGIN(kinopiko_b_init)
     CALL(evt_npc_set_position, STRING("me"), -575, 80, 120)
     RETURN
 EVT_END()
 
+/** Talk event of the Toad b: one line per chapter (gor_04_008 to 015), chosen by story progress. */
 static EVT_BEGIN(kinopiko_b_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG2_25_AFTER_THE_BOSS_BATTLE)
@@ -1242,16 +1352,22 @@ static EVT_BEGIN(kinopiko_b_talk)
     RETURN
 EVT_END()
 
+/** Init event of Baba (ババ): sets NPC status bit 2 on himself. */
 static EVT_BEGIN(baba_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/** Init event of the Flying Koopa (飛クッパ): sets NPC status bit 2 on himself. */
 static EVT_BEGIN(hkoopa_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/**
+ * Init event of Luigi (ルイージ): between STORY_STG6_54_WELCOME_BACK
+ * and STORY_STG7_19_THE_DOOR_TO_LORD_CRUMP places him at (65, 0, 120) facing left or right.
+ */
 static EVT_BEGIN(luigi_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG6_54_WELCOME_BACK, STORY_STG7_19_THE_DOOR_TO_LORD_CRUMP)
@@ -1261,6 +1377,7 @@ static EVT_BEGIN(luigi_init)
     RETURN
 EVT_END()
 
+/** Talk event of Luigi: runs luigi_gor_first_talk. */
 static EVT_BEGIN(luigi_talk)
     CALL_CHILD(luigi_gor_first_talk)
     RETURN
@@ -1282,6 +1399,11 @@ static NpcSetupInfo luigiEnt[] = {
     {0},
 };
 
+/**
+ * Registers Luigi (model c_luigi) and his companion Su Creamy (ス・クリーミ, model c_lp_moa) from luigiEnt
+ * and screamEnt in the story range STORY_STG6_54_WELCOME_BACK to STORY_STG7_19_THE_DOOR_TO_LORD_CRUMP;
+ * called while the map sets up its NPCs.
+ */
 static EVT_BEGIN(luigi_npcEnt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG6_54_WELCOME_BACK, STORY_STG7_19_THE_DOOR_TO_LORD_CRUMP)
@@ -1295,12 +1417,14 @@ static EVT_BEGIN(luigi_npcEnt)
     RETURN
 EVT_END()
 
+/** Init event of Luigi's companion (ス・クリーミ) NPC: puts him at (105, 0, 120) facing the player. */
 EVT_BEGIN(scream_init)
     CALL(evt_npc_set_position, STRING("me"), 105, 0, 120)
     CALL(evt_npc_set_ry_lr, STRING("me"), 0)
     RETURN
 EVT_END()
 
+/** Talk event of Luigi's companion (ス・クリーミ): says luigi_npc_05. */
 EVT_BEGIN(scream_talk)
     CALL(evt_msg_print, 0, STRING("luigi_npc_05"), 0, STRING("me"))
     RETURN
@@ -1394,6 +1518,12 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Boarding the blimp to Glitzville when Mario stands on the A_noriba gondola:
+ * the blimp music starts, the mooring poles are lowered one after another, the gondola rises over 2 seconds,
+ * then the screen changes to tou_20 (first trip, before STORY_STG3_00_WELCOME_TO_GLITZVILLE) or tou_00
+ * after a 10 second ride.
+ */
 EVT_BEGIN(evt_hikousen)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG3_AIRSHIP1"))
     CALL(evt_mario_key_onoff, 0)
@@ -1468,6 +1598,10 @@ EVT_BEGIN(evt_hikousen)
     RETURN
 EVT_END()
 
+/**
+ * Flaps the blimp's wing object (hane) forever:
+ * at random either three quick 10-degree swings back and forth or one slow swing about 30 frames each way.
+ */
 static EVT_BEGIN(evt_wing)
     LOOP(0)
         CALL(evt_sub_random, 100, LW(0))
@@ -1504,6 +1638,12 @@ static EVT_BEGIN(evt_wing)
     RETURN
 EVT_END()
 
+/**
+ * Scene of the blimp arriving back at Rogueport (entered from tou_00 as "hikousen_return"):
+ * the blimp flies in with the engine sound, the mooring poles rise,
+ * the gondola comes down over 3 seconds with Mario aboard, and Mario walks off it.
+ * Sets the city music back to the Rogueport tune.
+ */
 EVT_BEGIN(evt_hikousen_return)
     SPAWN_EVENT(hikosenkakari_init_ship)
     CALL(evt_mario_key_onoff, 0)
@@ -1649,6 +1789,12 @@ EVT_BEGIN(evt_hikousen_return)
     RETURN
 EVT_END()
 
+/**
+ * Interlude when the story is at STORY_STG4_15_05_PEACH_X_NAUT_PHD_REPORT:
+ * Kammy Koopa (ババ, on her broom "houki") talks to the airship attendant, scares him away,
+ * Bowser's flying airship (飛クッパ) arrives and they talk (kpa_stg4_000 to kpa_stg4_006)
+ * before the map changes to tou_00. Guess: the Bowser chapter 4 to 5 transition scene.
+ */
 EVT_BEGIN(gor_04_koopa_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, 425, 250, 340, 425, 214, 112, 0, 11)
@@ -1966,6 +2112,15 @@ EVT_BEGIN(gor_04_koopa_evt)
     RETURN
 EVT_END()
 
+/**
+ * Init script of gor_04, the station: music (Bowser's tune at STORY_STG4_15_05_PEACH_X_NAUT_PHD_REPORT,
+ * otherwise the Rogueport tune except on arriving by blimp), exits, Luigi and his companion, the NPCs,
+ * a save block, the spinning panel with a Star Piece, a second Star Piece, and the blimp ride trigger.
+ * Depending on how Mario entered (blimp return, train return trip, n_bero door) it sets the train flags
+ * and starts the matching scene.
+ * Also starts Peach's mail scene, the Bowser interlude and, after STORY_STG6_55_04_BOWSER_RAWK_HAWK,
+ * heals Mario and his partners.
+ */
 EVT_BEGIN(gor_04_init_evt)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG4_15_05_PEACH_X_NAUT_PHD_REPORT)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_KUPPA1"))
@@ -2066,6 +2221,10 @@ EVT_END()
 
 double sin(double x);
 
+/**
+ * Script helper for evt_ramp: stores in LW(10) the current rotation of the ramp (ranpu) models,
+ * a sine wave 1.8 times the absolute value of GW(0) in amplitude with a period of about 94 frames.
+ */
 static USER_FUNC(ramp_r) {
     f32 amp = __fabsf(evtGetFloat(event, GW(0)));
     f32 wave = sin(gp->retraceCount / 15.0f);
@@ -2074,10 +2233,15 @@ static USER_FUNC(ramp_r) {
     return EVT_RETURN_DONE;
 }
 
+/** TEV callback for the train model: forwards to envAddTev with slot 7 to add the shared environment lighting. */
 static void resha_tev(MapTevCallbackInfo* info) {
     envAddTev(7, info);
 }
 
+/**
+ * Script helper that lifts Bowser's airship NPC (飛クッパ) by setting its vertical move offset to args[0],
+ * used to bob it in gor_04_koopa_evt.
+ */
 static USER_FUNC(kpa_hikousen_yure) {
     f32 y = evtGetFloat(event, event->args[0]);
 

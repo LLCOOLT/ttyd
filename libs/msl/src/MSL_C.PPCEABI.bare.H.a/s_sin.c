@@ -1,5 +1,9 @@
 #include "fdlibm.h"
 
+/**
+ * Sine of x in radians (fdlibm): |x| < about pi/4 uses __kernel_sin directly, NaN/infinity return x - x,
+ * otherwise __ieee754_rem_pio2 reduces the argument and the quadrant selects +-sin or +-cos of the remainder.
+ */
 double sin(double x) {
     double y[2], z = 0.0;
     int n, ix;

@@ -152,6 +152,13 @@ static BattleWeapon weapon_chorobon_drain_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Attack event of the Green Fuzzy: uses an enemy item if one fits.
+ * Otherwise a roll of 0-98 under 50 (about half the time) runs the drain attack.
+ * If not, it searches around itself for open floor (CheckSpace) and splits with friend_event there,
+ * then waits half a second; the search sweeps out one way, then the other,
+ * and tries again from the top if no free spot is found.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -217,6 +224,13 @@ static BattleUnitSetup entry_chorobon = {
     NULL, // itemDropTable
 };
 
+/**
+ * The Green Fuzzy calls a friend (it splits): it spins
+ * and shakes on the spot with the split sound for about two seconds,
+ * then hops to LW(7..9) while a new Fuzzy is spawned there from entry_chorobon,
+ * given the same status as its parent (chorobon_copy_status),
+ * spun into place and hopped on to the free spot in LW(0..2), which becomes its home.
+ */
 static EVT_BEGIN(friend_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -351,6 +365,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Hop movement used by the Fuzzy: from the position in LW(0..2) it hops toward LW(5..7),
+ * covering at most LW(8) units per hop and squashing and stretching on each landing with the hop sound,
+ * then ends with a final squash and stretch. LW(6) is the target height.
+ */
 static EVT_BEGIN(rabbit_move)
     LOOP(2)
         CALL(btlevtcmd_AddScale, BTL_UNIT_SELF, FLOAT(0.15917969f), FLOAT(-0.23925781f), 0)
@@ -400,6 +419,10 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Init event of the Green Fuzzy: registers its wait, attack, damage and confusion events,
+ * its pose sound table and hop sound and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -411,6 +434,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event: runs the default battle damage reaction on the unit itself (part 1). */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -418,6 +442,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Reaction when the Fuzzy is hurt by a counterattack:
+ * restores its scale, runs subsetevt_counter_damage with the damage code and,
+ * unless that hit knocked it out for good, hops back home with return_event.
+ */
 static EVT_BEGIN(counter_damage_event)
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
     SET_VALUE(LW(10), -2)
@@ -435,6 +464,7 @@ static EVT_BEGIN(counter_damage_event)
     RETURN
 EVT_END()
 
+/** Makes the Fuzzy hop back to its home position with rabbit_move (up to 40 units per hop). */
 static EVT_BEGIN(return_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(4.0f), FLOAT(0.5996094f))
@@ -444,6 +474,13 @@ static EVT_BEGIN(return_event)
     RETURN
 EVT_END()
 
+/**
+ * The Green Fuzzy's drain attack: hops up to the target, jumps on it and clings on, shaking it.
+ * If an electric counter protects the target it takes weapon_chorobon_drain_attack_biribiri_counterd instead
+ * and the move ends.
+ * Otherwise the target takes the weapon damage, and the Fuzzy swells by the HP drained and recovers that much,
+ * with a recovery sparkle. After a miss it hops past and waits a second. It then hops home with return_event.
+ */
 static EVT_BEGIN(drain_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_chorobon_drain_attack))
@@ -683,6 +720,10 @@ static EVT_BEGIN(drain_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: arg0 = source unit, arg1 = destination unit;
+ * copies the HP (capped to the max) and size-change status so a replacement unit continues in the same state.
+ */
 static USER_FUNC(chorobon_copy_status) {
     EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));
@@ -703,6 +744,7 @@ static USER_FUNC(chorobon_copy_status) {
     return EVT_RETURN_DONE;
 }
 
+/** Wait event: sets the idle animation from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

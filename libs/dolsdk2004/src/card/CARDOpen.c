@@ -2,6 +2,7 @@
 
 #include "__card.h"
 
+/** Compares a directory entry's file name with a C string, up to CARD_FILENAME_MAX characters. */
 BOOL __CARDCompareFileName(CARDDir* ent, const char* fileName) {
     char* entName = (char*)ent->fileName;
     char c1;
@@ -20,6 +21,11 @@ BOOL __CARDCompareFileName(CARDDir* ent, const char* fileName) {
     return FALSE;
 }
 
+/**
+ * Checks whether this game may see a directory entry: NOFILE for an empty entry;
+ * READY if the channel's disk ID is the empty one or the entry's game and maker codes match it;
+ * otherwise NOPERM.
+ */
 s32 __CARDAccess(CARDControl* card, CARDDir* ent) {
     const DVDDiskID* diskID = card->diskID;
 
@@ -34,6 +40,11 @@ s32 __CARDAccess(CARDControl* card, CARDDir* ent) {
     return CARD_RESULT_NOPERM;
 }
 
+/**
+ * Checks write permission for an entry: READY if __CARDAccess does,
+ * or if the entry's permission has bit 0x20 (global) or 0x40 (company, same maker)
+ * and its game code is the empty one; otherwise NOPERM.
+ */
 s32 __CARDIsWritable(CARDControl* card, CARDDir* ent) {
     const DVDDiskID* diskID = card->diskID;
     s32 result;
@@ -56,6 +67,10 @@ s32 __CARDIsWritable(CARDControl* card, CARDDir* ent) {
     return result;
 }
 
+/**
+ * Checks read permission for an entry: as __CARDIsWritable,
+ * and also READY if the entry has permission bit 0x04 (public).
+ */
 s32 __CARDIsReadable(CARDControl* card, CARDDir* ent) {
     s32 result = __CARDIsWritable(card, ent);
     if (result == CARD_RESULT_NOPERM && (ent->permission & 0x4)) {
@@ -65,6 +80,7 @@ s32 __CARDIsReadable(CARDControl* card, CARDDir* ent) {
     return result;
 }
 
+/** Finds the directory index of the file with this name among the entries this game may access; NOFILE if none. */
 s32 __CARDGetFileNo(CARDControl* card, const char* fileName, s32* pfileNo) {
     CARDDir* dir;
     CARDDir* ent;
@@ -90,6 +106,10 @@ s32 __CARDGetFileNo(CARDControl* card, const char* fileName, s32* pfileNo) {
     return CARD_RESULT_NOFILE;
 }
 
+/**
+ * Opens a file by its directory index: checks read permission and block number,
+ * then fills in the CARDFileInfo (channel, file number, offset 0, first block).
+ */
 s32 CARDFastOpen(s32 chan, s32 fileNo, CARDFileInfo* fileInfo) {
     CARDControl* card;
     CARDDir* dir;
@@ -123,6 +143,11 @@ s32 CARDFastOpen(s32 chan, s32 fileNo, CARDFileInfo* fileInfo) {
     return __CARDPutControlBlock(card, result);
 }
 
+/**
+ * Opens a file by name (among this game's files):
+ * fills in the CARDFileInfo with channel, file number, offset 0 and first block,
+ * or leaves its channel at -1 on failure.
+ */
 s32 CARDOpen(s32 chan, const char* fileName, CARDFileInfo* fileInfo) {
     CARDControl* card;
     s32 fileNo;
@@ -154,6 +179,7 @@ s32 CARDOpen(s32 chan, const char* fileName, CARDFileInfo* fileInfo) {
     return __CARDPutControlBlock(card, result);
 }
 
+/** Closes a file handle by setting its channel to -1; nothing is written to the card. */
 s32 CARDClose(CARDFileInfo* fileInfo) {
     CARDControl* card;
     s32 result;
@@ -169,6 +195,7 @@ s32 CARDClose(CARDFileInfo* fileInfo) {
     return __CARDPutControlBlock(card, CARD_RESULT_READY);
 }
 
+/** Always returns FALSE: this library keeps no table of open files. */
 BOOL __CARDIsOpened(CARDControl* card, s32 fileNo) {
     return FALSE;
 }

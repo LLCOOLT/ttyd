@@ -15,6 +15,7 @@
 #include "evt/evt_msg.h"
 #include "version.h"
 
+// Battle script helper, defined below: finds the Gold Fuzzy unit (initial kind 0x14) and returns its unit id.
 USER_FUNC(get_gold_chorobon_id);
 
 BattleUnitKind unit_gold_chorobon;
@@ -198,6 +199,11 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Hop-walk used by the Gold Fuzzy's attack: squashes,
+ * then jumps in steps of LW(8) units toward x=LW(5) (height LW(6), depth LW(7)), squashing between hops,
+ * and finishes with the attack jump onto the target with its attack sound.
+ */
 EVT_BEGIN(gold_chorobon_rabbit_move)
     LOOP(2)
         CALL(btlevtcmd_AddScale, BTL_UNIT_SELF, FLOAT(0.15917969f), FLOAT(-0.23925781f), 0)
@@ -251,6 +257,11 @@ BattleUnitSetup entry_chorogun = {
     NULL, // itemDropTable
 };
 
+/**
+ * Battle script run when the Gold Fuzzy calls its friends:
+ * it shows the wave animation, the camera pans in on it and it says stg1_hei_43, Mario is startled,
+ * and chorogun_appear drops the 1000-Fuzzy horde into place.
+ */
 EVT_BEGIN(call_chorogun_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("CBN_S_1"))
     WAIT_MS(1000)
@@ -274,6 +285,11 @@ EVT_BEGIN(call_chorogun_event)
     RETURN
 EVT_END()
 
+/**
+ * Script for the Gold Fuzzy's end: after two seconds it releases the Fuzzy Horde (paying its reward),
+ * sends all the Fuzzies running off the stage and removes the horde unit;
+ * marks the unit work so it only happens once (JP and later).
+ */
 EVT_BEGIN(escape_chorogun_event)
     WAIT_MS(2000)
     CALL(get_gold_chorobon_id, LW(4))
@@ -300,6 +316,11 @@ EVT_BEGIN(escape_chorogun_event)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the Gold Fuzzy: installs wait, attack, damage and default confusion events,
+ * starts the Fuzzy horde setup (chorogun_entry),
+ * clears unit work 0 and 1 and sets the boss hop and landing sounds.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -314,6 +335,14 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage event of the Gold Fuzzy: while the swarm is out (work 0)
+ * and he is hit by a counter-type attack (512 without 2048),
+ * the swarm unit is removed with its reward (chorogun_dead_reward in JP and later) and the horde flees.
+ * After the default damage handling, the first time his HP drops to 7
+ * or less (but not 0) he spawns the Fuzzy swarm (entry_chorogun) and calls it in (call_chorogun_event);
+ * unit work 0 marks that it is out.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -370,6 +399,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage event used for the Gold Fuzzy's counter-damage case:
+ * restores its scale, runs the shared counter damage handling (subsetevt_counter_damage) and,
+ * if it is still alive, hops back home with return_event.
+ */
 static EVT_BEGIN(counter_damage_event)
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
     SET_VALUE(LW(10), -2)
@@ -383,6 +417,7 @@ static EVT_BEGIN(counter_damage_event)
     RETURN
 EVT_END()
 
+/** The Gold Fuzzy hops back to its home position (in hops of at most 40 units) with gold_chorobon_rabbit_move. */
 static EVT_BEGIN(return_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(4.0f), FLOAT(0.5996094f))
@@ -392,6 +427,10 @@ static EVT_BEGIN(return_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the Gold Fuzzy: hops over to a target and jumps onto it (weapon_gold_chorobon_attack);
+ * the pre-damage check decides between a dodge and a hit with the action-command result, and it hops back home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -534,11 +573,16 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait (idle) event of the Gold Fuzzy: shows the idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Battle script helper: stores the unit id of the Gold Fuzzy (initial kind 0x14) in args[0],
+ * or -1 if it is not in the battle.
+ */
 USER_FUNC(get_gold_chorobon_id) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;

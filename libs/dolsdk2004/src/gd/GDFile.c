@@ -3,6 +3,13 @@
 
 #define ROUND(n, a) (((u32)(n) + (a)-1) & ~((a)-1))
 
+/**
+ * Loads a display list file from the disc into a buffer from OSAlloc (size rounded to 32 bytes)
+ * and converts the offsets in its header to pointers,
+ * returning the counts and arrays of display lists and pixel lists.
+ * Returns 0 on success, -3 if the file cannot be opened, -5 if the allocation fails, -2 on a read error,
+ * -4 on a wrong version number.
+ */
 s32 GDReadDLFile(const char* fName, u32* numDLs, u32* numPLs, GDGList** DLDescArray, GDGList** PLDescArray) {
     DVDFileInfo finfo;
     u32 length;

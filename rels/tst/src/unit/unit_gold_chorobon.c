@@ -199,6 +199,10 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Guess: gold Fuzzy hops sideways toward the x in LW(5) in rabbit-like squash-and-stretch jumps (scale animated
+ * each frame) until it is within LW(8) units of it.
+ */
 EVT_BEGIN(gold_chorobon_rabbit_move)
     LOOP(2)
         CALL(btlevtcmd_AddScale, BTL_UNIT_SELF, FLOAT(0.15917969f), FLOAT(-0.23925781f), 0)
@@ -252,6 +256,10 @@ BattleUnitSetup entry_chorogun = {
     NULL, // itemDropTable
 };
 
+/**
+ * Gold Fuzzy calls the Fuzzy Horde: it holds its pose, the camera swings out, a message (stg1_hei_43) plays,
+ * then chorogun_appear brings the swarm in while Mario looks around.
+ */
 EVT_BEGIN(call_chorogun_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("CBN_S_1"))
     WAIT_MS(1000)
@@ -275,6 +283,10 @@ EVT_BEGIN(call_chorogun_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: after a 2 second wait the Gold Fuzzy sends the swarm away (once, tracked in its work[1])
+ * and makes the Horde flee.
+ */
 EVT_BEGIN(escape_chorogun_event)
     WAIT_MS(2000)
     CALL(get_gold_chorobon_id, LW(4))
@@ -301,6 +313,12 @@ EVT_BEGIN(escape_chorogun_event)
     RETURN
 EVT_END()
 
+/**
+ * Init script of the Gold Fuzzy: installs the wait,
+ * attack and damage handlers (confusion uses the default Confuse script), starts the wait event,
+ * spawns its Fuzzy horde setup (chorogun_entry), clears unit work 0 and 1 (horde called / dying flags),
+ * and sets the pose sound table and jump and landing sounds.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -315,6 +333,14 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler of the Gold Fuzzy.
+ * If its Fuzzy horde has been summoned and this hit would knock it out (damage flag 0x200 without the Life
+ * Shroom flag 0x800), it hands out the horde's rewards (chorogun_dead_reward),
+ * makes all the Fuzzies escape and removes the horde unit.
+ * Otherwise it runs the default damage script, and the first time its HP drops to 7
+ * or less (but not 0) it spawns the Fuzzy horde (entry_chorogun) with call_chorogun_event.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -371,6 +397,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler for when the Gold Fuzzy was hit by a counter attack:
+ * resets its scale, runs the shared counter-damage script,
+ * and if it is still alive hops back home with return_event.
+ */
 static EVT_BEGIN(counter_damage_event)
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
     SET_VALUE(LW(10), -2)
@@ -384,6 +415,10 @@ static EVT_BEGIN(counter_damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Hops the Gold Fuzzy back to its home position in 40-unit hops (gold_chorobon_rabbit_move) after an attack
+ * or a counter hit.
+ */
 static EVT_BEGIN(return_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(4.0f), FLOAT(0.5996094f))
@@ -393,6 +428,11 @@ static EVT_BEGIN(return_event)
     RETURN
 EVT_END()
 
+/**
+ * The Gold Fuzzy's attack (weapon_gold_chorobon_attack): it picks a target, hops up to it and jumps on it;
+ * a miss makes it bounce off, a hit shakes the camera and deals the damage with the guard-timing check,
+ * after which it bounces twice on the target and hops home with return_event.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -535,11 +575,16 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0] receives the unit index of the Gold Fuzzy (initial kind 0x14),
+ * or -1 when it is not on the field.
+ */
 USER_FUNC(get_gold_chorobon_id) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;

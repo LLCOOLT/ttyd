@@ -145,6 +145,10 @@ static BattleWeapon weapon_chorobon_drain_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Attack script of the Fuzzy: after the item-use check it always uses its drain attack
+ * (weapon_chorobon_drain_attack) via drain_attack_event.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -232,6 +236,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Hopping movement of the Fuzzy: hops along the stage toward x = LW(5) in steps of LW(8) units,
+ * squashing and stretching on each landing, and makes a last hop onto (LW(5), LW(6), LW(7)) with the landing
+ * sound.
+ */
 static EVT_BEGIN(rabbit_move)
     LOOP(2)
         CALL(btlevtcmd_AddScale, BTL_UNIT_SELF, FLOAT(0.15917969f), FLOAT(-0.23925781f), 0)
@@ -281,6 +290,11 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Init script of the Fuzzy: installs the wait, attack,
+ * damage and confusion handlers (confusion reuses the attack), sets its pose sound table and jump sound,
+ * and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -292,6 +306,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: runs the shared default damage script (btldefaultevt_Damage) with its default parameters
+ * (LW(10) = -2, LW(11) = 1).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -299,6 +317,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler for when the Fuzzy was hit by a counter attack:
+ * resets its scale, runs the shared counter-damage script,
+ * and unless the hit knocked it out (damage flag 0x200) without a Life Shroom revive (0x800) it hops back home
+ * with return_event.
+ */
 static EVT_BEGIN(counter_damage_event)
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
     SET_VALUE(LW(10), -2)
@@ -316,6 +340,7 @@ static EVT_BEGIN(counter_damage_event)
     RETURN
 EVT_END()
 
+/** Hops the Fuzzy back to its home position in 40-unit hops (rabbit_move) after an attack or a counter hit. */
 static EVT_BEGIN(return_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(4.0f), FLOAT(0.5996094f))
@@ -325,6 +350,15 @@ static EVT_BEGIN(return_event)
     RETURN
 EVT_END()
 
+/**
+ * The Fuzzy's drain attack (weapon_chorobon_drain_attack):
+ * it hops up to the target, jumps on it, and if the attack connects clings on (the target shakes, the Fuzzy
+ * spins), then the damage is dealt and the Fuzzy heals that much HP (or FP, for the FP-draining weapon) with a
+ * recovery effect.
+ * A miss makes it bounce off the target; if the target counters (a shock counter),
+ * the Fuzzy takes weapon_chorobon_drain_attack_biribiri_counterd instead and the script ends.
+ * Afterwards it hops home with return_event.
+ */
 static EVT_BEGIN(drain_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_chorobon_drain_attack))
@@ -564,6 +598,7 @@ static EVT_BEGIN(drain_attack_event)
     RETURN
 EVT_END()
 
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

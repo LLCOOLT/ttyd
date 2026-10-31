@@ -158,6 +158,10 @@ static BattleUnitKindPart parts_christine[] = {
     {1, "btl_un_christine", "c_pkr", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence_christine, &defence_attr_christine, 0x9, 0, pose_table_christine_stay},
 };
 
+/**
+ * Camera shot on the fake Mario (x = 90) from the Goombella double's side:
+ * sets the battle camera to a fixed position and waits 37 frames for it to arrive.
+ */
 static EVT_BEGIN(fmario_zoom_christine)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 90, 58, 228, 90, 38, -20, 30, 11)
@@ -165,6 +169,10 @@ static EVT_BEGIN(fmario_zoom_christine)
     RETURN
 EVT_END()
 
+/**
+ * Camera shot on the Goombella double (x = 130):
+ * sets the battle camera to a fixed position and waits 37 frames for it to arrive.
+ */
 static EVT_BEGIN(gparty_zoom_christine)
     CALL(evt_btl_camera_set_mode, 0, 3)
     CALL(evt_btl_camera_set_moveto, 0, 130, 58, 228, 130, 38, -20, 30, 11)
@@ -172,6 +180,10 @@ static EVT_BEGIN(gparty_zoom_christine)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the Goombella double: installs wait, attack,
+ * damage and default confusion events and the partner walk, run and jump sounds.
+ */
 static EVT_BEGIN(init_event_christine)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event_christine))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_christine))
@@ -184,6 +196,11 @@ static EVT_BEGIN(init_event_christine)
     RETURN
 EVT_END()
 
+/**
+ * Damage script of the Doopliss-controlled Goombella:
+ * if the hit carries damage code 1024 it sets GW(20)
+ * so the fake Mario's phase script knows the partner was struck, then runs the default damage handling.
+ */
 EVT_BEGIN(damage_event_christine)
     CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 1024, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -195,6 +212,13 @@ EVT_BEGIN(damage_event_christine)
     RETURN
 EVT_END()
 
+/**
+ * Death event of the Goombella double: she returns to her home position, then,
+ * depending on GW(19) (the fake Mario's state),
+ * speaks stg4_jin_26_03_kur and the fake Mario answers with stg4_jin_26_04,
+ * or she just waits for the fake Mario's defeat;
+ * she plays the defeat pose (PKR_D_3, defeat sound in JP and later), is removed and GW(20) is set to 2.
+ */
 static EVT_BEGIN(dead_event_christine)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(3), LW(4), LW(5))
@@ -249,6 +273,11 @@ static EVT_BEGIN(dead_event_christine)
     RETURN
 EVT_END()
 
+/**
+ * The Goombella double's attack: uses an enemy item if she has one,
+ * otherwise a Mario-style headbonk on a target (enemyWeapon_ChristineNormalAttack,
+ * with a random 0 to 4 bonus hops, 20% chance) and the pre-damage check decides between a dodge and a hit.
+ */
 static EVT_BEGIN(attack_event_christine)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -438,6 +467,10 @@ static EVT_BEGIN(attack_event_christine)
     RETURN
 EVT_END()
 
+/**
+ * Battle script helper: computes the angle (degrees) of the vector from (args[0], args[1]) to (args[2], args[3])
+ * into args[4]; leaves the old value in place when the two points coincide.
+ */
 static USER_FUNC(_krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);
@@ -456,6 +489,7 @@ static USER_FUNC(_krb_get_dir) {
     return EVT_RETURN_DONE;
 }
 
+/** Wait (idle) event of the Goombella: shows the idle pose from the pose table. */
 static EVT_BEGIN(wait_event_christine)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

@@ -251,6 +251,10 @@ static BattleUnitSetup entry_majolyne = {
     NULL, // itemDropTable
 };
 
+/**
+ * Vivian sinks into her shadow: after 250 ms plays the shadow sound (SFX_BOSS_VIVI_SHADOW1)
+ * and hides her model (battle_evt_majo_disp_off).
+ */
 static EVT_BEGIN(vivian_down)
     BEGIN_INLINE_EVENT
         WAIT_MS(250)
@@ -260,6 +264,10 @@ static EVT_BEGIN(vivian_down)
     RETURN
 EVT_END()
 
+/**
+ * Vivian rises out of her shadow at the position in LW(0..2):
+ * after 250 ms plays the rising sound (SFX_BOSS_VIVI_SHADOW2), shows her model and sets her position.
+ */
 static EVT_BEGIN(vivian_up)
     BEGIN_INLINE_EVENT
         WAIT_MS(250)
@@ -270,6 +278,10 @@ static EVT_BEGIN(vivian_up)
     RETURN
 EVT_END()
 
+/**
+ * Guess: init script of Vivian in the Shadow Sirens fight:
+ * installs her wait, phase, attack, damage, confusion and entry handlers and resets her unit work.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
@@ -313,6 +325,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: battle intro lines: the camera zooms on Beldam,
+ * Marilyn and Vivian in turn as they speak "btl_majo3_00" to "02".
+ */
 static EVT_BEGIN(entry_event)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     WAIT_FRAMES(60)
@@ -331,6 +347,10 @@ static EVT_BEGIN(entry_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: damage handler for Vivian: records in her shared flag when she took the knocked-out damage code,
+ * then runs the default damage script.
+ */
 static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 1024, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -342,6 +362,7 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Guess: vivian's defeat: she returns to her home spot if displaced, speaks and plays the shared dead sequence. */
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(3), LW(4), LW(5))
@@ -422,6 +443,11 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: vivian's unison-phase script, run after the player's phase:
+ * first runs the shared majo_unison_phase_event, then, if her move choice changed,
+ * has her sink into her shadow and re-emerge.
+ */
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -454,10 +480,15 @@ static EVT_BEGIN(unison_phase_event)
     RETURN
 EVT_END()
 
+/** Vivian's phase script: empty, it does nothing. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: vivian's attack choice: uses an item if the AI says so,
+ * otherwise picks by unit work 8 between the shadow-slip attack and the fire attack.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -497,6 +528,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Guess: vivian's shadow-slip attack: she dives into the shadow, slips under the target and strikes from below. */
 static EVT_BEGIN(kagenuke_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -569,6 +601,11 @@ static EVT_BEGIN(kagenuke_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: vivian's fire attack (weapon_vivian_flame_attack1):
+ * she raises her hands, the magic sound plays, flame smoke appears on every target in turn and each is hit
+ * or avoids it by the usual guard check; with no valid targets it ends (or flusters her when confused).
+ */
 EVT_BEGIN(flame_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -633,6 +670,7 @@ EVT_BEGIN(flame_attack_event)
     RETURN
 EVT_END()
 
+/** Wait event of Vivian: switches to pose table entry 1 (idle). */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

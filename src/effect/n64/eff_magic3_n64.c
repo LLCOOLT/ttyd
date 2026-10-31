@@ -29,6 +29,10 @@ static void effMagic3Disp(CameraId cameraId, EffectEntry* effect);
 #pragma opt_propagation off
 // strength reduction optimisation off for effMagic3N64Entry: the original register allocation and scheduling need it
 #pragma opt_strength_reduction off
+/**
+ * Spawns five sparks at (x, y, z) that shoot upward in a 100-degree fan facing the camera and
+ * then die out over life frames. Via evt_eff64 "magic3_n64"; no script callers found.
+ */
 EffectEntry* effMagic3N64Entry(s32 type, f32 x, f32 y, f32 z, s32 life) {
     s32 j;
     EffectEntry* effect;
@@ -108,10 +112,12 @@ EffectEntry* effMagic3N64Entry(s32 type, f32 x, f32 y, f32 z, s32 life) {
 
 #pragma opt_propagation reset
 #pragma opt_strength_reduction reset
+/** Returns 3 * a + b (a size term used while the sparks fade out). */
 inline f32 magic3_scale(f32 a, f32 b) {
     return 3.0f * a + b;
 }
 
+/** Slows each spark (80% per frame, 70% near the end), fades alpha in then out, and pulses its size with sine waves. */
 static void effMagic3Main(EffectEntry* effect) {
     s32 life;
     EffMagic3N64Work* work = effect->userdata;
@@ -155,6 +161,7 @@ static void effMagic3Main(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effMagic3Disp, effect);
 }
 
+/** Draws each spark as a camera-facing, rotated streak quad (32x16, effect texture 0x1E). */
 static void effMagic3Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffMagic3N64Work* work;

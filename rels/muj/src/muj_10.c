@@ -55,6 +55,10 @@ s32 senin_event_erumospos[180];
 extern EvtWord senin_event[];
 static HitDamageReturn hitDmgRetPoints[7];
 
+/**
+ * Script helper: sets the transparency scale (args[1], 0.0 to 1.0) of the kameki_tornade_n64 effect named
+ * args[0]; fades Cortez's tornado in and out (same as the helper in muj.c).
+ */
 static USER_FUNC(tornade_alpha_func) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -64,6 +68,10 @@ static USER_FUNC(tornade_alpha_func) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: moves the whole crowd of 95 sailors (mass NPCs) up or down to their base height plus args[0],
+ * so they bob with the ship (called from senin_event with the ship bobbing value).
+ */
 static USER_FUNC(suifu_option_func) {
     f32 y = evtGetFloat(event, event->args[0]);
     NanNPCWork* wp = nanNPCWork;
@@ -76,6 +84,10 @@ static USER_FUNC(suifu_option_func) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: remembers the current positions of the 95 crowd sailors as their base positions for
+ * suifu_option_func.
+ */
 static USER_FUNC(suifu_option_init_func) {
     NanNPCWork* wp = nanNPCWork;
     s32 i;
@@ -86,6 +98,10 @@ static USER_FUNC(suifu_option_init_func) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Init event of the bespectacled sailor on the dock:
+ * placed between STORY_STG5_31_FOUR_EYES and STORY_STG5_32_CORTEZS_WARNING.
+ */
 static EVT_BEGIN(megane_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_31_FOUR_EYES, STORY_STG5_32_CORTEZS_WARNING)
@@ -95,6 +111,7 @@ static EVT_BEGIN(megane_init)
     RETURN
 EVT_END()
 
+/** Talk event of the bespectacled sailor: says stg5_dou_19_00. */
 static EVT_BEGIN(megane_talk)
     CALL(evt_msg_print, 0, STRING("stg5_dou_19_00"), 0, STRING("me"))
     RETURN
@@ -116,18 +133,24 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/** Guess: closes the hold door (S_b_doa) of the ship: turns it back to shut over a short interpolation. */
 static EVT_BEGIN(e_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_b_doa"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Guess: opens the hold door (S_b_doa) of the ship by turning it over a short interpolation. */
 static EVT_BEGIN(e_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("S_b_doa"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Guess: custom door entrance of the hidden dock:
+ * reads the entrance animation and, if it names an event, runs it then walks Mario in.
+ */
 static EVT_BEGIN(door_custom)
     CALL(evt_bero_get_info_anime, LW(1), LW(10), LW(11), LW(12), LW(13))
     IF_INT_NOT_EQUAL(LW(12), 0)
@@ -152,6 +175,10 @@ static EVT_BEGIN(door_custom)
     RETURN
 EVT_END()
 
+/**
+ * Guess: entrance event of the dock: at STORY_STG5_41_RETURN_TO_THE_GROTTO it runs door_custom
+ * and holds the party until the entrance has finished.
+ */
 static EVT_BEGIN(bero_in_event)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_41_RETURN_TO_THE_GROTTO)
         SPAWN_EVENT(door_custom)
@@ -219,6 +246,12 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * The mystery of the ship (STORY_STG5_30 to 31):
+ * waits until Mario stands on the plank A_hasi_ita past x = -250,
+ * then the bespectacled sailor speaks (stg5_dou_19_00_00, stg5_dou_19), walks off,
+ * and the story becomes STORY_STG5_31_FOUR_EYES.
+ */
 EVT_BEGIN(nazo_event)
     LOOP(0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -266,6 +299,11 @@ EVT_BEGIN(nazo_event)
     RETURN
 EVT_END()
 
+/**
+ * Mario is thrown out of the ship (oidasare, driven away):
+ * his partner jumps clear, Mario tumbles to the dock and lies dazed (pose M_D_8) with a landing sound,
+ * and the story becomes STORY_STG5_34_KICKED_OFF.
+ */
 EVT_BEGIN(oidasare_event)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -441,6 +479,10 @@ s32 senin_event_erumospos[] = {
     -305, -126, 252, -242,
 };
 
+/**
+ * Sets up the crowd of 95 sailors on the hidden dock (mass NPCs with the sailor animation table) from
+ * senin_event_suifupos and bobs them up and down with the ship via muj_ship_puka.
+ */
 EVT_BEGIN(senin_event)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_nannpc_init, PTR(test_ext_entry_data), 0, 0, 0, 155)
@@ -563,6 +605,13 @@ EVT_BEGIN(senin_event)
 EVT_END()
 
 #if VERSION >= VERSION_US
+/**
+ * Cortez appears on the dock (STORY_STG5_41_RETURN_TO_THE_GROTTO):
+ * the sailors and Mony talk (stg5_dou_19_01 to 03),
+ * Cortez arrives in his tornado (korutesu_apper) and speaks (stg5_dou_19_04),
+ * the Embers fade in around the crowd, the story becomes STORY_STG5_41_01_ALL_ABOARD
+ * and the map changes to muj_00.
+ */
 EVT_BEGIN(korutesu_appear_event)
     CALL(evt_cam3d_evt_set, -71, 178, 259, -71, 83, -282, 0, 11)
     CALL(evt_bero_exec_wait, 65536)
@@ -589,6 +638,7 @@ EVT_BEGIN(korutesu_appear_event)
 EVT_END()
 #endif
 
+/** Guess: dust effect (hokori) spawned at random spots by a repeating timer during the ship scene. */
 static EVT_BEGIN(dai3_shurai_after)
     LOOP(0)
         CALL(evt_sub_random, 2500, LW(10))
@@ -614,6 +664,11 @@ static HitDamageReturn hitDmgRetPoints[] = {
     {0},
 };
 
+/**
+ * Map init for muj_10 (the hidden dock): picks music for the story stage, registers the exits and NPCs,
+ * hides or places sailors, Mony and Cortez for the current stage and spawns the scene (nazo_event,
+ * oidasare_event, senin_event or korutesu_appear_event).
+ */
 EVT_BEGIN(muj_10_init_evt)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG5_33_CORTEZ_AND_THE_TREASURE)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG5_GHOST1"))
@@ -687,6 +742,10 @@ EVT_BEGIN(muj_10_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Per-frame behaviour of an Ember in the crowd:
+ * waits a random time up to one second, then fades its alpha from 0 to 255 over 500 ms and stays visible.
+ */
 static void elmosalpha_func(NanNPC* npc) {
     s32 elapsed;
 

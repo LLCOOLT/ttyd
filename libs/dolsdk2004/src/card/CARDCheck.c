@@ -8,6 +8,10 @@ static s32 VerifyID(CARDControl* card);
 static s32 VerifyDir(CARDControl* card, int* pcurrent);
 static s32 VerifyFAT(CARDControl* card, int* pcurrent);
 
+/**
+ * Computes the two 16-bit checksums the card file system uses:
+ * the sum of the words and the sum of their bitwise inverses (a result of 0xFFFF is stored as 0).
+ */
 void __CARDCheckSum(void* ptr, int length, u16* checksum, u16* checksumInv) {
     u16* p;
     int i;
@@ -28,6 +32,11 @@ void __CARDCheckSum(void* ptr, int length, u16* checksum, u16* checksumInv) {
         *checksumInv = 0;
 }
 
+/**
+ * Checks the card header block: device ID and size, its checksums,
+ * the 12-byte serial number against the flash ID stored in SRAM (through a linear congruential sequence),
+ * and the font encoding. Returns BROKEN, ENCODING or READY.
+ */
 static s32 VerifyID(CARDControl* card) {
     CARDID* id;
     u16 checksum;
@@ -64,6 +73,11 @@ static s32 VerifyID(CARDControl* card) {
     return CARD_RESULT_READY;
 }
 
+/**
+ * Checks both directory copies' checksums.
+ * Returns the number of bad copies; when both are good it picks the one with the newer check code as current
+ * and copies it over the other.
+ */
 static s32 VerifyDir(CARDControl* card, int* pcurrent) {
     CARDDir* dir[2];
     CARDDirCheck* check[2];
@@ -104,6 +118,10 @@ static s32 VerifyDir(CARDControl* card, int* pcurrent) {
     return errors;
 }
 
+/**
+ * Checks both FAT copies: checksum and that the stored free-block count matches the number of free entries.
+ * Returns the number of bad copies; when both are good it picks the newer and copies it over the other.
+ */
 static s32 VerifyFAT(CARDControl* card, int* pcurrent) {
     u16* fat[2];
     u16* fatp;
@@ -159,6 +177,10 @@ static s32 VerifyFAT(CARDControl* card, int* pcurrent) {
     return errors;
 }
 
+/**
+ * Mount-time check: header, then directory and FAT.
+ * A single bad directory or FAT copy counts as BROKEN here; READY only when nothing is wrong.
+ */
 s32 __CARDVerify(CARDControl* card) {
     s32 result;
     int errors;
@@ -181,6 +203,13 @@ s32 __CARDVerify(CARDControl* card) {
     }
 }
 
+/**
+ * Checks the mounted card and repairs it where possible.
+ * One bad directory or FAT copy is rebuilt from the good one;
+ * then every file's block chain is walked (a bad, shared or wrongly sized chain gives BROKEN),
+ * blocks no file owns are returned to the free list and the free count is corrected.
+ * If a write is needed, 'xferBytes' is set to 8 KiB and the directory or FAT is saved before the callback runs.
+ */
 s32 CARDCheckExAsync(s32 chan, s32* xferBytes, CARDCallback callback) {
     CARDControl* card;
     CARDDir* dir[2];
@@ -323,11 +352,13 @@ s32 CARDCheckExAsync(s32 chan, s32* xferBytes, CARDCallback callback) {
     return CARD_RESULT_READY;
 }
 
+/** Asynchronous CARDCheckExAsync that discards the transferred-bytes count. */
 s32 CARDCheckAsync(s32 chan, CARDCallback callback) {
     s32 xferBytes;
     return CARDCheckExAsync(chan, &xferBytes, callback);
 }
 
+/** Blocking CARDCheckExAsync: waits for the check and its repair write to finish. */
 s32 CARDCheckEx(s32 chan, s32* xferBytes) {
     s32 result = CARDCheckExAsync(chan, xferBytes, __CARDSyncCallback);
     if (result < 0 || xferBytes == 0) {
@@ -337,6 +368,7 @@ s32 CARDCheckEx(s32 chan, s32* xferBytes) {
     return __CARDSync(chan);
 }
 
+/** Blocking check of the card's file system; see CARDCheckExAsync. */
 s32 CARDCheck(s32 chan) {
     s32 xferBytes;
     return CARDCheckEx(chan, &xferBytes);

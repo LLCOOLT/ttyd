@@ -63,6 +63,13 @@ u16 _hp_tbl[] = {20, 2, 35, 4, 45, 6, 55, 8, 65, 6, 80, 4, 100, 2};
 static s32 _get_angle_hp(s32 hp);
 static s32 _get_angle_rate(f32 angle);
 
+/**
+ * Per-frame driver of action command 12, used by Koops's Shell Shield.
+ * Swings unit params[1] (part params[2]) up to 45 degrees each way, a full swing every params[4] x 2 frames;
+ * pressing A stops it, and outputParams[1] gives the shield's HP for that angle (2 at the ends, 8 in the middle,
+ * see _hp_tbl). Fails after params[5] frames. With acFlags bit 0 the stick can damp the swing.
+ * The releases tick a sound on entering either end of the gauge.
+ */
 s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
     PendulumWork* cw;
     BattleUnit* unit;
@@ -224,12 +231,17 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
     return 1;
 }
 
+/** Returns the result word: 1 while running, 2 once A was pressed, 0 on timeout. */
 s32 battleAcResult_PendulumCraneTiming(BattleWork* work) {
     return work->actionCommands.result;
 }
 
 static void actionCommandDisp(f32 x, f32 y);
 
+/**
+ * Display callback: slides the gauge in from the left over 20 frames,
+ * and once the command ends keeps it up for 40 frames before sliding it back out.
+ */
 void battleAcDisp_PendulumCraneTiming(CameraId cameraId, void* param) {
     BattleACDispParams* disp;
     BattleWork* w = _battleWorkPointer;
@@ -260,6 +272,7 @@ void battleAcDisp_PendulumCraneTiming(CameraId cameraId, void* param) {
     }
 }
 
+/** Called by btlevtcmd_StopAC: unless the command already finished, stops its sound and starts the end wait. */
 void battleAcDelete_PendulumCraneTiming(BattleWork* work) {
     if ((u32)work->actionCommands.doneFlags & 1) {
         return;
@@ -267,6 +280,10 @@ void battleAcDelete_PendulumCraneTiming(BattleWork* work) {
     work->actionCommands.acState = 1002;
 }
 
+/**
+ * Draws the A icon, the gauge as seven bands shaded by HP (brightest in the middle)
+ * and the marker at the current swing position.
+ */
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     CameraEntry* cam;
@@ -301,6 +318,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     }
 }
 
+/** Maps a swing angle of -45..45 degrees to a gauge position of 0..100. */
 static s32 _get_angle_rate(f32 angle) {
     s32 r;
     f32 a;
@@ -318,6 +336,7 @@ static s32 _get_angle_rate(f32 angle) {
     return r;
 }
 
+/** Looks up the Shell Shield HP for a gauge position in _hp_tbl: 2 at the ends rising to 8 between 45 and 55. */
 static s32 _get_angle_hp(s32 hp) {
     u16* p = _hp_tbl;
     while (hp > p[0]) {

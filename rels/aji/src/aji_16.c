@@ -34,6 +34,11 @@ extern EvtWord evt_last_mail[];
 extern EvtWord peach_evt_door_open[];
 extern EvtWord peach_evt_stg2_1[];
 
+/**
+ * Door close animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times 0.22167969;
+ * the open and close scripts apply the same transform.
+ */
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
     CALL(evt_mapobj_trans, 0, STRING("S_door1_1"), 0, 0, LW(0))
@@ -42,6 +47,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door open animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times 0.22167969;
+ * the open and close scripts apply the same transform.
+ */
 static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
     CALL(evt_mapobj_trans, 0, STRING("S_door1_1"), 0, 0, LW(0))
@@ -50,6 +60,11 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door close animation step: moves the two door leaves S_door2_1
+ * and S_door2_2 in opposite directions along Z by the animation value in LW(0) times -0.22167969;
+ * the open and close scripts apply the same transform.
+ */
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
     CALL(evt_mapobj_trans, 0, STRING("S_door2_1"), 0, 0, LW(0))
@@ -58,6 +73,11 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door open animation step: moves the two door leaves S_door2_1
+ * and S_door2_2 in opposite directions along Z by the animation value in LW(0) times -0.22167969;
+ * the open and close scripts apply the same transform.
+ */
 static EVT_BEGIN(e_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
     CALL(evt_mapobj_trans, 0, STRING("S_door2_1"), 0, 0, LW(0))
@@ -66,6 +86,10 @@ static EVT_BEGIN(e_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Enter event of the west door w_bero: if the player is Peach,
+ * resets her to the normal condition (evt_peach_set_condition 0), and sets LW(0) = 0 so the entry proceeds.
+ */
 EVT_BEGIN(w_bero_in_evt)
     CALL(evt_mario_get_mode, LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -134,6 +158,11 @@ static BeroEntry bero_peach_data[] = {
     {0},
 };
 
+/**
+ * Sets up the Last Mail scene (aji_16 entered as "peach", STORY_STG7_25_THE_LAST_MAIL):
+ * Mario and the partner are placed on the left,
+ * a paper-flat Peach (P_Z_7) is put in the middle under soft focus and evt_last_mail starts.
+ */
 EVT_BEGIN(evt_last_mail_init)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -152,6 +181,10 @@ EVT_BEGIN(evt_last_mail_init)
     RETURN
 EVT_END()
 
+/**
+ * Plays the Last Mail scene: the camera pans across the room for five seconds,
+ * Peach fades away over two seconds, the text stg7_aji_58 appears and the map changes to aji_17.
+ */
 EVT_BEGIN(evt_last_mail)
     CALL(evt_seq_wait, 2)
     CALL(evt_cam3d_evt_set, -100, 80, 285, -100, 40, -13, 5000, 0)
@@ -171,6 +204,10 @@ EVT_BEGIN(evt_last_mail)
     RETURN
 EVT_END()
 
+/**
+ * Opens the east door e_bero for Peach with the door sound bero_open_door_play_se (the door swings 180 degrees
+ * over half a second).
+ */
 EVT_BEGIN(peach_evt_door_open)
     CALL(evt_cam3d_evt_set, 35, 114, 334, 157, 54, 17, 1000, 11)
     WAIT_MS(1000)
@@ -188,6 +225,11 @@ EVT_BEGIN(peach_evt_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Peach's first scene in her room after being caught:
+ * starts the dungeon BGM, shows peach_aji_34 and 34_01,
+ * and sets the story progress to STORY_STG1_18_PEACH_CAUGHT.
+ */
 static EVT_BEGIN(peach_evt_stg1)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI2"))
@@ -215,6 +257,11 @@ static EVT_BEGIN(peach_evt_stg1)
     RETURN
 EVT_END()
 
+/**
+ * Follow-up scene in Peach's room: she is startled (exclamation balloon), the door opens, peach_aji_38 plays,
+ * the e_bero exit is overwritten with Peach's version
+ * and the story progress becomes STORY_STG1_18_01_PEACH_AN_OPEN_DOOR.
+ */
 static EVT_BEGIN(peach_evt_stg1_1)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_seq_wait, 2)
@@ -241,6 +288,12 @@ static EVT_BEGIN(peach_evt_stg1_1)
     RETURN
 EVT_END()
 
+/**
+ * Peach's second captivity scene in the room (STORY_STG2_25_AFTER_THE_BOSS_BATTLE, scene already done):
+ * after five seconds she is startled, the east door opens (peach_aji_75),
+ * the story becomes STORY_STG2_25_01_PEACH_CRUMP_AND_X_NAUTS
+ * and the exit e_bero is rewritten to bero_peach_data.
+ */
 EVT_BEGIN(peach_evt_stg2_1)
     CALL(evt_seq_wait, 2)
     CALL(evt_bero_exec_wait, 65536)
@@ -275,6 +328,10 @@ EVT_BEGIN(peach_evt_stg2_1)
     RETURN
 EVT_END()
 
+/**
+ * Peach's chapter 2 scene in her room: Peach's BGM, peach_aji_73 and 74,
+ * then peach_evt_stg2_1 is spawned and GSWF_AJI16_PEACH2_SCENE_DONE is set.
+ */
 static EVT_BEGIN(peach_evt_stg2)
     CALL(evt_mario_set_mode, 1)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_PEACH1"))
@@ -305,6 +362,11 @@ static EVT_BEGIN(peach_evt_stg2)
     RETURN
 EVT_END()
 
+/**
+ * Peach's chapter 3 scene in her room: peach_aji_112 and 113, the door opens,
+ * the e_bero exit is overwritten with Peach's version,
+ * peach_aji_114 plays and the story progress becomes STORY_STG3_33_PEACH_THE_SECRET_WEAPON.
+ */
 static EVT_BEGIN(peach_evt_stg3)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_PEACH1"))
@@ -345,6 +407,11 @@ static EVT_BEGIN(peach_evt_stg3)
     RETURN
 EVT_END()
 
+/**
+ * Peach's chapter 6 scene in her room: peach_aji_280, the door opens, peach_aji_281,
+ * the e_bero exit is overwritten with Peach's version
+ * and the story progress becomes STORY_STG6_55_PEACH_GRODUS_AND_X_NAUT.
+ */
 static EVT_BEGIN(peach_evt_stg6)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_PEACH1"))
@@ -384,6 +451,10 @@ static EVT_BEGIN(peach_evt_stg6)
     RETURN
 EVT_END()
 
+/**
+ * Case script on the doors Peach may not use here:
+ * freezes controls, suspends other event types and shows peach_aji_38_01.
+ */
 static EVT_BEGIN(peach_evt_door_stop)
     CALL(evt_mario_key_onoff, 0)
     SUSPEND_TYPES_OTHER(239)
@@ -393,6 +464,14 @@ static EVT_BEGIN(peach_evt_door_stop)
     RETURN
 EVT_END()
 
+/**
+ * Init script of aji_16, Peach's room: depending on how it is entered ("peach" for the Last Mail,
+ * "peach_evt_stg1", "peach_evt_stg3", "peach_evt_stg6") and on the story it starts the matching scene:
+ * the shower aftermath at STORY_STG1_18, the captivity scenes at STORY_STG2_25, 3 and 6,
+ * locks the door e_bero while Peach has to wait,
+ * makes the player Peach (partner removed) before STORY_STG7_00_START
+ * and plays BGM_EVT_PEACH1 with the ambience off after.
+ */
 EVT_BEGIN(aji_16_init_evt)
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("peach"))
@@ -460,6 +539,7 @@ EVT_BEGIN(aji_16_init_evt)
     RETURN
 EVT_END()
 
+/** Script function: sets Mario's (Peach's) pose to the animation named in args[0]. */
 static USER_FUNC(peach_set_pose) {
     const char* pose = (const char*)evtGetValue(event, event->args[0]);
     MarioWork* mario = marioGetPtr();

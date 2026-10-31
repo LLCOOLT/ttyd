@@ -73,6 +73,10 @@ Vec rose_table_direct[55];
 f32 rose_table[120];
 extern EvtWord flower_event[];
 
+/**
+ * Door-open callback for the west bero exit: names the door map objects "S_doa_w_l" and "S_doa_w_r"
+ * and runs the shared evt_win_door_open.
+ */
 EVT_BEGIN(win_04w_door_open)
     SET_VALUE(LW(8), STRING("S_doa_w_l"))
     SET_VALUE(LW(9), STRING("S_doa_w_r"))
@@ -80,6 +84,10 @@ EVT_BEGIN(win_04w_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door-close callback for the west bero exit: names the door map objects "S_doa_w_l" and "S_doa_w_r"
+ * and runs the shared evt_win_door_close.
+ */
 EVT_BEGIN(win_04w_door_close)
     SET_VALUE(LW(8), STRING("S_doa_w_l"))
     SET_VALUE(LW(9), STRING("S_doa_w_r"))
@@ -87,6 +95,10 @@ EVT_BEGIN(win_04w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door-open callback for the east bero exit: names the door map objects "S_doa_e_l" and "S_doa_e_r"
+ * and runs the shared evt_win_door_open.
+ */
 EVT_BEGIN(win_04e_door_open)
     SET_VALUE(LW(8), STRING("S_doa_e_l"))
     SET_VALUE(LW(9), STRING("S_doa_e_r"))
@@ -94,6 +106,10 @@ EVT_BEGIN(win_04e_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door-close callback for the east bero exit: names the door map objects "S_doa_e_l" and "S_doa_e_r"
+ * and runs the shared evt_win_door_close.
+ */
 EVT_BEGIN(win_04e_door_close)
     SET_VALUE(LW(8), STRING("S_doa_e_l"))
     SET_VALUE(LW(9), STRING("S_doa_e_r"))
@@ -101,6 +117,10 @@ EVT_BEGIN(win_04e_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Guess: exit script of the west bero: sets the next map change to an iris wipe (500 ms out, 500 ms in);
+ * returns LW(0) = 0.
+ */
 static EVT_BEGIN(out_w_bero)
     CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_IRIS, 500, FADE_IN_IRIS, 500)
     SET_VALUE(LW(0), 0)
@@ -168,6 +188,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Guess: cutscene when Mario first enters Flurrie's house:
+ * the extra partner talks ("stg2_win_e05_00_00" and "_01") while the camera frames the room,
+ * and the story becomes STORY_STG2_05_A_SHY_FLURRIE.
+ */
 EVT_BEGIN(meet_clouda)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -190,6 +215,10 @@ EVT_BEGIN(meet_clouda)
     RETURN
 EVT_END()
 
+/**
+ * Guess: trigger loop: once Mario stands at x >= 150 on the floor (y = 50) and his partners are in place,
+ * the extra partner remarks "stg2_win_e05_00_02" and the story becomes STORY_STG2_05_01_FLURRIE_LIVING_ROOM.
+ */
 EVT_BEGIN(meet_clouda2)
     LOOP(0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -265,6 +294,10 @@ EVT_BEGIN(meet_clouda2)
     RETURN
 EVT_END()
 
+/**
+ * Guess: door script when Flurrie is not at home yet:
+ * Mario's "stg2_win_e04_03" and the party's "stg2_win_e04_04" lines.
+ */
 EVT_BEGIN(clouda_inai)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("stg2_win_e04_03"), 0, 0)
@@ -273,6 +306,12 @@ EVT_BEGIN(clouda_inai)
     RETURN
 EVT_END()
 
+/**
+ * Guess: flurrie's request scene through the door:
+ * she explains from behind it that she lost her necklace
+ * and asks Mario to find it ("stg2_win_e05_00_03" and on),
+ * then the story becomes STORY_STG2_05_02_FLURRIE_REQUEST.
+ */
 EVT_BEGIN(clouda_irai)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION >= VERSION_JP
@@ -394,6 +433,10 @@ EVT_BEGIN(clouda_irai)
     RETURN
 EVT_END()
 
+/**
+ * Door script after Flurrie's request: speaks "stg2_win_e05_19" from the door
+ * while Mario still has not found her necklace.
+ */
 EVT_BEGIN(clouda_irai_ato)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_toge, 2, 350, 100, 0)
@@ -402,6 +445,10 @@ EVT_BEGIN(clouda_irai_ato)
     RETURN
 EVT_END()
 
+/**
+ * Guess: moves the mirror ball ("S_mirre") along y by interpolating 0 to -100 over 1.5 seconds into GW(1),
+ * with Flurrie's light sound playing at (170, 50, 10).
+ */
 EVT_BEGIN(mirror_trans)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_CRAUD_LIGHT2"), 170, 50, 10, LW(9))
     CALL(evt_sub_intpl_msec_init, 0, 0, -100, 1500)
@@ -417,6 +464,10 @@ EVT_BEGIN(mirror_trans)
     RETURN
 EVT_END()
 
+/**
+ * Endless loop that spins the mirror ball ("S_mirre") 360 degrees every 6 seconds
+ * while keeping its height from GW(1).
+ */
 EVT_BEGIN(mirror_rotate)
     LOOP(0)
         CALL(evt_sub_intpl_msec_init, 0, 0, 360, 6000)
@@ -434,6 +485,10 @@ EVT_BEGIN(mirror_rotate)
     RETURN
 EVT_END()
 
+/**
+ * Guess: waits until Mario has stood still for several consecutive frames (his position is unchanged),
+ * so a scene can continue after his walk ends.
+ */
 EVT_BEGIN(mario_move_wait)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     SET_VALUE(LW(6), 0)
@@ -463,6 +518,10 @@ EVT_BEGIN(mario_move_wait)
     RETURN
 EVT_END()
 
+/**
+ * Guess: makes the dummy NPC "dummy1" (a copy of Mario) hop to a spot 90 left and 30 behind the given position,
+ * then sets sprite-slot flag 0 (ss_ch).
+ */
 EVT_BEGIN(dummy1_jump)
     CALL(evt_npc_set_position, STRING("dummy1"), LW(0), LW(1), LW(2))
     ADD(LW(0), -90)
@@ -472,6 +531,10 @@ EVT_BEGIN(dummy1_jump)
     RETURN
 EVT_END()
 
+/**
+ * Guess: makes the dummy NPC "dummy2" (a copy of his partner) hop to a spot 90 left
+ * and 30 ahead of the given position, then sets sprite-slot flag 1 (ss_ch).
+ */
 EVT_BEGIN(dummy2_jump)
     CALL(evt_party_get_pos, 1, LW(0), LW(1), LW(2))
     CALL(evt_npc_set_position, STRING("dummy2"), LW(0), LW(1), LW(2))
@@ -482,6 +545,10 @@ EVT_BEGIN(dummy2_jump)
     RETURN
 EVT_END()
 
+/**
+ * Guess: script helper: reads the float flag ssf[args[0]] into the variable args[1];
+ * used to check whether a dummy has finished its hop.
+ */
 static USER_FUNC(ss_ch_check) {
     u64 out; // FAKE: a 64-bit local for the variable id reorders the args[1] load (docs/FAKES.md lists the forms tried)
     EvtWord* args = event->args;
@@ -492,6 +559,7 @@ static USER_FUNC(ss_ch_check) {
     return EVT_RETURN_DONE;
 }
 
+/** Guess: script helper: sets the flag ssf[args[0]] to args[1]; used by the dummy hop scripts. */
 static USER_FUNC(ss_ch_set) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -500,6 +568,10 @@ static USER_FUNC(ss_ch_set) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: covers the screen with a 2D black fade of color (args[0], args[1], args[2]) and alpha args[3],
+ * without animating.
+ */
 static USER_FUNC(fade_alpha) {
     EvtWord* args = event->args;
     s32 r = evtGetValue(event, args[0]);
@@ -515,6 +587,11 @@ static s32 item_list[] = {
     ITEM_NECKLACE, -1,
 };
 
+/**
+ * Guess: flurrie joins the party: Mario picks the necklace from the item menu to return it to her,
+ * a mirror ball lowers and spins, rose petals bloom, she winks and joins;
+ * if Mario cancels the menu she speaks "stg2_win_e09_00_01" and nothing else changes.
+ */
 EVT_BEGIN(clouda_nakama)
     CALL(evt_npc_flag_onoff, 1, STRING("クラウダ"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_mario_key_onoff, 0)
@@ -949,6 +1026,10 @@ EVT_BEGIN(clouda_nakama)
     RETURN
 EVT_END()
 
+/**
+ * Front-door case script: depending on story progress it runs clouda_inai, clouda_irai, clouda_irai_ato,
+ * or (after the Sirens' defeat) either asks for the necklace or starts the joining scene clouda_nakama.
+ */
 EVT_BEGIN(touch_door)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG2_05_01_FLURRIE_LIVING_ROOM)
@@ -971,6 +1052,10 @@ EVT_BEGIN(touch_door)
     RETURN
 EVT_END()
 
+/**
+ * Guess: sets TEV callback 1 (mirror_ball) on the map object "S_mirre"
+ * and displays it as a live-lit object instead of a display list, so the mirror ball can shine.
+ */
 EVT_BEGIN(mirror_ball_event)
     CALL(evt_map_set_tevcallback, 1, PTR(mirror_ball))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_mirre"), MAPOBJ_TEV_CALLBACK(1))
@@ -1214,6 +1299,10 @@ f32 rose_table[] = {
     -190.0f, 270.0f, -190.0f, -260.0f, 190.0f, 270.0f, 190.0f, -260.0f,
 };
 
+/**
+ * Rose-petal effect: allocates 55 flowers, ticks them until GW(0) is set to 1, then fades them out;
+ * spawned during Flurrie's joining scene.
+ */
 EVT_BEGIN(flower_event)
     SET_VALUE(GW(0), 0)
     CALL(evt_flower_init)
@@ -1232,6 +1321,10 @@ EVT_BEGIN(flower_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: debug helper that waits for the A button (256) on controller 0 and calls flower_pos_report;
+ * has no effect on the shipped game.
+ */
 EVT_BEGIN(flower_disp_pos)
     LOOP(0)
         WAIT_FRAMES(1)
@@ -1245,10 +1338,15 @@ EVT_BEGIN(flower_disp_pos)
     RETURN
 EVT_END()
 
+/** Guess: map TEV callback for the mirror ball: adds TEV stage 10 for the environment-lit look. */
 static void mirror_ball(MapTevCallbackInfo* info) {
     envAddTev(10, info);
 }
 
+/**
+ * 2D draw callback for the falling rose petals:
+ * blends each of the 55 flowers' texture at its position, scale and alpha.
+ */
 static void flower_disp(CameraId camera, void* param) {
     FlowerWork* wp = param;
     CameraEntry* cam = camGetPtr(camera);
@@ -1307,6 +1405,10 @@ static void flower_disp(CameraId camera, void* param) {
     }
 }
 
+/**
+ * Guess: Flurrie appears in her living room: Mario is moved offscreen, the camera frames the room,
+ * "stg2_win_e04_00_02" and "_03" play and the map changes to win_05 with an iris wipe.
+ */
 static EVT_BEGIN(cloud_toujou)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -1329,6 +1431,11 @@ static EVT_BEGIN(cloud_toujou)
     RETURN
 EVT_END()
 
+/**
+ * Guess: map init script of Flurrie's house (win_04):
+ * registers exits, plays the Boggly Woods BGM, switches door behaviors by story progress,
+ * and starts the Flurrie meeting and request scenes.
+ */
 EVT_BEGIN(win_04_init_evt)
 #if VERSION >= VERSION_JP
     SET_VALUE(GSWF(GSWF_LOG_MAP_WIN_ROUTE_SHOWN), 1)
@@ -1366,12 +1473,14 @@ EVT_BEGIN(win_04_init_evt)
     RETURN
 EVT_END()
 
+/** Returns a random float in [min, max] from rand(). */
 static f32 randf(f32 min, f32 max) {
     f32 r = rand() / 32767.0f;
 
     return (max - min) * r + min;
 }
 
+/** Script helper: allocates the rose-petal work area (55 flowers) and stores it in LW(10). */
 static USER_FUNC(evt_flower_init) {
     FlowerWork* wp = _mapAlloc(sizeof(FlowerWork));
 
@@ -1381,6 +1490,10 @@ static USER_FUNC(evt_flower_init) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Guess: script helper: ticks every flower: starts each after a random delay, places it from rose_table_direct,
+ * grows it to its target scale, and draws the lot.
+ */
 static USER_FUNC(evt_flower) {
     FlowerWork* wp = (FlowerWork*)event->lwData[10];
     Flower* fl = wp->flowers;
@@ -1419,6 +1532,7 @@ static USER_FUNC(evt_flower) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: resets all flowers' states so they start fading. */
 static USER_FUNC(evt_flower_end) {
     FlowerWork* wp = (FlowerWork*)event->lwData[10];
     Flower* fl = wp->flowers;
@@ -1430,6 +1544,7 @@ static USER_FUNC(evt_flower_end) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: fades the flowers' alpha by 10 per frame until they are gone, drawing them each frame. */
 static USER_FUNC(evt_flower_end_main) {
     FlowerWork* wp = (FlowerWork*)event->lwData[10];
     Flower* fl = wp->flowers;
@@ -1452,6 +1567,7 @@ static USER_FUNC(evt_flower_end_main) {
     return EVT_RETURN_DONE;
 }
 
+/** Guess: debug stub: loops over the flowers doing nothing; the original printed their positions. */
 static USER_FUNC(flower_pos_report) {
     FlowerWork* wp = (FlowerWork*)event->lwData[10];
     s32 i;

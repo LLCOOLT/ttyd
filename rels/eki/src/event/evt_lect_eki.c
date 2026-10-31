@@ -45,6 +45,11 @@ static OSTime wwstart;
 static s32 x_flag_data[2];
 static void lecture_button_disp(CameraId camera, void* param);
 static LectButton lbtn[2];
+/**
+ * Shifts the 3D camera's current position and look-at target by ofs (the camera's preset values are saved,
+ * the shifted ones become its new stored target, with an instant move).
+ * Used to hop the camera 2016 units up and back while the item-get effect is repositioned.
+ */
 static inline void effitemget_cam_move(CameraEntry* camera, Vec ofs) {
     camera->presetPos = camera->cameraPos;
     camera->presetAt = camera->cameraAt;
@@ -94,12 +99,21 @@ extern EvtWord boots_lv3_juyoitem_lecture_sub01[];
 extern EvtWord boots_lv3_juyoitem_lecture_sub02[];
 extern EvtWord boots_lv3_juyoitem_lecture[];
 
+/**
+ * Linear blend used by lect_mario_ido_sum: returns (total - elapsed) / total of end plus elapsed / total of
+ * start, so the value moves from start toward end as elapsed grows.
+ */
 static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start) {
     f32 rem = total - elapsed;
 
     return (rem * end + elapsed * start) / total;
 }
 
+/**
+ * Script helper: moves Mario in a straight line over args[0] milliseconds from
+ * where he stands to the point in LW(3), LW(4), LW(5), saving his starting point in LW(0) to LW(2).
+ * Blocks until the time is up.
+ */
 static USER_FUNC(lect_mario_ido_sum) {
     EvtWord* args = event->args;
     MarioWork* mario = marioGetPtr();
@@ -125,16 +139,22 @@ static USER_FUNC(lect_mario_ido_sum) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper: forces the status window (HP/FP/coins bar) closed for the lecture. */
 static USER_FUNC(lect_status_off) {
     statusWinForceClose();
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: lets the status window open again after the lecture (statusWinForceCloseClear). */
 static USER_FUNC(lect_status_on) {
     statusWinForceCloseClear();
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: stores args[1] in the lecture's private flag slot args[0] (two slots,
+ * used to signal between the lecture's parallel scripts).
+ */
 static USER_FUNC(x_flag_set) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -143,6 +163,7 @@ static USER_FUNC(x_flag_set) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: adds args[1] to the lecture flag slot args[0]. */
 static USER_FUNC(x_flag_add) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -151,6 +172,7 @@ static USER_FUNC(x_flag_add) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: reads the lecture flag slot args[0] into the script variable args[1]. */
 static USER_FUNC(x_flag_get) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -159,6 +181,7 @@ static USER_FUNC(x_flag_get) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: blocks until the lecture flag slot args[0] equals args[1]. */
 static USER_FUNC(x_flag_wait) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -170,6 +193,10 @@ static USER_FUNC(x_flag_wait) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * 2D draw callback that draws the two lecture button icons (when not hidden) at their positions with their
+ * current alpha; icons 075 to 07D (the stick direction icons) are drawn 15 units higher.
+ */
 static void lecture_button_disp(CameraId camera, void* param) {
     s32 i;
 
@@ -204,6 +231,12 @@ static void lecture_button_disp(CameraId camera, void* param) {
     }
 }
 
+/**
+ * Script helper that runs for the whole lecture as a sibling event:
+ * sets up the two button icons on the first call,
+ * then every frame advances each button's sequence (fade in while seq 2, fade out while seq 3, hidden at seq 4)
+ * and queues lecture_button_disp. Finishes once both buttons are hidden.
+ */
 static USER_FUNC(lecture_button_rtn) {
     LectButton* btn;
     s32 i;
@@ -254,6 +287,7 @@ static USER_FUNC(lecture_button_rtn) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper: sets the icon of lecture button args[0] to the icon id args[1]. */
 static USER_FUNC(lecture_button_set_icon_id) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -264,6 +298,7 @@ static USER_FUNC(lecture_button_set_icon_id) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: sets the opacity (0 to 255) of lecture button args[0] to args[1]. */
 static USER_FUNC(lecture_button_set_alpha) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -274,6 +309,7 @@ static USER_FUNC(lecture_button_set_alpha) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: sets (args[2] nonzero) or clears the flag bits args[1] on lecture button args[0]. */
 static USER_FUNC(lecture_button_flag_on_off) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -290,6 +326,10 @@ static USER_FUNC(lecture_button_flag_on_off) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: puts lecture button args[0] into sequence step args[1] (2 fades it in, 3 fades it out,
+ * 1 is idle, 4 hides it).
+ */
 static USER_FUNC(lecture_button_set_seq) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -300,6 +340,10 @@ static USER_FUNC(lecture_button_set_seq) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: reads the sequence step of lecture button args[0] into args[1] (despite the name it does not
+ * return the icon id).
+ */
 static USER_FUNC(lecture_button_get_icon_id) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -309,6 +353,7 @@ static USER_FUNC(lecture_button_get_icon_id) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: blocks until lecture button args[0] has reached sequence step args[1]. */
 static USER_FUNC(lecture_button_seq_wait) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -321,6 +366,7 @@ static USER_FUNC(lecture_button_seq_wait) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: moves lecture button args[0] to the screen position (args[1], args[2], args[3]). */
 static USER_FUNC(lecture_button_set_pos) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -333,6 +379,10 @@ static USER_FUNC(lecture_button_set_pos) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Sets the camera id of a map object and, recursively,
+ * of its children (and of the siblings that follow a child) so the whole model is drawn by the given camera.
+ */
 static void lect_map_cam_chg_sub(MapObject* obj, s32 camId, BOOL siblings) {
     obj->cameraId = camId;
     if (obj->child != NULL) {
@@ -343,6 +393,10 @@ static void lect_map_cam_chg_sub(MapObject* obj, s32 camId, BOOL siblings) {
     }
 }
 
+/**
+ * Script helper: moves the map object named args[0] (with its child objects) to the camera id args[1],
+ * so the lecture can draw it on the lecture camera.
+ */
 static USER_FUNC(lect_map_cam_chg) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -355,6 +409,7 @@ static USER_FUNC(lect_map_cam_chg) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: changes the camera that the named item-get effect (args[0]) draws with to the camera id args[1]. */
 static USER_FUNC(effitemgetchange_cam) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -366,6 +421,7 @@ static USER_FUNC(effitemgetchange_cam) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: same as effitemgetchange_cam but takes the effect entry pointer in args[0]. */
 static USER_FUNC(effitemgetchange_cam_ptr) {
     EvtWord* args = event->args;
     EffectEntry* eff = (EffectEntry*)evtGetValue(event, args[0]);
@@ -376,6 +432,7 @@ static USER_FUNC(effitemgetchange_cam_ptr) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: starts the named item-get effect (args[0]) by moving it to its opening state. */
 static USER_FUNC(effitemget_open) {
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
     ItemGetWork* work = eff->userdata;
@@ -384,6 +441,7 @@ static USER_FUNC(effitemget_open) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: same as effitemget_open but takes the effect entry pointer in args[0]. */
 static USER_FUNC(effitemget_open_ptr) {
     EffectEntry* eff = (EffectEntry*)evtGetValue(event, event->args[0]);
     ItemGetWork* work = eff->userdata;
@@ -392,6 +450,11 @@ static USER_FUNC(effitemget_open_ptr) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] nonzero moves the 3D camera 2016 units up,
+ * zero moves it back down (effitemget_cam_move).
+ * Guess: the lecture uses it to move the view away from the map while the item-get effect is arranged.
+ */
 static USER_FUNC(effitemget_busaiku) {
     s32 up = evtGetValue(event, event->args[0]);
     CameraEntry* camera = camGetPtr(CAMERA_3D);
@@ -406,6 +469,11 @@ static USER_FUNC(effitemget_busaiku) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Sets up the stage for the Ultra Boots lecture:
+ * moves Mario's real position aside, places Kinopiko (the Toad teacher) next to him,
+ * sets a close lecture camera and slides Mario to his lecture spot, ending with Mario facing right.
+ */
 EVT_BEGIN(boots_lv3_juyoitem_lecture_init)
     CALL(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
     CALL(evt_mario_set_pos, 0, -600, 0)
@@ -430,6 +498,10 @@ EVT_BEGIN(boots_lv3_juyoitem_lecture_init)
     RETURN
 EVT_END()
 
+/**
+ * Lecture helper: shows the two button icons (A solid, the stick icon dimmed)
+ * and flips the A icon between its pressed and released pictures every 300 ms.
+ */
 EVT_BEGIN(boots_lv3_juyoitem_lecture_sub01)
     CALL(lecture_button_set_alpha, 0, 255)
     CALL(lecture_button_set_alpha, 1, 128)
@@ -443,6 +515,11 @@ EVT_BEGIN(boots_lv3_juyoitem_lecture_sub01)
     RETURN
 EVT_END()
 
+/**
+ * Lecture helper: while Mario is crouching on the spring (A held),
+ * shows the A icon pressed and dimmed and cycles the stick icon around its directions every 15 ms to show
+ * where to push; runs until the main lecture script deletes it.
+ */
 EVT_BEGIN(boots_lv3_juyoitem_lecture_sub02)
     CALL(lecture_button_set_icon_id, 0, ICON_065)
     LOOP(0)
@@ -475,6 +552,14 @@ EVT_BEGIN(boots_lv3_juyoitem_lecture_sub02)
     RETURN
 EVT_END()
 
+/**
+ * The Ultra Boots lecture proper.
+ * Kinopiko explains the spring jump (lecture_u_boots_04 to 08):
+ * the player holds A to crouch and releases it to launch, while the button icons show the controls;
+ * the script lets Mario try it until he reaches the target height,
+ * after which Kinopiko offers to repeat the lesson (lecture_u_boots_10 and 11)
+ * and finally says goodbye (lecture_u_boots_13) and leaves.
+ */
 EVT_BEGIN(boots_lv3_juyoitem_lecture)
     BEGIN_SIBLING_EVENT
         CALL(lecture_button_rtn)
@@ -622,6 +707,13 @@ EVT_BEGIN(boots_lv3_juyoitem_lecture)
     RETURN
 EVT_END()
 
+/**
+ * Entry point of the key-item lecture, run when Mario first picks up a key item such as the Ultra Boots (the
+ * Ultra Boots case calls it through lect_juyoitem_rel_set):
+ * stops the map, plays the lecture music, shows the item on its own camera,
+ * then runs the lecture for the item (only item 8, the Ultra Boots, has one here),
+ * blinks Mario back in with the lecture sound, restores the camera and music and lets the map run again.
+ */
 EVT_BEGIN(all_juyoitem_lecture_rel)
     CALL(evt_mario_normalize)
     CALL(juyoitem_get_no, LW(10))
@@ -701,6 +793,11 @@ EVT_BEGIN(all_juyoitem_lecture_rel)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: turns on hit-group flag 1 for the hit objects of the map object named by args[0] ("me" means
+ * the object running the script).
+ * Guess: "nasi" means "none", so this switches the object's collision off for the lecture.
+ */
 static USER_FUNC(lect_mobj_hit_nasi) {
     const char* name = (const char*)evtGetValue(event, event->args[0]);
     MapObjectEntry* mobj;
@@ -720,11 +817,16 @@ static USER_FUNC(lect_mobj_hit_nasi) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: writes the item id of the important item being shown (stored in event->lwData[8]) into args[0]. */
 static USER_FUNC(juyoitem_get_no) {
     evtSetValue(event, event->args[0], ((ItemEntry*)event->lwData[8])->itemId);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: ends the important-item display:
+ * removes the item-get effect (lwData[9]), puts Mario back on camera 4 and clears the item's effect flag.
+ */
 static USER_FUNC(juyoitem_end) {
     ItemEntry* item = (ItemEntry*)event->lwData[8];
 
@@ -734,6 +836,11 @@ static USER_FUNC(juyoitem_end) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: starts the lecture for an important item:
+ * clears the item icon's effect flag, parks the item below the map,
+ * puts Mario in his standing motion and sets the system level to 0.
+ */
 static USER_FUNC(juyoitem_gogo) {
     ItemEntry* item = (ItemEntry*)event->lwData[8];
 
@@ -744,11 +851,16 @@ static USER_FUNC(juyoitem_gogo) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: hides the important item's icon after the lecture. */
 static USER_FUNC(juyoitem_goato) {
     iconFlagOn(((ItemEntry*)event->lwData[8])->name, ICON_FLAG_HIDDEN);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: turns on the no-blend material flags of the map object named by args[0] ("me" is the running
+ * object). Guess: this keeps it from being affected by the screen fade.
+ */
 static USER_FUNC(lect_mobj_set_nosysblend) {
     const char* name = (const char*)evtGetValue(event, event->args[0]);
     MapObjectEntry* mobj;
@@ -762,6 +874,7 @@ static USER_FUNC(lect_mobj_set_nosysblend) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: writes TRUE into args[0] while controller 0 holds the A button, otherwise FALSE. */
 static USER_FUNC(lect_push_a_check) {
     EvtWord* args = event->args;
 
@@ -773,6 +886,7 @@ static USER_FUNC(lect_push_a_check) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: writes TRUE into args[0] while controller 0 holds the B button, otherwise FALSE. */
 static USER_FUNC(lect_push_b_check) {
     EvtWord* args = event->args;
 
@@ -784,6 +898,7 @@ static USER_FUNC(lect_push_b_check) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: blocks until the lecture music (BGM channel 1) has actually started playing. */
 static USER_FUNC(bgm_start_wait) {
     return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }

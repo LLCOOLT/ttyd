@@ -32,21 +32,25 @@ static HitEntry* hammerHitWall(f32 ang, f32* s, f32* co, f32* len, f32* hx, f32*
 
 s32 se_data[] = {315, 357, 316, 359, 317, 358, 318, 360, 319, 361};
 
+/** Light camera shake when a level-1 (plain Hammer) swing hits something solid. */
 EVT_BEGIN(lv1quake_evt)
     CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.009765625f), 90)
     RETURN
 EVT_END()
 
+/** Medium camera shake for a Super Hammer (level 2) hit. */
 EVT_BEGIN(lv2quake_evt)
     CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.01953125f), 110)
     RETURN
 EVT_END()
 
+/** Strongest camera shake, for an Ultra Hammer (level 3) hit. */
 EVT_BEGIN(lv3quake_evt)
     CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.029296875f), 140)
     RETURN
 EVT_END()
 
+/** TRUE when the angle (degrees) faces left on screen, 90 to 270. */
 inline BOOL chkRevDir(f32 angle) {
     BOOL ret = FALSE;
     if (angle >= 90.0f && angle <= 270.0f) {
@@ -55,8 +59,10 @@ inline BOOL chkRevDir(f32 angle) {
     return ret;
 }
 
-// The hammer swing direction: 180 (left) or 0 (right) from Mario's facing, turned 30 degrees towards the
-// camera when Mario shows his back.
+/**
+ * The hammer swing direction: 180 (left) or 0 (right) from Mario's facing,
+ * turned 30 degrees towards the camera when Mario shows his back.
+ */
 static inline f32 hamDir(MarioWork* mario) {
     f32 a = mario->displayDirection;
     MarioWork* p = marioGetPtr();
@@ -73,6 +79,7 @@ static inline f32 hamDir(MarioWork* mario) {
     return r;
 }
 
+/** Mario's hammer level from the pouch: 1 Hammer, 2 Super Hammer, 3 Ultra Hammer. */
 static inline s32 hamLv(void) {
     return pouchGetHammerLv();
 }
@@ -88,25 +95,34 @@ static const char isS2_str[14];
 static const char isB2_str[17];
 static const char isS3_str[14];
 static const char isB3_str[17];
-// Hammer-level blocks: isSn = "MOBJ_LvnBlock", isBn = "MOBJ_LvnBigBlock" (strings at the end of the file).
+/** Hammer-level blocks: isSn = "MOBJ_LvnBlock", isBn = "MOBJ_LvnBigBlock" (strings at the end of the file). */
 static inline BOOL isB3(const char* name) {
     return strcmp(name, isB3_str) == 0;
 }
+/** TRUE for the "MOBJ_Lv3Block" mobj, the small Ultra Hammer block. */
 static inline BOOL isS3(const char* name) {
     return strcmp(name, isS3_str) == 0;
 }
+/** TRUE for "MOBJ_Lv2BigBlock", the big Super Hammer block. */
 static inline BOOL isB2(const char* name) {
     return strcmp(name, isB2_str) == 0;
 }
+/** TRUE for "MOBJ_Lv2Block", the small Super Hammer block. */
 static inline BOOL isS2(const char* name) {
     return strcmp(name, isS2_str) == 0;
 }
+/** TRUE for "MOBJ_Lv1BigBlock", the big plain Hammer block. */
 static inline BOOL isB1(const char* name) {
     return strcmp(name, isB1_str) == 0;
 }
+/** TRUE for "MOBJ_Lv1Block", the small plain Hammer block. */
 static inline BOOL isS1(const char* name) {
     return strcmp(name, isS1_str) == 0;
 }
+/**
+ * 1 if the hammer block mobj obj can be broken with Mario's current hammer level,
+ * so the swing goes through instead of bouncing off.
+ */
 static inline s32 chkBlock(HamMobj* obj) {
     s32 ok = 0;
     if ((isS1(obj->name) || isB1(obj->name))) {
@@ -125,10 +141,21 @@ static inline s32 chkBlock(HamMobj* obj) {
     return ok;
 }
 
+/**
+ * Mario's hammer level (0 none, 1 Hammer, 2 Super Hammer, 3 Ultra Hammer);
+ * the motion code uses 0 to block swinging and 2+ for the spin hammer.
+ */
 s32 marioGetHammerLevel(void) {
     return pouchGetPtr()->hammerLevel;
 }
 
+/**
+ * Normal hammer swing (B button): picks the swing pose for the hammer level,
+ * checks what the hammer will hit (hitEstimate) and plays a clang or a breakable-block swing,
+ * shakes the camera per level on impact, spawns the hit effect,
+ * plays the Attack FX badge sound in place of the swing sound when one is equipped,
+ * then returns to standing after about 20 frames.
+ */
 void mot_hammer(void) {
     MarioWork* mario = marioGetPtr();
     Vec* unused;
@@ -353,6 +380,12 @@ void mot_hammer(void) {
     }
 }
 
+/**
+ * Checks for the Super Hammer spin from the stay motion:
+ * while B is held Mario glares (M_I_Y pose and voice),
+ * and once the stick has been rotated (marioGetRub) returns 1 with mario->hammerDir set.
+ * Returns 0 below the Super Hammer or when B is released.
+ */
 s32 marioChkHammer2(void) {
     MarioWork* mario = marioGetPtr();
     s32 b, a;
@@ -401,6 +434,7 @@ s32 marioChkHammer2(void) {
     return 1;
 }
 
+/** Moves the camera in for a spin hammer charge level: z shift and zoom, with a 40-unit upward zoom offset. */
 static inline void mot_ham(f32 camShiftZ, f32 camZoom) {
     MarioWork* mario = marioGetPtr();
     mario->camShiftTargetZ = camShiftZ;
@@ -409,14 +443,16 @@ static inline void mot_ham(f32 camShiftZ, f32 camZoom) {
     mario->camZoomOfs = (Vec){0.0f, 40.0f, 0.0f};
 }
 
-// Charge level reached: zoom the camera in and mark the level as new (the 0x1000 flag is handled below).
+/** Charge level reached: zoom the camera in and mark the level as new (the 0x1000 flag is handled below). */
 static inline void hammer2ChargeLvUp(MarioWork* mario, f32 camShiftZ, f32 camZoom) {
     mot_ham(camShiftZ, camZoom);
     mario->mot.hammer2.flags |= 0x1000;
 }
 
-// Charging below the top level: wind the animation up to maxTime (then the level is reached), or once the
-// level is held, rock it between midTime and minTime.
+/**
+ * Charging below the top level: wind the animation up to maxTime (then the level is reached),
+ * or once the level is held, rock it between midTime and minTime.
+ */
 static inline void hammer2ChargeRamp(MarioWork* mario, f32 maxTime, f32 midTime, f32 minTime, s32 lv, f32 camShiftZ,
                                      f32 camZoom) {
     marioChgPaper("P_H_1A");
@@ -443,7 +479,7 @@ static inline void hammer2ChargeRamp(MarioWork* mario, f32 maxTime, f32 midTime,
     }
 }
 
-// End of the swing: back to the plain standing pose.
+/** End of the swing: back to the plain standing pose. */
 static inline void hammer2PaperReset(MarioWork* mario) {
     marioPaperOff();
 #if VERSION <= VERSION_JP
@@ -455,6 +491,11 @@ static inline void hammer2PaperReset(MarioWork* mario) {
     mario->dispFlags &= ~MARIO_DISP_FLAG_MIRROR;
 }
 
+/**
+ * Spin hammer motion (Super and Ultra Hammer): Mario winds up while B is held,
+ * raising the charge level (hammerChargeLv, camera zooms in each level),
+ * then spins around hitting everything nearby; level 3 spins longer. Ends back in the stay motion.
+ */
 void mot_hammer2(void) {
     MarioWork* mario = marioGetPtr();
     s32 b, a;
@@ -674,6 +715,10 @@ void mot_hammer2(void) {
     }
 }
 
+/**
+ * Current facing angle of the spinning hammer, for npcdrv to see whether it hits an NPC:
+ * -1 if Mario is not doing the spin hammer, -2 if not in the spinning phase.
+ */
 f32 marioGetAngleKaitenHammer(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->currMotionId != MARIO_MOTION_HAMMER_2) {
@@ -685,6 +730,10 @@ f32 marioGetAngleKaitenHammer(void) {
     return revise360(270.0f - mario->displayDirection);
 }
 
+/**
+ * Cleanup when the spin hammer motion ends early:
+ * paper animation off, camera shift reset and the facing and mirror locks released.
+ */
 void mot_ham2_post(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->dispFlags & MARIO_DISP_FLAG_PAPER_ON) {
@@ -711,6 +760,11 @@ void mot_ham2_post(void) {
     marioAdjustMoveDir();
 }
 
+/**
+ * Probes in front of Mario where the hammer will land and returns the hit object, or NULL;
+ * *out gets the hit kind (0 nothing, 4/5/6 a wall or object at high, middle or low height,
+ * 7 something just above Mario's head height) that picks the swing pose and sound.
+ */
 static HitEntry* hitEstimate(s32* out) {
     MarioWork* mario;
     HitCheckQuery q;
@@ -887,6 +941,10 @@ static const char isB2_str[] = "MOBJ_Lv2BigBlock";
 static const char isS3_str[] = "MOBJ_Lv3Block";
 static const char isB3_str[] = "MOBJ_Lv3BigBlock";
 
+/**
+ * Casts a ray from Mario's mid height along angle ang (degrees) for twice his collision width,
+ * returning the wall hit and its position and normal through the pointers.
+ */
 static HitEntry* hammerHitWall(f32 ang, f32* s, f32* co, f32* len, f32* hx, f32* hy, f32* hz, f32* nx, f32* ny, f32* nz) {
     MarioWork* mario = marioGetPtr();
     sincosf(s, co, ang);

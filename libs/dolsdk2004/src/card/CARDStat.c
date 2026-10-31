@@ -2,6 +2,12 @@
 
 #include "__card.h"
 
+/**
+ * Works out where the banner, its palette, the icons
+ * and the icon palette lie in the file's data (starting at iconAddr) from the banner
+ * and icon formats in the directory entry, and fills in the offsets of the CARDStat.
+ * Without icon data it sets banner, icon and speed to none.
+ */
 static void UpdateIconOffsets(CARDDir* ent, CARDStat* stat) {
     u32 offset;
     BOOL iconTlut;
@@ -60,6 +66,11 @@ static void UpdateIconOffsets(CARDDir* ent, CARDStat* stat) {
     stat->offsetData = offset;
 }
 
+/**
+ * Fills a CARDStat for a file by directory index:
+ * names, size in bytes, modification time, banner and icon formats, icon speeds,
+ * icon and comment addresses and the derived offsets. Needs read permission.
+ */
 s32 CARDGetStatus(s32 chan, s32 fileNo, CARDStat* stat) {
     CARDControl* card;
     CARDDir* dir;
@@ -99,6 +110,11 @@ s32 CARDGetStatus(s32 chan, s32 fileNo, CARDStat* stat) {
     return __CARDPutControlBlock(card, result);
 }
 
+/**
+ * Changes a file's banner format, icon address,
+ * formats and speeds and comment address in its directory entry (the icon and comment addresses are range
+ * checked), stamps the modification time and saves the directory. Needs write permission.
+ */
 s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CARDStat* stat, CARDCallback callback) {
     CARDControl* card;
     CARDDir* dir;
@@ -146,6 +162,7 @@ s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CARDStat* stat, CARDCallback callba
     return result;
 }
 
+/** Blocking CARDSetStatusAsync. */
 s32 CARDSetStatus(s32 chan, s32 fileNo, CARDStat* stat) {
     s32 result = CARDSetStatusAsync(chan, fileNo, stat, __CARDSyncCallback);
     if (result < 0) {

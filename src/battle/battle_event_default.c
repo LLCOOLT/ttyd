@@ -34,14 +34,24 @@ static USER_FUNC(_get_escape_rate);
 static USER_FUNC(_get_flower_suitoru_point);
 static USER_FUNC(_get_heart_suitoru_point);
 static USER_FUNC(_set_escape_ac_hlp_msg);
+// Audience reaction when Mario starts to run away (defined below).
 USER_FUNC(btlevtcmd_audience_code_escape);
+// Audience reaction to a failed escape (defined below).
 USER_FUNC(btlevtcmd_audience_code_escape_fail);
+// Audience reaction to a successful escape (defined below).
 USER_FUNC(btlevtcmd_audience_code_escape_success);
 
 extern EvtWord btldefaultevt_guard_move[];
 extern EvtWord btldefaultevt_guard_return[];
 extern EvtWord _Defence_core[];
 
+/**
+ * Standard damage reaction that unit damage scripts call with LW(10) = unit and LW(11) = part:
+ * plays the reaction for the damage pattern and damage code (hurt pose, Gale Force and Fright blow-away, slaps,
+ * counters, guards, lucky and dodged misses, using the unit's data-table events where it has them), then the KO,
+ * the backfire (damage code bit 0x4000) or the guard return,
+ * and finally walks or floats the unit back to its home position and restarts its wait event.
+ */
 EVT_BEGIN(btldefaultevt_Damage)
     CALL(btlevtcmd_SetRotate, LW(10), 0, 0, 0)
     CALL(btlevtcmd_CheckDamageCode, LW(10), 32768, LW(1))
@@ -447,6 +457,12 @@ EVT_BEGIN(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
+/**
+ * Partner switch from the command menu: loads the new partner's animations,
+ * shrinks the old partner as it jumps to Mario, swaps in the new one with a cheer from the audience,
+ * grows it as it jumps to its home position and removes the old unit.
+ * The switch ends Mario's turn unless Quick Change is equipped (and he is not confused).
+ */
 EVT_BEGIN(btldefaultevt_ChangeParty)
     CALL(_anime_load)
     CALL(btlevtcmd_GetPartyId, BTL_UNIT_SELF, LW(3))
@@ -498,17 +514,22 @@ EVT_BEGIN(btldefaultevt_ChangeParty)
     RETURN
 EVT_END()
 
-// The short scripts sit where the demo's .data places them (retail keeps them in .sdata).
+/** The short scripts sit where the demo's .data places them (retail keeps them in .sdata). */
 EVT_BEGIN(btldefaultevt_ProtectPartner)
     CALL(btlevtcmd_GetPartnerId, BTL_UNIT_SELF, LW(3))
     CALL(btlevtcmd_SetGuard, BTL_UNIT_SELF, LW(3))
     RETURN
 EVT_END()
 
+/** Empty script used as a data-table event that should do nothing (the partners use it for event 48). */
 EVT_BEGIN(btldefaultevt_Dummy)
     RETURN
 EVT_END()
 
+/**
+ * Jitters the unit sideways for electric-shock paralysis ("biribiri"), then restarts its wait event.
+ * battle_seq would run it for Electric units, but its chance there is irand(100) < 0, so it never plays.
+ */
 EVT_BEGIN(btldefaultevt_BiribiriMove)
     CALL(evt_sub_intpl_init, 8, 0, 5, 16)
     LABEL(0)
@@ -522,6 +543,10 @@ EVT_BEGIN(btldefaultevt_BiribiriMove)
     RETURN
 EVT_END()
 
+/**
+ * Moves a unit (LW(10), part LW(11)) in front of the unit it protects, running or diving if it floats,
+ * and ends in the guard pose; run for damage code 56.
+ */
 EVT_BEGIN(btldefaultevt_guard_move)
     CALL(btlevtcmd_AnimeCmpPoseType, LW(10), LW(11), 42, 40, LW(2))
     IF_INT_EQUAL(LW(2), 0)
@@ -544,6 +569,10 @@ EVT_BEGIN(btldefaultevt_guard_move)
     RETURN
 EVT_END()
 
+/**
+ * After a protecting unit has taken the hit, moves it back to its home position,
+ * ends the guard and restarts its wait event.
+ */
 EVT_BEGIN(btldefaultevt_guard_return)
     CALL(btlevtcmd_WaitAttackEnd)
     CALL(btlevtcmd_CheckGuardMotionEnable, LW(10), LW(0))
@@ -572,11 +601,13 @@ EVT_BEGIN(btldefaultevt_guard_return)
     RETURN
 EVT_END()
 
+/** Action for a unit that does nothing this turn: restarts its wait event. */
 EVT_BEGIN(btldefaultevt_Wait)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
+/** Action that ends a tutorial battle turn: runs the lecture unit's data-table event 70 (69 in the demos). */
 EVT_BEGIN(btldefaultevt_LectureEnd)
 #if VERSION <= VERSION_DEMO_US
     CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_LECTURE, 69)
@@ -586,6 +617,11 @@ EVT_BEGIN(btldefaultevt_LectureEnd)
     RETURN
 EVT_END()
 
+/**
+ * The Appeal command: the camera zooms in on the unit (further out in retail when it is huge),
+ * it strikes the appeal pose with a sound and the audience reacts,
+ * unless its data table has its own appeal event.
+ */
 EVT_BEGIN(btldefaultevt_Appeal)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(0), 43)
@@ -635,6 +671,10 @@ EVT_BEGIN(btldefaultevt_Appeal)
     RETURN
 EVT_END()
 
+/**
+ * Shared Defend action (LW(12) = the defend weapon):
+ * pays the cost, spins the unit twice, marks it as defending, shows the "defend" message and returns to waiting.
+ */
 EVT_BEGIN(_Defence_core)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(3))
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(4))
@@ -659,18 +699,26 @@ EVT_BEGIN(_Defence_core)
     RETURN
 EVT_END()
 
+/** Mario's Defend command. */
 EVT_BEGIN(btldefaultevt_Defend)
     SET_VALUE(LW(12), PTR(&badgeWeapon_DefenceCommand))
     CALL_CHILD(_Defence_core)
     RETURN
 EVT_END()
 
+/** The partner's Defend command. */
 EVT_BEGIN(btldefaultevt_DefendParty)
     SET_VALUE(LW(12), PTR(&badgeWeapon_DefenceCommandP))
     CALL_CHILD(_Defence_core)
     RETURN
 EVT_END()
 
+/**
+ * The Run Away command: Mario and the partner turn and run in place
+ * while the escape action command plays (the gauge uses the enemy group's run rate).
+ * On a miss both stumble and walk home; on a success they run off screen,
+ * the audience reacts and the battle ends (after _event_MajinaiEnd when Merlee's spells ran out).
+ */
 EVT_BEGIN(btldefaultevt_Escape)
     CALL(evt_btl_camera_set_mode, 0, 20)
     CALL(_btl_escape_reset_move_color_lv_player_unit_all)
@@ -834,6 +882,7 @@ EVT_BEGIN(btldefaultevt_Escape)
     RETURN
 EVT_END()
 
+/** Confused unit's action: the confused pose for 30 frames, then the unit's confusion action script. */
 EVT_BEGIN(btldefaultevt_Confuse)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(0), 5)
@@ -843,6 +892,10 @@ EVT_BEGIN(btldefaultevt_Confuse)
     RETURN
 EVT_END()
 
+/**
+ * Run instead of a unit's action in zero gravity when it cannot act there:
+ * zooms on it and shows the "can't move in zero gravity" message.
+ */
 EVT_BEGIN(btldefaultevt_CantMoveZeroGravity)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(0), BTL_POSE_ZERO_GRAVITY)
@@ -857,6 +910,11 @@ EVT_BEGIN(btldefaultevt_CantMoveZeroGravity)
     RETURN
 EVT_END()
 
+/**
+ * HP Drain and FP Drain badge effect after an attack:
+ * heals the attacker by its equipped HP Drain and then FP Drain power, capped at the damage it dealt this turn,
+ * with the recovery effect over its head.
+ */
 EVT_BEGIN(btldefaultevt_SuitoruBadgeEffect)
     CALL(_get_heart_suitoru_point, BTL_UNIT_SELF, LW(5))
     IF_INT_GREATER_OR_EQUAL(LW(5), 1)
@@ -904,6 +962,7 @@ EVT_BEGIN(btldefaultevt_SuitoruBadgeEffect)
     RETURN
 EVT_END()
 
+/** Data-table event for avoiding a counter: the unit spins round five times (1800 degrees) over 40 frames. */
 EVT_BEGIN(btldefaultevt_avoid_counter_event)
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 49)
     BEGIN_SIBLING_EVENT_GET_ID(LW(0))
@@ -918,6 +977,10 @@ EVT_BEGIN(btldefaultevt_avoid_counter_event)
     RETURN
 EVT_END()
 
+/**
+ * Script: backfire for the unit args[0]: shows a pulsing fire for 60 frames, then deals 5 damage to it.
+ * Finishes the whole calling script when the unit is the one running it.
+ */
 static USER_FUNC(_backfire) {
     s32 id;
     BattleUnit* unit;
@@ -954,15 +1017,21 @@ static USER_FUNC(_backfire) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script: starts loading the animations of the partner chosen in the command menu. */
 static USER_FUNC(_anime_load) {
     ((BattlePartyAnimeLoadRetBoolFn)BattlePartyAnimeLoad)(_battleWorkPointer->commandMenu.partyKind);
     return EVT_RETURN_DONE;
 }
 
+/** Script: blocks until the chosen partner's animations are loaded. */
 static USER_FUNC(_anime_load_wait) {
     return ((BattlePartyAnimeLoadRetBoolFn)BattlePartyAnimeLoad)(_battleWorkPointer->commandMenu.partyKind) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script: sets args[0] to 1 when the active unit is Mario
+ * and the partner switch costs his turn (no Quick Change, or he is confused).
+ */
 static USER_FUNC(_check_pose_stay) {
     BattleWork* wp = _battleWorkPointer;
     s32 out = event->args[0];
@@ -985,21 +1054,25 @@ static USER_FUNC(_check_pose_stay) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: tells the audience that Mario is running away. */
 USER_FUNC(btlevtcmd_audience_code_escape) {
     BattleAudience_Case_Escape();
     return EVT_RETURN_DONE;
 }
 
+/** Script: audience reaction to a successful escape. */
 USER_FUNC(btlevtcmd_audience_code_escape_success) {
     BattleAudience_Case_Escape_Good();
     return EVT_RETURN_DONE;
 }
 
+/** Script: audience reaction to a failed escape. */
 USER_FUNC(btlevtcmd_audience_code_escape_fail) {
     BattleAudience_Case_Escape_Bad();
     return EVT_RETURN_DONE;
 }
 
+/** Script: resets the moveColorLv shading of Mario and the partner to full brightness before the escape. */
 static USER_FUNC(_btl_escape_reset_move_color_lv_player_unit_all) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -1013,12 +1086,14 @@ static USER_FUNC(_btl_escape_reset_move_color_lv_player_unit_all) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: shows the escape action command's help text. */
 static USER_FUNC(_set_escape_ac_hlp_msg) {
     BattleAcHelpSetHelp("msg_ac_escape");
     BattleAcHelpSetDispType(2);
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[0] the enemy group's run rate, which sets the escape gauge. */
 static USER_FUNC(_get_escape_rate) {
     BattleWork* wp = _battleWorkPointer;
     evtSetValue(event, event->args[0],
@@ -1026,6 +1101,10 @@ static USER_FUNC(_get_escape_rate) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns in args[1] the HP the unit args[0] regains from HP Drain:
+ * its equipped power, capped at its damage dealt.
+ */
 static USER_FUNC(_get_heart_suitoru_point) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -1047,6 +1126,10 @@ static USER_FUNC(_get_heart_suitoru_point) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns in args[1] the FP the unit args[0] regains from FP Drain:
+ * its equipped power, capped at its damage dealt.
+ */
 static USER_FUNC(_get_flower_suitoru_point) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;

@@ -43,6 +43,7 @@ static BOOL battle_init(void);
 
 s32 debug_battle_flag;
 
+/** Requests an async load of a TPL under the disc root; true once the file is resident (seq_battleMain polls it). */
 static inline BOOL loadTpl(const char* path) {
     return fileAsyncf(4, NULL, "%s/%s", getMarioStDvdRoot(), path) != NULL;
 }
@@ -54,6 +55,12 @@ static const char bti02[7];
 static const char bti03[7];
 static const char bti04[7];
 
+/**
+ * Enters the battle sequence: switches to the enemy's battle BGM (kept during the Great Tree time-bomb countdown
+ * and after the final battle), stops field events and rumble and mutes field sound effects.
+ * Later versions take Mario's control here for hit kinds 0x800000/0x1000000;
+ * the demos start preloading the audience map for Mario's rank.
+ */
 void seq_battleInit(SequenceWork* work) {
     FieldBattleData* fbat;
     NpcEntry* npc;
@@ -108,10 +115,17 @@ void seq_battleInit(SequenceWork* work) {
 #endif
 }
 
+/** Leaves the battle sequence; battle_exit tears the battle down and restores the field. */
 void seq_battleExit(SequenceWork* work) {
     battle_exit();
 }
 
+/**
+ * Per-frame battle sequence: curtain fade, audience texture loads,
+ * waits out a pending first strike (up to 200 frames), loads the bti_01..04 audience stage for Mario's rank,
+ * starts the battle via battle_init, then once the battle ends returns to the field (or game over on a kiosk
+ * timeout; states 10/11 end a debug battle).
+ */
 void seq_battleMain(SequenceWork* work) {
 #if VERSION >= VERSION_JP
     FieldBattleData* fbat;
@@ -268,9 +282,16 @@ void seq_battleMain(SequenceWork* work) {
     }
 }
 
+/**
+ * Sets up the battle: frees field memory, parks the field NPCs, resets the event manager,
+ * then fills the FieldBattleInfo (partner, first-attack kind from the field hit, setup and rules from the enemy)
+ * and calls BattleInit.
+ * The demos also take control and load the stage map here; later versions return FALSE (done in one call).
+ */
 #if VERSION <= VERSION_DEMO_US
 static void battle_init(void) {
 #else
+/** Later versions: same setup, returning FALSE once done (seq_battleMain state 4 retries while TRUE). */
 static BOOL battle_init(void) {
 #endif
     FieldBattleData* fbat;
@@ -405,6 +426,13 @@ static BOOL battle_init(void) {
 #endif
 }
 
+/**
+ * Tears the battle down and restores the field:
+ * frees battle data and drivers, restores the camera mode and field NPCs,
+ * resumes field events and Mario's control, resets the paper-craft light,
+ * and resumes the field BGM and ambience unless heading to game over (or, in later versions,
+ * resumes the time-bomb music in the Great Tree).
+ */
 static void battle_exit(void) {
     LightEntry* light;
     Mtx mtx;

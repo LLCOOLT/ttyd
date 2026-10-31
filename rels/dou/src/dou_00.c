@@ -24,6 +24,10 @@ static void water_tev(MapTevCallbackInfo* info);
 static BeroEntry bero_entry_data[3];
 extern EvtWord totsunyu_event[];
 
+/**
+ * Entry event of the grotto's entrance door: on the first arrival (STORY_STG5_19_SKULL_ROCK) it starts the
+ * arrival cutscene totsunyu_event; leaves LW(0) = 0.
+ */
 static EVT_BEGIN(bero_in_event)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_19_SKULL_ROCK)
         CALL_CHILD(totsunyu_event)
@@ -68,6 +72,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Fades the room's lighting up from black over 2 seconds (map blend colour 0 to 255),
+ * then lets Mario's model ignore the blend and switches the map blend off. Spawned by the arrival cutscene.
+ */
 static EVT_BEGIN(back_light)
     CALL(evt_sub_intpl_msec_init, 11, 0, 255, 2000)
     LOOP(0)
@@ -83,6 +91,11 @@ static EVT_BEGIN(back_light)
     RETURN
 EVT_END()
 
+/**
+ * Entrance cutscene of Pirate's Grotto (first entry, story step STORY_STG5_19_SKULL_ROCK):
+ * Mario arrives in darkness, speaks (stg5_dou_00), the lights come up and the area-title telop (id 10) is shown.
+ * Advances the story to STORY_STG5_19_01_ENTERING_THE_GROTTO.
+ */
 EVT_BEGIN(totsunyu_event)
     CALL(evt_map_set_blend, 0, 0, 0, 0, 255)
     CALL(evt_mario_key_onoff, 0)
@@ -101,6 +114,11 @@ EVT_BEGIN(totsunyu_event)
     RETURN
 EVT_END()
 
+/**
+ * Init script of dou_00, the entrance cave of Pirate's Grotto:
+ * music and ambience, the exits to Keelhaul Key (muj_05) and dou_01, waves, a save block,
+ * a Ruin Powder item and the water-surface shader on the pool.
+ */
 EVT_BEGIN(dou_00_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_DOU1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_DOU1"))
@@ -118,6 +136,7 @@ EVT_BEGIN(dou_00_init_evt)
     RETURN
 EVT_END()
 
+/** Map TEV callback for the pool surface (s00_suimen): applies the standard water shading. */
 static void water_tev(MapTevCallbackInfo* info) {
     envSetWater(info);
 }

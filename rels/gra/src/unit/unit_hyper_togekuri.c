@@ -215,6 +215,10 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init script of the Spiky Goomba.
+ * Registers its wait, attack and damage scripts and sets its run, walk and jump sounds.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -227,6 +231,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs when an attack on the spiky head is stopped by the thorns (the counter damage to the attacker).
+ * In the lecture battle it also marks the lecture's unit work 0, so the lesson knows the thorn was triggered.
+ * Guess.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -269,6 +278,7 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/** Damage reaction of the Spiky Goomba: the default damage script. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -291,6 +301,10 @@ static f32 SinTable[] = {
     0.999391f, 0.999848f, 1.0f,
 };
 
+/**
+ * The Hyper Spiky Goomba's attack: the Spiky Goomba's roll or jump onto the target,
+ * with a charge option (weapon_togekuri_charge) at the start unless it is already charged (status 16).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -491,6 +505,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: computes the facing direction (degrees) from point (args[0], args[1]) to (args[2], args[3])
+ * and stores it in args[4]; if both points coincide args[4] is left as it was.
+ */
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);
@@ -509,6 +527,10 @@ static USER_FUNC(krb_get_dir) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Finds the direction in degrees (0 to 359) of the vector (x, z) with a binary search over SinTable (seven
+ * halvings between 0 and 90 degrees), then reflects the result into the right quadrant.
+ */
 static u16 krb_comp_dir(f32 x, f32 z) {
     f32 dist = hypot(x, z);
     f32 s = __fabs(z) / dist;
@@ -539,6 +561,10 @@ static u16 krb_comp_dir(f32 x, f32 z) {
     return (u16)mid;
 }
 
+/**
+ * Script helper: tells which unit kind is the active attacker, 0 for initialKind 0xDE, 1 for 0xE0, otherwise 2,
+ * stored in args[0]. Guess: the three Hyper Goomba variants that can be in the formation.
+ */
 static USER_FUNC(get_attacker) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -554,6 +580,7 @@ static USER_FUNC(get_attacker) {
     return EVT_RETURN_DONE;
 }
 
+/** Wait (idle) event of the Hyper Spiky Goomba: shows the idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

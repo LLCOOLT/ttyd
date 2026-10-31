@@ -29,6 +29,10 @@
 s32 vivian_cancel_req;
 
 #if VERSION >= VERSION_JP
+/**
+ * Re-applies Mario's sunk-into-the-shadow look (the "p_bibi" paper pose M_B_3 / PM_B_1, held at frame 24)
+ * when mario.c refreshes his animation during the Vivian motion. Not in the demos.
+ */
 void N_marioForceVivianAnime(void) {
     MarioWork* mario = marioGetPtr();
 
@@ -42,6 +46,11 @@ void N_marioForceVivianAnime(void) {
 }
 #endif
 
+/**
+ * Mario motion MARIO_MOTION_VIVIAN (entered while Veil hides him in the floor):
+ * on entry it stops any jump or fall, zeroes his speed and timers and, in retail,
+ * clears his wall and push collision; nothing runs on later frames.
+ */
 void mot_vivian(void) {
     MarioWork* mario = marioGetPtr();
 
@@ -62,12 +71,14 @@ void mot_vivian(void) {
 }
 
 #if VERSION <= VERSION_DEMO_US
+/** Demo copy: hides Vivian's shadow tail (bit 0 of her tail flags), when she sinks into the floor with Mario. */
 static inline void L_partyVivianTailStop(PartyEntry* party) {
     if (party->currentMemberId == PARTY_MEMBER_VIVIAN) {
         party->work.vivian.tailFlags |= 1; // the demo keeps the tail flags in the Vivian work
     }
 }
 
+/** Demo copy: shows Vivian's shadow tail again. */
 static inline void L_partyVivianTailStart(PartyEntry* party) {
     if (party->currentMemberId == PARTY_MEMBER_VIVIAN) {
         party->work.vivian.tailFlags &= ~1;
@@ -77,6 +88,11 @@ static inline void L_partyVivianTailStart(PartyEntry* party) {
 void L_partyVivianTailStart(PartyEntry* party);
 #endif
 
+/**
+ * Post-step for Mario's Vivian motion: if Mario takes damage while hidden,
+ * pops both of them back out at once (paper off, offsets and walls restored, Vivian back to follow mode);
+ * otherwise, while Veil is in use, it sets vivian_cancel_req so vivian_use starts rising out.
+ */
 void mot_vivian_post(void) {
     PartyEntry* party = (PartyEntry*)partyGetPtr(marioGetPartyId());
     MarioWork* mario = marioGetPtr();
@@ -119,6 +135,7 @@ cancel:
     vivian_cancel_req = 1;
 }
 
+/** Party table init for Vivian: 24 wide by 35 tall, flying follower, base shadow size 10, tail shown and no ripple. */
 void vivian_init(PartyEntry* party) {
     party->memberKind = 6;
     party->moveKind = 1;
@@ -135,6 +152,12 @@ void vivian_init(PartyEntry* party) {
     vivian_cancel_req = 0;
 }
 
+/**
+ * Where Vivian is in her Veil: 0 not in use (or not Vivian), 1 sinking into the floor with Mario, 2 hidden,
+ * 3 rising back out, 4 anything else.
+ * Mario's collision, item pickup, NPC contact and the event commands read it (1 to 3 skip several of Mario's hit
+ * checks).
+ */
 s32 vivianGetStatus(void) {
     PartyEntry* party = (PartyEntry*)partyGetPtr(marioGetPartyId());
     u8 st;
@@ -158,6 +181,10 @@ s32 vivianGetStatus(void) {
     return 4;
 }
 
+/**
+ * Ends a hidden Veil from code or a script (evt_party, evt_mario):
+ * if Vivian is in the hidden state it starts the rise-out sequence.
+ */
 void vivianUnhold(PartyEntry* party) {
     if (party == NULL || party->currentMemberId != PARTY_MEMBER_VIVIAN || !(party->flags & PARTY_FLAG_IS_BEING_USED)) {
         return;
@@ -168,18 +195,31 @@ void vivianUnhold(PartyEntry* party) {
 }
 
 #if VERSION >= VERSION_JP
+/**
+ * Hides Vivian's shadow tail (tail flag bit 0);
+ * called when she sinks into the floor and from L_evt_party_vivian_tail.
+ */
 void L_partyVivianTailStop(PartyEntry* party) {
     if (party->currentMemberId == PARTY_MEMBER_VIVIAN) {
         party->tailFlags |= 1;
     }
 }
 
+/**
+ * Shows Vivian's shadow tail again (clears tail flag bit 0);
+ * called when Veil ends and from L_evt_party_vivian_tail.
+ */
 void L_partyVivianTailStart(PartyEntry* party) {
     if (party->currentMemberId == PARTY_MEMBER_VIVIAN) {
         party->tailFlags &= ~1;
     }
 }
 
+/**
+ * Whether party.c draws Vivian's shadow tail this frame:
+ * only for Vivian, with the tail not hidden, on screen,
+ * and not while Fahr Outpost's bom_01 has parked her at y = -1000.
+ */
 BOOL N_vivianDisplayTailCheck(PartyEntry* party) {
     if (party->currentMemberId != PARTY_MEMBER_VIVIAN) {
         return FALSE;
@@ -197,6 +237,11 @@ BOOL N_vivianDisplayTailCheck(PartyEntry* party) {
 }
 #endif
 
+/**
+ * Moves Vivian's tail point (trailPos) a tenth of the way toward her each frame,
+ * keeping it within VIVIAN_FOLLOW_DIST (30 units in the US and PAL releases, 22 before);
+ * party.c draws her shadow tail to it.
+ */
 void vivianShadow(PartyEntry* party) {
     f32 dx, dy, dz;
 
@@ -218,6 +263,7 @@ void vivianShadow(PartyEntry* party) {
     }
 }
 
+/** Vivian's follow routine: the shared flying-partner movement plus her shadow-tail update. */
 void vivian_move(PartyEntry* party) {
     if (party->trigFlags & PARTY_TRIG_FLAG_CHG_RUN_MODE) {
         party->trigFlags &= ~PARTY_TRIG_FLAG_CHG_RUN_MODE;
@@ -229,7 +275,7 @@ void vivian_move(PartyEntry* party) {
 
 // The demo's vivianFollow/vivian_use are older (fixed hide offset, ground search in vivian_use): one copy each
 #if VERSION <= VERSION_DEMO_US
-// demo: Vivian always hides 13 behind Mario, with no ground search outside the hidden state
+/** demo: Vivian always hides 13 behind Mario, with no ground search outside the hidden state */
 static inline void vivianFollow(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     f32 ofs;
@@ -244,6 +290,11 @@ static inline void vivianFollow(PartyEntry* party) {
     movePos(&party->moveTarget.x, &party->moveTarget.z, ofs, toMovedir(270.0f + mario->displayDirection));
 }
 
+/**
+ * Demo Veil: Vivian moves behind Mario and both sink into the floor shadow (ripple effect, sounds),
+ * then stay hidden riding the ground under Mario until B
+ * or X (or vivian_cancel_req) brings them back up with a small hop.
+ */
 void vivian_use(PartyEntry* party) {
     f32 gx, gy, gz;
     void* hit;
@@ -495,6 +546,11 @@ void vivian_use(PartyEntry* party) {
     }
 }
 #else
+/**
+ * Retail: places Vivian's target just behind Mario (followOfs, eased between 0 and -13 units,
+ * offset 2.5 to the side) after snapping Mario to the ground under him;
+ * on eki_02 it also pushes Mario out of walls.
+ */
 static inline void vivianFollow(PartyEntry* party) {
     void* hit;
     u8 id;
@@ -553,6 +609,11 @@ static inline void vivianFollow(PartyEntry* party) {
 }
 
 #pragma defer_codegen off
+/**
+ * Retail Veil: Vivian slides behind Mario and both sink into the floor shadow (ripple effect, sounds),
+ * then stay hidden, following the ground under Mario while he moves,
+ * until B or X (or vivian_cancel_req) raises them back up with a small hop. vivianGetStatus reports the state.
+ */
 void vivian_use(PartyEntry* party) {
     Vec s;
     void* rip;

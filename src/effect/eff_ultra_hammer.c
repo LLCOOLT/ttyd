@@ -511,6 +511,10 @@ f32 scroll_tbl[] = {
 static void effUltraHammerMain(EffectEntry* effect);
 static void effUltraHammerDisp(enum CameraId camId, void* param);
 
+/**
+ * Spawns the effect at (x, y, z) for `counter` frames (0 or less: until removed).
+ * `mode` mirrors the rings for a right-turning swing. Caller: Mario's Ultra Hammer swing (mot_hammer).
+ */
 EffectEntry* effUltraHammerEntry(BOOL mode, s32 counter, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffUltraHammerData* data;
@@ -548,6 +552,10 @@ EffectEntry* effUltraHammerEntry(BOOL mode, s32 counter, f32 x, f32 y, f32 z, f3
     return effect;
 }
 
+/**
+ * Counts down and fades alpha in the last 16 frames;
+ * each of the three rings waits for its start delay, then runs its 25-step scroll/scale table and repeats.
+ */
 static void effUltraHammerMain(EffectEntry* effect) {
     EffUltraHammerData* data;
     Vec position;
@@ -587,7 +595,10 @@ static void effUltraHammerMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, effUltraHammerDisp, effect);
 }
 
-// unknown function, is used for many functions to "initialize"/copy some value into the local stack, with an extra vec
+/**
+ * unknown function, is used for many functions to "initialize"/copy some value into the local stack,
+ * with an extra vec
+ */
 inline Vec initializeVec(Vec* input) {
     Vec temp = (Vec){0.0f, 0.0f, 0.0f};
     temp.x = input->x;
@@ -596,6 +607,7 @@ inline Vec initializeVec(Vec* input) {
     return temp;
 }
 
+/** Draws the three ring models with the scrolling texture, mirrored in x if `mode` is non-zero. */
 static void effUltraHammerDisp(enum CameraId camId, void* param) {
     u32 fmtLoop[2]; // FAKE: register-promoted array (vtx fmt + loop counter); separate scalars differ
     CameraEntry* cam;

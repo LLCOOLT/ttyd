@@ -147,6 +147,10 @@ static void __SYNNoteOn(SYNSYNTH* synth, u8 midiChannel, u8 keyNum, u8 keyVel);
 static void __SYNPitchWheel(SYNSYNTH* synth, u8 midiChannel, u8 lsb, u8 msb);
 static void __SYNMidiIn(SYNSYNTH* synth, u8* input);
 
+/**
+ * Handles the data-entry controllers (6 and 38) for a registered parameter:
+ * parameter 0 sets the pitch-bend range (semitones plus cents) of the channel.
+ */
 static void __SYNSetData(SYNSYNTH* synth, u8 midiChannel) {
     ASSERTLINE(59, synth);
     ASSERTLINE(60, midiChannel < 16);
@@ -173,6 +177,10 @@ static void __SYNSetData(SYNSYNTH* synth, u8 midiChannel) {
     }
 }
 
+/**
+ * Handles the sustain pedal controller (64): when the pedal comes up (below 64) every voice that was held is put
+ * into release.
+ */
 static void __SYNSetSustainPedal(SYNSYNTH* synth, u8 midiChannel, u8 data) {
     int i;
     SYNVOICE* voice;
@@ -193,6 +201,10 @@ static void __SYNSetSustainPedal(SYNSYNTH* synth, u8 midiChannel, u8 data) {
     }
 }
 
+/**
+ * Handles a MIDI program change: selects instrument number program for midiChannel from the melodic table,
+ * or the percussion table for channel 9 (the General MIDI drum channel).
+ */
 static void __SYNProgramChange(SYNSYNTH* synth, u8 midiChannel, u8 program) {
     ASSERTLINE(142, synth);
     ASSERTLINE(143, midiChannel < 16);
@@ -207,6 +219,7 @@ static void __SYNProgramChange(SYNSYNTH* synth, u8 midiChannel, u8 program) {
     synth->inst[midiChannel] += program;
 }
 
+/** Puts every note playing on midiChannel into its release phase and forgets the voices. */
 static void __SYNReleaseChannelNotes(SYNSYNTH* synth, u8 midiChannel) {
     int i;
     SYNVOICE* voice;
@@ -223,6 +236,7 @@ static void __SYNReleaseChannelNotes(SYNSYNTH* synth, u8 midiChannel) {
     }
 }
 
+/** Releases the notes on all 16 MIDI channels. */
 void __SYNClearAllNotes(SYNSYNTH* synth) {
     u8 i;
 
@@ -233,6 +247,12 @@ void __SYNClearAllNotes(SYNSYNTH* synth) {
     }
 }
 
+/**
+ * Handles a MIDI control change: stores value and applies it for the controllers it knows:
+ * data entry (6, 38), channel volume (7) and expression (11) as attenuation, sustain pedal (64),
+ * reverb and chorus aux sends (91, 92), RPN/NRPN select (98 to 101), all sound off (120),
+ * reset all controllers (121), and all notes off (123 to 127).
+ */
 void __SYNSetController(SYNSYNTH* synth, u8 midiChannel, u8 function, u8 value) {
     ASSERTLINE(201, synth);
     ASSERTLINE(202, midiChannel < 16);
@@ -294,6 +314,10 @@ void __SYNSetController(SYNSYNTH* synth, u8 midiChannel, u8 function, u8 value) 
     }
 }
 
+/**
+ * Resets one channel's controllers while keeping its current volume, pan and expression:
+ * pitch-bend range back to 2 semitones (0xC80000 cents in 16.16), bend to center, aux sends to 0.
+ */
 void __SYNResetController0(SYNSYNTH* synth, u8 midiChannel) {
     u8 volume;
     u8 pan;
@@ -320,6 +344,10 @@ void __SYNResetController0(SYNSYNTH* synth, u8 midiChannel) {
     __SYNSetController(synth, midiChannel, 0x5C, 0);
 }
 
+/**
+ * Resets one channel's controllers to the defaults:
+ * volume 100, pan center (64), expression 127, aux sends 0, pitch-bend range 2 semitones, bend centered.
+ */
 void __SYNResetController(SYNSYNTH* synth, u8 midiChannel) {
     int i;
 
@@ -340,6 +368,7 @@ void __SYNResetController(SYNSYNTH* synth, u8 midiChannel) {
     __SYNSetController(synth, midiChannel, 0x5C, 0);
 }
 
+/** For all 16 channels selects program 0 and resets the controllers to the defaults. */
 void __SYNResetAllControllers(SYNSYNTH* synth) {
     u8 midiChannel;
 
@@ -351,6 +380,10 @@ void __SYNResetAllControllers(SYNSYNTH* synth) {
     }
 }
 
+/**
+ * Handles note-off: releases the voice playing keyNum on midiChannel,
+ * or just marks it as held if the sustain pedal is down.
+ */
 static void __SYNNoteOff(SYNSYNTH* synth, u8 midiChannel, u8 keyNum) {
     SYNVOICE* voice;
 
@@ -369,6 +402,13 @@ static void __SYNNoteOff(SYNSYNTH* synth, u8 midiChannel, u8 keyNum) {
     }
 }
 
+/**
+ * Handles note-on (velocity 0 is treated as note-off):
+ * releases a voice already on that key, acquires an AX voice, looks up the region,
+ * articulation and sample for the key (__SYNGetWavetableData), cuts any voice in the same key group,
+ * sets up pitch, volume, pan, LFO and envelopes, initialises the mixer channel and sample playback,
+ * and starts the voice. Frees the voice again when the wavetable has no sample for the key.
+ */
 static void __SYNNoteOn(SYNSYNTH* synth, u8 midiChannel, u8 keyNum, u8 keyVel) {
     AXVPB* axvpb;
     SYNVOICE* voice;
@@ -442,6 +482,10 @@ static void __SYNNoteOn(SYNSYNTH* synth, u8 midiChannel, u8 keyNum, u8 keyVel) {
     }
 }
 
+/**
+ * Handles pitch bend: combines the 7-bit lsb and msb into a value around 0x2000
+ * and scales it by the channel's bend range to get the bend in cents.
+ */
 static void __SYNPitchWheel(SYNSYNTH* synth, u8 midiChannel, u8 lsb, u8 msb) {
     s32 position;
 
@@ -454,6 +498,11 @@ static void __SYNPitchWheel(SYNSYNTH* synth, u8 midiChannel, u8 lsb, u8 msb) {
     synth->pwCents[midiChannel] = (synth->pwMaxCents[midiChannel] * ((f32)position / 8192.0f));
 }
 
+/**
+ * Decodes one three-byte MIDI message and dispatches it:
+ * note off (8), note on (9), control change (11), program change (12) or pitch bend (14);
+ * other messages are ignored.
+ */
 static void __SYNMidiIn(SYNSYNTH* synth, u8* input) {
     u8* ch;
     u8 midiFunction;
@@ -491,6 +540,7 @@ static void __SYNMidiIn(SYNSYNTH* synth, u8* input) {
     }
 }
 
+/** Runs all MIDI messages queued by SYNMidiInput since the last audio frame and resets the input buffer. */
 void __SYNRunInputBufferEvents(SYNSYNTH* synth) {
     u8* input;
 
@@ -502,6 +552,7 @@ void __SYNRunInputBufferEvents(SYNSYNTH* synth) {
     synth->inputPosition = &synth->input[0][0];
 }
 
+/** Returns the current value of MIDI controller function on midiChannel. */
 u8 SYNGetMidiController(SYNSYNTH* synth, u8 midiChannel, u8 function) {
     ASSERTLINE(678, synth);
     ASSERTLINE(679, midiChannel < 16);

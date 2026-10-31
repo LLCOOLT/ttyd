@@ -9,6 +9,7 @@
 // prototypes
 void DMAErrorHandler(OSError error, OSContext* context, ...);
 
+/** Assembly: sets the HID0 data-cache flash-invalidate bit, discarding the whole L1 data cache. */
 #ifdef __GEKKO__
 asm void DCFlashInvalidate(void) {
     nofralloc
@@ -18,6 +19,7 @@ asm void DCFlashInvalidate(void) {
     blr
 }
 
+/** Assembly: syncs and sets the HID0 data-cache enable bit. */
 asm void DCEnable(void) {
     nofralloc
     sync
@@ -27,6 +29,7 @@ asm void DCEnable(void) {
     blr
 }
 
+/** Assembly: syncs and clears the HID0 data-cache enable bit. */
 asm void DCDisable(void) {
     nofralloc
     sync
@@ -36,6 +39,7 @@ asm void DCDisable(void) {
     blr
 }
 
+/** Assembly: sets the HID0 data-cache lock bit so misses stop allocating lines. */
 asm void DCFreeze(void) {
     nofralloc
     sync
@@ -45,6 +49,7 @@ asm void DCFreeze(void) {
     blr
 }
 
+/** Assembly: clears the HID0 data-cache lock bit. */
 asm void DCUnfreeze(void) {
     nofralloc
     mfspr r3, HID0
@@ -53,36 +58,45 @@ asm void DCUnfreeze(void) {
     blr
 }
 
+/** Assembly: dcbt, hints the line containing addr into the data cache. */
 asm void DCTouchLoad(register void* addr) {
     nofralloc
     dcbt r0, addr
     blr
 }
 
+/** Assembly: dcbz, zeroes the 32-byte cache line at addr without reading memory. */
 asm void DCBlockZero(register void* addr) {
     nofralloc
     dcbz r0, addr
     blr
 }
 
+/** Assembly: dcbst, writes the line at addr back to memory but leaves it cached. */
 asm void DCBlockStore(register void* addr) {
     nofralloc
     dcbst r0, addr
     blr
 }
 
+/** Assembly: dcbf, writes the line at addr back to memory and invalidates it. */
 asm void DCBlockFlush(register void* addr) {
     nofralloc
     dcbf r0, addr
     blr
 }
 
+/** Assembly: dcbi, invalidates the line at addr without writing it back. */
 asm void DCBlockInvalidate(register void* addr) {
     nofralloc
     dcbi r0, addr
     blr
 }
 
+/**
+ * Assembly: invalidates all cache lines covering [addr, addr + nBytes), discarding changes;
+ * used before the CPU reads memory that a DMA wrote.
+ */
 asm void DCInvalidateRange(register void* addr, register u32 nBytes) {
     nofralloc
     cmplwi nBytes, 0
@@ -100,6 +114,10 @@ asm void DCInvalidateRange(register void* addr, register u32 nBytes) {
     blr
 }
 
+/**
+ * Assembly: writes back and invalidates all cache lines covering [addr, addr + nBytes), then syncs;
+ * used before a DMA reads memory the CPU wrote.
+ */
 asm void DCFlushRange(register void* addr, register u32 nBytes) {
     nofralloc
     cmplwi nBytes, 0
@@ -118,6 +136,7 @@ asm void DCFlushRange(register void* addr, register u32 nBytes) {
     blr
 }
 
+/** Assembly: writes back (without invalidating) all lines covering the range, then syncs. */
 asm void DCStoreRange(register void* addr, register u32 nBytes) {
     nofralloc
     cmplwi nBytes, 0
@@ -137,6 +156,7 @@ asm void DCStoreRange(register void* addr, register u32 nBytes) {
     blr
 }
 
+/** Assembly: like DCFlushRange but without the closing sync. */
 asm void DCFlushRangeNoSync(register void* addr, register u32 nBytes) {
     nofralloc
     cmplwi nBytes, 0
@@ -154,6 +174,7 @@ asm void DCFlushRangeNoSync(register void* addr, register u32 nBytes) {
     blr
 }
 
+/** Assembly: like DCStoreRange but without the closing sync. */
 asm void DCStoreRangeNoSync(register void* addr, register u32 nBytes) {
     nofralloc
     cmplwi nBytes, 0
@@ -172,6 +193,7 @@ asm void DCStoreRangeNoSync(register void* addr, register u32 nBytes) {
     blr
 }
 
+/** Assembly: zeroes all cache lines covering the range with dcbz; fast memset for 32-byte aligned buffers. */
 asm void DCZeroRange(register void* addr, register u32 nBytes) {
   nofralloc
   cmplwi nBytes, 0
@@ -190,6 +212,7 @@ asm void DCZeroRange(register void* addr, register u32 nBytes) {
   blr
 }
 
+/** Assembly: prefetches all lines covering the range into the data cache. */
 asm void DCTouchRange(register void* addr, register u32 nBytes) {
     nofralloc
     cmplwi nBytes, 0
@@ -208,6 +231,10 @@ asm void DCTouchRange(register void* addr, register u32 nBytes) {
     blr
 }
 
+/**
+ * Assembly: invalidates all instruction cache lines covering the range, then syncs and isyncs;
+ * needed after writing code (module loading, exception vectors).
+ */
 asm void ICInvalidateRange(register void* addr, register u32 nBytes) {
     nofralloc
     cmplwi nBytes, 0
@@ -228,6 +255,7 @@ asm void ICInvalidateRange(register void* addr, register u32 nBytes) {
     blr
 }
 
+/** Assembly: sets the HID0 instruction-cache flash-invalidate bit. */
 asm void ICFlashInvalidate(void) {
     nofralloc
     mfspr r3, HID0
@@ -236,6 +264,7 @@ asm void ICFlashInvalidate(void) {
     blr
 }
 
+/** Assembly: isyncs and sets the HID0 instruction-cache enable bit. */
 asm void ICEnable(void) {
     nofralloc
     isync
@@ -245,6 +274,7 @@ asm void ICEnable(void) {
     blr
 }
 
+/** Assembly: isyncs and clears the HID0 instruction-cache enable bit. */
 asm void ICDisable(void) {
     nofralloc
     isync
@@ -254,6 +284,7 @@ asm void ICDisable(void) {
     blr
 }
 
+/** Assembly: sets the HID0 instruction-cache lock bit. */
 asm void ICFreeze(void) {
     nofralloc
     isync
@@ -263,6 +294,7 @@ asm void ICFreeze(void) {
     blr
 }
 
+/** Assembly: clears the HID0 instruction-cache lock bit. */
 asm void ICUnfreeze(void) {
     nofralloc
     mfspr r3, HID0
@@ -271,12 +303,14 @@ asm void ICUnfreeze(void) {
     blr
 }
 
+/** Assembly: icbi, invalidates the instruction cache line at addr. */
 asm void ICBlockInvalidate(register void* addr) {
     nofralloc
     icbi r0, addr
     blr
 }
 
+/** Assembly: isync, so following instructions are refetched. */
 asm void ICSync(void) {
     nofralloc
     isync
@@ -286,6 +320,11 @@ asm void ICSync(void) {
 #define LC_LINES    512
 #define CACHE_LINES 1024
 
+/**
+ * Assembly worker for LCEnable: flushes the data cache by touching 1024 lines,
+ * sets the locked-cache enable bits in HID2, maps the locked cache with DBAT3 at the LC base address
+ * and allocates its 512 lines with dcbz_l.
+ */
 static asm void __LCEnable(void) {
     nofralloc
     mfmsr   r5
@@ -348,6 +387,7 @@ _lockloop:
     blr
 }
 
+/** Enables the locked cache (the 16 KB of data cache usable as fast scratch memory) with interrupts off. */
 void LCEnable(void) {
     BOOL enabled;
 
@@ -356,6 +396,7 @@ void LCEnable(void) {
     OSRestoreInterrupts(enabled);
 }
 
+/** Assembly: invalidates the 512 locked-cache lines and clears the locked-cache enable bit in HID2. */
 asm void LCDisable(void) {
     nofralloc
     lis     r3, LC_BASE_PREFIX
@@ -371,6 +412,10 @@ asm void LCDisable(void) {
     blr
 }
 
+/**
+ * Assembly: allocates one locked-cache line for the address tag,
+ * optionally invalidating it first (dcbi then dcbz_l).
+ */
 asm void LCAllocOneTag(register BOOL invalidate, register void* tag) {
     nofralloc
     cmpwi invalidate, 0
@@ -381,6 +426,10 @@ asm void LCAllocOneTag(register BOOL invalidate, register void* tag) {
     blr
 }
 
+/**
+ * Assembly: allocates numBlocks consecutive locked-cache lines starting at startTag,
+ * optionally invalidating each first.
+ */
 asm void LCAllocTags(register BOOL invalidate, register void* startTag, register u32 numBlocks) {
     nofralloc
     mflr r6
@@ -404,6 +453,10 @@ asm void LCAllocTags(register BOOL invalidate, register void* startTag, register
     blr
 }
 
+/**
+ * Assembly: starts a locked-cache DMA from main memory at srcAddr into the locked cache at destTag for numBlocks
+ * 32-byte blocks (0 means 128), through the DMA_U/DMA_L registers.
+ */
 asm void LCLoadBlocks(register void* destTag, register void* srcAddr, register u32 numBlocks) {
     nofralloc
     rlwinm  r6, numBlocks, 30, 27, 31
@@ -417,6 +470,10 @@ asm void LCLoadBlocks(register void* destTag, register void* srcAddr, register u
     blr
 }
 
+/**
+ * Assembly: starts a locked-cache DMA from the locked cache at srcTag out to main memory at destAddr,
+ * for numBlocks 32-byte blocks (0 means 128).
+ */
 asm void LCStoreBlocks(register void* destAddr, register void* srcTag, register u32 numBlocks) {
     nofralloc
     rlwinm  r6, numBlocks, 30, 27, 31
@@ -431,6 +488,10 @@ asm void LCStoreBlocks(register void* destAddr, register void* srcTag, register 
 }
 #endif
 
+/**
+ * Allocates locked-cache lines for nBytes at addr, enabling the locked cache first if it is off,
+ * invalidating the lines.
+ */
 void LCAlloc(void* addr, u32 nBytes) {
     u32 numBlocks = nBytes >> 5;
     u32 hid2 = PPCMfhid2();
@@ -444,6 +505,7 @@ void LCAlloc(void* addr, u32 nBytes) {
     LCAllocTags(TRUE, addr, numBlocks);
 }
 
+/** Same as LCAlloc but without invalidating the lines first. */
 void LCAllocNoInvalidate(void* addr, u32 nBytes) {
     u32 numBlocks = nBytes >> 5;
     u32 hid2 = PPCMfhid2();
@@ -457,6 +519,10 @@ void LCAllocNoInvalidate(void* addr, u32 nBytes) {
     LCAllocTags(FALSE, addr, numBlocks);
 }
 
+/**
+ * Loads nBytes from main memory into the locked cache,
+ * split into DMA commands of at most 128 blocks (4096 bytes); returns the number of commands issued.
+ */
 u32 LCLoadData(void* destAddr, void* srcAddr, u32 nBytes) {
     u32 numBlocks = (nBytes + 31) / 32;
     u32 numTransactions = (numBlocks + 128 - 1) / 128;
@@ -479,6 +545,10 @@ u32 LCLoadData(void* destAddr, void* srcAddr, u32 nBytes) {
     return numTransactions;
 }
 
+/**
+ * Stores nBytes from the locked cache to main memory, split into DMA commands of at most 128 blocks;
+ * returns the number of commands issued.
+ */
 u32 LCStoreData(void* destAddr, void* srcAddr, u32 nBytes) {
     u32 numBlocks = (nBytes + 31) / 32;
     u32 numTransactions = (numBlocks + 128 - 1) / 128;
@@ -501,6 +571,7 @@ u32 LCStoreData(void* destAddr, void* srcAddr, u32 nBytes) {
     return numTransactions;
 }
 
+/** Assembly: returns the number of DMA commands still queued, read from HID2. */
 #ifdef __GEKKO__
 asm u32 LCQueueLength(void) {
     nofralloc
@@ -509,6 +580,7 @@ asm u32 LCQueueLength(void) {
     blr
 }
 
+/** Assembly: busy-waits until the locked-cache DMA queue holds no more than len commands. */
 asm void LCQueueWait(register u32 len) {
     nofralloc
 @1
@@ -520,6 +592,7 @@ asm void LCQueueWait(register u32 len) {
 }
 #endif
 
+/** Pushes queued locked-cache DMA commands out by writing the flush bit to the DMA control registers, then syncs. */
 void LCFlushQueue() {
     union {
         u32 val;
@@ -539,6 +612,10 @@ void LCFlushQueue() {
     PPCSync();
 }
 
+/**
+ * Disables and globally invalidates the L2 cache with address translation temporarily on;
+ * the setup step before L2Enable.
+ */
 static void L2Init(void) {
     u32 oldMSR;
     oldMSR = PPCMfmsr();
@@ -550,16 +627,19 @@ static void L2Init(void) {
     PPCMtmsr(oldMSR);
 }
 
+/** Turns the L2 cache on (L2E set, global-invalidate bit clear). */
 void L2Enable(void) { 
     PPCMtl2cr((PPCMfl2cr() | L2CR_L2E) & ~L2CR_L2I);
 }
 
+/** Turns the L2 cache off, with syncs around the write. */
 void L2Disable(void) {
     __sync();
     PPCMtl2cr(PPCMfl2cr() & ~0x80000000);
     __sync();
 }
 
+/** Disables the L2 cache and invalidates all of it, waiting for the hardware to finish. */
 void L2GlobalInvalidate(void) {
     L2Disable();
     PPCMtl2cr(PPCMfl2cr() | 0x00200000);
@@ -571,6 +651,7 @@ void L2GlobalInvalidate(void) {
     }
 }
 
+/** Sets or clears the L2 data-only mode, in which the L2 cache holds data but not instructions. */
 void L2SetDataOnly(BOOL dataOnly) {
     if (dataOnly) {
         PPCMtl2cr(PPCMfl2cr() | 0x400000);
@@ -579,6 +660,7 @@ void L2SetDataOnly(BOOL dataOnly) {
     PPCMtl2cr(PPCMfl2cr() & 0xFFBFFFFF);
 }
 
+/** Sets or clears L2 write-through mode (otherwise write-back). */
 void L2SetWriteThrough(BOOL writeThrough) {
     if (writeThrough) {
         PPCMtl2cr(PPCMfl2cr() | 0x80000);
@@ -587,6 +669,12 @@ void L2SetWriteThrough(BOOL writeThrough) {
     PPCMtl2cr(PPCMfl2cr() & 0xFFF7FFFF);
 }
 
+/**
+ * Machine-check handler.
+ * If the check was not a locked-cache DMA error it dumps the context and halts;
+ * otherwise it reports which DMA errors occurred (duplicate tag, normal cache access, miss, queue overflow)
+ * and clears them so execution continues.
+ */
 void DMAErrorHandler(OSError error, OSContext* context, ...) {
     u32 hid2 = PPCMfhid2();
 
@@ -621,6 +709,10 @@ void DMAErrorHandler(OSError error, OSContext* context, ...) {
     PPCMthid2(hid2);
 }
 
+/**
+ * Enables the L1 instruction and data caches and the L2 cache if they are off,
+ * and installs DMAErrorHandler as the machine-check handler. Called from OSInit.
+ */
 void __OSCacheInit() {
     if (!(PPCMfhid0() & HID0_ICE)) {
         ICEnable();

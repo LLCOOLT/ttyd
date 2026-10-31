@@ -166,6 +166,10 @@ static BattleWeapon weapon_kuriboo_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init script of the Goomba: installs the wait, attack, damage and confusion event handlers and the run,
+ * walk and jump sounds ("SFX_ENM_KURI_MOVE1/2", "KURI_JUMP1", "KURI_LANDING1").
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -178,6 +182,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: runs the shared default damage script (btldefaultevt_Damage) with its default parameters
+ * (LW(10) = -2, LW(11) = 1).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -185,10 +193,15 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Phase handler of the Goomba: empty, it does nothing at phase changes. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the Goomba's headbutt turn: unless it uses an item, it picks a target (or the first-strike target),
+ * runs to it, headbutts with the camera zoomed in, handles guard and miss results and returns to its home spot.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -322,6 +335,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: from point (args[0], args[1]) to point (args[2], args[3]) in x/z,
+ * writes the facing angle to args[4]; if the two points coincide it leaves the incoming angle in args[4]
+ * unchanged.
+ */
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);
@@ -340,6 +358,7 @@ static USER_FUNC(krb_get_dir) {
     return EVT_RETURN_DONE;
 }
 
+/** Guess: wait-pose event of the Goomba; it switches the unit to pose-table entry 1 (the stand pose). */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

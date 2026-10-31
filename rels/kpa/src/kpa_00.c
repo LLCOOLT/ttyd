@@ -18,6 +18,11 @@
 
 static NpcSetupInfo npcEnt[3];
 
+/**
+ * Opening cutscene of the Bowser interludes: the camera pans across Bowser's Castle to a BGM_STGK_CASTLE1 start,
+ * then the game moves on to kpa_01.
+ * Runs at the start of the first interlude (story progress below STORY_STG1_19_01_BOWSER_CASTLE).
+ */
 EVT_BEGIN(kpa_00_first_evt)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_mario_key_onoff, 0)
@@ -38,6 +43,14 @@ EVT_BEGIN(kpa_00_first_evt)
     RETURN
 EVT_END()
 
+/**
+ * Closing cutscene of the first interlude: Bowser flies off with Kammy Koopa,
+ * growing in the distance while the airship sound plays.
+ * The story advances to STORY_STG1_19_02_BOWSER_CASTLE_INTERIOR, the game is saved,
+ * and play returns to Petalburg (nok_01).
+ * Guess: the NPC named after flying Bowser is an airship-like flying fortress;
+ * only the NPC and sound names say so.
+ */
 EVT_BEGIN(kpa_00_fly_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -195,6 +208,11 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Map init for kpa_00 (Bowser's Castle exterior).
+ * Sets up the two NPCs, Kammy and the flying Bowser,
+ * and starts the opening cutscene or the flying cutscene depending on the story progress.
+ */
 EVT_BEGIN(kpa_00_init_evt)
     CALL(evt_mario_set_mode, 2)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_KOOPA_KPA1"))

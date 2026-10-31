@@ -80,6 +80,10 @@ static f32 spline_dt[] = {
     -170.0f,
 };
 
+/**
+ * Event script: puts the active partner (by party id: Goombella, Koops, Flurrie, Yoshi, Vivian, Bobbery,
+ * Ms. Mowz) into its first "hurt" pose, used while they lie on the ground after the crash landing.
+ */
 static EVT_BEGIN(party_damage_pose)
     CALL(evt_mario_get_party, LW(0))
     SWITCH(LW(0))
@@ -102,6 +106,7 @@ static EVT_BEGIN(party_damage_pose)
     RETURN
 EVT_END()
 
+/** Event script: puts the active partner into its second "hurt" pose (getting up), used after the crash landing. */
 EVT_BEGIN(party_damage_pose2)
     CALL(evt_mario_get_party, LW(0))
     SWITCH(LW(0))
@@ -124,6 +129,13 @@ EVT_BEGIN(party_damage_pose2)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the crash landing on the Moon, run on the first visit (story progress below
+ * STORY_STG7_06_TO_THE_MOON).
+ * Mario and the partner tumble down along a spline and hit the ground with a thud, dust and a camera shake.
+ * After lying there they get up, the partner speaks (stg7_moo_03, stg7_moo_04), Mario nods, control returns,
+ * the story progress is set to STORY_STG7_06_TO_THE_MOON and the area banner for the Moon is shown (telop 14).
+ */
 static EVT_BEGIN(evt_first)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -277,8 +289,21 @@ static EVT_BEGIN(evt_first)
 EVT_END()
 
 #if VERSION >= VERSION_US
+/**
+ * Rock-blasting script (US and later versions; the JP version has a static copy below).
+ * Bobbery's explosion breaks a rock: a sound plays,
+ * the rock is captured into an offscreen image and played as the paper-craft crumble animation OFF_d_bom_ver2
+ * (A_1), then the rock model and collision are removed.
+ * LW(10) is the map object and LW(11) the collision object of the rock;
+ * the moo_01 to moo_07 rocks use this one too.
+ */
 EVT_BEGIN(rock_main)
 #else
+/**
+ * Rock-blasting script (JP version): Bobbery's explosion breaks a rock into an offscreen crumble animation,
+ * then its model and collision are removed.
+ * LW(10) is the map object and LW(11) the collision object of the rock.
+ */
 static EVT_BEGIN(rock_main)
 #endif
     BEGIN_INLINE_EVENT
@@ -325,6 +350,7 @@ static EVT_BEGIN(rock_main)
     RETURN
 EVT_END()
 
+/** Event script: Bobbery blows up the first rock (S_iwa_01) of moo_00; sets GSWF_MOO00_ROCK_A_BOMBED. */
 static EVT_BEGIN(rock_evt0)
 #if VERSION >= VERSION_US
     SET_VALUE(GSWF(GSWF_MOO00_ROCK_A_BOMBED), 1)
@@ -342,6 +368,7 @@ static EVT_BEGIN(rock_evt0)
     RETURN
 EVT_END()
 
+/** Event script: Bobbery blows up the second rock (S_iwa_08) of moo_00; sets GSWF_MOO00_ROCK_B_BOMBED. */
 static EVT_BEGIN(rock_evt1)
 #if VERSION >= VERSION_US
     SET_VALUE(GSWF(GSWF_MOO00_ROCK_B_BOMBED), 1)
@@ -359,6 +386,14 @@ static EVT_BEGIN(rock_evt1)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for moo_00, the Moon landing site:
+ * places Mario at the entrance (or runs the entry bero), plays the Moon music (BGM_STG7_MON1) and ambience,
+ * animates the stars, puts a save block at (245, 49, -205),
+ * plays the crash landing cutscene before the Moon story starts,
+ * sets up the two Bobbery rocks (or removes them once they have been blown up)
+ * and places a Stopwatch at (-250, 0, -445).
+ */
 EVT_BEGIN(moo_00_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG7_06_TO_THE_MOON)
@@ -399,6 +434,10 @@ EVT_BEGIN(moo_00_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: resets the partner's scale, rotation offset and rotation to their normal values
+ * after the tumbling in the crash scene.
+ */
 static USER_FUNC(party_reset) {
     PartyEntry* party = partyGetPtr(0);
 
@@ -408,6 +447,10 @@ static USER_FUNC(party_reset) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: resets Mario's scale, rotation offset and Z rotation to their normal values
+ * after the tumbling in the crash scene.
+ */
 static USER_FUNC(mario_reset) {
     MarioWork* mario = marioGetPtr();
 
@@ -417,6 +460,10 @@ static USER_FUNC(mario_reset) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: makes the partner tumble head over heels.
+ * args[0] is the angle in degrees; the partner is rotated about its centre to that angle.
+ */
 static USER_FUNC(party_kirimomi) {
     f32 angle = evtGetFloat(event, event->args[0]);
     PartyEntry* party = partyGetPtr(0);
@@ -428,6 +475,10 @@ static USER_FUNC(party_kirimomi) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: makes Mario tumble head over heels.
+ * args[0] is the angle in degrees; Mario is rotated about his centre to that angle.
+ */
 static USER_FUNC(mario_kirimomi) {
     f32 angle = evtGetFloat(event, event->args[0]);
     MarioWork* mario = marioGetPtr();

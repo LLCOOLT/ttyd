@@ -9910,9 +9910,12 @@ static void psndENVMain(void);
 static void psndSFXMain(void);
 static s32 __psndSFXOn(const char* name, u8 vol, u8 pan, u16 pitch, Vec* pos, u32 posOnly, u16 dist, s32 ignoreSfxOff);
 
-// Direction from (x1, y1) to (x2, y2) in degrees (0-360), using angleABTBL to correct a linear estimate. The game
-// has two copies: this file-local one and the global one in system.c. The original names both angleABf (this
-// one static); it is psndAngleABf here because C does not allow a static after system.h's extern declaration.
+/**
+ * Direction from (x1, y1) to (x2, y2) in degrees (0-360), using angleABTBL to correct a linear estimate.
+ * The game has two copies: this file-local one and the global one in system.c.
+ * The original names both angleABf (this one static);
+ * it is psndAngleABf here because C does not allow a static after system.h's extern declaration.
+ */
 static f32 psndAngleABf(f32 x1, f32 y1, f32 x2, f32 y2) {
     f32 xdiff, ydiff;
     f32 xabs, yabs;
@@ -9979,7 +9982,7 @@ static f32 psndAngleABf(f32 x1, f32 y1, f32 x2, f32 y2) {
     return angle;
 }
 
-// calc3D, returns the first bit of SND_3DINFO (vol, pan, span, unused)
+/** calc3D, returns the first bit of SND_3DINFO (vol, pan, span, unused) */
 static u32 calc3D(s32 id, Vec* pos, u8 vol, u16 dist) {
     static u8 PAN[4];
     Vec v = *pos;
@@ -10090,6 +10093,10 @@ static u32 calc3D(s32 id, Vec* pos, u8 vol, u16 dist) {
 #define PSSFX_COUNT 4242
 #endif
 
+/**
+ * Returns the pssfxlist index of the sound effect called name ("SFX_..."),
+ * or the id itself when name is a packed numeric id (SFX_NAME_IS_ID).
+ */
 s32 searchPSSFXList(const char* name) {
     SoundEffectEntry* entry = pssfxlist;
     int i;
@@ -10109,6 +10116,11 @@ s32 searchPSSFXList(const char* name) {
     return i;
 }
 
+/**
+ * Boots the game's sound layer: starts the driver (SoundInit), clears the BGM,
+ * effect and environment channels and loads the sound/proj/pmario project and song library.
+ * The sound groups are pushed afterwards by psndPushGroup.
+ */
 void psndInit(void) {
     PaperSoundEnv* env;
     PaperSoundEffect* sfx;
@@ -10148,6 +10160,10 @@ void psndInit(void) {
     SoundSLibLoadDVD("sound/proj/pmario");
 }
 
+/**
+ * Per-frame sound update once loading is done: counts down the repeat guard for a few frequent sounds (not in
+ * the demos), then runs BGM fades, environment sounds, effects and the driver.
+ */
 void psndMain(void) {
     if (init_f) {
 #if VERSION >= VERSION_JP
@@ -10162,18 +10178,25 @@ void psndMain(void) {
     }
 }
 
+/** Audio-interrupt hook once loading is done: services the streams' disc reads. */
 void psndMainInt(void) {
     if (init_f) {
         SoundMainInt();
     }
 }
 
+/** Shuts sound down: drops all sound data and detaches the DVD manager callback. */
 void psndExit(void) {
     SoundDropData();
     DVDMgrSetupCallback(NULL);
     init_f = FALSE;
 }
 
+/**
+ * Loads one sound group (0-11) into ARAM per call during boot;
+ * returns TRUE while groups remain and, after the last, frees the staging buffer,
+ * marks sound as ready and returns FALSE.
+ */
 BOOL psndPushGroup(void) {
     static u8 tbl[4];
     static s32 group;
@@ -10195,11 +10218,19 @@ BOOL psndPushGroup(void) {
     return TRUE;
 }
 
+/**
+ * Sets the listener position and facing direction (degrees) used to place 3D sound effects;
+ * the field and battle sequences pass the camera's yaw each frame.
+ */
 void psndSetPosDirListener(Vec* position, f32 direction) {
     psnd.position = *position;
     psnd.direction = direction;
 }
 
+/**
+ * Fades everything out: both BGM channels and both environment channels over a second,
+ * and every sound effect over 45 frames (750 ms in US and PAL).
+ */
 void psndStopAllFadeOut(void) {
     PaperSoundWork* wp = &psnd;
     PaperSoundEffect* sfx;
@@ -10228,6 +10259,7 @@ void psndStopAllFadeOut(void) {
 #endif
 }
 
+/** Sets the map's reverb send for sound effects: mode 0-3 is 0, 20, 40 or 60. */
 void psndSetReverb(s32 mode) {
     switch (mode) {
         case 0:
@@ -10245,6 +10277,7 @@ void psndSetReverb(s32 mode) {
     }
 }
 
+/** Sets psnd flags; PSND_FLAG_BGM_OFF also stops both BGM channels and PSND_FLAG_ENV_OFF both environment channels. */
 void psndSetFlag(s32 flag) {
     psnd.flags |= flag;
     if (psnd.flags & PSND_FLAG_BGM_OFF) {
@@ -10257,16 +10290,18 @@ void psndSetFlag(s32 flag) {
     }
 }
 
+/** Clears psnd flags. */
 void psndClearFlag(s32 flag) {
     psnd.flags &= ~flag;
 }
 
+/** Returns the psnd flags. */
 s32 psndGetFlag(void) {
     return psnd.flags;
 }
 
 #if VERSION <= VERSION_DEMO_US
-// demo: the reverb reset is in psndBGMOn_f_d, and the SFX fade-out of psndSFXAllOff is written out here
+/** demo: the reverb reset is in psndBGMOn_f_d, and the SFX fade-out of psndSFXAllOff is written out here */
 void psndMapChange(void) {
     PaperSoundWork* wp = &psnd;
     PaperSoundEffect* sfx;
@@ -10287,6 +10322,10 @@ void psndMapChange(void) {
     }
 }
 #else
+/**
+ * Called on a map change: resets the reverb when the map really changed, records the map name,
+ * unmutes door sounds and fades out the map's effects (psndSFXAllOff).
+ */
 void psndMapChange(void) {
     if (strcmp(psnd.mapName, gp->currentMapName)) {
         psnd.reverb = 0;
@@ -10297,6 +10336,7 @@ void psndMapChange(void) {
 }
 #endif
 
+/** Fades out every playing effect except environment sounds and those marked to survive a map change. */
 void psndSFXAllOff(void) {
     PaperSoundWork* wp = &psnd;
     PaperSoundEffect* sfx;
@@ -10323,6 +10363,7 @@ void psndSFXAllOff(void) {
     }
 }
 
+/** Stops the effects tied to the BGM (PSND_SFX_WITH_BGM) when it stops, except environment and exempt ones. */
 void L_psndBGM_stop(void) {
     PaperSoundEffect* sfx;
     int i;
@@ -10336,6 +10377,10 @@ void L_psndBGM_stop(void) {
     }
 }
 
+/**
+ * Changes the playback rate of BGM channel id when it is a stream (evt_snd_bgm_rate);
+ * sequenced songs are left alone.
+ */
 void psndBGM_rate(s32 id, u16 rate) {
     PaperSoundBGM* bgm = &psbgm[id & 0xF];
     SoundBGMEntry* entry;
@@ -10349,6 +10394,11 @@ void psndBGM_rate(s32 id, u16 rate) {
     }
 }
 
+/**
+ * Per-frame BGM update: frees channels whose song or stream ended,
+ * applies the master BGM volume (65% in the camera idle mix, unless the BGM is exempt via psndBGMScope),
+ * and runs fade-in, fade-out, hold and dip/undip volume ramps for both channels.
+ */
 static void psndBGMMain(void) {
     PaperSoundBGM* bgm;
     PaperSoundFade* fade;
@@ -10489,7 +10539,7 @@ static void psndBGMMain(void) {
     }
 }
 
-// the demo's psndBGMOn_f_d has no fade-out time parameter (it always fades the old BGM out over 750 ms)
+/** the demo's psndBGMOn_f_d has no fade-out time parameter (it always fades the old BGM out over 750 ms) */
 BOOL psndBGMOn(u32 flags, char* bgm_name) {
 #if VERSION <= VERSION_DEMO_US
     return psndBGMOn_f_d(flags, bgm_name, 1000, 0);
@@ -10498,6 +10548,7 @@ BOOL psndBGMOn(u32 flags, char* bgm_name) {
 #endif
 }
 
+/** Starts BGM bgm_name with flags and fade-in time (psndBGMOn_f_d; US and PAL fade the previous BGM out in 750 ms). */
 BOOL psndBGMOn_f(u32 flags, char* bgm_name, u32 fadetime, s32 unused) {
 #if VERSION <= VERSION_DEMO_US
     return psndBGMOn_f_d(flags, bgm_name, fadetime, unused);
@@ -10506,6 +10557,7 @@ BOOL psndBGMOn_f(u32 flags, char* bgm_name, u32 fadetime, s32 unused) {
 #endif
 }
 
+/** Returns a free stream channel for a new BGM, stopping streams that are fading out if none is free. */
 static inline s32 psndSSFindCh(void) {
     u32 ch;
     for (ch = 0; ch < 3; ch++) {
@@ -10525,6 +10577,7 @@ static inline s32 psndSSFindCh(void) {
     }
     return -1;
 }
+/** Returns a free song channel, or -1. */
 static inline s32 psndSongFindCh(void) {
     u32 ch;
     for (ch = 0; ch < 4; ch++) {
@@ -10534,8 +10587,10 @@ static inline s32 psndSongFindCh(void) {
     }
     return -1;
 }
-// The BGM table index of name (or the id it encodes); 0 when it is not in the table. The demo returns it, the
-// other versions store it through pi.
+/**
+ * The BGM table index of name (or the id it encodes); 0 when it is not in the table.
+ * The demo returns it, the other versions store it through pi.
+ */
 #if VERSION <= VERSION_DEMO_US
 static inline s32 psndBGMSearch(char* name) {
     SoundBGMEntry* entry;
@@ -10555,6 +10610,7 @@ static inline s32 psndBGMSearch(char* name) {
     return i;
 }
 #else
+/** Looks BGM name up in psbgmlist (or decodes a numeric id) into *pi. */
 static inline void psndBGMSearchP(char* name, s32* pi) {
     SoundBGMEntry* entry;
     entry = psbgmlist;
@@ -10572,6 +10628,13 @@ static inline void psndBGMSearchP(char* name, s32* pi) {
     }
 }
 #endif
+/**
+ * Starts BGM bgm_name on channel flags & 0xF (PaperSoundFadeFlags say how):
+ * keeps a BGM that already plays unless PSND_FADE_RESTART, resumes or undips with PSND_FADE_RESUME,
+ * otherwise fades the old one out and starts the new stream or song with its list volume and pan,
+ * faded in over fadetime with PSND_FADE_IN. Returns FALSE when nothing started.
+ * The US/PAL form also takes the old BGM's fade-out time; the demo also resets the reverb here.
+ */
 #if VERSION <= VERSION_DEMO_US
 BOOL psndBGMOn_f_d(u32 flags, char* bgm_name, u32 fadetime, s32 unused) {
     PaperSoundBGM* bgm;
@@ -10781,6 +10844,7 @@ done:
     return TRUE;
 }
 #else
+/** JP, US and PAL form of psndBGMOn_f_d above; fadeout is the fade-out time for the BGM being replaced. */
 BOOL psndBGMOn_f_d(u32 flags, char* bgm_name, u32 fadetime, u32 fadeout, s32 unused) {
     PaperSoundBGM* bgm;
     s32 idx;
@@ -11007,10 +11071,18 @@ done:
 }
 #endif
 
+/** Stops or fades BGM channel flags & 0xF with a 1 second fade (psndBGMOff_f_d). */
 BOOL psndBGMOff(u32 flags) {
     return psndBGMOff_f_d(flags, 1000, FALSE);
 }
 
+/**
+ * Stops BGM channel flags & 0xF: fades it out (PSND_FADE_OUT), fades to silence keeping it (PSND_FADE_HOLD),
+ * dips it to a lower level (PSND_FADE_DIP), or stops it at once.
+ * Story guards keep certain BGMs (during the Great Tree time bomb,
+ * and between Glitzville and chapter 4) from being stopped; US and PAL skip them when someswitch is set.
+ * Returns FALSE when the channel is empty or guarded.
+ */
 BOOL psndBGMOff_f_d(s32 flags, u32 fadetime, u32 someswitch) {
     PaperSoundBGM* bgm = &psbgm[flags & 0xF];
     s32 silent = silent_tbl[(flags >> 12) & 0xF];
@@ -11082,10 +11154,12 @@ BOOL psndBGMOff_f_d(s32 flags, u32 fadetime, u32 someswitch) {
     return TRUE;
 }
 
+/** Returns 0 when BGM channel id is in use, -1 when it is empty. */
 s32 psndBGMChk(s32 id) {
     return psbgm[id & 0xF].listId == 0xFFFFFFFF ? -1 : 0;
 }
 
+/** Returns TRUE when BGM channel id is dipped (or dipping) to a lower volume. */
 u32 psndBGMChkSilent(s32 id) {
     PaperSoundBGM* bgm = &psbgm[id & 0xF];
 
@@ -11095,6 +11169,7 @@ u32 psndBGMChkSilent(s32 id) {
     return bgm->fade.dipState == 8;
 }
 
+/** Exempts BGM channel id from the master BGM volume: scope > 0 for good, < 0 not at all, 0 for 30 more frames. */
 void psndBGMScope(s32 id, s32 scope) {
     PaperSoundBGM* bgm = &psbgm[id & 0xF];
 
@@ -11112,6 +11187,7 @@ void psndBGMScope(s32 id, s32 scope) {
     }
 }
 
+/** Returns TRUE once the stream on BGM channel id has actually started playing (or when the channel is empty). */
 BOOL psndBGMStartCheck(s32 id) {
     PaperSoundBGM* bgm = &psbgm[id & 0xF];
 
@@ -11121,6 +11197,10 @@ BOOL psndBGMStartCheck(s32 id) {
     return (SoundSSCheck(bgm->streamId) >> 3) & 1;
 }
 
+/**
+ * Returns how long BGM channel id has been playing in milliseconds (microseconds in the demos);
+ * 600000 when the channel is empty (0 in the demos).
+ */
 s32 psndBGMPlayTime(s32 id) {
     PaperSoundBGM* bgm = &psbgm[id & 0xF];
 
@@ -11139,6 +11219,7 @@ s32 psndBGMPlayTime(s32 id) {
 #endif
 }
 
+/** Returns an effect's playing volume: its volume scaled by its list entry's volume, minus its attenuation, 0-127. */
 static inline s32 sfxvol(PaperSoundEffect* s) {
     s32 v = s->volume * s->entryVolume / 127 - s->attenuation;
     if (v < 0)
@@ -11149,6 +11230,11 @@ static inline s32 sfxvol(PaperSoundEffect* s) {
 }
 #define SFX_VOL(s) sfxvol(s)
 
+/**
+ * Per-frame effect update: starts pending effects once their delay passes (3D ones placed relative to the
+ * listener by calc3D), keeps 3D effects' volume, pan and surround up to date as they or the listener move,
+ * runs the global fade and per-effect fade-outs, and frees effects that ended.
+ */
 static void psndSFXMain(void) {
     SoundEffectEntry* e;
     u32 j;
@@ -11405,6 +11491,14 @@ static void psndSFXMain(void) {
     psnd.sfxDelay = 0;
 }
 
+/**
+ * Queues sound effect name on a free effect slot (or one of lower priority) with volume, pan, pitch,
+ * optional position (3D, or position only when posOnly) and audible distance dist;
+ * repeats of the same sound in one frame are staggered and quieter.
+ * Refused while PSND_FLAG_SFX_OFF (unless ignoreSfxOff),
+ * within 6 frames of a few frequent sounds (not in the demos),
+ * and for one sound before the prologue reaches Mario's house. Returns the effect id (slot | serial << 8) or -1.
+ */
 static s32 __psndSFXOn(const char* name, u8 vol, u8 pan, u16 pitch, Vec* pos, u32 posOnly, u16 dist, s32 ignoreSfxOff) {
     s32 sid;
     s32 k;
@@ -11533,26 +11627,32 @@ static s32 __psndSFXOn(const char* name, u8 vol, u8 pan, u16 pitch, Vec* pos, u3
     return idx;
 }
 
+/** Plays effect name even while effects are switched off (PSND_FLAG_SFX_OFF). */
 s32 psndSFXOn_(const char* name) {
     return __psndSFXOn(name, 0xFF, 0xFF, 0, NULL, 0, 0x10, 1);
 }
 
+/** Plays effect name at its list volume, centred; returns the effect id or -1. */
 s32 psndSFXOn(const char* name) {
     return __psndSFXOn(name, 0xFF, 0xFF, 0, NULL, 0, 0x10, 0);
 }
 
+/** Plays effect name at volume vol. */
 s32 psndSFXOnVol(const char* name, u8 vol) {
     return __psndSFXOn(name, vol, 0xFF, 0, NULL, 0, 0x10, 0);
 }
 
+/** Plays effect name as a 3D sound at position. */
 s32 psndSFXOn_3D(const char* name, Vec* position) {
     return __psndSFXOn(name, 0xFF, 0xFF, 0, position, 0, 0x10, 0);
 }
 
+/** Plays effect name as a 3D sound at position with volume, pan, a start delay from pitch and audible distance dist. */
 s32 psndSFXOnEx_3D(const char* name, Vec* position, u8 vol, u8 pan, u16 pitch, u16 dist) {
     return __psndSFXOn(name, vol, pan, pitch, position, 0, dist, 0);
 }
 
+/** Sets the volume of playing effect id. */
 void psndSFX_vol(s32 id, u8 vol) {
     PaperSoundEffect* sfx;
 
@@ -11566,6 +11666,7 @@ void psndSFX_vol(s32 id, u8 vol) {
     sfx->volume = vol;
 }
 
+/** Sets the pitch bend of playing effect id (stored until it starts if still pending). */
 void psndSFX_pit(s32 id, s16 pitch) {
     PaperSoundEffect* sfx;
 
@@ -11588,6 +11689,7 @@ void psndSFX_pit(s32 id, s16 pitch) {
     }
 }
 
+/** Moves the 3D position of playing effect id. */
 void psndSFX_pos(s32 id, Vec* position) {
     PaperSoundEffect* sfx;
 
@@ -11601,6 +11703,7 @@ void psndSFX_pos(s32 id, Vec* position) {
     sfx->position = *position;
 }
 
+/** Sets the audible distance of playing effect id. */
 void psndSFX_dist(s32 id, u16 dist) {
     PaperSoundEffect* sfx;
 
@@ -11614,6 +11717,7 @@ void psndSFX_dist(s32 id, u16 dist) {
     sfx->dist = dist;
 }
 
+/** Stops effect id (its stream, song or driver effect, whichever the list entry uses) and frees its slot. */
 void psndSFXOff(s32 id) {
     PaperSoundEffect* sfx;
     SoundEffectEntry* entry;
@@ -11646,6 +11750,7 @@ void psndSFXOff(s32 id) {
     sfx->channel = -1;
 }
 
+/** Returns 0 while effect id is still the same effect (its serial matches) and has not been freed, else -1. */
 s32 psndSFXChk(s32 id) {
     PaperSoundEffect* sfx;
     u32 uid = id;
@@ -11664,6 +11769,7 @@ s32 psndSFXChk(s32 id) {
     return 0;
 }
 
+/** Returns the volume of playing effect id, 0 when it is gone. */
 u8 psndSFX_get_vol(s32 id) {
     PaperSoundEffect* sfx;
 
@@ -11677,6 +11783,7 @@ u8 psndSFX_get_vol(s32 id) {
     return sfx->volume;
 }
 
+/** Stops every environment sound entry belonging to environment id, switching off their effects. */
 static void psndENV_stop(u32 id) {
     s32 i;
     PaperSoundEnv* e;
@@ -11714,7 +11821,7 @@ static void psndENV_stop(u32 id) {
     }
 }
 
-// volume of an ENV sound: its list volume scaled by its channel fade and dip and by the ENV master volume
+/** volume of an ENV sound: its list volume scaled by its channel fade and dip and by the ENV master volume */
 static inline void psndENVVolume(PaperSoundEnv* e, PaperSoundWork* p, u8* vol) {
     PaperSoundFade* f = NULL;
     s16 dip;
@@ -11742,7 +11849,7 @@ static inline void psndENVVolume(PaperSoundEnv* e, PaperSoundWork* p, u8* vol) {
     }
 }
 
-// the ENV sound has finished: wait for its next play
+/** the ENV sound has finished: wait for its next play */
 static inline void psndENVRestart(PaperSoundEnv* e) {
     e->sfx = -1;
     e->state = 0;
@@ -11761,7 +11868,7 @@ static inline void psndENVRestart(PaperSoundEnv* e) {
     }
 }
 
-// a playing ENV sound follows its channel volume and low-pass value
+/** a playing ENV sound follows its channel volume and low-pass value */
 static inline void psndENVApply(PaperSoundEnv* e) {
     PaperSoundEffect* sfx;
     u8 vol;
@@ -11799,6 +11906,12 @@ static inline void psndENVApply(PaperSoundEnv* e) {
     }
 }
 
+/**
+ * Per-frame environment sound update: ramps the environment volume (80% in the camera idle mix),
+ * then runs each entry by type: 0 plays at a random spot around the listener at random intervals,
+ * 1 loops at a fixed position, 2 repeats at a fixed position at intervals, 3 plays once at the listener.
+ * Also runs the environment fades and low-pass filter.
+ */
 static void psndENVMain(void) {
     s32 i;
     PaperSoundEnv* e;
@@ -12003,6 +12116,7 @@ static void psndENVMain(void) {
     }
 }
 
+/** Starts environment sound name on channel flags & 0xF with a 1 second fade (psndENVOn_f_d). */
 BOOL psndENVOn(u32 flags, const char* name) {
     return psndENVOn_f_d(flags, name, 1000, 0);
 }
@@ -12016,6 +12130,7 @@ typedef struct PairU32_ {
 #else
 #define PSENV_COUNT 0x76
 #endif
+/** Returns the index of environment name in the name table (or the numeric id it encodes); 0 when not found. */
 static inline s32 psndENVSearch(const char** names, const char* name) {
     s32 id;
     if (SFX_NAME_IS_ID(name)) {
@@ -12029,6 +12144,7 @@ static inline s32 psndENVSearch(const char** names, const char* name) {
         id = 0;
     return id;
 }
+/** Returns a free environment sound entry, or NULL when all 16 are in use. */
 static inline PaperSoundEnv* psndENVGetFree(void) {
     PaperSoundEnv* p = psenv;
     s32 j;
@@ -12040,6 +12156,12 @@ static inline PaperSoundEnv* psndENVGetFree(void) {
     }
     return NULL;
 }
+/**
+ * Starts the environment (ambient sounds of a map such as wind or waves) called name on channel flags & 0xF:
+ * keeps it if already running, otherwise stops the old one
+ * and creates an entry per sound of the environment's list, faded in over fadetime.
+ * Returns FALSE when nothing changed.
+ */
 BOOL psndENVOn_f_d(u32 flags, const char* name, u32 fadetime, s32 unused) {
     u16 cur;
     u16* env;
@@ -12168,12 +12290,17 @@ end:
 #else
 #pragma dont_inline off
 #endif
+/** Stops or fades environment channel flags & 0xF with a 1 second fade (psndENVOff_f_d). */
 BOOL psndENVOff(u32 flags) {
     return psndENVOff_f_d(flags, 1000, 0);
 }
 #pragma dont_inline reset
 
 #pragma dont_inline on
+/**
+ * Stops environment channel flags & 0xF: fades it out, holds it silent or dips it (PaperSoundFadeFlags),
+ * or stops it at once. Returns FALSE when the channel is empty.
+ */
 BOOL psndENVOff_f_d(u32 flags, u32 fadetime, s32 unused) {
     s32 silent = silent_tbl[(flags >> 12) & 0xF];
     PaperSoundFade* fade;
@@ -12223,6 +12350,10 @@ BOOL psndENVOff_f_d(u32 flags, u32 fadetime, s32 unused) {
 
 #pragma dont_inline reset
 
+/**
+ * Sets a low-pass filter frequency on environment channel id (0 = none, stored as 32000 Hz);
+ * returns FALSE when the channel is empty.
+ */
 BOOL psndENV_LPF(s32 id, u16 freq) {
     if (psnd.envId[id & 0xF] == 0) {
         return FALSE;
@@ -12234,6 +12365,10 @@ BOOL psndENV_LPF(s32 id, u16 freq) {
     return TRUE;
 }
 
+/**
+ * FAKE stand-in: keeps the int-to-float conversion constant of stripped code in its place in the literal pool;
+ * nothing calls it.
+ */
 void psndStrippedPool(f32* f, s32 i) {
     *f = (f32)i;
 }

@@ -38,6 +38,10 @@ static EvtWord move_event[84];
 static EvtWord move_event_sub[103];
 static EvtWord wait_event[6];
 
+/**
+ * Script helper: args[0] is a unit id; args[1] receives 1 when that unit is a Boo
+ * or Dark Boo (kinds 0x4B and 0x6A), else 0.
+ */
 static USER_FUNC(teresa_check_teresa) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -58,6 +62,10 @@ static USER_FUNC(teresa_check_teresa) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] receives 1 when at least one Boo
+ * or Dark Boo (kinds 0x4B, 0x6A) is still free to act (its work[0] is 0), else 0.
+ */
 static USER_FUNC(teresa_check_move) {
     EvtWord* args = event->args;
     s32 num = 0;
@@ -82,6 +90,11 @@ static USER_FUNC(teresa_check_move) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] is the Boo itself; args[1] receives 1 when some other Boo
+ * or Dark Boo (kinds 0x4B, 0x6A) is not invisible (status 0x12),
+ * i.e. there is another one that can still turn visible or invisible, else 0.
+ */
 static USER_FUNC(teresa_check_trans) {
     EvtWord* args = event->args;
     s32 num = 0;
@@ -358,6 +371,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Registers the Boo's wait, attack and damage events (confusion reuses the attack event),
+ * clears unit work 0 (set once it has risen out of reach in move_event),
+ * puts it 15 units above the ground and starts the idle loop.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -372,6 +390,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Hit reaction: just the default btldefaultevt_Damage for its single part. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -379,6 +398,14 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * The Boo's turn (also used when confused): on a first strike it attacks;
+ * otherwise uses a held item if the AI wants to, then rolls 0-114:
+ * under 25 it turns itself invisible if it is not already, under 50 it turns another visible Boo invisible,
+ * under 65 it lifts the Boos into the air if one is still grounded.
+ * A roll whose move cannot be done falls through to the next check, and finally to the attack.
+ * While confused it never turns another Boo invisible or lifts the Boos.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -444,6 +471,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Basic attack: fades out, reappears beside the target and lunges for 3 damage (weapon_teresa_attack).
+ * On a miss or dodge it holds its surprised pose; then it turns around and floats home.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -550,6 +581,10 @@ static EVT_BEGIN(normal_attack_event)
         RETURN
 EVT_END()
 
+/**
+ * Makes the Boo itself invisible for 2 turns (weapon_teresa_trans_myself, always hits):
+ * it backs off, fades out unless already invisible, spins in place and comes back.
+ */
 static EVT_BEGIN(trans_myself_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -602,6 +637,11 @@ static EVT_BEGIN(trans_myself_event)
     RETURN
 EVT_END()
 
+/**
+ * Makes another Boo invisible for 2 turns: keeps picking random allies until one is a Boo
+ * or Dark Boo that is not invisible (gives up only when no target is found),
+ * floats over to it fading out and in, touches it with weapon_teresa_trans_myself and floats home.
+ */
 static EVT_BEGIN(trans_event)
     LABEL(0)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
@@ -675,7 +715,7 @@ static EVT_BEGIN(trans_event)
     RETURN
 EVT_END()
 
-// tst has the JP/US move_event, without the PAL two-teresa wait minimum
+/** tst has the JP/US move_event, without the PAL two-teresa wait minimum */
 static EVT_BEGIN(move_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_teresa_move))
@@ -709,6 +749,11 @@ static EVT_BEGIN(move_event)
     RETURN
 EVT_END()
 
+/**
+ * Spawned by move_event for the Boo in LW(3): marks its unit work 0,
+ * makes it untargetable by hammer and shell-toss attacks and raises it to height 40 as its new home.
+ * The acting Boo goes at once in its T_1 pose; the others wait 60-80 frames and spin as they rise.
+ */
 static EVT_BEGIN(move_event_sub)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(1))
     IF_INT_EQUAL(LW(3), LW(1))
@@ -743,6 +788,7 @@ static EVT_BEGIN(move_event_sub)
     RETURN
 EVT_END()
 
+/** Idle: plays the stand pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

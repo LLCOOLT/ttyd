@@ -205,6 +205,10 @@ BattleUnitKind unitdata_Party_Sanders = {
     data_table,
 };
 
+/**
+ * Bobbery's battle entry: starts 250 units behind his home spot and, after 40 frames,
+ * runs in to it at speed 4 with his footstep sounds, then takes his stay pose.
+ */
 static EVT_BEGIN(battle_entry_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 250)
@@ -219,6 +223,11 @@ static EVT_BEGIN(battle_entry_event)
     RETURN
 EVT_END()
 
+/**
+ * Init for Bobbery: registers his wait, attack, damage, confusion and entry scripts and his walk,
+ * run and jump sounds, sets unit work 0-2 to -1 (not read anywhere in this file)
+ * and allocates Hold Fast's spare weapon.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -236,6 +245,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Hit reaction: straightens his rotation (left over from his moves), then runs the default damage script. */
 static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     SET_VALUE(LW(10), -2)
@@ -244,6 +254,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Idle: uses the Hold Fast pose table while he has the Hold Fast status (22), the normal one otherwise,
+ * and plays its stay pose.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 22, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -473,6 +487,11 @@ BattleWeapon partyWeapon_SandersSuperBombAttack = {
     {0, 50, 50, 100, 20, 25, 25, 10, 10, 5, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Bobbery's first strike, used when he hits an enemy in the field to start the battle:
+ * he moves up to the first-attack target's hit point (_get_bomb_hit_position) and explodes on it,
+ * then returns home.
+ */
 EVT_BEGIN(partySandersAttack_FirstAttack)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
@@ -556,6 +575,10 @@ EVT_BEGIN(partySandersAttack_FirstAttack)
     RETURN
 EVT_END()
 
+/**
+ * Bobbery's Bomb: he walks up to the enemy, lights his fuse during the action command and explodes on it,
+ * damaging the target, then walks back home.
+ */
 EVT_BEGIN(partySandersAttack_NormalAttack)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -824,6 +847,10 @@ EVT_BEGIN(partySandersAttack_NormalAttack)
     RETURN
 EVT_END()
 
+/**
+ * Bobbery's Bob-ombast: he charges a huge explosion with the action command and blasts every enemy at once,
+ * then returns home.
+ */
 EVT_BEGIN(partySandersAttack_SuperBombAttack)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -1144,6 +1171,10 @@ EVT_BEGIN(partySandersAttack_SuperBombAttack)
     RETURN
 EVT_END()
 
+/**
+ * Bobbery's Hold Fast: he braces himself; the action command output plus one sets how many turns the Hold Fast
+ * status lasts (_make_counterset_weapon), so enemies that touch him take explosive counter damage.
+ */
 EVT_BEGIN(partySandersAttack_CounterSet)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -1223,6 +1254,7 @@ EVT_BEGIN(partySandersAttack_CounterSet)
     RETURN
 EVT_END()
 
+/** Empty: partner moves come from the player's menu choices, not a unit attack script. */
 static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
@@ -1238,6 +1270,10 @@ BattleUnitSetup entry_bomzou = {
     NULL, // itemDropTable
 };
 
+/**
+ * Bobbery's Bomb Squad: for each successful action command he throws one of up to three bombs (unit_bomzou)
+ * along the aimed arc (_shot_bomb_event); bombs that land off the stage are removed, the rest explode next turn.
+ */
 EVT_BEGIN(partySandersAttack_TimeBombSet)
     CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_bomzou), 0)
@@ -1354,6 +1390,10 @@ EVT_BEGIN(partySandersAttack_TimeBombSet)
     RETURN
 EVT_END()
 
+/**
+ * Spawned by Bomb Squad for each bomb (LW(3)): flies it along the arc given by the angle LW(0) and power LW(1),
+ * then bounces it to a stop, deletes it if it landed off the stage, and starts its fuse sizzle.
+ */
 EVT_BEGIN(_shot_bomb_event)
     CALL(_shot_move, LW(3), LW(0), LW(1), LW(0), LW(1), LW(2), LW(5))
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
@@ -1395,6 +1435,7 @@ EVT_BEGIN(_shot_bomb_event)
     RETURN
 EVT_END()
 
+/** Bobbery's Appeal (data tag 5): appeal pose and sound, then the audience is fired up. */
 EVT_BEGIN(sanders_appeal_event)
     CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_APPEAL)
@@ -1430,12 +1471,18 @@ EVT_BEGIN(sanders_appeal_event)
     RETURN
 EVT_END()
 
+/** Victory reaction (data tag 64): Bobbery's Y_1 pose for 48 frames. */
 static EVT_BEGIN(party_win_reaction)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("Y_1"))
     WAIT_FRAMES(48)
     RETURN
 EVT_END()
 
+/**
+ * Audience-attack reaction (data tag 6): Bobbery runs offstage, reappears in the audience,
+ * lights his fuse for a second and explodes on the chosen audience member,
+ * then is blown up off the screen and falls back home.
+ */
 static EVT_BEGIN(attack_audience_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetStageSize, LW(3), EVT_NULLPTR, EVT_NULLPTR)
@@ -1520,6 +1567,10 @@ static EVT_BEGIN(attack_audience_event)
     RETURN
 EVT_END()
 
+/**
+ * Data tag 66, run on each unit at the end of the battle:
+ * clears Bobbery's Hold Fast status and restores his normal stand pose table. Not in the US demo.
+ */
 #if VERSION >= VERSION_JP
 EVT_BEGIN(sanders_battle_end_event)
     CALL(btlevtcmd_OnOffStatus, BTL_UNIT_SELF, 22, 0, 0, 0)
@@ -1528,6 +1579,10 @@ EVT_BEGIN(sanders_battle_end_event)
 EVT_END()
 #endif
 
+/**
+ * Allocates a spare BattleWeapon in the running unit's countersetWeapon slot,
+ * which Hold Fast fills per use (_make_counterset_weapon). Run from init_event.
+ */
 static USER_FUNC(_sanders_make_extra_work_area) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -1539,6 +1594,11 @@ static USER_FUNC(_sanders_make_extra_work_area) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Builds Bobbery's battle move list (data tag 1):
+ * Bomb and Bomb Squad always, Hold Fast from Super rank and Bob-ombast from Ultra rank,
+ * appending each to command->weapon and advancing *count.
+ */
 static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     s32 techLv;
 
@@ -1581,6 +1641,11 @@ static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     }
 }
 
+/**
+ * Returns in args[3]-args[5] where Bobbery should stand to hit target unit args[1]:
+ * its position plus its bintaHitOffset (scaled by size, X mirrored by facing).
+ * args[0] and args[2] (the part) are read but not used.
+ */
 static USER_FUNC(_get_bomb_hit_position) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -1608,6 +1673,10 @@ static USER_FUNC(_get_bomb_hit_position) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Copies the weapon pointed to by args[0] into the unit's spare weapon,
+ * sets its Hold Fast duration (holdFastTime) to args[1] turns, and writes the copy's address back into args[0].
+ */
 static USER_FUNC(_make_counterset_weapon) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -1629,6 +1698,11 @@ static USER_FUNC(_make_counterset_weapon) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Moves thrown bomb args[0] one frame along a ballistic arc launched at angle args[1] (degrees from vertical)
+ * with power args[2] / 10, until it reaches the floor.
+ * Then returns the landing point in args[3]-args[5] and its horizontal speed in args[6] for the bounces.
+ */
 static USER_FUNC(_shot_move) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1673,6 +1747,10 @@ static USER_FUNC(_shot_move) {
     return EVT_RETURN_YIELD;
 }
 
+/**
+ * Returns in args[1] whether unit args[0] is on the stage:
+ * TRUE when its X is within the stage half-width plus 40. Bomb Squad removes bombs that land outside.
+ */
 static USER_FUNC(_judge_on_stage) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;

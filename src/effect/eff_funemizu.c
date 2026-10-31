@@ -104,6 +104,10 @@ static struct {
 #endif
 
 #if VERSION >= VERSION_JP
+/**
+ * Returns the water colour for the current map:
+ * exact name match in the table first, then a 3-letter area prefix, then the default.
+ */
 GXColor effFunemizuGetMapColor(void) {
     ColorEntry* e;
     for (e = funemizu_color_tbl.e; e != NULL; e++) {
@@ -126,6 +130,11 @@ GXColor effFunemizuGetMapColor(void) {
 }
 #endif
 
+/**
+ * Spawns boat water: types 0 and 2 are the ripple wake,
+ * type 1 a spray burst (size picks how many pieces, max 10).
+ * Spawned by the ship motion (mot_ship.c) and by scripts in gor and muj.
+ */
 EffectEntry* effFunemizuEntry(s32 type, f32 x, f32 y, f32 z, f32 size, f32 yaw) {
     EffectEntry* effect;
     EffFunemizuWork* work;
@@ -174,6 +183,7 @@ EffectEntry* effFunemizuEntry(s32 type, f32 x, f32 y, f32 z, f32 size, f32 yaw) 
     return effect;
 }
 
+/** Advances the wake and spray timers, spawns a spray piece from the wake, and deletes spent ones. */
 static void effFunemizuMain(EffectEntry* effect) {
     EffFunemizuWork* work = effect->userdata;
     Vec position;
@@ -273,6 +283,7 @@ static void effFunemizuMain(EffectEntry* effect) {
 #endif
 }
 
+/** Calls the three display lists of the wake mesh. */
 static inline void funemizuCallDL(u32* p_u) {
     u32 u = *p_u;
     for (u = 0; u < 3; u++) {
@@ -280,6 +291,7 @@ static inline void funemizuCallDL(u32* p_u) {
     }
     *p_u = u;
 }
+/** Draws the wake ripple mesh tinted with the map's water colour. */
 static void effFunemizuDisp(CameraId cameraId, EffectEntry* effect) {
     EffFunemizuWork* work = effect->userdata;
     Mtx trans;
@@ -473,6 +485,7 @@ static void effFunemizuDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
+/** Draws the spray (shibuki) pieces as camera-facing quads. */
 static void effFunemizuShibukiDisp(CameraId cameraId, EffectEntry* effect) {
     EffFunemizuWork* work = effect->userdata;
     Mtx trans;

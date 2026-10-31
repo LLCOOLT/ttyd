@@ -50,11 +50,11 @@
 
 #define TRUE 1
 #define FALSE 0
-
+/** GLU tessellator mesh: allocates one vertex record from the map heap. */
 static GLUvertex* allocVertex() {
     return (GLUvertex*)memAlloc(sizeof(GLUvertex));
 }
-
+/** GLU tessellator mesh: allocates one face record from the map heap. */
 static GLUface* allocFace() {
     return (GLUface*)memAlloc(sizeof(GLUface));
 }

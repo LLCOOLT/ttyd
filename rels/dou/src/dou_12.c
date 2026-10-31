@@ -90,6 +90,11 @@ static HitDamageReturn hitDmgRetPoints[] = {
     {0},
 };
 
+/**
+ * Init script of dou_12, the side passage between dou_02 and dou_03:
+ * music and ambience, exits, waves, gazigazi hazards,
+ * and links the two Bill Blasters (Killer cannon 1 and 2) so they fire in turn when they exist.
+ */
 EVT_BEGIN(dou_12_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_DOU1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_DOU3"))

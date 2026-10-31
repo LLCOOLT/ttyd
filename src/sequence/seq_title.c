@@ -40,10 +40,17 @@ static
     void pressStartGX(s32 alpha, f32 x, f32 y);
 static void titleLoadDemo(void);
 
+/** Stub of the debug battle selector's message file hook: always NULL, so a debug battle loads gon_11's messages. */
 const char* DbgBtlSel_GetMsgDataPtr(void) {
     return NULL;
 }
 
+/**
+ * Enters the title sequence: loads mariost.tpl, parks the logo halves off screen,
+ * starts the title BGM (the digest theme after a game over) held paused until the curtain opens,
+ * and clears the map-event-skip, save-blocks and kiosk flags.
+ * Later versions do the setup in L_titleInit and also stop leftover field sound.
+ */
 #if VERSION <= VERSION_DEMO_US
 void seq_titleInit(SequenceWork* work) {
     memset(wp2, 0, sizeof(TitleWork));
@@ -77,6 +84,7 @@ void seq_titleInit(SequenceWork* work) {
     gp->flags &= ~GLOBAL_FLAG_KIOSK;
 }
 #else
+/** Later versions: L_titleInit does the setup, then the same flags are cleared. */
 void seq_titleInit(SequenceWork* work) {
     L_titleInit(work);
     gp->flags &= ~GLOBAL_FLAG_SKIP_MAP_EVENTS;
@@ -86,6 +94,7 @@ void seq_titleInit(SequenceWork* work) {
 }
 #endif
 
+/** Leaves the title sequence: frees mariost.tpl and fades out all sound unless going on to the file select. */
 void seq_titleExit(SequenceWork* work) {
     fileFree(wp2->texture);
     if (seqGetNextSeq() != SEQ_LOAD) {
@@ -93,15 +102,26 @@ void seq_titleExit(SequenceWork* work) {
     }
 }
 
+/** Per-frame title sequence; all the work is in titleMain. */
 void seq_titleMain(SequenceWork* work) {
     titleMain(work);
 }
 
+/**
+ * Debug mode state from the title-screen button code: -1 once X, B, R, B, Y, L has been entered.
+ * The crash handler only shows its error screen in debug mode; otherwise it stops sound and hangs.
+ */
 #if VERSION >= VERSION_JP
 s32 N_getDebugMode(void) {
     return wp2->debug;
 }
 
+/**
+ * Later versions' title setup (called by seq_titleInit):
+ * loads mariost.tpl, parks the logo off screen,
+ * stops leftover field sound (BGM fades over 3 s after a map change), and starts the title BGM,
+ * or the digest theme after a game over, held paused until the curtain opens.
+ */
 void L_titleInit(SequenceWork* work) {
     memset(wp2, 0, sizeof(TitleWork));
     wp2->texture = fileAllocf(4, "%s/mariost.tpl", getMarioStDvdRoot());
@@ -145,6 +165,12 @@ void L_titleInit(SequenceWork* work) {
 }
 #endif
 
+/**
+ * Title screen state machine: waits for the BGM (and curtain animations), opens the curtain,
+ * slides the logo halves in, then waits for A or Start (to the file select via SEQ_LOAD)
+ * or about 19 s of idling (to the dmo_00 opening demo).
+ * Queues the logo draws each frame; later versions also track the debug-mode button code.
+ */
 static void titleMain(SequenceWork* work) {
     switch (wp2->state) {
         case 0:
@@ -357,6 +383,7 @@ static void titleMain(SequenceWork* work) {
     }
 }
 
+/** 3D-camera draw callback: draws the title background image from mariost.tpl through the 2D camera. */
 static void disp1(CameraId cameraId, void* param) {
     CameraEntry* cam = camGetPtr(CAMERA_2D);
     CameraEntry saved;
@@ -381,6 +408,11 @@ static void disp1(CameraId cameraId, void* param) {
     GXSetViewport(vp[0], vp[1], vp[2], vp[3], vp[4], vp[5]);
 }
 
+/**
+ * Effect-layer draw callback: draws the two logo halves at their animated positions (per-language images in US
+ * and PAL) and the pulsing "press start" prompt.
+ * Later versions show the build date and time while Z is held in debug mode.
+ */
 static void disp2(CameraId cameraId, void* param) {
     CameraEntry* cam = camGetPtr(CAMERA_2D);
     CameraEntry saved;
@@ -524,6 +556,10 @@ static
     GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
 }
 
+/**
+ * Prefetches demo.tpl and the animations used by the dmo_00 opening demo (Peach, the treasure chest,
+ * a Goomba and the other characters of the opening) once the logo has landed, so the idle demo starts quickly.
+ */
 static void titleLoadDemo(void) {
     fileAsyncf(4, 0, "%s/demo.tpl", getMarioStDvdRoot());
     animGroupBaseAsync("c_peach", 0, 0);

@@ -89,6 +89,7 @@ static const GXColor coin_black = {0x00, 0x00, 0x00, 0xFF};
 
 static USER_FUNC(bgm_start_wait);
 #if VERSION >= VERSION_US
+// Forward declaration of evt_sub_scale_by_fps (defined near the end of the file), which the star stone cutscene calls.
 USER_FUNC(evt_sub_scale_by_fps);
 #endif
 static USER_FUNC(get_stop);
@@ -111,8 +112,11 @@ extern EvtWord evt_sub_mail_vibration[26];
 s32 evt_sub_mail_event_end[1];
 #endif
 
-// the demo keeps this file's data in definition order: stopwatch, the tree data and scripts, the grass data and
-// scripts, then the coin window (retail puts the small objects in .sdata)
+/**
+ * the demo keeps this file's data in definition order:
+ * stopwatch, the tree data and scripts, the grass data and scripts,
+ * then the coin window (retail puts the small objects in .sdata)
+ */
 #if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(evt_sub_stopwatch)
     LOOP(0)
@@ -136,6 +140,10 @@ s32 tree_data[] = {
 };
 
 #if VERSION >= VERSION_JP
+/**
+ * Placeholder script that just waits a frame forever; scripts run it to have an event to time against.
+ * Guess: the stopwatch for evt_sub_get_stopwatch.
+ */
 EVT_BEGIN(evt_sub_stopwatch)
     LOOP(0)
         WAIT_FRAMES(1)
@@ -154,6 +162,12 @@ WinMgrDesc coinget_window_desc[] = {
 #endif
 
 #if VERSION >= VERSION_US
+/**
+ * Shakes a tree hit with the hammer: plays the tree and leaves sounds,
+ * drops falling-leaf effects (LW(0) picks the leaf variant), spawns the optional drop script in LW(5),
+ * then sways map objects LW(2) (trunk, rotated)
+ * and LW(3)/LW(4) (leaves, shifted) through tree_data for 25 frames. Run per tree by evt_sub_tree_access_entry.
+ */
 EVT_BEGIN(tree_evt)
     SET_TYPE(0)
     SET_VALUE(LF(0), 0)
@@ -210,6 +224,7 @@ EVT_BEGIN(tree_evt)
     RETURN
 EVT_END()
 #elif VERSION <= VERSION_DEMO_US
+/** Demo version of tree_evt: same tree shake, without the SET_TYPE(0) at the start. */
 EVT_BEGIN(tree_evt)
     SET_VALUE(LF(0), 0)
     IF_INT_NOT_EQUAL(LW(3), 0)
@@ -265,6 +280,7 @@ EVT_BEGIN(tree_evt)
     RETURN
 EVT_END()
 #else
+/** JP version of tree_evt: identical to the US and PAL script. */
 EVT_BEGIN(tree_evt)
     SET_TYPE(0)
     SET_VALUE(LF(0), 0)
@@ -322,6 +338,11 @@ EVT_BEGIN(tree_evt)
 EVT_END()
 #endif
 
+/**
+ * Map setup helper: walks the tree table at LW(0) (rows of six words: leaf variant 0-6, hit object, trunk,
+ * leaves, leaves, drop script; a first word of 7 ends it)
+ * and registers a hammer case on each hit object that runs tree_evt.
+ */
 EVT_BEGIN(evt_sub_tree_access_entry)
     SET_INT_READ_ADDR(LW(0))
     LOOP(0)
@@ -343,6 +364,11 @@ static s32 kusa_data[] = {
 #endif
 
 #if VERSION >= VERSION_US
+/**
+ * Shakes a bush Mario checks: plays the grass sound at Mario, spawns the optional drop script in LW(3),
+ * and sways map object LW(2) sideways through kusa_data for 12 frames.
+ * Run per bush by evt_sub_kusa_access_entry.
+ */
 EVT_BEGIN(kusa_evt)
     SET_TYPE(0)
     CALL(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
@@ -361,6 +387,7 @@ EVT_BEGIN(kusa_evt)
     RETURN
 EVT_END()
 #elif VERSION <= VERSION_DEMO_US
+/** Demo version of kusa_evt: same bush shake, without the SET_TYPE(0) at the start. */
 EVT_BEGIN(kusa_evt)
     CALL(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
     CALL(evt_snd_sfxon_3d, STRING("SFX_GRASS_SHAKE1"), LW(10), LW(11), LW(12), 0)
@@ -378,6 +405,7 @@ EVT_BEGIN(kusa_evt)
     RETURN
 EVT_END()
 #else
+/** JP version of kusa_evt: identical to the US and PAL script. */
 EVT_BEGIN(kusa_evt)
     SET_TYPE(0)
     CALL(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
@@ -397,6 +425,11 @@ EVT_BEGIN(kusa_evt)
 EVT_END()
 #endif
 
+/**
+ * Map setup helper: walks the bush table at LW(0) (rows of four words: kind, hit object, map object,
+ * drop script; a first word of 4 ends it) and registers an A-button case in front of each one that runs
+ * kusa_evt.
+ */
 EVT_BEGIN(evt_sub_kusa_access_entry)
     SET_INT_READ_ADDR(LW(0))
     LOOP(0)
@@ -417,6 +450,15 @@ WinMgrDesc coinget_window_desc[] = {
 #endif
 
 #if VERSION >= VERSION_US
+/**
+ * The Crystal Star pickup cutscene.
+ * LW(0) is the star (1 Diamond ... 7 Crystal, -1 the chapter 4 scene where the star is shown with Doopliss as
+ * Mario, NPC "nise Mario"), LW(1) the item entry, LW(2) the pickup flag.
+ * Adds the star to the pouch, spins it up around Mario with the fanfare, prints the chapter's lines,
+ * runs the stage-clear curtain and save prompt, then changes map:
+ * Peach's interlude at aji_10 after chapters 1-3, usu_00, muj_12 and so on after the others.
+ * US and PAL time the spin in milliseconds and scale its steps by the frame rate.
+ */
 EVT_BEGIN(evt_sub_starstone)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -757,6 +799,11 @@ EVT_BEGIN(evt_sub_starstone)
     RETURN
 EVT_END()
 #elif VERSION <= VERSION_DEMO_US
+/**
+ * Demo version of evt_sub_starstone: same cutscene,
+ * with a frame-counted spin (evt_sub_intpl_init over 170 frames) and the plain evt_memcard_save prompt;
+ * it also leaves the ambient sound and, in the Doopliss case, the music running.
+ */
 EVT_BEGIN(evt_sub_starstone)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -1080,6 +1127,10 @@ EVT_BEGIN(evt_sub_starstone)
     RETURN
 EVT_END()
 #else
+/**
+ * JP version of evt_sub_starstone: the US cutscene with a frame-counted spin (170 frames)
+ * and the plain evt_memcard_save prompt.
+ */
 EVT_BEGIN(evt_sub_starstone)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -1408,6 +1459,10 @@ EVT_BEGIN(evt_sub_starstone)
 EVT_END()
 #endif
 
+/**
+ * Rumbles controller 0 in ten bursts of ten 50 ms pulses with two seconds between,
+ * the buzz of an incoming email. Spawned by mail_evt while the mail message is up.
+ */
 EVT_BEGIN(evt_sub_mail_vibration)
     LOOP(10)
         LOOP(10)
@@ -1422,6 +1477,12 @@ EVT_BEGIN(evt_sub_mail_vibration)
     RETURN
 EVT_END()
 
+/**
+ * The incoming-mail scene: freezes Mario (off Yoshi), shows the surprise balloon,
+ * plays the mail jingle with the rumble, prints the "mail arrived" message and, the first times,
+ * the hint about reading mail (GSWF_MAIL_TUTORIAL_SEEN).
+ * Called by every mail_evt_* script after it has put the mail in the pouch.
+ */
 EVT_BEGIN(mail_evt)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -1453,6 +1514,10 @@ EVT_BEGIN(mail_evt)
     RETURN
 EVT_END()
 
+/**
+ * Petalburg (nok_01): once Kroop's talk is done (STORY_STG1_02),
+ * sends Frankly's mail (16, plus 26) when Mario walks past x = 190.
+ */
 EVT_BEGIN(mail_evt_nok_01)
     IF_INT_EQUAL(GSWF(GSWF_MAIL_FRANKLY_SENT), 1)
         RETURN
@@ -1478,6 +1543,11 @@ EVT_BEGIN(mail_evt_nok_01)
     RETURN
 EVT_END()
 
+/**
+ * Rogueport (gor_03): after the Glitzville ticket (STORY_STG2_47) sends Koopley's mail (17)
+ * when Mario crosses x = -100; also delivers any Trouble Center follow-up mail that is due (irai_mail_check).
+ * Loops for as long as the map runs.
+ */
 EVT_BEGIN(mail_evt_gor_03)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     LOOP(0)
@@ -1510,6 +1580,11 @@ EVT_BEGIN(mail_evt_gor_03)
     RETURN
 EVT_END()
 
+/**
+ * Rogueport (gor_02): at STORY_STG3_51 sends Koopie Koo's mail (18)
+ * when Mario enters the strip near x -280..-230; also delivers due Trouble Center follow-up mail.
+ * Loops for as long as the map runs.
+ */
 EVT_BEGIN(mail_evt_gor_02)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     LOOP(0)
@@ -1542,6 +1617,7 @@ EVT_BEGIN(mail_evt_gor_02)
     RETURN
 EVT_END()
 
+/** Rogueport (gor_01): at STORY_STG4_37 sends Petuni's mail (19) when Mario crosses x = 350. */
 EVT_BEGIN(mail_evt_gor_01)
     IF_INT_EQUAL(GSWF(GSWF_MAIL_PETUNI_SENT), 1)
         RETURN
@@ -1566,6 +1642,11 @@ EVT_BEGIN(mail_evt_gor_01)
     RETURN
 EVT_END()
 
+/**
+ * Rogueport (gor_04): at STORY_STG5_66 sends the Boo mail (20) when Mario crosses x = 30,
+ * but only while Mario has control (mail_evt_gor_04_keyoff_check);
+ * also delivers due Trouble Center follow-up mail. Loops for as long as the map runs.
+ */
 EVT_BEGIN(mail_evt_gor_04)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     LOOP(0)
@@ -1602,6 +1683,11 @@ EVT_BEGIN(mail_evt_gor_04)
     RETURN
 EVT_END()
 
+/**
+ * Excess Express (rsh_02_a in US and PAL, rsh_03_a in JP and the demos):
+ * from day 3 (STORY_STG6_45) sends Pa-Patch's mail (21)
+ * when Mario crosses the line at x = -100 (JP and demos: 400).
+ */
 EVT_BEGIN(mail_evt_rsh_03_a)
     IF_INT_EQUAL(GSWF(GSWF_MAIL_PA_PATCH_SENT), 1)
         RETURN
@@ -1630,6 +1716,10 @@ EVT_BEGIN(mail_evt_rsh_03_a)
     RETURN
 EVT_END()
 
+/**
+ * Riverside Station (hom_00): once the drawbridge is down (STORY_STG6_42) sends King K's mail (22)
+ * when Mario crosses x = -600.
+ */
 EVT_BEGIN(mail_evt_hom_00)
     IF_INT_EQUAL(GSWF(GSWF_MAIL_KING_K_SENT), 1)
         RETURN
@@ -1654,6 +1744,10 @@ EVT_BEGIN(mail_evt_hom_00)
     RETURN
 EVT_END()
 
+/**
+ * Rogueport (gor_02): at STORY_STG6_71 sends Zip Toad's mail (23) when Mario enters the map's area.
+ * PAL also waits until Mario is out of motion 25.
+ */
 EVT_BEGIN(mail_evt_gor_02_2)
     IF_INT_EQUAL(GSWF(GSWF_MAIL_ZIP_TOAD_SENT), 1)
         RETURN
@@ -1685,6 +1779,10 @@ EVT_BEGIN(mail_evt_gor_02_2)
     RETURN
 EVT_END()
 
+/**
+ * Fahr Outpost (bom_01): at STORY_STG7_02 after the cannon is approved sends Rawk Hawk's mail (24)
+ * when Mario crosses x = -230.
+ */
 EVT_BEGIN(mail_evt_bom_01)
     IF_INT_EQUAL(GSWF(GSWF_MAIL_RAWK_HAWK_SENT), 1)
         RETURN
@@ -1711,6 +1809,10 @@ EVT_BEGIN(mail_evt_bom_01)
     RETURN
 EVT_END()
 
+/**
+ * Rogueport Underground (tik_00): at STORY_STG7_50_A sends the mails from the ghost T. (25 and 33)
+ * when Mario crosses x = 470 or x = -500.
+ */
 EVT_BEGIN(mail_evt_tik_00)
     IF_INT_EQUAL(GSWF(GSWF_MAIL_GHOST_T_SENT), 1)
         RETURN
@@ -1740,6 +1842,10 @@ EVT_BEGIN(mail_evt_tik_00)
     RETURN
 EVT_END()
 
+/**
+ * Boggly Woods (win_01): after Flurrie joins (STORY_STG2_09) sends mail 27,
+ * issue 1 of the RDM series (GSWF_MAIL_RDM_ISSUE1_SENT), when Mario crosses x = 390.
+ */
 EVT_BEGIN(mail_evt_win_01)
     IF_INT_EQUAL(GSWF(GSWF_MAIL_RDM_ISSUE1_SENT), 1)
         RETURN
@@ -1764,6 +1870,11 @@ EVT_BEGIN(mail_evt_win_01)
     RETURN
 EVT_END()
 
+/**
+ * Glitzville (tou_01): at STORY_STG3_12 sends mail 28 (RDM issue 2) when Mario crosses x = -50
+ * and starts the double-points sale (GSWF_MRI07_DOUBLE_POINTS_SALE),
+ * stamping its start time with evt_sub_save_playtime.
+ */
 EVT_BEGIN(mail_evt_tou_01)
     IF_INT_EQUAL(GSWF(GSWF_MAIL_RDM_ISSUE2_SENT), 1)
         RETURN
@@ -1790,6 +1901,10 @@ EVT_BEGIN(mail_evt_tou_01)
     RETURN
 EVT_END()
 
+/**
+ * Twilight Town (usu_01): at STORY_STG4_04_01 sends mail 29 (RDM issue 3)
+ * when Mario crosses x = 110 (the demos: 300).
+ */
 EVT_BEGIN(mail_evt_usu_01)
     IF_INT_EQUAL(GSWF(GSWF_MAIL_RDM_ISSUE3_SENT), 1)
         RETURN
@@ -1818,6 +1933,11 @@ EVT_BEGIN(mail_evt_usu_01)
     RETURN
 EVT_END()
 
+/**
+ * Rogueport (gor_01): at STORY_STG5_59_01_A sends mail 30 (RDM issue 4) when Mario crosses z = 200
+ * and starts the usu_01 double-points sale; also delivers due Trouble Center follow-up mail.
+ * Loops for as long as the map runs.
+ */
 EVT_BEGIN(mail_evt_gor_01_2)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     LOOP(0)
@@ -1852,6 +1972,7 @@ EVT_BEGIN(mail_evt_gor_01_2)
     RETURN
 EVT_END()
 
+/** Excess Express (rsh_03_a): on day 2 (STORY_STG6_21) sends mail 31 (RDM issue 5) when Mario crosses x = 400. */
 EVT_BEGIN(mail_evt_rsh_03_a_2)
     IF_INT_EQUAL(GSWF(GSWF_MAIL_RDM_ISSUE5_SENT), 1)
         RETURN
@@ -1876,6 +1997,10 @@ EVT_BEGIN(mail_evt_rsh_03_a_2)
     RETURN
 EVT_END()
 
+/**
+ * Poshley Heights (pik_00): at STORY_STG7_02 after the cannon is approved sends mail 32 (RDM issue 6)
+ * when Mario crosses x = -60 and starts the rsh_03 double-points sale.
+ */
 EVT_BEGIN(mail_evt_pik_00)
     IF_INT_EQUAL(GSWF(GSWF_MAIL_RDM_ISSUE6_SENT), 1)
         RETURN
@@ -1994,6 +2119,11 @@ __declspec(section ".data") s32 evt_sub_mail_event_end[] = {
 #endif
 #pragma force_active reset
 
+/**
+ * Starts a frame-counted interpolation in the calling script:
+ * args are the easing mode, start and end values and the step count, kept in LW(11)..LW(15).
+ * Read it back with evt_sub_intpl_get_value.
+ */
 USER_FUNC(evt_sub_intpl_init) {
     EvtWord* args = event->args;
     s32 mode = evtGetValue(event, args[0]);
@@ -2008,6 +2138,10 @@ USER_FUNC(evt_sub_intpl_init) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Advances the interpolation set by evt_sub_intpl_init one step:
+ * LW(0) gets the current value, LW(1) is 1 while steps remain and 0 on the last one.
+ */
 USER_FUNC(evt_sub_intpl_get_value) {
     event->lwData[0] = intplGetValue(event->lwData[11], event->lwData[12], event->lwData[13], event->lwData[14], event->lwData[15]);
     if (event->lwData[14] >= event->lwData[15]) {
@@ -2019,6 +2153,7 @@ USER_FUNC(evt_sub_intpl_get_value) {
     return EVT_RETURN_DONE;
 }
 
+/** Like evt_sub_intpl_get_value, but writes the value as a float to args[0] and the still-running flag to args[1]. */
 USER_FUNC(evt_sub_intpl_get_value_para) {
     EvtWord* args = event->args;
     evtSetFloat(event, args[0], intplGetValue(event->lwData[11], event->lwData[12], event->lwData[13], event->lwData[14], event->lwData[15]));
@@ -2031,6 +2166,7 @@ USER_FUNC(evt_sub_intpl_get_value_para) {
     return EVT_RETURN_DONE;
 }
 
+/** Float version of evt_sub_intpl_init: args are the easing mode, float start and end, and the step count. */
 USER_FUNC(evt_sub_intpl_init_float) {
     EvtWord* args = event->args;
     s32 mode = evtGetValue(event, args[0]);
@@ -2045,6 +2181,10 @@ USER_FUNC(evt_sub_intpl_init_float) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Advances the float interpolation from evt_sub_intpl_init_float:
+ * float value to args[0], still-running flag to args[1]; either may be null.
+ */
 USER_FUNC(evt_sub_intpl_get_float) {
     EvtWord* args = event->args;
     s32 out = args[0];
@@ -2066,6 +2206,10 @@ USER_FUNC(evt_sub_intpl_get_float) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Starts a time-based interpolation: easing mode, start, end and duration in milliseconds,
+ * timed from the script's own clock. Retail uses this so animations run at the same speed at 50 Hz.
+ */
 USER_FUNC(evt_sub_intpl_msec_init) {
     EvtWord* args = event->args;
     s32 mode = evtGetValue(event, args[0]);
@@ -2080,6 +2224,10 @@ USER_FUNC(evt_sub_intpl_msec_init) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Reads the time-based interpolation: LW(0) gets the value for the elapsed milliseconds,
+ * LW(1) is 1 until the duration has passed, then the end value and 0.
+ */
 USER_FUNC(evt_sub_intpl_msec_get_value) {
     s32 ms = (u64)(s32)((s32)event->lifetime - (s32)event->savedTime) / (OS_TIMER_CLOCK / 1000);
     if (ms < event->lwData[15]) {
@@ -2092,6 +2240,7 @@ USER_FUNC(evt_sub_intpl_msec_get_value) {
     return EVT_RETURN_DONE;
 }
 
+/** Like evt_sub_intpl_msec_get_value, but writes the value as a float to args[0] and the running flag to args[1]. */
 USER_FUNC(evt_sub_intpl_msec_get_value_para) {
     EvtWord* args = event->args;
     s32 ms = (u64)(s32)((s32)event->lifetime - (s32)event->savedTime) / (OS_TIMER_CLOCK / 1000);
@@ -2105,6 +2254,11 @@ USER_FUNC(evt_sub_intpl_msec_get_value_para) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Builds a spline through the args[3] points at args[2] and starts walking it:
+ * args[0] picks millisecond timing (1, duration args[5]) or step timing (0, args[4] steps), args[1] the easing.
+ * The work lives in map memory, pointed to by LW(15).
+ */
 USER_FUNC(evt_sub_spline_init) {
     EvtWord* args = event->args;
     s32 manual = evtGetValue(event, args[0]);
@@ -2129,6 +2283,10 @@ USER_FUNC(evt_sub_spline_init) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Samples the next point of the spline from evt_sub_spline_init into args[0..2] (x, y, z) and sets args[3] to 1
+ * while the path continues; on the last point it frees the spline work and sets 0.
+ */
 USER_FUNC(evt_sub_spline_get_value) {
     EvtWord* args = event->args;
     SplineWork* w = (SplineWork*)event->lwData[15];
@@ -2162,6 +2320,11 @@ USER_FUNC(evt_sub_spline_get_value) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Samples the spline at a script-chosen position:
+ * args[0] is the step (or millisecond) count along it, the point goes to args[1..3].
+ * Does not advance or free the spline.
+ */
 USER_FUNC(evt_sub_spline_get_value_manual) {
     EvtWord* args = event->args;
     SplineWork* w = (SplineWork*)event->lwData[15];
@@ -2176,6 +2339,7 @@ USER_FUNC(evt_sub_spline_get_value_manual) {
     return EVT_RETURN_DONE;
 }
 
+/** Frees the spline work from evt_sub_spline_init, for scripts that stop before the end of the path. */
 USER_FUNC(evt_sub_spline_free) {
     SplineWork* w = (SplineWork*)event->lwData[15];
     _mapFree(w->ts);
@@ -2184,6 +2348,7 @@ USER_FUNC(evt_sub_spline_free) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns the sine and cosine of the angle in args[0] (degrees) to args[1] and args[2]. */
 USER_FUNC(evt_sub_get_sincos) {
     EvtWord* args = event->args;
     f32 rad = (3.141592f * evtGetFloat(event, args[0])) / 180.0f;
@@ -2194,6 +2359,7 @@ USER_FUNC(evt_sub_get_sincos) {
     return EVT_RETURN_DONE;
 }
 
+/** Controller rumble: args[0] 0 starts it, 1 stops it, 2 stops it hard; args[1] is the controller channel. */
 USER_FUNC(evt_sub_rumble_onoff) {
     EvtWord* args = event->args;
     s32 mode = evtGetValue(event, args[0]);
@@ -2212,6 +2378,7 @@ USER_FUNC(evt_sub_rumble_onoff) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns a random integer from 0 to args[0] inclusive in args[1]. */
 USER_FUNC(evt_sub_random) {
     EvtWord* args = event->args;
     s32 n = evtGetValue(event, args[0]);
@@ -2219,6 +2386,10 @@ USER_FUNC(evt_sub_random) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Returns in args[1] the milliseconds held in the timer that args[0]'s pointer id points to,
+ * capped at ten minutes. Guess: the timer kept by evt_sub_stopwatch.
+ */
 USER_FUNC(evt_sub_get_stopwatch) {
     EvtWord* args = event->args;
     s64* sw = (s64*)evtGetPtrID(evtGetValue(event, args[0]));
@@ -2230,6 +2401,10 @@ USER_FUNC(evt_sub_get_stopwatch) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Tests whether the point (args[4], args[5]) lies inside a shape at (args[1], args[2]) of size args[3]:
+ * mode args[0] 0 is a circle of that radius, 1 a square of that half-width. Result 1 or 0 in args[6].
+ */
 USER_FUNC(evt_sub_area_check) {
     EvtWord* args = event->args;
     s32 mode = evtGetValue(event, args[0]);
@@ -2272,6 +2447,7 @@ USER_FUNC(evt_sub_area_check) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns the distance between (args[0], args[1]) and (args[2], args[3]) as a float in args[4]. */
 USER_FUNC(evt_sub_get_dist) {
     EvtWord* args = event->args;
     f32 x1 = evtGetValue(event, args[0]);
@@ -2282,6 +2458,7 @@ USER_FUNC(evt_sub_get_dist) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns the direction in degrees from (args[0], args[1]) to (args[2], args[3]) as a float in args[4]. */
 USER_FUNC(evt_sub_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetValue(event, args[0]);
@@ -2292,11 +2469,13 @@ USER_FUNC(evt_sub_get_dir) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns the global system flags (gp->flags, e.g. GLOBAL_FLAG_KIOSK) in args[0]. */
 USER_FUNC(evt_sub_get_system_flag) {
     evtSetValue(event, event->args[0], gp->flags);
     return EVT_RETURN_DONE;
 }
 
+/** Sets (args[0] nonzero) or clears the system flag bits given literally in args[1]. */
 USER_FUNC(evt_sub_system_flag_onoff) {
     EvtWord* args = event->args;
     s32 onoff = evtGetValue(event, args[0]);
@@ -2315,26 +2494,31 @@ KEYFN(evt_key_get_button, keyGetButton)
 
 KEYFN(evt_key_get_buttontrg, keyGetButtonTrg)
 
+/** Returns the current map name (e.g. "gor_01") in args[0]. */
 USER_FUNC(evt_sub_get_mapname) {
     evtSetValue(event, event->args[0], (EvtWord)gp->currentMapName);
     return EVT_RETURN_DONE;
 }
 
+/** Returns the current area name (e.g. "gor") in args[0]. */
 USER_FUNC(evt_sub_get_areaname) {
     evtSetValue(event, event->args[0], (EvtWord)gp->currentAreaName);
     return EVT_RETURN_DONE;
 }
 
+/** Forces the HP/FP status bar at the top of the screen open. */
 USER_FUNC(evt_sub_status_gauge_force_open) {
     statusWinForceOpen();
     return EVT_RETURN_DONE;
 }
 
+/** Forces the HP/FP status bar closed again. */
 USER_FUNC(evt_sub_status_gauge_force_close) {
     statusWinForceClose();
     return EVT_RETURN_DONE;
 }
 
+/** Returns 1 in args[0] while the status bar is still animating a change to its numbers, 0 once it has settled. */
 USER_FUNC(evt_sub_status_gauge_check_update) {
     EvtWord* args = event->args;
     if (statusWinCheckUpdate()) {
@@ -2346,12 +2530,17 @@ USER_FUNC(evt_sub_status_gauge_check_update) {
 }
 
 #if VERSION >= VERSION_US
+/** Makes the status bar refresh its numbers at once. Not in JP or the demos. */
 USER_FUNC(N_evt_sub_status_gauge_force_update) {
     statusWinForceUpdate();
     return EVT_RETURN_DONE;
 }
 #endif
 
+/**
+ * Stamps the current play-time clock (8 bytes) into the saved GSW bytes at args[0],
+ * so a later evt_sub_load_progresstime can measure how long ago it was. Used to time the double-points sales.
+ */
 USER_FUNC(evt_sub_save_playtime) {
     s32 base = event->args[0];
     u8 buf[8];
@@ -2367,6 +2556,10 @@ USER_FUNC(evt_sub_save_playtime) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Reads the time stamp saved by evt_sub_save_playtime at args[0] and returns the milliseconds since
+ * then in args[1], capped at 24 hours.
+ */
 USER_FUNC(evt_sub_load_progresstime) {
     EvtWord* args = event->args;
     s32 base = args[0];
@@ -2388,11 +2581,13 @@ USER_FUNC(evt_sub_load_progresstime) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns the text language setting (gp->language) in args[0]; message code uses 0 as the default language. */
 USER_FUNC(evt_sub_get_language) {
     evtSetValue(event, event->args[0], gp->language);
     return EVT_RETURN_DONE;
 }
 
+/** Loads the animation group named in args[0] (as a battle group when in a battle), blocking until it is resident. */
 USER_FUNC(evt_sub_animgroup_async) {
     const char* group = (const char*)evtGetValue(event, event->args[0]);
     s32 r = animGroupBaseAsync(group, gp->inBattle != 0, NULL);
@@ -2406,12 +2601,14 @@ USER_FUNC(evt_sub_animgroup_async) {
 }
 
 #if VERSION == VERSION_EU
+/** Returns the display frame rate (50 or 60) in args[0]. PAL only. */
 USER_FUNC(evt_sub_get_framerate) {
     evtSetValue(event, event->args[0], gp->framerate);
     return EVT_RETURN_DONE;
 }
 
 #endif
+/** Starts the on-screen countdown timer: args[0] is the time limit, args[1] the restart time. */
 USER_FUNC(evt_sub_countdown_start) {
     EvtWord* args = event->args;
     s32 limit = evtGetValue(event, args[0]);
@@ -2420,17 +2617,20 @@ USER_FUNC(evt_sub_countdown_start) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns the countdown timer's state in args[0]. */
 USER_FUNC(evt_sub_countdown_get_status) {
     EvtWord* args = event->args;
     evtSetValue(event, args[0], countDownGetStatus());
     return EVT_RETURN_DONE;
 }
 
+/** Ends and removes the countdown timer. */
 USER_FUNC(evt_sub_countdown_end) {
     countDownEnd();
     return EVT_RETURN_DONE;
 }
 
+/** Sets (args[0] nonzero) or clears the countdown flags given in args[1]. */
 USER_FUNC(evt_sub_countdown_flag_onoff) {
     EvtWord* args = event->args;
     s32 onoff = evtGetValue(event, args[0]);
@@ -2443,11 +2643,17 @@ USER_FUNC(evt_sub_countdown_flag_onoff) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets the time the countdown restarts from to args[0]. */
 USER_FUNC(evt_sub_countdown_set_restart_time) {
     countDownSetRestartTime(evtGetValue(event, event->args[0]));
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Draws the "You got N coins!" message inside the coin window of evt_sub_get_coin;
+ * work[0] is the coin count, work[1] turns the text on.
+ * US and PAL widen the window to fit the message and formats it per language.
+ */
 static void coingetDisp(WinMgrEntry* entry) {
     s32* work = entry->param;
     char buf[0x400];
@@ -2477,6 +2683,7 @@ static void coingetDisp(WinMgrEntry* entry) {
     }
 }
 
+/** Polynomial sine for evt_sub_get_coin's coin placement, valid on 0..2 pi. */
 static inline f32 coin_sin(f32 x) {
     f32 a = 0.00761f;
     f32 b = 0.16605f;
@@ -2513,6 +2720,7 @@ static inline f32 coin_sin(f32 x) {
     }
     return a;
 }
+/** Polynomial cosine for evt_sub_get_coin's coin placement, valid on 0..2 pi. */
 static inline f32 coin_cos(f32 x) {
     f32 a = 0.03705f;
     f32 b = 0.4967f;
@@ -2548,6 +2756,11 @@ static inline f32 coin_cos(f32 x) {
 // FAKE: turns off copy propagation so the temporaries and registers match the target; removing it changes the code
 #pragma opt_propagation off
 #pragma opt_lifetimes off
+/**
+ * The "got coins" scene: shows a coin icon in front of Mario with the item-get pose and jingle
+ * and the coin window, waits for A, then adds args[0] coins to the pouch and restores the music.
+ * Used for coin rewards from requests (the "iraiCoin" icon), e.g. evt_kinopio.c.
+ */
 USER_FUNC(evt_sub_get_coin) {
     s32 coin = evtGetValue(event, event->args[0]);
     MarioWork* mario = marioGetPtr();
@@ -2649,6 +2862,7 @@ USER_FUNC(evt_sub_get_coin) {
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
+/** Turns the star stone item args[0] to the yaw args[1] (degrees) while it spins up in evt_sub_starstone. */
 static USER_FUNC(stone_ry) {
     EvtWord* args = event->args;
     char* name = (char*)evtGetValue(event, args[0]);
@@ -2659,6 +2873,10 @@ static USER_FUNC(stone_ry) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Puts the star stone, its glow and Mario (or the Doopliss Mario NPC before STORY_STG4_15) on camera 5,
+ * so they draw in front of the stage-clear background in evt_sub_starstone.
+ */
 static USER_FUNC(stone_bg) {
     char* name;
     CameraEntry* cam;
@@ -2679,31 +2897,40 @@ static USER_FUNC(stone_bg) {
     return EVT_RETURN_DONE;
 }
 
+/** Starts the opening of the "sub_bg" item-get background effect in evt_sub_starstone. */
 static USER_FUNC(stone_bg_open) {
     EffectEntry* e = effNameToPtr("sub_bg");
     ((ItemGetWork*)e->userdata)->state = 1;
     return EVT_RETURN_DONE;
 }
 
+/** Blocks until the "sub_clear" stage-clear effect has finished. */
 static USER_FUNC(stageclear_wait) {
     return effStageClearEndChk(effNameToPtr("sub_clear")) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
+/** Sets the module-level stop flag to args[0]; evt_sub_starstone raises it 9.7 seconds into the fanfare. */
 static USER_FUNC(set_stop) {
     stop = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
+/** Returns the stop flag set by set_stop in args[0]. */
 static USER_FUNC(get_stop) {
     evtSetValue(event, event->args[0], stop);
     return EVT_RETURN_DONE;
 }
 
+/** Blocks until the music started on channel 1 has begun playing. */
 static USER_FUNC(bgm_start_wait) {
     return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
 #if VERSION >= VERSION_US
+/**
+ * Scales the two float variables args[0] and args[1] by 60 / frame rate,
+ * so per-frame steps cover the same distance at 50 Hz. Not in JP or the demos.
+ */
 USER_FUNC(evt_sub_scale_by_fps) {
     EvtWord* args = event->args;
     s32 a0 = args[0];
@@ -2718,6 +2945,11 @@ USER_FUNC(evt_sub_scale_by_fps) {
 }
 #endif
 
+/**
+ * Tests whether the segment from (args[0], args[1]) to (args[2], args[3]) crosses the segment from (args[4],
+ * args[5]) to (args[6], args[7]); 1 or 0 in args[8].
+ * The mail scripts use it to detect Mario walking across a line.
+ */
 USER_FUNC(evt_sub_check_intersect) {
     EvtWord* args = event->args;
     f32 a, b, c, d, e, f, g, h;
@@ -2781,6 +3013,12 @@ USER_FUNC(evt_sub_check_intersect) {
             }                                                      \
         }                                                          \
     }
+/**
+ * Guess: Trouble Center follow-up mail ("irai" is request).
+ * For six requests that are taken but whose mail has not been sent,
+ * checks whether two hours have passed since the time stamp saved for them; args[1] returns 1 if one is due.
+ * With args[0] nonzero it also marks it sent and puts the mail in the pouch.
+ */
 static USER_FUNC(irai_mail_check) {
     EvtWord* args = event->args;
     s32 arg = evtGetValue(event, args[0]);
@@ -2800,6 +3038,10 @@ static USER_FUNC(irai_mail_check) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Returns in args[0] how many of Mario's control and key locks are on;
+ * mail_evt_gor_04 holds the mail while it is nonzero.
+ */
 static USER_FUNC(mail_evt_gor_04_keyoff_check) {
     EvtWord* args = event->args;
     s32 a = marioCtrlOffChk();

@@ -52,6 +52,7 @@ static NpcSetupInfo npcEnt[3];
 static HitDamageReturn hitDmgRetPoints[3];
 extern EvtWord christine_hei_01[];
 
+/** Exit event for the map's exits: just returns 0 in LW(0) so the exit proceeds. */
 EVT_BEGIN(bero_out_event)
     SET_VALUE(LW(0), 0)
     RETURN
@@ -125,6 +126,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Reward script for bush a_kusa_2: if not yet taken,
+ * a Coin pops out of the bush when Mario hits it (GSWF_HEI01_BUSH_COIN_A_TAKEN).
+ */
 static EVT_BEGIN(evt_kusa_2)
     CALL(evt_item_delete_check, STRING("item_kusa_2"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -133,6 +138,10 @@ static EVT_BEGIN(evt_kusa_2)
     RETURN
 EVT_END()
 
+/**
+ * Reward script for bush a_kusa_4: if not yet taken,
+ * a Mystery pops out of the bush when Mario hits it (GSWF_HEI01_BUSH_MYSTERY_TAKEN).
+ */
 static EVT_BEGIN(evt_kusa_4)
     CALL(evt_item_delete_check, STRING("item_kusa_4"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -141,6 +150,10 @@ static EVT_BEGIN(evt_kusa_4)
     RETURN
 EVT_END()
 
+/**
+ * Reward script for bush a_kusa_7: if not yet taken,
+ * a Coin pops out of the bush when Mario hits it (GSWF_HEI01_BUSH_COIN_B_TAKEN).
+ */
 static EVT_BEGIN(evt_kusa_7)
     CALL(evt_item_delete_check, STRING("item_kusa_7"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -159,6 +172,10 @@ static KusaAccess kusa_data[] = {
     {4, NULL, NULL, NULL},
 };
 
+/**
+ * Case script for the grass patch a_kusa_1: Mario hits it, the grass shakes and a pipe rises out of it;
+ * sets GSWF_HEI01_BUSH_PIPE_REVEALED and enables the "dokan" exit.
+ */
 EVT_BEGIN(kusa_dokan)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mapobj_get_position, STRING("anm_kusa_1"), LW(5), LW(6), LW(7))
@@ -207,6 +224,11 @@ static const char* name_tbl[] = {
     "hasi_25",
 };
 
+/**
+ * Plays the flipping bridge: the camera pans to the gap,
+ * a captured image of the bridge pieces is flipped plate by plate through the offscreen texture
+ * until the bridge is across the gap.
+ */
 EVT_BEGIN(bridge_evt_02)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, -15, 150, 500, -15, 45, 85, 500, 11)
@@ -265,6 +287,10 @@ EVT_BEGIN(bridge_evt_02)
     RETURN
 EVT_END()
 
+/**
+ * Blue switch (bg_switch) script: after the switch is pressed, flips the bridge across (bridge_evt_02),
+ * enables its collision and sets the story to "The Flip Bridge".
+ */
 EVT_BEGIN(bridge_evt)
     CALL(evt_npc_change_fbat_mode, 7)
     CALL(evt_npc_stop_for_event)
@@ -280,6 +306,10 @@ EVT_BEGIN(bridge_evt)
     RETURN
 EVT_END()
 
+/**
+ * Koops joins: Koops speaks his line, the camera frames him,
+ * Mario and Koops are introduced through the partner lecture and the story progress becomes "Koops Joins".
+ */
 EVT_BEGIN(nokotaro_get)
     CALL(evt_npc_flag_onoff, 0, STRING("ノコタロウ"), NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_set_anim, STRING("ノコタロウ"), STRING("PNK_Y_2"))
@@ -307,6 +337,10 @@ EVT_BEGIN(nokotaro_get)
     RETURN
 EVT_END()
 
+/**
+ * Koops asks Mario to join: a yes/no question; yes calls nokotaro_get,
+ * no leads to a second yes/no prompt and then to the same join.
+ */
 EVT_BEGIN(nokotaro_kanyu)
     CALL(evt_msg_select, 0, STRING("stg1_hei_12_yesno1"))
     CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
@@ -325,6 +359,11 @@ EVT_BEGIN(nokotaro_kanyu)
     RETURN
 EVT_END()
 
+/**
+ * Map-init script for Koops (Nokotaro): once both the Sun and Moon Stones have been taken,
+ * the Fuzzy-gold story step is on, and Koops has not asked yet, he waits at the right edge,
+ * walks up to Mario when he comes close and asks to join.
+ */
 EVT_BEGIN(nokotaro_nakama)
     IF_INT_EQUAL(GSWF(GSWF_HEI_SUN_STONE_TAKEN), 0)
         RETURN
@@ -406,15 +445,21 @@ EVT_BEGIN(nokotaro_nakama)
     RETURN
 EVT_END()
 
+/** Init event of Koops (ノコタロウ): turns on his move and talk animations. */
 static EVT_BEGIN(nokotarou_init)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     RETURN
 EVT_END()
 
+/** Empty regular-event script for Koops; the NPC does nothing between conversations. */
 EVT_BEGIN(nokotarou_reg)
     RETURN
 EVT_END()
 
+/**
+ * Talk script for Koops while he waits here: runs the join prompts (nokotaro_kanyu) with Mario frozen,
+ * then lets him go if he already joined.
+ */
 EVT_BEGIN(nokotarou_talk_2)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -431,11 +476,16 @@ EVT_BEGIN(nokotarou_talk_2)
     RETURN
 EVT_END()
 
+/** Talk event of Koops: runs nokotarou_talk_2 as a separate event and returns. */
 static EVT_BEGIN(nokotarou_talk)
     SPAWN_EVENT(nokotarou_talk_2)
     RETURN
 EVT_END()
 
+/**
+ * Spin script for Nokorin (the rolling shell enemy NPC):
+ * plays its rolling sound, stops the walk animation and rotates it 30 degrees per frame.
+ */
 EVT_BEGIN(nokorin_pose)
     CALL(evt_npc_get_position, STRING("ノコリン"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG1_NOKORIN_MOVE1"), LW(0), LW(1), LW(2), LW(3))
@@ -458,6 +508,12 @@ EVT_BEGIN(nokorin_pose)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Koops' father (Koopie Koo) scene after Koops joins:
+ * a rolling shell (Nokorin) crashes into Mario and his partner, knocks them down,
+ * and the story turns on a farewell conversation (stg1_hei_12_01..);
+ * skipped once GSWF_HEI01_KOOPIE_KOO_FAREWELL is set.
+ */
 EVT_BEGIN(evt_nokorin)
     IF_INT_EQUAL(GSWF(GSWF_HEI01_KOOPIE_KOO_FAREWELL), 1)
         RETURN
@@ -741,6 +797,12 @@ static HitDamageReturn hitDmgRetPoints[] = {
     {0},
 };
 
+/**
+ * Cutscene spawned by the map init at STORY_STG1_20_KOOPS_LEAVES:
+ * once Mario walks west of x = 200 the mail jingle plays and the screen vibrates,
+ * the partner comes to him and comments (stg1_gon_44);
+ * after he presses A the mail is read (stg1_gon_44_01 to 47) and control returns.
+ */
 static EVT_BEGIN(peach_mail)
     LABEL(0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -832,6 +894,10 @@ static EVT_BEGIN(peach_mail)
     RETURN
 EVT_END()
 
+/**
+ * Opening talk when Mario first enters the field from Petalburg:
+ * Goombella gives her tip (stg1_hei_02_02), and GSWF_HEI01_GOOMBELLA_TIP_GIVEN stops it repeating.
+ */
 EVT_BEGIN(christine_hei_01)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION >= VERSION_JP
@@ -857,6 +923,11 @@ EVT_BEGIN(christine_hei_01)
     RETURN
 EVT_END()
 
+/**
+ * Petal Meadows hei_01 map init: registers the exits, the Fire Flower block, the Star Piece,
+ * bushes and the pipe in the grass, starts the flip bridge switch until the bridge story step, spawns Koops,
+ * Nokorin and Goombella's tip scenes and the Peach mail scene, and starts the field music.
+ */
 EVT_BEGIN(hei_01_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
@@ -905,6 +976,10 @@ EVT_BEGIN(hei_01_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: turns Mario's partner to face the direction given by args[0] (270 or 90 degrees depending on
+ * whether it is past 180).
+ */
 static USER_FUNC(set_dir) {
     s32 dir = evtGetValue(event, event->args[0]);
     PartyEntry* party = partyGetPtr(0);

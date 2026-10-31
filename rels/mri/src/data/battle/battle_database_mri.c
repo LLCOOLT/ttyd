@@ -1195,6 +1195,10 @@ NpcTerritoryInfo btl_mri_setup_no_tbl[] = {
     {0},
 };
 
+/**
+ * Stage init script for the battle stage stg_02_1 (the Great Tree's Puni village):
+ * turns on the planter model group (S_ueki) so it is visible in the battle backdrop.
+ */
 EVT_BEGIN(stg_02_1_init_evt)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ueki"), MAPOBJ_FLAG_HIDE)
     RETURN

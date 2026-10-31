@@ -6,6 +6,10 @@
 
 #include "__syn.h"
 
+/**
+ * Converts an envelope time parameter (in cents of time, 16.16) into milliseconds, 1000 * 2^(cents / 1200);
+ * mod adds a key-dependent term, and 0x80000000 means zero time.
+ */
 s32 __SYNGetEnvelopeTime(s32 scale, s32 mod, u8 key) {
     if (scale == 0x80000000) {
         return 0;
@@ -18,6 +22,11 @@ s32 __SYNGetEnvelopeTime(s32 scale, s32 mod, u8 key) {
     return (1000.0f* powf(2.0f, ((f32)scale + (mod* __SYNn128[key])) / (65535* 1200)));
 }
 
+/**
+ * Starts the voice's volume envelope (state 0 attack, 1 decay, 2 sustain, 3 release,
+ * 4 finished) from its articulation: converts the attack and decay times into per-frame steps (a frame is 5 ms)
+ * and starts at the sustain level directly when attack and decay are zero.
+ */
 void __SYNSetupVolumeEnvelope(SYNVOICE* voice) {
     ASSERTLINE(46, voice);
 
@@ -56,6 +65,10 @@ void __SYNSetupVolumeEnvelope(SYNVOICE* voice) {
     voice->veRelease = voice->art->eg1Release;
 }
 
+/**
+ * Starts the voice's pitch envelope from its articulation (the pitch offset and attack, decay, sustain,
+ * release rates); does nothing if the envelope has no pitch depth.
+ */
 void __SYNSetupPitchEnvelope(SYNVOICE* voice) {
     ASSERTLINE(110, voice);
 
@@ -94,6 +107,11 @@ void __SYNSetupPitchEnvelope(SYNVOICE* voice) {
     }
 }
 
+/**
+ * Advances the volume envelope by one audio frame:
+ * attack follows a lookup table, decay falls to the sustain level, release fades out to silence.
+ * A decay below the cutoff or a finished release ends the voice (state 4).
+ */
 void __SYNRunVolumeEnvelope(SYNVOICE* voice) {
     ASSERTLINE(178, voice);
 
@@ -131,6 +149,10 @@ void __SYNRunVolumeEnvelope(SYNVOICE* voice) {
     }
 }
 
+/**
+ * Advances the pitch envelope by one audio frame through attack, decay, sustain and release,
+ * updating the pitch offset in cents.
+ */
 void __SYNRunPitchEnvelope(SYNVOICE* voice) {
     ASSERTLINE(243, voice);
 

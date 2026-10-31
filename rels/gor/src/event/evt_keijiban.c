@@ -28,6 +28,14 @@ typedef struct KeijibanData {
 
 KeijibanData _kjdt[1];
 
+/**
+ * Builds the list of notice board entries for a message prefix: reads the messages prefix_0000, prefix_0001, ...
+ * until one lacks the "<!" header or its name is "enddata";
+ * each header's first field names an event number (search_evt_no).
+ * Without fill it finds the highest event number not past the current story progress
+ * and counts the entries for it; with fill (bit 0) it stores those entries (event number and message index) in
+ * the table. Returns the number of entries.
+ */
 s32 keijiban_data_make(const char* prefix, BOOL fill) {
     char name[64];
     char buf[64];
@@ -120,6 +128,10 @@ s32 keijiban_data_make(const char* prefix, BOOL fill) {
     return count;
 }
 
+/**
+ * Script helper that builds the message label of notice board entry args[0] ("prefix_NNNN") into args[1]
+ * and remembers it as the current entry; gives an empty string when the index is out of range.
+ */
 USER_FUNC(keijiban_joho_makelabel) {
     EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
@@ -136,11 +148,13 @@ USER_FUNC(keijiban_joho_makelabel) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper that returns the number of notice board entries in args[0]. */
 USER_FUNC(keijiban_joho_check) {
     evtSetValue(event, event->args[0], KJDT->count);
     return EVT_RETURN_DONE;
 }
 
+/** Script helper that frees the notice board entry table and resets the board data. */
 USER_FUNC(keijiban_data_free) {
     KeijibanData* kj = KJDT;
 
@@ -156,6 +170,10 @@ USER_FUNC(keijiban_data_free) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper that loads a notice board: args[0] is the message prefix;
+ * counts the entries at the current story progress, allocates the table and fills it.
+ */
 USER_FUNC(keijiban_data_alloc) {
     KJDT->prefix = (const char*)evtGetValue(event, event->args[0]);
     KJDT->count = keijiban_data_make(KJDT->prefix, FALSE);

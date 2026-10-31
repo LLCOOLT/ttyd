@@ -114,15 +114,24 @@ const void* __OSStringTable AT_ADDRESS(OS_BASE_CACHED | 0x30D0);
   } while (0)
 
 #pragma dont_inline on
+/** Hook called after a relocatable module is linked, so a debugger can load its symbols. Empty here. */
 void OSNotifyLink(OSModuleInfo* module) {}
 
+/** Hook called after a module is unlinked. Empty here. */
 void OSNotifyUnlink(OSModuleInfo* module) {}
 #pragma dont_inline reset
 
+/** Records the string table that module names are looked up in. */
 void OSSetStringTable(void* stringTable) {
     __OSStringTable = stringTable;
 }
 
+/**
+ * Applies the relocations that module holds against newModule (the main program when newModule is NULL):
+ * patches 32-bit addresses, 24/14-bit branches and 16-bit low/high halves in module's sections,
+ * then flushes the data cache and invalidates the instruction cache over every patched code section.
+ * Returns FALSE if module has no import entry for newModule.
+ */
 static BOOL Relocate(OSModuleHeader* newModule, OSModuleHeader* module) {
     OSModuleID idNew;
     OSImportInfo* imp;
@@ -224,6 +233,12 @@ Found:
     return TRUE;
 }
 
+/**
+ * Links a relocatable module (REL): checks its version and alignment, adds it to the module list,
+ * converts its header offsets to addresses, assigns bss, and relocates it against the main program,
+ * itself and every other loaded module (and them against it).
+ * With fixed set it trims the import table, then zeroes the bss.
+ */
 static BOOL Link(OSModuleInfo* newModule, void* bss, BOOL fixed) {
     u32 i;
     OSSectionInfo* si;
@@ -317,10 +332,20 @@ static BOOL Link(OSModuleInfo* newModule, void* bss, BOOL fixed) {
     return TRUE;
 }
 
+/**
+ * Links a REL module into the running program, using bss as its bss memory;
+ * returns FALSE if the module version or alignment is not supported.
+ * This is how the game loads its code overlays.
+ */
 BOOL OSLink(OSModuleInfo* newModule, void* bss) {
     return Link(newModule, bss, FALSE);
 }
 
+/**
+ * Like OSLink but for version 3 or later modules,
+ * additionally cutting the import table down so the relocation data for other modules can be discarded
+ * afterwards.
+ */
 BOOL OSLinkFixed(OSModuleInfo* newModule, void* bss) {
     ASSERTLINE(400, newModule->version <= OS_MODULE_VERSION && 3 <= newModule->version);
 
@@ -330,6 +355,11 @@ BOOL OSLinkFixed(OSModuleInfo* newModule, void* bss) {
     return Link(newModule, bss, TRUE);
 }
 
+/**
+ * Reverses the relocations that module made against newModule:
+ * zeroes addresses and points calls at the module's unresolved-function stub,
+ * so no other module still refers to code that is being unloaded.
+ */
 static BOOL Undo(OSModuleHeader* newModule, OSModuleHeader* module) {
     OSModuleID idNew;
     OSImportInfo* imp;
@@ -425,6 +455,10 @@ Found:
     return TRUE;
 }
 
+/**
+ * Unlinks a module: removes it from the module list,
+ * undoes the references other modules hold into it and turns its header addresses back into offsets.
+ */
 BOOL OSUnlink(OSModuleInfo* oldModule) {
     OSModuleHeader* moduleHeader;
     OSModuleInfo* moduleInfo;
@@ -486,11 +520,17 @@ BOOL OSUnlink(OSModuleInfo* oldModule) {
     return TRUE;
 }
 
+/** Empties the module list and clears the string table at startup. Called from OSInit. */
 void __OSModuleInit(void) {
     __OSModuleInfoList.head = __OSModuleInfoList.tail = 0;
     __OSStringTable = 0;
 }
 
+/**
+ * Finds the loaded module whose section contains ptr;
+ * returns its info and, through section and offset, the section index and the offset within it,
+ * or NULL if ptr is in none.
+ */
 OSModuleInfo* OSSearchModule(void* ptr, u32* section, u32* offset) {
     OSModuleInfo* moduleInfo;
     OSSectionInfo* sectionInfo;

@@ -46,6 +46,11 @@ EvtWord kpa_act_stg1_item[] = {
     KPA_ITEM(187.5f, 125.0f), KPA_ITEM(325.0f, 162.5f), KPA_ITEM(362.5f, 162.5f), KPA_ITEM_END,
 };
 
+/**
+ * Watches Bowser in the stage: each frame it checks whether he is dead (evt_koopa_chk_dead)
+ * or has fallen below y = -20, then runs the death handler (kpa_dead) if he died,
+ * or the pit fall handler (kpa_fall_sub) if he fell.
+ */
 static EVT_BEGIN(kpa_fall)
     SET_VALUE(LF(0), 0)
     LOOP(0)
@@ -68,6 +73,13 @@ static EVT_BEGIN(kpa_fall)
     RETURN
 EVT_END()
 
+/**
+ * Goal of the first Bowser stage: locks the controls,
+ * sets the story progress to STORY_STG2_25_04_BOWSER_ACTION_STAGE
+ * and changes the map to Petalburg (nok_00, entrance w_bero)
+ * after a 300 ms pause that also removes the letterbox.
+ * In kiosk demo mode it instead ends with the game over sequence.
+ */
 static EVT_BEGIN(kpa_goal)
     CALL(evt_mario_key_onoff, 0)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_04_BOWSER_ACTION_STAGE)
@@ -90,6 +102,11 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Map init for kpa_02, side-scrolling stage 1: starts Bowser at x = -1450,
+ * builds the stage's blocks and coins from kpa_act_stg1_mobj/item, and starts the pit watcher, the HUD,
+ * the intro and the clock. Reaching the goal goes to Petalburg (nok_00).
+ */
 EVT_BEGIN(kpa_02_init_evt)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL_CHILD(kpa_init)

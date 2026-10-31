@@ -34,6 +34,7 @@ typedef struct DamageStarWork {
     MayaAnim* anim; // 0x44
 } DamageStarWork;
 
+/** Polynomial sine approximation (input in radians, 0 to 2 pi) used instead of libm. */
 static inline f32 _sinf(f32 x) {
     f32 a = 0.00761f;
     f32 b = 0.16605f;
@@ -72,6 +73,7 @@ static inline f32 _sinf(f32 x) {
     return a;
 }
 
+/** Polynomial cosine approximation matching _sinf. */
 static inline f32 _cosf(f32 x) {
     f32 a = 0.03705f;
     f32 b = 0.4967f;
@@ -330,6 +332,10 @@ static void effDamageStarDisp(CameraId cameraId, EffectEntry* effect);
 #pragma opt_propagation off
 // lifetimes optimisation off for effDamageStarEntry: the original register allocation and scheduling need it
 #pragma opt_lifetimes off
+/**
+ * Spawns the damage star burst at (x, y, z): a central star plus up to 20 spark stars for the damage `number`.
+ * type 0 is HP damage, 1 is FP damage; angle tilts the burst. Spawned by battle damage code.
+ */
 EffectEntry* effDamageStarEntry(s32 type, s32 number, f32 x, f32 y, f32 z, f32 scale, f32 angle) {
     EffectEntry* effect;
     DamageStarWork* work;
@@ -386,6 +392,10 @@ EffectEntry* effDamageStarEntry(s32 type, s32 number, f32 x, f32 y, f32 z, f32 s
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
+/**
+ * Advances the Maya animation and the star physics for each elapsed retrace (decay factor 0.75 per step)
+ * and deletes the effect when life runs out.
+ */
 static void effDamageStarMain(EffectEntry* effect) {
     DamageStarWork* work = effect->userdata;
     Vec calcPos;
@@ -459,6 +469,7 @@ static void effDamageStarMain(EffectEntry* effect) {
     GXPosition3f32(-(h), -(h), 0.0f); \
     GXTexCoord2f32(0.0f, 1.0f);
 
+/** Draws the star sprites and the damage number as digit quads in front of them. */
 static void effDamageStarDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* cam;
     GXColor color;

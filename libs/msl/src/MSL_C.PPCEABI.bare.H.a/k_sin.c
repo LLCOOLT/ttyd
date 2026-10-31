@@ -9,6 +9,7 @@ S4 = 2.75573137070700676789e-06,
 S5 = -2.50507602534068634195e-08,
 S6 = 1.58969099521155010221e-10;
 
+/** Sine on the reduced range |x| <= pi/4 by polynomial (fdlibm); y is the tail of x. */
 double __kernel_sin(double x, double y, int iy) {
     double z, r, v;
     int ix;

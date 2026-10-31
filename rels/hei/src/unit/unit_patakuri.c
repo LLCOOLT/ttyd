@@ -196,6 +196,10 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Init script of the Paragoomba.
+ * Registers its wait, attack, damage and fall scripts, sets the flying movement sounds and starts waiting.
+ */
 static EVT_BEGIN(init_event_patakuri)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event_patakuri))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_patakuri))
@@ -206,6 +210,10 @@ static EVT_BEGIN(init_event_patakuri)
     RETURN
 EVT_END()
 
+/**
+ * Reaction when a Paragoomba loses its wings: it drops with SFX_ENM_FALL1, lands with a hop,
+ * and its pose table and data switch to those of the walking Goomba.
+ */
 static EVT_BEGIN(dmg_fall_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -234,6 +242,7 @@ static EVT_BEGIN(dmg_fall_event)
     RETURN
 EVT_END()
 
+/** Position the Paragoomba takes for a first-strike reaction. Guess. */
 static EVT_BEGIN(patakuri_dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -242,6 +251,11 @@ static EVT_BEGIN(patakuri_dmg_first_attack_pos)
     RETURN
 EVT_END()
 
+/**
+ * The Paragoomba's dive attack: it flies up, swoops down on the target with SFX_ENM_PATAKURI_MOVE2 and MOVE3,
+ * and the pre-damage check decides between a miss (avoid animation)
+ * and a hit (damage with the action-command result); then it returns to its place.
+ */
 static EVT_BEGIN(attack_event_patakuri)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -343,6 +357,7 @@ static EVT_BEGIN(attack_event_patakuri)
     RETURN
 EVT_END()
 
+/** Wait script of the Paragoomba: shows its flying idle pose from the pose table. */
 static EVT_BEGIN(wait_event_patakuri)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     LABEL(0)
@@ -444,6 +459,10 @@ static BattleWeapon weapon_kuriboo_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init script of the Goomba form of the Paragoomba (after losing its wings).
+ * Registers its wait, attack and damage scripts and the walking sounds.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -456,6 +475,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Paragoomba: runs the default damage handling. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -463,10 +483,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Phase event of the Paragoomba: does nothing. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/** The Goomba-form headbutt attack, the same as the Goomba's. */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -600,11 +622,17 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Wait (idle) event of the Paragoomba: shows the idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Battle script helper: computes the angle (degrees) of the vector from (args[0], args[1]) to (args[2], args[3])
+ * into args[4], used to face the Paragoomba toward its target;
+ * leaves the old value in place when the two points coincide.
+ */
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);

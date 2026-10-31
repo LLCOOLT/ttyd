@@ -15,6 +15,10 @@
 #define CHECK_LISTPTR(line, list)    ASSERTMSGLINE(line, (list) != NULL, "GXSetVtxAttrFmt: list pointer is NULL")
 #define CHECK_MTXIDX(line, attr, type)    ASSERTMSGLINE(line, (attr) > GX_VA_TEX7MTXIDX || (type) <= GX_VA_TEX0MTXIDX, "GXSetVtxDesc: GX_VA_*MTXIDX accepts GX_NONE or GX_DIRECT only")
 
+/**
+ * Counts the colors, normals and texture coordinates in the shadowed vertex descriptor
+ * and writes them to XF register 8 (the vertex spec the transform engine needs to parse vertices).
+ */
 static void __GXXfVtxSpecs(void) {
     u32 nCols = 0;
     u32 nNrm;
@@ -51,6 +55,10 @@ static void __GXXfVtxSpecs(void) {
     __GXData->bpSentNot = 1;
 }
 
+/**
+ * Records the type (none, direct, 8 or 16 bit index) of one attribute in the shadowed vertex descriptor words.
+ * Normals are tracked with the hasNrms and hasBiNrms flags and the shared normal type.
+ */
 static inline void SETVCDATTR(GXAttr Attr, GXAttrType Type) {
     switch (Attr) {
     case GX_VA_PNMTXIDX:   SET_REG_FIELD(212, __GXData->vcdLo, 1, 0, Type); break;
@@ -94,6 +102,11 @@ static inline void SETVCDATTR(GXAttr Attr, GXAttrType Type) {
     }
 }
 
+/**
+ * Sets how one vertex attribute (position, normal, color, texture coordinate or matrix index) is supplied:
+ * not present, direct, or by 8 or 16 bit index.
+ * Only changes the shadow copy and marks the vertex descriptor dirty.
+ */
 void GXSetVtxDesc(GXAttr attr, GXAttrType type) {
     CHECK_GXBEGIN(264, "GXSetVtxDesc");
     CHECK_ATTRNAME(267, attr);
@@ -110,6 +123,7 @@ void GXSetVtxDesc(GXAttr attr, GXAttrType type) {
     __GXData->dirtyState |= 8;
 }
 
+/** Same as GXSetVtxDesc for a list of attribute and type pairs ending with GX_VA_NULL. */
 void GXSetVtxDescv(const GXVtxDescList *attrPtr) {
     CHECK_GXBEGIN(306, "GXSetVtxDescv");
     CHECK_ATTRPTR(307, attrPtr);
@@ -130,12 +144,17 @@ void GXSetVtxDescv(const GXVtxDescList *attrPtr) {
     __GXData->dirtyState |= 8;
 }
 
+/** Writes the shadowed vertex descriptor (CP registers 0x50 and 0x60) and then the XF vertex specs. */
 void __GXSetVCD(void) {
     GX_WRITE_SOME_REG4(8, 0x50, __GXData->vcdLo, -12);
     GX_WRITE_SOME_REG4(8, 0x60, __GXData->vcdHi, -12);
     __GXXfVtxSpecs();
 }
 
+/**
+ * Adds up the byte size of one vertex for the current descriptor and stores it in vLim.
+ * Does nothing when vNum is 0.
+ */
 void __GXCalculateVLim(void) {
     static u8 tbl1[] = { 0, 4, 1, 2 };
     static u8 tbl2[] = { 0, 8, 1, 2 };
@@ -186,6 +205,7 @@ void __GXCalculateVLim(void) {
     }
 }
 
+/** Returns how one vertex attribute is currently supplied, read from the shadowed descriptor. */
 void GXGetVtxDesc(GXAttr attr, GXAttrType* type) {
     u32 cpType;
 
@@ -220,6 +240,10 @@ void GXGetVtxDesc(GXAttr attr, GXAttrType* type) {
     *type = cpType;
 }
 
+/**
+ * Fills a list with the type of every attribute from the position/normal matrix index up to texture 7,
+ * then the normal/binormal/tangent entry, ending with GX_VA_NULL.
+ */
 void GXGetVtxDescv(GXVtxDescList* vcd) {
     GXAttr attr;
 
@@ -238,6 +262,7 @@ void GXGetVtxDescv(GXVtxDescList* vcd) {
     vcd[attr].attr = GX_VA_NULL;
 }
 
+/** Marks every vertex attribute as not present except the position, which is set to direct. */
 void GXClearVtxDesc(void) {
     CHECK_GXBEGIN(543, "GXClearVtxDesc");
     __GXData->vcdLo = 0;
@@ -248,6 +273,10 @@ void GXClearVtxDesc(void) {
     __GXData->dirtyState |= 8;
 }
 
+/**
+ * Stores the component count, type and fraction bits of one attribute in the shadowed VAT words (A, B, C) at
+ * that attribute's bit positions.
+ */
 static inline void SETVAT(u32* va, u32* vb, u32* vc, GXAttr attr, GXCompCnt cnt, GXCompType type, u8 shft) {
     switch (attr) {
     case GX_VA_POS:
@@ -317,6 +346,10 @@ static inline void SETVAT(u32* va, u32* vb, u32* vc, GXAttr attr, GXCompCnt cnt,
     }
 }
 
+/**
+ * Sets the component count, type and fraction bits of one vertex attribute in one of the 8 vertex attribute
+ * tables; the shadow copy changes and the table is marked dirty.
+ */
 void GXSetVtxAttrFmt(GXVtxFmt vtxfmt, GXAttr attr, GXCompCnt cnt, GXCompType type, u8 frac) {
     u32* va;
     u32* vb;
@@ -340,6 +373,7 @@ void GXSetVtxAttrFmt(GXVtxFmt vtxfmt, GXAttr attr, GXCompCnt cnt, GXCompType typ
     __GXData->dirtyVAT |= (u8)(1 << (u8)vtxfmt);
 }
 
+/** Same as GXSetVtxAttrFmt for a list of attributes ending with GX_VA_NULL. */
 void GXSetVtxAttrFmtv(GXVtxFmt vtxfmt, const GXVtxAttrFmtList* list) {
     u32* va;
     u32* vb;
@@ -366,6 +400,7 @@ void GXSetVtxAttrFmtv(GXVtxFmt vtxfmt, const GXVtxAttrFmtList* list) {
     __GXData->dirtyVAT |= (u8)(1 << (u8)vtxfmt);
 }
 
+/** Writes the vertex attribute table words (A, B and C) of every table marked dirty to the CP registers. */
 void __GXSetVAT(void) {
     s32 i;
     u32 dirty = __GXData->dirtyVAT;
@@ -385,6 +420,10 @@ void __GXSetVAT(void) {
     __GXData->dirtyVAT = 0;
 }
 
+/**
+ * Returns the number of fraction bits of a normal component type:
+ * 6 for 8 bit signed, 14 for 16 bit signed, 0 otherwise.
+ */
 static inline u8 GetFracForNrm(GXCompType type) {
     u8 frac;
 
@@ -404,6 +443,10 @@ static inline u8 GetFracForNrm(GXCompType type) {
     return frac;
 }
 
+/**
+ * Returns the component count, type and fraction bits of one attribute in one vertex attribute table,
+ * decoded from the shadowed VAT words.
+ */
 void GXGetVtxAttrFmt(GXVtxFmt fmt, GXAttr attr, GXCompCnt* cnt, GXCompType* type, u8* frac) {
     u32* va;
     u32* vb;
@@ -489,6 +532,10 @@ void GXGetVtxAttrFmt(GXVtxFmt fmt, GXAttr attr, GXCompCnt* cnt, GXCompType* type
     }
 }
 
+/**
+ * Fills a list with the format of every attribute from position to texture 7 for one vertex attribute table,
+ * ending with GX_VA_NULL.
+ */
 void GXGetVtxAttrFmtv(GXVtxFmt fmt, GXVtxAttrFmtList* vat) {
     GXAttr attr;
 
@@ -505,6 +552,10 @@ void GXGetVtxAttrFmtv(GXVtxFmt fmt, GXVtxAttrFmtList* vat) {
     vat->attr = GX_VA_NULL;
 }
 
+/**
+ * Writes the main memory address (as a physical address)
+ * and stride of the array an indexed vertex attribute reads from. GX_VA_NBT uses the normal array.
+ */
 void GXSetArray(GXAttr attr, void* base_ptr, u8 stride) {
     GXAttr cpAttr;
     u32 phyAddr;
@@ -524,11 +575,17 @@ void GXSetArray(GXAttr attr, void* base_ptr, u8 stride) {
     GX_WRITE_SOME_REG3(8, cpAttr | 0xB0, stride, cpAttr - 12);
 }
 
+/** Sends the command that invalidates the GPU's vertex cache; needed after vertex arrays in memory have changed. */
 void GXInvalidateVtxCache(void) {
     CHECK_GXBEGIN(988, "GXInvalidateVtxCache");
     GX_WRITE_U8(0x48);
 }
 
+/**
+ * Sets how a texture coordinate is generated: source, function (matrix, bump or color), normalization,
+ * post-transform matrix.
+ * It also saves the texture matrix index mtx for that coordinate and sends the matrix index update.
+ */
 void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, u32 mtx, GXBool normalize, u32 pt_texmtx) {
     u32 reg = 0;
     u32 row;
@@ -633,6 +690,10 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
     __GXSetMatrixIndex(mtxIdAttr);
 }
 
+/**
+ * Sets the number of texture coordinate generators in the shadowed gen mode and in XF register 0x3F;
+ * the gen mode is marked dirty.
+ */
 void GXSetNumTexGens(u8 nTexGens) {
     CHECK_GXBEGIN(1172, "GXSetNumTexGens");
     SET_REG_FIELD(1174, __GXData->genMode, 4, 0, nTexGens);

@@ -73,6 +73,10 @@ void _restgpr_31(void);
 
 static const double __constants[] = {0.0, 4294967296.0, 2147483648.0};
 
+/**
+ * Compiler cast helper: converts the double in f1 to an unsigned 32-bit value in r3,
+ * clamping negatives to 0 and values of 2^32 or more to 0xFFFFFFFF.
+ */
 asm void __cvt_fp2unsigned(void) {
     nofralloc
     stwu r1, -0x10(r1)
@@ -102,6 +106,10 @@ L_8025E904:
     blr
 }
 
+/**
+ * Prologue helper with one entry point per register (_savefpr_14 to _savefpr_31):
+ * stores f14 up to f31 at negative offsets from r11 (the caller's frame pointer).
+ */
 asm void __save_fpr(void) {
     nofralloc
 entry _savefpr_14
@@ -143,6 +151,7 @@ entry _savefpr_31
     blr
 }
 
+/** Epilogue helper (_restfpr_14 to _restfpr_31): reloads f14 up to f31 from negative offsets from r11. */
 asm void __restore_fpr(void) {
     nofralloc
 entry _restfpr_14
@@ -184,6 +193,10 @@ entry _restfpr_31
     blr
 }
 
+/**
+ * Prologue helper with one entry point per register (_savegpr_14 to _savegpr_31):
+ * stores r14 up to r31 at negative offsets from r11.
+ */
 asm void __save_gpr(void) {
     nofralloc
 entry _savegpr_14
@@ -225,6 +238,7 @@ entry _savegpr_31
     blr
 }
 
+/** Epilogue helper (_restgpr_14 to _restgpr_31): reloads r14 up to r31 from negative offsets from r11 and returns. */
 asm void __restore_gpr(void) {
     nofralloc
 entry _restgpr_14
@@ -266,6 +280,10 @@ entry _restgpr_31
     blr
 }
 
+/**
+ * 64-bit unsigned division helper (the CPU has no 64-bit divide):
+ * dividend in r3:r4, divisor in r5:r6, quotient in r3:r4.
+ */
 asm void __div2u(void) {
     nofralloc
     cmpwi r3, 0x0
@@ -338,6 +356,10 @@ L_8025EB1C:
     blr
 }
 
+/**
+ * 64-bit signed division helper: dividend in r3:r4, divisor in r5:r6,
+ * quotient in r3:r4 (signs are stripped, then fixed up).
+ */
 asm void __div2i(void) {
     nofralloc
     stwu r1, -0x10(r1)
@@ -432,6 +454,7 @@ L_8025EC58:
     blr
 }
 
+/** 64-bit unsigned remainder helper: operands in r3:r4 and r5:r6, remainder in r3:r4. */
 asm void __mod2u(void) {
     nofralloc
     cmpwi r3, 0x0
@@ -501,6 +524,7 @@ L_8025ED30:
     blr
 }
 
+/** 64-bit signed remainder helper: operands in r3:r4 and r5:r6, remainder in r3:r4. */
 asm void __mod2i(void) {
     nofralloc
     cmpwi cr7, r3, 0x0
@@ -583,6 +607,7 @@ L_8025EE40:
     blr
 }
 
+/** 64-bit left shift: value in r3:r4 shifted by the count in r5, built from 32-bit shifts; result in r3:r4. */
 asm void __shl2i(void) {
     nofralloc
     subfic r8, r5, 0x20
@@ -596,6 +621,7 @@ asm void __shl2i(void) {
     blr
 }
 
+/** 64-bit logical right shift: value in r3:r4 shifted by the count in r5; result in r3:r4. */
 asm void __shr2u(void) {
     nofralloc
     subfic r8, r5, 0x20
@@ -609,6 +635,7 @@ asm void __shr2u(void) {
     blr
 }
 
+/** 64-bit arithmetic right shift: value in r3:r4 shifted by the count in r5, keeping the sign; result in r3:r4. */
 asm void __shr2i(void) {
     nofralloc
     subfic r8, r5, 0x20
@@ -624,6 +651,7 @@ L_8025EEB8:
     blr
 }
 
+/** Compiler cast helper: converts the signed 64-bit integer in r3:r4 to a float returned in f1 (rounds to nearest). */
 asm void __cvt_sll_flt(void) {
     nofralloc
     stwu r1, -0x10(r1)
@@ -677,6 +705,10 @@ L_8025EF5C:
     blr
 }
 
+/**
+ * Compiler cast helper: converts the unsigned 64-bit integer in r3:r4 to a float returned in f1 (rounds to
+ * nearest).
+ */
 asm void __cvt_ull_flt(void) {
     nofralloc
     stwu r1, -0x10(r1)
@@ -724,6 +756,7 @@ L_8025EFFC:
     blr
 }
 
+/** Compiler cast helper: converts the double in f1 to an unsigned 64-bit integer in r3:r4 (0 for values below 1). */
 asm void __cvt_dbl_usll(void) {
     nofralloc
     stwu r1, -0x10(r1)
@@ -858,6 +891,10 @@ asm int __setjmp(register void* env) {
     blr
 }
 
+/**
+ * Restores the registers saved by __setjmp (return address, condition register, r1, r2, r13-r31,
+ * f14-f31 and FPSCR) and resumes at the setjmp call, which returns the given value (1 if it is 0).
+ */
 asm void longjmp(register void* env, register int val) {
     nofralloc
     lwz r5, 0x0(r3)

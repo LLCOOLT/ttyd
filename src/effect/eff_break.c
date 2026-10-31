@@ -42,6 +42,10 @@ static s32* texid_tbl[] = {tex_jp, tex_us};
 static f32 ty_data[] = {3.0f, 3.0f, 2.7857144f, 2.5714285f, 2.357143f, 2.142857f, 1.9285715f, 1.7142857f, 1.5f, 1.2857143f, 1.0714285f, 0.85714287f, 0.64285713f, 0.42857143f, 0.21428572f, 0.0f, 0.083333336f, 0.16666667f, 0.25f, 0.125f, 0.0f};
 static f32 ty_data2[] = {0.0f, 0.15f, 0.3f, 0.45f, 0.6f, 0.75f, 0.9f, 1.05f, 1.2f, 1.35f, 1.5f, 1.65f, 1.8f, 1.95f, 2.1f, 2.25f, 2.4f, 2.55f, 2.7f, 2.85f, 3.0f};
 
+/**
+ * Spawns the BREAK banner at (x, y, z): one sprite per letter, centred using the language's letter textures,
+ * each starting 21 frames after the previous one. Spawned by the battle break slot with duration 240.
+ */
 EffectEntry* effBreakEntry(s32 type, s32 duration, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
     EffBreakWork* work;
@@ -105,6 +109,10 @@ EffectEntry* effBreakEntry(s32 type, s32 duration, f32 x, f32 y, f32 z) {
     return effect;
 }
 
+/**
+ * Steps each letter through its states (drop with stardust, bounce along ty_data, wait, fly off)
+ * and deletes the effect when every letter is done.
+ */
 static void effBreakMain(EffectEntry* effect) {
     EffBreakWork* work = effect->userdata;
     Vec position;
@@ -182,6 +190,7 @@ static void effBreakMain(EffectEntry* effect) {
     }
 }
 
+/** Draws the letter sprites with the active language's textures, offset by each letter's offsetY. */
 static void effBreakDisp(CameraId cameraId, EffectEntry* effect) {
     EffBreakWork* work = effect->userdata;
     CameraEntry* camera = camGetPtr(cameraId);

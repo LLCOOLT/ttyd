@@ -63,6 +63,10 @@ static u8 lightRegisterNames[13][256] = {
 #define BYTE2(var) (((u8 *)&(var))[2])
 #define BYTE3(var) (((u8 *)&(var))[3])
 
+/**
+ * Counts how many texgens (the number is in XF register 0x3F) are regular, bumpmap,
+ * colour 0 and colour 1 types from their XF texgen words, warning about any other type.
+ */
 static void CountTextureTypes(void) {
     u32 i;
     u32 texgen_type;
@@ -92,28 +96,36 @@ static void CountTextureTypes(void) {
     numColorTextures = numColor0Textures + numColor1Textures;
 }
 
+/** Prepares the transform verifier by counting the texgen types. */
 static void InitializeXFVerifyData(void) {
     CountTextureTypes();
 }
 
+/** Warns that an XF register was never written (not marked dirty) when it should have been. */
 static void CheckDirty(u32 index, const char* name) {
     if (!__gxVerif->xfRegsDirty[index - 0x1000] && __gxVerif->verifyLevel >= __gxvWarnLev[53]) {
         __GX_WARNF(GXWARN_XF_CTRL_UNINIT, index, name);
     }
 }
 
+/** Warns that an XF register was written (marked dirty) although it should not have been. */
 static void CheckClean(u32 index, const char* name) {
     if (__gxVerif->xfRegsDirty[index - 0x1000] && __gxVerif->verifyLevel >= __gxvWarnLev[54]) {
         __GX_WARNF(GXWARN_XF_CTRL_INIT, index, name);
     }
 }
 
+/** Warns when the number of output colour channels (low 2 bits of XF register 9) is greater than 2. */
 static void CheckCTGColors(void) {
     if ((u32)(BYTE3(__gxVerif->xfRegs[9]) & 3) > 2 && __gxVerif->verifyLevel >= __gxvWarnLev[120]) {
         __GX_WARNF(120, (u8)(BYTE3(__gxVerif->xfRegs[9]) & 3));
     }
 }
 
+/**
+ * Returns whether the current vertex descriptor sends the given attribute (position, normal, a colour,
+ * a texture coordinate or a matrix index).
+ */
 static GXBool __GXVertexPacketHas(GXAttr attr) {
     switch (attr) {
     case GX_VA_POS:        return GET_REG_FIELD(__GXData->vcdLo, 2, 9) != 0;
@@ -143,6 +155,10 @@ static GXBool __GXVertexPacketHas(GXAttr attr) {
     }
 }
 
+/**
+ * Warns about vertex descriptor problems: no position, the unsupported position-plus-matrix-index-only layout,
+ * colour 1 enabled while colour 0 is off, and texture coordinates not enabled from the lowest ID upward.
+ */
 static void CheckVertexPacket(void) {
     u32 numHostTextures;
     u32 numHostTexAbsent;
@@ -188,6 +204,10 @@ static void CheckVertexPacket(void) {
     }
 }
 
+/**
+ * Warns when a texgen's source row (position, normal, colour 0 or 1,
+ * binormal/tangent or an input texcoord) is not part of the vertex data being sent, or names an invalid row.
+ */
 static void CheckSourceRows(void) {
     u32 i;
 
@@ -238,6 +258,7 @@ static void CheckSourceRows(void) {
     }
 }
 
+/** Warns when texgen types are out of order (regular matrix texgens first, then bump, then colour). */
 static void CheckTextureOrder(void) {
     u8 done = 0;
     u32 count = 0;
@@ -279,6 +300,10 @@ static void CheckTextureOrder(void) {
     }
 }
 
+/**
+ * Warns once, with the given warning id and text,
+ * if any of Count entries from StartingAddress in matrix or normal RAM were never loaded.
+ */
 static void CheckRAM(u8 Normal, u32 StartingAddress, u32 Count, GXWarnID WarnID, char* Str) {
     u32 i;
     u8 printedPreamble;
@@ -301,6 +326,12 @@ static void CheckRAM(u8 Normal, u32 StartingAddress, u32 Count, GXWarnID WarnID,
     }
 }
 
+/**
+ * For bumpmap texgens: warns about a default matrix index above 30
+ * and checks that the normal matrix it selects is loaded (when vertices carry no index),
+ * then for each bump texgen warns if its source texture is not a regular texgen,
+ * if the chosen light has no position loaded, or if binormals and tangents are not sent.
+ */
 static void CheckBumpmapTextures(void) {
     u32 i;
     u32 BumpMapSource;
@@ -346,6 +377,10 @@ static void CheckBumpmapTextures(void) {
     lightRAMOffset; lightRAMOffset;  // needed to match
 }
 
+/**
+ * For the regular texgens, checks that the texture matrices their matrix indices point to are loaded (both with
+ * per- vertex indices and with the default indices in the matrix index registers).
+ */
 static void CheckTextureTransformMatrices(void) {
     u32 i;
     u32 StartingAddress;
@@ -458,6 +493,7 @@ static void CheckTextureTransformMatrices(void) {
     MtxIndexInVertexPacket;
 }
 
+/** Warns when a regular texgen with a two-element source row (texcoord) uses the ABC1 input form. */
 static void CheckInputForms(void) {
     u32 i;
 
@@ -478,6 +514,7 @@ static void CheckInputForms(void) {
     }
 }
 
+/** Warns if the XF light RAM for a light source was never loaded (the 13 words after its colour). */
 static void CheckLight(u32 lightSource) {
     u32 lightRAMOffset;
     u8 printedPreamble;
@@ -498,7 +535,12 @@ static void CheckLight(u32 lightSource) {
     }
 }
 
-// NONMATCHING
+/**
+ * Checks lighting channel COLOR0: that its colour and alpha control registers and the material
+ * and ambient registers it reads were written, that the lights it uses are loaded,
+ * that specular lights and the diffuse function agree,
+ * and that lit channels get normals and a loaded normal matrix. NONMATCHING
+ */
 static void CheckColor0(void) {
     char Preamble[256];
     u8 haveLight;
@@ -603,7 +645,12 @@ static void CheckColor0(void) {
     }
 }
 
-// NONMATCHING
+/**
+ * Checks lighting channel COLOR1: that its colour and alpha control registers and the material
+ * and ambient registers it reads were written, that the lights it uses are loaded,
+ * that specular lights and the diffuse function agree,
+ * and that lit channels get normals and a loaded normal matrix. NONMATCHING
+ */
 static void CheckColor1(void) {
     u8 usingColor1;
     char Preamble[256];
@@ -715,6 +762,10 @@ static void CheckColor1(void) {
     }
 }
 
+/**
+ * Recomputes the viewport edges from the XF scale and offset registers (relative to the 342 origin) and warns
+ * when top or bottom is outside 0 to 528 (top may be down to -0.5) or left or right is outside 0 to 640.
+ */
 static void CheckViewport(void) {
     f32 vl;
     f32 vr;
@@ -743,6 +794,7 @@ static void CheckViewport(void) {
     }
 }
 
+/** Splits a float into its sign bit, 8-bit exponent and 23-bit mantissa. */
 static void ComputeSignExponentMantissa(f32 floatVal, u32* sign, u32* exponent, u32* mantissa) {
     u32 intVal = *(u32*)&floatVal;
 
@@ -751,6 +803,10 @@ static void ComputeSignExponentMantissa(f32 floatVal, u32* sign, u32* exponent, 
     *mantissa = intVal & 0x7FFFFF;
 }
 
+/**
+ * Warns about a loaded float with the given label that is an infinity or NaN (verify level 2)
+ * or unintentionally tiny or huge (level 3); unloaded or zero values pass.
+ */
 static void CheckFloatingPointValue(u8 dirtyBit, u32 value, char* label) {
     u32 sign;
     u32 exponent;
@@ -800,6 +856,7 @@ static void CheckFloatingPointValue(u8 dirtyBit, u32 value, char* label) {
     }
 }
 
+/** Runs CheckFloatingPointValue over the 256 words of position and texture matrix RAM. */
 static void CheckMatrixRAMRanges(void) {
     u32 i;
     char label[256];
@@ -810,6 +867,7 @@ static void CheckMatrixRAMRanges(void) {
     }
 }
 
+/** Runs CheckFloatingPointValue over the normal matrix RAM. */
 static void CheckNormalRAMRanges(void) {
     u32 i;
     char label[256];
@@ -820,6 +878,7 @@ static void CheckNormalRAMRanges(void) {
     }
 }
 
+/** Runs CheckFloatingPointValue over the post-transform (dual) matrix RAM. */
 static void CheckDMatrixRAMRanges(void) {
     u32 i;
     char label[256];
@@ -830,6 +889,7 @@ static void CheckDMatrixRAMRanges(void) {
     }
 }
 
+/** Runs CheckFloatingPointValue over the attenuation, position and direction words of all 8 lights. */
 static void CheckLightRAMRanges(void) {
     u32 lightSource;
     u32 lightRAMOffset;
@@ -849,6 +909,7 @@ static void CheckLightRAMRanges(void) {
     i; lightSource;  // needed to match
 }
 
+/** Runs CheckFloatingPointValue over the viewport scale and offset and projection matrix registers. */
 static void CheckControlRAMRanges(void) {
     CheckFloatingPointValue(__gxVerif->xfRegsDirty[0x1A], __gxVerif->xfRegs[0x1A], "Viewport Scale X");
     CheckFloatingPointValue(__gxVerif->xfRegsDirty[0x1B], __gxVerif->xfRegs[0x1B], "Viewport Scale Y");
@@ -864,6 +925,7 @@ static void CheckControlRAMRanges(void) {
     CheckFloatingPointValue(__gxVerif->xfRegsDirty[0x25], __gxVerif->xfRegs[0x25], "Projection Matrix F Value");
 }
 
+/** Runs all the floating point range checks over matrix, normal, dual matrix, light and control RAM. */
 static void CheckFloatingPointRanges(void) {
     CheckMatrixRAMRanges();
     CheckNormalRAMRanges();
@@ -872,6 +934,10 @@ static void CheckFloatingPointRanges(void) {
     CheckControlRAMRanges();
 }
 
+/**
+ * Checks that the default position and texture matrix indices, when the vertices carry no index of their own,
+ * refer to loaded matrices and that the matrix index registers were written.
+ */
 static void CheckMatrixIndices(void) {
     if (!__GXVertexPacketHas(GX_VA_PNMTXIDX)
      || !__GXVertexPacketHas(GX_VA_TEX0MTXIDX)
@@ -897,6 +963,14 @@ static void CheckMatrixIndices(void) {
     }
 }
 
+/**
+ * Runs the transform-unit checks that report errors:
+ * requires the texgen count, colour count, in-vertex-spec,
+ * viewport and projection registers to have been written, then checks matrix indices, that some output exists,
+ * that the texgen counts stay within the hardware limits (8 in all, 8 regular, 3 bump, 2 colour),
+ * the vertex packet, per-texgen settings, source rows and order, bumpmap setup, texture matrices,
+ * colour channels and lighting, and the viewport.
+ */
 static void CheckErrors(void) {
     u32 i;
     char registerName[80];
@@ -969,6 +1043,11 @@ static void CheckErrors(void) {
     }
 }
 
+/**
+ * Runs the transform-unit checks that only warn:
+ * the input forms, that the internal error, diagnostic, state and power- saving registers were left untouched,
+ * and (at verify level 2) the floating point ranges.
+ */
 static void CheckWarnings(void) {
     if (__gxVerif->verifyLevel >= 1) {
         CheckInputForms();
@@ -985,10 +1064,18 @@ static void CheckWarnings(void) {
     }
 }
 
+/**
+ * Empty in this build (the register dump was removed);
+ * called from __GXVerifyXF when the internal debug switch is on.
+ */
 static void DumpXFRegisters(void) {
     static u8 firstTime = 1;
 }
 
+/**
+ * Entry point of the transform-unit verifier: counts the texgen types,
+ * then runs the error checks and the warning checks (and the dump when enabled).
+ */
 void __GXVerifyXF(void) {
     if (internalDebug) {
         DumpXFRegisters();

@@ -31,6 +31,11 @@ extern EvtWord tensou_switch[];
 extern EvtWord evt_tensou2[];
 extern EvtWord tensou_init[];
 
+/**
+ * Door open animation step: moves the two door leaves S_door1_2
+ * and S_door1_1 in opposite directions along X by the animation value in LW(0) times 0.16601563;
+ * the open and close scripts apply the same transform.
+ */
 static EVT_BEGIN(s_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.16601563f))
     CALL(evt_mapobj_trans, 1, STRING("S_door1_2"), LW(0), 0, 0)
@@ -39,6 +44,11 @@ static EVT_BEGIN(s_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door close animation step: moves the two door leaves S_door1_2
+ * and S_door1_1 in opposite directions along X by the animation value in LW(0) times 0.16601563;
+ * the open and close scripts apply the same transform.
+ */
 static EVT_BEGIN(s_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.16601563f))
     CALL(evt_mapobj_trans, 1, STRING("S_door1_2"), LW(0), 0, 0)
@@ -69,6 +79,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Script function: sets the scale of Mario and of the first partner to the float in args[0] on all axes;
+ * the teleporter uses it to shrink them as they dissolve into the beam.
+ */
 static USER_FUNC(scale_func) {
     f32 s = evtGetFloat(event, event->args[0]);
     MarioWork* mario = marioGetPtr();
@@ -81,6 +95,13 @@ static USER_FUNC(scale_func) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Case script for stepping on the teleporter pad (A_tensou):
+ * Mario and the partner walk into the beam, spin faster and faster for three seconds,
+ * shrink (scale_func) and rise out of sight, and the map changes:
+ * to the sewers tik_00 (setting GSWF_TIK00_TELEPORTER_ARRIVAL) normally,
+ * to moo_04 during STORY_STG7_25_THE_LAST_MAIL.
+ */
 EVT_BEGIN(tensou_ride)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -167,6 +188,11 @@ EVT_BEGIN(tensou_ride)
     RETURN
 EVT_END()
 
+/**
+ * Case script for the teleporter's switch (A__sui):
+ * presses the switch (SFX_STG7_SWITCH_WARP1), plays the teleporter's start-up animation anm_saisho and the beam,
+ * and attaches tensou_ride to the pad A_tensou.
+ */
 EVT_BEGIN(tensou_switch)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("sui__1"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("sui__2"), MAPOBJ_FLAG_HIDE)
@@ -183,6 +209,11 @@ EVT_BEGIN(tensou_switch)
     RETURN
 EVT_END()
 
+/**
+ * Arrival effect when the teleporter is used from the other side (entered from tik_00 with
+ * GSWF_TIK00_TELEPORT_TO_AJI set): Mario and the partner appear in the beam,
+ * spinning for four seconds while growing to full size, and then control returns.
+ */
 EVT_BEGIN(evt_tensou2)
     CALL(evt_map_playanim, STRING("anm_wa-p"), 1, 0)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("wa_pu"), MAPOBJ_FLAG_HIDE)
@@ -256,6 +287,11 @@ EVT_BEGIN(evt_tensou2)
     RETURN
 EVT_END()
 
+/**
+ * Sets up the teleporter: the switch (A__sui) gets tensou_switch;
+ * when GSWF_TIK00_TELEPORT_TO_AJI is set (the player has come in from tik_00) Mario
+ * and the partners are placed on the pad and evt_tensou2 plays the arrival.
+ */
 EVT_BEGIN(tensou_init)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("sui__1"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("sui__2"), MAPOBJ_FLAG_HIDE)
@@ -277,11 +313,20 @@ EVT_BEGIN(tensou_init)
     RETURN
 EVT_END()
 
+/**
+ * Pick-up event for the Cog lying in the teleporter room:
+ * records it in GSWF_AJI07_COG_TAKEN so it does not respawn.
+ */
 static EVT_BEGIN(evt_haguruma)
     SET_VALUE(GSWF(GSWF_AJI07_COG_TAKEN), 1)
     RETURN
 EVT_END()
 
+/**
+ * Init script of aji_07, the teleporter room: plays BGM_STG7_DUN2, sets up the exits and the teleporter,
+ * places the Cog (ITEM_COG, GSWF_AJI07_COG_TAKEN) on a ledge until it is taken, and, when entered as "tenjo",
+ * drops Mario and his partners in from the ceiling slit of aji_08.
+ */
 EVT_BEGIN(aji_07_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI4"))

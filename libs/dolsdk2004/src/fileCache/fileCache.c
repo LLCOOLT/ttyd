@@ -7,6 +7,11 @@ u8 DOCacheInitialized;
 static u8 AllocCacheNode(DSCacheNodePtr* cacheNode, char* name);
 static void FreeCacheNode(DSCacheNodePtr* cacheNode);
 
+/**
+ * Adds an entry to a cache's node list: copies the name,
+ * stores the data pointer and the function used to free it, and starts the reference count at 0.
+ * Returns NULL if memory ran out.
+ */
 DSCacheNodePtr DSAddCacheNode(DSCachePtr cache, char* name, Ptr data, Ptr OSFreeFunc) {
     DSCacheNodePtr cacheNode;
 
@@ -22,6 +27,10 @@ DSCacheNodePtr DSAddCacheNode(DSCachePtr cache, char* name, Ptr data, Ptr OSFree
     return cacheNode;
 }
 
+/**
+ * Allocates a cache node and a buffer for its name (OSAlloc). Frees any node already held in *cacheNode first.
+ * Returns false if either allocation fails.
+ */
 static u8 AllocCacheNode(DSCacheNodePtr* cacheNode, char* name) {
     if (*cacheNode) {
         FreeCacheNode(cacheNode);
@@ -40,6 +49,7 @@ static u8 AllocCacheNode(DSCacheNodePtr* cacheNode, char* name) {
     return TRUE;
 }
 
+/** Removes every node from a cache and frees them, whatever their reference count. */
 void DSEmptyCache(DSCachePtr cache) {
     DSCacheNodePtr cursor;
     DSCacheNodePtr cacheNode;
@@ -53,6 +63,7 @@ void DSEmptyCache(DSCachePtr cache) {
     }
 }
 
+/** Finds a node by its data pointer if data is given, otherwise by name. Returns NULL when none matches. */
 static DSCacheNodePtr FindCacheNode(DSCachePtr cache, char* name, Ptr data) {
     DSCacheNodePtr cacheNode;
 
@@ -75,6 +86,7 @@ static DSCacheNodePtr FindCacheNode(DSCachePtr cache, char* name, Ptr data) {
     return NULL;
 }
 
+/** Finds a cached object by name, adds one reference to it and returns its data, or NULL if it is not cached. */
 Ptr DSGetCacheObj(DSCachePtr cache, char* name) {
     DSCacheNodePtr cacheNode;
 
@@ -86,6 +98,7 @@ Ptr DSGetCacheObj(DSCachePtr cache, char* name) {
     return NULL;
 }
 
+/** Calls the node's free function on its data (if it has one), frees the name and the node, and clears the pointer. */
 static void FreeCacheNode(DSCacheNodePtr* cacheNode) {
     if (*cacheNode) {
         if ((*cacheNode)->Free) {
@@ -97,6 +110,7 @@ static void FreeCacheNode(DSCacheNodePtr* cacheNode) {
     }
 }
 
+/** Prepares an empty cache with automatic purging turned on. */
 void DSInitCache(DSCachePtr cache) {
     DSCacheNode cacheNode;
 
@@ -104,6 +118,7 @@ void DSInitCache(DSCachePtr cache) {
     DSInitList(&cache->CacheNodeList, (Ptr)&cacheNode, &cacheNode.Link);
 }
 
+/** Frees every node whose reference count is 0 and keeps the ones still in use. */
 void DSPurgeCache(DSCachePtr cache) {
     DSCacheNodePtr cursor;
     DSCacheNodePtr cacheNode;
@@ -119,6 +134,10 @@ void DSPurgeCache(DSCachePtr cache) {
     }
 }
 
+/**
+ * Drops one reference on the node holding this data.
+ * When the count reaches 0 and the cache is set to auto purge, the node is freed.
+ */
 void DSReleaseCacheObj(DSCachePtr cache, Ptr data) {
     DSCacheNodePtr cacheNode;
 
@@ -135,10 +154,12 @@ void DSReleaseCacheObj(DSCachePtr cache, Ptr data) {
     }
 }
 
+/** Sets whether DSReleaseCacheObj frees a node when its last reference is released. */
 void DSSetCachePurgeFlag(DSCachePtr cache, u8 purgeFlag) {
     cache->PurgeFlag = purgeFlag;
 }
 
+/** Initializes the global display cache (DODisplayCache) and marks it initialized. */
 void CSHInitDisplayCache(void) {
     DSInitCache(&DODisplayCache);
     DOCacheInitialized = TRUE;

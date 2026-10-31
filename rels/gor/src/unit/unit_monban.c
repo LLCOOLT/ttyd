@@ -217,6 +217,10 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Init event of Gus: installs phase, attack, damage and confusion events,
+ * sets the run and walk sounds and the pose sound timing table.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
@@ -230,6 +234,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Spark effect (toge_flush) shown when an attack on Gus's spiked head is turned away:
+ * it waits 30 frames, then places the flash above his head at a height that depends on whether he has status 10
+ * or 11.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -253,6 +262,7 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/** Damage event of Gus: runs the default damage handling. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -260,6 +270,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Phase event of Gus: the first time his turn starts while Mario has 5 or fewer HP,
+ * the camera moves in and he taunts with gor_02_008_01 (flag GSWF_GUS_TAUNT_SHOWN keeps it from repeating).
+ */
 static EVT_BEGIN(phase_event)
     IF_INT_EQUAL(GSWF(GSWF_GUS_TAUNT_SHOWN), 0)
         CALL(btlevtcmd_GetHp, BTL_UNIT_MARIO, LW(0))
@@ -284,6 +298,11 @@ static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of Gus: uses an enemy item if he has one,
+ * otherwise 50% weapon_monban_attack (normal_attack_event)
+ * and 50% weapon_monban_throw_attack (throw_attack_event).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -308,6 +327,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Gus's melee attack: picks a target, runs at it, hops in with SFX_ENM_MONBAN_MOVE sounds, strikes,
+ * and the pre-damage check decides between a dodge and a hit with the action-command result;
+ * afterwards he laughs (SFX_ENM_MONBAN_LAUGH1) and returns home.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -416,6 +440,11 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Gus's ranged attack (weapon_monban_throw_attack):
+ * picks a target and throws something at it (SFX_ENM_MONBAN_THROW1 and 2, poses A_2 and A_3);
+ * the pre-damage check decides between a dodge and a hit, then he laughs and returns to idle.
+ */
 static EVT_BEGIN(throw_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -517,6 +546,7 @@ static EVT_BEGIN(throw_attack_event)
     RETURN
 EVT_END()
 
+/** Wait (idle) event of Gus: shows the idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

@@ -116,6 +116,10 @@ void partyWalkSe(PartyEntry* party, s32 arg) {
     }
 }
 
+/**
+ * Demos: walk (pose 3) at 1.25 units/frame or faster, otherwise the slow walk (pose 2),
+ * with the matching footstep sound. Retail keeps this in party_move.c.
+ */
 void partyMoveAnime(PartyEntry* party, f32 spd) {
     if (spd >= 1.25f) {
         partyChgPoseId(party, 3);
@@ -126,7 +130,7 @@ void partyMoveAnime(PartyEntry* party, f32 spd) {
     }
 }
 
-// Height of the floor below (x, y + 40, z), rounded to 0.01, or -2000 when there is none.
+/** Height of the floor below (x, y + 40, z), rounded to 0.01, or -2000 when there is none. */
 static inline void partyGetGndYTo(f32* out, f32 x, f32 y, f32 z) {
     f32 hx, hy, hz, dist, nx, ny, nz;
     HitEntry* hit;
@@ -141,6 +145,11 @@ static inline void partyGetGndYTo(f32* out, f32 x, f32 y, f32 z) {
     }
 }
 
+/**
+ * Demos: FALSE while the partner should not chase Mario's height:
+ * he is in the air without moving, or in his damage or Spin Jump motion.
+ * The retail check below also covers the spike damage motion.
+ */
 static inline BOOL partyChkMarioFollowYDemo(MarioWork* mario) {
     if (mario->airTimer != 0 && mario->baseSpeed == 0.0f) {
         return FALSE;
@@ -151,6 +160,12 @@ static inline BOOL partyChkMarioFollowYDemo(MarioWork* mario) {
     return TRUE;
 }
 
+/**
+ * Demos: the walking partner's follow motion (motion 1 of move mode 1):
+ * walks along Mario's footmarks, jumps up ledges and onto their marked jump spots, steps up stairs,
+ * falls off edges and enters slits.
+ * Older and simpler than the retail copy (fixed 40/homingDist follow distances, no speed catch-up).
+ */
 void party_motion_homing_walk(PartyEntry* party) {
     HitEntry* hit;
     s32 id;
@@ -488,6 +503,11 @@ found:
     party_force_reset_outofscreen(party);
 }
 
+/**
+ * Demos: floor point one partner width ahead in direction dir, rounded to 0.001, written to out;
+ * returns its hit attributes, or 0 with out = the partner's position when there is none.
+ * Probes from at most 40 above the partner, staying under any ceiling found in front.
+ */
 static s32 getFrontFloor(PartyEntry* party, Vec* out, f32 dir) {
     f32 s2, c2;
     HitCheckQuery q2;
@@ -553,11 +573,15 @@ found:
     return hitGetAttr(hit);
 }
 
-// Unused helpers (as in the retail copy below); each keeps its down-vector literal in .rodata.
+/** Unused helpers (as in the retail copy below); each keeps its down-vector literal in .rodata. */
 static inline void partyDownDirX(HitCheckQuery* q) {
     q->targetDir = (Vec){0.0f, -1.0f, 0.0f};
 }
 
+/**
+ * Demos: hit attributes of the floor 20 units ahead in direction dir (probed from 20 up, 40 down), 0 if none.
+ * Homing walk uses it to skip footmarks over 0x800 floors.
+ */
 static inline u32 partyGetFrontAttr(PartyEntry* party, f32 dir) {
     HitCheckQuery q;
     HitEntry* hit;
@@ -572,6 +596,10 @@ static inline u32 partyGetFrontAttr(PartyEntry* party, f32 dir) {
     return hit ? hitGetAttr(hit) : 0;
 }
 
+/**
+ * Demos: hit attributes of the floor 40 units ahead along targetDir (probed from 40 up, 100 down), 0 if none.
+ * Homing walk does not step forward when it is 0x200 (water).
+ */
 static inline u32 partyGetFrontAttrFar(PartyEntry* party) {
     HitCheckQuery q;
     HitEntry* hit;
@@ -587,10 +615,16 @@ static inline u32 partyGetFrontAttrFar(PartyEntry* party) {
     return hit ? hitGetAttr(hit) : 0;
 }
 
+/** Unused: sets a hit query's direction to straight down. */
 static inline void partyDownDirY(HitCheckQuery* q) {
     q->targetDir = (Vec){0.0f, -1.0f, 0.0f};
 }
 
+/**
+ * Demos: while Mario has control, pulls a partner that has left the screen (more than 40 px past the sides or
+ * 650 px down) back toward Mario step by step onto the floor until it is on screen, and clears the footmarks.
+ * A partner right under Mario but far down the screen is put at its appear position instead.
+ */
 static void party_force_reset_outofscreen(PartyEntry* party) {
     MarioWork* m2;
     s32 i;
@@ -695,6 +729,12 @@ static void party_force_reset_outofscreen(PartyEntry* party) {
     }
 }
 
+/**
+ * Moves a jumping partner forward by moveSpeed along targetDir, stopped by walls;
+ * records the wall in hitobjFront/hitobjPush.
+ * With the front wall check disabled it moves a scratch vector that is never stored,
+ * so the partner does not move sideways at all.
+ */
 static inline void partyJumpFrontMove(PartyEntry* party) {
     Vec v;
     HitEntry* hit;
@@ -714,6 +754,11 @@ static inline void partyJumpFrontMove(PartyEntry* party) {
     party->position.z = v.z;
 }
 
+/**
+ * Demos: the follow jump (motion 2): aims at the next footmark or moveTarget,
+ * sets up an arc by distance and height, plays the jump sound,
+ * then flies it until landing (motion 0) or a splash in water (motion 3).
+ */
 void party_motion_jump(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     s32 id;
@@ -839,6 +884,11 @@ void party_motion_jump(PartyEntry* party) {
     }
 }
 
+/**
+ * Demos: the jump to moveTarget used by the behind/beside-Mario modes (motion 2 there):
+ * at most 50 units across, at least 10 frames; on landing it goes to stay
+ * or follow depending on how close moveTarget is.
+ */
 void party_motion_jump2(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     HitEntry* hit;
@@ -922,6 +972,11 @@ void party_motion_jump2(PartyEntry* party) {
     }
 }
 
+/**
+ * Demos: the flying partner's follow motion (Flurrie, Vivian and the like; motion 1 of move mode 1):
+ * floats along Mario's footmarks, easing its height toward the floor ahead or Mario.
+ * touch_wall_ct counts frames against a wall with no floor behind it; after 10 it heads straight for Mario.
+ */
 void party_motion_homing_fly(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     s32 id;
@@ -1119,6 +1174,11 @@ void party_motion_homing_fly(PartyEntry* party) {
     party->position.z = v.z;
     party_force_reset_outofscreen(party);
 }
+/**
+ * Demos: the fall motion (motion 3): applies gravity,
+ * lands on a floor (stay or follow by speed, landing sound) and drops the partner back behind Mario
+ * when it falls below -2000. Returns 2 while falling, 3 on landing.
+ */
 s32 party_motion_fall(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     HitEntry* hit;
@@ -1215,6 +1275,7 @@ s32 party_motion_fall(PartyEntry* party) {
     return 0;
 }
 
+/** Demos: the step-up motion (motion 6): rises to stepY over 3 frames, then goes back to following (motion 1). */
 void party_motion_upstairs(PartyEntry* party) {
     if (party->trigFlags & PARTY_TRIG_FLAG_CHG_MOT) {
         party->trigFlags &= ~PARTY_TRIG_FLAG_CHG_MOT;
@@ -1237,11 +1298,19 @@ void party_motion_upstairs(PartyEntry* party) {
     }
 }
 
+/**
+ * Demos: makes the next behind-Mario walk stand at direction dir (degrees) from Mario instead of behind his
+ * facing. Retail adds the camera yaw.
+ */
 void party_set_behind_dir(PartyEntry* party, f32 dir) {
     party->homeDir = dir;
     party->trigFlags |= PARTY_TRIG_FLAG_HOME_DIR_SET;
 }
 
+/**
+ * Movement direction (degrees) of whoever this partner follows:
+ * Mario, or for a second partner the first one when it is out.
+ */
 static inline f32 partyGetFollowDir(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     PartyEntry* other;
@@ -1255,6 +1324,11 @@ static inline f32 partyGetFollowDir(PartyEntry* party) {
     return toMovedir(mario->displayDirection);
 }
 
+/**
+ * Demos: walks the partner to its spot behind Mario (or at homeDir) for move mode 2 (partyMoveBehindMario,
+ * talking), jumping where the floor height changes;
+ * when it arrives or hits a wall it goes back to normal following (move mode 1).
+ */
 void party_motion_behind_mario(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     HitEntry* hit;
@@ -1436,6 +1510,11 @@ void party_motion_behind_mario(PartyEntry* party) {
     }
 }
 
+/**
+ * Demos: move mode 6, set by partyReInit when the partner may not walk after a map change:
+ * keeps the partner walking to the spot behind Mario's facing;
+ * hands back to normal following once Mario stands still there.
+ */
 void party_motion_behind_mario_continue(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     PartyEntry* other;
@@ -1547,6 +1626,10 @@ void party_motion_behind_mario_continue(PartyEntry* party) {
     }
 }
 
+/**
+ * Demos: the flying partner's behind-Mario motion (move modes 2 and 6):
+ * floats to the spot behind Mario, then returns to normal following facing him.
+ */
 void party_motion_behind_mario_fly(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     PartyEntry* other;
@@ -1685,6 +1768,10 @@ void party_motion_behind_mario_fly(PartyEntry* party) {
     party->hitobjStandOn = hit;
 }
 
+/**
+ * Demos: move mode 3 (partyMoveBesideMario): walks the partner to the spot at Mario's side (90 degrees from his
+ * facing), then returns to normal following.
+ */
 void party_motion_beside_mario(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     HitEntry* hit;
@@ -1782,6 +1869,13 @@ void party_motion_beside_mario(PartyEntry* party) {
 static void partyStayFlyY(PartyEntry* party);
 static void partyStayChkGnd(PartyEntry* party);
 
+/**
+ * Demos: the standing motion (motion 0 of the stay and walk modes):
+ * clears the footmarks on entry, runs the slit and roll states,
+ * starts following (motion 1) once Mario gets far enough away,
+ * and keeps the partner on the floor or at flying height.
+ * Ms. Mowz plays her sniffing pose when chuchu_searchObject finds something.
+ */
 void party_motion_stay(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     s32 id;
@@ -1925,7 +2019,7 @@ void party_motion_stay(PartyEntry* party) {
     }
 }
 
-// Stay helpers: inlined into party_motion_stay; the linker drops the out-of-line copies.
+/** Stay helpers: inlined into party_motion_stay; the linker drops the out-of-line copies. */
 static void partyStayFlyY(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     f32 depth, gy;
@@ -1940,6 +2034,11 @@ static void partyStayFlyY(PartyEntry* party) {
     }
 }
 
+/**
+ * Demos: head and floor probe for a standing partner:
+ * snaps it to the floor, flags shallow water and damage floors,
+ * and starts a fall (motion 3, gravity -1.5) or a water splash when there is no floor.
+ */
 static void partyStayChkGnd(PartyEntry* party) {
     HitEntry* hit;
     f32 depth2;
@@ -1983,6 +2082,11 @@ static void partyStayChkGnd(PartyEntry* party) {
     }
 }
 
+/**
+ * Demos: motion 7, the partner knocked away: it flies up off the top of the screen,
+ * waits until Mario's damage motion is over, drops in from 200 above partyGetReturnPos and,
+ * 30 frames after landing, returns to normal (run mode 2, move mode 0).
+ */
 void party_motion_damage(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     f32 x, y, z;
@@ -2054,6 +2158,7 @@ void party_motion_damage(PartyEntry* party) {
     }
 }
 
+/** Demos: Mario entered Paper Mode: both partners turn sideways too (slitOn 1, set up by party_slit). */
 void allPartySlitOn(void) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     if (party) {
@@ -2067,6 +2172,10 @@ void allPartySlitOn(void) {
     }
 }
 
+/**
+ * Mario left Paper Mode: both partners still in it start their turn-back animation (slitStep 40).
+ * Called from mot_slit.c.
+ */
 void allPartySlitOff(void) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     if (party && (party->flags & PARTY_FLAG_PAPER_MODE) && party->slitStep < 0x28) {
@@ -2078,6 +2187,9 @@ void allPartySlitOff(void) {
     }
 }
 
+/**
+ * Demos: ends Paper Mode on this partner at once, facing left or right from its direction, and resets its pose.
+ */
 static inline void partyForceSlitOff(PartyEntry* party) {
     party->displayDirection = revise360(party->targetDir - party->camDir) >= 180.0f ? 0.0f : 180.0f;
     party->displayDirectionTarget = party->displayDirection;
@@ -2090,6 +2202,10 @@ static inline void partyForceSlitOff(PartyEntry* party) {
     partyChgPoseId(party, 1);
 }
 
+/**
+ * Ends Paper Mode at once on both partners; used when Mario's own Paper Mode is cut short (mot_slit.c)
+ * and by the all_party_slit_off script helper.
+ */
 void allPartyForceSlitOff(void) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     if (party) {
@@ -2101,6 +2217,10 @@ void allPartyForceSlitOff(void) {
     }
 }
 
+/**
+ * Demos: the partner reached a Paper Mode floor grate in Mario's footmarks:
+ * enters Paper Mode and marks it to slip through the floor (party_slit's fall steps).
+ */
 void partyChgMotSlitFloor(PartyEntry* party) {
     if (party->flags & PARTY_FLAG_MOT_SLIT_FLOOR) {
         return;
@@ -2110,6 +2230,12 @@ void partyChgMotSlitFloor(PartyEntry* party) {
     party->flags |= PARTY_FLAG_MOT_SLIT_FLOOR;
 }
 
+/**
+ * Demos: per-frame Paper Mode state for a partner while slitOn is 1:
+ * turns sideways ("p_slit" paper animation), walks sideways, slips down through floor grates,
+ * and turns back when Mario leaves Paper Mode and no slit wall is in the way.
+ * Returns FALSE on the frame the turn completes, so the motion skips it.
+ */
 static BOOL party_slit(PartyEntry* party) {
     BOOL ret = TRUE;
     MarioWork* mario;
@@ -2231,6 +2357,11 @@ static BOOL party_slit(PartyEntry* party) {
     return ret;
 }
 
+/**
+ * Unknown: a roll state like Mario's tube mode ("p_roll" paper animation) for slitOn 2,
+ * spinning with speed and ending at slitStep 100; nothing in the decomp sets slitOn to 2.
+ * Returns FALSE while ending.
+ */
 static BOOL party_roll(PartyEntry* party) {
     BOOL ret = TRUE;
     f32 d;
@@ -2333,18 +2464,28 @@ static BOOL party_roll(PartyEntry* party) {
     return ret;
 }
 #else
+/** Resets the height above a point that the floor probes start from to 60; partyReInit calls it on map load. */
 void partyResetGndProbeDy(void) {
     gnd_probe_dy = 60.0f;
 }
 
+/**
+ * Makes the partner follow at close distance and keep up with Mario's speed;
+ * evt_mario door and pipe moves turn it on while Mario walks through.
+ */
 void N_partyFollowCloseOn(PartyEntry* party) {
     party->trigFlags |= PARTY_TRIG_FLAG_FOLLOW_CLOSE;
 }
 
+/** Back to normal follow distance after a door or pipe move (evt_mario). */
 void N_partyFollowCloseOff(PartyEntry* party) {
     party->trigFlags &= ~PARTY_TRIG_FLAG_FOLLOW_CLOSE;
 }
 
+/**
+ * Floor under the partner for the behind-Mario walks;
+ * water (attribute 0x200) counts as no floor and starts a splash.
+ */
 static inline HitEntry* partyBehindGround(PartyEntry* party) {
     HitEntry* hit = _partySearchGround(party, 10.0f, 0.0f);
     if (hit && (hitGetAttr(hit) & 0x200)) {
@@ -2369,6 +2510,14 @@ static s32 getFrontFloor(PartyEntry* party, Vec* out, f32 dir);
 
 static void party_force_reset_outofscreen(PartyEntry* party);
 
+/**
+ * The standing motion (motion 0 of the stay and walk modes):
+ * clears the footmarks on entry unless coming from a jump, runs the slit and roll states,
+ * starts following (motion 1) once Mario or the first partner is far enough away,
+ * and keeps the partner on the floor or at flying height.
+ * On aji_02, aji_05 and aji_12 (X-Naut Fortress) it follows close.
+ * Ms. Mowz plays her sniffing pose when chuchu_searchObject finds something.
+ */
 void party_motion_stay(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     s32 id;
@@ -2554,6 +2703,11 @@ void party_motion_stay(PartyEntry* party) {
     }
 }
 
+/**
+ * Motion 0 of the wait move mode: stands, clears the footmarks on entry
+ * and goes back to run mode 2 once Mario is over 31 units away;
+ * otherwise the same floor, talk and Ms. Mowz handling as party_motion_stay.
+ */
 void party_motion_wait(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     if (party->trigFlags & PARTY_TRIG_FLAG_CHG_MOT) {
@@ -2606,6 +2760,10 @@ void party_motion_wait(PartyEntry* party) {
     }
 }
 
+/**
+ * Head and floor probe for a walking partner: snaps it to the floor, flags shallow water and damage floors,
+ * falls (motion 3) or splashes when there is none, and jumps off objects that cannot be stood on.
+ */
 void partyWalkChkGnd(PartyEntry* party) {
     Vec pos;
     f32 height;
@@ -2659,6 +2817,10 @@ void partyWalkChkGnd(PartyEntry* party) {
     }
 }
 
+/**
+ * FALSE while the partner should not follow Mario:
+ * he is in the air without moving, or in a damage or Spin Jump motion.
+ */
 static inline BOOL partyChkMarioFollowY(MarioWork* mario) {
     if (mario->airTimer != 0 && mario->baseSpeed == 0.0f) {
         return FALSE;
@@ -2671,6 +2833,10 @@ static inline BOOL partyChkMarioFollowY(MarioWork* mario) {
 }
 
 #if VERSION >= VERSION_US
+/**
+ * US: eases a flying partner's height toward target + 5 (+1 in 8-bit mode) by rate per frame,
+ * unless it is already up to 5 above it.
+ */
 static inline void partyFlyMoveY(PartyEntry* party, f32 target, f32 rate) {
     f32 add;
     f32 diff;
@@ -2685,7 +2851,7 @@ static inline void partyFlyMoveY(PartyEntry* party, f32 target, f32 rate) {
     }
 }
 
-// US: on las_10 the flying partner is pushed down out of low ceilings
+/** US: on las_10 the flying partner is pushed down out of low ceilings */
 static inline void partyFlyHeadCheck(PartyEntry* party) {
     Vec pos;
     f32 height;
@@ -2708,6 +2874,11 @@ static inline void partyFlyHeadCheck(PartyEntry* party) {
     }
 }
 
+/**
+ * US: keeps a flying partner at Mario's height or the floor's,
+ * whichever is higher (faster when below the floor), and hands floors with attribute 0x800 to run mode 13.
+ * Also pushes it down from las_10's ceilings.
+ */
 void partyFlyAdjustY(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     HitEntry* hit;
@@ -2780,6 +2951,10 @@ void partyFlyAdjustY(PartyEntry* party) {
 }
 
 #else
+/**
+ * JP: keeps a flying partner at Mario's height or the floor's, whichever is higher,
+ * and hands floors with attribute 0x800 to run mode 13.
+ */
 void partyFlyAdjustY(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     HitEntry* hit;
@@ -2859,6 +3034,12 @@ void partyFlyAdjustY(PartyEntry* party) {
 
 #endif
 
+/**
+ * The walking partner's follow motion (motion 1 of move mode 1):
+ * walks along Mario's footmarks at a speed set by its distance, jumps up ledges and at marked jump spots,
+ * steps up stairs, falls off edges, enters slits and Paper Mode floor grates, and snaps back on screen.
+ * The US release also speeds up to catch up.
+ */
 void party_motion_homing_walk(PartyEntry* party) {
     HitEntry* hit = NULL;
     s32 id;
@@ -3299,6 +3480,12 @@ found:
     partyGorFix(party);
 }
 
+/**
+ * The flying partner's follow motion (motion 1 of move mode 1):
+ * floats along Mario's footmarks, easing its height toward the floor ahead or Mario;
+ * after 10 frames without floor behind a wall it heads straight for Mario.
+ * The US release keeps the floor (no fall) when a footmark has none and avoids las_10's ceilings.
+ */
 void party_motion_homing_fly(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     s32 id;
@@ -3646,11 +3833,19 @@ void party_motion_homing_fly(PartyEntry* party) {
     party_force_reset_outofscreen(party);
 }
 
+/**
+ * Makes the next behind-Mario walk stand at direction dir (degrees, relative to the camera) from Mario instead
+ * of behind his facing; partyMoveBehindMario3 calls it without passing dir.
+ */
 void party_set_behind_dir(PartyEntry* party, f32 dir) {
     party->homeDir = revise360(dir + camGetPtr((CameraId)4)->viewYaw);
     party->trigFlags |= PARTY_TRIG_FLAG_HOME_DIR_SET;
 }
 
+/**
+ * Movement direction (degrees) of whoever this partner follows:
+ * Mario, or for a second partner the first one when it is out.
+ */
 static inline f32 partyGetFollowDir(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     PartyEntry* other;
@@ -3664,6 +3859,11 @@ static inline f32 partyGetFollowDir(PartyEntry* party) {
     return toMovedir(mario->displayDirection);
 }
 
+/**
+ * Move mode 2 (partyMoveBehindMario, and whenever Mario talks):
+ * walks the partner to its spot behind Mario (or at homeDir), jumping where the floor height changes;
+ * when it arrives or hits a wall it goes back to normal following (move mode 1).
+ */
 void party_motion_behind_mario(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     HitEntry* hit;
@@ -3832,6 +4032,11 @@ void party_motion_behind_mario(PartyEntry* party) {
     }
 }
 
+/**
+ * Move mode 6, set by partyReInit when the partner may not walk after a map change:
+ * keeps the partner walking to the spot behind Mario's facing;
+ * hands back to normal following once Mario stands still there.
+ */
 void party_motion_behind_mario_continue(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     PartyEntry* other;
@@ -3947,6 +4152,10 @@ void party_motion_behind_mario_continue(PartyEntry* party) {
     }
 }
 
+/**
+ * The flying partner's behind-Mario motion (move modes 2 and 6):
+ * floats to moveTarget behind Mario, then returns to normal following facing him.
+ */
 void party_motion_behind_mario_fly(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     HitEntry* hit;
@@ -4066,6 +4275,10 @@ void party_motion_behind_mario_fly(PartyEntry* party) {
     party->hitobjStandOn = hit;
 }
 
+/**
+ * Move mode 3 (partyMoveBesideMario): walks the partner to the spot at Mario's side (90 degrees from his
+ * facing), then returns to normal following.
+ */
 void party_motion_beside_mario(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     HitEntry* hit;
@@ -4158,6 +4371,7 @@ void party_motion_beside_mario(PartyEntry* party) {
     }
 }
 
+/** Unused copy of partyJumpFrontMove. */
 static inline void partyJumpWallMove(PartyEntry* party) {
     Vec v;
     HitEntry* hit;
@@ -4178,6 +4392,12 @@ static inline void partyJumpWallMove(PartyEntry* party) {
     party->position.z = v.z;
 }
 
+/**
+ * Moves a jumping partner forward by moveSpeed along targetDir, stopped by walls;
+ * records the wall in hitobjFront/hitobjPush.
+ * With the front wall check disabled it moves a scratch vector that is never stored,
+ * so the partner does not move sideways at all.
+ */
 static inline void partyJumpFrontMove(PartyEntry* party) {
     Vec v;
     HitEntry* hit;
@@ -4197,6 +4417,7 @@ static inline void partyJumpFrontMove(PartyEntry* party) {
     party->position.z = v.z;
 }
 
+/** Jump arc height for a rise of dy: 25 for a level jump, dy going up, 10 going down. */
 static inline f32 partyJumpHeight(f32 dy) {
     if (__fabsf(dy) < 1.0f) {
         return 25.0f;
@@ -4207,6 +4428,10 @@ static inline f32 partyJumpHeight(f32 dy) {
     }
 }
 
+/**
+ * Sets up a follow jump over distance d: 12 to 40 frames, initial velY 3 to 13 and the gravity,
+ * scaled by Mario's playerGravity.
+ */
 static inline void partyJumpCalc(PartyEntry* party, MarioWork* mario, f32 d) {
     f32 t;
     f32 dy;
@@ -4238,6 +4463,11 @@ static inline void partyJumpCalc(PartyEntry* party, MarioWork* mario, f32 d) {
     party->gravity = -g * mario->playerGravity;
 }
 
+/**
+ * The follow jump (motion 2): aims at moveTarget,
+ * the next footmark (at most 50 units or 1.4 times the rise away) or the floor ahead, sets up the arc,
+ * plays the jump sound, then flies it until landing (motion 0) or a splash in water (motion 3).
+ */
 void party_motion_jump(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     s32 id;
@@ -4381,6 +4611,11 @@ void party_motion_jump(PartyEntry* party) {
             break;
     }
 }
+/**
+ * The jump to moveTarget used by the behind/beside-Mario modes (motion 2 there):
+ * at most 50 units across, at least 10 frames; on landing it goes to stay
+ * or follow depending on how close moveTarget is.
+ */
 void party_motion_jump2(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     HitEntry* hit;
@@ -4471,6 +4706,12 @@ void party_motion_jump2(PartyEntry* party) {
     }
 }
 
+/**
+ * The fall motion (motion 3): gravity up to -16 a frame,
+ * lands on a floor (stay or follow by speed, landing sound) and drops the partner back behind Mario
+ * when it falls below -2000. Returns 2 while falling, 3 on landing.
+ * The US release slows the sideways drift when the stick is held.
+ */
 s32 party_motion_fall(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     HitEntry* hit;
@@ -4579,6 +4820,10 @@ s32 party_motion_fall(PartyEntry* party) {
     return 3;
 }
 
+/**
+ * The step-up motion (motion 6, from homing walk or partyHit):
+ * rises to stepY over 3 frames, then goes back to following (motion 1).
+ */
 void party_motion_upstairs(PartyEntry* party) {
     if (party->trigFlags & PARTY_TRIG_FLAG_CHG_MOT) {
         party->trigFlags &= ~PARTY_TRIG_FLAG_CHG_MOT;
@@ -4593,6 +4838,7 @@ void party_motion_upstairs(PartyEntry* party) {
     }
 }
 
+/** TRUE when hit is water (attribute 0x200). */
 static inline BOOL partyChkHitAttr200(HitEntry* hit) {
     if (!hit) {
         return FALSE;
@@ -4603,6 +4849,11 @@ static inline BOOL partyChkHitAttr200(HitEntry* hit) {
     return FALSE;
 }
 
+/**
+ * Motion 7, the partner knocked away: it flies up off the top of the screen,
+ * waits until Mario's damage motion is over, drops in from 200 above partyGetReturnPos and,
+ * 30 frames after landing on dry floor, returns to normal (run mode 2, move mode 0).
+ */
 void party_motion_damage(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     f32 x, y, z;
@@ -4674,6 +4925,10 @@ void party_motion_damage(PartyEntry* party) {
     }
 }
 
+/**
+ * Mario entered Paper Mode (mot_slit.c): both partners turn sideways too (slitOn 1, set up by party_slit),
+ * unless Mario is being normalized.
+ */
 void allPartySlitOn(void) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     if (party) {
@@ -4691,6 +4946,10 @@ void allPartySlitOn(void) {
     }
 }
 
+/**
+ * Mario left Paper Mode: both partners still in it start their turn-back animation (slitStep 40).
+ * Called from mot_slit.c.
+ */
 void allPartySlitOff(void) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     if (party && (party->flags & PARTY_FLAG_PAPER_MODE) && party->slitStep < 0x28) {
@@ -4702,6 +4961,10 @@ void allPartySlitOff(void) {
     }
 }
 
+/**
+ * Ends Paper Mode at once on both partners; used when Mario's own Paper Mode is cut short (mot_slit.c),
+ * by the all_party_slit_off script helper and when the pause menu opens (win_main.c).
+ */
 void allPartyForceSlitOff(void) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     if (party) {
@@ -4714,6 +4977,10 @@ void allPartyForceSlitOff(void) {
 }
 
 #if VERSION >= VERSION_US
+/**
+ * US: ends Paper Mode on both partners without changing their facing;
+ * mot_slit.c uses it instead of allPartyForceSlitOff when Mario leaves Paper Mode while in his roll motion.
+ */
 void U_allPartySlitOffReq(void) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     if (party && ((party->flags & PARTY_FLAG_PAPER_MODE) || (party->flags2 & PARTY_DISP_FLAG_SLIT))) {
@@ -4734,6 +5001,10 @@ void U_allPartySlitOffReq(void) {
 }
 
 #endif
+/**
+ * Ends Paper Mode on one partner at once, facing left or right from its direction, and resets its pose.
+ * Used when a partner ability or ride starts, in 8-bit mode and by Vivian's ability (party.c, party_vivian.c).
+ */
 void L_partyForceSlitOff(PartyEntry* party) {
     if ((party->flags & PARTY_FLAG_PAPER_MODE) || (party->flags2 & PARTY_DISP_FLAG_SLIT)) {
         party->displayDirection = revise360(party->targetDir - party->camDir) >= 180.0f ? 0.0f : 180.0f;
@@ -4748,6 +5019,11 @@ void L_partyForceSlitOff(PartyEntry* party) {
     }
 }
 
+/**
+ * The partner reached a Paper Mode floor grate in Mario's footmarks:
+ * enters Paper Mode (unless Mario is being normalized)
+ * and marks it to slip through the floor (party_slit's fall steps).
+ */
 void partyChgMotSlitFloor(PartyEntry* party) {
     if (party->flags & PARTY_FLAG_MOT_SLIT_FLOOR) {
         return;
@@ -4760,6 +5036,7 @@ void partyChgMotSlitFloor(PartyEntry* party) {
 }
 
 #if VERSION >= VERSION_US
+/** US: evt_mario_normalize takes the partner out of Paper Mode and clears slitOn. */
 void partySlitReset(PartyEntry* party) {
     if (party) {
         if (party->slitOn == 1) {
@@ -4770,6 +5047,14 @@ void partySlitReset(PartyEntry* party) {
 }
 
 #endif
+/**
+ * Per-frame Paper Mode state for a partner while slitOn is 1:
+ * turns sideways ("p_slit" paper animation), walks sideways, slips down through floor grates,
+ * and turns back when Mario leaves Paper Mode and no slit wall is in the way.
+ * Returns FALSE on the frame the turn completes.
+ * The US release also joins Mario's Paper Mode on its own and checks for walls on both sides
+ * before turning back.
+ */
 static BOOL party_slit(PartyEntry* party) {
     BOOL ret = TRUE;
     MarioWork* mario;
@@ -4913,6 +5198,11 @@ static BOOL party_slit(PartyEntry* party) {
     return ret;
 }
 
+/**
+ * Unknown: a roll state like Mario's tube mode ("p_roll" paper animation) for slitOn 2,
+ * spinning with speed and ending at slitStep 100; nothing in the decomp sets slitOn to 2.
+ * Returns FALSE while ending.
+ */
 static BOOL party_roll(PartyEntry* party) {
     BOOL ret = TRUE;
     f32 d;
@@ -5015,6 +5305,10 @@ static BOOL party_roll(PartyEntry* party) {
     return ret;
 }
 
+/**
+ * Close-follow distance: 18 for walking partners; 30 for Flurrie and Vivian, 8 during a door move.
+ * Any other flying partner gets an unset value.
+ */
 static f32 partyStayDist(PartyEntry* party) {
     f32 d;
     if (party->moveKind == 0) {
@@ -5035,6 +5329,7 @@ static f32 partyStayDist(PartyEntry* party) {
     return d;
 }
 
+/** Height a flying partner hovers above its target: 5, or 1 in 8-bit mode. */
 static f32 partyHomingOff(PartyEntry* party) {
     f32 off = 5.0f;
     if (party->flags2 & PARTY_DISP_FLAG_FAMICOM) {
@@ -5043,6 +5338,11 @@ static f32 partyHomingOff(PartyEntry* party) {
     return off;
 }
 
+/**
+ * Floor point 0.75 partner widths ahead in direction dir, rounded to 0.001, written to out;
+ * returns its hit attributes, or 0 with out = the partner's position when there is none.
+ * Probes from at most gnd_probe_dy above the partner, staying under any ceiling found in front.
+ */
 static s32 getFrontFloor(PartyEntry* party, Vec* out, f32 dir) {
     f32 s2, c2;
     HitCheckQuery q2;
@@ -5106,10 +5406,12 @@ found:
     return hitGetAttr(hit);
 }
 
+/** Unused: sets a hit query's direction to straight down. */
 static inline void partyDownDirX(HitCheckQuery* q) {
     q->targetDir = (Vec){0.0f, -1.0f, 0.0f};
 }
 
+/** Floor height 40 units from u in direction md (probed from gnd_probe_dy up), rounded to 0.001, or -2000. */
 static f32 partyGetDirGndY(Vec u, f32 md) {
     f32 k = 40.0f;
     HitCheckQuery q2;
@@ -5136,6 +5438,7 @@ static f32 partyGetDirGndY(Vec u, f32 md) {
     return gy;
 }
 
+/** Floor height below (x, y + gnd_probe_dy, z), rounded to 0.01, or -2000 when there is none. */
 static f32 partyGetGndY(f32 x, f32 y, f32 z) {
     f32 r;
     f32 hx, hy, hz, dist, nx, ny, nz;
@@ -5152,6 +5455,10 @@ static f32 partyGetGndY(f32 x, f32 y, f32 z) {
     return r;
 }
 
+/**
+ * Hit attributes of the floor 20 units ahead in direction dir (probed from 20 up, 40 down), 0 if none.
+ * Homing walk uses it to skip footmarks over 0x800 floors.
+ */
 static u32 partyGetFrontAttr(PartyEntry* party, f32 dir) {
     HitCheckQuery q;
     HitEntry* hit;
@@ -5166,6 +5473,10 @@ static u32 partyGetFrontAttr(PartyEntry* party, f32 dir) {
     return hit ? hitGetAttr(hit) : 0;
 }
 
+/**
+ * Hit attributes of the floor 40 units ahead along targetDir (probed from 40 up, 100 down), 0 if none.
+ * Homing walk does not step forward when it is 0x200 (water).
+ */
 static inline u32 partyGetFrontAttrFar(PartyEntry* party) {
     HitCheckQuery q;
     HitEntry* hit;
@@ -5181,10 +5492,16 @@ static inline u32 partyGetFrontAttrFar(PartyEntry* party) {
     return hit ? hitGetAttr(hit) : 0;
 }
 
+/** Unused: sets a hit query's direction to straight down. */
 static inline void partyDownDirY(HitCheckQuery* q) {
     q->targetDir = (Vec){0.0f, -1.0f, 0.0f};
 }
 
+/**
+ * While Mario has control, pulls a partner that has left the screen (more than 100 px past the sides or 650 px
+ * down) back toward Mario step by step onto dry floor until it is on screen, and clears the footmarks.
+ * A partner right under Mario but far down the screen is put at its appear position instead.
+ */
 static void party_force_reset_outofscreen(PartyEntry* party) {
     MarioWork* m2;
     s32 i;
@@ -5296,6 +5613,10 @@ static void party_force_reset_outofscreen(PartyEntry* party) {
     }
 }
 
+/**
+ * Rogueport (gor_01): when Mario stands on one floor of a house and the partner on the floor above it,
+ * moves the partner to (122, 130, -313). Guess: works around a partner stuck on the upper floor.
+ */
 static void partyGorFix(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     if (!strcmp(gp->currentMapName, "gor_01") && mario->hitobjStandOn && party->hitobjStandOn &&
@@ -5305,6 +5626,10 @@ static void partyGorFix(PartyEntry* party) {
     }
 }
 
+/**
+ * Ms. Mowz's sniffing pose (PCH_A2_1) for 30 frames,
+ * when chuchu_searchObject finds an item or hidden treasure within 150 units of Mario.
+ */
 static void partyPoseA2(PartyEntry* party) {
     partyChgPose(party, "PCH_A2_1");
     party->useMotionId = 1;

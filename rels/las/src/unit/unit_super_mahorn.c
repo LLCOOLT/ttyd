@@ -24,6 +24,10 @@
 #include "evt/evt_sub.h"
 
 double __fabs(double x);
+/**
+ * Absolute value of a double, via the C library's __fabs (kept as an inline wrapper so the compiler does not
+ * turn it into the fabs instruction).
+ */
 static inline double mahorn_fabs(double x) {
     return __fabs(x);
 }
@@ -529,6 +533,14 @@ static BattleUnitSetup entry_mahorn = {
     NULL, // itemDropTable
 };
 
+/**
+ * Attack event of the Elite Wizzerd: when confused it punches.
+ * Illusion copies (unit work 4 set) do nothing here.
+ * Otherwise it can use an item; when it is the last Wizzerd alive it creates illusions (bunsin_event);
+ * when illusions exist it picks one of its spells to buff them (Dekadeka or Katikati);
+ * else it draws a weighted number among the punch, the magic ball at one target,
+ * the lightning on all targets and its support spells (Dekadeka, Katikati, Trans, Yokeyoke, Recover).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -630,6 +642,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Attack event of an illusion copy of the Elite Wizzerd: the copies never attack; it only returns to waiting. */
 static EVT_BEGIN(attack_event_bunsin)
     LABEL(99)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -670,6 +683,10 @@ static BattleDataEntry data_table_bunsin[] = {
     {0},
 };
 
+/**
+ * Init event of the Elite Wizzerd: installs its wait, attack, damage and confusion events,
+ * starts hand_ctrl_event, which floats its hands, and clears unit work 4 (copy flag) and 6 (hide flag).
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -691,6 +708,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: fades the Elite Wizzerd and its copies out (alpha down) by setting attribute 0x2000000 on all five
+ * parts of each of them.
+ */
 static EVT_BEGIN(alpha_down_event)
     IF_INT_EQUAL(LW(0), -1)
         RETURN
@@ -719,6 +740,10 @@ static EVT_BEGIN(alpha_down_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: fades the Elite Wizzerd and its copies back in (alpha up) by clearing attribute 0x2000000 on all five
+ * parts of each of them.
+ */
 static EVT_BEGIN(alpha_up_event)
     IF_INT_EQUAL(LW(0), -1)
         RETURN
@@ -751,6 +776,10 @@ static EVT_BEGIN(alpha_up_event)
     RETURN
 EVT_END()
 
+/**
+ * Event that runs for as long as the Elite Wizzerd exists and moves its four hands every frame;
+ * ends when the unit is gone.
+ */
 static EVT_BEGIN(hand_ctrl_event)
     LABEL(0)
     WAIT_FRAMES(1)
@@ -764,6 +793,11 @@ static EVT_BEGIN(hand_ctrl_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage event of the Elite Wizzerd: when an illusion copy is hit it disappears (bunsin_kill_event)
+ * and the real one is not hurt; when the real one is hit all the copies vanish with it
+ * (mahorn_subset_bunsin_all_kill) and the default damage handling runs.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -790,6 +824,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Removes all the illusion copies of the Elite Wizzerd, if it is the real one (unit work 4 is 0):
+ * spawns bunsin_kill_event for each copy.
+ */
 static EVT_BEGIN(mahorn_subset_bunsin_all_kill)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -817,6 +855,11 @@ static EVT_BEGIN(mahorn_subset_bunsin_all_kill)
     RETURN
 EVT_END()
 
+/**
+ * Death sequence of the Elite Wizzerd: it spins, a smoke puff, the coins, experience and star points appear,
+ * its statuses are cleared and the illusion copies are removed
+ * before the unit is killed (with a different kill mode for damage code 0x400).
+ */
 static EVT_BEGIN(mahorn_subset_dead_event)
     CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 50)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -873,6 +916,7 @@ static EVT_BEGIN(mahorn_subset_dead_event)
     RETURN
 EVT_END()
 
+/** Death sequence when the Elite Wizzerd is blown away: plays the blow-away pose, removes its copies, and kills it. */
 static EVT_BEGIN(mahorn_subset_blow_dead_event)
     CALL(evt_snd_sfxon, STRING("SFX_BTL_CLAUD_BREATH3"), 0)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(0))
@@ -897,6 +941,7 @@ static EVT_BEGIN(mahorn_subset_blow_dead_event)
     RETURN
 EVT_END()
 
+/** Event run when an attack misses the Elite Wizzerd: if it is an illusion copy it disappears (bunsin_kill_event). */
 static EVT_BEGIN(avoid_miss_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -906,6 +951,10 @@ static EVT_BEGIN(avoid_miss_event)
     RETURN
 EVT_END()
 
+/**
+ * Makes an illusion copy of the Elite Wizzerd disappear:
+ * fades it out once (unit work 6 marks it) and kills the unit.
+ */
 static EVT_BEGIN(bunsin_kill_event)
     CALL(btlevtcmd_GetUnitId, LW(0), LW(0))
     IF_INT_EQUAL(LW(0), -1)
@@ -923,6 +972,11 @@ static EVT_BEGIN(bunsin_kill_event)
     RETURN
 EVT_END()
 
+/**
+ * Punch attack of the Elite Wizzerd (weapon_mahorn_attack_punch):
+ * its hand part flies out to the target, which can dodge or take the hit with the action command defence check,
+ * and the hand then returns.
+ */
 static EVT_BEGIN(attack_punch_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -1044,6 +1098,10 @@ static EVT_BEGIN(attack_punch_event)
         RETURN
 EVT_END()
 
+/**
+ * Helper child script of the Wizzerd attacks: given the pre-check result in LW(5),
+ * makes the target start its dodge reaction (avoid type 38, 39 or 40).
+ */
 static EVT_BEGIN(start_avoid)
     IF_INT_EQUAL(LW(5), 3)
         CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -1057,6 +1115,12 @@ static EVT_BEGIN(start_avoid)
     RETURN
 EVT_END()
 
+/**
+ * Common script of the Elite Wizzerd's magic attack on one target:
+ * all four hands charge (attack_enemy_common_event_sub1),
+ * a magic ball flies from it to the target and the target either dodges
+ * or is hit with the action command defence check and the damage.
+ */
 static EVT_BEGIN(attack_enemy_common_event)
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
@@ -1167,6 +1231,10 @@ static EVT_BEGIN(attack_enemy_common_event)
         RETURN
 EVT_END()
 
+/**
+ * Common script of the Elite Wizzerd's magic attack on every target:
+ * it charges, then a lightning (thunder_n64 effect) strikes each target in turn with a dodge or hit check.
+ */
 static EVT_BEGIN(attack_enemy_all_common_event)
     CALL(btlevtcmd_WeaponAftereffect, LW(9))
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
@@ -1230,6 +1298,10 @@ static EVT_BEGIN(attack_enemy_all_common_event)
         RETURN
 EVT_END()
 
+/**
+ * Part of the Wizzerd's magic: the charge-up in which the hand parts spark (akari_charge_n64 effect)
+ * and take their casting poses.
+ */
 static EVT_BEGIN(attack_enemy_common_event_sub1)
     IF_INT_EQUAL(LW(15), -1)
         RETURN
@@ -1251,6 +1323,10 @@ static EVT_BEGIN(attack_enemy_common_event_sub1)
     RETURN
 EVT_END()
 
+/**
+ * Part of the Wizzerd's magic: the release, where the hand parts take their casting poses in turn (MAH_S_2A and
+ * MAH_S_2B) and the spell is cast.
+ */
 static EVT_BEGIN(attack_enemy_common_event_sub2)
     IF_INT_EQUAL(LW(15), -1)
         RETURN
@@ -1328,6 +1404,7 @@ static EVT_BEGIN(attack_enemy_common_event_sub2)
     RETURN
 EVT_END()
 
+/** Variant of the Wizzerd's casting that casts without hitting (the spell misses the target). */
 static EVT_BEGIN(attack_enemy_common_event_sub_no_hit)
     IF_INT_EQUAL(LW(15), -1)
         RETURN
@@ -1348,6 +1425,7 @@ static EVT_BEGIN(attack_enemy_common_event_sub_no_hit)
     RETURN
 EVT_END()
 
+/** Variant of the Wizzerd's casting that hits the target. */
 static EVT_BEGIN(attack_enemy_common_event_sub_hit)
     IF_INT_EQUAL(LW(15), -1)
         RETURN
@@ -1364,6 +1442,10 @@ static EVT_BEGIN(attack_enemy_common_event_sub_hit)
     RETURN
 EVT_END()
 
+/**
+ * Magic attack of the Elite Wizzerd on a single target (weapon_mahorn_attack_magic):
+ * picks a target, then runs attack_enemy_common_event.
+ */
 static EVT_BEGIN(attack_magic_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -1387,6 +1469,10 @@ static EVT_BEGIN(attack_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * Confused version of the Wizzerd's magic: it picks a target among all units (including allies)
+ * and runs attack_enemy_common_event.
+ */
 static EVT_BEGIN(confuse_magic_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -1405,6 +1491,10 @@ static EVT_BEGIN(confuse_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * Lightning attack of the Elite Wizzerd on every target (weapon_mahorn_all_attack_magic):
+ * runs attack_enemy_all_common_event.
+ */
 static EVT_BEGIN(all_attack_magic_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -1423,6 +1513,11 @@ static EVT_BEGIN(all_attack_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * Common script of the Elite Wizzerd's support spells:
+ * a charge flash (akari_charge_n64), the casting poses and the magic effect (mahorn) on the caster,
+ * which the individual spells then follow with their effects.
+ */
 static EVT_BEGIN(support_friend_common_event)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
@@ -1463,6 +1558,10 @@ static EVT_BEGIN(support_friend_common_event)
     RETURN
 EVT_END()
 
+/**
+ * Dekadeka spell of the Elite Wizzerd: makes the target grow bigger (weapon_mahorn_dekadeka_magic has
+ * sizeChangeChance 100).
+ */
 static EVT_BEGIN(dekadeka_magic_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -1481,6 +1580,10 @@ static EVT_BEGIN(dekadeka_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * Katikati spell of the Elite Wizzerd (weapon_mahorn_katikati_magic).
+ * Guess: a defence boost, from the name, "katikati" = rock hard.
+ */
 static EVT_BEGIN(katikati_magic_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -1499,6 +1602,10 @@ static EVT_BEGIN(katikati_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * Trans spell of the Elite Wizzerd (weapon_mahorn_trans_magic).
+ * Guess: makes the target transparent or harder to hit, from the name.
+ */
 static EVT_BEGIN(trans_magic_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -1517,6 +1624,10 @@ static EVT_BEGIN(trans_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * Yokeyoke spell of the Elite Wizzerd (weapon_mahorn_yokeyoke_magic):
+ * sets the target's chance to dodge attacks (dodgyChance 100).
+ */
 static EVT_BEGIN(yokeyoke_magic_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -1535,6 +1646,7 @@ static EVT_BEGIN(yokeyoke_magic_event)
     RETURN
 EVT_END()
 
+/** Recover spell of the Elite Wizzerd: heals the target by 10 HP with the recovery effect. */
 static EVT_BEGIN(recover_magic_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -1556,6 +1668,11 @@ static EVT_BEGIN(recover_magic_event)
     RETURN
 EVT_END()
 
+/**
+ * Illusion move of the Elite Wizzerd: after the casting flash it fades out
+ * and creates up to four copies of itself on free spots beside it (spawn_event),
+ * then fades everything back in so the player cannot tell which is the real one.
+ */
 static EVT_BEGIN(bunsin_event)
     SET_VALUE(LW(3), -2)
     SET_VALUE(LW(4), 1)
@@ -1609,6 +1726,11 @@ static EVT_BEGIN(bunsin_event)
     RETURN
 EVT_END()
 
+/**
+ * Creates one illusion copy of the Elite Wizzerd:
+ * spawns entry_mahorn, copies the original's status, marks it as a copy (unit work 4 = 1),
+ * gives it the do-nothing attack event and a special vulnerability table (regist_bunsin).
+ */
 static EVT_BEGIN(spawn_event)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_mahorn), 0)
     CALL(btlevtcmd_SetAlpha, LW(3), 1, 0)
@@ -1631,6 +1753,12 @@ static EVT_BEGIN(spawn_event)
     RETURN
 EVT_END()
 
+/**
+ * Wait event of the Elite Wizzerd and its copies:
+ * plays the idle pose from the table for the body and for each copy,
+ * and changes the hand poses according to the statuses (asleep, stopped, frozen, shrunk or grown)
+ * before looping.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -1758,6 +1886,11 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: returns in args[1] the X of the first magic effect element of type 3 (the leading orb)
+ * belonging to the unit in args[0], or 0 if there is none.
+ * Used to track where the Elite Wizzerd's spell currently is.
+ */
 static USER_FUNC(eff_magic_get_posX) {
     EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, *args++));
@@ -1778,6 +1911,11 @@ static USER_FUNC(eff_magic_get_posX) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: starts the Elite Wizzerd's spell effect from the unit towards the X in args[1] (Y and Z come
+ * from the unit, args[2] and args[3] are the other target coordinates),
+ * moving over the args[4] frames' worth of distance. Stores the effect in unit->work[7].
+ */
 static USER_FUNC(eff_magic) {
     EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
@@ -1798,6 +1936,11 @@ static USER_FUNC(eff_magic) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: copies HP, status counters (0x1E bytes starting at sleepTurns)
+ * and the HP gauge display from the unit in args[0] to the unit in args[1],
+ * so a clone of the Elite Wizzerd matches the original.
+ */
 static USER_FUNC(mahorn_copy_status) {
     EvtWord* args = event->args;
     s32 id1 = evtGetValue(event, args[0]);
@@ -1814,6 +1957,11 @@ static USER_FUNC(mahorn_copy_status) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: shuffles the positions of the Elite Wizzerd
+ * and its copies (kinds 0x80, 0x81, 0xA9 and 0xAA) with ten random swaps of their X and Z,
+ * so the player cannot tell which one is the real one.
+ */
 static USER_FUNC(mahorn_shuffle) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* kamecs[6];
@@ -1850,6 +1998,10 @@ static USER_FUNC(mahorn_shuffle) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: returns the battle unit indices of the Elite Wizzerd's clones (bunsin, kinds 0x81 and 0xAA) in
+ * up to four script variables args[0..3] (-1 for unused), then the number of clones after them.
+ */
 static USER_FUNC(mahorn_get_bunsin) {
     EvtWord* args = event->args;
     s32 copies[4];
@@ -1877,6 +2029,11 @@ static USER_FUNC(mahorn_get_bunsin) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: sets where hand args[1] (part 2..5 of the Elite Wizzerd, one per hand) should float:
+ * stores the offset (-x, y, z) in the hand's destination block,
+ * scaled by 1.25 when the unit is shrunk or 0.75 when it is grown (status 10 and 11).
+ */
 static USER_FUNC(set_hand_dest) {
     s32 hand;
     BattleUnit* unit;
@@ -1915,6 +2072,11 @@ static USER_FUNC(set_hand_dest) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper (runs every frame): eases each of the four hand parts of the Elite Wizzerd toward its
+ * destination offset, one tenth of the distance per call.
+ * It does nothing while the unit is asleep, stopped or frozen (statuses 2, 9 and 1).
+ */
 static USER_FUNC(hand_ctrl) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1963,6 +2125,7 @@ static USER_FUNC(hand_ctrl) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: frees the four hand destination blocks of the Elite Wizzerd allocated by hand_init. */
 static USER_FUNC(hand_end) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -1980,6 +2143,10 @@ static USER_FUNC(hand_end) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: sets up the Elite Wizzerd's four hands:
+ * starts each in the "MAH_Z_2" animation and allocates a three- float destination block in unit->work[0..3].
+ */
 static USER_FUNC(hand_init) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -2004,6 +2171,10 @@ static USER_FUNC(hand_init) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Guess: counts the enemy-side (alliance 1) units in battle that do not have status 0x1B (probably those still
+ * fighting) and returns the count in args[0].
+ */
 static USER_FUNC(mahorn_get_live_num) {
     s32 i;
     EvtWord* args = event->args;

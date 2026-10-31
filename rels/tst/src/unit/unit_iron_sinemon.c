@@ -192,6 +192,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init script of the first Iron Cleft of the pair:
+ * sets unit work 0 to 0 (first of the pair), stores the other Iron Cleft's id in unit work 1 (from get_id)
+ * and runs init_event_sub.
+ */
 static EVT_BEGIN(init_event1)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     CALL(get_id, LW(0), LW(1))
@@ -200,6 +205,11 @@ static EVT_BEGIN(init_event1)
     RETURN
 EVT_END()
 
+/**
+ * Init script of the second Iron Cleft of the pair:
+ * sets unit work 0 to 1 (second of the pair), stores the other Iron Cleft's id in unit work 1 (from get_id)
+ * and runs init_event_sub.
+ */
 static EVT_BEGIN(init_event2)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
     CALL(get_id, LW(0), LW(1))
@@ -208,6 +218,11 @@ static EVT_BEGIN(init_event2)
     RETURN
 EVT_END()
 
+/**
+ * Shared part of the Iron Clefts' init: installs the wait, phase, attack,
+ * damage and confusion handlers (confusion reuses the attack), scales the unit to 1.5 x 1.5,
+ * sets its walk and run sounds and starts the wait event.
+ */
 static EVT_BEGIN(init_event_sub)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
@@ -221,6 +236,11 @@ static EVT_BEGIN(init_event_sub)
     RETURN
 EVT_END()
 
+/**
+ * Spike spark shown when an attacker is hurt by (or avoids) the spiked head:
+ * waits 30 frames, then spawns the toge_flush effect in front of and above the unit (52 up,
+ * 67 when Huge and 37 when Tiny, with the front offset scaled to match).
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -244,6 +264,13 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler of the Iron Cleft.
+ * It runs the default damage script; then, the first time an Iron Cleft of the pair takes real damage (and only
+ * once ever, tracked by GSWF_TOU_IRON_CLEFTS_WEAKNESS_SEEN),
+ * the camera moves in and the two Iron Clefts speak the weakness lines stg3_tou_272 and stg3_tou_273
+ * before the flag is set.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -280,6 +307,15 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Phase script of the Iron Cleft pair.
+ * Only the first of the pair runs it (unit work 0 = 0),
+ * and only until the pair has been beaten (GSWF_TOU_IRON_CLEFTS_BEATEN).
+ * On the first turn before the player's turn it runs the intro:
+ * the camera moves in, the partner and the Iron Clefts talk (lines stg3_tou_266 and 267 the first time only,
+ * then stg3_tou_268/269 or, if Yoshi is the partner, stg3_tou_270/271),
+ * and GSWF_TOU_IRON_CLEFTS_INTRO_SEEN is set.
+ */
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -359,6 +395,13 @@ static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the Iron Cleft: it picks a target, walks toward it with the heavy step sounds,
+ * curls up (pose type
+ * 50) for 750 ms and rolls into it at speed 3 (weapon_iron_sinemon_attack). A miss lets it run past; a hit shakes the
+ * camera and applies the damage with the guard-timing check.
+ * It then hops twice with camera shakes and walks home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -465,11 +508,16 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0] and args[1] receive the unit indices of the two Shinemon kinds 0x3D
+ * and 0x3E on the field (left unset if a kind is missing).
+ */
 static USER_FUNC(get_id) {
     EvtWord* args = event->args;
     s32 i;
@@ -491,6 +539,7 @@ static USER_FUNC(get_id) {
     evtSetValue(event, args[1], id2);
     return EVT_RETURN_DONE;
 }
+/** Script helper: args[0] receives 1 when Yoshi is in the party data (partyData[4] flag 1 set), else 0. */
 static USER_FUNC(yoshi_exist) {
     EvtWord* args = event->args;
     PouchData* pouch = pouchGetPtr();

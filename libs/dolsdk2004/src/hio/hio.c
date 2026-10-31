@@ -25,6 +25,11 @@ static HIOCallback ExiCallback;
 static HIOCallback TxCallback;
 static HIOCallback RxCallback;
 
+/**
+ * EXI external-insertion callback for the host-I/O device:
+ * forgets the channel (Chan = -1, device 0) and removes the EXI interrupt callback on channel 0/1 (or on channel
+ * 2 for device 2).
+ */
 static void ExtHandler(s32 chan, OSContext *context) {
     Chan = -1;
     HIO_DEV = 0;
@@ -36,12 +41,18 @@ static void ExtHandler(s32 chan, OSContext *context) {
     }
 }
 
+/** EXI interrupt callback for the HIO device; just forwards to the callback the application gave HIOInit. */
 static void ExiHandler(s32 chan, OSContext* context) {
     if (ExiCallback) {
         ExiCallback();
     }
 }
 
+/**
+ * Handler for the processor-interface debugger interrupt (OS interrupt 0x19),
+ * used when HIO runs on EXI channel 2: acknowledges it in PI
+ * and calls the HIOInit callback inside a scratch OS context.
+ */
 static void DbgHandler(__OSInterrupt interrupt, OSContext *context) {
     OSContext exceptionContext;
 
@@ -55,6 +66,10 @@ static void DbgHandler(__OSInterrupt interrupt, OSContext *context) {
     }
 }
 
+/**
+ * Completion handler for HIOWriteAsync: deselects and unlocks the EXI channel,
+ * then calls the caller's transmit callback.
+ */
 static void TxHandler(s32 chan, OSContext* context) {
     EXIDeselect(Chan);
     EXIUnlock(Chan);
@@ -63,6 +78,10 @@ static void TxHandler(s32 chan, OSContext* context) {
     }
 }
 
+/**
+ * Completion handler for HIOReadAsync: deselects and unlocks the EXI channel,
+ * then calls the caller's receive callback.
+ */
 static void RxHandler(s32 chan, OSContext* context) {
     EXIDeselect(Chan);
     EXIUnlock(Chan);
@@ -71,6 +90,11 @@ static void RxHandler(s32 chan, OSContext* context) {
     }
 }
 
+/**
+ * Probes EXI channels 0 to 2 for host-I/O hardware (EXI id 0x01010000)
+ * and calls the callback with each channel found; stops early if the callback returns false.
+ * Refuses if HIO is already open.
+ */
 BOOL HIOEnumDevices(HIOEnumCallback callback) {
     s32 chan;
     u32 id;
@@ -93,6 +117,10 @@ BOOL HIOEnumDevices(HIOEnumCallback callback) {
     return 1;
 }
 
+/**
+ * Returns true when the console may use host I/O (a development unit or one with device code 0x8200);
+ * on other consoles the HIO calls fail or return false.
+ */
 static inline int CheckConsoleType() {
     if (__OSGetDIConfig() == 0xFF) {
         if (((OSGetConsoleType() & 0xF0000000) + 0xE0000000) == 0) {
@@ -110,6 +138,11 @@ static inline int CheckConsoleType() {
     return 1;
 }
 
+/**
+ * Opens the host-I/O link on EXI channel chan (the PC link of a development kit):
+ * checks the console type, locks the channel, reads the device id (must be 0x01010000)
+ * and installs the interrupt callback. Returns false on retail consoles.
+ */
 BOOL HIOInit(s32 chan, HIOCallback callback) {
     int err;
     u32 cmd;
@@ -195,6 +228,7 @@ BOOL HIOInit(s32 chan, HIOCallback callback) {
     return 1;
 }
 
+/** Same as HIOInit but with an explicit EXI device number (0, or 2 on channel 0). */
 BOOL HIOInitEx(s32 chan, u32 dev, HIOCallback callback) {
     ASSERTLINE(348, dev == 0 || chan == 0 && dev == 2);
 
@@ -210,6 +244,10 @@ BOOL HIOInitEx(s32 chan, u32 dev, HIOCallback callback) {
     return HIOInit(chan, callback);
 }
 
+/**
+ * Reads the 32-bit mailbox word the host left for the console (EXI command 0x60);
+ * false if HIO is not open or the transfer fails.
+ */
 BOOL HIOReadMailbox(u32* word) {
     int err;
     u32 cmd;
@@ -238,6 +276,7 @@ BOOL HIOReadMailbox(u32* word) {
     return !err;
 }
 
+/** Writes a mailbox word for the host (command 0xC0, only the low 29 bits are sent). */
 BOOL HIOWriteMailbox(u32 word) {
     int err;
     u32 cmd;
@@ -264,6 +303,10 @@ BOOL HIOWriteMailbox(u32 word) {
     return !err;
 }
 
+/**
+ * Synchronously DMAs size bytes from address addr in the host adapter's memory into buffer (command 0x20);
+ * addr must be 4-byte aligned.
+ */
 BOOL HIORead(u32 addr, void* buffer, s32 size) {
     int err;
     u32 cmd;
@@ -294,6 +337,10 @@ BOOL HIORead(u32 addr, void* buffer, s32 size) {
     return !err;
 }
 
+/**
+ * Synchronously DMAs size bytes from buffer to address addr in the host adapter's memory (command 0xA0);
+ * addr must be 4-byte aligned.
+ */
 BOOL HIOWrite(u32 addr, void* buffer, s32 size) {
     int err;
     u32 cmd;
@@ -324,6 +371,10 @@ BOOL HIOWrite(u32 addr, void* buffer, s32 size) {
     return !err;
 }
 
+/**
+ * Like HIORead but returns once the DMA is started;
+ * RxHandler unlocks the channel and calls the callback on completion.
+ */
 BOOL HIOReadAsync(u32 addr, void* buffer, s32 size, HIOCallback callback) {
     int err;
     u32 cmd;
@@ -352,6 +403,10 @@ BOOL HIOReadAsync(u32 addr, void* buffer, s32 size, HIOCallback callback) {
     return !err;
 }
 
+/**
+ * Like HIOWrite but returns once the DMA is started;
+ * TxHandler unlocks the channel and calls the callback on completion.
+ */
 BOOL HIOWriteAsync(u32 addr, void* buffer, s32 size, HIOCallback callback) {
     int err;
     u32 cmd;
@@ -380,6 +435,10 @@ BOOL HIOWriteAsync(u32 addr, void* buffer, s32 size, HIOCallback callback) {
     return !err;
 }
 
+/**
+ * Reads the 32-bit host-I/O status word (command 0x40);
+ * MCC checks its bit 1 (host mailbox busy) and bit 0 (host mail waiting).
+ */
 BOOL HIOReadStatus(u32* status) {
     int err;
     u32 cmd;

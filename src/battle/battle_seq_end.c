@@ -168,6 +168,11 @@ RankUpData _rank_up_data[] = {
     {30, 3, "msg_menu_mario_name_3", "butai_03"},
     {0xFFFF, 0, NULL, NULL},
 };
+/**
+ * Run on Mario by btlseqEnd after a win when BATTLE_FLAG_MAJINAI_END is set:
+ * shows the btl_msg_mj_last announcement for 60 frames.
+ * Guess: the notice that Merlee's charm (majinai) has run out.
+ */
 EVT_BEGIN(_event_MajinaiEnd)
     CALL(btlevtcmd_AnnounceMessage, 0, 0, -36, STRING("btl_msg_mj_last"), 60)
     WAIT_FRAMES(60)
@@ -180,6 +185,10 @@ s32 fp_tex_tbl[6] = {56, 56, 57, 58, 58, 58};
 s32 bp_tex_tbl[6] = {59, 59, 60, 61, 62, 63};
 #endif
 
+/**
+ * Returns the _rank_up_data entry whose start level is exactly level (the rank-up levels 1, 10, 20 and 30),
+ * or NULL for any other level.
+ */
 static RankUpData* _get_rank_data(s32 level) {
     RankUpData* rank;
 
@@ -191,6 +200,10 @@ static RankUpData* _get_rank_data(s32 level) {
     return rank;
 }
 
+/**
+ * Returns the message label of Mario's rank title for a level (the last _rank_up_data entry it has reached),
+ * for the Mario page of the pause menu (win_mario.c); NULL below level 1.
+ */
 const char* BattleGetRankNameLabel(s32 level) {
     RankUpData* found = NULL;
     RankUpData* rank = _rank_up_data;
@@ -218,6 +231,13 @@ static void btlseqEnd_DispMain(CameraId camId, void* param);
 #define SS(v) BattleSetSeq(wp, SEQ_END, (v))
 static void _GetExpIcon_End(SeqEndWork* work);
 
+/**
+ * Battle end sequence, run every frame by the battle sequencer during SEQ_END:
+ * decides the result (win, loss, fled or interrupted),
+ * runs the field's post-battle event and Merlee's Star Point charm, counts the Star Points into the pouch,
+ * then plays the level-up show with the HP/FP/BP choice and the rank-up message,
+ * fades out and hands Mario's and the partner's state back to the field. A loss goes to the game over sequence.
+ */
 void btlseqEnd(BattleWork* wp) {
     SeqEndWork* work = (SeqEndWork*)wp->seqEndWork;
     FieldBattleInfo* info = wp->fbatInfo;
@@ -863,6 +883,10 @@ void btlseqEnd(BattleWork* wp) {
 
 // inlining off for _ExecAllUnitBattleEndEvent, btlseqEnd_DispInit, btlseqEnd_DispMain and 13 more, as in the original (the object differs without it)
 #pragma dont_inline on
+/**
+ * Starts every unit's battle-end event (unit data entry 0x3F) bound to that unit;
+ * run on a win once all events have finished, and when the battle is fled or aborted.
+ */
 static void _ExecAllUnitBattleEndEvent(void) {
     BattleUnit* unit;
     BattleWork* wp = _battleWorkPointer;
@@ -883,10 +907,15 @@ static void _ExecAllUnitBattleEndEvent(void) {
     }
 }
 
+/** Clears the result display flags when the end-of-battle work is allocated. */
 static void btlseqEnd_DispInit(BattleWork* wp) {
     SEW(wp)->flags = 0;
 }
 
+/**
+ * Called at the end of every btlseqEnd frame: steps the Star Point icons
+ * and queues each result display whose SeqEndDispFlags bit is set.
+ */
 static void btlseqEnd_DispMain(CameraId camId, void* param) {
     BattleWork* wp = (BattleWork*)param;
     SeqEndWork* work = SEW(wp);
@@ -914,6 +943,10 @@ static void btlseqEnd_DispMain(CameraId camId, void* param) {
     }
 }
 
+/**
+ * Draws a window with the Star Point icon and the remaining expDisp count.
+ * Nothing sets SEQ_END_DISP_MARIO_EXP, so it never shows.
+ */
 static void _MarioExpDisp(CameraId camId, void* param) {
     SeqEndWork* work = SEW((BattleWork*)param);
     char buf[0x10];
@@ -938,6 +971,11 @@ static void _MarioExpDisp(CameraId camId, void* param) {
     }
 }
 
+/**
+ * Draws a level-up confirmation box (btl_msg_lvup_ok with yes and no, cursor at work->cursor).
+ * Nothing sets SEQ_END_DISP_LVUP_CONFIRM and the matching confirm state 0x7000013 is never entered,
+ * so it never shows.
+ */
 static void _LvupParamConfirmDisp(CameraId camId, void* param) {
     Vec pos;
     f32 zero = 0.0f;
@@ -962,7 +1000,7 @@ static void _LvupParamConfirmDisp(CameraId camId, void* param) {
     iconDispGx(&pos, ICON_DISP_2D, ICON_18C, 1.0f);
 }
 
-// The demo has this function but never calls it (the linker strips it; its strings stay).
+/** The demo has this function but never calls it (the linker strips it; its strings stay). */
 void L__LvupParamHelpMsgDisp(CameraId camId, void* param) {
     SeqEndWork* work = SEW((BattleWork*)param);
     PouchData* pouch;
@@ -1002,6 +1040,11 @@ void L__LvupParamHelpMsgDisp(CameraId camId, void* param) {
     FontDrawMessage(zero - width / 2, (s32)y + (lines - 1) * 29, msg);
 }
 
+/**
+ * Creates the 19 Star Point icons of the result screen,
+ * ten large ones (one per 10 points, centred on the count) and nine small ones (single points),
+ * and turns on their display.
+ */
 static void _GetExpIcon_Init(SeqEndWork* work) {
     s32 i;
     char name[16];
@@ -1033,6 +1076,10 @@ static void _GetExpIcon_Init(SeqEndWork* work) {
     work->flags |= SEQ_END_DISP_EXP_ICONS;
 }
 
+/**
+ * Per frame: shows expDisp / 10 large and expDisp % 10 small Star Point icons, fading them in by 0x40 a frame,
+ * hides the rest and re-centres the large row as the count drops.
+ */
 static void _GetExpIcon_Main(BattleWork* wp) {
     SeqEndWork* work = SEW(wp);
     s32 exp = work->expDisp;
@@ -1081,10 +1128,12 @@ static void _GetExpIcon_Main(BattleWork* wp) {
     }
 }
 
+/** Draws the translucent white window behind the Star Point icons. */
 static void _GetExpIcon_Disp(CameraId camId, void* param) {
     windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0x80}, -76.899994f, 21.0f, 165.79999f, 24.199999f, 10.0f);
 }
 
+/** Turns the Star Point icon display off and deletes the 19 icons. */
 static void _GetExpIcon_End(SeqEndWork* work) {
     s32 i;
 
@@ -1097,8 +1146,19 @@ static void _GetExpIcon_End(SeqEndWork* work) {
 // Two copies: the US release adds the upgrade-select prompt and cursor loop and reorders the closing events.
 #if VERSION >= VERSION_US
 USER_FUNC(N__display_select_one_to_upgrade_text);
+// Picks the first level-up choice from the first stick press; defined further down.
 USER_FUNC(N__set_initial_upgrade_cursor_position);
 
+/**
+ * US and later level-up show, started by btlseqEnd when the Star Points reach 100.
+ * The stage darkens and the curtains close (on a wide stage Mario and the partner walk off first and the
+ * wide-stage flag is cleared), the nozzle objects lower,
+ * confetti and the level-up effect play and Star Power refills,
+ * a spotlight cone follows Mario while the enemies are hidden, Mario and the partner walk back on,
+ * the HP/FP/BP blocks appear and the curtains open.
+ * The select_HPFPBP prompt then stays up until the stick is pushed:
+ * left picks BP, right picks HP, and the spotlight swings there.
+ */
 EVT_BEGIN(_curtain_close_event)
     BEGIN_SIBLING_EVENT
         CALL(evt_batstage_set_stg_dark, 80, 30, 0)
@@ -1293,6 +1353,10 @@ EVT_BEGIN(_curtain_close_event)
     RETURN
 EVT_END()
 #else
+/**
+ * Demo and Japanese level-up show: the same as the US version up to the curtains opening (the demos also leave
+ * the audience dark), then it lights the FP block, with no prompt.
+ */
 EVT_BEGIN(_curtain_close_event)
     BEGIN_SIBLING_EVENT
         CALL(evt_batstage_set_stg_dark, 80, 30, 0)
@@ -1447,6 +1511,10 @@ EVT_BEGIN(_curtain_close_event)
 EVT_END()
 #endif
 
+/**
+ * Started by the level-up show (its id kept through _set_confetti_control_evtid):
+ * drops a confetti effect every 20 frames until btlseqEnd deletes it after the stat increase.
+ */
 EVT_BEGIN(_confetti_control_event)
     SET_VALUE(LW(0), 1)
     SET_VALUE(LW(5), 5)
@@ -1462,6 +1530,12 @@ EVT_BEGIN(_confetti_control_event)
     RETURN
 EVT_END()
 
+/**
+ * Started by btlseqEnd when A confirms a level-up choice:
+ * the other blocks fade out, the chosen block spins over to Mario,
+ * he jumps and hits it from below (camera shake, the block bounces and shows its new value),
+ * then poses as the crowd cheers.
+ */
 EVT_BEGIN(_jump_event)
     BEGIN_SIBLING_EVENT
         CALL(_lvup_object_noselect_delete)
@@ -1484,6 +1558,11 @@ EVT_BEGIN(_jump_event)
     RETURN
 EVT_END()
 
+/**
+ * Started by btlseqEnd when the stick moves the level-up choice to HP:
+ * dims all three blocks, hides the help message,
+ * swings the spotlight stage object to -30 degrees over 10 frames, then lights the HP block and shows its help.
+ */
 EVT_BEGIN(_move_to_heart_event)
     CALL(evt_snd_sfxon_3d, STRING("SFX_BTL_LVUP_CURSOR1"), 0, 125, 0, 0)
     CALL(_lvup_obj_set_color, 0, 100, 128, 128, 255)
@@ -1502,6 +1581,11 @@ EVT_BEGIN(_move_to_heart_event)
     RETURN
 EVT_END()
 
+/**
+ * Started by btlseqEnd when the stick moves the level-up choice to FP:
+ * dims the blocks, swings the spotlight from where it is back to 0 degrees,
+ * then lights the FP block and shows its help.
+ */
 EVT_BEGIN(_move_to_flower_event)
     CALL(evt_snd_sfxon_3d, STRING("SFX_BTL_LVUP_CURSOR1"), 0, 125, 0, 0)
     CALL(_lvup_obj_set_color, 0, 100, 128, 128, 255)
@@ -1521,6 +1605,10 @@ EVT_BEGIN(_move_to_flower_event)
     RETURN
 EVT_END()
 
+/**
+ * Started by btlseqEnd when the stick moves the level-up choice to BP:
+ * dims the blocks, swings the spotlight to 30 degrees, then lights the BP block and shows its help.
+ */
 EVT_BEGIN(_move_to_badge_point_event)
     CALL(evt_snd_sfxon_3d, STRING("SFX_BTL_LVUP_CURSOR1"), 0, 125, 0, 0)
     CALL(_lvup_obj_set_color, 0, 100, 128, 128, 255)
@@ -1539,6 +1627,10 @@ EVT_BEGIN(_move_to_badge_point_event)
     RETURN
 EVT_END()
 
+/**
+ * Started on Mario by _BattleMarioKouraDelete after a win:
+ * if a Shell Shield still guards him, runs the shell's data event 62. Guess: the shell's removal.
+ */
 EVT_BEGIN(_koura_delete_event)
     CALL(_check_guard_koura, BTL_UNIT_MARIO, LW(10))
     IF_INT_NOT_EQUAL(LW(10), -1)
@@ -1547,7 +1639,7 @@ EVT_BEGIN(_koura_delete_event)
     RETURN
 EVT_END()
 
-// Defined after _koura_delete_event, where the demo's .data places it (retail keeps it in .sdata).
+/** Defined after _koura_delete_event, where the demo's .data places it (retail keeps it in .sdata). */
 EVT_BEGIN(_rank_up_event)
     CALL(_get_rank_up_msg, LW(0))
     CALL(evt_msg_print, 0, LW(0), 0, 0)
@@ -1555,11 +1647,16 @@ EVT_BEGIN(_rank_up_event)
 EVT_END()
 
 #if VERSION >= VERSION_US
+/**
+ * US and later script helper: sets the selected level-up choice to args[0] (0 HP, 1 FP, 2 BP);
+ * used for the first stick press of the level-up show.
+ */
 USER_FUNC(N__set_initial_upgrade_cursor_position) {
     SEW(_battleWorkPointer)->selected = evtGetValue(event, event->args[0]);
     return 2;
 }
 
+/** US and later: draws the select_HPFPBP prompt (choose one to upgrade) in a window near the bottom of the screen. */
 void N__draw_select_one_to_upgrade_text(CameraId camId, void* param) {
     const char* msg;
     u16 lines;
@@ -1576,12 +1673,20 @@ void N__draw_select_one_to_upgrade_text(CameraId camId, void* param) {
     FontDrawMessage(zero - width / 2, (s32)y + (lines - 1) * 29, msg);
 }
 
+/**
+ * US and later script helper: queues N__draw_select_one_to_upgrade_text for one frame;
+ * the level-up show calls it every frame until the first stick press.
+ */
 USER_FUNC(N__display_select_one_to_upgrade_text) {
     dispEntry(CAMERA_2D, 900.0f, 1, N__draw_select_one_to_upgrade_text, _battleWorkPointer);
     return 2;
 }
 #endif
 
+/**
+ * Script helper: args[0] a stage object name, args[1] a float; sets that object's Y position offset.
+ * The level-up show lowers nozzle_l, nozzle_c and nozzle_r by 40 with it.
+ */
 static USER_FUNC(_nozzle_set_offset) {
     EvtWord* args = event->args;
     const char* name;
@@ -1597,6 +1702,7 @@ static USER_FUNC(_nozzle_set_offset) {
     return 2;
 }
 
+/** Script helper for the level-up show: refills Star Power (AP) to its maximum and marks the audience excited. */
 static USER_FUNC(_lvup_ap_recover_full) {
     BattleAudience* aud = BattleAudienceBaseGetPtr();
 
@@ -1605,6 +1711,12 @@ static USER_FUNC(_lvup_ap_recover_full) {
     return 2;
 }
 
+/**
+ * Script helper for the level-up show: starts each other unit's level-up event (data entry 0x42),
+ * or hides it and its shadow when it has none, skipping the system unit,
+ * Mario and the partner (retail runs Bobbery's event but never hides him).
+ * A stage iron frame (if_body, if_wire) is hidden and marked gone.
+ */
 static USER_FUNC(_disable_enemy_unit_disp) {
     BattleWork* wp = _battleWorkPointer;
     s32 i;
@@ -1655,6 +1767,10 @@ static USER_FUNC(_disable_enemy_unit_disp) {
     return 2;
 }
 
+/**
+ * Script helper: stores args[0], the _confetti_control_event id, so btlseqEnd can delete it after the level-up.
+ * The empty triple check does nothing.
+ */
 static USER_FUNC(_set_confetti_control_evtid) {
     EvtWord* args = event->args;
     SeqEndWork* work = SEW(_battleWorkPointer);
@@ -1665,6 +1781,7 @@ static USER_FUNC(_set_confetti_control_evtid) {
     return 2;
 }
 
+/** Script helper: turns on drawing of the HP/FP/BP level-up blocks. */
 static USER_FUNC(_lvup_select_obj_disp_on) {
     SeqEndWork* work = SEW(_battleWorkPointer);
 
@@ -1672,6 +1789,10 @@ static USER_FUNC(_lvup_select_obj_disp_on) {
     return 2;
 }
 
+/**
+ * Script helper: makes all three level-up blocks show their current value,
+ * an arrow and the next value (paramDisp 1).
+ */
 static USER_FUNC(_lvup_select_obj_lvup_param_disp) {
     SeqEndWork* work = SEW(_battleWorkPointer);
     s32 i;
@@ -1682,6 +1803,10 @@ static USER_FUNC(_lvup_select_obj_lvup_param_disp) {
     return 2;
 }
 
+/**
+ * Script helper: args[0] a level-up block (0 HP, 1 FP, 2 BP), args[1] to args[4] the r, g,
+ * b and a it is drawn with; the scripts dim unselected blocks and light the selected one.
+ */
 static USER_FUNC(_lvup_obj_set_color) {
     EvtWord* args = event->args;
     SeqEndWork* work = SEW(_battleWorkPointer);
@@ -1695,6 +1820,10 @@ static USER_FUNC(_lvup_obj_set_color) {
     return 2;
 }
 
+/**
+ * Script helper: args[0] on or off, args[1] a raw SeqEndDispFlags mask to set
+ * or clear (the scripts only pass 0x20, the level-up help message).
+ */
 static USER_FUNC(_lvup_disp_flag_onoff) {
     EvtWord* args = event->args;
     SeqEndWork* work = SEW(_battleWorkPointer);
@@ -1709,6 +1838,10 @@ static USER_FUNC(_lvup_disp_flag_onoff) {
     return 2;
 }
 
+/**
+ * Script helper: args[0] a cone index (0-4); places that spotlight cone at x = 25n - 50 (y 25 or -10
+ * alternately), 15 x 15 x 150 and white, shows it and turns spotlight cone drawing on.
+ */
 static USER_FUNC(_lvup_spot_on) {
     BattleSpotWork* spot = BatSpotGetPtr();
     EvtWord* args = event->args;
@@ -1757,6 +1890,11 @@ static USER_FUNC(_lvup_spot_on) {
     return 2;
 }
 
+/**
+ * Script helper: args[0] a cone index; moves that spotlight cone every frame,
+ * cone 0 following half of Mario's X and cones 1-4 on looping sine paths.
+ * Nothing advances it past state 1, so it never finishes and its fade-out branch (states 2 and 3) never runs.
+ */
 static USER_FUNC(_lvup_spot_move) {
     BattleSpotWork* spot = BatSpotGetPtr();
     s32 n = evtGetValue(event, event->args[0]);
@@ -1820,6 +1958,10 @@ static USER_FUNC(_lvup_spot_move) {
     return event->userWork[1] < 4 ? 0 : 2;
 }
 
+/**
+ * Script helper: args[0] a frame count; fades all five spotlight cones from cone 0's alpha to 0 over that time,
+ * hiding each as it reaches 0, and yields until done.
+ */
 static USER_FUNC(_lvup_spot_off) {
     BattleSpotWork* spot = BatSpotGetPtr();
     EvtWord* args = event->args;
@@ -1845,6 +1987,10 @@ static USER_FUNC(_lvup_spot_off) {
     return event->userdata[1] > 0 ? 0 : 2;
 }
 
+/**
+ * Script helper from _jump_event: fades the unchosen level-up blocks out over 30 frames
+ * and hides their numbers (paramDisp 3).
+ */
 static USER_FUNC(_lvup_object_noselect_delete) {
     SeqEndWork* work = SEW(_battleWorkPointer);
     s32 sel = work->selected;
@@ -1876,6 +2022,10 @@ static USER_FUNC(_lvup_object_noselect_delete) {
     return 2;
 }
 
+/**
+ * Script helper from _jump_event: carries the chosen level-up block over Mario's X and Z in 60 frames
+ * while spinning it six full turns.
+ */
 static USER_FUNC(_lvup_object_select_move) {
     SeqEndWork* work = SEW(_battleWorkPointer);
     s32 sel = work->selected;
@@ -1902,6 +2052,11 @@ static USER_FUNC(_lvup_object_select_move) {
     return 2;
 }
 
+/**
+ * Script helper from _jump_event, when Mario's jump hits the chosen block:
+ * bounces it 30 units up and back over 16 frames,
+ * then sets it blinking with its new value (paramDisp 4) and spawns a sparkle effect.
+ */
 static USER_FUNC(_lvup_object_decide_bound) {
     SeqEndWork* work = SEW(_battleWorkPointer);
     SeqEndObj* obj = &work->objs[work->selected];
@@ -1930,6 +2085,11 @@ static USER_FUNC(_lvup_object_decide_bound) {
     return 2;
 }
 
+/**
+ * Script helper: sets up the three level-up blocks at x -80, 0 and 80,
+ * HP and FP from Mario's base maximums (next +5, none past 200)
+ * and BP from his maximum BP (next +3, none past 99), and turns their display on.
+ */
 static USER_FUNC(_lvup_select_object_init) {
     SeqEndWork* work = SEW(_battleWorkPointer);
     PouchData* pouch = pouchGetPtr();
@@ -1975,6 +2135,10 @@ static USER_FUNC(_lvup_select_object_init) {
     return 2;
 }
 
+/**
+ * Returns the number of decimal digits in n (1 for 0, sign ignored); keta is Japanese for digit.
+ * Used to place the level-up numbers.
+ */
 static s32 _keta_get(s32 n) {
 
     s32 k = 0;
@@ -2022,6 +2186,11 @@ static s32 _keta_get(s32 n) {
         LVOBJ_TEXPLANE(o, n, tbl);                                        \
     }
 
+/**
+ * 3D display callback for the level-up blocks: steps the 8-frame blink of the chosen block,
+ * draws each block and its label (per-language label textures in the US and later), and below it the old value,
+ * an arrow and the new value (paramDisp 1) or the new value alone (2 and 5).
+ */
 static void _lvup_select_object_disp(CameraId camId, void* param) {
     SeqEndWork* work = SEW(_battleWorkPointer);
     SeqEndObj* obj;
@@ -2101,6 +2270,11 @@ static void _lvup_select_object_disp(CameraId camId, void* param) {
     }
 }
 #pragma auto_inline reset
+/**
+ * On a win, raises the audience: GreatVictory when the first enemy's level is above Mario's level + 1,
+ * and FastVictory (scaled by the turns saved) when the battle took fewer turns than two thirds of the summed
+ * enemy levels divided by Mario's level + 1.
+ */
 static void _check_audience_battle_end_exec(void) {
     BattleWork* wp = _battleWorkPointer;
     SeqEndGroup* group = (SeqEndGroup*)wp->fbatInfo->setup->groupSetup;
@@ -2128,6 +2302,10 @@ static void _check_audience_battle_end_exec(void) {
     }
 }
 
+/**
+ * Called at the top of every btlseqEnd frame to play an audience whistle every 60-179 frames during the victory
+ * and level-up states. It tests work->state, which stays 0, so it never whistles.
+ */
 void _audience_Whistle_control(void) {
     SeqEndWork* work = SEW(_battleWorkPointer);
 
@@ -2163,6 +2341,10 @@ void _audience_Whistle_control(void) {
     }
 }
 
+/**
+ * After a win (and after a field post-battle event),
+ * starts _koura_delete_event on Mario to clear a Shell Shield still guarding him.
+ */
 static void _BattleMarioKouraDelete(void) {
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
     EventEntry* evt = evtEntry(_koura_delete_event, 10, 0);
@@ -2170,6 +2352,10 @@ static void _BattleMarioKouraDelete(void) {
     evt->unitId = mario->unitId;
 }
 
+/**
+ * Script helper: args[0] a unit; sets args[1] to the unit id of the Shell Shield guarding it,
+ * or -1 when it has none.
+ */
 static USER_FUNC(_check_guard_koura) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -2194,6 +2380,10 @@ static USER_FUNC(_check_guard_koura) {
     return 2;
 }
 
+/**
+ * Script helper for _rank_up_event: sets args[0] to the rank-up message for Mario's current level;
+ * btlseqEnd only starts that event at a rank-up level, as there is no NULL check.
+ */
 static USER_FUNC(_get_rank_up_msg) {
     s32 index = event->args[0];
 

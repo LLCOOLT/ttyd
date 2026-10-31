@@ -34,7 +34,7 @@ typedef f32 (*IntplSubArgOrderFn)(s32 mode, f32 start, f32 end, s32 cur, s32 ste
 #include "battle/battle_seq_command.h"
 #include "eff/eff_itemget.h"
 
-// s32* eventId
+/** s32* eventId */
 USER_FUNC(btlevtcmd_WaitEventEnd) {
     s32 id;
 
@@ -42,7 +42,7 @@ USER_FUNC(btlevtcmd_WaitEventEnd) {
     return evtCheckID(id) ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
 
-// s32 retIndex, s32 battleFlags
+/** s32 retIndex, s32 battleFlags */
 USER_FUNC(btlevtcmd_check_battleflag) {
     EvtWord* args = event->args;
     s32 index = *args++;
@@ -56,7 +56,7 @@ USER_FUNC(btlevtcmd_check_battleflag) {
     return EVT_RETURN_DONE;
 }
 
-// BOOL* onoff, s32 flags
+/** BOOL* onoff, s32 flags */
 USER_FUNC(btlevtcmd_onoff_battleflag) {
     EvtWord* args = event->args;
     BOOL val = evtGetValue(event, args[0]);
@@ -70,25 +70,25 @@ USER_FUNC(btlevtcmd_onoff_battleflag) {
     return EVT_RETURN_DONE;
 }
 
-// s32 retIndex
+/** s32 retIndex */
 USER_FUNC(btlevtcmd_get_turn) {
     evtSetValue(event, *event->args, _battleWorkPointer->turnCount);
     return EVT_RETURN_DONE;
 }
 
-// no params
+/** no params */
 USER_FUNC(btlevtcmd_reset_turn) {
     _battleWorkPointer->flags |= BATTLE_FLAG_RESET_TURN;
     return EVT_RETURN_DONE;
 }
 
-// no params
+/** no params */
 USER_FUNC(btlevtcmd_reset_move_color_lv_all) {
     btlsubResetMoveColorLvAll(_battleWorkPointer);
     return EVT_RETURN_DONE;
 }
 
-// s32 retIndex, s32 phaseSeqId
+/** s32 retIndex, s32 phaseSeqId */
 USER_FUNC(btlevtcmd_CheckPhase) {
     EvtWord* args = event->args;
     s32 index = args[0];
@@ -101,7 +101,7 @@ USER_FUNC(btlevtcmd_CheckPhase) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32 indexX, s32 indexY, s32 indexZ
+/** s32* battleId, s32 indexX, s32 indexY, s32 indexZ */
 USER_FUNC(btlevtcmd_GetPos) {
     EvtWord* args = event->args;
     s32 indexX, indexY, indexZ;
@@ -129,7 +129,7 @@ USER_FUNC(btlevtcmd_GetPos) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32 indexX, s32 indexY, s32 indexZ
+/** s32* battleId, s32 indexX, s32 indexY, s32 indexZ */
 USER_FUNC(btlevtcmd_GetPosFloat) {
     EvtWord* args = event->args;
     s32 indexX, indexY, indexZ;
@@ -157,7 +157,7 @@ USER_FUNC(btlevtcmd_GetPosFloat) {
     return EVT_RETURN_DONE;
 }
 
-// s32* maxValue, s32 retIndex
+/** s32* maxValue, s32 retIndex */
 USER_FUNC(btlevtcmd_GetRandomValue) {
     EvtWord* args = event->args;
     s32 max, index;
@@ -168,7 +168,7 @@ USER_FUNC(btlevtcmd_GetRandomValue) {
     return EVT_RETURN_DONE;
 }
 
-// s32 retIndex, s32 countIndex, s32 sizeIndex[]
+/** s32 retIndex, s32 countIndex, s32 sizeIndex[] */
 USER_FUNC(btlevtcmd_DrawLots) {
     EvtWord* args = event->args;
     s32 index = args[0];
@@ -202,6 +202,11 @@ USER_FUNC(btlevtcmd_DrawLots) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: spawns a new unit in the battle from the BattleUnitSetup args[1] (args[2] passed through to
+ * BtlUnit_Spawn) and stores its unit id in args[0], or -1 when no slot was free.
+ * Used by enemies that summon others.
+ */
 USER_FUNC(btlevtcmd_SpawnUnit) {
     EvtWord* args = event->args;
     BattleUnitSetup* setup;
@@ -219,7 +224,7 @@ USER_FUNC(btlevtcmd_SpawnUnit) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32 flags
+/** s32* battleId, s32 flags */
 USER_FUNC(btlevtcmd_KillUnit) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -247,7 +252,7 @@ USER_FUNC(btlevtcmd_KillUnit) {
     }
 }
 
-// s32* battleId, s32* copyToPartId, BattleUnitKindPart* kind, s32* copyFromPartId
+/** s32* battleId, s32* copyToPartId, BattleUnitKindPart* kind, s32* copyFromPartId */
 USER_FUNC(btlevtcmd_ReplaceParts) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -287,7 +292,7 @@ USER_FUNC(btlevtcmd_ReplaceParts) {
     return EVT_RETURN_DONE;
 }
 
-// s32 retIndex
+/** s32 retIndex */
 USER_FUNC(btlevtcmd_ChangeParty) {
     BattleUnit* unit;
     s32 index, value;
@@ -302,7 +307,7 @@ USER_FUNC(btlevtcmd_ChangeParty) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* x, f32* y, f32* z (can be EVTDAT_POINTER_MAX to set current)
+/** s32* battleId, f32* x, f32* y, f32* z (can be EVTDAT_POINTER_MAX to set current) */
 USER_FUNC(btlevtcmd_SetPos) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -334,7 +339,7 @@ USER_FUNC(btlevtcmd_SetPos) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* x, f32* y, f32* z
+/** s32* battleId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_AddPos) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -352,7 +357,7 @@ USER_FUNC(btlevtcmd_AddPos) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, s32 indexX, s32 indexY, s32 indexZ (can be EVTDAT_POINTER_MAX for noret)
+/** s32* battleId, s32* partId, s32 indexX, s32 indexY, s32 indexZ (can be EVTDAT_POINTER_MAX for noret) */
 USER_FUNC(btlevtcmd_GetPartsPos) {
     EvtWord* args = event->args;
     s32 id, partId;
@@ -382,7 +387,7 @@ USER_FUNC(btlevtcmd_GetPartsPos) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, f32* x, f32* y, f32* z
+/** s32* battleId, s32* partId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_SetPartsPos) {
     EvtWord* args = event->args;
     f32 x, y, z, currX, currY, currZ;
@@ -411,7 +416,7 @@ USER_FUNC(btlevtcmd_SetPartsPos) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, f32* x, f32* y, f32* z
+/** s32* battleId, s32* partId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_AddPartsPos) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -434,7 +439,7 @@ USER_FUNC(btlevtcmd_AddPartsPos) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* x, f32* y, f32* z
+/** s32* battleId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_SetDispOffset) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -452,7 +457,7 @@ USER_FUNC(btlevtcmd_SetDispOffset) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, f32* x, f32* y, f32* z
+/** s32* battleId, s32* partId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_SetPartsDispOffset) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -473,7 +478,7 @@ USER_FUNC(btlevtcmd_SetPartsDispOffset) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, f32* x, f32* y, f32* z
+/** s32* battleId, s32* partId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_AddPartsDispOffset) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -494,7 +499,7 @@ USER_FUNC(btlevtcmd_AddPartsDispOffset) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* x, f32* y, f32* z
+/** s32* battleId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_SetTogeOffset) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -520,7 +525,7 @@ USER_FUNC(btlevtcmd_SetTogeOffset) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32 indexX, s32 indexY, s32 indexZ
+/** s32* battleId, s32 indexX, s32 indexY, s32 indexZ */
 USER_FUNC(btlevtcmd_GetHomePos) {
     EvtWord* args = event->args;
     s32 indexX, indexY, indexZ;
@@ -542,7 +547,7 @@ USER_FUNC(btlevtcmd_GetHomePos) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* x, f32* y, f32* z
+/** s32* battleId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_SetHomePos) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -560,7 +565,7 @@ USER_FUNC(btlevtcmd_SetHomePos) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* x, f32* y, f32* z
+/** s32* battleId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_AddHomePos) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -578,7 +583,7 @@ USER_FUNC(btlevtcmd_AddHomePos) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, f32* x, f32* y, f32* z
+/** s32* battleId, s32* partId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_SetPartsHomePos) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -597,7 +602,7 @@ USER_FUNC(btlevtcmd_SetPartsHomePos) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, s32 indexX, s32 indexY, s32 indexZ
+/** s32* battleId, s32* partId, s32 indexX, s32 indexY, s32 indexZ */
 USER_FUNC(btlevtcmd_GetHitPos) {
     EvtWord* args = event->args;
     f32 x, y, z;
@@ -628,7 +633,7 @@ USER_FUNC(btlevtcmd_GetHitPos) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, f32* x, f32* y, f32* z
+/** s32* battleId, s32* partId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_SetHitOffset) {
     EvtWord* args = event->args;
     s32 partId;
@@ -650,7 +655,7 @@ USER_FUNC(btlevtcmd_SetHitOffset) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, f32* x, f32* y, f32* z
+/** s32* battleId, s32* partId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_SetHitCursorOffset) {
     EvtWord* args = event->args;
     s32 partId;
@@ -672,7 +677,7 @@ USER_FUNC(btlevtcmd_SetHitCursorOffset) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32 retIndex
+/** s32* battleId, s32 retIndex */
 USER_FUNC(btlevtcmd_GetWidth) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -687,7 +692,7 @@ USER_FUNC(btlevtcmd_GetWidth) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32 retIndex
+/** s32* battleId, s32 retIndex */
 USER_FUNC(btlevtcmd_GetHeight) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -703,7 +708,7 @@ USER_FUNC(btlevtcmd_GetHeight) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s16* height
+/** s32* battleId, s16* height */
 USER_FUNC(btlevtcmd_SetHeight) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -719,7 +724,7 @@ USER_FUNC(btlevtcmd_SetHeight) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32 retIndex
+/** s32* battleId, s32 retIndex */
 USER_FUNC(btlevtcmd_GetStatusMg) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -734,7 +739,7 @@ USER_FUNC(btlevtcmd_GetStatusMg) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* xpos, s32* ypos (can be EVTDAT_POINTER_MAX to not store)
+/** s32* battleId, s32* xpos, s32* ypos (can be EVTDAT_POINTER_MAX to not store) */
 USER_FUNC(btlevtcmd_SetStatusIconOffset) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -755,7 +760,7 @@ USER_FUNC(btlevtcmd_SetStatusIconOffset) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* xpos, s32* ypos (can be EVTDAT_POINTER_MAX to not store)
+/** s32* battleId, s32* xpos, s32* ypos (can be EVTDAT_POINTER_MAX to not store) */
 USER_FUNC(btlevtcmd_SetHpGaugeOffset) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -776,7 +781,7 @@ USER_FUNC(btlevtcmd_SetHpGaugeOffset) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32 retX, s32 retY
+/** s32* battleId, s32 retX, s32 retY */
 USER_FUNC(btlevtcmd_GetHpGaugeOffset) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -799,7 +804,7 @@ USER_FUNC(btlevtcmd_GetHpGaugeOffset) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, u8* alpha
+/** s32* battleId, s32* partId, u8* alpha */
 USER_FUNC(btlevtcmd_SetAlpha) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -815,7 +820,7 @@ USER_FUNC(btlevtcmd_SetAlpha) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, u8* redIndex, u8* greenIndex, u8* blueIndex
+/** s32* battleId, s32* partId, u8* redIndex, u8* greenIndex, u8* blueIndex */
 USER_FUNC(btlevtcmd_GetRGB) {
     EvtWord* args = event->args;
     s32 id, partId;
@@ -835,7 +840,7 @@ USER_FUNC(btlevtcmd_GetRGB) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, u8* red, u8* green, u8* blue
+/** s32* battleId, s32* partId, u8* red, u8* green, u8* blue */
 USER_FUNC(btlevtcmd_SetRGB) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -855,7 +860,7 @@ USER_FUNC(btlevtcmd_SetRGB) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* x, f32* y, f32* z (can be EVTDAT_POINTER_MAX to skip)
+/** s32* battleId, f32* x, f32* y, f32* z (can be EVTDAT_POINTER_MAX to skip) */
 USER_FUNC(btlevtcmd_GetRotate) {
     EvtWord* args = event->args;
     f32 rotateX, rotateY, rotateZ;
@@ -883,7 +888,7 @@ USER_FUNC(btlevtcmd_GetRotate) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* x, f32* y, f32* z (can be EVTDAT_POINTER_MAX to skip)
+/** s32* battleId, f32* x, f32* y, f32* z (can be EVTDAT_POINTER_MAX to skip) */
 USER_FUNC(btlevtcmd_SetRotate) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -914,7 +919,7 @@ USER_FUNC(btlevtcmd_SetRotate) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* x, f32* y, f32* z
+/** s32* battleId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_AddRotate) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -932,7 +937,7 @@ USER_FUNC(btlevtcmd_AddRotate) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, f32* x, f32* y, f32* z
+/** s32* battleId, s32* partId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_GetPartsRotate) {
     EvtWord* args = event->args;
     s32 id, partId, indexX, indexY, indexZ;
@@ -954,7 +959,7 @@ USER_FUNC(btlevtcmd_GetPartsRotate) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, f32* x, f32* y, f32* z
+/** s32* battleId, s32* partId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_SetPartsRotate) {
     EvtWord* args = event->args;
     s32 btlId;
@@ -973,7 +978,7 @@ USER_FUNC(btlevtcmd_SetPartsRotate) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, f32* x, f32* y, f32* z
+/** s32* battleId, s32* partId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_AddPartsRotate) {
     EvtWord* args = event->args;
     s32 btlId;
@@ -992,7 +997,7 @@ USER_FUNC(btlevtcmd_AddPartsRotate) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* x, f32* y, f32* z (can be EVTDAT_POINTER_MAX to skip)
+/** s32* battleId, f32* x, f32* y, f32* z (can be EVTDAT_POINTER_MAX to skip) */
 USER_FUNC(btlevtcmd_SetBaseRotate) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -1023,7 +1028,7 @@ USER_FUNC(btlevtcmd_SetBaseRotate) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, f32* x, f32* y, f32* z (can be EVTDAT_POINTER_MAX to skip)
+/** s32* battleId, s32* partId, f32* x, f32* y, f32* z (can be EVTDAT_POINTER_MAX to skip) */
 USER_FUNC(btlevtcmd_SetPartsBaseRotate) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -1053,7 +1058,7 @@ USER_FUNC(btlevtcmd_SetPartsBaseRotate) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* x, f32* y, f32* z
+/** s32* battleId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_SetRotateOffset) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -1071,7 +1076,7 @@ USER_FUNC(btlevtcmd_SetRotateOffset) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, f32* x, f32* y, f32* z
+/** s32* battleId, s32* partId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_SetPartsRotateOffset) {
     EvtWord* args = event->args;
     s32 btlId;
@@ -1090,7 +1095,7 @@ USER_FUNC(btlevtcmd_SetPartsRotateOffset) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, f32* x, f32* y, f32* z
+/** s32* battleId, s32* partId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_AddPartsRotateOffset) {
     EvtWord* args = event->args;
     s32 btlId;
@@ -1109,7 +1114,7 @@ USER_FUNC(btlevtcmd_AddPartsRotateOffset) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId
+/** s32* battleId */
 USER_FUNC(btlevtcmd_SetRotateOffsetFromCenterOffset) {
     BattleUnit* unit;
     s32 id;
@@ -1121,7 +1126,7 @@ USER_FUNC(btlevtcmd_SetRotateOffsetFromCenterOffset) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* x, f32* y, f32* z
+/** s32* battleId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_SetCutBaseOffset) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -1141,7 +1146,7 @@ USER_FUNC(btlevtcmd_SetCutBaseOffset) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* x, f32* y, f32* z
+/** s32* battleId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_SetBintaHitOffset) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -1161,7 +1166,7 @@ USER_FUNC(btlevtcmd_SetBintaHitOffset) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* x, f32* y, f32* z
+/** s32* battleId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_SetKissHitOffset) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -1181,7 +1186,7 @@ USER_FUNC(btlevtcmd_SetKissHitOffset) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* value
+/** s32* battleId, f32* value */
 USER_FUNC(btlevtcmd_SetCutWidth) {
     s32 value;
     s32 id;
@@ -1196,7 +1201,7 @@ USER_FUNC(btlevtcmd_SetCutWidth) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* value
+/** s32* battleId, f32* value */
 USER_FUNC(btlevtcmd_SetCutHeight) {
     s32 value;
     s32 id;
@@ -1211,7 +1216,7 @@ USER_FUNC(btlevtcmd_SetCutHeight) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* x, f32* y, f32* z (can be EVTDAT_POINTER_MAX to skip)
+/** s32* battleId, f32* x, f32* y, f32* z (can be EVTDAT_POINTER_MAX to skip) */
 USER_FUNC(btlevtcmd_SetPossessionItemOffset) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1240,7 +1245,7 @@ USER_FUNC(btlevtcmd_SetPossessionItemOffset) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* x, f32* y, f32* z
+/** s32* battleId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_SetBaseScale) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1265,7 +1270,7 @@ USER_FUNC(btlevtcmd_SetBaseScale) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, f32* x, f32* y, f32* z
+/** s32* battleId, s32* partId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_SetPartsBaseScale) {
     EvtWord* args = event->args;
     s32 btlId;
@@ -1289,7 +1294,7 @@ USER_FUNC(btlevtcmd_SetPartsBaseScale) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* x, f32* y, f32* z (can be EVTDAT_POINTER_MAX to skip)
+/** s32* battleId, f32* x, f32* y, f32* z (can be EVTDAT_POINTER_MAX to skip) */
 USER_FUNC(btlevtcmd_GetScale) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1321,7 +1326,7 @@ USER_FUNC(btlevtcmd_GetScale) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* x, f32* y, f32* z
+/** s32* battleId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_SetScale) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1345,7 +1350,7 @@ USER_FUNC(btlevtcmd_SetScale) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, f32* x, f32* y, f32* z
+/** s32* battleId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_AddScale) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1369,7 +1374,7 @@ USER_FUNC(btlevtcmd_AddScale) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, f32* x, f32* y, f32* z
+/** s32* battleId, s32* partId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_SetPartsScale) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -1393,7 +1398,7 @@ USER_FUNC(btlevtcmd_SetPartsScale) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* partId, f32* x, f32* y, f32* z
+/** s32* battleId, s32* partId, f32* x, f32* y, f32* z */
 USER_FUNC(btlevtcmd_AddPartsScale) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -1417,7 +1422,7 @@ USER_FUNC(btlevtcmd_AddPartsScale) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* retIndex
+/** s32* battleId, s32* retIndex */
 USER_FUNC(btlevtcmd_GetHp) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1434,7 +1439,7 @@ USER_FUNC(btlevtcmd_GetHp) {
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* retIndex
+/** s32* battleId, s32* retIndex */
 USER_FUNC(btlevtcmd_GetFp) { // 1:1
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1452,7 +1457,7 @@ USER_FUNC(btlevtcmd_GetFp) { // 1:1
     return EVT_RETURN_DONE;
 }
 
-// s32* battleId, s32* retIndex
+/** s32* battleId, s32* retIndex */
 USER_FUNC(btlevtcmd_GetMaxHp) { // 1:1
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1469,6 +1474,7 @@ USER_FUNC(btlevtcmd_GetMaxHp) { // 1:1
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] the maximum FP of the unit args[0] (badge bonuses included, via BtlUnit_GetMaxFp). */
 USER_FUNC(btlevtcmd_GetMaxFp) { // 1:1
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1486,6 +1492,10 @@ USER_FUNC(btlevtcmd_GetMaxFp) { // 1:1
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: sets the HP of the unit args[0] to args[1] at once,
+ * snapping its HP gauge to the new value without the drain.
+ */
 USER_FUNC(btlevtcmd_SetHp) { // 1:1
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1508,6 +1518,7 @@ USER_FUNC(btlevtcmd_SetHp) { // 1:1
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the FP of the unit args[0] to args[1]. */
 USER_FUNC(btlevtcmd_SetFp) { // 1:1
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1525,6 +1536,7 @@ USER_FUNC(btlevtcmd_SetFp) { // 1:1
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the maximum FP of the unit args[0] to args[1]. */
 USER_FUNC(btlevtcmd_SetMaxFp) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1542,6 +1554,7 @@ USER_FUNC(btlevtcmd_SetMaxFp) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the chance (swallowRate) that Yoshi's Gulp can swallow the unit args[0]. */
 USER_FUNC(btlevtcmd_SetSwallowParam) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1559,6 +1572,7 @@ USER_FUNC(btlevtcmd_SetSwallowParam) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the unit args[0]'s swallowAttribute, which decides how Yoshi's Gulp treats it. */
 USER_FUNC(btlevtcmd_SetSwallowAttribute) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1576,6 +1590,10 @@ USER_FUNC(btlevtcmd_SetSwallowAttribute) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: sets how many actions per turn the unit args[0] gets (args[1]),
+ * cutting the moves left this turn to match.
+ */
 USER_FUNC(btlevtcmd_SetMaxMoveCount) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1595,6 +1613,7 @@ USER_FUNC(btlevtcmd_SetMaxMoveCount) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] the part number of the part the unit args[0] is currently targeting. */
 USER_FUNC(btlevtcmd_GetDamagePartsId) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1611,6 +1630,7 @@ USER_FUNC(btlevtcmd_GetDamagePartsId) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] the HP damage the unit args[0] took from the current attack. */
 USER_FUNC(btlevtcmd_GetHpDamage) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1627,6 +1647,7 @@ USER_FUNC(btlevtcmd_GetHpDamage) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] the FP damage the unit args[0] took from the current attack. */
 USER_FUNC(btlevtcmd_GetFpDamage) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1643,6 +1664,7 @@ USER_FUNC(btlevtcmd_GetFpDamage) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] how many damaging hits the unit args[0] took from the current attack. */
 USER_FUNC(btlevtcmd_GetHpDamageCount) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1659,6 +1681,10 @@ USER_FUNC(btlevtcmd_GetHpDamageCount) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: heals the unit args[0] by args[2] HP (args[1], the part, is read but unused).
+ * The HP gauge animates the rise unless the unit's HP is locked.
+ */
 USER_FUNC(btlevtcmd_RecoverHp) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1686,6 +1712,7 @@ USER_FUNC(btlevtcmd_RecoverHp) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: restores args[2] FP to the unit args[0] (args[1] is read but unused). */
 USER_FUNC(btlevtcmd_RecoverFp) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1704,6 +1731,7 @@ USER_FUNC(btlevtcmd_RecoverFp) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] how many more turns the unit args[0] stays flipped over. */
 USER_FUNC(btlevtcmd_GetOverTurnCount) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -1717,6 +1745,7 @@ USER_FUNC(btlevtcmd_GetOverTurnCount) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets how many turns the unit args[0] stays flipped over (shelled enemies flipped by a jump or POW Block). */
 USER_FUNC(btlevtcmd_SetOverTurnCount) {
     s32 id;
     EvtWord* args = event->args;
@@ -1733,6 +1762,10 @@ USER_FUNC(btlevtcmd_SetOverTurnCount) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns in args[2] the unit args[0]'s script work slot args[1],
+ * free storage that unit scripts use between events.
+ */
 USER_FUNC(btlevtcmd_GetUnitWork) {
     EvtWord* args = event->args;
     s32 id, i, index;
@@ -1747,6 +1780,7 @@ USER_FUNC(btlevtcmd_GetUnitWork) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: stores args[2] in the unit args[0]'s script work slot args[1]. */
 USER_FUNC(btlevtcmd_SetUnitWork) {
     EvtWord* args = event->args;
     s32 btlId, id;
@@ -1763,6 +1797,7 @@ USER_FUNC(btlevtcmd_SetUnitWork) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: adds args[2] to the unit args[0]'s script work slot args[1]. */
 USER_FUNC(btlevtcmd_AddUnitWork) {
     EvtWord* args = event->args;
     s32 btlId, id, value, index;
@@ -1777,6 +1812,7 @@ USER_FUNC(btlevtcmd_AddUnitWork) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[2] the unit args[0]'s work slot args[1] read as a float. */
 USER_FUNC(btlevtcmd_GetUnitWorkFloat) {
     EvtWord* args = event->args;
     s32 id, i, index;
@@ -1791,6 +1827,7 @@ USER_FUNC(btlevtcmd_GetUnitWorkFloat) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: stores the float args[2] in the unit args[0]'s work slot args[1]. */
 USER_FUNC(btlevtcmd_SetUnitWorkFloat) {
     EvtWord* args = event->args;
     s32 btlId, id, index;
@@ -1804,6 +1841,7 @@ USER_FUNC(btlevtcmd_SetUnitWorkFloat) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[3] work slot args[2] of part args[1] of the unit args[0]. */
 USER_FUNC(btlevtcmd_GetPartsWork) {
     EvtWord* args = event->args;
     s32 id, partId, i, index;
@@ -1821,6 +1859,7 @@ USER_FUNC(btlevtcmd_GetPartsWork) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: stores args[3] in work slot args[2] of part args[1] of the unit args[0]. */
 USER_FUNC(btlevtcmd_SetPartsWork) {
     EvtWord* args = event->args;
     s32 btlId, id, partId, index;
@@ -1839,6 +1878,7 @@ USER_FUNC(btlevtcmd_SetPartsWork) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] the damage of the last hit the unit args[0] took. */
 USER_FUNC(btlevtcmd_GetDamage) {
     EvtWord* args = event->args;
     s32 id, index;
@@ -1854,6 +1894,7 @@ USER_FUNC(btlevtcmd_GetDamage) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] the total damage the unit args[0] took from the current attack. */
 USER_FUNC(btlevtcmd_GetTotalDamage) {
     EvtWord* args = event->args;
     s32 id, index;
@@ -1869,6 +1910,10 @@ USER_FUNC(btlevtcmd_GetTotalDamage) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns in args[1] the low byte of the unit args[0]'s damage code:
+ * the kind of the last hit (DAMAGE_HIT_*, or the miss, guard and counter codes).
+ */
 USER_FUNC(btlevtcmd_GetDamageCode) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -1882,6 +1927,7 @@ USER_FUNC(btlevtcmd_GetDamageCode) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns 1 in args[2] when the unit args[0]'s damage code has any of the bits args[1] (DAMAGE_FLAG_*). */
 USER_FUNC(btlevtcmd_CheckDamageCode) {
     EvtWord* args = event->args;
     s32 btlId, id, mask, index;
@@ -1900,6 +1946,10 @@ USER_FUNC(btlevtcmd_CheckDamageCode) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: makes the unit args[0] react to a miss with damage code args[1] (dodge, lucky, step aside),
+ * running its hit event. A lucky miss (0x26) also shows the "Lucky!" sign beside it.
+ */
 USER_FUNC(btlevtcmd_StartAvoid) {
     EvtWord* args = event->args;
     s32 id, damageCode;
@@ -1927,6 +1977,10 @@ USER_FUNC(btlevtcmd_StartAvoid) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: runs the hit event args[2] on the unit args[0] directly with damage code args[1]
+ * and damage pattern args[3].
+ */
 USER_FUNC(btlevtcmd_RunHitEventDirect) {
     EvtWord* args = event->args;
     void* code;
@@ -1943,6 +1997,10 @@ USER_FUNC(btlevtcmd_RunHitEventDirect) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns 1 in args[2] when the last hit on the unit args[0] had damage pattern args[1] (which hurt
+ * reaction to play).
+ */
 USER_FUNC(btlevtcmd_CheckDamagePattern) {
     EvtWord* args = event->args;
     s32 btlId, id, index;
@@ -1961,6 +2019,11 @@ USER_FUNC(btlevtcmd_CheckDamagePattern) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: finds a unit whose home position lies within args[4..6] of (args[1..3]) on any axis with a non-zero
+ * bound and returns its id in args[0], or -1; used to find a free spot when spawning.
+ * The alliance test is the constant UNIT_ALLIANCE_PARTY, so every unit is checked.
+ */
 USER_FUNC(btlevtcmd_CheckSpace) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -2012,6 +2075,7 @@ USER_FUNC(btlevtcmd_CheckSpace) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] the alliance hostile to the unit args[0]. */
 USER_FUNC(btlevtcmd_GetEnemyBelong) {
     EvtWord* args = event->args;
     s32 btlId, id, index, value;
@@ -2026,6 +2090,7 @@ USER_FUNC(btlevtcmd_GetEnemyBelong) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] the unit args[0]'s own alliance (0 = Mario's side). */
 USER_FUNC(btlevtcmd_GetFriendBelong) {
     EvtWord* args = event->args;
     s32 btlId, id, index;
@@ -2039,6 +2104,7 @@ USER_FUNC(btlevtcmd_GetFriendBelong) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] the id of the unit that the unit args[0] is stepping in to protect. */
 USER_FUNC(btlevtcmd_GetProtectId) {
     EvtWord* args = event->args;
     s32 btlId, id, index;
@@ -2052,6 +2118,7 @@ USER_FUNC(btlevtcmd_GetProtectId) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] the unit kind (UNIT_*) of the unit args[0]. */
 USER_FUNC(btlevtcmd_GetUnitKind) {
     EvtWord* args = event->args;
     s32 btlId, id, index;
@@ -2065,6 +2132,7 @@ USER_FUNC(btlevtcmd_GetUnitKind) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] the unit paired with args[0] (Mario for the partner, the partner for Mario), or -1. */
 USER_FUNC(btlevtcmd_GetPartnerId) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -2084,6 +2152,7 @@ USER_FUNC(btlevtcmd_GetPartnerId) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] the id of Mario on the side of the unit args[0], or -1. */
 USER_FUNC(btlevtcmd_GetMarioId) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -2109,6 +2178,7 @@ USER_FUNC(btlevtcmd_GetMarioId) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] the id of the partner on the side of the unit args[0], or -1. */
 USER_FUNC(btlevtcmd_GetPartyId) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -2137,6 +2207,7 @@ USER_FUNC(btlevtcmd_GetPartyId) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] the id of the unit args[0]'s body (main) part. */
 USER_FUNC(btlevtcmd_GetBodyId) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -2152,6 +2223,10 @@ USER_FUNC(btlevtcmd_GetBodyId) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns the resolved id of the unit args[0] in args[1] (turning BTL_UNIT_SELF and the like into a real
+ * id), or -1 when it does not exist or is about to be removed.
+ */
 USER_FUNC(btlevtcmd_GetUnitId) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -2173,6 +2248,10 @@ USER_FUNC(btlevtcmd_GetUnitId) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns in args[1] the upgrade rank of the partner args[0] (0 = normal, 1 = Super, 2 = Ultra),
+ * 0 for other units.
+ */
 USER_FUNC(btlevtcmd_GetPartyTechLv) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -2194,6 +2273,12 @@ USER_FUNC(btlevtcmd_GetPartyTechLv) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: works out a facing (1 = right, -1 = left) for the unit args[0] (part args[1], -1 for the whole unit)
+ * and returns it in args[5].
+ * The flags args[4] choose the source: its current facing, its side's attack direction, its move direction,
+ * toward the unit args[2] (part args[3]) or toward the x coordinate args[2]; FACE_DIR_REVERSE flips it.
+ */
 USER_FUNC(btlevtcmd_CalculateFaceDirection) {
     f32 thisX, thisY, thisZ;
     f32 targetX, targetY, targetZ;
@@ -2310,6 +2395,7 @@ USER_FUNC(btlevtcmd_CalculateFaceDirection) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] the facing of the unit args[0] (1 = right, -1 = left). */
 USER_FUNC(btlevtcmd_GetFaceDirection) {
     EvtWord* args = event->args;
     s32 btlId, id, index;
@@ -2323,6 +2409,7 @@ USER_FUNC(btlevtcmd_GetFaceDirection) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the facing of the unit args[0] to args[1]. */
 USER_FUNC(btlevtcmd_ChangeFaceDirection) {
     s32 id;
     EvtWord* args = event->args;
@@ -2339,6 +2426,7 @@ USER_FUNC(btlevtcmd_ChangeFaceDirection) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the facing of part args[1] of the unit args[0] to args[2]. */
 USER_FUNC(btlevtcmd_ChangePartsFaceDirection) {
     EvtWord* args = event->args;
     s32 btlId, id, partId;
@@ -2354,6 +2442,7 @@ USER_FUNC(btlevtcmd_ChangePartsFaceDirection) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: turns the unit args[0] back to its side's attack direction (toward the other side). */
 USER_FUNC(btlevtcmd_ResetFaceDirection) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -2365,6 +2454,7 @@ USER_FUNC(btlevtcmd_ResetFaceDirection) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns 1 in args[2] when the unit args[0] has any of the attribute flags args[1] (UNIT_ATTR_*). */
 USER_FUNC(btlevtcmd_CheckAttribute) {
     EvtWord* args = event->args;
     s32 btlId, id, mask, index;
@@ -2383,6 +2473,7 @@ USER_FUNC(btlevtcmd_CheckAttribute) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the attribute flags args[1] on the unit args[0]. */
 USER_FUNC(btlevtcmd_OnAttribute) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -2396,6 +2487,7 @@ USER_FUNC(btlevtcmd_OnAttribute) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: clears the attribute flags args[1] on the unit args[0]. */
 USER_FUNC(btlevtcmd_OffAttribute) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -2409,6 +2501,7 @@ USER_FUNC(btlevtcmd_OffAttribute) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns 1 in args[3] when part args[1] of the unit args[0] has any of the part attributes args[2]. */
 USER_FUNC(btlevtcmd_CheckPartsAttribute) {
     EvtWord* args = event->args;
     s32 id, partId, index, mask;
@@ -2430,6 +2523,7 @@ USER_FUNC(btlevtcmd_CheckPartsAttribute) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the part attributes args[2] on part args[1] of the unit args[0]. */
 USER_FUNC(btlevtcmd_OnPartsAttribute) {
     EvtWord* args = event->args;
     s32 id, partId, mask;
@@ -2446,6 +2540,7 @@ USER_FUNC(btlevtcmd_OnPartsAttribute) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: clears the part attributes args[2] on part args[1] of the unit args[0]. */
 USER_FUNC(btlevtcmd_OffPartsAttribute) {
     EvtWord* args = event->args;
     s32 id, partId, mask;
@@ -2462,6 +2557,10 @@ USER_FUNC(btlevtcmd_OffPartsAttribute) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns 1 in args[3] when part args[1] of the unit args[0] has any of the counter attributes args[2]
+ * (spiky, fiery, electric and so on).
+ */
 USER_FUNC(btlevtcmd_CheckPartsCounterAttribute) {
     EvtWord* args = event->args;
     s32 id, partId, index, mask;
@@ -2483,6 +2582,7 @@ USER_FUNC(btlevtcmd_CheckPartsCounterAttribute) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the counter attributes args[2] on part args[1] of the unit args[0]. */
 USER_FUNC(btlevtcmd_OnPartsCounterAttribute) {
     EvtWord* args = event->args;
     s32 id, partId, mask;
@@ -2499,6 +2599,7 @@ USER_FUNC(btlevtcmd_OnPartsCounterAttribute) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: clears the counter attributes args[2] on part args[1] of the unit args[0]. */
 USER_FUNC(btlevtcmd_OffPartsCounterAttribute) {
     EvtWord* args = event->args;
     s32 id, partId, mask;
@@ -2515,6 +2616,10 @@ USER_FUNC(btlevtcmd_OffPartsCounterAttribute) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: sets the two afterimage colours of part args[1] of the unit args[0]:
+ * RGBA args[2..5] at the head of the trail and args[6..9] at its end.
+ */
 USER_FUNC(btlevtcmd_SetPartsBlur) {
     EvtWord* args = event->args;
     s32 id, partId;
@@ -2546,6 +2651,7 @@ USER_FUNC(btlevtcmd_SetPartsBlur) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the token flags args[1] on the unit args[0] (per-action markers scripts use to signal each other). */
 USER_FUNC(btlevtcmd_OnToken) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -2561,6 +2667,7 @@ USER_FUNC(btlevtcmd_OnToken) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: clears the token flags args[1] on the unit args[0]. */
 USER_FUNC(btlevtcmd_OffToken) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -2578,6 +2685,7 @@ USER_FUNC(btlevtcmd_OffToken) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns 1 in args[2] when the unit args[0] has any of the token flags args[1]. */
 USER_FUNC(btlevtcmd_CheckToken) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -2598,6 +2706,7 @@ USER_FUNC(btlevtcmd_CheckToken) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: replaces the unit args[0]'s status vulnerability table with the BattleVulnerableStatus args[1]. */
 USER_FUNC(btlevtcmd_SetRegistStatus) {
     EvtWord* args = event->args;
     BattleVulnerableStatus* status;
@@ -2610,6 +2719,7 @@ USER_FUNC(btlevtcmd_SetRegistStatus) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns 1 in args[1] when the unit args[0] is one the player commands (Mario or a partner). */
 USER_FUNC(btlevtcmd_CheckCommandUnit) {
     EvtWord* args = event->args;
     s32 id, index;
@@ -2627,6 +2737,7 @@ USER_FUNC(btlevtcmd_CheckCommandUnit) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: changes the unit kind of the unit args[0] to args[1] (for enemies that transform). */
 USER_FUNC(btlevtcmd_ChangeKind) {
     s32 btlId, id;
     EvtWord* args = event->args;
@@ -2637,6 +2748,7 @@ USER_FUNC(btlevtcmd_ChangeKind) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: replaces the defense table of part args[1] of the unit args[0] with args[2] (BattleUnitDefense). */
 USER_FUNC(btlevtcmd_SetPartsDefenceTable) {
     EvtWord* args = event->args;
     s32 btlId, id, partId;
@@ -2650,6 +2762,7 @@ USER_FUNC(btlevtcmd_SetPartsDefenceTable) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: replaces the defense attribute table of part args[1] of the unit args[0] with args[2]. */
 USER_FUNC(btlevtcmd_SetPartsDefenceAttrTable) {
     EvtWord* args = event->args;
     s32 btlId, id, partId;
@@ -2663,6 +2776,7 @@ USER_FUNC(btlevtcmd_SetPartsDefenceAttrTable) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: replaces the unit args[0]'s data table (its events for damage, KO, appeal and so on) with args[1]. */
 USER_FUNC(btlevtcmd_ChangeDataTable) {
     EvtWord* args = event->args;
     s32 btlId, id;
@@ -2674,6 +2788,10 @@ USER_FUNC(btlevtcmd_ChangeDataTable) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: when the defeated unit args[0] holds an item it stole from Mario,
+ * puts the item in the battle's recovered items list so Mario gets it back after the battle.
+ */
 USER_FUNC(btlevtcmd_GetBackItem) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -2697,6 +2815,7 @@ USER_FUNC(btlevtcmd_GetBackItem) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] the Star Points the unit args[0] is worth. */
 USER_FUNC(btlevtcmd_GetExp) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -2711,12 +2830,14 @@ USER_FUNC(btlevtcmd_GetExp) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: adds args[0] Star Points to the total earned this battle (shown by the counter in the corner). */
 USER_FUNC(btlevtcmd_StoreExp) {
     s32 val = evtGetValue(event, event->args[0]);
     BattleStoreExp(_battleWorkPointer, val);
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] the coins the unit args[0] drops. */
 USER_FUNC(btlevtcmd_GetCoin) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -2731,12 +2852,14 @@ USER_FUNC(btlevtcmd_GetCoin) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: adds args[0] coins to the coins won this battle. */
 USER_FUNC(btlevtcmd_StoreCoin) {
     s32 val = evtGetValue(event, event->args[0]);
     BattleStoreCoin(_battleWorkPointer, val);
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the walking speed (units per frame) of the unit args[0] for the next move. */
 USER_FUNC(btlevtcmd_SetMoveSpeed) {
     EvtWord* args = event->args;
     s32 btlId, id;
@@ -2749,6 +2872,7 @@ USER_FUNC(btlevtcmd_SetMoveSpeed) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the horizontal jump speed of the unit args[0]. */
 USER_FUNC(btlevtcmd_SetJumpSpeed) {
     EvtWord* args = event->args;
     s32 btlId, id;
@@ -2761,6 +2885,7 @@ USER_FUNC(btlevtcmd_SetJumpSpeed) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the gravity per frame of the unit args[0] for its jumps and falls. */
 USER_FUNC(btlevtcmd_SetFallAccel) {
     EvtWord* args = event->args;
     s32 btlId, id;
@@ -2773,6 +2898,10 @@ USER_FUNC(btlevtcmd_SetFallAccel) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: sets the unit args[0]'s next jump: frame count args[1] (0 = derive from the speed),
+ * horizontal speed args[2] and gravity args[3].
+ */
 USER_FUNC(btlevtcmd_JumpSetting) {
     s32 btlId, id, frames;
     EvtWord* args = event->args;
@@ -2795,6 +2924,10 @@ USER_FUNC(btlevtcmd_JumpSetting) {
 static void _UnitMoveSoundControl(BattleUnit* unit);
 static void _UnitMoveSoundControlEnd(BattleUnit* unit);
 
+/**
+ * Builds a Vec for a 3D sound position; becMvVecA to becMvVecE are identical copies, one per call site,
+ * as the original code had them.
+ */
 static inline Vec becMvVecA(f32 x, f32 y, f32 z) {
     Vec v = {0.0f, 0.0f, 0.0f};
     v.x = x;
@@ -2803,6 +2936,7 @@ static inline Vec becMvVecA(f32 x, f32 y, f32 z) {
     return v;
 }
 
+/** Identical to becMvVecA (sound position for another mover). */
 static inline Vec becMvVecB(f32 x, f32 y, f32 z) {
     Vec v = {0.0f, 0.0f, 0.0f};
     v.x = x;
@@ -2811,6 +2945,7 @@ static inline Vec becMvVecB(f32 x, f32 y, f32 z) {
     return v;
 }
 
+/** Identical to becMvVecA (sound position for another mover). */
 static inline Vec becMvVecC(f32 x, f32 y, f32 z) {
     Vec v = {0.0f, 0.0f, 0.0f};
     v.x = x;
@@ -2819,6 +2954,7 @@ static inline Vec becMvVecC(f32 x, f32 y, f32 z) {
     return v;
 }
 
+/** Identical to becMvVecA (sound position for another mover). */
 static inline Vec becMvVecD(f32 x, f32 y, f32 z) {
     Vec v = {0.0f, 0.0f, 0.0f};
     v.x = x;
@@ -2827,6 +2963,7 @@ static inline Vec becMvVecD(f32 x, f32 y, f32 z) {
     return v;
 }
 
+/** Identical to becMvVecA (sound position for another mover). */
 static inline Vec becMvVecE(f32 x, f32 y, f32 z) {
     Vec v = {0.0f, 0.0f, 0.0f};
     v.x = x;
@@ -2835,6 +2972,10 @@ static inline Vec becMvVecE(f32 x, f32 y, f32 z) {
     return v;
 }
 
+/**
+ * Script: jumps the unit args[0] in an arc to (args[1..3]) over args[4] frames (0 = from the jump speed),
+ * using its gravity, with the jump sounds of sound set args[5]. Blocks until it lands.
+ */
 USER_FUNC(btlevtcmd_JumpPosition) {
     s32 id;
     EvtWord* args = event->args;
@@ -2904,6 +3045,7 @@ USER_FUNC(btlevtcmd_JumpPosition) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script: continues the unit args[0]'s current jump arc (speed and gravity as they are) until it reaches the floor. */
 USER_FUNC(btlevtcmd_JumpContinue) {
     BattleUnit* unit;
     s32 id;
@@ -2931,6 +3073,10 @@ USER_FUNC(btlevtcmd_JumpContinue) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script: drops the unit args[0] to (args[1..3]) over args[4] frames (0 = from its move speed),
+ * starting with no upward speed and choosing the gravity to land exactly; blocks until it arrives.
+ */
 USER_FUNC(btlevtcmd_FallPosition) {
     s32 id, frames;
     EvtWord* args = event->args;
@@ -2985,6 +3131,11 @@ USER_FUNC(btlevtcmd_FallPosition) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script: walks the unit args[0] in a straight line to (args[1..3]) over args[4] frames (0 = from its move
+ * speed), playing the footstep sounds of sound set args[5] in mode args[6] (run, walk and so on).
+ * Blocks until it arrives.
+ */
 USER_FUNC(btlevtcmd_MovePosition) {
     s32 id;
     EvtWord* args = event->args;
@@ -3038,6 +3189,11 @@ USER_FUNC(btlevtcmd_MovePosition) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script: returns in args[5] how many frames the unit args[0] needs to reach x = args[1],
+ * z = args[3] at speed args[4] (0 = its move speed); args[2] is read but unused.
+ * Passing EVT_NULLPTR as args[5] discards the result.
+ */
 USER_FUNC(btlevtcmd_GetMoveFrame) {
     s32 id;
     EvtWord* args = event->args;
@@ -3075,6 +3231,12 @@ USER_FUNC(btlevtcmd_GetMoveFrame) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: flies the unit args[0] to (args[1..3]) over args[4] frames along a curve bowed by args[5] units (0 =
+ * straight), the bow vertical for type args[7] 0 and sideways otherwise;
+ * args[6] is the interpolation mode (+100 also pins it to the target at the end), args[8] the sound set.
+ * Floating units use it instead of walking. Blocks until it arrives.
+ */
 USER_FUNC(btlevtcmd_DivePosition) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -3205,6 +3367,10 @@ USER_FUNC(btlevtcmd_DivePosition) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script: moves the unit args[0] to (args[1..3]) over args[4] frames along half an ellipse, args[5] units wide,
+ * eased by interpolation mode args[6]; used when Mario and the partner swap places.
+ */
 USER_FUNC(btlevtcmd_EllipseMovePosition) {
     s32 width, mode;
     EvtWord* args = event->args;
@@ -3271,6 +3437,10 @@ USER_FUNC(btlevtcmd_EllipseMovePosition) {
 }
 /* movers end (half_B) */
 
+/**
+ * Script: adds args[2] in the unit args[0]'s move direction (its facing when it is not moving) to the variable
+ * args[1].
+ */
 USER_FUNC(btlevtcmd_MoveDirectionAdd) {
     s32 btlId, id, value;
     EvtWord* args = event->args;
@@ -3294,6 +3464,7 @@ USER_FUNC(btlevtcmd_MoveDirectionAdd) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: adds args[2] in the direction the unit args[0] faces to the variable args[1] (positions in front of it). */
 USER_FUNC(btlevtcmd_FaceDirectionAdd) {
     s32 btlId, id, value;
     EvtWord* args = event->args;
@@ -3313,6 +3484,10 @@ USER_FUNC(btlevtcmd_FaceDirectionAdd) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: subtracts args[2] in the direction the unit args[0] faces from the variable args[1] (positions behind
+ * it).
+ */
 USER_FUNC(btlevtcmd_FaceDirectionSub) {
     s32 btlId, id;
     BattleWork* wp = _battleWorkPointer;
@@ -3330,6 +3505,7 @@ USER_FUNC(btlevtcmd_FaceDirectionSub) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: subtracts args[3] in the direction part args[1] of the unit args[0] faces from the variable args[2]. */
 USER_FUNC(btlevtcmd_PartsFaceDirectionSub) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -3357,6 +3533,10 @@ static void _MoveSoundControlEndCore(BattleUnit* unit, BecSndWork* work);
 static void _MoveSoundControlCore(BattleUnit* unit, BecSndWork* work, BattleUnitPart* part, f32 x, f32 y, f32 z);
 #include "eff/n64/eff_coin_n64.h"
 #include "battle/battle_detect.h"
+/**
+ * Refund badge payout when the unit uses an item:
+ * (70 + 5 per Refund badge)% of the item's sell price in coins, with a coin effect at the unit.
+ */
 static inline void bec_coin(BattleUnit* unit, s32 item) {
     s32 coins;
     Vec pos;
@@ -3370,6 +3550,10 @@ static inline void bec_coin(BattleUnit* unit, s32 item) {
     }
 }
 
+/**
+ * Script: fills the battle's target list for the weapon args[2] used by the unit args[0] against alliance
+ * args[1], scanning from the side the weapon's target flags start on.
+ */
 USER_FUNC(btlevtcmd_SamplingEnemy) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -3391,6 +3575,10 @@ USER_FUNC(btlevtcmd_SamplingEnemy) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: picks the preferred target from the target list using the weapon args[0]'s target weights (enemy AI)
+ * and returns its unit and part in args[1] and args[2].
+ */
 USER_FUNC(btlevtcmd_ChoiceSamplingEnemy) {
     EvtWord* args = event->args;
     BattleWorkWeaponTargets* targets = &_battleWorkPointer->weaponTargets;
@@ -3406,6 +3594,10 @@ USER_FUNC(btlevtcmd_ChoiceSamplingEnemy) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns the current target of the target list in args[0] (unit) and args[1] (part),
+ * or -1 when the list is empty.
+ */
 USER_FUNC(btlevtcmd_GetSelectEnemy) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -3425,6 +3617,10 @@ USER_FUNC(btlevtcmd_GetSelectEnemy) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: advances to the next target in the list and returns it in args[0] (unit) and args[1] (part);
+ * args[0] is -1 after the last.
+ */
 USER_FUNC(btlevtcmd_GetSelectNextEnemy) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -3445,6 +3641,7 @@ USER_FUNC(btlevtcmd_GetSelectNextEnemy) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns the target of a first strike from the field in args[0] (unit) and args[1] (its body part). */
 USER_FUNC(btlevtcmd_GetFirstAttackTarget) {
     EvtWord* args = event->args;
     BattleUnit* attacker;
@@ -3460,6 +3657,7 @@ USER_FUNC(btlevtcmd_GetFirstAttackTarget) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[0] the item chosen in the command menu's item list. */
 USER_FUNC(btlevtcmd_GetConsumeItem) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -3468,6 +3666,10 @@ USER_FUNC(btlevtcmd_GetConsumeItem) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: shows the item args[3] as a fixed icon at (args[0..2]) for args[4] frames, then removes it;
+ * blocks meanwhile. Used to show a Life Shroom over a revived unit.
+ */
 USER_FUNC(btlevtcmd_DispItemIcon) {
     EvtWord* args = event->args;
     s32 x, y, z;
@@ -3496,6 +3698,11 @@ USER_FUNC(btlevtcmd_DispItemIcon) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: holds the item being used over the head of the unit args[0] for args[1] frames with a sparkle
+ * and the item-use sound (Mario's, a partner's or an enemy's).
+ * Mario and the partners show the item chosen in the menu, enemies their held item. Blocks until done.
+ */
 USER_FUNC(btlevtcmd_CommandFlyItem) {
     EvtWord* args = event->args;
     s32 id, time;
@@ -3553,6 +3760,11 @@ USER_FUNC(btlevtcmd_CommandFlyItem) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: uses up the item the unit args[0] used:
+ * for Mario and the partners the item chosen in the menu leaves the pouch (if it is a pouch item)
+ * and the Refund badge pays out; enemies lose their held item.
+ */
 USER_FUNC(btlevtcmd_ConsumeItem) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -3577,6 +3789,11 @@ USER_FUNC(btlevtcmd_ConsumeItem) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: for Mario and the partners, queues the item args[1] in the battle's reserve list,
+ * to be taken out of the pouch after the battle (the automatic Life Shroom), and pays Refund;
+ * an enemy holding a Life Shroom loses it.
+ */
 USER_FUNC(btlevtcmd_ConsumeItemReserve) {
     s32 id;
     BattleUnit* unit;
@@ -3621,6 +3838,11 @@ USER_FUNC(btlevtcmd_ConsumeItemReserve) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: declares the attack on the target in the variables args[1] (unit) and args[2] (part):
+ * BattleAttackDeclare may redirect it, for example to a unit stepping in to protect the target,
+ * and writes the final target back.
+ */
 USER_FUNC(btlevtcmd_AttackDeclare) {
     EvtWord* args = event->args;
     s32 id;
@@ -3640,6 +3862,7 @@ USER_FUNC(btlevtcmd_AttackDeclare) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: declares an attack on every target in the list (BattleAttackDeclareAll). */
 USER_FUNC(btlevtcmd_AttackDeclareAll) {
     BattleWork* wp = _battleWorkPointer;
     s32 id;
@@ -3650,6 +3873,11 @@ USER_FUNC(btlevtcmd_AttackDeclareAll) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: before the hit, checks whether the weapon args[3] of the unit args[0] will connect with part args[2]
+ * of the unit args[1] (flags args[4]) and returns the result in args[5] (hit, miss, dodge, lucky and so on).
+ * Ends the script when the check fails or the attacker's event was killed.
+ */
 USER_FUNC(btlevtcmd_PreCheckDamage) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -3685,6 +3913,7 @@ USER_FUNC(btlevtcmd_PreCheckDamage) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: like btlevtcmd_PreCheckDamage with the weapon chosen in the command menu (flags args[3], result args[4]). */
 USER_FUNC(btlevtcmd_CommandPreCheckDamage) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -3721,6 +3950,10 @@ USER_FUNC(btlevtcmd_CommandPreCheckDamage) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: checks what the counter attributes of part args[2] of the unit args[1] would do to the unit args[0]
+ * attacking with the weapon args[3] (spikes, fire and so on) and returns the result in args[5].
+ */
 USER_FUNC(btlevtcmd_PreCheckCounter) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -3755,6 +3988,7 @@ USER_FUNC(btlevtcmd_PreCheckCounter) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: like btlevtcmd_PreCheckCounter with the weapon chosen in the command menu (result in args[4]). */
 USER_FUNC(btlevtcmd_CommandPreCheckCounter) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -3789,6 +4023,11 @@ USER_FUNC(btlevtcmd_CommandPreCheckCounter) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: deals the hit: applies the weapon args[3] of the unit args[0] to part args[2] of the unit args[1] with
+ * damage flags args[4] (damage, status, counters, the target's hit event) and returns the result in args[5].
+ * Ends the script when it fails or the attacker's event was killed.
+ */
 USER_FUNC(btlevtcmd_CheckDamage) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -3824,6 +4063,7 @@ USER_FUNC(btlevtcmd_CheckDamage) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: like btlevtcmd_CheckDamage with the weapon chosen in the command menu (flags args[3], result args[4]). */
 USER_FUNC(btlevtcmd_CommandCheckDamage) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -3860,6 +4100,10 @@ USER_FUNC(btlevtcmd_CommandCheckDamage) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: deals args[2] damage straight to part args[1] of the unit args[0] without a weapon,
+ * with damage code args[3], damage pattern args[4] and flags args[5].
+ */
 USER_FUNC(btlevtcmd_DamageDirect) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -3882,6 +4126,7 @@ USER_FUNC(btlevtcmd_DamageDirect) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the unit args[0]'s damage event (the script run when it is hit) to args[1]. */
 USER_FUNC(btlevtcmd_SetEventDamage) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -3894,6 +4139,7 @@ USER_FUNC(btlevtcmd_SetEventDamage) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the unit args[0]'s wait event (its idle loop between actions) to args[1]. */
 USER_FUNC(btlevtcmd_SetEventWait) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -3906,6 +4152,7 @@ USER_FUNC(btlevtcmd_SetEventWait) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the unit args[0]'s entry event (run when it enters the battle) to args[1]. */
 USER_FUNC(btlevtcmd_SetEventEntry) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -3918,6 +4165,7 @@ USER_FUNC(btlevtcmd_SetEventEntry) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the unit args[0]'s phase event (run at phase changes such as turn start and end) to args[1]. */
 USER_FUNC(btlevtcmd_SetEventPhase) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -3930,6 +4178,10 @@ USER_FUNC(btlevtcmd_SetEventPhase) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: sets the unit args[0]'s unison phase event to args[1].
+ * Guess: the phase event that runs together with the other units' phase events, from the name.
+ */
 USER_FUNC(btlevtcmd_SetEventUnisonPhase) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -3942,6 +4194,7 @@ USER_FUNC(btlevtcmd_SetEventUnisonPhase) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the unit args[0]'s attack event (its action this turn) to args[1] and clears the attack event flags. */
 USER_FUNC(btlevtcmd_SetEventAttack) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -3955,6 +4208,7 @@ USER_FUNC(btlevtcmd_SetEventAttack) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the unit args[0]'s confusion event (its action when confused) to args[1]. */
 USER_FUNC(btlevtcmd_SetEventConfusion) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -3967,6 +4221,10 @@ USER_FUNC(btlevtcmd_SetEventConfusion) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: sets the unit args[0]'s ceiling fall event to args[1] (run when it falls from the ceiling,
+ * as when a stage hazard knocks it down).
+ */
 USER_FUNC(btlevtcmd_SetEventCeilFall) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -3979,6 +4237,7 @@ USER_FUNC(btlevtcmd_SetEventCeilFall) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: (re)starts the unit args[0]'s wait event, if it has one. */
 USER_FUNC(btlevtcmd_StartWaitEvent) {
     BattleUnit* unit;
     s32 id;
@@ -3992,6 +4251,7 @@ USER_FUNC(btlevtcmd_StartWaitEvent) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: stops the unit args[0]'s running wait event. */
 USER_FUNC(btlevtcmd_StopWaitEvent) {
     BattleUnit* unit;
     s32 id;
@@ -4006,15 +4266,18 @@ USER_FUNC(btlevtcmd_StopWaitEvent) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: clears BATTLE_FLAG_GUARD_MOVE once a protecting unit is in place. */
 USER_FUNC(btlevtcmd_GuardMoveEnd) {
     _battleWorkPointer->flags &= ~BATTLE_FLAG_GUARD_MOVE;
     return EVT_RETURN_DONE;
 }
 
+/** Script: blocks while BATTLE_FLAG_GUARD_MOVE is set (a unit is still moving to protect the target). */
 USER_FUNC(btlevtcmd_WaitGuardMove) {
     return (_battleWorkPointer->flags & BATTLE_FLAG_GUARD_MOVE) ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
 
+/** Script: blocks until the active unit's attack event has finished. */
 USER_FUNC(btlevtcmd_WaitAttackEnd) {
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, _battleWorkPointer->activeUnitId);
     if (!unit) {
@@ -4030,6 +4293,10 @@ USER_FUNC(btlevtcmd_WaitAttackEnd) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns 1 in args[0] when the active unit's attack event has finished,
+ * 0 while it still runs (the non-blocking form of btlevtcmd_WaitAttackEnd).
+ */
 USER_FUNC(btlevtcmd_WaitAttackEndCheck) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -4051,6 +4318,10 @@ USER_FUNC(btlevtcmd_WaitAttackEndCheck) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: runs entry args[1] of the unit args[0]'s data table (its own damage, KO, appeal ... events) as a child
+ * script for that unit and waits for it; does nothing when the table has no such entry.
+ */
 USER_FUNC(btlevtcmd_RunDataEventChild) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -4072,6 +4343,7 @@ USER_FUNC(btlevtcmd_RunDataEventChild) {
     return 0xFF;
 }
 
+/** Script: returns in args[1] whether the unit args[0]'s data table has an entry of type args[2]. */
 USER_FUNC(btlevtcmd_CheckDataOfDataTable) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -4087,6 +4359,7 @@ USER_FUNC(btlevtcmd_CheckDataOfDataTable) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] the script of type args[2] from the unit args[0]'s data table, or 0. */
 USER_FUNC(btlevtcmd_GetDataFromDataTable) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -4102,6 +4375,7 @@ USER_FUNC(btlevtcmd_GetDataFromDataTable) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: marks the unit args[0]'s phase event as started (BattlePhaseEventStartDeclare). */
 USER_FUNC(btlevtcmd_PhaseEventStartDeclare) {
     s32 id;
 
@@ -4111,6 +4385,11 @@ USER_FUNC(btlevtcmd_PhaseEventStartDeclare) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: picks the action a confused unit args[0] takes (BattleSetConfuseAct)
+ * and returns its script in args[1]; after 20 failed tries (10 in the demos) it falls back to
+ * subsetevt_confuse_flustered.
+ */
 USER_FUNC(btlevtcmd_GetConfuseActEvent) {
     EvtWord* args = event->args;
     s32 id;
@@ -4139,6 +4418,12 @@ USER_FUNC(btlevtcmd_GetConfuseActEvent) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: works out the frame count for Mario's jump from the unit args[0] to x = args[1],
+ * z = args[3] (args[2] unused): the count already in args[4] (or, when that is 0,
+ * the distance over his move speed) plus 0.15 frames per unit of distance beyond 60.
+ * The result goes back to args[4].
+ */
 USER_FUNC(btlevtcmd_MarioJumpParam) {
     EvtWord* args = event->args;
     s32 id, frames, n, out;
@@ -4173,6 +4458,12 @@ USER_FUNC(btlevtcmd_MarioJumpParam) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: Mario's jump onto a target: arcs the unit args[0] to (args[1..3]) over args[4] frames (0 = from the
+ * move speed) with the jump sounds of sound set args[6].
+ * The arc height grows with the distance; type args[5] picks the curve (1 and 2 the normal jump,
+ * 2 about 12% higher; 3 and 4 a taller curve, 4 a further 25% higher). Blocks until he lands.
+ */
 USER_FUNC(btlevtcmd_MarioJumpPosition) {
     BattleUnit* unit;
     s32 id, frames, type, kind;
@@ -4328,6 +4619,11 @@ USER_FUNC(btlevtcmd_MarioJumpPosition) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script: returns in args[3..5] where the unit args[0] should take off to jump at part args[2] of the unit
+ * args[1]: in front of the target's hit position,
+ * moved up to the nearest unit in the way and stepped 30 or 60 units back toward the attacker's side.
+ */
 USER_FUNC(btlevtcmd_GetTakeoffPosition) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -4394,6 +4690,7 @@ USER_FUNC(btlevtcmd_GetTakeoffPosition) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the move speed of part args[1] of the unit args[0], for parts that move on their own. */
 USER_FUNC(btlevtcmd_SetPartsMoveSpeed) {
     EvtWord* args = event->args;
     s32 id, pno;
@@ -4407,6 +4704,7 @@ USER_FUNC(btlevtcmd_SetPartsMoveSpeed) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the gravity of part args[1] of the unit args[0] for its jumps. */
 USER_FUNC(btlevtcmd_SetPartsFallAccel) {
     EvtWord* args = event->args;
     s32 id, pno;
@@ -4420,6 +4718,10 @@ USER_FUNC(btlevtcmd_SetPartsFallAccel) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: jumps part args[1] of the unit args[0] in an arc to (args[2..4]) over args[5] frames,
+ * with the jump sounds of sound set args[6]; blocks until it lands. The part version of btlevtcmd_JumpPosition.
+ */
 USER_FUNC(btlevtcmd_JumpPartsPosition) {
     EvtWord* args = event->args;
     s32 id, pno;
@@ -4490,6 +4792,10 @@ USER_FUNC(btlevtcmd_JumpPartsPosition) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script: sets the next jump of part args[1] of the unit args[0]:
+ * frame count args[2], speed args[3], gravity args[4].
+ */
 USER_FUNC(btlevtcmd_JumpPartsSetting) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -4511,6 +4817,7 @@ USER_FUNC(btlevtcmd_JumpPartsSetting) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: continues the current jump arc of part args[1] of the unit args[0] until it reaches the floor. */
 USER_FUNC(btlevtcmd_JumpPartsContinue) {
     EvtWord* args = event->args;
     s32 id, pno;
@@ -4543,6 +4850,10 @@ USER_FUNC(btlevtcmd_JumpPartsContinue) {
 static void _PartsMoveSoundControl(BattleUnitPart* part);
 static void _PartsMoveSoundControlEnd(BattleUnitPart* part);
 
+/**
+ * Script: drops part args[1] of the unit args[0] to (args[2..4]) over args[5] frames,
+ * choosing the gravity to land exactly; the part version of btlevtcmd_FallPosition.
+ */
 USER_FUNC(btlevtcmd_FallPartsPosition) {
     s32 id;
     EvtWord* args = event->args;
@@ -4599,6 +4910,11 @@ USER_FUNC(btlevtcmd_FallPartsPosition) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script: flies part args[1] of the unit args[0] to (args[2..4]) along a bowed curve;
+ * the part version of btlevtcmd_DivePosition (frames args[5], bow args[6], mode args[7], type args[8],
+ * sound set args[9]).
+ */
 USER_FUNC(btlevtcmd_DivePartsPosition) {
     EvtWord* args = event->args;
     s32 id, pno, frames, height, mode, type, kind;
@@ -4730,6 +5046,10 @@ USER_FUNC(btlevtcmd_DivePartsPosition) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script: sets the action command difficulty for the unit args[0] to args[1] (badges such as Simplifier and
+ * Unsimplifier adjust it).
+ */
 USER_FUNC(btlevtcmd_AcSetDifficulty) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -4743,17 +5063,20 @@ USER_FUNC(btlevtcmd_AcSetDifficulty) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns the current action command difficulty in args[0]. */
 USER_FUNC(btlevtcmd_AcGetDifficulty) {
     s32 index = event->args[0];
     evtSetValue(event, index, BattleActionCommandGetDifficulty(_battleWorkPointer));
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the action command flags (acFlags) to the literal args[0]. */
 USER_FUNC(btlevtcmd_AcSetFlag) {
     _battleWorkPointer->actionCommands.acFlags = event->args[0];
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the eight action command parameters from args[0..7]; EVT_NULLPTR leaves a parameter unchanged. */
 USER_FUNC(btlevtcmd_AcSetParamAll) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -4768,6 +5091,7 @@ USER_FUNC(btlevtcmd_AcSetParamAll) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets action command parameter args[0] to args[1]. */
 USER_FUNC(btlevtcmd_AcSetParam) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -4776,6 +5100,7 @@ USER_FUNC(btlevtcmd_AcSetParam) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns action command parameter args[0] in args[1] (EVT_NULLPTR discards it). */
 USER_FUNC(btlevtcmd_AcGetParam) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -4788,6 +5113,7 @@ USER_FUNC(btlevtcmd_AcGetParam) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the four action command gauge parameters from args[0..3]. */
 USER_FUNC(btlevtcmd_AcSetGaugeParam) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -4798,6 +5124,10 @@ USER_FUNC(btlevtcmd_AcSetGaugeParam) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns action command output value args[0] (what the command produced, such as a power level) in
+ * args[1].
+ */
 USER_FUNC(btlevtcmd_AcGetOutputParam) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -4810,6 +5140,7 @@ USER_FUNC(btlevtcmd_AcGetOutputParam) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets action command output value args[0] to args[1]. */
 USER_FUNC(btlevtcmd_AcSetOutputParam) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -4818,6 +5149,10 @@ USER_FUNC(btlevtcmd_AcSetOutputParam) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: prepares the action command of type args[1] for the unit args[0] (args[2] and args[3] passed on to
+ * BattleActionCommandSetup).
+ */
 USER_FUNC(btlevtcmd_SetupAC) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -4834,6 +5169,10 @@ USER_FUNC(btlevtcmd_SetupAC) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: starts the prepared action command and shows its help text (args[0] nonzero),
+ * unless the unit acts confused.
+ */
 USER_FUNC(btlevtcmd_StartAC) {
     BattleWork* wp = _battleWorkPointer;
     s32 help = evtGetValue(event, event->args[0]);
@@ -4844,12 +5183,17 @@ USER_FUNC(btlevtcmd_StartAC) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: stops the action command and hides its help text. */
 USER_FUNC(btlevtcmd_StopAC) {
     BattleActionCommandStop(_battleWorkPointer);
     BattleAcHelpSetDispType(0);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: blocks while the action command is still running, then hides its help text;
+ * read the outcome with btlevtcmd_GetResultAC.
+ */
 USER_FUNC(btlevtcmd_ResultAC) {
     BattleWork* wp = _battleWorkPointer;
     BattleActionCommandResult(wp);
@@ -4860,6 +5204,7 @@ USER_FUNC(btlevtcmd_ResultAC) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: checks the guard and Superguard timing of the unit args[0] against the attack weapon args[1]. */
 USER_FUNC(btlevtcmd_ResultACDefence) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -4874,11 +5219,16 @@ USER_FUNC(btlevtcmd_ResultACDefence) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns the action command result flags in args[0] (bit 2 = success). */
 USER_FUNC(btlevtcmd_GetResultAC) {
     evtSetValue(event, event->args[0], _battleWorkPointer->actionCommands.result);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns in args[2] the rating level (Nice, Good, Great ...) of the action command result args[1] for
+ * the unit args[0] (none for BTL_UNIT_NONE or BTL_UNIT_SYSTEM).
+ */
 USER_FUNC(btlevtcmd_GetResultPrizeLv) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -4896,17 +5246,26 @@ USER_FUNC(btlevtcmd_GetResultPrizeLv) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[0] the result of the last guard check (none, guard or Superguard). */
 USER_FUNC(btlevtcmd_GetResultACDefence) {
     s32 index = event->args[0];
     evtSetValue(event, index, BattleActionCommandGetDefenceResult());
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns in args[0] how many times the action command was completed (for repeated presses and multi-hit
+ * moves).
+ */
 USER_FUNC(btlevtcmd_GetResultCountAC) {
     evtSetValue(event, event->args[0], _battleWorkPointer->actionCommands.resultCount);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: reports an action command result args[1] for the weapon args[0] to the audience (-1 = failed);
+ * also counts Mario's successes and failures (capped at 200) for the audience.
+ */
 USER_FUNC(btlevtcmd_AudienceDeclareACResult) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -4931,6 +5290,11 @@ USER_FUNC(btlevtcmd_AudienceDeclareACResult) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: reports a Stylish result: on success (args[1]) takes the audience bonus from the weapon args[0],
+ * cheers the audience and shows a "Nice" sign at the unit offset by (args[2..4]);
+ * on failure the audience boos and the miss sound plays.
+ */
 USER_FUNC(btlevtcmd_AudienceDeclareAcrobatResult) {
     EvtWord* args = event->args;
     u8* res;
@@ -4981,6 +5345,11 @@ static f32 ac_success_width_tbl[7][8] = {
     {30.0f, 5.0f, 5.0f, 5.0f, 6.0f, 6.0f, 7.0f, 7.0f},
 };
 
+/**
+ * Script: shows the action command rating sign args[0] (0-2 Nice at growing sizes, then Good, Great, Wonderful,
+ * Excellent) above the position args[1..3], kept on screen, with its sound.
+ * The US release sizes the sign by a per-language width table (ac_success_width_tbl).
+ */
 USER_FUNC(btlevtcmd_ACSuccessEffect) {
     EvtWord* args = event->args;
     s32 type;
@@ -5084,7 +5453,7 @@ USER_FUNC(btlevtcmd_ACSuccessEffect) {
     return EVT_RETURN_DONE;
 }
 #elif VERSION == VERSION_DEMO_US
-// The US demo has fixed widths, a different base scale, and no scaling or clamping of the position.
+/** The US demo has fixed widths, a different base scale, and no scaling or clamping of the position. */
 USER_FUNC(btlevtcmd_ACSuccessEffect) {
     EvtWord* args = event->args;
     s32 type;
@@ -5157,6 +5526,10 @@ USER_FUNC(btlevtcmd_ACSuccessEffect) {
     return EVT_RETURN_DONE;
 }
 #else
+/**
+ * Script: shows the action command rating sign args[0] (0-2 Nice at growing sizes, then Good, Great, Wonderful,
+ * Excellent) above the position args[1..3], kept on screen, with its sound.
+ */
 USER_FUNC(btlevtcmd_ACSuccessEffect) {
     EvtWord* args = event->args;
     s32 type;
@@ -5233,6 +5606,7 @@ USER_FUNC(btlevtcmd_ACSuccessEffect) {
 }
 #endif
 
+/** Script: sets (args[0] nonzero) or clears the flags args[1] in the running timing action command's work. */
 USER_FUNC(btlevtcmd_ac_timing_flag_onoff) {
     EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
@@ -5247,6 +5621,7 @@ USER_FUNC(btlevtcmd_ac_timing_flag_onoff) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[0] the frame on which the running timing action command succeeds. */
 USER_FUNC(btlevtcmd_ac_timing_get_success_frame) {
     s32 index = event->args[0];
     s32 frame = battleAcTimingA_GetSuccessFrame(_battleWorkPointer);
@@ -5254,6 +5629,7 @@ USER_FUNC(btlevtcmd_ac_timing_get_success_frame) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: shows the action command help text of the weapon args[0]. */
 USER_FUNC(btlevtcmd_ACHelpSet) {
     u8* weapon = (u8*)evtGetValue(event, event->args[0]);
     BattleAcHelpSetHelp(((BattleWeapon*)weapon)->acHelpMsg);
@@ -5262,7 +5638,7 @@ USER_FUNC(btlevtcmd_ACHelpSet) {
 }
 /* half_A end PRE */
 
-// s32* battleId, s32* windowStartFrame, s32* windowEndFrame, s32* endFrame, s32* earlyFrames
+/** s32* battleId, s32* windowStartFrame, s32* windowEndFrame, s32* endFrame, s32* earlyFrames */
 USER_FUNC(btlevtcmd_ACRStart) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -5280,7 +5656,7 @@ USER_FUNC(btlevtcmd_ACRStart) {
     return BattleAcrobatMain(wp);
 }
 
-// s32 resultRetIndex, s32 frameRetIndex (can be EVTDAT_POINTER_MAX to skip)
+/** s32 resultRetIndex, s32 frameRetIndex (can be EVTDAT_POINTER_MAX to skip) */
 USER_FUNC(btlevtcmd_ACRGetResult) {
     EvtWord* args = event->args;
     s32 index1, index2, result, frame;
@@ -5312,6 +5688,10 @@ USER_FUNC(btlevtcmd_AudienceAppeal) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: swaps the model of part args[1] of the unit args[0] for the animation group args[2],
+ * loading it asynchronously and blocking until it is ready.
+ */
 USER_FUNC(btlevtcmd_AnimeChangeGroup) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -5337,6 +5717,7 @@ USER_FUNC(btlevtcmd_AnimeChangeGroup) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: plays the named animation args[2] on part args[1] of the unit args[0] (manual pose). */
 USER_FUNC(btlevtcmd_AnimeChangePose) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -5352,6 +5733,7 @@ USER_FUNC(btlevtcmd_AnimeChangePose) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: plays the pose of type args[2] (BTL_POSE_*) from the pose table of part args[1] of the unit args[0]. */
 USER_FUNC(btlevtcmd_AnimeChangePoseType) {
     EvtWord* args = event->args;
     s32 type;
@@ -5368,6 +5750,10 @@ USER_FUNC(btlevtcmd_AnimeChangePoseType) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: plays the named animation args[2] on part args[1] of the unit args[0] straight away, restarting it,
+ * and picks the plain or translucent (Invisible) draw type.
+ */
 USER_FUNC(btlevtcmd_AnimeChangePoseDirect) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -5393,6 +5779,7 @@ USER_FUNC(btlevtcmd_AnimeChangePoseDirect) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: blocks until the current animation of part args[1] of the unit args[0] has played through once. */
 USER_FUNC(btlevtcmd_AnimeWaitPlayComplete) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -5415,6 +5802,10 @@ USER_FUNC(btlevtcmd_AnimeWaitPlayComplete) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: blocks until the looping animation of part args[1] of the unit args[0] starts its next loop;
+ * returns at once when the animation is paused.
+ */
 USER_FUNC(btlevtcmd_AnimeWaitPlayLoopTiming) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -5450,6 +5841,7 @@ USER_FUNC(btlevtcmd_AnimeWaitPlayLoopTiming) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script: sets which part of the unit args[0] speaks in battle conversations (args[1]). */
 USER_FUNC(btlevtcmd_SetTalkBodyId) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -5461,6 +5853,7 @@ USER_FUNC(btlevtcmd_SetTalkBodyId) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the animation the unit args[0] plays while talking to the name args[1]. */
 USER_FUNC(btlevtcmd_SetTalkPose) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -5469,6 +5862,7 @@ USER_FUNC(btlevtcmd_SetTalkPose) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the animation the unit args[0] holds between lines of a conversation to the name args[1]. */
 USER_FUNC(btlevtcmd_SetStayPose) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -5477,6 +5871,7 @@ USER_FUNC(btlevtcmd_SetStayPose) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the unit args[0]'s talk animation from pose type args[1] of its body part. */
 USER_FUNC(btlevtcmd_SetTalkPoseType) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -5493,6 +5888,7 @@ USER_FUNC(btlevtcmd_SetTalkPoseType) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the unit args[0]'s conversation stay animation from pose type args[1] of its body part. */
 USER_FUNC(btlevtcmd_SetStayPoseType) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -5509,6 +5905,11 @@ USER_FUNC(btlevtcmd_SetStayPoseType) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns 1 in args[4] when pose types args[2]
+ * and args[3] of part args[1] of the unit args[0] name different animations;
+ * scripts use it to speed up a walk that shares the run animation.
+ */
 USER_FUNC(btlevtcmd_AnimeCmpPoseType) {
     EvtWord* args = event->args;
     s32 id, pno;
@@ -5531,6 +5932,7 @@ USER_FUNC(btlevtcmd_AnimeCmpPoseType) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: hands part args[1] of the unit args[0] back to automatic, status-based pose selection. */
 USER_FUNC(btlevtcmd_AnimeChangePoseFromTable) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -5544,6 +5946,7 @@ USER_FUNC(btlevtcmd_AnimeChangePoseFromTable) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: replaces the pose table of part args[1] of the unit args[0] with args[2]. */
 USER_FUNC(btlevtcmd_AnimeSetPoseTable) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -5557,6 +5960,10 @@ USER_FUNC(btlevtcmd_AnimeSetPoseTable) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: replaces the pose sound table (sounds tied to animation frames) of part args[1] of the unit args[0]
+ * with args[2].
+ */
 USER_FUNC(btlevtcmd_AnimeSetPoseSoundTable) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -5571,6 +5978,10 @@ USER_FUNC(btlevtcmd_AnimeSetPoseSoundTable) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns 1 in args[3] when the pose table of part args[1] of the unit args[0] defines pose type args[2]
+ * (searching only the section of the table that type belongs to).
+ */
 USER_FUNC(btlevtcmd_CheckDefinePosetype) {
     EvtWord* args = event->args;
     s32 type;
@@ -5617,6 +6028,7 @@ USER_FUNC(btlevtcmd_CheckDefinePosetype) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the scripted animation speed multiplier of part args[1] of the unit args[0] to args[2]. */
 USER_FUNC(btlevtcmd_AnimeSetMotionSpeed) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -5630,6 +6042,10 @@ USER_FUNC(btlevtcmd_AnimeSetMotionSpeed) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: sets the paper effect group args[2] (such as "p_b_st") on part args[1] of the unit args[0],
+ * with mode args[3].
+ */
 USER_FUNC(btlevtcmd_AnimeChangePaperGroup) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -5647,6 +6063,10 @@ USER_FUNC(btlevtcmd_AnimeChangePaperGroup) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: plays the paper effect animation args[2] (frozen, dodge and similar looks) on part args[1] of the unit
+ * args[0].
+ */
 USER_FUNC(btlevtcmd_AnimeChangePaperAnime) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -5662,6 +6082,7 @@ USER_FUNC(btlevtcmd_AnimeChangePaperAnime) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets (args[3] nonzero) or clears the animation flags args[2] on part args[1] of the unit args[0]. */
 USER_FUNC(btlevtcmd_AnimeFlagOnOff) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -5682,6 +6103,10 @@ USER_FUNC(btlevtcmd_AnimeFlagOnOff) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns 1 in args[1] when the unit args[0] can show guard motions:
+ * not asleep, stopped, frozen, tiny, KO'd, invisible and the like, and not already defending.
+ */
 USER_FUNC(btlevtcmd_CheckGuardMotionEnable) {
     EvtWord* args = event->args;
     s32 id, index;
@@ -5704,6 +6129,7 @@ USER_FUNC(btlevtcmd_CheckGuardMotionEnable) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns TRUE in args[2] when the unit args[0] has the status args[1] (StatusEffectType). */
 USER_FUNC(btlevtcmd_CheckStatus) {
     EvtWord* args = event->args;
     s32 id, index;
@@ -5723,6 +6149,10 @@ USER_FUNC(btlevtcmd_CheckStatus) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: gives the unit args[0] the status args[1] for args[2] turns at strength args[3]
+ * when args[4] is nonzero, or removes it.
+ */
 USER_FUNC(btlevtcmd_OnOffStatus) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -5744,6 +6174,7 @@ USER_FUNC(btlevtcmd_OnOffStatus) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: removes every status from the unit args[0]. */
 USER_FUNC(btlevtcmd_ClearAllStatus) {
     s32 id;
 
@@ -5753,6 +6184,7 @@ USER_FUNC(btlevtcmd_ClearAllStatus) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the status flags args[1] (STATUS_FLAG_*, such as defending) on the unit args[0]. */
 USER_FUNC(btlevtcmd_OnStatusFlag) {
     BattleUnit* unit;
     EvtWord* args = event->args;
@@ -5767,6 +6199,7 @@ USER_FUNC(btlevtcmd_OnStatusFlag) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: clears the status flags args[1] on the unit args[0]. */
 USER_FUNC(btlevtcmd_OffStatusFlag) {
     BattleUnit* unit;
     EvtWord* args = event->args;
@@ -5781,6 +6214,7 @@ USER_FUNC(btlevtcmd_OffStatusFlag) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns TRUE in args[1] when the unit args[0] can act (no status such as sleep, stop or freeze holds it). */
 USER_FUNC(btlevtcmd_CheckActStatus) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -5793,6 +6227,7 @@ USER_FUNC(btlevtcmd_CheckActStatus) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns TRUE in args[1] when the unit args[0] is able to take part in action commands (guards included). */
 USER_FUNC(btlevtcmd_GetACPossibility) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -5805,6 +6240,7 @@ USER_FUNC(btlevtcmd_GetACPossibility) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns TRUE in args[2] when the unit args[0] has any of the unit flags args[1] (UNIT_FLAG_*). */
 USER_FUNC(btlevtcmd_CheckUnitFlag) {
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -5824,6 +6260,7 @@ USER_FUNC(btlevtcmd_CheckUnitFlag) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the unit flags args[1] on the unit args[0]. */
 USER_FUNC(btlevtcmd_OnUnitFlag) {
     BattleUnit* unit;
     EvtWord* args = event->args;
@@ -5838,6 +6275,7 @@ USER_FUNC(btlevtcmd_OnUnitFlag) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: clears the unit flags args[1] on the unit args[0]. */
 USER_FUNC(btlevtcmd_OffUnitFlag) {
     BattleUnit* unit;
     EvtWord* args = event->args;
@@ -5852,6 +6290,10 @@ USER_FUNC(btlevtcmd_OffUnitFlag) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: queues an after-reaction for the unit args[0] with value args[1] (BattleAfterReactionEntry),
+ * run once the current attack is over.
+ */
 USER_FUNC(btlevtcmd_AfterReactionEntry) {
     EvtWord* args = event->args;
     s32 id, value;
@@ -5863,6 +6305,7 @@ USER_FUNC(btlevtcmd_AfterReactionEntry) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns 1 in args[1] when the weapon args[0] hits several targets, 0 when it is single-target. */
 USER_FUNC(btlevtcmd_CheckWeaponPluralTarget) {
     EvtWord* args = event->args;
     u8* weapon = (u8*)evtGetValue(event, args[0]);
@@ -5876,6 +6319,7 @@ USER_FUNC(btlevtcmd_CheckWeaponPluralTarget) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: makes the unit args[0] pay the FP (and Star Power) cost of the weapon args[1]. */
 USER_FUNC(btlevtcmd_PayWeaponCost) {
     EvtWord* args = event->args;
     BattleWeapon* weapon;
@@ -5888,6 +6332,7 @@ USER_FUNC(btlevtcmd_PayWeaponCost) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: makes the unit args[0] pay the cost of the weapon chosen in the command menu. */
 USER_FUNC(btlevtcmd_CommandPayWeaponCost) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -5902,6 +6347,7 @@ USER_FUNC(btlevtcmd_CommandPayWeaponCost) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] the action command level (acLevel) of the weapon args[0]. */
 USER_FUNC(btlevtcmd_GetWeaponActionLv) {
     EvtWord* args = event->args;
     u8* weapon = (u8*)evtGetValue(event, args[0]);
@@ -5909,6 +6355,7 @@ USER_FUNC(btlevtcmd_GetWeaponActionLv) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[0] the action command level of the weapon chosen in the command menu. */
 USER_FUNC(btlevtcmd_CommandGetWeaponActionLv) {
     s32 index = event->args[0];
     u8* weapon = (u8*)BattleGetSelectWeapon(_battleWorkPointer);
@@ -5916,6 +6363,10 @@ USER_FUNC(btlevtcmd_CommandGetWeaponActionLv) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns in args[1] the weapon the unit args[0] is using:
+ * the one chosen in the menu for Mario and the partners, its held item's battle data for an enemy.
+ */
 USER_FUNC(btlevtcmd_CommandGetWeaponAddress) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -5936,6 +6387,7 @@ USER_FUNC(btlevtcmd_CommandGetWeaponAddress) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[0] the item id of the weapon args[1] (0 for moves that are not items). */
 USER_FUNC(btlevtcmd_CommandGetWeaponItemId) {
     EvtWord* args = event->args;
     s32 index = args[0];
@@ -5944,6 +6396,10 @@ USER_FUNC(btlevtcmd_CommandGetWeaponItemId) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns the HP, FP and Star Power restored by the item args[0] in args[1], args[2] and args[3];
+ * EVT_NULLPTR skips one.
+ */
 USER_FUNC(btlevtcmd_GetItemRecoverParam) {
     EvtWord* args = event->args;
     s32 id, a, b, c;
@@ -5966,6 +6422,11 @@ USER_FUNC(btlevtcmd_GetItemRecoverParam) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: rolls the stage hazards an attack with the weapon args[0] can set off, from its stageEffectRates:
+ * knocking down the background (A1, A2, then B), turning or firing the stage nozzles,
+ * dropping the iron frame and the objects above it. The battle debug flags can force each one.
+ */
 USER_FUNC(btlevtcmd_WeaponAftereffect) {
     BattleWork* wp = _battleWorkPointer;
     BattleWeapon* w = (BattleWeapon*)evtGetValue(event, event->args[0]);
@@ -6028,6 +6489,7 @@ USER_FUNC(btlevtcmd_WeaponAftereffect) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: makes the unit args[0] protect the unit args[1] (sets its protectId). */
 USER_FUNC(btlevtcmd_SetGuard) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -6042,6 +6504,10 @@ USER_FUNC(btlevtcmd_SetGuard) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns in args[1] the id of the shell shield unit (Koops' Shell Shield) guarding the unit args[0],
+ * or -1.
+ */
 USER_FUNC(btlevtcmd_GetGuardKouraId) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -6062,6 +6528,7 @@ USER_FUNC(btlevtcmd_GetGuardKouraId) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: ends the battle early: args[0] 0 = Mario ran away, 1 = interrupted by a script. */
 USER_FUNC(btlevtcmd_InterruptStop) {
     s32 type = evtGetValue(event, event->args[0]);
     BattleWork* wp = _battleWorkPointer;
@@ -6079,11 +6546,16 @@ USER_FUNC(btlevtcmd_InterruptStop) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: re-sorts the order in which units act (after a partner switch or a swap of positions). */
 USER_FUNC(btlevtcmd_SortPhaseMoveTable) {
     battleSortPhaseMoveTable(_battleWorkPointer, -1);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns the stage size in args[0..2] (x, y, z); EVT_NULLPTR skips one.
+ * Units fleeing or blown away move to the x edge.
+ */
 USER_FUNC(btlevtcmd_GetStageSize) {
     EvtWord* args = event->args;
     BattleStage* stage = BattleStageGetPtr();
@@ -6103,6 +6575,7 @@ USER_FUNC(btlevtcmd_GetStageSize) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns the size of the audience area in args[0..2]; EVT_NULLPTR skips one. */
 USER_FUNC(btlevtcmd_GetStageAudienceAreaSize) {
     EvtWord* args = event->args;
     BattleStage* stage = BattleStageGetPtr();
@@ -6122,6 +6595,7 @@ USER_FUNC(btlevtcmd_GetStageAudienceAreaSize) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns in args[1] the floor height of the stage at x = args[0], z = args[2]. */
 USER_FUNC(btlevtcmd_TransStageFloorPosition) {
     EvtWord* args = event->args;
     s32 index;
@@ -6134,6 +6608,10 @@ USER_FUNC(btlevtcmd_TransStageFloorPosition) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: sets the unit args[0]'s current movement sound directly:
+ * sounds args[1] and args[2] with timing values args[3..7] (BtlUnit_SetSeMode).
+ */
 USER_FUNC(btlevtcmd_SetMoveSoundDataWork) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -6158,6 +6636,11 @@ USER_FUNC(btlevtcmd_SetMoveSoundDataWork) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: sets the unit args[0]'s running footsteps:
+ * sounds args[1] and args[2] alternating, after args[3] frames, every args[4] and args[5] frames.
+ * One sound alone plays as a continuous loop.
+ */
 USER_FUNC(btlevtcmd_SetRunSound) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -6182,6 +6665,7 @@ USER_FUNC(btlevtcmd_SetRunSound) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the running footsteps of part args[1] of the unit args[0], like btlevtcmd_SetRunSound. */
 USER_FUNC(btlevtcmd_SetPartsRunSound) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -6206,6 +6690,7 @@ USER_FUNC(btlevtcmd_SetPartsRunSound) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the unit args[0]'s walking footsteps, laid out like btlevtcmd_SetRunSound. */
 USER_FUNC(btlevtcmd_SetWalkSound) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -6230,6 +6715,7 @@ USER_FUNC(btlevtcmd_SetWalkSound) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the walking footsteps of part args[1] of the unit args[0]. */
 USER_FUNC(btlevtcmd_SetPartsWalkSound) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -6254,6 +6740,7 @@ USER_FUNC(btlevtcmd_SetPartsWalkSound) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the unit args[0]'s flying (dive move) sounds, laid out like btlevtcmd_SetRunSound. */
 USER_FUNC(btlevtcmd_SetDiveSound) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -6278,6 +6765,7 @@ USER_FUNC(btlevtcmd_SetDiveSound) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the flying sounds of part args[1] of the unit args[0]. */
 USER_FUNC(btlevtcmd_SetPartsDiveSound) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -6302,6 +6790,7 @@ USER_FUNC(btlevtcmd_SetPartsDiveSound) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the unit args[0]'s jump sounds: args[1] at take-off and args[2] on landing. */
 USER_FUNC(btlevtcmd_SetJumpSound) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -6319,6 +6808,7 @@ USER_FUNC(btlevtcmd_SetJumpSound) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: sets the take-off and landing sounds of part args[1] of the unit args[0] (args[2], args[3]). */
 USER_FUNC(btlevtcmd_SetPartsJumpSound) {
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -6338,18 +6828,24 @@ USER_FUNC(btlevtcmd_SetPartsJumpSound) {
 
 // inlining off for _UnitMoveSoundControl, _PartsMoveSoundControl, _MoveSoundControlCore and 3 more, as in the original (the object differs without it)
 #pragma dont_inline on
+/** Per-frame movement sound for a moving unit, at its position. */
 static void _UnitMoveSoundControl(BattleUnit* unit) {
     f32 x, y, z;
     BtlUnit_GetPos(unit, &x, &y, &z);
     _MoveSoundControlCore(unit, &unit->moveSnd, NULL, x, y, z);
 }
 
+/** Per-frame movement sound for a moving part, at its position. */
 static void _PartsMoveSoundControl(BattleUnitPart* part) {
     f32 x, y, z;
     BtlUnit_GetPartsPos(part, &x, &y, &z);
     _MoveSoundControlCore(part->owner, &part->moveSnd, part, x, y, z);
 }
 
+/**
+ * Plays the movement sounds while a unit or part moves: a single sound loops and follows it;
+ * two sounds alternate as footsteps on their own timers.
+ */
 static void _MoveSoundControlCore(BattleUnit* unit, BecSndWork* work, BattleUnitPart* part, f32 x, f32 y, f32 z) {
     Vec pos;
     Vec cur;
@@ -6390,10 +6886,12 @@ static void _MoveSoundControlCore(BattleUnit* unit, BecSndWork* work, BattleUnit
     }
 }
 
+/** Stops a unit's looping movement sound when its move ends. */
 static void _UnitMoveSoundControlEnd(BattleUnit* unit) {
     _MoveSoundControlEndCore(unit, &unit->moveSnd);
 }
 
+/** Stops a part's looping movement sound when its move ends. */
 static void _PartsMoveSoundControlEnd(BattleUnitPart* part) {
     _MoveSoundControlEndCore(part->owner, &part->moveSnd);
 }
@@ -6408,6 +6906,7 @@ const char* _mario_attack_voice_table[10] = {
     "SFX_VOICE_MARIO_AC2_2", "SFX_VOICE_MARIO_AC2_3", "SFX_VOICE_MARIO_AC2_4",
     "SFX_VOICE_MARIO_AC2_5",
 };
+/** Stops the looping movement sound in the work, if one is playing. */
 static void _MoveSoundControlEndCore(BattleUnit* unit, BecSndWork* work) {
     if ((u32)work->sfxId != 0xFFFFFFFF) {
         psndSFXOff(work->sfxId);
@@ -6416,6 +6915,10 @@ static void _MoveSoundControlEndCore(BattleUnit* unit, BecSndWork* work) {
 }
 #pragma dont_inline reset
 
+/**
+ * Script: plays the sound args[1] at the unit args[0] with volume args[2] and pitch args[3];
+ * the sound id goes to args[4] unless it is EVT_NULLPTR.
+ */
 USER_FUNC(btlevtcmd_snd_se) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -6440,6 +6943,7 @@ USER_FUNC(btlevtcmd_snd_se) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: like btlevtcmd_snd_se, at the unit's position offset by (args[4..6]); the sound id goes to args[7]. */
 USER_FUNC(btlevtcmd_snd_se_offset) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -6469,6 +6973,10 @@ USER_FUNC(btlevtcmd_snd_se_offset) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: plays a random Mario voice clip on the unit args[0]:
+ * args[1] 1 for a Stylish cheer (of 5), 2 for an attack grunt (of 10).
+ */
 USER_FUNC(btlevtcmd_snd_voice) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -6492,6 +7000,10 @@ USER_FUNC(btlevtcmd_snd_voice) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: returns in args[1] the attack script of the item the enemy args[0] should use now,
+ * or 0 (see BattleEnemyUseItemCheck).
+ */
 USER_FUNC(btlevtcmd_EnemyItemUseCheck) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -6505,6 +7017,7 @@ USER_FUNC(btlevtcmd_EnemyItemUseCheck) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns TRUE in args[2] when a button in the mask args[1] was just pressed on controller args[0]. */
 USER_FUNC(btlevtcmd_PadCheckTrigger) {
     EvtWord* args = event->args;
     s32 chan = evtGetValue(event, args[0]);
@@ -6518,6 +7031,7 @@ USER_FUNC(btlevtcmd_PadCheckTrigger) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns TRUE in args[2] when a button in the mask args[1] is held on controller args[0]. */
 USER_FUNC(btlevtcmd_PadCheckNow) {
     EvtWord* args = event->args;
     s32 chan = evtGetValue(event, args[0]);
@@ -6531,6 +7045,7 @@ USER_FUNC(btlevtcmd_PadCheckNow) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: turns the Star Power bonuses earned by the current action into audience Star Power gain and clears them. */
 USER_FUNC(btlevtcmd_InviteApInfoReport) {
     StarPowerInfo* info = &_battleWorkPointer->impendingBonuses;
     BattleAudience_ApRecoveryBuild(info);
@@ -6538,6 +7053,10 @@ USER_FUNC(btlevtcmd_InviteApInfoReport) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: sets the unit args[0]'s hit event to args[1], used as the callback for counter action commands.
+ * Only in the demos and the European release.
+ */
 #if VERSION <= VERSION_DEMO_US || VERSION == VERSION_EU
 USER_FUNC(btlevtcmd_SetCounterAcCallBack) {
     BattleWork* wp = _battleWorkPointer;
@@ -6553,6 +7072,11 @@ USER_FUNC(btlevtcmd_SetCounterAcCallBack) {
 }
 #endif
 
+/**
+ * Script: slides the battle stage's background objects off screen (args[0] = 0: sideways 450 units for the back
+ * layers, up 260 for the top layer) or back into place (nonzero) over 45 frames; blocks until done.
+ * Used by Star Power special moves that need a clear stage.
+ */
 USER_FUNC(btlevtcmd_SacBgsetMove) {
     BattleWork* wp = _battleWorkPointer;
     s32 on, i;
@@ -6601,6 +7125,7 @@ USER_FUNC(btlevtcmd_SacBgsetMove) {
     return !(event->userdata[0] < 45);
 }
 
+/** Script: sets (args[2] nonzero) or clears the flags args[1] on the battle stage object named args[0]. */
 USER_FUNC(btlevtcmd_BtlStageObjFlagOnOff) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -6626,6 +7151,10 @@ USER_FUNC(btlevtcmd_BtlStageObjFlagOnOff) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: sets the rotation of the battle stage object named args[0] to (args[1..3]) in degrees;
+ * EVT_NULLPTR leaves an axis unchanged.
+ */
 USER_FUNC(btlevtcmd_BtlStageObjSetRotate) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -6661,6 +7190,7 @@ USER_FUNC(btlevtcmd_BtlStageObjSetRotate) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: returns the rotation of the battle stage object named args[0] in args[1..3]; EVT_NULLPTR skips an axis. */
 USER_FUNC(btlevtcmd_BtlStageObjGetRotate) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -6691,6 +7221,10 @@ USER_FUNC(btlevtcmd_BtlStageObjGetRotate) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: shows or hides the status window (Mario's and the partner's HP and FP):
+ * args[0] 2 = on for the system, 1 = on for a script, 0 = off for a script.
+ */
 USER_FUNC(btlevtcmd_StatusWindowOnOff) {
     BattleWork* wp = _battleWorkPointer;
     switch (evtGetValue(event, event->args[0])) {
@@ -6709,6 +7243,7 @@ USER_FUNC(btlevtcmd_StatusWindowOnOff) {
 }
 /* half_A end MID */
 
+/** Script: clears the battle fog effect at once. */
 USER_FUNC(btlevtcmd_StageDispellFog) {
     BattleFogForceStop();
     return EVT_RETURN_DONE;
@@ -6722,6 +7257,10 @@ USER_FUNC(btlevtcmd_ftomsec) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: converts args[0] frames at 60 fps into frames at the running frame rate and returns them in args[1];
+ * the PAL 50 Hz mode needs fewer frames. In the US release a 60 Hz setting returns the value unchanged.
+ */
 USER_FUNC(btlevtcmd_ftof) {
     EvtWord* args = event->args;
     s32 index, value, frames;

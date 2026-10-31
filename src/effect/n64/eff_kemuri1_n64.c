@@ -36,6 +36,12 @@ typedef struct effKemuri1EWork {
     s32 duration;      // 0x4C
 } effKemuri1EWork;
 
+/**
+ * Spawns smoke effect 1 at (x, y, z).
+ * Types 0-1 make two sprites, 3 three dust clouds,
+ * 4-7 a ring of eight (a5 is the start angle; 5 and 6 are coloured); type 2 makes none.
+ * Used by stage objects, eff_fall.c and effKemuri11.
+ */
 EffectEntry* effKemuri1N64Entry(s32 type, f32 x, f32 y, f32 z, f32 a5) {
 
     EffectEntry* effect;
@@ -228,6 +234,10 @@ typedef struct effKemuri1MWork {
     s32 duration;                                         // 0x4C
 } effKemuri1MWork;
 
+/**
+ * Steps an animation index through 16 frames across the effect's duration (15 to 129 frames),
+ * moves each sprite by its velocity and deletes the effect when the animation ends.
+ */
 static void effKemuri1Main(EffectEntry* effect) {
     effKemuri1MWork* work = effect->userdata;
     Vec pos2;
@@ -305,6 +315,10 @@ typedef struct effKemuri1Work {
     u8 pad_4C[4];
 } effKemuri1Work;
 
+/**
+ * Draws each smoke sprite as a camera-facing quad with texture 0x28, picking the animation frame from the timer;
+ * types 5-7 are half size.
+ */
 static void effKemuri1Disp(CameraId cameraId, EffectEntry* effect) {
     Mtx mtx, scale, rot, view;
     GXTexObj tex;

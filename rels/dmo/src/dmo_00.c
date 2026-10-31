@@ -79,6 +79,12 @@ extern EvtWord roten_move[];
 extern EvtWord kuribo_move[];
 extern EvtWord chusan_move[];
 
+/**
+ * Script helper that starts the opening demo: clears the DemoWork state,
+ * hides the status window and mutes sound effects, loads demo.tpl (blocks until the file is in),
+ * and sets the fade-in for the map (black after the logo sequence,
+ * white after the title screen in the demo versions; black otherwise).
+ */
 static USER_FUNC(demo_init) {
     if (isFirstCall) {
         memset(wp, 0, sizeof(DemoWork));
@@ -112,6 +118,10 @@ static USER_FUNC(demo_init) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Called when the module unloads: frees demo.tpl, switches sound effects back on,
+ * resets the 3D camera viewport to the full 608 by 480 screen and shows the status window again.
+ */
 void demo_exit(void) {
     CameraEntry* cam = camGetPtr(CAMERA_2D);
 
@@ -127,6 +137,10 @@ void demo_exit(void) {
     statusWinDispOn();
 }
 
+/**
+ * Guess: on the fifth picture (page 4) copies the rendered screen into a texture once,
+ * and again while the zoom into it is running, so the last picture can be drawn over the zoom.
+ */
 static void demo_cap(void) {
     if (wp->page == 4) {
         if (wp->captured == 0) {
@@ -144,6 +158,10 @@ static void demo_cap(void) {
     }
 }
 
+/**
+ * Draw callback for the desk: draws the full-screen desk texture (demo.tpl image 0) at the current scale
+ * and offset, fading out as the zoom into a picture advances.
+ */
 static void demo_desk(CameraId cameraId, void* param) {
     CameraEntry* cam = camGetPtr(CAMERA_2D);
     GXTexObj obj;
@@ -195,6 +213,10 @@ static void demo_desk(CameraId cameraId, void* param) {
     GXEnd();
 }
 
+/**
+ * Draw callback for the storybook picture: once the first page is turned (page is not -1) draws demo.tpl image
+ * page+8 as a textured quad, fading it out as the zoom amount (fade) rises.
+ */
 static void demo_img(CameraId cameraId, void* param) {
     CameraEntry* cam = camGetPtr(CAMERA_2D);
     CameraEntry* cam2;
@@ -272,6 +294,10 @@ static void demo_img(CameraId cameraId, void* param) {
     }
 }
 
+/**
+ * Draw callback for the storybook: draws the book's textures (demo.tpl images 1 and 2) at the current scale
+ * and offset with the cover turned by bookRot, so the book opens as the demo begins.
+ */
 static void demo_book(CameraId cameraId, void* param) {
     CameraEntry* cam = camGetPtr(CAMERA_2D);
     GXTexObj obj;
@@ -394,6 +420,10 @@ static void demo_book(CameraId cameraId, void* param) {
     GXEnd();
 }
 
+/**
+ * Draw callback for the narration window: fades the text window's background in
+ * or out (10 alpha per frame, depending on winOn) and draws it on the 2D camera.
+ */
 static void demo_window(CameraId cameraId, void* param) {
     CameraEntry* cam = camGetPtr(cameraId);
     GXTexObj obj;
@@ -455,6 +485,10 @@ static void demo_window(CameraId cameraId, void* param) {
     GXEnd();
 }
 
+/**
+ * Script helper that keeps the demo drawing: queues the desk, book, zoom picture and text window every frame.
+ * Never finishes.
+ */
 static USER_FUNC(demo_draw) {
     dispEntry(CAMERA_3D, 9.0f, 7, demo_desk, NULL);
     dispEntry(CAMERA_3D, 8.0f, 7, demo_book, NULL);
@@ -465,6 +499,7 @@ static USER_FUNC(demo_draw) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper: args[0] switches the narration window on (1) or off (0) so that it fades in or out. */
 static USER_FUNC(demo_winonoff) {
     EvtWord* args = event->args;
 
@@ -472,6 +507,10 @@ static USER_FUNC(demo_winonoff) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: slowly zooms the desk (scale 0.6 to 1.5 over 12 seconds) while the first pages are narrated;
+ * finishes at 1.5.
+ */
 static USER_FUNC(demo_scale) {
     OSTime now = event->lifetime;
     f32 t;
@@ -489,6 +528,7 @@ static USER_FUNC(demo_scale) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper: args[0] is a float; sets the angle of the book cover. */
 static USER_FUNC(book_r) {
     EvtWord* args = event->args;
 
@@ -496,11 +536,16 @@ static USER_FUNC(book_r) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: advances to the next picture of the storybook (increments the page counter). */
 static USER_FUNC(next) {
     wp->page++;
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] is a float from 0 to 1;
+ * sets the zoom amount into the last picture (img4) and moves its scale and position accordingly.
+ */
 static USER_FUNC(adjust) {
     EvtWord* args = event->args;
     Mtx trans;
@@ -521,19 +566,24 @@ static USER_FUNC(adjust) {
     return EVT_RETURN_DONE;
 }
 
-// Moves the two crystal effects to the CAMERA_3D_EFFECTA camera.
+/** Moves the two crystal effects to the CAMERA_3D_EFFECTA camera. */
 static USER_FUNC(eff_cam) {
     ((EffCrystalN64Work*)effNameToPtr("eff0")->userdata)->camera = CAMERA_3D_EFFECTA;
     ((EffCrystalN64Work*)effNameToPtr("eff1")->userdata)->camera = CAMERA_3D_EFFECTA;
     return EVT_RETURN_DONE;
 }
 
-// The same for the radiation effect.
+/** The same for the radiation effect. */
 static USER_FUNC(eff_cam1) {
     ((EffRadiationN64Work*)effNameToPtr("eff2")->userdata)->camera = CAMERA_3D_EFFECTA;
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] is a message name; measures its width and line count
+ * and builds the text window tags (clear, window position/size, once_stop) into buf so the narration is centred.
+ * The vertical offset differs slightly in the demo versions.
+ */
 static USER_FUNC(make_msg) {
     EvtWord* args = event->args;
     u16 lines;
@@ -550,6 +600,10 @@ static USER_FUNC(make_msg) {
 
 static DemoWork* wp = &work;
 
+/**
+ * Runs alongside the demo: after the fade finishes, waits for A or Start, then sets GF(10),
+ * fades to white and changes to the title screen.
+ */
 EVT_BEGIN(buttonCheck)
     CALL(evt_fade_end_wait)
     LOOP(0)
@@ -564,6 +618,12 @@ EVT_BEGIN(buttonCheck)
     RETURN
 EVT_END()
 
+/**
+ * The opening demo itself: starts the title-skip watcher and the music,
+ * narrates the storybook prologue (op_book_01 to op_book_24) while the book opens
+ * and each of the four pictures is turned, then cuts to the Rogueport scene
+ * where Peach meets the mysterious person who gives her the golden treasure box (op_00 to op_12 onwards).
+ */
 EVT_BEGIN(demo_evt)
     CALL(evt_seq_wait, 2)
     SET_VALUE(GF(10), 0)
@@ -979,6 +1039,10 @@ EVT_BEGIN(demo_evt)
     RETURN
 EVT_END()
 
+/**
+ * Swings the S_rop map object back and forth about its X axis between +10 and -10 degrees, one second each way,
+ * forever. Guess: koushukei-dai (絞首刑台, gallows) is the rope of a storybook picture.
+ */
 static EVT_BEGIN(koushukei_dai)
     LOOP(0)
         CALL(evt_sub_intpl_msec_init, 11, 10, -10, 1000)
@@ -1005,6 +1069,10 @@ static EVT_BEGIN(koushukei_dai)
     RETURN
 EVT_END()
 
+/**
+ * Walking loop for the vendor Roten in the demo scene:
+ * walks back and forth between X = 450 and X = -350 at speed 32, waiting a second at each end.
+ */
 EVT_BEGIN(roten_move)
     LOOP(0)
         CALL(evt_npc_move_position, STRING("ロテン１"), 450, 150, 0, FLOAT(32.0f), 0)
@@ -1015,6 +1083,7 @@ EVT_BEGIN(roten_move)
     RETURN
 EVT_END()
 
+/** Wander script for the demo Goomba: starts at the origin and wanders in a 100 by 30 area. */
 EVT_BEGIN(kuribo_move)
     CALL(evt_npc_set_position, STRING("クリボー１"), 0, 0, 0)
     CALL(evt_npc_get_position, STRING("クリボー１"), LW(0), LW(1), LW(2))
@@ -1023,6 +1092,7 @@ EVT_BEGIN(kuribo_move)
     RETURN
 EVT_END()
 
+/** Wander script for the demo Chu-san (mouse): starts at (-175, 100) and wanders in a 100 by 30 area. */
 EVT_BEGIN(chusan_move)
     CALL(evt_npc_set_position, STRING("チューさん１"), -175, 0, 100)
     CALL(evt_npc_get_position, STRING("チューさん１"), LW(0), LW(1), LW(2))
@@ -1031,6 +1101,11 @@ EVT_BEGIN(chusan_move)
     RETURN
 EVT_END()
 
+/**
+ * Init script of dmo_00, the opening demo map: starts demo_init, places Peach, the mysterious person,
+ * the golden treasure box and a few townsfolk (Roten, a Goomba and Chu-san, hidden until needed),
+ * sets up the camera, and spawns the drawing and the narration script (demo_evt).
+ */
 EVT_BEGIN(dmo_00_init_evt)
     CALL(demo_init)
     CALL(evt_npc_entry, STRING("peach"), STRING("c_peach"))

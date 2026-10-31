@@ -100,6 +100,10 @@ extern EvtWord settoku_event[];
 extern EvtWord settoku_event_main[];
 extern EvtWord yakan_anime[];
 
+/**
+ * Fades the white map blend layer 1 from opaque to clear over 300 ms;
+ * run when the player walks into a building (shop, inn) so the outdoor lighting fades away.
+ */
 EVT_BEGIN(custom_door_dark2)
     CALL(evt_sub_intpl_msec_init, 11, 255, 0, 300)
     LABEL(0)
@@ -113,6 +117,10 @@ EVT_BEGIN(custom_door_dark2)
     RETURN
 EVT_END()
 
+/**
+ * Fades the white map blend layer 1 back in over 300 ms and then switches it off;
+ * the opposite of custom_door_dark2, run when leaving a building.
+ */
 EVT_BEGIN(custom_door_light2)
     CALL(evt_sub_intpl_msec_init, 11, 0, 255, 300)
     LABEL(0)
@@ -126,6 +134,11 @@ EVT_BEGIN(custom_door_light2)
     RETURN
 EVT_END()
 
+/**
+ * Guess: init event of the rude sailor (Garawaru) in the camp:
+ * placed at different spots for each story stage between STORY_STG5_11_DESERTED_ISLAND
+ * and the later Rogueport stages.
+ */
 static EVT_BEGIN(garawaru_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_11_DESERTED_ISLAND, STORY_STG5_18_BOBBERY_RESCUE_2)
@@ -140,6 +153,7 @@ static EVT_BEGIN(garawaru_init)
     RETURN
 EVT_END()
 
+/** Talk event of the rude sailor: a different line for each story stage (stg5_muj_22_1, stg5_muj_32_02 and others). */
 static EVT_BEGIN(garawaru_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG5_12_FLAVIO_AND_PA_PATCH)
@@ -231,6 +245,10 @@ static EVT_BEGIN(garawaru_talk)
     RETURN
 EVT_END()
 
+/**
+ * Guess: init event of Marco in the camp: placed for STORY_STG5_11 to 18_01 and STORY_STG5_19_01 to 34,
+ * with different positions per stage.
+ */
 static EVT_BEGIN(marco_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_11_DESERTED_ISLAND, STORY_STG5_18_01_BOBBERY_JOINS)
@@ -243,6 +261,10 @@ static EVT_BEGIN(marco_init)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Marco glancing around in the shop: turns him from LW(0) to LW(1) degrees over 150 ms.
+ * Called from his shop talk event.
+ */
 EVT_BEGIN(marco_kyorokyoro)
     CALL(evt_sub_intpl_msec_init, 0, LW(0), LW(1), 150)
     LOOP(0)
@@ -256,6 +278,10 @@ EVT_BEGIN(marco_kyorokyoro)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of Marco: during STORY_STG5_13 to 17 he starts settoku_event_main
+ * if the timid sailor has not yet been persuaded, otherwise he talks according to the story stage.
+ */
 static EVT_BEGIN(marco_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_13_BOBBERY_AND_THE_BRIDGE, STORY_STG5_17_WINE_OBTAINED)
@@ -533,6 +559,10 @@ static EVT_BEGIN(marco_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the bespectacled sailor: placed in the camp between STORY_STG5_13_BOBBERY_AND_THE_BRIDGE
+ * and STORY_STG5_30_SHIPWRECKED_SAILORS.
+ */
 static EVT_BEGIN(megane_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_13_BOBBERY_AND_THE_BRIDGE, STORY_STG5_30_SHIPWRECKED_SAILORS)
@@ -541,6 +571,11 @@ static EVT_BEGIN(megane_init)
     RETURN
 EVT_END()
 
+/**
+ * Guess: talk event of the bespectacled sailor:
+ * stg5_muj_32_01 until Bobbery is rescued, a special exchange with the partner when Bobbery joins,
+ * other lines later.
+ */
 static EVT_BEGIN(megane_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_13_BOBBERY_AND_THE_BRIDGE, STORY_STG5_18_BOBBERY_RESCUE_2)
@@ -560,6 +595,10 @@ static EVT_BEGIN(megane_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the timid sailor (Odoodo): placed in the camp between STORY_STG5_13_BOBBERY_AND_THE_BRIDGE
+ * and STORY_STG5_34_KICKED_OFF.
+ */
 static EVT_BEGIN(odoodo_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_13_BOBBERY_AND_THE_BRIDGE, STORY_STG5_34_KICKED_OFF)
@@ -568,6 +607,10 @@ static EVT_BEGIN(odoodo_init)
     RETURN
 EVT_END()
 
+/**
+ * Guess: talk event of the timid sailor: stg5_muj_32_00 until Bobbery is rescued,
+ * a special exchange with the partner when Bobbery joins, other lines later.
+ */
 static EVT_BEGIN(odoodo_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_13_BOBBERY_AND_THE_BRIDGE, STORY_STG5_18_BOBBERY_RESCUE_2)
@@ -587,6 +630,10 @@ static EVT_BEGIN(odoodo_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init event of sailor A: placed in the camp between STORY_STG5_11_DESERTED_ISLAND
+ * and STORY_STG5_43_X_NAUTS_RETREAT.
+ */
 static EVT_BEGIN(suifu_a_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_11_DESERTED_ISLAND, STORY_STG5_43_X_NAUTS_RETREAT)
@@ -595,6 +642,7 @@ static EVT_BEGIN(suifu_a_init)
     RETURN
 EVT_END()
 
+/** Talk event of sailor A: a different line for each story stage (stg5_muj_22_2, stg5_muj_32_03 and others). */
 static EVT_BEGIN(suifu_a_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG5_12_FLAVIO_AND_PA_PATCH)
@@ -611,6 +659,10 @@ static EVT_BEGIN(suifu_a_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the bomb sailor: placed in the camp between STORY_STG5_11_DESERTED_ISLAND
+ * and STORY_STG5_43_X_NAUTS_RETREAT.
+ */
 static EVT_BEGIN(suifu_bomb_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_11_DESERTED_ISLAND, STORY_STG5_43_X_NAUTS_RETREAT)
@@ -619,6 +671,7 @@ static EVT_BEGIN(suifu_bomb_init)
     RETURN
 EVT_END()
 
+/** Talk event of the bomb sailor: a different line for each story stage (stg5_muj_22_3, stg5_muj_32_04 and others). */
 static EVT_BEGIN(suifu_bomb_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG5_12_FLAVIO_AND_PA_PATCH)
@@ -635,6 +688,7 @@ static EVT_BEGIN(suifu_bomb_talk)
     RETURN
 EVT_END()
 
+/** Init event of sailor D: from STORY_STG5_59_ROGUEPORT_DOCK on he is set up to wander (suifu_d_regl). */
 static EVT_BEGIN(suifu_d_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_GREATER_OR_EQUAL(STORY_STG5_59_ROGUEPORT_DOCK)
@@ -643,6 +697,10 @@ static EVT_BEGIN(suifu_d_init)
     RETURN
 EVT_END()
 
+/**
+ * Regular event of sailor D: once the story reaches STORY_STG5_59_ROGUEPORT_DOCK he wanders around his spawn
+ * point (urouro) within a radius of 100 by 30 units.
+ */
 EVT_BEGIN(suifu_d_regl)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_GREATER_OR_EQUAL(STORY_STG5_59_ROGUEPORT_DOCK)
@@ -653,6 +711,10 @@ EVT_BEGIN(suifu_d_regl)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of sailor D: lines stg5_muj_159 to 163 for the stretches of the story from Fair Winds to the end of
+ * the Hideout arc.
+ */
 static EVT_BEGIN(suifu_d_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_58_FAIR_WINDS, STORY_STG5_61_FRANKLYS_HOUSE)
@@ -671,6 +733,7 @@ static EVT_BEGIN(suifu_d_talk)
     RETURN
 EVT_END()
 
+/** Init event of the shabby sailor A: after STORY_STG5_59_ROGUEPORT_DOCK he is set up to wander. */
 EVT_BEGIN(borosuifu_a_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_GREATER_OR_EQUAL(STORY_STG5_59_ROGUEPORT_DOCK)
@@ -679,6 +742,10 @@ EVT_BEGIN(borosuifu_a_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of the shabby sailor A: a different line (stg5_muj_154 to 157) for each stretch of the story from
+ * Fair Winds to the end of the Hideout arc.
+ */
 EVT_BEGIN(borosuifu_a_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_58_FAIR_WINDS, STORY_STG5_61_FRANKLYS_HOUSE)
@@ -697,6 +764,10 @@ EVT_BEGIN(borosuifu_a_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the shabby sailor B: turns on his NPC status bit 2 and, after STORY_STG5_59_ROGUEPORT_DOCK,
+ * sets him up to wander.
+ */
 EVT_BEGIN(borosuifu_b_init)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -707,6 +778,10 @@ EVT_BEGIN(borosuifu_b_init)
     RETURN
 EVT_END()
 
+/**
+ * Regular event of the shabby sailor B: wanders around his spawn point once the story is past
+ * STORY_STG5_59_ROGUEPORT_DOCK.
+ */
 EVT_BEGIN(borosuifu_b_regl)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_GREATER_OR_EQUAL(STORY_STG5_59_ROGUEPORT_DOCK)
@@ -720,6 +795,10 @@ EVT_BEGIN(borosuifu_b_regl)
     RETURN
 EVT_END()
 
+/**
+ * Talk event of the shabby sailor B: a different line (stg5_muj_164 to 167) for each stretch of the story,
+ * as for sailor A.
+ */
 EVT_BEGIN(borosuifu_b_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_58_FAIR_WINDS, STORY_STG5_61_FRANKLYS_HOUSE)
@@ -738,6 +817,7 @@ EVT_BEGIN(borosuifu_b_talk)
     RETURN
 EVT_END()
 
+/** Init event of Mony in the camp: placed between STORY_STG5_59_ROGUEPORT_DOCK and STORY_STG5_61_FRANKLYS_HOUSE. */
 static EVT_BEGIN(mony_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_59_ROGUEPORT_DOCK, STORY_STG5_61_FRANKLYS_HOUSE)
@@ -746,11 +826,13 @@ static EVT_BEGIN(mony_init)
     RETURN
 EVT_END()
 
+/** Talk event of Mony in the camp: says stg5_muj_147. */
 static EVT_BEGIN(mony_talk)
     CALL(evt_msg_print, 0, STRING("stg5_muj_147"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/** Init event of Peton in the camp: placed between STORY_STG5_59_ROGUEPORT_DOCK and STORY_STG5_61_FRANKLYS_HOUSE. */
 static EVT_BEGIN(peton_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_59_ROGUEPORT_DOCK, STORY_STG5_61_FRANKLYS_HOUSE)
@@ -759,11 +841,13 @@ static EVT_BEGIN(peton_init)
     RETURN
 EVT_END()
 
+/** Talk event of Peton in the camp: says stg5_muj_148. */
 static EVT_BEGIN(peton_talk)
     CALL(evt_msg_print, 0, STRING("stg5_muj_148"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/** Talk event shared by the three dancers (musume): each says her line in turn (stg5_muj_168_01 to 03). */
 static EVT_BEGIN(musume_talk)
     CALL(evt_msg_print, 0, STRING("stg5_muj_168_01"), 0, STRING("３人娘Ａ"))
     CALL(evt_msg_print, 0, STRING("stg5_muj_168_02"), 0, STRING("３人娘Ｂ"))
@@ -771,6 +855,10 @@ static EVT_BEGIN(musume_talk)
     RETURN
 EVT_END()
 
+/**
+ * Adds the first dancer (3人娘Ａ, model c_dance_r, the red one) with walk and talk animations and musume_talk;
+ * called from the ending map init.
+ */
 static EVT_BEGIN(musume_a_entry)
     CALL(evt_npc_entry, STRING("３人娘Ａ"), STRING("c_dance_r"))
     CALL(evt_npc_set_tribe, STRING("３人娘Ａ"), STRING("踊り子"))
@@ -781,6 +869,7 @@ static EVT_BEGIN(musume_a_entry)
     RETURN
 EVT_END()
 
+/** Adds the second dancer (3人娘Ｂ, model c_dance_p, the pink one) with walk and talk animations and musume_talk. */
 static EVT_BEGIN(musume_b_entry)
     CALL(evt_npc_entry, STRING("３人娘Ｂ"), STRING("c_dance_p"))
     CALL(evt_npc_set_tribe, STRING("３人娘Ｂ"), STRING("踊り子ピンク"))
@@ -791,6 +880,10 @@ static EVT_BEGIN(musume_b_entry)
     RETURN
 EVT_END()
 
+/**
+ * Adds the third dancer (3人娘Ｃ, model c_dance_k, the yellow-green one) with walk and talk animations
+ * and musume_talk.
+ */
 static EVT_BEGIN(musume_c_entry)
     CALL(evt_npc_entry, STRING("３人娘Ｃ"), STRING("c_dance_k"))
     CALL(evt_npc_set_tribe, STRING("３人娘Ｃ"), STRING("踊り子黄緑"))
@@ -987,6 +1080,7 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/** Guess: door-in event for the camp exit: only clears LW(0) (no special entrance action). */
 static EVT_BEGIN(bero_in_event)
     SET_VALUE(LW(0), 0)
     RETURN
@@ -1028,6 +1122,12 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Custom door-open event for the Keelhaul Key houses:
+ * like the standard door-open event but does nothing when evt_mario_party_use_check returns 4 or
+ * when Mario is more than 30 units from the door;
+ * otherwise takes control, shows the interior and runs the door's open event.
+ */
 EVT_BEGIN(muj_00_door_open)
     CALL(evt_mario_party_use_check, LW(4))
     IF_INT_EQUAL(LW(4), 4)
@@ -1108,6 +1208,11 @@ EVT_BEGIN(muj_00_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Custom door-close event: the matching close for muj_00_door_open,
+ * run when Mario leaves through the door (it does nothing when evt_mario_party_use_check returns 4 or when he is
+ * too far from the door).
+ */
 EVT_BEGIN(muj_00_door_close)
     CALL(evt_mario_party_use_check, LW(4))
     IF_INT_EQUAL(LW(4), 4)
@@ -1126,6 +1231,10 @@ static const char* mise_npc[] = {
     NULL,
 };
 
+/**
+ * Open event of the shop building: shows the interior,
+ * fades the outside blend away and lowers the music and ambience to a muffled 50 percent with a low-pass filter.
+ */
 EVT_BEGIN(mise_data_open)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_mise_kan"), MAPOBJ_FLAG_NO_BLEND2)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_mise_hasi04"), MAPOBJ_FLAG_NO_BLEND2)
@@ -1137,6 +1246,10 @@ EVT_BEGIN(mise_data_open)
     RETURN
 EVT_END()
 
+/**
+ * Close event of the shop building: restores the exterior blend flags,
+ * fades the light back in and restores the music and ambience volume and filter.
+ */
 EVT_BEGIN(mise_data_close)
     BEGIN_INLINE_EVENT
         CALL_CHILD(custom_door_light2)
@@ -1170,6 +1283,7 @@ static const char* yado_npc[] = {
     NULL,
 };
 
+/** Open event of the inn: darkens the outside, shows the interior (S_yado) and muffles the music and ambience. */
 EVT_BEGIN(mise_open_event)
     SPAWN_EVENT(door_dark)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_yado"), MAPOBJ_FLAG_NO_BLEND)
@@ -1180,6 +1294,7 @@ EVT_BEGIN(mise_open_event)
     RETURN
 EVT_END()
 
+/** Close event of the inn: lights the outside again, hides the interior and restores music and ambience. */
 EVT_BEGIN(mise_close_event)
     SPAWN_EVENT(door_light)
     SPAWN_EVENT(custom_door_light2)
@@ -1206,6 +1321,7 @@ static DoorParam yado_data = {
     mise_close_event, // evtClose
 };
 
+/** Registers muj_00_door_open and muj_00_door_close as the door cases for the first custom door of the map. */
 EVT_BEGIN(evt_door_entry_custom00)
     CALL(evt_door_param, LW(0), 1, LW(1), LW(2), LW(3))
     IF_INT_NOT_EQUAL(LW(2), 0)
@@ -1219,6 +1335,7 @@ EVT_BEGIN(evt_door_entry_custom00)
     RETURN
 EVT_END()
 
+/** Registers muj_00_door_open and muj_00_door_close as the door cases for the second custom door of the map. */
 EVT_BEGIN(evt_door_entry_custom01)
     CALL(evt_door_param, LW(0), 1, LW(1), LW(2), LW(3))
     IF_INT_NOT_EQUAL(LW(2), 0)
@@ -1289,6 +1406,11 @@ static KinopioData kino_dt = {
     NULL, NULL, // toBedEvt..fromBedEvt
 };
 
+/**
+ * The sailors' homesickness (kyoshu): Mario and his partner overhear the crew (stg5_muj_15 to 22);
+ * Marco asks whether Mario will help, then the story advances to STORY_STG5_12_FLAVIO_AND_PA_PATCH
+ * and control returns.
+ */
 EVT_BEGIN(kyoshu_event)
     CALL(evt_party_stop, 0)
     CALL(evt_npc_set_position, STRING("水夫A"), -193, 0, 77)
@@ -1347,6 +1469,7 @@ EVT_BEGIN(kyoshu_event)
     RETURN
 EVT_END()
 
+/** Makes Marco shiver (muj_npc_buruburu, 1 unit every 10 ms for 10 seconds). */
 EVT_BEGIN(maruco_buruburu)
     CALL(evt_npc_flag_onoff, 0, STRING("マルコ"), NPC_FLAG_MOVE_ANIM)
     LOOP(0)
@@ -1355,6 +1478,7 @@ EVT_BEGIN(maruco_buruburu)
     RETURN
 EVT_END()
 
+/** Makes the shabby sailor Garawaru shiver (muj_npc_buruburu for 10 seconds). */
 EVT_BEGIN(garawaru_buruburu)
     CALL(evt_npc_flag_onoff, 0, STRING("ガラの悪い水夫"), NPC_FLAG_MOVE_ANIM)
     LOOP(0)
@@ -1363,6 +1487,7 @@ EVT_BEGIN(garawaru_buruburu)
     RETURN
 EVT_END()
 
+/** Makes sailor A shiver (muj_npc_buruburu for 10 seconds). */
 EVT_BEGIN(suifu_a_buruburu)
     CALL(evt_npc_flag_onoff, 0, STRING("水夫A"), NPC_FLAG_MOVE_ANIM)
     LOOP(0)
@@ -1371,6 +1496,7 @@ EVT_BEGIN(suifu_a_buruburu)
     RETURN
 EVT_END()
 
+/** Makes the bomb-shaped sailor shiver (muj_npc_buruburu for 10 seconds). */
 EVT_BEGIN(suifu_bom_buruburu)
     CALL(evt_npc_flag_onoff, 0, STRING("水夫ボム兵"), NPC_FLAG_MOVE_ANIM)
     LOOP(0)
@@ -1379,6 +1505,12 @@ EVT_BEGIN(suifu_bom_buruburu)
     RETURN
 EVT_END()
 
+/**
+ * The crew splits (nakamaware): Mario walks into the camp at STORY_STG5_11_DESERTED_ISLAND,
+ * the sailors argue about heading home (stg5_muj_05 to 14), and three Embers (ghost flames) appear and attack;
+ * the fight is battle info 6. Afterwards kyoshu_event plays.
+ * The GSWF_MUJ01_SKIP_TO_SHOW_OF_HANDS flag jumps straight to kyoshu_event.
+ */
 EVT_BEGIN(nakamaware_event)
     IF_INT_EQUAL(GSWF(GSWF_MUJ01_SKIP_TO_SHOW_OF_HANDS), 1)
         CALL(evt_mario_key_onoff, 0)
@@ -1565,6 +1697,7 @@ EVT_BEGIN(nakamaware_event)
     RETURN
 EVT_END()
 
+/** Moves the sailors and Marco to their places in the camp for the persuasion scene. */
 EVT_BEGIN(settoku_event)
     CALL(evt_npc_set_position, STRING("水夫A"), -203, 0, 61)
     CALL(evt_npc_set_ry, STRING("水夫A"), 90)
@@ -1579,6 +1712,10 @@ EVT_BEGIN(settoku_event)
     RETURN
 EVT_END()
 
+/**
+ * Marco persuades the timid sailor (settoku): everyone turns to face Marco, he speaks (stg5_muj_29),
+ * the timid sailor answers (stg5_muj_30) and GSWF_MUJ01_TIMID_SAILOR_PERSUADED is set.
+ */
 EVT_BEGIN(settoku_event_main)
     CALL(evt_set_dir_to_target, STRING("水夫A"), STRING("マルコ"))
     CALL(evt_set_dir_to_target, STRING("水夫ボム兵"), STRING("マルコ"))
@@ -1606,6 +1743,10 @@ EVT_BEGIN(settoku_event_main)
     RETURN
 EVT_END()
 
+/**
+ * Guess: stops the regular events of the sailors (poor sailors B and D and others)
+ * so they stop wandering during the dark ending scene.
+ */
 static EVT_BEGIN(delete_npc_regl_evt)
     CALL(evt_npc_change_interrupt, STRING("ボロ水夫B"), 1, 0)
     CALL(evt_npc_get_reglid, STRING("ボロ水夫B"), LW(0))
@@ -1616,6 +1757,7 @@ static EVT_BEGIN(delete_npc_regl_evt)
     RETURN
 EVT_END()
 
+/** Shakes the 3D camera sideways by a small amount every 500 ms, forever; used in the dark ending scene. */
 static EVT_BEGIN(sekai_yami_shake)
     LOOP(0)
         CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0f), FLOAT(0.009765625f), 500)
@@ -1623,6 +1765,10 @@ static EVT_BEGIN(sekai_yami_shake)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: copies Mario's held items (pouch->heldItems, up to 20) into a map-memory table ended by -1,
+ * stores the count in args[0] and the table address in LW(10), for an item selection menu.
+ */
 static USER_FUNC(make_itemsel_table) {
     EvtWord* args = event->args;
     PouchData* pouch = pouchGetPtr();
@@ -1647,11 +1793,13 @@ static USER_FUNC(make_itemsel_table) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: frees the item selection table made by make_itemsel_table. */
 static USER_FUNC(delete_itemsel_table) {
     _mapFree(itemsel_table_ram);
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: writes the direction Mario is currently requested to face (displayDirectionTarget) into args[0]. */
 static USER_FUNC(evt_mario_get_reqdir) {
     EvtWord* args = event->args;
 
@@ -1659,6 +1807,10 @@ static USER_FUNC(evt_mario_get_reqdir) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: writes 1 into args[2] if Mario is within args[1] units (horizontal) of the door's outside hit
+ * box, otherwise 0. args[0] is the door parameter block.
+ */
 static USER_FUNC(muj_get_door_check) {
     EvtWord* args = event->args;
     DoorParam* door = (DoorParam*)evtGetValue(event, args[0]);
@@ -1677,6 +1829,11 @@ static USER_FUNC(muj_get_door_check) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: sets the "dark world" view matrix,
+ * a camera looking down from height 100 at the offset z in args[0];
+ * used by the dark ending scene (after STORY_STG8_15_GRODUS) where the camp goes dark.
+ */
 static USER_FUNC(yami_view) {
     f32 z = evtGetFloat(event, event->args[0]);
     Mtx mtx;
@@ -1686,6 +1843,10 @@ static USER_FUNC(yami_view) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: turns on a TEV callback slot (args[1], low 4 bits) in the material of the NPC named args[0],
+ * so the NPC is drawn through the map's colour callback. Does nothing if the NPC does not exist.
+ */
 static USER_FUNC(anim_tevcallback) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1699,6 +1860,7 @@ static USER_FUNC(anim_tevcallback) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: the same TEV callback switch for a map object (args[0]) instead of an NPC. */
 static USER_FUNC(anim_tevcallback_mobj) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1712,6 +1874,7 @@ static USER_FUNC(anim_tevcallback_mobj) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper for the dark-world scene: tints the six shop icons shp0 to shp5 dark grey (0x40, 0x40, 0x40). */
 static USER_FUNC(sekai_yami_omise) {
     char name[40];
     s32 i;
@@ -1725,6 +1888,7 @@ static USER_FUNC(sekai_yami_omise) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: creates a Star Stone effect (type 4) named args[0] at (args[1], args[2], args[3]). */
 static USER_FUNC(starstone_entry) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1736,6 +1900,7 @@ static USER_FUNC(starstone_entry) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: moves the named Star Stone effect to (args[1], args[2], args[3]). */
 static USER_FUNC(starstone_set_pos) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1750,6 +1915,7 @@ static USER_FUNC(starstone_set_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: rotates the named Star Stone effect around Y by args[1] degrees. */
 static USER_FUNC(starstone_set_ry) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -1759,6 +1925,10 @@ static USER_FUNC(starstone_set_ry) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Guess: the dark world scene after STORY_STG8_15_GRODUS (entered from "sekai_yami2"):
+ * control is taken, the camp goes dark (yami view, dark shop icons) and the sailors react in the dark.
+ */
 static EVT_BEGIN(sekai_yami_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -1857,6 +2027,10 @@ static EVT_BEGIN(sekai_yami_evt)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the voices of everyone scene (entered from "minnnanokoe", STORY_STG8_15_GRODUS):
+ * control is taken and the camp is drawn in the dark view while the villagers' voices call out.
+ */
 static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -1960,6 +2134,10 @@ static EVT_BEGIN(minnnanokoe_evt)
     RETURN
 EVT_END()
 
+/**
+ * Guess: adds the ending-scene NPCs Christine (クリスチーヌ) and Bobbery (サンダース)
+ * and hooks up the sailors for the epilogue.
+ */
 static EVT_BEGIN(epilogue_npc_entry)
     CALL(evt_npc_entry, STRING("クリスチーヌ"), STRING("c_pkr"))
     CALL(evt_npc_set_tribe, STRING("クリスチーヌ"), STRING("クリスチーヌ"))
@@ -1977,6 +2155,10 @@ static EVT_BEGIN(epilogue_npc_entry)
     RETURN
 EVT_END()
 
+/**
+ * Guess: sub-event of the epilogue: Christine and the rude sailor play their talk animations in turn with a
+ * speech bubble above Christine.
+ */
 static EVT_BEGIN(epilogue_evt_sub)
     WAIT_MS(500)
     CALL(evt_npc_set_anim, STRING("クリスチーヌ"), STRING("PKR_T_1"))
@@ -2013,6 +2195,10 @@ static EVT_BEGIN(epilogue_evt_sub)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the epilogue in the camp (STORY_STG8_END_AFTER_THE_BATTLE):
+ * the Keelhaul music plays, the camera pans over the cast, ep_42 is shown and the party leaves for another map.
+ */
 static EVT_BEGIN(epilogue_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_MUJ1"))
     CALL(evt_snd_bgm_scope, 0, 1)
@@ -2039,6 +2225,7 @@ static EVT_BEGIN(epilogue_evt)
     RETURN
 EVT_END()
 
+/** Plays the kettle (yakan) animation of the map and keeps replaying it when it finishes. */
 EVT_BEGIN(yakan_anime)
     LOOP(0)
         CALL(evt_map_playanim, STRING("yakan"), 1, 0)
@@ -2048,6 +2235,11 @@ EVT_BEGIN(yakan_anime)
     RETURN
 EVT_END()
 
+/**
+ * Map init for muj_01 (the camp): picks music (ending-scene variants after STORY_STG8_15_GRODUS),
+ * registers the exits, Marco's shop and the inn, the save block and Star Pieces,
+ * then spawns the scene for the story stage (nakamaware_event, settoku_event or the ending epilogue).
+ */
 EVT_BEGIN(muj_01_init_evt)
     SET_VALUE(LF(0), 0)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)

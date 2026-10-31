@@ -87,6 +87,7 @@ s32 yoshi_data[30];
 extern EvtWord talk_tamago[];
 extern EvtWord evt_gondora2[];
 
+/** Script helper: turns off projected-texture shading (the blimp shadow) on Mario's and the partners' models. */
 static USER_FUNC(proj_off) {
     animPoseSetMaterialFlagOff(marioGetPtr()->paperAnimGroupId[0], ANIM_MATERIAL_FLAG_PROJ_TEXTURE);
     animPoseSetMaterialFlagOff(marioGetPtr()->paperAnimGroupId[1], ANIM_MATERIAL_FLAG_PROJ_TEXTURE);
@@ -100,6 +101,13 @@ static USER_FUNC(proj_off) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Door animation callback for the plaza's automatic double door (the exit animation of the bero to tou_02):
+ * LW(0) is the swing angle 0 to 180.
+ * At the start it plays the automatic door sound at Mario's position (GW(13) keeps its handle)
+ * unless the door is busy (GSWF_TOU_DOOR_BUSY), and at 180 it clears the flag and stops the sound.
+ * It swings door_1_b by a third of the angle and door_1_a the opposite way, then turns the projected shadow off.
+ */
 static EVT_BEGIN(n_door_open)
     IF_FLOAT_EQUAL(LW(0), FLOAT(0.0f))
         IF_INT_EQUAL(GSWF(GSWF_TOU_DOOR_BUSY), 0)
@@ -122,6 +130,12 @@ static EVT_BEGIN(n_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the automatic double door (the enter animation):
+ * the mirror image of n_door_open, run as the angle goes from 180 back to 0.
+ * It plays the door sound at the start of the swing, stops it and clears GSWF_TOU_DOOR_BUSY at 0,
+ * and swings door_1_a and door_1_b shut.
+ */
 static EVT_BEGIN(n_door_close)
     IF_FLOAT_EQUAL(LW(0), FLOAT(180.0f))
         IF_INT_EQUAL(GSWF(GSWF_TOU_DOOR_BUSY), 0)
@@ -164,6 +178,10 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
+/**
+ * Door animation for the shop door door_1, going in (evtIn): LW(0) is the swing angle;
+ * it turns the map object door_2 about its vertical axis by 0.55 times the angle.
+ */
 static EVT_BEGIN(evt_door)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.5546875f))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
@@ -171,12 +189,21 @@ static EVT_BEGIN(evt_door)
     RETURN
 EVT_END()
 
+/**
+ * Door animation for the shop door door_1, coming out (evtOut): LW(0) is the swing angle;
+ * it turns door_2 by half the angle about the Z axis.
+ */
 static EVT_BEGIN(evt_door2)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("door_2"), 0, 0, LW(0))
     RETURN
 EVT_END()
 
+/**
+ * Guess: wall animation for the shop door (evtWall): LW(0) is the swing angle;
+ * it turns the shop wall objects mise_N and mise_H in opposite directions by three quarters of the angle,
+ * folding the front wall away as the door opens.
+ */
 static EVT_BEGIN(evt_wall)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.75f))
     CALL(evt_mapobj_rotate, 1, STRING("mise_N"), 0, LW(0), 0)
@@ -185,6 +212,7 @@ static EVT_BEGIN(evt_wall)
     RETURN
 EVT_END()
 
+/** Guess: opens the first Glitzville door: ducks the background music to 50% while it swings. */
 EVT_BEGIN(evt_door_1_open)
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
@@ -192,6 +220,7 @@ EVT_BEGIN(evt_door_1_open)
     RETURN
 EVT_END()
 
+/** Guess: closing counterpart of evt_door_1_open: music returns to full volume. */
 EVT_BEGIN(evt_door_1_close)
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
@@ -224,18 +253,27 @@ static DoorParam door_1 = {
     evt_door_1_close, // evtClose
 };
 
+/**
+ * Door animation for the second door, going in (evtIn): LW(0) is the swing angle;
+ * it turns the map object door_3 about its vertical axis by half the angle.
+ */
 static EVT_BEGIN(evt_door_2)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("door_3"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation for the second door, coming out (evtOut): LW(0) is the swing angle;
+ * it turns door_3 by half the angle about the Z axis.
+ */
 static EVT_BEGIN(evt_door2_2)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
     CALL(evt_mapobj_rotate, 1, STRING("door_3"), 0, 0, LW(0))
     RETURN
 EVT_END()
 
+/** Folds down the first outer wall panel (sak_soto_1) of the tavern with a collapsing sound. */
 EVT_BEGIN(evt_sakaba_1)
     IF_INT_EQUAL(LW(6), 0)
         CALL(evt_mapobj_get_position, STRING("sak_soto_1"), LW(10), LW(11), LW(12))
@@ -245,6 +283,7 @@ EVT_BEGIN(evt_sakaba_1)
     RETURN
 EVT_END()
 
+/** Folds down the second outer wall panel (sak_soto_2) of the tavern. */
 EVT_BEGIN(evt_sakaba_2)
     IF_INT_EQUAL(LW(6), 0)
         CALL(evt_mapobj_get_position, STRING("sak_soto_2"), LW(10), LW(11), LW(12))
@@ -254,6 +293,7 @@ EVT_BEGIN(evt_sakaba_2)
     RETURN
 EVT_END()
 
+/** Folds down the third outer wall panel (sak_soto_3) of the tavern. */
 EVT_BEGIN(evt_sakaba_3)
     IF_INT_EQUAL(LW(6), 0)
         CALL(evt_mapobj_get_position, STRING("sak_soto_3"), LW(10), LW(11), LW(12))
@@ -263,6 +303,7 @@ EVT_BEGIN(evt_sakaba_3)
     RETURN
 EVT_END()
 
+/** Folds down the fourth outer wall panel (sak_soto_4) of the tavern. */
 EVT_BEGIN(evt_sakaba_4)
     IF_INT_EQUAL(LW(6), 0)
         CALL(evt_mapobj_get_position, STRING("sak_soto_4"), LW(10), LW(11), LW(12))
@@ -273,6 +314,10 @@ EVT_BEGIN(evt_sakaba_4)
     RETURN
 EVT_END()
 
+/**
+ * Opens or closes the tavern's front by running the four panel scripts in sequence (150 ms apart in the US and
+ * later versions, 100 ms in JP), in forward or reverse order depending on LW(1).
+ */
 EVT_BEGIN(evt_wall2)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5f))
 #if VERSION >= VERSION_US
@@ -326,6 +371,7 @@ const char* sakaba_item[] = {
     NULL,
 };
 
+/** Guess: opens the second door: ducks the background music to 50% while it swings. */
 EVT_BEGIN(evt_door_2_open)
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
@@ -333,6 +379,7 @@ EVT_BEGIN(evt_door_2_open)
     RETURN
 EVT_END()
 
+/** Guess: closing counterpart of evt_door_2_open: music returns to full volume. */
 EVT_BEGIN(evt_door_2_close)
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
@@ -361,6 +408,10 @@ static DoorParam door_2 = {
     evt_door_2_close, // evtClose
 };
 
+/**
+ * Looping decoration: the sign kanban_e rocks about the X axis between +20 and -20 degrees,
+ * taking 60 frames each way, forever.
+ */
 static EVT_BEGIN(evt_kanban)
     LOOP(0)
         CALL(evt_sub_intpl_init, 11, 2000, -2000, 60)
@@ -381,6 +432,11 @@ static EVT_BEGIN(evt_kanban)
     RETURN
 EVT_END()
 
+/**
+ * Looping decoration: the leaning sign object taore rocks about the Z axis (0 to 10, to -10,
+ * to 10 and back to 0 degrees, over 1, 2, 2 and 1 seconds) and then rests for 3 seconds,
+ * until global flag GF(10) is set, when it snaps upright.
+ */
 static EVT_BEGIN(evt_kanban2)
     LOOP(0)
         CALL(evt_sub_intpl_msec_init, 12, 0, 1000, 1000)
@@ -496,6 +552,10 @@ static ShopperData35 shopper_data = {
     {"stg3_shop_00", "stg3_shop_01", "stg3_shop_02", "stg3_shop_03", "stg3_shop_04", "stg3_shop_05", "stg3_shop_06", "stg3_shop_07", "stg3_shop_08", "stg3_shop_09", "stg3_shop_10", "stg3_shop_11", "stg3_shop_12", "stg3_shop_13", "stg3_shop_14", "stg3_shop_15", "stg3_shop_16", "stg3_shop_17", "stg3_shop_18", "stg3_shop_19", "stg3_shop_20", "stg3_shop_21", "stg3_shop_22", "stg3_shop_23", "stg3_shop_24", "stg3_shop_25", "stg3_shop_26", "stg3_shop_27", "stg3_shop_28", "stg3_shop_29", "stg3_shop_30", "stg3_shop_31", "stg3_shop_32", "stg3_shop_33", "stg3_shop_34"}, // msgs
 };
 
+/**
+ * Talk script of the hot dog vendor (ホットドッグ): he offers a Hot Dog on the house (stg3_tou_13 and a yes/no choice)
+ * and adds it to the pouch, or tells Mario to sell it if the inventory is full.
+ */
 EVT_BEGIN(evt_hotdog)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION >= VERSION_JP
@@ -531,6 +591,10 @@ EVT_BEGIN(evt_hotdog)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: turns projected-texture shading on for Mario, both partners and the blimp NPC,
+ * so the blimp's shadow falls on them.
+ */
 static USER_FUNC(proj_on) {
     animPoseSetMaterialFlagOn(marioGetPtr()->paperAnimGroupId[0], ANIM_MATERIAL_FLAG_PROJ_TEXTURE);
     animPoseSetMaterialFlagOn(marioGetPtr()->paperAnimGroupId[1], ANIM_MATERIAL_FLAG_PROJ_TEXTURE);
@@ -545,6 +609,10 @@ static USER_FUNC(proj_on) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Display callback: renders the blimp's silhouette from above into a 128x128 texture,
+ * the source for the blimp shadow projected on the plaza.
+ */
 static void make_shadow_disp(CameraId camera, void* param) {
     ShadowWork* wp = param;
     Mtx44 proj;
@@ -598,6 +666,7 @@ static void make_shadow_disp(CameraId camera, void* param) {
     GXSetScissor(left, top, width, height);
 }
 
+/** Script helper: allocates the shadow texture and queues make_shadow_disp every frame; blocks forever as the owner. */
 static USER_FUNC(make_shadow) {
     ShadowWork* wp;
 
@@ -614,6 +683,10 @@ static USER_FUNC(make_shadow) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper: args[0..2] = camera position, args[3..5] = look-at point;
+ * builds the view/projection matrices for the shadow projection.
+ */
 static USER_FUNC(proj_mtx) {
     EvtWord* args = event->args;
     f32 px = evtGetFloat(event, args[0]);
@@ -638,6 +711,7 @@ static USER_FUNC(proj_mtx) {
     return EVT_RETURN_DONE;
 }
 
+/** Sets up the blimp shadow: marks the ground, gondola and "den" map objects as projected-texture receivers. */
 EVT_BEGIN(evt_ship_shadow)
     CALL(proj_on)
     BEGIN_INLINE_EVENT
@@ -667,12 +741,17 @@ EVT_BEGIN(evt_ship_shadow)
     RETURN
 EVT_END()
 
+/** NPC init for the blimp ticket clerk: puts him at (100, 0, 430) facing 270. */
 EVT_BEGIN(init_hikuu)
     CALL(evt_npc_set_position, STRING("me"), 100, 0, 430)
     CALL(evt_npc_set_ry, STRING("me"), 270)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the blimp operator: offers a ride back to Rogueport (stg3_tou_00 with yes/no);
+ * on yes Mario shows the Blimp Ticket and the scene continues, on no he stays (stg3_tou_01).
+ */
 EVT_BEGIN(talk_hikuu)
     CALL(evt_msg_print, 0, STRING("stg3_tou_00"), 0, 0)
     CALL(evt_msg_select, 0, STRING("stg3_tou_00_yn"))
@@ -701,11 +780,17 @@ EVT_BEGIN(talk_hikuu)
     RETURN
 EVT_END()
 
+/** NPC init for the tavern keeper: places him at (650, 10, 12). */
 EVT_BEGIN(init_sakaba)
     CALL(evt_npc_set_position, STRING("me"), 650, 10, 12)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the tavern keeper.
+ * Handles Trouble Center job 25 first; otherwise his lines depend on story progress,
+ * including the Chapter 3 scene where Mario hears about the 8th-place rank.
+ */
 EVT_BEGIN(talk_sakaba)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 25)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_2), 1)
@@ -822,22 +907,29 @@ EVT_BEGIN(talk_sakaba)
     RETURN
 EVT_END()
 
+/** NPC init for the shop NPC: places it at (-600, 10, 140), facing 200. */
 EVT_BEGIN(init_mise)
     CALL(evt_npc_set_position, STRING("me"), -600, 10, 140)
     CALL(evt_npc_set_ry, STRING("me"), 200)
     RETURN
 EVT_END()
 
+/** Guess: talk script of the plaza's shop NPC, a short greeting. */
 EVT_BEGIN(talk_mise)
     RETURN
 EVT_END()
 
+/** NPC init for the hot dog vendor: shadowless at (-400, 20, -125). */
 EVT_BEGIN(init_hot)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_SHADOW)
     CALL(evt_npc_set_position, STRING("me"), -400, 20, -125)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the hot dog vendor (outside the main stall):
+ * different lines before and after the runaway egg (story stages 11 and 12).
+ */
 EVT_BEGIN(talk_hot)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_11_RUNAWAY_EGG)
@@ -848,6 +940,10 @@ EVT_BEGIN(talk_hot)
     RETURN
 EVT_END()
 
+/**
+ * NPC init for the dad (パパ, one of the plaza's family):
+ * placed at (-175, 0, -25) before STORY_STG5_65_TRAIN_TICKET and hidden below the map afterwards.
+ */
 static EVT_BEGIN(init_papa)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG5_65_TRAIN_TICKET)
@@ -858,6 +954,12 @@ static EVT_BEGIN(init_papa)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the dad: story-dependent lines.
+ * Before STORY_STG3_04_GONZALES_IS_BORN one line;
+ * until STORY_STG3_32_BOSS_BATTLE the line depends on Mario's Glitz Pit ranking (evt_tou_get_ranking: above 15,
+ * above 10, above 5, above 0, or 0); after that one of two lines depending on GSWF_TOU_LEFT_AS_CHAMPION.
+ */
 static EVT_BEGIN(talk_papa)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
@@ -886,6 +988,10 @@ static EVT_BEGIN(talk_papa)
     RETURN
 EVT_END()
 
+/**
+ * NPC init for the mom (ママ, one of the plaza's family):
+ * placed at (-130, 0, 0) before STORY_STG5_65_TRAIN_TICKET and hidden below the map afterwards.
+ */
 static EVT_BEGIN(init_mama)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG5_65_TRAIN_TICKET)
@@ -896,6 +1002,10 @@ static EVT_BEGIN(init_mama)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the mom: same structure as talk_papa (a line before STORY_STG3_04_GONZALES_IS_BORN,
+ * lines by Glitz Pit ranking until STORY_STG3_32_BOSS_BATTLE, then a line chosen by GSWF_TOU_LEFT_AS_CHAMPION).
+ */
 static EVT_BEGIN(talk_mama)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
@@ -924,6 +1034,10 @@ static EVT_BEGIN(talk_mama)
     RETURN
 EVT_END()
 
+/**
+ * Guess: NPC init for konari (コナリキン, a well-off Glitzville resident):
+ * placed at (-200, 0, 10) before STORY_STG5_65_TRAIN_TICKET and hidden below the map afterwards.
+ */
 static EVT_BEGIN(init_konari)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG5_65_TRAIN_TICKET)
@@ -934,6 +1048,10 @@ static EVT_BEGIN(init_konari)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of konari: same structure as talk_papa (a line before STORY_STG3_04_GONZALES_IS_BORN,
+ * lines by Glitz Pit ranking until STORY_STG3_32_BOSS_BATTLE, then a line chosen by GSWF_TOU_LEFT_AS_CHAMPION).
+ */
 static EVT_BEGIN(talk_konari)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
@@ -962,6 +1080,11 @@ static EVT_BEGIN(talk_konari)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the three girls (３人娘１ to ３): they speak in turn.
+ * Before STORY_STG3_04_GONZALES_IS_BORN one exchange;
+ * until STORY_STG3_32_BOSS_BATTLE the exchange depends on Mario's Glitz Pit ranking (above 15, 10, 5, 0, or 0).
+ */
 static EVT_BEGIN(talk_musume)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
@@ -996,6 +1119,7 @@ static EVT_BEGIN(talk_musume)
     RETURN
 EVT_END()
 
+/** NPC init for the first girl: stands at (300, 10, -150) between Glitzville's arrival and the boss battle. */
 EVT_BEGIN(init_musume_1)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG3_00_WELCOME_TO_GLITZVILLE, STORY_STG3_32_BOSS_BATTLE)
@@ -1004,11 +1128,13 @@ EVT_BEGIN(init_musume_1)
     RETURN
 EVT_END()
 
+/** Talk script of the first girl. */
 EVT_BEGIN(talk_musume_1)
     CALL_CHILD(talk_musume)
     RETURN
 EVT_END()
 
+/** NPC init for the second girl: stands at (330, 10, -180) between arrival and the boss battle. */
 EVT_BEGIN(init_musume_2)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG3_00_WELCOME_TO_GLITZVILLE, STORY_STG3_32_BOSS_BATTLE)
@@ -1017,11 +1143,13 @@ EVT_BEGIN(init_musume_2)
     RETURN
 EVT_END()
 
+/** Talk script of the second girl. */
 EVT_BEGIN(talk_musume_2)
     CALL_CHILD(talk_musume)
     RETURN
 EVT_END()
 
+/** NPC init for the third girl: stands at (370, 10, -140) between arrival and the boss battle. */
 EVT_BEGIN(init_musume_3)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG3_00_WELCOME_TO_GLITZVILLE, STORY_STG3_32_BOSS_BATTLE)
@@ -1030,17 +1158,20 @@ EVT_BEGIN(init_musume_3)
     RETURN
 EVT_END()
 
+/** Talk script of the third girl. */
 EVT_BEGIN(talk_musume_3)
     CALL_CHILD(talk_musume)
     RETURN
 EVT_END()
 
+/** NPC init for the first Toad: placed at (-350, 0, 75); status flag 2 set. */
 EVT_BEGIN(init_kino_1)
     CALL(evt_npc_set_position, STRING("me"), -350, 0, 75)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
+/** Regular (idle) script of the first Toad: paces back and forth along x between -350 and 350. */
 EVT_BEGIN(reg_kino_1)
     LOOP(0)
         CALL(evt_npc_move_position, STRING("me"), -350, 75, 0, FLOAT(48.0f), 0)
@@ -1053,6 +1184,11 @@ EVT_BEGIN(reg_kino_1)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the first Toad spectator: a line before the Gonzales story point,
+ * a set of lines until the boss battle, and different lines
+ * after Mario re-enters the league (GSWF_TOU_REENTERED_LEAGUE / GSWF_TOU_REMATCH_PROMOTED).
+ */
 EVT_BEGIN(talk_kino_1)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
@@ -1093,11 +1229,13 @@ EVT_BEGIN(talk_kino_1)
     RETURN
 EVT_END()
 
+/** NPC init for the second Toad: placed at (-450, 0, 625). */
 EVT_BEGIN(init_kino_2)
     CALL(evt_npc_set_position, STRING("me"), -450, 0, 625)
     RETURN
 EVT_END()
 
+/** Talk script of the second Toad: story-dependent spectator lines, like talk_kino_1. */
 EVT_BEGIN(talk_kino_2)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
@@ -1138,11 +1276,13 @@ EVT_BEGIN(talk_kino_2)
     RETURN
 EVT_END()
 
+/** NPC init for the first stall vendor (ロテン1): placed at (350, 0, 700). */
 EVT_BEGIN(init_roten_1)
     CALL(evt_npc_set_position, STRING("ロテン1"), 350, 0, 700)
     RETURN
 EVT_END()
 
+/** Talk script of the first stall vendor: story-dependent lines, like talk_kino_1. */
 EVT_BEGIN(talk_roten_1)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
@@ -1183,11 +1323,13 @@ EVT_BEGIN(talk_roten_1)
     RETURN
 EVT_END()
 
+/** NPC init for the second stall vendor: placed at (725, 10, 40). */
 EVT_BEGIN(init_roten_2)
     CALL(evt_npc_set_position, STRING("me"), 725, 10, 40)
     RETURN
 EVT_END()
 
+/** Talk script of the second stall vendor: story-dependent lines, like talk_kino_1. */
 EVT_BEGIN(talk_roten_2)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
@@ -1228,11 +1370,13 @@ EVT_BEGIN(talk_roten_2)
     RETURN
 EVT_END()
 
+/** NPC init for the first Lakitu (jugem): placed at (-400, 0, 625). */
 EVT_BEGIN(init_jugem_1)
     CALL(evt_npc_set_position, STRING("me"), -400, 0, 625)
     RETURN
 EVT_END()
 
+/** Talk script of the first Lakitu: story-dependent spectator lines, like talk_kino_1. */
 EVT_BEGIN(talk_jugem_1)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
@@ -1273,12 +1417,14 @@ EVT_BEGIN(talk_jugem_1)
     RETURN
 EVT_END()
 
+/** NPC init for the second Lakitu: placed at (700, 10, 105), facing 340. */
 EVT_BEGIN(init_jugem_2)
     CALL(evt_npc_set_position, STRING("me"), 700, 10, 105)
     CALL(evt_npc_set_ry, STRING("me"), 340)
     RETURN
 EVT_END()
 
+/** Talk script of the second Lakitu: story-dependent spectator lines, like talk_kino_1. */
 EVT_BEGIN(talk_jugem_2)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
@@ -1319,6 +1465,10 @@ EVT_BEGIN(talk_jugem_2)
     RETURN
 EVT_END()
 
+/**
+ * NPC init for the beauty (bijyo): her position depends on story progress (placed at (610, 10, -120) during the
+ * early Chapter 3 stage, elsewhere or absent otherwise, including after Mario leaves as champion).
+ */
 EVT_BEGIN(init_bijyo)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG3_20_00_MAJORS_8TH_PLACE, STORY_STG3_20_03_THE_YELLOW_BLOCK)
@@ -1341,6 +1491,7 @@ EVT_BEGIN(init_bijyo)
     RETURN
 EVT_END()
 
+/** Talk script of the beauty: story-dependent spectator lines, like talk_kino_1. */
 EVT_BEGIN(talk_bijyo)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
@@ -1381,6 +1532,10 @@ EVT_BEGIN(talk_bijyo)
     RETURN
 EVT_END()
 
+/**
+ * NPC init for the smug fan (キザ野郎): placed at (555, 10, -30) from STORY_STG3_00_WELCOME_TO_GLITZVILLE
+ * until STORY_STG3_32_BOSS_BATTLE and hidden below the map otherwise.
+ */
 static EVT_BEGIN(init_kiza)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG3_00_WELCOME_TO_GLITZVILLE, STORY_STG3_32_BOSS_BATTLE)
@@ -1391,6 +1546,10 @@ static EVT_BEGIN(init_kiza)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the smug fan: a line before STORY_STG3_04_GONZALES_IS_BORN,
+ * and until STORY_STG3_32_BOSS_BATTLE lines chosen by Mario's Glitz Pit ranking (above 15, 10, 5, 0, or 0).
+ */
 static EVT_BEGIN(talk_kiza)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_04_GONZALES_IS_BORN)
@@ -1413,6 +1572,7 @@ static EVT_BEGIN(talk_kiza)
     RETURN
 EVT_END()
 
+/** NPC init for the salaryman (サラリーマン): from STORY_STG6_56_ROGUEPORT_STATION on he stands at (-240, 10, -90). */
 static EVT_BEGIN(init_sarary)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_56_ROGUEPORT_STATION)
         CALL(evt_npc_set_position, STRING("me"), -240, 10, -90)
@@ -1420,6 +1580,10 @@ static EVT_BEGIN(init_sarary)
     RETURN
 EVT_END()
 
+/**
+ * Menu helper: asks "pick a number" (irai_24_010/011) on two pages to return 1 to 10 in LW(0) (Trouble Center
+ * job 24).
+ */
 EVT_BEGIN(select_number)
     SET_VALUE(LW(15), 0)
     LOOP(0)
@@ -1444,6 +1608,16 @@ EVT_BEGIN(select_number)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the salaryman, who runs Trouble Center job 24 (the hot sauce job).
+ * While the job is active he explains it, then asks four number questions (the select_number menu;
+ * the right answers are 2, 6, 2 and 5).
+ * A wrong answer ends the talk; four right answers send him to the hot dog vendor and, after a scene change,
+ * he thanks Mario and gives a Hot Sauce (placed on the ground if the inventory is full),
+ * then sets GSWF_TROUBLE_24_SOLVED and ends the job.
+ * Once solved, he sells Hot Sauce for 10 coins (checks coins and free pouch space).
+ * Otherwise he just chats (stg3_tou_16_1).
+ */
 static EVT_BEGIN(talk_sarary)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 24)
         CALL(evt_npc_flag_onoff, 1, STRING("サラリーマン"), NPC_FLAG_INTANGIBLE)
@@ -1834,6 +2008,11 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Guess: cutscene when Mario first arrives from the blimp:
+ * the camera pans down to the plaza, the party talks (stg3_tou_03, stg3_tou_04), a telop shows the location,
+ * and the story advances to STORY_STG3_00_WELCOME_TO_GLITZVILLE.
+ */
 EVT_BEGIN(evt_uron)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION >= VERSION_JP
@@ -1901,6 +2080,7 @@ EVT_BEGIN(evt_uron)
     RETURN
 EVT_END()
 
+/** Script helper: starts a sleeping "Z" effect over the egg NPC (たまご) if none exists yet. */
 static USER_FUNC(eff_sleep_on) {
     EffectEntry* eff = effNameToPtr("eff_sleep");
     NpcEntry* npc = npcNameToPtr_NoAssert("たまご");
@@ -1912,6 +2092,7 @@ static USER_FUNC(eff_sleep_on) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: removes the sleeping "Z" effect. */
 static USER_FUNC(eff_sleep_off) {
     EffectEntry* eff = effNameToPtr("eff_sleep");
 
@@ -1921,6 +2102,7 @@ static USER_FUNC(eff_sleep_off) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: args[0] receives 1 if Mario's key input and control are both enabled, else 0. */
 static USER_FUNC(mario_chk) {
     EvtWord* args = event->args;
     BOOL ok = FALSE;
@@ -1933,7 +2115,7 @@ static USER_FUNC(mario_chk) {
 }
 
 #if VERSION <= VERSION_DEMO_US
-// The demo's champion reset: the releases use evt_rankingReset of tou.c, which also rebuilds the ranking.
+/** The demo's champion reset: the releases use evt_rankingReset of tou.c, which also rebuilds the ranking. */
 static USER_FUNC(rankingReset) {
     s32 i;
 
@@ -1952,6 +2134,10 @@ static USER_FUNC(rankingReset) {
 }
 #endif
 
+/**
+ * Idle loop of the egg NPC: while the story is at STORY_STG3_11_RUNAWAY_EGG it pulses its scale between 100%
+ * and 120% to look like it breathes in its sleep.
+ */
 EVT_BEGIN(evt_tamago_sleep)
     LOOP(0)
         IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_11_RUNAWAY_EGG)
@@ -1976,10 +2162,12 @@ EVT_BEGIN(evt_tamago_sleep)
     RETURN
 EVT_END()
 
+/** Empty script (just RETURN). */
 EVT_BEGIN(dummy)
     RETURN
 EVT_END()
 
+/** The hot dog vendor's interrupt script: chases the egg to its position and hops after it. */
 EVT_BEGIN(hot_move_evt)
     CALL(evt_npc_flag_onoff, 0, STRING("ホットドッグ"), NPC_FLAG_NO_SHADOW)
     CALL(evt_npc_flag_onoff, 1, STRING("ホットドッグ"), NPC_FLAG_NO_WALL_HIT)
@@ -2000,6 +2188,7 @@ EVT_BEGIN(hot_move_evt)
     RETURN
 EVT_END()
 
+/** The hot dog vendor's regular script variant: moves to (-288, -110) and faces the egg. */
 EVT_BEGIN(hot_move_evt2)
     CALL(evt_npc_flag_onoff, 0, STRING("ホットドッグ"), NPC_FLAG_NO_SHADOW)
     CALL(evt_npc_flag_onoff, 1, STRING("ホットドッグ"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
@@ -2008,6 +2197,10 @@ EVT_BEGIN(hot_move_evt2)
     RETURN
 EVT_END()
 
+/**
+ * Hot dog vendor ("oyaji", old man) walks across the plaza to the egg, speaking stg3_tou_242,
+ * and then restarts his regular script.
+ */
 EVT_BEGIN(evt_oyaji_move)
     WAIT_MS(1000)
     CALL(evt_npc_flag_onoff, 1, STRING("ホットドッグ"), NPC_FLAG_NO_WALL_HIT)
@@ -2024,6 +2217,11 @@ EVT_BEGIN(evt_oyaji_move)
     RETURN
 EVT_END()
 
+/**
+ * Squash-and-stretch of the egg NPC ("たまご") over a hop of LW(3) milliseconds:
+ * the width scale eases from 1.2 down to 0.9 and the height scale from 0.9 up to 1.1 (two inline events),
+ * while the loop applies both scales to the egg every frame.
+ */
 static EVT_BEGIN(evt_tamago_scale)
     SET_FLOAT_VALUE(GW(10), FLOAT(1.1992188f))
     SET_FLOAT_VALUE(GW(11), FLOAT(0.89941406f))
@@ -2062,6 +2260,11 @@ static EVT_BEGIN(evt_tamago_scale)
     RETURN
 EVT_END()
 
+/**
+ * Second squash-and-stretch step for the egg NPC ("たまご"), over LW(3) milliseconds:
+ * the width eases from 0.9 back to 1.0 and the height from 1.1 back to 1.0,
+ * and the loop applies the scales every frame (the settle after the hops of evt_tamago_scale).
+ */
 static EVT_BEGIN(evt_tamago_scale2)
     BEGIN_INLINE_EVENT
         DIVIDE(LW(3), 2)
@@ -2105,6 +2308,10 @@ s32 yoshi_data[] = {
     -360, 0, 150, -290, 0, 40,
 };
 
+/**
+ * Runaway egg scene: the egg NPC hops along the points in yoshi_data (ten jumps with random height and
+ * squashing) away from the plaza, stopping if Mario takes control.
+ */
 EVT_BEGIN(evt_tamago_move)
     CALL(evt_npc_flag_onoff, 1, STRING("たまご"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_set_position, STRING("たまご"), -400, 10, -135)
@@ -2197,6 +2404,11 @@ EVT_BEGIN(evt_tamago_move)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene when Mario first sees the runaway egg:
+ * he turns toward it, reacts with an exclamation bubble (stg3_tou_241), the camera frames it,
+ * and the story advances to STORY_STG3_10_MINORS_5TH_PL_EGG.
+ */
 EVT_BEGIN(evt_tamago)
     CALL(evt_mario_set_dir, 90, 0, 0)
     CALL(evt_mario_key_onoff, 0)
@@ -2232,6 +2444,11 @@ EVT_BEGIN(evt_tamago)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the egg NPC (たまご): Mario picks it up,
+ * the partner and the hot dog vendor talk about it (stg3_tou_247 to 250, with a yes/no prompt),
+ * and the story advances to STORY_STG3_12_MINI_YOSHI_EGG.
+ */
 EVT_BEGIN(talk_tamago)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION >= VERSION_JP
@@ -2323,6 +2540,10 @@ EVT_BEGIN(talk_tamago)
     RETURN
 EVT_END()
 
+/**
+ * Moves the blimp gondola ("gondora" map object) up or down with its sound and keeps Mario
+ * and the partner standing on it.
+ */
 EVT_BEGIN(evt_gondora_updown)
     SET_VALUE(LW(3), LW(0))
     SET_VALUE(LW(4), LW(1))
@@ -2366,6 +2587,7 @@ EVT_BEGIN(evt_gondora_updown)
     RETURN
 EVT_END()
 
+/** Swings the gondola's gate (g_mon) with its door sound and keeps its collision in sync. */
 EVT_BEGIN(evt_gondora_mon)
     SET_VALUE(LW(3), LW(0))
     SET_VALUE(LW(4), LW(1))
@@ -2387,6 +2609,10 @@ EVT_BEGIN(evt_gondora_mon)
     RETURN
 EVT_END()
 
+/**
+ * Boarding scene: Mario and the partners are placed on the gondola above the plaza,
+ * the camera tracks it and the blimp lifts off.
+ */
 EVT_BEGIN(evt_gondora)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION >= VERSION_JP
@@ -2437,6 +2663,10 @@ EVT_BEGIN(evt_gondora)
     RETURN
 EVT_END()
 
+/**
+ * Landing scene for the gondola ride: the party steps onto the plaza,
+ * the music fades out and the party turns to face the plaza.
+ */
 EVT_BEGIN(evt_gondora2)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION >= VERSION_JP
@@ -2512,6 +2742,7 @@ EVT_BEGIN(evt_gondora2)
     RETURN
 EVT_END()
 
+/** Guess: sweeps the plaza's searchlight objects back and forth for atmosphere. */
 EVT_BEGIN(evt_search_light)
     SET_VALUE(LW(8), LW(0))
     LOOP(0)
@@ -2543,6 +2774,10 @@ EVT_BEGIN(evt_search_light)
     RETURN
 EVT_END()
 
+/**
+ * Guess: toggles the neon signs (neon_1 to neon_3) and makes the stairs a_sak_kaidan appear with a sound,
+ * for the tavern's hidden staircase.
+ */
 EVT_BEGIN(evt_dummy_sw)
     SET_VALUE(GF(10), 1)
     CALL(evt_mario_key_onoff, 0)
@@ -2592,6 +2827,11 @@ EVT_BEGIN(evt_dummy_sw)
     RETURN
 EVT_END()
 
+/**
+ * Scene after the Peach interlude: Mario and his partner come back into the plaza,
+ * the partner speaks stg3_tou_479, the beauty is removed from the scene
+ * and the story sets STORY_STG3_34_RETURN_TO_ROGUEPORT.
+ */
 EVT_BEGIN(evt_peach_after)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, 0, 130, 134, 0, 75, -312, 0, 11)
@@ -2621,6 +2861,10 @@ EVT_BEGIN(evt_peach_after)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0] = distance; sets the darkness (yami) overlay view matrix for the camera yaw,
+ * offset by the distance.
+ */
 static USER_FUNC(yami_view) {
     f32 s;
     f32 c;
@@ -2645,6 +2889,12 @@ static USER_FUNC(yami_view) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Chapter 8 darkness scene setup: spawns the Toad guide (キノシコワ) at (4, 0, 420), parks the blimp,
+ * a Lakitu and the stall vendor around the plaza,
+ * hides the family and the two spectator Toads below the map and deletes the regular scripts of the Toad
+ * and vendor.
+ */
 static EVT_BEGIN(sekai_yami_npc_init)
     CALL(evt_npc_entry, STRING("キノシコワ"), STRING("c_ksikowa"))
     CALL(evt_npc_set_tribe, STRING("キノシコワ"), STRING("キノシコワ"))
@@ -2665,6 +2915,11 @@ static EVT_BEGIN(sekai_yami_npc_init)
     RETURN
 EVT_END()
 
+/**
+ * Per-NPC reaction in the Chapter 8 darkness scene (the NPC name is passed in LW(0)):
+ * waits until the spreading darkness (yami_oowareru_check against GW(0)) reaches the NPC,
+ * then stops its regular script, shows a shock bubble and keeps turning around at random intervals.
+ */
 static EVT_BEGIN(sekai_yami_npc)
     LOOP(0)
         CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
@@ -2689,6 +2944,14 @@ static EVT_BEGIN(sekai_yami_npc)
     RETURN
 EVT_END()
 
+/**
+ * Chapter 8 scene in which the world goes dark over the Glitzville plaza:
+ * Mario and the partner are moved out of view, the background fades to a dark grey
+ * and the tev callback tints the scene while the darkness spreads out from x=-600 to 900 over 5 seconds
+ * (yami_view) with the world-dark sound.
+ * The blimp, Lakitu and vendor react (sekai_yami_npc),
+ * the Toad says stg8_dark_03 and the game changes map to las_29 (bero sekai_yami1).
+ */
 static EVT_BEGIN(sekai_yami_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -2757,6 +3020,11 @@ static EVT_BEGIN(sekai_yami_evt)
     RETURN
 EVT_END()
 
+/**
+ * Guess: spawns the NPCs for the Chapter 8 "everyone's voice" scene on the plaza:
+ * the Toad guide (キノシコワ), Rawk Hawk (ブレッドハート), the two Iron Clefts (シンエモンＡ and Ｂ, scaled 1.5 in JP and later
+ * versions), a reporter, a camera Toad and a Shady Koopa (ウラノコ), all placed and facing each other.
+ */
 static EVT_BEGIN(minnnanokoe_npc_entry)
     CALL(evt_npc_entry, STRING("キノシコワ"), STRING("c_ksikowa"))
     CALL(evt_npc_set_tribe, STRING("キノシコワ"), STRING("キノシコワ"))
@@ -2802,6 +3070,12 @@ static EVT_BEGIN(minnnanokoe_npc_entry)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the Chapter 8 "everyone's voice" scene:
+ * with the plaza in the dark tint, a spinning Star Stone floats at the centre and the Toad guide, Rawk Hawk,
+ * the Iron Clefts and the Shady Koopa speak in turn (stg8_las_148_18 to 25) as the camera moves between them,
+ * then the game changes map to usu_00 (bero minnnanokoe).
+ */
 static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -2923,6 +3197,10 @@ static EVT_BEGIN(minnnanokoe_evt)
     RETURN
 EVT_END()
 
+/**
+ * Telephone box: a ring and a series of phone messages (stg3_tel_01 and following) that Mario hears
+ * when he steps in.
+ */
 EVT_BEGIN(evt_telbox)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_TELEPHONE1"), LW(0), LW(1), LW(2), 0)
@@ -2960,6 +3238,10 @@ EVT_BEGIN(evt_telbox)
     RETURN
 EVT_END()
 
+/**
+ * Mail scene: Mario notices a notification (bubble, mail jingle and vibration), the mail is read,
+ * and a series of poses and sounds follows.
+ */
 EVT_BEGIN(evt_mail)
     LABEL(0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -3019,6 +3301,7 @@ EVT_BEGIN(evt_mail)
     RETURN
 EVT_END()
 
+/** Script helper: args[0] = NPC name, args[1] = index; enables TEV callback `index` (0-15) on that NPC's model. */
 static USER_FUNC(anim_tevcallback) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -3032,6 +3315,10 @@ static USER_FUNC(anim_tevcallback) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] = map object name, args[1] = index;
+ * enables TEV callback `index` (0-15) on that object's model.
+ */
 static USER_FUNC(anim_tevcallback_mobj) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -3045,6 +3332,7 @@ static USER_FUNC(anim_tevcallback_mobj) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: args[0] = NPC name; stops and clears that NPC's regular (idle) event. */
 static USER_FUNC(delete_npc_regl_evt) {
     NpcEntry* npc = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
 
@@ -3056,6 +3344,10 @@ static USER_FUNC(delete_npc_regl_evt) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] = limit, args[1], args[2] = x, z;
+ * sets args[3] to TRUE when the point is behind the darkness cutoff for the current camera yaw.
+ */
 static USER_FUNC(yami_oowareru_check) {
     EvtWord* args = event->args;
     f32 limit = evtGetFloat(event, args[0]);
@@ -3077,6 +3369,7 @@ static USER_FUNC(yami_oowareru_check) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper: args[0] = effect name, args[1..3] = x, y, z; creates a star-stone effect (type 2) with that name. */
 static USER_FUNC(starstone_entry) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -3088,6 +3381,7 @@ static USER_FUNC(starstone_entry) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: args[0] = effect name, args[1..3] = x, y, z; moves the named star-stone effect. */
 static USER_FUNC(starstone_set_pos) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -3102,6 +3396,7 @@ static USER_FUNC(starstone_set_pos) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: args[0] = effect name, args[1] = degrees; sets the named star-stone effect's rotation about y. */
 static USER_FUNC(starstone_set_ry) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -3111,12 +3406,20 @@ static USER_FUNC(starstone_set_ry) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Pickup callback of the Storage Key lying at (-745, 20, 435) (placed during "Rawk Hawk's Warning"):
+ * sets the story stage to STORY_STG3_20_07_STORAGE_KEY and spawns evt_mail.
+ */
 static EVT_BEGIN(evt_key)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_20_07_STORAGE_KEY)
     SPAWN_EVENT(evt_mail)
     RETURN
 EVT_END()
 
+/**
+ * Opens the plaza's item box (mobj_box00): takes control from Mario,
+ * the box pops an item (ITEM_POWER_PLUS_P, the Power Plus P badge) at its position and Mario receives it.
+ */
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION >= VERSION_JP
@@ -3135,6 +3438,13 @@ static EVT_BEGIN(mobj_box00)
     RETURN
 EVT_END()
 
+/**
+ * Map init for tou_01, Glitzville's front plaza:
+ * sets up the blocks, Star Pieces, Inn Coupon, doors,
+ * NPCs (spectators, vendors, the egg and the blimp) and their talk scripts,
+ * and chooses the scene to run from the entrance and the story progress (the ship shadow, the gondola ride,
+ * the Chapter 3 intro, etc.).
+ */
 EVT_BEGIN(tou_01_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
@@ -3516,7 +3826,7 @@ EVT_BEGIN(tou_01_init_evt)
 EVT_END()
 
 #if VERSION >= VERSION_US
-// US: copy the visibility flags of the sign board (0x1800) onto the English letter objects
+/** US: copy the visibility flags of the sign board (0x1800) onto the English letter objects */
 static inline void kanbanCopyFlags(MapObject* kanban, const char* name) {
     MapObject* obj = mapGetMapObj(name);
     if (obj != NULL) {
@@ -3525,6 +3835,10 @@ static inline void kanbanCopyFlags(MapObject* kanban, const char* name) {
     }
 }
 
+/**
+ * Script helper: copies the display flags of the "kanban" sign's parts to its language-specific letter objects,
+ * so only the right-language lettering shows. Blocks forever.
+ */
 USER_FUNC(tou_01_kanban_moji_flag_sync) {
     MapObject* kanban = mapGetMapObj("kanban");
     if (kanban != NULL) {

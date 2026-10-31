@@ -86,6 +86,7 @@ GXColor hibana_col[32] = {
 
 s32 seed = 1;
 
+/** Pseudo-random f32 in [0, 1) from a linear congruential generator on the global seed. */
 static inline f32 pt_frand(void) {
     seed = seed * 0x5EEDF715 + 0x1B0CB173;
     return (f32)(u32)seed * 2.3283064e-10f;
@@ -96,6 +97,7 @@ static void effParticleMain(EffectEntry* effect);
 static void EmitterEmit(EffectEntry* effect, ParticleEmitter* emitter);
 static void ParticleEmit(EffectEntry* effect, ParticleItem* p, ParticleEmitter* emitter);
 
+/** Gaussian-distributed random number (polar Box-Muller), caching the second value for the next call. */
 static inline f32 pt_gauss(void) {
     static f32 y2;
     static s32 use_last;
@@ -119,11 +121,12 @@ static inline f32 pt_gauss(void) {
     return y1;
 }
 
-// Stand-in for a function the original linker dead-stripped; its signed int->float constant is last in .rodata.
+/** Stand-in for a function the original linker dead-stripped; its signed int->float constant is last in .rodata. */
 void particleStrippedPool(f32* f, s32 i) {
     *f = (f32)i;
 }
 
+/** Initialises one particle from the emitter: random direction and speed, life and size. */
 static void ParticleEmit(EffectEntry* effect, ParticleItem* p, ParticleEmitter* emitter) {
     ParticleWork* work = effect->userdata;
     f32 w;
@@ -147,6 +150,7 @@ static void ParticleEmit(EffectEntry* effect, ParticleItem* p, ParticleEmitter* 
     PSVECAdd(&emitter->pos, &p->pos, &p->pos);
 }
 
+/** Spawns the next batch of particles for an emitter. */
 static void EmitterEmit(EffectEntry* effect, ParticleEmitter* emitter) {
     ParticleWork* work = effect->userdata;
     u32 prev, n;
@@ -175,6 +179,10 @@ static void EmitterEmit(EffectEntry* effect, ParticleEmitter* emitter) {
     }
 }
 
+/**
+ * Spawns an emitter at (x, y, z) that throws `count` particles toward (dx, dy, dz) for `life` frames;
+ * reached through evt_eff ("particle").
+ */
 EffectEntry* effParticleEntry(s32 type, f32 x, f32 y, f32 z, f32 dx, f32 dy, f32 dz, s32 count, s32 life) {
     EffectEntry* effect;
     ParticleWork* work;
@@ -238,6 +246,7 @@ EffectEntry* effParticleEntry(s32 type, f32 x, f32 y, f32 z, f32 dx, f32 dy, f32
     return effect;
 }
 
+/** Per frame: emits new particles, moves and ages the live ones and deletes the effect when none remain. */
 static void effParticleMain(EffectEntry* effect) {
     ParticleWork* work = effect->userdata;
     Vec zero = {0.0f, 0.0f, 0.0f};
@@ -290,6 +299,7 @@ static void effParticleMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&pos), 2, (DispCallback)effParticleDisp, effect);
 }
 
+/** Draws every live particle as a camera-facing textured quad (effect texture 0x61). */
 static void effParticleDisp(CameraId cameraId, EffectEntry* effect) {
     ParticleWork* work = effect->userdata;
     CameraEntry* cam = camGetPtr(cameraId);

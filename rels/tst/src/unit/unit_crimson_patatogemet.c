@@ -240,6 +240,10 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Init script of the winged form: installs its own wait,
+ * attack and damage handlers (confusion reuses the attack), sets the pose sound table and starts the wait event.
+ */
 static EVT_BEGIN(init_event_pata)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event_pata))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_pata))
@@ -250,6 +254,11 @@ static EVT_BEGIN(init_event_pata)
     RETURN
 EVT_END()
 
+/**
+ * After the Red Spiky Parabuzzy dodges or counters,
+ * flashes a thorn-spark effect (toge_flush) above its head 30 frames later,
+ * higher or lower depending on whether it is Mega or Mini.
+ */
 EVT_BEGIN(crimson_dmg_avoid_counter_thorn_head_event_pata)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -270,6 +279,10 @@ EVT_BEGIN(crimson_dmg_avoid_counter_thorn_head_event_pata)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: runs the shared default damage script (btldefaultevt_Damage) with its default parameters
+ * (LW(10) = -2, LW(11) = 1).
+ */
 static EVT_BEGIN(damage_event_pata)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -277,6 +290,11 @@ static EVT_BEGIN(damage_event_pata)
     RETURN
 EVT_END()
 
+/**
+ * Called when the winged form is hit down: clears its flying state and winged part attribute,
+ * switches to the ground tables and parts, changes its kind to the wingless version (kind 73) and lands,
+ * then runs init_event; if it took more than one point of damage it also flips over (dmg_turn_event).
+ */
 static EVT_BEGIN(dmg_fall_event_pata)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -308,6 +326,10 @@ static EVT_BEGIN(dmg_fall_event_pata)
     RETURN
 EVT_END()
 
+/**
+ * Positioning script that runs before the unit's first attack in a battle:
+ * puts it at height 10 and waits for the attack to end.
+ */
 static EVT_BEGIN(dmg_first_attack_pos_event_pata)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -316,6 +338,11 @@ static EVT_BEGIN(dmg_first_attack_pos_event_pata)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the winged form: picks a target after the item-use check, flies up,
+ * then dives in shell form at the target; on a miss it flies past,
+ * on a hit it plays the attack sound and deals damage. It then flies back home.
+ */
 static EVT_BEGIN(attack_event_pata)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -411,6 +438,7 @@ static EVT_BEGIN(attack_event_pata)
     RETURN
 EVT_END()
 
+/** Idle script of the winged form: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event_pata)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -599,6 +627,11 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_crimson_togemet", "c_met_h", 0.0f, 0.0f, 0.0f, 0.0f, 23.0f, 0.0f, 0.0f, 28.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0x1, pose_table},
 };
 
+/**
+ * Init script of the crimson shell-backed unit:
+ * reads unit work 0 (1 means it starts on the ceiling) into LW(15),
+ * runs init_event2 to install the right handlers and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(15))
     CALL_CHILD(init_event2)
@@ -606,6 +639,12 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Installs the handlers for the spiked unit's current form, chosen by unit work 0:
+ * on the ground (0) its normal wait, attack, damage and confusion scripts;
+ * on the ceiling (1) the ceiling pose and data tables at height 130 with the ceiling scripts
+ * and the fall script. Both set the run and walk sounds and clear the flipped-over count.
+ */
 static EVT_BEGIN(init_event2)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(15))
     IF_INT_EQUAL(LW(15), 0)
@@ -643,6 +682,11 @@ static EVT_BEGIN(init_event2)
     RETURN
 EVT_END()
 
+/**
+ * Spike spark shown when an attacker is hurt by (or avoids) the spiked head:
+ * waits 30 frames, then spawns the toge_flush effect above the unit's head (38 units up when Huge, 18 when Tiny,
+ * else 28).
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -663,6 +707,10 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: runs the shared default damage script (btldefaultevt_Damage) with its default parameters
+ * (LW(10) = -2, LW(11) = 1).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -670,6 +718,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Flips the spiked unit onto its back: swaps in the flipped defence, pose and attribute tables,
+ * marks status flag 1 (flipped) with a flipped-over count of 1, plays the shell sound,
+ * lands it in two bounces at height 5 and turns off the spike counter on part 1.
+ */
 static EVT_BEGIN(dmg_turn_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -690,6 +743,11 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Turn-over recovery of the spiked unit: counts down the flipped-over count;
+ * at 0 it restores the normal defence and pose tables, clears status flag 1, plays the wake-up sound,
+ * hops to the ground and turns the spike counter on part 1 back on; otherwise it keeps lying flipped.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -716,6 +774,13 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the crimson shell-backed unit: if it is lying flipped it gets up (wakeup_event);
+ * otherwise it picks a target (after the item-use check),
+ * jumps into its shell and spins up while rolling at the target, leaving dust puffs.
+ * If the attack misses it rolls past the target and jumps back;
+ * if it hits it deals damage with the guard-timing check and bounces off, then walks home.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -862,11 +927,17 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler while it hangs on the ceiling:
+ * runs the default damage script, and unless the hit knocked it out (damage flag 0x200) without a Life Shroom
+ * revive (0x800) it runs ceil_fall_ready_event when it took damage while still on the ceiling, so it falls.
+ */
 static EVT_BEGIN(damage_event_ceil)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -889,6 +960,11 @@ static EVT_BEGIN(damage_event_ceil)
     RETURN
 EVT_END()
 
+/**
+ * Counter-damage handler on the ceiling for the spiked unit:
+ * leaves the ceiling state (ground pose and data tables, hit offsets, home position,
+ * init_event2 for the ground form) and then applies the counter damage.
+ */
 static EVT_BEGIN(counter_damage_event_ceil)
     CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 2)
     CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 4194304)
@@ -911,6 +987,12 @@ static EVT_BEGIN(counter_damage_event_ceil)
     RETURN
 EVT_END()
 
+/**
+ * Makes the ceiling spiked unit fall: plays the fall sound, drops it to the ground with the landing sound,
+ * swaps to the ground tables and runs init_event2,
+ * then leaves it lying flipped over (turned tables, flipped-over count 1) after two bounces,
+ * with its spike counter turned off.
+ */
 static EVT_BEGIN(ceil_fall_ready_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_FALL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, 0)
@@ -948,6 +1030,12 @@ static EVT_BEGIN(ceil_fall_ready_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script on the ceiling for the spiked unit:
+ * picks a target, slides along the ceiling over it,
+ * drops with the fall and landing sounds and hits it (guard check and damage), waits a second,
+ * then jumps back down, restores the ground form (init_event2) and walks home.
+ */
 static EVT_BEGIN(attack_event_ceil)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -1062,6 +1150,7 @@ static EVT_BEGIN(attack_event_ceil)
     RETURN
 EVT_END()
 
+/** Idle script for the ceiling form: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event_ceil)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

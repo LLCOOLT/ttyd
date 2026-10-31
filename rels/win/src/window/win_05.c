@@ -21,6 +21,10 @@
 
 static BeroEntry bero_entry_data[2];
 
+/**
+ * Door-open callback for the bero exit "w_bero":
+ * names the two door map objects "S_doa_e_l" and "S_doa_e_r" and runs the shared evt_win_door_open.
+ */
 EVT_BEGIN(win_05_door_open)
     SET_VALUE(LW(8), STRING("S_doa_e_l"))
     SET_VALUE(LW(9), STRING("S_doa_e_r"))
@@ -28,6 +32,10 @@ EVT_BEGIN(win_05_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door-close callback for the bero exit "w_bero":
+ * names the door map objects "S_doa_e_l" and "S_doa_e_r" and runs the shared evt_win_door_close.
+ */
 EVT_BEGIN(win_05_door_close)
     SET_VALUE(LW(8), STRING("S_doa_e_l"))
     SET_VALUE(LW(9), STRING("S_doa_e_r"))
@@ -57,6 +65,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Opening script of the item chest "mobj_box00":
+ * gives the Super Appeal P badge as a fixed item with the pickup fanfare (badge-return flag outside the early
+ * demos).
+ */
 static EVT_BEGIN(item_get00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
@@ -72,6 +85,10 @@ static EVT_BEGIN(item_get00)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Flurrie appears in this small room: the screen fades up from black, she speaks "stg2_win_e04_00_04",
+ * the story becomes STORY_STG2_03_03_FLURRIE_INTRO and the map changes to win_03.
+ */
 static EVT_BEGIN(cloud_toujou)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -106,6 +123,12 @@ static EVT_BEGIN(cloud_toujou)
     RETURN
 EVT_END()
 
+/**
+ * Guess: map init script of the small interior room win_05:
+ * registers its exit, places the Super Appeal P chest and the Star Piece spinning panel,
+ * plays the Boggly Woods BGM, and starts Flurrie's appearance (cloud_toujou) at
+ * STORY_STG2_03_02_SEALED_ENTRANCE_2.
+ */
 EVT_BEGIN(win_05_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)

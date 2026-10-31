@@ -141,6 +141,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init script of a Mini-Yux satellite: registers its wait, unison-phase,
+ * attack and damage handlers (confusion uses the default handler),
+ * sets the unit flags 0x300000 and starts the idle event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventUnisonPhase, BTL_UNIT_SELF, PTR(unison_phase_event))
@@ -152,6 +157,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction of a Mini-Yux: runs the default damage handling with LW(10) = -2 (the unit itself)
+ * and LW(11) = 1.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -159,20 +168,31 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Phase event: empty, it does nothing. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/** Start-of-turn event of a Mini-Yux: empty, it only restarts its idle event. The parent Yux does the moving. */
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of a Mini-Yux: empty, it only restarts its idle event.
+ * The parent Yux makes the satellites attack through its own scripts.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
+/**
+ * Idle event of a Mini-Yux: shows its pose from the pose table, then at random intervals of 30 to 150 frames,
+ * if its unit work 1 is set (the parent told it to idle) and it can act and is not asleep,
+ * holds the S_4 pose for 180 frames before returning to the table pose.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     LABEL(0)
@@ -195,6 +215,11 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0] is the Yux, args[1] the number of satellites (1-4),
+ * args[2] the index of this satellite; args[3]-args[5] receive its starting offset from the Yux (a fixed
+ * formation of +-25 units, x mirrored by facing direction).
+ */
 static USER_FUNC(battleGetBarriernSatelliteInitPos) {
     EvtWord* args = event->args;
     BattleUnit* unit;

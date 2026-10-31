@@ -25,6 +25,10 @@
 
 static BeroEntry bero_entry_data[4];
 
+/**
+ * Closes the double door (door_L and door_R) of the Creepy Steeple entrance:
+ * LW(0) is the door angle, and the two leaves rotate opposite ways.
+ */
 EVT_BEGIN(ne_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("door_L"), 0, LW(0), 0)
@@ -33,6 +37,7 @@ EVT_BEGIN(ne_close)
     RETURN
 EVT_END()
 
+/** Opens the double door of the Creepy Steeple entrance, the reverse of ne_close. */
 EVT_BEGIN(ne_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("door_L"), 0, LW(0), 0)
@@ -41,6 +46,7 @@ EVT_BEGIN(ne_open)
     RETURN
 EVT_END()
 
+/** Exit event of the hole ("ana"): sets GSWF_STG4_DROP_IN_ENTRANCE and changes the map to jin_09, the room below. */
 EVT_BEGIN(gra_06_ido)
     SET_VALUE(GSWF(GSWF_STG4_DROP_IN_ENTRANCE), 1)
     CALL(evt_bero_mapchange, STRING("jin_09"), 0)
@@ -48,6 +54,10 @@ EVT_BEGIN(gra_06_ido)
     RETURN
 EVT_END()
 
+/**
+ * Moves Mario and his partners above the hole's landing spot and makes them jump down to it,
+ * then waits 1.5 seconds.
+ */
 EVT_BEGIN(gra_06_ido_in_sub)
     CALL(evt_seq_wait, 2)
     CALL(evt_mario_set_pos, 210, -100, 318)
@@ -74,6 +84,7 @@ EVT_BEGIN(gra_06_ido_in_sub)
     RETURN
 EVT_END()
 
+/** Enter event of the hole: spawns gra_06_ido_in_sub and returns 0. */
 EVT_BEGIN(gra_06_ido_in)
     SPAWN_EVENT(gra_06_ido_in_sub)
     SET_VALUE(LW(0), 0)
@@ -135,6 +146,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Opens the Creepy Steeple's iron gate when Mario presses A in front of it:
+ * the gate leaves swing open while the chain rattles and lifts away,
+ * sets GSWF_GRA06_STEEPLE_GATE_OPENED and removes the gate collision.
+ */
 EVT_BEGIN(gra_06_saku_open)
     CALL(evt_mapobj_get_position, STRING("kusari"), LW(10), LW(11), LW(12))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG4_GATE_CLOSED1"), LW(10), LW(11), LW(12), 0)
@@ -228,6 +244,12 @@ EVT_BEGIN(gra_06_saku_open)
     RETURN
 EVT_END()
 
+/**
+ * Cutscene on the first arrival at the Steeple gate:
+ * the camera pans over the Creepy Steeple, a place-name telop is shown,
+ * Mario and the partner walk to the gate and the partner comments (stg4_gra_19).
+ * Sets the story to STORY_STG4_08_STEEPLE_DEMO_EXT.
+ */
 EVT_BEGIN(first_gra06jin)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_GRA1"))
     CALL(evt_mario_key_onoff, 0)
@@ -274,6 +296,11 @@ EVT_BEGIN(first_gra06jin)
     RETURN
 EVT_END()
 
+/**
+ * Scene when Mario comes out of the Steeple carried by the Boos:
+ * Mario and the partner drop from above onto the trail and land,
+ * control returns and the Steeple door's n_bero case is switched on again.
+ */
 EVT_BEGIN(teresa_oidasare_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -377,6 +404,12 @@ EVT_BEGIN(teresa_oidasare_evt)
     RETURN
 EVT_END()
 
+/**
+ * Init script of gra_06, the end of the trail: a Star Piece,
+ * the entry cases (the Boo drop-out scene or the normal exits), save and recovery blocks, a hidden coin brick,
+ * the Steeple gate in its open or closed state,
+ * and the first- arrival cutscene before STORY_STG4_08_STEEPLE_DEMO_EXT.
+ */
 EVT_BEGIN(gra_06_init_evt)
     CALL(evt_item_entry, STRING("item00"), ITEM_STAR_PIECE, -130, 0, 150, ITEM_ENTRY_FIXED, GSWF(GSWF_GRA06_STAR_PIECE), 0)
     CALL(evt_kagemario_init)

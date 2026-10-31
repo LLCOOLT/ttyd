@@ -16,6 +16,11 @@ u32 hwGetSampleExtraData(u32 voice);
 
 VS vs;
 
+/**
+ * Clears the virtual sample tables (the 64 voice-to-buffer slots) and the application callback.
+ * Virtual samples are samples whose data the game supplies on the fly through a callback into an ARAM loop
+ * buffer.
+ */
 void vsInit() {
   u32 i;
   vs.numBuffers = 0;
@@ -27,6 +32,7 @@ void vsInit() {
   vs.callback = NULL;
 }
 
+/** Returns an instance ID for a new virtual sample that no active buffer uses. */
 static inline u16 vsNewInstanceID() {
   u8 i;       // r31
   u16 instID; // r29
@@ -42,6 +48,7 @@ static inline u16 vsNewInstanceID() {
   return instID;
 }
 
+/** Reserves the first free virtual sample buffer slot and returns its index, or 0xFF if all are in use. */
 static inline u8 vsAllocateBuffer() {
   u8 i;
 
@@ -57,11 +64,18 @@ static inline u8 vsAllocateBuffer() {
   return 0xFF;
 }
 
+/** Releases a virtual sample buffer slot and its voice mapping. */
 static inline void vsFreeBuffer(u8 bufferIndex) {
   vs.streamBuffer[bufferIndex].state = 0;
   vs.voices[vs.streamBuffer[bufferIndex].voice] = 0xFF;
 }
 
+/**
+ * Called when a voice starts a virtual sample: frees any old buffer of that voice,
+ * assigns a new buffer and ARAM loop buffer, fills in the sample ID, instance ID,
+ * owning sequence and extra data, then asks the application callback (reason 0) to start supplying data.
+ * Returns the voice/instance handle, or 0xFFFFFFFF if the voice could not be set up or the callback refused.
+ */
 u32 vsSampleStartNotify(unsigned long vid) {
   u8 voice;
   u8 v1 = vid;
@@ -103,6 +117,10 @@ u32 vsSampleStartNotify(unsigned long vid) {
   return 0xFFFFFFFF;
 }
 
+/**
+ * Called when a virtual sample voice ends: if the handle still matches its buffer,
+ * tells the callback (reason 2) and frees the buffer.
+ */
 void vsSampleEndNotify(u32 pubID) {
   u8 sb;
   u8 voice;
@@ -121,6 +139,11 @@ void vsSampleEndNotify(u32 pubID) {
   }
 }
 
+/**
+ * Asks the application callback (reason 1) to refill the part of the loop buffer that the voice has played since
+ * last time, for ADPCM (type 5, 14 samples per 8 bytes) or 16-bit PCM (type 6) data,
+ * handling the wrap at the end of the buffer.
+ */
 void vsUpdateBuffer(struct VS_BUFFER* sb, unsigned long cpos) {
   u32 len;
   if (sb->last == cpos) {
@@ -198,6 +221,11 @@ void vsUpdateBuffer(struct VS_BUFFER* sb, unsigned long cpos) {
   }
 }
 
+/**
+ * Per-frame virtual sample service: for each voice playing from a loop buffer it refills played data via
+ * vsUpdateBuffer, and once a sample is ending (states 2 and 3) it counts the remaining valid samples
+ * and stops the voice when less than one frame's worth is left.
+ */
 void vsSampleUpdates() {
   u32 i;           // r29
   u32 cpos;        // r27

@@ -45,6 +45,11 @@ extern EvtWord hikaru_yuka[];
 static HitDamageReturn dmgReturnPt[2];
 static EvtWord hikaru_yuka_init[83];
 
+/**
+ * Door close animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times 0.25;
+ * the open and close scripts apply the same transform. The demo builds use 0.2217.
+ */
 static EVT_BEGIN(w_door_close)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -57,6 +62,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door open animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times 0.25;
+ * the open and close scripts apply the same transform. The demo builds use 0.2217.
+ */
 static EVT_BEGIN(w_door_open)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -112,16 +122,23 @@ RootRoute root_data[] = {
     {root_2, 15},
 };
 
+/** Turns the glowing floor panels on by calling the hikaru_on_func script function. */
 static EVT_BEGIN(hikaru_on)
     CALL(hikaru_on_func)
     RETURN
 EVT_END()
 
+/** Turns the glowing floor panels off by calling the hikaru_off_func script function. */
 static EVT_BEGIN(hikaru_off)
     CALL(hikaru_off_func)
     RETURN
 EVT_END()
 
+/**
+ * Guess: shows the route across the glowing floor to the player:
+ * lights the panels of the route chosen in GW(10) (hikaru_on),
+ * pans the camera over the room for about three seconds and switches the lights off again (hikaru_off).
+ */
 EVT_BEGIN(hikaru_yuka)
     CALL_CHILD(hikaru_on)
     WAIT_MS(1000)
@@ -134,6 +151,13 @@ EVT_BEGIN(hikaru_yuka)
     RETURN
 EVT_END()
 
+/**
+ * Item-box script for the chest at "box": gives Mario the elevator key (ITEM_ELEVATOR_KEY_0x1B)
+ * and sets the story progress to STORY_STG7_09_ELEVATOR_KEY_A_LIT_FLOOR.
+ * It then clears the A_no01 hit flag 2048, switches off all panel lights
+ * and makes the floor visibly flash between two states five times
+ * while Mario turns to face away (Guess: the floor is revealed to be the electric kind).
+ */
 static EVT_BEGIN(evt_box)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
@@ -199,6 +223,11 @@ static EvtWord hikaru_yuka_init[] = {
     RETURN
 };
 
+/**
+ * Peach's stage-1 variant of this room: hides Mario's model, places him at (-140, 10, 0),
+ * hides the "no1" object and the floor lights, fades out after 1.5 seconds
+ * and changes map to aji_16 at the peach_evt_stg1 entrance.
+ */
 static EVT_BEGIN(peach_evt_stg1)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_dispflag_onoff, 1, 1)
@@ -215,6 +244,13 @@ static EVT_BEGIN(peach_evt_stg1)
     RETURN
 EVT_END()
 
+/**
+ * Init script of aji_02, the room with the glowing floor panels:
+ * plays BGM_STG7_DUN1 (DUN2 after the story start), sets up the exits and the Super Shroom badge block,
+ * and keeps the panels lighting up under Mario's feet (hikaru_yuka_init)
+ * until STORY_STG7_09_ELEVATOR_KEY_A_LIT_FLOOR (the lit-floor puzzle); afterwards all panels stay off.
+ * Entering as "peach_evt_stg1" starts Peach's part instead.
+ */
 EVT_BEGIN(aji_02_init_evt)
     CALL(evt_bero_get_entername, LW(0))
 #if VERSION >= VERSION_JP
@@ -258,6 +294,12 @@ EVT_BEGIN(aji_02_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script function that runs while the floor puzzle is active:
+ * lights the panel hikaru_NN that Mario (or Yoshi, when he is being ridden) is standing on,
+ * keeping each lit for 30 frames after the last touch, and shows its dark twin nashi_NN otherwise.
+ * Blocks until STORY_STG7_09_ELEVATOR_KEY_A_LIT_FLOOR is reached.
+ */
 static USER_FUNC(ride_chk) {
     static s32 onoff[30];
     char hitName[64];
@@ -325,6 +367,11 @@ static USER_FUNC(ride_chk) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script function that plays an electric shock when Mario is in the spike-damage motion
+ * (MARIO_MOTION_DAMAGE_TOGE): the sound SFX_STG7_ELECTRIC_SHOCK1 and a blue-green spark effect at his position,
+ * once per hit.
+ */
 static USER_FUNC(thunder_main) {
     MarioWork* mario = marioGetPtr();
 
@@ -351,6 +398,10 @@ static USER_FUNC(thunder_main) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script function that runs the panel light-up show:
+ * lights the panels one after another, twice (see the comment in the body), with timing kept in event->userdata.
+ */
 static USER_FUNC(loop_onoff) {
     char name[64];
     s32 i;
@@ -389,6 +440,11 @@ static USER_FUNC(loop_onoff) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script function: hides every panel light (hikaru_NN, nashi_NN)
+ * and turns the damaging flag 0x800 off on all 30 hit areas A_hikaru_NN,
+ * (Guess: this is the state with no panel active).
+ */
 static USER_FUNC(all_flag_off) {
     char name[64];
     s32 i;
@@ -404,6 +460,11 @@ static USER_FUNC(all_flag_off) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script function: shows the panels of the route chosen by GW(10) (index into root_data):
+ * the route's panels are lit (hikaru_NN shown) with hit flag 0x800 cleared,
+ * and every other panel is dark with 0x800 set (Guess: the flag marks the shocking floor).
+ */
 static USER_FUNC(hikaru_on_func) {
     char name[64];
     s32 idx = evtGetValue(event, GW(10));
@@ -440,6 +501,7 @@ static USER_FUNC(hikaru_on_func) {
     return EVT_RETURN_DONE;
 }
 
+/** Script function: hides all panel lights (hikaru_NN and nashi_NN) without touching the hit areas. */
 static USER_FUNC(hikaru_off_func) {
     char name[64];
     s32 i;

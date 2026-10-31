@@ -50,6 +50,7 @@ static u8 color_rotation_data[] = {
 static void effWangFlushMain(EffectEntry* effect);
 static void effWangFlushDisp(CameraId cameraId, EffectEntry* effect);
 
+/** Spawns a flash at (x, y, z) lasting `timer` frames. Spawned by event scripts through evt_eff. */
 EffectEntry* effWangFlushN64Entry(s32 type, f32 x, f32 y, f32 z, s32 timer) {
     EffectEntry* effect;
     EffWangFlushN64Work* work;
@@ -80,6 +81,12 @@ EffectEntry* effWangFlushN64Entry(s32 type, f32 x, f32 y, f32 z, s32 timer) {
     return effect;
 }
 
+/**
+ * The sprite's alpha jumps toward 218 over the first 6 frames, then drops 22% per frame;
+ * its size grows faster every frame (+0.29 per frame per frame) and its spin slows 7% per frame.
+ * The flash behind it pulses in size (0.4-1.4) and alpha on sine waves. Deletes when the timer runs out.
+ * CAMERA_3D, layer 2.
+ */
 static void effWangFlushMain(EffectEntry* effect) {
     s32 timer;
     s32 frame;
@@ -116,6 +123,10 @@ static void effWangFlushMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effWangFlushDisp, effect);
 }
 
+/**
+ * Draws texture 0x1C camera-facing: for type 0 first a pulsing flash whose colour cycles through
+ * color_rotation_data, then the white sprite turned by its spin, at its size and alpha.
+ */
 static void effWangFlushDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffWangFlushN64Work* work;

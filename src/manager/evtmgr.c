@@ -26,12 +26,20 @@ f32 evtSpd = 1.0f;
 static void make_pri_table(void);
 static void evtEntryRunCheck(EventEntry* entry);
 
+/**
+ * The event pool in use: battles run their scripts in a second pool of 256 entries (with its own GW/GF
+ * variables), so field events survive a battle untouched.
+ */
 EventWork* evtGetWork(void) {
     return gp->inBattle ? &work[1] : &work[0];
 }
 
 // FAKE: keeps the following function(s) out of line as in the target; removing it changes the code
 #pragma dont_inline on
+/**
+ * Builds this frame's run order for evtmgrMain:
+ * every active event's slot and id, sorted by priority, highest first.
+ */
 static void make_pri_table(void) {
     EventWork* wp = evtGetWork();
     EventEntry* entry = wp->entries;
@@ -68,6 +76,10 @@ static void make_pri_table(void) {
 }
 #pragma dont_inline reset
 
+/**
+ * Scans an event's script up to END_SCRIPT and records the position
+ * after each LABEL (up to 16) for GOTO to jump to.
+ */
 inline void make_jump_table(EventEntry* entry) {
     s32 params, opcode;
     s32 label;
@@ -101,6 +113,10 @@ inline void make_jump_table(EventEntry* entry) {
     }
 }
 
+/**
+ * Boot-time setup: allocates the field and battle event pools (256 entries each),
+ * clears their GW/GF variables and the message state.
+ */
 void evtmgrInit(void) {
     EventWork* wp;
 
@@ -125,6 +141,10 @@ void evtmgrInit(void) {
     evt_msg_init();
 }
 
+/**
+ * Kills every event in the current pool (GW/GF variables are kept);
+ * runs on map changes and on entering and leaving battle.
+ */
 void evtmgrReInit(void) {
     EventWork* wp = evtGetWork();
 
@@ -135,6 +155,10 @@ void evtmgrReInit(void) {
     evt_msg_init();
 }
 
+/**
+ * Re-applies the current system level (marioStSystemLevel: pause menus and the like) by stopping all events of
+ * the types it suspends, so an event started while the game is paused starts paused too.
+ */
 static void evtEntryRunCheck(EventEntry* entry) {
     switch (_mariostSystemLevel) {
         case 1:
@@ -153,6 +177,11 @@ static void evtEntryRunCheck(EventEntry* entry) {
     }
 }
 
+/**
+ * Starts a new script in a free event slot with the given priority (higher runs first) and flags,
+ * type 0xEF (stopped by every system level). Its LW/LF variables start at 0.
+ * Started during evtmgrMain with flag 0x20, it also runs this frame. Does not check that a slot is free.
+ */
 EventEntry* evtEntry(void* evtCode, u8 priority, u8 flags) {
     EventWork* wp = evtGetWork();
     EventEntry* entry;
@@ -212,6 +241,10 @@ EventEntry* evtEntry(void* evtCode, u8 priority, u8 flags) {
     return entry;
 }
 
+/**
+ * evtEntry with an explicit type mask, which decides which system levels pause the event (0 = never paused,
+ * used for sounds and lectures that must play on while the game is paused).
+ */
 EventEntry* evtEntryType(void* evtCode, u8 priority, u8 flags, u8 type) {
     EventWork* wp = evtGetWork();
     EventEntry* entry;
@@ -268,6 +301,11 @@ EventEntry* evtEntryType(void* evtCode, u8 priority, u8 flags, u8 type) {
     return entry;
 }
 
+/**
+ * Starts a child script for CALL_CHILD: the parent waits until it ends.
+ * The child copies the parent's LW/LF variables, UW/UF bases, owner, unit, type and message window state,
+ * runs one priority higher and runs this frame; evtDelete copies the variables back to the parent.
+ */
 EventEntry* evtChildEntry(EventEntry* parent, void* evtCode, u8 flags) {
     EventWork* wp = evtGetWork();
     EventEntry* entry;
@@ -338,6 +376,11 @@ EventEntry* evtChildEntry(EventEntry* parent, void* evtCode, u8 flags) {
     return entry;
 }
 
+/**
+ * Starts a script alongside brother (BEGIN_SIBLING_EVENT):
+ * same priority, type, owner and copied variables, but the caller keeps running.
+ * Deleting or stopping brother does the same to it.
+ */
 EventEntry* evtBrotherEntry(EventEntry* brother, void* evtCode, u8 flags) {
     EventWork* wp = evtGetWork();
     EventEntry* entry;
@@ -400,6 +443,7 @@ EventEntry* evtBrotherEntry(EventEntry* brother, void* evtCode, u8 flags) {
     return entry;
 }
 
+/** Starts an event's script over from its first command (loops, switches, timing and labels reset; variables kept). */
 EventEntry* evtRestart(EventEntry* entry) {
     entry->currCommand = entry->nextCommand = entry->restartFrom;
     entry->opcode = 0;
@@ -415,6 +459,13 @@ EventEntry* evtRestart(EventEntry* entry) {
     return entry;
 }
 
+/**
+ * Runs every active event once per frame (from mariost.c), highest priority first,
+ * skipping stopped events and ones waiting on a child.
+ * Each event runs as many commands as its speed allows until one yields;
+ * a command returning 1 ends the whole pass for this frame.
+ * Also advances each event's lifetime by the frame's time (capped after long stalls).
+ */
 void evtmgrMain(void) {
     EventWork* wp = evtGetWork();
     EventEntry* entry;
@@ -473,6 +524,10 @@ void evtmgrMain(void) {
     runMainF = FALSE;
 }
 
+/**
+ * Ends an event together with its child and all its brother events.
+ * A child hands its LW/LF variables and message window state back to the parent, which then resumes.
+ */
 void evtDelete(EventEntry* entry) {
     EventWork* wp = evtGetWork();
     EventEntry* waiting;
@@ -513,6 +568,7 @@ void evtDelete(EventEntry* entry) {
     }
 }
 
+/** Ends the event with this id (and its children and brothers) if it is still running. */
 void evtDeleteID(s32 eventId) {
     EventWork* wp = evtGetWork();
     EventEntry* entry = wp->entries;
@@ -525,6 +581,7 @@ void evtDeleteID(s32 eventId) {
     }
 }
 
+/** TRUE while the event with this id is still running; scripts poll it through IS_EVENT_RUNNING. */
 BOOL evtCheckID(s32 eventId) {
     int i;
 
@@ -538,18 +595,22 @@ BOOL evtCheckID(s32 eventId) {
     return FALSE;
 }
 
+/** Changes an event's priority; takes effect from the next frame's ordering. */
 void evtSetPri(EventEntry* entry, u32 priority) {
     entry->priority = (u8)priority;
 }
 
+/** Sets how many commands per frame the event runs (speed times the global evtSpd). */
 void evtSetSpeed(EventEntry* entry, f32 speed) {
     entry->timescale = speed * evtSpd;
 }
 
+/** Changes an event's type mask, the set of system levels that pause it. */
 void evtSetType(EventEntry* entry, u32 type) {
     entry->type = (u8)type;
 }
 
+/** Pauses an event, its child and brother events, each only if its type mask shares a bit with type. */
 void evtStop(EventEntry* entry, u32 type) {
     EventWork* wp = gp->inBattle ? &work[1] : &work[0];
     EventEntry* brother;
@@ -571,6 +632,7 @@ void evtStop(EventEntry* entry, u32 type) {
     }
 }
 
+/** Resumes events paused by evtStop, again only those whose type mask shares a bit with type. */
 void evtStart(EventEntry* entry, u32 type) {
     EventWork* wp = gp->inBattle ? &work[1] : &work[0];
     EventEntry* brother;
@@ -592,6 +654,7 @@ void evtStart(EventEntry* entry, u32 type) {
     }
 }
 
+/** Pauses the event with this id (and its children and brothers) regardless of type. */
 void evtStopID(s32 eventId) {
     EventWork* wp = evtGetWork();
     EventEntry* entry = wp->entries;
@@ -604,6 +667,7 @@ void evtStopID(s32 eventId) {
     }
 }
 
+/** Resumes the event with this id (and its children and brothers) regardless of type. */
 void evtStartID(s32 eventId) {
     EventWork* wp = evtGetWork();
     EventEntry* entry = wp->entries;
@@ -616,6 +680,7 @@ void evtStartID(s32 eventId) {
     }
 }
 
+/** Pauses every event whose type matches; marioStSystemLevel uses it when menus or cutscenes freeze the game. */
 void evtStopAll(u32 type) {
     EventWork* wp = evtGetWork();
     EventEntry* entry = wp->entries;
@@ -628,6 +693,7 @@ void evtStopAll(u32 type) {
     }
 }
 
+/** Resumes every event whose type matches; marioStSystemLevel(0) resumes them all. */
 void evtStartAll(u32 type) {
     EventWork* wp = evtGetWork();
     EventEntry* entry = wp->entries;
@@ -640,6 +706,7 @@ void evtStartAll(u32 type) {
     }
 }
 
+/** Pauses every matching event except entry (its own children and brothers too, if they match). */
 void evtStopOther(EventEntry* entry, u32 type) {
     EventWork* wp = evtGetWork();
     EventEntry* search = wp->entries;
@@ -652,6 +719,7 @@ void evtStopOther(EventEntry* entry, u32 type) {
     }
 }
 
+/** Resumes every matching event except entry. */
 void evtStartOther(EventEntry* entry, u32 type) {
     EventWork* wp = evtGetWork();
     EventEntry* search = wp->entries;
@@ -664,6 +732,7 @@ void evtStartOther(EventEntry* entry, u32 type) {
     }
 }
 
+/** The event in pool slot index, or NULL if that slot is free. */
 EventEntry* evtGetPtr(s32 index) {
     EventWork* wp = evtGetWork();
     EventEntry* entry = &wp->entries[index];
@@ -673,6 +742,7 @@ EventEntry* evtGetPtr(s32 index) {
     return NULL;
 }
 
+/** The running event with this id, or NULL once it has ended; ids are what scripts store to refer to events. */
 EventEntry* evtGetPtrID(s32 eventId) {
     EventWork* wp = evtGetWork();
     EventEntry* entry = wp->entries;

@@ -191,6 +191,10 @@ BattleUnitKind unitdata_Party_Chuchurina = {
     data_table,
 };
 
+/**
+ * Ms. Mowz's battle entry: starts 250 units behind her home spot and, after 40 frames,
+ * runs in to it at speed 4 with her footstep sounds, then takes her stay pose.
+ */
 static EVT_BEGIN(battle_entry_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 250)
@@ -205,6 +209,10 @@ static EVT_BEGIN(battle_entry_event)
     RETURN
 EVT_END()
 
+/**
+ * Init for Ms. Mowz: allocates the spare weapon Tease copies into (_chuchu_make_extra_work_area),
+ * registers her wait, attack, damage, confusion and entry scripts and her walk, run and jump sounds.
+ */
 static EVT_BEGIN(init_event)
     CALL(_chuchu_make_extra_work_area)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
@@ -219,6 +227,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Hit reaction: straightens her rotation (left over from her spinning moves), then runs the default damage script. */
 static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     SET_VALUE(LW(10), -2)
@@ -227,10 +236,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Empty: partner moves come from the player's menu choices, not a unit attack script. */
 static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle: plays the stay pose from the current pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -561,6 +572,11 @@ BattleWeapon partyWeapon_ChuchurinaKiss = {
     {0, 0, 0, 100, 0, 0, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Ms. Mowz's Love Slap: she moves to the enemy's slap point (_get_binta_hit_position) and slaps it back
+ * and forth, one hit per successful action command press, the last slap using the final-hit weapon;
+ * then returns home.
+ */
 EVT_BEGIN(partyChuchurinaAttack_NormalAttack)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -1082,11 +1098,19 @@ EVT_BEGIN(partyChuchurinaAttack_NormalAttack)
         RETURN
 EVT_END()
 
+/**
+ * Kiss Thief's spawned helper: runs mono_main, which draws the captured greyscale screen every frame;
+ * the move deletes this event when the effect ends.
+ */
 static EVT_BEGIN(main_evt)
     CALL(mono_main)
     RETURN
 EVT_END()
 
+/**
+ * Ms. Mowz's Tease: she teases the enemies, and the action command result sets the dizzy chance of a copy of the
+ * weapon (_make_madowase_weapon) that is then applied to each target; misses make the target dodge.
+ */
 EVT_BEGIN(partyChuchurinaAttack_MadowaseAttack)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -1521,6 +1545,11 @@ EVT_BEGIN(partyChuchurinaAttack_MadowaseAttack)
     RETURN
 EVT_END()
 
+/**
+ * Ms. Mowz's Kiss Thief: she blows a kiss at the target,
+ * the screen fades to greyscale with her drawn on top (the mono_* helpers),
+ * and on a successful action command she flies to the enemy and steals its item (_chuchu_item_steal).
+ */
 EVT_BEGIN(partyChuchurinaAttack_ItemSteal)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -1792,6 +1821,10 @@ EVT_BEGIN(partyChuchurinaAttack_ItemSteal)
     RETURN
 EVT_END()
 
+/**
+ * Ms. Mowz's Smooch: she kisses Mario, healing him by an amount the action command builds up,
+ * with the recovery effect, then returns home.
+ */
 EVT_BEGIN(partyChuchurinaAttack_Kiss)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -1975,6 +2008,10 @@ EVT_BEGIN(partyChuchurinaAttack_Kiss)
     RETURN
 EVT_END()
 
+/**
+ * Ms. Mowz's Appeal (data tag 5): appeal sound and pose, the audience is fired up,
+ * then she blows a kiss towards it.
+ */
 EVT_BEGIN(chuchurina_appeal_event)
     CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -1996,6 +2033,10 @@ EVT_BEGIN(chuchurina_appeal_event)
     RETURN
 EVT_END()
 
+/**
+ * Victory reaction (data tag 64): plays Ms. Mowz's PCH_Y_1 pose to the end, holds a third of a second,
+ * then her stay pose.
+ */
 static EVT_BEGIN(party_win_reaction)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PCH_Y_1"))
     CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
@@ -2004,6 +2045,10 @@ static EVT_BEGIN(party_win_reaction)
     RETURN
 EVT_END()
 
+/**
+ * Audience-attack reaction (data tag 6): Ms. Mowz runs offstage, reappears in the audience,
+ * strikes her Tease pose (PCH_A4_1) and then PCH_Y_1 to knock out the chosen audience member, and runs home.
+ */
 static EVT_BEGIN(attack_audience_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetStageSize, LW(3), EVT_NULLPTR, EVT_NULLPTR)
@@ -2061,6 +2106,10 @@ EVT_END()
 
 s32 mono_alpha;
 
+/**
+ * Allocates a spare BattleWeapon in the running unit's countersetWeapon slot,
+ * which Tease later fills with its per-use copy (_make_madowase_weapon). Run from init_event.
+ */
 static USER_FUNC(_chuchu_make_extra_work_area) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -2081,6 +2130,11 @@ static USER_FUNC(_chuchu_make_extra_work_area) {
     command->weapon[*count].name = msgSearch(command->weapon[*count].weapon->name); \
     (*count)++;
 
+/**
+ * Builds Ms. Mowz's battle move list (data tag 1):
+ * Love Slap and Kiss Thief always, Tease from Super rank and Smooch from Ultra rank,
+ * appending each to command->weapon and advancing *count.
+ */
 static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     s32 techLv;
 
@@ -2097,6 +2151,11 @@ static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     }
 }
 
+/**
+ * Returns in args[3]-args[5] where Love Slap should hit target unit args[1]:
+ * its position plus its bintaHitOffset (scaled by its size, X mirrored by its facing).
+ * args[0] and args[2] (the part) are read but not used.
+ */
 static USER_FUNC(_get_binta_hit_position) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -2124,6 +2183,11 @@ static USER_FUNC(_get_binta_hit_position) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Copies the weapon pointed to by args[0] into the unit's spare weapon (countersetWeapon),
+ * sets its dizzy chance to args[1] (the Tease action command output),
+ * and writes the copy's address back into args[0].
+ */
 static USER_FUNC(_make_madowase_weapon) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -2145,6 +2209,11 @@ static USER_FUNC(_make_madowase_weapon) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Kiss Thief action command parameters for target args[0]:
+ * args[1] gets the success rate, 80 at normal difficulty and 20 lower per level above (minimum 5);
+ * args[2] gets 100 minus the target's itemStealParam.
+ */
 static USER_FUNC(_get_itemsteal_param) {
     BattleWork* wp;
     EvtWord* args = event->args;
@@ -2166,6 +2235,13 @@ static USER_FUNC(_get_itemsteal_param) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Kiss Thief's steal from target args[0].
+ * With action command result args[2] bit 2 set and room in the pouch,
+ * takes its held item (or, if none, a weighted roll of its drop table, falling back to a coin),
+ * clears the item from the field battle setup and unequips it if it was a badge.
+ * Returns the item in args[1], or 0 when nothing is stolen.
+ */
 static USER_FUNC(_chuchu_item_steal) {
     ItemDropData* table;
     BattleWork* wp;
@@ -2251,6 +2327,10 @@ static USER_FUNC(_chuchu_item_steal) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Display callback that copies the current 608x480 frame into a new intensity (greyscale) texture in the unit's
+ * screenTexBuf for Kiss Thief, then makes the unit's main part visible again.
+ */
 static void mono_capture(CameraId camId, void* param) {
     BattleUnit* unit = param;
     BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, 1);
@@ -2262,6 +2342,10 @@ static void mono_capture(CameraId camId, void* param) {
     part->animFlags &= ~PART_ANIM_NO_DISP;
 }
 
+/**
+ * Display callback that draws the captured greyscale frame full-screen with alpha mono_alpha and
+ * then redraws the partner's main part over it, so Ms. Mowz stays in colour during Kiss Thief.
+ */
 static void mono_disp(CameraId camId, BattleUnit* unit) {
     CameraEntry* cam = camGetPtr(camId);
     smartEntry* e = unit->screenTexBuf;
@@ -2318,6 +2402,10 @@ static void mono_disp(CameraId camId, BattleUnit* unit) {
     }
 }
 
+/**
+ * Registers mono_disp for the running unit every frame;
+ * never returns, so Kiss Thief runs it in a spawned event and deletes that event when the effect ends.
+ */
 static USER_FUNC(mono_main) {
     BattleUnit* unit;
     s32 id;
@@ -2328,6 +2416,7 @@ static USER_FUNC(mono_main) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Queues mono_capture for this frame to grab the screen for Kiss Thief's greyscale effect. */
 static USER_FUNC(mono_capture_event) {
     BattleUnit* unit;
     s32 id;
@@ -2339,6 +2428,7 @@ static USER_FUNC(mono_capture_event) {
     return EVT_RETURN_DONE;
 }
 
+/** Fades Kiss Thief's greyscale overlay in: raises mono_alpha from 0 by 10 a frame until it reaches 255. */
 static USER_FUNC(mono_on) {
     if (isFirstCall) {
         mono_alpha = 0;
@@ -2351,6 +2441,7 @@ static USER_FUNC(mono_on) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Fades Kiss Thief's greyscale overlay out by 10 a frame; at 0 it frees the captured screen texture. */
 static USER_FUNC(mono_off) {
     BattleUnit* unit;
     s32 id;

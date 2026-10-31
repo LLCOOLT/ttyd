@@ -95,8 +95,8 @@ void pqDeletePriorityQ( PriorityQ *pq )
   memFree( pq->nodes );
   memFree( pq );
 }
-
-
+/** GLU priority queue (heap version): sifts the node at index curr down, swapping with the smaller child, until the
+ * heap order is restored. */
 static void FloatDown( PriorityQ *pq, long curr )
 {
   PQnode *n = pq->nodes;
@@ -125,8 +125,8 @@ static void FloatDown( PriorityQ *pq, long curr )
     curr = child;
   }
 }
-
-
+/** GLU priority queue (heap version): sifts the node at index curr up toward the root until its parent is no larger.
+ */
 static void FloatUp( PriorityQ *pq, long curr )
 {
   PQnode *n = pq->nodes;

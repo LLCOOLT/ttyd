@@ -8,6 +8,11 @@ DSError TRKTerminateNub(void);
 
 static DSError TRK_mainError;
 
+/**
+ * Main routine of the MetroTRK stub: initialises the nub,
+ * and if that worked prints the welcome banner and runs the nub main loop until a shutdown event;
+ * then terminates the nub and returns its status.
+ */
 DSError TRK_main(void) {
     MWTRACE(1, "TRK_Main \n");
     TRK_mainError = TRKInitializeNub();

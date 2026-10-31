@@ -64,16 +64,26 @@ static u32 bootThisDol;
 static int CallResetFunctions(int final);
 static void Reset(u32 resetCode);
 
+/**
+ * Adds a function to the reset callback list, sorted by its priority,
+ * to be called before the console resets or launches another program.
+ */
 void OSRegisterResetFunction(OSResetFunctionInfo* info) {
     ASSERTLINE(208, info->func);
 
     ENQUEUE_INFO_PRIO(info, &ResetFunctionQueue);
 }
 
+/** Removes a function from the reset callback list. */
 void OSUnregisterResetFunction(OSResetFunctionInfo* info) {
     DEQUEUE_INFO(info, &ResetFunctionQueue);
 }
 
+/**
+ * Calls the reset callbacks in priority order (final tells them the reset is happening now);
+ * stops after a priority group in which one refused, and also syncs the SRAM.
+ * Returns 1 if every callback agreed, 0 otherwise.
+ */
 int __OSCallResetFunctions(BOOL final) {
     OSResetFunctionInfo* info;
     int err;
@@ -97,6 +107,10 @@ int __OSCallResetFunctions(BOOL final) {
     return 1;
 }
 
+/**
+ * Assembly: waits a short time after enabling HID0 instruction-cache flash invalidate,
+ * then writes the reset code to PI register 9, resetting the console; never returns.
+ */
 #ifdef __GEKKO__
 static asm void Reset(u32 resetCode) {
     nofralloc
@@ -140,6 +154,7 @@ L_00000208:
 }
 #endif
 
+/** Cancels every thread that is ready or waiting (states 1 and 4) so nothing runs during a reset or launch. */
 static void KillThreads(void) {
     OSThread* thread;
     OSThread* next;
@@ -157,6 +172,10 @@ static void KillThreads(void) {
     }
 }
 
+/**
+ * Resets the console now: disables interrupts, turns off video,
+ * invalidates the instruction cache and calls Reset with the code shifted left 3 bits.
+ */
 void __OSDoHotReset(u32 resetCode) {
     OSDisableInterrupts();
     __VIRegs[1] = 0;
@@ -164,6 +183,11 @@ void __OSDoHotReset(u32 resetCode) {
     Reset(resetCode * 8);
 }
 
+/**
+ * Quiets the hardware before a reset or launch:
+ * stops the DSP, optionally keeps controller recalibration off, repeats the reset callbacks until they agree,
+ * syncs the SRAM, makes the final callback pass, disables the locked cache and kills the threads.
+ */
 void __OSShutdownDevices(BOOL doRecal) {
     int rc;
     BOOL disableRecalibration;
@@ -190,6 +214,12 @@ void __OSShutdownDevices(BOOL doRecal) {
     KillThreads();
 }
 
+/**
+ * Resets or restarts the console.
+ * OS_RESET_RESTART reboots a DOL from the disc, OS_RESET_HOTRESET does a hot reset with the reset code,
+ * and OS_RESET_SHUTDOWN shuts the devices down and clears the low-memory globals.
+ * forceMenu sets the SRAM flag that makes the IPL show its menu.
+ */
 void OSResetSystem(BOOL reset, u32 resetCode, BOOL forceMenu) {
     OSSram* sram;
 
@@ -229,6 +259,10 @@ void OSResetSystem(BOOL reset, u32 resetCode, BOOL forceMenu) {
     memset(OSPhysicalToCached(0x30e2), 0, 1);
 }
 
+/**
+ * Returns the reset code of the previous reset:
+ * from the reboot parameters (tagged with 0x80000000) if there are any, otherwise from PI register 9.
+ */
 u32 OSGetResetCode() {
     u32 resetCode;
     if (__OSRebootParams.valid)
@@ -239,6 +273,7 @@ u32 OSGetResetCode() {
     return resetCode;
 }
 
+/** Sets the DOL offset the next restart will boot and returns the previous setting. */
 u32 OSSetBootDol(u32 dolOffset) {
     u32 oldDol;
 

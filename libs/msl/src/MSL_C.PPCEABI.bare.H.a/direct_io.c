@@ -22,6 +22,13 @@ int fseek(FILE* file, long offset, int file_mode);
 void* __memrchr(const void* src, int val, size_t n);
 void* memcpy(void* dst, const void* src, size_t n);
 
+/**
+ * Writes memb_size * num_memb bytes to a stream:
+ * marks it byte-oriented, seeks to the end first in append mode,
+ * copies data into the buffer (flushing when it fills, at a newline when line buffered,
+ * or every time when unbuffered) and sends large unbuffered binary writes straight through.
+ * Returns the number of whole items written, 0 on error or a closed stream.
+ */
 size_t __fwrite(const void* ptr, size_t memb_size, size_t num_memb, FILE* file) {
     unsigned char* write_ptr;
     size_t num_bytes, bytes_to_go, bytes_written;
@@ -125,6 +132,7 @@ size_t __fwrite(const void* ptr, size_t memb_size, size_t num_memb, FILE* file) 
     return ((bytes_written + memb_size - 1) / memb_size);
 }
 
+/** Standard fwrite(): __fwrite inside the files critical region. */
 size_t fwrite(const void* ptr, size_t memb_size, size_t num_memb, FILE* file) {
     size_t retval;
 

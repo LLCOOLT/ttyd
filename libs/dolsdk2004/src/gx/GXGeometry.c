@@ -4,6 +4,12 @@
 
 #include "__gx.h"
 
+/**
+ * Sends the state that changed since the last draw, according to the gx->dirtyState bits:
+ * texture setup-unit registers (bit 0), the BP mask (bit 1), the general mode (bit 2),
+ * the vertex descriptor (bit 3) and vertex attribute table (bit 4),
+ * and recalculates the vertex size limit when either of those two changed. Called by GXBegin.
+ */
 void __GXSetDirtyState(void) {
     u32 dState = __GXData->dirtyState;
 
@@ -29,6 +35,12 @@ void __GXSetDirtyState(void) {
     __GXData->dirtyState = 0;
 }
 
+/**
+ * Starts a primitive of type with nverts vertices in vertex format vtxfmt:
+ * flushes pending dirty state, in debug builds runs the state verifier and marks that a Begin is open,
+ * sends a flush primitive if one is owed, then writes the command byte (format | primitive)
+ * and the 16-bit vertex count to the FIFO. The caller writes the vertex data next.
+ */
 void GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts) {
     ASSERTMSGLINE(359, vtxfmt < GX_MAX_VTXFMT,   "GXBegin: Format Index is out of range");
     ASSERTMSGLINE(360, !__GXinBegin, "GXBegin: called inside another GXBegin/GXEnd");
@@ -51,6 +63,10 @@ void GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts) {
     GX_WRITE_U16(nverts);
 }
 
+/**
+ * Writes a dummy draw command (0x98) carrying vNum vertices of zero data to the FIFO,
+ * which pushes earlier vertex data out of the pipeline, and records that a BP write has been sent.
+ */
 void __GXSendFlushPrim(void) {
     u32 i;
     u32 numD = __GXData->vNum * __GXData->vLim;
@@ -63,6 +79,10 @@ void __GXSendFlushPrim(void) {
     __GXData->bpSentNot = 1;
 }
 
+/**
+ * Sets the line width in the 8-bit width field of the line/point size register (the SDK documents the unit as
+ * 1/6 pixel) and the 3-bit texture-offset field, and writes the register.
+ */
 void GXSetLineWidth(u8 width, GXTexOffset texOffsets) {
     CHECK_GXBEGIN(440, "GXSetLineWidth");
     SET_REG_FIELD(441, __GXData->lpSize, 8, 0, width);
@@ -71,6 +91,7 @@ void GXSetLineWidth(u8 width, GXTexOffset texOffsets) {
     __GXData->bpSentNot = 0;
 }
 
+/** Reads back the line width and texture-offset setting from the line/point size register copy. */
 void GXGetLineWidth(u8* width, GXTexOffset* texOffsets) {
     ASSERTMSGLINE(463, width != NULL && texOffsets != NULL, "GXGet*: invalid null pointer");
 
@@ -78,6 +99,10 @@ void GXGetLineWidth(u8* width, GXTexOffset* texOffsets) {
     *texOffsets = GET_REG_FIELD(__GXData->lpSize, 3, 16);
 }
 
+/**
+ * Sets the point size in the 8-bit point-size field of the line/point size register (the SDK documents the unit
+ * as 1/6 pixel) and the 3-bit texture-offset field, and writes the register.
+ */
 void GXSetPointSize(u8 pointSize, GXTexOffset texOffsets) {
     CHECK_GXBEGIN(484, "GXSetPointSize");
     SET_REG_FIELD(485, __GXData->lpSize, 8, 8, pointSize);
@@ -86,6 +111,7 @@ void GXSetPointSize(u8 pointSize, GXTexOffset texOffsets) {
     __GXData->bpSentNot = 0;
 }
 
+/** Reads back the point size and texture-offset setting from the line/point size register copy. */
 void GXGetPointSize(u8* pointSize, GXTexOffset* texOffsets) {
     ASSERTMSGLINE(507, pointSize != NULL && texOffsets != NULL, "GXGet*: invalid null pointer");
 
@@ -93,6 +119,10 @@ void GXGetPointSize(u8* pointSize, GXTexOffset* texOffsets) {
     *texOffsets = GET_REG_FIELD(__GXData->lpSize, 3, 19);
 }
 
+/**
+ * For texture coordinate slot coord, enables or disables the texture offset for lines (line_enable)
+ * and for points (point_enable) in the setup-unit register.
+ */
 void GXEnableTexOffsets(GXTexCoordID coord, u8 line_enable, u8 point_enable) {
     CHECK_GXBEGIN(529, "GXEnableTexOffsets");
 
@@ -104,6 +134,11 @@ void GXEnableTexOffsets(GXTexCoordID coord, u8 line_enable, u8 point_enable) {
     __GXData->bpSentNot = 0;
 }
 
+/**
+ * Sets which triangle faces are culled in the general mode register;
+ * GX's front/back encoding is the reverse of the hardware's, so the two values are swapped,
+ * and the general mode is flagged dirty.
+ */
 void GXSetCullMode(GXCullMode mode) {
     GXCullMode hwMode;
 
@@ -123,6 +158,7 @@ void GXSetCullMode(GXCullMode mode) {
     __GXData->dirtyState |= 4;
 }
 
+/** Reads the cull mode from the general mode register, swapping front and back back to the GX encoding. */
 void GXGetCullMode(GXCullMode* mode) {
     GXCullMode hwMode = GET_REG_FIELD(__GXData->genMode, 2, 14);
 
@@ -138,6 +174,10 @@ void GXGetCullMode(GXCullMode* mode) {
 #endif
 }
 
+/**
+ * Sets the co-planar bit in the general mode and writes the co-planar BP register (0xFE080000)
+ * and the general mode; used for drawing decals on a surface without Z fighting.
+ */
 void GXSetCoPlanar(GXBool enable) {
     u32 reg;
 
@@ -149,6 +189,10 @@ void GXSetCoPlanar(GXBool enable) {
     GX_WRITE_RAS_REG(__GXData->genMode);
 }
 
+/**
+ * Writes the cached general-mode BP register (colour channel, texgen and TEV stage counts, cull mode,
+ * co-planar bit) to the GPU.
+ */
 void __GXSetGenMode(void) {
     GX_WRITE_RAS_REG(__GXData->genMode);
     __GXData->bpSentNot = 0;

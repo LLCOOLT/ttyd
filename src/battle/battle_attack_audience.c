@@ -29,6 +29,11 @@
 // this unit is size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
 
+/**
+ * Script helper: finds the audience member currently holding an item to throw and returns its index (args[0])
+ * and its position (args[1..3], whole units); any argument may be EVT_NULLPTR to skip it.
+ * Used by the "attack the audience" scripts when Mario or a partner presses X to stop a troublemaker.
+ */
 s32 _get_attack_aud_no(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     s32 a0 = args[0];
@@ -56,6 +61,12 @@ s32 _get_attack_aud_no(EventEntry* event, BOOL isFirstCall) {
     return 2;
 }
 
+/**
+ * Script helper: hits audience member args[0].
+ * args[1] == 1 skips the hit spark and the "pliable" damage sound (Koops' shell variant);
+ * otherwise a hit effect and the sound play at the member.
+ * The member is then knocked out of the crowd by BattleAudience_Attack.
+ */
 s32 _attack_aud(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     s32 no;
@@ -80,6 +91,11 @@ s32 _attack_aud(EventEntry* event, BOOL isFirstCall) {
     return 2;
 }
 
+/**
+ * Script helper: sets args[0] to 1 when the item about to be thrown is junk (can, rock, bone or hammer, items
+ * 0xEC-0xEF) or nothing is held, 0 when it is a real item.
+ * Partner audience-attack scripts pick their reaction from it.
+ */
 s32 _check_aud_item_type(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     s32 out = args[0];
@@ -100,6 +116,10 @@ s32 _check_aud_item_type(EventEntry* event, BOOL isFirstCall) {
     return 2;
 }
 
+/**
+ * Script helper: clears the item an audience member is throwing,
+ * returning its id in args[0] unless that is EVT_NULLPTR.
+ */
 static s32 _delete_present_item(EventEntry* event, BOOL isFirstCall) {
     s32 out = event->args[0];
     s32 item = BattleAudience_GetPresentItemNo();
@@ -111,6 +131,10 @@ static s32 _delete_present_item(EventEntry* event, BOOL isFirstCall) {
     return 2;
 }
 
+/**
+ * Script helper: gives the thrown item to its target:
+ * into Mario's pouch for the player's side, otherwise as the enemy's held item if it has none.
+ */
 static s32 _get_present_item(EventEntry* event, BOOL isFirstCall) {
     BattleWork* wp = _battleWorkPointer;
     s32 item = BattleAudience_GetPresentItemNo();
@@ -125,6 +149,7 @@ static s32 _get_present_item(EventEntry* event, BOOL isFirstCall) {
     return 2;
 }
 
+/** Script helper: returns the unit id the audience item was thrown at in args[0]. */
 static s32 _get_present_target_id(EventEntry* event, BOOL isFirstCall) {
     s32 out = event->args[0];
 
@@ -132,6 +157,10 @@ static s32 _get_present_target_id(EventEntry* event, BOOL isFirstCall) {
     return 2;
 }
 
+/**
+ * Draws the "Got <item>!" window (btl_msg_get_item) centred near the top of the screen for the thrown item.
+ * Non-JP releases fill the item name in with evtMsgFmtStr for languages other than English.
+ */
 static void _get_item_announce_disp(s32 cameraId, void* param) {
     u16 lines;
     const char* itemName;
@@ -165,6 +194,10 @@ static void _get_item_announce_disp(s32 cameraId, void* param) {
     FontDrawMessage(x - width / 2, (s32)y - 29, buf);
 }
 
+/**
+ * Script helper: shows the caught item floating above the target unit
+ * and the "Got <item>!" window for 90 frames, then removes the item entity.
+ */
 static s32 _get_item_announce(EventEntry* event, BOOL isFirstCall) {
     BattleWork* wp = _battleWorkPointer;
     s32 item = BattleAudience_GetPresentItemNo();
@@ -198,6 +231,10 @@ static s32 _get_item_announce(EventEntry* event, BOOL isFirstCall) {
     return 0;
 }
 
+/**
+ * Script helper: applies the damage of a harmful thrown item (the audience's presentWeapon) to the target unit's
+ * body part. args[0] is read but unused.
+ */
 static s32 _damage(EventEntry* event, BOOL isFirstCall) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -214,6 +251,11 @@ static s32 _damage(EventEntry* event, BOOL isFirstCall) {
     return 2;
 }
 
+/**
+ * Returns the script the target runs when an audience item lands:
+ * btlataudevtPresentItem_Damage for harmful throws (type 1), btlataudevtPresentItem_Get for gifts.
+ * Called by the battle command sequence.
+ */
 EvtWord* btlataudGetMoveEventPtr(void) {
     switch (BattleAudience_GetPresentItemType()) {
         case 1:
@@ -224,12 +266,14 @@ EvtWord* btlataudGetMoveEventPtr(void) {
     }
 }
 
+/** Fallback audience attack for units without their own: hit the member holding the item and resume. */
 EVT_BEGIN(btlataudevtDummy)
     CALL(_get_attack_aud_no, LW(3), LW(0), LW(1), LW(2))
     CALL(_attack_aud, LW(3), 0)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
+/** Returns the unit's own "attack the audience" script (unit data slot 6), or btlataudevtDummy when it has none. */
 EvtWord* btlataudGetAttackEventPtr(s32 unitId) {
     s32* p = BtlUnit_GetData(BattleGetUnitPtr(_battleWorkPointer, unitId), 6);
     if (p == NULL) {
@@ -238,6 +282,7 @@ EvtWord* btlataudGetAttackEventPtr(s32 unitId) {
     return p;
 }
 
+/** Runs when a harmful item thrown by the audience hits its target: clears the item and applies the damage. */
 EVT_BEGIN(btlataudevtPresentItem_Damage)
     CALL(_delete_present_item, LW(0))
     BEGIN_INLINE_EVENT_GET_ID(LW(15))
@@ -247,6 +292,11 @@ EVT_BEGIN(btlataudevtPresentItem_Damage)
     RETURN
 EVT_END()
 
+/**
+ * Runs when a gift from the audience reaches its target:
+ * pauses the target's wait animation, hands over the item,
+ * plays the catching pose and the "Got <item>!" announcement, then clears the item.
+ */
 EVT_BEGIN(btlataudevtPresentItem_Get)
     CALL(_get_present_target_id, LW(3))
     CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_SELF)

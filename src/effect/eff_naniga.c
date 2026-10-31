@@ -43,6 +43,10 @@ static void effNanigaDisp(CameraId cameraId, EffectEntry* effect);
 static void effNanigaDisp2(CameraId cameraId, EffectEntry* effect);
 static void effNanigaDisp3(CameraId cameraId, EffectEntry* effect);
 
+/**
+ * Plays SFX_ITEM_WHAT3, 4 and 5 at the effect's position (LW 0-2), 833 ms apart;
+ * started when the EFF_naniga pose appears.
+ */
 static EVT_BEGIN(sound_evt)
     CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_WHAT3"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(833)
@@ -52,6 +56,10 @@ static EVT_BEGIN(sound_evt)
     RETURN
 EVT_END()
 
+/**
+ * Spawns the item-reveal effect at (x, y, z) for `item`, using `list` as the item table;
+ * called from the battle item code (battle_item_data.c).
+ */
 EffectEntry* effNanigaEntry(s32 type, f32 x, f32 y, f32 z, s32* list, s32 item) {
     EffectEntry* effect;
     EffNanigaWork* work;
@@ -113,6 +121,10 @@ EffectEntry* effNanigaEntry(s32 type, f32 x, f32 y, f32 z, s32* list, s32 item) 
     return effect;
 }
 
+/**
+ * Per frame: runs the state machine ("what" sounds, EFF_naniga animation, smoke burst)
+ * and deletes the effect at the end.
+ */
 static void effNanigaMain(EffectEntry* effect) {
     EffNanigaWork* work = effect->userdata;
     BOOL inBattle;
@@ -274,6 +286,11 @@ static void effNanigaMain(EffectEntry* effect) {
     }
 }
 
+/**
+ * Draws the item reel in screen space: the candidate items' icons in a vertical strip scrolled by `offset`,
+ * clipped by a scissor to a 40x40 window (scaled 1.5x) around the effect's screen position.
+ * Used while the reel spins and settles (states 2-5 and 10).
+ */
 static void effNanigaDisp(CameraId cameraId, EffectEntry* effect) {
     EffNanigaWork* work = effect->userdata;
     CameraEntry* camera = camGetPtr(cameraId);
@@ -349,6 +366,10 @@ static void effNanigaDisp(CameraId cameraId, EffectEntry* effect) {
     work->scale = oldScale;
 }
 
+/**
+ * Draws the EFF_naniga animation pose (groups 1-3) 20 units below the effect, facing the camera,
+ * tinted white at the work's alpha. Registered every frame while the pose is loaded.
+ */
 static void effNanigaDisp2(CameraId cameraId, EffectEntry* effect) {
     EffNanigaWork* work = effect->userdata;
     Mtx mT, mR, mS, mC;
@@ -367,6 +388,11 @@ static void effNanigaDisp2(CameraId cameraId, EffectEntry* effect) {
     animPoseDrawMtx(work->pose, mC, 3, 0.0f, 10.0f);
 }
 
+/**
+ * Draws the result as a single camera-facing icon 16 units below the effect:
+ * the chosen item's icon (ICON_184 below state 4, which this pass is not registered for).
+ * Registered in the states after the reel (state 11 waits until the pose has played 0.8 of its loop).
+ */
 static void effNanigaDisp3(CameraId cameraId, EffectEntry* effect) {
     EffNanigaWork* work = effect->userdata;
     ItemData* item;

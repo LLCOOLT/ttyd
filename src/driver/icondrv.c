@@ -86,6 +86,10 @@ u16 icon_067_lang_tbl[6] = {0x67, 0x68, 0x69, 0x6A, 0x67, 0x6B};
 #endif
 
 #if VERSION >= VERSION_US
+/**
+ * Returns icon iconId's frame data in icon.bin, or NULL until both icon.tpl and icon.bin have loaded.
+ * The US and later builds swap icons 0x49 and 0x67 for their variant in the current language.
+ */
 static inline IconBinData* iconGetBinData(s32 iconId) {
     IconBinary* bin = icon_bin;
     if (!icon_tpl_ok || !icon_bin_ok) {
@@ -102,6 +106,10 @@ static inline IconBinData* iconGetBinData(s32 iconId) {
     return (IconBinData*)((u8*)bin + bin->offset[(u16)iconId]);
 }
 #else
+/**
+ * Returns icon iconId's frame data in icon.bin, or NULL until both icon.tpl and icon.bin have loaded.
+ * The US and later builds swap icons 0x49 and 0x67 for their variant in the current language.
+ */
 static inline IconBinData* iconGetBinData(u16 iconId) {
     IconBinary* bin = icon_bin;
     if (!icon_tpl_ok || !icon_bin_ok) {
@@ -117,12 +125,12 @@ static void _callback_bin(s32 error, DVDFileInfo* info);
 static void iconDisp(CameraId camId, void* param);
 static void iconGX(Mtx mtx, IconEntry* entry);
 
-// the field or the battle icon work (inlined everywhere; no symbol of its own)
+/** the field or the battle icon work (inlined everywhere; no symbol of its own) */
 static inline IconWork* iconGetWork(void) {
     return gp->inBattle ? &work[1] : &work[0];
 }
 
-// looks a name up in one icon work (inlined; no symbol of its own)
+/** looks a name up in one icon work (inlined; no symbol of its own) */
 inline IconEntry* iconFindIn(IconWork* wp, const char* name) {
     int i;
     IconEntry* entry = wp->entries;
@@ -135,6 +143,7 @@ inline IconEntry* iconFindIn(IconWork* wp, const char* name) {
     return NULL;
 }
 
+/** Returns the live icon with this name in the current (field or battle) set, or NULL; same search as iconNameToPtr. */
 inline IconEntry* iconGetEntry(const char* name) {
     IconWork* wp = iconGetWork();
     IconEntry* entry = wp->entries;
@@ -148,6 +157,7 @@ inline IconEntry* iconGetEntry(const char* name) {
     return NULL;
 }
 
+/** DVD read callback for icon.tpl: unpacks the texture palette, closes the file and marks the textures ready. */
 static void _callback_tpl(s32 error, DVDFileInfo* info) {
     DVDEntry* entry = info->cb.userData;
     UnpackTexPalette(icon_tpl);
@@ -155,11 +165,16 @@ static void _callback_tpl(s32 error, DVDFileInfo* info) {
     icon_tpl_ok = TRUE;
 }
 
+/** DVD read callback for icon.bin (per-icon size and animation frames): closes the file and marks it ready. */
 static void _callback_bin(s32 error, DVDFileInfo* info) {
     DVDMgrClose(info->cb.userData);
     icon_bin_ok = TRUE;
 }
 
+/**
+ * Allocates the 32-entry field and battle icon tables and starts asynchronous reads of icon.tpl
+ * and icon.bin from the disc; called once at boot. Icons draw nothing until both reads finish.
+ */
 void iconInit(void) {
     char path[128];
     DVDEntry* entry;
@@ -198,15 +213,23 @@ void iconInit(void) {
     }
 }
 
+/** Empty in every release build. */
 void iconTexSetup(void) {
     ; // stubbed in retail
 }
 
+/** Clears every icon of the current (field or battle) set. */
 void iconReInit(void) {
     IconWork* wp = iconGetWork();
     memset(wp->entries, 0, sizeof(IconEntry) * wp->count);
 }
 
+/**
+ * Per-frame update: finishes the set-up of icons made before icon.bin loaded,
+ * steps animated icons through their frames (delays in frames),
+ * and queues each visible icon for drawing on the 2D, effect or 3D camera,
+ * with a small ground shadow for 3D icons.
+ */
 void iconMain(void) {
     IconWork* wp;
     int i;
@@ -271,6 +294,11 @@ void iconMain(void) {
     }
 }
 
+/**
+ * Creates a named 3D icon showing iconId at the origin, scale 1, opaque white.
+ * On maps whose first map entry has flag 2 the map blend colour is not applied to it;
+ * later versions make an exception for Rogueport Sewers' X-Naut Fortress (aji) during the last-mail story step.
+ */
 void iconEntry(const char* name, u16 iconId) {
     IconWork* wp = iconGetWork();
     int i;
@@ -317,6 +345,7 @@ void iconEntry(const char* name, u16 iconId) {
     }
 }
 
+/** Creates a named icon showing iconId drawn with the 2D (screen) camera. */
 void iconEntry2D(const char* name, s16 iconId) {
     IconWork* wp = iconGetWork();
     int i;
@@ -352,6 +381,7 @@ void iconEntry2D(const char* name, s16 iconId) {
     entry->uflags |= 1 | ICON_FLAG_2D;
 }
 
+/** Frees the icon with this name. */
 void iconDelete(const char* name) {
     IconWork* wp = iconGetWork();
     IconEntry* entry = wp->entries;
@@ -365,6 +395,7 @@ void iconDelete(const char* name) {
     }
 }
 
+/** Switches the named icon to show iconId, restarting its animation. */
 void iconChange(const char* name, u16 iconId) {
     IconEntry* entry = iconNameToPtr(name); // inline
     IconBinData* data;
@@ -383,6 +414,10 @@ void iconChange(const char* name, u16 iconId) {
     entry->uflags |= ICON_FLAG_USED;
 }
 
+/**
+ * Draw callback for a named icon: places it at its position and scale,
+ * turned to face the camera (billboarded on the y axis), and draws it.
+ */
 static void iconDisp(CameraId camId, void* param) {
     IconEntry* entry = param; // cast to correct type
     CameraEntry* camera;
@@ -398,6 +433,10 @@ static void iconDisp(CameraId camId, void* param) {
     iconGX(mtx, entry);
 }
 
+/**
+ * Immediately draws icon iconId at a world position as a camera-facing billboard with the given alpha and scale,
+ * picking the animation frame from the retrace count; for draw callbacks that show icons without a named entry.
+ */
 void iconDispGxAlpha(Vec* position, s16 flags, u16 iconId, u8 alpha, f32 scale) {
     IconEntry entry;
     Mtx transmtx;
@@ -448,10 +487,15 @@ void iconDispGxAlpha(Vec* position, s16 flags, u16 iconId, u8 alpha, f32 scale) 
     iconGX(mtx, ep);
 }
 
+/** Immediately draws icon iconId at a world position, opaque; see iconDispGxAlpha. */
 void iconDispGx(Vec* position, s16 flags, u16 iconId, f32 scale) {
     iconDispGxAlpha(position, flags, iconId, 0xFF, scale);
 }
 
+/**
+ * Immediately draws icon iconId with a caller-built matrix (in the current camera's space), opaque white;
+ * the battle menus and audience use it.
+ */
 void iconDispGx2(Mtx mtx, s16 flags, u16 iconId) {
     IconEntry entry;
     Mtx m;
@@ -494,6 +538,10 @@ void iconDispGx2(Mtx mtx, s16 flags, u16 iconId) {
     iconGX(m, ep);
 }
 
+/**
+ * Immediately draws icon iconId with a caller-built matrix, tinted by color;
+ * used for the digit icons of iconNumberDispGx.
+ */
 void iconDispGxCol(Mtx pos, s16 flags, u16 iconId, GXColor color) {
     IconEntry entry;
     Mtx m;
@@ -521,9 +569,14 @@ void iconDispGxCol(Mtx pos, s16 flags, u16 iconId, GXColor color) {
     iconGX(m, ep);
 }
 
+/**
+ * Fills texObj with the first frame of icon iconId's texture (a 1x1 dummy until the icon files load),
+ * for callers that draw the icon themselves. The JP release and the demos take the id as s16.
+ */
 #if VERSION >= VERSION_US
 void iconGetTexObj(GXTexObj* texObj, s32 iconId) {
 #else
+/** JP and demo signature: the id is an s16. */
 void iconGetTexObj(GXTexObj* texObj, s16 iconId) {
 #endif
     static char dummy[] ATTRIBUTE_ALIGN(32) = "";
@@ -545,9 +598,14 @@ void iconGetTexObj(GXTexObj* texObj, s16 iconId) {
     GXInitTexObjLOD(texObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
 }
 
+/**
+ * Returns icon iconId's display size from icon.bin, or its texture's size when icon.bin gives 0x0.
+ * The JP release and the demos take the id as s16.
+ */
 #if VERSION >= VERSION_US
 void iconGetWidthHight(u16* width, u16* height, s32 iconId) {
 #else
+/** JP and demo signature: the id is an s16. */
 void iconGetWidthHight(u16* width, u16* height, s16 iconId) {
 #endif
     IconBinData* entry;
@@ -563,6 +621,10 @@ void iconGetWidthHight(u16* width, u16* height, s16 iconId) {
     }
 }
 
+/**
+ * Sets up GX and draws one icon quad with matrix mtx:
+ * flips, 2D or map-lit 3D lighting, grayscale and colour tint, culling. Shared by every icon draw path.
+ */
 static void iconGX(Mtx mtx, IconEntry* entry) {
     static char dummy[] ATTRIBUTE_ALIGN(32) = "";
     f32 x, y, w, hn;
@@ -733,6 +795,7 @@ static void iconGX(Mtx mtx, IconEntry* entry) {
     }
 }
 
+/** Returns the live icon with this name in the current (field or battle) set, or NULL. */
 IconEntry* iconNameToPtr(const char* name) {
     IconWork* wp = iconGetWork();
     IconEntry* entry = wp->entries;
@@ -746,6 +809,7 @@ IconEntry* iconNameToPtr(const char* name) {
     return NULL;
 }
 
+/** Moves the named icon to (x, y, z): world units for 3D icons, screen units for 2D ones. */
 void iconSetPos(const char* name, f32 x, f32 y, f32 z) {
     IconEntry* entry = iconNameToPtr(name); // inline
 
@@ -758,6 +822,7 @@ void iconSetPos(const char* name, f32 x, f32 y, f32 z) {
     }
 }
 
+/** Sets ICON_FLAG_* bits on the named icon (hide, flip, grayscale, ...). */
 void iconFlagOn(const char* name, s16 flags) {
     IconEntry* entry = iconNameToPtr(name); // inline
     if (entry) {
@@ -765,6 +830,7 @@ void iconFlagOn(const char* name, s16 flags) {
     }
 }
 
+/** Clears ICON_FLAG_* bits on the named icon. */
 void iconFlagOff(const char* name, s16 mask) {
     IconEntry* entry = iconNameToPtr(name); // inline
     if (entry) {
@@ -772,6 +838,7 @@ void iconFlagOff(const char* name, s16 mask) {
     }
 }
 
+/** Sets the named icon's scale. */
 void iconSetScale(const char* name, f32 scale) {
     IconEntry* entry = iconNameToPtr(name); // inline
     if (entry) {
@@ -779,6 +846,7 @@ void iconSetScale(const char* name, f32 scale) {
     }
 }
 
+/** Sets the named icon's transparency (0xFF opaque); translucent 3D icons are drawn in the translucent pass. */
 void iconSetAlpha(const char* name, u8 alpha) {
     IconEntry* entry = iconNameToPtr(name); // inline
     if (entry) {
@@ -791,6 +859,10 @@ void iconSetAlpha(const char* name, u8 alpha) {
 static u16 suuji[] = {ICON_1D9, ICON_1DB, ICON_1DD, ICON_1DF, ICON_1E1, ICON_1E3, ICON_1E5, ICON_1E7, ICON_1E9, ICON_1EB}; // 0-9
 u16 suuji_s[] = {ICON_1DA, ICON_1DC, ICON_1DE, ICON_1E0, ICON_1E2, ICON_1E4, ICON_1E6, ICON_1E8, ICON_1EA, ICON_1EC};      // 0-9 small
 
+/**
+ * Draws number (up to five digits, right to left from mtx, tinted by color) with the 2D digit icons,
+ * large or small; returns the width drawn in screen units.
+ */
 s32 iconNumberDispGx(Mtx mtx, s32 number, BOOL small, GXColor color) {
     s32 digits[5];
     Mtx m;
@@ -835,6 +907,10 @@ s32 iconNumberDispGx(Mtx mtx, s32 number, BOOL small, GXColor color) {
     return ret;
 }
 
+/**
+ * Like iconNumberDispGx with narrower digit spacing for numbers drawn in 3D,
+ * as for the battle-end experience counts.
+ */
 s32 iconNumberDispGx3D(Mtx mtx, s32 number, BOOL small, GXColor color) {
     // BUG: the array is one short for the five digits it holds. digits[4] (the ten-thousands digit) is
     // the first word of m, so it is right for the count test but MTXTrans has overwritten it by the time the loop

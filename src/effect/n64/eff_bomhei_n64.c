@@ -30,6 +30,10 @@ static effN64Vtx size32x32_tex32x32_vtx[] = {
 static void effBomheiMain(EffectEntry* effect);
 static void effBomheiDisp(CameraId cameraId, EffectEntry* effect);
 
+/**
+ * Spawns a Bob-omb sprite at (x, y, z), `scale` times its size, living `duration` frames;
+ * type 0 stays upright and any other type spins at 40 degrees per frame.
+ */
 EffectEntry* effBomheiN64Entry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffBomheiN64Work* work;
@@ -58,6 +62,7 @@ EffectEntry* effBomheiN64Entry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 
     return effect;
 }
 
+/** Advances a progress value from 0 to 9 across the duration, which Disp uses to cross-fade between sprite frames. */
 static void effBomheiMain(EffectEntry* effect) {
     EffBomheiN64Work* work = effect->userdata;
     Vec position;
@@ -78,6 +83,10 @@ static void effBomheiMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effBomheiDisp, effect);
 }
 
+/**
+ * Draws the sprite, cross-fading between two frames of one texture sheet by the progress fraction;
+ * tinted yellow until progress passes 4, then white.
+ */
 static void effBomheiDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffBomheiN64Work* work;

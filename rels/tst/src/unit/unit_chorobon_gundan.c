@@ -71,6 +71,7 @@ static EvtWord attack_event[217];
 static EvtWord wait_event[6];
 ExtTexInfo chorogun_ext_entry_data[21];
 
+/** Finds the Fuzzy Horde unit (initial kind 0x15) and returns it, or NULL when there is none. */
 BattleUnit* chorogun_get_ptr(void) {
     s32 i;
     BattleWork* wp = _battleWorkPointer;
@@ -225,6 +226,10 @@ BattleWeapon weapon_chorobon_gundan_attack = {
 };
 
 #if VERSION >= VERSION_JP
+/**
+ * Reward script run when a Fuzzy from the horde is defeated (unit LW(10)):
+ * plays its death sound, pays out its coins and EXP and spawns the star point effect above it.
+ */
 EVT_BEGIN(chorogun_dead_reward)
     CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
@@ -246,6 +251,11 @@ EVT_BEGIN(chorogun_dead_reward)
 EVT_END()
 #endif
 
+/**
+ * Init script of the Fuzzy Horde: installs the wait,
+ * attack and damage handlers (confusion uses the default Confuse script),
+ * clears unit work 0 (the horde's flee flag) and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -256,6 +266,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler of the Fuzzy Horde: for each point of damage one Fuzzy leaves the swarm (chorogun_escape)
+ * while more than 50 remain; once 50 or fewer are left it sets unit work 0 to 1.
+ * After a lethal hit, it runs escape_chorogun_event if 500 or fewer are alive.
+ */
 static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_GetDamage, BTL_UNIT_SELF, LW(15))
     SET_VALUE(LW(0), 0)
@@ -293,6 +308,13 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the Fuzzy Horde: after the item-use check,
+ * picks a target and the swarm flies in (chorogun_approach_target);
+ * if the attack connects it dives onto the target (alive count + 100) / 200 times (at least once),
+ * each time with the guard check, and the last dive deals the damage.
+ * Misses wait one second; the swarm then returns (chorogun_after_attack).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -378,6 +400,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -407,6 +430,10 @@ ExtTexInfo chorogun_ext_entry_data[] = {
     {0},
 };
 
+/**
+ * Creates the swarm: adds the hidden NPC model ext_chorobon (c_chorobon) at y = -1000
+ * and registers a 1000-pose extdrv object driven by chorogun_ext_init and chorogun_ext_main.
+ */
 EVT_BEGIN(chorogun_entry)
     CALL(evt_npc_entry, STRING("ext_chorobon"), STRING("c_chorobon"))
     CALL(evt_npc_set_position, STRING("ext_chorobon"), 0, -1000, 0)
@@ -414,6 +441,11 @@ EVT_BEGIN(chorogun_entry)
     RETURN
 EVT_END()
 
+/**
+ * Initialises the 1000 swarm Fuzzies: allocates their records,
+ * parks each pose off screen and gives it a start position on a jittered grid (50 per row, 5 units apart in x, 7
+ * in z), then shuffles the positions with 500 random swaps.
+ */
 void chorogun_ext_init(void) {
     s32 i;
     s32 a, b;
@@ -455,6 +487,10 @@ void chorogun_ext_init(void) {
     }
 }
 
+/**
+ * Guess: per-frame update of the swarm: runs each Fuzzy's state machine (appear, approach the target, dive,
+ * bounce, escape) and writes the result to its pose matrix, then queues chorogun_ext_disp.
+ */
 void chorogun_ext_main(void) {
     BattleWork* wp;
     BattleUnit* unit;
@@ -684,6 +720,7 @@ void chorogun_ext_main(void) {
     dispEntry(CAMERA_3D, 0.0f, 1, chorogun_ext_disp, NULL);
 }
 
+/** Draw callback for the swarm: sets up the extdrv render mode, vertices, texture and TEV, then draws all poses. */
 void chorogun_ext_disp(CameraId camera, void* param) {
     extLoadRenderMode();
     extLoadVertex();
@@ -693,6 +730,7 @@ void chorogun_ext_disp(CameraId camera, void* param) {
     extLoadTextureExit();
 }
 
+/** Script helper: args[0] receives how many swarm Fuzzies are flagged alive. */
 USER_FUNC(chorogun_get_alive_num) {
     EvtWord* args = event->args;
     s32 i;
@@ -707,11 +745,16 @@ USER_FUNC(chorogun_get_alive_num) {
     return 2;
 }
 
+/** Script helper: stores the unit id in args[0] as the target the swarm dives at. */
 USER_FUNC(chorogun_set_target_id) {
     chorogun_targetId = evtGetValue(event, event->args[0]);
     return 2;
 }
 
+/**
+ * Script helper: on the first call flags every swarm Fuzzy alive and starts its entrance (state 1);
+ * blocks until all of them have reached state 21.
+ */
 USER_FUNC(chorogun_appear) {
     s32 i;
     s32 n;
@@ -736,6 +779,10 @@ USER_FUNC(chorogun_appear) {
     return 0;
 }
 
+/**
+ * Script helper: sends every living swarm Fuzzy toward the target (state 30) and blocks
+ * until all have arrived (state 40).
+ */
 USER_FUNC(chorogun_approach_target) {
     s32 i;
 
@@ -754,6 +801,11 @@ USER_FUNC(chorogun_approach_target) {
     return 2;
 }
 
+/**
+ * Script helper: args[0] is the flight time in frames.
+ * Picks a random living Fuzzy, launches it at the target unit on a ballistic arc that lands
+ * after that many frames, plays the attack sound and writes the Fuzzy's index to args[1].
+ */
 USER_FUNC(chorogun_dive_target) {
     ExtdrvPose* pose;
     s32 frames;
@@ -799,6 +851,7 @@ USER_FUNC(chorogun_dive_target) {
     return 2;
 }
 
+/** Script helper: args[0] is a swarm Fuzzy index; sets it to state 46, bouncing off the target after landing. */
 USER_FUNC(chorogun_bound_target) {
     s32 id = evtGetValue(event, event->args[0]);
 
@@ -806,6 +859,7 @@ USER_FUNC(chorogun_bound_target) {
     return 2;
 }
 
+/** Script helper: args[0] is a swarm Fuzzy index; sets it to state 48, knocked back by a counter. */
 USER_FUNC(chorogun_counterd) {
     s32 id = evtGetValue(event, event->args[0]);
 
@@ -813,6 +867,7 @@ USER_FUNC(chorogun_counterd) {
     return 2;
 }
 
+/** Script helper: on the first call sets every living swarm Fuzzy to state 50, the after-attack regroup. */
 USER_FUNC(chorogun_after_attack) {
     s32 i;
 
@@ -826,6 +881,10 @@ USER_FUNC(chorogun_after_attack) {
     return 2;
 }
 
+/**
+ * Script helper: makes the (up to) 50 living Fuzzies nearest the Horde unit's home position run away:
+ * they stop counting as alive and go to state 60. With 50 or more alive, only those within 50 units qualify.
+ */
 USER_FUNC(chorogun_escape) {
     f32 dist[1000];
     s32 idx[1000];
@@ -876,6 +935,7 @@ USER_FUNC(chorogun_escape) {
     return 2;
 }
 
+/** Script helper: makes every living swarm Fuzzy run away (not alive, state 60). */
 USER_FUNC(chorogun_escape_all) {
     s32 i;
     Chorogun* c;

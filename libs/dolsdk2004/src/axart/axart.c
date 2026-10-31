@@ -4,12 +4,20 @@
 
 static AXART_SOUND* __AXARTSoundList;
 
+/**
+ * Initializes the AXART articulator layer: empties the list of active sounds
+ * and sets the default 3D distance scale (40.0) and Doppler scale (20.0).
+ */
 void AXARTInit(void) {
     __AXARTSoundList = 0;
     AXARTSet3DDistanceScale(40.0f);
     AXARTSet3DDopplerScale(20.0f);
 }
 
+/**
+ * Shuts the articulator layer down: releases the MIX channel of every registered sound (interrupts disabled)
+ * and empties the sound list.
+ */
 void AXARTQuit(void) {
     BOOL old;
     AXART_SOUND* sound;
@@ -24,6 +32,10 @@ void AXARTQuit(void) {
     OSRestoreInterrupts(old);
 }
 
+/**
+ * Per-frame update: runs AXARTServiceSound on every sound in the active list so envelopes,
+ * LFOs and 3D positions are applied to their voices.
+ */
 void AXARTServiceSounds(void) {
     AXART_SOUND* sound;
 
@@ -32,6 +44,10 @@ void AXARTServiceSounds(void) {
     }
 }
 
+/**
+ * Prepares an AXART_SOUND for a voice: no articulators yet,
+ * bound to the given AX voice and its source sample rate (used to scale the SRC ratio against 32 kHz).
+ */
 void AXARTInitSound(AXART_SOUND* sound, AXVPB* voice, u32 sampleRate) {
     ASSERTLINE(141, sound);
     ASSERTLINE(142, voice);
@@ -41,6 +57,13 @@ void AXARTInitSound(AXART_SOUND* sound, AXVPB* voice, u32 sampleRate) {
     sound->sampleRate = sampleRate;
 }
 
+/**
+ * Starts articulating a voice.
+ * Sums the contribution of each attached articulator (pan, surround pan, ITD, SRC type, pitch cents,
+ * attenuation, aux A/B sends, LPF), programs the voice's SRC type and ratio and ITD target,
+ * calls MIXInitChannel with the resulting levels and pan,
+ * and pushes the sound onto the head of the active list (interrupts disabled).
+ */
 void AXARTAddSound(AXART_SOUND* sound) {
     AXART_ART* articulator;
     AXVPB* axvpb;
@@ -160,6 +183,7 @@ void AXARTAddSound(AXART_SOUND* sound) {
     OSRestoreInterrupts(old);
 }
 
+/** Unlinks a sound from the active list (interrupts disabled) and releases its MIX channel. */
 void AXARTRemoveSound(AXART_SOUND* sound) {
     BOOL old;
 
@@ -186,6 +210,10 @@ void AXARTRemoveSound(AXART_SOUND* sound) {
     MIXReleaseChannel(sound->axvpb);
 }
 
+/**
+ * Sets up a low-frequency oscillator on a 'length'-entry sample table;
+ * 'delta' is how many table steps it advances per service tick. Resets its phase and output to 0.
+ */
 void AXARTInitLfo(AXART_LFO* lfo, f32* samples, u32 length, f32 delta) {
     ASSERTLINE(417, samples);
     ASSERTLINE(418, length);
@@ -197,6 +225,10 @@ void AXARTInitLfo(AXART_LFO* lfo, f32* samples, u32 length, f32 delta) {
     lfo->counter = lfo->sample1 = lfo->sample = lfo->output = 0.0f;
 }
 
+/**
+ * Initializes a 3D-positioning articulator: no angle, distance, closing speed or pending update,
+ * centre pan (64), surround pan 127, SRC type 1, no ITD, pitch ratio 1.0 and a large initial attenuation.
+ */
 void AXARTInitArt3D(AXART_3D* articulator) {
     ASSERTLINE(446, articulator);
     
@@ -210,6 +242,7 @@ void AXARTInitArt3D(AXART_3D* articulator) {
     articulator->attenuation = -0x03C00000;
 }
 
+/** Initializes a panning articulator to centre (pan 64) with the surround pan at 127. */
 void AXARTInitArtPanning(AXART_PANNING* articulator) {
     ASSERTLINE(481, articulator);
     
@@ -218,6 +251,7 @@ void AXARTInitArtPanning(AXART_PANNING* articulator) {
     articulator->span = 127;
 }
 
+/** Initializes an interaural-time-difference articulator with zero delay on both ears. */
 void AXARTInitArtItd(AXART_ITD* articulator) {
     ASSERTLINE(503, articulator);
 
@@ -225,6 +259,7 @@ void AXARTInitArtItd(AXART_ITD* articulator) {
     articulator->itdL = articulator->itdR = 0;
 }
 
+/** Initializes a sample-rate-converter-type articulator to the default type 1. */
 void AXARTInitArtSrctype(AXART_SRC* articulator) {
     ASSERTLINE(526, articulator);
 
@@ -232,6 +267,7 @@ void AXARTInitArtSrctype(AXART_SRC* articulator) {
     articulator->src = 1;
 }
 
+/** Initializes a fixed pitch articulator to 0 cents of offset. */
 void AXARTInitArtPitch(AXART_PITCH* articulator) {
     ASSERTLINE(547, articulator);
 
@@ -239,6 +275,7 @@ void AXARTInitArtPitch(AXART_PITCH* articulator) {
     articulator->cents = 0;
 }
 
+/** Initializes a pitch envelope articulator (current cents, target and per-tick delta all 0). */
 void AXARTInitArtPitchEnv(AXART_PITCH_ENV* articulator) {
     ASSERTLINE(569, articulator);
 
@@ -246,6 +283,7 @@ void AXARTInitArtPitchEnv(AXART_PITCH_ENV* articulator) {
     articulator->delta = articulator->target = articulator->cents = 0;
 }
 
+/** Initializes an LFO pitch-modulation (vibrato) articulator with a zero depth and the sine table at zero speed. */
 void AXARTInitArtPitchMod(AXART_PITCH_MOD* articulator) {
     ASSERTLINE(594, articulator);
 
@@ -254,6 +292,7 @@ void AXARTInitArtPitchMod(AXART_PITCH_MOD* articulator) {
     AXARTInitLfo(&articulator->lfo, AXARTSine, AXART_SINE_CNT, 0.0f);
 }
 
+/** Initializes a fixed volume articulator with 0 attenuation. */
 void AXARTInitArtVolume(AXART_VOLUME* articulator) {
     ASSERTLINE(617, articulator);
 
@@ -261,6 +300,7 @@ void AXARTInitArtVolume(AXART_VOLUME* articulator) {
     articulator->attenuation = 0;
 }
 
+/** Initializes a fixed aux bus A send articulator with 0 attenuation. */
 void AXARTInitArtAuxAVolume(AXART_AUXA_VOLUME* articulator) {
     ASSERTLINE(639, articulator);
 
@@ -268,6 +308,7 @@ void AXARTInitArtAuxAVolume(AXART_AUXA_VOLUME* articulator) {
     articulator->attenuation = 0;
 }
 
+/** Initializes a fixed aux bus B send articulator with 0 attenuation. */
 void AXARTInitArtAuxBVolume(AXART_AUXB_VOLUME* articulator) {
     ASSERTLINE(661, articulator);
 
@@ -275,6 +316,7 @@ void AXARTInitArtAuxBVolume(AXART_AUXB_VOLUME* articulator) {
     articulator->attenuation = 0;
 }
 
+/** Initializes a volume envelope articulator (attenuation, target and delta all 0). */
 void AXARTInitArtVolumeEnv(AXART_VOLUME_ENV* articulator) {
     ASSERTLINE(683, articulator);
 
@@ -282,6 +324,7 @@ void AXARTInitArtVolumeEnv(AXART_VOLUME_ENV* articulator) {
     articulator->delta = articulator->target = articulator->attenuation = 0;
 }
 
+/** Initializes an aux bus A send envelope articulator (attenuation, target and delta all 0). */
 void AXARTInitArtAuxAVolumeEnv(AXART_AUXA_VOLUME_ENV* articulator) {
     ASSERTLINE(707, articulator);
 
@@ -289,6 +332,7 @@ void AXARTInitArtAuxAVolumeEnv(AXART_AUXA_VOLUME_ENV* articulator) {
     articulator->delta = articulator->target = articulator->attenuation = 0;
 }
 
+/** Initializes an aux bus B send envelope articulator (attenuation, target and delta all 0). */
 void AXARTInitArtAuxBVolumeEnv(AXART_AUXB_VOLUME_ENV* articulator) {
     ASSERTLINE(731, articulator);
 
@@ -296,6 +340,7 @@ void AXARTInitArtAuxBVolumeEnv(AXART_AUXB_VOLUME_ENV* articulator) {
     articulator->delta = articulator->target = articulator->attenuation = 0;
 }
 
+/** Initializes an LFO volume-modulation (tremolo) articulator with zero depth and the sine table at zero speed. */
 void AXARTInitArtVolumeMod(AXART_VOLUME_MOD* articulator) {
     ASSERTLINE(756, articulator);
 
@@ -304,6 +349,7 @@ void AXARTInitArtVolumeMod(AXART_VOLUME_MOD* articulator) {
     AXARTInitLfo(&articulator->lfo, AXARTSine, AXART_SINE_CNT, 0.0f);
 }
 
+/** Initializes an LFO modulation articulator for the aux bus A send, zero depth and a sine table. */
 void AXARTInitArtAuxAVolumeMod(AXART_AUXA_VOLUME_MOD* articulator) {
     ASSERTLINE(781, articulator);
 
@@ -312,6 +358,7 @@ void AXARTInitArtAuxAVolumeMod(AXART_AUXA_VOLUME_MOD* articulator) {
     AXARTInitLfo(&articulator->lfo, AXARTSine, AXART_SINE_CNT, 0.0f);
 }
 
+/** Initializes an LFO modulation articulator for the aux bus B send, zero depth and a sine table. */
 void AXARTInitArtAuxBVolumeMod(AXART_AUXB_VOLUME_MOD* articulator) {
     ASSERTLINE(806, articulator);
 
@@ -320,6 +367,10 @@ void AXARTInitArtAuxBVolumeMod(AXART_AUXB_VOLUME_MOD* articulator) {
     AXARTInitLfo(&articulator->lfo, AXARTSine, AXART_SINE_CNT, 0.0f);
 }
 
+/**
+ * Initializes a low-pass filter articulator; the first AXARTLpf call will switch the voice's LPF on
+ * and load the coefficients.
+ */
 void AXARTInitArtLpf(AXART_LPF* articulator) {
     ASSERTLINE(830, articulator);
 

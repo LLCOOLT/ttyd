@@ -82,11 +82,16 @@ TessTestWork* tess_test_work;
 #endif
 char item_name[32];
 
+/** Init event of the tst_00 test map: puts Mario at (-525, 0, -15). */
 EVT_BEGIN(tst_00_init_evt)
     CALL(evt_mario_set_pos, -525, 0, -15)
     RETURN
 EVT_END()
 
+/**
+ * Endless loop on tst_01: every 60 frames shows the font_test message, then the font_test1 message,
+ * with Mario frozen while each is up.
+ */
 EVT_BEGIN(tst_01_font_evt)
     LOOP(0)
         WAIT_FRAMES(60)
@@ -101,17 +106,23 @@ EVT_BEGIN(tst_01_font_evt)
     RETURN
 EVT_END()
 
+/** Init event of the tst_01 test map: puts Mario at (-525, 0, -15) and starts the font test loop. */
 EVT_BEGIN(tst_01_init_evt)
     CALL(evt_mario_set_pos, -525, 0, -15)
     SPAWN_EVENT(tst_01_font_evt)
     RETURN
 EVT_END()
 
+/** Init event of the tst_02 test map: puts Mario at (0, 0, -100). */
 EVT_BEGIN(tst_02_init_evt)
     CALL(evt_mario_set_pos, 0, 0, -100)
     RETURN
 EVT_END()
 
+/**
+ * Talk interrupt of the test NPC: plays its PAN_D_1 animation for half a second,
+ * then hands control back to the NPC's normal behaviour.
+ */
 EVT_BEGIN(tst_npc_talk_evt)
     CALL(evt_npc_set_anim, STRING("me"), STRING("PAN_D_1"))
     WAIT_MS(500)
@@ -129,6 +140,10 @@ EvtWord tst_npc_env_evt[] = {
     GOTO(0)
 };
 
+/**
+ * Guess: init event of the NPC test map: sets up NPC_01 with a movement script and the talk interrupt,
+ * plays move/talk animations, switches to the field-battle mode and starts the ambient sound loop.
+ */
 EVT_BEGIN(tst_npc_init_evt)
     CALL(evt_npc_change_interrupt, STRING("NPC_01"), 1, PTR(testnpc_move_event))
     CALL(evt_npc_change_interrupt, STRING("NPC_01"), 8, PTR(tst_npc_talk_evt))
@@ -139,6 +154,11 @@ EVT_BEGIN(tst_npc_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the tst_moj_00 map-object test map:
+ * lays out Level 1-3 blocks (normal, big, bigger)
+ * and rows of floating blocks in several colours for the block hitting tests.
+ */
 EVT_BEGIN(tst_moj_00_init_evt)
     CALL(tst_mobj_koopa_on)
     CALL(evt_mobj_lv_blk, STRING("l1"), -450, 0, 100, 0, LSWF(0), STRING("MOBJ_Lv1Block"))
@@ -163,6 +183,10 @@ EVT_BEGIN(tst_moj_00_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the tst_moj_01 map-object test map:
+ * places one of each switch (ride, timer, blue/red, float, tornado) and switch-linked floating blocks.
+ */
 EVT_BEGIN(tst_moj_01_init_evt)
     CALL(tst_mobj_koopa_on)
     CALL(evt_mobj_rideswitch_orange, STRING("rso"), 100, 0, -200, 0, LSWF(0))
@@ -185,6 +209,11 @@ EVT_BEGIN(tst_moj_01_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the tst_moj_02 map-object test map:
+ * places recovery blocks, a save block, plain, item, badge and power-up blocks and bricks that give an item,
+ * a badge or 10 coins.
+ */
 EVT_BEGIN(tst_moj_02_init_evt)
     CALL(evt_mobj_recovery_blk, STRING("rb1"), 0, -300, 64, 0, 0, LSWF(0))
     CALL(evt_mobj_recovery_blk, STRING("rb2"), 10, -200, 64, 0, 0, LSWF(1))
@@ -204,6 +233,10 @@ EVT_BEGIN(tst_moj_02_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the tst_moj_03 map-object test map:
+ * places jump stands, a locked door, item boxes, a sign, an arrow, breaking floors and a breakable rock.
+ */
 EVT_BEGIN(tst_moj_03_init_evt)
     CALL(evt_mobj_jumpstand_red, 0, STRING("j1r"), 0, 0, -100, 0, LSWF(0))
     CALL(evt_mobj_jumpstand_blue, 0, STRING("j1b"), 200, 200, 0, -100, 0, LSWF(2))
@@ -222,6 +255,11 @@ EVT_BEGIN(tst_moj_03_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the offscreen-capture test map:
+ * creates three animated paper images (OFF_cloud_1, OFF_hei_07, nakayama_test3),
+ * each captured into its own offscreen image and looping its animation.
+ */
 EVT_BEGIN(tst_off_01_init_evt)
     CALL(evt_paper_entry, STRING("OFF_cloud_1"))
     CALL(evt_paper_entry, STRING("OFF_hei_07"))
@@ -259,6 +297,10 @@ EVT_BEGIN(tst_off_01_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the battle-stage test map: hides the fence, grass,
+ * tree and hill map objects (saku, kusa, ki, yama) so the plain stage shows.
+ */
 EVT_BEGIN(btl_tst_00_init_evt)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("saku_00"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("saku_01"), MAPOBJ_FLAG_HIDE)
@@ -281,12 +323,16 @@ EVT_BEGIN(btl_tst_00_init_evt)
     RETURN
 EVT_END()
 
+/** Init event of the tst_bt00 map, which does nothing. */
 EVT_BEGIN(tst_bt00_init_evt)
     RETURN
 EVT_END()
 
-// The Japanese store demo has no tst_nakayama_init_evt, though tst.c still registers it: its tst.rel holds 0 there
-// with no relocation. Keep the event out of that version; tst.c explains how the build reproduces the reference.
+/**
+ * The Japanese store demo has no tst_nakayama_init_evt, though tst.c still registers it:
+ * its tst.rel holds 0 there with no relocation.
+ * Keep the event out of that version; tst.c explains how the build reproduces the reference.
+ */
 #if VERSION >= VERSION_JP
 EVT_BEGIN(tst_nakayama_init_evt)
     CALL(evt_mario_key_onoff, 0)
@@ -296,7 +342,7 @@ EVT_BEGIN(tst_nakayama_init_evt)
     RETURN
 EVT_END()
 
-// Shows a random paper, draws the outline with the stick, and cuts the paper to the tessellated polygon.
+/** Shows a random paper, draws the outline with the stick, and cuts the paper to the tessellated polygon. */
 EVT_BEGIN(tst_nakayama_tess_evt)
     CALL(evt_seq_wait, 2)
     LOOP(0)
@@ -352,7 +398,7 @@ EVT_END()
 // first in the REL.
 
 #if VERSION >= VERSION_JP
-// Draws the outline: one rainbow line per segment, the buffer use, and the cursor.
+/** Draws the outline: one rainbow line per segment, the buffer use, and the cursor. */
 void tess_test_line_disp(CameraId cameraId, void* param) {
     s32 i;
 
@@ -404,7 +450,7 @@ void tess_test_line_disp(CameraId cameraId, void* param) {
     dbgDrawReset(-1);
 }
 
-// Copies the screen into the texture the filled polygon is drawn with.
+/** Copies the screen into the texture the filled polygon is drawn with. */
 void tess_test_capture(CameraId cameraId, void* param) {
     tess_test_work->capture = smartAlloc(GXGetTexBufferSize(608, 480, GX_TF_I8, GX_FALSE, 0), 1);
     GXSetTexCopySrc(0, 0, 608, 480);
@@ -413,7 +459,7 @@ void tess_test_capture(CameraId cameraId, void* param) {
     GXPixModeSync();
 }
 
-// Whether segment a-b crosses segment c-d.
+/** Whether segment a-b crosses segment c-d. */
 BOOL tess_test_cross(TessVertex* a, TessVertex* b, TessVertex* c, TessVertex* d) {
     if (((a->x - b->x) * (c->y - a->y) + (a->y - b->y) * (a->x - c->x)) *
             ((a->x - b->x) * (d->y - a->y) + (a->y - b->y) * (a->x - d->x)) <
@@ -427,7 +473,7 @@ BOOL tess_test_cross(TessVertex* a, TessVertex* b, TessVertex* c, TessVertex* d)
     return FALSE;
 }
 
-// Moves the cursor with the stick and adds a point every 6 frames, until the newest segment crosses an older one.
+/** Moves the cursor with the stick and adds a point every 6 frames, until the newest segment crosses an older one. */
 USER_FUNC(tess_test_draw) {
     s32 j;
     s32 i;
@@ -485,7 +531,7 @@ USER_FUNC(tess_test_draw) {
     return EVT_RETURN_BLOCK;
 }
 
-// Draws the tessellated polygon with the screen copy and records its bounding box for the "ofs" offscreen.
+/** Draws the tessellated polygon with the screen copy and records its bounding box for the "ofs" offscreen. */
 void tess_test_disp(CameraId cameraId, void* param) {
     GXTexObj texObj;
     Mtx mtx;
@@ -527,37 +573,47 @@ void tess_test_disp(CameraId cameraId, void* param) {
     offscreenAddBoundingBox(offscreenNameToId("ofs"), left, top, right, bottom);
 }
 
-// Runs the tessellator over the drawn outline and flushes the vertices for the GPU.
+/** Runs the tessellator over the drawn outline and flushes the vertices for the GPU. */
 USER_FUNC(tess_test_run) {
     tess_test();
     DCFlushRange(tess_test_work->vertices, tess_test_work->vertexCount * sizeof(TessVertex));
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: queues the tessellated polygon draw (tess_test_disp) on the second offscreen camera. */
 USER_FUNC(tess_test_disp_entry) {
     dispEntry(CAMERA_OFFSCREEN2, 0.0f, 1, tess_test_disp, NULL);
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: frees the screen capture and the work buffer of the tessellator test. */
 USER_FUNC(tess_test_end) {
     smartFree(tess_test_work->capture);
     _mapFree(tess_test_work);
     return EVT_RETURN_DONE;
 }
 
+/** GLU_TESS_BEGIN_DATA callback: does nothing (the test collects vertices in tess_test_vertex instead). */
 void tess_test_begin(u32 type, void* polygonData) {
 }
 
+/**
+ * GLU_TESS_EDGE_FLAG_DATA callback: does nothing.
+ * Registering any edge flag callback makes GLU deliver plain triangle lists rather than fans and strips,
+ * which is what the test wants.
+ */
 void tess_test_edge_flag(u8 flag, void* polygonData) {
 }
 
+/** GLU_TESS_END_DATA callback: does nothing. */
 void tess_test_end_polygon(void* polygonData) {
 }
 
+/** GLU_TESS_ERROR_DATA callback: ignores tessellator errors. */
 void tess_test_error(u32 error, void* polygonData) {
 }
 
-// Collects the triangle list: each vertex is an index into the outline.
+/** Collects the triangle list: each vertex is an index into the outline. */
 void tess_test_vertex(void* vertexData, void* polygonData) {
     if (tess_test_work->indexCount >= TESS_MAX_INDICES) {
         OSPanic("evt_init.c", 1263, "MAX_INDICES over!!\n");
@@ -565,8 +621,10 @@ void tess_test_vertex(void* vertexData, void* polygonData) {
     tess_test_work->indices[tess_test_work->indexCount++] = (s32)vertexData;
 }
 
-// Adds a vertex where two edges cross, unless it repeats a corner; it is marked as on the outline when the
-// crossing edges are outline edges.
+/**
+ * Adds a vertex where two edges cross, unless it repeats a corner;
+ * it is marked as on the outline when the crossing edges are outline edges.
+ */
 void tess_test_combine(f64 coords[3], u32 index[4], f32 weight[4], u32* outIndex, void* polygonData) {
     TessVertex* v0 = &tess_test_work->vertices[index[0]];
     TessVertex* v1 = &tess_test_work->vertices[index[1]];
@@ -642,7 +700,7 @@ void tess_test_combine(f64 coords[3], u32 index[4], f32 weight[4], u32* outIndex
     tess_test_work->vertexCount++;
 }
 
-// Feeds each contour of the outline to the tessellator.
+/** Feeds each contour of the outline to the tessellator. */
 void tess_test(void) {
     GLUtesselator* tess = gluNewTess();
     TessVertex* v = tess_test_work->vertices;
@@ -672,6 +730,10 @@ void tess_test(void) {
 }
 #endif
 
+/**
+ * Script helper: formats the item id in args[0] as a three-digit string in the global item_name
+ * and stores its address in args[1], to be used as an item-entry name.
+ */
 USER_FUNC(make_item_name) {
     EvtWord* args = event->args;
 
@@ -680,7 +742,7 @@ USER_FUNC(make_item_name) {
     return EVT_RETURN_DONE;
 }
 
-// Keeps a Koops shell effect on Mario for 600 frames.
+/** Keeps a Koops shell effect on Mario for 600 frames. */
 USER_FUNC(nokotarou_follow_test) {
     MarioWork* mario = marioGetPtr();
     EffectEntry* effect;
@@ -700,7 +762,7 @@ USER_FUNC(nokotarou_follow_test) {
     return EVT_RETURN_BLOCK;
 }
 
-// Puts every item on the floor of tst_item_00, 31 at a time; each run of the event shows the next 31.
+/** Puts every item on the floor of tst_item_00, 31 at a time; each run of the event shows the next 31. */
 EVT_BEGIN(tst_item_00_show_evt)
     SET_VALUE(LW(0), 1)
     LOOP(0)
@@ -731,6 +793,11 @@ EVT_BEGIN(tst_item_00_show_evt)
     RETURN
 EVT_END()
 
+/**
+ * Init event of the tst_item_00 item display map:
+ * starts at item 1, shows the first 31 items and creates a red switch that shows the next 31, plus power-up,
+ * save and recovery blocks and a locked door.
+ */
 EVT_BEGIN(tst_item_00_init_evt)
     SET_VALUE(GW(0), 1)
     CALL_CHILD(tst_item_00_show_evt)

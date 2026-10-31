@@ -228,6 +228,11 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Init script of the Dark Craw: installs the wait, phase, attack,
+ * damage and confusion handlers (confusion reuses the attack),
+ * sets its run and walk sounds and pose sound table, and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
@@ -241,6 +246,12 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Spike spark shown when an attacker is hurt by (or avoids) the spiked head:
+ * waits 30 frames, then spawns the toge_flush effect above the unit's head;
+ * the spot is higher when the unit is Huge and lower when Tiny.
+ * The spot is 60 up when Huge, 33 when Tiny, 48 otherwise.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -264,6 +275,10 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: runs the shared default damage script (btldefaultevt_Damage) with its default parameters
+ * (LW(10) = -2, LW(11) = 1).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -271,10 +286,16 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Phase script: does nothing. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the Dark Craw: after the item-use check,
+ * 50 percent its normal attack (weapon_monban_attack)
+ * and 50 percent its throw attack (weapon_monban_throw_attack).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -299,6 +320,13 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Craw's normal attack: it picks a target and winds up (A_1,
+ * then the running pose R_2 with stomping sounds),
+ * then charges at the target at speed 8 (the stopping distance scales with its size).
+ * A miss makes it run past and wait; a hit applies the damage with the guard check and it staggers in two steps.
+ * Then it walks home and laughs three times before returning to idle.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -407,6 +435,12 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Dark Craw's throw attack: it picks a target
+ * and throws part 2 (Guess: a thrown weapon) in a spinning arc to the target's hit position;
+ * if it is avoided the part keeps going, if it connects the damage is dealt with the guard check.
+ * Then it laughs three times and returns to idle.
+ */
 static EVT_BEGIN(throw_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -508,6 +542,7 @@ static EVT_BEGIN(throw_attack_event)
     RETURN
 EVT_END()
 
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

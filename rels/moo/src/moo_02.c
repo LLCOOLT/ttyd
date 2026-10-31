@@ -20,6 +20,10 @@
 
 static BeroEntry bero_entry_data[6];
 
+/**
+ * Bero-in script of the north entry (n_bero): hides the partner,
+ * places Mario at the bero position and runs the bero entry; returns 1 in LW(0).
+ */
 EVT_BEGIN(n_bero_in)
     CALL(evt_mario_bgmode_on)
     CALL(evt_mario_kill_party, 0)
@@ -31,6 +35,10 @@ EVT_BEGIN(n_bero_in)
     RETURN
 EVT_END()
 
+/**
+ * Bero-out script of the north exit (n_bero): takes control from Mario
+ * and changes the map to aji_19 (the X-Naut Fortress), entering at w_bero; returns 1 in LW(0).
+ */
 EVT_BEGIN(n_bero_out)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_bero_mapchange, STRING("aji_19"), STRING("w_bero"))
@@ -123,6 +131,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Event script: Bobbery blows up the rock S_iwa_04 that hides the pipe back to the X-Naut Fortress.
+ * The rock crumbles, the pipe appears, and the story progress is set to STORY_STG7_07_A_PIPE_APPEARS.
+ */
 static EVT_BEGIN(dokan_evt)
 #if VERSION >= VERSION_US
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_07_A_PIPE_APPEARS)
@@ -180,6 +192,10 @@ static EVT_BEGIN(dokan_evt)
 EVT_END()
 
 #if VERSION <= VERSION_JP
+/**
+ * Rock-blasting script (JP only): the rock crumbles into an offscreen animation,
+ * then the model and collision of the rock in LW(10)/LW(11) are removed.
+ */
 static EVT_BEGIN(rock_main)
     BEGIN_INLINE_EVENT
         WAIT_MS(200)
@@ -204,6 +220,7 @@ static EVT_BEGIN(rock_main)
 EVT_END()
 #endif
 
+/** Event script: Bobbery blows up the first rock (S_iwa_01) of moo_02; sets GSWF_MOO02_ROCK_A_BOMBED. */
 static EVT_BEGIN(rock_evt0)
 #if VERSION >= VERSION_US
     SET_VALUE(GSWF(GSWF_MOO02_ROCK_A_BOMBED), 1)
@@ -221,6 +238,7 @@ static EVT_BEGIN(rock_evt0)
     RETURN
 EVT_END()
 
+/** Event script: Bobbery blows up the second rock (S_iwa_07) of moo_02; sets GSWF_MOO02_ROCK_B_BOMBED. */
 static EVT_BEGIN(rock_evt1)
 #if VERSION >= VERSION_US
     SET_VALUE(GSWF(GSWF_MOO02_ROCK_B_BOMBED), 1)
@@ -238,6 +256,11 @@ static EVT_BEGIN(rock_evt1)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for moo_02: entry bero, Moon music and ambience, star animations,
+ * a Star Piece at (-55, 0, -135), the pipe rock (S_iwa_04, blown up before STORY_STG7_07_A_PIPE_APPEARS),
+ * the two Bobbery rocks and a Power Punch at (330, 0, 403).
+ */
 EVT_BEGIN(moo_02_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)

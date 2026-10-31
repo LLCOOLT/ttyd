@@ -27,6 +27,10 @@ static void __ARReadDMA(u32 mmem_addr, u32 aram_addr, u32 length);
 static void __ARChecksize(void);
 static void __ARClearArea(u32 start_addr, u32 length);
 
+/**
+ * Installs the function called when an ARAM DMA transfer completes (the ARQ uses it for its interrupt service
+ * routine) and returns the previous callback.
+ */
 ARQCallback ARRegisterDMACallback(ARQCallback callback) {
     ARQCallback old_callback;
     BOOL old;
@@ -38,6 +42,7 @@ ARQCallback ARRegisterDMACallback(ARQCallback callback) {
     return old_callback;
 }
 
+/** Returns nonzero while an ARAM DMA transfer is in progress (bit 0x200 of the DSP control register). */
 u32 ARGetDMAStatus(void) {
     BOOL old;
     u32 val;
@@ -48,6 +53,12 @@ u32 ARGetDMAStatus(void) {
     return val;
 }
 
+/**
+ * Starts a DMA between main memory and ARAM: type 0 copies main memory to ARAM,
+ * type 1 copies ARAM to main memory.
+ * Loads the main memory address, ARAM address, direction and length (writing the length starts the transfer);
+ * the length and main memory address must be multiples of 32.
+ */
 void ARStartDMA(u32 type, u32 mainmem_addr, u32 aram_addr, u32 length) {
     BOOL old;
 
@@ -65,6 +76,10 @@ void ARStartDMA(u32 type, u32 mainmem_addr, u32 aram_addr, u32 length) {
     OSRestoreInterrupts(old);
 }
 
+/**
+ * Allocates length bytes (a multiple of 32) from ARAM as a stack:
+ * returns the old stack pointer and pushes the block length on the caller-supplied length table.
+ */
 u32 ARAlloc(u32 length) {
     u32 tmp;
     BOOL old;
@@ -83,6 +98,10 @@ u32 ARAlloc(u32 length) {
     return tmp;
 }
 
+/**
+ * Pops the most recent ARAlloc block: optionally returns its length through *length,
+ * and returns the new stack pointer (the address of the freed block).
+ */
 u32 ARFree(u32* length) {
     BOOL old;
 
@@ -97,10 +116,17 @@ u32 ARFree(u32* length) {
     return __AR_StackPointer;
 }
 
+/** Returns whether ARInit has been called. */
 BOOL ARCheckInit(void) {
     return __AR_init_flag;
 }
 
+/**
+ * Initialises the ARAM driver once: installs the DMA-complete interrupt handler (interrupt 6),
+ * starts the allocation stack at 0x4000 (below that is reserved for the audio system), records the length table,
+ * checks the SDRAM refresh value, and probes the installed ARAM size with __ARChecksize.
+ * Returns the initial stack pointer (0x4000; 0x4000 is also returned if it was already initialised).
+ */
 u32 ARInit(u32* stack_index_addr, u32 num_entries) {
     BOOL old;
     u16 refresh;
@@ -129,28 +155,37 @@ u32 ARInit(u32* stack_index_addr, u32 num_entries) {
     return __AR_StackPointer;
 }
 
+/** Clears the initialised flag so ARInit can run again. */
 void ARReset(void) {
     __AR_init_flag = FALSE;
 }
 
+/** Obsolete; does nothing, since ARInit now detects the size itself. */
 void ARSetSize(void) {
 #ifdef DEBUG
     OSReport("ARSetSize(): I don't do anything anymore!\n");
 #endif
 }
 
+/** Returns the first ARAM address available to applications (0x4000). */
 u32 ARGetBaseAddress(void) {
     return 0x4000;
 }
 
+/** Returns the total ARAM size in bytes found by __ARChecksize (the internal 16 MB plus any expansion). */
 u32 ARGetSize(void) {
     return __AR_Size;
 }
 
+/** Returns the size in bytes of the built-in ARAM (16 MB). */
 u32 ARGetInternalSize(void) {
     return __AR_InternalSize;
 }
 
+/**
+ * Zeroes part of ARAM: flag 0 clears all internal ARAM,
+ * flag 1 clears the internal ARAM above the reserved 0x4000 bytes, flag 2 clears the expansion ARAM.
+ */
 void ARClear(u32 flag) {
     switch (flag) {
     case 0:
@@ -174,6 +209,11 @@ void ARClear(u32 flag) {
     }
 }
 
+/**
+ * Interrupt handler for the ARAM DMA-complete interrupt:
+ * acknowledges it in the DSP control register, then runs the registered DMA callback inside a scratch exception
+ * context before restoring the interrupted context.
+ */
 static void __ARHandler(__OSInterrupt exception, OSContext* context) {
     OSContext exceptionContext;
     u16 tmp;
@@ -190,6 +230,10 @@ static void __ARHandler(__OSInterrupt exception, OSContext* context) {
     OSSetCurrentContext(context);
 }
 
+/**
+ * Acknowledges the ARAM DMA interrupt by writing the DSP control register's interrupt bit (0x20)
+ * and clearing the other interrupt flags.
+ */
 void __ARClearInterrupt(void) {
     u16 tmp;
 
@@ -198,14 +242,20 @@ void __ARClearInterrupt(void) {
     __DSPRegs[5] = (tmp);
 }
 
+/** Returns the ARAM DMA interrupt flag (bit 0x20 of the DSP control register). */
 u16 __ARGetInterruptStatus(void) {
     return __DSPRegs[5] & 0x20;
 }
 
+/** Busy-waits until the ARAM DMA in progress bit clears. */
 static void __ARWaitForDMA(void) {
     while (__DSPRegs[5] & 0x200);
 }
 
+/**
+ * Synchronous main memory to ARAM copy used during size probing and clearing:
+ * programs the addresses and length, waits for the DMA to finish and clears the interrupt.
+ */
 static void __ARWriteDMA(u32 mmem_addr, u32 aram_addr, u32 length) {
 	// Main mem address
 	__DSPRegs[DSP_ARAM_DMA_MM_HI] = (u16)((__DSPRegs[DSP_ARAM_DMA_MM_HI] & ~0x03ff) | (u16)(mmem_addr >> 16));
@@ -225,6 +275,11 @@ static void __ARWriteDMA(u32 mmem_addr, u32 aram_addr, u32 length) {
     __ARClearInterrupt();
 }
 
+/**
+ * Synchronous ARAM to main memory copy used during size probing:
+ * programs the addresses and length with the direction bit set,
+ * waits for the DMA to finish and clears the interrupt.
+ */
 static void __ARReadDMA(u32 mmem_addr, u32 aram_addr, u32 length) {
 	// Main mem address
 	__DSPRegs[DSP_ARAM_DMA_MM_HI] = (u16)((__DSPRegs[DSP_ARAM_DMA_MM_HI] & ~0x03ff) | (u16)(mmem_addr >> 16));
@@ -244,6 +299,14 @@ static void __ARReadDMA(u32 mmem_addr, u32 aram_addr, u32 length) {
     __ARClearInterrupt();
 }
 
+/**
+ * Detects how much ARAM is installed.
+ * It assumes 16 MB internal, then writes a test pattern just above it
+ * and uses alias reads at several offsets (0x200000, 0x1000000,
+ * 0x200 and 0x400000 above the base) to tell whether the expansion is 2, 4, 8, 16 or 32 MB,
+ * restoring the saved words; it programs the matching mode bits,
+ * stores the total size at 0x800000D0 and in __AR_Size.
+ */
 static void __ARChecksize(void) {
     u8 test_data_pad[63];
     u8 dummy_data_pad[63];
@@ -415,6 +478,10 @@ static void __ARChecksize(void) {
     __AR_Size = ARAM_size;
 }
 
+/**
+ * Fills ARAM from start_addr for length bytes with zeros, in DMA chunks of up to 2 KB from a zeroed,
+ * 32-byte- aligned stack buffer.
+ */
 static void __ARClearArea(u32 start_addr, u32 length) {
     u8 zero_buffer[2079];
     u8* ptr;

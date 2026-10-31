@@ -35,6 +35,7 @@ pio2_2t = 2.02226624879595063154e-21,
 pio2_3 = 2.02226624871116645580e-21,
 pio2_3t = 8.47842766036889956997e-32;
 
+/** Argument reduction for sin/cos/tan: reduces x modulo pi/2 into a two-part remainder and returns the quadrant. */
 int __ieee754_rem_pio2(double x, double* y) {
     double z, w, t, r, fn;
     double tx[3];

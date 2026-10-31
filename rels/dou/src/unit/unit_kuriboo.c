@@ -171,6 +171,7 @@ static BattleWeapon weapon_kuriboo_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/** Guess: init event of the Goomba: sets its work values and pose tables. */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -183,6 +184,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Guess: damage event of a sword: runs the default damage reaction. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -190,10 +192,15 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Guess: phase event of the Goomba (empty). */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: attack event of the Goomba: may use an item,
+ * otherwise runs at one target and headbutts it for the weapon damage.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -327,6 +334,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[4] is an angle in/out.
+ * Writes the angle from (x1, z1) towards (x2, z2) given in args[0..3] into args[4],
+ * or leaves it unchanged when the two points coincide.
+ */
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);
@@ -345,6 +357,7 @@ static USER_FUNC(krb_get_dir) {
     return EVT_RETURN_DONE;
 }
 
+/** Guess: wait (idle) event of Cortez: sets the idle pose from the current mode's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

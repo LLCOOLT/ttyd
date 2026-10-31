@@ -109,8 +109,8 @@ void __gl_renderMesh( GLUtesselator *tess, GLUmesh *mesh )
     tess->lonelyTriList = NULL;
   }
 }
-
-
+/** GLU tessellator: greedily picks the largest triangle fan or strip of unrendered faces through face fOrig (three fans
+ * and three strips are tried; a lone triangle when boundary flags are wanted) and renders it. */
 static void RenderMaximumFaceGroup( GLUtesselator *tess, GLUface *fOrig )
 {
   /* We want to find the largest triangle fan or strip of unmarked faces
@@ -157,8 +157,8 @@ static void RenderMaximumFaceGroup( GLUtesselator *tess, GLUface *fOrig )
 			  } \
 			} else /* absorb trailing semicolon */
 
-
-
+/** GLU tessellator: measures the largest triangle fan around the origin vertex of eOrig by walking both ways across
+ * unmarked inside faces; marks them temporarily and returns the size, start edge and render function. */
 static struct FaceCount MaximumFan( GLUhalfEdge *eOrig )
 {
   /* eOrig->Lface is the face we want to render.  We want to find the size
@@ -185,7 +185,7 @@ static struct FaceCount MaximumFan( GLUhalfEdge *eOrig )
 
 
 #define IsEven(n)	(((n) & 1) == 0)
-
+// GLU tessellator: largest CCW triangle strip through eOrig (even count on one side); returns size, start, renderer.
 static struct FaceCount MaximumStrip( GLUhalfEdge *eOrig )
 {
   /* Here we are looking for a maximal strip that contains the vertices
@@ -237,8 +237,8 @@ static struct FaceCount MaximumStrip( GLUhalfEdge *eOrig )
   FreeTrail( trail );
   return newFace;
 }
-
-
+/** GLU tessellator: queues a single triangle on the lonely-triangle list so all such triangles render together later as
+ * GL_TRIANGLES. */
 static void RenderTriangle( GLUtesselator *tess, GLUhalfEdge *e, long size )
 {
   /* Just add the triangle to a triangle list, so we can render all
@@ -247,8 +247,8 @@ static void RenderTriangle( GLUtesselator *tess, GLUhalfEdge *e, long size )
   assert( size == 1 );
   AddToTrail( e->Lface, tess->lonelyTriList );
 }
-
-
+/** GLU tessellator: emits all queued single triangles as one GL_TRIANGLES begin/end pair, sending edge flags before
+ * vertices when boundary flags were requested. */
 static void RenderLonelyTriangles( GLUtesselator *tess, GLUface *f )
 {
   /* Now we render all the separate triangles which could not be
@@ -282,8 +282,8 @@ static void RenderLonelyTriangles( GLUtesselator *tess, GLUface *f )
   }
   CALL_END_OR_END_DATA();
 }
-
-
+/** GLU tessellator: emits the triangle fan of the given size starting at edge e as GL_TRIANGLE_FAN and marks its faces
+ * as rendered. */
 static void RenderFan( GLUtesselator *tess, GLUhalfEdge *e, long size )
 {
   /* Render as many CCW triangles as possible in a fan starting from
@@ -304,8 +304,8 @@ static void RenderFan( GLUtesselator *tess, GLUhalfEdge *e, long size )
   assert( size == 0 );
   CALL_END_OR_END_DATA();
 }
-
-
+/** GLU tessellator: emits the triangle strip of the given size starting at edge e as GL_TRIANGLE_STRIP and marks its
+ * faces as rendered. */
 static void RenderStrip( GLUtesselator *tess, GLUhalfEdge *e, long size )
 {
   /* Render as many CCW triangles as possible in a strip starting from

@@ -7,6 +7,10 @@
 #include "hom.h"
 #include "rel_module.h"
 
+/**
+ * Module entry point of hom.rel: runs the static constructors
+ * and registers the init scripts of the platform map hom_00 and the train scenes hom_10..hom_12.
+ */
 void _prolog(void) {
     voidfunctionptr* ctor;
 
@@ -19,6 +23,7 @@ void _prolog(void) {
     relSetEvtAddr("hom_12", hom_12_init_evt);
 }
 
+/** Module exit point of hom.rel: runs the static destructors. */
 void _epilog(void) {
     voidfunctionptr* dtor;
 
@@ -26,5 +31,6 @@ void _epilog(void) {
         (*dtor)();
     }
 }
+/** Linker stub for unresolved symbols; does nothing. */
 void _unresolved(void) {
 }

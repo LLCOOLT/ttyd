@@ -155,6 +155,10 @@ static BattleWeapon weapon_twinkling_pansy_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Attack event of the Amazy Dayzee: uses an enemy item if it has one;
+ * otherwise 20% sings (song_event with weapon_twinkling_pansy_attack) and 80% flees (escape_event).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -203,6 +207,10 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init event of the Amazy Dayzee: installs wait, attack,
+ * damage and confusion events and starts the sparkle loop twink_event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -213,6 +221,10 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Sparkle loop of the Amazy Dayzee: every 40 frames, while the unit exists,
+ * spawns a stardust effect just above it (scaled by its size).
+ */
 static EVT_BEGIN(twink_event)
     LABEL(0)
     WAIT_FRAMES(40)
@@ -232,6 +244,7 @@ static EVT_BEGIN(twink_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Amazy Dayzee: runs the default damage handling. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -239,6 +252,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * The Amazy Dayzee's lullaby: identical to the Crazee Dayzee's song_event except the map blend fades with a
+ * different tint (red and blue channels changed together).
+ */
 static EVT_BEGIN(song_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
@@ -342,6 +359,10 @@ static EVT_BEGIN(song_event)
     RETURN
 EVT_END()
 
+/**
+ * The Amazy Dayzee runs away from the battle: it turns its back with a blurred trail,
+ * jumps and runs off to x = 300, then the unit is removed.
+ */
 static EVT_BEGIN(escape_event)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_PANSY_ESCAPE1_1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PAN_E_1"))
@@ -362,6 +383,7 @@ static EVT_BEGIN(escape_event)
     RETURN
 EVT_END()
 
+/** Wait (idle) event of the Amazy Dayzee: shows the idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

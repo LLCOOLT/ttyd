@@ -1,6 +1,12 @@
 #include <dolphin.h>
 #include <dolphin/sp.h>
 
+/**
+ * Relocates a sound table loaded from a file: adds the ARAM base to each entry's current,
+ * end and loop addresses, converted to the unit of its sample format (4-bit ADPCM nibbles, 16-bit or 8-bit PCM
+ * samples), and points looping-less entries at the zero sample (zeroBase).
+ * ADPCM entries (types 0 and 1) are given their coefficient block, stored after the entries.
+ */
 void SPInitSoundTable(SPSoundTable* table, u32 aramBase, u32 zeroBase) {
     int i;
     SPSoundEntry* sound;
@@ -68,6 +74,7 @@ void SPInitSoundTable(SPSoundTable* table, u32 aramBase, u32 zeroBase) {
     }
 }
 
+/** Returns entry number index of a sound table, or NULL when index is beyond the number of entries. */
 SPSoundEntry* SPGetSoundEntry(SPSoundTable* table, u32 index) {
     ASSERTLINE(123, table);
 
@@ -78,6 +85,13 @@ SPSoundEntry* SPGetSoundEntry(SPSoundTable* table, u32 index) {
     return NULL;
 }
 
+/**
+ * Programs an AX voice parameter block to play a sound entry:
+ * sets its format and loop flag (type 0/1 ADPCM, 2/3 16-bit PCM, 4/5 8-bit PCM, odd types loop), the loop,
+ * end and current sample addresses, the ADPCM coefficients for ADPCM,
+ * and the sample-rate-converter ratio for sampleRate relative to 32 kHz.
+ * Queues the update to AX through the voice's sync flags, with interrupts disabled.
+ */
 void SPPrepareSound(SPSoundEntry* sound, AXVPB* axvpb, u32 sampleRate) {
     BOOL old;
     u32 srcBits;
@@ -387,6 +401,10 @@ void SPPrepareSound(SPSoundEntry* sound, AXVPB* axvpb, u32 sampleRate) {
     }
 }
 
+/**
+ * Makes a playing voice finish: clears its loop flag and sets its end address to the sound's end address
+ * so it stops after the current pass.
+ */
 void SPPrepareEnd(SPSoundEntry* sound, AXVPB* axvpb) {
     BOOL old;
 

@@ -43,10 +43,12 @@ rept:
     blr
 }
 
+/** User-level start-up hook called from __start before main; here it only runs the C++ static constructors. */
 void __init_user(void) {
     __init_cpp();
 }
 
+/** Calls every function in the _ctors table (C++ static constructors) in order. */
 static void __init_cpp(void) {
 	void (* * constructor)();
 
@@ -58,6 +60,7 @@ static void __init_cpp(void) {
 	}
 }
 
+/** Calls every function in the _dtors table (C++ static destructors); run from exit. */
 static void __fini_cpp(void) {
     void (* * destructor)();
 
@@ -70,16 +73,22 @@ static void __fini_cpp(void) {
 }
 
 __declspec(weak)
+/** Standard C abort: ends the program through _ExitProcess. */
 void abort(void) {
     _ExitProcess();
 }
 
 __declspec(weak)
+/**
+ * Standard C exit: runs the static destructors and then ends the program through _ExitProcess.
+ * Weak, so a program can override it.
+ */
 void exit(int status) {
     __fini_cpp();
     _ExitProcess();
 }
 
+/** Halts the processor with PPCHalt; nothing returns from here. */
 void _ExitProcess(void) {
     PPCHalt();
 }

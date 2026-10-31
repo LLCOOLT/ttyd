@@ -127,6 +127,12 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Plays the falling-wall paper animation for one wall panel:
+ * LW(0) paper name, LW(1) map object, LW(2) image name, LW(3) offscreen name.
+ * It captures the panel, shows the roll animation with a slot sound,
+ * then hides the panel and releases the capture.
+ */
 EVT_BEGIN(wall_roll_sub)
 #if VERSION <= VERSION_DEMO_US
     CALL(evt_paper_entry, LW(0))
@@ -158,6 +164,11 @@ EVT_BEGIN(wall_roll_sub)
     RETURN
 EVT_END()
 
+/**
+ * Reward scene for the slot puzzle: with a quake and fanfare the four wall panels roll away one by one,
+ * the floor and wall collisions change, small stars burst from the four switches, which are removed.
+ * Sets the story to STORY_STG2_21_02_MATCHING_THE_PATTERNS.
+ */
 EVT_BEGIN(wall_roll)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -237,6 +248,11 @@ EVT_BEGIN(wall_roll)
     RETURN
 EVT_END()
 
+/**
+ * Init script of the breaking floor: sets the collision of the lower floor piece (A_f2_rak_02) from
+ * GSWF_MRI09_FLOOR_BROKEN.
+ * In the demo the flag test is the wrong way round and there is no else branch (marked BUG in the code).
+ */
 static EVT_BEGIN(breakyuka_init)
 #if VERSION <= VERSION_DEMO_US
     // BUG: the demo tests the floor flag the other way round and has no ELSE (fixed in the later builds)
@@ -253,6 +269,10 @@ static EVT_BEGIN(breakyuka_init)
     RETURN
 EVT_END()
 
+/**
+ * Main script when the floor gives way under the Puni weight:
+ * turns on the collision of the lower floor piece and makes every Puni that is standing over the hole fall.
+ */
 static EVT_BEGIN(breakyuka_main)
     CALL(evt_hitobj_onoff, STRING("A_f2_rak_02"), 1, 1)
     CALL(evt_puni_all_fall_check)
@@ -268,6 +288,10 @@ static KusaAccess ueki_access_data[] = {
     {4, NULL, NULL, NULL},
 };
 
+/**
+ * Hit script of red switch 0: while the puzzle is not solved,
+ * each hit turns the first panel (GW(0)) by 90 degrees over half a second.
+ */
 EVT_BEGIN(slot00_event)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_21_02_MATCHING_THE_PATTERNS)
         RETURN
@@ -292,6 +316,7 @@ EVT_BEGIN(slot00_event)
     RETURN
 EVT_END()
 
+/** Hit script of red switch 1: turns the second panel (GW(1)) by 90 degrees over half a second. */
 EVT_BEGIN(slot01_event)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_21_02_MATCHING_THE_PATTERNS)
         RETURN
@@ -316,6 +341,7 @@ EVT_BEGIN(slot01_event)
     RETURN
 EVT_END()
 
+/** Hit script of red switch 2: turns the third panel (GW(2)) by 90 degrees over half a second. */
 EVT_BEGIN(slot02_event)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_21_02_MATCHING_THE_PATTERNS)
         RETURN
@@ -340,6 +366,7 @@ EVT_BEGIN(slot02_event)
     RETURN
 EVT_END()
 
+/** Hit script of red switch 3: turns the fourth panel (GW(3)) by 90 degrees over half a second. */
 EVT_BEGIN(slot03_event)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_21_02_MATCHING_THE_PATTERNS)
         RETURN
@@ -364,6 +391,11 @@ EVT_BEGIN(slot03_event)
     RETURN
 EVT_END()
 
+/**
+ * Runs the four-panel pattern puzzle: sets the panels' starting angles (GW(0) to GW(3)),
+ * keeps their rotation up to date and starts wall_roll
+ * when the panels show the correct pattern (270, 180, 0, 90).
+ */
 EVT_BEGIN(slot_event)
     SET_VALUE(GW(0), 0)
 #if VERSION >= VERSION_US
@@ -395,6 +427,10 @@ EVT_BEGIN(slot_event)
     RETURN
 EVT_END()
 
+/**
+ * Chest script for the Blue Key: Mario opens the chest and receives the Blue Key, Punio comments,
+ * and the west exit is changed to lead to the blue cell. Sets the story to STORY_STG2_18_JABBLE.
+ */
 EVT_BEGIN(get_blue_jail_key)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
@@ -436,6 +472,11 @@ EVT_BEGIN(get_blue_jail_key)
     RETURN
 EVT_END()
 
+/**
+ * Map init script of mri_09, the slot-switch room:
+ * sets up the Puni, planters and Piders checker, the four red switches and wall panels for the story state,
+ * the Blue Key chest, the Charge badge, a Shine Sprite block and the breaking floor.
+ */
 EVT_BEGIN(mri_09_init_evt)
     CALL(evt_puni_mem_init)
     CALL(evt_puni_set_yuka, 9, 100, 0, -310, -1000, 2, 2)

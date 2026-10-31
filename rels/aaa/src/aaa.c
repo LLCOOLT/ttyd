@@ -6,6 +6,10 @@
 #include "aaa.h"
 #include "rel_module.h"
 
+/**
+ * Module entry point: runs the static constructors
+ * and registers aaa_00_init_evt for the map "aaa_00" (Mario's house).
+ */
 void _prolog(void) {
     voidfunctionptr* ctor;
 
@@ -15,6 +19,7 @@ void _prolog(void) {
     relSetEvtAddr("aaa_00", aaa_00_init_evt);
 }
 
+/** Module exit point: frees the prologue's Mario's-house texture via mapdelete, then runs the static destructors. */
 void _epilog(void) {
     voidfunctionptr* dtor;
 
@@ -23,5 +28,6 @@ void _epilog(void) {
         (*dtor)();
     }
 }
+/** Stub the linker needs for unresolved symbols; does nothing. */
 void _unresolved(void) {
 }

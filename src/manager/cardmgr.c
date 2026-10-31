@@ -100,10 +100,19 @@ static inline BOOL headerCheck(void);
 static inline BOOL headerCheck2(void);
 static inline BOOL dataCheck(void);
 
+/**
+ * The in-memory copy of the save file: the header (comment, banner, icon, settings)
+ * and the four save slots the file select screen lists.
+ */
 CardData* cardGetFilePtr(void) {
     return wp->data;
 }
 
+/**
+ * Cancels any card access in flight and resets the in-memory save file to an empty header and four erased slots;
+ * the memory card scripts call it before loading the file again.
+ * The demo keeps its insert-watch flag across the reset.
+ */
 void cardBufReset(void) {
     s32 flags;
     s32 timeout;
@@ -135,6 +144,11 @@ void cardBufReset(void) {
 #endif
 }
 
+/**
+ * Boot-time setup: allocates the card work, the SDK work area,
+ * the save file image and the read and write slot buffers,
+ * builds an empty file image and starts the CARD library.
+ */
 void cardInit(void) {
     wp = __memAlloc(HEAP_DEFAULT, sizeof(CardWork));
     memset(wp, 0, sizeof(CardWork));
@@ -160,17 +174,23 @@ void cardInit(void) {
 }
 
 #if VERSION >= VERSION_JP
+/**
+ * Starts watching slot A for a card being inserted or removed (memcard_watch_start);
+ * also keeps cardIsExec busy for 10 frames while the probe settles. Not in the demo.
+ */
 void cardInsertWatchStart(void) {
     wp->prevInserted = wp->chan;
     wp->busyFrames = 10;
     wp->flags |= 0x8000;
 }
 
+/** Stops the insert watch and clears its changed flag. */
 void cardInsertWatchEnd(void) {
     wp->flags &= ~0x8000;
     wp->flags &= ~0xC000;
 }
 
+/** TRUE once a card was inserted or removed in slot A since cardInsertWatchStart; the file select scripts poll it. */
 BOOL cardInsertChanged(void) {
     if (wp->flags & 0x8000 && wp->flags & 0x4000) {
         return TRUE;
@@ -179,6 +199,10 @@ BOOL cardInsertChanged(void) {
 }
 #endif
 
+/**
+ * TRUE while a card operation is running or a card call is in flight (or the insert watch is settling).
+ * Scripts wait on it, and mariost.c waits for it before a reset so a save is never cut off.
+ */
 BOOL cardIsExec(void) {
 #if VERSION >= VERSION_JP
     if (wp == NULL) {
@@ -194,10 +218,17 @@ BOOL cardIsExec(void) {
     return wp->busyFrames != 0;
 }
 
+/** Result of the last card operation as a CARD_RESULT_* code (READY on success, NOCARD, BROKEN, INSSPACE, ...). */
 s32 cardGetCode(void) {
     return wp->result;
 }
 
+/**
+ * Advances the running card operation by one step each frame (from mariost.c):
+ * write, header write, read, read all, create, format; also samples slot A for the insert watch.
+ * Each step starts one SDK call and the next frame continues once its callback has stored the result.
+ * Delete (op 7) has no starter function.
+ */
 void cardMain(void) {
 #if VERSION >= VERSION_JP
     s32 inserted;
@@ -317,6 +348,12 @@ void cardMain(void) {
     }
 }
 
+/**
+ * Loads a save slot into the running game: copies its global work, pouch, defeated-NPC records, badge shop,
+ * Pianta Parlor and informant state over the live ones,
+ * keeping the console settings (sound mode, rumble, last slot, progressive scan, and the language,
+ * plus the 50/60 Hz choice on PAL) and runtime pointers. Called by the file select's load.
+ */
 void cardCopy2Main(s32 slot) {
 #if VERSION >= VERSION_US
     void* backup2;
@@ -401,6 +438,7 @@ void cardCopy2Main(s32 slot) {
 #endif
 }
 
+/** Starts erasing a save slot: writes an empty slot marked erased (flag 1) over both its copies on the card. */
 void cardErase(s32 slotNo) {
     CardSaveSlot* save;
 
@@ -419,6 +457,7 @@ void cardErase(s32 slotNo) {
     }
 }
 
+/** Starts copying save slot from into slot to (file select's Copy), writing both copies of the target on the card. */
 void cardCopy(s32 from, s32 to) {
     if (!(wp->flags & 2)) {
         wp->op = 1;
@@ -432,6 +471,11 @@ void cardCopy(s32 from, s32 to) {
     }
 }
 
+/**
+ * Saves the game into a slot: records Mario's position, both partners, the save time and count,
+ * then snapshots the global work, pouch, defeated-NPC records, badge shop, Pianta Parlor and informant state,
+ * checksums it and starts the write.
+ */
 void cardWrite(s32 slot) {
     CardSaveSlot* save;
     MarioWork* mario;
@@ -488,6 +532,12 @@ void cardWrite(s32 slot) {
     }
 }
 
+/**
+ * Step machine for cardWrite/cardCopy/cardErase:
+ * mounts and checks the card, rewrites a bad header, checks which of the slot's two copies is valid,
+ * and writes the new data to the other copy first and then over the valid one, so a power cut never loses both.
+ * Ends by closing the file and unmounting.
+ */
 static void write_main(void) {
     if (wp->result) {
         wp->op = 8;
@@ -576,6 +626,7 @@ static void write_main(void) {
     }
 }
 
+/** Starts rewriting just the save file header (comment, date and settings like sound mode and rumble). */
 void cardWriteHeader(void) {
     if (!(wp->flags & 2)) {
         wp->op = 2;
@@ -589,6 +640,7 @@ void cardWriteHeader(void) {
     }
 }
 
+/** Step machine for cardWriteHeader: mount, check, open, write the header block, close, unmount. */
 static void write_header_main(void) {
     if (wp->result) {
         wp->op = 8;
@@ -634,6 +686,11 @@ static void write_header_main(void) {
     }
 }
 
+/**
+ * Step machine for reading one slot (opSlot): validates both copies
+ * and loads the newer valid one into the file image, or marks the slot corrupt (flag 2) if neither is valid.
+ * No starter in this file sets its op (3).
+ */
 static void read_main(void) {
     s32 saveType; // invalid = -1, main = 0, backup = 1
 
@@ -720,6 +777,7 @@ static void read_main(void) {
     }
 }
 
+/** Starts reading the whole save file from slot A: header and all four slots (file select start-up). */
 void cardReadAll(void) {
     if (!(wp->flags & 2)) {
         wp->op = 4;
@@ -732,6 +790,11 @@ void cardReadAll(void) {
     }
 }
 
+/**
+ * Step machine for cardReadAll: loads the header (rebuilding it if corrupt, flag 0x400)
+ * and takes the sound mode, rumble and last slot settings from it,
+ * then for each of the four slots picks the newer valid copy, or marks it corrupt.
+ */
 static void read_all_main(void) {
     s32 saveType; // invalid = -1, main = 0, backup = 1
 
@@ -827,6 +890,7 @@ static void read_all_main(void) {
     }
 }
 
+/** Starts creating the save file on the card, replacing any old one (evt_memcard's create, from the file select). */
 void cardCreate(void) {
     if (!(wp->flags & 2)) {
         wp->op = 5;
@@ -839,6 +903,11 @@ void cardCreate(void) {
     }
 }
 
+/**
+ * Step machine for cardCreate: deletes any old file, creates a 0x22000-byte file,
+ * writes an empty header and slots, then sets the comment,
+ * banner and animated icon in the card's directory entry.
+ */
 static void create_main(void) {
     if (wp->result) {
         wp->op = 8;
@@ -908,6 +977,7 @@ static void create_main(void) {
     }
 }
 
+/** Starts formatting the card in slot A (evt_memcard's format, offered by the file select for an unusable card). */
 void cardFormat(void) {
     if (!(wp->flags & 2)) {
         wp->op = 6;
@@ -919,6 +989,7 @@ void cardFormat(void) {
     }
 }
 
+/** Step machine for formatting: mount, format, unmount. Unused: cardMain carries its own copy for op 6. */
 static inline void format_main(void) {
     if (wp->result != CARD_RESULT_READY) {
         wp->op = 8;
@@ -955,6 +1026,10 @@ static inline void format_main(void) {
     }
 }
 
+/**
+ * Step machine for deleting the save file: mount, check, delete, unmount.
+ * Unused: cardMain carries its own copy (op 7).
+ */
 static inline void delete_main(void) {
     if (wp->result != CARD_RESULT_READY) {
         wp->op = 8;
@@ -995,6 +1070,7 @@ static inline void delete_main(void) {
     }
 }
 
+/** Stamps a slot with the save version string and size and its checksums (byte sum and its complement). */
 static inline void check_sum(CardSaveSlot* save) {
     s32 i;
     u8* byte;
@@ -1013,6 +1089,7 @@ static inline void check_sum(CardSaveSlot* save) {
     save->checksum2 = ~save->checksum1;
 }
 
+/** TRUE if the header just read into the read buffer has matching checksums. */
 static inline BOOL headerCheck(void) {
     s32 i;
     s32 checksum;
@@ -1036,6 +1113,7 @@ static inline BOOL headerCheck(void) {
     }
 }
 
+/** TRUE if the header in the file image has matching checksums (cardReadAll reads it straight there). */
 static inline BOOL headerCheck2(void) {
     s32 i;
     s32 checksum;
@@ -1059,6 +1137,10 @@ static inline BOOL headerCheck2(void) {
     }
 }
 
+/**
+ * TRUE if the slot in the read buffer has the right size, this release's version string and matching checksums,
+ * so a save from a different version reads as corrupt.
+ */
 static inline BOOL dataCheck(void) {
     s32 i;
     u32 checksum;
@@ -1086,6 +1168,7 @@ static inline BOOL dataCheck(void) {
     }
 }
 
+/** Byte sum used as the header checksum. */
 static inline u32 header_sum(u8* data, s32 size) {
     s32 i;
     u32 sum;
@@ -1097,7 +1180,7 @@ static inline u32 header_sum(u8* data, s32 size) {
 }
 
 #if VERSION == VERSION_EU
-// PAL: not inlined; the comment and its date order follow gp->language
+/** PAL: not inlined; the comment and its date order follow gp->language */
 static void make_header(void) {
     CardMetadata* metadata;
     OSCalendarTime td;
@@ -1143,6 +1226,11 @@ static void make_header(void) {
     metadata->checksum2 = ~metadata->checksum1;
 }
 #else
+/**
+ * Builds the save file header: the "Paper Mario" title
+ * and today's date comment shown in the GameCube memory card screen, the banner and icon images, and the sound,
+ * rumble and last slot settings, then its checksums.
+ */
 static inline void make_header(void) {
     CardMetadata* metadata;
     OSCalendarTime td;
@@ -1164,6 +1252,7 @@ static inline void make_header(void) {
 }
 #endif
 
+/** Clears the four slots of the file image to erased, checksummed empty saves. */
 static inline void make_data(void) {
     CardSaveSlot* save;
     s32 i;
@@ -1234,10 +1323,15 @@ static void memcard_probe(void) {
     wp->flags &= ~1;
 }
 
+/** Card-removed callback for CARDMountAsync; does nothing. */
 static void mountDetachCallback(s32 chan, s32 result) {
     ; // stubbed in retail
 }
 
+/**
+ * Mount completion: stores the result, treating BROKEN and ENCODING as success
+ * so the following check step reports them.
+ */
 static void mountAttachCallback(s32 chan, s32 result) {
     wp->result = result;
     if (result == CARD_RESULT_BROKEN || result == CARD_RESULT_ENCODING) {
@@ -1246,12 +1340,14 @@ static void mountAttachCallback(s32 chan, s32 result) {
     wp->flags &= ~1;
 }
 
+/** Mounts the card in the chosen slot asynchronously, in fast mode. */
 static inline void memcard_mount(void) {
     CARDSetFastMode(TRUE);
     wp->flags |= 1;
     CARDMountAsync(wp->chan, wp->workArea, mountDetachCallback, mountAttachCallback);
 }
 
+/** Unmounts the card, retrying while busy. */
 static inline void memcard_unmount(void) {
     s32 result;
     s32 i;
@@ -1268,26 +1364,31 @@ static inline void memcard_unmount(void) {
     wp->flags &= ~1;
 }
 
+/** CARDCheckAsync completion: stores the result and clears the in-flight flag. */
 static void checkCallback(s32 chan, s32 result) {
     wp->result = result;
     wp->flags &= ~1;
 }
 
+/** Checks the card's file system asynchronously. */
 static inline void memcard_check(void) {
     wp->flags |= 1;
     CARDCheckAsync(wp->chan, checkCallback);
 }
 
+/** CARDFormatAsync completion: stores the result and clears the in-flight flag. */
 static void formatCallback(s32 chan, s32 result) {
     wp->result = result;
     wp->flags &= ~1;
 }
 
+/** Formats the card asynchronously. */
 static inline void memcard_format(void) {
     wp->flags |= 1;
     CARDFormatAsync(wp->chan, formatCallback);
 }
 
+/** Deletes the save file, retrying while busy; a missing file counts as success. */
 static inline void memcard_delete(void) {
     s32 result;
     s32 i;
@@ -1309,46 +1410,55 @@ static inline void memcard_delete(void) {
     wp->flags &= ~1;
 }
 
+/** CARDCreateAsync completion: stores the result and clears the in-flight flag. */
 static void createCallback(s32 chan, s32 result) {
     wp->result = result;
     wp->flags &= ~1;
 }
 
+/** Creates mariost_save_file with room for the header and the eight slot copies (0x22000 bytes). */
 static inline void memcard_create(void) {
     wp->flags |= 1;
     CARDCreateAsync(wp->chan, card_file_name, sizeof(CardData) + (sizeof(CardSaveSlot) * 4), &wp->info, createCallback);
 }
 
+/** CARDWriteAsync completion: stores the result and clears the in-flight flag. */
 static void writeCallback(s32 chan, s32 result) {
     wp->result = result;
     wp->flags &= ~1;
 }
 
+/** Writes length bytes at offset in the open save file asynchronously. */
 static inline void memcard_write(void* addr, s32 length, s32 offset) {
     wp->flags |= 1;
     CARDWriteAsync(&wp->info, addr, length, offset, writeCallback);
 }
 
+/** CARDReadAsync completion: stores the result and clears the in-flight flag. */
 static void readCallback(s32 chan, s32 result) {
     wp->result = result;
     wp->flags &= ~1;
 }
 
+/** Reads length bytes at offset from the open save file asynchronously. */
 static inline void memcard_read(void* addr, s32 length, s32 offset) {
     wp->flags |= 1;
     CARDReadAsync(&wp->info, addr, length, offset, readCallback);
 }
 
+/** CARDSetStatusAsync completion: stores the result and clears the in-flight flag. */
 static void statusCallback(s32 chan, s32 result) {
     wp->result = result;
     wp->flags &= ~1;
 }
 
+/** Writes the directory entry (comment, banner and icon settings) of the save file asynchronously. */
 static inline void memcard_set_stat(void) {
     wp->flags |= 1;
     CARDSetStatusAsync(wp->chan, wp->info.fileNo, &wp->status, statusCallback);
 }
 
+/** Reads the save file's directory entry into wp->status, retrying while busy. */
 static inline void memcard_get_stat(void) {
     s32 result;
     s32 i;
@@ -1366,6 +1476,7 @@ static inline void memcard_get_stat(void) {
     wp->flags &= ~1;
 }
 
+/** Reads the card's serial number, which memcard_open later compares to spot a swapped card. */
 static inline void memcard_get_serial(void) {
     s32 result;
     s32 i;
@@ -1384,6 +1495,12 @@ static inline void memcard_get_serial(void) {
     wp->flags &= ~1;
 }
 
+/**
+ * Opens the save file.
+ * If a card was opened before, it first refuses (NOPERM) a card with a different serial number.
+ * Finds mariost_save_file in the directory; a file of the wrong layout gives NOFILE.
+ * With no file it reports why one cannot be made (INSSPACE, NOENT) or NOFILE when there is room.
+ */
 static void memcard_open(void) {
     CARDStat stat;
     u64 serialNo;
@@ -1482,6 +1599,7 @@ static void memcard_open(void) {
     wp->flags &= ~1;
 }
 
+/** Closes the save file, retrying while busy. */
 static inline void memcard_close(void) {
     s32 result;
     s32 i;

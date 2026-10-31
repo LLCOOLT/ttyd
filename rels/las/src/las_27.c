@@ -21,6 +21,11 @@ static USER_FUNC(make_name);
 
 static BeroEntry bero_entry_data[3];
 
+/**
+ * Door animation script (closing) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_door1_1 and S_door1_2 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door1_1"), 0, LW(0), 0)
@@ -29,6 +34,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_door1_1 and S_door1_2 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door1_1"), 0, LW(0), 0)
@@ -37,6 +47,11 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (closing) for the east door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_door2_1 and S_door2_2 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door2_1"), 0, LW(0), 0)
@@ -45,6 +60,11 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the east door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_door2_1 and S_door2_2 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(e_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_door2_1"), 0, LW(0), 0)
@@ -93,6 +113,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Map-init helper: hides the 28 numbered torch map objects (names from make_name)
+ * and puts a small flame effect 9 units below the origin of each one.
+ */
 static EVT_BEGIN(shan_init)
     SET_VALUE(LW(0), 1)
     LOOP(28)
@@ -110,6 +134,11 @@ static EVT_BEGIN(shan_init)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for las_27, the hall before the throne rooms:
+ * ambience only (no music), the doors to las_25 and las_28, a save block, a recovery block,
+ * and 28 lit wall torches.
+ */
 EVT_BEGIN(las_27_init_evt)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS9"))
@@ -129,6 +158,7 @@ EVT_BEGIN(las_27_init_evt)
     RETURN
 EVT_END()
 
+/** Script helper: builds the torch map-object name "hi<args[0]>" and returns it in args[1]. */
 static USER_FUNC(make_name) {
     EvtWord* args = event->args;
 #if VERSION <= VERSION_DEMO_US

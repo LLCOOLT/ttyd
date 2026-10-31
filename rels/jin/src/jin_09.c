@@ -36,6 +36,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Script for the red jump stand: Mario is launched up in an arc by the stand. */
 EVT_BEGIN(jin_09_jumpstand)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_jump_jumpstand, 0, 0, 0, -10, 700, 0, 50, 0, 0, 1800, 1)
@@ -43,6 +44,11 @@ EVT_BEGIN(jin_09_jumpstand)
     RETURN
 EVT_END()
 
+/**
+ * Creepy Steeple jin_09 map init: sets music, the shadow-Mario tint and the exit,
+ * adds the Shine Sprite power-up block, the random water-drip animations and sounds,
+ * the red jump stand and the drop-in entrance from above.
+ */
 EVT_BEGIN(jin_09_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_JIN1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_JIN1"))

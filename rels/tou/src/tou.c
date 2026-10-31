@@ -160,6 +160,11 @@ static EvtWord evt_open[VERSION_PICK(165, 173)];
 extern EvtWord evt_doku_cake[];
 extern EvtWord evt_michel_1[];
 
+/**
+ * Glitz Pit REL prolog: runs the static constructors,
+ * registers the init scripts of tou_00 to tou_20 with the map loader (tou_03, the ring, is in the tou2 REL)
+ * and builds the fighter ranking from the saved story flags.
+ */
 void _prolog(void) {
     voidfunctionptr* ctor;
 
@@ -183,6 +188,7 @@ void _prolog(void) {
     rankingInit();
 }
 
+/** Glitz Pit REL epilog: writes the ranking back into the saved flags, then runs the static destructors. */
 void _epilog(void) {
     voidfunctionptr* dtor;
 
@@ -192,9 +198,16 @@ void _epilog(void) {
     }
 }
 
+/** Unresolved-import stub for the REL linker; does nothing. */
 void _unresolved(void) {
 }
 
+/**
+ * Builds rank_wp, the Glitz Pit fighter ranking:
+ * 23 entries before Chapter 3 ends (Return to Rogueport), 21 afterwards.
+ * Restores each fighter's lost-flag and score from saved flags (or the initial points of fighterDt),
+ * hides Swoops and Spinia until the story reaches them, and sorts the board via rankingControll.
+ */
 static void rankingInit(void) {
     s32 i;
     s32 j;
@@ -252,6 +265,10 @@ static void rankingInit(void) {
     rankingControll();
 }
 
+/**
+ * Saves the ranking back to the game state: each fighter's "has fallen below" flag and two score bytes,
+ * then frees the entry array.
+ */
 static void rankingExit(void) {
     s32 i;
     s32 j;
@@ -270,6 +287,7 @@ static void rankingExit(void) {
     _mapFree(rank_wp->entries);
 }
 
+/** Script helper (no arguments): saves and rebuilds the ranking, so story-flag changes made by a script take effect. */
 static USER_FUNC(evt_rankingReInit) {
     rankingExit();
     rankingInit();
@@ -277,6 +295,11 @@ static USER_FUNC(evt_rankingReInit) {
 }
 
 #if VERSION >= VERSION_JP
+/**
+ * Script helper (no arguments): resets the Glitz Pit to its starting state.
+ * Removes item 0x41 from the pouch, clears every fighter's lost flag
+ * and the first-match/champion/title-match/last-opponent flags, then rebuilds the ranking.
+ */
 USER_FUNC(evt_rankingReset) {
     s32 i;
 
@@ -297,6 +320,7 @@ USER_FUNC(evt_rankingReset) {
 }
 #endif
 
+/** Moves list[from] to position `to`, shifting the entries in between by one (the ranking's reorder primitive). */
 static void insert(s32* list, s32 num, s32 from, s32 to) {
     s32 i;
 
@@ -315,6 +339,13 @@ static void insert(s32* list, s32 num, s32 from, s32 to) {
     }
 }
 
+/**
+ * Re-sorts the ranking.
+ * Fighters who are still above Mario ("win" group) are ordered by score
+ * and some are pinned to fixed slots (the champion first, then slots 1, 10, 14, 18,
+ * 19 for the flagged fighters); the last opponent is pushed to the end of its group.
+ * Mario's marker (id 20) sits between the two groups and his rank goes to GSW_TOU_PLAYER_RANK.
+ */
 static void rankingControll(void) {
     s32 win[32];
     s32 lose[32];
@@ -413,6 +444,7 @@ static void rankingControll(void) {
     swByteSet(GSW_TOU_PLAYER_RANK, j);
 }
 
+/** Script helper: args[0] receives Mario's current rank (0 = the champion's seat). */
 USER_FUNC(evt_tou_get_ranking) {
     EvtWord* args = event->args;
     s32 rank;
@@ -423,6 +455,11 @@ USER_FUNC(evt_tou_get_ranking) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] receives the id of the fighter Mario fights next:
+ * the one ranked just above him, or the one just below
+ * after the last rule was not met (GSWF_TOU_LAST_RULE_MET clear). Mario at rank 0 gets the second fighter.
+ */
 static USER_FUNC(evt_tou_get_next_match) {
     EvtWord* args = event->args;
     s32 flag = evtGetValue(event, GSWF(GSWF_TOU_LAST_RULE_MET));
@@ -458,6 +495,7 @@ static USER_FUNC(evt_tou_get_next_match) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: args[0] = fighter id; args[1] receives the fighter's name string, args[2] its battle setup id. */
 USER_FUNC(evt_tou_get_fighter_info) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -473,6 +511,7 @@ USER_FUNC(evt_tou_get_fighter_info) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: args[0] = fighter id; args[1] receives the fighter's title (second name string). */
 static USER_FUNC(evt_tou_get_fighter_name2) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -487,6 +526,10 @@ static USER_FUNC(evt_tou_get_fighter_name2) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] = fighter id; args[1] receives that fighter's current position on the board (hidden
+ * fighters are skipped).
+ */
 static USER_FUNC(evt_tou_get_fighter_rank) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -507,6 +550,10 @@ static USER_FUNC(evt_tou_get_fighter_rank) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] = fighter id; args[1] and args[2] receive the fighter's pre-match taunt
+ * and victory message ids.
+ */
 static USER_FUNC(evt_tou_get_fighter_battle_msg) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -522,6 +569,13 @@ static USER_FUNC(evt_tou_get_fighter_battle_msg) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: picks a match rule for the registration.
+ * args[0] = mode (0 forces the rule with id 6, 10 excludes the special ids 0x20/0x30/0x40,
+ * anything else is random); returns name (args[1]),
+ * rule id (args[2]) and the two rule parameters (args[3], args[4]).
+ * The table depends on Mario's rank and the story.
+ */
 static USER_FUNC(evt_tou_get_rule_info) {
     EvtWord* args = event->args;
     s32 mode = evtGetValue(event, args[0]);
@@ -576,6 +630,7 @@ static USER_FUNC(evt_tou_get_rule_info) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: args[0] = rule id; args[1] receives the message string describing that rule's conditions. */
 USER_FUNC(evt_tou_get_rule_msg2) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -619,6 +674,12 @@ USER_FUNC(evt_tou_get_rule_msg2) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] = 0 if Mario won the match, else lost; args[1] = opponent id.
+ * Updates the opponent's lost flag and GSWF_TOU_LAST_MATCH_WON,
+ * jitters every fighter's score by a random amount,
+ * records the opponent in GSW_TOU_LAST_OPPONENT_ID and re-sorts the board.
+ */
 static USER_FUNC(evt_tou_set_ranking_win_lose) {
     EvtWord* args = event->args;
     s32 lose = evtGetValue(event, args[0]);
@@ -663,6 +724,10 @@ static USER_FUNC(evt_tou_set_ranking_win_lose) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] = rule result bits from the match (bit 2 = rule met);
+ * sets or clears GSWF_TOU_LAST_RULE_MET.
+ */
 static USER_FUNC(evt_tou_set_rule_result) {
     s32 result = evtGetValue(event, event->args[0]);
 
@@ -676,6 +741,7 @@ static USER_FUNC(evt_tou_set_rule_result) {
     return EVT_RETURN_DONE;
 }
 
+/** Debug stub left from the original build: reads the story progress and loops over the entries; prints nothing. */
 static void printRanking(void) {
     s32 i;
 
@@ -790,6 +856,11 @@ static const char* suuji[] = {
     "８", "９",
 };
 
+/**
+ * Draws the ranking window: a "Ranking" title and the scrolling two-page list of fighter names with rank numbers
+ * (the champion's seat in red), clipped by a scissor box.
+ * Runs as a display entry queued by evt_tou_print_ranking.
+ */
 static void disp_proc(CameraId cameraId, void* param) {
 #if VERSION >= VERSION_US
     const char* title;
@@ -1000,6 +1071,12 @@ const char* lockerDt[] = {
     NULL,
 };
 
+/**
+ * Locker door close script.
+ * Triggered by pushing at or standing on an open locker;
+ * plays the close sound, swings the door shut over 40 or 20 frames,
+ * then re-registers evt_open so the door can be opened again.
+ */
 EVT_BEGIN(evt_close)
     SET_VALUE(LF(0), 0)
     IF_INT_EQUAL(LW(10), 0)
@@ -1063,6 +1140,16 @@ EVT_BEGIN(evt_close)
     RETURN
 EVT_END()
 
+/**
+ * Locker door open script, run when Mario pushes on a locker (registered by the locker setup script;
+ * evt_close is its counterpart).
+ * Before STORY_STG3_05_MATCH in tou_10, with no match reserved yet,
+ * the locker stays shut and a staff member says stg3_tou_67 (the US and later versions skip the line if Mario's
+ * input is already locked).
+ * Otherwise it plays the locker-open sound at the door,
+ * swings the door open 120 degrees over 40 frames (mirrored when LF(0) is 1),
+ * and registers evt_close for pushing at or standing on it.
+ */
 static EVT_BEGIN(evt_open)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_05_MATCH)
         CALL(evt_sub_get_mapname, LW(5))
@@ -1121,6 +1208,10 @@ static EVT_BEGIN(evt_open)
     RETURN
 EVT_END()
 
+/**
+ * Map-init helper: binds every locker in lockerDt to its collision and an evt_open case script,
+ * except the doors that are scenery on the current map (a few door objects in tou_10, tou_09 and tou_08).
+ */
 EVT_BEGIN(evt_tou_locker_init)
     SET_INT_READ_ADDR(PTR(&lockerDt))
     LOOP(0)
@@ -1169,6 +1260,7 @@ EVT_BEGIN(evt_tou_locker_init)
     RETURN
 EVT_END()
 
+/** Script helper: shows the ranking window (disp_proc) and blocks while it is open; L/R switch pages, B closes it. */
 static USER_FUNC(evt_tou_print_ranking) {
     s32 rank;
     s32 i;
@@ -1200,6 +1292,7 @@ static USER_FUNC(evt_tou_print_ranking) {
 }
 
 #if VERSION >= VERSION_US
+/** Script helper: args[0] receives 1 if Mario's key input or control is currently disabled, else 0. */
 USER_FUNC(tou_mario_keyoff_check) {
     EvtWord* args = event->args;
 
@@ -1212,6 +1305,11 @@ USER_FUNC(tou_mario_keyoff_check) {
 }
 #endif
 
+/**
+ * Display callback for the in-world monitor: renders Grubba (ガンス),
+ * or Jolene (キノシコワ) after Chapter 3's story point, into a 128x128 texture with its own camera,
+ * so the screen mesh can show him.
+ */
 static void gans_tex(CameraId cameraId, void* param) {
     GansWork* wp = param;
     CameraEntry saved;
@@ -1265,12 +1363,14 @@ static void gans_tex(CameraId cameraId, void* param) {
     wp->ready = 1;
 }
 
+/** Returns a white color with the given alpha (used for the monitor's fade). */
 static inline GXColor tou_mkcolor(u8 a) {
     GXColor c = {0xFF, 0xFF, 0xFF, 0x00};
     c.a = a;
     return c;
 }
 
+/** Turns the registration monitor on, with the computer sound at the "M_make" console. */
 EVT_BEGIN(evt_tou_monitor_on)
     CALL(evt_hit_get_position, STRING("M_make"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_TOUROKU_COM2"), LW(0), LW(1), LW(2), 0)
@@ -1278,6 +1378,7 @@ EVT_BEGIN(evt_tou_monitor_on)
     RETURN
 EVT_END()
 
+/** Turns the registration monitor off, with the computer sound at the "M_make" console. */
 EVT_BEGIN(evt_tou_monitor_off)
     CALL(evt_hit_get_position, STRING("M_make"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_TOUROKU_COM2"), LW(0), LW(1), LW(2), 0)
@@ -1285,6 +1386,10 @@ EVT_BEGIN(evt_tou_monitor_off)
     RETURN
 EVT_END()
 
+/**
+ * Map-init helper for tou_10, tou_08 and tou_07:
+ * starts the monitor renderer and hooks the screen mesh onto monitor_tev so it shows the live texture.
+ */
 EVT_BEGIN(evt_tou_monitor_init)
     BEGIN_INLINE_EVENT
         CALL(make_monitor)
@@ -1308,6 +1413,10 @@ EVT_BEGIN(evt_tou_monitor_init)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the guard's remark during the poison cake event;
+ * only plays when the guard is more than 100 units away in z.
+ */
 EVT_BEGIN(talk_gardman_doku)
     CALL(evt_npc_get_position, STRING("ガードマン"), LW(0), LW(1), LW(2))
     IF_INT_GREATER(LW(2), 100)
@@ -1316,30 +1425,39 @@ EVT_BEGIN(talk_gardman_doku)
     RETURN
 EVT_END()
 
+/** Talk script of Goombella's stand-in NPC: her line, then the guard's remark. */
 EVT_BEGIN(dummy_party_msg_pkr)
     CALL(evt_msg_print, 0, STRING("stg3_tou_303_kur"), 0, STRING("me"))
     CALL_CHILD(talk_gardman_doku)
     RETURN
 EVT_END()
 
+/** Talk script of Koops' stand-in NPC: his line, then the guard's remark. */
 EVT_BEGIN(dummy_party_msg_pnk)
     CALL(evt_msg_print, 0, STRING("stg3_tou_303_nok"), 0, STRING("me"))
     CALL_CHILD(talk_gardman_doku)
     RETURN
 EVT_END()
 
+/** Talk script of Yoshi's stand-in NPC: his line, then the guard's remark. */
 EVT_BEGIN(dummy_party_msg_yos)
     CALL(evt_msg_print, 0, STRING("stg3_tou_303_yos"), 0, STRING("me"))
     CALL_CHILD(talk_gardman_doku)
     RETURN
 EVT_END()
 
+/** Talk script of Flurrie's stand-in NPC (Windy in the data names): her line, then the guard's remark. */
 EVT_BEGIN(dummy_party_msg_win)
     CALL(evt_msg_print, 0, STRING("stg3_tou_303_win"), 0, STRING("me"))
     CALL_CHILD(talk_gardman_doku)
     RETURN
 EVT_END()
 
+/**
+ * Swaps the partner for a stand-in NPC ("dummy_party") at the partner's position,
+ * matching the current partner (Goombella, Koops, Yoshi in its color, Flurrie),
+ * and parks the real partner offscreen.
+ */
 EVT_BEGIN(party_npc_replace)
     CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_mario_get_party, LW(3))
@@ -1386,6 +1504,11 @@ EVT_BEGIN(party_npc_replace)
     RETURN
 EVT_END()
 
+/**
+ * Squash-and-stretch of the egg NPC ("たまご") over a hop of LW(3) milliseconds:
+ * the width scale eases from 1.2 down to 0.9 and the height scale from 0.9 up to 1.1 (two inline events),
+ * while the loop applies both scales to the egg every frame.
+ */
 static EVT_BEGIN(evt_tamago_scale)
     SET_VALUE(GW(10), FLOAT(1.1992188f))
     SET_VALUE(GW(11), FLOAT(0.89941406f))
@@ -1424,6 +1547,11 @@ static EVT_BEGIN(evt_tamago_scale)
     RETURN
 EVT_END()
 
+/**
+ * Second squash-and-stretch step for the egg NPC ("たまご"), over LW(3) milliseconds:
+ * the width eases from 0.9 back to 1.0 and the height from 1.1 back to 1.0,
+ * and the loop applies the scales every frame (the settle after the hops of evt_tamago_scale).
+ */
 static EVT_BEGIN(evt_tamago_scale2)
     BEGIN_INLINE_EVENT
         DIVIDE(LW(3), 2)
@@ -1460,6 +1588,10 @@ static EVT_BEGIN(evt_tamago_scale2)
     RETURN
 EVT_END()
 
+/**
+ * Mini-Yoshi egg scene (story stage 12 to 19): the egg Yoshi NPC takes the partner's place,
+ * Yoshi leaves the party, and the egg hops away in squashing jumps.
+ */
 EVT_BEGIN(evt_tamago_byebye)
     CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_npc_check, STRING("たまご"), LW(10))
@@ -1507,6 +1639,10 @@ EVT_BEGIN(evt_tamago_byebye)
     RETURN
 EVT_END()
 
+/**
+ * Guard's talk script: after the poison remark or the egg scene,
+ * he steps out and swings the door of the current map (tou_10, tou_08 or tou_07) open and closed for Mario.
+ */
 EVT_BEGIN(talk_gardman)
     IF_INT_EQUAL(GSWF(GSWF_TOU_PARTNER_POISON_CURED), 0)
         IF_INT_EQUAL(GSWF(GSWF_TOU_PARTNER_POISONED), 1)
@@ -1579,6 +1715,16 @@ EVT_BEGIN(talk_gardman)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the guard escort scene.
+ * The guard (ガードマン) is the NPC of the map; LF(0),
+ * LF(1) and LF(2) tell which map it is (tou_10, tou_08 or tou_07)
+ * and select the door message (stg3_tou_74, 327 or 453).
+ * It waits for Mario to be free; if Mario stands near the door (x within 35, z at or below -60) he is bounced
+ * back to (40, 0, -120), and the guard opens the door_1 map object (with the door sounds), steps out,
+ * closes it and speaks. It then gives the guard his talk event (talk_gardman) back and returns control to Mario.
+ * The versions before the US release wait 240 frames of free movement first.
+ */
 static EVT_BEGIN(evt_gardman)
     SET_VALUE(LF(0), 0)
     SET_VALUE(LF(1), 0)
@@ -1722,12 +1868,17 @@ static EVT_BEGIN(evt_gardman)
 EVT_END()
 
 #if VERSION >= VERSION_JP
+/** Spawns the guard's walk-through script (evt_gardman). */
 EVT_BEGIN(evt_gardman_spawn)
     CALL_CHILD(evt_gardman)
     RETURN
 EVT_END()
 #endif
 
+/**
+ * Shared part of the match registration console:
+ * sets which map (tou_10, tou_08 or tou_07) is running and prepares the registration prompts.
+ */
 EVT_BEGIN(evt_tou_match_make_default_sub)
     SET_VALUE(LF(0), 0)
     SET_VALUE(LF(1), 0)
@@ -1931,6 +2082,11 @@ EVT_BEGIN(evt_tou_match_make_default_sub)
     RETURN
 EVT_END()
 
+/**
+ * Interaction with the match registration console ("M_make"):
+ * prints the registration prompt and lets Mario reserve a match, picking the opponent and rule.
+ * Returns without effect if Mario's controls are disabled.
+ */
 EVT_BEGIN(evt_tou_match_make_default)
 #if VERSION >= VERSION_JP
     CALL(tou_mario_keyoff_check, LW(0))
@@ -2051,6 +2207,7 @@ EVT_BEGIN(evt_tou_match_make_default)
     RETURN
 EVT_END()
 
+/** Talk script of the poison cake: Mario gets a message (stg3_tou_307_04). */
 EVT_BEGIN(evt_talk_doku_cake)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("stg3_tou_307_04"), 0, STRING("me"))
@@ -2058,6 +2215,7 @@ EVT_BEGIN(evt_talk_doku_cake)
     RETURN
 EVT_END()
 
+/** Mario's decision to eat the poison cake: partner remark, a yes/no prompt and, on yes, the eating sequence. */
 EVT_BEGIN(evt_eat_doku_cake)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -2157,6 +2315,7 @@ EVT_BEGIN(evt_eat_doku_cake)
     RETURN
 EVT_END()
 
+/** Guess: poison cake delivery scene; a character comes in through the door of the room and sets the cake down. */
 EVT_BEGIN(evt_doku_cake)
     WAIT_MS(2000)
     CALL(evt_npc_set_position, STRING("キノシコワ"), 0, 0, -180)
@@ -2235,6 +2394,7 @@ EVT_BEGIN(evt_doku_cake)
     RETURN
 EVT_END()
 
+/** Guess: Michel's first scene; Mario and the partner turn to him, the camera pans and he talks (stg3_npc_10_01_01). */
 EVT_BEGIN(evt_michel_1)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_set_dir_npc, STRING("マイケル"))
@@ -2247,6 +2407,7 @@ EVT_BEGIN(evt_michel_1)
     RETURN
 EVT_END()
 
+/** Guess: Michel's second line (stg3_npc_10_01_02) with a camera zoom, then he walks away. */
 EVT_BEGIN(evt_michel_2)
     CALL(evt_cam3d_evt_set, -45, 105, 288, -45, 60, -9, 2000, 11)
     CALL(evt_npc_move_position, STRING("マイケル"), 0, -80, 0, FLOAT(60.0f), 1)
@@ -2257,6 +2418,7 @@ EVT_BEGIN(evt_michel_2)
     RETURN
 EVT_END()
 
+/** Door helper: the NPC named in LW(0) walks out through door_1 and is hidden at y = -1000 once the door has closed. */
 EVT_BEGIN(evt_michel_3_sub)
     SET_VALUE(LW(3), LW(0))
     CALL(evt_npc_move_position, LW(3), 0, -130, 0, FLOAT(80.0f), 1)
@@ -2292,6 +2454,7 @@ EVT_BEGIN(evt_michel_3_sub)
     RETURN
 EVT_END()
 
+/** Guess: Michel scene; he turns to Mario and talks with a camera move (stg3_tou_93_17 and following). */
 EVT_BEGIN(evt_michel_3)
     CALL(evt_set_dir_to_target, STRING("マイケル"), STRING("mario"))
     CALL(evt_msg_print, 0, STRING("stg3_tou_93_17"), 0, STRING("マイケル"))
@@ -2358,6 +2521,10 @@ EVT_BEGIN(evt_michel_3)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Michel scene with a startled-Mario reaction (surprised voice and "!" bubble),
+ * then dialogue (stg3_tou_93_24).
+ */
 EVT_BEGIN(evt_michel_4)
     CALL(evt_cam3d_evt_set, -45, 105, 288, -45, 60, -9, 2000, 11)
     CALL(evt_npc_move_position, STRING("マイケル"), 0, -80, 0, FLOAT(60.0f), 1)
@@ -2422,6 +2589,7 @@ EVT_BEGIN(evt_michel_4)
     RETURN
 EVT_END()
 
+/** Guess: Michel's next line (stg3_tou_93_25) with the same camera framing as the previous scenes. */
 EVT_BEGIN(evt_michel_5)
     CALL(evt_cam3d_evt_set, -45, 105, 288, -45, 60, -9, 2000, 11)
     CALL(evt_npc_move_position, STRING("マイケル"), 0, -80, 0, FLOAT(60.0f), 1)
@@ -2432,6 +2600,7 @@ EVT_BEGIN(evt_michel_5)
     RETURN
 EVT_END()
 
+/** Guess: Michel's next line (stg3_tou_93_26) with the same camera framing. */
 EVT_BEGIN(evt_michel_6)
     CALL(evt_cam3d_evt_set, -45, 105, 288, -45, 60, -9, 2000, 11)
     CALL(evt_npc_move_position, STRING("マイケル"), 0, -80, 0, FLOAT(60.0f), 1)
@@ -2442,6 +2611,7 @@ EVT_BEGIN(evt_michel_6)
     RETURN
 EVT_END()
 
+/** Guess: Michel's next line (stg3_tou_93_27) with the same camera framing. */
 EVT_BEGIN(evt_michel_7)
     CALL(evt_cam3d_evt_set, -45, 105, 288, -45, 60, -9, 2000, 11)
     CALL(evt_npc_move_position, STRING("マイケル"), 0, -80, 0, FLOAT(60.0f), 1)
@@ -2452,6 +2622,11 @@ EVT_BEGIN(evt_michel_7)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: sets up and renders the monitor texture each frame.
+ * Allocates the work area and a 128x128 texture, fades the screen alpha toward on/off, and queues gans_tex.
+ * Blocks forever as the owning script.
+ */
 static USER_FUNC(make_monitor) {
     NpcEntry* npc = npcNameToPtr_NoAssert(evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG3_34_RETURN_TO_ROGUEPORT ? "ガンス" : "キノシコワ");
     GansWork* wp;
@@ -2485,6 +2660,10 @@ static USER_FUNC(make_monitor) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * TEV callback for the monitor screen: replaces the screen's color stages with the live texture,
+ * blended by the work alpha, once the texture has been rendered at least once.
+ */
 static void monitor_tev(MapTevCallbackInfo* info) {
     if (gans_wp->ready) {
         GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, 60, GX_FALSE, GX_PTIDENTITY);
@@ -2510,17 +2689,20 @@ static void monitor_tev(MapTevCallbackInfo* info) {
     }
 }
 
+/** Script helper: args[0] = 1/0 to fade the registration monitor in or out. */
 static USER_FUNC(onoff) {
     gans_wp->onoff = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: args[0] receives Yoshi's color (0-6) from the pouch. */
 static USER_FUNC(getYoshiColor) {
     EvtWord* args = event->args;
     evtSetValue(event, args[0], pouchGetPartyColor(4));
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: args[0] receives 1 if Yoshi is currently in the party, else 0. */
 static USER_FUNC(chk) {
     EvtWord* args = event->args;
     evtSetValue(event, args[0], partyChkJoin(4) != 0);
@@ -2528,6 +2710,7 @@ static USER_FUNC(chk) {
 }
 
 #if VERSION >= VERSION_JP
+/** Script helper: waits until Mario has been idle, walking or dashing (and not locked out) for 240 frames in total. */
 USER_FUNC(tou_mario_free_wait) {
     MarioWork* mario = marioGetPtr();
 
@@ -2546,10 +2729,12 @@ USER_FUNC(tou_mario_free_wait) {
 #endif
 
 #if VERSION >= VERSION_US
+/** Script helper: blocks until Mario leaves his talking motion. */
 USER_FUNC(tou_mario_talk_end_wait) {
     return marioGetPtr()->currMotionId != MARIO_MOTION_TALK ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 #elif VERSION >= VERSION_JP
+/** Script helper: args[0] receives 1 if Mario's key input or control is currently disabled, else 0. */
 USER_FUNC(tou_mario_keyoff_check) {
     EvtWord* args = event->args;
 
@@ -2562,6 +2747,7 @@ USER_FUNC(tou_mario_keyoff_check) {
 }
 #endif
 
+/** Script helper: stops Octor's regular script and parks him at (80, 0, 85) facing 270 degrees. */
 static USER_FUNC(octo_stop) {
     NpcEntry* npc = npcNameToPtr_NoAssert("オクトール");
 
@@ -2574,6 +2760,7 @@ static USER_FUNC(octo_stop) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: restarts Octor's regular script. */
 static USER_FUNC(octo_start) {
     NpcEntry* npc = npcNameToPtr_NoAssert("オクトール");
 
@@ -2583,6 +2770,10 @@ static USER_FUNC(octo_start) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: args[0] = Mario's rank, args[1] = won?, args[2] receives the coin payout:
+ * 1 on a loss, 20 for the title match, and otherwise a payout growing as the opponent's rank rises.
+ */
 static USER_FUNC(fight_money) {
     EvtWord* args = event->args;
     s32 rank = evtGetValue(event, args[0]);
@@ -2604,6 +2795,7 @@ static USER_FUNC(fight_money) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns the 3D camera's yaw (0-360 degrees), computed from its position and look-at point. */
 static f32 camGetRy(void) {
     CameraEntry* cam = camGetPtr(CAMERA_3D);
     f32 ry = reviseAngle(57.29579f * (f32)atan2(-(cam->cameraAt.x - cam->cameraPos.x), -(cam->cameraAt.z - cam->cameraPos.z)));
@@ -2614,6 +2806,11 @@ static f32 camGetRy(void) {
     return ry;
 }
 
+/**
+ * Script helper (args[0] = NPC name): draws the Champion's Belt (a star-stone effect) at the NPC's "locator8"
+ * joint, following its rotation and the camera;
+ * hides it when the NPC is below the floor or the belt is switched off.
+ */
 USER_FUNC(tou_champion_belt) {
     void** udPtr; // FAKE: alias of &eff->userdata; a typed StarStoneWork* local or direct eff->userdata changes codegen
     EffectEntry* eff;
@@ -2657,11 +2854,16 @@ USER_FUNC(tou_champion_belt) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper: args[0] = 1 hides the Champion's Belt effect, 0 shows it. */
 static USER_FUNC(tou_champion_belt_onoff) {
     champion_belt_onoff = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Guess: scene where Octor and Gangan are at the door and the next visitors enter (Pogo, Jolene);
+ * camera cuts and dialogue stg3_tou_93_28 to 30.
+ */
 EVT_BEGIN(evt_michel_8)
     CALL(evt_npc_set_position, STRING("オクトール"), 145, 0, 50)
     CALL(evt_npc_set_position, STRING("ガンガン"), 95, 0, 50)
@@ -2874,6 +3076,7 @@ EVT_BEGIN(evt_michel_8)
     RETURN
 EVT_END()
 
+/** Pogo's line (stg3_tou_255_01) with a camera move, then he walks off. */
 EVT_BEGIN(evt_michel_9)
     CALL(evt_cam3d_evt_set, -45, 105, 288, -45, 60, -9, 2000, 11)
     CALL(evt_npc_move_position, STRING("ポグ"), 0, -80, 0, FLOAT(60.0f), 1)
@@ -2885,6 +3088,7 @@ EVT_BEGIN(evt_michel_9)
     RETURN
 EVT_END()
 
+/** Mail scene: Mario notices a notification (bubble, mail jingle, vibration) and the party reads stg3_tou_297_03. */
 EVT_BEGIN(evt_mail_1)
     WAIT_MS(1000)
     BEGIN_INLINE_EVENT_GET_ID(LW(11))
@@ -2937,6 +3141,7 @@ EVT_BEGIN(evt_mail_1)
     RETURN
 EVT_END()
 
+/** Mail scene: the same notification with message stg3_tou_297_22. */
 EVT_BEGIN(evt_mail_2)
     WAIT_MS(1000)
     BEGIN_INLINE_EVENT_GET_ID(LW(11))
@@ -2988,6 +3193,7 @@ EVT_BEGIN(evt_mail_2)
     RETURN
 EVT_END()
 
+/** Mario eats the Glitz Pit cake: partner warning, a yes/no prompt and the eating sequence. */
 EVT_BEGIN(evt_eat_cake)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -3052,6 +3258,7 @@ EVT_BEGIN(evt_eat_cake)
     RETURN
 EVT_END()
 
+/** Map-init helper: places the cake item when Mario is ranked 6th and the cake event is not done yet. */
 EVT_BEGIN(evt_cake_init)
     CALL(evt_tou_get_ranking, LW(0))
     IF_INT_EQUAL(LW(0), 6)
@@ -3067,6 +3274,10 @@ EVT_BEGIN(evt_cake_init)
     RETURN
 EVT_END()
 
+/**
+ * Guess: cake scene; a camera move to the cake and the トゲノコエース NPC's announcement (stg3_tou_295),
+ * then it waits for Mario.
+ */
 EVT_BEGIN(evt_cake)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_cake"), 0, PTR(evt_eat_cake), 0)
     CALL(evt_cam3d_evt_set, 55, 102, 362, 55, 45, -9, 1000, 11)
@@ -3078,11 +3289,16 @@ EVT_BEGIN(evt_cake)
     RETURN
 EVT_END()
 
+/**
+ * Partner remark after Bowser's visit to the Glitz Pit (GSWF_TOU_BOWSER_RAID_DONE):
+ * the party partner says stg3_tou_403_11.
+ */
 static EVT_BEGIN(evt_koopa_after)
     CALL(evt_msg_print_party, STRING("stg3_tou_403_11"))
     RETURN
 EVT_END()
 
+/** Mail scene: the same notification with message stg3_tou_297_25. */
 EVT_BEGIN(evt_mail_3)
     WAIT_MS(1000)
     BEGIN_INLINE_EVENT_GET_ID(LW(11))
@@ -3135,6 +3351,7 @@ EVT_BEGIN(evt_mail_3)
     RETURN
 EVT_END()
 
+/** Mail scene: the same notification, with its own message. */
 EVT_BEGIN(evt_mail_4)
     WAIT_MS(1000)
     BEGIN_INLINE_EVENT_GET_ID(LW(11))
@@ -3185,6 +3402,7 @@ EVT_BEGIN(evt_mail_4)
     RETURN
 EVT_END()
 
+/** Mail scene: the same notification with message stg3_tou_307_05. */
 EVT_BEGIN(evt_mail_5)
     WAIT_MS(1000)
     BEGIN_INLINE_EVENT_GET_ID(LW(11))
@@ -3237,6 +3455,7 @@ EVT_BEGIN(evt_mail_5)
     RETURN
 EVT_END()
 
+/** Mini-Yoshi egg arrives: spawns the egg NPC near Mario and takes the Yoshi partner off the field. */
 EVT_BEGIN(evt_tamago_hello)
     CALL(evt_npc_check, STRING("たまご"), LW(10))
     IF_INT_EQUAL(LW(10), 0)
@@ -3251,6 +3470,7 @@ EVT_BEGIN(evt_tamago_hello)
     RETURN
 EVT_END()
 
+/** Mini-Yoshi egg hops three times and then hatches back into the Yoshi partner. */
 EVT_BEGIN(evt_tamago_hello2)
     LOOP(3)
         CALL(evt_npc_get_position, STRING("たまご"), LW(0), LW(1), LW(2))
@@ -3274,6 +3494,7 @@ EVT_BEGIN(evt_tamago_hello2)
     RETURN
 EVT_END()
 
+/** Prints the rank-change message after a match: champion, moved up, moved down or unchanged (stg3_rank_01 to 06). */
 EVT_BEGIN(evt_tou_ranking_msg)
     CALL(evt_tou_get_ranking, LW(0))
     IF_INT_LESS(LW(0), GSW(GSW_TOU_RANK_BEFORE_MATCH))
@@ -3301,6 +3522,10 @@ EVT_BEGIN(evt_tou_ranking_msg)
     RETURN
 EVT_END()
 
+/**
+ * Script run after a match: story follow-ups (Yoshi egg, poison cake, Swoops joining),
+ * ranking announcements and cleanup.
+ */
 EVT_BEGIN(evt_tou_match_after_default)
     SET_VALUE(LF(0), 0)
     IF_INT_EQUAL(GSW(GSW_TOU_OPPONENT_ID), 10)

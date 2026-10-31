@@ -23,6 +23,11 @@
 static BeroEntry bero_entry_data[6];
 static TreeAccess tree_access_data[5];
 
+/**
+ * Guess: cutscene after Mario comes out of the pipe in Flurrie's direction:
+ * the partners step up, an extra party member says "stg2_win_e04_01",
+ * and the story becomes STORY_STG2_03_05_TO_FLURRIES_PLACE.
+ */
 EVT_BEGIN(evt_dokan1_message)
     CALL(evt_bero_exec_wait, 65536)
     CALL(evt_mario_key_onoff, 0)
@@ -41,6 +46,10 @@ EVT_BEGIN(evt_dokan1_message)
     RETURN
 EVT_END()
 
+/**
+ * Enter script of the "dokan1" pipe: if the story is at STORY_STG2_03_04_SHES_LOST_HER_PRECIOUS it starts
+ * evt_dokan1_message; returns LW(0) = 0.
+ */
 EVT_BEGIN(evt_dokan1)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_03_04_SHES_LOST_HER_PRECIOUS)
         SPAWN_EVENT(evt_dokan1_message)
@@ -135,6 +144,11 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Guess: trigger: when Mario walks past x = -50 on the way to the Great Tree, the Puni guide's party stops him,
+ * Mario reacts (exclamation mark, pose), the extra partner speaks "stg2_win_e02_00" and "e02_01",
+ * and the story becomes STORY_STG2_02_TO_THE_GREAT_TREE.
+ */
 EVT_BEGIN(guide_bigtree)
     LOOP(0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -217,6 +231,11 @@ EVT_BEGIN(guide_bigtree)
     RETURN
 EVT_END()
 
+/**
+ * Guess: cutscene when a mail from Peach arrives while Mario is on the map:
+ * the mail jingle plays and the phone vibrates, the party says "stg2_mri_00",
+ * and the camera and poses follow the reading.
+ */
 static EVT_BEGIN(peach_mail)
     LABEL(0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -310,6 +329,7 @@ static EVT_BEGIN(peach_mail)
     RETURN
 EVT_END()
 
+/** Tree hit script for the third tree: drops a coin from it the first time it is hit (GSWF_WIN01_TREE_COIN_TAKEN). */
 EVT_BEGIN(ki_data_evt_03)
     CALL(evt_item_delete_check, STRING("item_ki03"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -326,6 +346,11 @@ static TreeAccess tree_access_data[] = {
     {7, NULL, NULL, NULL, 0, NULL},
 };
 
+/**
+ * Guess: map init script of Boggly Woods' second map (win_01):
+ * registers exits and trees, plays the Boggly Woods BGM, starts the guide scene early in the story,
+ * the post-boss mail event, and places the Inn Coupon item.
+ */
 EVT_BEGIN(win_01_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)

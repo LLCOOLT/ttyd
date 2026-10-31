@@ -15,6 +15,11 @@
 #include "rel_module.h"
 #include "driver/casedrv.h"
 
+/**
+ * Boggly Woods double-door swing without the walk-through:
+ * LW(0) = 0 opens (plays the wooden door-open sound) and nonzero closes, LW(1) is the duration in ms,
+ * LW(8) and LW(9) the two door map objects, which rotate in opposite directions by up to 70 degrees.
+ */
 EVT_BEGIN(evt_win_door_open_pure)
     BEGIN_INLINE_EVENT
         IF_INT_EQUAL(LW(0), 0)
@@ -44,6 +49,10 @@ EVT_BEGIN(evt_win_door_open_pure)
     RETURN
 EVT_END()
 
+/**
+ * Door script run when Mario enters a Boggly Woods house door:
+ * starts the bero walk-in after 1 second and opens the doors over 800 ms via evt_win_door_open_pure.
+ */
 EVT_BEGIN(evt_win_door_open)
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
@@ -55,6 +64,11 @@ EVT_BEGIN(evt_win_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Boggly Woods double-door close animation without the walk:
+ * plays the wooden door-shut sound and swings the two door map objects (LW(8), LW(9)) shut over LW(1) ms;
+ * LW(0) picks the direction.
+ */
 EVT_BEGIN(evt_win_door_close_pure)
     BEGIN_INLINE_EVENT
         CALL(evt_mapobj_get_position, LW(8), LW(10), LW(11), LW(12))
@@ -79,6 +93,10 @@ EVT_BEGIN(evt_win_door_close_pure)
     RETURN
 EVT_END()
 
+/**
+ * Door script run when Mario leaves a Boggly Woods house:
+ * snaps the doors to the open angle, starts the bero walk after 200 ms, then closes them over 800 ms.
+ */
 EVT_BEGIN(evt_win_door_close)
     BEGIN_INLINE_EVENT
         WAIT_MS(200)
@@ -96,6 +114,10 @@ EVT_BEGIN(evt_win_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Hammer reaction of a Boggly Woods tree: plays the hit-tree and falling-leaves sounds at the tree
+ * and shakes its trunk (LW(2)) and leaves (LW(3)) back and forth.
+ */
 EVT_BEGIN(_tree_anime)
     CALL(evt_mapobj_get_position, LW(2), LW(4), LW(5), LW(6))
     CALL(evt_snd_sfxon_3d, STRING("SFX_HIT_TREE1"), LW(4), LW(5), LW(6), 0)
@@ -120,6 +142,10 @@ EVT_BEGIN(_tree_anime)
     RETURN
 EVT_END()
 
+/**
+ * Guess: registers hammerable trees: reads a table of (tree object, leaves object, ...) entries
+ * until a 0 terminator and installs _tree_anime as the hammer case event on each trunk.
+ */
 EVT_BEGIN(win_tree_entry)
     SET_INT_READ_ADDR(LW(0))
     LOOP(0)
@@ -132,6 +158,10 @@ EVT_BEGIN(win_tree_entry)
     RETURN
 EVT_END()
 
+/**
+ * Guess: loops forever playing the Puni walking sound at the position of the NPC "ガイド" (the Puni guide) every 5
+ * frames.
+ */
 EVT_BEGIN(win_puni_walk_se)
     LOOP(0)
         CALL(evt_npc_get_position, STRING("ガイド"), LW(0), LW(1), LW(2))
@@ -141,6 +171,10 @@ EVT_BEGIN(win_puni_walk_se)
     RETURN
 EVT_END()
 
+/**
+ * REL entry point for win.rel: runs the static constructors,
+ * registers the init scripts of win_00 to win_06 and the Boggly Woods battle setup tables.
+ */
 void _prolog(void) {
     voidfunctionptr* ctor;
 
@@ -157,6 +191,7 @@ void _prolog(void) {
     relSetBtlAddr("win", btlsetup_win_tbl, btl_win_setup_no_tbl);
 }
 
+/** REL exit point for win.rel: runs the static destructors. */
 void _epilog(void) {
     voidfunctionptr* dtor;
 
@@ -164,5 +199,6 @@ void _epilog(void) {
         (*dtor)();
     }
 }
+/** Handler called when an unresolved import in win.rel is hit; does nothing. */
 void _unresolved(void) {
 }

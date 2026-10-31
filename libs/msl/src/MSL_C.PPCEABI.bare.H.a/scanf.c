@@ -47,6 +47,10 @@ extern int mbtowc(unsigned short*, const char*, unsigned long);
 int __sformatter(int (*ReadProc)(void*, int, int), void* ReadProcArg, const char* format_str, va_list arg);
 int __StringRead(void* arg, int ch, int behavior);
 
+/**
+ * Standard sscanf(): scans the string with __sformatter using __StringRead;
+ * returns -1 for a null or empty string, otherwise the number of items assigned.
+ */
 int sscanf(const char* buffer, const char* format, ...) {
     va_list args;
     __InStr s;
@@ -59,6 +63,11 @@ int sscanf(const char* buffer, const char* format, ...) {
     return __sformatter(__StringRead, &s, format, args);
 }
 
+/**
+ * __sformatter input callback over a string, selected by behavior:
+ * 0 reads the next character (-1 and sets the end flag at the terminator), 1 pushes one character back,
+ * 2 reports whether the end was reached.
+ */
 int __StringRead(void* arg, int ch, int behavior) {
     __InStr* s = (__InStr*)arg;
     char c;
@@ -84,6 +93,12 @@ int __StringRead(void* arg, int ch, int behavior) {
     return 0;
 }
 
+/**
+ * Core of the scanf family: matches whitespace and literal characters against the input,
+ * parses each % conversion with parse_format and stores integers, floats (via __strtold), strings,
+ * characters and scansets through the va_list; reads input via ReadProc(arg, ch, 0/1/2 = get/unget/eof-test)
+ * and returns the items assigned.
+ */
 int __sformatter(int (*ReadProc)(void*, int, int), void* ReadProcArg, const char* format_str, va_list arg) {
     char* arg_ptr;
     int num_chars;
@@ -392,6 +407,11 @@ exit:
 
 
 
+/**
+ * Parses one scanf conversion spec starting at the %:
+ * * suppresses assignment, then field width (default unlimited), length modifier (h, l, ll, L),
+ * conversion character, and the [..] scanset; returns the position after it.
+ */
 static const char* parse_format(const char* format_string, scan_format* format) {
     const char* s = format_string;
     int c;

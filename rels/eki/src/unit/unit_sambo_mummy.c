@@ -527,6 +527,12 @@ static BattleUnitKindPart parts[] = {
     {5, "btl_un_sambo_mummy", "c_sanbo_m", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table_parts},
 };
 
+/**
+ * Init script of the Pokey Mummy.
+ * Registers its wait, attack, damage and confusion scripts, starts it with 4 body segments (unit work 0),
+ * sets its height from that count through _body_param_set,
+ * clears unit work 1 (the number of friends it has called), and sets its run and walk sounds.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -542,6 +548,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Shown when an attacker avoids counter damage from the Pokey Mummy's thorns (data table entry):
+ * plays the side-hit pose 47 and flashes the toge_flush thorn effect at the height of the stack (unit height
+ * scaled by its status scale), then waits 60 frames.
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_side_event)
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 47)
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
@@ -556,6 +567,10 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_side_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction of the Pokey Mummy: picks the part index to damage from the number of body segments left (unit
+ * work 0: 1 segment is part 4, 2 is 3, 3 is 2, otherwise 1) and runs the default damage script.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
@@ -573,6 +588,13 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction that knocks a segment off the Pokey Mummy's stack.
+ * With one segment left (unit work 0 is 1) it only plays the damage pose;
+ * otherwise it drops one segment (unit work 0 minus 1), recomputes the height with _body_param_set,
+ * moves the status icon, cut and kiss offsets for the shorter stack and hands the hit to the next part down.
+ * The lost segment (part 5) hops to the floor twice and blinks 40 times before disappearing.
+ */
 static EVT_BEGIN(damage_event_bodylost)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -647,6 +669,11 @@ static EVT_BEGIN(damage_event_bodylost)
     RETURN
 EVT_END()
 
+/**
+ * Shared helper for the Pokey Mummy's segment loss:
+ * plays the hurt pose (LW(14)), lifts the unit 18 units and lets it drop
+ * and wobble back to its height over about 20 frames in small SetPos steps.
+ */
 static EVT_BEGIN(subset_dmg_sambo_fall)
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
@@ -690,6 +717,13 @@ static EVT_BEGIN(subset_dmg_sambo_fall)
     RETURN
 EVT_END()
 
+/**
+ * Like damage_event_bodylost, but for the Ultra Hammer style blow-away damage.
+ * With one segment left it plays the shot-damage subscript;
+ * otherwise it removes a segment as before, then sends the lost segment (part 5) bouncing from enemy to enemy,
+ * damaging each with the Ultra Hammer (or Spin Hammer, Guess: for damage pattern 15) weapon data,
+ * until it lands off the stage.
+ */
 static EVT_BEGIN(damage_event_bodylost_blow)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -787,6 +821,13 @@ static EVT_BEGIN(damage_event_bodylost_blow)
     RETURN
 EVT_END()
 
+/**
+ * Damage reaction when the Pokey Mummy is swallowed (Yoshi's Gulp):
+ * with one segment left it plays the hurt pose 39,
+ * otherwise the segment handling of damage_event_bodylost applies (a segment is dropped,
+ * the height and hit offsets shrink to the shorter stack,
+ * the lost segment hops and blinks away) after a 3-frame wait.
+ */
 static EVT_BEGIN(damage_swallow_body)
     SET_VALUE(LW(14), 39)
     SET_VALUE(LW(15), -1)
@@ -858,6 +899,14 @@ static EVT_BEGIN(damage_swallow_body)
     RETURN
 EVT_END()
 
+/**
+ * Turn script of the Pokey Mummy. After an item-use check it works from the segment count (unit work 0).
+ * With a full stack of 4 and at most one friend called so far,
+ * it has a 20 percent chance to call a friend (call_friend_event) if there is room beside it.
+ * With 2 or more segments it then rolls 0 to 69 and, on 30 or less,
+ * throws its head segments (attack_head_2_event) if a target is available;
+ * otherwise it uses the spike attack (attack_spike_event). A single segment always uses attack_head_1_event.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 0, 0)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
@@ -927,6 +976,12 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Pokey Mummy's attack with its top segments.
+ * It picks the weapon for the current segment count (weapon_sambo_mummy_head_attack_2 to _4),
+ * samples a target and attacks it, with the avoid,
+ * hit and guard results taken from the pre-damage check and the action command defence.
+ */
 static EVT_BEGIN(attack_head_2_event)
     SET_VALUE(LW(6), LW(11))
     CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(5))
@@ -1113,6 +1168,11 @@ static EVT_BEGIN(attack_head_2_event)
     RETURN
 EVT_END()
 
+/**
+ * The attack of a Pokey Mummy with a single segment left (weapon_sambo_mummy_head_attack_1):
+ * it hops toward its target with sambo_rabbit_move, then hits it, with avoid,
+ * guard and hit results from the pre-damage check and the action command defence, and hops home.
+ */
 static EVT_BEGIN(attack_head_1_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_sambo_mummy_head_attack_1))
@@ -1275,6 +1335,11 @@ static EVT_BEGIN(attack_head_1_event)
     RETURN
 EVT_END()
 
+/**
+ * Spike attack of the Pokey Mummy (weapon_sambo_mummy_spike_attack_2 to _4, by segment count).
+ * Guess: the stack bends over (SNB_B_1) and slams its spiked top onto the target, with the avoid,
+ * guard and hit results from the pre- damage check and the action command defence.
+ */
 static EVT_BEGIN(attack_spike_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(10))
     SWITCH(LW(10))
@@ -1484,6 +1549,11 @@ static EVT_BEGIN(attack_spike_event)
     RETURN
 EVT_END()
 
+/**
+ * The Pokey Mummy calls a friend: it sways its stack in several rotation steps with SFX_ENM_SAMBO_SEND_GROUP
+ * sounds, shakes the camera, spawns a new Pokey Mummy beside it with SpawnUnit,
+ * adds one to its own called-friends counter (unit work 1) and settles back upright.
+ */
 static EVT_BEGIN(call_friend_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("SNB_S_1"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_SAMBO_SEND_GROUP1_3"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -1581,6 +1651,10 @@ static BattleUnitSetup entry_sambo = {
     NULL, // itemDropTable
 };
 
+/**
+ * Wait script of the Pokey Mummy: shows the idle pose that matches its remaining body segments (unit work 0
+ * picks the part index 1 to 4).
+ */
 static EVT_BEGIN(wait_event)
     SET_VALUE(LW(10), -2)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
@@ -1598,6 +1672,11 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper for the Pokey Mummy's hopping approach.
+ * Hops toward the x position in LW(5) in steps of LW(8) units, playing SFX_ENM_SAMBO_MOVE2 on every hop,
+ * then makes the final hop onto (LW(5), LW(6), LW(7)).
+ */
 static EVT_BEGIN(sambo_rabbit_move)
     LABEL(0)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -1623,6 +1702,10 @@ static EVT_BEGIN(sambo_rabbit_move)
     RETURN
 EVT_END()
 
+/**
+ * Sets the Pokey Mummy's height and cut height to 20, 40, 60 or 80 units for 1, 2,
+ * 3 or 4 body segments (unit work 0).
+ */
 static EVT_BEGIN(_body_param_set)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     SWITCH(LW(0))

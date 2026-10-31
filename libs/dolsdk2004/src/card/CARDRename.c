@@ -2,6 +2,11 @@
 
 #include "__card.h"
 
+/**
+ * Renames one of this game's files: FATAL_ERROR for an empty or 0xFF-leading name,
+ * NAMETOOLONG for names over the limit, NOFILE if the old one is missing, EXIST if the new one is taken.
+ * Needs write permission; updates the name and modification time and saves the directory.
+ */
 s32 CARDRenameAsync(s32 chan, const char* old, const char* new, CARDCallback callback) {
     CARDControl* card;
     CARDDir* dir;
@@ -61,6 +66,7 @@ s32 CARDRenameAsync(s32 chan, const char* old, const char* new, CARDCallback cal
     return result;
 }
 
+/** Blocking CARDRenameAsync. */
 s32 CARDRename(s32 chan, const char* old, const char* new) {
 	s32 result = CARDRenameAsync(chan, old, new, __CARDSyncCallback);
 	if (result < 0)

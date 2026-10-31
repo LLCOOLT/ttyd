@@ -90,7 +90,7 @@ static const char* mario_status_name_table[][3] = {
 static const char* mario_status_name_table[] = {"\x82\x67\x82\x6F", "\x82\x65\x82\x6F", "\x82\x61\x82\x6F"};
 #endif
 
-// the short name of a level-up stat (HP, FP, BP); US has one per language
+/** the short name of a level-up stat (HP, FP, BP); US has one per language */
 static inline const char* mario_status_name(s32 id) {
 #if VERSION >= VERSION_US
     return mario_status_name_table[gp->language][id];
@@ -185,7 +185,7 @@ static inline const char* party_name_table_rtn(u16 id);
 static inline s32 iconid_conv(s32 icon);
 #endif
 
-// The demo has no party rank checks.
+/** The demo has no party rank checks. */
 #if VERSION >= VERSION_JP
 USER_FUNC(evt_win_party_lankup_chk) {
     PouchData* pouch;
@@ -219,6 +219,12 @@ USER_FUNC(evt_win_party_lankup_chk) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * The power-down shop's check (Rogueport Sewers, tik_11) before trading partner ranks:
+ * sets args[0] to 1 when at least two partners have joined,
+ * one of them can still be ranked up (same limit as evt_win_party_lankup_chk) and one has a rank to give;
+ * otherwise 0.
+ */
 USER_FUNC(evt_win_party_lankdown_chk) {
     PouchData* pouch;
     u16* p;
@@ -263,16 +269,23 @@ USER_FUNC(evt_win_party_lankdown_chk) {
 }
 #endif
 
+/** Allocates and clears the 32 window slots at boot (called from mariost.c). */
 void winMgrInit(void) {
     wp->numEntries = 32;
     wp->entries = (WinMgrEntry*)__memAlloc(HEAP_DEFAULT, wp->numEntries * sizeof(WinMgrEntry));
     memset(wp->entries, 0, wp->numEntries * sizeof(WinMgrEntry));
 }
 
+/** Clears every window slot; called on a map change so no window survives into the next map. */
 void winMgrReInit(void) {
     memset(wp->entries, 0, wp->numEntries * sizeof(WinMgrEntry));
 }
 
+/**
+ * Display callback of one window: draws the frame in its descriptor colour,
+ * rotated and scaled by the open/close animation, then the blue title tabs for dispType 1 (one),
+ * 3 (two) or 4/5 (two, list and value columns), then the descriptor's own disp function.
+ */
 static void winMgrDisp(CameraId camId, void* param) {
     WinMgrEntry* entry = param;
     Mtx rot;
@@ -305,6 +318,11 @@ static void winMgrDisp(CameraId camId, void* param) {
     }
 }
 
+/**
+ * Per-frame update of every window in use (called from the main loop):
+ * advances the open/close animation, runs the descriptor's main function
+ * and queues winMgrDisp at priority 300 + the window's priority while it is visible.
+ */
 void winMgrMain(void) {
     WinMgrEntry* entry;
     int i;
@@ -323,6 +341,13 @@ void winMgrMain(void) {
     }
 }
 
+/**
+ * The open/close animation of a window over FPS_FRAMES(8) frames.
+ * Type 0 spins and grows from 30 degrees and zero size, type 1 grows and fades in,
+ * type 2 appears and disappears at once.
+ * Flag 4 stays set while animating; closing clears flag 2 (visible) and, with auto-delete (flag 8),
+ * frees the slot.
+ */
 static void winMgrSeq(WinMgrEntry* entry) {
     entry->flags |= 4;
     switch (entry->description->type) {
@@ -413,6 +438,10 @@ static void winMgrSeq(WinMgrEntry* entry) {
     }
 }
 
+/**
+ * Claims the first free window slot for a descriptor, copying its position and size; returns the window id.
+ * The window stays hidden until winMgrOpen. There is no check for a full table.
+ */
 s32 winMgrEntry(WinMgrDesc* desc) {
     WinMgrEntry* entry;
     int i;
@@ -439,6 +468,7 @@ s32 winMgrEntry(WinMgrDesc* desc) {
     return i;
 }
 
+/** Stores the caller's data pointer that the descriptor's main and disp functions read (entry->param). */
 void winMgrSetParam(s32 id, void* param) {
     WinMgrEntry* entry;
 
@@ -448,6 +478,7 @@ void winMgrSetParam(s32 id, void* param) {
     }
 }
 
+/** Starts a window's opening animation and resets its help-text scroll and message. */
 void winMgrOpen(s32 id) {
     WinMgrEntry* entry;
 
@@ -461,6 +492,7 @@ void winMgrOpen(s32 id) {
     }
 }
 
+/** Starts a window's closing animation; the slot stays allocated (see winMgrCloseAutoDelete). */
 void winMgrClose(s32 id) {
     WinMgrEntry* entry;
 
@@ -471,6 +503,7 @@ void winMgrClose(s32 id) {
     }
 }
 
+/** Starts a window's closing animation and frees the slot once it has finished. */
 void winMgrCloseAutoDelete(s32 id) {
     WinMgrEntry* entry;
 
@@ -482,14 +515,17 @@ void winMgrCloseAutoDelete(s32 id) {
     }
 }
 
+/** Frees a window slot at once, without an animation. */
 void winMgrDelete(s32 id) {
     wp->entries[id].flags &= ~1;
 }
 
+/** TRUE while the window is still opening or closing (flag 4), so callers wait before reading input or drawing. */
 BOOL winMgrAction(s32 id) {
     return (wp->entries[id].flags >> 2) & 1;
 }
 
+/** Moves and resizes a window (x, y is the top left corner, y up) if the slot is in use. */
 void winMgrSetSize(s32 id, s32 x, s32 y, s32 width, s32 height) {
     WinMgrEntry* entry;
 
@@ -502,6 +538,7 @@ void winMgrSetSize(s32 id, s32 x, s32 y, s32 width, s32 height) {
     }
 }
 
+/** Sets a window's draw priority offset (added to 300 in winMgrMain) if the slot is in use. */
 void winMgrSetPriority(s32 id, s32 priority) {
     WinMgrEntry* entry;
 
@@ -511,16 +548,24 @@ void winMgrSetPriority(s32 id, s32 priority) {
     }
 }
 
+/** The window slot for an id (no range or in-use check). */
 WinMgrEntry* winMgrGetPtr(s32 id) {
     return &wp->entries[id];
 }
 
+/** Resets a help window: scroll back to the top, no line count, no message. */
 void winMgrHelpInit(WinMgrEntry* entry) {
     entry->scroll = 0;
     entry->lines = 0;
     entry->msg = NULL;
 }
 
+/**
+ * Per-frame input of a help (description) window:
+ * counts the lines of entry->msg and, when it has more than two, scrolls two lines at a time with the C stick.
+ * Used by the select lists, the item and shop windows and evt_win.
+ * PAL computes the last scroll position differently.
+ */
 void winMgrHelpMain(WinMgrEntry* entry) {
     u16 lines = 0;
 
@@ -548,6 +593,11 @@ void winMgrHelpMain(WinMgrEntry* entry) {
     }
 }
 
+/**
+ * Draws a help window's message clipped to the two visible lines at the bottom of the screen,
+ * filling in the lottery number for msg_lottery_number,
+ * plus blinking up/down arrows and a scroll hint icon when it can scroll.
+ */
 void winMgrHelpDraw(WinMgrEntry* entry) {
     Mtx mtx;
     Mtx scale;
@@ -603,6 +653,16 @@ void winMgrHelpDraw(WinMgrEntry* entry) {
     }
 }
 
+/**
+ * Opens a selection list (list, title and help windows) and fills it by type:
+ * 0 key items, 1/3/4 items (use, sell, store), 2 badges, 5 stored items, 6/7 partners to rank up,
+ * 8 partner to rank down, 9/10 HP/FP/BP to raise or lower,
+ * 11-16 shop stock (badge shop, sell badges, Star Piece badges, bargains, the Pit's trader, Pianta Parlor),
+ * 17/18 the informant's lists; a negative type is a -1-terminated item id list.
+ * Rows flagged 3 are greyed and refused.
+ * newItem is shown first, above a divider (the item being picked up when the bag is full).
+ * Free with winMgrSelectDelete.
+ */
 WinMgrSelect* winMgrSelectEntry(EvtWord type, s32 newItem, BOOL cancelable) {
     s32 n;
     WinMgrDesc* desc;
@@ -925,7 +985,7 @@ WinMgrSelect* winMgrSelectEntry(EvtWord type, s32 newItem, BOOL cancelable) {
 }
 
 #if VERSION <= VERSION_DEMO_US
-// the demo does not sort the badge shop lists
+/** the demo does not sort the badge shop lists */
 #elif VERSION == VERSION_EU
 s32 select_comp_starpiece(const void* a, const void* b) {
     // PAL: equal prices fall back to the type order
@@ -951,6 +1011,7 @@ s32 select_comp_starpiece(const void* a, const void* b) {
             }
 #endif
 
+/** qsort comparator ordering items by their item-table type_sort_order; used for the badge shop list. */
 #if VERSION >= VERSION_JP
 s32 select_comp_type(const void* a, const void* b) {
     s16 x = itemDataTable[((const WinMgrSelectItem*)a)->id].type_sort_order;
@@ -963,7 +1024,7 @@ s32 select_comp_type(const void* a, const void* b) {
 #endif
 
 #if VERSION >= VERSION_US
-// US: badge list sorted by (buy price * 2 + 2) / 3
+/** US: badge list sorted by (buy price * 2 + 2) / 3 */
 s32 select_comp_bteresa(const void* a, const void* b) {
     s32 x = (itemDataTable[((const WinMgrSelectItem*)a)->id].buy_price * 2 + 2) / 3;
     s32 y = (itemDataTable[((const WinMgrSelectItem*)b)->id].buy_price * 2 + 2) / 3;
@@ -974,6 +1035,10 @@ s32 select_comp_bteresa(const void* a, const void* b) {
 }
 
 #endif
+/**
+ * The result of an item-style selection list: 0 while it is still open,
+ * -1 if cancelled (or, from JP on, if the new item at the top was chosen), otherwise the chosen item id.
+ */
 s32 winMgrSelect(WinMgrSelect* sel) {
     if (sel->flags & WINMGR_SELECT_DONE) {
         if (sel->flags & WINMGR_SELECT_CANCELED) {
@@ -989,6 +1054,12 @@ s32 winMgrSelect(WinMgrSelect* sel) {
     return 0;
 }
 
+/**
+ * Result of the shop, partner, stat and informant lists for evt_win_other_select:
+ * 0 while open, -1 if cancelled, 1 when chosen,
+ * after writing the choice into the script's LW slots (id, name, price and BP cost by type;
+ * the informant types also build the message name). For types 9/10 it also writes the stats after the trade.
+ */
 s32 winMgrSelectOther(WinMgrSelect* sel, EventEntry* evt) {
     InformantWork* jdt = &_jdt;
     s32 id;
@@ -1112,12 +1183,19 @@ void winMgrSelectDelete(WinMgrSelect* sel) {
     __memFree(heap, sel3);
 }
 
+/** The row index chosen in a selection list (evt_win_item_select returns it as its extra value). */
 #if VERSION >= VERSION_JP
 s32 winMgrSelectGetCursor(WinMgrSelect* sel) {
     return sel->cursor;
 }
 #endif
 
+/**
+ * The selection list's state machine: opens its windows and the status bar with a sound,
+ * moves the cursor with repeat and wrap-around (scrolling 8 visible rows), A picks (greyed rows buzz),
+ * B cancels if allowed, then closes the windows and sets WINMGR_SELECT_DONE.
+ * Cursor and scroll ease toward their targets by 1/6 a frame.
+ */
 static void select_main(WinMgrEntry* entry) {
     WinMgrSelect* sel = entry->param;
     s32 prev;
@@ -1223,6 +1301,12 @@ static void select_main(WinMgrEntry* entry) {
     }
 }
 
+/**
+ * Draws an item or badge list: icon, name and (for the sell and shop types) price per row,
+ * the divider under a new item, the title by type,
+ * a currency icon above the price column (one for 13, another for 16), the hand cursor and scroll arrows.
+ * From US on, worn badges in the sell list get a mark.
+ */
 static void select_disp(WinMgrEntry* entry) {
     WinMgrSelect* sel = entry->param;
     u32 left, top, wd, ht;
@@ -1432,6 +1516,11 @@ static void select_disp(WinMgrEntry* entry) {
     }
 }
 
+/**
+ * Draws the partner list of the rank-up and rank-swap menus:
+ * name, portrait (Yoshi in his colour) and one rank icon per rank already earned, with the two column titles,
+ * cursor and scroll arrows.
+ */
 static void select_disp_party(WinMgrEntry* entry) {
 #if VERSION <= VERSION_DEMO_US
     // the demo declares the row counter first
@@ -1553,6 +1642,11 @@ static void select_disp_party(WinMgrEntry* entry) {
     }
 }
 
+/**
+ * Draws the HP/FP/BP list of the power-down shop:
+ * the stat's name, icon, current value and, unless refused,
+ * the value after raising or lowering it by its step (5, 5, 3).
+ */
 static void select_disp_mario(WinMgrEntry* entry) {
 #if VERSION >= VERSION_US
     f32 tw;
@@ -1678,6 +1772,10 @@ static void select_disp_mario(WinMgrEntry* entry) {
     }
 }
 
+/**
+ * Draws the informant lists: each entry's title cut at its tag end, read ones in grey,
+ * and for type 17 the price of unread entries with a coin icon. Despite the name it serves both 17 and 18.
+ */
 static void select_disp_luigi(WinMgrEntry* entry) {
 #if VERSION >= VERSION_US
     f32 tw;
@@ -1785,6 +1883,10 @@ static void select_disp_luigi(WinMgrEntry* entry) {
     }
 }
 
+/**
+ * Draws the prompt window beside a selection list (msg_window_select_* by type), centred.
+ * From US on the text is squeezed to fit and the window grows with the prompt's line count.
+ */
 static void select_disp2(WinMgrEntry* entry) {
     WinMgrSelect* sel = entry->param;
     const char* msg;
@@ -1878,10 +1980,12 @@ static void select_disp2(WinMgrEntry* entry) {
 #endif
 }
 
+/** Main function of a selection list's help window: scrolls its text (winMgrHelpMain). */
 static void select_main3(WinMgrEntry* entry) {
     winMgrHelpMain(entry);
 }
 
+/** Help window of an item list: shows the description of the item under the cursor. */
 static void select_disp3(WinMgrEntry* entry) {
     WinMgrSelect* sel = entry->param;
 
@@ -1892,6 +1996,11 @@ static void select_disp3(WinMgrEntry* entry) {
     }
 }
 
+/**
+ * Help window of the partner list: shows the rank-up
+ * or rank-down text for the partner's next rank (help_lankup_lank2_kur and the like;
+ * helperr_ when the row is refused).
+ */
 static void select_disp3_party(WinMgrEntry* entry) {
     WinMgrSelect* sel = entry->param;
     PouchData* pouch;
@@ -1920,6 +2029,10 @@ static void select_disp3_party(WinMgrEntry* entry) {
     }
 }
 
+/**
+ * Help window of the HP/FP/BP list: shows help_levelup_hp / help_leveldown_fp and the like,
+ * or the refusal text (helperr2_ when raising would pass the cap; not in the demos).
+ */
 static void select_disp3_mario(WinMgrEntry* entry) {
     WinMgrSelect* sel = entry->param;
     char buf[0x48];
@@ -1961,9 +2074,11 @@ static const char name_party5[] = "name_party5";
 static const char name_party2[] = "name_party2";
 static const char name_party6[] = "name_party6";
 
+/** Swaps Yoshi's portrait icon for the one in the colour he hatched with; other icons pass through. */
 #if VERSION <= VERSION_DEMO_US
 static s32 iconid_conv(s32 icon) {
 #else
+/** The release versions make it static inline (see the prototypes near the top of the file). */
 static inline s32 iconid_conv(s32 icon) {
 #endif
     if (icon == ICON_158) {
@@ -1995,9 +2110,11 @@ static inline s32 iconid_conv(s32 icon) {
     return icon;
 }
 
+/** A partner's display name by party_id_table index (Yoshi's is the name the player gave him). */
 #if VERSION <= VERSION_DEMO_US
 static const char* party_name_table_rtn(s32 id) {
 #else
+/** The release versions make it static inline (see the prototypes near the top of the file). */
 static inline const char* party_name_table_rtn(u16 id) {
 #endif
     const char* name;

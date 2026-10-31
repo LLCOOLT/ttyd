@@ -1,6 +1,11 @@
 #include <dolphin/gd.h>
 #include <dolphin/os.h>
 
+/**
+ * Builds the vertex descriptor from an attribute list (ending with GX_VA_NULL)
+ * and writes the two CP vertex descriptor registers plus the XF register with the counts of colors,
+ * normals and texture coordinates. Attributes not in the list are off (position is direct).
+ */
 void GDSetVtxDescv(const GXVtxDescList* attrPtr) {
     u32 nnorms = 0;
     u32 ncols = 0;
@@ -117,6 +122,11 @@ void GDSetVtxDescv(const GXVtxDescList* attrPtr) {
     GDWriteXFCmd(XF_REG_INVERTEXSPEC_ID, XF_REG_INVTXSPEC(ncols, nnorms, ntexs));
 }
 
+/**
+ * Writes the three CP vertex attribute table registers for a format slot from a GXVtxAttrFmtList.
+ * Attributes not in the list default to XYZ float positions and normals,
+ * RGBA8 colors and ST float texture coordinates.
+ */
 void GDSetVtxAttrFmtv(GXVtxFmt vtxfmt, const GXVtxAttrFmtList* list) {
     u32 posCnt = GX_POS_XYZ;
     u32 posType = GX_F32;
@@ -242,6 +252,10 @@ void GDSetVtxAttrFmtv(GXVtxFmt vtxfmt, const GXVtxAttrFmtList* list) {
     GDWriteCPCmd(vtxfmt + CP_REG_VAT_GRP2_ID, CP_REG_VAT_GRP2(tx4Frac, tx5Cnt, tx5Type, tx5Frac, tx6Cnt, tx6Type, tx6Frac, tx7Cnt, tx7Type, tx7Frac));
 }
 
+/**
+ * Writes the CP array base (converted to a physical address) and stride registers for a vertex attribute.
+ * GX_VA_NBT shares the slot of GX_VA_TEX0MTXIDX.
+ */
 void GDSetArray(GXAttr attr, void* base_ptr, u8 stride) {
     s32 cpAttr;
     if (attr == GX_VA_NBT) {
@@ -254,6 +268,7 @@ void GDSetArray(GXAttr attr, void* base_ptr, u8 stride) {
     GDWriteCPCmd(cpAttr + CP_REG_ARRAYSTRIDE_ID, stride);
 }
 
+/** Same as GDSetArray but takes the base as an already physical address. */
 void GDSetArrayRaw(GXAttr attr, u32 base_ptr_raw, u8 stride) {
     s32 cpAttr;
     if (attr == GX_VA_NBT) {
@@ -266,10 +281,18 @@ void GDSetArrayRaw(GXAttr attr, u32 base_ptr_raw, u8 stride) {
     GDWriteCPCmd(cpAttr + CP_REG_ARRAYSTRIDE_ID, stride);
 }
 
+/**
+ * Writes the physical address of base_ptr at the current write position,
+ * to patch the base word of an array command already in a list.
+ */
 void GDPatchArrayPtr(void* base_ptr) {
     GDWrite_u32(OSCachedToPhysical(base_ptr));
 }
 
+/**
+ * Writes the two XF registers for a texture coordinate:
+ * source row, type (matrix, bump, color), projection form, normalization and post-transform matrix.
+ */
 void GDSetTexCoordGen(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, u8 normalize, u32 postmtx) {
     u32 form;
     u32 tgType;
@@ -395,6 +418,10 @@ void GDSetTexCoordGen(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src
     GDWriteXFCmd(dst_coord + XF_REG_DUALTEX0_ID, XF_REG_DUALTEX(postmtx - 0x40, normalize));
 }
 
+/**
+ * Writes the cull mode bits of the BP gen mode register through a masked write,
+ * translating the GX value to the hardware one.
+ */
 void GDSetCullMode(GXCullMode mode) {
     static u8 cm2hw[4] = { 0, 2, 1, 3 };
 
@@ -402,6 +429,10 @@ void GDSetCullMode(GXCullMode mode) {
     GDWriteBPCmd(cm2hw[mode] << 14);
 }
 
+/**
+ * Writes the BP gen mode (texture generator, color and TEV stage counts) and the matching XF color
+ * and texture counts. Does not touch the indirect stage count or culling.
+ */
 void GDSetGenMode(u8 nTexGens, u8 nChans, u8 nTevs) {
     GDWriteBPCmd(0xFE003C3F);
     GDWriteBPCmd(BP_GEN_MODE(nTexGens, nChans, nTevs - 1, 0, 0));
@@ -410,6 +441,7 @@ void GDSetGenMode(u8 nTexGens, u8 nChans, u8 nTevs) {
     GDWriteXFCmd(XF_REG_NUMTEX_ID, nTexGens);
 }
 
+/** Same as GDSetGenMode but also sets the number of indirect stages and the cull mode. */
 void GDSetGenMode2(u8 nTexGens, u8 nChans, u8 nTevs, u8 nInds, GXCullMode cm) {
     static u8 cm2hw[4] = { 0, 2, 1, 3 };
 
@@ -420,10 +452,12 @@ void GDSetGenMode2(u8 nTexGens, u8 nChans, u8 nTevs, u8 nInds, GXCullMode cm) {
     GDWriteXFCmd(XF_REG_NUMTEX_ID, nTexGens);
 }
 
+/** Writes the line width, point size and texture offsets register. */
 void GDSetLPSize(u8 lineWidth, u8 pointSize, GXTexOffset lineOffset, GXTexOffset pointOffset, u8 lineHalfAspect) {
     GDWriteBPCmd(BP_LP_SIZE(lineWidth, pointSize, lineOffset, pointOffset, lineHalfAspect, 0x22));
 }
 
+/** Sets or clears the co-planar bit (bit 19 of BP register 0x08) with a masked write. */
 void GDSetCoPlanar(u8 enable) {
     GDWriteBPCmd(0xFE080000);
     GDWriteBPCmd(enable << 19);

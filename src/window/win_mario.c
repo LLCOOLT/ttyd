@@ -56,6 +56,11 @@ const char* hammer_help[] = {NULL, ("msg_hammer_1"), ("msg_hammer_2"), ("msg_ham
 const char* boots_help[] = {NULL, ("msg_boots_1"), ("msg_boots_2"), ("msg_boots_3")};
 const char* hammer_pose[] = {NULL, ("M_H_1"), ("M_H_4"), ("M_H_7")};
 
+/**
+ * Sets up the Mario window when the pause menu opens:
+ * loads Mario's model in his current outfit (emblem colors, or the 8-bit d_mario model in 8-bit form)
+ * and counts the special moves (Star Powers) obtained.
+ */
 void winMarioInit(WindowWork* w) {
     PouchData* pouch;
     const char* name;
@@ -116,6 +121,10 @@ void winMarioInit(WindowWork* w) {
     }
 }
 
+/**
+ * Run from win_root.c each time the Mario window comes to the front:
+ * cursor back to the Level entry, its help text, special-move list closed.
+ */
 void winMarioInit2(WindowWork* w) {
     w->marioSel = 0;
     w->helpTgtX = w->helpTgtX = linkDt[w->marioSel].x;
@@ -138,6 +147,7 @@ void winMarioInit2(WindowWork* w) {
     w->mario.f194 = 0;
 }
 
+/** Frees the Mario model loaded by winMarioInit. */
 void winMarioExit(WindowWork* w) {
     animPoseRelease(w->mario.poseId);
 }
@@ -190,6 +200,13 @@ void winMarioExit(WindowWork* w) {
     }                                                              \
     psndSFXOn((const char*)0x20005);
 
+/**
+ * Mario window input.
+ * The D-pad moves between the entries in linkDt (skipping gear and curses Mario lacks),
+ * sets the help text and poses Mario to match (hammer swing, boots, ...);
+ * A on the special moves entry opens the list of Star Powers with their descriptions.
+ * Returns -1 on B, -2 on Start, else 0.
+ */
 s32 winMarioMain(WindowWork* w) {
     const char* anims[2];
     LinkDt* lp;
@@ -302,11 +319,12 @@ s32 winMarioMain(WindowWork* w) {
     return 0;
 }
 
+/** Per-frame update hook for the Mario window; empty. */
 void winMarioMain2(WindowWork* w) {
 }
 
 #if VERSION >= VERSION_US
-// US: plain ASCII digits
+/** US: plain ASCII digits */
 const char* winZenkakuStr(s32 n) {
     static char tmp2[0x100];
     sprintf(tmp2, "%d", n);
@@ -315,6 +333,7 @@ const char* winZenkakuStr(s32 n) {
 
 char winZenkakuStrPad_buf[0x100];
 
+/** Formats n zero-padded to digits places (the play time's hours and minutes); returns a shared static buffer. */
 char* winZenkakuStrPad(s32 n, s32 digits) {
     char buf[0x100];
     sprintf(buf, "%%0%dd", digits);
@@ -323,6 +342,10 @@ char* winZenkakuStrPad(s32 n, s32 digits) {
 }
 
 #else
+/**
+ * Converts n to full-width (zenkaku) Shift-JIS digits for the Japanese menus,
+ * with a full-width minus for negatives (not in the demos). Returns a shared static buffer.
+ */
 const char* winZenkakuStr(s32 n) {
     const char* tbl[10] = {"\x82\x4f", "\x82\x50", "\x82\x51", "\x82\x52", "\x82\x53",
                            "\x82\x54", "\x82\x55", "\x82\x56", "\x82\x57", "\x82\x58"};
@@ -351,6 +374,7 @@ const char* winZenkakuStr(s32 n) {
 #if VERSION >= VERSION_JP
 char winZenkakuStrPad_tmp[0x100];
 
+/** Full-width digits zero-padded to digits places (the play time's hours and minutes); shared static buffer. */
 char* winZenkakuStrPad(s32 n, s32 digits) {
     const char* tbl[10] = {"\x82\x4f", "\x82\x50", "\x82\x51", "\x82\x52", "\x82\x53",
                            "\x82\x54", "\x82\x55", "\x82\x56", "\x82\x57", "\x82\x58"};
@@ -375,6 +399,7 @@ char* winZenkakuStrPad(s32 n, s32 digits) {
 #endif
 #endif
 
+/** Draws a speech-bubble (fukidashi) with a curse's icon in it, plus a drop shadow. */
 static inline void fukiKey(WindowWork* w, u16 icon, f32 x, f32 y) {
     winTexInit(*w->res->data);
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
@@ -385,6 +410,7 @@ static inline void fukiKey(WindowWork* w, u16 icon, f32 x, f32 y) {
     winIconSet(icon, (Vec){x + 6.0f, y, 0.0f}, (Vec){0.7f, 0.7f, 0.7f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 }
 
+/** Mirrored speech bubble for the hammer or boots icon (the bubble texture flipped horizontally). */
 static inline void fukiTool(WindowWork* w, u16 icon, f32 x, f32 y) {
     winTexInit(*w->res->data);
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
@@ -395,6 +421,10 @@ static inline void fukiTool(WindowWork* w, u16 icon, f32 x, f32 y) {
     winIconSet(icon, (Vec){x - 6.0f, y, 0.0f}, (Vec){0.7f, 0.7f, 0.7f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 }
 
+/**
+ * Draws the bubble for Mario window entry idx if Mario owns it:
+ * current hammer (2), current boots (3), or the Paper, Plane, Boat and Tube curses (7-10).
+ */
 static void fukidashi(WindowWork* w, u32 idx, f32 x, f32 y) {
     switch (idx) {
         case 2:
@@ -432,7 +462,12 @@ static void fukidashi(WindowWork* w, u32 idx, f32 x, f32 y) {
 
 #if VERSION >= VERSION_US
 
-// US: every float live range has its own variable (register order); rowC is the second value of rowB
+/**
+ * Draws the Mario window (menu slot idx): name, level and rank, the gear and curse bubbles, HP/FP/BP,
+ * the Star Power gauge, Star Points, coins, Star Pieces, Shine Sprites and play time (capped at 99:59),
+ * Mario's model, and the special-move list when open.
+ * US: every float live range has its own variable (register order); rowC is the second value of rowB
+ */
 void winMarioDisp(s32 camId, void* param, s32 idx) {
     f32 rowC;
     // FAKE: q1/q2 hold copies of row0/row1 for the dead guards after the f198 block (register order, no code)
@@ -687,6 +722,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     }
 }
 #else
+/** Pre-US winMarioDisp: the same screen with Japanese-only labels (the demos print the counters with plain digits). */
 void winMarioDisp(s32 camId, void* param, s32 idx) {
     static s32 pri[6] = {3, 2, 8, 10, 7, 9};
     WindowWork* w;

@@ -161,10 +161,18 @@ IconDispTableEntry _disp_table[0x17] = {
 // local prototypes
 void BattleStatusIconDisp(CameraId camId, void* param);
 
+/** Clears the unit's status icon work; called from BtlUnit_Entry. */
 void BattleStatusIconInit(BattleUnit* unit) {
     memset(&unit->statusIconWork, 0, sizeof(BattleWorkStatusIcon));
 }
 
+/**
+ * Runs every frame for each unit from battle_disp.c:
+ * while the command menu is up (dispFlags bit 0), fills the unit's icon list from _disp_table,
+ * one entry per active status, placed at the unit's statusIconOffset and stacked 25.6 units apart,
+ * and registers BattleStatusIconDisp.
+ * The US release picks the table by language; the PAL tables differ only in the HP and FP Regen icons.
+ */
 void BattleStatusIconMain(BattleUnit* unit) {
     BattleWorkStatusIcon* icon = &unit->statusIconWork;
     BattleWork* work = _battleWorkPointer;
@@ -225,12 +233,18 @@ void BattleStatusIconMain(BattleUnit* unit) {
     }
 }
 
+/** Status-icon cleanup when a unit is deleted; empty in every version. */
 void BattleStatusIconDelete(BattleUnit* unit) {
     ; // stubbed in retail
 }
 
 #include "driver/icondrv.h"
 
+/**
+ * Draws one unit's status icons in 2D, bottom to top:
+ * the backing plate for entries without STATUS_ICON_NO_PLATE, the icon with its own scale,
+ * rotation and colour (skipped while STATUS_ICON_HIDDEN), and the remaining turn count beside it.
+ */
 void BattleStatusIconDisp(CameraId camId, void* param) {
     BattleWorkStatusIcon* icon = &((BattleUnit*)param)->statusIconWork;
     GXColor col = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -289,6 +303,11 @@ void BattleStatusIconDisp(CameraId camId, void* param) {
 
 #include "system.h"
 
+/**
+ * Icon builder for the plain turn-count statuses (Sleep, Poison, Stop, Burn, Freeze, Fast, Slow,
+ * attack and defense changes, Dodgy, Huge, Tiny, Confused, Invisible, Payback):
+ * fills the entry with the status's icon and turn count and returns TRUE if the unit has the status.
+ */
 static BOOL _bsi_default_turn(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
     s32 type = disp->statusType;
     s8 turns, strength;
@@ -315,6 +334,11 @@ static BOOL _bsi_default_turn(BattleUnit* unit, IconDispTableEntry* disp, Battle
     return TRUE;
 }
 
+/**
+ * Guruguru = Dizzy.
+ * Builds the Dizzy icon, spinning it 4 degrees per frame about its centre and raised 4 units;
+ * resets the spin and returns FALSE when the unit is not Dizzy.
+ */
 static BOOL _bsi_guruguru(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
     int type = disp->statusType;
     s8 turns, strength;
@@ -339,6 +363,10 @@ static BOOL _bsi_guruguru(BattleUnit* unit, IconDispTableEntry* disp, BattleWork
     return TRUE;
 }
 
+/**
+ * Builds the Allergic icon, which blinks: it is hidden for 16 frames out of every 32.
+ * Returns FALSE (and resets the blink timer) when the unit is not Allergic.
+ */
 static BOOL _bsi_allergy(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
     int type = disp->statusType;
     s8 turns, strength;
@@ -362,6 +390,11 @@ static BOOL _bsi_allergy(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkS
     return TRUE;
 }
 
+/**
+ * Biribiri = Electrified.
+ * Builds the Electrified icon, which flickers: full size for 4-9 frames, then shrunk to 0.8 for 30-129 frames,
+ * at random lengths. Returns FALSE and resets the flicker when the unit is not Electrified.
+ */
 static BOOL _bsi_biribiri(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
     s32 type = disp->statusType;
     s8 turns, strength;
@@ -404,6 +437,11 @@ static BOOL _bsi_biribiri(BattleUnit* unit, IconDispTableEntry* disp, BattleWork
     return TRUE;
 }
 
+/**
+ * Builds the HP Regen or FP Regen icon (status 23 or 24),
+ * tinting it back and forth over 60 frames between pink-red and yellow (HP) or green and cyan (FP).
+ * Returns FALSE when the unit lacks the status or for any other status.
+ */
 static BOOL _bsi_regeneration(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
     s32 type = disp->statusType;
     s16* ctr;

@@ -4,6 +4,7 @@
 
 #include "qiz.h"
 
+/** Map init script of qiz_00: does nothing and returns at once; the quiz map was left without content. */
 EVT_BEGIN(qiz_00_init_evt)
     RETURN
 EVT_END()

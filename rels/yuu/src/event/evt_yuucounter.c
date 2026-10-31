@@ -46,6 +46,10 @@ extern EvtWord yuucounter_window_disp_evt[];
 extern EvtWord yuucounter_window_null_evt[];
 #endif
 
+/**
+ * Returns the bits of the counter's display flags selected by mask (1 hide, 2 freeze the value,
+ * 4 restart the timer baseline), or 0 if no counter exists.
+ */
 u32 yuucounter_flag(u32 mask) {
     if (_wp == NULL) {
         return 0;
@@ -53,6 +57,7 @@ u32 yuucounter_flag(u32 mask) {
     return _wp->dispFlags & mask;
 }
 
+/** Clears the masked display flag bits of the counter; does nothing if no counter exists. */
 void yuucounter_flag_off(u32 mask) {
     if (_wp == NULL) {
         return;
@@ -60,6 +65,10 @@ void yuucounter_flag_off(u32 mask) {
     _wp->dispFlags &= ~mask;
 }
 
+/**
+ * Sets the masked display flag bits of the counter (the minigames use 2 to freeze the value when a round ends);
+ * does nothing if no counter exists.
+ */
 void yuucounter_flag_on(u32 mask) {
     if (_wp == NULL) {
         return;
@@ -67,6 +76,7 @@ void yuucounter_flag_on(u32 mask) {
     _wp->dispFlags |= mask;
 }
 
+/** Overwrites the counter's current value; does nothing if no counter exists. */
 void yuucounter_set_data(s32 data) {
     if (_wp == NULL) {
         return;
@@ -74,6 +84,10 @@ void yuucounter_set_data(s32 data) {
     _wp->data = data;
 }
 
+/**
+ * Returns the counter's current value (distance, remaining milliseconds or rank, depending on its type),
+ * or 0 if no counter exists.
+ */
 s32 yuucounter_get_data(void) {
     if (_wp == NULL) {
         return 0;
@@ -81,6 +95,7 @@ s32 yuucounter_get_data(void) {
     return _wp->data;
 }
 
+/** Script call that asks the counter's event to stop, blocks until it has, then frees the counter work area. */
 USER_FUNC(evt_yuucounter_free) {
     YuuCounterWork* wp = _wp;
 
@@ -98,6 +113,13 @@ USER_FUNC(evt_yuucounter_free) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * args: [0] = x, [1] = y of the on-screen counter,
+ * [2] = type (0 distance in Plane Mode, 1 countdown timer, 2 rank),
+ * [3] = limit in seconds for type 1 or start count for type 2.
+ * Allocates the counter and starts its draw event;
+ * on JP and later also tells the Pianta Parlor window event whether to show the timer.
+ */
 USER_FUNC(evt_yuucounter_alloc) {
     EvtWord* args = event->args;
     YuuCounterWork* wp = _mapAlloc(sizeof(YuuCounterWork));
@@ -132,6 +154,10 @@ USER_FUNC(evt_yuucounter_alloc) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Body of the counter event: queues the 2D draw callback each frame until the free request flag is set,
+ * then marks itself stopped.
+ */
 static USER_FUNC(evt_yuucounter_main_func) {
     YuuCounterWork* wp = (YuuCounterWork*)event->lwData[0];
 
@@ -143,6 +169,13 @@ static USER_FUNC(evt_yuucounter_main_func) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Updates and draws the counter.
+ * Type 0 derives the value from Mario's x position,
+ * type 1 counts the remaining time down from the limit using render time,
+ * type 2 asks yuunpc_juni for Mario's current rank;
+ * then draws the translucent backdrop, the digits and the unit icon with icon sprites.
+ */
 static void evt_yuucounter_disp_func(CameraId camera, void* param) {
     YuuCounterWork* wp = param;
     GXColor color = white;
@@ -313,6 +346,7 @@ static void evt_yuucounter_disp_func(CameraId camera, void* param) {
 }
 
 #if VERSION >= VERSION_JP
+/** args[0] = on/off, args[1] = flag mask. Sets or clears those display flag bits of the counter (JP and later). */
 USER_FUNC(yuucounter_disp_flag_onoff) {
     EvtWord* args = event->args;
     BOOL on = evtGetValue(event, args[0]);
@@ -328,17 +362,23 @@ USER_FUNC(yuucounter_disp_flag_onoff) {
 }
 #endif
 
+/** The counter's per-frame event, started by evt_yuucounter_alloc; runs evt_yuucounter_main_func. */
 static EVT_BEGIN(main_evt)
     CALL(evt_yuucounter_main_func)
     RETURN
 EVT_END()
 
 #if VERSION >= VERSION_JP
+/**
+ * Script run for timer counters: sets display flag 4 so the timer restarts its baseline
+ * when the window opens (JP and later).
+ */
 EVT_BEGIN(yuucounter_window_disp_evt)
     CALL(yuucounter_disp_flag_onoff, 1, 4)
     RETURN
 EVT_END()
 
+/** Empty script used for counters that are not timers (JP and later). */
 EVT_BEGIN(yuucounter_window_null_evt)
     RETURN
 EVT_END()

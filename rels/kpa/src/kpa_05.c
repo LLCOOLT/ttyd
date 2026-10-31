@@ -50,6 +50,11 @@ EvtWord kpa_act_stg3_item[] = {
     KPA_ITEM(1425.0f, 12.5f), KPA_ITEM(1425.0f, 50.0f), KPA_ITEM_END,
 };
 
+/**
+ * Watches Bowser in the lava stage: it waits until he is dead or standing on the "a_magu" (magma) object.
+ * In the lava case it adds a "splash" effect at his position sized by his power level (0.8, 1.7, 3.0 or 4.5)
+ * and runs the pit fall handler (kpa_fall_sub); if he died it runs kpa_dead.
+ */
 static EVT_BEGIN(kpa_fall)
     SET_VALUE(LF(0), 0)
     LOOP(0)
@@ -87,6 +92,13 @@ static EVT_BEGIN(kpa_fall)
     RETURN
 EVT_END()
 
+/**
+ * Guess: run when Bowser lands on the stage's jump platform:
+ * kills the event whose id is in GW(15) (the stage's countdown, probably), saves Bowser's power level,
+ * loads kpa_06 after 500 ms, turns the camera off once he is above y = 400
+ * and launches him up with evt_mario_jump_jumpstand 800 units above the platform (a lower launch speed in the US
+ * demo and earlier).
+ */
 static EVT_BEGIN(jumpstand_evt)
     DELETE_EVENT(GW(15))
     BEGIN_INLINE_EVENT
@@ -119,6 +131,11 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Map init for kpa_05, side-scrolling stage 3 (over lava):
+ * builds the blocks and coins from kpa_act_stg3_*, resets the camera road,
+ * plays the lava animation and starts the HUD, intro and clock. It continues in kpa_06.
+ */
 EVT_BEGIN(kpa_05_init_evt)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL_CHILD(kpa_init)
@@ -139,6 +156,7 @@ EVT_END()
 
 s32 kpaGetLevel(void);
 
+/** Script helper: returns Bowser's current power level (kpaGetLevel) in args[0]. */
 static USER_FUNC(kpa_get_level) {
     EvtWord* args = event->args;
     evtSetValue(event, args[0], kpaGetLevel());

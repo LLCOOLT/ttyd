@@ -69,6 +69,10 @@ typedef struct {
     int precision;
 } print_format;
 
+/**
+ * Parses one printf conversion specification (flags, width, precision, length modifier,
+ * conversion character) into a print_format.
+ */
 static const char* parse_format(const char* format_string, va_list* arg, print_format* format) {
     print_format f;
     const char* s = format_string;
@@ -302,6 +306,11 @@ static const char* parse_format(const char* format_string, va_list* arg, print_f
     return s + 1;
 }
 
+/**
+ * Formats a long as text for %d/%i/%u/%o/%x/%X in the given print_format:
+ * digits are written backwards from the end of buff, padded to the precision,
+ * with the 0/0x prefix for the # flag and the sign (- + or space); returns a pointer to the start of the text.
+ */
 static char* long2str(long num, char* buff, print_format format) {
     unsigned long unsigned_num, base;
     char* p;
@@ -410,6 +419,7 @@ static char* long2str(long num, char* buff, print_format format) {
     return p;
 }
 
+/** Same as long2str for long long (%lld and friends). */
 static char* longlong2str(long long num, char* buff, print_format format) {
     unsigned long long unsigned_num, base;
     char* p;
@@ -518,6 +528,10 @@ static char* longlong2str(long long num, char* buff, print_format format) {
     return p;
 }
 
+/**
+ * Formats a double as hexadecimal floating point (%a/%A, e.g. 0x1.8p+3) into buff;
+ * returns null if the precision exceeds 509, and prints inf/nan text for non-finite values.
+ */
 static char* double2hex(long double num, char* buff, print_format format) {
     char* p;
     unsigned char* q;
@@ -642,6 +656,11 @@ static char* double2hex(long double num, char* buff, print_format format) {
     return p;
 }
 
+/**
+ * Rounds the decimal digit string in place to new_length digits (round half to even, carry through 9s,
+ * a carry out of the top digit becomes 1 with exp + 1);
+ * a negative length or a result of all zeros gives a single 0 digit.
+ */
 void round_decimal(decimal* dec, int new_length) {
     char c;
     char* p;
@@ -694,6 +713,12 @@ void round_decimal(decimal* dec, int new_length) {
     dec->sig.length = new_length;
 }
 
+/**
+ * Formats a double for %f/%e/%g (and uppercase):
+ * converts with __num2dec, trims trailing zeros,
+ * rounds to the precision with round_decimal and lays out the digits, exponent and sign;
+ * returns null if the precision exceeds 509, and prints inf/nan text for non-finite values.
+ */
 static char* float2str(long double num, char* buff, print_format format) {
     decimal dec;
     decform form;
@@ -1182,10 +1207,19 @@ static int __pformatter(void* (*WriteProc)(void*, const char*, size_t), void* Wr
     return chars_written;
 }
 
+/**
+ * __pformatter output callback: fwrite()s the chunk to the FILE and returns the FILE pointer on success or null
+ * if it wrote fewer bytes.
+ */
 void* __FileWrite(void* pFile, const char* pBuffer, size_t char_num) {
     return (fwrite(pBuffer, 1, char_num, (FILE*)pFile) == char_num ? pFile : 0);
 }
 
+/**
+ * __pformatter output callback: copies the chunk into the destination string at the running count,
+ * clipped to MaxCharCount (the count still advances so vsnprintf can report the full length);
+ * always returns non-null.
+ */
 void* __StringWrite(void* pCtrl, const char* pBuffer, size_t char_num) {
     size_t chars;
     __OutStrCtrl* ctrl = (__OutStrCtrl*)pCtrl;
@@ -1197,6 +1231,11 @@ void* __StringWrite(void* pCtrl, const char* pBuffer, size_t char_num) {
     return (void*)1;
 }
 
+/**
+ * Standard printf(): returns -1 if stdout is wide-oriented,
+ * otherwise runs __pformatter with __FileWrite on stdout inside the stdout critical region
+ * and returns the character count.
+ */
 int printf(const char* format, ...) {
     int res;
 
@@ -1215,6 +1254,7 @@ int printf(const char* format, ...) {
     return res;
 }
 
+/** Standard vprintf(): same as printf() with the arguments already in a va_list. */
 int vprintf(const char* format, va_list arg) {
     int ret;
 
@@ -1228,6 +1268,11 @@ int vprintf(const char* format, va_list arg) {
     return ret;
 }
 
+/**
+ * Formats into s with __pformatter and __StringWrite,
+ * writing at most n characters and always placing the terminator at min(length, n - 1);
+ * returns the length the full output would have had.
+ */
 static inline int vsnprintf(char* s, size_t n, const char* format, va_list arg) {
     int end;
     __OutStrCtrl osc;
@@ -1245,10 +1290,12 @@ static inline int vsnprintf(char* s, size_t n, const char* format, va_list arg) 
     return end;
 }
 
+/** Standard vsprintf(): vsnprintf with an effectively unlimited size (0xFFFFFFFF). */
 int vsprintf(char* s, const char* format, va_list arg) {
     return vsnprintf(s, 0xFFFFFFFF, format, arg);
 }
 
+/** Standard sprintf(): vsnprintf with an effectively unlimited size (0xFFFFFFFF); returns the character count. */
 int sprintf(char* s, const char* format, ...) {
     va_list args;
     va_start(args, format);

@@ -24,6 +24,11 @@ static USER_FUNC(make_name);
 
 static BeroEntry bero_entry_data[3];
 
+/**
+ * Door animation script (closing) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_l_01 and S_doa_l_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l_01"), 0, LW(0), 0)
@@ -32,6 +37,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the west door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_l_01 and S_doa_l_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_l_01"), 0, LW(0), 0)
@@ -40,6 +50,11 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (closing) for the east door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_r_01 and S_doa_r_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r_01"), 0, LW(0), 0)
@@ -48,6 +63,11 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation script (opening) for the east door, used as the enter/exit animation of this room's bero entry.
+ * LW(0) holds the angle step of the swing, and the script turns the door panels S_doa_r_01 and S_doa_r_02 by it,
+ * the second one the opposite way.
+ */
 static EVT_BEGIN(e_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("S_doa_r_01"), 0, LW(0), 0)
@@ -96,6 +116,12 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Event script: the opening cutscene of the Palace of Shadow,
+ * run on the first entry (story progress is set to STORY_STG8_00_START).
+ * Mario and the partner are placed inside the west door, the camera pans over the hall while they walk in,
+ * the partner comments (stg8_las_01), Mario nods, and control returns with the area banner (telop 17).
+ */
 static EVT_BEGIN(first_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_snd_bgm_scope, 0, 1)
@@ -155,6 +181,10 @@ static EVT_BEGIN(first_evt)
     RETURN
 EVT_END()
 
+/**
+ * Map-init helper: hides the 12 numbered candle map objects (names from make_name)
+ * and puts a flame effect 9 units below the origin of each one.
+ */
 static EVT_BEGIN(shan_init)
     SET_VALUE(LW(0), 1)
     LOOP(12)
@@ -172,6 +202,11 @@ static EVT_BEGIN(shan_init)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for las_00: starts the Palace of Shadow music and ambience,
+ * sets up the doors west to tik_05 and east to las_01, lights the 12 wall torches (S_shan_rou_01..12),
+ * and on first arrival (story before STORY_STG8_00_START) plays the opening cutscene.
+ */
 EVT_BEGIN(las_00_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
@@ -190,6 +225,7 @@ EVT_BEGIN(las_00_init_evt)
     RETURN
 EVT_END()
 
+/** Script helper: builds the torch map-object name "S_shan_rou_0<args[0]>" and returns it in args[1]. */
 static USER_FUNC(make_name) {
     EvtWord* args = event->args;
     static char name[16];

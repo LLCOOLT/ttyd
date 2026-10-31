@@ -17,12 +17,20 @@
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
 
+/**
+ * Door animation callback for the west door (door_1), opening: LW(0) is the swing angle;
+ * turns door_1 about the Y axis by -0.44 times the angle.
+ */
 static EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the west door (door_1), closing:
+ * turns door_1 about the Y axis by 0.44 times the angle.
+ */
 static EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
@@ -51,6 +59,11 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
+/**
+ * Scene when Mario steps into the back room: Jolene (キノシコワ) stands by the half-open door,
+ * notices him and runs out (a "!" balloon, then she leaves toward x=-250 and the door slams shut with a wood
+ * sound); the partner remarks stg3_tou_307_13_00 and control returns.
+ */
 static EVT_BEGIN(evt_kinoshikowa)
     CALL(evt_npc_set_position, STRING("キノシコワ"), -200, 0, 10)
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, 30, 0)
@@ -85,6 +98,12 @@ static EVT_BEGIN(evt_kinoshikowa)
     RETURN
 EVT_END()
 
+/**
+ * Run when the block is broken and the flattened fighters are revealed:
+ * the partner walks to (95, 10) with the surprised jingle and remarks stg3_tou_307_10,
+ * Brots' dummy (ブロッツダミー) says stg3_tou_307_11, evt_kinoshikowa runs
+ * and the story advances to STORY_STG3_20_16_FLATTENED.
+ */
 static EVT_BEGIN(evt_block_broken)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -109,6 +128,10 @@ static EVT_BEGIN(evt_block_broken)
     RETURN
 EVT_END()
 
+/**
+ * NPC init for Michel (マイケル, a Koopa fighter): before STORY_STG3_32_BOSS_BATTLE he lies flattened at (175, 0,
+ * -20) in the "NKT_Z_1" pose, rotated 80 degrees.
+ */
 static EVT_BEGIN(init_michel)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_32_BOSS_BATTLE)
         CALL(evt_npc_set_anim, STRING("マイケル"), STRING("NKT_Z_1"))
@@ -118,6 +141,7 @@ static EVT_BEGIN(init_michel)
     RETURN
 EVT_END()
 
+/** Guess: NPC init for the dummy Michel NPC: placed at (175, 0, -20) until the boss battle. */
 EVT_BEGIN(init_michel_dummy)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_32_BOSS_BATTLE)
         CALL(evt_npc_set_position, STRING("マイケルダミー"), 175, 0, -20)
@@ -125,11 +149,16 @@ EVT_BEGIN(init_michel_dummy)
     RETURN
 EVT_END()
 
+/** Talk script of Michel: says stg3_tou_307_14_01. */
 static EVT_BEGIN(talk_michel)
     CALL(evt_msg_print, 0, STRING("stg3_tou_307_14_01"), 0, STRING("マイケル"))
     RETURN
 EVT_END()
 
+/**
+ * NPC init for Brots (ブロッツ): before STORY_STG3_32_BOSS_BATTLE he lies flattened at (110, 3, -60), rotated,
+ * in the "S_1" pose, or the "X_1" pose once Mario has talked to him (GSWF_TOU12_FLATTENED_FIGHTER_TALK).
+ */
 static EVT_BEGIN(init_brots)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_32_BOSS_BATTLE)
         CALL(evt_npc_set_position, STRING("ブロッツ"), 110, 3, -60)
@@ -143,6 +172,7 @@ static EVT_BEGIN(init_brots)
     RETURN
 EVT_END()
 
+/** Guess: NPC init for the dummy Brots NPC (ブロッツダミー): placed at (125, 4, -60) until the boss battle. */
 EVT_BEGIN(init_brots_dummy)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_32_BOSS_BATTLE)
         CALL(evt_npc_set_position, STRING("ブロッツダミー"), 125, 4, -60)
@@ -150,6 +180,11 @@ EVT_BEGIN(init_brots_dummy)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the flattened Brots: the first time the partner is stopped and turns to him,
+ * he speaks (stg3_tou_307_12), faints into the "X_1" pose and the partner comments (stg3_tou_307_13),
+ * setting GSWF_TOU12_FLATTENED_FIGHTER_TALK; afterwards he only says stg3_tou_307_14.
+ */
 static EVT_BEGIN(talk_brots)
     IF_INT_EQUAL(GSWF(GSWF_TOU12_FLATTENED_FIGHTER_TALK), 0)
         CALL(evt_party_cont_onoff, 0, 0)
@@ -177,10 +212,12 @@ static EVT_BEGIN(talk_brots)
     RETURN
 EVT_END()
 
+/** NPC init for Jolene (キノシコワ) in this room: does nothing. */
 static EVT_BEGIN(init_kinoshikowa)
     RETURN
 EVT_END()
 
+/** Talk script of Jolene in this room: does nothing. */
 static EVT_BEGIN(talk_kinoshikowa)
     RETURN
 EVT_END()
@@ -245,6 +282,10 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Map init for tou_12, the back room beside the storage room:
+ * music by story stage, NPCs, a Star Piece, and the big block that Mario breaks open until the boss battle.
+ */
 EVT_BEGIN(tou_12_init_evt)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_31_GRUBBAS_PLANS)
         CALL(evt_snd_bgmoff, PSND_FADE_OUT)

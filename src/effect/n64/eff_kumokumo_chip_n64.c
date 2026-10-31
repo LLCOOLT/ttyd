@@ -37,6 +37,10 @@ static effN64Vtx size32x32_tex32x32_vtx[] = {
 static void effKumokumoChipMain(EffectEntry* effect);
 static void effKumokumoChipDisp(CameraId cameraId, EffectEntry* effect);
 
+/**
+ * Spawns one cloud chip at (x, y, z) that flies in a straight line to (tx, ty, tz) at speed units per frame (so
+ * it lives distance / speed frames); type 0 and 2 are yellowish, other types white-blue. Soft-deletable.
+ */
 EffectEntry* effKumokumoChipN64Entry(s32 type, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32 tz, f32 speed, f32 scale) {
     EffectEntry* effect;
     EffKumokumoChipN64Work* work;
@@ -126,6 +130,10 @@ EffectEntry* effKumokumoChipN64Entry(s32 type, f32 x, f32 y, f32 z, f32 tx, f32 
     return effect;
 }
 
+/**
+ * Fades the chip in over 16 frames (4 for types other than 0 and 2) and out before its end;
+ * moves it by its velocity. A delete request starts a 16-frame fade instead of deleting at once.
+ */
 static void effKumokumoChipMain(EffectEntry* effect) {
     EffKumokumoChipN64Work* work = effect->userdata;
     Vec position;
@@ -178,6 +186,7 @@ static void effKumokumoChipMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effKumokumoChipDisp, effect);
 }
 
+/** Draws the chip as one scaled 32x32 textured quad (effect texture 0x6B) with the current fade alpha. */
 static void effKumokumoChipDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffKumokumoChipN64Work* work;

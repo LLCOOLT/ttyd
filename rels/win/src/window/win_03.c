@@ -30,6 +30,10 @@
 static BeroEntry bero_entry_data[5];
 static TreeAccess tree_access_data[5];
 
+/**
+ * Bero enter script of Flurrie's front door: locks Mario's keys
+ * and changes the map to win_04 at its "w_bero" entry (Flurrie's house interior); returns LW(0) = 1.
+ */
 EVT_BEGIN(clouda_house_in)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_bero_mapchange, STRING("win_04"), STRING("w_bero"))
@@ -37,6 +41,11 @@ EVT_BEGIN(clouda_house_in)
     RETURN
 EVT_END()
 
+/**
+ * Guess: bero enter script used when Mario returns outside Flurrie's door:
+ * turns on Mario's background mode, removes the partner, resets the camera,
+ * places Mario at (277, 54, -450) and re-enters the bero; returns LW(0) = 1.
+ */
 EVT_BEGIN(clouda_house_out)
     CALL(evt_mario_bgmode_on)
     CALL(evt_mario_kill_party, 0)
@@ -47,12 +56,14 @@ EVT_BEGIN(clouda_house_out)
     RETURN
 EVT_END()
 
+/** Bero exit script: plays the wooden door-shut sound at Flurrie's door (306, 23, -448); returns LW(0) = 0. */
 EVT_BEGIN(cloud_out)
     CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_WOOD2"), 306, 23, -448, 0)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
 
+/** Bero enter script: plays the wooden door-open sound at Flurrie's door (306, 23, -448); returns LW(0) = 0. */
 EVT_BEGIN(cloud_in)
     CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_WOOD3"), 306, 23, -448, 0)
     SET_VALUE(LW(0), 0)
@@ -128,6 +139,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Trigger: when Mario walks past x = 200 the extra partner comments on Flurrie's house ("stg2_win_e04_02")
+ * and the story becomes STORY_STG2_04_PLANE_PANEL.
+ */
 EVT_BEGIN(lookat_house)
     LOOP(0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -150,6 +165,11 @@ EVT_BEGIN(lookat_house)
     RETURN
 EVT_END()
 
+/**
+ * Guess: script helper that bobs the 3D camera in
+ * and out around (290, 150, 491) looking at (290, 90, -6) with an accelerating motion,
+ * used by the Flurrie-lost-item scene to shake the view.
+ */
 static USER_FUNC(camera_action) {
     CameraEntry* cam = camGetPtr(CAMERA_3D);
     Vec pos = {290.0f, 150.0f, 491.0f};
@@ -199,6 +219,11 @@ static USER_FUNC(camera_action) {
     return event->lwData[10] == 0 ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
 
+/**
+ * Guess: Flurrie appears outside her house (Boggly Woods):
+ * Mario is moved offscreen, the camera frames the house,
+ * "stg2_win_e04_00_01" plays and the map changes to win_04 with an iris wipe.
+ */
 static EVT_BEGIN(cloud_toujou)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -219,6 +244,11 @@ static EVT_BEGIN(cloud_toujou)
     RETURN
 EVT_END()
 
+/**
+ * Guess: cutscene at Flurrie's house where she has lost her precious item:
+ * the camera bobs, the surprised jingle plays, "stg2_win_e04_00_05" is shown
+ * and the story becomes STORY_STG2_03_04_SHES_LOST_HER_PRECIOUS.
+ */
 EVT_BEGIN(cloud_lostitem)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -276,6 +306,7 @@ EVT_BEGIN(cloud_lostitem)
     RETURN
 EVT_END()
 
+/** Tree hit script for the second tree: spawns a Star Piece (GSWF_WIN03_STAR_PIECE_TREE) the first time it is hit. */
 EVT_BEGIN(tree_evt_01)
     CALL(evt_item_delete_check, STRING("item_tree01"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -292,11 +323,20 @@ static TreeAccess tree_access_data[] = {
     {7, NULL, NULL, NULL, 0, NULL},
 };
 
+/**
+ * Guess: empty case event for the "n_bero" area: it only exits the case event;
+ * used so the area registers as a case without doing anything.
+ */
 EVT_BEGIN(dummy_event)
     CALL(evt_exit_case_evt)
     RETURN
 EVT_END()
 
+/**
+ * Guess: map init script of Boggly Woods' Flurrie's-house map (win_03):
+ * registers exits, trees, the Volt Shroom and Star Piece items, hides the cave and castle scenery,
+ * and starts the Flurrie scenes by story progress.
+ */
 EVT_BEGIN(win_03_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)

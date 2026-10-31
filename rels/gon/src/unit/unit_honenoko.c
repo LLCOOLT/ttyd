@@ -195,6 +195,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Init event of the Dull Bones: installs its wait, attack, damage and confusion events,
+ * sets the thrown-bone part poses (KRN_H_1) and the landing sound,
+ * and clears unit work 1 (the flag that the death reward was already given).
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -206,6 +211,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Guess: damage event of a sword: runs the default damage reaction. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -213,6 +219,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Dead event of the Dark Bones: it spins for 48 frames with the death sound, a smoke puff appears and the coins,
+ * experience and star points are awarded once (unit work 1 guards it);
+ * then it tips over and the unit is killed (with a different kill mode when the damage code 0x400 is set,
+ * Guess: a special defeat).
+ */
 static EVT_BEGIN(dead_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(0), 48)
@@ -265,6 +277,13 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Event when the Dark Bones runs out of HP but can rebuild itself:
+ * it moves to its home position, awards the reward once,
+ * collapses into a pile of bones (KRN_D_2, crumble sound),
+ * stays there for a second and sets unit work 2 to 2 or 3,
+ * the number of turns until rebirth_event brings it back.
+ */
 static EVT_BEGIN(fake_dead_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(2), LW(3), LW(4))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
@@ -303,6 +322,11 @@ static EVT_BEGIN(fake_dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Turn event of the collapsed Dark Bones: counts unit work 2 down and, when it reaches zero,
+ * reassembles it (KRN_D_3 and KRN_D_4 with the reunite sounds),
+ * clears attribute 0x20000 and restores its HP to the maximum.
+ */
 static EVT_BEGIN(rebirth_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
     SUBTRACT(LW(0), 1)
@@ -323,6 +347,12 @@ static EVT_BEGIN(rebirth_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the Dull Bones: when confused it throws a plain bone;
+ * when collapsed it rebuilds itself (rebirth_event);
+ * otherwise it can use an item, or draws a random number weighted 85 for the bone throw
+ * and 15 for calling a Dull Bones friend, which needs room beside it (btlevtcmd_CheckSpace).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -392,6 +422,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Starts the target's avoid animation for the result of a pre-damage check (3, 6 or 2 select the three avoid
+ * types, 38 to 40).
+ */
 static EVT_BEGIN(start_avoid)
     IF_INT_EQUAL(LW(5), 3)
         CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -405,6 +439,13 @@ static EVT_BEGIN(start_avoid)
     RETURN
 EVT_END()
 
+/**
+ * Attack of the Dull Bones: it picks a target (weapon_honenoko_attack),
+ * winds up (KRN_A_1, KRN_A_2) and throws a spinning bone (part 2) in an arc;
+ * the target can dodge as the bone passes (start_avoid).
+ * If the bone is not avoided it lands on the target with the action command defence check,
+ * and the bone then bounces off.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -531,6 +572,12 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Call-for-help move of the Dull Bones: the camera zooms in and, six times,
+ * it throws up pieces of itself (parts and poses KRN_H_x, KRN_C_x) which pile up beside it;
+ * the pile reassembles (KRN_D_3, KRN_D_4) and a new Dull Bones unit (entry_honenoko) is spawned in that spot,
+ * copying its status (honenoko_copy_status).
+ */
 static EVT_BEGIN(call_friend_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -615,11 +662,16 @@ static EVT_BEGIN(call_friend_event)
     RETURN
 EVT_END()
 
+/** Guess: wait (idle) event of Cortez: sets the idle pose from the current mode's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: copies the shrink/grow status (turns and strength) from battle unit args[0] to unit args[1];
+ * used when a Dull Bones reassembles into a fresh unit so the new one keeps the old one's size status.
+ */
 static USER_FUNC(honenoko_copy_status) {
     EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));

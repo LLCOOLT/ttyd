@@ -5,6 +5,10 @@ char* strncpy(char* dst, const char* src, size_t n);
 
 static int is_utf8_complete(const char* s, size_t n);
 
+/**
+ * Encodes one 16-bit wide character as UTF-8 (1 byte below 0x80, 2 below 0x800, else 3) into s
+ * and returns the byte count; 0 if s is null.
+ */
 static inline int unicode_to_UTF8(char* s, wchar_t wchar) {
     int number_of_bytes;
     wchar_t wide_char;
@@ -39,6 +43,11 @@ static inline int unicode_to_UTF8(char* s, wchar_t wchar) {
     return number_of_bytes;
 }
 
+/**
+ * Standard wcstombs(): converts the wide string to UTF-8 in s,
+ * stopping at the terminator (which is stored) or when the next character would exceed n bytes;
+ * returns the bytes written. Returns 0 if either pointer is null.
+ */
 size_t wcstombs(char* s, const wchar_t* pwcs, size_t n) {
     int chars_written = 0;
     int result;
@@ -67,6 +76,11 @@ size_t wcstombs(char* s, const wchar_t* pwcs, size_t n) {
     return chars_written;
 }
 
+/**
+ * Decodes one UTF-8 sequence from s (up to n bytes) into *pwc and returns its length (0 for a NUL);
+ * -1 if it is malformed, incomplete or not the shortest encoding.
+ * Despite the name it is the only mbtowc implementation here.
+ */
 static inline int __mbtowc_noconv(wchar_t* pwc, const char* s, size_t n) {
     int number_of_bytes;
     int check_byte_count;
@@ -113,10 +127,16 @@ static inline int __mbtowc_noconv(wchar_t* pwc, const char* s, size_t n) {
     return number_of_bytes;
 }
 
+/** Standard mbtowc(): forwards to __mbtowc_noconv, which decodes UTF-8. */
 int mbtowc(wchar_t* pwc, const char* s, size_t n) {
     return __mbtowc_noconv(pwc, s, n);
 }
 
+/**
+ * Inspects the lead byte of the UTF-8 sequence at s:
+ * returns its length (1 to 3) when n bytes cover it and the continuation bytes are valid, 0 for a NUL byte,
+ * -2 if more bytes are needed, and -1 if it is invalid or n is 0.
+ */
 static int is_utf8_complete(const char* s, size_t n) {
     if (n == 0)
         return -1;

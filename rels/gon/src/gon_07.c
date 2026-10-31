@@ -29,18 +29,31 @@
 extern EvtWord out_func[];
 static BeroEntry bero_entry_data[3];
 
+/**
+ * Door animation callback, closing for the w_bero exit to gon_06:
+ * rotates map object "door01" about Y by 0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(door01_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door01"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback, opening for the w_bero exit to gon_06:
+ * rotates map object "door01" about Y by -0.444 times the value in LW(0).
+ */
 static EVT_BEGIN(door01_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door01"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Run when Mario leaves the room during the escape countdown:
+ * ends the countdown timer (evt_sub_countdown_end) and, at STORY_STG1_13_A_SUSPICIOUS_ROOM,
+ * stops the ceiling's rumble sound GW(10).
+ */
 EVT_BEGIN(out_func)
     CALL(evt_sub_countdown_end)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_13_A_SUSPICIOUS_ROOM)
@@ -88,6 +101,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Rumble sequence after the Black Key is taken:
+ * a chain of camera shakes (strength 0.0049, 1000 ms each) whose gaps shrink from 2000 ms to 600 ms.
+ */
 static EVT_BEGIN(shake_evt)
     CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1000)
     WAIT_MS(2000)
@@ -128,6 +145,14 @@ static EVT_BEGIN(shake_evt)
     RETURN
 EVT_END()
 
+/**
+ * Runs when Mario opens the Black Key chest (gon07treasure):
+ * sets the story to STORY_STG1_13_A_SUSPICIOUS_ROOM and GSWF_GON07_BLACK_KEY_CHEST_OPENED,
+ * picks up the key (ITEM_BLACK_KEY_0x22), starts the earthquake (SFX_STG1_QUAKE4, shake_evt)
+ * and the danger music, raises the spikes (a_togeshita, SFX_STG1_TOGE_UP1; Guess: floor spikes,
+ * with a_to_ue the ceiling spikes), with Mario and his partner scrambling away and lines stg1_gon_15
+ * and stg1_gon_16.
+ */
 static EVT_BEGIN(item_evt)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_13_A_SUSPICIOUS_ROOM)
         RETURN
@@ -217,6 +242,11 @@ static EVT_BEGIN(item_evt)
     RETURN
 EVT_END()
 
+/**
+ * Bobbery's bomb wall break (S_ana): plays SFX_OFF_WALL_BREAK1,
+ * captures the wall hole into a paper image (OFF_d_bom_ver2) and plays its crumbling animation A_1
+ * so the wall breaks apart, and swaps the S_ana hide flags to show the opened hole (S_ana_after).
+ */
 static EVT_BEGIN(bomb_wall_evt)
     CALL(evt_mario_key_onoff, 0)
     BEGIN_INLINE_EVENT
@@ -277,6 +307,12 @@ static EVT_BEGIN(bomb_wall_evt)
     RETURN
 EVT_END()
 
+/**
+ * Map init for gon_07: sets up the door, the treasure chest holding the Black Key (already open once the story
+ * reaches STORY_STG1_13_A_SUSPICIOUS_ROOM; opening it drops the spiked ceiling and starts the escape countdown,
+ * and the story changes to that step), and the cracked wall that Bobbery's bomb can blow up (bomb_wall_evt),
+ * which stays open afterwards.
+ */
 EVT_BEGIN(gon_07_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)

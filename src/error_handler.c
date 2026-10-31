@@ -19,12 +19,25 @@ extern void *DemoCurrentBuffer, *DemoFrameBuffer1, *DemoFrameBuffer2;
 // local prototypes
 void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar);
 
+/**
+ * Installs N_systemErrorHandler for the DSI, ISI and program exceptions (bad data access, bad instruction fetch,
+ * illegal instruction). Called once from marioStInit.
+ */
 void N_setupErrorHandler(void) {
     OSSetErrorHandler(OS_ERROR_DSI, (void (*)(u16, OSContext*, ...))N_systemErrorHandler);
     OSSetErrorHandler(OS_ERROR_ISI, (void (*)(u16, OSContext*, ...))N_systemErrorHandler);
     OSSetErrorHandler(OS_ERROR_PROGRAM, (void (*)(u16, OSContext*, ...))N_systemErrorHandler);
 }
 
+/**
+ * Crash screen.
+ * If the title screen's debug mode (N_getDebugMode) is 0 or more it stops sound and hangs;
+ * otherwise it formats the exception type, all 32 GPRs,
+ * LR/CR/SRR0/SRR1/DSISR/DAR and a 16-frame stack back chain,
+ * reinitialises the heap for the ROM font and draws the text to the frame buffer forever.
+ * The US and PAL releases scroll the text upward, use a 0.8 horizontal scale instead of 0.5,
+ * and halt once it has scrolled off. Guess: debug mode is set by a hidden title-screen input.
+ */
 void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar) {
     // registers
     signed char* textBase;

@@ -22,6 +22,11 @@
 
 static BeroEntry bero_data[2];
 
+/**
+ * Enter-event of the s_bero entrance of the hidden room:
+ * places Mario and the partner at the entrance and walks them forward into the room with the letter box off,
+ * then turns on the case events for the entrance. Returns 1 in LW(0).
+ */
 EVT_BEGIN(bero_in)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -40,6 +45,11 @@ EVT_BEGIN(bero_in)
     RETURN
 EVT_END()
 
+/**
+ * Exit-event of the s_bero entrance: locks the controls, gets Mario off Yoshi (evt_party_yoshi_ride),
+ * walks Mario back out of the room and changes map to pik_02 at h_bero while the partner follows.
+ * Returns 1 in LW(0).
+ */
 EVT_BEGIN(bero_out)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -80,6 +90,12 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
+/**
+ * Examine script of the hidden room's altar: locks the controls,
+ * sets story progress to STORY_STG6_53_THE_REAL_GARNET_STAR, stops the NPCs,
+ * fades out the music (JP and later) and runs evt_sub_starstone for the Garnet Star (star number 6),
+ * then returns the controls.
+ */
 static EVT_BEGIN(evt_daiza)
     CALL(evt_mario_key_onoff, 0)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_53_THE_REAL_GARNET_STAR)
@@ -95,6 +111,12 @@ static EVT_BEGIN(evt_daiza)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for pik_03, the hidden room behind the sanctum: sets up the entrance, music and ambience;
+ * before the real Garnet Star has been taken it places the Garnet Star item on the altar
+ * and registers the case event (evt_daiza) that picks it up; also places the L Emblem and a Shine Sprite block.
+ * When entered through "next" Mario and the partner are placed on the altar side and the screen fades in.
+ */
 EVT_BEGIN(pik_03_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)

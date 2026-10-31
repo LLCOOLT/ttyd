@@ -46,6 +46,10 @@ static void __AISHandler(__OSInterrupt interrupt, OSContext* context);
 static void __AICallbackStackSwitch(void* cb);
 static void __AI_SRC_INIT(void);
 
+/**
+ * Installs the function called when the audio DMA block finishes (the AI/DSP DMA interrupt)
+ * and returns the previous callback.
+ */
 AIDCallback AIRegisterDMACallback(AIDCallback callback) {
     AIDCallback old_callback;
     BOOL old;
@@ -57,6 +61,11 @@ AIDCallback AIRegisterDMACallback(AIDCallback callback) {
     return old_callback;
 }
 
+/**
+ * Sets the audio DMA source address (bits 16 to 25 and 5 to 15 of the physical address)
+ * and length (in 32-byte blocks) in the DSP registers, with interrupts disabled.
+ * The length must be a multiple of 32 bytes.
+ */
 void AIInitDMA(u32 start_addr, u32 length) {
     BOOL old;
 
@@ -68,34 +77,48 @@ void AIInitDMA(u32 start_addr, u32 length) {
     OSRestoreInterrupts(old);
 }
 
+/** Returns 1 if the audio DMA is currently running. */
 BOOL AIGetDMAEnableFlag(void) {
     return (__DSPRegs[27] & (1 << 15)) >> 15;
 }
 
+/** Starts the audio DMA by setting the enable bit of the length register. */
 void AIStartDMA(void) {
     __DSPRegs[27] = __DSPRegs[27] | 0x8000;
 }
 
+/** Stops the audio DMA by clearing the enable bit. */
 void AIStopDMA(void) {
     __DSPRegs[27] = __DSPRegs[27] & ~0x8000;
 }
 
+/**
+ * Returns how many bytes of the current audio DMA block have not been sent yet (the hardware counter is in
+ * 32-byte blocks).
+ */
 u32 AIGetDMABytesLeft(void) {
     return (__DSPRegs[29] & 0x7FFF) << 5;
 }
 
+/** Returns the start address of the current audio DMA block. */
 u32 AIGetDMAStartAddr(void) {
     return ((__DSPRegs[24] << 16) & 0x03FF0000) |  (__DSPRegs[25] & 0xFFE0);
 }
 
+/** Returns the length of the audio DMA block in bytes. */
 u32 AIGetDMALength(void) {
     return (__DSPRegs[27] & 0x7FFF) << 5;
 }
 
+/** Returns whether AIInit has been called. */
 BOOL AICheckInit(void) {
     return __AI_init_flag;
 }
 
+/**
+ * Installs the callback called when the stream sample counter reaches its trigger value,
+ * and returns the previous callback.
+ */
 AISCallback AIRegisterStreamCallback(AISCallback callback) {
     AISCallback old_callback;
     BOOL old;
@@ -107,22 +130,31 @@ AISCallback AIRegisterStreamCallback(AISCallback callback) {
     return old_callback;
 }
 
+/** Returns the stream sample counter of the audio interface. */
 u32 AIGetStreamSampleCount(void) {
     return __AIRegs[2];
 }
 
+/** Resets the stream sample counter to zero. */
 void AIResetStreamSampleCount(void) {
     __AIRegs[0] = (__AIRegs[0] & ~0x20) | 0x20;
 }
 
+/** Sets the sample count at which the stream callback is triggered. */
 void AISetStreamTrigger(u32 trigger) {
     __AIRegs[3] = trigger;
 }
 
+/** Returns the stream trigger sample count. */
 u32 AIGetStreamTrigger(void) {
     return __AIRegs[3];
 }
 
+/**
+ * Starts or stops the audio stream (the disc-streaming input of the audio interface).
+ * When starting while the stream sample rate is 32 kHz it mutes the volume,
+ * runs the sample-rate-converter synchronisation (__AI_SRC_INIT), starts the stream and restores the volume.
+ */
 void AISetStreamPlayState(u32 state) {
     BOOL old;
     u8 vol_left;
@@ -147,10 +179,16 @@ void AISetStreamPlayState(u32 state) {
     }
 }
 
+/** Returns 1 if the audio stream is playing. */
 u32 AIGetStreamPlayState(void) {
     return __AIRegs[0] & 1;
 }
 
+/**
+ * Selects the DSP output rate.
+ * Only a change to 32 kHz does anything: it mutes the stream, resynchronises the sample-rate converter,
+ * restores the stream rate, play state and volume, and sets the DSP rate bit (so the DSP runs at 32 kHz).
+ */
 void AISetDSPSampleRate(u32 rate) {
     BOOL old;
     u32 play_state;
@@ -180,10 +218,15 @@ void AISetDSPSampleRate(u32 rate) {
     }
 }
 
+/** Returns the DSP sample rate (AI_SAMPLERATE_32KHZ or 48KHZ) from the control register. */
 u32 AIGetDSPSampleRate(void) {
     return GET_REG_FIELD(__AIRegs[0], 1, 6) ^ 1;
 }
 
+/**
+ * Public setter for the stream rate.
+ * Only 48 kHz is accepted (disc streaming is 48 kHz only); other values are ignored.
+ */
 void AISetStreamSampleRate(u32 rate) {
     if (rate == AI_SAMPLERATE_48KHZ) {
         __AI_set_stream_sample_rate(rate);
@@ -194,10 +237,18 @@ void AISetStreamSampleRate(u32 rate) {
 #endif
 }
 
+/**
+ * Debug-only entry that sets any stream sample rate directly,
+ * bypassing the 48 kHz restriction of AISetStreamSampleRate.
+ */
 void __AI_DEBUG_set_stream_sample_rate(u32 rate) {
     __AI_set_stream_sample_rate(rate);
 }
 
+/**
+ * Changes the stream sample rate: saves the play state and volumes, mutes,
+ * resynchronises the sample-rate converter, programs the rate bit, then restores play state and volumes.
+ */
 static void __AI_set_stream_sample_rate(u32 rate) {
     BOOL old;
     u32 play_state;
@@ -225,27 +276,39 @@ static void __AI_set_stream_sample_rate(u32 rate) {
     }
 }
 
+/** Returns the stream sample rate bit (AI_SAMPLERATE_32KHZ is 0, AI_SAMPLERATE_48KHZ is 1). */
 u32 AIGetStreamSampleRate(void) {
     return GET_REG_FIELD(__AIRegs[0], 1, 1);
 }
 
+/** Sets the left channel stream volume (0 to 255). */
 void AISetStreamVolLeft(u8 vol) {
     OLD_SET_REG_FIELD(945, __AIRegs[1], 8, 0, vol);
 }
 
+/** Returns the left channel stream volume. */
 u8 AIGetStreamVolLeft(void) {
     return GET_REG_FIELD(__AIRegs[1], 8, 0);
 }
 
+/** Sets the right channel stream volume (0 to 255). */
 void AISetStreamVolRight(u8 vol) {
     OLD_SET_REG_FIELD(986, __AIRegs[1], 8, 8, vol);
 }
 
+/** Returns the right channel stream volume. */
 u8 AIGetStreamVolRight(void)
 {
     return (__AIRegs[1] & (0xFF << 8)) >> 8;
 }
 
+/**
+ * Initialises the audio interface once: registers the SDK version,
+ * computes the timing bounds used by the SRC synchronisation, mutes the stream, clears the trigger and counter,
+ * sets the stream to 48 kHz and the DSP to 32 kHz, clears the callbacks,
+ * remembers the optional callback stack (8-byte aligned) and installs the DMA (interrupt 5)
+ * and stream (interrupt 8) interrupt handlers.
+ */
 void AIInit(u8* stack) {
     if (__AI_init_flag != TRUE) {
         OSRegisterVersion(__AIVersion);
@@ -278,10 +341,16 @@ void AIInit(u8* stack) {
     }
 }
 
+/** Clears the initialised flag so AIInit can run again. */
 void AIReset(void) {
     __AI_init_flag = FALSE;
 }
 
+/**
+ * Stream sample-counter interrupt handler: acknowledges the interrupt,
+ * runs the registered stream callback with the current sample count inside a scratch exception context,
+ * then restores the interrupted context.
+ */
 static void __AISHandler(__OSInterrupt interrupt, OSContext* context) {
     OSContext exceptionContext;
 
@@ -295,6 +364,11 @@ static void __AISHandler(__OSInterrupt interrupt, OSContext* context) {
     OSSetCurrentContext(context);
 }
 
+/**
+ * Audio DMA interrupt handler: acknowledges the DSP AI-DMA interrupt,
+ * then runs the registered DMA callback (on the private callback stack if AIInit was given one),
+ * guarded against re-entry, inside a scratch exception context.
+ */
 static void __AIDHandler(__OSInterrupt interrupt, OSContext* context) {
     OSContext exceptionContext;
     u16 tmp;
@@ -317,6 +391,10 @@ static void __AIDHandler(__OSInterrupt interrupt, OSContext* context) {
     OSSetCurrentContext(context);
 }
 
+/**
+ * Assembly helper that calls the function cb with the stack pointer switched to the callback stack set by AIInit
+ * (minus 8), then switches back to the original stack.
+ */
 static asm void __AICallbackStackSwitch(register void* cb) {
     nofralloc
     mflr r0
@@ -343,6 +421,12 @@ static asm void __AICallbackStackSwitch(register void* cb) {
     blr
 }
 
+/**
+ * Synchronises the audio interface's sample-rate converter:
+ * it repeatedly starts the stream at 32 kHz and 48 kHz, times the interval between the sample-counter edges,
+ * and, once the phase is acceptable, waits a minimum or maximum delay chosen from that timing before returning.
+ * This avoids starting streaming at a bad phase of the converter.
+ */
 void __AI_SRC_INIT(void) {
     OSTime rising_32khz = 0;
     OSTime rising_48khz = 0;
@@ -402,6 +486,7 @@ void __AI_SRC_INIT(void) {
 #endif
 }
 
+/** Returns the timing log of __AI_SRC_INIT in debug builds, NULL otherwise. */
 STRUCT_TIMELOG* __ai_src_get_time(void) {
 #if DEBUG
     return &profile;

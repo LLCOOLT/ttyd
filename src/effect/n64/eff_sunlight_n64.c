@@ -25,6 +25,10 @@ typedef struct EffSunlightN64Work {
 static void effSunlightMain(EffectEntry* effect);
 static void effSunlightDisp(CameraId cameraId, EffectEntry* effect);
 
+/**
+ * Spawns sunlight beams at (x, y, z) of width `w`; a lifetime of 0 or less lasts until soft-deleted.
+ * Spawned by event scripts through evt_eff.
+ */
 EffectEntry* effSunlightN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 w) {
     EffectEntry* effect;
     EffSunlightN64Work* work;
@@ -64,6 +68,12 @@ EffectEntry* effSunlightN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f3
     return effect;
 }
 
+/**
+ * Eases the alpha 8 per frame toward alphaMax (clamped 0-255),
+ * drops it 16 per frame over the last 16 frames (a delete request starts that; lifetime 1000 means endless)
+ * and drifts each of the five shafts' texture scroll on two sine waves.
+ * Drawn on layer 2 in JP and the demos, 10 in US and PAL.
+ */
 static void effSunlightMain(EffectEntry* effect) {
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -130,6 +140,11 @@ static void effSunlightMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), VERSION_PICK(2, 10), (DispCallback)effSunlightDisp, effect);
 }
 
+/**
+ * Draws five light shafts (testsrc__s_v) through a fixed orthographic screen view,
+ * mirrored left-right for type 0: shaft shape from texture 0x42, shimmer from texture 0x43 scrolled per shaft,
+ * shaded between the work's two colours at half alpha. Skipped while alpha is 0.
+ */
 static void effSunlightDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera = camGetPtr(cameraId);
     EffSunlightN64Work* work = effect->userdata;

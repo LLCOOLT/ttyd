@@ -355,6 +355,10 @@ BattleUnitKind unitdata_Party_Clauda = {
     data_table,
 };
 
+/**
+ * Flurrie's battle entry: starts 250 units behind her home spot and, after 40 frames,
+ * floats in to it at speed 4 with her hovering sound, then takes her stay pose.
+ */
 static EVT_BEGIN(battle_entry_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 250)
@@ -369,6 +373,11 @@ static EVT_BEGIN(battle_entry_event)
     RETURN
 EVT_END()
 
+/**
+ * Init for Flurrie: allocates the spare weapon her moves copy into (_clauda_make_extra_work_area),
+ * registers her wait, attack, damage, confusion and entry scripts and her hovering move and jump sounds,
+ * and turns on floating.
+ */
 static EVT_BEGIN(init_event)
     CALL(_clauda_make_extra_work_area)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
@@ -385,6 +394,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Hit reaction: straightens her rotation (left over from her moves), then runs the default damage script. */
 static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     SET_VALUE(LW(10), -2)
@@ -393,15 +403,21 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Empty: partner moves come from the player's menu choices, not a unit attack script. */
 static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle: plays the stay pose from the current pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Flurrie's Body Slam: she floats over the enemy and drops onto it,
+ * the action command deciding whether the slam connects at full strength, then floats back home.
+ */
 EVT_BEGIN(partyClaudaAttack_NormalAttack)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -595,6 +611,11 @@ EVT_BEGIN(partyClaudaAttack_NormalAttack)
     RETURN
 EVT_END()
 
+/**
+ * Flurrie's Gale Force: she inhales and blows a gust at all enemies;
+ * the action command output sets the blow-away chance of a copy of the weapon (_make_breath_weapon) that is
+ * then tried against each enemy.
+ */
 EVT_BEGIN(partyClaudaAttack_BreathAttack)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -777,6 +798,10 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     RETURN
 EVT_END()
 
+/**
+ * Flurrie's Lip Lock: she floats to the enemy's kiss point (_get_clauda_kiss_hit_position) and kisses it,
+ * healing herself by the HP damage dealt, then floats back.
+ */
 EVT_BEGIN(partyClaudaAttack_PredationAttack)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -1074,6 +1099,10 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
     RETURN
 EVT_END()
 
+/**
+ * Flurrie's Dodgy Fog: she covers the selected target in a cloud of fog;
+ * the action command output plus one sets how many turns the Dodgy status lasts (_make_kumoguard_weapon).
+ */
 EVT_BEGIN(partyClaudaAttack_KumoGuard)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -1150,6 +1179,10 @@ EVT_BEGIN(partyClaudaAttack_KumoGuard)
     RETURN
 EVT_END()
 
+/**
+ * Flurrie's Appeal (data tag 5): appeal pose and sound, a kiss effect towards the audience,
+ * then the audience is fired up.
+ */
 EVT_BEGIN(clauda_appeal_event)
     CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_APPEAL)
@@ -1168,12 +1201,17 @@ EVT_BEGIN(clauda_appeal_event)
     RETURN
 EVT_END()
 
+/** Victory reaction (data tag 64): plays Flurrie's PWD_Y_1 pose to the end. */
 static EVT_BEGIN(party_win_reaction)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PWD_Y_1"))
     CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Audience-attack reaction (data tag 6): Flurrie body slams an audience member about to throw junk
+ * or nothing (attack_bad_audience_event) and kisses one holding a real item (attack_good_audience_event).
+ */
 static EVT_BEGIN(attack_audience_event)
     CALL(_check_aud_item_type, LW(0))
     SWITCH(LW(0))
@@ -1185,6 +1223,11 @@ static EVT_BEGIN(attack_audience_event)
     RETURN
 EVT_END()
 
+/**
+ * Flurrie's audience-attack reaction when the audience member holds a can, rock,
+ * bone or hammer to throw (or nothing, per _check_aud_item_type):
+ * she body slams it with a squash-and-stretch landing, then floats home.
+ */
 EVT_BEGIN(attack_bad_audience_event)
     CALL(btlevtcmd_OffUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_FLOAT_ACTIVE)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PWD_A1_1"))
@@ -1274,6 +1317,10 @@ EVT_BEGIN(attack_bad_audience_event)
     RETURN
 EVT_END()
 
+/**
+ * Flurrie's audience-attack reaction for any other audience member:
+ * she floats over and kisses it, then floats home.
+ */
 EVT_BEGIN(attack_good_audience_event)
     CALL(btlevtcmd_OffUnitFlag, BTL_UNIT_SELF, UNIT_FLAG_FLOAT_ACTIVE)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PWD_A1_1"))
@@ -1321,6 +1368,10 @@ EVT_BEGIN(attack_good_audience_event)
     RETURN
 EVT_END()
 
+/**
+ * Allocates a spare BattleWeapon in the running unit's countersetWeapon slot,
+ * filled per use by _make_breath_weapon, _make_kiss_weapon and _make_kumoguard_weapon. Run from init_event.
+ */
 static USER_FUNC(_clauda_make_extra_work_area) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -1332,6 +1383,11 @@ static USER_FUNC(_clauda_make_extra_work_area) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Builds Flurrie's battle move list (data tag 1):
+ * Body Slam and Gale Force always, Lip Lock from Super rank and Dodgy Fog from Ultra rank,
+ * appending each to command->weapon and advancing *count.
+ */
 static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     s32 techLv;
 
@@ -1374,6 +1430,10 @@ static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     }
 }
 
+/**
+ * Returns in args[1] the Gale Force vulnerability (vulnStatus->galeForceRate) of unit args[0];
+ * Gale Force shakes every enemy with a non-zero rate while Flurrie blows.
+ */
 static USER_FUNC(_check_blow_rate) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -1387,6 +1447,10 @@ static USER_FUNC(_check_blow_rate) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Spawns the inhale effect for Gale Force: a blue-to-purple swirling cloud (kumokumo_n64) in front of the
+ * running unit's mouth, facing the way it faces.
+ */
 static USER_FUNC(_clauda_breath_effect_ready) {
     BattleWork* wp = _battleWorkPointer;
     s32 id;
@@ -1413,6 +1477,10 @@ static USER_FUNC(_clauda_breath_effect_ready) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Spawns the outgoing gust effect for Gale Force in front of the running unit (blue-to-purple kumokumo_n64 cloud
+ * blowing forward) and returns the effect entry in args[0].
+ */
 static USER_FUNC(_clauda_breath_effect_fire) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -1444,6 +1512,11 @@ static USER_FUNC(_clauda_breath_effect_fire) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Copies the weapon pointed to by args[0] into the unit's spare weapon,
+ * sets its gale force chance to args[1] (the action command output),
+ * and writes the copy's address back into args[0].
+ */
 static USER_FUNC(_make_breath_weapon) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -1465,6 +1538,10 @@ static USER_FUNC(_make_breath_weapon) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Copies the weapon pointed to by args[0] into the unit's spare weapon unchanged
+ * and writes the copy's address back into args[0]; args[1] (the action command output) is read but not used.
+ */
 static USER_FUNC(_make_kiss_weapon) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -1485,6 +1562,11 @@ static USER_FUNC(_make_kiss_weapon) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Returns in args[3]-args[5] where Flurrie should be for Lip Lock on target unit args[1]:
+ * its kissHitOffset point (scaled, X mirrored by facing) lowered by 30 units times the kisser's (args[0]) size,
+ * but not below the floor.
+ */
 static USER_FUNC(_get_clauda_kiss_hit_position) {
     EvtWord* args = event->args;
     Vec pos, tmp;
@@ -1523,6 +1605,11 @@ static USER_FUNC(_get_clauda_kiss_hit_position) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Copies the weapon pointed to by args[0] into the unit's spare weapon,
+ * sets its Dodgy duration (dodgyTime) to args[1] turns, and writes the copy's address back into args[0].
+ * Used by Dodgy Fog.
+ */
 static USER_FUNC(_make_kumoguard_weapon) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;

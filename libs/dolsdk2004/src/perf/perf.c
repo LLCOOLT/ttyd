@@ -51,6 +51,10 @@ void PERFStartAutoSampling(f32 msInterval);
 void PERFStopAutoSampling(void);
 
 #ifndef DEBUG
+/**
+ * Hands out the next free sample slot of the current frame (PERFCurrSample++);
+ * once the table is full it keeps returning the last slot instead of overflowing.
+ */
 inline s32 PERFGetNewSample(void) {
     if (PERFCurrSample >= (PERFNumSamples - 1)) {
         PERFCurrSample = PERFNumSamples - 1;
@@ -60,6 +64,10 @@ inline s32 PERFGetNewSample(void) {
 }
 #endif
 
+/**
+ * Zeroes the twenty 16-bit memory-interface counter registers (__memReg[25] to [44]) that count CP, TC,
+ * CPU read/write, DSP, IO, VI, PE, RF and FI memory requests, before a frame is measured.
+ */
 static void PERFResetAllMemMetrics(void) {
     ((u16*)__memReg)[25] = 0;
     ((u16*)__memReg)[26] = 0;
@@ -83,6 +91,10 @@ static void PERFResetAllMemMetrics(void) {
     ((u16*)__memReg)[43] = 0;
 }
 
+/**
+ * Snapshots the GX transform/raster metrics (GXReadXfRasMetric) and the ten 32-bit memory request counters (CP,
+ * TC, CPU read, CPU write, DSP, IO, VI, PE, RF, FI) into slot i (0 = start, 1 = end) of a sample.
+ */
 static void PERFGetAllMemMetrics(PerfSample* s, u32 i) {
     u32 ctrl;
     u32 ctrh;
@@ -130,10 +142,21 @@ static void PERFGetAllMemMetrics(PerfSample* s, u32 i) {
     s->fiReq[i] = ((ctrh << 0x10) | ctrl);
 }
 
+/**
+ * Registers the game's own GXSetDrawSync callback,
+ * which the profiler calls for tokens it does not use (it installs its own callback on the GX draw-sync
+ * interrupt).
+ */
 void PERFSetDrawSyncCallback(void (*cb)(u16)) {
     DSCB = cb;
 }
 
+/**
+ * GX draw-sync interrupt callback.
+ * Tokens of 0xE000 and above whose magic nibble matches the current frame belong to the profiler:
+ * they record the GP-side timestamp (performance counter 4), cache misses and instructions,
+ * and memory counters when a GP event starts or ends. Other tokens go to the game's callback.
+ */
 static void PERFTokenCallback(u16 token) {
     s32 sample;
 
@@ -191,6 +214,13 @@ static void PERFTokenCallback(u16 token) {
     }
 }
 
+/**
+ * Allocates the profiler's tables with the given allocator:
+ * numFramesHistory frames of numSamples samples (0xB0 bytes each) plus numTypes event slots.
+ * Sets up the overlay (initDraw is the game's callback to restore its GX state),
+ * installs the draw-sync callback and starts the GX transform/raster metrics.
+ * Returns the number of bytes allocated.
+ */
 u32 PERFInit(u32 numSamples, u32 numFramesHistory, u32 numTypes, PERFAllocator allocator, PERFDeallocator deallocator, void (*initDraw)()) {
     u32 i;
     u32 size;
@@ -227,6 +257,10 @@ u32 PERFInit(u32 numSamples, u32 numFramesHistory, u32 numTypes, PERFAllocator a
     return size;
 }
 
+/**
+ * Names event id and sets its type (PERF_CPU_EVENT,
+ * PERF_GP_EVENT or PERF_CPU_GP_EVENT) with the default red-orange colour.
+ */
 void PERFSetEvent(u8 id, char* name, PerfType type) {
     GXColor def = {0xFF, 0x19, 0x00, 0xC8};
 
@@ -236,10 +270,17 @@ void PERFSetEvent(u8 id, char* name, PerfType type) {
     PERFEvents[id].color = def;
 }
 
+/** Sets the colour used to draw event id in the overlay. */
 void PERFSetEventColor(u8 id, GXColor color) {
     PERFEvents[id].color = color; 
 }
 
+/**
+ * Starts profiling a frame with interrupts off:
+ * resets the sample counter, GX and memory metrics
+ * and the PowerPC performance counters (counter 4 is the cycle timer), selects the monitored events,
+ * and starts the first automatic sample.
+ */
 void PERFStartFrame(void) {
     BOOL enabled = OSDisableInterrupts();
 
@@ -259,6 +300,11 @@ void PERFStartFrame(void) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Ends the frame: closes the automatic sample, restores the game's draw-sync callback,
+ * records the frame's end time and total cache-miss cycles, advances to the next frame in the history ring,
+ * and steps the 4-bit magic that tags this frame's tokens.
+ */
 void PERFEndFrame(void) {
     u32 i;
     BOOL enabled;
@@ -285,6 +331,11 @@ void PERFEndFrame(void) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Marks the start of event id: takes a sample slot, records the CPU start time, cache misses and instructions,
+ * and for GP events inserts a GXSetDrawSync token so the GP start time is captured when the GPU reaches it.
+ * Reports through OSReport if the event is already open.
+ */
 void PERFEventStart(u8 id) {
     BOOL enabled;
     s32 sample;
@@ -340,6 +391,11 @@ __declspec(weak) s32 PERFGetNewSample(void) {
 }
 #endif
 
+/**
+ * Marks the end of event id: records the CPU end time, cache misses and instructions,
+ * and for GP events inserts the GXSetDrawSync token for the GP end.
+ * Reports through OSReport if the event never started.
+ */
 void PERFEventEnd(u8 id) {
     BOOL enabled;
     s32 sample;
@@ -369,6 +425,10 @@ void PERFEventEnd(u8 id) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Begins a background (id 0xFF) sample used for the bandwidth, CPU and GPU bars,
+ * snapshotting the counters at its start.
+ */
 static void PERFStartAutoSample(void) {
     CurrAutoSample = PERFGetNewSample();
     PERFFrames[PERFCurrFrame].samples[CurrAutoSample].id = 0xFF;
@@ -380,6 +440,7 @@ static void PERFStartAutoSample(void) {
     PERFFrames[PERFCurrFrame].samples[CurrAutoSample].instructions[0] = PPCMfpmc1();
 }
 
+/** Closes the current background sample by snapshotting the counters at its end. */
 static void PERFEndAutoSample(void) {
     if (CurrAutoSample >= 0) {
         PERFFrames[PERFCurrFrame].samples[CurrAutoSample].gpTimeStampEnd = PPCMfpmc4();
@@ -390,6 +451,11 @@ static void PERFEndAutoSample(void) {
     CurrAutoSample = -1;
 }
 
+/**
+ * Periodic alarm callback for automatic sampling.
+ * While a GP event is open it splits that event's sample (copying it so the interval before the split is kept
+ * and restarting it); otherwise it closes the current background sample and starts the next.
+ */
 static void PERFTimerCallback(OSAlarm* alarm, OSContext* context) {
     s32 sample;
     s32 newsample;
@@ -432,10 +498,12 @@ static void PERFTimerCallback(OSAlarm* alarm, OSContext* context) {
     }
 }
 
+/** Starts a periodic OS alarm that runs PERFTimerCallback every msInterval milliseconds. */
 void PERFStartAutoSampling(f32 msInterval) {
     OSSetPeriodicAlarm(&PERFAlarm, OSGetTime(), (u32)OSMillisecondsToTicks(msInterval), PERFTimerCallback);
 }
 
+/** Closes the open background sample and cancels the sampling alarm. */
 void PERFStopAutoSampling(void) {
     BOOL enabled = OSDisableInterrupts();
 
@@ -448,6 +516,7 @@ void PERFStopAutoSampling(void) {
     OSRestoreInterrupts(enabled);
 }
 
+/** Stops sampling, restores the game's draw-sync callback and frees the tables allocated by PERFInit. */
 void PERFShutDown(void) {
     BOOL enabled;
     u32 i;

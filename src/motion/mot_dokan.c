@@ -10,6 +10,12 @@
 #include "system.h"
 #include "version.h"
 
+/**
+ * Brings the partners back out with Mario when he comes out of a pipe:
+ * re-enters any partner that was sent away (partyEntryPos / partyEntry2Pos) at his position,
+ * puts both in run mode 10 facing away from him, and zero-scales them so they grow in when flag is 0.
+ * Skipped in background mode. From JP on, two partners fan out at +/-120 degrees instead of both turning 180.
+ */
 static void _partyEntry(s32 flag) {
     MarioWork* mario;
     s32 i;
@@ -100,6 +106,13 @@ static void _partyEntry(s32 flag) {
     }
 }
 
+/**
+ * Pipe motion, chosen by mario->dokanType (set by evt_mario before the switch):
+ * 2/3 spin and shrink into a vertical pipe, 1 spins and grows back out of one, 0 just spins in place,
+ * 5 tumbles and shrinks into a sideways pipe, 4 tumbles and grows out of a sideways pipe.
+ * Ends in the stay motion once Mario is out.
+ * The US and later releases flip the sideways exit tumble to match the facing.
+ */
 void mot_dokan(void) {
     MarioWork* mario = marioGetPtr();
     PartyEntry* party;

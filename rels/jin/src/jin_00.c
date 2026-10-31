@@ -66,8 +66,10 @@ s32 g_nNumHarituku[1];
 static s32 g_nNumEndProc[1];
 f32 g_fSpeed;
 static f32 randf(f32 min, f32 max);
-// Float wrappers of sin() and cos(), the inline sinf/cosf of the original C library headers
-// (renamed: the math.h used here declares sinf and cosf as external functions).
+/**
+ * Float wrappers of sin() and cos(), the inline sinf/cosf of the original C library headers (renamed: the math.h
+ * used here declares sinf and cosf as external functions).
+ */
 static inline f32 sinf_inline(f32 x) {
     return sin(x);
 }
@@ -78,6 +80,10 @@ static f32 computeAngle(ExtdrvPose* pose, MarioWork* mp);
 static void senteresa_ext_disp(CameraId camera, void* param);
 static void senteresa_loadTev(void);
 static void senteresa_loadRenderMode(void);
+/**
+ * Float wrapper around cos(), as the original library headers did (the math.h here only declares cosf as an
+ * external function).
+ */
 static inline f32 cosf_inline(f32 x) {
     return cos(x);
 }
@@ -127,6 +133,10 @@ static NpcSetupInfo npcEnt[12];
 static ExtTexInfo senteresa_ext_entry_data[47];
 extern EvtWord senteresa_evt[];
 
+/**
+ * Script helper: reads the colour of the NPC named args[0] into args[1..4] (red, green, blue, alpha);
+ * used to start the Boo fade-ins from the current alpha.
+ */
 static USER_FUNC(get_npc_color) {
     EvtWord* args = event->args;
     NpcEntry* npc = npcNameToPtr((const char*)evtGetValue(event, args[0]));
@@ -138,16 +148,22 @@ static USER_FUNC(get_npc_color) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns a random integer in min..max-1. */
 static s32 randn(s32 min, s32 max) {
     return min + rand() % (max - min);
 }
 
+/** Returns a random float between min and max. */
 static f32 randf(f32 min, f32 max) {
     f32 r = rand() / 32767.0f;
 
     return r * (max - min) + min;
 }
 
+/**
+ * Returns the angle (0..360, in the 3D rotation convention) from Mario to the Boo in the swarm,
+ * used to turn the Boo sprite toward him.
+ */
 static f32 computeAngle(ExtdrvPose* pose, MarioWork* mp) {
     f32 a = angleABf(mp->position.x, mp->position.z, (*pose->mtx)[0][3], (*pose->mtx)[2][3]);
 
@@ -163,6 +179,10 @@ static f32 computeAngle(ExtdrvPose* pose, MarioWork* mp) {
     return 90.0f + (360.0f - a);
 }
 
+/**
+ * Builds the Y-rotation matrix for the given angle in degrees
+ * and stores it in the rotation part of the Boo's pose matrix.
+ */
 static void computeMtx(ExtdrvPose* pose, f32 angle) {
     Mtx m;
 
@@ -178,6 +198,10 @@ static void computeMtx(ExtdrvPose* pose, f32 angle) {
     (*pose->mtx)[2][2] = m[2][2];
 }
 
+/**
+ * Fades a Boo of the swarm in or out depending on its angle to the camera
+ * and Mario's facing direction (alpha 128..255); returns 1 when it is fully visible, else 0.
+ */
 static s32 computeAlpha(SenTeresa* ter, MarioWork* mp, f32 angle) {
     f32 dir;
 
@@ -205,6 +229,10 @@ static s32 computeAlpha(SenTeresa* ter, MarioWork* mp, f32 angle) {
     }
 }
 
+/**
+ * Rotates the Boo's offset from the swarm centre by its current angle around the vertical axis
+ * and stores the result in out.
+ */
 static void computePos(SenTeresa* ter, Vec* out) {
     Vec v;
     Mtx m;
@@ -217,6 +245,11 @@ static void computePos(SenTeresa* ter, Vec* out) {
     PSMTXMultVec(m, &v, out);
 }
 
+/**
+ * Setup callback of the Boo swarm (ext pose effect):
+ * allocates the state of the 200 Boos, scatters them at random offsets around Mario
+ * and resets the swarm counters (Boos finished, clinging, blown away) and the swarm centre.
+ */
 static void senteresa_ext_init(void) {
     ExtdrvPose* pose = extGetPosePtr();
     MarioWork* mp = marioGetPtr();
@@ -255,6 +288,10 @@ static void senteresa_ext_init(void) {
     g_vecRotCenter.z = mp->position.z;
 }
 
+/**
+ * Door animation callback: opens door01L and door01R as Mario leaves through w_bero (to gra_06 and usu_00);
+ * LW(0) is the door angle and the two leaves turn around Y by 0.39 times it in opposite directions.
+ */
 static EVT_BEGIN(w_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("door01L"), 0, LW(0), 0)
@@ -263,6 +300,10 @@ static EVT_BEGIN(w_open)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback: closes door01L and door01R as Mario arrives through w_bero (from gra_06 and usu_00);
+ * LW(0) is the door angle and the two leaves turn around Y by 0.39 times it in opposite directions.
+ */
 static EVT_BEGIN(w_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 0, STRING("door01L"), 0, LW(0), 0)
@@ -271,78 +312,106 @@ static EVT_BEGIN(w_close)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the door03 door opening (exit to jin_01):
+ * rotates it by 0.444 times the value in LW(0).
+ */
 EVT_BEGIN(n3_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door03"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Door animation callback for the door03 door closing (exit to jin_01). */
 EVT_BEGIN(n3_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door03"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback: opens door07 as Mario leaves through s_bero (to jin_02);
+ * LW(0) is the door angle and the door turns around Y by 0.44 times it, negated.
+ */
 static EVT_BEGIN(s_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door07"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback: closes door07 as Mario arrives through s_bero (from jin_02);
+ * LW(0) is the door angle and the door turns around Y by 0.44 times it.
+ */
 static EVT_BEGIN(s_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door07"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback: opens door02 as Mario leaves through n_bero_2 (to jin_04);
+ * LW(0) is the door angle and the door turns around Y by 0.44 times it.
+ */
 static EVT_BEGIN(n2_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door02"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback: closes door02 as Mario arrives through n_bero_2 (from jin_04);
+ * LW(0) is the door angle and the door turns around Y by 0.44 times it, negated.
+ */
 static EVT_BEGIN(n2_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door02"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Door animation callback for the door06 door opening (exit to jin_03, e_bero_3). */
 EVT_BEGIN(e3_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door06"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Door animation callback for the door06 door closing. */
 EVT_BEGIN(e3_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door06"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Door animation callback for the door04 door opening (exit to jin_03, e_bero_1). */
 EVT_BEGIN(e1_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door04"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Door animation callback for the door04 door closing. */
 EVT_BEGIN(e1_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door04"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Door animation callback for the door05 door opening (exit to jin_03, e_bero_2). */
 EVT_BEGIN(e2_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door05"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Door animation callback for the door05 door closing. */
 EVT_BEGIN(e2_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 0, STRING("door05"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/** Exit event of the hole in the floor ("ana"): Mario drops through to jin_06 and GSWF_STG4_DROP_IN_ENTRANCE is set. */
 EVT_BEGIN(jin_00_dai)
     DEBUG_PUT_MSG(STRING("出る"))
     CALL(evt_mario_normalize)
@@ -352,6 +421,10 @@ EVT_BEGIN(jin_00_dai)
     RETURN
 EVT_END()
 
+/**
+ * Script run when Mario drops back into the main hall from jin_06:
+ * places Mario and his partners at (390, -60) and has them jump to (365, 40) on the floor.
+ */
 EVT_BEGIN(jin_00_dai_in_sub)
     CALL(evt_seq_wait, 2)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -379,6 +452,7 @@ EVT_BEGIN(jin_00_dai_in_sub)
     RETURN
 EVT_END()
 
+/** Enter event of the hole in the floor: starts jin_00_dai_in_sub and returns 0. */
 EVT_BEGIN(jin_00_dai_in)
     DEBUG_PUT_MSG(STRING("入る"))
     SPAWN_EVENT(jin_00_dai_in_sub)
@@ -386,6 +460,10 @@ EVT_BEGIN(jin_00_dai_in)
     RETURN
 EVT_END()
 
+/**
+ * Exit event of the roll-through doorways: returns 0 in LW(0), which blocks the exit,
+ * while Mario is in motion 22 (Guess: the paper-roll form), and 1 otherwise.
+ */
 static EVT_BEGIN(check_roll)
     CALL(evt_mario_get_motion, LW(0))
     IF_INT_EQUAL(LW(0), 22)
@@ -396,6 +474,10 @@ static EVT_BEGIN(check_roll)
     RETURN
 EVT_END()
 
+/**
+ * Fades in the Boo that blocks the north door; stops its fade-out if it is still running,
+ * then raises its alpha by 4 per frame.
+ */
 EVT_BEGIN(teresa_n_fadein)
     IS_EVENT_RUNNING(GW(0), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -415,6 +497,7 @@ EVT_BEGIN(teresa_n_fadein)
     RETURN
 EVT_END()
 
+/** Fades out the north-door Boo, lowering its alpha by 4 per frame to 0. */
 EVT_BEGIN(teresa_n_fadeout)
     SET_VALUE(LW(0), 255)
     LOOP(0)
@@ -430,6 +513,12 @@ EVT_BEGIN(teresa_n_fadeout)
     RETURN
 EVT_END()
 
+/**
+ * Exit event of the north door (to jin_01) while the Boos have not been unleashed yet:
+ * a Boo appears in front of the door and speaks (stg4_jin_49 or, after the Boo box, stg4_jin_51)
+ * and the door stays shut for now; once the "1000 Boos" story step is reached it lets Mario through.
+ * Returns 1 in LW(0) when it blocked him.
+ */
 EVT_BEGIN(door_teresa_n)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG4_09_03_1000_BOOS)
         SET_VALUE(LW(0), 0)
@@ -462,6 +551,10 @@ EVT_BEGIN(door_teresa_n)
     RETURN
 EVT_END()
 
+/**
+ * Fades in the Boo that blocks the south door; stops its fade-out if it is still running,
+ * then raises its alpha by 4 per frame.
+ */
 EVT_BEGIN(teresa_s_fadein)
     IS_EVENT_RUNNING(GW(1), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -481,6 +574,7 @@ EVT_BEGIN(teresa_s_fadein)
     RETURN
 EVT_END()
 
+/** Fades out the south-door Boo, lowering its alpha by 4 per frame to 0. */
 EVT_BEGIN(teresa_s_fadeout)
     SET_VALUE(LW(0), 255)
     LOOP(0)
@@ -496,6 +590,10 @@ EVT_BEGIN(teresa_s_fadeout)
     RETURN
 EVT_END()
 
+/**
+ * Exit event of the south door (to jin_02) while the Boos have not been unleashed yet:
+ * same as door_teresa_n for the south door's Boo.
+ */
 EVT_BEGIN(door_teresa_s)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG4_09_03_1000_BOOS)
         SET_VALUE(LW(0), 0)
@@ -712,6 +810,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Opening scene of the steeple: Mario and Goombella (the partner) appear at the west door (x=-640),
+ * the door animation plays, the story becomes "Steeple demo" and control returns.
+ */
 EVT_BEGIN(first_jin00)
     CALL(evt_mario_set_pos, -640, 0, 0)
     CALL(evt_party_set_pos, 0, -640, 0, 0)
@@ -734,6 +836,17 @@ EVT_BEGIN(first_jin00)
     RETURN
 EVT_END()
 
+/**
+ * Case script run every frame while Mario pushes the statue base (A_dai):
+ * he keeps the pushing pose and the base (oki01) slides sideways a little each frame,
+ * with dust now and then once pushed 40 frames.
+ * After 80 frames of pushing it finishes by itself:
+ * the music switches to the success jingle, the camera shakes,
+ * dust puffs and the pedestal sounds play while the base slides 50 units and carries Mario along
+ * until it reaches x = 396, where he looks surprised.
+ * Afterwards the statue-top collision (a_futa) turns off,
+ * story progress becomes STORY_STG4_09_01_PUSH_THE_STATUE and the case event ends.
+ */
 static EVT_BEGIN(push_evt)
     CALL(evt_mario_set_dir, 90, 0, 0)
     CALL(evt_mario_get_pose, LW(0))
@@ -817,11 +930,16 @@ static EVT_BEGIN(push_evt)
     RETURN
 EVT_END()
 
+/** Case script for the statue base (A_dai) when Mario stops pushing; resets the push counter to 0. */
 EVT_BEGIN(nopush_evt)
     SET_VALUE(GW(10), 0)
     RETURN
 EVT_END()
 
+/**
+ * Pickup event of the Steeple Key lying in the main hall (item key00, ITEM_STEEPLE_KEY_0x16):
+ * sets story progress to STORY_STG4_09_04_KEY when Mario takes it.
+ */
 static EVT_BEGIN(evt_key)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG4_09_04_KEY)
     RETURN
@@ -831,6 +949,10 @@ static s32 lock_tbl[] = {
     ITEM_STEEPLE_KEY_0x16, -1,
 };
 
+/**
+ * Check script of the locked door: if Mario has a Steeple Key (ITEM_STEEPLE_KEY_0x16) it opens the key picker
+ * (lock_tbl) and cancels the unlock (evt_mobj_exec_cancel) if he backs out of it.
+ */
 static EVT_BEGIN(lock_item_check)
     CALL(evt_pouch_check_item, ITEM_STEEPLE_KEY_0x16, LW(0))
     IF_INT_GREATER(LW(0), 0)
@@ -846,6 +968,10 @@ static EVT_BEGIN(lock_item_check)
     RETURN
 EVT_END()
 
+/**
+ * Runs when the Steeple Key is used on the lock:
+ * sets story progress to STORY_STG4_09_05_LOCK and switches the n_bero_2 door entry on.
+ */
 static EVT_BEGIN(evt_unlock)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG4_09_05_LOCK)
     SET_VALUE(LW(0), STRING("n_bero_2"))
@@ -853,6 +979,7 @@ static EVT_BEGIN(evt_unlock)
     RETURN
 EVT_END()
 
+/** Waits until Mario is within 125 units of the central Boo and then plays its whispering message (stg4_jin_53). */
 EVT_BEGIN(tyuou_teresa_kusukusu)
     CALL(evt_seq_wait, 2)
     WAIT_MS(1000)
@@ -869,6 +996,7 @@ EVT_BEGIN(tyuou_teresa_kusukusu)
     RETURN
 EVT_END()
 
+/** Keeps the central Boo turned toward Mario every frame. */
 EVT_BEGIN(tyuou_teresa_look_mario)
     CALL(evt_seq_wait, 2)
     LOOP(0)
@@ -878,6 +1006,11 @@ EVT_BEGIN(tyuou_teresa_look_mario)
     RETURN
 EVT_END()
 
+/**
+ * Init script of the central Boo: starts the common Boo setup;
+ * at the "Boo box" story step moves it to (70, 0, 0),
+ * and at the "1000 Boos" step makes it invisible and intangible.
+ */
 EVT_BEGIN(tyuou_teresa_init)
     SPAWN_EVENT(npc_init_evt)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG4_09_02_BOO_BOX)
@@ -891,6 +1024,11 @@ EVT_BEGIN(tyuou_teresa_init)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of the central Boo: asks whether to carry on (stg4_jin_54),
+ * then the Boo is startled and swells to four times its size (stg4_jin_56..57),
+ * vanishes and starts the 1000-Boos swarm (senteresa_evt); when it ends the story becomes "1000 Boos".
+ */
 EVT_BEGIN(tyuou_teresa_talk)
     CALL(evt_msg_print, 0, STRING("stg4_jin_54"), 0, STRING("中央テレサ"))
     CALL(evt_msg_select, 0, STRING("stg4_jin_54_yn"))
@@ -1006,6 +1144,11 @@ EVT_BEGIN(tyuou_teresa_talk)
     RETURN
 EVT_END()
 
+/**
+ * Init script of the Boo in front of the north door:
+ * starts the common Boo setup and, before the "1000 Boos" step,
+ * moves it to (-60, 45, -238) and makes it transparent.
+ */
 EVT_BEGIN(oku_teresa_init)
     SPAWN_EVENT(npc_init_evt)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG4_09_03_1000_BOOS)
@@ -1015,6 +1158,11 @@ EVT_BEGIN(oku_teresa_init)
     RETURN
 EVT_END()
 
+/**
+ * Init script of the Boo in front of the south door:
+ * starts the common Boo setup and, before the "1000 Boos" step,
+ * moves it to (-60, 45, 238) and makes it transparent.
+ */
 EVT_BEGIN(temae_teresa_init)
     SPAWN_EVENT(npc_init_evt)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG4_09_03_1000_BOOS)
@@ -1024,6 +1172,7 @@ EVT_BEGIN(temae_teresa_init)
     RETURN
 EVT_END()
 
+/** Init script of the Atomic Boo NPC; empty (its sequences are driven by senteresa_evt). */
 EVT_BEGIN(atomic_teresa_init)
     RETURN
 EVT_END()
@@ -1187,6 +1336,13 @@ static ExtTexInfo senteresa_ext_entry_data[] = {
     {0},
 };
 
+/**
+ * Per-frame update of the 200-Boo swarm (the "1000 Boos" scene):
+ * follows Mario's walking with a lagging swarm centre,
+ * and moves each Boo through its sequence (waiting, fading in around Mario, circling,
+ * chasing and clinging to Mario, being knocked away by the spin hammer, gathering into the Atomic Boo,
+ * being blown away at the end).
+ */
 static void senteresa_ext_main(void) {
     ExtdrvPose* pose = extGetPosePtr();
     MarioWork* mp = marioGetPtr();
@@ -1586,10 +1742,12 @@ static void senteresa_ext_main(void) {
     }
 }
 
+/** Registers the swarm's draw callback with the 3D camera. */
 static void senteresa_ext_dispent(void) {
     dispEntry(CAMERA_3D, 0.0f, 1, senteresa_ext_disp, NULL);
 }
 
+/** Sets the GX blend and alpha-compare mode for drawing the Boos (alpha-blended, with alpha-tested edges). */
 static void senteresa_loadRenderMode(void) {
     GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
     GXSetZCompLoc(GX_FALSE);
@@ -1597,6 +1755,7 @@ static void senteresa_loadRenderMode(void) {
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 }
 
+/** Sets the TEV for the Boo sprites: texture colour with the per-Boo alpha from register 0. */
 static void senteresa_loadTev(void) {
     GXColor fogColor = {0xFF, 0xFF, 0xFF, 0xFF};
 
@@ -1612,6 +1771,7 @@ static void senteresa_loadTev(void) {
     GXSetNumTevStages(1);
 }
 
+/** Draw callback of the Boo swarm: sets the render mode and TEV, then draws each Boo with its own alpha. */
 static void senteresa_ext_disp(CameraId camera, void* param) {
     GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
     s32 n = extGetPoseNum();
@@ -1629,6 +1789,7 @@ static void senteresa_ext_disp(CameraId camera, void* param) {
     extLoadTextureExit();
 }
 
+/** Draw callback for the swarm's shadows. */
 static void senteresa_ext_shadow_disp(void) {
     static Mtx mt = {
         {10.0f, 0.0f, 0.0f, 0.0f},
@@ -1643,6 +1804,7 @@ static void senteresa_ext_shadow_disp(void) {
     extDrawShadow();
 }
 
+/** Script helper: returns in args[1] the sequence number of Boo args[0] in the swarm. */
 static USER_FUNC(senteresa_get_seq) {
     EvtWord* args = event->args;
     s32 i = evtGetValue(event, args[0]);
@@ -1651,6 +1813,7 @@ static USER_FUNC(senteresa_get_seq) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: returns the position of a randomly chosen Boo of the swarm in args[0..2]. */
 static USER_FUNC(senteresa_get_random_position) {
     EvtWord* args = event->args;
     ExtdrvPose* pose = extGetPosePtr();
@@ -1663,6 +1826,10 @@ static USER_FUNC(senteresa_get_random_position) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: stops the Boos from closing in (all but those clinging to Mario go to sequence 4 with an
+ * endless wait).
+ */
 static USER_FUNC(senteresa_tikaduku_stop) {
     s32 n = extGetPoseNum();
     s32 i;
@@ -1676,6 +1843,11 @@ static USER_FUNC(senteresa_tikaduku_stop) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: starts the Boos gathering (syugo) into one point at the central Boo's position,
+ * each at a random spot within 25 units and with a staggered delay;
+ * they fly there and the counter g_nNumEndProc counts them in.
+ */
 static USER_FUNC(senteresa_syugo) {
     ExtdrvPose* pose = extGetPosePtr();
     NpcEntry* npc = npcNameToPtr("中央テレサ");
@@ -1707,6 +1879,7 @@ static USER_FUNC(senteresa_syugo) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: turns off the display of all 200 Boo sprites. */
 static USER_FUNC(senteresa_dispoff) {
     ExtdrvPose* pose = extGetPosePtr();
     s32 n = extGetPoseNum();
@@ -1718,6 +1891,10 @@ static USER_FUNC(senteresa_dispoff) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: sets every Boo to fly out of the Atomic Boo's position with random upward
+ * and sideways speeds (blown away after the fight), with a random sound for every second one.
+ */
 static USER_FUNC(senteresa_huttobu) {
     ExtdrvPose* pose = extGetPosePtr();
     NpcEntry* npc = npcNameToPtr("アトミックテレサ");
@@ -1753,6 +1930,14 @@ static USER_FUNC(senteresa_huttobu) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * The "1000 Boos" scene: the swarm of Boos fades in around Mario and the Boos jeer at him in speech bubbles;
+ * if 20 of them cling to Mario they lift him up and carry him out to Twilight Town
+ * or Twilight Trail (GSWF_JIN00_BOOS_CARRIED_MARIO_OUT);
+ * if he knocks 20 away the central Boo reappears, all the Boos gather into the Atomic Boo,
+ * who speaks and fights Mario.
+ * After the fight a Lucky Start badge drops, the Boos are blown away and GSWF_JIN00_ATOMIC_BOO_DEFEATED is set.
+ */
 EVT_BEGIN(senteresa_evt)
     CALL(evt_ext_entry, 200, PTR(senteresa_ext_entry_data), PTR(senteresa_ext_init), PTR(senteresa_ext_main), PTR(senteresa_ext_dispent))
     LOOP(0)
@@ -2128,6 +2313,12 @@ EVT_BEGIN(senteresa_evt)
     RETURN
 EVT_END()
 
+/**
+ * Creepy Steeple main hall (jin_00) map init: sets the steeple music and reverb, the shadow-Mario tint,
+ * save block, exits and the Boo NPCs; places the Steeple Key and its lock (north door), the statue-push puzzle,
+ * resumes or starts the 1000-Boos scene by the story step and removes the other Boos
+ * when the Atomic Boo is not yet defeated.
+ */
 EVT_BEGIN(jin_00_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_JIN1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_JIN1"))
@@ -2203,6 +2394,10 @@ EVT_BEGIN(jin_00_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: ends the carrying of Mario: Boos that were clinging (sequence 6) switch to the lifting sequence
+ * (80) and all others wait indefinitely.
+ */
 static USER_FUNC(senteresa_turiageru) {
     s32 n = extGetPoseNum();
     s32 i;
@@ -2218,15 +2413,18 @@ static USER_FUNC(senteresa_turiageru) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: resets the ext pose effect, ending the swarm. */
 static USER_FUNC(senteresa_end) {
     extReset();
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: blocks until all 200 Boos have reached their final state (g_nNumEndProc is 200). */
 static USER_FUNC(senteresa_wait_end_seq) {
     return g_nNumEndProc[0] == 200 ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
+/** Script helper: returns the swarm centre (the point the Boos circle around) in args[0..2]. */
 static USER_FUNC(senteresa_get_rot_center) {
     EvtWord* args = event->args;
 
@@ -2236,6 +2434,10 @@ static USER_FUNC(senteresa_get_rot_center) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: slows Mario's walking and dashing speed down in proportion to the number of Boos clinging to
+ * him (zero at 20).
+ */
 static USER_FUNC(senteresa_mario_spd) {
     MarioWork* mp = marioGetPtr();
     f32 scale = (20 - g_nNumHarituku[0]) / 20.0f;
@@ -2248,6 +2450,7 @@ static USER_FUNC(senteresa_mario_spd) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: spawns the Boo-puff effect at (args[0], args[1] + 20, args[2] + 20). */
 static USER_FUNC(teresa_eff) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);

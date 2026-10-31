@@ -31,6 +31,9 @@ SND_HOOKS salHooks;
 u8 salTimeOffset;
 void hwSetTimeOffset(u8 offset);
 
+/** One audio frame, run from the AI DMA interrupt: has the DSP render the next buffer, runs the aux effects, flips the
+ * frame counters, then advances the sequencer and synth in five 256-tick steps (hwSetTimeOffset 0..4), the 3D emitters,
+ * streams and virtual samples. */
 static void snd_handle_irq() {
   u8 r; // r31
   u8 i; // r30
@@ -100,6 +103,9 @@ static void snd_handle_irq() {
   // }
 }
 
+/** Starts the hardware layer: installs the IRQ, starts the AI with snd_handle_irq as the frame callback, sets up the
+ * DSP voice/studio state (flags bit 0 = default studio is Dolby Pro Logic II, bit 3 = compressor on), boots the DSP
+ * and starts AI DMA. Returns 0 on success, -1 on failure. */
 s32 hwInit(u32* frq, u16 numVoices, u16 numStudios, u32 flags) {
   MUSY_DEBUG("Entering hwInit()\n\n");
   hwInitIrq();
@@ -133,6 +139,7 @@ s32 hwInit(u32* frq, u16 numVoices, u16 numStudios, u32 flags) {
   return -1;
 }
 
+/** Shuts down in reverse order: interrupts off, DSP task, DSP control state, AI, then the IRQ hooks. */
 void hwExit() {
   hwDisableIrq();
   salExitDsp();
@@ -142,17 +149,28 @@ void hwExit() {
   hwExitIrq();
 }
 
+/** Selects which of the five sub-frame slots (changed[]/pitch[]) later hw* calls write into; snd_handle_irq steps it
+ * 0..4 while the synth runs. */
 void hwSetTimeOffset(u8 offset) { salTimeOffset = offset; }
 
+/** Returns the sub-frame slot chosen by hwSetTimeOffset. */
 u8 hwGetTimeOffset() { return salTimeOffset; }
 
+/** Returns nonzero if DSP voice v is not idle. */
 u32 hwIsActive(u32 v) { return dspVoice[v].state != 0; }
+/** Always returns 0; the Dolphin build keeps no global activity count. */
 u32 hwGlobalActivity() { return 0; }
 
+/** Registers the callback (the synth's message handler) that salSynthSendMessage calls for voice events. */
 void hwSetMesgCallback(SND_MESSAGE_CALLBACK callback) { salMessageCallback = callback; }
 
+/** Stores the priority of DSP voice v, used by SortVoices to order voices when building the command list. */
 void hwSetPriority(u32 v, u32 prio) { dspVoice[v].prio = prio; }
 
+/** Prepares DSP voice v to play a new sample: clears its pending changes (keeping a pending break), stores the
+ * priority, the callback user value, the sample ID and a copy of the SAMPLE_INFO, optionally installs a default
+ * instant-attack/full-sustain envelope, forgets the last pitch and volume sent, and optionally sets the default
+ * sample-rate conversion and the ITD mode. */
 void hwInitSamplePlayback(u32 v, u16 smpID, void* newsmp, u32 set_defadsr, u32 prio,
                           u32 callbackUserValue, u32 setSRC, u8 itdMode) {
   unsigned char i;  // r30
@@ -191,6 +209,8 @@ void hwInitSamplePlayback(u32 v, u16 smpID, void* newsmp, u32 set_defadsr, u32 p
   hwSetITDMode(v, itdMode);
 }
 
+/** Cuts the sample loop of voice vid so it plays out to its end: flags the change (0x20) in the current slot and, if
+ * the voice has only just been started, marks startupBreak. */
 void hwBreak(s32 vid) {
   if (dspVoice[vid].state == 1 && salTimeOffset == 0) {
     dspVoice[vid].startupBreak = 1;
@@ -199,6 +219,9 @@ void hwBreak(s32 vid) {
   dspVoice[vid].changed[salTimeOffset] |= 0x20;
 }
 
+/** Copies an envelope into DSP voice v. Mode 0 = linear (sustain level scaled up to 15 bits), mode 1 = DLS with times
+ * in time-cents converted by adsrConvertTimeCents and the sustain level mapped through dspScale2IndexTab, mode 2 = DLS
+ * with raw values. */
 void hwSetADSR(u32 v, void* _adsr, u8 mode) {
   u32 sl;                              // r29
   ADSR_INFO* adsr = (ADSR_INFO*)_adsr; // r30
@@ -243,30 +266,40 @@ void hwSetADSR(u32 v, void* _adsr, u8 mode) {
   dspVoice[v].changed[0] |= 0x10;
 }
 
+/** Stores the loop buffer address and length that a virtual-sample (streamed from RAM) voice uses. */
 void hwSetVirtualSampleLoopBuffer(u32 voice, void* addr, u32 len) {
   dspVoice[voice].vSampleInfo.loopBufferAddr = addr;
   dspVoice[voice].vSampleInfo.loopBufferLength = len;
 }
 
+/** Returns the voice's inLoopBuffer flag: whether it is playing from the loop buffer. */
 u32 hwGetVirtualSampleState(u32 voice) { return dspVoice[voice].vSampleInfo.inLoopBuffer; }
 
+/** Returns the compression type of the sample the voice is playing. */
 u8 hwGetSampleType(u32 voice) { return dspVoice[voice].smp_info.compType; }
 
+/** Returns the sample ID the voice was started with. */
 u16 hwGetSampleID(u32 voice) { return dspVoice[voice].smp_id; }
 
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 3)
+/** Returns the extra-data pointer stored in the voice's SAMPLE_INFO. */
 void* hwGetSampleExtraData(u32 voice) { return dspVoice[voice].smp_info.extraData; }
 #endif
 
+/** Stores the ADPCM predictor/scale byte for the voice's stream loop. */
 void hwSetStreamLoopPS(u32 voice, u8 ps) { dspVoice[voice].streamLoopPS = ps; }
 
+/** Starts DSP voice v on a studio: records the current sub-frame slot as its start offset and activates the voice. */
 void hwStart(u32 v, u8 studio) {
   dspVoice[v].singleOffset = salTimeOffset;
   salActivateVoice(&dspVoice[v], studio);
 }
 
+/** Flags voice v for key-off (0x40) in the current sub-frame slot. */
 void hwKeyOff(u32 v) { dspVoice[v].changed[salTimeOffset] |= 0x40; }
 
+/** Sets voice pitch; speed is clamped to 0x3FFF and stored times 16 in the current slot. Skipped if it equals the last
+ * value. */
 void hwSetPitch(u32 v, u16 speed) {
   DSPvoice* dsp_vptr = &dspVoice[v];
 
@@ -284,6 +317,7 @@ void hwSetPitch(u32 v, u16 speed) {
   dsp_vptr->lastUpdate.pitch = salTimeOffset;
 }
 
+/** Selects the sample-rate-conversion type (0, 1 or 2) of voice v. */
 void hwSetSRCType(u32 v, u8 salSRCType) {
   static u16 dspSRCType[3] = {0, 1, 2};
   struct DSPvoice* dsp_vptr = &dspVoice[v];
@@ -291,6 +325,7 @@ void hwSetSRCType(u32 v, u8 salSRCType) {
   dsp_vptr->changed[0] |= 0x100;
 }
 
+/** Selects the SRC coefficient set (0, 1 or 2) of voice v. */
 void hwSetPolyPhaseFilter(u32 v, u8 salCoefSel) {
   static u16 dspCoefSel[3] = {0, 1, 2};
   DSPvoice* dsp_vptr = &dspVoice[v];
@@ -299,6 +334,8 @@ void hwSetPolyPhaseFilter(u32 v, u8 salCoefSel) {
 }
 
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 3)
+/** Converts a cutoff in Hz (relative to the 32 kHz mix rate) into the one-pole low-pass coefficients: *_a0 and *_b1,
+ * scaled by 32768. */
 void hwLowPassFrqToCoef(u32 frq, u16* _a0, u16* _b1) {
   f32 c;
   f32 b;
@@ -314,6 +351,8 @@ void hwLowPassFrqToCoef(u32 frq, u16* _a0, u16* _b1) {
   *_b1 = 32768.f * -b;
 }
 
+/** Voice low-pass filter control: mode 1 turns it on (or updates the coefficients if already on), any other mode turns
+ * it off. */
 void hwSetFilter(u32 v, u8 mode, u16 coefA, u16 coefB) {
   DSPvoice* dsp_vptr = &dspVoice[v];
 
@@ -335,12 +374,14 @@ void hwSetFilter(u32 v, u8 mode, u16 coefA, u16 coefB) {
 }
 #endif
 
+/** Sets the voice's left/right interaural delay shifts from itdOffTab[pan] and flags the change. */
 static void SetupITD(DSPvoice* dsp_vptr, u8 pan) {
   dsp_vptr->itdShiftL = itdOffTab[pan];
   dsp_vptr->itdShiftR = 32 - itdOffTab[pan];
   dsp_vptr->changed[0] |= 0x200;
 }
 
+/** mode 0 disables the interaural time delay (flag bit 31 set, both shifts 16); nonzero re-enables it. */
 void hwSetITDMode(u32 v, u8 mode) {
   if (!mode) {
     dspVoice[v].flags |= 0x80000000;
@@ -353,6 +394,9 @@ void hwSetITDMode(u32 v, u8 mode) {
 
 #define hwGetITDMode(dsp_vptr) (dsp_vptr->flags & 0x80000000)
 
+/** Sets voice volume, pan, surround pan and the aux A/B sends: calls salCalcVolume and stores the resulting
+ * left/right/surround levels (scaled to 0..32767) for the main, aux A and aux B buses, flagging only those that
+ * changed. Sets up ITD from the pan if ITD is active. */
 void hwSetVolume(u32 v, u8 table, float vol, u32 pan, u32 span, float auxa, float auxb) {
   SAL_VOLINFO vi;                    // r1+0x24
   u16 il;                            // r30
@@ -418,8 +462,10 @@ void hwSetVolume(u32 v, u8 table, float vol, u32 pan, u32 span, float auxa, floa
   }
 }
 
+/** Deactivates DSP voice vid. */
 void hwOff(s32 vid) { salDeactivateVoice(&dspVoice[vid]); }
 
+// Registers the aux A and aux B effect callbacks (and their user data) that salHandleAuxProcessing calls for a studio.
 void hwSetAUXProcessingCallbacks(u8 studio, SND_AUX_CALLBACK auxA, void* userA,
                                  SND_AUX_CALLBACK auxB, void* userB) {
   dspStudio[studio].auxAHandler = auxA;
@@ -428,26 +474,35 @@ void hwSetAUXProcessingCallbacks(u8 studio, SND_AUX_CALLBACK auxA, void* userA,
   dspStudio[studio].auxBUser = userB;
 }
 
+/** Activates a studio via salActivateStudio. */
 void hwActivateStudio(u8 studio, bool isMaster, SND_STUDIO_TYPE type) {
   salActivateStudio(studio, isMaster, type);
 }
 
+/** Deactivates a studio. */
 void hwDeactivateStudio(u8 studio) { salDeactivateStudio(studio); }
 
+/** Sets the studio's isMaster flag. */
 void hwChangeStudioMix(u8 studio, u32 isMaster) { dspStudio[studio].isMaster = isMaster; }
 
+/** Returns whether the studio's state is 1 (active). */
 bool hwIsStudioActive(u8 studio) { return dspStudio[studio].state == 1; }
 
+/** Adds a studio input description to a studio. */
 bool hwAddInput(u8 studio, SND_STUDIO_INPUT* in_desc) {
   return salAddStudioInput(&dspStudio[studio], in_desc);
 }
 
+/** Removes a studio input description from a studio. */
 bool hwRemoveInput(u8 studio, SND_STUDIO_INPUT* in_desc) {
   return salRemoveStudioInput(&dspStudio[studio], in_desc);
 }
 
+/** Moves voice v to another studio (salReconnectVoice). */
 void hwChangeStudio(u32 v, u8 studio) { salReconnectVoice(&dspVoice[v], studio); }
 
+/** Returns how many samples voice v has played (0 unless it is running), converting the DSP's current address for the
+ * ADPCM (14 samples per 16-nibble frame), 8-bit and 16-bit sample types. */
 u32 hwGetPos(u32 v) {
   unsigned long pos; // r31
   unsigned long off; // r30
@@ -496,27 +551,37 @@ void hwFlushStream(void* base, u32 offset, u32 bytes, u8 hwStreamHandle, void (*
   aramUploadData((void*)mram, aram + offset, bytes, 1, callback, user);
 }
 
+/** Empty. */
 void hwPrepareStreamBuffer() {}
+/** Reserves an ARAM stream buffer of len bytes; returns its handle. */
 u8 hwInitStream(u32 len) { return aramAllocateStreamBuffer(len); }
 
+/** Frees a stream buffer handle. */
 void hwExitStream(u8 id) { aramFreeStreamBuffer(id); }
 
+/** Returns the ARAM address of a stream buffer. */
 void* hwGetStreamPlayBuffer(u8 hwStreamHandle) {
   return (void*)aramGetStreamBufferAddress(hwStreamHandle, NULL);
 }
 
+/** Returns the pointer unchanged. */
 void* hwTransAddr(void* samples) { return samples; }
 
+/** Converts a sample rate in Hz to the pitch ratio relative to synthInfo.mixFrq, as a 12-bit fraction. */
 u32 hwFrq2Pitch(u32 frq) { return (frq * 4096.f) / synthInfo.mixFrq; }
 
+/** Initializes sample memory; baseAddr must be 0. length is the ARAM area size. */
 void hwInitSampleMem(u32 baseAddr, u32 length) {
 #line 940
   MUSY_ASSERT(baseAddr == 0x00000000);
   aramInit(length);
 }
 
+/** Shuts down ARAM sample memory. */
 void hwExitSampleMem() { aramExit(); }
 
+/** Converts a sample length in samples to bytes: ADPCM types (0, 1, 4, 5) use 8 bytes per 14 samples, types 2 and 6 use
+ * 2 bytes per sample, others are unchanged. */
 static u32 convert_length(u32 len, u8 type) {
   switch (type) {
   case 0:
@@ -553,6 +618,7 @@ void hwSaveSample(void* header, void* data
 #endif
 }
 
+/** Installs the ARAM upload callback and its chunk size. */
 void hwSetSaveSampleCallback(ARAMUploadCallback callback, unsigned long chunckSize) {
   aramSetUploadCallback(callback, chunckSize);
 }
@@ -578,20 +644,27 @@ void hwRemoveSample(void* header, void* data
 #endif
 }
 
+/** Waits for pending ARAM transfers to finish. */
 void hwSyncSampleMem() { aramSyncTransferQueue(); }
 
+/** Empty. */
 void hwFrameDone() {}
 
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 3)
+/** Public: installs the allocation hooks (malloc, mallocPhysical, free) used by salMalloc and friends. In this version
+ * both malloc hooks use hooks->malloc. */
 void sndSetHooks(SND_HOOKS* hooks) {
   salHooks.malloc = hooks->malloc;
   salHooks.mallocPhysical = hooks->malloc;
   salHooks.free = hooks->free;
 }
 #else
+/** Public: installs the allocation hooks (malloc, mallocPhysical, free) used by salMalloc and friends. In this version
+ * both malloc hooks use hooks->malloc. */
 void sndSetHooks(SND_HOOKS* hooks) { salHooks = *hooks; }
 #endif
 
+/** Turns HRTF on if it is off and initializes the HRTF buffer. */
 void hwEnableHRTF() {
   if (dspHRTFOn != FALSE) {
     return;
@@ -599,12 +672,16 @@ void hwEnableHRTF() {
   dspHRTFOn = TRUE;
   salInitHRTFBuffer();
 }
+/** Turns HRTF processing off. */
 void hwDisableHRTF() { dspHRTFOn = FALSE; }
 
+/** Turns the compressor on. */
 void hwEnableCompressor() { dspCompressorOn = TRUE; }
 
+/** Turns the compressor off. */
 void hwDisableCompressor() { dspCompressorOn = FALSE; }
 
+/** Returns the virtual sample ID of voice v, or 0xFFFFFFFF if the voice is idle. */
 u32 hwGetVirtualSampleID(u32 v) {
   if (dspVoice[v].state == 0) {
     return 0xFFFFFFFF;
@@ -613,4 +690,5 @@ u32 hwGetVirtualSampleID(u32 v) {
   return dspVoice[v].virtualSampleID;
 }
 
+/** Returns TRUE if voice v is in state 1, started but not yet running on the DSP. */
 bool hwVoiceInStartup(u32 v) { return dspVoice[v].state == 1; }

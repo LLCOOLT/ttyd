@@ -39,6 +39,11 @@ static USER_FUNC(camps30);
 
 static BeroEntry bero_entry_data[3];
 
+/**
+ * Guess: pipe enter script for the Boggly Woods arrival:
+ * only at STORY_STG1_END_TO_STAGE_2 does it set GF(0) and wait for the arrival cutscene to clear it;
+ * otherwise it returns at once. Always returns LW(0) = 0.
+ */
 static EVT_BEGIN(first_evt_dokan)
     IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_END_TO_STAGE_2)
         SET_VALUE(LW(0), 0)
@@ -87,11 +92,17 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/** Starts the Chapter 2 arrival scene with the letterbox bars on. */
 EVT_BEGIN(welcome_wonderforest_init)
     CALL(evt_cam_letter_box_onoff, 1, 0)
     RETURN
 EVT_END()
 
+/**
+ * Chapter 2 opening cutscene in Boggly Woods: shows the area title card after 5 seconds
+ * while the camera orbits Mario for 7.5 seconds,
+ * then Mario and the party react ("stg2_win_e00_00") and the story becomes STORY_STG2_00_BOGGLY_WOODS.
+ */
 EVT_BEGIN(welcome_wonderforest)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -170,6 +181,11 @@ EVT_BEGIN(welcome_wonderforest)
     RETURN
 EVT_END()
 
+/**
+ * Guess: map init script of the Boggly Woods arrival map (win_06):
+ * plays the Boggly Woods BGM and ambience (delaying the music during the first arrival), registers exits,
+ * turns on bounding-box culling for the scenery, and starts the arrival scene after Chapter 1.
+ */
 EVT_BEGIN(win_06_init_evt)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG2_00_BOGGLY_WOODS)
         BEGIN_INLINE_EVENT
@@ -198,6 +214,10 @@ EVT_BEGIN(win_06_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: stores a camera-orbit parameter set in slot args[0] (0, 1 or the working copy):
+ * position (args[1..3]), target (args[4..6]), angle (args[7]) and distance (args[8]).
+ */
 static USER_FUNC(cam_kaiten_set_para) {
     EvtWord* args = event->args;
     KaitenParam* p;
@@ -225,6 +245,10 @@ static USER_FUNC(cam_kaiten_set_para) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: reads the camera-orbit parameter set in slot args[0] back into args[1..8] (position, target,
+ * angle, distance).
+ */
 static USER_FUNC(cam_kaiten_get_para) {
     EvtWord* args = event->args;
     KaitenParam* p;
@@ -252,6 +276,10 @@ static USER_FUNC(cam_kaiten_get_para) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: places the 3D camera at the working orbit's angle
+ * and distance around its target in one step (0 frames), so a loop can move the camera around it every frame.
+ */
 static USER_FUNC(cam_kaiten_set_direct) {
     CameraEntry* camera = camGetPtr(CAMERA_3D);
     f32 s = sin(6.2831855f * ckpw->angle / 360.0f);
@@ -270,10 +298,16 @@ static USER_FUNC(cam_kaiten_set_direct) {
     return EVT_RETURN_DONE;
 }
 
+/** Identity function (returns x unchanged); inline helper kept from the original source. */
 static inline f32 fid(f32 x) {
     return x;
 }
 
+/**
+ * Guess: script helper: allocates the three orbit parameter sets and fills sets 0
+ * and 1 from the two position/target vectors in its arguments,
+ * then derives the working set's angle and distance.
+ */
 static USER_FUNC(cam_kaiten_init) {
     EvtWord* args = event->args;
     Vec target;
@@ -322,6 +356,7 @@ static USER_FUNC(cam_kaiten_init) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: sets the 3D camera's vertical field of view to 25 degrees. */
 static USER_FUNC(camps25) {
     f32 fovY = 25.0f;
 
@@ -329,6 +364,7 @@ static USER_FUNC(camps25) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: sets the 3D camera's vertical field of view to 30 degrees. */
 static USER_FUNC(camps30) {
     f32 fovY = 30.0f;
 

@@ -144,6 +144,11 @@ static WinMgrDesc window_desc[2] = {
 #define WI_SLASH "／"
 #endif
 
+/**
+ * Builds the Important Items list: every key item in the pouch except those in menu_skip_list (the curses,
+ * boots, hammers, Magical Map and Crystal Stars, which other menu screens show;
+ * the demos also hide the Strange Sack).
+ */
 void winMakeSkipList(WindowWork* w) {
     s32 i;
     u32 j;
@@ -165,6 +170,12 @@ void winMakeSkipList(WindowWork* w) {
     }
 }
 
+/**
+ * Resets the Items window when the pause menu opens:
+ * cursors, book and mail panels off screen, gives Mario the Mailbox SP if he lacks it,
+ * copies the received mail list (newest first), builds the Important Items list,
+ * creates the two item-use windows and starts loading mail.tpl.
+ */
 void winItemInit(WindowWork* w) {
     s32 i;
     w->item.state = 0;
@@ -201,6 +212,10 @@ void winItemInit(WindowWork* w) {
 #endif
 }
 
+/**
+ * Run from win_root.c each time the Items window comes to the front:
+ * snaps scrolls to the saved pages, hides the book and mail panels and sets the help text for the current tab.
+ */
 void winItemInit2(WindowWork* w) {
     w->helpTgtX = -275.0f;
     w->helpTgtY = (f32)(125 - w->item.mode * 40);
@@ -215,11 +230,21 @@ void winItemInit2(WindowWork* w) {
     w->item.useItem = 0;
 }
 
+/** Frees the two item-use windows created by winItemInit. */
 void winItemExit(WindowWork* w) {
     winMgrDelete(w->useWin[0]);
     winMgrDelete(w->useWin[1]);
 }
 
+/**
+ * Items window input.
+ * State 0 picks the Items / Important Items tab; 10 moves through the two-column list;
+ * 100 pages through one of Luigi's books; 200-202 pick and read mail (Mailbox SP);
+ * 300 picks who gets a field-usable item and 301 blinks while it is applied in the menu;
+ * 1000 is the Z sort menu.
+ * Returns -1 on B, -2 to close the menu (also to use an item or read the Ragged Diary in the field), else 0.
+ * Luigi's books are the Super Luigi key items.
+ */
 s32 winItemMain(WindowWork* w) {
     s32 cnt;
     s32 col;
@@ -705,6 +730,7 @@ s32 winItemMain(WindowWork* w) {
     return 0;
 }
 
+/** Every frame: eases the list scrolls toward their pages, and the book and mail panels toward their targets. */
 void winItemMain2(WindowWork* w) {
     w->item.scrollTgt[0] = 190.0f * (f32)w->item.page[0];
     w->item.scroll[0] += (w->item.scrollTgt[0] - w->item.scroll[0]) / 4.0f;
@@ -718,6 +744,7 @@ void winItemMain2(WindowWork* w) {
     w->item.mailScroll += (w->item.mailScrollTgt - w->item.mailScroll) / 4.0f;
 }
 
+/** Draws the Items window (menu slot n): background, the two tab labels, then the item list via item_disp. */
 void winItemDisp(s32 camId, void* param, s32 n) {
     GXColor white = {255, 255, 255, 255};
     f32 c;
@@ -751,6 +778,10 @@ void winItemDisp(s32 camId, void* param, s32 n) {
     item_disp(w, x, y);
 }
 
+/**
+ * Draws the scrolling two-column item list (items not usable in the field are grayed on the Items tab),
+ * the page arrows, the Z sort hint, and the open book panel.
+ */
 static void item_disp(WindowWork* w, f32 xo, f32 yo) {
     GXColor white = {255, 255, 255, 255};
     GXColor white2;
@@ -863,6 +894,10 @@ static const char* hpfp_name_table[7][2] = {
 #define WI_FP_NAME "ＦＰ"
 #endif
 
+/**
+ * winMgr draw callback for the item target window: Mario with his HP and FP, then each partner with HP;
+ * the chosen target blinks while the item takes effect and the others gray out. Also draws the hand cursor.
+ */
 static void itemUseDisp(WinMgrEntry* entry) {
     WindowWork* w = winGetPtr();
     GXColor black = {0, 0, 0, 255};
@@ -1019,6 +1054,11 @@ static void itemUseDisp(WinMgrEntry* entry) {
     winTexSet(0, (Vec){w->helpX, w->helpY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
 }
 
+/**
+ * winMgr draw callback for the small orange title window over the target list:
+ * centres msg_window_select_5 in it (the US and later releases resize it to the text's line count and squeeze
+ * long text).
+ */
 static void itemUseDisp2(WinMgrEntry* entry) {
     WindowWork* wp = winGetPtr();
     GXColor color = {0, 0, 0, 255};

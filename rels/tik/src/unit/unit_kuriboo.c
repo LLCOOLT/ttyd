@@ -171,6 +171,10 @@ static BattleWeapon weapon_kuriboo_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init script of the Goomba.
+ * Registers its wait, attack, damage and confusion scripts and sets its run, walk and jump sounds.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -183,6 +187,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage reaction of the Goomba: the default damage script. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -190,10 +195,17 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Phase script of the Goomba; does nothing. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * The Goomba's headbutt (jump on Mario or the target, with action-command defence).
+ * It picks a target (the first- attack target on a pre-emptive strike), runs to it, spins and jumps;
+ * the pre-damage check decides between a miss (the Goomba hops past, avoid animation on the target)
+ * and a hit (camera shake, SFX_ENM_KURI_ATTACK1, damage), then the Goomba hops back to its place.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -327,6 +339,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Script helper shared by the Goomba family.
+ * Computes the angle in degrees from the point (args[0], args[1]) to (args[2], args[3])
+ * and stores it in args[4]; if both points coincide it leaves the current value.
+ */
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);
@@ -345,6 +362,7 @@ static USER_FUNC(krb_get_dir) {
     return EVT_RETURN_DONE;
 }
 
+/** Wait script of the Goomba: shows its idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

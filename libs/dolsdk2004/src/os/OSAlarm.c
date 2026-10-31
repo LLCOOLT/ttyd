@@ -22,6 +22,10 @@ static OSAlarmQueue AlarmQueue;
 #define ASSERTREPORT(line, cond) \
     if (!(cond)) { OSReport("OSCheckAlarmQueue: Failed " #cond " in %d", line); return 0; }
 
+/**
+ * Debug sanity check of the alarm queue's head, tail and prev/next links;
+ * prints the failed condition and returns FALSE when the list is corrupt.
+ */
 BOOL OSCheckAlarmQueue(void) {
     OSAlarm* alarm;
 
@@ -36,6 +40,10 @@ BOOL OSCheckAlarmQueue(void) {
     return TRUE;
 }
 
+/**
+ * Programs the decrementer for an alarm: 0 if it is already due, the remaining ticks if they fit in 31 bits,
+ * otherwise 0x7FFFFFFF.
+ */
 static void SetTimer(OSAlarm* alarm) {
     OSTime delta = alarm->fire - __OSGetSystemTime();
 
@@ -48,6 +56,11 @@ static void SetTimer(OSAlarm* alarm) {
     }
 }
 
+/**
+ * Installs the decrementer exception handler (exception 8),
+ * empties the alarm queue and registers the reset callback; does nothing if already installed.
+ * Called from OSInit.
+ */
 void OSInitAlarm(void) {
     if (__OSGetExceptionHandler(8) != DecrementerExceptionHandler) {
         AlarmQueue.head = AlarmQueue.tail = NULL;
@@ -56,11 +69,17 @@ void OSInitAlarm(void) {
     }
 }
 
+/** Readies an OSAlarm for use by clearing its handler and tag; it does not start it. */
 void OSCreateAlarm(OSAlarm* alarm) {
     alarm->handler = 0;
     alarm->tag = 0;
 }
 
+/**
+ * Puts an alarm in the fire-time-ordered queue with its handler.
+ * For a periodic alarm it first computes the next fire time on the start-plus-n-periods grid.
+ * Reprograms the timer when the alarm became the earliest.
+ */
 static void InsertAlarm(OSAlarm* alarm, OSTime fire, OSAlarmHandler handler) {
     OSAlarm* next;
     OSAlarm* prev;
@@ -114,6 +133,7 @@ static void InsertAlarm(OSAlarm* alarm, OSTime fire, OSAlarmHandler handler) {
     }
 }
 
+/** Starts a one-shot alarm that calls its handler once, tick time-base ticks from now. */
 void OSSetAlarm(OSAlarm* alarm, OSTime tick, OSAlarmHandler handler) {
     BOOL enabled;
     ASSERTMSGLINE(313, tick > 0, "OSSetAlarm(): tick was less than zero.");
@@ -125,6 +145,7 @@ void OSSetAlarm(OSAlarm* alarm, OSTime tick, OSAlarmHandler handler) {
     OSRestoreInterrupts(enabled);
 }
 
+/** Starts a one-shot alarm that fires at an absolute time-base value. */
 void OSSetAbsAlarm(OSAlarm* alarm, OSTime time, OSAlarmHandler handler) {
     BOOL enabled;
 
@@ -136,6 +157,7 @@ void OSSetAbsAlarm(OSAlarm* alarm, OSTime time, OSAlarmHandler handler) {
     OSRestoreInterrupts(enabled);
 }
 
+/** Starts an alarm that first fires at the absolute time start and then every period ticks. */
 void OSSetPeriodicAlarm(OSAlarm* alarm, OSTime start, OSTime period, OSAlarmHandler handler) {
     BOOL enabled;
     ASSERTMSGLINE(374, period > 0, "OSSetPeriodicAlarm(): period was less than zero.");
@@ -148,6 +170,10 @@ void OSSetPeriodicAlarm(OSAlarm* alarm, OSTime start, OSTime period, OSAlarmHand
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Removes a pending alarm from the queue (reprogramming the timer if it was first) so its handler will not run;
+ * harmless if it is not queued.
+ */
 void OSCancelAlarm(OSAlarm* alarm) {
     OSAlarm* next;
     BOOL enabled;
@@ -178,6 +204,12 @@ void OSCancelAlarm(OSAlarm* alarm) {
     OSRestoreInterrupts(enabled);
 }
 
+/**
+ * Decrementer exception body: pops the alarm at the head of the queue
+ * if it is due (otherwise just re-arms the timer), re-queues it if periodic,
+ * re-arms the timer for the next alarm, then runs the alarm handler inside a scratch OS context with the
+ * scheduler disabled and reschedules before returning to the interrupted context.
+ */
 static void DecrementerExceptionCallback(register __OSException exception,
                                          register OSContext* context) {
     OSAlarm* alarm;
@@ -230,6 +262,10 @@ static void DecrementerExceptionCallback(register __OSException exception,
 }
 
 #ifdef __GEKKO__
+/**
+ * Assembly entry installed for the decrementer exception:
+ * saves the GPRs into the interrupted context, then branches to DecrementerExceptionCallback.
+ */
 static asm void DecrementerExceptionHandler(register __OSException exception,
                                             register OSContext* context) {
     nofralloc 
@@ -239,10 +275,12 @@ static asm void DecrementerExceptionHandler(register __OSException exception,
 }
 #endif
 
+/** Sets a nonzero tag on an alarm so a group of alarms can be cancelled with OSCancelAlarms. */
 void OSSetAlarmTag(OSAlarm* alarm, u32 tag) {
     alarm->tag = tag;
 }
 
+/** Cancels every queued alarm that carries the given nonzero tag. */
 void OSCancelAlarms(u32 tag) {
     BOOL enabled;
     OSAlarm* alarm;
@@ -271,6 +309,7 @@ void OSCancelAlarms(u32 tag) {
     }
 }
 
+/** Reset callback: on the final pass it cancels every queued alarm except the DVD driver's own. */
 static BOOL OnReset(BOOL final) {
     OSAlarm* alarm;
     OSAlarm* next;

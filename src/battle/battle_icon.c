@@ -15,6 +15,10 @@
 #pragma optimize_for_size on
 // inlining off for BtlIconGetPtr, BattleIconInit, BattleIconMain and 4 more, as in the original (the object differs without it)
 #pragma dont_inline on
+/**
+ * Finds the in-use battle icon (of the 16 slots in BattleWork) whose slot index matches; NULL if none.
+ * Scripts refer to icons by this index.
+ */
 BattleIcon* BtlIconGetPtr(s32 index) {
     BattleIcon* icon;
     int i;
@@ -28,10 +32,15 @@ BattleIcon* BtlIconGetPtr(s32 index) {
     return NULL;
 }
 
+/** Clears all 16 battle icon slots; called from battle start. */
 void BattleIconInit(void) {
     memset(_battleWorkPointer->icons, 0, sizeof(_battleWorkPointer->icons));
 }
 
+/**
+ * Per-frame update from the battle main loop: copies each live icon's position
+ * and scale (scale * scaleMul) to its icondrv icon, and mirrors flag 2 onto the icon's flag 2.
+ */
 void BattleIconMain(void) {
     BattleWork* wp;
     BattleIcon* icon;
@@ -54,6 +63,7 @@ void BattleIconMain(void) {
     }
 }
 
+/** Deletes every battle icon when the battle ends. */
 void BattleIconEnd(void) {
     BattleWork* wp = _battleWorkPointer;
     int i;
@@ -63,6 +73,10 @@ void BattleIconEnd(void) {
     }
 }
 
+/**
+ * Takes a free icon slot and creates an icondrv icon named "_biu_NN" showing iconId at (x, y, z), scale 1.
+ * Returns the slot, or NULL when all 16 are in use.
+ */
 BattleIcon* BtlIcon_Entry(u16 iconId, f32 x, f32 y, f32 z) {
     BattleIcon* icon;
     int i;
@@ -93,6 +107,7 @@ BattleIcon* BtlIcon_Entry(u16 iconId, f32 x, f32 y, f32 z) {
     return icon;
 }
 
+/** Removes a live battle icon's icondrv icon and frees its slot; safe on an unused slot. */
 void BtlIcon_Delete(BattleIcon* icon) {
     if (icon->flags & 1) {
         iconDelete(icon->base->name);
@@ -100,7 +115,10 @@ void BtlIcon_Delete(BattleIcon* icon) {
     }
 }
 
-// s32 iconId, f32 x, f32 y, f32 z, s32 evtIndex
+/**
+ * s32 iconId, f32 x, f32 y, f32 z, s32 evtIndex Script:
+ * creates a battle icon (see BtlIcon_Entry) and stores its index in args[4] for the other BtlIcon commands.
+ */
 USER_FUNC(btlevtcmd_BtlIconEntry) {
     EvtWord* args = event->args;
     BattleIcon* icon;
@@ -117,7 +135,10 @@ USER_FUNC(btlevtcmd_BtlIconEntry) {
     return EVT_RETURN_DONE;
 }
 
-// s32 itemId (index for itemDataTable) , f32 x, f32 y, f32 z, s32 evtIndex
+/**
+ * s32 itemId (index for itemDataTable) , f32 x, f32 y, f32 z, s32 evtIndex Script:
+ * like btlevtcmd_BtlIconEntry but takes an item id and shows that item's icon from itemDataTable.
+ */
 USER_FUNC(btlevtcmd_BtlIconEntryItemId) {
     EvtWord* args = event->args;
     BattleIcon* icon;
@@ -134,7 +155,9 @@ USER_FUNC(btlevtcmd_BtlIconEntryItemId) {
     return EVT_RETURN_DONE;
 }
 
-// s32 index for BtlIconGetPtr
+/**
+ * s32 index for BtlIconGetPtr Script: deletes the battle icon with the given index.
+ */
 USER_FUNC(btlevtcmd_BtlIconDelete) {
     BattleIcon* icon;
     s32 value;
@@ -145,7 +168,10 @@ USER_FUNC(btlevtcmd_BtlIconDelete) {
     return EVT_RETURN_DONE;
 }
 
-// s32 index for BtlIconGetPtr, f32 x, f32 y, f32 z
+/**
+ * s32 index for BtlIconGetPtr, f32 x, f32 y, f32 z Script:
+ * moves the battle icon with the given index to (x, y, z).
+ */
 USER_FUNC(btlevtcmd_BtlIconSetPosition) {
     EvtWord* args = event->args;
     BattleIcon* icon;
@@ -163,7 +189,10 @@ USER_FUNC(btlevtcmd_BtlIconSetPosition) {
     return EVT_RETURN_DONE;
 }
 
-// s32 index for BtlIconGetPtr, f32 fallAccel
+/**
+ * s32 index for BtlIconGetPtr, f32 fallAccel Script:
+ * sets the gravity per frame used by btlevtcmd_BtlIconJumpPosition for that icon.
+ */
 USER_FUNC(btlevtcmd_BtlIconSetFallAccel) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
@@ -172,6 +201,11 @@ USER_FUNC(btlevtcmd_BtlIconSetFallAccel) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: arcs a battle icon from its position to (x, y, z) over args[4] frames (0 keeps the icon's own frame
+ * count or derives it from jumpSpeed), falling by fallAccel per frame.
+ * Blocks the script until it lands; used for items tossed in battle.
+ */
 USER_FUNC(btlevtcmd_BtlIconJumpPosition) {
     EvtWord* args = event->args;
     BattleIcon* icon;
@@ -243,6 +277,10 @@ USER_FUNC(btlevtcmd_BtlIconJumpPosition) {
     return 0;
 }
 
+/**
+ * Never called: a stand-in for a function the linker stripped, so that 0.0f,
+ * 1.0f and 0.5f come first in the unit's float constant pool as in the original.
+ */
 void btlIconStrippedPool(f32* f) {
     f[0] = 0.0f;
     f[1] = 1.0f;

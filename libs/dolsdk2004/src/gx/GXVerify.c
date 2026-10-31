@@ -265,8 +265,13 @@ GXWarningLevel __gxvWarnLev[125] = {
 
 char __gxvDummyStr[256];
 
+/** Empty placeholder in the list of verifier checks run before a draw. */
 static void __GXVerifyGlobal(void) {}
 
+/**
+ * Warns (at severe level) when the vertex format's normal count in VAT A disagrees with the vertex descriptor:
+ * plain normals need GX_NRM_XYZ, normal-binormal-tangent data needs GX_NRM_NBT or GX_NRM_NBT3.
+ */
 static void __GXVerifyCP(GXVtxFmt fmt) {
     u32 nrmCnt = GET_REG_FIELD(__GXData->vatA[fmt], 1, 9);
     
@@ -284,6 +289,10 @@ static void __GXVerifyCP(GXVtxFmt fmt) {
     }
 }
 
+/**
+ * Runs the whole verifier before a draw in vertex format vtxfmt, unless the level is none:
+ * the CP check for the format, then the XF, setup unit, bump, texture, TEV and pixel engine checks.
+ */
 void __GXVerifyState(GXVtxFmt vtxfmt) {
     if (__gxVerif->verifyLevel != GX_WARN_NONE) {
         __GXVerifyGlobal();
@@ -297,6 +306,11 @@ void __GXVerifyState(GXVtxFmt vtxfmt) {
     }
 }
 
+/**
+ * Checks an attribute format being set (GXSetVtxAttrFmt) and warns about:
+ * an RGB colour type with a count other than RGB (or RGBA types with a count other than RGBA),
+ * a fraction on a colour or a float, and normals that are not S8 with a fraction of 6, S16 with 14, or F32.
+ */
 void __GXVerifyVATImm(GXAttr attr, GXCompCnt cnt, GXCompType type, u8 frac) {
     if (__gxVerif->verifyLevel != GX_WARN_NONE) {
         if (attr == GX_VA_CLR0 || attr == GX_VA_CLR1) {
@@ -354,10 +368,12 @@ void __GXVerifyVATImm(GXAttr attr, GXCompCnt cnt, GXCompType type, u8 frac) {
     }
 }
 
+/** Sets the severity from which the verifier reports problems (GX_WARN_NONE turns it off). */
 void GXSetVerifyLevel(GXWarningLevel level) {
     __gxVerif->verifyLevel = level;
 }
 
+/** Installs the function the verifier calls with each warning (level, id, message); returns the previous one. */
 GXVerifyCallback GXSetVerifyCallback(GXVerifyCallback cb) {
     GXVerifyCallback old_cb = __gxVerif->cb;
 

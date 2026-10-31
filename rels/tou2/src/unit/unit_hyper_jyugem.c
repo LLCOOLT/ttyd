@@ -38,6 +38,10 @@ static EvtWord friend_event[263];
 static EvtWord charge_event[102];
 static EvtWord wait_event[6];
 
+/**
+ * Script helper: arg0 = source unit, arg1 = destination unit;
+ * copies the size-change status, used when the Hyper Lakitu's Spiny is swapped for the thrown one.
+ */
 static USER_FUNC(togezo_copy_status) {
     EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));
@@ -269,6 +273,11 @@ static BattleUnitSetup entry_togezo = {
     NULL, // itemDropTable
 };
 
+/**
+ * Init event of the Hyper Lakitu: registers its wait, unison-phase, attack, damage and confusion events,
+ * clears unit work 0 (holding a Spiny) and 2 (has charged),
+ * sets part 2 (the Spiny it carries) to the "JGM_P_1" pose and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventUnisonPhase, BTL_UNIT_SELF, PTR(unison_phase_event))
@@ -282,6 +291,15 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: damage event of the Hyper Lakitu.
+ * Not holding a Spiny (unit work 0 = 0) it runs the default damage reaction.
+ * While holding one, a hit that did damage or left a status that stops it acting (instant kill, sleep, dizzy,
+ * confuse, electric, freeze or stop) knocks the Spiny out of its hands:
+ * part 2 is thrown clear and the unit goes back to its normal pose table.
+ * Other hits and statuses also knock it free in a gentler way;
+ * a few damage codes (22, 30, 31, 38, 39, 41) skip the drop.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -377,6 +395,12 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Run before the player's phase from the second turn on (the unison phase event) while the Hyper Lakitu can act
+ * and is not dizzy, confused or electrified: with a 50% chance it picks up a Spiny,
+ * with a wind-up and hold sound, sets unit work 0 to 1, switches to the holding pose table,
+ * turns on the counter attribute of its part and raises the hit offset.
+ */
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_EQUAL(LW(0), 0)
@@ -422,6 +446,10 @@ static EVT_BEGIN(unison_phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Data event 37 (the thorn-head counter): after 30 frames flashes the "toge_flush" spike effect above the unit,
+ * 45 units up when Huge (status 10), 25 when Tiny (status 11) and 35 otherwise.
+ */
 static EVT_BEGIN(avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -442,6 +470,10 @@ static EVT_BEGIN(avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: data event 48 (position when hit by a first strike):
+ * sets the unit's Y to 10 and waits for the attack to end.
+ */
 static EVT_BEGIN(dmg_first_attack_pos_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -450,6 +482,15 @@ static EVT_BEGIN(dmg_first_attack_pos_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the Hyper Lakitu: uses an enemy item if one fits.
+ * Then it draws between trying to call a friend (40 in 130 on turn 1, 40 in 110 later) and its normal attack.
+ * A friend needs an open spot beside it (CheckSpace), searched on both sides,
+ * otherwise it falls through to the attack. After a charge (unit work 2 = 1) it always attacks.
+ * Otherwise it draws among a plain Spiny throw,
+ * a throw that can rebound to spawn a new Spiny (unit work 1 = 1)
+ * and a charge (weights 30, 30, 30 on turn 1 and 30, 30, 10 later).
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -529,6 +570,15 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Hyper Lakitu's Spiny throw (weapon_jyugem_attack):
+ * if it is not already holding a Spiny it picks one up first;
+ * it then throws the Spiny (part 2) in an arc at the target. A miss lets it fly past and land at the edge.
+ * A hit damages the target.
+ * If unit work 1 is 1 and the damage code has bit 0x40000 (guarded) it looks for an open spot
+ * and the Spiny rebounds there to land as a new Hyper Spiny spawned from entry_togezo with the thrower's status.
+ * Otherwise the Spiny is picked up again.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_jyugem_attack))
@@ -686,6 +736,12 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Hyper Lakitu calls a friend: faces the spot in LW(0..2), picks up a Spiny if it was not holding one,
+ * throws it to the spot and has a new Hyper Spiny (entry_togezo,
+ * with the thrower's status via togezo_copy_status) land there and spin up with its sound,
+ * setting its home position there.
+ */
 static EVT_BEGIN(friend_event)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
@@ -745,6 +801,12 @@ static EVT_BEGIN(friend_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: the Hyper Lakitu charges up: pays the weapon cost (LW(9) is weapon_jyugem_charge), zooms in,
+ * plays the charge sound and a "crystal_n64" crystal effect for a second,
+ * hops once and applies the weapon to itself (CheckDamage with itself as the target)
+ * so it receives the charge status.
+ */
 static EVT_BEGIN(charge_event)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(evt_btl_camera_set_mode, 0, 7)
@@ -770,6 +832,7 @@ static EVT_BEGIN(charge_event)
     RETURN
 EVT_END()
 
+/** Wait event: sets the idle animation from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

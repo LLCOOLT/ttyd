@@ -34,6 +34,7 @@ static f32 spline_dt[] = {
     -75.32023f,
 };
 
+/** Event script: puts the active partner (by party id) into its hurt pose during the flight. */
 static EVT_BEGIN(party_damage_pose)
     CALL(evt_mario_get_party, LW(0))
     SWITCH(LW(0))
@@ -56,6 +57,11 @@ static EVT_BEGIN(party_damage_pose)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the flight to the Moon (story progress below STORY_STG7_06_TO_THE_MOON).
+ * Mario and the partner tumble along a spline for 5 seconds, shrinking as they go away from the camera,
+ * with a flying sound, then the map changes to moo_00.
+ */
 static EVT_BEGIN(mario_fly)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -114,6 +120,13 @@ static EVT_BEGIN(mario_fly)
     RETURN
 EVT_END()
 
+/**
+ * Event script: the X-Naut officer flung through space
+ * after the story reaches STORY_STG7_20_LORD_CRUMP_DEFEATED:
+ * he spins as he flies away from the camera at small scale,
+ * a flash (wangflush) lights up and the map changes to aji_14 at tuzuki.
+ * Guess: the officer is Lord Crump, from the story flag.
+ */
 EVT_BEGIN(kanbu_fly)
     WAIT_MS(2000)
     CALL(evt_npc_set_position, STRING("幹部"), 25, 75, -70)
@@ -188,6 +201,11 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Event script: the epilogue scene after the ending:
+ * the camera shows the Moon, a text (ep_45) is displayed,
+ * the music and ambience fade out and the map changes to gor_00 (epilogue2).
+ */
 static EVT_BEGIN(epilogue_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN1"))
     CALL(evt_snd_bgm_scope, 0, 1)
@@ -207,6 +225,14 @@ static EVT_BEGIN(epilogue_evt)
     RETURN
 EVT_END()
 
+/**
+ * Map init script for moo_04, the space backdrop.
+ * By story progress: before the Moon it runs the flight (mario_fly);
+ * until Lord Crump is defeated it runs the officer flight (kanbu_fly);
+ * after the final battle it runs the epilogue; otherwise it shows the message stg7_aji_63 and a crystal flash,
+ * sets the story progress to STORY_STG7_26_THE_HIDEOUT_EXPLODES with a white fade
+ * and changes to tik_00 with the teleporter arrival flag.
+ */
 EVT_BEGIN(moo_04_init_evt)
     IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_END_AFTER_THE_BATTLE)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_MON1"))
@@ -261,6 +287,10 @@ EVT_BEGIN(moo_04_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: makes Mario and the partner spin end over end during the flight.
+ * args[0] is their scale, which shrinks over the flight; both rotate 10 degrees per call.
+ */
 static USER_FUNC(mario_kirimomi) {
     f32 scale = evtGetFloat(event, event->args[0]);
     MarioWork* mario = marioGetPtr();

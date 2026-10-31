@@ -77,12 +77,24 @@ static s32 _getHammerIconId(void);
 s32 _jump_badge_table[8] = {ITEM_POWER_JUMP, ITEM_MULTIBOUNCE, ITEM_SHRINK_STOMP, ITEM_SLEEPY_STOMP, ITEM_SOFT_STOMP, ITEM_TORNADO_JUMP, ITEM_POWER_BOUNCE, ITEM_MEGA_JUMP};
 s32 _hammer_badge_table[9] = {ITEM_POWER_SMASH, ITEM_PIERCING_BLOW, ITEM_HAMMER_THROW, ITEM_HEAD_RATTLE, ITEM_ICE_SMASH, ITEM_FIRE_DRIVE, ITEM_QUAKE_HAMMER, ITEM_MEGA_SMASH, ITEM_MEGA_QUAKE};
 
+/**
+ * Resets the command menu to its first step and sets BATTLE_FLAG_COMMAND_INPUT;
+ * btlseqAct calls it when Mario or the partner is about to choose an action.
+ */
 void BattleCommandInit(BattleWork* wp) {
     wp->commandMenu.state = 0;
     wp->flags |= BATTLE_FLAG_COMMAND_INPUT;
 }
 
 #define PADREP(x) (BattlePadCheckRepeat(x))
+/**
+ * Builds the action menu for the acting unit in cmd->act:
+ * Jump, the partner's moves, Hammer, Items, Special (once a Star Power is obtained), Tactics,
+ * or the tutorial's end-lecture entry.
+ * Greys entries out for Jumpman/Hammerman, the battle's no-jump/no-hammer flags, the command-disable counters,
+ * being veiled by Vivian or flipped, and the tutorial (lecture) locks.
+ * The Jump and Hammer icons follow the boots and hammer level.
+ */
 static void _btlcmd_MakeActClassTable(BattleWork* wp) {
     PouchData* pouch;
     BattleUnit* unit;
@@ -281,6 +293,12 @@ static void _btlcmd_MakeActClassTable(BattleWork* wp) {
     }
 }
 
+/**
+ * Sets *out to the cursor that remembers the position in a menu:
+ * 14 the action menu (one each for Mario and the partner), 0 jumps, 1 hammers, 2 items,
+ * 3 the Double/Triple Dip menu, 4 Specials, 5 Tactics (one each for Mario and the partner),
+ * 6 the partner's moves, 7 and 8 two more weapon lists, 10 the partner list. Other types leave *out unchanged.
+ */
 static void _btlcmd_GetCursorPtr(BattleCommand* cmd, u32 type, BattleCursor** out) {
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, _battleWorkPointer->activeUnitId);
 
@@ -331,6 +349,7 @@ static void _btlcmd_GetCursorPtr(BattleCommand* cmd, u32 type, BattleCursor** ou
 
 // inlining off for _getJumpIconId, as in the original (the object differs without it)
 #pragma dont_inline on
+/** Icon of the jump moves in the weapon list: normal, Super or Ultra Boots by the pouch jumpLevel. */
 static s32 _getJumpIconId(void) {
     switch (pouchGetPtr()->jumpLevel) {
         case 3:
@@ -345,6 +364,7 @@ static s32 _getJumpIconId(void) {
 
 // inlining off for _getHammerIconId, as in the original (the object differs without it)
 #pragma dont_inline on
+/** Icon of the hammer moves in the weapon list: normal, Super or Ultra Hammer by the pouch hammerLevel. */
 static s32 _getHammerIconId(void) {
     switch (pouchGetPtr()->hammerLevel) {
         case 3:
@@ -357,6 +377,15 @@ static s32 _getHammerIconId(void) {
 }
 #pragma dont_inline reset
 
+/**
+ * Fills cmd->weapon with the list for menu type `type` and returns its length:
+ * 0 Jump (plus Spin Jump and Spring Jump with the Super and Ultra Boots) and the equipped jump badges;
+ * 1 Hammer (plus Super and Ultra Hammer) and the equipped hammer badges;
+ * 2 the battle-usable items Mario carries (cooking items without battle data use ItemWeaponData_CookingItem;
+ * a 'no items' dummy when empty); 4 the obtained Special moves; 6 the partner's moves from the unit's data hook.
+ * In the tutorial the basic Jump or Hammer is swapped for the lecture unit's weapon.
+ * Then marks which entries are usable.
+ */
 static s32 _btlcmd_MakeSelectWeaponTable(BattleWork* wp, s32 type) {
     s32 top;
     BattleUnit* unit;
@@ -674,12 +703,21 @@ BattleCheckPartyEntry _checkPartyTable[8] = {
     {UNIT_MS_MOWZ, "btl_cmd_pt_chuchurina", ICON_161, "btl_hlp_cmd_operation_party7"},
 };
 
+/**
+ * Started by BattleCommandInput when the player picks a greyed-out command:
+ * gets the reason message from _get_msg and announces it for 60 frames; the menu reopens when it ends.
+ */
 EVT_BEGIN(_btl_cmd_error_msg_event)
     CALL(_get_msg, LW(0))
     CALL(btlevtcmd_AnnounceMessage, 0, 0, -30, LW(0), 60)
     RETURN
 EVT_END()
 
+/**
+ * Re-checks every entry of the current weapon list: usable when it has a target and its cost can be paid.
+ * Otherwise disableReason is 1 (not enough FP) or 2 for Specials (not enough Star Power),
+ * or with no target 4 for jumps, 5 for hammers and 3 for the rest.
+ */
 static void _btlcmd_UpdateSelectWeaponTable(BattleWork* wp, s32 type) {
     BattleUnit* unit;
     BattleCommand* cmd;
@@ -725,6 +763,10 @@ static void _btlcmd_UpdateSelectWeaponTable(BattleWork* wp, s32 type) {
     }
 }
 
+/**
+ * Number of targets the unit could pick with the weapon:
+ * 0 with no weapon or no attack script, -1 when the unit cannot pay its cost.
+ */
 static s32 _btlcmd_CheckWeaponTargetNum(BattleWork* wp, BattleUnit* unit, BattleWeapon* weapon) {
     BattleWorkWeaponTargets targets;
 
@@ -745,6 +787,13 @@ static s32 _btlcmd_CheckWeaponTargetNum(BattleWork* wp, BattleUnit* unit, Battle
     return targets.numTargets;
 }
 
+/**
+ * Builds the Tactics menu: Change Partner (when another partner can be picked),
+ * Appeal (once a Star Power is obtained), Charge and Super Charge (if equipped, with their FP cost),
+ * Defend and Run Away.
+ * Run Away is greyed out in no-escape battles or when the unit cannot act, and most entries while veiled.
+ * The demos leave the cost of the free entries unset.
+ */
 static void _btlcmd_MakeOperationTable(BattleWork* wp) {
     PouchData* pouch;
     NpcBattleInfo* info;
@@ -896,6 +945,11 @@ static void _btlcmd_MakeOperationTable(BattleWork* wp) {
 
 // propagation optimisation off for _btlcmd_MakeMultiItemTable: the original register allocation and scheduling need it
 #pragma opt_propagation off
+/**
+ * Builds the menu shown before the item list when Double Dip or Triple Dip is equipped:
+ * a single item, then Double Dip and Triple Dip with their FP cost (the P versions' names and icons for a
+ * partner).
+ */
 static void _btlcmd_MakeMultiItemTable(BattleWork* wp) {
     BattleUnit* unit;
     BattleCommand* cmd;
@@ -968,6 +1022,10 @@ static void _btlcmd_MakeMultiItemTable(BattleWork* wp) {
 
 // inlining off for _battleGetPartyIcon, as in the original (the object differs without it)
 #pragma dont_inline on
+/**
+ * Menu icon of a partner kind from _checkPartyTable; Yoshi's follows the colour he hatched with.
+ * 0 for a kind that is not a partner.
+ */
 static u16 _battleGetPartyIcon(s32 kind) {
     BattleCheckPartyEntry* entry;
     s32 i;
@@ -1001,6 +1059,12 @@ static u16 _battleGetPartyIcon(s32 kind) {
 }
 #pragma dont_inline reset
 
+/**
+ * Fills the Change Partner list with each partner whose pouch entry carries the joined flag (tested as
+ * UNIT_FLAG_SHOW_HP_GAUGE), with name, icon and HP.
+ * The partner already out and KO'd partners are greyed out, and the cursor starts on the current one.
+ * Returns the count, 0 when there is no partner out.
+ */
 static s32 _btlcmd_MakePartyTable(BattleWork* wp) {
     BattleUnit* unit;
     BattleUnit* partner;
@@ -1065,6 +1129,11 @@ static s32 _btlcmd_MakePartyTable(BattleWork* wp) {
 
 // inlining off for _btlcmd_SelectWeaponDecide, as in the original (the object differs without it)
 #pragma dont_inline on
+/**
+ * Rebuilds the weapon list and samples the targets of the chosen weapon into wp->weaponTargets,
+ * starting the target cursor on the last own-side or the first opposing target
+ * when the weapon's TARGET_PROP_START flags ask for it. Always returns 0.
+ */
 static s32 _btlcmd_SelectWeaponDecide(BattleWork* wp, s32 type, s32 index) {
     BattleWorkWeaponTargets* targets;
     BattleWeapon* weapon;
@@ -1126,6 +1195,13 @@ static void _commandRestoreRec(void);
 static s32 _check_present_item(void);
 static void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd);
 
+/**
+ * Per-frame command input for Mario's or the partner's turn, called from btlseqAct:
+ * a state machine over the action, weapon, Double Dip, Tactics, partner and target menus,
+ * the error message for greyed-out picks, the X-button audience attack and items thrown by the audience.
+ * In the middle of a Double or Triple Dip it opens the item list directly.
+ * Returns 1 once the action is decided, after _btlcmd_SetAttackEvent has stored its script in the unit.
+ */
 s32 BattleCommandInput(void* work) {
     const char* sfxA;
     const char* sfxB;
@@ -1436,6 +1512,11 @@ s32 BattleCommandInput(void* work) {
 
 #pragma dont_inline reset
 
+/**
+ * Registers this frame's draw callbacks for the command input (from battle_disp.c):
+ * the enemy HP display and every menu whose CMD_MENU_FLAG is set.
+ * The demos draw the enemy HP at layer 501 instead of 902.
+ */
 void BattleCommandDisplay(BattleWork* wp) {
     BattleCommand* cmd = &wp->commandMenu;
 
@@ -1472,6 +1553,7 @@ void BattleCommandDisplay(BattleWork* wp) {
 
 // inlining off for _cursor_init, as in the original (the object differs without it)
 #pragma dont_inline on
+/** Puts a menu cursor back on the first entry. */
 static void _cursor_init(BattleCursor* cursor) {
     cursor->absPos = 0;
     cursor->relPos = 0;
@@ -1480,6 +1562,11 @@ static void _cursor_init(BattleCursor* cursor) {
 
 // inlining off for BattleCommandDisplay_ActMenuSetup, as in the original (the object differs without it)
 #pragma dont_inline on
+/**
+ * Opens the action menu: rebuilds its entries, starts the menu display (a = 1 when coming back from a submenu)
+ * and shows all enemy HP.
+ * Opening it fresh resets the weapon, item, Special and Tactics cursors unless an audience action is pending.
+ */
 void BattleCommandDisplay_ActMenuSetup(BattleWork* wp, u32 a) {
     BattleCommand* cmd = &wp->commandMenu;
     BattleCursor* cursor;
@@ -1521,6 +1608,13 @@ void BattleCommandDisplay_ActMenuSetup(BattleWork* wp, u32 a) {
 void BattleCommandDisplay_ActMenuEnd(BattleWork* wp);
 BOOL BattleCommandCheckChangePositionEnable(BattleWork* wp);
 
+/**
+ * Per-frame input for the action menu: moves the cursor,
+ * A picks the action (on to its list, the Double Dip menu, Tactics or the tutorial end)
+ * or shows why it is greyed out, Y swaps Mario and the partner when allowed, X attacks the audience.
+ * Greys out Jump or Hammer when Mario's single move has no target and lets the camera drift
+ * after 900 idle frames. Returns 1 when the menu state changed.
+ */
 s32 BattleCommandDisplay_ActMenuMain(BattleWork* wp) {
     BattleCommand* cmd = &wp->commandMenu;
     BattleUnit* unit = BattleGetUnitPtr(wp, wp->activeUnitId);
@@ -1651,6 +1745,11 @@ s32 BattleCommandDisplay_ActMenuMain(BattleWork* wp) {
     return ret;
 }
 
+/**
+ * TRUE when Mario and the partner may swap places with Y:
+ * not in zero gravity or a locked tutorial, both able to act and still on their first move of the turn,
+ * Mario not veiled and the partner not flipped. battle_menu_disp.c also checks it.
+ */
 BOOL BattleCommandCheckChangePositionEnable(BattleWork* wp) {
     BattleUnit* unit;
 
@@ -1670,6 +1769,7 @@ BOOL BattleCommandCheckChangePositionEnable(BattleWork* wp) {
     return unit->flippedTurns <= 0;
 }
 
+/** Draw callback for the action menu. */
 void BattleCommandDisplay_ActMenuDisp(CameraId camId, void* param) {
     BattleWork* wp = param;
     BattleCursor* cursor;
@@ -1680,6 +1780,7 @@ void BattleCommandDisplay_ActMenuDisp(CameraId camId, void* param) {
 
 // inlining off for BattleCommandDisplay_ActMenuEnd, as in the original (the object differs without it)
 #pragma dont_inline on
+/** Closes the action menu display and clears CMD_MENU_FLAG_ACT. */
 void BattleCommandDisplay_ActMenuEnd(BattleWork* wp) {
     BattleMenuDisp_ActSelect_End(wp);
     wp->commandMenu.flags &= ~CMD_MENU_FLAG_ACT;
@@ -1688,6 +1789,7 @@ void BattleCommandDisplay_ActMenuEnd(BattleWork* wp) {
 
 // inlining off for BattleCommandDisplay_WeaponSelectMenuSetup, as in the original (the object differs without it)
 #pragma dont_inline on
+/** Opens the weapon list of menu type `type`: builds it, starts its display (a is passed on) and shows all enemy HP. */
 void BattleCommandDisplay_WeaponSelectMenuSetup(BattleWork* wp, s32 type, s32 a) {
     BattleCommand* cmd = &wp->commandMenu;
     BattleCursor* cursor;
@@ -1702,6 +1804,13 @@ void BattleCommandDisplay_WeaponSelectMenuSetup(BattleWork* wp, s32 type, s32 a)
 void BattleCommandDisplay_WeaponSelectMenuEnd(BattleWork* wp);
 void BattleCommandDisplay_TargetSelectMenuSetup(BattleWork* wp);
 
+/**
+ * Per-frame input for the weapon, item, Special or partner-move list:
+ * A on a usable entry samples its targets and moves to target selection, lighting the side it can hit;
+ * on a greyed one it shows why.
+ * B goes back to the action menu, or for items with Double or Triple Dip to the dip menu or, mid-dip,
+ * to the cancel prompt. Returns 1 when the menu state changed.
+ */
 s32 BattleCommandDisplay_WeaponSelectMenuMain(BattleWork* wp, s32 type) {
     BattleCommand* cmd = &wp->commandMenu;
     s32 ret;
@@ -1796,12 +1905,14 @@ s32 BattleCommandDisplay_WeaponSelectMenuMain(BattleWork* wp, s32 type) {
     return ret;
 }
 
+/** Draw callback for the weapon list. */
 void BattleCommandDisplay_WeaponSelectMenuDisp(CameraId camId, void* param) {
     BattleMenuDisp_WeaponSelect_Disp(param);
 }
 
 // inlining off for BattleCommandDisplay_WeaponSelectMenuEnd, as in the original (the object differs without it)
 #pragma dont_inline on
+/** Closes the weapon list display and clears CMD_MENU_FLAG_WEAPON_SELECT. */
 void BattleCommandDisplay_WeaponSelectMenuEnd(BattleWork* wp) {
     BattleMenuDisp_WeaponSelect_End(wp);
     wp->commandMenu.flags &= ~CMD_MENU_FLAG_WEAPON_SELECT;
@@ -1810,6 +1921,10 @@ void BattleCommandDisplay_WeaponSelectMenuEnd(BattleWork* wp) {
 
 // inlining off for BattleCommandDisplay_WeaponMultiItemCancelCheckSetup, as in the original (the object differs without it)
 #pragma dont_inline on
+/**
+ * Resets the Yes/No cursor of the prompt shown when B is pressed in the item list in the middle of a Double
+ * or Triple Dip.
+ */
 void BattleCommandDisplay_WeaponMultiItemCancelCheckSetup(BattleWork* wp) {
     wp->commandMenu.cursor[13].absPos = 0;
     wp->commandMenu.cursor[13].relPos = 0;
@@ -1817,6 +1932,11 @@ void BattleCommandDisplay_WeaponMultiItemCancelCheckSetup(BattleWork* wp) {
 }
 #pragma dont_inline reset
 
+/**
+ * Per-frame input for that prompt: Yes gives up the remaining items
+ * and ends the action (cmd->cancelled, the unit then just waits); No or B returns to the item list.
+ * Returns 1 once answered.
+ */
 s32 BattleCommandDisplay_WeaponMultiItemCancelCheckMain(BattleWork* wp) {
     BattleCommand* cmd = &wp->commandMenu;
     BattleCursor* cursor = &cmd->cursor[13];
@@ -1873,6 +1993,11 @@ check:
     return done;
 }
 
+/**
+ * Draws the Double/Triple Dip cancel prompt: btl_msg_multi_item_cancel_check with Yes/No and the hand cursor.
+ * Before the US release Yes/No are hardcoded Japanese;
+ * the PAL release sizes the window by the text's measured width instead of its length.
+ */
 void BattleCommandDisplay_WeaponMultiItemCancelCheckDisp(CameraId camId, void* param) {
     BattleWork* wp = param;
     char buf[36];
@@ -1909,6 +2034,7 @@ void BattleCommandDisplay_WeaponMultiItemCancelCheckDisp(CameraId camId, void* p
 
 // inlining off for BattleCommandDisplay_OperationMenuSetup, as in the original (the object differs without it)
 #pragma dont_inline on
+/** Opens the Tactics menu: builds its entries, starts its display (a is passed on) and shows all enemy HP. */
 void BattleCommandDisplay_OperationMenuSetup(BattleWork* wp, s32 a) {
     _btlcmd_MakeOperationTable(wp);
     BattleMenuDisp_Operation_Init(wp, a);
@@ -1918,6 +2044,11 @@ void BattleCommandDisplay_OperationMenuSetup(BattleWork* wp, s32 a) {
 
 void BattleCommandDisplay_OperationMenuEnd(BattleWork* wp);
 
+/**
+ * Per-frame input for the Tactics menu: A on Change Partner opens the partner list,
+ * type 4 the protect-partner choice, and the other tactics end input; a greyed entry shows why.
+ * B goes back to the action menu. Returns 1 when the menu state changed.
+ */
 s32 BattleCommandDisplay_OperationMenuMain(BattleWork* wp) {
     BattleCommand* cmd = &wp->commandMenu;
     s32 ret = 0;
@@ -2008,12 +2139,14 @@ end:
     return ret;
 }
 
+/** Draw callback for the Tactics menu. */
 void BattleCommandDisplay_OperationMenuDisp(CameraId camId, void* param) {
     BattleMenuDisp_Operation_Disp(param);
 }
 
 // inlining off for BattleCommandDisplay_OperationMenuEnd, as in the original (the object differs without it)
 #pragma dont_inline on
+/** Closes the Tactics menu display and clears CMD_MENU_FLAG_OPERATION. */
 void BattleCommandDisplay_OperationMenuEnd(BattleWork* wp) {
     BattleMenuDisp_Operation_End(wp);
     wp->commandMenu.flags &= ~CMD_MENU_FLAG_OPERATION;
@@ -2022,6 +2155,7 @@ void BattleCommandDisplay_OperationMenuEnd(BattleWork* wp) {
 
 // inlining off for BattleCommandDisplay_MultiItemMenuSetup, as in the original (the object differs without it)
 #pragma dont_inline on
+/** Opens the Double/Triple Dip menu: builds its entries and starts its display (a is passed on). */
 void BattleCommandDisplay_MultiItemMenuSetup(BattleWork* wp, s32 a) {
     _btlcmd_MakeMultiItemTable(wp);
     BattleMenuDisp_MultiItem_Init(wp, a);
@@ -2031,6 +2165,11 @@ void BattleCommandDisplay_MultiItemMenuSetup(BattleWork* wp, s32 a) {
 
 void BattleCommandDisplay_MultiItemMenuEnd(BattleWork* wp);
 
+/**
+ * Per-frame input for the Double/Triple Dip menu:
+ * A sets cmd->dipMode to 1, 2 or 3 items and opens the item list, or shows why the entry is greyed out;
+ * B goes back to the action menu. Returns 1 when the menu state changed.
+ */
 s32 BattleCommandDisplay_MultiItemMenuMain(BattleWork* wp) {
     BattleCommand* cmd = &wp->commandMenu;
     s32 ret = 0;
@@ -2100,18 +2239,21 @@ end:
     return ret;
 }
 
+/** Draw callback for the Double/Triple Dip menu. */
 void BattleCommandDisplay_MultiItemMenuDisp(CameraId camId, void* param) {
     BattleMenuDisp_MultiItem_Disp(param);
 }
 
 // inlining off for BattleCommandDisplay_MultiItemMenuEnd, as in the original (the object differs without it)
 #pragma dont_inline on
+/** Closes the Double/Triple Dip menu display and clears CMD_MENU_FLAG_MULTI_ITEM. */
 void BattleCommandDisplay_MultiItemMenuEnd(BattleWork* wp) {
     BattleMenuDisp_MultiItem_End(wp);
     wp->commandMenu.flags &= ~CMD_MENU_FLAG_MULTI_ITEM;
 }
 #pragma dont_inline reset
 
+/** Opens the Change Partner list display (flag is passed to its init) and shows all enemy HP. */
 void BattleCommandDisplay_ChangePartySelectMenuSetup(BattleWork* wp, BOOL flag) {
     BattleMenuDisp_ChangePartySelect_Init(wp, flag);
     wp->commandMenu.flags |= (CMD_MENU_FLAG_CHANGE_PARTY | CMD_MENU_FLAG_SHOW_ALL_ENEMY_HP);
@@ -2119,6 +2261,10 @@ void BattleCommandDisplay_ChangePartySelectMenuSetup(BattleWork* wp, BOOL flag) 
 
 void BattleCommandDisplay_ChangePartySelectMenuEnd(BattleWork* wp);
 
+/**
+ * Per-frame input for the Change Partner list: A on an available partner stores cmd->partyKind and ends input;
+ * B goes back to Tactics. Returns 1 when the menu state changed.
+ */
 s32 BattleCommandDisplay_ChangePartySelectMenuMain(BattleWork* wp) {
     BattleCommand* cmd = &wp->commandMenu;
     s32 ret = 0;
@@ -2182,12 +2328,14 @@ end:
     return ret;
 }
 
+/** Draw callback for the Change Partner list. */
 void BattleCommandDisplay_ChangePartySelectMenuDisp(CameraId camId, void* param) {
     BattleMenuDisp_ChangePartySelect_Disp(param);
 }
 
 // inlining off for BattleCommandDisplay_ChangePartySelectMenuEnd, as in the original (the object differs without it)
 #pragma dont_inline on
+/** Closes the Change Partner list display and clears CMD_MENU_FLAG_CHANGE_PARTY. */
 void BattleCommandDisplay_ChangePartySelectMenuEnd(BattleWork* wp) {
     BattleMenuDisp_ChangePartySelect_End(wp);
     wp->commandMenu.flags &= ~CMD_MENU_FLAG_CHANGE_PARTY;
@@ -2196,6 +2344,10 @@ void BattleCommandDisplay_ChangePartySelectMenuEnd(BattleWork* wp) {
 
 // inlining off for BattleCommandDisplay_TargetSelectMenuSetup, as in the original (the object differs without it)
 #pragma dont_inline on
+/**
+ * Starts target selection: sets CMD_MENU_FLAG_TARGET_SELECT
+ * and gives the acting unit's body animation type 0x28. Guess: 0x28 is the ready-to-attack pose.
+ */
 void BattleCommandDisplay_TargetSelectMenuSetup(BattleWork* wp) {
     BattleUnit* unit = BattleGetUnitPtr(wp, wp->activeUnitId);
 
@@ -2204,6 +2356,11 @@ void BattleCommandDisplay_TargetSelectMenuSetup(BattleWork* wp) {
 }
 #pragma dont_inline reset
 
+/**
+ * Draws target selection: the hand cursor on the current target with its name boxed at the top left,
+ * or for multi-target moves a cursor on every target and their names stacked (flipped for ceiling units;
+ * Yoshi shows the name he was given).
+ */
 void BattleCommandDisplay_TargetSelectMenuDisp(CameraId camId, void* param) {
     BattleWork* wp = param;
     Vec icon;
@@ -2319,6 +2476,7 @@ void BattleCommandDisplay_TargetSelectMenuDisp(CameraId camId, void* param) {
 
 // inlining off for BattleCommandDisplay_TargetSelectMenuEnd, as in the original (the object differs without it)
 #pragma dont_inline on
+/** Ends target selection: resets the battle camera and clears the target-select and show-all-enemy-HP flags. */
 void BattleCommandDisplay_TargetSelectMenuEnd(BattleWork* wp) {
     BattleCommand* cmd = &wp->commandMenu;
     BattleCursor* cursor;
@@ -2332,6 +2490,11 @@ void BattleCommandDisplay_TargetSelectMenuEnd(BattleWork* wp) {
 
 // inlining off for BattleCommandDisplay_ProtectPartnerSelectMenuSetup, as in the original (the object differs without it)
 #pragma dont_inline on
+/**
+ * Starts the protect-partner choice (Tactics type 4):
+ * sets CMD_MENU_FLAG_PROTECT_PARTNER and hides the all-enemy HP display.
+ * No Tactics entry built by _btlcmd_MakeOperationTable has type 4, so this appears unused.
+ */
 void BattleCommandDisplay_ProtectPartnerSelectMenuSetup(BattleWork* wp) {
     BattleUnit* unit = BattleGetUnitPtr(wp, wp->activeUnitId);
     BattleGetPartnerPtr(wp, unit);
@@ -2340,6 +2503,7 @@ void BattleCommandDisplay_ProtectPartnerSelectMenuSetup(BattleWork* wp) {
 }
 #pragma dont_inline reset
 
+/** Draws the hand cursor and name box over the partner for the protect-partner choice. */
 void BattleCommandDisplay_ProtectPartnerSelectMenuDisp(CameraId camId, void* param) {
     BattleWork* wp = param;
     BattleUnit* unit = BattleGetUnitPtr(wp, wp->activeUnitId);
@@ -2366,6 +2530,7 @@ void BattleCommandDisplay_ProtectPartnerSelectMenuDisp(CameraId camId, void* par
 
 // inlining off for BattleCommandDisplay_ProtectPartnerSelectMenuEnd, as in the original (the object differs without it)
 #pragma dont_inline on
+/** Ends the protect-partner choice (clears CMD_MENU_FLAG_PROTECT_PARTNER). */
 void BattleCommandDisplay_ProtectPartnerSelectMenuEnd(BattleWork* wp) {
     wp->commandMenu.flags &= ~CMD_MENU_FLAG_PROTECT_PARTNER;
 }
@@ -2373,6 +2538,10 @@ void BattleCommandDisplay_ProtectPartnerSelectMenuEnd(BattleWork* wp) {
 
 // inlining off for BattleCommandDisplay_AllEnd, as in the original (the object differs without it)
 #pragma dont_inline on
+/**
+ * Hides every command menu except the Double Dip menu at once;
+ * _check_present_item calls it when an audience item interrupts input.
+ */
 void BattleCommandDisplay_AllEnd(BattleWork* wp) {
     wp->commandMenu.flags &= ~(CMD_MENU_FLAG_ACT | CMD_MENU_FLAG_WEAPON_SELECT | CMD_MENU_FLAG_OPERATION | CMD_MENU_FLAG_CHANGE_PARTY | CMD_MENU_FLAG_TARGET_SELECT | CMD_MENU_FLAG_PROTECT_PARTNER);
 }
@@ -2383,6 +2552,13 @@ void* btlataudGetMoveEventPtr(s32 id);
 static s32 _check_weapon_type_attack(BattleWeapon* weapon);
 #define WEVT(w) ((w)->attackEvtScript)
 
+/**
+ * Turns the decided command into the unit's attackEventCode and flags for btlseqAct
+ * and counts it in the battle action record: the chosen move, item or Special script;
+ * the Tactics (Defend, Appeal, Charge, Super Charge, Run Away, Change Partner,
+ * which with Quick Change keeps the turn); the Y position swap;
+ * the audience attack (X) and audience item scripts; and the tutorial end. A cancelled Double Dip just waits.
+ */
 static void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
     BattleWork* wp = _battleWorkPointer;
     u32 type = cmd->actType;
@@ -2620,6 +2796,10 @@ static void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
     }
 }
 
+/**
+ * The weapon under the cursor of the current list, i.e. the move the player chose;
+ * read by the btlevtcmd helpers in battle_event_cmd.c.
+ */
 BattleWeapon* BattleGetSelectWeapon(BattleWork* wp) {
     BattleCommand* cmd = &wp->commandMenu;
     BattleCursor* cursor;
@@ -2630,6 +2810,12 @@ BattleWeapon* BattleGetSelectWeapon(BattleWork* wp) {
 
 void effRecoveryEntry(s32 type, s32 amount, f32 x, f32 y, f32 z);
 
+/**
+ * Handles an item the audience threw (BattleAudience_GetPresentItemNo):
+ * a Heart or Flower restores 1 HP or FP to its target on the spot;
+ * any other item closes the menus and forces the audience-item action (actType 12) and returns 1.
+ * Returns 0 otherwise.
+ */
 static s32 _check_present_item(void) {
     BattleWork* wp = _battleWorkPointer;
     s32 item = BattleAudience_GetPresentItemNo();
@@ -2685,6 +2871,11 @@ static s32 _check_present_item(void) {
 
 void BattleDrawEnemyHPBar(Vec pos, BattleUnit* unit, GXColor color);
 
+/**
+ * Draw callback for the HP number and bar under each living unit the player has Tattled that has a gauge:
+ * all of them while a menu shows all enemy HP, otherwise only those with their gauge on,
+ * fading over its last 20 frames. During command input the gauges sit at the units' home positions.
+ */
 void BattleDrawEnemyHP(CameraId camId, void* param) {
     BattleWork* wp = param;
     GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -2740,6 +2931,11 @@ s32 irand(s32 scalar);
 
 // inlining off for BattleDrawEnemyHPBar, as in the original (the object differs without it)
 #pragma dont_inline on
+/**
+ * Draws one HP bar at screen position pos: the frame texture, then the fill by barRatio,
+ * with a black trail for recent damage while it drains (mode 1).
+ * The US and PAL releases use other texture ids than JP and the demos.
+ */
 void BattleDrawEnemyHPBar(Vec pos, BattleUnit* unit, GXColor color) {
     CameraEntry* cam = camGetPtr(CAMERA_2D);
     f32 x, y;
@@ -2769,6 +2965,15 @@ void BattleDrawEnemyHPBar(Vec pos, BattleUnit* unit, GXColor color) {
 }
 #pragma dont_inline reset
 
+/**
+ * Picks the random action of a Confused Mario or partner
+ * and returns its script (btlevtcmd in battle_event_cmd.c retries while it returns NULL):
+ * a random enabled command other than Items or Special,
+ * then a random single-target move usable while confused aimed at a random target, or Defend,
+ * Run Away or Change Partner from Tactics.
+ * Enemies, and cases with no valid pick, get subsetevt_confuse_flustered.
+ * The US and PAL releases first drop a Double or Triple Dip in progress.
+ */
 void* BattleSetConfuseAct(BattleWork* wp, BattleUnit* unit) {
     BattleCommand* cmd = &wp->commandMenu;
     BattleCursor* cursor;
@@ -2953,6 +3158,12 @@ void* BattleSetConfuseAct(BattleWork* wp, BattleUnit* unit) {
 
 // inlining off for _commandRestoreRec, as in the original (the object differs without it)
 #pragma dont_inline on
+/**
+ * Records the current menu state in cmd->recCommand;
+ * while an audience action is pending, clears it
+ * and the pending action once the menu is back at the recorded state.
+ * Guess: lets input resume where it was after an audience interruption.
+ */
 static void _commandRestoreRec(void) {
     BattleWork* wp = _battleWorkPointer;
 
@@ -2969,6 +3180,11 @@ static void _commandRestoreRec(void) {
 
 // inlining off for BattleCommandAttackAudienceCheck, as in the original (the object differs without it)
 #pragma dont_inline on
+/**
+ * X during command input: unless in zero gravity or Mario is veiled,
+ * targets the audience member BattleAudience_GetItemOn reports,
+ * closes the menu and decides the audience-attack action (actType 11). TRUE when that happened.
+ */
 static BOOL BattleCommandAttackAudienceCheck(void) {
     BattleWork* wp = _battleWorkPointer;
     s32 id;
@@ -2993,6 +3209,11 @@ static BOOL BattleCommandAttackAudienceCheck(void) {
 }
 #pragma dont_inline reset
 
+/**
+ * Script helper for _btl_cmd_error_msg_event: sets args[0] to the message id explaining why the picked command
+ * is greyed out, by cmd->disableReason (no FP, no Star Power, no jump or hammer target, can't run,
+ * or can't pick it now).
+ */
 static USER_FUNC(_get_msg) {
     s32 index = event->args[0];
     BattleWork* wp = _battleWorkPointer;
@@ -3023,6 +3244,11 @@ static USER_FUNC(_get_msg) {
     return 2;
 }
 
+/**
+ * TRUE if the weapon is offensive: it deals HP damage or inflicts a harmful status (sleep, stop, dizzy, poison,
+ * confuse, burn, freeze, shrink, ATK or DEF down, OHKO, fright, gale force, slow).
+ * Used to count attack against support moves and items in the action record.
+ */
 static s32 _check_weapon_type_attack(BattleWeapon* weapon) {
     if (!weapon)
         return 0;

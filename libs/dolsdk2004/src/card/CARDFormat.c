@@ -3,6 +3,11 @@
 #include "os/__os.h"
 #include "__card.h"
 
+/**
+ * Steps the format along: after each completed step it erases the next of the card's five system sectors,
+ * then writes the five prepared system blocks (header, two directories, two FATs) one by one,
+ * and finally sets the current directory and FAT and finishes the call.
+ */
 static void FormatCallback(s32 chan, s32 result) {
     CARDControl* card;
     CARDCallback callback;
@@ -37,6 +42,13 @@ error:
     callback(chan, result);
 }
 
+/**
+ * Prepares and starts a format for the given font encoding:
+ * builds the header block (encoding, a serial number made from the flash ID in SRAM,
+ * the time base and other SRAM and video register values, size, checksums),
+ * two empty directories and two empty FATs (all blocks past the system blocks free) in the work area,
+ * then begins erasing the first sector.
+ */
 s32 __CARDFormatRegionAsync(s32 chan, u16 encode, CARDCallback callback) {
     CARDControl* card;
     CARDID* id;
@@ -114,6 +126,7 @@ s32 __CARDFormatRegionAsync(s32 chan, u16 encode, CARDCallback callback) {
     return result;
 }
 
+/** Blocking __CARDFormatRegionAsync. */
 s32 __CARDFormatRegion(s32 chan, u16 encode) {
     s32 result = __CARDFormatRegionAsync(chan, encode, &__CARDSyncCallback);
     if (result < 0) {
@@ -123,10 +136,15 @@ s32 __CARDFormatRegion(s32 chan, u16 encode) {
     return __CARDSync(chan);
 }
 
+/**
+ * Formats the card in a channel for the library's current font encoding, erasing everything on it.
+ * Completes through the callback.
+ */
 s32 CARDFormatAsync(s32 chan, CARDCallback callback) {
     return __CARDFormatRegionAsync(chan, __CARDGetFontEncode(), callback);
 }
 
+/** Blocking format of the card in a channel using the library's current font encoding; erases all files. */
 s32 CARDFormat(s32 chan) {
     s32 result = __CARDFormatRegionAsync(chan, __CARDGetFontEncode(), &__CARDSyncCallback);
     if (result < 0) {

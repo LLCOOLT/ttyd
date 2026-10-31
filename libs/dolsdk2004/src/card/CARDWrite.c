@@ -6,6 +6,11 @@
 static void WriteCallback(s32 chan, s32 result);
 static void EraseCallback(s32 chan, s32 result);
 
+/**
+ * Completion callback for each sector written by CARDWriteAsync: stops with CANCELED if cancelled;
+ * after the last sector it stamps the modification time and saves the directory,
+ * otherwise follows the FAT to the next block and erases it.
+ */
 static void WriteCallback(s32 chan, s32 result) {
     CARDControl* card;
     CARDCallback callback;
@@ -54,6 +59,7 @@ after:;
     }
 }
 
+/** Completion callback for the sector erase of CARDWriteAsync: writes one sector from the buffer into that sector. */
 static void EraseCallback(s32 chan, s32 result) {
     CARDControl* card;
     CARDCallback callback;
@@ -77,6 +83,10 @@ after:;
     }
 }
 
+/**
+ * Writes 'length' bytes at 'offset' of an open file, erasing and rewriting one sector at a time;
+ * both must be multiples of the sector size and the file must be writable. Completes through the callback.
+ */
 s32 CARDWriteAsync(CARDFileInfo* fileInfo, void* buf, s32 length, s32 offset, CARDCallback callback) {
     CARDControl* card;
     s32 result;
@@ -113,6 +123,7 @@ s32 CARDWriteAsync(CARDFileInfo* fileInfo, void* buf, s32 length, s32 offset, CA
     return result;
 }
 
+/** Blocking CARDWriteAsync; how a game saves its data. */
 s32 CARDWrite(CARDFileInfo* fileInfo, void* buf, s32 length, s32 offset) {
     s32 result = CARDWriteAsync(fileInfo, buf, length, offset, __CARDSyncCallback);
     if (result < 0) {

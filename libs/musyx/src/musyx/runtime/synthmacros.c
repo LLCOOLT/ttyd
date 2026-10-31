@@ -25,6 +25,8 @@ void macSetExternalKeyoff(SYNTH_VOICE* svoice);
 
 static void DoSetPitch(SYNTH_VOICE* svoice);
 
+/** Sends an external key-off to the voice with this ID if it is still playing that sound. Returns 0 if it was sent, -1
+ * otherwise. */
 static int SendSingleKeyOff(u32 voiceid) {
   u32 i; // r31
 
@@ -43,6 +45,8 @@ static int SendSingleKeyOff(u32 voiceid) {
   return -1;
 }
 
+/** If the voice has a trap of this type set (0 key-off, 1 sample end, 2 message), jumps its macro to the trap handler,
+ * clears the trap and makes the macro run. Returns 1 if a trap fired. */
 static u32 ExecuteTrap(SYNTH_VOICE* svoice, u8 trapType) {
   if (svoice->trapEventAny != 0 && svoice->trapEventAddr[trapType] != NULL) {
     svoice->curAddr = svoice->trapEventCurAddr[trapType];
@@ -55,6 +59,7 @@ static u32 ExecuteTrap(SYNTH_VOICE* svoice, u8 trapType) {
   return 0;
 }
 
+/** Returns nonzero if the voice has a sample-end trap (type 1) set. */
 static u32 HasHWEventTrap(SYNTH_VOICE* svoice) {
   if (svoice->trapEventAny != '\0') {
     return svoice->trapEventAddr[1] != NULL;
@@ -62,12 +67,17 @@ static u32 HasHWEventTrap(SYNTH_VOICE* svoice) {
   return 0;
 }
 
+/** If the voice has started its sample but the DSP voice has gone idle, fires the sample-end trap. */
 static void CheckHWEventTrap(SYNTH_VOICE* svoice) {
   if ((svoice->cFlags & 0x20) == 0 && !hwIsActive(svoice->id & 0xff)) {
     ExecuteTrap(svoice, 1);
   }
 }
 
+/** Macro command 0x04 (and the tail of several others): waits for a number of ticks (or ms for 0x07) from the macro
+ * start or the last wait, optionally randomized, or forever if the time is 0xFFFF. Flags choose to also end the wait on
+ * key-off or when the sample ends. If the wait is not already over the macro yields and is queued by time. Returns 1 if
+ * the macro yielded. */
 static u32 mcmdWait(SYNTH_VOICE* svoice, MSTEP* cstep) {
   u32 w;  // r1+0x10
   u32 ms; // r29
@@ -139,19 +149,23 @@ static u32 mcmdWait(SYNTH_VOICE* svoice, MSTEP* cstep) {
   return 0;
 }
 
+/** Macro command 0x07: like mcmdWait but the time is in milliseconds. */
 static u32 mcmdWaitMs(SYNTH_VOICE* svoice, MSTEP* cstep) {
   *((u8*)cstep->para + 6) = 1;
   return mcmdWait(svoice, cstep);
 }
 
+/** Macro command 0x00: ends the macro, releasing the voice and its voice ID references. */
 static u32 mcmdEndOfMacro(SYNTH_VOICE* svoice) {
   vidRemoveVoiceReferences(svoice);
   voiceFree(svoice);
   return 1;
 }
 
+/** Macro command 0x01: stops the macro; same as the end of macro. */
 static u32 mcmdStop(SYNTH_VOICE* svoice) { return mcmdEndOfMacro(svoice); }
 
+/** Macro command 0x24: returns from a gosub (restores the saved macro and position from the 4-deep call stack). */
 static u32 mcmdReturn(SYNTH_VOICE* svoice) {
   if (svoice->callStackEntryNum != 0) {
     svoice->addr = svoice->callStack[svoice->callStackIndex].addr;
@@ -162,6 +176,7 @@ static u32 mcmdReturn(SYNTH_VOICE* svoice) {
   return 0;
 }
 
+/** Macro command 0x02: if the current key is at least the given value, jumps to another macro or step. */
 static void mcmdIfKey(SYNTH_VOICE* svoice, MSTEP* cstep) {
   MSTEP* addr; // r31
   if (svoice->curNote < ((u8)(cstep->para[0] >> 8))) {
@@ -174,6 +189,7 @@ static void mcmdIfKey(SYNTH_VOICE* svoice, MSTEP* cstep) {
   }
 }
 
+/** Macro command 0x03: if the note velocity is at least the given value, jumps to another macro or step. */
 static void mcmdIfVelocity(SYNTH_VOICE* svoice, MSTEP* cstep) {
   MSTEP* addr;
   if (((u8)(svoice->volume >> 0x10)) < (u8)(cstep->para[0] >> 8)) {
@@ -186,6 +202,8 @@ static void mcmdIfVelocity(SYNTH_VOICE* svoice, MSTEP* cstep) {
   }
 }
 
+/** Macro command 0x0A: if the modulation wheel (seven-bit value) is at least the given value, jumps to another macro or
+ * step. */
 static void mcmdIfModulation(SYNTH_VOICE* svoice, MSTEP* cstep) {
   MSTEP* addr; // r30
   u8 mod;      // r28
@@ -204,6 +222,7 @@ static void mcmdIfModulation(SYNTH_VOICE* svoice, MSTEP* cstep) {
   }
 }
 
+/** Macro command 0x13: jumps to another macro or step unless a random byte is below the threshold. */
 static void mcmdIfRandom(SYNTH_VOICE* svoice, MSTEP* cstep) {
   MSTEP* addr; // r31
   if ((u8)sndRand() < (u8)(cstep->para[0] >> 8)) {
@@ -216,6 +235,7 @@ static void mcmdIfRandom(SYNTH_VOICE* svoice, MSTEP* cstep) {
   }
 }
 
+/** Macro command 0x06: continues at another macro and step; ends the voice if that macro is not loaded. */
 static u32 mcmdGoto(SYNTH_VOICE* svoice, MSTEP* cstep) {
   MSTEP* addr; // r31
   if ((addr = (MSTEP*)dataGetMacro(cstep->para[0] >> 0x10)) != NULL) {
@@ -227,6 +247,8 @@ static u32 mcmdGoto(SYNTH_VOICE* svoice, MSTEP* cstep) {
   return mcmdEndOfMacro(svoice);
 }
 
+/** Macro command 0x25: calls another macro and step, pushing the return address on the 4-entry call stack; ends the
+ * voice if that macro is not loaded. */
 static u32 mcmdGosub(SYNTH_VOICE* svoice, MSTEP* cstep) {
   MSTEP* addr; // r30
   if ((addr = (MSTEP*)dataGetMacro((u16)(cstep->para[0] >> 0x10))) != NULL) {
@@ -245,6 +267,7 @@ static u32 mcmdGosub(SYNTH_VOICE* svoice, MSTEP* cstep) {
   return mcmdEndOfMacro(svoice);
 }
 
+/** Macro command 0x28: installs a handler (macro and step) for an event: key-off (0), sample end (1) or message (2). */
 static void mcmdTrapEvent(SYNTH_VOICE* svoice, MSTEP* cstep) {
   MSTEP* addr; // r29
   u8 t;        // r30
@@ -259,6 +282,7 @@ static void mcmdTrapEvent(SYNTH_VOICE* svoice, MSTEP* cstep) {
   }
 }
 
+/** Macro command 0x29: removes the handler for one event type. */
 static void mcmdUntrapEvent(SYNTH_VOICE* svoice, MSTEP* cstep) {
   u8 i; // r31
   svoice->trapEventAddr[(u8)(cstep->para[0] >> 8)] = 0;
@@ -272,6 +296,8 @@ static void mcmdUntrapEvent(SYNTH_VOICE* svoice, MSTEP* cstep) {
   svoice->trapEventAny = 0;
 }
 
+/** Macro command 0x05: loops back to a step a given number of times (0xFFFF = forever, optionally random); can be told
+ * to stop looping on key-off or when the sample ends. */
 static void mcmdLoop(SYNTH_VOICE* svoice, MSTEP* cstep) {
 
   if (svoice->loop == 0) {
@@ -304,6 +330,8 @@ skip:
   }
 }
 
+/** Macro command 0x08: starts another macro as a child voice, with a key offset, priority and voice limit, passing
+ * along volume, pan, MIDI channel and group; the new voice is linked as a child of this one. */
 static void mcmdPlayMacro(SYNTH_VOICE* svoice, MSTEP* cstep) {
   s32 key;       // r29
   u32 new_child; // r30
@@ -338,6 +366,7 @@ static void mcmdPlayMacro(SYNTH_VOICE* svoice, MSTEP* cstep) {
   }
 }
 
+/** Macro command 0x09: sends key-off to every voice playing the given macro/key combination. */
 static void mcmdSendKeyOff(SYNTH_VOICE* svoice, MSTEP* cstep) {
   u32 voiceid; // r30
   u32 i;       // r31
@@ -351,6 +380,8 @@ static void mcmdSendKeyOff(SYNTH_VOICE* svoice, MSTEP* cstep) {
   }
 }
 
+/** Macro command 0x30: adds a signed amount to the voice's age counter (its tie-breaker for being stolen) and updates
+ * the DSP voice priority. */
 static void mcmdAddAgeCounter(SYNTH_VOICE* svoice, MSTEP* cstep) {
   s16 step; // r29
   s32 age;  // r30
@@ -369,11 +400,13 @@ static void mcmdAddAgeCounter(SYNTH_VOICE* svoice, MSTEP* cstep) {
   hwSetPriority(svoice->id & 0xFF, ((u32)svoice->prio << 24) | ((u32)svoice->age >> 15));
 }
 
+/** Macro command 0x31: sets the voice's age counter and updates the DSP voice priority. */
 static void mcmdSetAgeCounter(SYNTH_VOICE* svoice, MSTEP* cstep) {
   svoice->age = (u16)(cstep->para[0] >> 0x10) << 0xf;
   hwSetPriority(svoice->id & 0xff, (u32)svoice->prio << 0x18 | svoice->age >> 0xf);
 }
 
+/** Macro command 0x38: sets how fast the age counter decays so that it reaches zero over the given time. */
 static void mcmdSetAgeCounterSpeed(SYNTH_VOICE* svoice, MSTEP* cstep) {
   u32 time = cstep->para[1];
   if (time != 0) {
@@ -382,6 +415,8 @@ static void mcmdSetAgeCounterSpeed(SYNTH_VOICE* svoice, MSTEP* cstep) {
     svoice->ageSpeed = 0;
   }
 }
+/** Macro command 0x39: sets the age counter from the note velocity (louder notes age higher) and updates the DSP
+ * priority. */
 static void mcmdSetAgeCounterByVolume(SYNTH_VOICE* svoice, MSTEP* cstep) {
   u32 age; // r30
 
@@ -390,6 +425,7 @@ static void mcmdSetAgeCounterByVolume(SYNTH_VOICE* svoice, MSTEP* cstep) {
   hwSetPriority(svoice->id & 0xff, (u32)svoice->prio << 0x18 | svoice->age >> 0xf);
 }
 
+/** Macro command 0x37: adds a signed amount to the voice priority (clamped to 0..255). */
 static void mcmdAddPriority(SYNTH_VOICE* svoice, MSTEP* cstep) {
   s16 add;  // r30
   s16 prio; // r31
@@ -400,19 +436,24 @@ static void mcmdAddPriority(SYNTH_VOICE* svoice, MSTEP* cstep) {
   voiceSetPriority(svoice, prio);
 }
 
+/** Macro command 0x36: sets the voice priority. */
 static void mcmdSetPriority(SYNTH_VOICE* svoice, MSTEP* cstep) {
   voiceSetPriority(svoice, cstep->para[0] >> 8);
 }
 
+/** Macro command 0x32: stores a value in one of the 16 global macro variables (synthGlobalVariable). */
 static void mcmdSendFlag(MSTEP* cstep) {
   synthGlobalVariable[(u8)(cstep->para[0] >> 8)] = (u8)(cstep->para[0] >> 16);
 }
 
+/** Macro command 0x33: sets the pitch bend range, in semitones, for bending down and up. */
 static void mcmdSetPitchWheelRange(SYNTH_VOICE* svoice, MSTEP* cstep) {
   svoice->pbLowerKeyRange = (u8)(cstep->para[0] >> 0x10);
   svoice->pbUpperKeyRange = (u8)(cstep->para[0] >> 8);
 }
 
+/** Macro command 0x19: sets the pitch of the voice to a key and detune (cents), remembers it as the last note if this
+ * is the latest started voice, then waits as given. */
 static u32 mcmdSetKey(SYNTH_VOICE* svoice, MSTEP* cstep) {
   svoice->curNote = (u8)(cstep->para[0] >> 8) & 0x7f;
   svoice->curDetune = (s8)(cstep->para[0] >> 0x10);
@@ -423,6 +464,8 @@ static u32 mcmdSetKey(SYNTH_VOICE* svoice, MSTEP* cstep) {
   return mcmdWait(svoice, cstep);
 }
 
+/** Macro command 0x18: adds a semitone and detune offset to the current key (or to the original key), clamped to
+ * 0..127, then waits as given. */
 static u32 mcmdAddKey(SYNTH_VOICE* svoice, MSTEP* cstep) {
   if ((u8)(cstep->para[0] >> 0x18) == 0) {
     svoice->curNote += (s8)(u8)(cstep->para[0] >> 8);
@@ -440,6 +483,8 @@ static u32 mcmdAddKey(SYNTH_VOICE* svoice, MSTEP* cstep) {
   return mcmdWait(svoice, cstep);
 }
 
+/** Macro command 0x1A: sets the key relative to the previous note played on the channel (for glides), then waits as
+ * given. */
 static u32 mcmdLastKey(SYNTH_VOICE* svoice, MSTEP* cstep) {
   svoice->curNote = svoice->lastNote + (s8)(u8)(cstep->para[0] >> 8);
   svoice->curNote = (s16)svoice->curNote < 0 ? 0 : svoice->curNote > 0x7f ? 0x7f : svoice->curNote;
@@ -452,6 +497,8 @@ static u32 mcmdLastKey(SYNTH_VOICE* svoice, MSTEP* cstep) {
   return mcmdWait(svoice, cstep);
 }
 
+/** Macro command 0x10: starts sample sid on the voice: looks it up, sets the start offset (fixed, or scaled by the
+ * velocity), sets up the DSP voice and flags it to start on the next key state update. */
 static void mcmdStartSample(SYNTH_VOICE* svoice, MSTEP* cstep) {
   static SAMPLE_INFO newsmp;
   u16 smp; // r28
@@ -496,12 +543,15 @@ static void mcmdStartSample(SYNTH_VOICE* svoice, MSTEP* cstep) {
   synthKeyStateUpdate(svoice);
 }
 
+/** Macro command 0x11: breaks (stops) the DSP voice's sample. */
 static void mcmdStopSample(SYNTH_VOICE* svoice) { hwBreak(svoice->id & 0xFF); }
+/** Macro command 0x12: starts the voice's release phase as if key-off arrived. */
 static void mcmdKeyOff(SYNTH_VOICE* svoice) {
   svoice->cFlags |= 0x80;
   synthKeyStateUpdate(svoice);
 }
 
+/** Macro command 0x22: sets how much the modulation wheel adds to the vibrato depth (semitones and cents). */
 static void mcmdSetMod2Vibrato(SYNTH_VOICE* svoice, MSTEP* cstep) {
   svoice->vibModAddScale = (s8)(cstep->para[0] >> 8) << 8;
   if (svoice->vibModAddScale >= 0) {
@@ -512,6 +562,8 @@ static void mcmdSetMod2Vibrato(SYNTH_VOICE* svoice, MSTEP* cstep) {
   }
 }
 
+/** Macro command 0x1C: turns the vibrato LFO on with depth in semitones and cents and the period in ticks or ms (period
+ * 0 turns it off); a flag lets the modulation wheel scale the depth. */
 static void mcmdVibrato(SYNTH_VOICE* svoice, MSTEP* cstep) {
   u32 time; // r1+0x10
   s8 kr;    // r29
@@ -567,6 +619,7 @@ static void mcmdVibrato(SYNTH_VOICE* svoice, MSTEP* cstep) {
   }
 }
 
+/** Macro command 0x50: sets the period (ms) of LFO n (0 or 1) and, if it was already running, its phase. */
 static void mcmdSetupLFO(SYNTH_VOICE* svoice, MSTEP* cstep) {
   u32 time;  // r1+0x14
   u32 phase; // r1+0x10
@@ -583,6 +636,8 @@ static void mcmdSetupLFO(SYNTH_VOICE* svoice, MSTEP* cstep) {
   svoice->lfo[n].period = time;
 }
 
+/** Converts the played sample's native rate and root key (sInfo) and the requested playback frequency (playFrq) into a
+ * key and detune in cents for the voice. */
 static void DoSetPitch(SYNTH_VOICE* svoice) {
   u32 f;    // r29
   u32 of;   // r26
@@ -651,6 +706,8 @@ static void DoSetPitch(SYNTH_VOICE* svoice) {
   }
 }
 
+/** Macro command 0x1F: sets the playback frequency of the voice in Hz and, if a sample is already set, converts it to a
+ * key with DoSetPitch. */
 static void mcmdSetPitch(SYNTH_VOICE* svoice, MSTEP* cstep) {
   svoice->playFrq = (u32)(cstep->para[0] >> 8);
   svoice->playFrq |= (u8)cstep->para[1];
@@ -659,6 +716,8 @@ static void mcmdSetPitch(SYNTH_VOICE* svoice, MSTEP* cstep) {
   }
 }
 
+/** Macro command 0x0C: loads the volume envelope from curve data (linear, or DLS with attack/decay scaled by velocity
+ * and key) and sends it to the DSP voice. */
 static void mcmdSetADSR(SYNTH_VOICE* svoice, MSTEP* cstep) {
   ADSR_INFO adsr;      // r1+0x8
   ADSR_INFO* adsr_ptr; // r31
@@ -722,6 +781,8 @@ static s32 midi2TimeTab[128] = {
     150000, 155000, 160000, 165000, 170000, 175000, 180000, 0,
 };
 
+/** Macro command 0x16: builds a DLS envelope from four MIDI controllers (attack, decay, sustain, release) read from the
+ * voice's channel, using a time table, and sends it to the DSP voice. */
 static void mcmdSetADSRFromCtrl(SYNTH_VOICE* svoice, MSTEP* cstep) {
   // Local variables
   f32 sScale;     // f31
@@ -741,6 +802,8 @@ static void mcmdSetADSRFromCtrl(SYNTH_VOICE* svoice, MSTEP* cstep) {
   svoice->cFlags |= 0x100;
 }
 
+/** Macro command 0x20: sets up a pitch envelope from curve data with a range in semitones and cents, using the same
+ * envelope code as the volume one. */
 static void mcmdSetPitchADSR(SYNTH_VOICE* svoice, MSTEP* cstep) {
   ADSR_INFO adsr;      // r1+0x10
   ADSR_INFO* adsr_ptr; // r31
@@ -795,6 +858,7 @@ static void mcmdSetPitchADSR(SYNTH_VOICE* svoice, MSTEP* cstep) {
   svoice->cFlags |= 0x20000000000;
 }
 
+/** Macro commands 0x1D and 0x1E: starts pitch sweep num (0 or 1) of a given length and rate, then waits as given. */
 static u32 mcmdPitchSweep(SYNTH_VOICE* svoice, MSTEP* cstep, int num) {
   s32 delta; // r31
   svoice->sweepOff[num] = 0;
@@ -811,6 +875,8 @@ static u32 mcmdPitchSweep(SYNTH_VOICE* svoice, MSTEP* cstep, int num) {
   return mcmdWait(svoice, cstep);
 }
 
+/** Sets up panning channel pi (0 pan, 1 surround): start position, target and per-step change over a time, so the voice
+ * pan can glide. */
 static void DoPanningSetup(SYNTH_VOICE* svoice, MSTEP* cstep, u8 pi) {
   s32 width;  // r29
   u32 mstime; // r27
@@ -828,12 +894,16 @@ static void DoPanningSetup(SYNTH_VOICE* svoice, MSTEP* cstep, u8 pi) {
   svoice->cFlags |= 0x200000000000;
 }
 
+/** Macro command 0x0E: sets or glides the voice's left/right pan. */
 static void mcmdSetPanning(SYNTH_VOICE* svoice, MSTEP* cstep) { DoPanningSetup(svoice, cstep, 0); }
 
+/** Macro command 0x15: sets or glides the voice's surround pan. */
 static void mcmdSetSurroundPanning(SYNTH_VOICE* svoice, MSTEP* cstep) {
   DoPanningSetup(svoice, cstep, 1);
 }
 
+/** Macro command 0x0B: pans the voice by key (like a piano: lower keys left, higher keys right) around a centre key
+ * with a scale and offset. */
 static void mcmdSetPianoPanning(SYNTH_VOICE* svoice, MSTEP* cstep) {
   s32 delta; // r31
   s32 scale; // r30
@@ -846,6 +916,8 @@ static void mcmdSetPianoPanning(SYNTH_VOICE* svoice, MSTEP* cstep) {
   svoice->panning[0] = delta;
 }
 
+/** Maps a 16.16 volume through an optional 128-entry volume curve (interpolating between entries); returns it unchanged
+ * when curve is 0xFFFF or missing. */
 static u32 TranslateVolume(u32 volume, u16 curve) {
   u8* ptr;   // r30
   u32 vlow;  // r28
@@ -873,6 +945,8 @@ static u32 TranslateVolume(u32 volume, u16 curve) {
   return volume;
 }
 
+/** Macro command 0x0D: scales the voice volume (current or original) by a 0..127 factor, adds an offset, clamps and
+ * applies an optional curve. */
 static void mcmdScaleVolume(SYNTH_VOICE* svoice, MSTEP* cstep) {
   u16 curve; // r29
   u16 scale; // r28
@@ -895,6 +969,7 @@ static void mcmdScaleVolume(SYNTH_VOICE* svoice, MSTEP* cstep) {
   svoice->cFlags |= 0x100000000000;
 }
 
+/** Macro command 0x21: scales the voice volume by a DLS-style factor (current or original volume). */
 static void mcmdScaleVolumeDLS(SYNTH_VOICE* svoice, MSTEP* cstep) {
   u16 scale; // r31
 
@@ -911,6 +986,8 @@ static void mcmdScaleVolumeDLS(SYNTH_VOICE* svoice, MSTEP* cstep) {
   svoice->cFlags |= 0x100000000000;
 }
 
+/** Sets up a timed volume ramp from start_vol to a target volume (scaled and offset from the current volume, through an
+ * optional curve) over a time in ticks or ms; the synth then moves the voice volume along it. */
 static void DoEnvelopeCalculation(SYNTH_VOICE* svoice, MSTEP* cstep, s32 start_vol) {
   u32 tvol;   // r31
   u32 time;   // r1+0x14
@@ -947,13 +1024,17 @@ static void DoEnvelopeCalculation(SYNTH_VOICE* svoice, MSTEP* cstep, s32 start_v
   svoice->cFlags |= 0x8000;
 }
 
+/** Macro command 0x0F: ramps the volume from its current value to a target over a time. */
 static void mcmdEnvelope(SYNTH_VOICE* svoice, MSTEP* cstep) {
   DoEnvelopeCalculation(svoice, cstep, svoice->volume);
 }
+/** Macro command 0x14: ramps the volume from 0 up to a target over a time. */
 static void mcmdFadeIn(SYNTH_VOICE* svoice, MSTEP* cstep) {
   DoEnvelopeCalculation(svoice, cstep, 0);
 }
 
+/** Macro command 0x17: picks a random key between two limits (absolute, or relative to the current key) and optional
+ * random detune, then sets it like mcmdSetKey. */
 static void mcmdRandomKey(SYNTH_VOICE* svoice /* r28 */, MSTEP* cstep /* r31 */) {
   u8 k1;     // r30
   u8 k2;     // r29
@@ -989,11 +1070,16 @@ static void mcmdRandomKey(SYNTH_VOICE* svoice /* r28 */, MSTEP* cstep /* r31 */)
   mcmdSetKey(svoice, cstep);
 }
 
+/** Macro command 0x35: lets the voice keep following pitch bend after key-off. */
 static void mcmdSetPitchbendAfterKeyOff(SYNTH_VOICE* svoice) { svoice->cFlags |= 0x10000; }
+/** Macro command 0x34: sets the voice's reverb send scale and offset. */
 static void mcmdScaleReverb(SYNTH_VOICE* svoice, MSTEP* cstep) {
   svoice->revVolScale = (u8)(cstep->para[0] >> 8);
   svoice->revVolOffset = (u8)(cstep->para[0] >> 0x10);
 }
+/** Shared part of the controller select commands: adds a controller source to a voice input (scale from 16.16 percent
+ * plus an extra fraction, combine mode, MIDI controller or macro variable) and flags the input to be recomputed. The
+ * first call replaces the defaults. */
 static void SelectSource(SYNTH_VOICE* svoice, CTRL_DEST* dest, MSTEP* cstep, u64 tstflag,
                          u32 dirtyFlag) {
   u8 comb;   // r28
@@ -1022,68 +1108,84 @@ static void SelectSource(SYNTH_VOICE* svoice, CTRL_DEST* dest, MSTEP* cstep, u64
   }
 }
 
+/** Macro command 0x40: selects the controller that drives the voice volume. */
 static void mcmdVolumeSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   SelectSource(svoice, &svoice->inpVolume, cstep, 0x80000, 1);
 }
 
+/** Macro command 0x41: selects the controller that drives the voice pan. */
 static void mcmdPanningSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   SelectSource(svoice, &svoice->inpPanning, cstep, 0x100000, 2);
 }
 
+/** Macro command 0x42: selects the controller that drives pitch bend. */
 static void mcmdPitchWheelSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   SelectSource(svoice, &svoice->inpPitchBend, cstep, 0x200000, 8);
 }
 
+/** Macro command 0x43: selects the controller that drives modulation. */
 static void mcmdModWheelSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   SelectSource(svoice, &svoice->inpModulation, cstep, 0x400000, 0x20);
 }
 
+/** Macro command 0x44: selects the controller that drives the sustain pedal. */
 static void mcmdPedalSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   SelectSource(svoice, &svoice->inpPedal, cstep, 0x2000000, 0x40);
 }
 
+/** Macro command 0x45: selects the controller that drives portamento on/off. */
 static void mcmdPortamentoSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   SelectSource(svoice, &svoice->inpPortamento, cstep, 0x1000000, 0x80);
 }
 
+/** Macro command 0x46: selects the controller that drives the reverb send. */
 static void mcmdReverbSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   SelectSource(svoice, &svoice->inpReverb, cstep, 0x800000, 0x200);
 }
 
+/** Macro command 0x4A: selects the controller that drives the pre-fader aux A send. */
 static void mcmdPreAuxASelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   SelectSource(svoice, &svoice->inpPreAuxA, cstep, 0x20000000, 0x100);
 }
 
+/** Macro command 0x4B: selects the controller that drives the pre-fader aux B send. */
 static void mcmdPreAuxBSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   SelectSource(svoice, &svoice->inpPreAuxB, cstep, 0x40000000, 0x400);
 }
 
+/** Macro command 0x4C: selects the controller that drives the post-fader aux B send. */
 static void mcmdPostAuxBSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   SelectSource(svoice, &svoice->inpPostAuxB, cstep, 0x80000000, 0x800);
 }
 
+/** Macro command 0x47: selects the controller that drives the surround pan. */
 static void mcmdSurroundPanningSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   SelectSource(svoice, &svoice->inpSurroundPanning, cstep, 0x4000000, 4);
 }
 
+/** Macro command 0x48: selects the controller that drives the doppler pitch factor. */
 static void mcmdDopplerSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   SelectSource(svoice, &svoice->inpDoppler, cstep, 0x8000000, 0x10);
 }
 
+/** Macro command 0x49: selects the controller that drives the tremolo. */
 static void mcmdTremoloSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   SelectSource(svoice, &svoice->inpTremolo, cstep, 0x10000000, 0x1000);
 }
 
 #if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 1)
+/** Macro command 0x5E: selects the controller that switches the low-pass filter on. */
 static void mcmdFilterSwitchSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   SelectSource(svoice, &svoice->inpFilterSwitch, cstep, 0x40, 0x2000);
 }
 
+/** Macro command 0x5F: selects the controller that sets the low-pass filter cutoff. */
 static void mcmdFilterParameterSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   SelectSource(svoice, &svoice->inpFilterParameter, cstep, 0x800, 0x4000);
 }
 #endif
 
+/** Macro command 0x4D: selects a controller for one of the four parameters of the studio's aux A effect. */
 static void mcmdAuxAFXSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   u32 i;                                                                     // r31
   static u64 mask[4] = {0x100000000, 0x200000000, 0x400000000, 0x800000000}; // size: 0x20
@@ -1092,6 +1194,7 @@ static void mcmdAuxAFXSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   SelectSource(svoice, &inpAuxA[svoice->studio][i], cstep, mask[i], dirty[i]);
 }
 
+/** Macro command 0x4E: selects a controller for one of the four parameters of the studio's aux B effect. */
 static void mcmdAuxBFXSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   u32 i;                                                                         // r31
   static u64 mask[4] = {0x1000000000, 0x2000000000, 0x4000000000, 0x8000000000}; // size: 0x20
@@ -1100,6 +1203,8 @@ static void mcmdAuxBFXSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   SelectSource(svoice, &inpAuxB[svoice->studio][i], cstep, mask[i], dirty[i]);
 }
 
+/** Macro command 0x1B: sets the portamento mode (off, on, or follow the portamento controller), type and glide time
+ * (ticks or ms). */
 static void mcmdPortamento(SYNTH_VOICE* svoice, MSTEP* cstep) {
   u32 time; // r1+0x10
   svoice->portType = cstep->para[0] >> 16;
@@ -1138,6 +1243,8 @@ static void mcmdPortamento(SYNTH_VOICE* svoice, MSTEP* cstep) {
   }
 }
 
+/** Reads macro variable index: with ctrl set it is an extended MIDI controller of the voice, otherwise variables 0-15
+ * are local to the voice and 16-31 are global. */
 s32 varGet32(SYNTH_VOICE* svoice, u32 ctrl, u8 index) {
   if (ctrl != 0) {
     return inpGetExCtrl(svoice, index);
@@ -1147,8 +1254,10 @@ s32 varGet32(SYNTH_VOICE* svoice, u32 ctrl, u8 index) {
   return index < 16 ? svoice->local_vars[index] : synthGlobalVariable[index - 16];
 }
 
+/** 16-bit version of varGet32. */
 s16 varGet(SYNTH_VOICE* svoice, u32 ctrl, u8 index) { return varGet32(svoice, ctrl, index); }
 
+/** Writes macro variable index (extended controller if ctrl is set, else local 0-15 or global 16-31). */
 void varSet32(SYNTH_VOICE* svoice, u32 ctrl, u8 index, s32 v) {
   if (ctrl != 0) {
     inpSetExCtrl(svoice, index, v);
@@ -1163,8 +1272,11 @@ void varSet32(SYNTH_VOICE* svoice, u32 ctrl, u8 index, s32 v) {
 
   synthGlobalVariable[index - 16] = v;
 }
+/** 16-bit version of varSet32. */
 void varSet(SYNTH_VOICE* svoice, u32 ctrl, u8 index, s16 v) { varSet32(svoice, ctrl, index, v); }
 
+/** Macro commands 0x60-0x64: variable arithmetic (op 0 add, 1 subtract, 2 multiply, 3 divide, 4 add immediate) on
+ * 16-bit values, saturated to the s16 range. */
 static void mcmdVarCalculation(SYNTH_VOICE* svoice, MSTEP* cstep, u8 op) {
   s16 s1; // r28
   s16 s2; // r31
@@ -1198,10 +1310,13 @@ static void mcmdVarCalculation(SYNTH_VOICE* svoice, MSTEP* cstep, u8 op) {
                        : t));
 }
 
+/** Macro command 0x65: sets a variable to a constant. */
 static void mcmdSetVarImmediate(SYNTH_VOICE* svoice, MSTEP* cstep) {
   varSet(svoice, (u8)(cstep->para[0] >> 8), (u8)(cstep->para[0] >> 0x10), (s16)cstep->para[1]);
 }
 
+/** Macro commands 0x70 and 0x71: compares two variables (cmp 0 equal, 1 less than), optionally negated, and jumps to a
+ * step in this macro if true. */
 static void mcmdIfVarCompare(SYNTH_VOICE* svoice, MSTEP* cstep, u8 cmp) {
   s32 a;     // r28
   s32 b;     // r27
@@ -1226,6 +1341,8 @@ static void mcmdIfVarCompare(SYNTH_VOICE* svoice, MSTEP* cstep, u8 cmp) {
     svoice->curAddr = svoice->addr + (u16)(cstep->para[1] >> 0x10);
   }
 }
+/** Posts a 32-bit message to the voice with this ID (queue of 4) and fires its message trap. Returns 1 if the message
+ * was queued. */
 bool macPostMessage(u32 vid, s32 mesg) {
   SYNTH_VOICE* sv; // r31
   if ((vid = vidGetInternalId(vid)) != -1 && (sv = &synthVoice[vid & 0xFF])->mesgNum < 4) {
@@ -1238,6 +1355,8 @@ bool macPostMessage(u32 vid, s32 mesg) {
 
   return 0;
 }
+/** Macro command 0x2A: sends the value of a variable as a message, either to every voice running a given macro, to the
+ * game's message callback (macro 0xFFFF) or to the voice whose ID is in a variable. */
 static void mcmdSendMessage(SYNTH_VOICE* svoice, MSTEP* cstep) {
   u8 i;      // r31
   s32 mesg;  // r30
@@ -1261,6 +1380,7 @@ static void mcmdSendMessage(SYNTH_VOICE* svoice, MSTEP* cstep) {
   }
 }
 
+/** Macro command 0x2B: takes the next message from the voice's queue into a variable (0 if none). */
 static void mcmdGetMessage(SYNTH_VOICE* svoice, MSTEP* cstep) {
   s32 mesg; // r30
   mesg = 0;
@@ -1272,6 +1392,7 @@ static void mcmdGetMessage(SYNTH_VOICE* svoice, MSTEP* cstep) {
   varSet32(svoice, 0, (u8)(cstep->para[0] >> 8), mesg);
 }
 
+/** Macro command 0x2C: stores the voice's own ID, or the ID of the last macro it started, in a variable. */
 static void mcmdGetVID(SYNTH_VOICE* svoice, MSTEP* cstep) {
   if ((u8)(cstep->para[0] >> 0x10) == 0) {
     varSet32(svoice, 0, (u8)(cstep->para[0] >> 8), svoice->vidList->vid);
@@ -1279,15 +1400,19 @@ static void mcmdGetVID(SYNTH_VOICE* svoice, MSTEP* cstep) {
     varSet32(svoice, 0, (u8)(cstep->para[0] >> 8), svoice->lastVID);
   }
 }
+/** Macro command 0x58: selects the volume table and enables or disables the interaural time delay for the voice. */
 static void mcmdModeSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   svoice->volTable = (u8)(cstep->para[0] >> 8) ? TRUE : FALSE;
   svoice->itdMode = (u8)(cstep->para[0] >> 0x10) ? FALSE : TRUE;
 }
+/** Macro command 0x5A: sets the DSP sample rate conversion type and polyphase filter for the voice. */
 static void mcmdSRCModeSelect(SYNTH_VOICE* svoice, MSTEP* cstep) {
   hwSetSRCType(svoice->id & 0xff, (u8)(cstep->para[0] >> 8));
   hwSetPolyPhaseFilter(svoice->id & 0xff, (u8)(cstep->para[0] >> 0x10));
   svoice->cFlags |= 0x80000000000;
 }
+/** Macro command 0x59: puts the voice in a key group; other voices of the group are released (or killed) first, so one
+ * sound cuts off another (as with hi-hats). */
 static void mcmdSetKeyGroup(SYNTH_VOICE* svoice, MSTEP* cstep) {
   u32 i;    // r31
   u8 kg;    // r30
@@ -1311,12 +1436,16 @@ static void mcmdSetKeyGroup(SYNTH_VOICE* svoice, MSTEP* cstep) {
     svoice->keyGroup = kg;
   }
 }
+/** Macro command 0x23: sets the tremolo depth scale and the modulation wheel scale. */
 static void mcmdSetupTremolo(SYNTH_VOICE* svoice, MSTEP* cstep) {
   svoice->treScale = (cstep->para[0] >> 8);
   svoice->treModAddScale = cstep->para[1];
   svoice->treCurScale = 1.f;
 }
 
+/** Runs the voice's macro. If the voice has just been started it first initializes its whole state (volume, pan, MIDI
+ * channel, inputs, LFOs, portamento, pitch bend range, variables, traps), then executes commands (up to 32) until one
+ * yields or ends it. Each command is dispatched on the low 7 bits of its first word. */
 static void macHandleActive(SYNTH_VOICE* svoice) {
   u8 i;                              // r29
   u8 lastNote;                       // r27
@@ -1667,6 +1796,8 @@ static void macHandleActive(SYNTH_VOICE* svoice) {
   } while (!ex);
 }
 
+/** Per-step macro scheduler: wakes macros whose wait time has come, runs every runnable macro (checking sample-end
+ * traps) and advances the macro clock by deltaTime. */
 void macHandle(u32 deltaTime) {
   SYNTH_VOICE* sv;     // r31
   SYNTH_VOICE* nextSv; // r30
@@ -1691,6 +1822,7 @@ void macHandle(u32 deltaTime) {
   macRealTime += deltaTime;
 }
 
+/** Called when a voice's sample ends: fires the sample-end trap, or resumes a macro waiting for the sample to end. */
 void macSampleEndNotify(SYNTH_VOICE* sv) {
   if (sv->macState != MAC_STATE_YIELDED) {
     return;
@@ -1703,6 +1835,8 @@ void macSampleEndNotify(SYNTH_VOICE* sv) {
     macMakeActive(sv);
   }
 }
+/** Delivers a key-off to the voice: held back while the pedal is down, otherwise fires the key-off trap or resumes a
+ * macro waiting for key-off. */
 void macSetExternalKeyoff(SYNTH_VOICE* sv) {
   sv->cFlags |= 8;
   if (!sv->addr) {
@@ -1718,6 +1852,7 @@ void macSetExternalKeyoff(SYNTH_VOICE* sv) {
   }
 }
 
+/** Applies the sustain pedal state: while down, key-offs are held; when released, a held key-off is delivered. */
 void macSetPedalState(SYNTH_VOICE* svoice, u32 state) {
   if (state != 0) {
     svoice->cFlags |= 0x10000000000;
@@ -1732,6 +1867,7 @@ void macSetPedalState(SYNTH_VOICE* svoice, u32 state) {
   }
 }
 
+/** Inserts a waiting macro into the time-sorted queue of macros waiting for a timer. */
 static void TimeQueueAdd(SYNTH_VOICE* svoice) {
   SYNTH_VOICE* sv;     // r31
   SYNTH_VOICE* lastSv; // r30
@@ -1762,6 +1898,7 @@ static void TimeQueueAdd(SYNTH_VOICE* svoice) {
     sv->prevTimeQueueMacro = svoice;
   }
 }
+/** Takes a macro out of the wait queue and clears its wait state, optionally forcing a pitch/volume update. */
 static void UnYieldMacro(SYNTH_VOICE* svoice, bool disableUpdate) {
   if (svoice->wait != 0) {
     if (svoice->wait != -1) {
@@ -1785,6 +1922,7 @@ static void UnYieldMacro(SYNTH_VOICE* svoice, bool disableUpdate) {
     svoice->cFlags &= ~0x40004;
   }
 }
+/** Makes a voice's macro runnable by adding it to the active macro list (no-op if it already is). */
 void macMakeActive(SYNTH_VOICE* sv) {
   if (sv->macState == MAC_STATE_RUNNABLE) {
     return;
@@ -1801,6 +1939,7 @@ void macMakeActive(SYNTH_VOICE* sv) {
   sv->macState = MAC_STATE_RUNNABLE;
 }
 
+/** Takes a voice's macro out of the active list and sets its new state (waiting or stopped). */
 void macMakeInactive(SYNTH_VOICE* svoice, MAC_STATE newState) {
   if (svoice->macState == newState) {
     return;
@@ -1913,6 +2052,7 @@ u32 macStart(u16 macid, u8 priority, u8 maxVoices,
   return -1;
 }
 
+/** Initializes the macro scheduler: empty active and time queues, the macro clock at zero and all voices stopped. */
 void macInit() {
   u32 i; // r31
 

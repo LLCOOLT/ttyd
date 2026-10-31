@@ -70,6 +70,10 @@ effN64Vtx shooting_dust_vtx[10] = {
 static void effSstarMain(EffectEntry* effect);
 static void effSstarDisp(CameraId cameraId, EffectEntry* effect);
 
+/**
+ * Spawns a star at (x, y, z) flying toward (tx, ty, tz) at `speed` per frame.
+ * Spawned by event scripts through evt_eff.
+ */
 EffectEntry* effSstarN64Entry(s32 type, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32 tz, f32 speed) {
     EffectEntry* effect;
     EffSstarN64Work* w;
@@ -143,6 +147,14 @@ EffectEntry* effSstarN64Entry(s32 type, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32
     return effect;
 }
 
+/**
+ * Moves the star by its velocity.
+ * Subtypes 2+ bounce off the ground below (hitCheckFilter):
+ * each bounce keeps 60% of the fall speed and 70% of the sideways speed and spin,
+ * then gravity (-0.5) and spin take over; 10 bounces end it.
+ * It also ends 300 units below Mario (in battle, below y = -300; the demos only check Mario).
+ * CAMERA_3D, layer 2.
+ */
 static void effSstarMain(EffectEntry* effect) {
     EffSstarN64Work* w = effect->userdata;
     MarioWork* mario = marioGetPtr();
@@ -207,6 +219,11 @@ static void effSstarMain(EffectEntry* effect) {
     }
 }
 
+/**
+ * Draws the star camera-facing: a 64x64 star from texture 9 in its colour plus a 128x128 glow, then,
+ * until its second bounce, a five-segment dust trail built from the last eight frames' matrices with texture 0xA
+ * (0xB for subtype 3).
+ */
 static void effSstarDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffSstarN64Work* w;

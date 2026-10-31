@@ -21,6 +21,7 @@ static void __DEMOWinMenu_refesh_menu(DEMOWindow* w);
 static u16 __DEMOWinMenu_get_user_input(DEMOWinPadInfo* p);
 static void __DEMOWinList_refresh_list(DEMOWindow* w);
 
+/** Empties the window list, remembers the render mode and sets the EFB clear colour to black. */
 void DEMOWinInit() {
     __first_node = NULL;
     __last_node = NULL;
@@ -29,6 +30,12 @@ void DEMOWinInit() {
     GXSetCopyClear((GXColor){0, 0, 0, 0}, 0xFFFFFF);
 }
 
+/**
+ * Allocates a text window with the given pixel rectangle, caption,
+ * number of scroll-back lines and optional per-frame refresh callback.
+ * Works out its size in 8x8 characters, allocates and blanks its character buffer,
+ * gives it default colours and adds it to the window list. It starts closed.
+ */
 DEMOWindow* DEMOWinCreateWindow(s32 x1, s32 y1, s32 x2, s32 y2, char* caption, u16 scroll, void* func) {
     DEMOWindow* handle;
     ASSERTMSGLINE(188, x1 < x2, "DEMOWIN: Illegal X coords for window\n");
@@ -68,6 +75,7 @@ DEMOWindow* DEMOWinCreateWindow(s32 x1, s32 y1, s32 x2, s32 y2, char* caption, u
     return handle;
 }
 
+/** Removes a window from the list and frees its buffer and the window (interrupts disabled). */
 void DEMOWinDestroyWindow(DEMOWindow* handle) {
     BOOL old;
     ASSERTMSGLINE(287, handle, "DEMOWinDestroyWindow(): NULL handle!\n");
@@ -78,16 +86,22 @@ void DEMOWinDestroyWindow(DEMOWindow* handle) {
     OSRestoreInterrupts(old);
 }
 
+/** Marks a window as open so DEMOWinRefresh draws it. */
 void DEMOWinOpenWindow(DEMOWindow* handle) {
     ASSERTMSGLINE(321, handle, "DEMOWinOpenWindow(): NULL handle!\n");
     handle->flags |= DEMOWIN_FLAGS_OPENED;
 }
 
+/** Marks a window as closed so DEMOWinRefresh skips it. */
 void DEMOWinCloseWindow(DEMOWindow* handle) {
     ASSERTMSGLINE(337, handle, "DEMOWinCloseWindow(): NULL handle!\n");
     handle->flags &= ~(DEMOWIN_FLAGS_OPENED);
 }
 
+/**
+ * Sets the caption, border or background colour of a window,
+ * or restores all three defaults (grey background, red caption and border).
+ */
 void DEMOWinSetWindowColor(DEMOWindow* handle, u32 item, u8 r, u8 g, u8 b, u8 a) {
     ASSERTMSGLINE(355, handle, "DEMOWinSetWinColor(): NULL window handle\n");
 
@@ -133,6 +147,11 @@ void DEMOWinSetWindowColor(DEMOWindow* handle, u32 item, u8 r, u8 g, u8 b, u8 a)
     }
 }
 
+/**
+ * printf into the window's scrolling log: appends the text at the output position,
+ * starting a new line (and scrolling the view) on newline or at the right edge.
+ * Output is limited to 128 characters per call.
+ */
 void DEMOWinLogPrintf(DEMOWindow* handle, char* fmt, ...) {
     va_list vlist;
     char buffer[128];
@@ -172,6 +191,10 @@ void DEMOWinLogPrintf(DEMOWindow* handle, char* fmt, ...) {
     va_end(vlist);
 }
 
+/**
+ * printf at a fixed column and row of the window's visible area (clipped at the right edge, 128-character
+ * limit), overwriting what is there.
+ */
 void DEMOWinPrintfXY(DEMOWindow* handle, u16 col, u16 row, char* fmt, ...) {
     BOOL old;
     va_list vlist;
@@ -199,6 +222,7 @@ void DEMOWinPrintfXY(DEMOWindow* handle, u16 col, u16 row, char* fmt, ...) {
     OSRestoreInterrupts(old);
 }
 
+/** Scrolls the view of a window's buffer: 1 up one line, 2 down one line, 0 back to the newest output. */
 void DEMOWinScrollWindow(DEMOWindow* handle, u32 dir) {
     BOOL old;
     u16 n;
@@ -235,6 +259,7 @@ void DEMOWinScrollWindow(DEMOWindow* handle, u32 dir) {
     }
 }
 
+/** Makes the window the front-most one by giving it priority 0 and all others 1. */
 void DEMOWinBringToFront(DEMOWindow* handle) {
     DEMOWindow* ptr;
     ASSERTMSGLINE(609, __first_node, "DEMOWinBringToFront(): Window list is empty!\n");
@@ -248,11 +273,13 @@ void DEMOWinBringToFront(DEMOWindow* handle) {
     }
 }
 
+/** Gives the window priority 1 so others are drawn in front of it. */
 void DEMOWinSendToBack(DEMOWindow* handle) {
     ASSERTMSGLINE(645, handle, "DEMOWinSendToBack(): NULL handle!\n");
     handle->priority = 1;
 } 
 
+/** Blanks one visible row of a window. */
 void DEMOWinClearRow(DEMOWindow* handle, u16 row) {
     u16 buffer_row;
     u16 index;
@@ -275,6 +302,7 @@ void DEMOWinClearRow(DEMOWindow* handle, u16 row) {
     }
 }
 
+/** Blanks all visible rows of a window. */
 void DEMOWinClearWindow(DEMOWindow* handle) {
     u16 buffer_row;
     u16 index;
@@ -295,6 +323,7 @@ void DEMOWinClearWindow(DEMOWindow* handle) {
     OSRestoreInterrupts(old);
 }
 
+/** Blanks the whole character buffer of a window, including the scroll-back. */
 void DEMOWinClearBuffer(DEMOWindow* handle) {
     BOOL old;
 
@@ -304,6 +333,11 @@ void DEMOWinClearBuffer(DEMOWindow* handle) {
     OSRestoreInterrupts(old);
 }
 
+/**
+ * Draws every open window: background, a caption bar, a shaded border, then calls the window's refresh callback,
+ * draws the character rows and caption with the demo font,
+ * and finally the highlighted cursor line when one is set. Call between DEMOBeforeRender and DEMODoneRender.
+ */
 void DEMOWinRefresh(void) {
     DEMOWindow* ptr;
     u16 i;
@@ -466,6 +500,7 @@ void DEMOWinRefresh(void) {
     }
 }
 
+/** Appends a window to the end of the window list and marks it initialised. */
 static void __DEMOWin_add_node(DEMOWindow* handle) {
     ASSERTMSGLINE(1032, handle, "__add_node(): you're adding a NULL node!\n");
 
@@ -487,6 +522,7 @@ static void __DEMOWin_add_node(DEMOWindow* handle) {
     handle->flags |= DEMOWIN_FLAGS_INIT;
 }
 
+/** Unlinks a window from the window list and clears its initialised flag. */
 static void __DEMOWin_delete_node(DEMOWindow* handle) {
     ASSERTMSGLINE(1071, handle, "__delete_node(): you're deleting a NULL node!\n");
 
@@ -512,6 +548,7 @@ static void __DEMOWin_delete_node(DEMOWindow* handle) {
     handle->flags &= ~(DEMOWIN_FLAGS_INIT);
 }
 
+/** Draws exactly n characters (blanks included) of a string at x, y, z with the 8x8 demo font as one batch of quads. */
 static void __DEMOWin_puts_n(s16 x, s16 y, s16 z, u16 n, char* string) {
     s32 s;
     s32 t;
@@ -545,6 +582,11 @@ static void __DEMOWin_puts_n(s16 x, s16 y, s16 z, u16 n, char* string) {
     }
 }
 
+/**
+ * Sizes and creates the window for a menu: the width fits the longest item or title,
+ * the height at most max_display_items rows. Counts the items up to the entry flagged 0x80000000.
+ * Returns the menu, or NULL if it has no items.
+ */
 DEMOWinMenu* DEMOWinCreateMenuWindow(DEMOWinMenu* menu, u16 x, u16 y) {
     DEMOWinMenuItem* ptr;
 
@@ -575,6 +617,7 @@ DEMOWinMenu* DEMOWinCreateMenuWindow(DEMOWinMenu* menu, u16 x, u16 y) {
     return NULL;
 }
 
+/** Closes and destroys a menu's window. */
 void DEMOWinDestroyMenuWindow(DEMOWinMenu* menu) {
     if (menu->handle) {
         DEMOWinCloseWindow(menu->handle);
@@ -583,6 +626,14 @@ void DEMOWinDestroyMenuWindow(DEMOWinMenu* menu) {
     }
 }
 
+/**
+ * Runs a menu (and its sub-menus) as a modal loop until the user leaves it:
+ * opens the window, then each frame reads controller 1 (up and down move the cursor over items that are not
+ * disabled or separators, A selects, B cancels, left leaves a sub-menu, right opens an item's linked sub-menu),
+ * calls the move, select and cancel callbacks and item functions,
+ * opens linked sub-menus 20 pixels down and right, and redraws.
+ * Returns the value an item function stored in its result.
+ */
 u32 DEMOWinMenuChild(DEMOWinMenu* menu, int child_flag) {
     DEMOWinPadInfo* pad;
     DEMOWindow* handle;
@@ -729,6 +780,10 @@ u32 DEMOWinMenuChild(DEMOWinMenu* menu, int child_flag) {
     return result;
 }
 
+/**
+ * The menu window's refresh callback: draws the visible items with a check mark for checked items,
+ * parentheses for disabled ones and an arrow for items that open a sub-menu.
+ */
 static void __DEMOWinMenu_refesh_menu(DEMOWindow* w) {
     DEMOWinMenu* m;
     s32 i;
@@ -757,6 +812,7 @@ static void __DEMOWinMenu_refesh_menu(DEMOWindow* w) {
     }
 }
 
+/** Zeroes a DEMOWinPadInfo's four controllers' button state, changed buttons and repeat counters. */
 void DEMOWinPadInit(DEMOWinPadInfo* p) {
     u16 i;
 
@@ -768,6 +824,11 @@ void DEMOWinPadInit(DEMOWinPadInfo* p) {
     }
 }
 
+/**
+ * Reads all controllers and builds for each a button mask (the stick and trigger positions are turned into extra
+ * direction and trigger bits), the buttons newly pressed, and the auto-repeat state:
+ * the mask is reported at the first frame, then again every 'rate' frames once held past 'threshold' frames.
+ */
 void DEMOWinPadRead(DEMOWinPadInfo* p) {
     PADStatus* pad;
     u16 index;
@@ -822,6 +883,11 @@ void DEMOWinPadRead(DEMOWinPadInfo* p) {
     }
 }
 
+/**
+ * Reads controller 1 and turns it into a menu command:
+ * 1 up, 2 down, 3 left, 4 right (from the D-pad, main stick, with auto-repeat), 5 for a newly pressed A,
+ * 6 for B, 0 for none.
+ */
 static u16 __DEMOWinMenu_get_user_input(DEMOWinPadInfo* p) {
     u16 user_input;
 
@@ -845,16 +911,22 @@ static u16 __DEMOWinMenu_get_user_input(DEMOWinPadInfo* p) {
     return user_input;
 }
 
+/** Sets the button auto-repeat delay (in frames) and rate (frames between repeats) used by DEMOWinPadRead. */
 void DEMOWinSetRepeat(u32 threshold, u32 rate) {
     __DEMOWIN_PAD_repeat_rate = rate;
     __DEMOWIN_PAD_repeat_threshold = threshold;
 }
 
+/** Restores the default auto-repeat delay (15 frames) and rate (every 2 frames). */
 void DEMOWinResetRepeat(void) {
     __DEMOWIN_PAD_repeat_threshold = 15;
     __DEMOWIN_PAD_repeat_rate = 2;
 }
 
+/**
+ * Sizes and creates the window for a list box in the same way as for a menu.
+ * Returns the list, or NULL if it has no items.
+ */
 DEMOWinListbox* DEMOWinCreateListWindow(DEMOWinListbox* list, u16 x, u16 y) {
     DEMOWinListboxItem* ptr;
     ASSERTMSGLINE(1846, list, "DEMOWinCreateListWindow(): List is NULL!\n");
@@ -885,6 +957,7 @@ DEMOWinListbox* DEMOWinCreateListWindow(DEMOWinListbox* list, u16 x, u16 y) {
     return NULL;
 }
 
+/** Closes and destroys a list box's window. */
 void DEMOWinDestroyListWindow(DEMOWinListbox* list) {
     if (list->handle) {
         DEMOWinCloseWindow(list->handle);
@@ -893,6 +966,10 @@ void DEMOWinDestroyListWindow(DEMOWinListbox* list) {
     }
 }
 
+/**
+ * The list window's refresh callback: keeps the cursor inside the list and scrolls the view so it is visible,
+ * sets the cursor line (or none when the cursor is off), then draws the visible items.
+ */
 static void __DEMOWinList_refresh_list(DEMOWindow* w) {
     DEMOWinListbox* l;
     s32 i;
@@ -927,10 +1004,15 @@ static void __DEMOWinList_refresh_list(DEMOWindow* w) {
     }
 }
 
+/** Turns the list box's highlight cursor on or off. */
 void DEMOWinListSetCursor(DEMOWinListbox* list, int x) {
     list->cursor_state = x;
 }
 
+/**
+ * Scrolls the list view 1 up, 2 down or 0 back to the top,
+ * keeps the cursor inside the visible part and returns the first visible index.
+ */
 s32 DEMOWinListScrollList(DEMOWinListbox* list, u32 dir) {
     ASSERTMSGLINE(2032, list, "DEMOWinListScrollList(): NULL handle!\n");
 
@@ -962,6 +1044,7 @@ s32 DEMOWinListScrollList(DEMOWinListbox* list, u32 dir) {
     return list->display_pos;
 }
 
+/** Moves the list cursor 1 up or 2 down, wrapping around the list, and returns its index. */
 s32 DEMOWinListMoveCursor(DEMOWinListbox* list, u32 dir) {
     ASSERTMSGLINE(2092, list, "DEMOWinListScrollList(): NULL handle!\n");
 

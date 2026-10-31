@@ -196,6 +196,10 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Init event of the flying Paragloomba: installs its wait, attack,
+ * damage and confusion events and its pose sound table, then starts the wait event.
+ */
 static EVT_BEGIN(init_event_patakuri)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event_patakuri))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event_patakuri))
@@ -206,6 +210,11 @@ static EVT_BEGIN(init_event_patakuri)
     RETURN
 EVT_END()
 
+/**
+ * Guess: run when a flying Paragloomba is hit: its wings are knocked off
+ * and it falls to the ground as a Gloomba (parts, pose table and data table replaced, unit flag 4 set),
+ * landing with the fall sound and a short pause.
+ */
 static EVT_BEGIN(dmg_fall_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -234,6 +243,10 @@ static EVT_BEGIN(dmg_fall_event)
     RETURN
 EVT_END()
 
+/**
+ * Sets the flying Paragloomba's height to 10 and waits for the attack in progress to end;
+ * used before the first attack of a battle.
+ */
 static EVT_BEGIN(patakuri_dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -242,6 +255,11 @@ static EVT_BEGIN(patakuri_dmg_first_attack_pos)
     RETURN
 EVT_END()
 
+/**
+ * Guess: attack event of the flying Paragloomba:
+ * uses an enemy item if it has one, otherwise swoops from the air onto the target (PATAKURI_MOVE sounds) with
+ * the usual hit and miss branches and the action command defence check, then flies back to its place.
+ */
 static EVT_BEGIN(attack_event_patakuri)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -343,6 +361,7 @@ static EVT_BEGIN(attack_event_patakuri)
     RETURN
 EVT_END()
 
+/** Idle event of the flying Paragloomba: shows the table pose for state 1 and then idles forever in 30 frame steps. */
 static EVT_BEGIN(wait_event_patakuri)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     LABEL(0)
@@ -444,6 +463,10 @@ static BattleWeapon weapon_kuriboo_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init event of the Paragloomba: installs its wait, attack, damage and confusion events and sets its run,
+ * walk and jump sounds.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -456,6 +479,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Paragloomba: runs the default damage handling with LW(10) = -2 and LW(11) = 1. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -463,10 +487,19 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Phase event of the Paragloomba: does nothing. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: attack event of the Paragloomba: picks a target (the first attack target in the forced case),
+ * flusters if there is none, and uses an enemy item first if it has one.
+ * Otherwise it runs at the target, then tumbles in a spin (krb_get_dir gives the rotation from its path) with a
+ * 32-unit jump onto the target.
+ * A miss lands it nearby; a hit applies weapon_kuriboo_attack with the action command defence check.
+ * It then hops back to its place.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -600,11 +633,17 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle event: shows the unit's table pose for state 1. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0..1] = x, z of the first point, args[2..3] = x, z of the second,
+ * args[4] = angle in and out.
+ * Returns the angle (degrees) from the first point towards the second; unchanged if the points coincide.
+ */
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);

@@ -56,6 +56,10 @@ static void effThruHammerMain(EffectEntry* effect);
 static void effThruHammerDisp(CameraId cameraId, EffectEntry* effect);
 static void main_dl(EffectEntry* effect, Mtx mtx);
 
+/**
+ * Spawns scrolling rings at (x, y, z) rotated by `angle`; type 0 uses four rings, others one.
+ * Spawned by event scripts through evt_eff.
+ */
 EffectEntry* effThruHammerN64Entry(s32 type, f32 x, f32 y, f32 z, f32 angle) {
     EffectEntry* effect;
     EffThruHammerN64Work* work;
@@ -99,6 +103,12 @@ EffectEntry* effThruHammerN64Entry(s32 type, f32 x, f32 y, f32 z, f32 angle) {
     return effect;
 }
 
+/**
+ * Starts each ring in turn (negative delay counts up to 0):
+ * it resets to the centre with a direction from its Z angle,
+ * then widens 0.2 per frame on X and Z while its height eases from 10 down to 0.1 and its texture scroll slows.
+ * After 8 frames the shared alpha drops 20% per frame; deletes when the timer runs out. CAMERA_3D, layer 2.
+ */
 static void effThruHammerMain(EffectEntry* effect) {
     EffThruHammerN64Work* work = effect->userdata;
     s32 i;
@@ -154,6 +164,10 @@ static void effThruHammerMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effThruHammerDisp, effect);
 }
 
+/**
+ * Draws the ring mesh (stg_thruhammer_v, via main_dl) camera-facing with texture 0x23 as the alpha mask
+ * and 0x24 shaded between the work's two colours: back faces culled first, then front faces, so both sides show.
+ */
 static void effThruHammerDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffThruHammerN64Work* work;
@@ -206,6 +220,7 @@ static void effThruHammerDisp(CameraId cameraId, EffectEntry* effect) {
     main_dl(effect, mtx);
 }
 
+/** Draws each active ring as a scaled, rotated textured quad. */
 static void main_dl(EffectEntry* effect, Mtx camMtx) {
     EffThruHammerN64Work* work = effect->userdata;
     s32 i;

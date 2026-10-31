@@ -9,6 +9,10 @@ static __GXFifoObj DisplayListFifo;
 static volatile __GXFifoObj* OldCPUFifo;
 static GXData __savedGXdata;
 
+/**
+ * Starts recording GX commands into the buffer list (size in bytes, 32 byte aligned) instead of the real FIFO:
+ * saves the CPU FIFO (and the GX state if a context save is wanted) and points the CPU FIFO at the buffer.
+ */
 void GXBeginDisplayList(void* list, u32 size) {
     __GXFifoObj* CPUFifo = (__GXFifoObj*)GXGetCPUFifo();
 
@@ -38,6 +42,10 @@ void GXBeginDisplayList(void* list, u32 size) {
     GXResetWriteGatherPipe();
 }
 
+/**
+ * Stops recording: restores the real CPU FIFO (and the saved GX state) and returns the number of bytes recorded,
+ * or 0 if the buffer overflowed.
+ */
 u32 GXEndDisplayList(void) {
     u32 ov;
 #ifdef DEBUG
@@ -75,6 +83,10 @@ u32 GXEndDisplayList(void) {
     return 0;
 }
 
+/**
+ * Flushes any dirty state and then queues a command that makes the GPU run the display list at list for nbytes
+ * bytes.
+ */
 void GXCallDisplayList(void* list, u32 nbytes) {
     CHECK_GXBEGIN(254, "GXCallDisplayList");
     ASSERTMSGLINE(255, !__GXData->inDispList, "GXCallDisplayList: display list already in progress");

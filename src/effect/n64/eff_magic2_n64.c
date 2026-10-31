@@ -99,6 +99,11 @@ effN64Vtx stg_magic2_1_v[] = {
     {87, 50, -50, 2731, 0, 255, 255, 255, 255},
 };
 
+/**
+ * Spawns a screen-space magic burst for life frames, centered on the projection of world point (x, y, z).
+ * Type 0 is the streaked variant (target size 0.2 * scale), type 1 the wide ring variant.
+ * Via evt_eff64 effect set 13; no script callers found.
+ */
 EffectEntry* effMagic2N64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffMagic2N64Work* w;
@@ -140,6 +145,10 @@ EffectEntry* effMagic2N64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 scal
 
 // Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_common_subs off
+/**
+ * Fades the burst in over 10 frames and out over the last 6, eases its scale with a sine pulse,
+ * projects the world position to screen coordinates for the draw, and scrolls the two texture offsets.
+ */
 static void effMagic2Main(EffectEntry* effect) {
     EffMagic2N64Work* w = effect->userdata;
     Vec position;
@@ -211,6 +220,10 @@ static void effMagic2Main(EffectEntry* effect) {
 }
 
 #pragma opt_common_subs reset
+/**
+ * Draws the burst with an N64-style perspective projection (narrow for type 0, wide for type 1) once per record,
+ * scrolling two textures and cycling a color table.
+ */
 static void effMagic2Disp(CameraId cameraId, EffectEntry* effect) {
     s32 fov;
     s32 half;
@@ -299,6 +312,7 @@ static void effMagic2Disp(CameraId cameraId, EffectEntry* effect) {
     GXSetScissorBoxOffset(0, 0);
 }
 
+/** Draws type 0: a 12-sided tube of long streaks (2000 units deep, texture 17). */
 static void magic2_2_line_dl(void) {
     GXTexObj texObj;
     GXSetNumChans(1);
@@ -342,6 +356,7 @@ static void magic2_2_line_dl(void) {
     tri2(15, 14, 25, 0, 15, 25, 24, 0);
 }
 
+/** Draws type 1: a 12-sided short ring (50 units deep) using textures 18 and 19. */
 static void magic2_4_dl(void) {
     GXTexObj texObj;
     GXSetNumChans(1);

@@ -18,6 +18,7 @@
 
 static USER_FUNC(_binta_effect);
 static USER_FUNC(_check_through_pos);
+// Fades a unit's HP gauge out (defined below, retail only).
 USER_FUNC(_set_hp_gauge_fade_flag);
 static USER_FUNC(_check_at_dm_event_wait);
 static USER_FUNC(_disable_restore_command_cursor);
@@ -31,6 +32,16 @@ extern EvtWord subsetevt_swallow_shot_damage[];
 extern EvtWord subsetevt_binta_damage_left_last[];
 extern EvtWord subsetevt_binta_damage_right_last[];
 
+/**
+ * KO reaction for a unit (LW(10) = unit, LW(11) = part) whose HP reached 0.
+ * Mario and the partners first walk home.
+ * Mario then runs his data-table event 51 when a Life Shroom revives him (damage code bit 0x800), else event 49.
+ * A partner with a Life Shroom keels over, uses it up and gets back up with 10 HP;
+ * otherwise it is KO'd and, when it stood in front, swaps places with Mario.
+ * Enemies revived by a Life Shroom spin down, show it and recover 10 HP;
+ * other enemies run their data-table KO event or subsetevt_dead_core.
+ * US on, a revived enemy also loses its holding-stolen-item flag.
+ */
 EVT_BEGIN(subsetevt_dead)
     CALL(_disable_restore_command_cursor)
     CALL(btlevtcmd_GetUnitKind, LW(10), LW(0))
@@ -213,6 +224,11 @@ EVT_BEGIN(subsetevt_dead)
     RETURN
 EVT_END()
 
+/**
+ * Standard enemy defeat: spins the unit, puffs it away in smoke,
+ * banks its coins and Star Points (with the star point effect at the unit's offset), tips it over,
+ * returns any item it stole and removes the unit.
+ */
 EVT_BEGIN(subsetevt_dead_core)
     CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 50)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -266,6 +282,10 @@ EVT_BEGIN(subsetevt_dead_core)
     RETURN
 EVT_END()
 
+/**
+ * Enemy defeat without the spin and tip-over: smoke, coins and Star Points, stolen item returned,
+ * then the unit is removed.
+ */
 EVT_BEGIN(subsetevt_dead_core_nospin_norotate)
     CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 50)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -299,6 +319,10 @@ EVT_BEGIN(subsetevt_dead_core_nospin_norotate)
     RETURN
 EVT_END()
 
+/**
+ * Reaction when a unit avoids an attack by stepping back (damage code 41):
+ * it backs away, waits in the guard pose until the attack ends and walks home.
+ */
 EVT_BEGIN(btldefaultevt_avoid_guard)
     CALL(btlevtcmd_AnimeCmpPoseType, LW(10), LW(11), 42, 40, LW(2))
     IF_INT_EQUAL(LW(2), 0)
@@ -322,6 +346,13 @@ EVT_BEGIN(btldefaultevt_avoid_guard)
     RETURN
 EVT_END()
 
+/**
+ * The hurt reaction for a hit, called from btldefaultevt_Damage with the hurt pose in LW(14) and the pose
+ * after it in LW(15): flipped or grounded units, hammer knockback (Spin Hammer, Ultra Hammer), slaps,
+ * Gale Force and Yoshi's swallow patterns run the unit's data-table event or the matching subset;
+ * a squashing hit flattens the unit for 1.5 to 3 seconds; other hits hold the hurt pose.
+ * A hit that does no damage shakes the unit with a miss sound (retail also fades the HP gauge on the last hit).
+ */
 EVT_BEGIN(subsetevt_damage)
     CALL(btlevtcmd_CheckDamageCode, LW(10), 2097152, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -656,6 +687,11 @@ EVT_BEGIN(subsetevt_damage)
     RETURN
 EVT_END()
 
+/**
+ * Hurt reaction for an attacker damaged by the target's counter (LW(0) = damage code: spikes, fire, ice,
+ * electric, explosions, poison, Payback and so on):
+ * the attacker hops back with the matching pose, Mario cries out on the spike and fire counters.
+ */
 EVT_BEGIN(subsetevt_counter_damage)
     CALL(btlevtcmd_OnUnitFlag, LW(10), UNIT_FLAG_SHOW_HP_GAUGE)
     BEGIN_SIBLING_EVENT
@@ -715,6 +751,7 @@ EVT_BEGIN(subsetevt_counter_damage)
     RETURN
 EVT_END()
 
+/** Plays the miss sound for an attack that did nothing. */
 #if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(subsetevt_nodamage_motion)
     CALL(evt_snd_sfxon, STRING("SFX_BTL_ATTACK_MISS2"), 0)
@@ -722,6 +759,11 @@ EVT_BEGIN(subsetevt_nodamage_motion)
 EVT_END()
 #endif
 
+/**
+ * Swaps Mario and the partner (the front-and-back switch):
+ * both arc to each other's home positions and the Koops shell shield follows Mario.
+ * Retail only moves the shell when it still has HP.
+ */
 EVT_BEGIN(btldefaultevt_ChangePosition)
     CALL(btlevtcmd_GetGuardKouraId, BTL_UNIT_MARIO, LW(10))
     IF_INT_NOT_EQUAL(LW(10), -1)
@@ -780,6 +822,10 @@ EVT_BEGIN(btldefaultevt_ChangePosition)
     RETURN
 EVT_END()
 
+/**
+ * Happy Heart badge regeneration: the unit strikes its happy pose (retail: only when it is not frozen,
+ * asleep or stopped) and waits a moment.
+ */
 EVT_BEGIN(subsetevt_happy_heart)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(5))
 #if VERSION <= VERSION_DEMO_US
@@ -808,6 +854,7 @@ EVT_BEGIN(subsetevt_happy_heart)
     RETURN
 EVT_END()
 
+/** Happy Flower badge regeneration: like subsetevt_happy_heart for FP. */
 EVT_BEGIN(subsetevt_happy_flower)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(5))
 #if VERSION <= VERSION_DEMO_US
@@ -836,6 +883,10 @@ EVT_BEGIN(subsetevt_happy_flower)
     RETURN
 EVT_END()
 
+/**
+ * Pause after the HP Regen status heals a unit at turn start:
+ * 120 frames in the demos, 60 in retail (defined below).
+ */
 #if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(subsetevt_regeneration)
     WAIT_FRAMES(120)
@@ -843,6 +894,7 @@ EVT_BEGIN(subsetevt_regeneration)
 EVT_END()
 #endif
 
+/** Fright: the unit hops, runs off the edge of the stage and is removed from the battle (no coins or Star Points). */
 EVT_BEGIN(subsetevt_terror)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -855,6 +907,10 @@ EVT_BEGIN(subsetevt_terror)
     RETURN
 EVT_END()
 
+/**
+ * Gale Force blow-away that fails: the unit spins up and flies to the stage edge,
+ * then lands back on the floor there.
+ */
 EVT_BEGIN(subsetevt_blow_damage)
     CALL(evt_snd_sfxon, STRING("SFX_BTL_CLAUD_BREATH3"), 0)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(0))
@@ -875,6 +931,10 @@ EVT_BEGIN(subsetevt_blow_damage)
     RETURN
 EVT_END()
 
+/**
+ * Gale Force blow-away that succeeds: the unit spins and flies off the stage;
+ * its coins and Star Points are still banked before it is removed.
+ */
 EVT_BEGIN(subsetevt_blow_dead)
     CALL(evt_snd_sfxon, STRING("SFX_BTL_CLAUD_BREATH3"), 0)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(0))
@@ -898,6 +958,10 @@ EVT_BEGIN(subsetevt_blow_dead)
     RETURN
 EVT_END()
 
+/**
+ * A hammer knockback hit sends the unit flying into the units behind it:
+ * Spin Hammer (damage pattern 14) or Ultra Hammer, with the matching "involved" weapon in LW(12).
+ */
 EVT_BEGIN(subsetevt_shot_damage)
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
     CALL(btlevtcmd_OnToken, LW(10), 32)
@@ -912,6 +976,10 @@ EVT_BEGIN(subsetevt_shot_damage)
     RETURN
 EVT_END()
 
+/**
+ * Spin Hammer knockback: the unit spins and flies along the line of enemies behind it, hitting each one,
+ * then off the stage edge; it comes back home unless the hit KO'd it.
+ */
 EVT_BEGIN(subsetevt_shot_damage_kaiten)
     BEGIN_SIBLING_EVENT_GET_ID(LW(13))
         LABEL(0)
@@ -995,6 +1063,10 @@ EVT_BEGIN(subsetevt_shot_damage_kaiten)
     RETURN
 EVT_END()
 
+/**
+ * Ultra Hammer knockback: the unit tumbles through the enemies behind it to the last one,
+ * damaging each as it passes (_check_through_pos), flies off the stage and bounces back to its home position.
+ */
 EVT_BEGIN(subsetevt_shot_damage_ultra)
     BEGIN_SIBLING_EVENT_GET_ID(LW(13))
         CALL(btlevtcmd_SetRotateOffsetFromCenterOffset, LW(10))
@@ -1135,6 +1207,7 @@ EVT_BEGIN(subsetevt_shot_damage_ultra)
     RETURN
 EVT_END()
 
+/** Yoshi's Gulp on a unit that could not be swallowed: it is knocked back with a hop. */
 EVT_BEGIN(subsetevt_swallow_failed_damage)
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 39)
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
@@ -1149,6 +1222,7 @@ EVT_BEGIN(subsetevt_swallow_failed_damage)
     RETURN
 EVT_END()
 
+/** Yoshi spits a swallowed unit out without hitting anyone: it lands with a hop. */
 EVT_BEGIN(subsetevt_swallow_spew_damage)
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 39)
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
@@ -1163,6 +1237,10 @@ EVT_BEGIN(subsetevt_swallow_spew_damage)
     RETURN
 EVT_END()
 
+/**
+ * Yoshi's Gulp spits the unit at the enemy behind it:
+ * it flies at that enemy and damages it, then bounces away, or flies off past x = 400 when nothing is hit.
+ */
 EVT_BEGIN(subsetevt_swallow_shot_damage)
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
     SET_VALUE(LW(12), PTR(&partyWeapon_YoshiNomikomi_Involved))
@@ -1260,6 +1338,11 @@ EVT_BEGIN(subsetevt_swallow_shot_damage)
     RETURN
 EVT_END()
 
+/**
+ * Knockback for damage pattern 18: the unit is knocked back in two hops
+ * and token 0x80 is set for the attack script to continue.
+ * Guess: the Ultra Hammer's acrobatic (Stylish) follow-up, from the name.
+ */
 EVT_BEGIN(subset_ultra_hammer_acrobat_damage_event)
     CALL(btlevtcmd_SetRotate, LW(10), 0, 0, 0)
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 39)
@@ -1275,6 +1358,10 @@ EVT_BEGIN(subset_ultra_hammer_acrobat_damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Confused unit with nothing it can do: the camera zooms in on it in its confused pose for a moment.
+ * Used when no confused action is found in 20 tries (10 in the demos).
+ */
 EVT_BEGIN(subsetevt_confuse_flustered)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -1290,6 +1377,7 @@ EVT_BEGIN(subsetevt_confuse_flustered)
     RETURN
 EVT_END()
 
+/** Slap from the left (damage pattern 21): the unit twists one turn round over 20 frames. */
 EVT_BEGIN(subsetevt_binta_damage_left)
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
     CALL(btlevtcmd_SetRotate, LW(10), 0, 0, 0)
@@ -1309,6 +1397,7 @@ EVT_BEGIN(subsetevt_binta_damage_left)
     RETURN
 EVT_END()
 
+/** Slap from the right (damage pattern 22): the mirror of subsetevt_binta_damage_left. */
 EVT_BEGIN(subsetevt_binta_damage_right)
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
     CALL(btlevtcmd_SetRotate, LW(10), 0, 0, 0)
@@ -1328,6 +1417,11 @@ EVT_BEGIN(subsetevt_binta_damage_right)
     RETURN
 EVT_END()
 
+/**
+ * Final slap from the left (pattern 23): the unit spins six times round over 90 frames inside a whirlwind
+ * effect.
+ * Guess: the last hit of Ms. Mowz's Love Slap, from the slap names and the partners that use these subsets.
+ */
 EVT_BEGIN(subsetevt_binta_damage_left_last)
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
     CALL(btlevtcmd_SetRotate, LW(10), 0, 0, 0)
@@ -1354,6 +1448,7 @@ EVT_BEGIN(subsetevt_binta_damage_left_last)
     RETURN
 EVT_END()
 
+/** Final slap from the right (pattern 24): the mirror of subsetevt_binta_damage_left_last. */
 EVT_BEGIN(subsetevt_binta_damage_right_last)
     CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
     CALL(btlevtcmd_SetRotate, LW(10), 0, 0, 0)
@@ -1380,6 +1475,10 @@ EVT_BEGIN(subsetevt_binta_damage_right_last)
     RETURN
 EVT_END()
 
+/**
+ * A unit recovers from a status that stopped it (sleep, stop, freeze and similar):
+ * its data-table event 8 if it has one, else it returns to its normal pose with a small hop.
+ */
 EVT_BEGIN(subsetevt_status_recovery)
     CALL(btlevtcmd_CheckDataOfDataTable, LW(10), LW(0), 8)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -1396,6 +1495,10 @@ EVT_BEGIN(subsetevt_status_recovery)
     RETURN
 EVT_END()
 
+/**
+ * Sets LW(0) to 0 when the target LW(3) cannot move (KO, frozen or stopped), else 1;
+ * used by Flurrie and Ms. Mowz moves. The stop check is written twice. Retail only.
+ */
 #if VERSION >= VERSION_JP
 EVT_BEGIN(subsetevt_check_target_movable)
     CALL(btlevtcmd_CheckStatus, LW(3), 27, LW(0))
@@ -1422,21 +1525,25 @@ EVT_BEGIN(subsetevt_check_target_movable)
     RETURN
 EVT_END()
 
+/** Plays the miss sound for an attack that did nothing. */
 EVT_BEGIN(subsetevt_nodamage_motion)
     CALL(evt_snd_sfxon, STRING("SFX_BTL_ATTACK_MISS2"), 0)
     RETURN
 EVT_END()
 
+/** Pause after the HP Regen status heals a unit at turn start. */
 EVT_BEGIN(subsetevt_regeneration)
     WAIT_FRAMES(60)
     RETURN
 EVT_END()
 #endif
 
+/** Empty data-table event 7 (attack ready) for partners that have nothing to do there. */
 EVT_BEGIN(subset_attack_ready_jump_event)
     RETURN
 EVT_END()
 
+/** Script: clears the remembered command menu cursor, so the menu does not reopen on the last command after a KO. */
 static USER_FUNC(_disable_restore_command_cursor) {
     BattleWork* wp = _battleWorkPointer;
     wp->commandMenu.recCommand = 0;
@@ -1444,6 +1551,7 @@ static USER_FUNC(_disable_restore_command_cursor) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: blocks until the unit args[0] has no attack or damage event running. */
 static USER_FUNC(_check_at_dm_event_wait) {
     BattleWork* wp = _battleWorkPointer;
     s32 id;
@@ -1463,6 +1571,10 @@ static USER_FUNC(_check_at_dm_event_wait) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: adds the unit's starPointDispOffset (from its kind data) to the position in args[1..3],
+ * where the Star Point effect appears when it is defeated.
+ */
 USER_FUNC(_add_star_point_disp_offset) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -1488,6 +1600,7 @@ USER_FUNC(_add_star_point_disp_offset) {
     return EVT_RETURN_DONE;
 }
 
+/** Script: makes the HP gauge of the unit args[0] fade out. Retail only. */
 #if VERSION >= VERSION_JP
 USER_FUNC(_set_hp_gauge_fade_flag) {
     BattleWork* wp = _battleWorkPointer;
@@ -1503,6 +1616,11 @@ USER_FUNC(_set_hp_gauge_fade_flag) {
 }
 #endif
 
+/**
+ * Script: sets args[4] to 1 when x = args[1] lies between args[2] and args[3],
+ * or beyond them in the direction the unit args[0] faces;
+ * the Ultra Hammer knockback uses it to tell when the flying unit has passed a target.
+ */
 static USER_FUNC(_check_through_pos) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -1537,6 +1655,10 @@ static USER_FUNC(_check_through_pos) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script: starts a 90-frame whirlwind effect at the unit args[0], turning the way of args[1]'s sign;
+ * used by the final slaps.
+ */
 static USER_FUNC(_binta_effect) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;

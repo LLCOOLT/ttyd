@@ -32,6 +32,7 @@ static const double
 one = 1.0,
 huge = 1.0e300;
 
+/** Arc tangent of x in radians (fdlibm), result in (-pi/2, pi/2). */
 double atan(double x) {
     double w, s1, s2, z;
     int ix, hx, id;

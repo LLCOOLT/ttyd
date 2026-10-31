@@ -199,6 +199,11 @@ static BattleWeapon weapon_nokonoko_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Init script of the Koopa Troopa.
+ * Registers its wait, attack, damage and confusion scripts,
+ * clears the overturned counter and sets its run and walk sounds.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -211,6 +216,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Guess: damage event of a sword: runs the default damage reaction. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -218,6 +224,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Flips the Koopa onto its back after a stomp-type hit:
+ * switches to the overturned defence and pose tables, sets status flag 1 and the overturned counter to 2,
+ * and hops once.
+ */
 static EVT_BEGIN(dmg_turn_event)
     CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, -15, 0)
     SET_VALUE(LW(10), -2)
@@ -237,6 +248,11 @@ static EVT_BEGIN(dmg_turn_event)
     RETURN
 EVT_END()
 
+/**
+ * Counts the overturned counter down by one.
+ * While it is still above 0 the Koopa struggles in place (NKT_S_3) and goes back to waiting;
+ * at 0 it restores its normal defence and pose tables, clears status flag 1 and jumps back onto its feet.
+ */
 static EVT_BEGIN(wakeup_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -262,6 +278,11 @@ static EVT_BEGIN(wakeup_event)
     RETURN
 EVT_END()
 
+/**
+ * Pre-emptive strike by the Koopa (used when the battle starts with the enemy's attack):
+ * retreats into its shell, spins into the first-attack target and hits it,
+ * with the miss/hit result from the pre-damage and damage checks.
+ */
 static EVT_BEGIN(first_attack_event)
     CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -330,6 +351,11 @@ static EVT_BEGIN(first_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Koopa's shell attack. If it is overturned it only wakes up.
+ * Otherwise it jumps into its shell and spins at the target while a smoke trail follows it,
+ * a miss makes it bounce past and a hit damages the target, after which it returns to its home position.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -476,6 +502,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Guess: wait (idle) event of Cortez: sets the idle pose from the current mode's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

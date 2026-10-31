@@ -23,27 +23,40 @@ extern int __DSP_rude_task_pending;
 static BOOL __DSP_init_flag;
 
 
+/**
+ * Returns 1 while the CPU-to-DSP mailbox still holds an unread mail (bit 15 of the high word),
+ * 0 once the DSP has taken it.
+ */
 u32 DSPCheckMailToDSP(void) {
     return (__DSPRegs[0] & (1 << 15)) >> 15;
 }
 
+/** Returns 1 when the DSP has put a mail in the DSP-to-CPU mailbox for the CPU to read. */
 u32 DSPCheckMailFromDSP(void) {
     return (__DSPRegs[2] & (1 << 15)) >> 15;
 }
 
+/** Reads back the 32-bit value currently in the CPU-to-DSP mailbox. */
 u32 DSPReadCPUToDSPMbox(void) {
     return (__DSPRegs[0] << 16) | __DSPRegs[1];
 }
 
+/** Reads the 32-bit mail from the DSP-to-CPU mailbox (high word first, then low word). */
 u32 DSPReadMailFromDSP(void) {
     return (__DSPRegs[2] << 16) | __DSPRegs[3];
 }
 
+/** Writes a 32-bit mail to the DSP: high 16 bits first, then the low 16 bits (which completes the mail). */
 void DSPSendMailToDSP(u32 mail) {
     __DSPRegs[0] = mail >> 16;
     __DSPRegs[1] = mail & 0xFFFF;
 }
 
+/**
+ * Sets the control bit (value 2 in DSP control register 5,
+ * with interrupt bits cleared) that raises an interrupt on the DSP,
+ * used to ask it to yield to a higher-priority task.
+ */
 void DSPAssertInt(void) {
     BOOL old;
     u16 tmp;
@@ -55,6 +68,10 @@ void DSPAssertInt(void) {
     OSRestoreInterrupts(old);
 }
 
+/**
+ * Starts using the DSP: registers __DSPHandler as the DSP interrupt handler (interrupt 7), unmasks it,
+ * resets the DSP control register bits and empties the task list. Does nothing if already initialised.
+ */
 void DSPInit(void) {
     BOOL old;
     u16 tmp;
@@ -83,10 +100,12 @@ void DSPInit(void) {
     OSRestoreInterrupts(old);
 }
 
+/** Returns whether DSPInit has been called (and DSPReset has not). */
 BOOL DSPCheckInit(void) {
     return __DSP_init_flag;
 }
 
+/** Sets the DSP reset bit in the control register and clears the initialised flag. */
 void DSPReset(void) {
     BOOL old;
     u16 tmp;
@@ -99,6 +118,7 @@ void DSPReset(void) {
     OSRestoreInterrupts(old);
 }
 
+/** Sets the DSP halt bit in the control register (interrupts disabled). */
 void DSPHalt(void) {
     BOOL old;
     u16 tmp;
@@ -110,6 +130,7 @@ void DSPHalt(void) {
     OSRestoreInterrupts(old);
 }
 
+/** Clears the DSP halt bit so it runs again. */
 void DSPUnhalt(void) {
     BOOL old;
     u16 tmp;
@@ -121,10 +142,15 @@ void DSPUnhalt(void) {
     OSRestoreInterrupts(old);
 }
 
+/** Returns the DSP DMA-busy bit (bit 9 of the control register). */
 u32 DSPGetDMAStatus(void) {
     return (__DSPRegs[5] & (1 << 9));
 }
 
+/**
+ * Queues a DSP task in priority order (state 0, flag 1).
+ * If it lands at the head of the list the DSP is booted with it right away.
+ */
 DSPTaskInfo* DSPAddTask(DSPTaskInfo* task) {
     BOOL old;
 
@@ -142,6 +168,7 @@ DSPTaskInfo* DSPAddTask(DSPTaskInfo* task) {
     return task;
 }
 
+/** Flags a task as cancelled (bit 2 of its flags); __DSPHandler then ends it at its next yield. */
 DSPTaskInfo* DSPCancelTask(DSPTaskInfo* task) {
     BOOL old;
 
@@ -155,6 +182,12 @@ DSPTaskInfo* DSPCancelTask(DSPTaskInfo* task) {
     return task;
 }
 
+/**
+ * Asks for a task to run immediately: if it is the running task
+ * or has a lower priority number than the running task,
+ * it is stored as the "rude" task to switch to (interrupting the DSP if the current task is running)
+ * and the task is returned; otherwise returns NULL.
+ */
 DSPTaskInfo* DSPAssertTask(DSPTaskInfo* task) {
     s32 old;
 

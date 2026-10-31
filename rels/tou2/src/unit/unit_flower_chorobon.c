@@ -231,6 +231,12 @@ static BattleWeapon weapon_chorobon_magic_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+/**
+ * Attack event of the Flower Fuzzy: uses an enemy item if one fits.
+ * Otherwise it chooses by its FP (max 3, starting at 0):
+ * with under 2 FP it always drains, with full FP it always casts its magic attack,
+ * in between it drains about 5 times in 6 and casts otherwise.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -262,6 +268,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The Flower Fuzzy's magic attack on every enemy (weapon_chorobon_magic_attack):
+ * costs 2 FP, the Fuzzy hops, three "shock_n64" flashes go off with the magic sound, the camera shakes,
+ * and every target is damage-checked in turn (the action command result is taken from the first).
+ */
 static EVT_BEGIN(magic_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_chorobon_magic_attack))
@@ -410,6 +421,11 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Hop movement used by the Fuzzy: from the position in LW(0..2) it hops toward LW(5..7),
+ * covering at most LW(8) units per hop and squashing and stretching on each landing with the hop sound,
+ * then ends with a final squash and stretch. LW(6) is the target height.
+ */
 static EVT_BEGIN(rabbit_move)
     LOOP(2)
         CALL(btlevtcmd_AddScale, BTL_UNIT_SELF, FLOAT(0.15917969f), FLOAT(-0.23925781f), 0)
@@ -459,6 +475,10 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Init event of the Flower Fuzzy: registers its wait, attack, damage and confusion events,
+ * its pose sound table and hop sound, gives it a maximum of 3 FP with 0 to start, then starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -472,6 +492,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event: runs the default battle damage reaction on the unit itself (part 1). */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -479,6 +500,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Reaction when the Fuzzy is hurt by a counterattack:
+ * restores its scale, runs subsetevt_counter_damage with the damage code and,
+ * unless that hit knocked it out for good, hops back home with return_event.
+ */
 static EVT_BEGIN(counter_damage_event)
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
     SET_VALUE(LW(10), -2)
@@ -496,6 +522,7 @@ static EVT_BEGIN(counter_damage_event)
     RETURN
 EVT_END()
 
+/** Makes the Fuzzy hop back to its home position with rabbit_move (up to 40 units per hop). */
 static EVT_BEGIN(return_event)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(4.0f), FLOAT(0.5996094f))
@@ -505,6 +532,14 @@ static EVT_BEGIN(return_event)
     RETURN
 EVT_END()
 
+/**
+ * The Flower Fuzzy's drain attack: like the plain Fuzzy's (hop up,
+ * jump on the target and cling on while shaking it),
+ * except that a target with FP above 0 is hit with weapon_chorobon_drain_attack_fp
+ * and the Fuzzy recovers the FP it took, while a target without FP takes the HP drain and the Fuzzy recovers HP.
+ * An electric counter ends the move with weapon_chorobon_drain_attack_biribiri_counterd.
+ * It then hops home with return_event.
+ */
 static EVT_BEGIN(drain_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_chorobon_drain_attack))
@@ -751,6 +786,7 @@ static EVT_BEGIN(drain_attack_event)
     RETURN
 EVT_END()
 
+/** Wait event: sets the idle animation from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

@@ -85,6 +85,10 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Planter hit script 4: the first time it is hit it launches a coin out of the planter;
+ * remembered with GSWF_MRI18_PLANTER_COIN_TAKEN.
+ */
 static EVT_BEGIN(evt_ueki_04)
     CALL(evt_item_delete_check, STRING("item_ueki_04"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
@@ -103,6 +107,11 @@ static KusaAccess ueki_access_data[] = {
     {4, NULL, NULL, NULL},
 };
 
+/**
+ * Map init script of mri_18, a pipe room with planters that an X-Naut grunt and a Yux guard:
+ * sets up the Puni, the planters and the water animations,
+ * and removes the guards once the story is past STORY_STG2_25_01_PEACH_CRUMP_AND_X_NAUTS.
+ */
 EVT_BEGIN(mri_18_init_evt)
     CALL(evt_puni_mem_init)
     CALL(evt_puni_set_yuka, 18, -89, -319, -1000, -1000, 0, 0)

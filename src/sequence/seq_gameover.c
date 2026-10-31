@@ -34,6 +34,7 @@ typedef struct GameOverWork {
 static GameOverWork work;
 static GameOverWork* wp = &work;
 
+// Defined below seq_gameOverExit (later versions only).
 USER_FUNC(N_evt_snd_bgm_unpause);
 
 s32 fall_data[] = {
@@ -45,6 +46,10 @@ s32 fall_data2[] = {
     200, 170, 140, 110, 80, 50, 20, 0, 12, 15, 16, 15, 11, 6, 0, 4, 3, 1, 0,
 };
 
+/**
+ * Drops the GAME OVER letter map object named in LW(0) from 200 units up,
+ * bouncing it to rest over 26 frames using the heights in fall_data.
+ */
 EVT_BEGIN(_fall_char)
     SET_INT_READ_ADDR(PTR(fall_data))
     LOOP(26)
@@ -55,6 +60,7 @@ EVT_BEGIN(_fall_char)
     RETURN
 EVT_END()
 
+/** Same as _fall_char for the last letter, with the shorter fall_data2 bounce (19 frames). */
 EVT_BEGIN(_fall_char_last)
     SET_INT_READ_ADDR(PTR(fall_data2))
     LOOP(19)
@@ -65,6 +71,10 @@ EVT_BEGIN(_fall_char_last)
     RETURN
 EVT_END()
 
+/**
+ * Drops the letters of GAME OVER one after another, waits for the last one to land,
+ * then pauses (1 s in later versions; frame waits in the demos and JP).
+ */
 EVT_BEGIN(fall_gameover)
     SET_VALUE(LW(0), STRING("g"))
     SPAWN_EVENT(_fall_char)
@@ -134,6 +144,7 @@ EVT_BEGIN(fall_gameover)
     RETURN
 EVT_END()
 
+/** Spanish version of fall_gameover: drops the letters of "FIN DEL JUEGO" (US and PAL, language 4). */
 #if VERSION >= VERSION_US
 EVT_BEGIN(fall_gameover_es)
     SET_VALUE(LW(0), STRING("f"))
@@ -181,6 +192,11 @@ EVT_BEGIN(fall_gameover_es)
 EVT_END()
 #endif
 
+/**
+ * Game over scene on sys_00: hides the partners, lays Mario down in his fallen pose facing the camera,
+ * hides the letters of the other language, sets the camera,
+ * plays the dust animation and runs the falling-letters script.
+ */
 EVT_BEGIN(evt_gameover)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
@@ -264,6 +280,10 @@ EVT_BEGIN(evt_gameover)
     RETURN
 EVT_END()
 
+/**
+ * Enters the game over sequence: resets windows, fades out all sound, clears sound flags and stops field events.
+ * Later versions also show the 3D camera and unequip Slow Go.
+ */
 void seq_gameOverInit(SequenceWork* work) {
     winReInit();
 #if VERSION <= VERSION_DEMO_US
@@ -286,14 +306,17 @@ void seq_gameOverInit(SequenceWork* work) {
     marioStSystemLevel(4); // every system-level flag set, events stopped
 }
 
+/** Leaves the game over sequence: fades out all sound and restarts events. */
 void seq_gameOverExit(SequenceWork* work) {
     psndStopAllFadeOut();
     marioStSystemLevel(0); // flags cleared, events restarted
 }
 
 #if VERSION >= VERSION_JP
-// Clears bit 0x8000 of the stream of BGM channel 0, if it has one (a stream id of -1 means none), the bit the
-// title and game-over sequences set on the stream they start (called by evt_gameover).
+/**
+ * Clears bit 0x8000 of the stream of BGM channel 0, if it has one (a stream id of -1 means none),
+ * the bit the title and game-over sequences set on the stream they start (called by evt_gameover).
+ */
 USER_FUNC(N_evt_snd_bgm_unpause) {
     if ((u32)psbgm[0].streamId != 0xFFFFFFFFU) {
         sound.streams[psbgm[0].streamId].flags &= ~0x8000;
@@ -302,8 +325,10 @@ USER_FUNC(N_evt_snd_bgm_unpause) {
 }
 #endif
 
-// seq_gameOverMain is defined last: functions are emitted in reverse order (-inline deferred), so it comes first in
-// the object.
+/**
+ * seq_gameOverMain is defined last: functions are emitted in reverse order (-inline deferred),
+ * so it comes first in the object.
+ */
 void seq_gameOverMain(SequenceWork* work) {
     CameraEntry* camera;
     MarioWork* mario;

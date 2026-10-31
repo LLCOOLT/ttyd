@@ -95,24 +95,32 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_clauda", "c_windy", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table_clauda_stay},
 };
 
+/**
+ * Init event of the Flurrie stage actor: installs only its wait event and starts it;
+ * this unit never attacks or takes damage.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
+/** Damage event of the Flurrie stage actor: does nothing. */
 static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Phase event of the Flurrie stage actor: does nothing. */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/** Attack event of the Flurrie stage actor: does nothing. */
 static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/** Idle event of the Flurrie stage actor: shows the unit's table pose for state 1. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

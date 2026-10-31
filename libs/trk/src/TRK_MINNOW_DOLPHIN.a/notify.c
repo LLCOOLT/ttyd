@@ -7,6 +7,11 @@ DSError TRKRequestSend(TRKBuffer* msg, int* bufIdx, unsigned int p1, unsigned in
 DSError TRKTargetAddStopInfo(TRKBuffer* msg);
 void TRKTargetAddExceptionInfo(TRKBuffer* msg);
 
+/**
+ * Tells the host the game has stopped: fills a free buffer with the stop report (command 0x90)
+ * or the exception report (any other value), sends it as a request and waits for the host's reply.
+ * Returns the error, 0 on success.
+ */
 DSError TRKDoNotifyStopped(int cmd) {
     DSError err;
     int reqIdx;

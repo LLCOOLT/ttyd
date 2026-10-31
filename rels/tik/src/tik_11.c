@@ -64,11 +64,19 @@ extern EvtWord powerdownya_init[];
 static NpcSetupInfo npcEnt[2];
 static BeroEntry bero_entry_data[2];
 
+/**
+ * Script helper.
+ * Sets the running event's owner NPC to the NPC named by args[0], so "me" in the shop scripts refers to it.
+ */
 static USER_FUNC(setmertn) {
     event->ownerNPC = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper.
+ * Spawns a star-dust particle burst: args are the type, X, Y, Z, X and Y velocities, particle count and camera.
+ */
 static USER_FUNC(effect_stardust) {
     EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
@@ -84,6 +92,11 @@ static USER_FUNC(effect_stardust) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper for ratio ("wariai") math on integers.
+ * With a = args[0] - 1 and b = args[1], stores (a * args[2] + args[3] * (b - a)) / b into args[4]:
+ * a blend from args[3] toward args[2] as args[0] steps up from 1 to b + 1.
+ */
 static USER_FUNC(wariai_enzan_1) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
@@ -95,6 +108,7 @@ static USER_FUNC(wariai_enzan_1) {
     return EVT_RETURN_DONE;
 }
 
+/** The same blend as wariai_enzan_1, but stores the result into args[4] as a float. */
 static USER_FUNC(wariai_enzan_1f) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
@@ -106,6 +120,10 @@ static USER_FUNC(wariai_enzan_1f) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Like wariai_enzan_1, but the divisor is args[1] - 1, so the blend reaches args[2] when args[0] equals args[1].
+ * Result stored as an integer.
+ */
 static USER_FUNC(wariai_enzan_0) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
@@ -117,6 +135,7 @@ static USER_FUNC(wariai_enzan_0) {
     return EVT_RETURN_DONE;
 }
 
+/** The same as wariai_enzan_0, with the result stored as a float. */
 static USER_FUNC(wariai_enzan_0f) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
@@ -128,6 +147,12 @@ static USER_FUNC(wariai_enzan_0f) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper.
+ * Rotates the point whose X and Z are held in the variables args[1]
+ * and args[2] around the centre (args[3], args[4]) by args[0] degrees (modulo 360),
+ * writing the new X and Z back.
+ */
 static USER_FUNC(enzan_cam_turn_keisan) {
     EvtWord* args = event->args;
     f32 angle = evtGetValue(event, args[0]) % 360;
@@ -152,6 +177,11 @@ static USER_FUNC(enzan_cam_turn_keisan) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper that sets the 3D camera for a turn around the shop counter.
+ * args[0] is a percentage 0..100: the camera slides from (-9, 212, 886) toward (-9, 152, 542)
+ * while orbiting the point (-9, 56, 0) by up to two turns (720 degrees), then is snapped to that position.
+ */
 static USER_FUNC(enzan_cam_turn_keisan_f) {
     f32 t = evtGetFloat(event, event->args[0]) / 100.0f;
     CameraEntry* cam = camGetPtr(CAMERA_3D);
@@ -179,6 +209,7 @@ static USER_FUNC(enzan_cam_turn_keisan_f) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Copies the float args[1] into the variable args[0] as an integer. */
 static USER_FUNC(enzan_set_i_f) {
     EvtWord* args = event->args;
     s32 var = args[0];
@@ -187,6 +218,7 @@ static USER_FUNC(enzan_set_i_f) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Copies the integer args[1] into the variable args[0] as a float. */
 static USER_FUNC(enzan_set_f_i) {
     EvtWord* args = event->args;
     s32 var = args[0];
@@ -195,6 +227,7 @@ static USER_FUNC(enzan_set_f_i) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Saves the script's 16 LW registers into the module array xlw. */
 static USER_FUNC(enzan_lw_save) {
     s32 i;
 
@@ -204,6 +237,7 @@ static USER_FUNC(enzan_lw_save) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Restores the 16 LW registers from the array saved by enzan_lw_save. */
 static USER_FUNC(enzan_lw_load) {
     s32 i;
 
@@ -213,6 +247,7 @@ static USER_FUNC(enzan_lw_load) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. With args[0] = 0 turns the background scroll offset off, otherwise on. */
 static USER_FUNC(bgScrollControll) {
     if (evtGetValue(event, event->args[0]) == 0) {
         bgTransOffsetOff();
@@ -222,11 +257,16 @@ static USER_FUNC(bgScrollControll) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper. Blocks until the music on channel 1 has started. */
 static USER_FUNC(bgm_start_wait) {
     return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
 #if VERSION >= VERSION_JP
+/**
+ * Loop that keeps Mario and his partner facing the shopkeeper (the point X = -9) every frame,
+ * until the script is stopped. JP and later.
+ */
 EVT_BEGIN(powerdownya_face_left)
     LOOP(0)
         CALL(evt_party_set_dir_pos, 0, -9, 0)
@@ -237,6 +277,13 @@ EVT_BEGIN(powerdownya_face_left)
 EVT_END()
 #endif
 
+/**
+ * Guess: Chet Rippo's offer to lower Mario's level. Refuses if Mario has fewer than 39 coins (powerdown_04).
+ * Otherwise shows the coin window and a stat choice (HP, FP or BP)
+ * and asks for confirmation (powerdown_06, powerdown_09);
+ * on yes it takes the 39 coins and lowers Mario's level,
+ * giving the chosen stat boost (powerdown_10 to powerdown_13).
+ */
 EVT_BEGIN(powerdownya_mario_level_rtn)
     CALL(evt_pouch_get_coin, LW(0))
     IF_INT_LESS(LW(0), 39)
@@ -444,6 +491,13 @@ EVT_BEGIN(powerdownya_mario_level_rtn)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Chet Rippo's offer to lower a partner's rank.
+ * Refuses if Mario has fewer than 39 coins (powerdown_04) or no partner can be ranked down (powerdown_07).
+ * Otherwise it lets Mario pick a partner and a bonus,
+ * asks for confirmation (powerdown_08, powerdown_09) and on yes takes 39 coins,
+ * lowers the partner's rank and applies the bonus (powerdown_13).
+ */
 EVT_BEGIN(powerdownya_party_lank_rtn)
     CALL(evt_pouch_get_coin, LW(0))
     IF_INT_LESS(LW(0), 39)
@@ -762,6 +816,13 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
     RETURN
 EVT_END()
 
+/**
+ * Talk script at Chet Rippo's counter.
+ * The first visit sets GSWF_TIK11_CHET_RIPPO_MET and greets Mario (powerdown_00),
+ * later visits use powerdown_00_01 and powerdown_01.
+ * Offers the menu (powerdown_02): lower Mario's level (powerdownya_mario_level_rtn),
+ * lower a partner's rank (powerdownya_party_lank_rtn), or leave.
+ */
 EVT_BEGIN(powerdownya_table_talk)
     CALL(setmertn, STRING("パワーダウン屋"))
     CALL(evt_mario_key_onoff, 0)
@@ -806,11 +867,13 @@ EVT_BEGIN(powerdownya_table_talk)
     RETURN
 EVT_END()
 
+/** Talk script for Chet Rippo when spoken to directly instead of at the counter; he says powerdown_14. */
 EVT_BEGIN(powerdownya_direct_talk)
     CALL(evt_msg_print, 0, STRING("powerdown_14"), 0, STRING("me"))
     RETURN
 EVT_END()
 
+/** Init script for Chet Rippo (パワーダウン屋). Registers the counter talk on the A_power_down hit area. */
 EVT_BEGIN(powerdownya_init)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_power_down"), 0, PTR(powerdownya_table_talk), 0)
     RETURN
@@ -852,6 +915,12 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Map init script of tik_11, Chet Rippo's shop.
+ * Starts the sewer music and ambience, sets up the exit back to tik_01,
+ * clears the greeting flag so he greets Mario on each entry,
+ * places the shopkeeper and starts the smoke animation.
+ */
 EVT_BEGIN(tik_11_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK1"))

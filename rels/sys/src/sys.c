@@ -168,6 +168,12 @@ const char* lang_prefix[2];
 extern EvtWord sys_01_init_evt[];
 extern EvtWord evt_start[];
 
+/**
+ * REL entry point of sys.rel: runs the global constructors,
+ * registers the empty init event for sys_00 and sys_01_init_evt for the chapter title map sys_01,
+ * stops all music with a fade unless the story is at one of the stages
+ * where the previous scene's music should carry over, and turns the 2D camera's letterbox off and snaps it.
+ */
 void _prolog(void) {
     voidfunctionptr* ctor;
 
@@ -185,6 +191,7 @@ void _prolog(void) {
     camGetPtr(CAMERA_2D)->flags |= CAM_FLAG_LETTER_BOX_SNAP;
 }
 
+/** Init event of sys_00, an empty map: does nothing. */
 EVT_BEGIN(dummy_evt)
     RETURN
 EVT_END()
@@ -202,8 +209,10 @@ static const char* msg_tbl[] = {
     "msg_stg_seq_stg8",
 };
 
-// JP and the demo list _epilog and _unresolved as file-local in their symbol maps (US and PAL: global). The
-// binding does not reach the REL, so they follow rel_module.h, which declares the hooks for every module.
+/**
+ * JP and the demo list _epilog and _unresolved as file-local in their symbol maps (US and PAL: global).
+ * The binding does not reach the REL, so they follow rel_module.h, which declares the hooks for every module.
+ */
 void _epilog(void) {
     voidfunctionptr* dtor;
 
@@ -216,9 +225,14 @@ void _epilog(void) {
     }
 }
 
+/** Linker stub for unresolved references in the relocatable module; does nothing. */
 void _unresolved(void) {
 }
 
+/**
+ * Frees the title texture file (effect_sys.tpl) that display loaded and clears the work area pointer.
+ * Called from _epilog when the module is unloaded from sys_01.
+ */
 static void sys_01_release(void) {
     if (g_wp->file != NULL) {
         fileFree(g_wp->file);
@@ -226,6 +240,10 @@ static void sys_01_release(void) {
     g_wp = NULL;
 }
 
+/**
+ * Returns a gray level (255 down to 75) for the rainbow light, as a triangle wave of the angle in degrees:
+ * 255 at 0 and 180, lowest at 90 and 270. Used for the shimmer on the title letters.
+ */
 static s32 getLightColor(f32 angle) {
     f32 a = fmod(angle, 360.0);
     s32 c;
@@ -242,12 +260,17 @@ static s32 getLightColor(f32 angle) {
     return 255 - c * 2;
 }
 
+/** Loads the color into TEV register 0 (inlined helper of display_func). */
 static inline void setTevColor(GXColor init) {
     GXColor color = init;
 
     GXSetTevColor(GX_TEVREG0, color);
 }
 
+/**
+ * Sets the material color of channel COLOR0A0 to a gray with level c (alpha from the argument);
+ * inlined helper of display_func.
+ */
 static inline void setChanMatColor(GXColor init, s32 c) {
     GXColor color = init;
 
@@ -259,7 +282,7 @@ static inline void setChanMatColor(GXColor init, s32 c) {
 
 #if VERSION >= VERSION_US
 
-// US: draws the chapter subtitle once, flat, and copies it into a texture that display_func bends
+/** US: draws the chapter subtitle once, flat, and copies it into a texture that display_func bends */
 void sys_01_msg_tex_capture_func(CameraId cameraId, void* param) {
     SysWork* wp = param;
     CameraEntry* camera = camGetPtr(cameraId);
@@ -357,6 +380,12 @@ void sys_01_msg_tex_capture_func(CameraId cameraId, void* param) {
 }
 #endif
 
+/**
+ * Draw callback of the chapter title card (camera 3D effect A):
+ * lights the letters with a rotating rainbow light, scrolls the background,
+ * and draws each flying title letter and the subtitle in 3D using the effect_sys texture.
+ * The US release and later lay the letters out per language; JP and the demo use a fixed layout.
+ */
 static void display_func(CameraId cameraId, void* param) {
     SysWork* wp = param;
     CameraEntry* camera = camGetPtr(cameraId);
@@ -992,6 +1021,11 @@ const char* lang_prefix[] = {
 
 #endif
 
+/**
+ * Init event of sys_01, the chapter title card map:
+ * draws the background (bg), starts the title (display) for the chapter named by the map entry (prologue, stg_1
+ * to stg_8), waits 3 seconds, sets the white fade for the map change and runs evt_start.
+ */
 EVT_BEGIN(sys_01_init_evt)
     CALL(init)
     CALL(evt_mario_cont_onoff, 0)
@@ -1041,6 +1075,12 @@ EVT_BEGIN(sys_01_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Runs after the chapter title appears: waits for the fade,
+ * starts the chapter-start jingle (not for chapters 3, 5 and 6), opens the curtain,
+ * waits for the title letters to settle, then changes map to the first map of that chapter (gor_10 for the
+ * prologue, hei_00, win_06, tou_20, usu_00, muj_20, rsh_02_a, bom_00 and las_00 for chapters 1 to 8).
+ */
 EVT_BEGIN(evt_start)
     CALL(evt_fade_end_wait)
     WAIT_MS(2000)
@@ -1121,6 +1161,12 @@ EVT_BEGIN(evt_start)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: loads the language's effect_sys.tpl title texture,
+ * sets up one title letter per character of the chapter's title (flying in one at a time, 20 frames apart)
+ * and queues display_func every frame. args[0] is the chapter number (0 = prologue to 8).
+ * Blocks until the title is loaded.
+ */
 static USER_FUNC(display) {
     SysWork* wp;
 #if VERSION >= VERSION_US
@@ -1252,6 +1298,10 @@ static USER_FUNC(display) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper: sets GLOBAL_FLAG_CURTAIN_OPEN and advances the title work from state 0 to the next,
+ * so the letters begin their spin-in; blocks until the title has been loaded.
+ */
 static USER_FUNC(start) {
     SysWork* wp = g_wp;
 
@@ -1263,6 +1313,10 @@ static USER_FUNC(start) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: creates the item-get effect used as the title card background
+ * and points it at the 3D effect A camera.
+ */
 static USER_FUNC(bg) {
     EffectEntry* eff = effItemGetEntry(0, 0.0f, 0.0f, 0.0f);
 
@@ -1271,12 +1325,13 @@ static USER_FUNC(bg) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: placeholder that does nothing. */
 static USER_FUNC(init) {
     return EVT_RETURN_DONE;
 }
 
 #if VERSION >= VERSION_US
-// US: waits until every title letter has finished spinning in
+/** US: waits until every title letter has finished spinning in */
 USER_FUNC(sys_01_start_end_wait) {
     SysWork* wp = g_wp;
     s32 i;

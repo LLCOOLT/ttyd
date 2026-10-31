@@ -16,6 +16,11 @@ static u8 DSPInitCode[128] = {
 
 #define __DSPWorkBuffer (void*)0x81000000
 
+/**
+ * Boots the DSP at startup: saves 128 bytes at 0x81000000 to the top of the arena,
+ * DMAs a small DSP init program there into DSP memory, resets the DSP,
+ * waits for the mailbox handshake (0x80544348) and restores the saved bytes. Called from OSInit.
+ */
 void __OSInitAudioSystem(void) {
     u8 errFlag;
     u16 reg16;
@@ -85,6 +90,10 @@ void __OSInitAudioSystem(void) {
     memcpy(__DSPWorkBuffer, (void*)((u32)OSGetArenaHi() - 0x80), sizeof(DSPInitCode));
 }
 
+/**
+ * Stops the DSP and audio DMA by writing the DSP control registers and waiting for each step to finish,
+ * then resets the DSP; used before launching another program.
+ */
 void __OSStopAudioSystem(void) {
     u16 reg16;
     u32 start_tick;

@@ -91,6 +91,11 @@ static KinopioWork* work;
 //.sdata
 static KinopioWork** wp = &work;
 
+/**
+ * Registers a map's inn: args[0] is its KinopioWork (innkeeper name, price, bed and camera spots, messages).
+ * Waits for the "p_slit" paper animation to load,
+ * then gives the innkeeper kinopio_house_talk_evt as his talk script.
+ */
 USER_FUNC(evt_kinopio_setup) {
     KinopioWork* w = (KinopioWork*)evtGetValue(event, event->args[0]);
     NpcEntry* npc = npcNameToPtr(w->npcName);
@@ -102,6 +107,7 @@ USER_FUNC(evt_kinopio_setup) {
     return 2;
 }
 
+/** Writes the inn's message for slot args[0] (KinopioWork.msg: 0 greeting, 3 good night, 5 morning, ...) to args[1]. */
 static USER_FUNC(msg_no) {
     EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
@@ -109,6 +115,10 @@ static USER_FUNC(msg_no) {
     return 2;
 }
 
+/**
+ * Writes 1 to args[0] when Mario's HP, FP and star power and every partner's HP are already full, else 0;
+ * the innkeeper then asks whether to stay anyway.
+ */
 static USER_FUNC(power_chk) {
     EvtWord* args = event->args;
     s32 ok;
@@ -129,6 +139,7 @@ static USER_FUNC(power_chk) {
     return 2;
 }
 
+/** Writes 1 to args[0] when Mario has fewer coins than the inn's price, else 0. */
 static USER_FUNC(coin_chk) {
     EvtWord* args = event->args;
     if (pouchGetCoin() < (*wp)->ryoukin) {
@@ -139,16 +150,19 @@ static USER_FUNC(coin_chk) {
     return 2;
 }
 
+/** Writes the inn's price in coins to args[0]. */
 static USER_FUNC(get_ryoukin) {
     evtSetValue(event, event->args[0], (*wp)->ryoukin);
     return 2;
 }
 
+/** Writes the innkeeper's NPC name to args[0]. */
 static USER_FUNC(get_npcname) {
     evtSetValue(event, event->args[0], (EvtWord)(*wp)->npcName);
     return 2;
 }
 
+/** Writes the bed position (where Mario lies) to the float variables args[0..2]. */
 static USER_FUNC(get_bed) {
     EvtWord* args = event->args;
     evtSetFloat(event, args[0], (*wp)->bed.x);
@@ -157,6 +171,7 @@ static USER_FUNC(get_bed) {
     return 2;
 }
 
+/** Writes the spot beside the bed, where Mario walks to and wakes up, to args[0..2]. */
 static USER_FUNC(get_bedside) {
     EvtWord* args = event->args;
     evtSetFloat(event, args[0], (*wp)->bedside.x);
@@ -165,11 +180,13 @@ static USER_FUNC(get_bedside) {
     return 2;
 }
 
+/** Writes the angle (degrees) Mario lies at in bed to args[0]. */
 static USER_FUNC(get_beddeg) {
     evtSetFloat(event, event->args[0], (*wp)->bedDeg);
     return 2;
 }
 
+/** Writes the spot Mario walks back to in front of the innkeeper after waking to args[0..2]. */
 static USER_FUNC(get_npctalk) {
     EvtWord* args = event->args;
     evtSetFloat(event, args[0], (*wp)->npcTalk.x);
@@ -178,6 +195,7 @@ static USER_FUNC(get_npctalk) {
     return 2;
 }
 
+/** Writes the six camera values for the bed shot (passed to evt_cam3d_evt_set) to args[0..5]. */
 static USER_FUNC(get_cam) {
     EvtWord* args = event->args;
     evtSetFloat(event, args[0], (*wp)->cam[0]);
@@ -189,16 +207,23 @@ static USER_FUNC(get_cam) {
     return 2;
 }
 
+/** Writes the inn's optional walk-to-bed script (0 for none; then Mario just walks beside the bed) to args[0]. */
 static USER_FUNC(get_to_bed_evt) {
     evtSetValue(event, event->args[0], (*wp)->toBedEvt);
     return 2;
 }
 
+/** Writes the inn's optional script run after waking (0 for none) to args[0]. */
 static USER_FUNC(get_from_bed_evt) {
     evtSetValue(event, event->args[0], (*wp)->fromBedEvt);
     return 2;
 }
 
+/**
+ * Lays Mario flat in bed: switches him to the "p_slit" paper pose and holds his facing at args[0] degrees,
+ * never finishing (the talk script deletes it).
+ * Retail also slides him 0.2 units a frame for 30 frames (backwards in pik_04).
+ */
 static USER_FUNC(paper_on) {
     EvtWord* args = event->args;
     f32 amount = evtGetFloat(event, *args++);
@@ -232,11 +257,16 @@ static USER_FUNC(paper_on) {
     return 0;
 }
 
+/** Ends the bed paper pose set by paper_on. */
 static USER_FUNC(paper_off) {
     marioPaperOff();
     return 2;
 }
 
+/**
+ * Turns distance args[0] into an x/z offset across the camera's view (yaw + 90 degrees),
+ * written to args[1] and args[2]; places the second partner beside the bed.
+ */
 static USER_FUNC(offset) {
     EvtWord* args = event->args;
     f32 dist = evtGetFloat(event, args[0]);
@@ -246,6 +276,10 @@ static USER_FUNC(offset) {
     return 2;
 }
 
+/**
+ * Puts the inn's breakfast item (KinopioWork.breakfastItem) at its spot as the fixed item "breakfast",
+ * unless one is already there or the inn has none.
+ */
 static USER_FUNC(breakfast) {
     ItemEntry* item = itemNameToPtr("breakfast");
     if (item == NULL || !(item->flags & ITEM_FLAG_USED)) {
@@ -257,16 +291,19 @@ static USER_FUNC(breakfast) {
     return 2;
 }
 
+/** Mutes sound effects while Mario sleeps. */
 static USER_FUNC(snd_off) {
     psndSetFlag(PSND_FLAG_MUTE_SFX);
     return 2;
 }
 
+/** Unmutes sound effects after the stay. */
 static USER_FUNC(snd_on) {
     psndClearFlag(PSND_FLAG_MUTE_SFX);
     return 2;
 }
 
+/** Turns off material blending on the Lakitu cameraman's pose for the 50th-stay photo. Retail only. */
 #if VERSION >= VERSION_JP
 USER_FUNC(N_cameraman_on) {
     NpcEntry* npc = npcNameToPtr("宿屋のカメラマン");
@@ -275,7 +312,11 @@ USER_FUNC(N_cameraman_on) {
 }
 #endif
 
-//.data
+/**
+ * .data The innkeeper's talk script: asks to stay, takes an Inn Coupon or the price,
+ * puts Mario to bed with a spotlight fade and sleep music, restores HP/FP and partners,
+ * places breakfast and counts GSW_INN_STAY_COUNT (max 100).
+ */
 EVT_BEGIN(kinopio_house_talk_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(get_ryoukin, LW(10))
@@ -517,6 +558,11 @@ EVT_BEGIN(kinopio_house_talk_evt)
     RETURN
 EVT_END()
 
+/**
+ * The 50th stay (GSW_INN_STAY_COUNT reaches 50): confetti and a special message, then a 200-coin gift.
+ * Retail adds a Lakitu cameraman who takes a photo,
+ * placed per inn map (bom_02, gor_01, muj_01, nok_00, pik_04, usu_00).
+ */
 #if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(evt_50)
     CALL(get_npcname, LW(10))
@@ -559,6 +605,7 @@ EVT_BEGIN(evt_50)
     RETURN
 EVT_END()
 #else
+/** Retail 50th-stay celebration with the Lakitu cameraman's photo and the 200-coin gift; see the demo version above. */
 EVT_BEGIN(evt_50)
     CALL(get_npcname, LW(10))
     CALL(evt_npc_get_position, LW(10), LW(13), LW(14), LW(15))

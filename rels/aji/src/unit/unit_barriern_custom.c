@@ -466,6 +466,13 @@ static Vec splineTableOut4_4[] = {
     {-25.0f, -25.0f, 0.0f},
 };
 
+/**
+ * Battle init for the X-Yux: registers its wait, unison-phase, attack, damage and confusion events,
+ * scales its body part to 1.0, then spawns its 4 Mini-Yux satellites (unit_barriern_custom_satellite),
+ * stores their unit ids in unit work 4 onward, links each back to the parent
+ * and places them around it with battleGetBarriernSatelliteInitPos;
+ * finally builds the out-spline tables for the current satellite count.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventUnisonPhase, BTL_UNIT_SELF, PTR(unison_phase_event))
@@ -506,6 +513,7 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Damage event for the X-Yux: flashes the body white, then runs the default damage handler (btldefaultevt_Damage). */
 static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_SetRGB, BTL_UNIT_SELF, 1, 255, 255, 255)
     SET_VALUE(LW(10), -2)
@@ -514,6 +522,10 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Raises the X-Yux to y=20 and waits for any attack to end (used as the first-attack position of its damage
+ * handling).
+ */
 static EVT_BEGIN(barriern_dmg_first_attack_pos)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 20)
@@ -522,6 +534,10 @@ static EVT_BEGIN(barriern_dmg_first_attack_pos)
     RETURN
 EVT_END()
 
+/**
+ * Switches on the afterimage blur on every living satellite of the X-Yux (unit work 4 onward)
+ * and sets the blur part attribute 0x4000000.
+ */
 static EVT_BEGIN(satellite_blur_on)
     SET_VALUE(LW(2), 4)
     LOOP(4)
@@ -536,6 +552,7 @@ static EVT_BEGIN(satellite_blur_on)
     RETURN
 EVT_END()
 
+/** Clears the blur part attribute 0x4000000 on every living satellite of the X-Yux. */
 static EVT_BEGIN(satellite_blur_off)
     SET_VALUE(LW(2), 4)
     LOOP(4)
@@ -549,6 +566,11 @@ static EVT_BEGIN(satellite_blur_off)
     RETURN
 EVT_END()
 
+/**
+ * Script function: plays the Yux's afterimage effect of the barrier ring on the unit args[0] (type 0: the five
+ * ghost- ring parts 2 to 6 start large at 1.7 to 4.5 times and shrink in toward the body over 36 frames
+ * while fading in to alpha 64).
+ */
 static USER_FUNC(barriern_zanzou) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -557,6 +579,10 @@ static USER_FUNC(barriern_zanzou) {
     return barriern_zanzou_sub(isFirstCall, unit, scales, 0);
 }
 
+/**
+ * Script function: the second afterimage type on the unit args[0]:
+ * the ghost rings (parts 2 to 6) expand outward from the body over 8 frames and fade out from alpha 64 to 0.
+ */
 static USER_FUNC(barriern_zanzou2) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -565,6 +591,10 @@ static USER_FUNC(barriern_zanzou2) {
     return barriern_zanzou_sub(isFirstCall, unit, scales, 1);
 }
 
+/**
+ * Script function: the third afterimage type on the unit args[0]:
+ * like barriern_zanzou2 but expanding over 36 frames.
+ */
 static USER_FUNC(barriern_zanzou3) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -573,10 +603,18 @@ static USER_FUNC(barriern_zanzou3) {
     return barriern_zanzou_sub(isFirstCall, unit, scales, 2);
 }
 
+/** Inline helper: interpolates from start to end with the easing mode over cur of total steps (intplGetValue). */
 static inline f32 intpl_ff(f32 start, f32 end, s32 mode, s32 cur, s32 total) {
     return intplGetValue(mode, start, end, cur, total);
 }
 
+/**
+ * Runs one frame of the Yux afterimage effect of the given type (0 shrinking in, 1 and 2 expanding out):
+ * scales the body part and the five ghost rings (parts 2 to 6, offset in depth by 0.5 each)
+ * and fades them with the frame count kept in zanzou_count[0].
+ * Returns EVT_RETURN_BLOCK until the effect has run its frames,
+ * then restores the body scale and hides the rings.
+ */
 static s32 barriern_zanzou_sub(BOOL isFirstCall, BattleUnit* unit, f32* scales, s32 type) {
     f32 start[5];
     f32 end[5];
@@ -661,6 +699,10 @@ static s32 barriern_zanzou_sub(BOOL isFirstCall, BattleUnit* unit, f32* scales, 
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script function: the shrinking-in afterimage (type 0) for the satellite number args[1] of the unit args[0],
+ * looked up from the unit's work[4 + n].
+ */
 static USER_FUNC(barriern_satellite_zanzou) {
     EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
@@ -674,6 +716,7 @@ static USER_FUNC(barriern_satellite_zanzou) {
     return barriern_satellite_zanzou_sub(isFirstCall, sat, scales, n, 0);
 }
 
+/** Script function: the expanding afterimage (type 1) for the satellite number args[1] of the unit args[0]. */
 static USER_FUNC(barriern_satellite_zanzou2) {
     EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
@@ -687,6 +730,11 @@ static USER_FUNC(barriern_satellite_zanzou2) {
     return barriern_satellite_zanzou_sub(isFirstCall, sat, scales, n, 1);
 }
 
+/**
+ * Runs one frame of a Mini-Yux's afterimage effect (type 0 shrinking in over the effect's frames,
+ * type 1 expanding out over 8) with its frame count in zanzou_count[n + 1];
+ * the same ghost-ring scaling and fading as barriern_zanzou_sub.
+ */
 static s32 barriern_satellite_zanzou_sub(BOOL isFirstCall, BattleUnit* unit, f32* scales, s32 n, s32 type) {
     f32 start[5];
     f32 end[5];
@@ -769,6 +817,13 @@ static s32 barriern_satellite_zanzou_sub(BOOL isFirstCall, BattleUnit* unit, f32
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Unison phase script of the X-Yux, run before the player's phase:
+ * skipped on turn 1 and when the X-Yux cannot act, and does nothing if all 4 satellites are alive.
+ * After a short random delay it pulls its satellites into its body (SFX_ENM_BARRI_SPLIT1),
+ * spawns 2 replacement Mini-Yux, sends the satellites back out to their orbit positions (SFX_ENM_BARRI_SPLIT2)
+ * and restores the wait event.
+ */
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_SELF)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
@@ -836,6 +891,13 @@ static EVT_BEGIN(unison_phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack script of the X-Yux: if battle flag 2 is set it always uses the ring attack (wakka_attack_event);
+ * otherwise it lets an enemy item be used if one is ready.
+ * When all 4 satellites can act it does the combined attack wawawa_attack_event, otherwise the ring attack.
+ * The 1-in-100 roll that would choose recovery_event can never fail (the roll is below 100),
+ * so recovery_event is not reached from here.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetRGB, BTL_UNIT_SELF, 1, 255, 255, 255)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
@@ -881,6 +943,10 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * The X-Yux heals itself: the camera zooms on it, it plays the S_3 pose for 2 seconds,
+ * calls btlevtcmd_RecoverHp with amount 0 and shows the recovery effect above its head.
+ */
 static EVT_BEGIN(recovery_event)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -899,6 +965,10 @@ static EVT_BEGIN(recovery_event)
     RETURN
 EVT_END()
 
+/**
+ * Starts the target's avoid reaction (type 38, 39 or 40) for the pre-check result in LW(5) (3, 6 or 2),
+ * so the target reacts as the ring passes it.
+ */
 static EVT_BEGIN(start_avoid)
     IF_INT_EQUAL(LW(5), 3)
         CALL(btlevtcmd_StartAvoid, LW(3), 38)
@@ -912,6 +982,13 @@ static EVT_BEGIN(start_avoid)
     RETURN
 EVT_END()
 
+/**
+ * Flight of the thrown ring (wakka) when it misses:
+ * the ring part (LW(15)) appears at the thrower,
+ * pulses while it crosses the stage past the target (slow wide pulses for the single ring attack,
+ * fast ones with the blur during the combined attack) and triggers the target's avoid reaction
+ * when it passes it; the part is moved off-screen at the end.
+ */
 static EVT_BEGIN(wakka_attack_common_event_no_hit)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(6))
     IF_INT_EQUAL(LW(6), 0)
@@ -1000,6 +1077,11 @@ static EVT_BEGIN(wakka_attack_common_event_no_hit)
     RETURN
 EVT_END()
 
+/**
+ * Flight of the thrown ring (wakka) when it hits:
+ * the ring part (LW(15)) appears at the thrower,
+ * pulses while it flies to the target's hit position and stops there (the caller applies the damage).
+ */
 static EVT_BEGIN(wakka_attack_common_event_hit)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(6))
     IF_INT_EQUAL(LW(6), 0)
@@ -1057,6 +1139,13 @@ static EVT_BEGIN(wakka_attack_common_event_hit)
     RETURN
 EVT_END()
 
+/**
+ * Resolves one ring against a target (LW(3) unit, LW(4) part, LW(9) weapon): pre-checks the damage;
+ * on a miss or guard (results 2, 3, 4 and 6) it flies the ring past with wakka_attack_common_event_no_hit,
+ * on a hit (result 1) it records the target as hit,
+ * flies the ring in and applies the damage (with damage flag 256 when LW(10) is 1).
+ * The ring part is hidden afterwards.
+ */
 static EVT_BEGIN(damage_check_event_sub)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     SWITCH(LW(5))
@@ -1109,6 +1198,11 @@ static EVT_BEGIN(damage_check_event_sub)
     RETURN
 EVT_END()
 
+/**
+ * Ring attack (wakka) of the X-Yux: picks a target, declares the attack, spins up with afterimages,
+ * plays the ring-throw poses (A_1 to A_4), throws the ring at the target through damage_check_event_sub
+ * and spins back; with no valid target it does nothing (or acts flustered when confused).
+ */
 static EVT_BEGIN(wakka_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_wakka_attack))
@@ -1179,12 +1273,23 @@ static EVT_BEGIN(wakka_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Plays both afterimage effects (barriern_satellite_zanzou and zanzou2) for satellite number LW(0) during the
+ * combined attack.
+ */
 static EVT_BEGIN(wawawa_attack_event_satellite_blur)
     CALL(barriern_satellite_zanzou, BTL_UNIT_SELF, LW(0))
     CALL(barriern_satellite_zanzou2, BTL_UNIT_SELF, LW(0))
     RETURN
 EVT_END()
 
+/**
+ * Combined attack (wawawa) of the X-Yux with its satellites:
+ * picks a first target, lets barriern_wawawa_set_target assign a target to every ring,
+ * declares an all-target attack, spins the body and satellites with afterimages,
+ * then fires a ring from the X-Yux and from each satellite (wawawa_attack_event_sub) and waits
+ * until all of them have finished before spinning back.
+ */
 static EVT_BEGIN(wawawa_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_wawawa_attack))
@@ -1349,6 +1454,12 @@ static EVT_BEGIN(wawawa_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * One ring of the combined attack: plays the ring sounds,
+ * looks through the target list to decide whether this is the last ring aimed at its target
+ * (wawawa_attack_event_sub_last) or an earlier one (wawawa_attack_event_sub_no_last),
+ * then counts itself finished in unit work 2.
+ */
 static EVT_BEGIN(wawawa_attack_event_sub)
     CALL(btlevtcmd_GetPartsWork, BTL_UNIT_SELF, 1, LW(13), LW(3))
     CALL(btlevtcmd_GetPartsWork, BTL_UNIT_SELF, 1, LW(14), LW(4))
@@ -1377,6 +1488,11 @@ static EVT_BEGIN(wawawa_attack_event_sub)
     RETURN
 EVT_END()
 
+/**
+ * A ring of the combined attack that is not the last one aimed at its target:
+ * checks the damage with the wawawa weapon and flies the ring past (Guess: only the last ring on a target
+ * applies a hit).
+ */
 static EVT_BEGIN(wawawa_attack_event_sub_no_last)
     SET_VALUE(LW(9), PTR(&weapon_wawawa_attack))
     SET_VALUE(LW(10), 0)
@@ -1384,6 +1500,11 @@ static EVT_BEGIN(wawawa_attack_event_sub_no_last)
     RETURN
 EVT_END()
 
+/**
+ * The last ring of the combined attack on a target:
+ * if an earlier ring of that target was recorded as a hit it flies this ring in,
+ * applies the damage and hides the ring; otherwise it resolves like a normal ring (damage_check_event_sub).
+ */
 static EVT_BEGIN(wawawa_attack_event_sub_last)
     SET_VALUE(LW(13), 0)
     SET_VALUE(LW(14), 5)
@@ -1416,6 +1537,11 @@ static EVT_BEGIN(wawawa_attack_event_sub_last)
     RETURN
 EVT_END()
 
+/**
+ * Idle script of the X-Yux: keeps the barrier in sync with its satellites (_check_satellite),
+ * loops the idle pose, and every 0.5 to 2.5 seconds plays its short S_3 pose while it can act
+ * and has no bad status.
+ */
 static EVT_BEGIN(wait_event)
     CALL(_check_satellite)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
@@ -1461,6 +1587,12 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+/**
+ * Prepares the move of satellite n of the Yux along the spline in table:
+ * allocates a SatelliteSpline (5 points, frame 0),
+ * builds its spline tables and records the table in the satellite's body part work[2].
+ * Returns FALSE if the Yux has no satellite n.
+ */
 static u8 barriernSatelliteTo_Init(BattleUnit* unit, s32 n, Vec* table) {
     SatelliteSpline* sp;
 
@@ -1477,6 +1609,11 @@ static u8 barriernSatelliteTo_Init(BattleUnit* unit, s32 n, Vec* table) {
     return TRUE;
 }
 
+/**
+ * Moves satellite n one frame along its spline (60 frames, eased) around the Yux's position,
+ * mirrored by the Yux's facing; sets both its position and home position.
+ * Returns TRUE while moving and FALSE when done (and frees the spline) or if there is no satellite.
+ */
 static u8 barriernSatelliteTo_Main(BattleUnit* unit, s32 n) {
     SatelliteSpline* sp;
     BattleUnit* sat;
@@ -1509,6 +1646,11 @@ static u8 barriernSatelliteTo_Main(BattleUnit* unit, s32 n) {
     return TRUE;
 }
 
+/**
+ * Script function: moves the Yux's satellites from their outer positions to the inner (shield) positions,
+ * picking for each satellite the Inside spline matching its current Out spline.
+ * Blocks until all satellites have arrived.
+ */
 static USER_FUNC(barriernSatelliteToInside) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -1566,6 +1708,10 @@ static USER_FUNC(barriernSatelliteToInside) {
     return moving == FALSE ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script function: moves args[1] satellites (1 to 4) of the Yux args[0] out to their outer positions along the
+ * splineTableOut tables. Blocks until all satellites have arrived.
+ */
 static USER_FUNC(barriernSatelliteToOutside) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -1669,6 +1815,10 @@ static USER_FUNC(barriernSatelliteToOutside) {
     return moving == FALSE ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script function: tags the first args[1] satellites (1 to 4) of the unit args[0] with their outer spline tables
+ * (splineTableOut1_1 to 4_4) by storing them in the satellite's body part work[2].
+ */
 static USER_FUNC(outSplineTableSet) {
     EvtWord* args = event->args;
     s32 id = BattleTransID(event, evtGetValue(event, args[0]));
@@ -1708,10 +1858,16 @@ static USER_FUNC(outSplineTableSet) {
     return EVT_RETURN_DONE;
 }
 
+/** Stores the spline table in the body part work[2] of satellite n of the unit. */
 static void outSplineTableSet_Sub(BattleUnit* unit, s32 n, Vec* table) {
     BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, unit->work[4 + n]), 1)->work[2] = (EvtWord)table;
 }
 
+/**
+ * Script function: collects the targets the wawawa attack can hit (the weapon's target list)
+ * and picks five at random, with repeats; returns the five (unit, part) pairs in the script's argument
+ * variables.
+ */
 static USER_FUNC(barriern_wawawa_set_target) {
     EvtWord* args = event->args;
     s32 unitIdx[10];
@@ -1738,6 +1894,7 @@ static USER_FUNC(barriern_wawawa_set_target) {
     return EVT_RETURN_DONE;
 }
 
+/** Returns the unit and part index of the current target of the weapon's target list. */
 static void barriern_wawawa_get_target(s32* unitIdx, s32* partIdx) {
     BattleWorkWeaponTargets* wt = &_battleWorkPointer->weaponTargets;
     BattleWorkTarget* target = &wt->targets[wt->targetIndices[wt->currentTarget]];
@@ -1746,6 +1903,10 @@ static void barriern_wawawa_get_target(s32* unitIdx, s32* partIdx) {
     *partIdx = target->partIdx;
 }
 
+/**
+ * Steps to the next target in the weapon's target list and returns its unit and part index,
+ * or -1 and 0 when the list is used up.
+ */
 static void barriern_wawawa_get_next_target(s32* unitIdx, s32* partIdx) {
     BattleWorkWeaponTargets* wt = &_battleWorkPointer->weaponTargets;
 
@@ -1760,6 +1921,13 @@ static void barriern_wawawa_get_next_target(s32* unitIdx, s32* partIdx) {
     }
 }
 
+/**
+ * Script function: updates the Yux's barrier from its satellites.
+ * If no satellite (work[4], work[5]) is left, the barrier breaks (SFX_ENM_BARRI_BARRIER_BREAK1, glass shards,
+ * damage immunity of the body removed) and args[0] = 0;
+ * while one is left, the body is immune to damage and status and the barrier effect (work[3]) follows the unit,
+ * args[0] = 1.
+ */
 static USER_FUNC(_check_satellite) {
     s32 id = BattleTransID(event, -2);
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -1829,6 +1997,11 @@ static USER_FUNC(_check_satellite) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script function: returns the starting offset of satellite index args[2]
+ * when the Yux has args[1] satellites (1 to 4 laid out as a fixed pattern 25 units apart,
+ * mirrored by the facing direction) in the variables args[3] to args[5] as x, y and z.
+ */
 static USER_FUNC(battleGetBarriernSatelliteInitPos) {
     EvtWord* args = event->args;
     BattleUnit* unit;

@@ -51,6 +51,10 @@ static s32 key_tbl[2];
 extern EvtWord evt_train_door[];
 extern EvtWord evt_train_nidome[];
 
+/**
+ * Door-swing callback when opening the station door (n_bero_2): LW(0) is the door angle;
+ * the two leaves tobira_1 and tobira_2 turn around Y by 0.39 times it in opposite directions.
+ */
 static EVT_BEGIN(n_2_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("tobira_1"), 0, LW(0), 0)
@@ -59,6 +63,10 @@ static EVT_BEGIN(n_2_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door-swing callback when closing the station door (n_bero_2):
+ * same as n_2_door_open with the angle direction reversed.
+ */
 static EVT_BEGIN(n_2_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
     CALL(evt_mapobj_rotate, 1, STRING("tobira_1"), 0, LW(0), 0)
@@ -129,6 +137,12 @@ BeroEntry bero_data_nidome[] = {
     {0},
 };
 
+/**
+ * Talk script of station attendant 1 (ekiin1) about the raised drawbridge:
+ * explains the bridge (stg6_hom_04/05, or stg6_hom_10 on a repeat),
+ * then asks whether Mario wants the Station Key (yes/no);
+ * on yes he is given the key (ITEM_STATION_KEY_0x18) and the story becomes "Station Key obtained".
+ */
 EVT_BEGIN(evt_carry_up_bridge)
     IF_INT_EQUAL(GSWF(GSWF_HOM00_BRIDGE_EXPLAINED), 0)
         CALL(evt_msg_print, 0, STRING("stg6_hom_04"), 0, STRING("me"))
@@ -157,6 +171,11 @@ EVT_BEGIN(evt_carry_up_bridge)
     RETURN
 EVT_END()
 
+/**
+ * Init script shared by the platform NPCs Powan (the detective), Toron, Gurume, Nari Kin Papa and Konari:
+ * removes the NPC from the map once the drawbridge is down (story 42),
+ * and Toron once the station has been reached (story 27).
+ */
 EVT_BEGIN(init_powan_toron_konari_papa_gurume)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_GREATER_OR_EQUAL(STORY_STG6_42_DRAWBRIDGE_DOWN)
@@ -168,35 +187,45 @@ EVT_BEGIN(init_powan_toron_konari_papa_gurume)
     RETURN
 EVT_END()
 
+/** Talk event of Detective Powan (ポワン探偵): says stg6_hom_00. */
 static EVT_BEGIN(talk_powan)
     CALL(evt_msg_print, 0, STRING("stg6_hom_00"), 0, 0)
     RETURN
 EVT_END()
 
+/** Talk event of Toron (トロン): says stg6_hom_01. */
 static EVT_BEGIN(talk_toron)
     CALL(evt_msg_print, 0, STRING("stg6_hom_01"), 0, 0)
     RETURN
 EVT_END()
 
+/** Talk event of the Gourmet Toad (グルメキノピオ): says stg6_rsh_211. */
 static EVT_BEGIN(talk_gurume)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_211"), 0, 0)
     RETURN
 EVT_END()
 
+/** Talk event of Papa Nariking (ナリキンパパ): says stg6_hom_02. */
 static EVT_BEGIN(talk_papa)
     CALL(evt_msg_print, 0, STRING("stg6_hom_02"), 0, 0)
     RETURN
 EVT_END()
 
+/** Talk event of Little Nariking (コナリキン): says stg6_hom_03. */
 static EVT_BEGIN(talk_konari)
     CALL(evt_msg_print, 0, STRING("stg6_hom_03"), 0, 0)
     RETURN
 EVT_END()
 
+/** Init script of station attendant 1; does nothing. */
 EVT_BEGIN(init_ekiin1)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of station attendant 1: before the key is obtained, runs evt_carry_up_bridge;
+ * then gives the drawbridge, waiting-for-the-train and after-departure lines by story progress.
+ */
 EVT_BEGIN(talk_ekiin1)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_28_STATION_KEY_OBTAINED)
@@ -211,6 +240,10 @@ EVT_BEGIN(talk_ekiin1)
     RETURN
 EVT_END()
 
+/**
+ * Init script of station attendant 2: once the drawbridge is down (story 42),
+ * moves him to the gate at (-865, 80, 100).
+ */
 EVT_BEGIN(init_ekiin2)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_GREATER_OR_EQUAL(STORY_STG6_42_DRAWBRIDGE_DOWN)
@@ -219,6 +252,10 @@ EVT_BEGIN(init_ekiin2)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of station attendant 2 (at the ticket gate):
+ * different lines before the drawbridge is down, while waiting for the conductor, and afterwards.
+ */
 EVT_BEGIN(talk_ekiin2)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_42_DRAWBRIDGE_DOWN)
@@ -328,6 +365,13 @@ static NpcSetupInfo npc_data[] = {
     {0},
 };
 
+/**
+ * Cutscene when Mario reaches the platform with the drawbridge lowering scene flag
+ * (GSWF_EKI00_BRIDGE_LOWER_SCENE): Mario and his partner are hidden,
+ * the camera shows the attendant noticing the bridge,
+ * the drawbridge ("hasi") is lowered with its machinery sounds and a camera shake,
+ * and the map changes back to eki_00.
+ */
 EVT_BEGIN(evt_bridge_down)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
@@ -370,6 +414,10 @@ static s32 key_tbl[] = {
     ITEM_STATION_KEY_0x18, -1,
 };
 
+/**
+ * Check script of the locked station door: if Mario carries a Station Key it opens the key picker (key_tbl)
+ * and cancels the unlock (evt_mobj_exec_cancel) if he backs out of it.
+ */
 static EVT_BEGIN(evt_chk)
     CALL(evt_pouch_check_item, ITEM_STATION_KEY_0x18, LW(0))
     IF_INT_GREATER(LW(0), 0)
@@ -385,6 +433,11 @@ static EVT_BEGIN(evt_chk)
     RETURN
 EVT_END()
 
+/**
+ * Runs when the Station Key is used on the lock:
+ * switches the station door's entry on (bero_case_switch_on with LW(0) = 1)
+ * and sets story progress to STORY_STG6_29_STATION_DOOR_UNLOCKED.
+ */
 static EVT_BEGIN(evt_lock)
     SET_VALUE(LW(0), 1)
     CALL_CHILD(bero_case_switch_on)
@@ -392,6 +445,10 @@ static EVT_BEGIN(evt_lock)
     RETURN
 EVT_END()
 
+/**
+ * Exit event of the train door: returns 1 in LW(0) only while the story is at "Drawbridge down",
+ * so the door can be used just then.
+ */
 EVT_BEGIN(evt_train_door)
     IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_42_DRAWBRIDGE_DOWN)
         SET_VALUE(LW(0), 0)
@@ -401,6 +458,15 @@ EVT_BEGIN(evt_train_door)
     RETURN
 EVT_END()
 
+/**
+ * Boarding scene on the first trip: the rear cars are shown,
+ * Mario and the partner walk to station attendant 2 (駅員2) beside the train,
+ * the door closes and the attendant says stg6_eki_05.
+ * The crossing barrier lowers (shadanki) and the train departs (hom_10_evt_resha_start) with the camera
+ * following it for about 15 seconds.
+ * It then sets GSWF_TRAIN_DEPARTED and GSWF_HOM00_TRAIN_DEPARTED,
+ * moves story progress to STORY_STG6_43_CONDUCTOR_APPEARS and changes the map to rsh_02_c ("hom_hassya").
+ */
 static EVT_BEGIN(evt_train)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("train_4"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("train_5"), MAPOBJ_FLAG_HIDE)
@@ -466,6 +532,12 @@ static EVT_BEGIN(evt_train)
     RETURN
 EVT_END()
 
+/**
+ * Exit event of the train door on the second trip:
+ * Mario boards, the crossing barrier closes, attendant 2 calls the train off,
+ * the train starts (hom_10_evt_resha_start, or start2 on the return trip),
+ * the train-leg counter is set to 1 (outbound) or 3 (return) and the map changes to rsh_02_c.
+ */
 EVT_BEGIN(evt_train_nidome)
     IF_INT_EQUAL(GSWF(GSWF_TRAIN_RETURN_TRIP), 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("train_4"), MAPOBJ_FLAG_HIDE)
@@ -555,6 +627,11 @@ EVT_BEGIN(evt_train_nidome)
     RETURN
 EVT_END()
 
+/**
+ * Arrival cutscene at Riverside Station (story before 27):
+ * the Excess Express pulls in, the doors open, Toron and Powan the detective step off, Toron turns into Rampell,
+ * who speaks and hops away, the story becomes "Riverside Station" and the map changes to rsh_02_b.
+ */
 EVT_BEGIN(evt_hom_touchaku)
     CALL(evt_snd_bgm_scope, 0, 1)
     CALL(evt_mario_cont_onoff, 0)
@@ -670,6 +747,10 @@ EVT_BEGIN(evt_hom_touchaku)
     RETURN
 EVT_END()
 
+/**
+ * Arrival cutscene on the second visit (entering through "nidome"):
+ * the train pulls in, GSWF_TRAIN_AT_RIVERSIDE is set and the map changes to rsh_02_b.
+ */
 EVT_BEGIN(evt_hom_touchaku_nidome)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
@@ -691,6 +772,13 @@ EVT_BEGIN(evt_hom_touchaku_nidome)
     RETURN
 EVT_END()
 
+/**
+ * Riverside Station platform (hom_00) map init:
+ * sets up the NPCs, music, save block and recovery block, the train on the correct side,
+ * the sun's heat-haze effect and glare, the station clock,
+ * the drawbridge and the locked station door (opened with the Station Key),
+ * and starts the arrival or drawbridge scene as the story requires.
+ */
 EVT_BEGIN(hom_00_init_evt)
     SET_VALUE(GF(15), 0)
 #if VERSION >= VERSION_US
@@ -787,6 +875,10 @@ EVT_BEGIN(hom_00_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Texture-environment callback for the sun: every frame it fills a 64x64 indirect texture with a scrolling sine
+ * wave and sets up an indirect warp so the sun shimmers like a heat haze.
+ */
 static void sun_tev(MapTevCallbackInfo* info) {
     static const s32 texmtx_tbl[] = {
         GX_TEXMTX0,
@@ -847,6 +939,10 @@ static void sun_tev(MapTevCallbackInfo* info) {
     info->texCoord = texMap + 1;
 }
 
+/**
+ * Script helper, runs forever: draws a glare filter over the sun's screen rectangle (grown by 50 pixels),
+ * switching it off when the sun is off screen or the train has left (GF(15)).
+ */
 static USER_FUNC(test_glare) {
     MapObject* sun = mapGetMapObj("sun");
     u16* rect;
@@ -869,6 +965,10 @@ static USER_FUNC(test_glare) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Script helper: sets the hour and minute hand rotation of the station clock (LW(0) and LW(1)) from the
+ * console's real-time clock.
+ */
 static USER_FUNC(tokei) {
     s32 min;
     OSCalendarTime time;

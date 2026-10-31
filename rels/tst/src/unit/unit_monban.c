@@ -216,6 +216,10 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {NULL, 0.0f, NULL, NULL, 0, 1},
 };
 
+/**
+ * Battle init script for Gus: installs the wait, phase, attack, damage and confusion handlers,
+ * the walk and run sounds, the pose sound timing table, and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventPhase, BTL_UNIT_SELF, PTR(phase_event))
@@ -229,6 +233,11 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Plays the spike flash effect (toge_flush) at the top of Gus after 30 frames,
+ * when an attack is stopped by his spiked helmet.
+ * The effect is placed 48 above him, or 33 when he is Tiny (status 11) and 60 when he is Huge (status 10).
+ */
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -252,6 +261,10 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/**
+ * Damage handler: selects this unit (-2) and its part 1
+ * and runs the shared default damage reaction (btldefaultevt_Damage).
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -259,6 +272,11 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Gus's taunt: once per save (GSWF_GUS_TAUNT_SHOWN),
+ * at the start of the player's phase when Mario has 5 HP or less and Gus can act, it hides the status window,
+ * pans the camera and prints the message gor_02_008_01 from Gus, then restores the camera.
+ */
 static EVT_BEGIN(phase_event)
     IF_INT_EQUAL(GSWF(GSWF_GUS_TAUNT_SHOWN), 0)
         CALL(btlevtcmd_GetHp, BTL_UNIT_MARIO, LW(0))
@@ -283,6 +301,7 @@ static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/** Attack AI of Gus: uses an enemy item if it has one, otherwise a spear charge (50%) or a spear throw (50%). */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -307,6 +326,12 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Gus's spear charge on one target (the fixed first target in a flag-2 battle, otherwise a sampled enemy):
+ * he rears up with marching sounds, then dashes to the target and thrusts.
+ * A hit shakes the camera and he hops back; a miss makes him run past and turn.
+ * Afterwards he walks home and laughs three times.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -415,6 +440,11 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Gus throws his spear (part 2) at one target: he winds up, the spear flies in a spinning arc to the target and,
+ * on a hit, damages it; a miss plays the avoid animation and the spear is retrieved.
+ * Afterwards he laughs three times.
+ */
 static EVT_BEGIN(throw_attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -516,6 +546,10 @@ static EVT_BEGIN(throw_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Wait (idle) event: refreshes the body animation (part 1) from the unit's pose table
+ * so it matches the current state, then returns; the battle system runs it whenever the unit is idle.
+ */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN

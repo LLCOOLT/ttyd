@@ -20,6 +20,7 @@
 static TreeAccess tree_tbl[4];
 static BeroEntry bero_entry_data[3];
 
+/** Starts the snowfall effect (snowfall_n64) shared by the Fahr Outpost field maps. */
 EVT_BEGIN(evt_bom_snowfall)
     CALL(evt_eff64, 0, STRING("snowfall_n64"), 0, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     RETURN
@@ -32,12 +33,18 @@ static TreeAccess tree_tbl[] = {
     {7, NULL, NULL, NULL, 0, NULL},
 };
 
+/** Registers the map's tree access table (tree_tbl) with evt_sub_tree_access_entry so the trees can be shaken. */
 static EVT_BEGIN(evt_tree)
     SET_VALUE(LW(0), PTR(tree_tbl))
     CALL_CHILD(evt_sub_tree_access_entry)
     RETURN
 EVT_END()
 
+/**
+ * Pipe-exit event used when entering from the Rogueport Sewers pipe:
+ * on the very first arrival (GSWF_BOM_FAHR_REACHED not set) it hides Mario and the partner
+ * until first_evt clears GF(0), then shows them again; leaves LW(0) = 0.
+ */
 static EVT_BEGIN(first_evt_dokan)
     IF_INT_EQUAL(GSWF(GSWF_BOM_FAHR_REACHED), 1)
         SET_VALUE(LW(0), 0)
@@ -90,6 +97,12 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * First arrival at Fahr Outpost: letterboxed camera pan down over the snowfield,
+ * Mario and the partner walk into the scene, the partner speaks stg7_bom_01,
+ * and the story progress is set to STORY_STG7_00_START with GSWF_BOM_FAHR_REACHED raised.
+ * It clears GF(0) once the pan is done.
+ */
 static EVT_BEGIN(first_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -119,6 +132,12 @@ static EVT_BEGIN(first_evt)
     RETURN
 EVT_END()
 
+/**
+ * Arrival cutscene for the first visit when Fahr Outpost is reached
+ * before Chapter 7 proper (story step before STORY_STG6_71_01):
+ * the camera pulls down from above, Mario and the partner walk in from the pipe
+ * and the partner comments (stg7_bom_01_00). It does not advance the story.
+ */
 EVT_BEGIN(first_evt2)
     CALL(evt_snd_bgm_scope, 0, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -146,6 +165,12 @@ EVT_BEGIN(first_evt2)
     RETURN
 EVT_END()
 
+/**
+ * Init script of bom_00, the snowy entrance field of Fahr Outpost:
+ * sets the exits (the pipe back to Rogueport Sewers tik_07 and the path east to bom_03), the music and ambience,
+ * snowfall and trees, a Double Dip P brick and a Star Piece panel,
+ * and starts the arrival cutscene on the first visit.
+ */
 EVT_BEGIN(bom_00_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)

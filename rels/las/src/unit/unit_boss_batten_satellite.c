@@ -191,6 +191,12 @@ static BattleDataEntry data_table[] = {
     {0, NULL},
 };
 
+/**
+ * Event script: a satellite's reaction when it is hit:
+ * flags the unit, plays the miss sound for pose 43 (otherwise picks a pose type by the hit kind),
+ * plays the damage pose type, runs the unit's data event 10 alongside
+ * and turns the satellite to face the hit direction, and starts it falling with acceleration 1.
+ */
 EVT_BEGIN(dmg_counter_event)
     CALL(btlevtcmd_OnUnitFlag, LW(10), 1)
     SWITCH(LW(0))
@@ -242,6 +248,10 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_batten_satellite", "c_shuryo_p", 0.0f, 0.0f, 0.0f, -4.0f, -2.0f, 0.0f, -6.0f, 1.0f, 0.0f, 14, 14, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
 };
 
+/**
+ * Init event of the Grodus satellite: installs its wait, attack,
+ * damage and confusion events and offsets its HP gauge.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
@@ -253,10 +263,12 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/** Entry event of the Grodus satellite: does nothing (an empty script). */
 static EVT_BEGIN(entry_event)
     RETURN
 EVT_END()
 
+/** Damage event of the Grodus satellite: default damage handling. */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -264,14 +276,23 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/** Phase event of the Grodus satellite: does nothing (an empty script). */
 static EVT_BEGIN(phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Dead event of the Grodus satellite: does nothing here (an empty script);
+ * the satellite is removed by Grodus's own dead event.
+ */
 static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+/**
+ * Attack event of the Grodus satellite: always uses weapon_batten_satellite_attack
+ * (batten_satellite_attack_attack_event).
+ */
 static EVT_BEGIN(attack_event)
     SET_VALUE(LW(9), PTR(&weapon_batten_satellite_attack))
     CALL_CHILD(batten_satellite_attack_attack_event)
@@ -279,6 +300,11 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Event script: a satellite's attack.
+ * It plays pose F_1, picks a target, declares the attack and pays its cost,
+ * and plays SFX_BOSS_SATELLITE_ATTACK1; if no target was found it ends, flustered if confused.
+ */
 EVT_BEGIN(batten_satellite_attack_attack_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("F_1"))
     WAIT_MS(400)
@@ -370,11 +396,13 @@ EVT_BEGIN(batten_satellite_attack_attack_event)
     RETURN
 EVT_END()
 
+/** Wait event of the Grodus satellite: plays its idle pose from the pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/** Script helper: blocks until the shared satellite counter bts_x_flag_data equals args[0]. */
 USER_FUNC(bts_x_flag_wait) {
     s32 v = evtGetValue(event, event->args[0]);
 
@@ -384,21 +412,30 @@ USER_FUNC(bts_x_flag_wait) {
     return EVT_RETURN_BLOCK;
 }
 
+/** Script helper: returns the shared satellite counter bts_x_flag_data in args[0]. */
 static USER_FUNC(bts_x_flag_get) {
     evtSetValue(event, event->args[0], bts_x_flag_data);
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: adds args[0] to the shared satellite counter bts_x_flag_data. */
 USER_FUNC(bts_x_flag_add) {
     bts_x_flag_data += evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: sets the shared satellite counter bts_x_flag_data to args[0]. */
 USER_FUNC(bts_x_flag_set) {
     bts_x_flag_data = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper ("wariai" is ratio): float version.
+ * Computes (a*c + d*(b-a)) / b with a = args[0] - 1 and b = args[1]
+ * - 1, c = args[2] and d = args[3], and returns it as a float in args[4]; a mixing ratio used to place satellite
+ * afterimages.
+ */
 static USER_FUNC(bts_wariai_enzan_0f) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
@@ -410,6 +447,7 @@ static USER_FUNC(bts_wariai_enzan_0f) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: the same mixing ratio as bts_wariai_enzan_0f but stores the result as an integer in args[4]. */
 static USER_FUNC(bts_wariai_enzan_0) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
@@ -421,6 +459,11 @@ static USER_FUNC(bts_wariai_enzan_0) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: two-stage ramp blend between c = args[2] and d = args[3]:
+ * the weights r1 (from time args[5]) and r2 (from time args[6]) each rise from 0 to 1 and fall back
+ * after 14 frames, and the result c * (1 - w) + d * w with w = r1 * r2 is returned as a float in args[4].
+ */
 static USER_FUNC(bts_wariai_enzan_1f_intpl_w) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
@@ -459,6 +502,11 @@ static USER_FUNC(bts_wariai_enzan_1f_intpl_w) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: single-stage ramp blend between c = args[2]
+ * and d = args[3] with the weight rising over the first 14 frames of args[5] and falling again over the next 14;
+ * returns the float in args[4], c after 28 frames.
+ */
 static USER_FUNC(bts_wariai_enzan_1f_intpl) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
@@ -483,6 +531,10 @@ static USER_FUNC(bts_wariai_enzan_1f_intpl) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script helper: float ratio mix (a*c + d*(b-a)) / b with a = args[0] - 1, b = args[1], c = args[2],
+ * d = args[3], returned in args[4].
+ */
 static USER_FUNC(bts_wariai_enzan_1f) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
@@ -494,6 +546,7 @@ static USER_FUNC(bts_wariai_enzan_1f) {
     return EVT_RETURN_DONE;
 }
 
+/** Script helper: the same mix as bts_wariai_enzan_1f but returned as an integer in args[4]. */
 static USER_FUNC(bts_wariai_enzan_1) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;

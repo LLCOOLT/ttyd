@@ -63,8 +63,10 @@ static FileEntry* logoAsyncFirst(void);
 #endif
 
 #if VERSION <= VERSION_DEMO_US
-// The demos always start interlaced; the US demo also starts the logo files loading and preloads the E3 demo's
-// models and textures.
+/**
+ * The demos always start interlaced; the US demo also starts the logo files loading
+ * and preloads the E3 demo's models and textures.
+ */
 void seq_logoInit(SequenceWork* work) {
     memset(wp, 0, sizeof(LogoWork));
 #if VERSION == VERSION_DEMO_JP
@@ -91,6 +93,11 @@ void seq_logoInit(SequenceWork* work) {
 #endif
 }
 
+/**
+ * JP: loads mariost.tpl and decides whether to offer progressive scan (component cable,
+ * and the saved setting or B held at boot); starts reading b/first;
+ * sets the video mode, keeping progressive after a hot reset.
+ */
 #elif VERSION <= VERSION_JP
 void seq_logoInit(SequenceWork* work) {
     memset(wp, 0, sizeof(LogoWork));
@@ -141,6 +148,10 @@ void seq_logoInit(SequenceWork* work) {
 }
 
 #else
+/**
+ * US and PAL: as JP without the b/first read; PAL always asks 50 Hz or 60 Hz instead,
+ * preselecting the saved EURGB60 choice.
+ */
 void seq_logoInit(SequenceWork* work) {
     memset(wp, 0, sizeof(LogoWork));
     wp->logoId = LOGO_NONE;
@@ -195,6 +206,10 @@ void seq_logoInit(SequenceWork* work) {
 
 #endif
 
+/**
+ * Leaves the logo sequence: sets up the font, window, fade, icon,
+ * environment and effect textures and Mario's poses for the rest of the game, and frees mariost.tpl.
+ */
 void seq_logoExit(SequenceWork* work) {
     fontmgrTexSetup();
     windowTexSetup();
@@ -209,8 +224,10 @@ void seq_logoExit(SequenceWork* work) {
 #endif
 }
 
-// Two copies: US and PAL insert the story screen (states 2-9) and renumber every later state, and only JP and
-// the demo read b/first here.
+/**
+ * Two copies: US and PAL insert the story screen (states 2-9) and renumber every later state,
+ * and only JP and the demo read b/first here.
+ */
 #if VERSION <= VERSION_JP
 void seq_logoMain(SequenceWork* work) {
     static OSTime time; // time instance 1
@@ -363,6 +380,10 @@ void seq_logoMain(SequenceWork* work) {
 }
 
 #else
+/**
+ * US and PAL logo sequence: the story screen, the three logos (1 s each, 500 ms fades) while sound groups load,
+ * then the dmo_00 opening (skipped with A or Start to the title), or the kiosk menu on kiosk builds.
+ */
 void seq_logoMain(SequenceWork* work) {
     static OSTime time;
 
@@ -545,7 +566,7 @@ void seq_logoMain(SequenceWork* work) {
 
 #endif
 
-// param is unused
+/** param is unused */
 static void logoDisp(CameraId camId, void* param) {
     GXRenderModeObj* rmode;
     f32 width, height, x, y;
@@ -810,11 +831,16 @@ static void logoDisp(CameraId camId, void* param) {
 }
 
 #if VERSION <= VERSION_JP
-// JP and the demo start reading the first data file while the logos show
+/** JP and the demo start reading the first data file while the logos show */
 static FileEntry* logoAsyncFirst(void) {
     return fileAsyncf(0, 0, "%s/b/first", getMarioStDvdRoot());
 }
 #endif
+/**
+ * Background draw callback queued for the frame the video mode switches:
+ * sets the display copy and a 608x480 viewport and scissor for the interlaced
+ * or progressive (PAL: 50 or 60 Hz) render mode.
+ */
 static void dummy_draw(CameraId camId, void* param) {
     GXRenderModeObj* rmode;
     f32 scale;
@@ -839,7 +865,11 @@ static void dummy_draw(CameraId camId, void* param) {
 }
 
 #if VERSION <= VERSION_JP
-// param is unused
+/**
+ * JP and demo progressive-scan prompt: asks whether to display in progressive scan (left/right toggles,
+ * A confirms, 10 s idle picks the current choice), shows the result for 2 s and switches the video mode.
+ * param is unused
+ */
 static void progDisp(CameraId camId, void* param) {
     static OSTime time; // time instance 2
     const char* msg;
@@ -956,7 +986,7 @@ static void progDisp(CameraId camId, void* param) {
 }
 #else
 #if VERSION == VERSION_EU
-// PAL: the 50Hz / 60Hz (EURGB60) selection screen
+/** PAL: the 50Hz / 60Hz (EURGB60) selection screen */
 static void progDisp(CameraId camId, void* param) {
     static OSTime time;
     const char* msg;
@@ -1073,6 +1103,7 @@ static void progDisp(CameraId camId, void* param) {
 }
 
 #else
+/** US progressive-scan prompt: the same flow as JP's, with the text at full size and laid out differently. */
 static void progDisp(CameraId camId, void* param) {
     static OSTime time;
     const char* msg;

@@ -72,11 +72,16 @@ BOOL yuuminigame4_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
 static USER_FUNC(evt_nomal_cange);
 
 #if VERSION >= VERSION_JP
+/** Resets the camera shift offset (camShiftReset) so the camera returns to its normal framing after the minigame. */
 USER_FUNC(yuu_03_cam_shift_reset) {
     camShiftReset();
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Draw callback for the marker icon (ICON_1B6) that floats above Mario during Paper Mode;
+ * it bobs up 5 units for part of each 32-frame cycle.
+ */
 void yuu_03_icon_monte_disp(CameraId camera, void* param) {
     Monte* monte = param;
     s32 i;
@@ -95,6 +100,10 @@ void yuu_03_icon_monte_disp(CameraId camera, void* param) {
     }
 }
 
+/**
+ * View event that creates the single marker icon on its first call,
+ * keeps it 40 units above Mario every frame and draws it through yuu_03_icon_monte_disp. Blocks forever.
+ */
 USER_FUNC(yuu_03_icon_monte_entry) {
     BOOL exists = FALSE;
     MiniGameWork* wp = (MiniGameWork*)event->lwData[0];
@@ -140,6 +149,10 @@ USER_FUNC(yuu_03_icon_monte_entry) {
     return EVT_RETURN_BLOCK;
 }
 
+/**
+ * Rebuilds the marker icon view event for the next round:
+ * stops the old event, frees the icon array and starts a new one.
+ */
 USER_FUNC(yuu_03_icon_monte_restart) {
     SlitWork* data;
 
@@ -157,6 +170,7 @@ USER_FUNC(yuu_03_icon_monte_restart) {
 }
 #endif
 
+/** args[0] = minigame work pointer, args[1] = new phase for the Paper Mode state machine. */
 static USER_FUNC(yuuminigame4_set_phase) {
     EvtWord* args = event->args;
     SlitWork* data = ((MiniGameWork*)evtGetValue(event, args[0]))->data;
@@ -165,6 +179,10 @@ static USER_FUNC(yuuminigame4_set_phase) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script call that forces Mario out of the paper-thin "slit" squeeze motion
+ * if he has just started a new motion (marioSlitForceCancel).
+ */
 static USER_FUNC(evt_slit_cancel) {
     MarioWork* mario = marioGetPtr();
 
@@ -175,16 +193,26 @@ static USER_FUNC(evt_slit_cancel) {
     return EVT_RETURN_DONE;
 }
 
+/** Script call that re-runs the Paper Mode NPC (Pianta) set-up for the next round (ext_yuunpc_minigame4_init_sub). */
 static USER_FUNC(re_init_yuunpc) {
     ext_yuunpc_minigame4_init_sub();
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script call that clears bit 1 of the NPC work flags (yuunpc_wp_flag_off),
+ * letting the Pianta NPC move once the game starts.
+ */
 static USER_FUNC(yuunpc_go) {
     yuunpc_wp_flag_off(1);
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Script call that returns Mario to his normal form:
+ * cancels any roll and the paper-mode slit squeeze, then blocks until he is no longer in a slit.
+ * "nomal cange" is "normal change".
+ */
 static USER_FUNC(evt_nomal_cange) {
     MarioWork* mario = marioGetPtr();
 
@@ -204,6 +232,10 @@ static USER_FUNC(evt_nomal_cange) {
     return (mario->dispFlags & MARIO_DISP_FLAG_SLIT) ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
 
+/**
+ * args[0] = minigame work pointer, args[1] = on/off.
+ * Sets or clears the "opening cutscene pending" bit (flags bit 0).
+ */
 static USER_FUNC(yuuminigame4_opening_on_off) {
     EvtWord* args = event->args;
     SlitWork* data = ((MiniGameWork*)evtGetValue(event, args[0]))->data;
@@ -216,6 +248,10 @@ static USER_FUNC(yuuminigame4_opening_on_off) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * args[0] = minigame work pointer, args[1] = output.
+ * Writes 1 if the opening cutscene is still pending (flags bit 0), else 0.
+ */
 static USER_FUNC(yuuminigame4_opening_chk) {
     EvtWord* args = event->args;
     MiniGameWork* wp = (MiniGameWork*)evtGetValue(event, args[0]);
@@ -228,6 +264,10 @@ static USER_FUNC(yuuminigame4_opening_chk) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Emits one textured quad in immediate mode with its top-left corner at (x, y), size w by h,
+ * and texture coordinates running to (u, v).
+ */
 static void polygon(f32 x, f32 y, f32 w, f32 h, f32 u, f32 v) {
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(x, y, 0.0f);
@@ -240,6 +280,11 @@ static void polygon(f32 x, f32 y, f32 w, f32 h, f32 u, f32 v) {
     GXTexCoord2f32(0.0f, v);
 }
 
+/**
+ * Draw callback for the "ryushi" (particle) wind streaks of Paper Mode:
+ * sets up a textured additive GX pipeline and draws each active particle as a camera-facing quad that sways
+ * sideways on a sine table, tinted by the work colours.
+ */
 static void ryushi_disp(CameraId camera, void* param) {
     RyushiWork* hdr = xwp;
     s32 g = hdr->g;
@@ -308,12 +353,17 @@ static void ryushi_disp(CameraId camera, void* param) {
     }
 }
 
+/** Returns a random float between min and max using rand() / 32767. */
 static f32 randf(f32 min, f32 max) {
     f32 r = rand() / 32767.0f;
 
     return r * (max - min) + min;
 }
 
+/**
+ * Allocates the particle array (241 entries: one header plus 240 particles)
+ * and sets the header's default colours, scale and counters.
+ */
 static USER_FUNC(evt_ryushi_init) {
     RyushiWork* p;
     RyushiWork* q;
@@ -340,6 +390,10 @@ static USER_FUNC(evt_ryushi_init) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * args[0] = direction mode (0 streaks toward -z, 1 toward +z).
+ * Resets the particle header and lays the 240 particles out on a jittered grid (10 by 6 by 4) around the camera.
+ */
 static USER_FUNC(evt_ryushi_clr) {
     RyushiWork* p = xwp;
     EvtWord* args = event->args;
@@ -376,6 +430,10 @@ static USER_FUNC(evt_ryushi_clr) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Per-frame update of the wind particles: moves them at a speed set by the current Paper Mode wind state,
+ * wraps them around the view, fades them in and out with the state timer, and queues ryushi_disp.
+ */
 static USER_FUNC(evt_ryushi) {
     RyushiWork* hdr = xwp;
     Vec pos2;
@@ -495,12 +553,17 @@ static USER_FUNC(evt_ryushi) {
 }
 
 #if VERSION >= VERSION_JP
+/** Event wrapper that runs yuu_03_icon_monte_entry as a blocking view event. */
 EVT_BEGIN(yuu_03_icon_monte_entry_evt)
     CALL(yuu_03_icon_monte_entry)
     RETURN
 EVT_END()
 #endif
 
+/**
+ * Runs the wind particle effect for one gust: clears the particles for the direction in LW(1)
+ * and updates them each frame until GW(0) becomes 1 (gust over) or 2 (abort).
+ */
 EVT_BEGIN(ryushi_event)
     SET_VALUE(GW(0), 0)
     CALL(evt_ryushi_clr, LW(1))
@@ -517,18 +580,24 @@ EVT_BEGIN(ryushi_event)
     RETURN
 EVT_END()
 
+/** Puts Mario on the Paper Mode starting spot (x -1650) facing right. */
 EVT_BEGIN(yuu_03_kaijo_init)
     CALL(evt_mario_set_pos, -1650, 0, 0)
     CALL(evt_mario_set_dir, 90, 0, 0)
     RETURN
 EVT_END()
 
+/** Puts Mario back on the start spot after the opening camera or between rounds (x -1520) facing right. */
 EVT_BEGIN(yuu_03_kaijo_init2)
     CALL(evt_mario_set_pos, -1520, 0, 0)
     CALL(evt_mario_set_dir, 90, 0, 0)
     RETURN
 EVT_END()
 
+/**
+ * Set-up for minigame 4 (Paper Mode): freezes Mario's controls, allocates the minigame work area,
+ * dismisses the partners, starts the crowd sound and sets phase 1.
+ */
 EVT_BEGIN(minigame04_main)
     CALL(evt_mario_key_onoff, 0)
     CALL_CHILD(yuu_03_kaijo_init)
@@ -542,6 +611,10 @@ EVT_BEGIN(minigame04_main)
     RETURN
 EVT_END()
 
+/**
+ * Opening cutscene of Paper Mode: pans the 3D camera along the course,
+ * then shows the "menu_title_minigame4" title card.
+ */
 EVT_BEGIN(minigame04_start_cam)
     CALL(evt_cam3d_evt_set, FLOAT(-1520.0f), FLOAT(335.0f), FLOAT(850.0f), FLOAT(-1520.0f), FLOAT(65.0f), FLOAT(-25.0f), 0, 11)
     WAIT_FRAMES(1)
@@ -563,6 +636,10 @@ EVT_BEGIN(minigame04_start_cam)
     RETURN
 EVT_END()
 
+/**
+ * Cleans up when the player skips the opening camera:
+ * frees the title card, turns off the event camera and puts Mario at the start spot.
+ */
 EVT_BEGIN(minigame04_start_cam_cancel)
     CALL(evt_seq_wait, 2)
     CALL(evt_yuutitle_free)
@@ -574,6 +651,10 @@ EVT_BEGIN(minigame04_start_cam_cancel)
     RETURN
 EVT_END()
 
+/**
+ * Phase 1 of Paper Mode: plays the opening camera (skippable), starts the minigame music,
+ * shows the countdown effect, gives Mario control, lets the Pianta NPC go and starts the counter (limit 701).
+ */
 EVT_BEGIN(minigame04_start)
     CALL(yuuminigame4_opening_chk, LW(0), LW(1))
     IF_INT_NOT_EQUAL(LW(1), 0)
@@ -617,6 +698,13 @@ EVT_BEGIN(minigame04_start)
     RETURN
 EVT_END()
 
+/**
+ * Ends a Paper Mode round: lets Mario land and walks him to the goal side,
+ * shows the success or failure effect (the counter reaching 701 means failure), the score and monte rewards,
+ * and pays out the medals.
+ * Then asks whether to play again: quitting (or having fewer than 10 medals) sets GSWF_YUU_MINIGAME_QUIT
+ * and returns Mario to gor_03; playing again charges 10 medals and resets the course.
+ */
 EVT_BEGIN(minigame04_end)
 #if VERSION >= VERSION_JP
     CALL(evt_cam_letter_box_onoff, 1, 0)
@@ -820,6 +908,11 @@ EVT_BEGIN(minigame04_end)
 EVT_END()
 
 #if VERSION >= VERSION_US
+/**
+ * Map init for yuu_03 (Paper Mode room): starts the arrow, ball, grade and audience animations,
+ * the minigame set- up and the NPC script, and (US and later) hides all
+ * but the current game-language sign graphics.
+ */
 EVT_BEGIN(yuu_03_init_evt)
     CALL(evt_map_playanim, STRING("yajirushi"), 1, 0)
     CALL(evt_map_playanim, STRING("tama"), 1, 0)
@@ -855,6 +948,11 @@ EVT_BEGIN(yuu_03_init_evt)
     RETURN
 EVT_END()
 #else
+/**
+ * Map init for yuu_03 (Paper Mode room): starts the arrow, ball, grade and audience animations,
+ * the minigame set- up and the NPC script, and (US and later) hides all
+ * but the current game-language sign graphics.
+ */
 EVT_BEGIN(yuu_03_init_evt)
     CALL(evt_map_playanim, STRING("yajirushi"), 1, 0)
     CALL(evt_map_playanim, STRING("tama"), 1, 0)
@@ -866,6 +964,10 @@ EVT_BEGIN(yuu_03_init_evt)
 EVT_END()
 #endif
 
+/**
+ * Init callback for minigame 4: (JP and later) starts the marker icon event,
+ * marks the opening cutscene as pending and allocates the wind particles.
+ */
 void yuuminigame_init_4slit(EventEntry* event, BOOL isFirstCall) {
     SlitWork* data = ((MiniGameWork*)event->lwData[0])->data;
 
@@ -877,6 +979,12 @@ void yuuminigame_init_4slit(EventEntry* event, BOOL isFirstCall) {
     evt_ryushi_init(event, isFirstCall);
 }
 
+/**
+ * Per-frame state machine for Paper Mode: phase 1 starts minigame04_start, phase 2 picks the first wind delay,
+ * phases 2 and 3 run the rules check, phase 4 launches minigame04_end with the final counter
+ * and a result code chosen from the coin total (special repeated-digit totals pay out more).
+ * It also spins the "puro" and "pera" map objects (the course's turning bars) every frame.
+ */
 void yuuminigame_main_4slit(EventEntry* event, BOOL isFirstCall) {
     MiniGameWork* wp = (MiniGameWork*)event->lwData[0];
     SlitWork* data = wp->data;
@@ -982,10 +1090,17 @@ void yuuminigame_main_4slit(EventEntry* event, BOOL isFirstCall) {
     mapObjRotate("pera_9", 0.0f, 0.0f, data->rot2);
 }
 
+/** Draw callback for minigame 4: draws the collected-coin counter (monteCountDisp). */
 void yuuminigame_disp_4slit(CameraId camera, void* param) {
     monteCountDisp();
 }
 
+/**
+ * Per-frame rules of Paper Mode: runs the wind state machine (idle, gust building up, full gust, fading,
+ * in one of two directions with random delays), turns the puro/pera bars to match,
+ * pushes Mario along with the wind unless he is squeezed through a slit in paper form,
+ * and returns TRUE once he falls off (counter forced to 701) or reaches x >= 1500.
+ */
 BOOL yuuminigame4_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp, SlitWork* data) {
     MarioWork* mario = marioGetPtr();
     EventEntry* ev;

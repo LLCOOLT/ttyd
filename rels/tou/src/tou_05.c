@@ -36,6 +36,12 @@ static void gans_msg_callback(s32 type, void** work);
 extern EvtWord evt_hiki_open[];
 static EvtWord evt_kinoshikowa[222];
 
+/**
+ * Entrance script for the air duct: puts Mario and the partner at the duct mouth and walks them out of it.
+ * The first time (GSWF_TOU05_DUCT_GRATE_FALLEN clear) the duct grate (haikikau_2) falls off with a clatter,
+ * the partner remarks (stg3_tou_456) and the flag is set; the hit object a_haikikan is switched on.
+ * Control returns to Mario and LW(0) is set to 1.
+ */
 static EVT_BEGIN(evt_dakuto)
     CALL(evt_mario_normalize)
     CALL(evt_mario_set_pos, -160, 85, -65)
@@ -66,12 +72,20 @@ static EVT_BEGIN(evt_dakuto)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the office door (door_1), opening: LW(0) is the swing angle;
+ * turns door_1 about the Y axis by 0.44 times the angle.
+ */
 static EVT_BEGIN(n_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
+/**
+ * Door animation callback for the office door (door_1), closing:
+ * turns door_1 about the Y axis by -0.44 times the angle.
+ */
 static EVT_BEGIN(n_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
     CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
@@ -79,6 +93,10 @@ static EVT_BEGIN(n_door_close)
 EVT_END()
 
 #if VERSION >= VERSION_JP
+/**
+ * Entrance script: cancels a registered but unplayed match (clears GSWF_TOU_MATCH_RESERVED)
+ * when Mario leaves through the door.
+ */
 EVT_BEGIN(n_bero_match_reset)
     IF_INT_EQUAL(GSWF(GSWF_TOU_MATCH_RESERVED), 1)
         DEBUG_PUT_MSG(STRING("登録していた試合をリセット"))
@@ -129,6 +147,10 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
+/**
+ * Guess: chapter 3 scene in Grubba's office: Mario sees a plot against Rawk Hawk;
+ * the partner reacts (stg3_tou_456_01, 458), Grubba (ガンス) enters and confronts Mario (stg3_tou_459 onward).
+ */
 EVT_BEGIN(evt_takurami)
 #if VERSION >= VERSION_JP
     CALL(evt_mario_key_onoff, 0)
@@ -234,6 +256,7 @@ EVT_BEGIN(evt_takurami)
     RETURN
 EVT_END()
 
+/** Closes the desk drawer (kami_2 papers hidden) with the drawer-shut sound and re-registers evt_hiki_open. */
 EVT_BEGIN(evt_hiki_close)
 #if VERSION >= VERSION_JP
     CALL(evt_cam_letter_box_disable, 1)
@@ -274,6 +297,11 @@ EVT_BEGIN(evt_hiki_close)
     RETURN
 EVT_END()
 
+/**
+ * Guess: opens the desk drawer in Grubba's office:
+ * the partner and Mario step up to the desk, the drawer opens
+ * and Mario finds a Star Piece (once; GSWF_TOU05_DRAWER_STAR_PIECE_TAKEN).
+ */
 EVT_BEGIN(evt_hiki_open)
 #if VERSION >= VERSION_JP
     CALL(evt_cam_letter_box_disable, 1)
@@ -361,6 +389,10 @@ EVT_BEGIN(evt_hiki_open)
     RETURN
 EVT_END()
 
+/**
+ * NPC init for Grubba (ガンス) in his office: before STORY_STG3_04_GONZALES_IS_BORN he stands at (120, 0, 0) facing
+ * 270.
+ */
 static EVT_BEGIN(init_gans)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_03_GRUBBA)
@@ -373,6 +405,13 @@ static EVT_BEGIN(init_gans)
     RETURN
 EVT_END()
 
+/**
+ * Talk script of Grubba in the office when Mario signs up for the Glitz Pit:
+ * Grubba asks (stg3_tou_54) and Mario answers the yes/no menu (stg3_tou_52_yn).
+ * One answer gets a short reply (stg3_tou_53).
+ * The other fades out, resets everyone in front of Grubba, and they talk (stg3_tou_55, 55_01, 56);
+ * the story advances to STORY_STG3_03_GRUBBA and evt_kinoshikowa runs.
+ */
 static EVT_BEGIN(talk_gans)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_set_dir_to_target, STRING("ガンス"), STRING("mario"))
@@ -426,6 +465,10 @@ static EVT_BEGIN(talk_gans)
     RETURN
 EVT_END()
 
+/**
+ * NPC init for Jolene (キノシコワ, the Toad receptionist):
+ * from STORY_STG3_32_BOSS_BATTLE on she stands at (127, 0, 7) facing 270.
+ */
 static EVT_BEGIN(init_kinoshikowa)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_32_BOSS_BATTLE)
@@ -436,6 +479,14 @@ static EVT_BEGIN(init_kinoshikowa)
     RETURN
 EVT_END()
 
+/**
+ * Guess: talk script of Jolene, who runs two Trouble Center jobs.
+ * Job 13 is the Battle Trunks job (it checks ITEM_BATTLE_TRUNKS in the pouch, first asks for them,
+ * then pays 30 coins and records the finish time in GSW_TOU_JOLENE_TROUBLE_TIME).
+ * Job 23: the Wrestling Mag job (if Mario has the magazine she is delighted; otherwise Mario shrugs,
+ * she runs off past Grubba's desk and comes back with the ITEM_WRESTLING_MAG, which Mario receives).
+ * Outside the jobs she says stg3_tou_re_008 from STORY_STG3_32_BOSS_BATTLE on and nothing before.
+ */
 static EVT_BEGIN(talk_kinoshikowa)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 13)
         CALL(evt_pouch_check_item, ITEM_BATTLE_TRUNKS, LW(0))
@@ -573,6 +624,12 @@ static NpcSetupInfo npcEnt[] = {
     {0},
 };
 
+/**
+ * Scene after Mario signs up: Grubba (stg3_tou_57) calls in Jolene (キノシコワ), who enters through the office door,
+ * walks to the desk and talks with Grubba (stg3_tou_58 to 61);
+ * then she leads Mario out, the door opens, GSWF_TOU_JOLENE_ESCORT_1_PENDING is set
+ * and the map changes to tou_04.
+ */
 static EVT_BEGIN(evt_kinoshikowa)
     CALL(evt_msg_print, 0, STRING("stg3_tou_57"), 0, STRING("ガンス"))
     WAIT_MS(300)
@@ -648,6 +705,13 @@ static EVT_BEGIN(evt_kinoshikowa)
     RETURN
 EVT_END()
 
+/**
+ * Scene on Mario's first visit to the office (before STORY_STG3_03_GRUBBA, run from the map init):
+ * Grubba (ガンス) greets Mario with his theme (BGM_EVT_STG3_GANCE1),
+ * explains the fighter's contract (stg3_tou_43 to 47, with a yes/no menu),
+ * walks around Mario as camera moves in, then leaves through the door;
+ * GSWF_TOU_GRUBBA_ESCORT_PENDING is set and the map changes to tou_04.
+ */
 static EVT_BEGIN(evt_sensyu)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envoff, PSND_FADE_OUT)
@@ -758,6 +822,10 @@ static EVT_BEGIN(evt_sensyu)
     RETURN
 EVT_END()
 
+/**
+ * Chapter 3 intro scene: Grubba welcomes Mario and offers to enter him in the Glitz Pit (stg3_tou_51 to 55),
+ * asks yes/no, and advances the story to STORY_STG3_03_GRUBBA.
+ */
 EVT_BEGIN(evt_sensyu2)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, 20, 0, 0)
@@ -816,6 +884,12 @@ EVT_BEGIN(evt_sensyu2)
     RETURN
 EVT_END()
 
+/**
+ * Scene run from the map init when GSWF_TOU_PROMOTION_PENDING is set (the promotion to the first league, the
+ * majors): Jolene (キノシコワ) comes in, Grubba jumps out from behind the desk
+ * and the two talk (stg3_tou_287 to 293); Grubba hands Mario 30 coins;
+ * Jolene leaves through the door, GSWF_TOU_JOLENE_ESCORT_MAJORS_PENDING is set and the map changes to tou_04.
+ */
 static EVT_BEGIN(evt_1st_leagu)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -947,6 +1021,7 @@ static EVT_BEGIN(evt_1st_leagu)
     RETURN
 EVT_END()
 
+/** Guess: peeking-scene narration; prints the two lines stg3_tou_316_03 and 316_04 at fixed positions. */
 EVT_BEGIN(evt_nozoki_msg)
     LOOP(0)
         CALL(evt_msg_toge, 2, -50, 100, 0)
@@ -959,6 +1034,10 @@ EVT_BEGIN(evt_nozoki_msg)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Mario peeks at Grubba and Jolene's meeting through the paper-thin gap (Jolene's secret, story stage
+ * 20_12): the camera zooms, a capture of the dark sprite shows through, and the two talk.
+ */
 EVT_BEGIN(evt_nozoki)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -1167,6 +1246,11 @@ EVT_BEGIN(evt_nozoki)
     RETURN
 EVT_END()
 
+/**
+ * Guess: scene when Mario re-enters the league after Chapter 3:
+ * Jolene (キノシコワ) explains the rematch rules in the office (stg3_tou_re_003 to 005_2 and following)
+ * and walks around the room.
+ */
 EVT_BEGIN(evt_sensyu_reentry)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_dir, 90, 0, 0)
@@ -1227,6 +1311,11 @@ EVT_BEGIN(evt_sensyu_reentry)
     RETURN
 EVT_END()
 
+/**
+ * Map init for tou_05, Grubba's office: sets up the Star Piece, the desk papers and the camera animation,
+ * drops Mario in from the ceiling when he enters through "fall",
+ * and chooses the scene to run from the story progress.
+ */
 EVT_BEGIN(tou_05_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
@@ -1389,6 +1478,10 @@ EVT_BEGIN(tou_05_init_evt)
     RETURN
 EVT_END()
 
+/**
+ * Message-window callback: counts printed text windows (type 2) into GW(10),
+ * so a scene script can wait for Grubba's speech to reach a given line.
+ */
 static void gans_msg_callback(s32 type, void** work) {
     EventEntry* evt = ((MsgWinData*)*work)->event;
     if (type == 2) {

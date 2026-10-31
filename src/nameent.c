@@ -91,10 +91,12 @@ static const char* msg_tbl[] = {
     "msg_nameent_4"
 };
 
+/** Clears the name entry state. Called once at boot (marioStInit). */
 void nameEntInit(void) {
     memset(wp, 0, sizeof(NameEntryWork));
 }
 
+/** Makes the next nameEntMain free the name entry textures and stop drawing. Used when the game over screen resets. */
 void nameEntReInit(void) {
     wp->loadState = 3;
 }
@@ -132,6 +134,10 @@ const char* latin_tbl[] = {
 #define NAME_TPL_JP "%s/w/jp/name.tpl"
 #endif
 
+/**
+ * Starts loading the name entry textures (w/<language>/name.tpl; the JP builds always use jp,
+ * the demo reads window/jp) and returns TRUE once they are loaded. Callers poll it before nameEntOn.
+ */
 BOOL nameEntPrepare(void) {
 #if VERSION >= VERSION_US
     const char* lang[6] = {"jp", "us", "ge", "fr", "sp", "it"};
@@ -141,6 +147,16 @@ BOOL nameEntPrepare(void) {
 #endif
 }
 
+/**
+ * Opens the name entry screen.
+ * type selects the prompt from msg_tbl and the rules:
+ * 0 the save file name (seq_load), 1 Yoshi's name (tou_10, blank gives his default name),
+ * 2 and 3 guessing Doopliss's name (gra_00) before and after the Letter P is recovered,
+ * 4 the password in the X-Naut Fortress (aji_01).
+ * Starts with hiragana (latin outside Japanese in the US and PAL releases),
+ * an empty 8-character name and the cursor at the top left.
+ * Type 2 blanks the grid cell the name needs (hiragana and katakana n, latin p), so it cannot be typed yet.
+ */
 void nameEntOn(s32 type) {
     s32 i;
 
@@ -209,19 +225,27 @@ void nameEntOn(s32 type) {
 #endif
 }
 
+/** Closes the name entry screen: the next nameEntMain frees its textures. */
 void nameEntOff(void) {
     wp->loadState = 3;
 }
 
+/** Lets the screen take input (flag 1) and returns TRUE while the player has not yet confirmed or cancelled. */
 BOOL nameEntWait(void) {
     wp->flags |= 1;
     return wp->state != 0x65;
 }
 
+/** TRUE when the player backed out with B on an empty file name (type 0 only). */
 BOOL nameEntIsCancel(void) {
     return (wp->flags >> 1) & 1;
 }
 
+/**
+ * Returns the confirmed name with trailing blanks (full-width spaces,
+ * or plain spaces in the latin table) cut off, keeping at least one character;
+ * NULL until the player has confirmed.
+ */
 const char* nameEntGetName(void) {
     s32 j;
 
@@ -257,6 +281,7 @@ const char* nameEntGetName(void) {
     return wp->name;
 }
 
+/** Loads the language's name.tpl into tplFile once the async read has finished; FALSE while it is still loading. */
 static inline BOOL nameEntLoad(void) {
 #if VERSION >= VERSION_US
     const char* lang[6] = {"jp", "us", "ge", "fr", "sp", "it"};
@@ -276,6 +301,10 @@ static inline BOOL nameEntLoad(void) {
     return FALSE;
 }
 
+/**
+ * Per frame: loads the textures, runs nameMain while the screen is open, or frees them after nameEntOff,
+ * and queues nameEntDisp in the 3D camera layer while anything is shown.
+ */
 void nameEntMain(void) {
     switch (wp->loadState) {
         case 0:
@@ -301,7 +330,7 @@ void nameEntMain(void) {
 }
 
 #if VERSION <= VERSION_DEMO_US
-// The demo has no cursor travel check, no all-blank name check and no default partner name.
+/** The demo has no cursor travel check, no all-blank name check and no default partner name. */
 static s32 nameMain(void) {
     s32 off;
     s32 idx;
@@ -463,6 +492,14 @@ static s32 nameMain(void) {
     return 0;
 }
 #else
+/**
+ * Input and animation for the name entry screen (JP and later).
+ * The stick moves the cursor over the 14 x 9 character grid and the side buttons (hiragana, katakana, back, end;
+ * the latin grid has only back and end), A types a character or presses a button, B deletes, Start jumps to end.
+ * End asks to confirm (state 100): an all-blank name is refused for file names,
+ * and for Yoshi becomes his default name. Confirming sets state 0x65.
+ * Also eases the cursor and the caret and fades the background mask.
+ */
 static s32 nameMain(void) {
     s32 len;
     s32 j;
@@ -848,6 +885,11 @@ static s32 nameMain(void) {
 
 #endif
 
+/**
+ * Draws the name entry screen in 2D: background, the name boxes with the 8 typed characters, the character grid,
+ * the side buttons, the caret, the prompt window for this type and, while confirming,
+ * the yes/no window over a darkening mask. Restores the camera, projection and viewport afterwards.
+ */
 static void nameEntDisp(CameraId cameraId, void* param) {
     GXColor white2;
     GXColor white;
@@ -963,6 +1005,10 @@ static void nameEntDisp(CameraId cameraId, void* param) {
     GXSetViewport(vp[0], vp[1], vp[2], vp[3], vp[4], vp[5]);
 }
 
+/**
+ * Draws the screen background from name.tpl: a 32-pixel strip on each side (textures 0x22 and 0x23)
+ * and the 544-pixel middle (0x21), all 480 high.
+ */
 static void nameBG(void) {
     Mtx m1, m2, m3;
     GXTexObj obj1, obj2, obj3;
@@ -1049,6 +1095,7 @@ static void nameBG(void) {
     GXTexCoord2f32(1.0f, 0.0f);
 }
 
+/** Draws one textured quad from name.tpl texture id at (x, y), w x h, with the texture scaled to fit. */
 static inline void nameTexQuad(s32 id, f32 x, f32 y, f32 w, f32 h) {
     GXTexObj obj;
     Mtx i;
@@ -1076,6 +1123,10 @@ static inline void nameTexQuad(s32 id, f32 x, f32 y, f32 w, f32 h) {
     GXTexCoord2f32(1.0f, 0.0f);
 }
 
+/**
+ * Draws the panel the character grid sits on (kirinuki, a cut-out) from nine name.tpl pieces:
+ * 8-pixel corners and edges around the middle.
+ */
 static void nameKirinukiGX(f32 x, f32 y, f32 w, f32 h) {
     GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
     GXSetZCompLoc(GX_FALSE);
@@ -1105,6 +1156,11 @@ static void nameKirinukiGX(f32 x, f32 y, f32 w, f32 h) {
     nameTexQuad(0x32, x + w - 8, y - (h - 8), 8, 8);
 }
 
+/**
+ * Draws the full-screen mask behind the confirm window from fade texture 1,
+ * scaling the texture about its centre by 1000 t^5 (t is maskAlpha, 0 to 1, raised while confirming).
+ * Guess: this fades the screen behind the window darker.
+ */
 void nameMaskGX(f32 t) {
     Mtx a, b, c;
     GXTexObj obj;
@@ -1153,6 +1209,7 @@ void nameMaskGX(f32 t) {
     GXTexCoord2f32(0.0f, 1.0f);
 }
 
+/** Draws one window piece: texture a scaled to w x h modulated by textures b and c. */
 static inline void nameWinQuad(TEXPalette* tpl, s32 a, s32 b, s32 c, f32 x, f32 y, f32 w, f32 h) {
     GXTexObj obj;
     Mtx i;
@@ -1194,6 +1251,10 @@ static inline void nameWinQuad(TEXPalette* tpl, s32 a, s32 b, s32 c, f32 x, f32 
     GXTexCoord2f32(1.0f, 0.0f);
 }
 
+/**
+ * Draws a window frame at (x, y), w x h, from four pieces of the given texture palette starting at texture type
+ * (the body and the right, bottom and corner edges, 16 pixels wide). Used for the confirm window.
+ */
 void nameWinGX(f32 x, f32 y, f32 w, f32 h, TEXPalette* tpl, s32 type) {
     GXSetZCompLoc(GX_TRUE);
     GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);

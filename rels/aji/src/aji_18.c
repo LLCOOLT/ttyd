@@ -33,6 +33,10 @@ static BeroEntry bero_entry_data[3];
 extern EvtWord evt_machine[];
 extern EvtWord key_lock_koujyou[];
 
+/**
+ * Script function: fills key_list with the Card Keys (item IDs 0x1D, 0x1E, 0x1F) that Mario carries,
+ * ending the list with -1, for the key slot menu.
+ */
 static USER_FUNC(make_list) {
     s32 n = 0;
 
@@ -49,6 +53,11 @@ static USER_FUNC(make_list) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Door close animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times 0.25;
+ * the open and close scripts apply the same transform. The demo builds use 0.2217.
+ */
 static EVT_BEGIN(w_door_close)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -61,6 +70,11 @@ static EVT_BEGIN(w_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door open animation step: moves the two door leaves S_door1_1
+ * and S_door1_2 in opposite directions along Z by the animation value in LW(0) times 0.25;
+ * the open and close scripts apply the same transform. The demo builds use 0.2217.
+ */
 static EVT_BEGIN(w_door_open)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -73,6 +87,11 @@ static EVT_BEGIN(w_door_open)
     RETURN
 EVT_END()
 
+/**
+ * Door close animation step: moves the two door leaves S_door2_1
+ * and S_door2_2 in opposite directions along Z by the animation value in LW(0) times 0.25;
+ * the open and close scripts apply the same transform. The demo builds use 0.2217.
+ */
 static EVT_BEGIN(e_door_close)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -85,6 +104,11 @@ static EVT_BEGIN(e_door_close)
     RETURN
 EVT_END()
 
+/**
+ * Door open animation step: moves the two door leaves S_door2_1
+ * and S_door2_2 in opposite directions along Z by the animation value in LW(0) times 0.25;
+ * the open and close scripts apply the same transform. The demo builds use 0.2217.
+ */
 static EVT_BEGIN(e_door_open)
 #if VERSION <= VERSION_DEMO_US
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
@@ -137,6 +161,13 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
+/**
+ * Case script of the three key slots of the factory door (A_kagi1 to 3):
+ * Mario puts a Card Key (ITEM_CARD_KEY_0x1D, 0x1E or 0x1F) from the item menu into the slot it belongs to.
+ * A right key lights the slot (GSWF_AJI18_CARD_KEY_SLOT_1 to 3) and is used up; a wrong one gets stg7_aji_67_01.
+ * When all three slots are filled the story becomes STORY_STG7_16_FACTORY_DOOR
+ * and the door's lamp turns from red to green.
+ */
 EVT_BEGIN(evt_machine)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("stg7_aji_67"), 0, 0)
@@ -218,6 +249,7 @@ EVT_BEGIN(evt_machine)
     RETURN
 EVT_END()
 
+/** Case script of the exit e_bero while the factory door is locked: shows the locked-door text stg7_aji_67_02. */
 EVT_BEGIN(key_lock_koujyou)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("stg7_aji_67_02"), 0, 0)
@@ -225,6 +257,11 @@ EVT_BEGIN(key_lock_koujyou)
     RETURN
 EVT_END()
 
+/**
+ * Scene played when Mario returns through e_bero after Lord Crump's defeat:
+ * Mario and the partner walk in, the partner speaks stg7_aji_43 to 45 (Mario thinks, then nods),
+ * and the partner is set to run after Mario again.
+ */
 static EVT_BEGIN(evt_koopa_after)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_seq_wait, 2)
@@ -262,6 +299,10 @@ static EVT_BEGIN(evt_koopa_after)
     RETURN
 EVT_END()
 
+/**
+ * Script function: if the global flag GLOBAL_FLAG_LOADED is set (a game was just loaded),
+ * clears it and starts a side- curtain fade-in, so a loaded save does not appear with the screen already open.
+ */
 static USER_FUNC(sysflag) {
     if (gp->flags & GLOBAL_FLAG_LOADED) {
         gp->flags &= ~GLOBAL_FLAG_LOADED;
@@ -270,6 +311,15 @@ static USER_FUNC(sysflag) {
     return EVT_RETURN_DONE;
 }
 
+/**
+ * Init script of aji_18, the room with the factory door:
+ * plays BGM_STG7_DUN2, sets up the exits, lights the three key slots by their flags (all filled from
+ * STORY_STG7_16_FACTORY_DOOR on), attaches evt_machine to each empty slot
+ * and locks the exit e_bero (key_lock_koujyou) before that point and between Lord Crump's defeat
+ * and STORY_STG7_25_00_1_BOWSER_POSHLEY_SANCTUM.
+ * In that last stretch, entering from e_bero puts a partner back with Mario if he has none,
+ * heals Mario and the partners, and starts evt_koopa_after.
+ */
 EVT_BEGIN(aji_18_init_evt)
     CALL(sysflag)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))

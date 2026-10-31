@@ -52,6 +52,7 @@ static void __SEQRunEvent(SYNSYNTH* synth, SEQTRACK* track);
 static void __SEQInitTracks(SEQSEQUENCE* sequence, u8* read, int tracks);
 static void __SEQReadHeader(SEQSEQUENCE* sequence, u8* midiStream);
 
+/** Adds a sequence at the head of the list of sequences that SEQRunAudioFrame plays, with interrupts disabled. */
 static void __SEQPushSequenceList(SEQSEQUENCE* sequence) {
     BOOL old;
 
@@ -66,6 +67,10 @@ static void __SEQPushSequenceList(SEQSEQUENCE* sequence) {
     OSRestoreInterrupts(old);
 }
 
+/**
+ * Removes a sequence from the list by clearing the list
+ * and pushing back every other sequence (so the order of the others is reversed), with interrupts disabled.
+ */
 static void __SEQRemoveSequenceFromList(SEQSEQUENCE* sequence) {
     BOOL old;
     SEQSEQUENCE* thisSequence;
@@ -86,6 +91,10 @@ static void __SEQRemoveSequenceFromList(SEQSEQUENCE* sequence) {
     OSRestoreInterrupts(old);
 }
 
+/**
+ * Reads a MIDI variable-length quantity (7 bits per byte, high bit means more bytes follow) at the track's read
+ * pointer and advances the pointer past it.
+ */
 static u32 __SEQGetIntTrack(SEQTRACK* track) {
     u32 value;
 
@@ -97,6 +106,7 @@ static u32 __SEQGetIntTrack(SEQTRACK* track) {
     return value;
 }
 
+/** Skips a MIDI system-exclusive event by reading its length and advancing the track pointer past the data. */
 static void __SEQHandleSysExEvent(SEQTRACK* track) {
     u32 length;
 
@@ -105,6 +115,10 @@ static void __SEQHandleSysExEvent(SEQTRACK* track) {
     track->current += length;
 }
 
+/**
+ * Stores the track's tempo in beats per second and converts it to 16.16 fixed-point MIDI ticks per audio frame
+ * (a frame is 160 samples at 32 kHz) using the file's ticks-per-beat.
+ */
 static void __SEQSetTicksPerFrame(SEQTRACK* track, f32 bps) {
     SEQSEQUENCE* sequence;
 
@@ -114,6 +128,7 @@ static void __SEQSetTicksPerFrame(SEQTRACK* track, f32 bps) {
     track->ticksPerFrame = (65536.0f * (160.0f / ((32000.0f / bps) / sequence->timeFormat)));
 }
 
+/** Handles the MIDI set-tempo meta event: reads the 24-bit microseconds per beat and sets the track's tempo from it. */
 static void __SEQTempoMetaEvent(SEQTRACK* track) {
     u32 data;
     f32 beatsPerSec;
@@ -131,6 +146,7 @@ static void __SEQTempoMetaEvent(SEQTRACK* track) {
     __SEQSetTicksPerFrame(track, beatsPerSec);
 }
 
+/** Marks a track finished; when the last running track ends the sequence is flagged as ended. */
 static void __SEQTrackEnd(SEQTRACK* track) {
     SEQSEQUENCE* sequence;
     ASSERTLINE(199, track);
@@ -143,6 +159,10 @@ static void __SEQTrackEnd(SEQTRACK* track) {
     }
 }
 
+/**
+ * Handles a MIDI meta event: end of track (0x2F) finishes the track, set tempo (0x51) changes the tempo,
+ * everything else is skipped by its length.
+ */
 static void __SEQHandleMetaEvent(SEQTRACK* track) {
     u8 type;
     u32 length;
@@ -166,6 +186,11 @@ static void __SEQHandleMetaEvent(SEQTRACK* track) {
     }
 }
 
+/**
+ * Reads the data bytes of a MIDI channel event (count from __SEQMidiEventLength),
+ * calls the callback registered for that controller number if it is a control change (0xB0),
+ * and passes the message to the synthesizer with SYNMidiInput.
+ */
 static void __SEQHandleSynthEvent(SYNSYNTH* synth, SEQTRACK* track) {
     u8 ch[3];
     u32 bytes;
@@ -196,6 +221,10 @@ static void __SEQHandleSynthEvent(SYNSYNTH* synth, SEQTRACK* track) {
     SYNMidiInput(synth, ch);
 }
 
+/**
+ * Runs the next event of a track: takes a new status byte if present (otherwise uses running status),
+ * dispatches sysex, meta or synth events, and ends the track when it reaches the end of its data.
+ */
 static void __SEQRunEvent(SYNSYNTH* synth, SEQTRACK* track) {
     u8 event;
 
@@ -225,6 +254,10 @@ static void __SEQRunEvent(SYNSYNTH* synth, SEQTRACK* track) {
     }
 }
 
+/**
+ * Scans the MIDI chunks after the header and sets up each MTrk chunk as a track of the sequence:
+ * data range, read pointer and default tempo (120 beats per minute equivalent).
+ */
 static void __SEQInitTracks(SEQSEQUENCE* sequence, u8* read, int tracks) {
     int i;
     u8* p;
@@ -259,6 +292,10 @@ static void __SEQInitTracks(SEQSEQUENCE* sequence, u8* read, int tracks) {
     }
 }
 
+/**
+ * Parses the MIDI header chunk (file type 0 or 1, track count, ticks per beat)
+ * and initialises the sequence's tracks; a type 0 file has one track.
+ */
 static void __SEQReadHeader(SEQSEQUENCE* sequence, u8* midiStream) {
     u8* read;
     u32 bytes;
@@ -301,14 +338,21 @@ static void __SEQReadHeader(SEQSEQUENCE* sequence, u8* midiStream) {
     sequence->tracksRunning = sequence->nTracks;
 }
 
+/** Initialises the sequencer library by emptying the list of sequences. */
 void SEQInit(void) {
     __SEQSequenceList = NULL;
 }
 
+/** Shuts the sequencer library down by emptying the list of sequences. */
 void SEQQuit(void) {
     __SEQSequenceList = NULL;
 }
 
+/**
+ * Advances every playing sequence (state 1 or 2) by one audio frame:
+ * for each running track it subtracts the frame's ticks from the delay and runs all events that fall due.
+ * A sequence that has ended is stopped, and restarted if it was in state 2 (looping).
+ */
 void SEQRunAudioFrame(void) {
     SEQSEQUENCE* sequence;
     u32 i;
@@ -351,6 +395,11 @@ void SEQRunAudioFrame(void) {
     }
 }
 
+/**
+ * Registers a MIDI sequence: sets up its synthesizer with the wavetable wt and ARAM addresses (SYNInitSynth),
+ * clears the controller callbacks, parses the MIDI data in midiStream
+ * and adds it to the play list in the stopped state.
+ */
 void SEQAddSequence(SEQSEQUENCE* sequence, u8* midiStream, void* wt, u32 aramBase, u32 zeroBase, u32 priorityVoiceAlloc, u32 priorityNoteOn, u32 priorityNoteRelease) {
     int i;
 
@@ -373,12 +422,17 @@ void SEQAddSequence(SEQSEQUENCE* sequence, u8* midiStream, void* wt, u32 aramBas
     __SEQPushSequenceList(sequence);
 }
 
+/** Takes a sequence out of the play list and shuts down its synthesizer. */
 void SEQRemoveSequence(SEQSEQUENCE* sequence) {
     ASSERTLINE(598, sequence);
     __SEQRemoveSequenceFromList(sequence);
     SYNQuitSynth(&sequence->synth);
 }
 
+/**
+ * Registers a function called with the track and controller number whenever the sequence sends the given MIDI
+ * control change.
+ */
 void SEQRegisterControllerCallback(SEQSEQUENCE* sequence, u8 controller, void (*callback)(void*, u8)) {
     ASSERTLINE(617, sequence);
     ASSERTLINE(618, controller < 128);
@@ -386,6 +440,11 @@ void SEQRegisterControllerCallback(SEQSEQUENCE* sequence, u8 controller, void (*
     sequence->callback[controller] = callback;
 }
 
+/**
+ * Sets a sequence's state: 1 plays, 2 plays and loops, 0 stops, 3 pauses.
+ * Starting from stopped rewinds every track and reads the first delay;
+ * stopping or pausing sends all-notes-off (controller 0x7B) on all 16 channels.
+ */
 void SEQSetState(SEQSEQUENCE* sequence, u32 state) {
     int i;
 
@@ -430,11 +489,13 @@ void SEQSetState(SEQSEQUENCE* sequence, u32 state) {
     sequence->state = state;
 }
 
+/** Returns the sequence's state (0 stopped, 1 playing, 2 looping, 3 paused). */
 u32 SEQGetState(SEQSEQUENCE* sequence) {
     ASSERTLINE(700, sequence);
     return sequence->state;
 }
 
+/** Sets the tempo of one track, or of all tracks when trackIndex is -1, from beats per minute. */
 void SEQSetTempo(SEQSEQUENCE* sequence, u32 trackIndex, f32 bpm) {
     int i;
 
@@ -451,17 +512,24 @@ void SEQSetTempo(SEQSEQUENCE* sequence, u32 trackIndex, f32 bpm) {
     __SEQSetTicksPerFrame(&sequence->track[trackIndex], bpm / 60.0f);
 }
 
+/** Returns the track's tempo in beats per minute. */
 f32 SEQGetTempo(SEQSEQUENCE* sequence, u32 trackIndex) {
     ASSERTLINE(733, sequence);
     ASSERTLINE(734, trackIndex < sequence->nTracks);
     return 60.0f* sequence->track[trackIndex].beatsPerSec;
 }
 
+/** Sets the master volume of the sequence's synthesizer in decibels. */
 void SEQSetVolume(SEQSEQUENCE* sequence, s32 dB) {
     ASSERTLINE(745, sequence);
     SYNSetMasterVolume(&sequence->synth, dB);
 }
 
+/**
+ * Returns the master volume of the sequence's synthesizer.
+ * Surprising: the function has no return statement,
+ * so the value returned is whatever the call leaves in the return register.
+ */
 long SEQGetVolume(SEQSEQUENCE* sequence) {
     ASSERTLINE(756, sequence);
     SYNGetMasterVolume(&sequence->synth);

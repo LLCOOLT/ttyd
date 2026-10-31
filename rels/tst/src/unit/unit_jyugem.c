@@ -211,6 +211,11 @@ static BattleUnitSetup entry_togezo = {
     NULL, // itemDropTable
 };
 
+/**
+ * Init script of the Lakitu (shared with the Dark Lakitu):
+ * installs the wait, unison-phase, attack, damage and confusion handlers (confusion reuses the attack),
+ * clears unit work 0 and 2, poses part 2 as JGM_P_1 and starts the wait event.
+ */
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
     CALL(btlevtcmd_SetEventUnisonPhase, BTL_UNIT_SELF, PTR(unison_phase_event))
@@ -224,6 +229,15 @@ static EVT_BEGIN(init_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Damage handler of the Lakitu. When it is not holding a Spiny egg it just runs the default damage.
+ * When it is holding one (unit work 0 = 1), the damage is dealt,
+ * and if it took damage or was afflicted by one of the checked statuses the egg falls out:
+ * part 2 drops to the ground, the hold is cleared (unit work 0, counter attribute,
+ * pose table and hit offset reset) and the damage script runs again for the fall;
+ * some damage codes and statuses (poison, burn, tiny, defense down, slow, allergic) make the egg fall in a
+ * higher arc instead.
+ */
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -319,6 +333,13 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Phase script run before the player's turn (not on turn 1):
+ * unless it is frozen, cannot act or is dizzy, confused or electrified,
+ * the Lakitu has a 50 percent chance to pick up a Spiny egg and hold it (JGM_A_1/A_2 poses with the hold sound,
+ * unit work 0 = 1, hold pose table, counter attribute on part 1 and a hit offset of 20 so it can be hit
+ * while holding).
+ */
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_EQUAL(LW(0), 0)
@@ -364,6 +385,10 @@ static EVT_BEGIN(unison_phase_event)
     RETURN
 EVT_END()
 
+/**
+ * Spike spark shown when an attacker is hurt by (or avoids) the spiked head:
+ * waits 30 frames, then spawns the toge_flush effect above the unit (45 up when Huge, 25 when Tiny, else 35).
+ */
 static EVT_BEGIN(avoid_counter_thorn_head_event)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -384,6 +409,10 @@ static EVT_BEGIN(avoid_counter_thorn_head_event)
     RETURN
 EVT_END()
 
+/**
+ * Positioning script that runs before the unit's first attack in a battle:
+ * puts it at height 10 and waits for the attack to end.
+ */
 static EVT_BEGIN(dmg_first_attack_pos_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 10)
@@ -392,6 +421,12 @@ static EVT_BEGIN(dmg_first_attack_pos_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Attack script of the Lakitu: after the item-use check it has a 20 percent chance to look for free space
+ * on the stage (either side) and call a Spiny with friend_event;
+ * otherwise it throws normally, 65 percent of the time as the plain throw (unit work 1 = 0) and
+ * otherwise with unit work 1 = 1.
+ */
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -460,6 +495,15 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: The Lakitu's normal attack (weapon_jyugem_attack):
+ * if it was holding an egg it lets it go (JGM_A_1 and A_2, hold state cleared),
+ * then throws part 2 (the Spiny egg) in an arc at the target (JGM_A_3 with the throw sound).
+ * A miss lets the egg fly on; a hit applies the damage with the guard-timing check.
+ * If the hit was a plain damage hit (damage flag 0x40000) it also finds free space
+ * and spawns a Spiny (entry_togezo, togezo_copy_status) that rolls out of the egg;
+ * the egg then drops back to the Lakitu.
+ */
 static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), PTR(&weapon_jyugem_attack))
@@ -617,6 +661,12 @@ static EVT_BEGIN(normal_attack_event)
     RETURN
 EVT_END()
 
+/**
+ * Guess: Lakitu calls a Spiny: releases the held egg if any,
+ * throws part 2 (the Spiny egg) to the free spot at LW(0) to LW(2),
+ * spawns a Spiny there (entry_togezo, copying the Lakitu's status with togezo_copy_status) that spins out of the
+ * egg (TGZ_P_1 then TGZ_S_1), and sets the spot as its home position.
+ */
 static EVT_BEGIN(friend_event)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
@@ -676,11 +726,17 @@ static EVT_BEGIN(friend_event)
     RETURN
 EVT_END()
 
+/** Idle script: sets the standard waiting pose from the unit's pose table. */
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
 EVT_END()
 
+/**
+ * Script helper: args[0] and args[1] are unit ids (BattleTransID).
+ * Copies the size-change (Mini/Mega) turns and strength from the first unit to the second,
+ * so a unit spawned or replaced mid-battle keeps the size it had. Called with the new unit (LW(3)).
+ */
 static USER_FUNC(togezo_copy_status) {
     EvtWord* args = event->args;
     s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));
