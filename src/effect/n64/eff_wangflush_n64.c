@@ -23,7 +23,7 @@ typedef struct EffWangFlushN64Work {
     s32 frame;      // 0x30
 } EffWangFlushN64Work;
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // The demo defines the colours first
 static u8 color_rotation_data[] = {
     0xFF, 0xFF, 0x52, 0xFF, 0xFF, 0x52, 0xB5, 0x94,

@@ -403,7 +403,7 @@ EVT_BEGIN(trap_event)
             BREAK_LOOP
         END_IF
     END_LOOP
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL_CHILD(mri_guide_goryu)
 #endif
     CALL(evt_puni_flag_onoff, 1, 0, 262144)
@@ -413,7 +413,7 @@ EVT_BEGIN(trap_event)
     CALL(evt_npc_set_position, STRING("ガイド"), LW(0), LW(1), LW(2))
     CALL(evt_npc_flag_onoff, 1, STRING("ガイド"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_npc_flag_onoff, 1, STRING("ガイド"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
 #endif
     CALL(evt_npc_set_ry, STRING("ガイド"), 270)
@@ -736,7 +736,7 @@ static EVT_BEGIN(breakyuka_main)
 #if VERSION >= VERSION_JP
             CALL(evt_puni_flag_onoff, LW(10), 1, 2097152)
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_puni_flag_onoff, LW(10), 1, 0xA00000)
             CALL(evt_puni_set_trap_index, LW(10), 0)
 #endif
@@ -863,7 +863,7 @@ EVT_BEGIN(mri_17_init_evt)
         SPAWN_EVENT(trap_restore)
         CASE_GREATER_OR_EQUAL(STORY_STG2_21_04_ESCAPE)
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CASE_GREATER_OR_EQUAL(STORY_STG2_21_03_SUPER_BOOTS)
 #endif
     END_SWITCH

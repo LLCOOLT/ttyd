@@ -64,7 +64,7 @@ WinMgrDesc coin_desc = {
 };
 
 /** The release versions take a flag first and, when it is set, also return the select window's cursor */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 USER_FUNC(evt_win_item_select) {
     EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
@@ -365,7 +365,7 @@ static void coin_disp(WinMgrEntry* entry) {
         }
         w->timer++;
         w->timer = w->timer % 1200;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         if (__abs(target - w->coins) == 1 || gp->retraceCount % 6 == 0) {
             psndSFXOn("SFX_COUNT_COIN1");
         }

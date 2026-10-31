@@ -38,7 +38,7 @@ static EvtWord attack_event_pata[339];
 static EvtWord wait_event_pata[6];
 static PoseTableEntry pose_table[18];
 static PoseTableEntry pose_table_ceil[18];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static PoseTableEntry pose_table_turn[15];
 #else
 static PoseTableEntry pose_table_turn[17];
@@ -178,7 +178,7 @@ static BattleUnitDefense defence_pata = {{4, 99, 4, 99, 4}};
 /** Element response of the Parabuzzy, flying form: it is immune to fire and explosions. */
 static BattleUnitDefenseAttr defence_attr_pata = {{0, 2, 0, 2, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Status vulnerability of the Parabuzzy, flying form (percent, 0 is immune): immune to burn. Demo values. */
 static StatusVulnerability regist_pata = {75, 90, 75, 100, 75, 100, 0, 75, 100, 75, 100, 75, 100, 75, 75, 60, 95, 100, 75, 100, 100, 95};
 #else
@@ -607,7 +607,7 @@ static BattleUnitDefense defence_turn = {0};
 /** Element response of the Parabuzzy, flipped on its back: none, every attack type is treated normally. */
 static BattleUnitDefenseAttr defence_attr_turn = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Status vulnerability of the Parabuzzy (percent, 0 is immune): immune to burn. Demo values. */
 static StatusVulnerability regist = {75, 90, 75, 100, 75, 100, 0, 75, 100, 75, 100, 75, 100, 75, 75, 60, 65, 100, 75, 100, 100, 95};
 #else

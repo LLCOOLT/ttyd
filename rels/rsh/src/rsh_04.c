@@ -368,7 +368,7 @@ EVT_BEGIN(evt_shorui_funshitu)
     CALL(evt_npc_flag_onoff, 0, STRING("ポワン探偵"), NPC_FLAG_INTANGIBLE)
 #endif
     CALL(evt_npc_status_onoff, 1, STRING("ポワン探偵"), 2)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_msg_print, 0, STRING("stg6_rsh_167"), 0, 0)
 #else
     CALL(evt_msg_print, 0, STRING("stg6_rsh_167"), 0, STRING("me"))
@@ -491,7 +491,7 @@ EVT_BEGIN(evt_daijisouna_kami)
     CALL(evt_set_dir_to_target, STRING("me"), STRING("mario"))
     CALL(evt_npc_flag_onoff, 0, STRING("ポワン探偵"), NPC_FLAG_INTANGIBLE)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_172"), 0, STRING("me"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_win_item_select, PTR(item_tbl), LW(1))
 #else
     CALL(evt_win_item_select, 0, PTR(item_tbl), LW(1), 0)
@@ -654,7 +654,7 @@ static EVT_BEGIN(talk_syashou)
         CASE_LESS(STORY_STG6_19_GIVE_BLANKET)
         // The Blanket exchange: he takes the Blanket and gives a Mushroom.
         CALL(evt_msg_print, 0, STRING("stg6_rsh_142"), 0, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_win_item_select, PTR(item_tbl2), LW(1))
 #else
         CALL(evt_win_item_select, 0, PTR(item_tbl2), LW(1), 0)
@@ -713,7 +713,7 @@ static EVT_BEGIN(talk_syashou)
             IF_INT_EQUAL(GSWF(GSWF_TRAIN_RETURN_TRIP), 0)
                 CALL(evt_msg_print, 0, STRING("stg6_rsh_c_13"), 0, 0)
             ELSE
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(evt_msg_print, 0, STRING("stg6_rsh_c_14"), 0, 0)
 #else
                 IF_INT_EQUAL(GSWF(GSWF_TRAIN_AT_ROGUEPORT), 0)
@@ -1047,7 +1047,7 @@ static EVT_BEGIN(talk_konari)
             END_IF
         ELSE
             CALL(evt_msg_print, 0, STRING("stg6_rsh_96"), 0, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_win_item_select, PTR(item_tbl3), LW(1))
 #else
             CALL(evt_win_item_select, 0, PTR(item_tbl3), LW(1), 0)
@@ -1290,7 +1290,7 @@ static NpcSetupInfo npc_data[] = {
  */
 EVT_BEGIN(evt_tana_5)
     IF_INT_EQUAL(GSWF(GSWF_RSH04_STAR_PIECE_SHELF), 1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_msg_print, 0, LW(1), 0, 0)
 #else
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_56_ROGUEPORT_STATION)
@@ -1313,7 +1313,7 @@ EVT_END()
 /** Luggage shelves of the car: each shelf hit area with the message it shows and the script a shelf runs. */
 static ShelfAccessTbl3 access_tbl = {
     {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {"tana_3", "stg6_rsh_272", NULL},
         {"tana_4", "stg6_rsh_273", NULL},
         {"tana_5", "stg6_rsh_274", evt_tana_5},
@@ -1330,7 +1330,7 @@ static ShelfAccessTbl3 access_tbl = {
 static EVT_BEGIN(evt_access)
     CALL(evt_mario_key_onoff, 0)
     IF_INT_EQUAL(LW(2), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_msg_print, 0, LW(1), 0, 0)
 #else
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_56_ROGUEPORT_STATION)
@@ -1350,7 +1350,7 @@ EVT_END()
 static EVT_BEGIN(evt_access_entry)
     SET_INT_READ_ADDR(PTR(&access_tbl))
     LOOP(0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         READ_INT3(LW(0), LW(1), LW(2))
 #else
         READ_INT4(LW(0), LW(1), LW(2), LW(3))
@@ -1843,7 +1843,7 @@ EVT_BEGIN(rsh_04_init_evt_nidome)
     ELSE
         IF_INT_EQUAL(GSWF(GSWF_TRAIN_ARRIVED_ROGUEPORT), 1)
             CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_GOR1"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_GOR5"))
 #else
             CALL(evt_snd_envoff, PSND_FADE_OUT)

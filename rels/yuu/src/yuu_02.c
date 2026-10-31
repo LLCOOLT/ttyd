@@ -85,7 +85,7 @@ Vec fukkipoint[] = {
     {1150.0f, 0.0f, 300.0f},
     {1500.0f, 0.0f, 300.0f},
     {1550.0f, 0.0f, -300.0f},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {950.0f, 200.0f, -300.0f},
 #else
     {925.0f, 200.0f, -300.0f},
@@ -359,7 +359,7 @@ static USER_FUNC(fall_rtn) {
                 if (hitCheckVecFilter(qp, NULL) == NULL) {
                     continue;
                 }
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 hit = query.hitPos;
                 query.targetPos.x -= 9.0f;
 #else
@@ -369,7 +369,7 @@ static USER_FUNC(fall_rtn) {
                 if (hitCheckVecFilter(qp, NULL) != NULL && query.hitPos.y > hit.y + 1.0f) {
                     continue;
                 }
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 // PAL also probes 2 units back in z and keeps the first floor height
                 query.targetPos.z -= 2.0f;
                 if (hitCheckVecFilter(qp, NULL) != NULL && query.hitPos.y > hit.y + 1.0f) {
@@ -546,7 +546,7 @@ void yuuminigame_main_3roll(EventEntry* event, BOOL isFirstCall) {
         case 4:
             wp->subEvent = evtEntry(minigame03_end, 0, 0);
             wp->subEvent->lwData[0] = data->coins;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (data->result == 0) {
                 data->result += 2;
             } else if (data->result < 0) {
@@ -593,7 +593,7 @@ BOOL yuuminigame3_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
     if (!(data->flags & 2) && mario->position.y <= -50.0f) {
         data->flags |= 2;
         data->jumpEvent = evtEntry(yuu_02_jumpret, 0, 0);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         data->jumpEvent->lwData[0] = (s32)fukkipoint[data->index].x;
 #else
         data->jumpEvent->lwData[0] = (s32)fukkipoint[data->index].x + (fukkipoint[data->index].z >= 0.0f ? 5 : -5);
@@ -604,7 +604,7 @@ BOOL yuuminigame3_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
         data->result--;
     }
     if (!(data->flags & 2)) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         // the demo only counts checkpoints forward and has no checkpoint icon
         if (mario->position.z * fukkipoint[data->index + 1].z >= 0.0f && mario->position.y >= fukkipoint[data->index + 1].y - 1.0f) {
             if ((data->pos.x < fukkipoint[data->index + 1].x && mario->position.x >= fukkipoint[data->index + 1].x) ||
@@ -687,7 +687,7 @@ EVT_BEGIN(yuu_02_jumpret)
     CALL(evt_cam3d_evt_off, 1000, 0)
 #endif
     WAIT_MS(1000)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_cam3d_evt_off, 3000, 0)
     WAIT_MS(3000)
 #endif
@@ -729,7 +729,7 @@ EVT_END()
  * or between rounds (x 200 on US and later, 300 in the US demo, z 300).
  */
 EVT_BEGIN(yuu_02_kaijo_init2)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_set_pos, 300, 0, 300)
 #else
     CALL(evt_mario_set_pos, 200, 0, 300)
@@ -763,14 +763,14 @@ EVT_BEGIN(minigame03_start_cam)
     CALL(evt_cam3d_evt_set, FLOAT(-1600.0f), FLOAT(573.0f), FLOAT(1333.0f), FLOAT(-1600.0f), FLOAT(12.0f), FLOAT(-89.0f), 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_seq_wait, 2)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_cam3d_evt_set, FLOAT(1600.0f), FLOAT(573.0f), FLOAT(1333.0f), FLOAT(1600.0f), FLOAT(12.0f), FLOAT(-89.0f), 5000, 0)
 #else
     CALL(evt_cam3d_evt_set, FLOAT(1600.0f), FLOAT(573.0f), FLOAT(1333.0f), FLOAT(1600.0f), FLOAT(12.0f), FLOAT(-89.0f), 8000, 0)
 #endif
     WAIT_MS(1000)
     CALL(evt_yuutitle_alloc, 0, 0, STRING("menu_title_minigame3"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     WAIT_MS(2000)
 #else
     WAIT_MS(5000)
@@ -864,7 +864,7 @@ EVT_BEGIN(minigame03_start)
     CALL(eff_call_minigame, 0, 0, 0, 500)
     WAIT_MS(3000)
     CALL(yuuminigame3_roll_fix_on)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_key_onoff, 1)
 #else
     CALL(evt_cam_letter_box_onoff, 0, 0)
@@ -1055,7 +1055,7 @@ EVT_BEGIN(yuu_02_init_evt)
     SPAWN_EVENT(minigame03_main)
     CALL_CHILD(evt_yuunpc_minigame3)
     RETURN
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_END()
 #else
 EVT_END_PAD()

@@ -490,7 +490,7 @@ s32 pouchGetJumpLv(void);
 s32 pouchGetHammerLv(void);
 s32 pouchGetPartyAttackLv(PartyId partyId);
 BOOL pouchAddKeepItem(s16 id);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 BOOL pouchRemoveKeepItem(s32 id);
 #else
 BOOL pouchRemoveKeepItem(s32 id, s32 index);

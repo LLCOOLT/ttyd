@@ -107,7 +107,7 @@ static s16 nozle_1_texcoord1_tbl[] __attribute__((aligned(32))) = {
     16384, -5461, 16384, -8192, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
 };
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static s8 nozle_1_normal_tbl[] __attribute__((aligned(32))) = {0, 0, 64};
 #else
 static s8 nozle_1_normal_tbl[] __attribute__((aligned(32))) = {
@@ -345,7 +345,7 @@ static s16 nozle_4_texcoord1_tbl[] __attribute__((aligned(32))) = {
     8192, 12288, 8192, 16384, 8192, 20480, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
 };
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static s8 nozle_4_normal_tbl[] __attribute__((aligned(32))) = {0, 0, 64, 0};
 #else
 static s8 nozle_4_normal_tbl[] __attribute__((aligned(32))) = {
@@ -373,7 +373,7 @@ static u8 nozle_4_dl_0_size_tbl[] = {0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0
  * remaining life as it shrinks away at the end.
  */
 static u8 scale_dt[][2] = {{0, 0}, {11, 13}, {22, 27}, {34, 41}, {46, 55}, {57, 69}, {68, 82}, {79, 94}, {87, 105}, {94, 113}, {100, 120}, {102, 123}, {103, 124}, {101, 123}, {98, 120}, {95, 116}, {90, 111}, {86, 107}, {83, 103}, {81, 101}, {80, 100}, {0, 0}
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the demo keeps a fade-out half after the grow-in half
     , {80, 100}, {79, 99}, {77, 97}, {75, 94}, {73, 91}, {70, 87}, {66, 83}, {62, 78}, {58, 73}, {54, 67}, {49, 61}, {44, 55}, {39, 49}, {34, 42}, {29, 36}, {24, 29}, {19, 23}, {14, 17}, {9, 11}, {5, 6}, {0, 0}, {0, 0}
 #endif

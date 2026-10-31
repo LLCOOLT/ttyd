@@ -25,13 +25,13 @@ static BattleDataEntry data_table_christine[2];
 static BattleUnitKindPart parts_christine[1];
 static EvtWord init_event_christine[42];
 extern EvtWord damage_event_christine[];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord dead_event_christine[126];
 #else
 static EvtWord dead_event_christine[147];
 #endif
 static EvtWord attack_event_christine[690];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord wait_event_christine[6];
 #else
 static EvtWord wait_event_christine[7];
@@ -153,7 +153,7 @@ static BattleUnitDefense defence_christine = {{0, 0, 0, 0, 0}};
 /** Defence attributes of the Goombella double's body: none, so every damage type is dealt normally. */
 static BattleUnitDefenseAttr defence_attr_christine = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Goombella double in the demo, as a percent of the normal chance:
  * immune to fright, gale force, instant kill;
@@ -529,7 +529,7 @@ static USER_FUNC(_krb_get_dir) {
 static EVT_BEGIN(wait_event_christine)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_END()
 #else
 EVT_END_PAD()

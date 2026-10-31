@@ -202,7 +202,7 @@ static void effSstarMain(EffectEntry* effect) {
             w->rotZ = angleABf(0.0f, 0.0f, -w->velocity.y, w->screenSpeedX);
         }
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (mario->position.y - w->position.y > 300.0f) {
         w->life = -1;
     }

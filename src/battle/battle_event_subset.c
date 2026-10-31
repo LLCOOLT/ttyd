@@ -788,7 +788,7 @@ EVT_BEGIN(subsetevt_counter_damage)
 EVT_END()
 
 /** Plays the miss sound for an attack that did nothing. */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_BEGIN(subsetevt_nodamage_motion)
     CALL(evt_snd_sfxon, STRING("SFX_BTL_ATTACK_MISS2"), 0)
     RETURN
@@ -839,7 +839,7 @@ EVT_BEGIN(btldefaultevt_ChangePosition)
             WAIT_FRAMES(1)
             GOTO(10)
         END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(btlevtcmd_RunDataEventChild, LW(10), 59)
         CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
         CALL(btlevtcmd_SetHomePos, LW(10), LW(0), LW(1), LW(2))
@@ -864,7 +864,7 @@ EVT_END()
  */
 EVT_BEGIN(subsetevt_happy_heart)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(5))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(btlevtcmd_CheckDefinePosetype, BTL_UNIT_SELF, LW(5), 60, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(5), 60)
@@ -893,7 +893,7 @@ EVT_END()
 /** Happy Flower badge regeneration: like subsetevt_happy_heart for FP. */
 EVT_BEGIN(subsetevt_happy_flower)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(5))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(btlevtcmd_CheckDefinePosetype, BTL_UNIT_SELF, LW(5), 61, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(5), 61)
@@ -923,7 +923,7 @@ EVT_END()
  * Pause after the HP Regen status heals a unit at turn start:
  * 120 frames in the demos, 60 in retail (defined below).
  */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_BEGIN(subsetevt_regeneration)
     WAIT_FRAMES(120)
     RETURN
@@ -1179,7 +1179,7 @@ EVT_BEGIN(subsetevt_shot_damage_ultra)
     CALL(btlevtcmd_GetPos, LW(10), LW(0), EVT_NULLPTR, EVT_NULLPTR)
     CALL(_check_through_pos, LW(10), LW(2), LW(0), LW(1), LW(2))
     IF_INT_EQUAL(LW(2), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         SET_VALUE(LW(1), LW(0))
         WAIT_FRAMES(1)
         GOTO(32)

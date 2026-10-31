@@ -136,7 +136,7 @@ static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 /** Defence attributes of the Red Bones: none, every element hits it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo builds: Status vulnerability of the Red Bones (percent chance each status takes hold):
  * immune to poison, instant KO; resists sleep (50%), stop (50%), confusion (50%); the rest take hold at 80%

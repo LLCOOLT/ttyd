@@ -127,7 +127,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Elemental reactions of the Poison Pokey: none, every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Poison Pokey (percent, 100 is normal) in the demo builds: resists most statuses
  * (30-95%).
@@ -158,7 +158,7 @@ static BattleWeapon weapon_sambo_mummy_head_attack_4 = {
     1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
 #else
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
@@ -205,7 +205,7 @@ static BattleWeapon weapon_sambo_mummy_head_attack_3 = {
     1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
 #else
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
@@ -252,7 +252,7 @@ static BattleWeapon weapon_sambo_mummy_head_attack_2 = {
     1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
 #else
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
@@ -339,7 +339,7 @@ static BattleWeapon weapon_sambo_mummy_spike_attack_4 = {
     1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
 #else
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
@@ -380,7 +380,7 @@ static BattleWeapon weapon_sambo_mummy_spike_attack_3 = {
     1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
 #else
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
@@ -421,7 +421,7 @@ static BattleWeapon weapon_sambo_mummy_spike_attack_2 = {
     1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
 #else
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork

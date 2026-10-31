@@ -2,7 +2,7 @@
 // helpers seq_demo draws with.
 #include "gxsub.h"
 #include "version.h"
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #include "driver/camdrv.h"
 #endif
 
@@ -15,7 +15,7 @@ f32 queen_uv[4]
 #endif
     = {0.0f, -0.0016000001f, 0.0f, -0.00080000004f};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // The demo still has the 2D textured-quad helpers seq_demo draws with (cut from retail).
 
 //.sdata

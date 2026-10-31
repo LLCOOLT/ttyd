@@ -320,7 +320,7 @@ USER_FUNC(evt_mario_paper_pose_dokan) {
             party = partyGetPtr(marioGetPartyId());
             if (party) {
                 party->position = mp->position;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 // the demo copies the scale one axis at a time
                 party->scale.x = mp->scale.x;
                 party->scale.y = mp->scale.y;
@@ -338,7 +338,7 @@ USER_FUNC(evt_mario_paper_pose_dokan) {
             party = partyGetPtr(marioGetExtraPartyId());
             if (party) {
                 party->position = mp->position;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 // the demo copies the scale one axis at a time
                 party->scale.x = mp->scale.x;
                 party->scale.y = mp->scale.y;
@@ -398,7 +398,7 @@ const char* a_mario_group[] = {
     "M_H_8", "M_H_9", "M_H_9A", "M_H_9B", "M_O_1", "M_O_2", "M_B_1", "M_B_2", "M_D_1", "M_D_2",
     "M_U_3", "M_D_6", "M_P_1", "M_P_2", "M_I_1", "M_I_2", "M_I_S", "M_X_1", "M_I_U", "M_A_1A",
     "M_A_1B", "M_U_2", "M_W_7", "M_C_1", "M_C_2", "M_Y_1", "M_Y_2", "M_Y_3", "M_A_2A", "M_A_2B",
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     "M_A_2C", "M_B_3", "M_B_4", "M_J_5A", "M_J_5B", "M_S_4", "M_W_6", "M_V_2", "M_I_Y", "M_I_3", NULL,
 #else
     "M_A_2C", "M_B_3", "M_B_4", "M_J_5A", "M_J_5B", "M_S_4", "M_W_6", "M_V_2", "M_I_Y", NULL,
@@ -617,7 +617,7 @@ USER_FUNC(evt_mario_get_dir) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // the demo reads these turns from named constants defined after their users, so they are
 // loaded from memory and come first in .sdata2
 extern const f32 evt_mario_full_turn;
@@ -722,7 +722,7 @@ USER_FUNC(evt_mario_set_dir_npc) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo only: a full turn and a half turn in degrees, read by the Mario turn functions above
  * (DIR_FULL_TURN wraps a facing angle, DIR_HALF_TURN picks the left or right sprite facing).
@@ -794,7 +794,7 @@ USER_FUNC(evt_mario_set_pose) {
         return EVT_RETURN_DONE;
     }
     name = (const char*)evtGetValue(event, args[0]);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     if (strcmp(name, "M_I_2") == 0) {
         name = "M_I_3";
     }
@@ -816,7 +816,7 @@ USER_FUNC(evt_mario_normalize) {
     BOOL off;
 
     if (isFirstCall) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         // the demo has no slit reset, no normalize trigger bit and no wait for a ride to end
         event->userdata[1] = 0;
         off = !marioChkCtrl();
@@ -1024,7 +1024,7 @@ USER_FUNC(evt_mario_set_talk_motion) {
  */
 USER_FUNC(evt_mario_cancel_roll_motion) {
     if (isFirstCall) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         marioRollCancel(); // the demo has no marioRollTryCancel
 #else
         marioRollTryCancel();
@@ -1138,7 +1138,7 @@ static inline f32 doorAngle(f32 cam) {
         return 180.0f;
     return 270.0f;
 }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** the demo turns the partners behind Mario by the camera only, without close-follow mode */
 USER_FUNC(evt_mario_party_door_move) {
     EvtWord* args = event->args;
@@ -1408,7 +1408,7 @@ USER_FUNC(evt_mario_party_bero_move) {
             if (mp->position.y > party->position.y) {
                 party->position = mp->position;
             }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             party->trigFlags |= PARTY_TRIG_FLAG_FOLLOW_CLOSE;
 #else
             N_partyFollowCloseOn(party);
@@ -1425,7 +1425,7 @@ USER_FUNC(evt_mario_party_bero_move) {
             if (mp->position.y > party->position.y) {
                 party->position = mp->position;
             }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             party->trigFlags |= PARTY_TRIG_FLAG_FOLLOW_CLOSE;
 #else
             N_partyFollowCloseOn(party);
@@ -1462,7 +1462,7 @@ USER_FUNC(evt_mario_party_bero_move) {
             if (--event->userdata[1] > 0) {
                 break;
             }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             event->userdata[1] = sysMsec2Frame(400);
             event->userdata[0] = 6;
             party = partyGetPtr(marioGetPartyId());
@@ -1759,7 +1759,7 @@ USER_FUNC(evt_mario_jump_jumpstand) {
             if (event->userWork[3] & 2) {
                 event->userWork[0] = 10;
             }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             marioChgMot(MARIO_MOTION_JUMP_3); // the demo switches to the jump motion here for every jump
 #endif
             event->userWork[2] = 0.5f * (f32)event->userWork[1] + 0.5f;
@@ -1806,7 +1806,7 @@ USER_FUNC(evt_mario_jump_jumpstand) {
     switch (event->userWork[0]) {
         case 10:
             if (mp->position.y < y2) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 if (!mode) {
 #else
                 if (!(mode & 1)) {
@@ -2559,7 +2559,7 @@ USER_FUNC(evt_mario_paper_plane) {
             mp->trigFlags |= MARIO_TRIG_FLAG_SHIP_PLANE_EVT_ON;
         }
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the demo clears the flag once the plane glides; the other versions when Mario stands still on the ground
     if (!mode) {
         if (mp->currMotionId == MARIO_MOTION_STAY && mp->hitobjStandOn) {

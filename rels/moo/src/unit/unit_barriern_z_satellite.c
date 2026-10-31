@@ -55,7 +55,7 @@ BattleUnitKind unit_barriern_z_satellite = {
     0.0f,
     0.0f,
     0.0f,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     0,
     -16,
 #else
@@ -121,7 +121,7 @@ static BattleUnitKindPart parts[] = {
     {6, "btl_un_barriern_satellite_z", "c_baria_z", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
 };
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo builds: Status vulnerability of the Mini-Z-Yux (percent chance each status takes hold):
  * immune to poison, freeze, fright; resists sleep (70%); the rest take hold at 80% or better.

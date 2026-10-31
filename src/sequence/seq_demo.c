@@ -132,7 +132,7 @@ static u16 VolumeTable[] = {
 // clang-format on
 
 //.bss
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #include "manager/filemgr.h"
 
 // work for the demo's movie sequence (seq_demoInit and on, at the end of the file)
@@ -1066,7 +1066,7 @@ void THPGXYuv2RgbDraw(u8* y_data, u8* u_data, u8* v_data, s16 x, s16 y, s16 text
     GXEnd();
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /* The demo's movie sequence: plays demo.thp, then returns to the title screen. */
 
 #include "driver/camdrv.h"

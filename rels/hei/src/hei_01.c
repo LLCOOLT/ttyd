@@ -933,7 +933,7 @@ EVT_BEGIN(christine_hei_01)
     CALL(evt_bero_exec_wait, 65536)
 #endif
     CALL(evt_party_stop, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_bero_exec_wait, 65536)
 #endif
     CALL(evt_npc_stop_for_event)

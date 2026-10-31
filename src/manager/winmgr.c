@@ -67,7 +67,7 @@ static s16* mario_status_point_table[3];
 
 //.sdata
 static WinMgrWork* wp = &work;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // Unreferenced; every demo TU that had it carries its own copy at the start of .data.
 static f32 unusedSignTbl[16] = {-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f};
 #endif
@@ -164,7 +164,7 @@ WinMgrSelectTbl select_desc_tbl[] = {
     {3, select_mario_desc},
     {3, select_desc},
     {3, select_desc},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {3, select_desc},
     {3, select_desc},
     {3, select_desc},
@@ -191,7 +191,7 @@ static const char name_party6[12];
 // The party list helpers, defined at the end of the file. The demo has them as plain functions (deferred
 // inlining still inlines them, and their out-of-line copies stay); later versions made them static inline,
 // which also narrows the party index to u16.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static const char* party_name_table_rtn(s32 id);
 static s32 iconid_conv(s32 icon);
 #else
@@ -596,7 +596,7 @@ void winMgrHelpMain(WinMgrEntry* entry) {
                     entry->scroll = 0;
                 }
             } else if (keyGetDirTrg(0) & DEMO_SUBSTICK_DOWN) {
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 if (entry->scroll / 2 < (entry->lines + 1) / 2 - 1) {
 #else
                 if ((entry->lines + 1) / 2 - 1 > (entry->scroll + 1) / 2) {
@@ -639,7 +639,7 @@ void winMgrHelpDraw(WinMgrEntry* entry) {
                     iconDispGx2(mtx, ICON_DISP_2D, ICON_1B6);
                 }
             }
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             else if (entry->scroll / 2 == (entry->lines + 1) / 2 - 1) {
 #else
             else if (entry->scroll + 2 == entry->lines) {
@@ -851,7 +851,7 @@ WinMgrSelect* winMgrSelectEntry(EvtWord type, s32 newItem, BOOL cancelable) {
                     }
 #endif
                 }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 // the demo has no stat cap check
                 if (cnt == 2) {
                     sel->items[i].flags |= (WINMGR_ITEM_GRAY | WINMGR_ITEM_DISABLED);
@@ -907,7 +907,7 @@ WinMgrSelect* winMgrSelectEntry(EvtWord type, s32 newItem, BOOL cancelable) {
             for (i = 0; i < 99; i++) {
                 m = (s16)badgeShop_get(bdsw->starmaniac_table, i + 240);
                 if (m - badgeShop_ThrowCheck(i + 240) > 0) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     sel->items[sel->numItems++].id = i + 240;
                 }
             }
@@ -999,9 +999,9 @@ WinMgrSelect* winMgrSelectEntry(EvtWord type, s32 newItem, BOOL cancelable) {
     return sel;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** the demo does not sort the badge shop lists */
-#elif VERSION == VERSION_EU
+#elif VERSION >= VERSION_DEMO_EU
 s32 select_comp_starpiece(const void* a, const void* b) {
     // PAL: equal prices fall back to the type order
     if (itemDataTable[((const WinMgrSelectItem*)a)->id].star_piece_price > itemDataTable[((const WinMgrSelectItem*)b)->id].star_piece_price) {
@@ -1269,7 +1269,7 @@ static void select_main(WinMgrEntry* entry) {
             if (prev != sel->cursor) {
                 psndSFXOn((const char*)0x20005);
             }
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             // PAL: moving the cursor resets the help window's text
             if (prev != sel->cursor && sel->numDescriptors >= 3) {
                 winMgrHelpInit(&wp->entries[sel->descriptorId[2]]);
@@ -1370,7 +1370,7 @@ static void select_disp(WinMgrEntry* entry) {
                 winIconSet(ICON_092, (Vec){entry->x + 15, sel->scrollY + (ofs + (entry->y - 44 - i * 24)), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xC0});
             }
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             winIconInit();
 #else
             if (sel->items[i].flags & WINMGR_ITEM_GRAY) {
@@ -1384,7 +1384,7 @@ static void select_disp(WinMgrEntry* entry) {
 #if VERSION >= VERSION_US
             winFontSetWidth((Vec){entry->x + 60, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
                             *((sel->items[i].flags & WINMGR_ITEM_GRAY) ? &gray : &black), 185.0f, msgSearch(item->name));
-#elif VERSION <= VERSION_DEMO_US
+#elif VERSION <= VERSION_DEMO_JP
             winFontSet((Vec){entry->x + 60, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
                        black, msgSearch(item->name));
 #else
@@ -1431,7 +1431,7 @@ static void select_disp(WinMgrEntry* entry) {
             winFontInit();
             winFontSetWidth((Vec){entry->x + entry->width - 10 - tw, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
                             *((sel->items[i].flags & WINMGR_ITEM_GRAY) ? &gray : &black), 30.0f, buf);
-#elif VERSION <= VERSION_DEMO_US
+#elif VERSION <= VERSION_DEMO_JP
             tw = FontGetMessageWidth(buf);
             winFontInit();
             winFontSet((Vec){entry->x + entry->width - 10 - tw, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
@@ -1491,7 +1491,7 @@ static void select_disp(WinMgrEntry* entry) {
             case 3:
             case 11:
             case 12:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             case 15:
             case 17:
 #else
@@ -1537,7 +1537,7 @@ static void select_disp(WinMgrEntry* entry) {
  * cursor and scroll arrows.
  */
 static void select_disp_party(WinMgrEntry* entry) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the demo declares the row counter first
     s32 i;
     WinMgrSelect* sel = entry->param;
@@ -1588,7 +1588,7 @@ static void select_disp_party(WinMgrEntry* entry) {
                 ofs = ofs + 0.0f;
             }
             winFontInit();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             winFontSet((Vec){entry->x + 60, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
                        *((sel->items[i].flags & WINMGR_ITEM_GRAY) ? &gray : &black), party_name_table_rtn(sel->items[i].id));
 #else
@@ -1602,7 +1602,7 @@ static void select_disp_party(WinMgrEntry* entry) {
                 winIconInit();
             }
             winIconSet(iconid_conv(party_icon_table[sel->items[i].id]), (Vec){entry->x + 35, sel->scrollY + (ofs + (entry->y - 44 - i * 24)), 0.0f}, (Vec){0.55f, 0.55f, 0.55f}, iconcol);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             winIconInit();
             for (j = 0; j < pouch->partyData[party_id_table[sel->items[i].id]].techLevel; j++) {
 #else
@@ -1849,7 +1849,7 @@ static void select_disp_luigi(WinMgrEntry* entry) {
             }
         }
         GXSetScissor(left, top, wd, ht);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         msg = msgSearch("msg_window_title_6");
 #else
         switch (sel->type) {
@@ -2056,7 +2056,7 @@ static void select_disp3_mario(WinMgrEntry* entry) {
     pouchGetPtr();
     if (!(wp->entries[sel->descriptorId[2]].flags & WINMGR_ENTRY_ANIMATING)) {
         if (sel->items[sel->cursor].flags & WINMGR_ITEM_DISABLED) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             help = "helperr";
 #else
             if (sel->items[sel->cursor].flags & WINMGR_ITEM_OVER_CAP) {
@@ -2094,7 +2094,7 @@ static const char name_party2[] = "name_party2";
 static const char name_party6[] = "name_party6";
 
 /** Swaps Yoshi's portrait icon for the one in the colour he hatched with; other icons pass through. */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static s32 iconid_conv(s32 icon) {
 #else
 /** The release versions make it static inline (see the prototypes near the top of the file). */
@@ -2130,7 +2130,7 @@ static inline s32 iconid_conv(s32 icon) {
 }
 
 /** A partner's display name by party_id_table index (Yoshi's is the name the player gave him). */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static const char* party_name_table_rtn(s32 id) {
 #else
 /** The release versions make it static inline (see the prototypes near the top of the file). */

@@ -162,7 +162,7 @@ static BattleUnitDefense defence_patapata = {{1, 1, 1, 1, 1}};
  */
 static BattleUnitDefenseAttr defence_patapata_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the KP Paratroopa in its winged form (both demos), as the percent chance each
  * status takes hold: resists 10 statuses (down to 85% of the normal chance); extra vulnerable to dizziness
@@ -538,7 +538,7 @@ static BattleUnitDefenseAttr defence_attr = {0};
  */
 static BattleUnitDefense defence_turn = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the KP Paratroopa (both demos), as the percent chance each status takes hold:
  * resists 12 statuses (down to 80% of the normal chance).

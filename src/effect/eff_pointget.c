@@ -50,7 +50,7 @@ static PointGetTex tex_lang3[3] = {{0, 0x7C, 0x7D}, {-1, -1, -1}, {1, 0x7E, 0x7F
 static PointGetTex tex_shadow_lang3[3] = {{0, 0x7C, 0x7D}, {-1, -1, -1}, {1, 0x80, 0x81}};
 static PointGetTex tex_lang4[3] = {{0, 0x7C, 0x7D}, {-1, -1, -1}, {1, 0x7E, 0x7F}};
 static PointGetTex tex_shadow_lang4[3] = {{0, 0x7C, 0x7D}, {-1, -1, -1}, {1, 0x80, 0x81}};
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 /** Spanish one-point and plural Star Point pieces as the European release lays them out. */
 static PointGetTex tex_lang5[6] = {{1, 0x7C, 0x7D}, {0, 0x7E, 0x7F}, {-1, -1, -1}, {1, 0x80, 0x81}, {-1, -1, -1}, {1, 0x84, 0x85}};
 static PointGetTex tex_shadow_lang5[6] = {{1, 0x7C, 0x7D}, {0, 0x7E, 0x7F}, {-1, -1, -1}, {1, 0x82, 0x83}, {-1, -1, -1}, {1, 0x84, 0x85}};
@@ -69,7 +69,7 @@ static PointGetTexSet texid_tbl[6] = {
     { { tex_us, tex_shadow_us }, 5 },
     { { tex_lang3, tex_shadow_lang3 }, 3 },
     { { tex_lang4, tex_shadow_lang4 }, 3 },
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     { { tex_lang5, tex_shadow_lang5 }, 6 },
 #else
     { { tex_lang5, tex_shadow_lang5 }, 7 },
@@ -125,7 +125,7 @@ static void effPointGetMain(EffectEntry* effect) {
     work->timer++;
     switch (work->state) {
         case 0:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             work->position.x = intplGetValue(11, -1000.0f, 50.0f * work->scale, work->timer, 45);
 #else
             work->position.x = intplGetValue(11, -1000.0f, 0.0f, work->timer, 45);
@@ -148,7 +148,7 @@ static void effPointGetMain(EffectEntry* effect) {
             }
             break;
         case 2:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             work->position.x = intplGetValue(11, 50.0f * work->scale, 1000.0f, work->timer, 60);
 #else
             work->position.x = intplGetValue(11, 0.0f, 1000.0f, work->timer, 60);
@@ -162,7 +162,7 @@ static void effPointGetMain(EffectEntry* effect) {
     dispEntry(CAMERA_2D, dispCalcZ(&position), 2, (DispCallback)effPointGetDisp, effect);
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** The demo draws the point count as three fixed digit cells (leading zeros skipped) after the header. */
 static void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     EffPointGetWork* work = effect->userdata;

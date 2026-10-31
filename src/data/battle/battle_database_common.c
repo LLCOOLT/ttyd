@@ -126,7 +126,7 @@ ItemDropData battle_item_champion[1];
 ItemDropData battle_item_kanbu1[1];
 ItemDropData battle_item_zonbaba[1];
 ItemDropData battle_item_default_param_list[1];
-#if VERSION <= VERSION_DEMO_US || VERSION == VERSION_EU
+#if VERSION <= VERSION_DEMO_JP || VERSION >= VERSION_DEMO_EU
 ItemDropData battle_item_kinoko[1];
 ItemDropData battle_item_funyafunya_kun[1];
 ItemDropData battle_item_pow_block[1];
@@ -470,7 +470,7 @@ ItemDropData battle_item_met[] = {
     {ITEM_POWER_PUNCH, 5, 5},
     {ITEM_MINI_MR_MINI, 5, 5},
     {ITEM_POWER_JUMP, 0, 2},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {ITEM_POWER_JUMP, 0, 2},
 #else
     {ITEM_POWER_SMASH, 0, 2},
@@ -488,7 +488,7 @@ ItemDropData battle_item_togemet[] = {
     {ITEM_POWER_PUNCH, 5, 5},
     {ITEM_REPEL_CAPE, 5, 5},
     {ITEM_POWER_JUMP, 0, 2},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {ITEM_POWER_JUMP, 0, 2},
 #else
     {ITEM_POWER_SMASH, 0, 2},
@@ -1622,7 +1622,7 @@ PointDropData battle_flower_drop_param_default5[] = {
     {100, 30, 6, 40},
 };
 
-#if VERSION <= VERSION_DEMO_US || VERSION == VERSION_EU
+#if VERSION <= VERSION_DEMO_JP || VERSION >= VERSION_DEMO_EU
 // PAL and the demo: empty drop tables of the tst.rel test battles (BTLNO_TEST_*); killer_cannon is shared by both cannons
 ItemDropData battle_item_kinoko[] = {
     {0},

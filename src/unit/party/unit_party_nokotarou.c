@@ -41,7 +41,7 @@ static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 
 PoseTableEntry pose_table_nokotarou_stay[26];
 PoseTableEntry pose_table_nokotarou_turn[12];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static BattleDataEntry data_table[11];
 #else
 static BattleDataEntry data_table[12];
@@ -1381,7 +1381,7 @@ EVT_BEGIN(partyNokotarouAttack_KouraGuard)
     CALL(btlevtcmd_AcSetParamAll, 1, LW(10), LW(11), 30, LW(0), LW(1), EVT_NULLPTR, EVT_NULLPTR)
     CALL(btlevtcmd_AcSetFlag, 0)
     CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 12, 1, 0)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     WAIT_FRAMES(2)
 #endif
     // The shell floats down towards Mario while the command runs.
@@ -1460,7 +1460,7 @@ EVT_BEGIN(partyNokotarouAttack_KouraGuard)
                 SET_VALUE(LW(0), -1)
             END_SWITCH
             IF_INT_GREATER_OR_EQUAL(LW(0), 0)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 CALL(btlevtcmd_GetResultPrizeLv, BTL_UNIT_NONE, LW(0), LW(7))
 #else
                 CALL(btlevtcmd_GetResultPrizeLv, LW(3), LW(0), LW(7))
@@ -1943,7 +1943,7 @@ static EVT_BEGIN(attack_audience_event)
     CALL(evt_snd_sfxon, STRING("SFX_BTL_NOKO_ATTACK2"), 0)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(8.0f))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 15)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
 #else
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, 0, 0)

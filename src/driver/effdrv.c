@@ -13,7 +13,7 @@
 #include "version.h"
 
 //.data
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // The demo table also carries debug names: each effect's Japanese name and the names of its types
 static const char* str_kemuri[] = {"着地", "敵消滅", "重いもの移動用", NULL};
 static const char* str_confetti[] = {"type 0", "type 1", "type 2", "type 3", "type 4", "type 5", "type 6", NULL};
@@ -254,7 +254,7 @@ const char* prefix_tbl[2] = {"jp", "us"};
 #endif
 
 // effect texture directory on the disc
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #define EFF_DIR "eff"
 #else
 #define EFF_DIR "e"

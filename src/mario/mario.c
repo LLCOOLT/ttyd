@@ -132,7 +132,7 @@ static inline s32 marioBadgeColor(void) {
 }
 
 // Mario's automatic talk pose: PAL uses M_I_3
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 #define MARIO_TALK_POSE "M_I_3"
 #else
 #define MARIO_TALK_POSE "M_I_2"
@@ -211,7 +211,7 @@ void marioSetCharMode(s32 mode) {
     } else {
         marioSetFamicomMode(1);
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // The demo picks the paper animation by motion only.
     if (wp->currMotionId == MARIO_MOTION_PLANE) {
         marioForcePlaneAnime();
@@ -620,7 +620,7 @@ BOOL N_marioChkUseParty(void) {
 void marioFBattlePrepare(void) {
     MarioWork* wp = mp;
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // The demo does not keep Mario's position for the bellows (jabara) motion.
     marioAdjustMoveDir();
     wp->flags |= MARIO_FLAG_PRE_BATTLE_PHYSICS;
@@ -664,7 +664,7 @@ void marioFBattlePost(void) {
     }
 #endif
     partyCtrlOn();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (wp->currMotionId == MARIO_MOTION_HAMMER) {
 #else
     if (wp->currMotionId == MARIO_MOTION_HAMMER || wp->currMotionId == MARIO_MOTION_JABARA) {
@@ -992,7 +992,7 @@ void marioReInit(void) {
     MarioMotion motion;
     s32 charId;
     s32 dotFlag;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     BOOL flag22;
 #endif
     s32 poseId;
@@ -1005,7 +1005,7 @@ void marioReInit(void) {
     f32 f1A0;
     f32 f19C;
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the demo carries flag 0x200000 over the reset as flag 0x400000
     flag22 = FALSE;
     if ((wp = mp)->flags & 0x200000) {
@@ -1041,7 +1041,7 @@ void marioReInit(void) {
         wp->paperPoseId = poseId;
     }
     memset(wp, 0, sizeof(MarioWork));
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (flag22) {
         wp->flags |= MARIO_FLAG_PARTY_WALK_DISABLED;
     }
@@ -1207,7 +1207,7 @@ void marioMain(void) {
     if (!(wp->flags & MARIO_FLAG_ACTIVE)) {
         return;
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // The demo has no badge 0x143 check here.
     marioColorChk();
 #else
@@ -1227,7 +1227,7 @@ void marioMain(void) {
     }
 #endif
     marioSetDirEventMain();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (!strcmp(gp->currentMapName, "moo_00") || !strcmp(gp->currentMapName, "moo_01") ||
         !strcmp(gp->currentMapName, "moo_02") || !strcmp(gp->currentMapName, "moo_05") ||
         !strcmp(gp->currentMapName, "moo_06") || !strcmp(gp->currentMapName, "moo_07")) {
@@ -1314,7 +1314,7 @@ void marioMain(void) {
             return;
         }
         if (wp->currMotionId == MARIO_MOTION_VIVIAN) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             marioMove();
 #else
             marioChkGnd();
@@ -1373,7 +1373,7 @@ void marioMain(void) {
             marioJump();
             marioChkOverhead();
             marioMove();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (wp->airTimer > 5) {
 #else
             if (!marioChkRollMot2() && wp->airTimer > 5) {
@@ -1393,7 +1393,7 @@ void marioMain(void) {
                 }
                 marioFall();
                 if (wp->currMotionId != MARIO_MOTION_HIP && wp->currMotionId != MARIO_MOTION_HIP_2) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     if (wp->airTimer > 5) {
 #else
                     if (!marioChkRollMot2() && wp->airTimer > 5) {
@@ -1444,7 +1444,7 @@ static void marioCtrlOff2Main(void) {
         return;
     if (mot == MARIO_MOTION_SHIP)
         return;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (mot == MARIO_MOTION_DAMAGE || mot == MARIO_MOTION_DAMAGE_TOGE || mot == MARIO_MOTION_BOTTOMLESS ||
         mot == MARIO_MOTION_JABARA || mot == MARIO_MOTION_YOSHI ||
         mot == MARIO_MOTION_JUMP_3) {
@@ -1472,7 +1472,7 @@ static void marioCtrlOff2Main(void) {
         marioJump();
         marioChkOverhead();
         marioMove();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         if (wp->airTimer > 5) {
 #else
         if (!marioChkRollMot() && wp->airTimer > 5) {
@@ -1494,7 +1494,7 @@ static void marioCtrlOff2Main(void) {
         }
         marioFall();
         if (wp->currMotionId != MARIO_MOTION_HIP && wp->currMotionId != MARIO_MOTION_HIP_2) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (wp->airTimer > 5) {
 #else
             if (!marioChkRollMot() && wp->airTimer > 5) {
@@ -1550,7 +1550,7 @@ void marioMove(void) {
         }
     }
     if (wp->flags & MARIO_FLAG_BG_MODE) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         // The demo has no aji_13 camera case.
         if (wp->controlStickSensitivity && !(wp->dispFlags & MARIO_DISP_FLAG_CAM_FOLLOW_Y_OFF)) {
             camFollowYOff();
@@ -1820,7 +1820,7 @@ void marioChgEvtPose(const char* name) {
     }
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // The demo defines the table here, after marioMain, which puts its strings after the vector templates in .rodata.
 const char* dotMarioPose[4][6] = {
     {"Z_1", "S_1", "W_1", "R_1", "U_1", "J_1"},
@@ -2478,7 +2478,7 @@ static void marioDisp(CameraId camId, void* param) {
     f32 scale;
     f32 angle;
     f32 angle2;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     f32 yofs = 0.0f;
 #endif
 
@@ -2535,7 +2535,7 @@ static void marioDisp(CameraId camId, void* param) {
         MTXScale(scaleMtx, 1.0f, wp->tubeScaleY, 1.0f);
         MTXConcat(scaleMtx, mtx, mtx);
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     MTXTrans(rotMtx,
              wp->dispOfs2.x + (wp->position.x + wp->dispOfs.x),
              yofs + (wp->dispOfs2.y + (wp->position.y + wp->dispOfs.y)),
@@ -2642,7 +2642,7 @@ static const char* toRearPose(const char* name) {
         } else if (!strcmp(name, "M_I_2")) {
             rear = "M_I_2R";
         }
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         else if (!strcmp(name, "M_I_3")) {
             rear = "M_I_3R";
         }
@@ -2746,7 +2746,7 @@ static const char* toFrontPose(const char* name) {
         } else if (!strcmp(name, "M_I_2R")) {
             front = "M_I_2";
         }
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         else if (!strcmp(name, "M_I_3R")) {
             front = "M_I_3";
         }

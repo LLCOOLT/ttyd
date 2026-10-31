@@ -111,7 +111,7 @@ static BattleUnitDefense defence_turn = {0};
 /** Damage-type modifiers of the Hyper Bald Cleft: it is immune to fire attacks. */
 static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Hyper Bald Cleft (100% is the normal chance): immune to Burn; resists Sleep
  * 30%, Stop 80%, Dizzy 40%, Confusion 40%, Freeze 60%, Tiny 60%, Attack Down 60%, Defense Down 70%, Allergic

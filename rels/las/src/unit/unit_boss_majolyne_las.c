@@ -144,7 +144,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
  */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of Beldam:
  * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
@@ -978,7 +978,7 @@ static EVT_BEGIN(attack_event)
         IF_INT_NOT_EQUAL(LW(2), 0)
             CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_MAJOLYNE_LAS_BLIZZARD_WAIT, LW(0))
             IF_INT_EQUAL(LW(0), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 ADD(LW(14), 20)
 #else
                 ADD(LW(14), 30)

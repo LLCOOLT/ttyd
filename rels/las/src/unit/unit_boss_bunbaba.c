@@ -28,7 +28,7 @@ BattleUnitKind unit_boss_bunbaba;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static PoseTableEntry pose_table[7];
 #else
 static PoseTableEntry pose_table[9];
@@ -89,7 +89,7 @@ BattleUnitKind unit_boss_bunbaba = {
 #endif
     0.0f,
     0.0f,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     250.0f,
 #else
     20.0f,
@@ -139,7 +139,7 @@ static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
  */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of Gloomtail:
  * percent chance that each status takes hold (100 is normal);
@@ -1084,7 +1084,7 @@ EVT_BEGIN(mega_attack_event)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(1750)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         // A huge blast of fire sweeps over the party.
         CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_BREATH_FIRE1"), EVT_NULLPTR, 0, -300, 0, 0, EVT_NULLPTR)
 #else
@@ -1208,7 +1208,7 @@ static EVT_BEGIN(attack_event)
         SET_VALUE(LW(9), PTR(&weapon_bunbaba_eq_attack))
         CALL_CHILD(eq_attack_event)
         CASE_EQUAL(3)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(btlevtcmd_DrawLots, LW(0), 4, 10, 10, 20, 10)
 #else
         CALL(btlevtcmd_DrawLots, LW(0), 4, 10, 10, 20, 15)

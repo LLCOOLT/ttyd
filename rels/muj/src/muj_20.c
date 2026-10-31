@@ -104,7 +104,7 @@ extern EvtWord elmos_a_kakushuku[];
 extern EvtWord elmos_a_kaku[];
 extern EvtWord elmos_a_shuku[];
 static ExtTexInfo ext_entry_data[21];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static s16 elmos_animtbl[21];
 #else
 static s16 elmos_animtbl[22];
@@ -1000,7 +1000,7 @@ static ExtTexInfo ext_entry_data[] = {
 static s16 elmos_animtbl[] = {
     0, 1, 2, 3, 4, 5, 6, 7,
     8, 9, 10, 11, 12, 13, 14, 15,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     16, 17, 18, 19, -1,
 #else
     16, 17, 18, 19, -1, 0,
@@ -1254,7 +1254,7 @@ EVT_BEGIN(onryo_event)
     CALL(evt_set_fune_anim_rate, FLOAT(0.69921875f))
     CALL(evt_set_nami_anim_rate, FLOAT(0.69921875f))
     WAIT_MS(1000)
-#if VERSION == VERSION_EU // PAL: NPC flag 0x200 on the two sailors for this part of the scene
+#if VERSION >= VERSION_DEMO_EU // PAL: NPC flag 0x200 on the two sailors for this part of the scene
     CALL(evt_npc_flag_onoff, 1, STRING("ガラの悪い水夫"), NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_flag_onoff, 1, STRING("オドオド水夫"), NPC_FLAG_TALK_ANIM)
 #endif
@@ -1398,7 +1398,7 @@ EVT_BEGIN(onryo_event)
     END_INLINE_EVENT
     CALL(evt_msg_print, 0, STRING("stg5_sea_11"), 0, STRING("ガラの悪い水夫"))
     WAIT_WHILE(GF(0))
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     CALL(evt_npc_flag_onoff, 0, STRING("ガラの悪い水夫"), NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_flag_onoff, 0, STRING("オドオド水夫"), NPC_FLAG_TALK_ANIM)
 #endif
@@ -2066,7 +2066,7 @@ EVT_BEGIN(anm_yure)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
             DIVIDE_FLOAT(LW(0), FLOAT(100.0f))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_mapobj_trans, 1, STRING("S_fune_m"), GW(0), GW(1), GW(2))
             CALL(evt_mapobj_rotate, 1, STRING("S_fune_m"), 0, 180, LW(0))
             CALL(evt_snd_sfx_pos, GW(4), GW(0), GW(1), GW(2))
@@ -2087,7 +2087,7 @@ EVT_BEGIN(anm_yure)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
             DIVIDE_FLOAT(LW(0), FLOAT(100.0f))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_mapobj_trans, 1, STRING("S_fune_m"), GW(0), GW(1), GW(2))
             CALL(evt_mapobj_rotate, 1, STRING("S_fune_m"), 0, 180, LW(0))
             CALL(evt_snd_sfx_pos, GW(4), GW(0), GW(1), GW(2))
@@ -2117,7 +2117,7 @@ static void pressStartGX(TitleLogoWork* wp, s32 alpha, f32 x, f32 y) {
     GXTexObj startText, gradient;
     Mtx v17, v16;
 
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     TEXGetGXTexObjFromPalette(*wp->tpl->data, &startText, 13); // PAL: texture 13 of the TPL
 #else
     TEXGetGXTexObjFromPalette(*wp->tpl->data, &startText, VERSION_PICK(8, 15));
@@ -2183,7 +2183,7 @@ static void draw(CameraId camera, void* param) {
     f32 viewport[6];
     f32 projection[7];
     CameraEntry* cam;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     // PAL: logo texture per language (indexed by gp->language)
     s32 logoTex[6] = {0x13, 0x13, 0x14, 0x15, 0x16, 0x17};
 #elif VERSION >= VERSION_US
@@ -2232,7 +2232,7 @@ static void draw(CameraId camera, void* param) {
  * After the press it plays SFX_PRESS_START1, sails the ship on out and fades to white into sys_01 ("prologue").
  */
 static EVT_BEGIN(evt_prologue)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     WAIT_MS(4000)
 #else
     WAIT_MS(500)
@@ -2477,7 +2477,7 @@ EVT_BEGIN(muj_20_init_evt)
     // When entered as the prologue, the ship animations start and the opening title scene runs.
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("prologue"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_OPENING1"))
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_OPN_MUJ1"))
 #endif
@@ -2556,7 +2556,7 @@ static USER_FUNC(logo) {
             }
             break;
         case 2:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (evtGetValue(event, GF(0)) && (keyGetButtonTrg(0) & (PAD_BUTTON_A | PAD_BUTTON_START))) {
 #else
             if (evtGetValue(event, GF(0)) && (keyGetButtonTrg(0) & (PAD_BUTTON_A | PAD_BUTTON_B | PAD_BUTTON_START))) {

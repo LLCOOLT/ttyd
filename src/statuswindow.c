@@ -69,7 +69,7 @@ s16 journal_icon_tbl[6] = {0x218, 0x239, 0x239, 0x239, 0x23A, 0x23B};
 static SWork* wp;
 
 // The demo draws the status window icons with icon flag 0x4, retail with 0x10.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #define SW_ICON_FLAGS 0x4
 #else
 #define SW_ICON_FLAGS 0x10
@@ -492,7 +492,7 @@ static void statusGetValue(SVal* values) {
         values->maxAp = pouchGetMaxAP();
         values->starPoints = pouchGetStarPoint();
         values->coins = pouchGetCoin();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         // the demo remembers the last partner in cur.lastParty and shows it while in bg mode
         if (!marioBgmodeChk()) {
             values->party = marioGetParty();
@@ -631,7 +631,7 @@ static void valueUpdate(void) {
         return;
     }
     d = calcStep(v.coins, wp->cur.coins);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (d && !(count % 6)) {
 #else
     if (d && !(count % 8)) {

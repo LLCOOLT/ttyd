@@ -58,7 +58,7 @@ void DVDMgrDelete(void) {
 static s32 compare(const void* a, const void* b) {
     u8 priorityA, priorityB;
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the demo sorts by queue index, not priority
     priorityA = *(u8*)a; // (a const cast here changes the demo code)
     priorityB = *(u8*)b;
@@ -140,7 +140,7 @@ void DVDMgrMain(void) {
 
         if (entry->status & DVDMGR_CLOSED) {
             DVDClose(&entry->info);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             entry->status &= ~DVDMGR_INUSE;
 #endif
             memset(entry, 0, sizeof(DVDEntry));
@@ -186,7 +186,7 @@ DVDEntry* DVDMgrOpen(const char* path, u8 priority, u16 unknown) {
     entry->position = 0;
     entry->status |= DVDMGR_INUSE;
     if (!DVDOpen(entry->name, &entry->info)) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         entry->status |= DVDMGR_OPEN_FAILED;
         entry->status |= DVDMGR_UNK_ERROR2;
         entry->status &= ~DVDMGR_INUSE;

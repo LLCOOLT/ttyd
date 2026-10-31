@@ -108,7 +108,7 @@ USER_FUNC(evt_pouch_add_keepitem) {
  */
 USER_FUNC(evt_pouch_remove_keepitem) {
     EvtWord* args = event->args;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (pouchRemoveKeepItem(evtGetValue(event, args[0]))) {
         evtSetValue(event, args[1], 0);
     } else {

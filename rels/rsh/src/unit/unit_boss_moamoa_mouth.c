@@ -69,7 +69,7 @@ BattleUnitKind unit_boss_moamoa_mouth = {
     0.0f,
     0.0f,
     0.0f,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     250.0f,
 #else
     0.0f,

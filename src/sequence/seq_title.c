@@ -28,7 +28,7 @@ TitleWork* wp2 = &work2;
 
 // Resting height of the title logo (TitleWork.topPosY). The timings below use one second,
 // VERSION_PICK(60, gp->framerate) frames: US counts at the display frame rate (50 or 60), JP and the demo at 60.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #define TITLE_TOP_Y 130.0f
 #else
 #define TITLE_TOP_Y 120.0f
@@ -55,7 +55,7 @@ const char* DbgBtlSel_GetMsgDataPtr(void) {
  * and clears the map-event-skip, save-blocks and kiosk flags.
  * Later versions do the setup in L_titleInit and also stop leftover field sound.
  */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 void seq_titleInit(SequenceWork* work) {
     memset(wp2, 0, sizeof(TitleWork));
     wp2->texture = fileAllocf(4, "%s/mariost.tpl", getMarioStDvdRoot());
@@ -178,7 +178,7 @@ void L_titleInit(SequenceWork* work) {
 static void titleMain(SequenceWork* work) {
     switch (wp2->state) {
         case 0:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (psndBGMStartCheck(0) != 0U) {
 #else
             // later versions also wait for the curtain animations to load
@@ -200,7 +200,7 @@ static void titleMain(SequenceWork* work) {
                     fadeEntry(FADE_OUT_WHITE_3D, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
                     fadeEntry(FADE_CURTAIN_ENTER_3D, 0, (GXColor){0x00, 0x00, 0x00, 0xFF});
                     fadeSetNarrowFast();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     wp2->timer = 38;
 #else
                     wp2->timer = 23;
@@ -250,7 +250,7 @@ static void titleMain(SequenceWork* work) {
             wp2->counter++;
             if (wp2->counter > VERSION_PICK(60, gp->framerate)) {
                 titleLoadDemo();
-#if VERSION == VERSION_US
+#if VERSION == VERSION_US || VERSION == VERSION_DEMO_US2
                 wp2->counter = 0;
 #endif
 #if VERSION >= VERSION_JP
@@ -269,7 +269,7 @@ static void titleMain(SequenceWork* work) {
                     wp2->fadeAlpha = 1.0f;
                 }
                 if (keyGetButtonTrg(0) & (PAD_BUTTON_A | PAD_BUTTON_START)) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     psndSFXOn((const char*)0x12);
 #else
                 psndSFXOn((const char*)8);
@@ -299,7 +299,7 @@ static void titleMain(SequenceWork* work) {
             break;
         case 20:
             fadeEntry(FADE_CURTAIN_LEAVE_3D, 0, (GXColor){0x00, 0x00, 0x00, 0xFF});
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             fadeEntry(FADE_OUT_WHITE, 1000, (GXColor){0x00, 0x00, 0x00, 0xFF});
 #else
             fadeEntry(FADE_OUT_BLACK, 1000, (GXColor){0x00, 0x00, 0x00, 0xFF});
@@ -321,7 +321,7 @@ static void titleMain(SequenceWork* work) {
             }
             if (fadeIsFinish()) {
                 fadeReset(1);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 gp->areaFadeInType = FADE_OUT_WHITE;
 #else
                 if (pouchGetHP() <= 0) {
@@ -424,7 +424,7 @@ static void disp2(CameraId cameraId, void* param) {
     f32 vp[6];
     s32 alpha;
     f32 s;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     s32 tbl[6] = {19, 19, 20, 21, 22, 23};
 #elif VERSION >= VERSION_US
     s32 tbl[6] = {21, 21, 22, 23, 24, 25};
@@ -440,19 +440,19 @@ static void disp2(CameraId cameraId, void* param) {
     winTexInit(*wp2->texture->data);
 #if VERSION >= VERSION_US
     winTexSetNearest(tbl[gp->language], (Vec){wp2->topPosX, wp2->topPosY - 20.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     winTexSet(gp->language + 7, (Vec){wp2->bottomPosX, wp2->bottomPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 #else
     winTexSet(gp->language + 9, (Vec){wp2->bottomPosX, wp2->bottomPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 #endif
-#elif VERSION <= VERSION_DEMO_US
+#elif VERSION <= VERSION_DEMO_JP
     winTexSet(5, (Vec){wp2->topPosX, wp2->topPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     winTexSet(6, (Vec){wp2->bottomPosX, wp2->bottomPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 #else
     winTexSetNearest(5, (Vec){wp2->topPosX, wp2->topPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     winTexSet(6, (Vec){wp2->bottomPosX, wp2->bottomPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     s = (f32)sin((f32)gp->retraceCount / 30.0f);
 #else
     wp2->frame++;
@@ -494,7 +494,7 @@ static
     Mtx v17, v16;
 
 #if VERSION >= VERSION_US
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     TEXGetGXTexObjFromPalette(*wp2->texture->data, &startText, gp->language + 13);
 #else
     TEXGetGXTexObjFromPalette(*wp2->texture->data, &startText, gp->language + 15);
@@ -525,7 +525,7 @@ static
     GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, 30);
     MTXScale(v16, 1.0f, 1.0f, 1.0f);
     // the frame count scrolls the "press start" gradient
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     MTXTrans(v17, (f32)gp->retraceCount / -200.0f, 0.0f, 0.0f);
 #else
     MTXTrans(v17, (f32)wp2->frame / -200.0f, 0.0f, 0.0f);

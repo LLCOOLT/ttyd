@@ -55,7 +55,7 @@ static EVT_BEGIN(out_evt)
         BEGIN_INLINE_EVENT_GET_ID(LW(10))
             CALL(evt_party_stop, 1)
             CALL(evt_party_move_pos2, 1, -375, -20, FLOAT(150.0f))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_party_stop, 1)
 #else
             CALL(evt_mario_kill_party, 1)
@@ -68,7 +68,7 @@ static EVT_BEGIN(out_evt)
         BEGIN_INLINE_EVENT_GET_ID(LW(11))
             CALL(evt_party_stop, 0)
             CALL(evt_party_move_pos2, 0, -375, -25, FLOAT(150.0f))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_party_stop, 1)
 #else
             CALL(evt_mario_kill_party, 0)
@@ -110,7 +110,7 @@ EVT_END()
  */
 static EVT_BEGIN(out_evt2)
     CALL(evt_mario_key_onoff, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_normalize)
 #else
     CALL(roll_release_check, LW(0))

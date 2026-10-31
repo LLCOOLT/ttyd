@@ -96,7 +96,7 @@ static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 /** Damage-type modifiers of the Bullet Bill: none, no special weakness or immunity. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Bullet Bill (100% is the normal chance): immune to Sleep, Stop, Poison and
  * Fright; resists Confusion 50%, Freeze 75%, Tiny 75%, Attack Down 75%, Defense Down 75%, Allergic 75%, Slow

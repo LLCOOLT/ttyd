@@ -77,7 +77,7 @@ static s32 mobj_switch_red(MapObjectEntry* mobj);
 static s32 mobj_switch_blue(MapObjectEntry* mobj);
 // PAL and both demos build the breaking-rock, trap-floor, arrow, orange/green ride-switch and red tornado-switch
 // objects that JP and US strip (their strings and literals stay behind there)
-#if VERSION <= VERSION_DEMO_US || VERSION == VERSION_EU
+#if VERSION <= VERSION_DEMO_JP || VERSION >= VERSION_DEMO_EU
 #define MOBJ_EXTRA_OBJS 1
 #else
 #define MOBJ_EXTRA_OBJS 0
@@ -3427,7 +3427,7 @@ static s32 mobj_breaking_floor(MapObjectEntry* mobj) {
     switch (mobj->state) {
         case 0:
             if (mobj->flags & MOBJ_FLAG_HIT) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 psndSFXOn_3D((const char*)0x1e8, &mobj->position);
 #else
                 psndSFXOn_3D((const char*)0x401e8, &mobj->position);
@@ -4886,7 +4886,7 @@ static s32 mobj_koopa_fireber_dodai_evt(MapObjectEntry* mobj) {
     char buf[0x20];
     char buf2[0x20];
     BOOL ok = FALSE;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     s32 i;
     NpcEntry* npc;
 #else
@@ -5068,7 +5068,7 @@ USER_FUNC(evt_mobj_koopa_fireber_dodai) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** demo-only: turn Mario to face the given angle */
 static USER_FUNC(kpa_set_dir) {
     f32 dir = evtGetFloat(event, event->args[0]);
@@ -5122,7 +5122,7 @@ static USER_FUNC(kpa_get_width) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** demo-only: read Mario's position into three float variables */
 static USER_FUNC(kpa_get_mario_pos) {
     EvtWord* args = event->args;
@@ -5209,7 +5209,7 @@ static USER_FUNC(kpa_clear_jump_data) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** the demo defines these two with the koopa scripts */
 EVT_BEGIN(kpa_powerup_evt)
     CALL(kpa_powerup, LW(0), LW(1), LW(2))
@@ -5226,7 +5226,7 @@ EVT_END()
  * The demo sets the pole speeds from Mario's height;
  * the other versions use fixed speeds and an inline lowering event
  */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_BEGIN(kpa_pole)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_cam_letter_box_onoff, 0, 0)

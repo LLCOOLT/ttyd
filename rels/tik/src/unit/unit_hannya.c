@@ -101,7 +101,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Element reactions of the Spania: no special reaction to any element. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Spania (percent chance to take each status): immune to dodgy and invisibility;
  * extra prone to stop, poison, electric shock, burn, growing huge, attack up, defence up, fright, gale force,

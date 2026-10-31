@@ -31,7 +31,7 @@ static EvtWord change_spark_event[70];
 static EvtWord attack_event[440];
 static EvtWord wait_event[6];
 static EvtWord damage_event_spark[25];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord attack_event_spark[292];
 #else
 static EvtWord attack_event_spark[288];
@@ -143,7 +143,7 @@ static PoseTableEntry pose_table_spark[] = {
     {9, "BOM_Y_2"},
     {5, "BOM_K_2"},
     {4, "BOM_X_2"},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {3, "BSA_X_2"},
 #else
     {3, "BOM_X_2"},
@@ -179,7 +179,7 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_bomhei", "c_bomhey", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, COUNTER_ATTR_EXPLOSIVE, pose_table},
 };
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Bob-omb (percent chance to take each status): immune to poison;
  * extra prone to electric shock; resists most other statuses.
@@ -411,7 +411,7 @@ static EVT_BEGIN(attack_event)
     // The camera frames the Bob-omb and its target, and the attack is announced.
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
 #else
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -478,7 +478,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 90)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), 0, LW(2), 0, -1, 1)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("BOM_N_1"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     WAIT_MS(1000)
 #else
     WAIT_MS(500)
@@ -503,7 +503,7 @@ static EVT_BEGIN(attack_event)
     LABEL(98)
     CALL(btlevtcmd_SetMoveSoundDataWork, BTL_UNIT_SELF, STRING("SFX_ENM_BOMB_MOVE4"), STRING("SFX_ENM_BOMB_MOVE4"), 0, 10, 10, 0, 0)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
 #else
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
@@ -567,7 +567,7 @@ static EVT_BEGIN(attack_event_spark)
     // The camera frames the Bob-omb and its target, and the attack is announced.
     CALL(evt_btl_camera_set_mode, 0, 8)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, LW(3))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
 #else
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
@@ -593,7 +593,7 @@ static EVT_BEGIN(attack_event_spark)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 10)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_btl_camera_set_mode, 0, 0)
 #endif
     // Check how the target defends against the blast.

@@ -91,7 +91,7 @@ USER_FUNC(evt_npc_slave_entry) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // FAKE: the demo's .rodata keeps an orphan "%f%f%f" just before "_s%d"; an unreferenced static that prints an NPC position
 // leaves the string where the original's stripped code did
 static void npc_report_pos(NpcEntry* npc) {
@@ -1979,7 +1979,7 @@ USER_FUNC(evt_npc_wait_battle_end) {
     if (party) {
         partyCtrlOn();
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     psndClearFlag(PSND_FLAG_SFX_WITH_BGM);
 #else
     L_psndBGM_stop();
@@ -2091,7 +2091,7 @@ USER_FUNC(evt_npc_get_drop_item) {
     if (npc->battleInfo.battleFlags & NPC_BATTLE_NO_ITEM) {
         evtSetValue(event, index, 0);
     } else {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         evtSetValue(event, index, 0); // the demo never reports a dropped item
 #else
         evtSetValue(event, index, npc->battleInfo.itemDropped);
@@ -2402,7 +2402,7 @@ USER_FUNC(evt_npc_majo_disp_on) {
             break;
 
         case 1:
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             animPoseSetLocalTime(npc->poseId, 0.0f);
 #else
             animPoseSetEffect(npc->poseId, "p_bibi", 1);

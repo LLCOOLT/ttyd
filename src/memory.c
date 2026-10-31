@@ -17,7 +17,7 @@ struct MapAllocEntry {
 };
 
 //.bss
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // demo: smartWork is defined after the heap arrays (they share its .bss), so it is laid out first
 extern SmartWork smartWork;
 #else
@@ -49,7 +49,7 @@ s32 size_table[HEAP_COUNT][2] = {
  * memInit carves the OS arena into the heaps from this table, the smart heap last.
  */
 s32 size_table[HEAP_COUNT][2] = {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {1, 0x3784}, //0xDE1000
 #else
     {1, 0x1C84}, //0x721000, 7300 KiB/7.13 MiB
@@ -67,7 +67,7 @@ static SmartWork* wp = &smartWork;
 OSHeapHandle heapHandle[HEAP_COUNT];
 void* heapStart[HEAP_COUNT];
 void* heapEnd[HEAP_COUNT];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 SmartWork smartWork;
 #endif
 #if VERSION >= VERSION_US
@@ -86,7 +86,7 @@ BOOL g_bFirstSmartAlloc;
 static u16 count; // JP/demo: id stamped on each map heap allocation (MapAllocEntry.currId)
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // demo: the smart heap is a fixed 7 MiB block taken from the default heap
 #define SMART_ALLOC_HEAP HEAP_DEFAULT
 #else
@@ -98,7 +98,7 @@ void smartGarbage(void);
 
 /** Size of the smart heap's block: the demo takes a fixed 7 MiB, later versions use their whole heap minus 32 bytes. */
 static inline u32 smartHeapSize(void) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     return 0x700000;
 #else
     return (u8*)heapEnd[SMART_HEAP] - (u8*)heapStart[SMART_HEAP] - 32;

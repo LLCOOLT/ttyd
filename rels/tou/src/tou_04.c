@@ -830,7 +830,7 @@ EVT_BEGIN(init_g_4)
         END_SWITCH
         IF_INT_EQUAL(LF(0), 1)
             SET_VALUE(LF(1), GSWF(GSWF_TOU04_REMATCH_JOLENE_CALL))
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             IF_INT_EQUAL(GSWF(GSWF_TOU04_REMATCH_JOLENE_CALL), 0)
                 CALL(evt_bero_get_entername, LW(0))
                 IF_STR_EQUAL(LW(0), STRING("s_bero_5"))
@@ -856,7 +856,7 @@ EVT_BEGIN(init_g_4)
             CALL(evt_npc_set_position, STRING("me"), -350, 0, -530)
         ELSE
             CALL(evt_npc_set_position, STRING("me"), -300, 0, -530)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             CALL(evt_npc_set_ry, STRING("me"), 270)
 #endif
             IF_INT_EQUAL(LF(2), 1)
@@ -1292,7 +1292,7 @@ static USER_FUNC(make_list) {
     s32 i;
 
     if (tmp == NULL) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         tmp = _mapAlloc(0x400);
 #else
         tmp = _mapAlloc(0x1000);
@@ -2254,7 +2254,7 @@ static s32 key_tbl[] = {
 static EVT_BEGIN(evt_chk)
     CALL(evt_pouch_check_item, ITEM_STORAGE_KEY_0x12, LW(0))
     IF_INT_GREATER(LW(0), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_win_item_select, PTR(key_tbl), LW(0))
 #else
         CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
@@ -2476,7 +2476,7 @@ EVT_BEGIN(tou_04_init_evt)
             SWITCH(GSW(GSW_STORY_PROGRESS))
                 CASE_BETWEEN(STORY_STG3_00_WELCOME_TO_GLITZVILLE, STORY_STG3_12_MINI_YOSHI_EGG)
                 CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
 #else
                 CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU4"))
@@ -2484,7 +2484,7 @@ EVT_BEGIN(tou_04_init_evt)
                 CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
                 CASE_GREATER_OR_EQUAL(STORY_STG3_33_PEACH_THE_SECRET_WEAPON)
                 CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
 #else
                 CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU4"))
@@ -2640,7 +2640,7 @@ EVT_BEGIN(tou_04_init_evt)
                 CALL_CHILD(bero_case_switch_on)
             END_IF
             IF_INT_EQUAL(GSWF(GSWF_TOU04_REMATCH_GUARD_TALK), 1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 SET_VALUE(LW(0), 5)
                 CALL_CHILD(bero_case_switch_on)
 #else

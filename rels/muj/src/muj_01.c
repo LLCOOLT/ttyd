@@ -343,7 +343,7 @@ static EVT_BEGIN(marco_talk)
             CALL(delete_itemsel_table)
             RETURN
         END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         // Mario chooses an item to trade for the Chuckola Cola.
         CALL(evt_win_item_select, LW(10), LW(0))
 #else
@@ -425,7 +425,7 @@ static EVT_BEGIN(marco_talk)
             WAIT_FRAMES(1)
         END_LOOP
         CALL(evt_cam3d_evt_set, -60, 95, 491, -60, 35, 146, 500, 11)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_party_stop, 0)
 #else
         CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_INTANGIBLE)
@@ -1223,7 +1223,7 @@ EVT_BEGIN(muj_00_door_open)
     WAIT_MS(500)
     CALL(evt_door_param, LW(0), 10, LW(1), LW(2), LW(3))
     CALL(evt_mario_party_door_move, LW(1), LW(3), FLOAT(135.0f))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_party_move_behind_mario, 0)
     CALL(evt_party_move_behind_mario, 1)
 #endif
@@ -1441,7 +1441,7 @@ static KinopioData kino_dt = {
     0, // breakfastItem
     {0}, // breakfastPos
     10, // ryoukin
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {399.0f, 16.0f, -185.0f}, // bed
 #else
     {403.0f, 17.0f, -182.0f}, // bed

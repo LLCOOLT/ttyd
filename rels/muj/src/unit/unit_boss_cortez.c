@@ -123,7 +123,7 @@ static EvtWord init_event[260];
 static EvtWord damage_event[70];
 extern EvtWord cortez_ac_counter_damage_event[];
 static EvtWord avoid_thorn_event[89];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord phase_event[184];
 #else
 static EvtWord phase_event[196];
@@ -135,7 +135,7 @@ extern EvtWord at2_hone_charge_event[];
 extern EvtWord at2_hone_rain_attack_event[];
 extern EvtWord _bone_rain_event[];
 extern EvtWord attack_event_mode3[];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord attack_audience_event[198];
 #else
 static EvtWord attack_audience_event[247];
@@ -150,7 +150,7 @@ BattleUnitSetup entry_sword;
 BattleUnitSetup entry_saber;
 extern EvtWord cortez_reset_pose_table[];
 static EvtWord cortez_damage_sub_event[153];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord dead_event[1007];
 #else
 static EvtWord dead_event[1033];
@@ -230,7 +230,7 @@ BattleUnitKind unit_boss_cortez = {
     data_table,
 };
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo builds: Status vulnerability of Cortez (percent chance each status takes hold): immune to Huge,
  * Tiny, Attack Down, fright, Gale Force, Dodgy, Invisible, instant KO; resists sleep (50%), stop (40%),
@@ -705,7 +705,7 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {"KRT_3S_1", 0.6f, NULL, "SFX_BOSS_KOR_WAIT1", 0, 1},
     {"KRT_3S_1", 0.8f, NULL, "SFX_BOSS_KOR_WAIT1", 0, 1},
     {"KRT_3S_1", 1.0f, NULL, "SFX_BOSS_KOR_WAIT1", 0, 1},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {"KRT_3S2_1", 0.01f, NULL, "SFX_BOSS_KOR_WAIT1", 0, 1},
     {"KRT_3S2_1", 0.2f, NULL, "SFX_BOSS_KOR_WAIT1", 0, 1},
     {"KRT_3S2_1", 0.4f, NULL, "SFX_BOSS_KOR_WAIT1", 0, 1},
@@ -726,7 +726,7 @@ static PoseSoundTiming pose_sound_timing_table[] = {
     {"KRT_3S_2", 0.6f, NULL, "SFX_BOSS_KOR_WAIT1", 0, 1},
     {"KRT_3S_2", 0.8f, NULL, "SFX_BOSS_KOR_WAIT1", 0, 1},
     {"KRT_3S_2", 1.0f, NULL, "SFX_BOSS_KOR_WAIT1", 0, 1},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {"KRT_3S2_2", 0.01f, NULL, "SFX_BOSS_KOR_WAIT1", 0, 1},
     {"KRT_3S2_2", 0.2f, NULL, "SFX_BOSS_KOR_WAIT1", 0, 1},
     {"KRT_3S2_2", 0.4f, NULL, "SFX_BOSS_KOR_WAIT1", 0, 1},
@@ -749,7 +749,7 @@ PoseTableEntry pose_table_mode_1[] = {
     {1, "KRT_N_1"},
     {5, "KRT_K_1"},
     // the demo names these poses after the Goomba animations (KUR_*)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {2, "KUR_Z_1"},
     {9, "KUR_Z_1"},
     {4, "KUR_X_1"},
@@ -770,7 +770,7 @@ PoseTableEntry pose_table_mode_1[] = {
 PoseTableEntry pose_table_mode_1_hone[] = {
     {1, "KRT_N_1"},
     {5, "KRT_K_1"},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {2, "KUR_Z_1"},
     {9, "KUR_Z_1"},
     {4, "KUR_X_1"},
@@ -901,7 +901,7 @@ PoseTableEntry pose_table_fly_bone[] = {
 
 /** Poses of Cortez in his final form. */
 PoseTableEntry pose_table_mode_3[] = {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {1, "KUR_N_1"},
     {2, "KUR_Z_1"},
     {9, "KUR_Z_1"},
@@ -940,7 +940,7 @@ PoseTableEntry pose_table_honeduka[] = {
 static BattleDataEntry data_table[] = {
     {9, cortez_damage_sub_event},
     {49, dead_event},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {70, mode2_honeduka_damage_event},
 #else
     {71, mode2_honeduka_damage_event},
@@ -1182,7 +1182,7 @@ static EVT_BEGIN(phase_event)
         CALL_CHILD(mode2_rib_close_event)
     END_IF
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_BOSS_CORTEZ_FORM, LW(0))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SET_VALUE(LW(15), -1)
     SWITCH(LW(0))
         CASE_EQUAL(2)
@@ -1720,7 +1720,7 @@ static EVT_BEGIN(attack_audience_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_A2_1"))
     CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KOR_INHALE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_snd_sfxon, STRING("SFX_AUDIENCE_PANIC_SCREAM1"), LW(15))
 #else
     BEGIN_SIBLING_EVENT
@@ -1745,7 +1745,7 @@ static EVT_BEGIN(attack_audience_event)
 #endif
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_A2_2"))
     CALL(_cortez_collect_energy, BTL_UNIT_SELF)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_snd_sfxoff, LW(15))
 #endif
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_A2_3"))
@@ -2522,7 +2522,7 @@ static EVT_BEGIN(dead_event)
         IF_INT_NOT_EQUAL(LW(3), -1)
             CALL(btlevtcmd_SetUnitWork, LW(3), 0, -1)
             CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_CORTEZ_SWORD_ID, -1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(btlevtcmd_GetDataFromDataTable, LW(3), LW(0), 70)
 #else
             CALL(btlevtcmd_GetDataFromDataTable, LW(3), LW(0), 71)
@@ -2533,7 +2533,7 @@ static EVT_BEGIN(dead_event)
         IF_INT_NOT_EQUAL(LW(3), -1)
             CALL(btlevtcmd_SetUnitWork, LW(3), 0, -1)
             CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_CORTEZ_SABER_ID, -1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(btlevtcmd_GetDataFromDataTable, LW(3), LW(0), 70)
 #else
             CALL(btlevtcmd_GetDataFromDataTable, LW(3), LW(0), 71)
@@ -2544,7 +2544,7 @@ static EVT_BEGIN(dead_event)
         IF_INT_NOT_EQUAL(LW(3), -1)
             CALL(btlevtcmd_SetUnitWork, LW(3), 0, -1)
             CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_CORTEZ_CLAW_ID, -1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(btlevtcmd_GetDataFromDataTable, LW(3), LW(0), 70)
 #else
             CALL(btlevtcmd_GetDataFromDataTable, LW(3), LW(0), 71)
@@ -2555,7 +2555,7 @@ static EVT_BEGIN(dead_event)
         IF_INT_NOT_EQUAL(LW(3), -1)
             CALL(btlevtcmd_SetUnitWork, LW(3), 0, -1)
             CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_CORTEZ_RAPIER_ID, -1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(btlevtcmd_GetDataFromDataTable, LW(3), LW(0), 70)
 #else
             CALL(btlevtcmd_GetDataFromDataTable, LW(3), LW(0), 71)
@@ -2697,7 +2697,7 @@ EVT_BEGIN(mode_change_event)
         ELSE
             CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_1H2_1"))
         END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KOR_MOVE1"), EVT_NULLPTR, 0, LW(15))
 #else
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KOR_MOVE2"), EVT_NULLPTR, 0, LW(15))
@@ -2713,7 +2713,7 @@ EVT_BEGIN(mode_change_event)
         ELSE
             CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_2H2_1"))
         END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_KOR_MOVE1"), EVT_NULLPTR, 0, LW(15))
         CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
         CALL(evt_snd_sfxoff, LW(15))

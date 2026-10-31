@@ -22,7 +22,7 @@ typedef struct EffHagetakaFlushN64Work {
     f32 scale;     // 0x2C
 } EffHagetakaFlushN64Work;
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // The demo defines the colours first
 static u8 color_rotation_data[] = {
     0xFF, 0xFF, 0x52, 0xFF, 0xFF, 0x52, 0xB5, 0x94,

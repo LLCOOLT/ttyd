@@ -3683,7 +3683,7 @@ USER_FUNC(btlevtcmd_DispItemIcon) {
     time = evtGetValue(event, args[4]);
     if (isFirstCall) {
         event->userdata[0] = time;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         event->userdatap[1] = itemEntry(x, y, z, NULL, item, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0);
         itemFlagOn(event->userdatap[1], ITEM_FLAG_BADGE_RETURN);
 #else
@@ -3736,7 +3736,7 @@ USER_FUNC(btlevtcmd_CommandFlyItem) {
                 pos.y += unit->sizeMultiplier * BtlUnit_GetHeight(unit);
             }
         }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         event->userdatap[1] = itemEntry(pos.x, pos.y, pos.z, NULL, item, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0);
         effItemGetEntry(10, pos.x, 12.0f + pos.y, pos.z - 5.0f);
         itemFlagOn(event->userdatap[1], ITEM_FLAG_BADGE_RETURN);
@@ -4407,7 +4407,7 @@ USER_FUNC(btlevtcmd_GetConfuseActEvent) {
     while (!evt) {
         evt = BattleSetConfuseAct(_battleWorkPointer, unit);
         i++;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         if (i > 10) {
 #else
         if (i > 20) {
@@ -7063,7 +7063,7 @@ USER_FUNC(btlevtcmd_InviteApInfoReport) {
  * Script: sets the unit args[0]'s hit event to args[1], used as the callback for counter action commands.
  * Only in the demos and the European release.
  */
-#if VERSION <= VERSION_DEMO_US || VERSION == VERSION_EU
+#if VERSION <= VERSION_DEMO_JP || VERSION >= VERSION_DEMO_EU
 USER_FUNC(btlevtcmd_SetCounterAcCallBack) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;

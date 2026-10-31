@@ -371,7 +371,7 @@ static EVT_BEGIN(guide_talk)
         SPAWN_EVENT(seal_bigtree2)
         CASE_EQUAL(STORY_STG2_10_SECRET_ENTRANCE_REVEALED)
         CALL(evt_msg_print, 0, STRING("stg2_mri_e10_05"), 0, STRING("me"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CASE_EQUAL(STORY_STG2_26_PRAISE_FROM_THE_PUNI)
 #else
         CASE_GREATER_OR_EQUAL(STORY_STG2_26_PRAISE_FROM_THE_PUNI)
@@ -885,7 +885,7 @@ static USER_FUNC(evt_cloud_main) {
     if (party == NULL) {
         return EVT_RETURN_BLOCK;
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (party->currentMemberId != 5) {
         return EVT_RETURN_BLOCK;
     }
@@ -1804,7 +1804,7 @@ EVT_BEGIN(mri_00_init_evt)
         CASE_GREATER_OR_EQUAL(STORY_STG2_25_05_BOWSER_PETALBURG)
         IF_INT_EQUAL(GSWF(GSWF_MRI_LEFT_TREE_AFTER_STG2), 0)
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_26_PRAISE_FROM_THE_PUNI)
 #endif
             BEGIN_INLINE_EVENT

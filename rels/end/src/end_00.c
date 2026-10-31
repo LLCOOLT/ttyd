@@ -21,7 +21,7 @@
 #include "memory.h"
 #include "string.h"
 #include "stdlib.h"
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 #include "evt/evt_pouch.h"
 #endif
 #include "stdio.h"
@@ -65,7 +65,7 @@ typedef struct EndExtData {
 } EndExtData;
 typedef struct EndWork {
     FileEntry* tpl;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     s32 alpha;
     s32 npcLoadNum;     // credit NPCs whose animation groups have been requested so far
     s32 npcLoadRequest; // credit NPCs that left the screen since the last preload pass
@@ -102,7 +102,7 @@ typedef struct CreditActor {
     Mtx mtx;
 } CreditActor;
 EndWork end_work;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 extern CreditNpc R_credits_npc_info[151];
 #else
 s32 (*end_moa_chain_group)[2];
@@ -279,7 +279,7 @@ USER_FUNC(evt_end_credit_npc_get_wait_type) {
 /** Pointer to the ending's work data (end_work), used by the ending callbacks. */
 EndWork* end_wp = &end_work;
 
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 // PAL credits: the European staff entries
 CreditMsg end_staff_roll_msg_tbl[] = {
     0, 0, 0, 0, 0, 0, "a00", 0,
@@ -524,7 +524,7 @@ CreditMsg end_staff_roll_msg_tbl[] = {
 };
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Parade of the ending: for each silhouette, the NPC model, its animation and the script it runs. Version for
  * the demo releases (151 entries).
@@ -705,7 +705,7 @@ USER_FUNC(evt_end_credit_npc_main) {
                 actor->angle = 250.0f;
                 actor->limit = 90.0f + actor->angle + 30.0f;
                 break;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             case 3:
 #endif
             default:
@@ -740,7 +740,7 @@ USER_FUNC(evt_end_credit_npc_main) {
             y = -240.0f;
             r = 100.0f;
             break;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         case 3:
 #endif
         default:
@@ -778,7 +778,7 @@ USER_FUNC(evt_end_credit_npc_main) {
             if (actor->angle > actor->limit) {
                 animPoseRelease(actor->poseId);
                 _mapFree(actor);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 end_wp->npcLoadRequest++; // one more NPC for evt_end_credit_npc_preload to load
 #endif
                 return 2;
@@ -823,7 +823,7 @@ EVT_BEGIN(end_credit_npc_parade)
             CALL(evt_end_credit_npc_main, LW(0))
         END_INLINE_EVENT
         IF_INT_EQUAL(LW(1), 1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             WAIT_MS(2000)
 #else
             WAIT_MS(1920)
@@ -846,7 +846,7 @@ EVT_BEGIN(end_credit_npc_parade)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Requests the animation groups of the credit NPCs after the ones already loaded,
  * one for each NPC that has left the screen, so the parade's next characters are ready in time;
@@ -935,7 +935,7 @@ EVT_BEGIN(end_image_blend_loop)
 EVT_END()
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * The demo draws only the roll's picture (the id wraps around the picture count),
  * with no overlay or blended pictures, a little further out to the sides.
@@ -1310,7 +1310,7 @@ EVT_BEGIN(end_return_title_evt)
     SET_VALUE(GF(10), 1)
     CALL(evt_end_font_restore)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG9_01_END_CREDITS)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     CALL(evt_pouch_mario_recovery) // PAL: the party is healed before the save
     CALL(evt_pouch_all_party_recovery)
 #endif
@@ -1321,7 +1321,7 @@ EVT_BEGIN(end_return_title_evt)
 #else
     CALL_CHILD(evt_memcard_save_wrapper)
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(end_bgm_wait_stop)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 3000)
 #else
@@ -1350,7 +1350,7 @@ EVT_BEGIN(end_00_init_evt)
     CALL(evt_bg_set_color, 0, 0, 0, 255)
     SET_VALUE(GF(10), 0)
     CALL(evt_end_staff_roll_init)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     BEGIN_INLINE_EVENT
         CALL(evt_end_credit_npc_preload)
     END_INLINE_EVENT
@@ -1358,7 +1358,7 @@ EVT_BEGIN(end_00_init_evt)
     SPAWN_EVENT(end_credit_npc_parade)
     BEGIN_INLINE_EVENT
         CALL(evt_end_staff_roll_msg_main)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         SPAWN_EVENT(end_return_title_evt)
 #endif
     END_INLINE_EVENT
@@ -1367,7 +1367,7 @@ EVT_BEGIN(end_00_init_evt)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * the demo's silhouette scripts: other models and paths than the releases' (most rise straight up through the
  * middle of the screen)
@@ -1829,7 +1829,7 @@ USER_FUNC(evt_end_staff_roll_msg_main) {
     switch (end_wp->pos) {
         case 0:
             x = -274;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             y = -20;
 #else
             y = -24;
@@ -1841,7 +1841,7 @@ USER_FUNC(evt_end_staff_roll_msg_main) {
             break;
         case 2:
             x = 274;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             y = -20;
 #else
             y = -24;
@@ -1853,7 +1853,7 @@ USER_FUNC(evt_end_staff_roll_msg_main) {
             break;
         case 4:
             x = 0;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             y = -80;
 #else
             y = -60;
@@ -1872,12 +1872,12 @@ USER_FUNC(evt_end_staff_roll_msg_main) {
                     } else if (x > 0) {
                         wx = x - 0.8f * FontGetMessageWidth(msg);
                     }
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                     if (strcmp(end_staff_roll_msg_tbl[idx].msg1[i], "c00") == 0) {
                         wx += 10;
                     }
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     sprintf(buf1, "<clear><wait %d><dkey><wpos %d %d 400 200><col f0f0f0ff><speed 0><scale 0.8>%s</scale></speed></col><wait 500></dkey><once_stop>", 0, wx - 62, wy, msg);
 #else
                     sprintf(buf1, "<clear><dkey><wpos %d %d 400 200><col f0f0f0ff><speed 0><scale 0.8>%s</scale></speed></col><wait 500></dkey><once_stop>", wx - 62, wy, msg);
@@ -1889,7 +1889,7 @@ USER_FUNC(evt_end_staff_roll_msg_main) {
                 if (end_staff_roll_msg_tbl[idx].msg2[i] != NULL) {
                     msg2 = msgSearch(end_staff_roll_msg_tbl[idx].msg2[i]);
                     // Both demos place the second line 8 pixels further right (integer centring) and add a <wait 0> tag
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     wx2 = x + 8;
                     wy2 = y - i * 24 - 50;
                     if (x == 0) {
@@ -1940,7 +1940,7 @@ USER_FUNC(evt_end_staff_roll_msg_main) {
         case 2:
             n = idx + 1;
             // The releases also continue the windows after the last entry; both demos keep the last entry up with BGM_EVT_PEACH1 instead
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (n < ARRAY_SIZE(end_staff_roll_msg_tbl)) {
                 for (i = 0; i < 3; i++) {
                     if (end_staff_roll_msg_tbl[n].msg1[i] != NULL) {
@@ -2003,7 +2003,7 @@ USER_FUNC(evt_end_staff_roll_msg_main) {
                 idx++;
             }
             break;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         case 4:
             if (keyGetButtonTrg(0) & PAD_BUTTON_A) {
                 evtSetValue(event, GW(10), 2);
@@ -2036,7 +2036,7 @@ USER_FUNC(evt_end_staff_roll_init) {
     s32 i;
 
     if (isFirstCall) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         end_wp->npcLoadNum = 0;
         end_wp->npcLoadRequest = 0;
         end_wp->tpl = NULL;
@@ -2053,7 +2053,7 @@ USER_FUNC(evt_end_staff_roll_init) {
         JUTFont_Free();
         JUTFontSetup(1);
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         msgLoad("global", 1);
 #endif
     }
@@ -2063,7 +2063,7 @@ USER_FUNC(evt_end_staff_roll_init) {
     if (end_wp->tpl == NULL) {
         end_wp->tpl = fileAllocf(4, "%s/ending.tpl", getMarioStDvdRoot());
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the first ten credit NPCs are loaded here, the rest by evt_end_credit_npc_preload as the parade goes on
     end_wp->npcLoadNum = 10;
     for (i = 0; i < end_wp->npcLoadNum; i++) {
@@ -2074,7 +2074,7 @@ USER_FUNC(evt_end_staff_roll_init) {
             return 0;
         }
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     for (i = 0; i < end_wp->npcLoadNum; i++) {
 #else
     for (i = 0; i < 5; i++) {
@@ -2098,7 +2098,7 @@ void end_staff_roll_exit(void) {
     JUTFont_Free();
     JUTFontSetup(0);
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     msgLoad("global", 1);
 #endif
 }
@@ -2114,7 +2114,7 @@ USER_FUNC(evt_end_font_restore) {
     JUTFont_Free();
     JUTFontSetup(0);
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     msgLoad("global", 1);
 #else
     psndClearFlag(PSND_FLAG_SFX_OFF);

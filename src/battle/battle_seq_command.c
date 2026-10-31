@@ -467,7 +467,7 @@ static s32 _btlcmd_MakeSelectWeaponTable(BattleWork* wp, s32 type) {
                     cmd->weapon[num].name = msgSearch(itemDataTable[cmd->weapon[num].weapon->itemId].name);
                 }
                 if (wp->flags & (BATTLE_FLAG_LECTURE_JUMP | BATTLE_FLAG_LECTURE_MENU) && wp->lectureUnitId != -1) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     cmd->weapon[num].weapon = BtlUnit_GetData(BattleGetUnitPtr(wp, wp->lectureUnitId), 0x43);
 #else
                     cmd->weapon[num].weapon = BtlUnit_GetData(BattleGetUnitPtr(wp, wp->lectureUnitId), 0x44);
@@ -518,7 +518,7 @@ static s32 _btlcmd_MakeSelectWeaponTable(BattleWork* wp, s32 type) {
                     cmd->weapon[num].name = msgSearch(itemDataTable[cmd->weapon[num].weapon->itemId].name);
                 }
                 if (wp->flags & (BATTLE_FLAG_LECTURE_HAMMER | BATTLE_FLAG_LECTURE_MENU) && wp->lectureUnitId != -1) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     cmd->weapon[num].weapon = BtlUnit_GetData(BattleGetUnitPtr(wp, wp->lectureUnitId), 0x44);
 #else
                     cmd->weapon[num].weapon = BtlUnit_GetData(BattleGetUnitPtr(wp, wp->lectureUnitId), 0x45);
@@ -1527,7 +1527,7 @@ void BattleCommandDisplay(BattleWork* wp) {
 
     if (cmd != NULL) {
         SelectedItemCoordinateColorUpDate();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         dispEntry(CAMERA_2D, 501.0f, 0, BattleDrawEnemyHP, wp);
 #else
         dispEntry(CAMERA_2D, 902.0f, 0, BattleDrawEnemyHP, wp);
@@ -2013,7 +2013,7 @@ void BattleCommandDisplay_WeaponMultiItemCancelCheckDisp(CameraId camId, void* p
 
     pouchGetPtr();
     sprintf(buf, msgSearch("btl_msg_multi_item_cancel_check"));
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     len = (f32)FontGetMessageWidth(buf);
     ((WindowDispWakuColFloatsFirstFn)windowDispGX_Waku_col)(-30.0f - (w = 0.5f * (f32)len), 30.0f, 65.0f + (f32)len, 32.0f, 10.0f, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 #else
@@ -2613,7 +2613,7 @@ static void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
                     }
                     break;
                     // Two copies: the demos set one charge event; the releases pick a Mario or partner event.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 case 1:
                     unit->attackEventCode = WEVT(&badgeWeapon_Charge);
                     unit->attackEventFlags = 0;
@@ -2701,7 +2701,7 @@ static void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
                     BtlActRec_AddCount(&wp->actRecord.marioHammerMoves);
                     break;
                 case 4:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     if (weapon->hpDamageFn) {
 #else
                     if (_check_weapon_type_attack(weapon)) {
@@ -2840,7 +2840,7 @@ static s32 _check_present_item(void) {
         case 0x7b:
             BtlUnit_RecoverHp(unit, 1);
             BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             pos.y += BtlUnit_GetHeight(unit);
 #else
             pos.y += unit->sizeMultiplier * BtlUnit_GetHeight(unit) + 5.0f;
@@ -2851,7 +2851,7 @@ static s32 _check_present_item(void) {
         case 0x7c:
             BtlUnit_RecoverFp(unit, 1);
             BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             pos.y += BtlUnit_GetHeight(unit);
 #else
             pos.y += unit->sizeMultiplier * BtlUnit_GetHeight(unit) + 5.0f;
@@ -3105,7 +3105,7 @@ void* BattleSetConfuseAct(BattleWork* wp, BattleUnit* unit) {
                     return btldefaultevt_Wait;
                 case 3:
                     return btldefaultevt_Escape;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 case 1:
                     return WEVT(&badgeWeapon_Charge);
                 case 2:
@@ -3138,7 +3138,7 @@ void* BattleSetConfuseAct(BattleWork* wp, BattleUnit* unit) {
                     if (cnt) {
                         cursor->absPos = list[irand(cnt)];
                     } else {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         return subsetevt_confuse_flustered;
 #else
                         return NULL;

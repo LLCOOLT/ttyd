@@ -97,7 +97,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Damage-type modifiers of the Spinia: none, no special weakness or immunity. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Spinia (100% is the normal chance): immune to Dodgy and Invisible; weak to Stop
  * 120%, Poison 150%, Electrified 150%, Burn 150%, Huge 150%, Attack Up 150%, Defense Up 150%, Fright 120%,

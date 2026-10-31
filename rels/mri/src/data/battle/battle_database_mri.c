@@ -592,7 +592,7 @@ BattleUnitSetup btlparty_mri_mri_18_03[] = {
         1, // alliance
         {0}, // pad_05
         BATTLE_PHASE_ENEMY, // attackPhase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {50.0f, 40.0f, -10.0f}, // position
 #else
         {0.0f, 40.0f, -20.0f}, // position
@@ -606,7 +606,7 @@ BattleUnitSetup btlparty_mri_mri_18_03[] = {
         1, // alliance
         {0}, // pad_05
         BATTLE_PHASE_ENEMY, // attackPhase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {90.0f, 40.0f, 0.0f}, // position
 #else
         {75.0f, 40.0f, 0.0f}, // position
@@ -620,7 +620,7 @@ BattleUnitSetup btlparty_mri_mri_18_03[] = {
         1, // alliance
         {0}, // pad_05
         BATTLE_PHASE_ENEMY, // attackPhase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {130.0f, 40.0f, 10.0f}, // position
 #else
         {150.0f, 40.0f, 20.0f}, // position
@@ -814,7 +814,7 @@ BattleUnitSetup btlparty_mri_mri_20_03[] = {
         1, // alliance
         {0}, // pad_05
         BATTLE_PHASE_ENEMY, // attackPhase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {50.0f, 40.0f, -10.0f}, // position
 #else
         {10.0f, 40.0f, -20.0f}, // position

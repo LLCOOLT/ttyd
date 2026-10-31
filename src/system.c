@@ -42,7 +42,7 @@ const char* build_time_ptr = R_build_time;
 
 // FAKE: stand-in for the assertion helper JP, US and both demos strip (PAL keeps it, below); it only
 // keeps the original's message string in its place in .rodata.
-#if VERSION != VERSION_EU
+#if VERSION < VERSION_DEMO_EU
 const char* systemStrippedPool0(void) {
     return "assertion \"%s\" failed.\n \"%s\"\n";
 }
@@ -53,7 +53,7 @@ const char* getMarioStDvdRoot(void) {
     return ".";
 }
 
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 /** PAL keeps the assertion helpers that JP and US strip */
 BOOL __assert(const char* filename, s32 line, const char* assertion) {
     OSPanic(filename, line, assertion);
@@ -554,7 +554,7 @@ static inline DEMOPadStatus* GET_DEMO_PAD_STATUS(u32 i) {
  */
 void makeKey(void) {
     s32 delay;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // The demo keeps button/dirs in 32-bit locals: with no u16 masks to fold, the global optimiser's constant
     // propagation changes nothing in makeKey, so its dead-li deletion never runs and loop 2's count register
     // is colour-coalesced with i's zero (the demo's loop-2 register assignment).
@@ -858,7 +858,7 @@ f32 sysMsec2FrameFloat(f32 msec) {
 #endif
 }
 
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 /** PAL keeps the file:line debug print that JP and US strip */
 void sysDebugReport(const char* filename, s32 line, const char* format, ...) {
     char buf[2048];
@@ -1110,7 +1110,7 @@ void systemStrippedPool1(const char** str, f32* f, f64* d, f32 x) {
 /** FAKE stand-in, JP and demo form of systemStrippedPool1 above (the demo keeps the full mode name table). */
 void systemStrippedPool1(const char** str, f32* f, f64* d, f32 x) {
     f[0] = 1.0f;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the demo's small-data limit leaves the 6-byte names in .rodata, so the whole name table stays
     str[0] = "LINEAR";
     str[1] = "ACCEL";

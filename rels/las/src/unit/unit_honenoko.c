@@ -134,7 +134,7 @@ static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 /** Defence attributes of the Dull Bones: none, every element hits it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo builds: Status vulnerability of the Dull Bones (percent chance each status takes hold):
  * immune to sleep, poison; resists stop (60%), dizzy (50%), confusion (50%), fright (10%),

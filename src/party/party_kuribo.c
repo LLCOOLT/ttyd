@@ -49,7 +49,7 @@ static USER_FUNC(pre_kurio_use) {
         return EVT_RETURN_DONE;
     }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (!(party->flags & PARTY_FLAG_IS_GROUNDED)) {
         return EVT_RETURN_DONE;
     }
@@ -188,7 +188,7 @@ static USER_FUNC(post_kurio_use) {
     if (!party) {
         return EVT_RETURN_DONE;
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     party->useMotionId = 10;
     marioStSystemLevel(0);
     psndClearFlag(PSND_FLAG_MUTE_SFX);
@@ -241,7 +241,7 @@ void kuribo_use_post(PartyEntry* party) {
 #endif
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** The demo starts the message right where Goombella stands; retail first walks her next to Mario. */
 void kuribo_use(PartyEntry* party) {
     EventEntry* evt;

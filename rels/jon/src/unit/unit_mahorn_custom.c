@@ -87,7 +87,7 @@ static EvtWord trans_magic_event[49];
 static EvtWord yokeyoke_magic_event[49];
 static EvtWord recover_magic_event[70];
 static EvtWord bunsin_event[152];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord spawn_event[72];
 #else
 static EvtWord spawn_event[76];
@@ -234,7 +234,7 @@ static BattleUnitDefense defence = {{5, 5, 5, 5, 5}};
 /** Element response of the Elite Wizzerd: none, every attack type is treated normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Status vulnerability of the Elite Wizzerd (percent, 0 is immune): immune to sleep. Demo values. */
 static StatusVulnerability regist = {0, 30, 30, 100, 20, 100, 100, 20, 100, 20, 100, 20, 100, 20, 20, 10, 55, 100, 20, 100, 100, 20};
 #else
@@ -244,7 +244,7 @@ static StatusVulnerability regist = {0, 30, 30, 100, 20, 100, 100, 20, 100, 20, 
 static StatusVulnerability regist = {0, 30, 80, 100, 20, 100, 100, 40, 100, 75, 100, 75, 100, 80, 20, 10, 75, 100, 20, 100, 100, 20};
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Elite Wizzerd, clone (percent, 0 is immune): immune to sleep, stop, dizzy,
  * confuse, freeze, tiny, attack down, defence down, allergic, fright, gale force, slow, instant KO. Demo
@@ -292,7 +292,7 @@ static BattleWeapon weapon_mahorn_attack_magic = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
 #else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE, // special

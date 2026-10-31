@@ -95,7 +95,7 @@ static BattleUnitDefense defence = {0};
 /** Defence attributes of the Dark Puff: none, every element hits it normally. */
 static BattleUnitDefenseAttr defence_attr = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo builds: Status vulnerability of the Dark Puff (percent chance each status takes hold):
  * every status takes hold at 90% or better.

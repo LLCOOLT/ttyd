@@ -81,7 +81,7 @@ static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 /** Damage-type reactions of the Spunia: none, so every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Spunia (both demos), as the percent chance each status takes hold: immune to
  * Dodgy and Invisible; resists 13 statuses (down to 30% of the normal chance); extra vulnerable to poison,

@@ -109,7 +109,7 @@ extern EvtWord aud_no_hit_event[];
 static EvtWord init_event[92];
 static EvtWord waku_event[23];
 static EvtWord damage_event[111];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord dead_event[216];
 #else
 static EvtWord dead_event[234];
@@ -162,7 +162,7 @@ BattleUnitKind unit_boss_magnum_battender_mkII = {
     0.0f,
     0,
     0,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     0.0f,
     0.0f,
 #else
@@ -216,7 +216,7 @@ static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 /** Elemental reactions of Magnus von Grapple 2.0: none, every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of Magnus von Grapple 2.0 (percent, 100 is normal) in the demo builds: immune to
  * sleep, poison, electric, Huge, Tiny, Attack Down, fright, Gale Force, Dodgy, Invisible and instant KO;
@@ -241,7 +241,7 @@ static PoseTableEntry pose_table[] = {
     {2, "MGN_2D_1"},
     {9, "MGN_2D_1"},
     {5, "MGN_X_1"},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {4, "MGN_S_1"},
     {3, "MGN_S_1"},
 #else
@@ -267,7 +267,7 @@ static PoseTableEntry pose_table_no_arm[] = {
     {2, "MGN_2D_2"},
     {9, "MGN_2D_2"},
     {5, "MGN_X_2"},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {4, "MGN_S_2"},
     {3, "MGN_S_2"},
 #else
@@ -727,7 +727,7 @@ static USER_FUNC(aud_suikomi) {
             }
         }
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // The audience scream stops as soon as the last member is pulled in.
     if (done < 20) {
         return EVT_RETURN_BLOCK;
@@ -2046,7 +2046,7 @@ static BattleUnitDefense defence_r = {{0, 0, 0, 0, 0}};
  */
 static BattleUnitDefenseAttr defence_attr_r = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the X-Punch fist of Magnus von Grapple 2.0 (percent, 100 is normal) in the demo
  * builds: immune to sleep, Huge, Tiny, Attack Down, fright, Dodgy, Invisible and instant KO; resists most
@@ -2117,7 +2117,7 @@ static BattleWeapon weapon_batten_rocket_attack = {
     2, // reserved_6F
     NULL, // acHelpMsg
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     COUNTER_RESIST_ALL & ~(COUNTER_RESIST_ELECTRIC | COUNTER_RESIST_PREEMPTIVE_SPIKY), // counterResistFlags
 #else
     COUNTER_RESIST_ALL, // counterResistFlags

@@ -38,7 +38,7 @@ typedef struct StChgMsgData {
 } StChgMsgData;
 
 // Status Type Priority Data. The demo defines it first; its .data follows that order (retail keeps it in .sdata).
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo copy of the status announcement order: Charge first, then Poison, Sleep and so on, ending with -1.
  * BattleStatusChangeMsgMain shows pending messages in this order and _get_pri ranks queued changes by it.

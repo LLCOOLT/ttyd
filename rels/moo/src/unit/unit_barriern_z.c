@@ -196,7 +196,7 @@ static BattleUnitKindPart parts[] = {
     {11, "btl_un_barriern_z", "c_baria_z", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 10, 10, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
 };
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo builds: Status vulnerability of the Z-Yux (percent chance each status takes hold): immune to poison,
  * freeze, fright, Gale Force; resists sleep (10%), dizzy (70%), confusion (70%), Tiny (70%),

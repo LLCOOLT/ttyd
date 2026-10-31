@@ -20,7 +20,7 @@
 #pragma dont_inline on
 static void kemuri(void);
 static void kemuri_mugi(void);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static inline void mario_kemuri_landon(void);
 #else
 void mario_kemuri_landon(void);
@@ -132,7 +132,7 @@ void mario_land_kemuri(void) {
 }
 
 // The demo has no mri_05 splash type, and the function is inlined into its two callers.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static inline
 #endif
     void mario_kemuri_landon(void) {

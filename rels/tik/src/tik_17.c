@@ -241,7 +241,7 @@ static EVT_BEGIN(mobj_box01)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box01"), LW(0), LW(1), LW(2))
     CALL(evt_item_entry, STRING("item01"), ITEM_FP_PLUS, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_item_flag_on, STRING("item01"), ITEM_FLAG_NO_TOUCH)
 #else
     CALL(evt_item_flag_on, STRING("item01"), ITEM_FLAG_BADGE_RETURN | ITEM_FLAG_NO_TOUCH)
@@ -275,7 +275,7 @@ EVT_BEGIN(tik_17_init_evt)
     IF_INT_EQUAL(GSWF(GSWF_TIK17_BIG_BLOCK_BROKEN), 0)
         CALL(evt_mobj_flag_onoff, 1, STRING("block"), MOBJ_FLAG_NO_CULL)
     END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mobj_itembox, STRING("mobj_box01"), -125, 100, -125, 0, 0, PTR(mobj_box01), GSWF(GSWF_TIK17_FP_PLUS_CHEST_OPENED))
 #else
     CALL(evt_mobj_itembox, STRING("mobj_box01"), -125, 100, -110, 0, 0, PTR(mobj_box01), GSWF(GSWF_TIK17_FP_PLUS_CHEST_OPENED))

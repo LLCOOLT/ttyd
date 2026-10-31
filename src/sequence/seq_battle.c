@@ -35,7 +35,7 @@
 #include "evt/evt_story.h"
 
 static void battle_exit(void);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static void battle_init(void);
 #else
 static BOOL battle_init(void);
@@ -64,12 +64,12 @@ static const char bti04[7];
 void seq_battleInit(SequenceWork* work) {
     FieldBattleData* fbat;
     NpcEntry* npc;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     MapData* map;
 #endif
 
     debug_battle_flag = gp->debugBattle;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the demo starts reading the battle map now
     fbatGetPointer();
     switch (pouchGetPtr()->rank) {
@@ -153,7 +153,7 @@ void seq_battleMain(SequenceWork* work) {
                 work->state++;
             }
             break;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         // the demo loads the battle map in battle_init
         case 2:
             battle_init();
@@ -252,7 +252,7 @@ void seq_battleMain(SequenceWork* work) {
             psndSetPosDirListener(&pos, camGetPtr(CAMERA_3D)->viewYaw);
             break;
         }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         case 4:
 #else
         case 6:
@@ -288,7 +288,7 @@ void seq_battleMain(SequenceWork* work) {
  * and calls BattleInit.
  * The demos also take control and load the stage map here; later versions return FALSE (done in one call).
  */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static void battle_init(void) {
 #else
 /** Later versions: same setup, returning FALSE once done (seq_battleMain state 4 retries while TRUE). */
@@ -297,7 +297,7 @@ static BOOL battle_init(void) {
     FieldBattleData* fbat;
     NpcEntry* npc;
     PouchData* pouch;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     MapData* map;
     MapData* map2;
     BattleStageData* stage;
@@ -307,11 +307,11 @@ static BOOL battle_init(void) {
 
     fbat = fbatGetPointer();
     npc = fbat->target;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     stage = npc->battleInfo.stageData;
 #endif
     pouch = pouchGetPtr();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the demo takes Mario's control and loads the battle map here (later versions: seq_battleMain states 2 and 3)
     if (debug_battle_flag == 0) {
         marioCtrlOff();
@@ -360,7 +360,7 @@ static BOOL battle_init(void) {
     npcReleaseFiledNpc();
     gp->inBattle = 1;
     evtmgrReInit();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (map && map->eventAddr) {
         evtEntry(map->eventAddr, 0, 0);
     }
@@ -469,7 +469,7 @@ static void battle_exit(void) {
         partyCtrlOn();
         marioGetPtr()->flags |= MARIO_FLAG_ACTIVE;
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     psndClearFlag(PSND_FLAG_SFX_WITH_BGM);
 #else
     L_psndBGM_stop();
@@ -482,7 +482,7 @@ static void battle_exit(void) {
     }
     PSMTXScale(mtx, 3.0f, 3.0f, 3.0f);
     PSMTXMultVec(mtx, &light->position, &light->position);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if ((evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG2_23_TIME_BOMB_ACTIVATED || evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) >= STORY_STG2_24_BOSS_BATTLE) && evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) != STORY_STG8_END_AFTER_THE_BATTLE && seqGetNextSeq() != SEQ_GAME_OVER) {
 #else
     if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) >= STORY_STG2_23_TIME_BOMB_ACTIVATED && evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG2_24_BOSS_BATTLE) {
@@ -495,7 +495,7 @@ static void battle_exit(void) {
 }
 
 // the demo defines the names in another order (their order in .rodata)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Names of the battle stage maps for Mario's rank (bti_01 to bti_04, the stage gets bigger as he rises),
  * and gon_11, whose message file a debug battle loads when its menu has none.

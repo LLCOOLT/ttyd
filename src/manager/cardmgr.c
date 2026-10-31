@@ -20,7 +20,7 @@
 #include "libc_decls.h"
 /** Name of the game's save file on the memory card, used to find, create and delete it. */
 const char card_file_name[0x14] = "mariost_save_file";
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 // PAL: memory card comment per language (gp->language)
 const char card_title_jp[0x18] = "ペーパーマリオＲＰＧ";
 const char card_date_jp[0x20] = "%2d月%2d日のセーブデータです";
@@ -53,7 +53,7 @@ static CardWork* wp;
 
 // Set once a card has been opened; memcard_open then reads its serial number.
 // The demo keeps it in bit 0x4000 (retail moved it to make room for the insert watch).
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #define CARD_FLAG_SERIAL 0x4000
 #else
 #define CARD_FLAG_SERIAL 0x2000
@@ -64,14 +64,14 @@ const char* version = VERSION_PICK("009", "010");
 
 // local prototypes
 static inline void check_sum(CardSaveSlot* save);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 static void make_header(void);
 #else
 static inline void make_header(void);
 #endif
 static inline void make_data(void);
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static void memcard_probe(void); // the demo calls it, the later versions inline it
 #else
 static inline void memcard_probe(void);
@@ -148,7 +148,7 @@ void cardBufReset(void) {
     wp->op = 0;
     wp->result = CARD_RESULT_NOCARD;
     wp->flags = 0;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (flags & CARD_FLAG_INSERT_WATCH) {
         wp->flags |= CARD_FLAG_INSERT_WATCH;
     }
@@ -375,10 +375,10 @@ void cardCopy2Main(s32 slot) {
     s32 backup6;
     u32 backup3;
     s32 language;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     s32 framerate;
 #endif
-#elif VERSION <= VERSION_DEMO_US
+#elif VERSION <= VERSION_DEMO_JP
     CardSaveSlot* save;
     void* backup1;
     void* backup2;
@@ -403,7 +403,7 @@ void cardCopy2Main(s32 slot) {
 #if VERSION >= VERSION_US
     language = gp->language;
 #endif
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     framerate = gp->framerate;
 #endif
     backup4 = gp->soundMode;
@@ -443,7 +443,7 @@ void cardCopy2Main(s32 slot) {
 #if VERSION >= VERSION_US
     gp->language = language;
 #endif
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     // PAL: loading a save keeps the current 50/60 Hz frame rate
     gp->framerate = framerate;
 #endif
@@ -1190,7 +1190,7 @@ static inline u32 header_sum(u8* data, s32 size) {
     return sum;
 }
 
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 /** PAL: not inlined; the comment and its date order follow gp->language */
 static void make_header(void) {
     CardMetadata* metadata;
@@ -1288,7 +1288,7 @@ static void memcard_probe(void) {
     s32 sectorSize;
     s32 result;
     // the declaration order sets the registers: the demo's out-of-line copy and the inlined copies need opposite orders
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     s32 resultB;
     s32 timeout;
     s32 i;
@@ -1314,7 +1314,7 @@ static void memcard_probe(void) {
     if (result == CARD_RESULT_READY) {
         wp->result = CARD_RESULT_READY;
         wp->chan = 0;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     } else if (resultB == CARD_RESULT_READY) {
         wp->result = CARD_RESULT_READY;
         wp->chan = 1;
@@ -1322,7 +1322,7 @@ static void memcard_probe(void) {
     } else if (result == CARD_RESULT_WRONGDEVICE) {
         wp->result = CARD_RESULT_WRONGDEVICE;
         wp->chan = 0;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     } else if (resultB == CARD_RESULT_WRONGDEVICE) {
         wp->result = CARD_RESULT_WRONGDEVICE;
         wp->chan = 1;

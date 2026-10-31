@@ -23,7 +23,7 @@
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static BeroEntry bero_entry_data[8];
 #else
 static BeroEntry bero_entry_data[5];
@@ -73,7 +73,7 @@ static BeroEntry bero_entry_data[] = {
         1, // exitAnimeType
         0, 0, // enterAnimeArg..exitAnimeArg
     },
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {
         "n_bero_2", // hitName
         0, 0, // type..sfxId
@@ -377,7 +377,7 @@ static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
     CALL(evt_item_entry, STRING("item00"), ITEM_HAPPY_HEART_P, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
 #else
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_BADGE_RETURN | ITEM_FLAG_NO_TOUCH)
@@ -440,7 +440,7 @@ EVT_BEGIN(tik_04_init_evt)
         CALL(evt_mobj_flag_onoff, 1, STRING("block"), MOBJ_FLAG_NO_CULL)
     END_IF
     CALL(evt_mobj_itembox, STRING("mobj_box00"), 310, 0, -25, 0, 0, PTR(mobj_box00), GSWF(GSWF_TIK04_HAPPY_HEART_P_CHEST_OPENED))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mobj_brick, STRING("mobj_box01"), -345, 60, 130, ITEM_PRETTY_LUCKY, 12, 0, GSWF(GSWF_TIK04_PRETTY_LUCKY_BLOCK_HIT))
 #else
     CALL(evt_mobj_brick, STRING("mobj_box01"), -150, 60, 130, ITEM_PRETTY_LUCKY, 12, 0, GSWF(GSWF_TIK04_PRETTY_LUCKY_BLOCK_HIT))

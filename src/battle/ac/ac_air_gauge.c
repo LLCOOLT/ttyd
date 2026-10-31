@@ -32,7 +32,7 @@ typedef struct GaugeKey {
 } GaugeKey;
 
 #define GAUGE_TABLE {{0, 0.0f, 1}, {20, 1.0f, 1}, {40, 1.0f, 1}, {80, 0.0f, 0}, {-1, -1.0f, 0}}
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // the demo curve rises faster and falls off sooner; table 3 already has the retail one
 #define GAUGE_TABLE_DEMO {{0, 0.0f, 1}, {10, 1.2f, 1}, {30, 0.7f, 1}, {50, 0.0f, 0}, {-1, -1.0f, 0}}
 /**
@@ -290,7 +290,7 @@ static f32 _GetGaugeDecValue(void) {
 
     switch ((u32)ac->params[7]) {
         // Two copies: the demos use different gauge decrease values for most levels.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         case 0:
             base = 0.0f;
             t = _table_0;

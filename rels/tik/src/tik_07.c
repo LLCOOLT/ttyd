@@ -224,7 +224,7 @@ EVT_BEGIN(tik_07_down_evt)
         CALL(evt_party_cont_onoff, 1, 1)
         CALL(evt_mario_wait_landon)
         WAIT_MS(100)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         LOOP(30)
             CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
             CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
@@ -242,7 +242,7 @@ EVT_BEGIN(tik_07_down_evt)
         CALL(evt_cam3d_evt_off, 0, 11)
         WAIT_MS(400)
         CALL(evt_mario_key_onoff, 1)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         CALL(evt_cam_letter_box_disable, 0)
 #endif
     END_INLINE_EVENT
@@ -325,7 +325,7 @@ static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
     CALL(evt_item_entry, STRING("item00"), ITEM_FLOWER_SAVER_P, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
 #else
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_BADGE_RETURN | ITEM_FLAG_NO_TOUCH)

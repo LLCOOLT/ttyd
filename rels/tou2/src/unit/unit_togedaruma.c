@@ -113,7 +113,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
  */
 static BattleUnitDefense defence_turn = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Bristle (both demos), as the percent chance each status takes hold: immune
  * to burn; resists 13 statuses (down to 50% of the normal chance).

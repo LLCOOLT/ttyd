@@ -9726,7 +9726,7 @@ NpcSetupBattleInfo btlsetup_jon_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_jon_btlno_jon_100_zonbaba_off, // select
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         NPC_BATTLE_MAX_COUNT | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
 #else
         NPC_BATTLE_MAX_COUNT | NPC_BATTLE_NO_PLAYER_ENTRY | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags

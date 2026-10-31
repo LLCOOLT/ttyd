@@ -82,7 +82,7 @@ typedef struct MoamoaExtData {
     f32 speed;
 } MoamoaExtData;
 static BtlMoamoaWork* wp;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 // PAL: a seeded generator for the swarm's start positions (moamoa_srand / moamoa_randf)
 static u32 moamoa_rand_prev;
 static u32 moamoa_rand_cur;
@@ -174,7 +174,7 @@ static f32 randf(f32 min, f32 max) {
  * EU only: seeds the boss swarm's own random generator (two-word state),
  * so the EU version gets the same swarm placement on every run.
  */
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 void moamoa_srand(u32 seed) {
     moamoa_rand_prev = seed;
     moamoa_rand_cur = seed + 0x37E35F7D;
@@ -237,7 +237,7 @@ BattleUnitKind unit_boss_moamoa = {
     0.0f,
     0.0f,
     0.0f,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     250.0f,
     0.0f,
 #else
@@ -1171,7 +1171,7 @@ static USER_FUNC(moamoa_on) {
     AnimationPose* ap;
     Vec* p;
     s32 start;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     u32 seeds[4] = {0x3056, 0xF36, 0xF2A93, 0x17F57};
 #endif
     Vec v;
@@ -1184,13 +1184,13 @@ static USER_FUNC(moamoa_on) {
     wp->elems = BTL_ALLOC(wp->count * sizeof(BtlMoamoa));
     memset(wp->elems, 0, wp->count * sizeof(BtlMoamoa));
     elem = wp->elems;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     moamoa_srand(seeds[rand() & 3]);
 #endif
     for (i = 0; i < wp->count; i++, elem++) {
         elem->flags = 0;
         v = (Vec){0.0f, 0.0f, 0.0f};
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         v.x = moamoa_randf(-10.0f, 10.0f);
         v.y = moamoa_randf(-10.0f, 10.0f);
         v.z = moamoa_randf(-10.0f, 10.0f);

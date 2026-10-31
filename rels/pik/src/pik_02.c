@@ -1273,7 +1273,7 @@ EVT_BEGIN(pik_02_init_evt)
         CALL(evt_snd_bgmoff, PSND_FADE_OUT)
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_PIK2"))
         CALL(evt_snd_set_rev_mode, 2)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     ELSE
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_KUPPA1"))
         CALL(evt_snd_bgm_scope, 0, 1)

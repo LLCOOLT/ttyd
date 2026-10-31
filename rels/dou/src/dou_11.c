@@ -239,7 +239,7 @@ static EVT_BEGIN(suifu_e_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_30_SHIPWRECKED_SAILORS, STORY_STG5_35_ESCAPE_ROUTE)
 #if VERSION >= VERSION_US
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         CALL(evt_npc_set_position, STRING("水夫E"), 736, 50, 113)
 #else
         CALL(evt_npc_set_position, STRING("me"), 736, 50, 113)
@@ -1072,7 +1072,7 @@ EVT_END()
  * until the first island switch has been pressed.
  */
 EVT_BEGIN(ukishima_init1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     IF_INT_EQUAL(GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED), 0)
 #else
     SET_VALUE(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
@@ -1097,7 +1097,7 @@ EVT_BEGIN(ukishima_part1)
     WAIT_MS(500)
     CALL(evt_cam3d_evt_set, 280, 174, 527, 280, 79, -14, 500, 11)
     WAIT_MS(1000)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SET_VALUE(GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED), 1)
 #endif
     SET_VALUE(LW(2), STRING("S_taru_n01"))
@@ -1122,7 +1122,7 @@ EVT_END()
  * until both island switches have been pressed (or in the demos, the second switch).
  */
 EVT_BEGIN(ukishima_init2)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     IF_INT_EQUAL(GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED), 0)
 #else
     SET_VALUE(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
@@ -1146,7 +1146,7 @@ EVT_BEGIN(ukishima_part2)
     WAIT_MS(500)
     CALL(evt_cam3d_evt_set, 525, 174, 527, 525, 79, -14, 500, 11)
     WAIT_MS(1000)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SET_VALUE(GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED), 1)
 #endif
     SET_VALUE(LW(2), STRING("S_taru_n03"))
@@ -1570,7 +1570,7 @@ EVT_END()
  */
 EVT_BEGIN(escapeway_event)
     CALL(evt_mario_key_onoff, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_normalize)
     CALL(evt_bero_exec_wait, 65536)
 #else
@@ -1635,7 +1635,7 @@ EVT_END()
  */
 static EVT_BEGIN(bombwall_bomb)
     CALL(evt_mario_key_onoff, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_normalize)
 #endif
     BEGIN_INLINE_EVENT
@@ -2801,12 +2801,12 @@ EVT_BEGIN(dou_11_init_evt)
         END_IF
     END_IF
     // The two blue switches that raise the floating islands.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mobj_switch_blue, 2, STRING("mobj01"), -220, 120, -450, PTR(ukishima_part1), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
 #else
     CALL(evt_mobj_switch_blue, 2, STRING("mobj01"), -220, 120, -450, PTR(ukishima_switch1_evt), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mobj_switch_blue, 2, STRING("mobj02"), 80, 120, -450, PTR(ukishima_part2), GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED))
 #else
     CALL(evt_mobj_switch_blue, 2, STRING("mobj02"), 80, 120, -450, PTR(ukishima_switch2_evt), GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED))
@@ -2814,7 +2814,7 @@ EVT_BEGIN(dou_11_init_evt)
     // Barrels and islands are shown or hidden according to which switches were pressed and the story step.
     SPAWN_EVENT(ukishima_init1)
     SPAWN_EVENT(ukishima_init2)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_32_CORTEZS_WARNING)
 #else
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_33_CORTEZ_AND_THE_TREASURE)
@@ -2862,7 +2862,7 @@ EVT_BEGIN(dou_11_init_evt)
     SET_VALUE(LW(1), 0)
     SPAWN_EVENT_GET_ID(PTR(dou_puka_event_main17), LW(10))
     // Islands already raised by pressed switches are put in place.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     IF_INT_EQUAL(GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED), 1)
         SPAWN_EVENT(pukapuka_watari_init01)
     END_IF

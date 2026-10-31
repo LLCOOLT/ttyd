@@ -334,7 +334,7 @@ void iconEntry(const char* name, u16 iconId) {
     }
     entry->uflags |= ICON_FLAG_USED;
     if (mapGetWork()->entries[0].flags & MAPENT_FLAG_BLEND) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         entry->uflags |= ICON_FLAG_NO_MAP_BLEND;
 #else
         if (!strncmp(gp->currentMapName, "aji", 3) && evtGetValue(0, GSW(GSW_STORY_PROGRESS)) == STORY_STG7_25_THE_LAST_MAIL) {
@@ -702,7 +702,7 @@ static void iconGX(Mtx mtx, IconEntry* entry) {
         GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
         GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_C0, GX_CC_CPREV, GX_CC_ZERO);
         GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_A0, GX_CA_APREV, GX_CA_ZERO);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         if (!(entry->uflags & ICON_FLAG_2D) && !(entry->uflags & ICON_FLAG_NO_MAP_BLEND) &&
             (mapGetWork()->entries[0].flags & MAPENT_FLAG_BLEND)) {
 #else

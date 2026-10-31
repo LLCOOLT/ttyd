@@ -463,7 +463,7 @@ void nokonoko_use(PartyEntry* party) {
             }
             NOKO_ITEM(party, party->useMotionId = 50; psndSFXOn_3D((const char*)0x92c, &party->position); noko_star(party, 1); noko_se_off(); break;)
             if (!(party->flags & PARTY_FLAG_IS_EVT_USE)) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 if (mario->currMotionId == MARIO_MOTION_SHIP || mario->currMotionId == MARIO_MOTION_JABARA || mario->currMotionId == MARIO_MOTION_PLANE || mario->currMotionId == MARIO_MOTION_ROLL ||
                     (mario->flags & MARIO_FLAG_FORCED_MOVEMENT) || !marioChkKey()) {
 #else
@@ -522,7 +522,7 @@ void nokonoko_use(PartyEntry* party) {
 #if VERSION >= VERSION_US
                 partyChkWallAround(party, &party->position, spd, dir, party->width, party->height);
 #else
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 marioChkWallAround(&party->position, spd, dir, party->width, party->height);
 #else
                 marioChkWallAround(&party->position, 1, spd, dir, party->width, party->height);

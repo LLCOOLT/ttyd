@@ -415,7 +415,7 @@ static void effRecoveryMain(EffectEntry* effect) {
                     if (p->timer < 16) {
                         p->timer++;
                         p->position.x = intplGetValue(1, p->position.x, 0.0f, p->timer, 16);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         p->position.y = intplGetValue(1, p->position.y, -30.0f, p->timer, 16);
 #else
                         p->position.y = intplGetValue(1, p->position.y, baseY, p->timer, 16);
@@ -436,7 +436,7 @@ static void effRecoveryMain(EffectEntry* effect) {
                 work = effect->userdata;
                 if (type != 7 && type != 8) {
                     Vec sfxPos;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     s32 count = amount * 10;
                     if (count > 100) {
                         count = 100;

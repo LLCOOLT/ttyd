@@ -287,7 +287,7 @@ static EVT_BEGIN(sanders_talk)
         IF_INT_EQUAL(LW(0), 0)
             CALL(evt_msg_print, 0, STRING("stg5_muj_34_03"), 0, STRING("me"))
         ELSE
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_win_item_select, PTR(itemsel_table01), LW(0))
 #else
             CALL(evt_win_item_select, 0, PTR(itemsel_table01), LW(0), 0)
@@ -838,7 +838,7 @@ EVT_BEGIN(dokuroiwa_touch)
         END_IF
         CALL(evt_mario_key_onoff, 1)
     ELSE
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_win_item_select, PTR(itemsel_table), LW(0))
 #else
         CALL(evt_win_item_select, 0, PTR(itemsel_table), LW(0), 0)
@@ -1344,7 +1344,7 @@ EVT_END()
 EVT_BEGIN(muj_05_first)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
     CALL(evt_mario_key_onoff, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_normalize)
 #endif
     CALL(evt_bero_exec_wait, 65536)

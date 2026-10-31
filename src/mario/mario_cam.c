@@ -80,7 +80,7 @@ f32 marioGetCamFollowRate(void) {
  * The demos round it to 0.01 degree, JP and later to 0.001 degree with proper rounding.
  */
 void marioPreCamera(void) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     marioGetPtr()->targetYaw = revise360((100.0f * camGetPtr(CAMERA_3D)->viewYaw + 5.0f) / 100.0f);
 #else
     f32 roundingFactor;

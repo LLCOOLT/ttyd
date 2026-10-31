@@ -50,7 +50,7 @@ static void BattleAudienceCtrlProcessKinopioShell();
 static void BattleAudienceCtrlProcessKinopioIgnite(s32 index, s32 front);
 static void BattleAudienceCtrlProcessKinopioFire(s32 index, s32 front);
 static void BattleAudienceCtrlProcessKinopioEat();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static void BattleAudienceCtrlProcessKinopioNoGravity(s32 index, s32 front);
 static void BattleAudienceCtrlProcessKinopioAudBall(s32 index, s32 front);
 #endif
@@ -131,7 +131,7 @@ void BattleAudienceCtrlProcessKinopio(s32 index) {
         case 20:
             BattleAudienceCtrlProcessKinopioEat(index, front);
             break;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         case 21:
             BattleAudienceCtrlProcessKinopioNoGravity(index, front);
             break;
@@ -1538,7 +1538,7 @@ static void BattleAudienceCtrlProcessKinopioEat(s32 index) {
     }
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Status 21, demos only: empty (Guess: a no-gravity state, from the name); retail drops the case. */
 static void BattleAudienceCtrlProcessKinopioNoGravity(s32 index, s32 front) {
 }

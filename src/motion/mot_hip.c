@@ -229,7 +229,7 @@ void mot_hip(void) {
                 break;
             }
             fall = marioGetFallSpd();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             hit = marioChkLandon(&y, fall);
 #else
             hit = marioSearchGround(&y, &tmp1, &tmp2, fall, fall);
@@ -280,7 +280,7 @@ void mot_hip(void) {
                     return;
                 }
                 psndSFXOn_3D((char*)0x159, &mario->position);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 evtEntry(marioBgmodeChk() == 0 ? quake_evt : quake_bgmode_evt, 0, 0);
 #else
                 evtEntryType(marioBgmodeChk() == 0 ? quake_evt : quake_bgmode_evt, 0, 0, 0);
@@ -354,7 +354,7 @@ s32 U_chkground(void) {
         mario->jumpPeakAirTime = 0;
         mario->dispFlags &= ~MARIO_DISP_FLAG_FRONT_POSE;
         mario->flags &= ~MARIO_FLAG_STOP_AIR_MOVEMENT;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         if (!marioBgmodeChk()) {
             camFollowYOn();
         }

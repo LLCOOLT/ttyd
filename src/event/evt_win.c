@@ -1,7 +1,7 @@
 // Script commands for the unit windows (unitwin): the shop, partner and item list windows.
 #include "version.h"
 // Script commands for the unit windows: the shop, partner and item list windows.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // the demo unit is built without the main precompiled header: only the dtrigf constants lead its data
 #define DTRIGF_WITH_INITIAL_VALUES
 #include <dtrigf.h>
@@ -33,14 +33,14 @@
 #include <dolphin/mtx.h>
 #include <stdio.h>
 #include <string.h>
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #include <stdlib.h>
 #endif
 #include "icon_ids.h"
 #include "mario/mario_party.h"
 #include "driver/itemdrv.h"
 #include "win/win_main.h"
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #include "driver/casedrv.h"
 #include "evt/evt_case.h"
 #endif
@@ -78,7 +78,7 @@ enum UnitWinItemFlags {
     UNITWIN_ITEM_FLAG_SOLD = 0x1, // bought: hidden and not selectable
 };
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // demo: no help/name/point windows; the list windows (mode 2..18) are run by unitwin_window_select_func here
 typedef struct UnitWinWork {
     u16 flags;             // 0x0
@@ -1470,7 +1470,7 @@ static void evt_unitwin_disp_func(CameraId cameraId, void* param) {
             }
             wp->coinFrame++;
             wp->coinFrame %= 1200;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (abs(coin - wp->coin) == 1 || gp->retraceCount % 6 == 0) {
                 psndSFXOn("SFX_COUNT_COIN1");
             }

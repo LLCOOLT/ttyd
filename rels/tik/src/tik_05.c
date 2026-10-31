@@ -1081,7 +1081,7 @@ static void tiz_broken_draw(CameraId cameraId, void* param) {
 
     if (broken_wp->copied == 0) {
         GXSetTexCopySrc(0, 0, 608, 480);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         // the demo copies the screen at full size
         GXSetTexCopyDst(608, 480, GX_TF_RGBA8, GX_FALSE);
 #else
@@ -1092,7 +1092,7 @@ static void tiz_broken_draw(CameraId cameraId, void* param) {
         broken_wp->copied = 1;
     }
     GXSetNumChans(0);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     GXInitTexObj(&tex, broken_wp->tex->address, 608, 480, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
 #else
     GXInitTexObj(&tex, broken_wp->tex->address, 304, 240, GX_TF_RGB5A3, GX_CLAMP, GX_CLAMP, GX_FALSE);
@@ -1198,7 +1198,7 @@ static USER_FUNC(tiz_broken) {
 
     if (isFirstCall) {
         memset(broken_wp, 0, sizeof(BrokenWork));
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         broken_wp->tex = smartAlloc(GXGetTexBufferSize(608, 480, GX_TF_RGBA8, GX_FALSE, 0), 1);
 #else
         broken_wp->tex = smartAlloc(GXGetTexBufferSize(304, 240, GX_TF_RGB5A3, GX_FALSE, 0), 1);
@@ -1501,7 +1501,7 @@ static USER_FUNC(cam_mahojin_kaiten_main) {
             }
         }
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the demo counts frames instead of timing the rotation
     event->lwData[14]++;
 #else
@@ -1888,7 +1888,7 @@ EVT_BEGIN(evt_mapwrite)
         SET_VALUE(LW(8), STRING("TIZ_stg_6"))
         SET_VALUE(LW(9), STRING("SFX_EVT_MAP_STG6_APPEAR1"))
         CASE_EQUAL(6)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         SET_VALUE(LW(5), -70)
         SET_VALUE(LW(6), 145)
         SET_VALUE(LW(7), -140)
@@ -1902,7 +1902,7 @@ EVT_BEGIN(evt_mapwrite)
     END_SWITCH
     ADD(LW(6), -10)
     ADD(LW(7), -20)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_MAP_NEXT_APPEAR1"), LW(5), LW(6), LW(7), 0)
     CALL(evt_eff64, STRING("tiz_dust2"), STRING("stardust2_n64"), 5, LW(5), LW(6), LW(7), 50, 50, 30, 600, 0, 0, 0, 0)
     CALL(tiz_stone, LW(0))
@@ -1914,7 +1914,7 @@ EVT_BEGIN(evt_mapwrite)
 #endif
     WAIT_MS(500)
     CALL(evt_npc_entry, STRING("tiz_obj"), LW(8))
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     CALL(evt_npc_pera_onoff, STRING("tiz_obj"), 0)
     CALL(evt_npc_set_ry, STRING("tiz_obj"), 0)
 #endif
@@ -1922,7 +1922,7 @@ EVT_BEGIN(evt_mapwrite)
     CALL(evt_npc_set_position, STRING("tiz_obj"), LW(5), LW(6), LW(7))
     CALL(evt_npc_set_scale, STRING("tiz_obj"), FLOAT(1.5f), FLOAT(1.5f), FLOAT(1.5f))
     CALL(evt_npc_set_camid, STRING("tiz_obj"), 7)
-#if VERSION != VERSION_EU
+#if VERSION < VERSION_DEMO_EU
     CALL(evt_sub_intpl_msec_init, 11, 0, 255, 1000)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -2592,7 +2592,7 @@ EVT_BEGIN(mahojin_event7)
     // The music stops and the magic circle forms; seen from above, a crystal wave rises around Mario.
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_snd_sfxon, STRING("SFX_EVT_MAP_KAKAGERU3_1"), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_eff, STRING("mahojin"), STRING("mahojin"), 7, 0, 28, -250, 0, 0, 0, 0, 0, 0, 0, 0)
 #else
     CALL(evt_eff, STRING("mahojin"), STRING("mahojin"), 8, 0, 28, -250, 0, 0, 0, 0, 0, 0, 0, 0)

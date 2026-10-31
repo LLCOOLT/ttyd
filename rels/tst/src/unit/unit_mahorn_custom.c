@@ -86,7 +86,7 @@ static EvtWord trans_magic_event[49];
 static EvtWord yokeyoke_magic_event[49];
 static EvtWord recover_magic_event[70];
 static EvtWord bunsin_event[152];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord spawn_event[72];
 #else
 static EvtWord spawn_event[76];
@@ -104,23 +104,23 @@ BattleUnitKind unit_mahorn_custom = {
     0,
     1,
     1,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     50,
 #else
     36,
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     0,
 #else
     2,
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     1,
 #else
     3,
 #endif
     70,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     5,
 #else
     2,
@@ -191,7 +191,7 @@ BattleUnitKind unit_mahorn_custom_bunsin = {
     1,
     1,
     1,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     0,
 #else
     2,
@@ -259,7 +259,7 @@ static BattleUnitDefense defence = {{5, 5, 5, 5, 5}};
 /** Damage-type modifiers of the Elite Wizzerd: none, no special weakness or immunity. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Elite Wizzerd (100% is the normal chance): immune to Sleep; resists Stop 30%,
  * Dizzy 30%, Confusion 20%, Freeze 20%, Tiny 20%, Attack Down 20%, Defense Down 20%, Allergic 20%, Fright
@@ -270,7 +270,7 @@ static StatusVulnerability regist = {0, 30, 30, 100, 20, 100, 100, 20, 100, 20, 
 static StatusVulnerability regist = {0, 30, 80, 100, 20, 100, 100, 40, 100, 75, 100, 75, 100, 80, 20, 10, 75, 100, 20, 100, 100, 20};
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Elite Wizzerd for its clones (100% is the normal chance): immune to Sleep,
  * Stop, Dizzy, Confusion, Freeze, Tiny, Attack Down, Defense Down, Allergic, Fright, Gale Force, Slow and
@@ -319,7 +319,7 @@ static BattleWeapon weapon_mahorn_attack_magic = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
 #else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE, // special
@@ -357,7 +357,7 @@ static BattleWeapon weapon_mahorn_all_attack_magic = {
     1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
 #else
     {8, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
@@ -689,12 +689,12 @@ static EVT_BEGIN(attack_event)
         ELSE
             LABEL(10)
             SET_VALUE(LW(0), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             ADD(LW(0), 50)
 #else
             ADD(LW(0), 30)
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             ADD(LW(0), 50)
 #else
             ADD(LW(0), 60)
@@ -707,7 +707,7 @@ static EVT_BEGIN(attack_event)
             ADD(LW(0), 10)
             SUBTRACT(LW(0), 1)
             CALL(evt_sub_random, LW(0), LW(1))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             SET_VALUE(LW(0), 50)
 #else
             SET_VALUE(LW(0), 30)
@@ -717,7 +717,7 @@ static EVT_BEGIN(attack_event)
                 CALL_CHILD(attack_punch_event)
                 GOTO(99)
             END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             ADD(LW(0), 50)
 #else
             ADD(LW(0), 60)

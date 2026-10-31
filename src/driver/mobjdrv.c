@@ -261,7 +261,7 @@ u32 cubeDN[1230] = {
 /** Mesh of the full collision cube: all six faces. */
 CubeMesh cubeDP = {0, {0}, 0, 6, 0, cubeDDT, {cubeDN, &cubeDN[205], &cubeDN[410], &cubeDN[615], &cubeDN[820], &cubeDN[1025]}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Draw mode of the built-in collision cube (culling flag set), shared by the cube, head and front hit joints. */
 CubeDrawMode cubeMSJ = {{0, 1, 0, 0, 0, (s32)0x80000000}, 0};
 #endif
@@ -289,7 +289,7 @@ CubeJoint frontDJ = {
     { NULL, (MapFileMesh*)&frontDP },
 };
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Draw mode of the second part of a two-part object's collision (the MOBJ~ part). */
 CubeDrawMode front2MSJ = {{0, 1, 0, 0, 0, 0}, 0};
 #endif
@@ -312,7 +312,7 @@ static MapObjectWork work[MAX_MOBJ_WORK];
 
 #define mobjGetWorkFlag(flag) (flag ? &work[1] : &work[0])
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 int mobjCheckKururingFloorItem(MapObjectEntry* entry);
 #else
 static inline int mobjCheckKururingFloorItem(MapObjectEntry* entry);
@@ -762,7 +762,7 @@ void mobjMain(void) {
                     entry->position.y += entry->velocity.y;
                     entry->velocity.y -= entry->gravity;
                 } else {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     dist = 1.0f + (f32)__fabs(entry->velocity.y);
                     if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, entry->position.x,
                                        10.0f + entry->position.y, entry->position.z, 0.0f, -10.0f, 0.0f) != NULL) {
@@ -812,7 +812,7 @@ void mobjMain(void) {
                         hit = 1;
                         goto hitDone;
                     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     if ((entry->flags & MOBJ_HIT_FRONT_ACTION) && mario->hitobjFront == hitPtr &&
                         (mario->buttonTrg & PAD_BUTTON_A) && !partyFlag) {
 #else
@@ -1004,7 +1004,7 @@ MapObjectEntry* mobjNameToPtrNoAssert(const char* name) {
     return entry;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** the demo searches the mobj list for the entry whose first hit object is hitObj */
 MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hitObj) {
     int i;
@@ -1170,7 +1170,7 @@ s32 mobjCheckItemboxOpen(MapObjectEntry* entry) {
     }
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // FAKE: stand-in for the stripped function whose constants open the .sdata2 pool; the demo's fall code uses
 // 1 + |vy| and a -10 ray, so its constants come in this order (and its 2.0 opens the .rodata doubles)
 void mobjStrippedFallPool(MapObjectEntry* entry) {
@@ -1293,7 +1293,7 @@ MapObjectEntry* mobjNearDistCheck2(f32 x, f32 y, f32 z, f32 minMagnitude, char**
 /** Name of the flipping floor panels that hide Star Pieces, checked to treat their hidden item specially. */
 const char kururinName[] = "MOBJ_KururinFloor";
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * For a MOBJ_KururinFloor object returns 2 while its item is still there to find,
  * 1 once its item is out or its flag is set, and 0 for any other object. The demo keeps it as a real function.

@@ -113,7 +113,7 @@ static BattleWeapon weapon;
 extern EvtWord nice_event_pow[];
 
 /** the demo defines the event first */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_BEGIN(nice_event_pow)
     CALL(btlevtcmd_ACSuccessEffect, LW(0), -100, 175, 0)
     RETURN
@@ -408,7 +408,7 @@ static void main_cursor(void) {
                 ob = w->o3d[w->idx].link;
                 if (ob) {
                     ob->kind = 5;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     effHitEntry(0, 0x20, ob->pos.x, ob->pos.y, ob->pos.z, 1.0f);
 #else
                     effHitEntry(0, 5, ob->pos.x, ob->pos.y, ob->pos.z, 1.0f);
@@ -1113,7 +1113,7 @@ EVT_BEGIN(marioAttackEvent_Muki)
         CALL(evt_btl_camera_set_zoomSpeedLv, 0, 2)
         WAIT_MS(1000)
         CALL(sac_wao)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         BEGIN_INLINE_EVENT_GET_ID(LW(12))
 #else
         BEGIN_INLINE_EVENT
@@ -1123,7 +1123,7 @@ EVT_BEGIN(marioAttackEvent_Muki)
             CALL(sac_enemy_slide_return)
             CALL(end_muki)
         END_INLINE_EVENT
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         SET_VALUE(LW(13), 0)
         IF_INT_NOT_EQUAL(LW(1), 0)
             SET_VALUE(LW(13), 1)
@@ -1140,7 +1140,7 @@ EVT_BEGIN(marioAttackEvent_Muki)
             END_IF
         END_INLINE_EVENT
         IF_INT_NOT_EQUAL(LW(0), 0)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             SET_VALUE(LW(13), 1)
 #endif
             CALL(set_weapon, 0, LW(0), LW(9))
@@ -1151,7 +1151,7 @@ EVT_BEGIN(marioAttackEvent_Muki)
             RETURN
         END_IF
     END_IF
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     // PAL: LW(13) is set when only the second hit (LW(1)) is left, whose path already returns the
     // enemies through the inline event; US ran sac_enemy_slide_return and end_muki twice there
     IF_INT_EQUAL(LW(13), 0)
@@ -1162,7 +1162,7 @@ EVT_BEGIN(marioAttackEvent_Muki)
         CALL(end_muki)
         WAIT_MS(1000)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     ELSE
     END_IF
 #endif

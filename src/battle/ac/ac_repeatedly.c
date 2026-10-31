@@ -56,7 +56,7 @@ void battleAcDelete_Repeatedly(BattleWork* work);
 
 #define PadNow(m) (BattlePadCheckNow(m))
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Gauge gain per press by difficulty in the demos (80 at the easiest down to 8); for fleeing and Rally Wink. */
 static s32 _power_table[] = {80, 60, 50, 40, 28, 16, 8};
 #else

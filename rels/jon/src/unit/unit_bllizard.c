@@ -121,7 +121,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Element response of the Ice Puff: it takes extra damage from fire and is healed by ice. */
 static BattleUnitDefenseAttr defence_attr = {{0, 1, 3, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Status vulnerability of the Ice Puff (percent, 0 is immune): immune to electric, freeze. Demo values. */
 static StatusVulnerability regist = {70, 70, 80, 100, 60, 0, 100, 0, 100, 60, 100, 60, 100, 70, 60, 70, 80, 100, 60, 100, 100, 95};
 #else

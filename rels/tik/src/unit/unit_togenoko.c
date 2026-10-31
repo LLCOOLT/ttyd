@@ -134,7 +134,7 @@ static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 /** Element reactions of the Koopatrol: no special reaction to any element. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Status vulnerability of the Koopatrol (percent chance to take each status): resists most statuses. */
 static StatusVulnerability regist = {70, 70, 60, 100, 60, 100, 100, 60, 100, 70, 100, 70, 100, 70, 70, 60, 60, 100, 60, 100, 100, 95};
 #else

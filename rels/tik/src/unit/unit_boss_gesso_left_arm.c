@@ -103,7 +103,7 @@ BattleUnitKind unit_boss_gesso_left_arm = {
     1,
     parts,
     init_event,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     data_table,
 #else
     gesso_left_arm_data_table,

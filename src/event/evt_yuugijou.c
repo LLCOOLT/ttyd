@@ -53,7 +53,7 @@ EVT_END()
  * Asks whether to quit (sysyuu_all_01/02); picking the first choice runs minigame_end.
  * Then flags the window as closed for evtYuuWindowEndChk.
  */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_BEGIN(window_open)
     CALL(evt_msg_print, 0, STRING("sysyuu_all_01"), 0, 0)
     CALL(evt_msg_select, 0, STRING("sysyuu_all_02"))
@@ -111,7 +111,7 @@ void yuugijou_init(void) {
     yuwp = &yuugijouwork;
     memset(yuwp, 0, sizeof(PiantaParlorWork));
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the demo has its own default records, with the per-rank values written out
     yuwp->recordOn[0][0] = 1;
     yuwp->recordOn[0][1] = 1;
@@ -470,7 +470,7 @@ void monteCountDisp(void) {
                     monte_snd_flag = 8;
 #endif
                 }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 monte_snd_flag = 0; // the demo plays the count sound every step
 #endif
                 if (y != 0) {
@@ -486,7 +486,7 @@ void monteCountDisp(void) {
                     yuwp->dispTokens += y;
                 }
             }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             monte_snd_flag = 0;
 #else
             if (monte_snd_flag != 0)
@@ -503,7 +503,7 @@ void monteCountDisp(void) {
 USER_FUNC(yuugijou_add_montemedal) {
     EvtWord* args = event->args;
     s32 a = evtGetValue(event, args[0]);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     yuwp->tokens += evtGetValue(event, args[1]); // no 99999 cap in the demo
 #else
     s32 sum = yuwp->tokens + evtGetValue(event, args[1]);

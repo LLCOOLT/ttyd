@@ -41,7 +41,7 @@ static EvtWord wait_event[6];
  */
 BattleUnitKind unit_kurikuri = {
     36,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     "btl_un_kurikuri",
 #else
     "btl_un_kuriboo",
@@ -154,7 +154,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Damage-type reactions of the Goomba Bros.: none, so every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Goomba Bros. (both demos), as the percent chance each status takes hold:
  * extra vulnerable to stop, Fright, Gale Force and instant KO.

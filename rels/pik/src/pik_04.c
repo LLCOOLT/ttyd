@@ -361,7 +361,7 @@ EVT_BEGIN(imgend)
 EVT_END()
 
 /** The demo's elevator keeps the field camera and carries Mario and the partner from where they stand. */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_BEGIN(evt_up)
     // The ride up: the elevator doors slide open.
     CALL(evt_mario_key_onoff, 0)
@@ -601,7 +601,7 @@ EVT_END()
 #endif
 
 /** The demo's ride down, like evt_up. */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_BEGIN(evt_down)
     // The ride down: the elevator doors slide open.
     CALL(evt_mario_key_onoff, 0)
@@ -1098,7 +1098,7 @@ static NpcSetupInfo npc_data[] = {
  */
 EVT_BEGIN(evt_roten)
     CALL(evt_mario_key_onoff, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_unitwin_alloc)
 #else
     CALL(evt_unitwin_alloc, 0)
@@ -1178,7 +1178,7 @@ static KinopioData kino_dt = {
     221, // breakfastItem
     {360.0f, 33.0f, -235.0f}, // breakfastPos
     30, // ryoukin
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {295.0f, 1345.0f, 75.0f}, // bed
 #else
     {290.0f, 1345.0f, 80.0f}, // bed

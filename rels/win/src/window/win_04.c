@@ -234,7 +234,7 @@ EVT_BEGIN(meet_clouda2)
         IF_INT_GREATER_OR_EQUAL(LW(0), 150)
             IF_INT_GREATER_OR_EQUAL(LW(1), 50)
                 IF_INT_LESS(LW(1), 51)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
                     IF_INT_GREATER_OR_EQUAL(LW(1), 50)
                         IF_INT_LESS(LW(1), 51)
@@ -280,7 +280,7 @@ EVT_BEGIN(meet_clouda2)
     ELSE
         SUBTRACT(LW(2), 50)
     END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_party_move_pos2, 1, LW(0), LW(2), FLOAT(120.0f))
 #else
     CALL(evt_party_move_pos2, 1, 160, LW(2), FLOAT(120.0f))
@@ -625,7 +625,7 @@ EVT_BEGIN(clouda_nakama)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
     CALL(evt_party_stop, 1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_win_item_select, PTR(item_list), LW(0))
 #else
     CALL(evt_win_item_select, 0, PTR(item_list), LW(0), 0)

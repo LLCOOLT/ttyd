@@ -210,7 +210,7 @@ static s32 _get_item_announce(EventEntry* event, BOOL isFirstCall) {
         f32 z;
 
         BtlUnit_GetPos(unit, &x, &y, &z);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         y = y + (f32)(BtlUnit_GetHeight(unit) + 10);
         event->userdatap[1] = itemEntry(x, y, z, NULL, item, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0);
 #else

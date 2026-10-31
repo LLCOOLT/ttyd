@@ -109,7 +109,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
  */
 static BattleUnitDefense defence_turn = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Cleft (100% is the normal chance): immune to Burn; resists Sleep 40%, Stop 90%,
  * Dizzy 50%, Confusion 50%, Freeze 70%, Tiny 70%, Attack Down 70%, Defense Down 80%, Allergic 80%, Fright

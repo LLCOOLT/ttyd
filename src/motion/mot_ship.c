@@ -1,7 +1,7 @@
 // Mario's paper boat motion (boat panel): turning into the boat, steering, swirls (whirlpools), the dash and
 // turning back.
 #include "version.h"
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // the demo unit is built without the main precompiled header: only the dtrigf constants lead its data
 #define DTRIGF_WITH_INITIAL_VALUES
 #include <dtrigf.h>
@@ -47,7 +47,7 @@ typedef struct MotShipWork {
     Vec harborPos;               // 0x3C: docking target (checkHarbor)
 } MotShipWork;                   // size 0x48
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // the demo's small-data limit puts shipData in .data, ahead of the events
 f32 shipData[6] = {-0.05f, -0.7f, 0.02f, 0.02f, 2.0f, 0.01f};
 #endif
@@ -269,7 +269,7 @@ void mot_ship_post(void) {
     if (mario->dispFlags & MARIO_DISP_FLAG_PAPER_ON) {
         marioPaperOff();
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the demo keeps Mario's collision box and resets only the draw offset and rotation
     mario->dispFlags &= ~MARIO_DISP_FLAG_FRONT_POSE;
     mario->dispFlags &= ~MARIO_DISP_FLAG_DIR_LOCK;
@@ -285,7 +285,7 @@ void mot_ship_post(void) {
             marioGetPtr()->motShip->sfxId = t;
         }
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {
         Vec zero = {0.0f, 0.0f, 0.0f};
         mario->dispOfs = zero;
@@ -838,7 +838,7 @@ void mot_ship(void) {
                     r27 = 1;
                 }
             } else {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 if (m->displayDirection <= -540.0f) {
                     m->displayDirection = -540.0f;
 #else
@@ -1000,7 +1000,7 @@ BOOL marioChkShipMoveMode(void) {
  */
 static void shipMove(void) {
     MarioWork* m = marioGetPtr();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the demo clamps the swirl with its own variable (swirlMax) and keeps the negative limit in nmax
     f32 spd;
     f32 swirlMax;
@@ -1037,7 +1037,7 @@ static void shipMove(void) {
         movePos(&dx, &dz, marioGetPtr()->motShip->swirlX, marioGetPtr()->motShip->swirlY);
         marioGetPtr()->motShip->dispX += dx;
         marioGetPtr()->motShip->dispY += dz;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         swirlMax = shipData[4];
         if (marioGetPtr()->motShip->dispX > swirlMax) {
             swirlMax = shipData[4];
@@ -1092,7 +1092,7 @@ static void shipMove(void) {
             }
         } else {
             vx += ((tx - 1.0f) - vx) * shipData[rateIdx];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             nmax = -max;
             if (vx <= nmax) {
                 vx = nmax;
@@ -1110,7 +1110,7 @@ static void shipMove(void) {
             }
         } else {
             vz += ((tz - 1.0f) - vz) * shipData[rateIdx];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             nmax = -max;
             if (vz <= nmax) {
                 vz = nmax;

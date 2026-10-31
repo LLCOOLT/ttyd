@@ -103,7 +103,7 @@ EVT_END()
  * stg6_rsh_c_08_1 once the train is at Rogueport.
  */
 static EVT_BEGIN(talk_unten)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_08"), 0, 0)
 #else
     IF_INT_EQUAL(GSWF(GSWF_TRAIN_AT_ROGUEPORT), 0)
@@ -190,7 +190,7 @@ EVT_BEGIN(rsh_07_init_evt)
     ELSE
         IF_INT_EQUAL(GSWF(GSWF_TRAIN_ARRIVED_ROGUEPORT), 1)
             CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_GOR1"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_GOR5"))
 #else
             CALL(evt_snd_envoff, PSND_FADE_OUT)

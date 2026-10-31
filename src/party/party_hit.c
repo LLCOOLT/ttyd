@@ -196,7 +196,7 @@ void partyChkGnd(PartyEntry* party) {
 
     if (!(party->flags & PARTY_FLAG_FORCE_FALL)) {
         attr = 0;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         hit = partySearchGround(party, 11.0f, party->velY);
 #else
         hit = _partySearchGround(party, 11.0f, party->velY);
@@ -246,7 +246,7 @@ static inline f32 partyNrmSet(PartyEntry* party, Vec n) {
  * Demo only: downward ray with the partner filter that returns the hit object,
  * the floor height (rounded to 0.001) and the normal.
  */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static inline HitEntry* partyHitCheckGnd(PartyEntry* party, Vec* pos, Vec* dir, f32 dist, f32* outY, Vec* outNrm) {
     HitCheckQuery query;
     Vec d = *dir;
@@ -656,7 +656,7 @@ static inline void partyWallSlide(Vec* out, Vec n, f32 d, f32 sn, f32 cs) {
     out->z += 0.5f * (mz - dot * n.z);
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Demo only: partner-filtered ray that returns the hit object, the rounded hit distance in *dist and the normal. */
 static inline HitEntry* partyHitCheckDistNrm(PartyEntry* party, Vec* pos, Vec* dir, Vec* outNrm, f32* dist) {
     HitCheckQuery query;
@@ -1274,7 +1274,7 @@ void partyChkWallAround(PartyEntry* party, Vec* pos, f32 spd, f32 dir, f32 width
     if (party->flags & PARTY_FLAG_PAPER_MODE) {
         width = 6.0f;
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     marioChkWallAround(pos, spd, dir, width, height); // no mode argument in the demo
 #else
     marioChkWallAround(pos, 1, spd, dir, width, height);

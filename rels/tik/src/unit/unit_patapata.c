@@ -31,7 +31,7 @@ static EvtWord dmg_fall_event[189];
 static EvtWord patapata_dmg_first_attack_pos[19];
 static EvtWord attack_event_patapata[541];
 static PoseTableEntry pose_table[18];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static PoseTableEntry pose_table_turn[15];
 #else
 static PoseTableEntry pose_table_turn[17];
@@ -161,7 +161,7 @@ static BattleUnitDefense defence_patapata = {{1, 1, 1, 1, 1}};
 /** Defence of the Paratroopa (Paratroopa form): no damage reduction. */
 static BattleUnitDefenseAttr defence_patapata_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Paratroopa (Paratroopa form) (percent chance to take each status):
  * extra prone to dizzy and gale force; resists most other statuses.
@@ -536,7 +536,7 @@ static BattleUnitDefenseAttr defence_attr = {0};
 /** Defence of the Paratroopa (flipped over): no damage reduction. */
 static BattleUnitDefense defence_turn = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Status vulnerability of the Paratroopa (percent chance to take each status): resists most statuses. */
 static StatusVulnerability regist = {100, 100, 90, 100, 95, 100, 100, 95, 100, 95, 100, 95, 100, 95, 95, 100, 90, 100, 95, 100, 100, 100};
 #else

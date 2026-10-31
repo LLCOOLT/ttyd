@@ -273,7 +273,7 @@ EVT_BEGIN(witchtrio_momeru)
     CALL(evt_npc_flag_onoff, 1, STRING("マジョリン"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     // Mario's controls are locked until he has finished entering the map.
     CALL(evt_mario_key_onoff, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_normalize)
 #endif
     CALL(evt_bero_exec_wait, 65536)
@@ -1083,13 +1083,13 @@ EVT_END()
 EVT_BEGIN(iri_28_init)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 28)
         SET_VALUE(GSW(GSW_TROUBLE_WORK_FIRST), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_npc_check, STRING("ドクガッスン１"), LW(0))
 #else
         CALL(evt_npc_check, STRING("パックン１"), LW(0))
 #endif
         IF_INT_EQUAL(LW(0), 1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_npc_change_interrupt, STRING("ドクガッスン１"), 8, PTR(iri_28_enemy_dead))
 #else
             CALL(evt_npc_change_interrupt, STRING("パックン１"), 8, PTR(iri_28_enemy_dead))
@@ -1097,13 +1097,13 @@ EVT_BEGIN(iri_28_init)
         ELSE
             ADD(GSW(GSW_TROUBLE_WORK_FIRST), 1)
         END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_npc_check, STRING("モノクロシンエモン"), LW(0))
 #else
         CALL(evt_npc_check, STRING("シンエモン"), LW(0))
 #endif
         IF_INT_EQUAL(LW(0), 1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_npc_change_interrupt, STRING("モノクロシンエモン"), 8, PTR(iri_28_enemy_dead))
 #else
             CALL(evt_npc_change_interrupt, STRING("シンエモン"), 8, PTR(iri_28_enemy_dead))
@@ -1111,13 +1111,13 @@ EVT_BEGIN(iri_28_init)
         ELSE
             ADD(GSW(GSW_TROUBLE_WORK_FIRST), 1)
         END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_npc_check, STRING("ドクガッスン３"), LW(0))
 #else
         CALL(evt_npc_check, STRING("パックン２"), LW(0))
 #endif
         IF_INT_EQUAL(LW(0), 1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_npc_change_interrupt, STRING("ドクガッスン３"), 8, PTR(iri_28_enemy_dead))
 #else
             CALL(evt_npc_change_interrupt, STRING("パックン２"), 8, PTR(iri_28_enemy_dead))
@@ -1148,7 +1148,7 @@ EVT_BEGIN(win_00_init_evt)
             CALL_CHILD(kizayarou_init)
         END_IF
     END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_npc_check_delete, STRING("ドクガッスン１_2"))
     CALL(evt_npc_check_delete, STRING("モノクロシンエモン_2"))
     CALL(evt_npc_check_delete, STRING("ドクガッスン３_2"))

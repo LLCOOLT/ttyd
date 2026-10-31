@@ -124,7 +124,7 @@ static BattleUnitDefense defence_patakuri = {{0, 0, 0, 0, 0}};
  */
 static BattleUnitDefenseAttr defence_patakuri_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of the flying Paragloomba:
  * percent chance that each status takes hold (100 is normal); extra susceptible to Gale Force.
@@ -466,7 +466,7 @@ static BattleUnitDefense defence = {0};
  */
 static BattleUnitDefenseAttr defence_attr = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of the Paragloomba once it has lost its wings (a Gloomba):
  * percent chance that each status takes hold (100 is normal).

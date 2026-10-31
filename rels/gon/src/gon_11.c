@@ -591,7 +591,7 @@ EVT_BEGIN(gonbaba_event)
     // Hooktail is defeated, father and son are reunited: the story advances and the Diamond Star is awarded.
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_16_HOOKTAIL)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_17_FATHER_AND_SON_REUNITED)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
 #else
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
@@ -774,7 +774,7 @@ static USER_FUNC(evt_cloud_main) {
     if (party == NULL) {
         return EVT_RETURN_BLOCK;
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (party->currentMemberId != PARTY_MEMBER_FLURRIE) {
         return EVT_RETURN_BLOCK;
     }
@@ -807,7 +807,7 @@ static USER_FUNC(evt_cloud_main) {
             animPaperPoseEntry(wp->animName, group);
             offscreenEntry(wp->offscreenName);
             off = offscreenNameToPtr(wp->offscreenName);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             off->texFmt = off->copyFmt = 6;
 #else
             off->texFmt = off->copyFmt = 4;

@@ -37,7 +37,7 @@ static BattleWeapon weapon_wanwan_attack;
 static EvtWord init_event[41];
 static EvtWord chain_event[23];
 static EvtWord damage_event[33];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord counter_damage_event[115];
 #else
 static EvtWord counter_damage_event[68];
@@ -47,7 +47,7 @@ static EvtWord attack_event[452];
 static EvtWord wait_event[476];
 static EvtWord sound_gensui_event[22];
 static EvtWord wait_sound_event1[25];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord wait_sound_event2[11];
 #else
 static EvtWord wait_sound_event2[12];
@@ -68,7 +68,7 @@ BattleUnitKind unit_wanwan = {
     0,
     2,
     70,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     3,
 #else
     2,
@@ -100,7 +100,7 @@ BattleUnitKind unit_wanwan = {
     0.0f,
     17.0f,
     23.4f,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     0.0f,
 #else
     10.0f,
@@ -112,17 +112,17 @@ BattleUnitKind unit_wanwan = {
     36.0f,
     0,
     0,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     -1,
 #else
     0,
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     0,
 #else
     2,
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     0,
 #else
     100,
@@ -152,7 +152,7 @@ static BattleUnitDefense defence = {{5, 99, 99, 5, 5}};
 /** Element modifiers of the Chain-Chomp: fire and ice hits do no damage. */
 static BattleUnitDefenseAttr defence_attr = {{0, 2, 2, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Chain-Chomp in the demo builds: immune to sleep; resists most other statuses.
  */
@@ -334,7 +334,7 @@ static EVT_BEGIN(counter_damage_event)
     ADD(LW(3), 25)
     CALL(btlevtcmd_DivePartsPosition, LW(10), 1, LW(2), LW(3), LW(4), 5, 0, 0, 0, -1)
     WAIT_FRAMES(30)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the JP demo bounces the chomp down to the floor
     CALL(btlevtcmd_SetPartsFallAccel, LW(10), 1, FLOAT(1.0f))
     CALL(btlevtcmd_GetPartsPos, LW(10), 1, LW(2), LW(3), LW(4))
@@ -724,7 +724,7 @@ static EVT_BEGIN(wait_sound_event2)
     WAIT_FRAMES(LW(10))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_WAN_WAIT4"), LW(11), 0, EVT_NULLPTR)
     RETURN
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_END()
 #else
 EVT_END_PAD()
@@ -794,7 +794,7 @@ static USER_FUNC(chain_main) {
     dx = x1 - x2;
     dy = y1 - y2;
     dz = z1 - z2;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     len = (f32)sqrt(dx * dx + dy * dy + dz * dz) / 7;
 #else
     len = (f32)sqrt(dx * dx + dy * dy + dz * dz) / 8;
@@ -815,7 +815,7 @@ static USER_FUNC(chain_main) {
     x += -(unit->faceDirection * 16);
     y += 16.0f;
     BtlUnit_SetPartsPos(BtlUnit_GetPartsPtr(unit, 2), x, y, z);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     for (i = 2; i <= 6; i++) {
 #else
     for (i = 2; i <= 7; i++) {

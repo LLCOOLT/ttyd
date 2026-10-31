@@ -1378,7 +1378,7 @@ BattleStageFallObjectData battle_stage_fall_object_data[] = {
                 0, 0, 100, 0, 100, 0, 0, 0, // poisonTime..dodgyTime
                 100, 0, 100, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
                 0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 -99, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
 #else
                 -99, 0, 0, 0, 0, 0, 0, -99, // chargeStrength..paybackTime
@@ -1706,7 +1706,7 @@ BattleStageFallObjectData battle_stage_fall_object_data[] = {
                 0, 0, 100, 0, 100, 0, 0, 0, // poisonTime..dodgyTime
                 100, 0, 100, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
                 0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 -99, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
 #else
                 -99, 0, 0, 0, 0, 0, 0, -99, // chargeStrength..paybackTime
@@ -2034,7 +2034,7 @@ BattleStageFallObjectData battle_stage_fall_object_data[] = {
                 0, 0, 100, 0, 100, 0, 0, 0, // poisonTime..dodgyTime
                 100, 0, 100, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
                 0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 -99, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
 #else
                 -99, 0, 0, 0, 0, 0, 0, -99, // chargeStrength..paybackTime
@@ -2362,7 +2362,7 @@ BattleStageFallObjectData battle_stage_fall_object_data[] = {
                 0, 0, 100, 0, 100, 0, 0, 0, // poisonTime..dodgyTime
                 100, 0, 100, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
                 0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 -99, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
 #else
                 -99, 0, 0, 0, 0, 0, 0, -99, // chargeStrength..paybackTime
@@ -3328,7 +3328,7 @@ static USER_FUNC(_fall_frame_wait_unit_ready) {
     if (isFirstCall) {
         for (i = 0; i < BATTLE_UNIT_MAX; i++) {
             unit = BattleGetUnitPtr(wp, i);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (unit && !(unit->flags & UNIT_FLAG_DELETE_PENDING) && unit->ceilFallEventCode) {
 #else
             if (unit && !(unit->flags & UNIT_FLAG_DELETE_PENDING) && !BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL) && unit->ceilFallEventCode) {
@@ -4198,7 +4198,7 @@ static s32 _object_fall_attack(EventEntry* event, BOOL isFirstCall) {
                     break;
 
                 case 4:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     e3->effect = effFallEntry(2, pos.x, pos.y, pos.z, width, hit.y - pos.y, dir, 1, 90);
 #else
                     e3->effect = effFallEntry(2, pos.x, pos.y, 5.0f + pos.z, width, hit.y - pos.y, dir, 1, 90);
@@ -4215,13 +4215,13 @@ static s32 _object_fall_attack(EventEntry* event, BOOL isFirstCall) {
 
                 case 6:
                     if (BtlUnit_GetBelong(unit) == 0) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         e3->effect = effFallEntry(6, -300.0f, pos.y, pos.z, 0.0f, 0.0f, dir, 1, 180);
 #else
                         e3->effect = effFallEntry(6, -300.0f, pos.y, 15.0f + pos.z, 0.0f, 0.0f, dir, 1, 180);
 #endif
                     } else {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         e3->effect = effFallEntry(6, 300.0f, pos.y, pos.z, 0.0f, 0.0f, dir, 1, 180);
 #else
                         e3->effect = effFallEntry(6, 300.0f, pos.y, 15.0f + pos.z, 0.0f, 0.0f, dir, 1, 180);
@@ -4230,7 +4230,7 @@ static s32 _object_fall_attack(EventEntry* event, BOOL isFirstCall) {
                     break;
 
                 case 7:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     e3->effect = effFallEntry(7, pos.x, pos.y, pos.z, width, hit.y - pos.y, dir, 1, 180);
 #else
                     e3->effect = effFallEntry(7, pos.x, pos.y, 5.0f + pos.z, width, hit.y - pos.y, dir, 1, 180);

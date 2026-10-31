@@ -111,7 +111,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 /** Damage reduction of the Cleft while it is flipped onto its back: none against any element. */
 static BattleUnitDefense defence_turn = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Cleft in the demo builds, as a percent of the normal chance of each status:
  * immune to burn; 50% for sleep, dizzy, confusion, fright; 70% for freeze, Tiny, Attack Down, Gale Force;

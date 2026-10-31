@@ -38,7 +38,7 @@ static EvtWord attack_event_pata[339];
 static EvtWord wait_event_pata[6];
 static PoseTableEntry pose_table[17];
 static PoseTableEntry pose_table_ceil[17];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static PoseTableEntry pose_table_turn[14];
 #else
 static PoseTableEntry pose_table_turn[16];
@@ -183,7 +183,7 @@ static BattleUnitDefense defence_pata = {{4, 99, 4, 99, 4}};
 /** Elemental reactions of the Spiky Parabuzzy: is immune to fire and explosion attacks. */
 static BattleUnitDefenseAttr defence_attr_pata = {{0, 2, 0, 2, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Spiky Parabuzzy (percent, 100 is normal) in the demo builds: immune to burn;
  * resists most statuses (60-95%).
@@ -662,7 +662,7 @@ static BattleUnitDefense defence_turn = {0};
  */
 static BattleUnitDefenseAttr defence_attr_turn = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Spike Top (percent, 100 is normal) in the demo builds: immune to burn; resists
  * most statuses (60-95%).

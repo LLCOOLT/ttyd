@@ -87,7 +87,7 @@ BattleUnitKind unit_boss_champion = {
     0,
     1,
     1,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     49,
 #else
     34,
@@ -160,7 +160,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Element reactions of the Rawk Hawk: no special reaction to any element. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Rawk Hawk (percent chance to take each status):
  * immune to growing huge, fright, gale force and instant kill; resists most other statuses.
@@ -497,7 +497,7 @@ BattleWeapon weapon_champion_roof_shake_last_attack = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
 #else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE | SPECIAL_UNGUARDABLE, // special
@@ -1653,13 +1653,13 @@ EVT_BEGIN(roof_shake_attack_event)
         CALL(evt_btl_camera_shake_h, 0, 2, 0, 10, 13)
         // A bucket, a tub or a light drops onto the target; if it lands on the target the damage is dealt,
         // and otherwise the target hops out of the way.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
 #else
         CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
 #endif
         ADD(LW(2), 10)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         SET_VALUE(LW(6), 30)
         CALL(evt_sub_random, 2, LW(5))
         SWITCH(LW(5))
@@ -1676,7 +1676,7 @@ EVT_BEGIN(roof_shake_attack_event)
         CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
 #endif
         CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         IF_INT_EQUAL(LW(5), 1)
             BEGIN_INLINE_EVENT
                 WAIT_FRAMES(LW(6))
@@ -1737,7 +1737,7 @@ EVT_BEGIN(roof_shake_attack_event)
     END_LOOP
     // When the last object has landed, the shaking ends with a final hit on Mario (or the shell guarding him)
     // and on the partner.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     WAIT_FRAMES(32)
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_MARIO, 1, PTR(&weapon_champion_roof_shake_last_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
 #else

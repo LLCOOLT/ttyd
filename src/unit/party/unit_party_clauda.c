@@ -687,7 +687,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     CALL(btlevtcmd_AcGetDifficulty, LW(1))
     SUBTRACT(LW(1), 3)
     SWITCH(LW(1))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CASE_LESS_OR_EQUAL(-3)
         SET_VALUE(LW(0), 420)
         CASE_EQUAL(-2)
@@ -902,7 +902,7 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
             SET_VALUE(LW(0), 70)
             SET_VALUE(LW(1), 2)
             CASE_EQUAL(1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             SET_VALUE(LW(0), 65)
             SET_VALUE(LW(1), 3)
             CASE_EQUAL(2)
@@ -922,7 +922,7 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
             SET_VALUE(LW(1), 2)
 #endif
         END_SWITCH
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(btlevtcmd_AcSetParamAll, 0, LW(0), LW(1), 6, 3, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
         CALL(btlevtcmd_AcSetGaugeParam, 51, 68, 85, 100)
 #else
@@ -933,7 +933,7 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
         CALL(btlevtcmd_AcGetDifficulty, LW(0))
         SUBTRACT(LW(0), 3)
         SWITCH(LW(0))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CASE_LESS_OR_EQUAL(-3)
             SET_VALUE(LW(0), 80)
             SET_VALUE(LW(1), 0)
@@ -979,7 +979,7 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
             SET_VALUE(LW(1), 2)
 #endif
         END_SWITCH
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(btlevtcmd_AcSetParamAll, 0, LW(0), LW(1), 4, 2, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
         CALL(btlevtcmd_AcSetGaugeParam, 25, 50, 75, 100)
 #else

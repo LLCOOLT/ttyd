@@ -25,7 +25,7 @@
 #include "dolphin/exi.h"
 #include "dolphin/pad.h"
 #include "version.h"
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 #include "system.h"
 #endif
 #include "dig.h"
@@ -124,7 +124,7 @@ static void movie_draw(CameraId camera, void* param) {
         width = gp->fbWidth;
         height = gp->efbHeight;
         if (THPSimpleDecode(0) == 1) {
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             sysDebugReport("dig_00.c", 130, /*"THP Video Decode 失敗\n"*/ "THP Video Decode \x8E\xB8\x94\x73\n");
 #endif
         } else {

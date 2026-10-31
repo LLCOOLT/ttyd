@@ -112,7 +112,7 @@ static EVT_BEGIN(yari_trap_sub)
             WAIT_FRAMES(1)
         END_LOOP
         CALL(evt_hitobj_attr_onoff, 1, 0, STRING("bb"), 2048)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         CALL(evt_sub_get_framerate, LW(0))
         IF_INT_EQUAL(LW(0), 50)
             WAIT_MS(2800)

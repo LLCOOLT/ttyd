@@ -162,7 +162,7 @@ BattleUnitKind unit_fire_bros = {
     data_table,
 };
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Defence of the Fire Bro: 1 against normal, ice, explosion and electric hits;
  * immune to fire (defence 99 cancels the hit).
@@ -176,7 +176,7 @@ static BattleUnitDefense defence = {{1, 99, 1, 1, 1}};
 static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Element reactions of Fire Bro: fire immune; the other elements hit normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 #else
@@ -184,7 +184,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of Fire Bro (the demos), as the percent chance a status takes hold:
  * always hit by Poison, Electric, Burn, Huge, Attack Up, Defense Up, Fast, Dodgy and Invisible;

@@ -106,7 +106,7 @@ static USER_FUNC(_steal_item) {
         s32 item = 0;
         s32 r;
         s32 i;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         s32 heldMax = GetHeldItemCount; // PAL scans only the held-item slots the bag has
 #else
         s32 heldMax = MAX_HELD_ITEMS;
@@ -281,7 +281,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Element reactions of the Big Bandit: no special reaction to any element. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Status vulnerability of the Big Bandit (percent chance to take each status): resists most statuses. */
 static StatusVulnerability regist = {80, 80, 70, 100, 80, 100, 100, 60, 100, 80, 100, 80, 100, 80, 80, 85, 70, 100, 80, 100, 100, 95};
 #else
@@ -307,7 +307,7 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_RUN, "R_1"},
     {41, "R_1"},
     {BTL_POSE_WALK, "W_1"},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {BTL_POSE_DANGER, "I_1"},
     {BTL_POSE_PERIL, "I_1"},
 #else
@@ -326,7 +326,7 @@ static PoseTableEntry pose_table_item_have[] = {
     {2, "Y_1"},
     {9, "Y_1"},
     {5, "K_1"},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {4, "I_1"},
     {3, "I_1"},
 #else

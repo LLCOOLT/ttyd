@@ -117,7 +117,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Damage-type modifiers of the Lakitu: none, no special weakness or immunity. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Lakitu (100% is the normal chance): resists Sleep 80%, Stop 90%, Confusion 80%,
  * Freeze 70%, Tiny 80%, Attack Down 80%, Defense Down 80%, Allergic 80%, Fright 90%, Slow 80% and instant KO

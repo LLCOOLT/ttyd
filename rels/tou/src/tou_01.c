@@ -1497,7 +1497,7 @@ EVT_END()
 EVT_BEGIN(init_bijyo)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG3_20_00_MAJORS_8TH_PLACE, STORY_STG3_20_03_THE_YELLOW_BLOCK)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CASE_DEFAULT
         CALL(evt_npc_set_position, STRING("me"), 610, 10, -120)
 #else
@@ -1764,7 +1764,7 @@ static EVT_BEGIN(talk_sarary)
             RETURN
         END_IF
         CALL(evt_msg_print_add, 0, STRING("irai_24_032"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_unitwin_alloc)
 #else
         CALL(evt_unitwin_alloc, 0)
@@ -2154,7 +2154,7 @@ static USER_FUNC(mario_chk) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** The demo's champion reset: the releases use evt_rankingReset of tou.c, which also rebuilds the ranking. */
 static USER_FUNC(rankingReset) {
     s32 i;
@@ -2771,7 +2771,7 @@ EVT_BEGIN(evt_gondora2)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
         IF_INT_EQUAL(GSWF(GSWF_TOU_LEFT_AS_CHAMPION), 0)
             SET_VALUE(GSWF(GSWF_TOU_LEFT_AS_CHAMPION), 1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(rankingReset)
 #else
             CALL(evt_rankingReset)
@@ -3487,7 +3487,7 @@ static EVT_BEGIN(mobj_box00)
 #endif
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
     CALL(evt_item_entry, STRING("item00"), ITEM_POWER_PLUS_P, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
 #else
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_BADGE_RETURN | ITEM_FLAG_NO_TOUCH)
@@ -3702,7 +3702,7 @@ EVT_BEGIN(tou_01_init_evt)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("I_gai_1"), MAPOBJ_FLAG_DISABLE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("I_gai_2"), MAPOBJ_FLAG_DISABLE)
     END_SWITCH
-#if VERSION != VERSION_EU // PAL sets the language signs once (above)
+#if VERSION < VERSION_DEMO_EU // PAL sets the language signs once (above)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("J_hot"), MAPOBJ_FLAG_DISABLE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("E_hot"), MAPOBJ_FLAG_DISABLE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("D_hot"), MAPOBJ_FLAG_DISABLE)
@@ -3787,7 +3787,7 @@ EVT_BEGIN(tou_01_init_evt)
         CALL(tou_01_kanban_moji_flag_sync)
     END_INLINE_EVENT
 #else
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mobj_jumpstand_blue, 0, STRING("jump"), 180, 615, 160, -10, 0, 0)
 #else
     CALL(evt_mobj_jumpstand_blue, 0, STRING("jump"), 180, 610, 160, 20, 0, 0)

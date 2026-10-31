@@ -970,7 +970,7 @@ static void btlseqTurn(BattleWork* wp) {
             if (!BattleWaitAllActiveEvtEnd(wp)) {
                 break;
             }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             BattleIncSeq(wp, SEQ_TURN);
 #else
             if (BattleCheckConcluded(wp)) {
@@ -1721,7 +1721,7 @@ static void btlseqTurn(BattleWork* wp) {
                     if (!BattleWaitAllActiveEvtEnd(wp)) {
                         break;
                     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     BattleIncSeq(wp, SEQ_TURN);
 #else
                     if (BattleCheckConcluded(wp)) {
@@ -1829,7 +1829,7 @@ static void btlseqTurn(BattleWork* wp) {
                             unit->currentHp = unit->maxHp;
                         }
                         BtlUnit_GetPartsWorldPos(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit)), &heartX, &heartY, &heartZ);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         heartY += BtlUnit_GetHeight(unit);
 #else
                         heartY += unit->sizeMultiplier * BtlUnit_GetHeight(unit);
@@ -1875,7 +1875,7 @@ static void btlseqTurn(BattleWork* wp) {
                     if (n > 0) {
                         BtlUnit_RecoverFp(unit, n);
                         BtlUnit_GetPartsWorldPos(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit)), &flowerX, &flowerY, &flowerZ);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         flowerY += BtlUnit_GetHeight(unit);
 #else
                         flowerY += unit->sizeMultiplier * BtlUnit_GetHeight(unit);
@@ -2155,7 +2155,7 @@ static void btlseqMove(BattleWork* wp) {
                 for (i = 0; i < BATTLE_UNIT_MAX; i++) {
                     unit = BattleGetUnitPtr(wp, i);
                     if (unit) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         unit->tokenFlags &= TOKEN_FLAG_PERSISTENT;
 #else
                         unit->tokenFlags &= (TOKEN_FLAG_RALLY_WINK | TOKEN_FLAG_PERSISTENT);
@@ -2175,7 +2175,7 @@ static void btlseqMove(BattleWork* wp) {
                     id = wp->movePriorityQueue[i];
                     if (id != -1) {
                         unit = BattleGetUnitPtr(wp, id);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         if (unit) {
 #else
                         if (unit && unit->movesRemaining > 0) {
@@ -2296,7 +2296,7 @@ static BOOL BattlePhaseEndCheck(void) {
     for (i = 0; i < BATTLE_UNIT_MAX; i++) {
         if (wp->movePriorityQueue[i] != -1) {
             unit = BattleGetUnitPtr(wp, wp->movePriorityQueue[i]);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (unit && unit->moveState != 10 && !BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) {
 #else
             if (unit && unit->moveState != 10 && unit->movesRemaining > 0 &&
@@ -2499,7 +2499,7 @@ static void btlseqAct(BattleWork* wp) {
                         }
                         if (unit->movesRemaining <= 0) {
                             unit->moveState = 10;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                             unit->activeTurns = 0;
 #else
                             if (!(unit->tokenFlags & TOKEN_FLAG_RALLY_WINK)) {
@@ -2630,7 +2630,7 @@ static void btlseqPhaseFirstProcess(BattleWork* wp) {
         unit = BattleGetUnitPtr(wp, i);
         if (unit) {
             unit->moveColorLv = 0xFF;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (unit->moveState == 10) {
 #else
             if (unit->moveState == 10 && !BtlUnit_CheckStatus(unit, STATUS_SLOW)) {
@@ -2841,7 +2841,7 @@ BOOL BattleWaitAllActiveEvtEnd_NoBgSetEndWait(BattleWork* wp) {
                 unit->entryEventId = 0;
                 break;
             }
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             while (unit->slideReturnEventId) {
                 if (evtCheckID(unit->slideReturnEventId)) {
                     done = FALSE;

@@ -37,7 +37,7 @@ static EvtWord attack_event[153];
 static EvtWord normal_attack_event[354];
 static EvtWord trans_myself_event[196];
 static EvtWord trans_event[289];
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 static EvtWord move_event[101];
 #else
 static EvtWord move_event[84];
@@ -208,7 +208,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
  */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of the Boo:
  * percent chance that each status takes hold (100 is normal); immune to Poison;
@@ -787,7 +787,7 @@ static EVT_BEGIN(move_event)
     WAIT_FRAMES(30)
     SET_VALUE(LW(12), 80)
     LABEL(0)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     // BUG: the count is cleared on every pass of the loop, so LW(15) never reaches 2 and the 145 minimum below never applies
     SET_VALUE(LW(15), 0)
 #endif
@@ -797,7 +797,7 @@ static EVT_BEGIN(move_event)
         IF_INT_EQUAL(LW(6), 0)
             SPAWN_EVENT(move_event_sub)
             ADD(LW(12), 20)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             ADD(LW(15), 1)
 #endif
         END_IF
@@ -806,7 +806,7 @@ static EVT_BEGIN(move_event)
     IF_INT_NOT_EQUAL(LW(3), -1)
         GOTO(0)
     END_IF
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     IF_INT_GREATER_OR_EQUAL(LW(15), 2)
         IF_INT_LESS(LW(12), 145)
             SET_VALUE(LW(12), 145)

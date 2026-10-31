@@ -58,7 +58,7 @@ BattleUnitKind unit_karon = {
     30,
     0,
     2,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     100,
 #else
     70,
@@ -124,7 +124,7 @@ static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 /** Damage-type modifiers of the Dry Bones: none, no special weakness or immunity. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Dry Bones (100% is the normal chance): immune to Sleep and Poison; resists Stop
  * 70%, Dizzy 60%, Confusion 60%, Freeze 60%, Tiny 60%, Attack Down 60%, Defense Down 60%, Allergic 60%,

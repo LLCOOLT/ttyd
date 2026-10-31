@@ -134,7 +134,7 @@ static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 /** Element reactions of the Bowser: no special reaction to any element. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Bowser (percent chance to take each status):
  * immune to fright, gale force and instant kill; resists most other statuses.

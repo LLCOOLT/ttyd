@@ -629,7 +629,7 @@ BattleWeapon partyWeapon_VivianCharmKissAttack = {
     TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, // poisonStrength
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     90, // confuseChance
 #else
     100, // confuseChance
@@ -902,7 +902,7 @@ EVT_BEGIN(partyVivianAttack_ShadowGuard)
         GOTO(90)
     END_IF
     // Success: the rating effect, then she opens her shadow and Mario sinks into it, veiled and untargetable.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
 #else
     CALL(btlevtcmd_GetResultPrizeLv, BTL_UNIT_NONE, 0, LW(6))

@@ -117,7 +117,7 @@ static BattleUnitDefense defence_patakuri = {{0, 0, 0, 0, 0}};
 /** Defence of the Paragoomba (Paragoomba form): no damage reduction. */
 static BattleUnitDefenseAttr defence_patakuri_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Paragoomba (Paragoomba form) (percent chance to take each status):
  * extra prone to stop, dizzy, fright, gale force and instant kill.
@@ -437,7 +437,7 @@ static BattleUnitDefense defence = {0};
 /** Element reactions of the Paragoomba: no special reaction to any element. */
 static BattleUnitDefenseAttr defence_attr = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Paragoomba (percent chance to take each status):
  * extra prone to stop, fright, gale force and instant kill.

@@ -231,15 +231,17 @@ cflags_base = [
     f"-DVERSION_{config.version}",
     "-DSDK_REVISION=1",
 ]
-# The game code tests the version through include/version.h (VERSION_DEMO_JP < VERSION_DEMO_US < VERSION_JP <
-# VERSION_US < VERSION_EU; tools/check_versions.py keeps the per-version macros below out of it). The library code
+# The game code tests the version through include/version.h (VERSION_DEMO_US < VERSION_DEMO_JP < VERSION_JP <
+# VERSION_US < VERSION_DEMO_US2 < VERSION_DEMO_EU < VERSION_EU; tools/check_versions.py keeps the per-version macros
+# below out of it). The library code
 # under libs/ tests those: the European release is built from the US code, so G8MP01 defines VERSION_G8ME01 as well,
 # and VERSION_G8MP01 marks what differs in PAL.
 if config.version == "G8MP01":
     cflags_base.append("-DVERSION_G8ME01")
 # The September 2004 demos were built from the release code a few days after it (the US demo from the US code, the
 # European demo from the PAL code): of their main.dol functions, all but a few dozen have the same code as US or
-# PAL (relocations masked). Until version.h has their own values they take the US and PAL code paths.
+# PAL (relocations masked). version.h gives them their own values (VERSION_DEMO_US2, VERSION_DEMO_EU); the library
+# code under libs/ sees them as US and PAL.
 if config.version == "G8ME01_DEMO2":
     cflags_base.append("-DVERSION_G8ME01")
 if config.version == "G8MP01_DEMO":
@@ -248,8 +250,8 @@ if config.version == "G8MP01_DEMO":
 # the main.dol functions where JP and US differ, 373 match JP and none match US. So it takes the JP code paths (no
 # VERSION_G8ME01).
 
-# The Japanese store demo is the US demo's code before its English localisation: 6,890 of its 6,905 main.dol
-# functions have the same code as the US demo's (relocations masked). The library code marks what the two demos
+# The Japanese store demo has the US demo's pre-final code a little later (in five places it already has the
+# release code): 6,890 of its 6,905 main.dol functions have the same code as the US demo's (relocations masked). The library code marks what the two demos
 # share with VERSION_G8ME01_DEMO || VERSION_G8MJ01_DEMO.
 DEMO_VERSIONS = ("G8ME01_DEMO", "G8MJ01_DEMO")
 

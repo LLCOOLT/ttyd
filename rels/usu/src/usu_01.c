@@ -752,7 +752,7 @@ EVT_BEGIN(aunt_talk)
             // The town music fades out and music-box music takes over.
             CALL(evt_snd_bgmoff_f, PSND_FADE_HOLD, 2000)
             WAIT_MS(1000)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
             CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_EVT_ORGEL1"))
 #else
@@ -902,7 +902,7 @@ EVT_BEGIN(aunt_talk)
             IF_INT_EQUAL(LW(0), 0)
                 CALL(get_item_list, LW(0))
                 LOOP(0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     CALL(evt_win_item_select, LW(0), LW(1))
 #else
                     CALL(evt_win_item_select, 0, LW(0), LW(1), 0)
@@ -1521,7 +1521,7 @@ static NpcSetupInfo npcEnt[] = {
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         gatekeeper_pig_init, // initEvent
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         urouro_move, // regularEvent
 #else
         NULL, // regularEvent
@@ -3099,7 +3099,7 @@ static s32 lock_tbl[] = {
 static EVT_BEGIN(lock_item_check)
     CALL(evt_pouch_check_item, ITEM_SHOP_KEY, LW(0))
     IF_INT_GREATER(LW(0), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_win_item_select, PTR(lock_tbl), LW(0))
 #else
         CALL(evt_win_item_select, 0, PTR(lock_tbl), LW(0), 0)
@@ -3144,7 +3144,7 @@ static ShopObj obj_list[] = {
  */
 static ShopItem goods_list[] = {
     {ITEM_THUNDER_RAGE, 20},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {ITEM_BOOS_SHEET, 10},
 #else
     {ITEM_SPITE_POUCH, 10},
@@ -3162,7 +3162,7 @@ static ShopItem goods_list[] = {
  */
 static ShopDb trade_list[] = {
     {ITEM_THUNDER_RAGE, 10, 0},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {ITEM_BOOS_SHEET, 5, 0},
 #else
     {ITEM_SPITE_POUCH, 5, 0},
@@ -3317,7 +3317,7 @@ static EVT_BEGIN(evt_majin)
             ADD(LW(1), 30)
             CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
             CALL(evt_msg_print, 0, STRING("stg4_usu_majin3_09"), PTR(majin_callback), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_win_item_select, PTR(key_tbl), LW(0))
 #else
             CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
@@ -3354,7 +3354,7 @@ EVT_END()
  */
 static EVT_BEGIN(evt_majin2)
     CALL(evt_mario_key_onoff, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_normalize)
 #endif
     CALL(evt_party_stop, 0)
@@ -3557,7 +3557,7 @@ static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
     CALL(evt_item_entry, STRING("item00"), ITEM_DEFEND_PLUS, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
 #else
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_BADGE_RETURN | ITEM_FLAG_NO_TOUCH)

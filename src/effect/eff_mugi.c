@@ -47,7 +47,7 @@ inline f32 inline_fn(effMugiKemuriData* data) {
     return 6.2831855f * reviseAngle(data->rot.y);
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * The demo has one more entry function here.
  * Nothing calls it, so the linker drops it, but its type string stays at the end of the unit's .rodata.

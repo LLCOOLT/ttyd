@@ -771,7 +771,7 @@ static s32 moamoa_hit_check(ExtdrvPose* pose, Moamoa* moa) {
         return 0;
     }
     if (distABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], mario->position.x, mario->position.z) < (mario->wPlayerCollisionBox.x + 20.0f) / 2 && mario->position.y > 10.0f + (*pose->mtx)[1][3] && (mario->flags & 0x20000) && !(mario->flags & 0x10000) && wp->bounceCount < 2) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         marioChgMot(5);
 #else
         if (mario->currMotionId != MARIO_MOTION_ROLL && mario->currMotionId != MARIO_MOTION_YOSHI) {
@@ -945,7 +945,7 @@ static void ext_moamoa_main(void) {
     for (i = 0; i < wp->count; i++, pose++, moa++) {
         wp->angle = angleABf(mario->position.x, mario->position.z, (*pose->mtx)[0][3], (*pose->mtx)[2][3]);
         wp->dist = distABf(mario->position.x, mario->position.z, (*pose->mtx)[0][3], (*pose->mtx)[2][3]);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         if ((((wp->flags & MOAMOA_WORK_ACTIVE) && (!(wp->flags & MOAMOA_WORK_NO_HIT))) && (!hit)) && (!(moa->flags & (MOAMOA_FLAG_DAMAGED | MOAMOA_FLAG_ESCAPING | MOAMOA_FLAG_OFF_FLOOR | MOAMOA_FLAG_FUSING)))) {
 #else
         if ((((((wp->flags & MOAMOA_WORK_ACTIVE) && (!(wp->flags & MOAMOA_WORK_NO_HIT))) && (!marioKeyOffChk())) && (!marioCtrlOffChk())) && (!hit)) && (!(moa->flags & (MOAMOA_FLAG_DAMAGED | MOAMOA_FLAG_ESCAPING | MOAMOA_FLAG_OFF_FLOOR | MOAMOA_FLAG_FUSING)))) {
@@ -1388,7 +1388,7 @@ static void ext_moamoa_main(void) {
     }
 
     moamoa_pose_main();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {
 #else
     if (wp->flags & MOAMOA_WORK_PARTNER_IN_USE) {
@@ -1510,14 +1510,14 @@ static BeroEntry bero_data[] = {
  */
 EVT_BEGIN(evt_bridge)
     CALL(evt_mario_key_onoff, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_normalize)
 #else
     WAIT_MS(500)
 #endif
     SET_VALUE(GSWF(GSWF_EKI00_BRIDGE_LOWER_SCENE), 1)
     CALL(evt_bero_mapchange, STRING("hom_00"), STRING("n_bero_2"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_key_onoff, 1)
 #endif
     RETURN
@@ -1594,7 +1594,7 @@ static EVT_BEGIN(evt_origami)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_ori"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("kaidann_A"), 1, 1)
     CALL(evt_map_checkanim, STRING("anm_ori"), LW(0), LW(1))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     WAIT_MS(LW(1))
 #else
     WAIT_MS(1600)
@@ -1904,7 +1904,7 @@ EVT_BEGIN(evt_elv_down)
     CALL(evt_hitobj_onoff, STRING("a_eki_07"), 1, 1)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("s_eki_00"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("a_eki_00"), 1, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_41_ORIGAMI_STAIRS)
         CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_lever"), 0, PTR(evt_origami), GW(10))
     ELSE
@@ -2138,7 +2138,7 @@ static s32 item_tbl[] = {
 EVT_BEGIN(evt_elv)
     CALL(evt_mario_key_onoff, 0)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_38_RIDE_THE_ELEVATOR)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_win_item_select, PTR(item_tbl), LW(1))
 #else
         CALL(evt_win_item_select, 0, PTR(item_tbl), LW(1), 0)

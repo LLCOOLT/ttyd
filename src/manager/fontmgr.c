@@ -40,7 +40,7 @@ const char* fontname[2] = {"papermarioset_JPN", "popjoyB22"};
 #endif
 
 // The demo draws message icons with display flag 4 (retail 0x10) and keeps the fonts under font/
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #define FONT_ICON_FLAGS 4
 #define FONT_DIR "font"
 #else

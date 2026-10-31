@@ -39,7 +39,7 @@ static EvtWord attack_event_pata[339];
 static EvtWord wait_event_pata[6];
 static PoseTableEntry pose_table[17];
 static PoseTableEntry pose_table_ceil[17];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static PoseTableEntry pose_table_turn[14];
 #else
 static PoseTableEntry pose_table_turn[16];
@@ -184,7 +184,7 @@ static BattleUnitDefense defence_pata = {{4, 99, 4, 99, 4}};
 /** Element response of the Spiky Parabuzzy, flying form: it is immune to fire and explosions. */
 static BattleUnitDefenseAttr defence_attr_pata = {{0, 2, 0, 2, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Spiky Parabuzzy, flying form (percent, 0 is immune): immune to burn. Demo
  * values.
@@ -652,7 +652,7 @@ static BattleUnitDefense defence_turn = {0};
  */
 static BattleUnitDefenseAttr defence_attr_turn = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Status vulnerability of the Spiky Parabuzzy (percent, 0 is immune): immune to burn. Demo values. */
 static StatusVulnerability regist = {75, 90, 75, 100, 75, 100, 0, 75, 100, 75, 100, 75, 100, 75, 75, 60, 65, 100, 75, 100, 100, 95};
 #else

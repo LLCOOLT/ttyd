@@ -256,7 +256,7 @@ static BattleWeapon weapon_heavy_bomb_guard_2 = {
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, // burnChance..sizeChangeStrength
     100, // atkChangeChance
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     2, // atkChangeTime
 #else
     3, // atkChangeTime
@@ -298,7 +298,7 @@ static BattleWeapon weapon_heavy_bomb_guard_3 = {
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     12, // chargeStrength
 #else
     9, // chargeStrength
@@ -316,7 +316,7 @@ static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 /** Element response of the Bob-ulk: none, every attack type is treated normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Status vulnerability of the Bob-ulk (percent, 0 is immune): immune to gale force. Demo values. */
 static StatusVulnerability regist = {50, 30, 50, 100, 50, 100, 100, 50, 100, 50, 100, 50, 100, 50, 50, 60, 0, 100, 50, 100, 100, 20};
 #else

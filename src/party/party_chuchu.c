@@ -34,7 +34,7 @@ typedef struct ChuchuParty {
     u8 state;              // 0x39
     u8 pad3A;              // 0x3A
     u8 moveMode;           // 0x3B
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     u8 pad3C[0x54 - 0x3C]; // 0x3C, the demo PartyEntry is 4 bytes shorter here
 #else
     u8 pad3C[0x58 - 0x3C]; // 0x3C
@@ -42,7 +42,7 @@ typedef struct ChuchuParty {
     Vec position;          // 0x58
     u8 pad64[0x94 - 0x64]; // 0x64
     Vec target;            // 0x94
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     u8 padA0[0xD8 - 0x9C]; // 0xA0, the demo PartyEntry is 0x14 shorter here
 #else
     u8 padA0[0xF0 - 0xA0]; // 0xA0
@@ -199,7 +199,7 @@ static USER_FUNC(search_result) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * The demo stops at the first item or block in range and has no buried treasure table.
  * Script helper: looks for an item and then a block from mobj_list within 150 units of Mario, then anywhere;
@@ -393,7 +393,7 @@ static USER_FUNC(post_msg) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Whether there is something to sniff within 150 units of Mario (an item, an unopened item box,
  * a Kururin floor item or a block from mobj_list);

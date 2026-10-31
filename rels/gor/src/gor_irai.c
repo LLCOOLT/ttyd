@@ -45,7 +45,7 @@ typedef struct IraiWork {
     s32 yubiY;
     s32 cursorTimer;
     f32 scroll;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     // PAL: the request names and texts get 101 bytes each, and there is no unused tail
     char client[30][101];
     char contents[30][101];

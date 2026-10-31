@@ -100,7 +100,7 @@ static USER_FUNC(demo_init) {
     }
     if (fileAsyncf(4, NULL, "%s/demo.tpl", getMarioStDvdRoot()) != NULL) {
         wp->tpl = fileAllocf(4, "%s/demo.tpl", getMarioStDvdRoot());
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         // the map fades in from black after the logo sequence and from white after the title screen
         if (seqGetPrevSeq() == SEQ_LOGO) {
             gp->areaFadeOutType = FADE_IN_BLACK;
@@ -591,7 +591,7 @@ static USER_FUNC(make_msg) {
     u16 width;
 
     width = FontGetMessageWidthLine(msgSearch((const char*)evtGetValue(event, args[0])), &lines);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     sprintf(buf, "<clear><wpos %d %d %d %d><once_stop>", -width / 2 - 62, lines * 28 / 2 - 90, 400, 200);
 #else
     sprintf(buf, "<clear><wpos %d %d %d %d><once_stop>", -width / 2 - 62, lines * 28 / 2 - 84, 400, 200);
@@ -632,7 +632,7 @@ EVT_BEGIN(demo_evt)
     CALL(evt_seq_wait, 2)
     SET_VALUE(GF(10), 0)
     SPAWN_EVENT_GET_ID(PTR(buttonCheck), GW(10))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_DEMO1"))
 #else
     CALL(evt_snd_bgmon, PSND_FADE_OUT | PSND_CH(1), STRING("BGM_DEMO1"))
@@ -699,7 +699,7 @@ EVT_BEGIN(demo_evt)
     CALL(demo_winonoff, 0)
     // The four page pictures are set up; the first page turns and the narrator tells of the town sinking
     // underground.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_img_entry, STRING("img4"))
     CALL(evt_img_entry, STRING("img3"))
     CALL(evt_img_entry, STRING("img2"))
@@ -839,7 +839,7 @@ EVT_BEGIN(demo_evt)
 #if VERSION >= VERSION_JP
     CALL(evt_mobj_flag_onoff, 0, STRING("hako"), MOBJ_FLAG_INVISIBLE)
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // The storybook music fades out and the town fades in.
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 6000)
 #else
@@ -863,7 +863,7 @@ EVT_BEGIN(demo_evt)
     LABEL(100)
     // New music; Peach strolls in and complains that Toadsworth is always watching over her.
     WAIT_MS(1000)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_DEMO2"))
 #else
     CALL(evt_snd_bgmon, PSND_FADE_OUT | PSND_CH(1), STRING("BGM_DEMO2"))

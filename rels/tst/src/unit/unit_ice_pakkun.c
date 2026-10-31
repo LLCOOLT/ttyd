@@ -34,7 +34,7 @@ static EvtWord init_event[31];
 static EvtWord dmg_avoid_counter_thorn_head_event[71];
 static EvtWord damage_event[10];
 static EvtWord counter_damage_event[30];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord return_event[244];
 #else
 static EvtWord return_event[256];
@@ -54,7 +54,7 @@ BattleUnitKind unit_ice_pakkun = {
     1,
     26,
     0,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     2,
     70,
     2,
@@ -127,7 +127,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
  */
 static BattleUnitDefenseAttr defence_attr = {{0, 1, 3, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Frost Piranha (100% is the normal chance): immune to Freeze; resists Sleep 80%,
  * Stop 80%, Dizzy 60%, Confusion 75%, Tiny 70%, Attack Down 70%, Defense Down 70%, Allergic 70%, Fright 20%,
@@ -662,7 +662,7 @@ static USER_FUNC(shadow_scale_memory) {
 static USER_FUNC(pakkun_ceil_exist) {
     EvtWord* args = event->args;
 
-#if VERSION <= VERSION_DEMO_US // the JP demo's tst has the JP demo BattleWork layout
+#if VERSION <= VERSION_DEMO_JP // the JP demo's tst has the JP demo BattleWork layout
     if (_battleWorkPointer->stageObjectWork.flags & STAGE_OBJ_FLAG_IRON_FRAME_GONE) {
 #else
     if (TST_BATTLE_WORK(_battleWorkPointer)->stageObjectWork.flags & STAGE_OBJ_FLAG_IRON_FRAME_GONE) {

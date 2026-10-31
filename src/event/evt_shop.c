@@ -40,7 +40,7 @@
 #define SHOP_PTS(p) ((p)->shopPoints)
 
 // demo-only numbering: the 2D icon flag is 4 (retail 0x10), the list window sounds are 0x12/0x13 (retail 0x2A/0x2B)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #define SHOP_SFX_LIST_OPEN 0x12
 #define SHOP_SFX_LIST_CLOSE 0x13
 #else
@@ -107,7 +107,7 @@ ShopPoint shopPointList[11];
 WinMgrDesc list_desc[3];
 extern EvtWord shopper_talk_evt[];
 extern EvtWord first_shopping_evt[];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord sell_evt[193];
 #else
 static EvtWord sell_evt[VERSION_PICK(196, 207)];
@@ -149,7 +149,7 @@ WinMgrDesc list_desc[] = {
     {2, 0, 8, -250, -130, 150, 45, {0xF0, 0xF0, 0xF0, 0xFF}, NULL, point_disp},
 };
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** the demos define the prize list script here, in .data (retail: .sdata); the US demo never runs it */
 EVT_BEGIN(evt_shoplist)
     CALL(evt_mario_key_onoff, 0)
@@ -603,7 +603,7 @@ static EVT_BEGIN(sell_evt)
     GOTO(0)
     RETURN
 EVT_END()
-#elif VERSION <= VERSION_DEMO_US
+#elif VERSION <= VERSION_DEMO_JP
                         static EVT_BEGIN(sell_evt)
     CALL(sell_pouchcheck_func)
     IF_INT_EQUAL(LW(0), 0)
@@ -793,7 +793,7 @@ EVT_BEGIN(keep_evt)
     GOTO(0)
     RETURN
 EVT_END()
-#elif VERSION <= VERSION_DEMO_US
+#elif VERSION <= VERSION_DEMO_JP
                         EVT_BEGIN(keep_evt)
     CALL(keep_pouchcheck_func)
     IF_INT_EQUAL(LW(0), 0)
@@ -914,7 +914,7 @@ EVT_BEGIN(unkeep_evt)
     CALL(get_msg, LW(10), 19, LW(14))
     CALL(evt_msg_print_add, 0, LW(14))
     LABEL(0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_win_item_select, 5, LW(1))
 #else
     CALL(evt_win_item_select, 1, 5, LW(1), LW(4))
@@ -924,7 +924,7 @@ EVT_BEGIN(unkeep_evt)
         CALL(evt_msg_print, 0, LW(14), 0, STRING("me"))
         RETURN
     END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_pouch_remove_keepitem, LW(1), LW(0))
 #else
     CALL(evt_pouch_remove_keepitem, LW(1), LW(4), LW(0))
@@ -1424,7 +1424,7 @@ static USER_FUNC(point_disp_onoff) {
 static USER_FUNC(point_wait) {
     ShopWork* wp = _wp;
     PouchData* pouch = pouchGetPtr();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     return wp->points != SHOP_PTS(pouch) ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 #else
     if (wp->points != SHOP_PTS(pouch)) {
@@ -1725,7 +1725,7 @@ static USER_FUNC(evt_shop_main_func) {
         }
         return EVT_RETURN_BLOCK;
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (winGhostDiaryChk()) {
 #else
     if (winGhostDiaryChk() || N_itemPickUpFromFieldCheck()) {

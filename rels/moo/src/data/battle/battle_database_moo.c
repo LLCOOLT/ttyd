@@ -518,7 +518,7 @@ BattleUnitSetup btlparty_moo_moo_02_01_off_1[] = {
         1, // alliance
         {0}, // pad_05
         BATTLE_PHASE_ENEMY, // attackPhase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {70.0f, 40.0f, 0.0f}, // position
 #else
         {50.0f, 40.0f, -10.0f}, // position
@@ -532,7 +532,7 @@ BattleUnitSetup btlparty_moo_moo_02_01_off_1[] = {
         1, // alliance
         {0}, // pad_05
         BATTLE_PHASE_ENEMY, // attackPhase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {110.0f, 40.0f, 10.0f}, // position
 #else
         {130.0f, 40.0f, 10.0f}, // position
@@ -598,7 +598,7 @@ BattleUnitSetup btlparty_moo_moo_02_03_off_1[] = {
         1, // alliance
         {0}, // pad_05
         BATTLE_PHASE_ENEMY, // attackPhase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {70.0f, 40.0f, 0.0f}, // position
 #else
         {50.0f, 40.0f, -10.0f}, // position
@@ -612,7 +612,7 @@ BattleUnitSetup btlparty_moo_moo_02_03_off_1[] = {
         1, // alliance
         {0}, // pad_05
         BATTLE_PHASE_ENEMY, // attackPhase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {110.0f, 40.0f, 10.0f}, // position
 #else
         {130.0f, 40.0f, 10.0f}, // position

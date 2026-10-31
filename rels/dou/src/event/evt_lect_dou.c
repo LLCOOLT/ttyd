@@ -880,13 +880,13 @@ EVT_BEGIN(ship_majin_lecture)
         // again, and the loop repeats; otherwise it exits.
         CALL(evt_msg_print_add, 0, STRING("stg1_gon_majin4_15_1"))
         CALL(evt_msg_select, 0, STRING("stg1_gon_majin4_16"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_msg_continue)
 #endif
         CALL(evt_cam_letter_box_disable, 0)
         IF_INT_EQUAL(LW(0), 0)
             CALL(evt_mario_set_dir, 90, 300, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_msg_toge, 1, 0, 0, 0)
             CALL(evt_msg_print, 0, STRING("stg1_gon_majin4_17"), 0, STRING("ペラ魔人"))
 #else
@@ -918,7 +918,7 @@ EVT_BEGIN(ship_majin_lecture)
         END_LOOP
     END_INLINE_EVENT
     CALL(evt_msg_toge, 1, 0, 0, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_msg_print, 0, STRING("stg1_gon_majin4_18"), 0, STRING("ペラ魔人"))
 #else
     CALL(evt_msg_print_add, 0, STRING("stg1_gon_majin4_18"))
@@ -954,7 +954,7 @@ static USER_FUNC(evt_nomal_cange) {
     MarioWork* mario = marioGetPtr();
 
     if (isFirstCall) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         marioRollCancel(); // the demo has no marioRollTryCancel
 #else
         marioRollTryCancel();

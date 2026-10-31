@@ -226,7 +226,7 @@ extern EvtWord kurihakase_lecture_badge[];
 extern EvtWord kurihakase_after3minutes[];
 s32 stg0_list[1];
 s32 stg1_list[4];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 s32 stg2_list[3];
 s32 stg3_list[1];
 s32 stg4_list[1];
@@ -903,7 +903,7 @@ EVT_BEGIN(powerupya_table_talk)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * The demo has no Up Arrow trade: Merlon takes the item and turns the star chart himself.
  * This talk event has the name that retail gives to its door animation.
@@ -1523,7 +1523,7 @@ static EVT_BEGIN(kurihakase_talk)
             SPAWN_EVENT(kurihakase_after3minutes)
         END_IF
         // Both demos switch on STG7_03/STG7_04; the releases switch on STG7_02 and whether Fahr Outpost was reached
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CASE_LESS(STORY_STG7_03_WHERES_WHITE)
         CALL(evt_pouch_check_item, ITEM_ULTRA_HAMMER, LW(0))
         IF_INT_EQUAL(LW(0), 0)
@@ -1843,7 +1843,7 @@ static s32 key_tbl[] = {
 static EVT_BEGIN(evt_chk)
     CALL(evt_pouch_check_item, ITEM_HOUSE_KEY, LW(0))
     IF_INT_GREATER(LW(0), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_win_item_select, PTR(key_tbl), LW(0))
 #else
         CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
@@ -2038,7 +2038,7 @@ EVT_BEGIN(tozokudan2_talk)
         CALL(evt_pouch_check_item, ITEM_HOUSE_KEY, LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 1)
             CALL(evt_msg_print, 0, STRING("irai_01_02"), 0, STRING("me"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_win_item_select, PTR(key_tbl), LW(0))
 #else
             CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
@@ -2166,7 +2166,7 @@ static EVT_BEGIN(sanders_talk)
             CALL(evt_msg_print, 0, STRING("mac_4_051"), 0, STRING("me"))
             CALL(evt_party_set_dir_npc, 0, STRING("me"))
             CALL(evt_msg_print_party, STRING("mac_4_052"))
-#if VERSION != VERSION_EU
+#if VERSION < VERSION_DEMO_EU
             CALL(evt_party_run, 0)
 #endif
             CALL(evt_msg_print, 0, STRING("mac_4_053"), 0, STRING("me"))
@@ -2174,7 +2174,7 @@ static EVT_BEGIN(sanders_talk)
             WAIT_MS(500)
             CALL(evt_msg_print, 0, STRING("mac_4_054"), 0, STRING("me"))
             CALL(evt_msg_print_party, STRING("mac_4_055"))
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             CALL(evt_party_run, 0)
 #endif
             CALL(evt_msg_print, 0, STRING("mac_4_056"), 0, STRING("me"))
@@ -2296,11 +2296,11 @@ static EVT_BEGIN(sanders_talk)
         CALL(evt_mario_set_pose, STRING("M_N_2"))
         WAIT_MS(500)
         CALL(evt_msg_print, 0, STRING("mac_4_085"), 0, STRING("me"))
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         CALL(evt_party_stop, 0)
 #endif
         CALL(evt_msg_print_party, STRING("mac_4_086"))
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         CALL(evt_party_run, 0)
 #endif
         CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
@@ -2352,7 +2352,7 @@ EVT_BEGIN(kuribo4_talk)
             CALL(evt_pouch_check_item, ITEM_BOX, LW(0))
             IF_INT_GREATER_OR_EQUAL(LW(0), 1)
                 CALL(evt_msg_print, 0, STRING("irai_02_03"), 0, STRING("me"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(evt_win_item_select, PTR(item_tbl), LW(0))
 #else
                 CALL(evt_win_item_select, 0, PTR(item_tbl), LW(0), 0)
@@ -2384,7 +2384,7 @@ EVT_BEGIN(kuribo4_talk)
                     CALL(evt_msg_print, 0, STRING("irai_13_002"), 0, 0)
                     CALL(iri_13_update_item_tbl, LW(1), LW(0))
                     LOOP(0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         CALL(evt_win_item_select, LW(1), LW(0))
 #else
                         CALL(evt_win_item_select, 0, LW(1), LW(0), 0)
@@ -2407,7 +2407,7 @@ EVT_BEGIN(kuribo4_talk)
                             BREAK_LOOP
                         END_IF
                         CALL(evt_msg_print, 0, STRING("irai_13_005"), 0, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         CALL(evt_win_item_select, LW(1), LW(0))
 #else
                         CALL(evt_win_item_select, 0, LW(1), LW(0), 0)
@@ -2907,7 +2907,7 @@ static NpcSetupInfo npcEnt[] = {
         0, // reactionFlags
         powerupya_init, // initEvent
         NULL, // regularEvent
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         powerupya_direct_talk, // talkEvent
 #else
         powerupya_talk, // talkEvent
@@ -3458,11 +3458,11 @@ static EVT_BEGIN(evt_door_03_close)
             CALL(evt_party_move_pos2, 0, LW(0), LW(2), 60)
             CALL(evt_party_set_dir, 0, 270, -1)
             CALL(evt_mario_set_dir, 90, 300, 0)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             CALL(evt_party_stop, 0)
 #endif
             CALL(evt_msg_print_party, STRING("mac_4_058"))
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             CALL(evt_party_run, 0)
 #endif
             CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -3470,11 +3470,11 @@ static EVT_BEGIN(evt_door_03_close)
             CALL(evt_mario_set_pose, STRING("M_I_Z"))
             WAIT_MS(1000)
             CALL(evt_mario_set_pose, STRING("M_S_1"))
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             CALL(evt_party_stop, 0)
 #endif
             CALL(evt_msg_print_party, STRING("mac_4_059"))
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             CALL(evt_party_run, 0)
 #endif
             SET_VALUE(GSWF(GSWF_GOR02_BOBBERY_DECLINE_SCENE_DONE), 1)
@@ -3488,7 +3488,7 @@ static EVT_BEGIN(evt_door_03_close)
     CALL(evt_mario_key_onoff, 0)
     WAIT_MS(500)
     CALL(evt_party_stop, 1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_party_move_pos2, 1, -36, 140, FLOAT(120.0f))
 #else
     CALL(evt_party_get_pos, 1, LW(0), LW(1), LW(2))
@@ -3499,7 +3499,7 @@ static EVT_BEGIN(evt_door_03_close)
 #endif
     CALL(evt_party_set_dir, 1, 90, -1)
     CALL(evt_mario_set_dir, 270, 200, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     WAIT_MS(500)
 #endif
     CALL(evt_msg_print, 0, STRING("mac_4_087"), 0, STRING("extparty"))
@@ -3672,7 +3672,7 @@ EVT_BEGIN(evt_door_03_roll_open)
     WAIT_MS(1000)
     CALL(evt_mario_get_pos, 0, LW(1), LW(2), LW(3))
     CALL(evt_mario_mov_pos2, 65, -55, FLOAT(120.0f))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     WAIT_MS(500)
     CALL(evt_mario_set_dir, 270, 0, 0)
     CALL(evt_mario_cancel_roll_motion)
@@ -3686,7 +3686,7 @@ EVT_BEGIN(evt_door_03_roll_open)
     IF_INT_EQUAL(GSWF(GSWF_GOR02_BOBBERY_DOOR_OPEN), 0)
         CALL(evt_npc_set_ry, STRING("サンダース"), 90)
     END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_party_set_dir, 0, 270, 0)
     CALL(evt_party_set_dispdir, 0, 0)
 #else
@@ -4292,7 +4292,7 @@ static USER_FUNC(evt_set_bgtpl) {
     if (name == NULL) {
         name = gp->currentMapName;
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     sprintf(path, "./bg/%s.tpl", name);
 #else
     sprintf(path, "./b/%s.tpl", name);
@@ -5778,14 +5778,14 @@ EVT_BEGIN(epigraphy_map)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_snd_bgmon_f, PSND_FADE_IN | PSND_FADE_OUT, STRING("BGM_STG0_GOR1"), 2000)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_GOR3"))
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     SET_VALUE(GSWF(GSWF_GOR02_FIRST_EPIGRAPHY_DONE), 1)
 #endif
 #if VERSION >= VERSION_US
     CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50) | PSND_FADE_DIP_FAST)
     CALL(evt_snd_env_lpf, 0, 800)
 #endif
-#if VERSION != VERSION_EU
+#if VERSION < VERSION_DEMO_EU
     SET_VALUE(GSWF(GSWF_GOR02_FIRST_EPIGRAPHY_DONE), 1)
 #endif
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG0_16_FRANKLYS_HOUSE)
@@ -5919,7 +5919,7 @@ EVT_BEGIN(epigraphy_map_after_stage2)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_MARIO_FALL_CRUSH1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_mario_set_pose, STRING("M_D_8"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_party_set_breed_pose, 0, 9)
 #else
     CALL(evt_party_set_breed_pose, 0, 8)
@@ -6470,7 +6470,7 @@ static EVT_BEGIN(mobj_box01)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box01"), LW(0), LW(1), LW(2))
     CALL(evt_item_entry, STRING("item01"), ITEM_DOUBLE_DIP, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_item_flag_on, STRING("item01"), ITEM_FLAG_NO_TOUCH)
 #else
     CALL(evt_item_flag_on, STRING("item01"), ITEM_FLAG_BADGE_RETURN | ITEM_FLAG_NO_TOUCH)
@@ -6493,7 +6493,7 @@ s32 stg1_list[] = {
 
 /** Chapter 2 enemies whose Tattle entries Frankly's notes can fill in (enemy ids). */
 s32 stg2_list[] = {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     29, 30, 34,
 #else
     29, 30, 33, 34,
@@ -6505,7 +6505,7 @@ s32 stg3_list[] = {
     65,
 };
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // The demo's list also asks for the Atomic Boo (76) from chapter 4 on; retail checks it on its own in monosiri_check
 s32 stg4_list[] = {
     76,
@@ -6514,7 +6514,7 @@ s32 stg4_list[] = {
 
 /** Chapter 5 enemies whose Tattle entries Frankly's notes can fill in (enemy ids). */
 s32 stg5_list[] = {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     93, 94, 99,
 #else
     93, 99,
@@ -6528,7 +6528,7 @@ s32 stg6_list[] = {
 
 /** Chapter 7 enemies whose Tattle entries Frankly's notes can fill in (enemy ids). */
 s32 stg7_list[] = {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     114, 115, 116, 117, 118, 28, 120, 119, 121,
 #else
     117, 118, 28, 120, 119, 121,
@@ -6537,7 +6537,7 @@ s32 stg7_list[] = {
 
 /** Chapter 8 enemies whose Tattle entries Frankly's notes can fill in (enemy ids). */
 s32 stg8_list[] = {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     131, 132, 133, 134, 135, 144, 146, 147,
     150,
 #else
@@ -6553,7 +6553,7 @@ s32 stg8_list[] = {
 MonosiriFollow follow[] = {
     {23, stg0_list, 1},
     {56, stg1_list, 4},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {112, stg2_list, 3},
     {164, stg3_list, 1},
     {215, stg4_list, 1},

@@ -80,7 +80,7 @@ BattleUnitKind unit_killer_cannon = {
     0.0f,
     0.0f,
     0.0f,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     0.0f,
     0.0f,
 #else
@@ -125,7 +125,7 @@ static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 /** Elemental reactions of the Bill Blaster: none, every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Bill Blaster (percent, 100 is normal) in the demo builds: immune to sleep,
  * stop, dizzy, poison, confusion and fright; resists most statuses (15-95%); is extra vulnerable to electric

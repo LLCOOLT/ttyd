@@ -289,7 +289,7 @@ EVT_BEGIN(powerdownya_mario_level_rtn)
     // Chet Rippo turns Mario away if he cannot pay 39 coins.
     CALL(evt_pouch_get_coin, LW(0))
     IF_INT_LESS(LW(0), 39)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_msg_print, 0, STRING("powerdown_04"), 0, STRING("me"))
 #else
         CALL(evt_msg_print_add, 0, STRING("powerdown_04"))

@@ -34,7 +34,7 @@ static USER_FUNC(_get_mario_hammer_lv);
 static void callback(MapTevCallbackInfo* info);
 static s32 mario_pinch_pose_sound_callback(BattleUnit* unit);
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 PoseTableEntry pose_table_mario_stay[32];
 #else
 PoseTableEntry pose_table_mario_stay[34];
@@ -711,7 +711,7 @@ EVT_BEGIN(btlataudevtMarioHammer)
         CASE_EQUAL(2)
         SET_VALUE(LW(0), STRING("M_H_5A"))
         SET_VALUE(LW(1), STRING("M_H_5B"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         SET_VALUE(LW(2), STRING("M_H_15"))
 #else
         SET_VALUE(LW(2), STRING("M_H_14"))
@@ -719,7 +719,7 @@ EVT_BEGIN(btlataudevtMarioHammer)
         CASE_EQUAL(3)
         SET_VALUE(LW(0), STRING("M_H_9A"))
         SET_VALUE(LW(1), STRING("M_H_9B"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         SET_VALUE(LW(2), STRING("M_H_14"))
 #else
         SET_VALUE(LW(2), STRING("M_H_15"))
@@ -773,7 +773,7 @@ EVT_BEGIN(btlataudevtMarioHammer)
         CALL(evt_btl_camera_set_mode, 0, 0)
         WAIT_MS(1000)
     END_SIBLING_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // He reappears at the stage edge and walks home.
     WAIT_MS(30)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_RUN)

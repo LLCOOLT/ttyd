@@ -65,7 +65,7 @@ static void mapDispMapObj_off(CameraId cam, MapObject* obj);
 
 /** Frames per second of the map animation clock. PAL keeps it at 60 even when the display runs at 50 Hz. */
 static inline s32 mapAnimFps(void) {
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     return 60;
 #else
     return gp->framerate;
@@ -449,9 +449,9 @@ static MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 i
             obj->flags |= MAPOBJ_FLAG_CHAR_SHADOW;
         }
     } else {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         OSPanic("mapdrv.c", 0x2c1, "\x83\x57\x83\x87\x83\x43\x83\x93\x83\x67\x82\xcc\x83\x66\x81\x5b\x83\x5e\x82\xcc\x8e\x77\x92\xe8\x82\xc9\x82\xa8\x82\xa9\x82\xb5\x82\xc8\x82\xe0\x82\xcc\x82\xaa\x82\xa0\x82\xe9\n");
-#elif VERSION == VERSION_EU
+#elif VERSION >= VERSION_DEMO_EU
         OSPanic("mapdrv.c", 0x2e8, "\x83\x57\x83\x87\x83\x43\x83\x93\x83\x67\x82\xcc\x83\x66\x81\x5b\x83\x5e\x82\xcc\x8e\x77\x92\xe8\x82\xc9\x82\xa8\x82\xa9\x82\xb5\x82\xc8\x82\xe0\x82\xcc\x82\xaa\x82\xa0\x82\xe9\n");
 #else
         OSPanic("mapdrv.c", 0x2e5, "\x83\x57\x83\x87\x83\x43\x83\x93\x83\x67\x82\xcc\x83\x66\x81\x5b\x83\x5e\x82\xcc\x8e\x77\x92\xe8\x82\xc9\x82\xa8\x82\xa9\x82\xb5\x82\xc8\x82\xe0\x82\xcc\x82\xaa\x82\xa0\x82\xe9\n");
@@ -907,7 +907,7 @@ found:
 }
 
 // The demo keeps the full file names under ./map/<name>/.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #define MAP_PATH_DAT "./map/%s/map.dat"
 #define MAP_PATH_TPL "./map/%s/texture.tpl"
 #define MAP_PATH_CAMROAD "./map/%s/camera_road.bin"
@@ -1161,7 +1161,7 @@ void mapUnLoad(void) {
     memset(wp, 0, sizeof(MapWork));
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * The demo reads each map's LZ77-compressed archive "<root>/b/<map>" itself:
  * mapPreLoad starts the read, mapLoad unpacks it into the arc slot before loading the map.
@@ -1248,7 +1248,7 @@ void mapLoad(const char* map) {
  * then copies the field map's files back from ARAM and rebuilds its display lists so the field can resume.
  */
 void bmapUnLoad(void) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     MapWork* wp2;
     MapEntry* entry3;
     int j;
@@ -1315,7 +1315,7 @@ void bmapUnLoad(void) {
     arcDelete(1);
     arcDelete(2);
     memset(wp, 0, sizeof(MapWork));
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     j = 0;
     // FAKE: a dead guard between j = 0 and the mapWork load keeps the target's li-before-lwz order (docs/FAKES.md).
     {
@@ -1375,7 +1375,7 @@ void bmapUnLoad(void) {
 #pragma opt_common_subs reset
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo only: starts the async read of the battle map archives arc_d/<map>.arc;
  * TRUE once both requested files are available.
@@ -1403,14 +1403,14 @@ BOOL bmapPreLoad(const char* map, const char* map2) {
  * the stage-specific map map2 as entry 1. The demo reads and unpacks both archives itself.
  */
 void bmapLoad(const char* map, const char* map2) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     char path[256];
 #endif
     MapWork* wp;
     MapEntry* entry;
     MapEntry* e;
     int i;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     FileEntry* file;
     u32 size;
     void* arc;
@@ -1455,7 +1455,7 @@ void bmapLoad(const char* map, const char* map2) {
     wp = (0, &mapWork[1]); // FAKE: the comma expression keeps the target register order for wp
     activeGroup = 1;
     memset(wp, 0, sizeof(MapWork));
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the demo reads the battle map archives itself
     if (map != NULL) {
         sprintf(path, "%s/b/%s", getMarioStDvdRoot(), map);
@@ -1905,7 +1905,7 @@ void mapMain(void) {
     f32 v[9];
     f32 cv[5];
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     for (i = 0; i < wp->entries[0].count; i++) {
         entry = &wp->entries[i];
 #else
@@ -1940,7 +1940,7 @@ void mapMain(void) {
             if (!(anim->flags & MAP_ANIM_FLAG_PAUSED)) {
                 ms = OSTicksToMilliseconds(t);
                 // written out: mapAnimFps() here swaps the fmuls operands
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 cur = 60.0f * (f32)(u64)(ms - anim->startTime) / 1000.0f;
 #else
                 cur = gp->framerate * (f32)(u64)(ms - anim->startTime) / 1000.0f;
@@ -3983,7 +3983,7 @@ void mapObjFlagOn(const char* name, u32 flags) {
         error_count %= 32;
         return;
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     obj->flags |= flags;
 #else
     if (!(flags & MAPOBJ_FLAG_DISPLAY_LIST) || obj->displayListSize[0]) {
@@ -4012,7 +4012,7 @@ void mapObjFlagOff(const char* name, u32 flags) {
  * retail versions skip the display-list flag on objects without a display list.
  */
 static void mapFlgOn(MapObject* obj, u32 flags, BOOL doNext) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     obj->flags |= flags;
 #else
     if (!(flags & MAPOBJ_FLAG_DISPLAY_LIST) || obj->displayListSize[0]) {
@@ -4577,7 +4577,7 @@ static void mapStrippedPool(const char** str, f32* val) {
     val[1] = 0.0f;
     val[2] = 0.5f;
     val[3] = 2.0f;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     str[1] = "%s/map/%s/map.dat";
 #else
     str[1] = "%s/m/%s/d";

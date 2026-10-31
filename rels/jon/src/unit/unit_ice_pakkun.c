@@ -111,7 +111,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Element response of the Frost Piranha: it takes extra damage from fire and is healed by ice. */
 static BattleUnitDefenseAttr defence_attr = {{0, 1, 3, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Status vulnerability of the Frost Piranha (percent, 0 is immune): immune to freeze. Demo values. */
 static StatusVulnerability regist = {80, 80, 60, 100, 75, 100, 100, 0, 100, 70, 100, 70, 100, 70, 70, 20, 30, 100, 70, 100, 100, 95};
 #else

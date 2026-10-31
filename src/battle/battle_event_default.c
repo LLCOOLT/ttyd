@@ -645,7 +645,7 @@ EVT_END()
 
 /** Action that ends a tutorial battle turn: runs the lecture unit's data-table event 70 (69 in the demos). */
 EVT_BEGIN(btldefaultevt_LectureEnd)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_LECTURE, 69)
 #else
     CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_LECTURE, 70)
@@ -965,7 +965,7 @@ EVT_BEGIN(btldefaultevt_SuitoruBadgeEffect)
     IF_INT_GREATER_OR_EQUAL(LW(5), 1)
         BEGIN_SIBLING_EVENT
             CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(4))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(btlevtcmd_GetPartsPos, BTL_UNIT_SELF, LW(4), LW(0), LW(1), LW(2))
             ADD(LW(1), 50)
             CALL(evt_eff, STRING(""), STRING("recovery"), 0, LW(0), LW(1), LW(2), LW(5), 0, 0, 0, 0, 0, 0, 0)
@@ -985,7 +985,7 @@ EVT_BEGIN(btldefaultevt_SuitoruBadgeEffect)
     CALL(_get_flower_suitoru_point, BTL_UNIT_SELF, LW(5))
     IF_INT_GREATER_OR_EQUAL(LW(5), 1)
         BEGIN_SIBLING_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(4))
             CALL(btlevtcmd_GetPartsPos, BTL_UNIT_SELF, LW(4), LW(0), LW(1), LW(2))
             ADD(LW(1), 50)

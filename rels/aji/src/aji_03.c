@@ -67,7 +67,7 @@ extern EvtWord badge_evt3[];
  * the open and close scripts apply the same transform. The demo builds use -0.2217.
  */
 static EVT_BEGIN(e_door_close)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
 #else
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.25f))
@@ -84,7 +84,7 @@ EVT_END()
  * the open and close scripts apply the same transform. The demo builds use -0.2217.
  */
 static EVT_BEGIN(e_door_open)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
 #else
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.25f))
@@ -995,7 +995,7 @@ static EVT_BEGIN(evt_haguruma)
         CALL(evt_mario_key_onoff, 1)
         RETURN
     END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_win_item_select, PTR(haguruma_tbl), LW(0))
 #else
     CALL(evt_win_item_select, 0, PTR(haguruma_tbl), LW(0), 0)
@@ -1238,7 +1238,7 @@ static void icon_disp(CameraId camera, void* param) {
         PSMTXRotRad(rot, 'z', 0.0f);
         PSMTXConcat(trans, scale, trans);
         PSMTXConcat(trans, rot, trans);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         iconDispGx2(trans, 0x4, ICON_163);
 #else
         iconDispGx2(trans, 0x10, ICON_163);
@@ -1246,7 +1246,7 @@ static void icon_disp(CameraId camera, void* param) {
         PSMTXTrans(trans, event->userdata[1], event->userdata[2], 0.0f);
         PSMTXScale(scale, 1.5f, 1.5f, 1.5f);
         PSMTXConcat(trans, scale, trans);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         iconDispGx2(trans, 0x4, ICON_064);
 #else
         iconDispGx2(trans, 0x10, ICON_064);
@@ -1257,7 +1257,7 @@ static void icon_disp(CameraId camera, void* param) {
         PSMTXRotRad(rot, 'z', 4.712389f);
         PSMTXConcat(trans, scale, trans);
         PSMTXConcat(trans, rot, trans);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         iconDispGx2(trans, 0x4, ICON_163);
 #else
         iconDispGx2(trans, 0x10, ICON_163);
@@ -1265,7 +1265,7 @@ static void icon_disp(CameraId camera, void* param) {
         PSMTXTrans(trans, event->userdata[1], event->userdata[2], 0.0f);
         PSMTXScale(scale, 1.5f, 1.5f, 1.5f);
         PSMTXConcat(trans, scale, trans);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         iconDispGx2(trans, 0x4, ICON_066);
 #else
         iconDispGx2(trans, 0x10, ICON_066);

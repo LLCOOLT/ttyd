@@ -41,7 +41,7 @@ BattleUnitKind unit_yamitogedaruma = {
     0,
     1,
     1,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     40,
     0,
     1,
@@ -117,7 +117,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 /** Damage reduction while flipped on its back: none, so it takes full damage. */
 static BattleUnitDefense defence_turn = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerabilities of the Dark Bristle (percent chance per status;
  * the newer releases tweak a few values).
@@ -216,7 +216,7 @@ static BattleWeapon weapon_togedaruma_attack = {
     1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
 #else
     {8, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork

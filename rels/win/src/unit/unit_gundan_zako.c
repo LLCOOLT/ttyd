@@ -86,7 +86,7 @@ static BattleUnitDefense defence = {0};
 /** Element attributes of the X-Naut: none, so every element does its normal damage. */
 static BattleUnitDefenseAttr defence_attr = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the X-Naut in the demo builds, as a percent of the normal chance of each status:
  * 80% for sleep, dizzy, freeze, Defense Down, allergy, Slow; 85% for Tiny, Attack Down; 90% for stop,

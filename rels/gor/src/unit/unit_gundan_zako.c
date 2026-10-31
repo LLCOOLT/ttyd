@@ -84,7 +84,7 @@ static BattleUnitDefense defence = {0};
 /** Defence attributes of the X-Naut's body: none, so every damage type is dealt normally. */
 static BattleUnitDefenseAttr defence_attr = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the X-Naut in the demo, as a percent of the normal chance:
  * sleep 80%, stop 90%, freeze 80%, instant kill 95% (and 8 other statuses lowered).

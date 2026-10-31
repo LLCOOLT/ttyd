@@ -45,7 +45,7 @@ void marioGetStick(f32* dir, f32* mag);
 
 RubWork rubwork;
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * The demo has no respawn position in MarioWork:
  * falling out of eki_04, gon_10 or muj_00 puts Mario at a fixed spot for that map,
@@ -446,7 +446,7 @@ void marioUpdateKeyData(void) {
     mario->buttonRepeat = gp->buttonRepeat[0] & mask;
     mario->buttonUp = gp->buttonUp[0] & mask;
     // The demo has no CTRL_OFF_2 lock (and keeps its input lock bits elsewhere, see MarioTrigFlags).
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (!(mario->flags & (MARIO_FLAG_CTRL_OFF | MARIO_FLAG_KEY_OFF))) {
 #else
     if (!(mario->flags & (MARIO_FLAG_CTRL_OFF | MARIO_FLAG_CTRL_OFF_2 | MARIO_FLAG_KEY_OFF))) {
@@ -468,7 +468,7 @@ void marioUpdateKeyData(void) {
             mario->analogB = 0;
         }
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if ((mario->flags & (MARIO_FLAG_CTRL_OFF | MARIO_FLAG_KEY_OFF)) || !marioChkKey()) {
 #else
     if ((mario->flags & (MARIO_FLAG_CTRL_OFF | MARIO_FLAG_CTRL_OFF_2 | MARIO_FLAG_KEY_OFF)) || !marioChkKey()) {

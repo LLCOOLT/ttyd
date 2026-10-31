@@ -41,7 +41,7 @@
 #include "version.h"
 
 // first-strike announce: frames to slide in/out, and the frame the slide out starts
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #define ANNOUNCE_SLIDE 30
 #define ANNOUNCE_HOLD_END 150
 #else
@@ -49,7 +49,7 @@
 #define ANNOUNCE_HOLD_END 80
 #endif
 // radius of the hammer hit spheres, how far an NPC pushes Mario per frame, Merlee effect height above Mario
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #define NPC_HAMMER_HIT_RADIUS 10.0f
 #define MARIO_PUSH_STEP 1.0f
 #define MAJINAI_EFFECT_OFS_Y 4.0f
@@ -662,7 +662,7 @@ s32 npcEntry(const char* name, const char* animName) {
     entry->scale = (Vec){1.0f, 1.0f, 1.0f};
     entry->shadowScale = 1.0f;
     entry->moveAnimState = 0;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     entry->checkPose = "M_I_3";
 #else
     entry->checkPose = "M_I_2";
@@ -1487,7 +1487,7 @@ static BOOL npcCheckHitMarioSide(NpcEntry* npc) {
     mario->position.x += dx;
     mario->position.z += dz;
     dz = mario->wPlayerCollisionBox.y;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     marioChkWallAround(&mario->position, 0.0f, 160.0f + angle, 20.0f, dz);
 #else
     marioChkWallAround(&mario->position, 0, 0.0f, 160.0f + angle, 20.0f, dz);
@@ -2181,7 +2181,7 @@ void fbatEncountCheck(void) {
     data = gp->fbatData;
     if (data->mode == 1) {
         u32* hitKind = (u32*)&data->hitKind;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         npc = fbatHitCheck(FBAT_CHECK_QUERY | FBAT_CHECK_SHELL | FBAT_CHECK_HAMMER | FBAT_CHECK_JUMP | FBAT_CHECK_LIVE_ATTACK, hitKind); // no 0x200 check in the demo
 #else
         npc = fbatHitCheck(FBAT_CHECK_QUERY | FBAT_CHECK_BOMB | FBAT_CHECK_SHELL | FBAT_CHECK_HAMMER | FBAT_CHECK_JUMP | FBAT_CHECK_LIVE_ATTACK, hitKind);
@@ -2278,7 +2278,7 @@ void marioChgMoveMotion(void);
 // The do-while keeps the deleted arm from leaving branches behind.
 static inline void fbatRecoverItems(NpcEntry* npc) {
     NpcBattleInfo* b = &npc->battleInfo;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     s32 i;
     s32 z;
 #else
@@ -2298,7 +2298,7 @@ static inline void fbatRecoverItems(NpcEntry* npc) {
             if (item) {
                 itemFlagOn(item, ITEM_FLAG_BADGE_RETURN);
             }
-#elif VERSION <= VERSION_DEMO_US
+#elif VERSION <= VERSION_DEMO_JP
             itemEntry(npc->position.x, npc->position.y, npc->position.z, NULL, b->recoveredItems[i], ITEM_ENTRY_LAUNCH_5S, -1, 0);
 #else
             itemFlagOn(itemEntry(npc->position.x, npc->position.y, npc->position.z, NULL, b->recoveredItems[i], ITEM_ENTRY_DROP_20S, -1,
@@ -2342,7 +2342,7 @@ void fbatBattleMode(void) {
     pouch = pouchGetPtr();
     mario = marioGetPtr();
     cur->rotation.y = 0.0f;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if ((u32)data->hitKind == FBAT_HIT_ENEMY_FIRST) {
         marioChgPose("M_D_1");
     }
@@ -2372,7 +2372,7 @@ void fbatBattleMode(void) {
                 data->mode = 1;
                 break;
             }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             data->target->interruptFlags = 0;
 #else
             data->target->interruptFlags &= NPC_INTERRUPT_KEEP_MASK;
@@ -2438,7 +2438,7 @@ void fbatBattleMode(void) {
                     BattleMajinaiDone();
                     marioKeyOff();
                     wp = npcGetWorkPtrInline();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     result = wp->total;
                     for (num = 0, cur = wp->entries; num < result; num++, cur++) {
 #else
@@ -2464,7 +2464,7 @@ void fbatBattleMode(void) {
                 data->merleeEvtId = 0;
                 data->subState = 4;
                 wp = npcGetWorkPtrInline();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 result = wp->total;
                 for (num = 0, cur = wp->entries; num < result; num++, cur++) {
 #else
@@ -2484,7 +2484,7 @@ void fbatBattleMode(void) {
             marioChgMoveMotion();
             if (!gp->inBattle) {
                 FieldBattleInfo* info4;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 s32 stolen;
 #endif
                 info4 = &data->info;
@@ -2753,7 +2753,7 @@ static inline void npcKaitenHammerPos(f32 angle, f32 r, f32* x, f32* y, f32* z) 
     f32 s, c;
 
     sincosf(&s, &c, angle);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     *x = mario->position.x + s * (s * r);
     *z = s * (c * r) + mario->position.z;
     *y = r * c + mario->position.y;
@@ -2966,7 +2966,7 @@ NpcEntry* fbatHitCheck(u32 flags, void* unused) {
             if (!fbat_canHit(npc))
                 break;
             if (flags & FBAT_CHECK_LIVE_ATTACK) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 f32 reach, swingAngle;
 #else
                 f32 swingAngle, reach;
@@ -3184,7 +3184,7 @@ BOOL npcCheckInterrupt(NpcEntry* npc) {
 
     evtGetPtrID(npc->regularEvtId);
     flags = npc->interruptFlags;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the demo has no 0x100..0x800 interrupt bits to keep
     if (flags) {
 #else
@@ -3226,7 +3226,7 @@ BOOL npcCheckInterrupt(NpcEntry* npc) {
         if (evt) {
             evtDeleteID(npc->regularEvtId);
             npc->regularEvtId = evt->eventId;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             npc->interruptFlags = 0;
 #else
             npc->interruptFlags &= NPC_INTERRUPT_KEEP_MASK;
@@ -3237,7 +3237,7 @@ BOOL npcCheckInterrupt(NpcEntry* npc) {
             return TRUE;
         }
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     npc->interruptFlags = 0;
 #else
     npc->interruptFlags &= NPC_INTERRUPT_KEEP_MASK;
@@ -3705,7 +3705,7 @@ void npcGetBackItemEntry(NpcEntry* npc) {
             if (item) {
                 itemFlagOn(item, ITEM_FLAG_BADGE_RETURN);
             }
-#elif VERSION <= VERSION_DEMO_US
+#elif VERSION <= VERSION_DEMO_JP
             itemEntry(npc->position.x, npc->position.y, npc->position.z, NULL, info->recoveredItems[i], ITEM_ENTRY_LAUNCH_5S, -1, 0);
 #else
                 itemFlagOn(itemEntry(npc->position.x, npc->position.y, npc->position.z, NULL, info->recoveredItems[i],

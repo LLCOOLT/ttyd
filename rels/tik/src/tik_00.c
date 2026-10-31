@@ -299,7 +299,7 @@ EVT_BEGIN(uranaisi_next_evt)
             CALL(evt_msg_print, 0, LW(1), 0, STRING("me"))
         ELSE
             IF_INT_EQUAL(LW(0), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_unitwin_alloc)
             CALL(unitwincoin_disp_onoff, 1)
 #else
@@ -310,20 +310,20 @@ EVT_BEGIN(uranaisi_next_evt)
                 CALL(evt_msg_print_add_insert, 1, STRING("げんざいの　イベントばんごうは\n『%s』\nです\n<key>"), LW(1))
                 CALL(uranaisi_ryokin, 0, LW(2))
                 CALL(evt_pouch_add_coin, LW(2))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(unitwincoin_wait)
 #else
                 CALL(evt_win_coin_wait, LW(12))
 #endif
                 WAIT_MS(200)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(unitwincoin_disp_onoff, 0)
             CALL(evt_unitwin_free)
 #else
                 CALL(evt_win_coin_off, LW(12))
 #endif
             ELSE
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_unitwin_alloc)
             CALL(unitwincoin_disp_onoff, 1)
 #else
@@ -341,13 +341,13 @@ EVT_BEGIN(uranaisi_next_evt)
                 CALL(evt_msg_print_add_insert, 1, STRING("いじょう　%dこが\nじゅうふくしている　メッセージです\n<key>"), LW(3))
                 CALL(uranaisi_ryokin, 0, LW(2))
                 CALL(evt_pouch_add_coin, LW(2))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(unitwincoin_wait)
 #else
                 CALL(evt_win_coin_wait, LW(12))
 #endif
                 WAIT_MS(200)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(unitwincoin_disp_onoff, 0)
             CALL(evt_unitwin_free)
 #else
@@ -380,7 +380,7 @@ EVT_BEGIN(uranaisi_starpiece_evt)
     CALL(uranaisi_data_alloc, 1, STRING("un_starpiece"))
     CALL(uranaisi_starpiece_check, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_unitwin_alloc)
         CALL(unitwincoin_disp_onoff, 1)
 #else
@@ -389,13 +389,13 @@ EVT_BEGIN(uranaisi_starpiece_evt)
         CALL(evt_msg_print, 0, STRING("uranaisi_14"), 0, STRING("me"))
         CALL(uranaisi_ryokin, 1, LW(2))
         CALL(evt_pouch_add_coin, LW(2))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(unitwincoin_wait)
 #else
         CALL(evt_win_coin_wait, LW(12))
 #endif
         WAIT_MS(200)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(unitwincoin_disp_onoff, 0)
         CALL(evt_unitwin_free)
 #else
@@ -420,7 +420,7 @@ EVT_BEGIN(uranaisi_supercoin_evt)
     CALL(uranaisi_data_alloc, 2, STRING("un_supercoin"))
     CALL(uranaisi_supercoin_check, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_unitwin_alloc)
         CALL(unitwincoin_disp_onoff, 1)
 #else
@@ -429,13 +429,13 @@ EVT_BEGIN(uranaisi_supercoin_evt)
         CALL(evt_msg_print, 0, STRING("uranaisi_16"), 0, STRING("me"))
         CALL(uranaisi_ryokin, 2, LW(2))
         CALL(evt_pouch_add_coin, LW(2))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(unitwincoin_wait)
 #else
         CALL(evt_win_coin_wait, LW(12))
 #endif
         WAIT_MS(200)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(unitwincoin_disp_onoff, 0)
         CALL(evt_unitwin_free)
 #else
@@ -1192,7 +1192,7 @@ EVT_BEGIN(uranaisi_table_talk)
         // A menu lists the three readings with their prices (My Next Path, Star Pieces, Shine Sprites);
         // cancelling ends the talk.
         SET_VALUE(GSWF(GSWF_TIK00_MERLUVLEE_SESSION), 1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_unitwin_alloc)
     CALL(unitwincoin_disp_onoff, 1)
 #else
@@ -1203,7 +1203,7 @@ EVT_BEGIN(uranaisi_table_talk)
         CALL(evt_msg_select, 1, LW(1))
         CALL(evt_uranaisi_msg_free)
         IF_INT_EQUAL(LW(0), 4)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(unitwincoin_disp_onoff, 0)
         CALL(evt_unitwin_free)
 #else
@@ -1217,7 +1217,7 @@ EVT_BEGIN(uranaisi_table_talk)
         CALL(evt_pouch_get_coin, LW(1))
         IF_INT_LESS(LW(1), LW(2))
             CALL(evt_msg_print_add, 0, STRING("uranaisi_07"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(unitwincoin_disp_onoff, 0)
         CALL(evt_unitwin_free)
 #else
@@ -1236,13 +1236,13 @@ EVT_BEGIN(uranaisi_table_talk)
         END_SWITCH
         MULTIPLY(LW(2), -1)
         CALL(evt_pouch_add_coin, LW(2))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(unitwincoin_wait)
 #else
         CALL(evt_win_coin_wait, LW(12))
 #endif
         WAIT_MS(200)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(unitwincoin_disp_onoff, 0)
     CALL(evt_unitwin_free)
 #else
@@ -1372,7 +1372,7 @@ EVT_BEGIN(starmaniac_talk)
     END_IF
     // Dazzle names the badge and the Star Piece price (and the BP it needs) and asks for confirmation;
     // declining returns to the list.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_msg_print_insert, 0, STRING("starmaniac_09"), 0, STRING("me"), LW(2), LW(3), LW(4))
 #elif VERSION == VERSION_JP
     CALL(evt_sub_get_language, LW(0))
@@ -1758,7 +1758,7 @@ static NpcSetupInfo npcEnt[] = {
         "星マニア", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         npc_init_evt, // initEvent
 #else
         starmaniac_init, // initEvent
@@ -2449,7 +2449,7 @@ EVT_END()
  */
 EVT_BEGIN(evt_open_04_open)
     // The releases add a third state from the return to Rogueport (STG9_02) on, so the demos' IF/ELSE became a SWITCH
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_26_THE_HIDEOUT_EXPLODES)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("ie_4_1"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("ie_4_2"), MAPOBJ_FLAG_HIDE)
@@ -2730,7 +2730,7 @@ EVT_END()
  */
 EVT_BEGIN(tensou_init_event)
     SET_VALUE(GW(10), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_26_THE_HIDEOUT_EXPLODES)
         CALL(evt_map_playanim, STRING("anm_PC"), 1, 0)
         CALL(evt_map_playanim, STRING("anm_Terop"), 1, 0)
@@ -3182,7 +3182,7 @@ static EVT_BEGIN(mobj_box01)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box01"), LW(0), LW(1), LW(2))
     CALL(evt_item_entry, STRING("item01"), ITEM_SOFT_STOMP, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_item_flag_on, STRING("item01"), ITEM_FLAG_NO_TOUCH)
 #else
     CALL(evt_item_flag_on, STRING("item01"), ITEM_FLAG_BADGE_RETURN | ITEM_FLAG_NO_TOUCH)

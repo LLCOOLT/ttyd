@@ -20,7 +20,7 @@ static BattleDataEntry data_table_clauda[2];
 static BattleUnitKindPart parts_clauda[1];
 static EvtWord init_event_clauda[50];
 extern EvtWord damage_event_clauda[];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord dead_event_clauda[156];
 #else
 static EvtWord dead_event_clauda[177];
@@ -145,7 +145,7 @@ static BattleUnitDefense defence_clauda = {{0, 0, 0, 0, 0}};
 /** Defence attributes of the Flurrie double's body: none, so every damage type is dealt normally. */
 static BattleUnitDefenseAttr defence_attr_clauda = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Flurrie double in the demo, as a percent of the normal chance:
  * immune to fright, gale force, instant kill;

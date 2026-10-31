@@ -96,7 +96,7 @@ static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 /** Elemental reactions of the Bullet Bill: none, every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Bullet Bill (percent, 100 is normal) in the demo builds: immune to sleep, stop,
  * poison and fright; resists most statuses (50-95%); is extra vulnerable to electric (150%).

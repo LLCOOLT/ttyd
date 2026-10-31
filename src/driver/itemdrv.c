@@ -92,7 +92,7 @@ WinMgrDesc itemdrv_window_desc[4] = {
 // A macro: the symbol map has no itemGetWork function.
 #define itemGetWork() (gp->inBattle ? &work[1] : &work[0])
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * The demo puts a removed badge item on sale at the badge shop (pouchArriveBadge, the bargain table)
  * when its ITEM_FLAG_BADGE_RETURN bit (0x100) is clear, in or out of battle.
@@ -229,7 +229,7 @@ void itemCoinDrop(Vec* position) {
  * taking damage or holding Koops's item, no other get is in progress, and field battle state allows it.
  */
 static BOOL itemGetCheck(ItemEntry* entry) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the demo has no N_fbatPreventMarioEventChk: only field battle modes 0 and 1 allow pick-ups
     s32 fbatMode = fbatGetPointer()->mode;
 #endif
@@ -239,7 +239,7 @@ static BOOL itemGetCheck(ItemEntry* entry) {
         return FALSE;
     if (entry->status & ITEM_STATUS_IN_WATER)
         return FALSE;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (marioStGetSystemLevel() != 0U)
         return FALSE;
     if (mario->flags & (MARIO_FLAG_CTRL_OFF | MARIO_FLAG_KEY_OFF))
@@ -285,7 +285,7 @@ static BOOL itemGetCheck(ItemEntry* entry) {
             }
         }
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (fbatMode != 0 && fbatMode != 1)
         return FALSE;
 #else
@@ -316,7 +316,7 @@ static BOOL itemGetCheck(ItemEntry* entry) {
 
 /** Like itemGetCheck for an item fetched by Koops's shell: whether the item may be collected for Mario now. */
 static BOOL itemGetNokoCheck(ItemEntry* entry) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     s32 fbatMode = fbatGetPointer()->mode;
 #endif
     MarioWork* mario = marioGetPtr();
@@ -355,7 +355,7 @@ static BOOL itemGetNokoCheck(ItemEntry* entry) {
             }
         }
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (fbatMode != 0 && fbatMode != 1)
         return FALSE;
     return TRUE;
@@ -472,7 +472,7 @@ void itemMain(void) {
                             hitDist = 20.0 + d;
                         }
                         hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, px, py, pz, 0.0f, -1.0f, 0.0f);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         hit = hit ? hit : NULL;
 #else
                         if (hit) {
@@ -509,7 +509,7 @@ void itemMain(void) {
                 }
                 break;
             case 9:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 itemCheckBadge(entry);
 #endif
                 itemDelete(entry->name);
@@ -955,7 +955,7 @@ ItemEntry* itemNearDistCheck(f32 x, f32 y, f32 z, f32 range) {
     for (; i < wp->count; i++, entry++) {
         if (!(entry->flags & ITEM_FLAG_USED))
             continue;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         if (entry->flags & ITEM_FLAG_NO_TOUCH)
             continue;
         if (entry->status & ITEM_STATUS_PARTY_HOLD)
@@ -1127,7 +1127,7 @@ static void winHelpDisp(WinMgrEntry* win) {
     }
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** the demo has no badge-full message */
 static void winFullDisp(WinMgrEntry* win) {
     ItemEntry* entry;
@@ -1177,7 +1177,7 @@ static void winFullDisp(WinMgrEntry* win) {
 }
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * The demo's item-get sequence: no retail sub-states 2 (control off) and 8 (motion abort),
  * so retail 3-7 and 9 are 2-7 here; no badge flag bookkeeping, no item renaming after a swap,

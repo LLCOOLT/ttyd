@@ -96,7 +96,7 @@ static BeroEntry bero_entry_data[] = {
 EVT_BEGIN(evt_hikou_nobiru_init)
     CALL(evt_hit_bind_mapobj, STRING("a_dai"), STRING("hikou"))
     CALL(evt_hit_bind_mapobj, STRING("a_hi"), STRING("hikou"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_hit_bind_mapobj, STRING("A_dokan1"), STRING("S_dokan_ha"))
 #else
     CALL(evt_hit_bind_mapobj, STRING("A_dokan1"), STRING("S_dokan2"))
@@ -144,7 +144,7 @@ EVT_BEGIN(evt_hikou_nobiru)
     CALL(evt_cam3d_evt_set, -307, 393, 533, -307, 297, -7, 3000, 0)
     CALL(evt_hit_bind_mapobj, STRING("a_dai"), STRING("hikou"))
     CALL(evt_hit_bind_mapobj, STRING("a_hi"), STRING("hikou"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_hit_bind_mapobj, STRING("A_dokan1"), STRING("S_dokan_ha"))
 #else
     CALL(evt_hit_bind_mapobj, STRING("A_dokan1"), STRING("S_dokan2"))

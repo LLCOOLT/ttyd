@@ -31,7 +31,7 @@ typedef void (*BtlDispTexPlaneFloatsFirstFn)(f32 tX, f32 tY, f32 tZ, f32 sX, f32
 #include "evt/evt_snd.h"
 
 #include "unit/party/unit_party_yoshi.h"
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static void _btlYoshiDisp(CameraId camera, YoshiGundanWork* w);
 #else
 static void _btlYoshiDisp(CameraId camera, YoshiGundanPart* p);
@@ -96,7 +96,7 @@ static EvtWord wait_event[6];
 u8 _yoshig_tpl_no_tbl[8] __attribute__((aligned(4)));
 
 // The demo defines regist first and data_table after the egg pose tables.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Yoshi's status chances: 100 for every status (badges lower them in battle). */
 static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 #endif
@@ -187,7 +187,7 @@ PoseTableEntry pose_table_egg_p[] = {
     {BTL_POSE_STAY_DEFAULT, "CHU_C_3"},
 };
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Yoshi's data events: Appeal, the audience attack reaction, his move list (tag 1, __makeTechMenuFunc), First
  * Strike (nothing), the victory pose, an empty step run after a move's cost is paid (7) and the spin when he
@@ -337,7 +337,7 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 /** The demo defines wait_event here; retail defines it near the end of the file. */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -600,7 +600,7 @@ BattleWeapon partyWeapon_YoshiNomikomi_Involved = {
     NULL, // fpDamageFn
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
 #else
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_RECOIL | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
@@ -1822,7 +1822,7 @@ EVT_BEGIN(partyYoshiAttack_CallGuard)
         SET_VALUE(LW(1), 14)
         SET_VALUE(LW(2), 30)
     END_SWITCH
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(btlevtcmd_AcSetParamAll, 15, LW(0), 178, LW(1), LW(2), 17, 18, EVT_NULLPTR)
 #else
     CALL(btlevtcmd_AcSetParamAll, 15, LW(0), 178, LW(1), LW(2), 20, 61, EVT_NULLPTR)
@@ -1842,7 +1842,7 @@ EVT_BEGIN(partyYoshiAttack_CallGuard)
     CALL(btlevtcmd_StartAC, 1)
     CALL(btlevtcmd_ResultAC)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PYS_A_11"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // The demo puts the effect at Yoshi's feet and plays no sound.
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
@@ -2533,7 +2533,7 @@ static USER_FUNC(_gundan_yoshi_run_effect) {
                     f32 sc;
                     p = &w->parts[irand(256)];
                     sc = 1.0f + 0.05f * (f32)irand(20);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     effKemuTestEntry(0, p->x, 5.0f + p->y + (f32)irand(10), p->z, sc);
 #else
                     effKemuTestEntry(0, p->x, 5.0f + p->y + (f32)irand(15), 65.0f, sc);
@@ -2554,7 +2554,7 @@ static USER_FUNC(_gundan_yoshi_run_effect) {
                 unit->countersetWeapon = NULL;
                 return EVT_RETURN_DONE;
         }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         // The demo draws every Yoshi from one display callback.
         dispEntry(CAMERA_3D, 0.0f, 2, (DispCallback)_btlYoshiDisp, w);
 #else
@@ -2570,7 +2570,7 @@ static USER_FUNC(_gundan_yoshi_run_effect) {
  * animated from _yoshig_tpl_no_tbl and flipped by run direction.
  * The US demo draws all 256 in one call; later releases register one call per Yoshi.
  */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static void _btlYoshiDisp(CameraId camera, YoshiGundanWork* w) {
     YoshiGundanPart* p;
     s32 i;

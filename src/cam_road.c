@@ -106,7 +106,7 @@ s32 camRoadSetup(const char* name) {
     }
     return 1;
 }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // FAKE: the demo copy of the stand-in for the stripped camRoadDraw strings (see the note above the retail copy)
 /** The demo pools the two strings ahead of camRoadSetup's, so the stand-in follows camRoadSetup. */
 static void camRoadStrippedReport(const char* p, s32 a, s32 b) {

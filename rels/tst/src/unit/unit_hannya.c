@@ -101,7 +101,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Element reactions of Spania: none, every element hits normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of Spania (the demos), as the percent chance a status takes hold:
  * immune to Dodgy and Invisible; always hit by Stop, Poison, Electric, Burn, Huge, Attack Up, Defense Up,

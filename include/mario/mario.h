@@ -156,7 +156,7 @@ typedef enum MarioTrigFlags {
     MARIO_TRIG_FLAG_JABARA_CHK = (1 << 20),
     MARIO_TRIG_FLAG_JABARA_MOVE_CHK = (1 << 21),
     MARIO_TRIG_FLAG_START_JABARA_SPIN = (1 << 22),
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // The demo keeps the ship/plane event flag and the input locks (mario_sbr.c marioUpdateKeyData) elsewhere.
     MARIO_TRIG_FLAG_SHIP_PLANE_EVT_ON = (1 << 24), // the demo also sets it on landing (marioChkGnd)
     MARIO_TRIG_FLAG_DISABLE_UNUSED_INPUT = (1 << 28),
@@ -194,7 +194,7 @@ typedef struct MarioMotSlit { // mot_slit.c (paper slit / side-step)
     s32 counter;              // 0x04
     f32 pushDir;              // 0x08, 0 or 180: slide direction relative to targetYaw while pushing a 0x2000 wall
     f32 lastY;                // 0x0C, position.y last frame
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     s16 reserved_10; // 0x10, demo: mot_slit's second timer, accessed as MarioWork.slitTimer2
     s16 resumeState; // 0x12, demo: state motSlitContinue2 returns to
 #else
@@ -360,7 +360,7 @@ typedef struct MarioWork {
     s8 hammerChargeTimer;      // 0x41, mot_hammer charge frames (capped at 20)
     s8 hammerChargeLv;         // 0x42, mot_hammer charge stage (3 = full)
     s8 hammerDir;              // 0x43, mot_hammer swing side (0/1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     union {
         s32 currSubMotionId; // 0x44
         s32 slitState;       // 0x44, demo: mot_slit's state machine runs on the sub-motion id
@@ -526,7 +526,7 @@ typedef struct MarioWork {
             u8 pad_stay[0x10];  // motion work up to mot_stay's counters
             MarioStayWork stay; // 0x2B0 JP: mot_stay's counters, inside the motion work
         };
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         struct {
             u8 pad_slit[0x10]; // mot.slit up to its second timer
             s16 slitTimer2;    // demo: mot_slit's second timer, inside the motion work

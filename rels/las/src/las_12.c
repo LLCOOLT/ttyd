@@ -114,7 +114,7 @@ EVT_BEGIN(kabenuke_check_evt)
     IF_INT_LESS(LW(0), 0)
         GOTO(0)
     END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
 #endif
@@ -124,7 +124,7 @@ EVT_BEGIN(kabenuke_check_evt)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     SET_VALUE(GSWF(GSWF_LAS12_WALL_PASSED), 1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_cam_letter_box_disable, 0)
 #endif

@@ -32,7 +32,7 @@ static EvtWord dmg_fall_event[189];
 static EvtWord patapata_dmg_first_attack_pos[19];
 static EvtWord attack_event_patapata[541];
 static PoseTableEntry pose_table[18];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static PoseTableEntry pose_table_turn[15];
 #else
 static PoseTableEntry pose_table_turn[17];
@@ -168,7 +168,7 @@ static BattleUnitDefense defence_patapata = {{2, 2, 2, 2, 2}};
  */
 static BattleUnitDefenseAttr defence_patapata_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of the flying Dark Paratroopa:
  * percent chance that each status takes hold (100 is normal).
@@ -561,7 +561,7 @@ static BattleUnitDefenseAttr defence_attr = {0};
  */
 static BattleUnitDefense defence_turn = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of the Dark Paratroopa once it has lost its wings (a Dark Koopa):
  * percent chance that each status takes hold (100 is normal).

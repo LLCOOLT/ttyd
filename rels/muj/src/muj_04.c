@@ -341,7 +341,7 @@ EVT_BEGIN(sanders_funto)
     CALL(evt_npc_set_ry, STRING("オドオド水夫"), 270)
     CALL(evt_npc_set_position, STRING("めがね水夫"), 25, 112, -20)
     CALL(evt_npc_set_ry, STRING("めがね水夫"), 90)
-#if VERSION == VERSION_EU // PAL: also sets NPC flag 0x40000000 on the two sailors
+#if VERSION >= VERSION_DEMO_EU // PAL: also sets NPC flag 0x40000000 on the two sailors
     CALL(evt_npc_flag_onoff, 1, STRING("オドオド水夫"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("めがね水夫"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
 #else

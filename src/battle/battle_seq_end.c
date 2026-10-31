@@ -55,7 +55,7 @@
 #include "evt/evt_sub.h"
 
 // The demo stops gaining levels at 98.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #define LEVEL_MAX 98
 #else
 #define LEVEL_MAX 99
@@ -1521,7 +1521,7 @@ EVT_BEGIN(_curtain_close_event)
         CALL(_lvup_obj_set_color, 0, 100, 128, 128, 255)
         CALL(_lvup_obj_set_color, 1, 100, 128, 128, 255)
         CALL(_lvup_obj_set_color, 2, 100, 128, 128, 255)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_fade_entry, FADE_CURTAIN_SIDES_A2_3D, 1000, 0, 0, 0)
         CALL(evt_fade_set_anim_ofs_pos, 0, 130)
         CALL(evt_fade_set_anim_virtual_pos, 0, 0, LW(0))
@@ -1773,7 +1773,7 @@ static USER_FUNC(_disable_enemy_unit_disp) {
             continue;
         if (kind == UNIT_MARIO)
             continue;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         if (kind >= UNIT_GOOMBELLA && kind < UNIT_MAX && unit->alliance == 0)
             continue;
 #else

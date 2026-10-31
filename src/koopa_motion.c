@@ -250,7 +250,7 @@ void kpa_walk(void) {
         m->flags &= ~(MARIO_FLAG_IS_JUMPING | MARIO_FLAG_IS_FALLING | MARIO_FLAG_IS_STEPPING | MARIO_FLAG_HAS_INPUT_JUMP);
         m->currSubMotionId = 0;
         m->multiTimer = 0;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         // the demo walks with W_1 in the side view or when the stick is pushed
         if (kpaGetStageViewType() == 0) {
             if (m->controlStickSensitivity) {
@@ -471,7 +471,7 @@ void kpa_fall(void) {
         mario->currSubMotionId = 0;
         if (mario->currMotionId != MARIO_MOTION_FALL_2) {
             if ((s32)(u8)mario->characterId == 2) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 kpaChgPose("KPA_J_1B", "KPA2_J_1B");
 #else
                 if (!kpaFireAttackCheck()) {
@@ -545,7 +545,7 @@ void kpa_hip(void) {
         mario->baseSpeed = 0.0f;
         marioChgPose("KPA2_J_1C");
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (mario->fallStartPos.y >= mario->position.y && ((u32)mario->dispFlags & MARIO_DISP_FLAG_CAM_FOLLOW_Y_OFF) && mario->position.y > 75.0f) {
         camFollowYOn();
     }
@@ -807,7 +807,7 @@ static void kpaSwimMove(void) {
         }
     }
     mario->kpaSpeed = spd;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     f31 = 0.03f * __fabsf(spd);
     if (f31 >= 1.0f) {
         f31 = 1.0f;
@@ -829,7 +829,7 @@ static void kpaSwimMove(void) {
         }
     }
     mario->moveDist = f31;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     movePos(&mario->position.x, &mario->position.z, mario->baseSpeed, mario->directionView);
 #endif
 }
@@ -1037,7 +1037,7 @@ void kpa_swim(void) {
             mario->currSubMotionId = 0x29;
             mario->multiTimer = 0x18;
         case 0x29:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (mario->buttonTrg & PAD_BUTTON_A) {
 #else
             if ((mario->buttonTrg & PAD_BUTTON_A) && !kpaFireAttackCheck()) {

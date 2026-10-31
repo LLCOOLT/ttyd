@@ -3,13 +3,9 @@ R_build.c
 battle/battle.c
 battle/battle_seq_end.c
 event/evt_npc.c
-event/evt_shop.c
 gon/gon_01.c
 gon/gon_10.c
-kpa/kpa_01.c
-kpa/kpa_03.c
 mario/mariost.c
-motion/mot_slit.c
 sequence/seq_gameover.c
 sequence/seq_logo.c
 statuswindow.c

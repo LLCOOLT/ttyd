@@ -36,7 +36,7 @@ static StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_dokugassun_attack;
 static BattleWeapon weapon_dokugassun_poisongas_attack;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord poisongas_event[274];
 #else
 static EvtWord poisongas_event[303];
@@ -51,7 +51,7 @@ static EvtWord counter_event[2];
 static EvtWord unison_phase_event[140];
 static EvtWord normal_attack_event[386];
 static EvtWord charge_event[58];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord wait_event[12];
 #else
 static EvtWord wait_event[13];
@@ -68,7 +68,7 @@ BattleUnitKind unit_dokugassun = {
     0,
     1,
     1,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     45,
     0,
     1,
@@ -144,7 +144,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Element reactions of Poison Puff: none, every element hits normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of Poison Puff (the demos), as the percent chance a status takes hold:
  * immune to Poison; always hit by Electric, Burn, Huge, Attack Up, Defense Up, Fast, Dodgy and Invisible;
@@ -241,7 +241,7 @@ static BattleWeapon weapon_dokugassun_poisongas_attack = {
     COUNTER_RESIST_ALL, // counterResistFlags
     TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, // sleepChance..dizzyTime
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     50, // poisonChance
 #else
     70, // poisonChance
@@ -277,7 +277,7 @@ static EVT_BEGIN(attack_event)
         CALL_CHILD(poisongas_event)
         GOTO(99)
     END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SET_VALUE(LW(0), 70)
     ADD(LW(0), 30)
 #else
@@ -286,7 +286,7 @@ static EVT_BEGIN(attack_event)
 #endif
     SUBTRACT(LW(0), 1)
     CALL(evt_sub_random, LW(0), LW(1))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SET_VALUE(LW(0), 70)
 #else
     SET_VALUE(LW(0), 65)
@@ -777,7 +777,7 @@ static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, 1, 1, 1)
     RETURN
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_END()
 #else
 EVT_END_PAD()

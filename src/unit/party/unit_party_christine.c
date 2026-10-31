@@ -104,7 +104,7 @@ PoseTableEntry pose_table_christine_stay[] = {
     {BTL_POSE_STAY_DEFAULT, "PKR_S_1"},
 };
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // demo only: not referenced by the demo's own data
 PoseTableEntry pose_table_dictionary_page[] = {
     {BTL_POSE_NORMAL, "ZYO_Z_1"},
@@ -1687,7 +1687,7 @@ static USER_FUNC(_set_hustle) {
         if (unit->movesRemaining <= 0) {
             unit->movesRemaining++;
             unit->moveState = 0;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             unit->activeTurns = 0;
             unit->moveColorLv = 0xFF;
 #else

@@ -112,7 +112,7 @@ static BattleUnitDefense defence_turn = {0};
 /** Damage-type reactions of the Hyper Bald Cleft: immune to fire. */
 static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Hyper Bald Cleft (both demos), as the percent chance each status takes hold:
  * immune to burn; resists 13 statuses (down to 20% of the normal chance).

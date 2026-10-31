@@ -38,7 +38,7 @@ extern EvtWord gold_chorobon_rabbit_move[];
 BattleUnitSetup entry_chorogun;
 extern EvtWord call_chorogun_event[];
 static EvtWord init_event[43];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord damage_event[108];
 #else
 static EvtWord damage_event[131];
@@ -346,7 +346,7 @@ EVT_BEGIN(escape_chorogun_event)
     WAIT_MS(1000)
     CALL(btlevtcmd_GetUnitWork, LW(4), UW_GOLD_CHOROBON_HORDE_UNIT, LW(3))
     CALL(btlevtcmd_KillUnit, LW(3), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(btlevtcmd_SetUnitWork, LW(4), UW_GOLD_CHOROBON_HORDE_GONE, 1)
 #endif
     RETURN
@@ -407,7 +407,7 @@ static EVT_BEGIN(damage_event)
                         CALL(chorogun_escape_all)
                         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, UW_GOLD_CHOROBON_HORDE_UNIT, LW(3))
                         CALL(btlevtcmd_KillUnit, LW(3), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_GOLD_CHOROBON_HORDE_GONE, 1)
 #else
                     END_IF

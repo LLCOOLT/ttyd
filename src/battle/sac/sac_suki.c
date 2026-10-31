@@ -127,7 +127,7 @@ static BattleWeapon weapon = {
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
     0, 0, 0, 0, 0, 0, 0, // atkChangeTime..allergicTime
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     0, // ohkoChance
 #else
     100, // ohkoChance
@@ -518,7 +518,7 @@ static void disp_2D(CameraId cam, void* param) {
         iconDispGx(&b, ICON_DISP_2D, ICON_08F, 1.0f);
     }
     GXSetScissor(0, 0x91, gp->fbWidth, 0x50);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     for (i = 0; i < 7; i++) {
         u16 icon;
         if (w->btn2[i].state != 0) {
@@ -750,7 +750,7 @@ void N__disp_2D(s32 side, s32 idx) {
 
 /** 3D draw callback; draws nothing (the demo only fetches the work). */
 static void disp_3D(CameraId cam, void* param) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     get_ptr();
 #endif
 }

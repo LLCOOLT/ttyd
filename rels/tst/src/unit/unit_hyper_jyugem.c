@@ -57,18 +57,18 @@ BattleUnitKind unit_hyper_jyugem = {
     1,
     1,
     26,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     0,
 #else
     1,
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     1,
 #else
     2,
 #endif
     70,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     2,
 #else
     1,
@@ -133,7 +133,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Damage-type modifiers of the Dark Lakitu: none, no special weakness or immunity. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Dark Lakitu (100% is the normal chance): resists Sleep 60%, Stop 70%, Dizzy
  * 80%, Confusion 60%, Freeze 50%, Tiny 60%, Attack Down 60%, Defense Down 60%, Allergic 60%, Fright 70%, Gale
@@ -540,13 +540,13 @@ static EVT_BEGIN(attack_event)
     // Draws lots on whether to try calling a Spiny this turn (the odds depend on the turn number).
     CALL(btlevtcmd_get_turn, LW(0))
     IF_INT_LESS_OR_EQUAL(LW(0), 1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(btlevtcmd_DrawLots, LW(0), 2, 34, 116)
 #else
         CALL(btlevtcmd_DrawLots, LW(0), 2, 40, 90)
 #endif
     ELSE
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(btlevtcmd_DrawLots, LW(0), 2, 34, 82)
 #else
         CALL(btlevtcmd_DrawLots, LW(0), 2, 40, 70)
@@ -603,13 +603,13 @@ static EVT_BEGIN(attack_event)
     // charging up.
     CALL(btlevtcmd_get_turn, LW(0))
     IF_INT_LESS_OR_EQUAL(LW(0), 1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(btlevtcmd_DrawLots, LW(0), 3, 33, 33, 50)
 #else
         CALL(btlevtcmd_DrawLots, LW(0), 3, 30, 30, 30)
 #endif
     ELSE
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(btlevtcmd_DrawLots, LW(0), 3, 33, 33, 16)
 #else
         CALL(btlevtcmd_DrawLots, LW(0), 3, 30, 30, 10)

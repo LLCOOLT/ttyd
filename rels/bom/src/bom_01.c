@@ -779,7 +779,7 @@ static EVT_BEGIN(first_evt)
     CALL(evt_cam_letter_box_onoff, 1, 1)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_normalize)
 #endif
     CALL(evt_cam3d_evt_set, 340, 100, -53, 340, 80, -302, 0, 11)
@@ -836,7 +836,7 @@ EVT_BEGIN(evt_bom_01_karakara)
     SET_VALUE(LW(8), 0)
     LOOP(0)
         CALL(evt_mapobj_get_position, LW(9), LW(0), LW(1), LW(2))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_AMB_WINDVANE1"), LW(0), LW(1), LW(2), LW(10))
 #endif
         CALL(evt_sub_intpl_msec_init, 12, 1, 10, 1000)
@@ -864,7 +864,7 @@ EVT_BEGIN(evt_bom_01_karakara)
         END_LOOP
         BEGIN_INLINE_EVENT
             WAIT_MS(900)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_snd_sfxoff, LW(10))
 #endif
         END_INLINE_EVENT
@@ -2978,7 +2978,7 @@ static EVT_BEGIN(minnnanokoe_evt)
             WAIT_MS(100)
         END_LOOP
     END_SIBLING_EVENT
-#if VERSION == VERSION_US
+#if VERSION == VERSION_US || VERSION == VERSION_DEMO_US2
     SET_VALUE(GW(6), 0)
 #endif
     BEGIN_SIBLING_EVENT
@@ -3006,7 +3006,7 @@ static EVT_BEGIN(minnnanokoe_evt)
                 SET_VALUE(LW(3), STRING("stg8_las_148_70"))
             END_SWITCH
             BEGIN_INLINE_EVENT
-#if VERSION == VERSION_US
+#if VERSION == VERSION_US || VERSION == VERSION_DEMO_US2
                 CALL(evt_msg_pri, GW(6))
                 ADD(GW(6), 1)
                 IF_INT_EQUAL(GW(6), 10)

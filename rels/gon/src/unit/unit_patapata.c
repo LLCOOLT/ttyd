@@ -32,7 +32,7 @@ static EvtWord dmg_fall_event[189];
 static EvtWord patapata_dmg_first_attack_pos[19];
 static EvtWord attack_event_patapata[541];
 static PoseTableEntry pose_table[18];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static PoseTableEntry pose_table_turn[15];
 #else
 static PoseTableEntry pose_table_turn[17];
@@ -159,7 +159,7 @@ static BattleUnitDefense defence_patapata = {{1, 1, 1, 1, 1}};
 /** Elemental reactions of the Koopa Paratroopa: none, every element hurts it normally. */
 static BattleUnitDefenseAttr defence_patapata_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Koopa Paratroopa (percent, 100 is normal) in the demo builds: resists most
  * statuses (95-95%); is extra vulnerable to dizzy (120%) and Gale Force (120%).
@@ -532,7 +532,7 @@ static BattleUnitDefenseAttr defence_attr = {0};
 /** Defence of the Koopa Troopa while it lies flipped on its back: none against any element. */
 static BattleUnitDefense defence_turn = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Koopa Troopa (percent, 100 is normal) in the demo builds: resists most statuses
  * (90-95%).

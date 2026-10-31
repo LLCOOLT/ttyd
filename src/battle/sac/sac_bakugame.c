@@ -166,7 +166,7 @@ static BattleWeapon weapon = {
     SPECIAL_ALWAYS_HITS | SPECIAL_SHATTERS_FREEZE | SPECIAL_UNGUARDABLE, // special
     COUNTER_RESIST_ALL, // counterResistFlags
     0, 0, 0, // targetWeightFlags..sleepTime
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     0, // stopChance
     0, // stopTime
 #else
@@ -548,7 +548,7 @@ state_end:
             w->hstate = 2;
             w->hflag = -1;
             w->texIdx = 0x5A;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             w->hpos = (Vec){300.0f, 0.0f, 100.0f};
             w->hfrom = w->hpos;
             w->hto = (Vec){125.0f, 0.0f, -30.0f};
@@ -719,7 +719,7 @@ state_end:
             w->s80 = 0;
             w->c0 = 70.0f;
         case 11:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (w->cc == 2 && !(w->flags & 2)) {
                 w->c0 = 70.0f;
             } else if (w->s80 < 14) {
@@ -844,7 +844,7 @@ state_end:
                             if (u != NULL && !(u->attributeFlags & UNIT_ATTR_INACTIVE) && !BtlUnit_CheckStatus(u, STATUS_INSTANT_KILL) &&
                                 u->alliance == 1 && BtlUnit_CanActStatus(u)) {
                                 if (w->s80 == 0) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                                     BtlUnit_SetBodyAnimType(u, 0x3F);
 #else
                                     BtlUnit_SetBodyAnimType(u, 0x41);
@@ -957,7 +957,7 @@ state_end:
                 case 1:
                     w->to = (Vec){125.0f, 0.0f, -30.0f};
                     if (w->flags & 1) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         w->to = w->hpos;
                         w->to.y = 30.0f + w->hpos.y;
 #else

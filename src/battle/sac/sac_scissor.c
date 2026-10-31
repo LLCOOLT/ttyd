@@ -1016,7 +1016,7 @@ static s32 scissor_damage(EventEntry* evt, BOOL first) {
             BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit));
             s32 res;
             if (BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL) != 1 && !(part->attributes & PART_ATTR_EVASIVE) && !(part->attributes & PART_ATTR_IMMUNE_TO_DAMAGE_OR_STATUS) &&
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 !(part->attributes & PART_ATTR_NOT_TARGETABLE) && *(s8*)part->defenseAttr != 4) {
 #else
                 !(part->attributes & PART_ATTR_NOT_TARGETABLE) && *(s8*)part->defenseAttr != 4 && *(s8*)part->defenseAttr != 2) {
@@ -1178,7 +1178,7 @@ static void scissor_disp_control(CameraId camera, void* param) {
     ScissorWork* w = GetScissorPtr();
     f32* pts = (f32*)w->strokePts;
     s32 i;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     BattleWork* wp;
     BattleUnit* unit;
     Vec pos;
@@ -1222,7 +1222,7 @@ static void scissor_disp_control(CameraId camera, void* param) {
         GXPosition3f32(pts[i * 2], pts[i * 2 + 1], 0.0f);
         GXPosition3f32(pts[i * 2 + 2], pts[i * 2 + 3], 0.0f);
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // The demo outlines each enemy's cut box in red (scissor_damage's box).
     wp = _battleWorkPointer;
     GXSetChanMatColor(4, (GXColor){0xFF, 0x00, 0x00, 0xFF});
@@ -1434,7 +1434,7 @@ EVT_BEGIN(marioAttackEvent_Scissor)
     BEGIN_SIBLING_EVENT
         WAIT_FRAMES(30)
         CALL(evt_btl_camera_set_mode, 0, 3)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_btl_camera_set_moveto, 0, 75, 120, 600, 75, 70, 0, 30, 0)
 #else
         CALL(evt_btl_camera_set_moveto, 0, 75, 105, 600, 75, 55, 0, 30, 0)

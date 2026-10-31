@@ -55,13 +55,13 @@ BattleUnitKind unit_yami_patakuri = {
     1,
     12,
     0,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     1,
 #else
     2,
 #endif
     70,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     1,
 #else
     0,
@@ -126,7 +126,7 @@ static BattleUnitDefense defence_patakuri = {{0, 0, 0, 0, 0}};
 /** The flying Paragloomba has no elemental defence. */
 static BattleUnitDefenseAttr defence_patakuri_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerabilities of the flying Paragloomba (percent chance per status;
  * the newer releases tweak a few values).
@@ -455,7 +455,7 @@ static BattleUnitDefense defence = {0};
 /** The grounded Gloomba has no elemental defence. */
 static BattleUnitDefenseAttr defence_attr = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerabilities of the grounded Gloomba (percent chance per status;
  * the newer releases tweak a few values).

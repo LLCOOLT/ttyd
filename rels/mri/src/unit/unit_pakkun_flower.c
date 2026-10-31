@@ -93,7 +93,7 @@ static BattleUnitDefense defence = {0};
 /** Defence attributes of the Piranha Plant: none, every element hits it normally. */
 static BattleUnitDefenseAttr defence_attr = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo builds: Status vulnerability of the Piranha Plant (percent chance each status takes hold):
  * resists dizzy (60%), confusion (75%), Tiny (70%), Attack Down (70%), Defense Down (70%), allergic (70%),

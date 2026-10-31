@@ -35,7 +35,7 @@ static EvtWord attack_event[5];
 static EvtWord wait_event[57];
 static EvtWord dead_event[6];
 extern EvtWord end_battle_evt[];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord explosion_event[172];
 #else
 static EvtWord explosion_event[173];
@@ -367,7 +367,7 @@ static EVT_BEGIN(explosion_event)
     LABEL(99)
     CALL(btlevtcmd_KillUnit, BTL_UNIT_SELF, 0)
     RETURN
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_END()
 #else
 EVT_END_PAD()

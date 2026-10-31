@@ -372,7 +372,7 @@ s32 mri_itemsel_table[] = {
  * so the Puni switch can show it when Mario sets the orb on its pedestal. The item id is returned in LW(10).
  */
 EVT_BEGIN(mri_punipuni_setup)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_item_entry, LW(10), ITEM_PUNI_ORB, 0, -1000, 0, ITEM_ENTRY_FIXED, -1, 0)
 #else
     CALL(evt_item_entry, LW(10), ITEM_PUNI_ORB, 0, -20000, 0, ITEM_ENTRY_FIXED, -1, 0)
@@ -393,7 +393,7 @@ EVT_BEGIN(mri_punipuni_itemselect)
         CALL(evt_msg_print, 0, STRING("sys_no_item_to_put_on"), 0, 0)
         RETURN
     END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_win_item_select, PTR(mri_itemsel_table), LW(0))
 #else
     CALL(evt_win_item_select, 0, PTR(mri_itemsel_table), LW(0), 0)
@@ -426,7 +426,7 @@ EVT_END()
 EVT_BEGIN(mri_punipuni_itemremove)
     CALL(evt_target_flag_onoff, LW(11), 1, 1)
     CALL(evt_pouch_add_item, ITEM_PUNI_ORB, LW(0))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_item_set_position, LW(10), 0, -1000, 0)
 #else
     CALL(evt_item_set_position, LW(10), 0, -20000, 0)

@@ -219,7 +219,7 @@ BattleWeapon _lec_weapon_hammer = {
  *  and the end-of-lecture script (the tags are one higher in the retail versions).
  */
 static BattleDataEntry data_table[] = {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {67, &_lec_weapon_jump},
     {68, &_lec_weapon_hammer},
     {69, lecture_end_event},

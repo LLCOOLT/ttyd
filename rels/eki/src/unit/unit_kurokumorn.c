@@ -112,7 +112,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Elemental reactions of the Ruff Puff: is healed by electric attacks. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 3}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Ruff Puff (percent, 100 is normal) in the demo builds: immune to electric;
  * resists most statuses (70-95%).

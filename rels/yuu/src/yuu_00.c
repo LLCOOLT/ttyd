@@ -73,7 +73,7 @@ BOOL yuuminigame1_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
  * holding 2, 2 and 1 coins. US and later spread the coins over a wider, lower band of heights.
  */
 static MonteTable montetable[] = {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {-1200.0f, -800.0f, 450.0f, 400.0f, 2},
     {-800.0f, -300.0f, 400.0f, 300.0f, 2},
     {-300.0f, 200.0f, 300.0f, 150.0f, 1},
@@ -323,20 +323,20 @@ EVT_BEGIN(minigame01_start_cam)
     CALL(evt_cam3d_evt_set, FLOAT(-1230.0f), FLOAT(360.0f), FLOAT(1140.0f), FLOAT(-1230.0f), FLOAT(160.0f), FLOAT(-10.0f), 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_seq_wait, 2)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_cam3d_evt_set, FLOAT(700.0f), FLOAT(360.0f), FLOAT(1140.0f), FLOAT(700.0f), FLOAT(160.0f), FLOAT(-10.0f), 4000, 0)
 #else
     CALL(evt_cam3d_evt_set, FLOAT(700.0f), FLOAT(360.0f), FLOAT(1140.0f), FLOAT(700.0f), FLOAT(160.0f), FLOAT(-10.0f), 6000, 0)
 #endif
     WAIT_MS(1000)
     CALL(evt_yuutitle_alloc, 0, 0, STRING("menu_title_minigame1"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     WAIT_MS(2000)
 #else
     WAIT_MS(3000)
 #endif
     CALL(evt_yuutitle_free)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     WAIT_MS(1000)
 #else
     WAIT_MS(2000)
@@ -916,7 +916,7 @@ EVT_BEGIN(minigame01_start)
     WAIT_MS(3000)
     // Mario becomes a paper airplane, the controls come back and the coin counter appears.
     CALL(evt_change_plane)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_key_onoff, 1)
 #else
     CALL(evt_cam_letter_box_onoff, 0, 0)

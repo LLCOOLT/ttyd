@@ -115,7 +115,7 @@ static BattleUnitDefense defence_patakuri = {{0, 0, 0, 0, 0}};
 /** Elemental reactions of the Paragoomba: none, every element hurts it normally. */
 static BattleUnitDefenseAttr defence_patakuri_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Paragoomba (percent, 100 is normal) in the demo builds: is extra vulnerable to
  * stop (120%), dizzy (120%), fright (120%), Gale Force (150%) and instant KO (150%).
@@ -439,7 +439,7 @@ static BattleUnitDefense defence = {0};
 /** Elemental reactions of the Goomba: none, every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Goomba (percent, 100 is normal) in the demo builds: is extra vulnerable to stop
  * (120%), fright (120%), Gale Force (120%) and instant KO (150%).

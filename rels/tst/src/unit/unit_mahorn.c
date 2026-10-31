@@ -76,18 +76,18 @@ BattleUnitKind unit_mahorn = {
     1,
     1,
     30,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     0,
 #else
     1,
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     1,
 #else
     4,
 #endif
     70,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     3,
 #else
     0,
@@ -152,7 +152,7 @@ static BattleUnitDefense defence = {{3, 3, 3, 3, 3}};
 /** Damage-type modifiers of the Wizzerd: none, no special weakness or immunity. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Wizzerd (100% is the normal chance): resists Sleep 10%, Stop 50%, Dizzy 50%,
  * Confusion 40%, Freeze 40%, Tiny 40%, Attack Down 40%, Defense Down 40%, Allergic 40%, Fright 30%, Gale
@@ -201,7 +201,7 @@ static BattleWeapon weapon_mahorn_attack_magic = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
 #else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE, // special
@@ -233,7 +233,7 @@ static BattleWeapon weapon_mahorn_all_attack_magic = {
     1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {2, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
 #else
     {6, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
@@ -372,7 +372,7 @@ BattleWeapon weapon_mahorn_confuse_magic = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
 #else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
@@ -452,12 +452,12 @@ static EVT_BEGIN(attack_event)
     END_IF
     LABEL(10)
     SET_VALUE(LW(0), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     ADD(LW(0), 60)
 #else
     ADD(LW(0), 50)
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     ADD(LW(0), 10)
 #else
     ADD(LW(0), 30)
@@ -468,7 +468,7 @@ static EVT_BEGIN(attack_event)
     ADD(LW(0), 10)
     SUBTRACT(LW(0), 1)
     CALL(evt_sub_random, LW(0), LW(1))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SET_VALUE(LW(0), 60)
 #else
     SET_VALUE(LW(0), 50)
@@ -478,7 +478,7 @@ static EVT_BEGIN(attack_event)
         CALL_CHILD(attack_magic_event)
         GOTO(99)
     END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     ADD(LW(0), 10)
 #else
     ADD(LW(0), 30)

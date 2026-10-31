@@ -113,7 +113,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
  */
 static BattleUnitDefense defence_turn = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo builds: Status vulnerability of the Moon Cleft (percent chance each status takes hold):
  * immune to burn; resists sleep (30%), stop (70%), dizzy (30%), confusion (30%), freeze (50%), Tiny (50%),

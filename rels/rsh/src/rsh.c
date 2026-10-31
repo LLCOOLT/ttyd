@@ -304,7 +304,7 @@ EVT_BEGIN(evt_rsh_door_open)
     CALL(evt_img_free_capture, STRING("capture_img"), 0)
     CALL(evt_img_free_capture, STRING("capture_img"), 1)
     CALL(evt_img_free_capture, STRING("capture_img"), 2)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_img_alloc_capture, STRING("capture_img"), 0, STRING("offscreen"), 0, 0, 0, 0, 0)
     CALL(evt_img_alloc_capture, STRING("capture_img"), 1, STRING("offscreen"), 0, 0, 0, 0, 0)
     CALL(evt_img_alloc_capture, STRING("capture_img"), 2, STRING("offscreen"), 0, 0, 0, 0, 0)
@@ -326,13 +326,13 @@ EVT_BEGIN(evt_rsh_door_open)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_OFF6_ROOM_IN1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_img_set_virtual_point, STRING("capture_img"), 0, 0, -80)
 #endif
     CALL(evt_img_set_paper_anim, STRING("capture_img"), STRING("A_1"))
     CALL(evt_img_onoff, STRING("capture_img"), 1)
     BEGIN_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_img_wait_animend, STRING("capture_img"))
 #endif
         CALL(evt_mapobj_clear_offscreen, 1, STRING("rouka"))
@@ -427,7 +427,7 @@ EVT_BEGIN(evt_rsh_door_open)
                 CALL(evt_img_wait_animend, STRING("capture_img"))
                 CALL(evt_mario_key_onoff, 1)
             END_SWITCH
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             // Once Zip Toad has appeared, entering the cabins makes him touchable.
             IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_25_ZIP_TOAD_APPEARS)
                 CALL(evt_npc_check, STRING("トロン"), LW(10))
@@ -457,7 +457,7 @@ EVT_BEGIN(evt_rsh_door_open)
             IF_INT_EQUAL(GSWF(GSWF_RSH02_GHOST_APPEARED), 1)
                 CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(10))
             END_IF
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_25_ZIP_TOAD_APPEARS)
                 CALL(evt_npc_check, STRING("トロン"), LW(10))
                 IF_INT_EQUAL(LW(10), 1)
@@ -587,7 +587,7 @@ EVT_BEGIN(evt_rsh_door_close)
     CALL(evt_img_free_capture, STRING("capture_img"), 0)
     CALL(evt_img_free_capture, STRING("capture_img"), 1)
     CALL(evt_img_free_capture, STRING("capture_img"), 2)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_img_alloc_capture, STRING("capture_img"), 0, STRING("offscreen"), 0, 0, 0, 608, 480)
     CALL(evt_img_alloc_capture, STRING("capture_img"), 1, STRING("offscreen"), 0, 0, 0, 608, 480)
     CALL(evt_img_alloc_capture, STRING("capture_img"), 2, STRING("offscreen"), 0, 0, 0, 608, 480)
@@ -607,7 +607,7 @@ EVT_BEGIN(evt_rsh_door_close)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_OFF6_ROOM_OUT1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_img_set_virtual_point, STRING("capture_img"), 0, 0, -70)
 #endif
     CALL(evt_img_set_paper_anim, STRING("capture_img"), STRING("A_2"))
@@ -617,7 +617,7 @@ EVT_BEGIN(evt_rsh_door_close)
         CALL(evt_hit_get_position, LW(6), LW(13), LW(14), LW(15))
         CALL(evt_mario_mov_pos, LW(13), LW(12), 300)
     END_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_img_wait_animend, STRING("capture_img"))
     CALL(evt_img_onoff, STRING("capture_img"), 0)
     CALL(evt_mapobj_clear_offscreen, 1, STRING("rouka"))
@@ -1518,7 +1518,7 @@ EVT_BEGIN(evt_rsh_04_rnd_npc_entry)
     CALL(evt_rsh_get_rnd_npc_talk_evt, 2, 3, LW(0), LW(3))
     CALL(evt_npc_entry, STRING("乗客４"), LW(1))
     CALL(evt_npc_set_tribe, STRING("乗客４"), LW(2))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_npc_set_position, STRING("乗客４"), -50, 30, -260)
 #else
     CALL(evt_npc_set_position, STRING("乗客４"), -85, 16, -255)

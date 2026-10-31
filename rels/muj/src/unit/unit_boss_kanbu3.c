@@ -52,7 +52,7 @@ static EvtWord damage_event[337];
 #else
 static EvtWord damage_event[315];
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord dead_event[393];
 #else
 static EvtWord dead_event[402];
@@ -148,7 +148,7 @@ static BattleUnitDefense defence_guard = {{2, 2, 2, 2, 2}};
 /** Defence attributes of Lord Crump: none, every element hits it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo builds: Status vulnerability of Lord Crump (percent chance each status takes hold):
  * immune to fright, Gale Force, Invisible, instant KO; resists stop (70%), dizzy (60%), confusion (60%),

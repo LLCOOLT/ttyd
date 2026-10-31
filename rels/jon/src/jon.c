@@ -315,7 +315,7 @@ NpcSetupInfo npcEnt_kuriboo[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -348,7 +348,7 @@ NpcSetupInfo npcEnt_patakuri[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -381,7 +381,7 @@ NpcSetupInfo npcEnt_hannya[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -414,7 +414,7 @@ NpcSetupInfo npcEnt_chorobon[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -447,7 +447,7 @@ NpcSetupInfo npcEnt_sinnosuke[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -480,7 +480,7 @@ NpcSetupInfo npcEnt_sinemon[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -513,7 +513,7 @@ NpcSetupInfo npcEnt_nokonoko[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -546,7 +546,7 @@ NpcSetupInfo npcEnt_patapata[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -579,7 +579,7 @@ NpcSetupInfo npcEnt_met[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -612,7 +612,7 @@ NpcSetupInfo npcEnt_patamet[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -645,7 +645,7 @@ NpcSetupInfo npcEnt_sambo[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -678,7 +678,7 @@ NpcSetupInfo npcEnt_honenoko[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -711,7 +711,7 @@ NpcSetupInfo npcEnt_karon[] = {
         karon_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -744,7 +744,7 @@ NpcSetupInfo npcEnt_dokugassun[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -776,7 +776,7 @@ NpcSetupInfo npcEnt_piders[] = {
         piders_blow_event, // blowEvent
         2, // territoryType
         {0.0f, 140.0f, 0.0f}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -809,7 +809,7 @@ NpcSetupInfo npcEnt_teresa[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -842,7 +842,7 @@ NpcSetupInfo npcEnt_hbom[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -875,7 +875,7 @@ NpcSetupInfo npcEnt_bubble[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -907,7 +907,7 @@ NpcSetupInfo npcEnt_wanwan[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -940,7 +940,7 @@ NpcSetupInfo npcEnt_mahoon[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -973,7 +973,7 @@ NpcSetupInfo npcEnt_pakkun[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -1006,7 +1006,7 @@ NpcSetupInfo npcEnt_togenoko[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -1039,7 +1039,7 @@ NpcSetupInfo npcEnt_basabasa2[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -1072,7 +1072,7 @@ NpcSetupInfo npcEnt_togedaruma[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -1105,7 +1105,7 @@ NpcSetupInfo npcEnt_pansy[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -1132,7 +1132,7 @@ NpcSetupInfo npcEnt_zonbaba[] = {
         NULL, NULL, NULL, NULL, // findEvent..blowEvent
         2, // territoryType
         {0}, // territoryBase
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {200.0f, 100.0f, 140.0f}, // territoryLoiter
 #else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
@@ -1491,7 +1491,7 @@ EVT_BEGIN(enemy_setup)
     END_IF
     // Make the chosen spot the enemy's home, then arm its battle and watch for its defeat.
     CALL(evt_npc_get_position, STRING("敵"), LW(3), LW(4), LW(5))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_npc_set_home_position, STRING("敵"), LW(3), LW(4), LW(5))
 #endif
     CALL(evt_npc_set_battle_info, STRING("敵"), LW(2))
@@ -1623,7 +1623,7 @@ EVT_BEGIN(get_map_name)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** The demo's mover takes 10 coins for every trip and picks the destination before checking the coins. */
 EVT_BEGIN(talk_idouya)
     CALL(evt_msg_print, 0, STRING("msg_jon_mover"), 0, 0)
@@ -1818,7 +1818,7 @@ EVT_BEGIN(talk_gyousyou)
     // The trader names the item and its price and asks Mario to confirm (the English text swaps the order of
     // name and price for some languages).
     IF_INT_GREATER_OR_EQUAL(LW(1), 240)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_msg_print_insert, 0, STRING("100kai_item_04"), 0, STRING("me"), LW(2), LW(3), LW(4))
 #else
         CALL(evt_sub_get_language, LW(0))
@@ -1840,7 +1840,7 @@ EVT_BEGIN(talk_gyousyou)
 #endif
 #endif
     ELSE
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_msg_print_insert, 0, STRING("100kai_item_04"), 0, STRING("me"), LW(2), LW(3))
 #else
         CALL(evt_sub_get_language, LW(0))
@@ -1887,19 +1887,19 @@ EVT_BEGIN(talk_gyousyou)
     CALL(evt_win_coin_wait, LW(12))
     WAIT_MS(200)
     CALL(evt_win_coin_off, LW(12))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_msg_continue)
 #endif
     CALL(evt_pouch_get_coin, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_msg_print, 0, STRING("100kai_item_06"), 0, STRING("me"))
 #else
         CALL(evt_msg_print_add, 0, STRING("100kai_item_06"))
 #endif
         RETURN
     END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_msg_print, 0, STRING("100kai_item_06"), 0, STRING("me"))
     CALL(evt_msg_print, 0, STRING("100kai_item_07"), 0, STRING("me"))
 #else
@@ -2016,7 +2016,7 @@ EVT_END()
  * Spawned from enemy_setup.
  */
 EVT_BEGIN(dokan_open)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     WAIT_MS(1000)
     CALL(evt_mario_key_onoff, 0)
 #else
@@ -3204,7 +3204,7 @@ EVT_BEGIN(zonbaba_first_event)
     CALL(evt_npc_set_anim, STRING("敵"), STRING("GNB_S_1"))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("oFF_jon_06"), MAPOBJ_FLAG_HIDE)
     CALL(evt_seq_wait, 2)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // Mario and his partner are startled by the sleeping dragon and step back.
     WAIT_MS(4000)
 #else

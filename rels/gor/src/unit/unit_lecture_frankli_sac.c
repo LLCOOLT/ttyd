@@ -360,14 +360,14 @@ static void spot_square_disp(CameraId cameraId, void* param) {
  */
 EVT_BEGIN(stop_wait_event)
     CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_MARIO)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_MARIO, 1, STRING("M_S_1"))
 #else
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_MARIO, 1)
 #endif
     CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_PARTNER)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_PARTNER, LW(0))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_PARTNER, LW(0), BTL_POSE_STAY)
 #else
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_PARTNER, LW(0))

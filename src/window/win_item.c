@@ -131,7 +131,7 @@ static const char* luigi_book_5[] = {
  */
 const char** luigi_book_list[] = {luigi_book_1, luigi_book_2, luigi_book_3, luigi_book_4, luigi_book_5};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo: key items left out of the Important Items list (as below, plus the Strange Sack);
  * winMakeSkipList reads it.
@@ -145,7 +145,7 @@ u16 menu_skip_list[] = {1, 9, 10, 11, 6, 7, 8, 5, 3, 2, 4, 0x32, 0x72, 0x73, 0x7
 u16 menu_skip_list[] = {9, 10, 11, 6, 7, 8, 5, 3, 2, 4, 0x32, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78};
 #endif
 #define MENU_SKIP_NUM (sizeof(menu_skip_list) / sizeof(menu_skip_list[0]))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #define WI_MAIL_TPL "%s/window/jp/mail.tpl" // the demo keeps the menu files in window/
 #else
 #define WI_MAIL_TPL "%s/w/jp/mail.tpl"
@@ -488,7 +488,7 @@ s32 winItemMain(WindowWork* w) {
                 mail = mailGetPtr(w->item.mail[w->item.mailSel].id);
                 FontGetMessageWidthLine(msgSearch(mail->body), &w->item.mailLines);
                 w->item.mailLines++;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 w->item.mailLines += 7;
                 w->item.mailLine = 0;
                 if (mail->flags & MAIL_FLAG_PICTURE) {
@@ -589,7 +589,7 @@ s32 winItemMain(WindowWork* w) {
                         w->item.mailLine--;
                     }
                 } else if (keyGetDirRep(0) & DEMO_SUBSTICK_DOWN) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     if (w->item.mailLine + 8 < w->item.mailLines) {
 #else
                     if (w->item.mailLine + 6 < w->item.mailLines) {
@@ -624,7 +624,7 @@ s32 winItemMain(WindowWork* w) {
                 winMgrClose(w->useWin[1]);
             } else if (w->buttonTrg & PAD_BUTTON_A) {
                 mp = marioGetPtr();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 psndSFXOn(SFX_NAME_WORD(0x20012));
                 if (mp->currMotionId != MARIO_MOTION_SHIP && mp->currMotionId != MARIO_MOTION_PLANE &&
                     ((w->item.useTarget < 2 && !marioBgmodeChk()) || (w->item.useTarget < 1 && marioBgmodeChk()))) {
@@ -661,7 +661,7 @@ s32 winItemMain(WindowWork* w) {
                     }
                 }
                 for (i = 0; i < 7; i++) {
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                     // PAL lists only the other partners that have joined (flag 1) and are not away (flag 2)
                     if (party != winPartyDt[i].partyId && (pouchGetPtr()->partyData[winPartyDt[i].partyId].flags & POUCH_PARTY_FLAG_JOINED) &&
                         !(pouchGetPtr()->partyData[winPartyDt[i].partyId].flags & POUCH_PARTY_FLAG_AWAY)) {
@@ -954,7 +954,7 @@ static void itemUseDisp(WinMgrEntry* entry) {
             }
         }
         for (i = 0; i < 7; i++) {
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             // PAL lists only the other partners that have joined (flag 1) and are not away (flag 2)
             if (party != winPartyDt[i].partyId && (pouchGetPtr()->partyData[winPartyDt[i].partyId].flags & POUCH_PARTY_FLAG_JOINED) &&
                 !(pouchGetPtr()->partyData[winPartyDt[i].partyId].flags & POUCH_PARTY_FLAG_AWAY)) {
@@ -1000,13 +1000,13 @@ static void itemUseDisp(WinMgrEntry* entry) {
                 winFontInit();
                 winFontSet((Vec){entry->x + 50, entry->y - 8 - off, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, msgSearch("name_mario"));
                 winFontSet((Vec){entry->x + 220, entry->y - 8 - off, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, WI_HP_NAME);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 winFontSetRWidth((Vec){entry->x + 245, entry->y - 8 - off, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, 30.0f, "%d", pouchGetHP());
 #else
                 winFontSetR((Vec){entry->x + 245, entry->y - 8 - off, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%d", pouchGetHP());
 #endif
                 winFontSetR((Vec){entry->x + 267, entry->y - 8 - off, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, WI_SLASH);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 winFontSetWidth((Vec){entry->x + 310, entry->y - 10 - off, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, 30.0f, "%d", ((PouchGetMaxHPRetS32Fn)pouchGetMaxHP)());
 #else
                 winFontSet((Vec){entry->x + 310, entry->y - 10 - off, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "%d", ((PouchGetMaxHPRetS32Fn)pouchGetMaxHP)());
@@ -1021,13 +1021,13 @@ static void itemUseDisp(WinMgrEntry* entry) {
 #endif
                 winFontInit();
                 winFontSet((Vec){entry->x + 220, entry->y - 8 - off3, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, WI_FP_NAME);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 winFontSetRWidth((Vec){entry->x + 245, entry->y - 8 - off3, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, 30.0f, "%d", pouchGetFP());
 #else
                 winFontSetR((Vec){entry->x + 245, entry->y - 8 - off3, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%d", pouchGetFP());
 #endif
                 winFontSetR((Vec){entry->x + 267, entry->y - 8 - off3, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, WI_SLASH);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 winFontSetWidth((Vec){entry->x + 310, entry->y - 10 - off3, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, 30.0f, "%d", ((PouchGetMaxFPRetS32Fn)pouchGetMaxFP)());
 #else
                 winFontSet((Vec){entry->x + 310, entry->y - 10 - off3, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "%d", ((PouchGetMaxFPRetS32Fn)pouchGetMaxFP)());
@@ -1054,13 +1054,13 @@ static void itemUseDisp(WinMgrEntry* entry) {
                 winFontSet((Vec){entry->x + 50, yoff + (entry->y - 8 - i * 28), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, name);
 #endif
                 winFontSet((Vec){entry->x + 220, yoff + (entry->y - 8 - i * 28), 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, WI_HP_NAME);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 winFontSetRWidth((Vec){entry->x + 245, yoff + (entry->y - 8 - i * 28), 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, 30.0f, "%d", pouchGetPtr()->partyData[list[i - 1]->partyId].currentHP);
 #else
                 winFontSetR((Vec){entry->x + 245, yoff + (entry->y - 8 - i * 28), 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%d", pouchGetPtr()->partyData[list[i - 1]->partyId].currentHP);
 #endif
                 winFontSetR((Vec){entry->x + 267, yoff + (entry->y - 8 - i * 28), 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, WI_SLASH);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 winFontSetWidth((Vec){entry->x + 310, (yoff + (entry->y - 8 - i * 28)) - 2.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, 30.0f, "%d", pouchGetPtr()->partyData[list[i - 1]->partyId].maximumHP);
 #else
                 winFontSet((Vec){entry->x + 310, (yoff + (entry->y - 8 - i * 28)) - 2.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "%d", pouchGetPtr()->partyData[list[i - 1]->partyId].maximumHP);

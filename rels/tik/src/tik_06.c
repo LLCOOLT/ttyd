@@ -290,7 +290,7 @@ EVT_END()
  * two signboards (one shows the Pit record: deepest floor and best times) and a Star Piece.
  */
 EVT_BEGIN(tik_06_init_evt)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
 #else
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)

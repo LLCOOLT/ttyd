@@ -14,7 +14,7 @@
 #include "addr_word.h"
 
 //.bss
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 FileManagerWork fileWork; // .bss in the demo (-sdata 8), after _filename: .bss is laid out in reverse order
 #endif
 
@@ -143,7 +143,7 @@ static void fileGarbageDataAdrClear(FileEntry* entry) {
         case 4:
             tpl = data;
             if (tpl->versionNumber != 0x0020AF30) {
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 OSPanic("filemgr.c", 150, "invalid version number for texture palette");
 #else
                 OSPanic("filemgr.c", VERSION_PICK(147, 153), "invalid version number for texture palette");
@@ -342,7 +342,7 @@ static void fileGarbageDataAdrSet(void* data, s32 type) {
         case 4:
             tpl = data;
             if (tpl->versionNumber != 0x0020AF30) {
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 OSPanic("filemgr.c", 109, "invalid version number for texture palette");
 #else
                 OSPanic("filemgr.c", VERSION_PICK(106, 112), "invalid version number for texture palette");

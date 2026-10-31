@@ -23,7 +23,7 @@ static PoseTableEntry pose_table[18];
 static BattleDataEntry data_table[2];
 static EvtWord init_event[21];
 static EvtWord damage_event[10];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord song_event[298];
 #else
 static EvtWord song_event[300];
@@ -106,7 +106,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Damage-type modifiers of the Crazee Dayzee: none, no special weakness or immunity. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Crazee Dayzee (100% is the normal chance): resists Sleep 95%, Stop 30%, Dizzy
  * 30%, Confusion 30%, Freeze 30%, Tiny 30%, Attack Down 30%, Defense Down 30%, Allergic 30%, Gale Force 80%,
@@ -155,7 +155,7 @@ BattleWeapon weapon_pansy_attack = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
 #else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
@@ -320,7 +320,7 @@ static EVT_BEGIN(song_event)
         END_LOOP
     END_SIBLING_EVENT
     // After about two seconds the song reaches the party.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     WAIT_FRAMES(60)
     WAIT_FRAMES(60)
     SET_VALUE(LW(6), 0)

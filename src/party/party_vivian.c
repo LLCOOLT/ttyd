@@ -70,7 +70,7 @@ void mot_vivian(void) {
     }
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Demo copy: hides Vivian's shadow tail (bit 0 of her tail flags), when she sinks into the floor with Mario. */
 static inline void L_partyVivianTailStop(PartyEntry* party) {
     if (party->currentMemberId == PARTY_MEMBER_VIVIAN) {
@@ -102,7 +102,7 @@ void mot_vivian_post(void) {
         marioPaperOff();
         {
             Vec zero = {0.0f, 0.0f, 0.0f};
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             mario->dispOfs = zero;
 #else
             mario->dispOfs2 = zero;
@@ -124,7 +124,7 @@ void mot_vivian_post(void) {
             partyChgPoseId(party, 1);
             L_partyVivianTailStart(party);
         }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         camFollowYOn();
 #endif
     } else if (party && party->currentMemberId == PARTY_MEMBER_VIVIAN && (party->flags & PARTY_FLAG_IS_BEING_USED)) {
@@ -142,7 +142,7 @@ void vivian_init(PartyEntry* party) {
     party->height = 35.0f;
     party->width = 24.0f;
     party->work.vivian.shadowSize = 10.0f;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     party->work.vivian.tailFlags = 0;
 #else
     party->tailFlags = 0;
@@ -274,7 +274,7 @@ void vivian_move(PartyEntry* party) {
 }
 
 // The demo's vivianFollow/vivian_use are older (fixed hide offset, ground search in vivian_use): one copy each
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** demo: Vivian always hides 13 behind Mario, with no ground search outside the hidden state */
 static inline void vivianFollow(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;

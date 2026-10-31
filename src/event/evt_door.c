@@ -267,7 +267,7 @@ static USER_FUNC(door_entry) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** the demo defines house_close_se right after house_open_se */
 EVT_BEGIN(house_close_se)
     CALL_CHILD(house_open_se)
@@ -1547,7 +1547,7 @@ static USER_FUNC(animation) {
 }
 
 // the item flag the dark/light helpers toggle on field items: 0x80 in the demo, 0x40 in retail
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #define DOOR_ITEM_DARK_FLAG 0x80
 #else
 #define DOOR_ITEM_DARK_FLAG 0x40
@@ -1915,7 +1915,7 @@ static USER_FUNC(npc_hide_onoff) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** the demo defines these with the door helpers at the end of the file */
 static USER_FUNC(snd_door_in) {
     psndSetFlag(PSND_FLAG_MUTE_DOOR_SFX);

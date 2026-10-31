@@ -129,7 +129,7 @@ static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 /** Damage-type reactions of the Dark Koopatrol: none, so every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Dark Koopatrol (both demos), as the percent chance each status takes hold:
  * resists 13 statuses (down to 50% of the normal chance).

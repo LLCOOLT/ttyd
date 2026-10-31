@@ -51,7 +51,7 @@ static NpcSetupInfo npcEnt[2];
 extern EvtWord ukishima_move[];
 char geso_checkpose[];
 extern EvtWord geso_battle[];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static HitDamageReturn hitDmgRetPoints[6];
 #else
 static HitDamageReturn hitDmgRetPoints[7];

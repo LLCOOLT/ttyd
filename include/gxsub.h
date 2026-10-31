@@ -6,7 +6,7 @@
 
 extern f32 queen_uv[];
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #include <dolphin/gx.h>
 
 // demo only: the 2D textured-quad helpers seq_demo draws its movie overlay with

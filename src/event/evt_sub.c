@@ -105,7 +105,7 @@ static USER_FUNC(stone_bg_open);
 static USER_FUNC(stone_ry);
 static void coingetDisp(WinMgrEntry* entry);
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 extern EvtWord evt_sub_starstone[1030];
 #else
 extern EvtWord evt_sub_starstone[VERSION_PICK(1043, 1084)];
@@ -120,7 +120,7 @@ s32 evt_sub_mail_event_end[1];
  * stopwatch, the tree data and scripts, the grass data and scripts,
  * then the coin window (retail puts the small objects in .sdata)
  */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_BEGIN(evt_sub_stopwatch)
     LOOP(0)
         WAIT_FRAMES(1)
@@ -238,7 +238,7 @@ EVT_BEGIN(tree_evt)
     END_LOOP
     RETURN
 EVT_END()
-#elif VERSION <= VERSION_DEMO_US
+#elif VERSION <= VERSION_DEMO_JP
 /** Demo version of tree_evt: same tree shake, without the SET_TYPE(0) at the start. */
 EVT_BEGIN(tree_evt)
     SET_VALUE(LF(0), 0)
@@ -371,7 +371,7 @@ EVT_BEGIN(evt_sub_tree_access_entry)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Demo position of kusa_data: the bush sway offsets read by kusa_evt. */
 static s32 kusa_data[] = {
     FLOAT(0.0f), FLOAT(-1.874f), FLOAT(-2.999f), FLOAT(-2.22f), FLOAT(-0.776f), FLOAT(0.0f), FLOAT(-0.776f), FLOAT(-2.22f),
@@ -402,7 +402,7 @@ EVT_BEGIN(kusa_evt)
     END_LOOP
     RETURN
 EVT_END()
-#elif VERSION <= VERSION_DEMO_US
+#elif VERSION <= VERSION_DEMO_JP
 /** Demo version of kusa_evt: same bush shake, without the SET_TYPE(0) at the start. */
 EVT_BEGIN(kusa_evt)
     CALL(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
@@ -459,7 +459,7 @@ EVT_BEGIN(evt_sub_kusa_access_entry)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Demo position of coinget_window_desc: the "You got N coins!" window of evt_sub_get_coin. */
 WinMgrDesc coinget_window_desc[] = {
     {0, 0, 8, -175, 120, 350, 42, {0xE1, 0xD7, 0x9B, 0xFF}, NULL, coingetDisp},
@@ -831,7 +831,7 @@ EVT_BEGIN(evt_sub_starstone)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
-#elif VERSION <= VERSION_DEMO_US
+#elif VERSION <= VERSION_DEMO_JP
 /**
  * Demo version of evt_sub_starstone: same cutscene,
  * with a frame-counted spin (evt_sub_intpl_init over 170 frames) and the plain evt_memcard_save prompt;
@@ -1826,7 +1826,7 @@ EVT_BEGIN(mail_evt_gor_02_2)
         CALL(evt_sub_check_intersect, LW(0), LW(2), LW(10), LW(12), -1000, -4226, 1000, 7374, LW(5))
         IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_71_FRANKLYS_HOUSE)
             IF_INT_EQUAL(LW(5), 1)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 CALL(evt_mario_get_motion, LW(5))
                 IF_INT_NOT_EQUAL(LW(5), 25)
                     BREAK_LOOP
@@ -1980,7 +1980,7 @@ EVT_BEGIN(mail_evt_usu_01)
         SET_VALUE(LW(11), LW(1))
         SET_VALUE(LW(12), LW(2))
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_sub_check_intersect, LW(0), LW(2), LW(10), LW(12), 300, -2000, 300, 2000, LW(5))
 #else
         CALL(evt_sub_check_intersect, LW(0), LW(2), LW(10), LW(12), 110, -2000, 110, 2000, LW(5))
@@ -2665,7 +2665,7 @@ USER_FUNC(evt_sub_animgroup_async) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 /** Returns the display frame rate (50 or 60) in args[0]. PAL only. */
 USER_FUNC(evt_sub_get_framerate) {
     evtSetValue(event, event->args[0], gp->framerate);
@@ -2831,7 +2831,7 @@ USER_FUNC(evt_sub_get_coin) {
     MarioWork* mario = marioGetPtr();
     Vec a = mario->position;
     Vec b = a;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     Vec scr;
 #endif
     f32 rad = reviseAngle((100.0f * camGetPtr(CAMERA_3D)->viewYaw + 5.0f) / 100.0f);
@@ -2861,7 +2861,7 @@ USER_FUNC(evt_sub_get_coin) {
     work = event->wInterpWork;
     switch (state) {
         case 0:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             // the demo draws the coin icon in 2D at Mario's screen position
             iconEntry2D("iraiCoin", ICON_18B);
             getScreenPoint(&b, &scr);

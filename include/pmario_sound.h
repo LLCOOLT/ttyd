@@ -214,7 +214,7 @@ BOOL psndPushGroup(void);
 
 BOOL psndBGMOn(u32 r3, char* bgm_name);
 BOOL psndBGMOn_f(u32 flags, char* bgm_name, u32 fadetime, s32 unused);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 BOOL psndBGMOn_f_d(u32 flags, char* bgm_name, u32 fadetime, s32 unused); // the demo always fades the old BGM out over 750 ms
 #else
 BOOL psndBGMOn_f_d(u32 flags, char* bgm_name, u32 fadetime, u32 fadeout, s32 unused);

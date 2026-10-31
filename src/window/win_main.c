@@ -167,7 +167,7 @@ static const WinLangTbl winLangTbl;
 void winMain(void) {
     MarioWork* mario;
     s32 i;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     WindowPartyDt* list[7];
 #endif
 
@@ -273,7 +273,7 @@ void winMain(void) {
                     npcStopForEvent();
                 }
                 fbatChangeMode(7);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 marioCtrlOff2();
 #else
                 if (mario->characterId == 2) {
@@ -361,7 +361,7 @@ void winMain(void) {
 
             case 3:
                 camGetPtr(CAMERA_2D)->flags &= ~CAM_FLAG_LETTER_BOX_DISABLE;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 marioCtrlOn2();
 #else
                 if (mario->characterId == 2) {
@@ -414,7 +414,7 @@ void winMain(void) {
                 break;
 
             case 200: {
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 s32 partyId;
                 s32 n;
 
@@ -668,7 +668,7 @@ EVT_END()
 EVT_BEGIN(evt_item_use)
     SET_TYPE(0)
     CALL(evt_mario_normalize)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     WAIT_FRAMES(1)
     CALL(evt_mario_adjust_dir)
 #else
@@ -728,7 +728,7 @@ EVT_BEGIN(evt_item_use)
         CALL(itemUseFunc)
         WAIT_MS(1500)
         CALL(itemUseFunc2)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_party_set_breed_pose, 0, 1)
 #else
         CALL_CHILD(win_main_child_evt)
@@ -819,7 +819,7 @@ EVT_BEGIN(evt_diary_read)
     ADD(LW(1), 20)
     ADD(LW(2), 20)
     CALL(evt_npc_set_position, STRING("ゆうれい"), LW(0), LW(1), LW(2))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_GHOST_APPEAR1"), LW(0), LW(1), LW(2), 0)
 #else
     CALL(evt_snd_sfxon_3d, 132773, LW(0), LW(1), LW(2), 0)
@@ -833,7 +833,7 @@ EVT_BEGIN(evt_diary_read)
     BEGIN_INLINE_EVENT
         CALL(evt_env_blur_on, 0, 0)
     END_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_GHOST_SHAKE1"), LW(0), LW(1), LW(2), LW(3))
 #else
@@ -976,7 +976,7 @@ static USER_FUNC(itemUseFunc) {
                 cnt = 300;
                 break;
             }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             effRecoveryEntry(0, item->hp_restored, party->position.x, party->position.y + party->height, party->position.z);
 #else
             eff = effRecoveryEntry(0, item->hp_restored, party->position.x, party->position.y + party->height, party->position.z);
@@ -1199,7 +1199,7 @@ void winFontSetR(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
 }
 #endif
 
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 /** PAL: right-aligned like winFontSetR, squeezed horizontally to fit width */
 void winFontSetRWidth(Vec pos, Vec scale, GXColor color, f32 width, const char* fmt, ...) {
     char buf[0x1000];
@@ -1636,7 +1636,7 @@ void winIconSet(s32 iconId, Vec translate, Vec scale, GXColor color) {
 static USER_FUNC(wait) {
     s32 n = evtGetValue(event, event->args[0]);
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // The demo has no key mask flag.
     if (wp->lectureStep < n) {
         return EVT_RETURN_BLOCK;

@@ -719,7 +719,7 @@ EVT_BEGIN(kosho_event)
     SET_VALUE(GF(2), 1)
     DELETE_EVENT(LW(10))
     WAIT_MS(500)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_item_set_position, STRING("jewel"), 0, -1000, 0)
 #else
     CALL(evt_item_delete, STRING("jewel"))

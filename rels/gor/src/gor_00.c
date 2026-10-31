@@ -127,7 +127,7 @@ extern EvtWord mony_peton_depart[];
 #else
 static EvtWord mony_peton_event[251];
 #endif
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 static EvtWord peach_mail[215];
 #else
 static EvtWord peach_mail[209];
@@ -1181,7 +1181,7 @@ EVT_BEGIN(suifubomb_a_talk)
                 RETURN
             END_IF
             CALL(evt_msg_continue)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_win_item_select, LW(10), LW(0))
 #else
             CALL(evt_win_item_select, 0, LW(10), LW(0), 0)
@@ -1580,7 +1580,7 @@ EVT_BEGIN(mokorim_talk)
             CALL(evt_mario_set_pose, STRING("M_I_Z"))
             WAIT_MS(500)
         END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         // Lumpy asks for an investment of 100 coins or more; Mario chooses to lend or refuse.
         CALL(evt_unitwin_alloc)
 #else
@@ -1677,7 +1677,7 @@ EVT_BEGIN(mokorim_talk)
                     CASE_EQUAL(3)
                     SET_VALUE(LW(0), 999)
                 END_SWITCH
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(evt_unitwin_alloc)
 #else
                 CALL(evt_unitwin_alloc, 0)
@@ -2496,7 +2496,7 @@ EVT_BEGIN(enter_gorotsuki_town)
             WAIT_FRAMES(1)
         END_LOOP
     END_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
         SET_FLOAT_VALUE(LW(0), FLOAT(1.0f))
@@ -4475,7 +4475,7 @@ EVT_BEGIN(gorotsuki_kikan)
     // set up.
     CALL(evt_snd_bgm_scope, 0, 1)
     CALL(evt_mario_key_onoff, 0)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     CALL(evt_party_stop, 0)
 #endif
     CALL(evt_mario_cont_onoff, 0)
@@ -4615,7 +4615,7 @@ EVT_BEGIN(gorotsuki_kikan)
     WAIT_MS(1000)
     CALL(evt_msg_print_party, STRING("mac_5_000_10"))
     CALL(evt_cam3d_evt_off, 500, 11)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     CALL(evt_party_run, 0)
 #endif
     // Return control and start the Peach mail scene.
@@ -5196,7 +5196,7 @@ static EVT_BEGIN(peach_mail)
     END_LOOP
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     CALL(evt_party_stop, 0)
 #endif
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
@@ -5241,7 +5241,7 @@ static EVT_BEGIN(peach_mail)
     CALL(evt_msg_print, 0, STRING("gor_00_mail5_01"), 0, 0)
     CALL(evt_msg_print_party, STRING("gor_00_mail5_02"))
     CALL(evt_mario_set_pose, STRING("M_S_1"))
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     CALL(evt_party_run, 0)
 #endif
     CALL(evt_mario_key_onoff, 1)
@@ -5759,7 +5759,7 @@ static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
     CALL(evt_item_entry, STRING("item00"), ITEM_HP_DRAIN_BADGE, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
 #else
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_BADGE_RETURN | ITEM_FLAG_NO_TOUCH)
@@ -5777,7 +5777,7 @@ EVT_END()
  * Ms. Mowz and Punio and Puniko.
  */
 static EVT_BEGIN(epilogue_npc_entry)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_npc_delete, STRING("モニー"))
     CALL(evt_npc_delete, STRING("ピートン"))
     CALL(evt_npc_delete, STRING("マルコ"))
@@ -6044,7 +6044,7 @@ static EVT_BEGIN(epilogue_evt)
     CALL(evt_npc_move_position, STRING("プニオ"), 65, 205, 0, 40, 0)
     WAIT_WHILE(GF(0))
     WAIT_MS(200)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_npc_set_autotalkpose, STRING("ピーチ姫"), STRING("P_S_8"), STRING("P_T_14"))
     CALL(evt_msg_print, 0, STRING("ep_20"), 0, STRING("ピーチ姫"))
     CALL(evt_npc_set_anim, STRING("ピーチ姫"), STRING("P_S_7"))
@@ -6582,7 +6582,7 @@ EVT_BEGIN(return_gorotsuki_town)
             WAIT_FRAMES(1)
         END_LOOP
     END_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
         SET_FLOAT_VALUE(LW(0), FLOAT(1.0f))
@@ -6806,7 +6806,7 @@ EVT_BEGIN(gor_00_init_evt)
         END_IF
         // Chapter 5: Mario returns from Keelhaul Key.
         CASE_EQUAL(STORY_STG5_58_FAIR_WINDS)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL_CHILD(gor_muj_ship_init)
 #endif
         SPAWN_EVENT(gorotsuki_kikan)

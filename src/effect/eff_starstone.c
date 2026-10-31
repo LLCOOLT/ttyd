@@ -446,7 +446,7 @@ static void effStarStoneMain(EffectEntry* effect) {
             ((EffSnowDustN64Work*)w->dust->userdata)->position.z = 0.0f;
         }
         if (w->state < 3 && cam == 4) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             shadowEntry(w->position.x, w->position.y, w->position.z, 8.0f * w->scale);
 #else
             U_shadowSetMode(shadowEntry(w->position.x, w->position.y, w->position.z, 8.0f * w->scale), w->a);
@@ -505,7 +505,7 @@ static inline void starStoneSetBlend(void) {
  * and the demo orders the loop variables differently; each form gives the original register allocation.
  */
 static void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     u32 i;
     u8* size;
     u8** list;
@@ -552,7 +552,7 @@ static void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
     GXSetCullMode(GX_CULL_BACK);
     if (type == 0) {
         starStoneSetVtx(diamond_1_vertex_tbl, diamond_1_normal_tbl, TRUE, diamond_1_color0_tbl, diamond_1_texcoord0_tbl, 13);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         for (i = 0, size = diamond_1_dl_0_size_tbl, list = diamond_1_dl_0_tbl; i < sizeof(diamond_1_dl_0_tbl) / sizeof(diamond_1_dl_0_tbl[0]); i++, size++, list++) {
             GXCallDisplayList(*list, *size << 5);
         }
@@ -562,7 +562,7 @@ static void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
         }
 #endif
         starStoneSetVtx(diamond_1_vertex_tbl, diamond_1_normal_tbl, FALSE, NULL, diamond_1_texcoord0_tbl, 13);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {
             u8* sz;
             u8** dl;
@@ -579,7 +579,7 @@ static void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
 #endif
     } else {
         starStoneSetVtx(diamond_7_vertex_tbl, diamond_7_normal_tbl, TRUE, diamond_7_color0_tbl, diamond_7_texcoord0_tbl, 13);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {
             u8* sz;
             u8** dl;
@@ -595,7 +595,7 @@ static void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
         }
 #endif
         starStoneSetVtx(diamond_7_vertex_tbl, diamond_7_normal_tbl, TRUE, diamond_7_color0_tbl, diamond_7_texcoord0_tbl, 13);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {
             u8* sz;
             u8** dl;
@@ -646,7 +646,7 @@ static void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
     starStoneSetBlend();
     if (type == 0) {
         starStoneSetVtx(diamond_1_vertex_tbl, diamond_1_normal_tbl, TRUE, diamond_1_color0_tbl, diamond_1_texcoord0_tbl, 13);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {
             u8* sz;
             u8** dl;

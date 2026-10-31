@@ -42,7 +42,7 @@ const char R_no_messages_US[] = "<col ff0000ff>No messages.<col>\n<key>";
 
 /** the text of a loaded message file (the demo keeps it in a smart heap block) */
 static inline const char* msgEntryText(MessageEntry* entry) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     return entry->address->address;
 #else
     return entry->address;
@@ -101,7 +101,7 @@ s32 msgWindowOpen_SE_Data[] = {
 
 //.sbss
 MessageWork msgWork;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static smartEntry dummySmartList; // stands in for a message file that failed to load
 #endif
 BOOL msgSEflag;             // msgSEInit and related functions are unused
@@ -110,7 +110,7 @@ u16 g5_active_s772;
 
 //.sdata
 MessageWork* msgw = &msgWork;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Empty text that a message file which failed to load is replaced with. */
 static char NoMessage[] = ""; // the text of dummySmartList
 #endif
@@ -130,7 +130,7 @@ const char* language_dir[7] = {"msg/JP", "msg/US", "msg/DE", "msg/FR", "msg/SP",
 const char* language_dir[2] = {"msg", "emsg"};
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // the demo's sound table follows the pose names in .data
 s32 msgWindowOpen_SE_Data[] = {
     0x16, 0x17, 0x1A, 0x1B, 0x20, 0x21, 0x1C, 0x1D,
@@ -160,7 +160,7 @@ void msgInit(void) {
     msgLoad("global", 1);
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** the demo loads the text into a smart heap block and points a missing file at an empty text */
 void msgLoad(const char* filename, s32 index) {
     MessageEntry* entry;
@@ -880,7 +880,7 @@ void msgAnalize(smartEntry* smart, const char* msg) {
 #if VERSION >= VERSION_US
     Vec scale; // US: x and y scale apart (<scaleX>)
     u32 maxW;  // US: widest line so far, becomes the window width
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     s32 centerStart; // PAL: first character of the open <center> span
 #endif
 #else
@@ -934,7 +934,7 @@ void msgAnalize(smartEntry* smart, const char* msg) {
         scale = one;
     }
     maxW = 70;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     centerStart = 0;
 #endif
 #else
@@ -975,7 +975,7 @@ void msgAnalize(smartEntry* smart, const char* msg) {
     }
 
     while (TRUE) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         // FAKE: dead guard (never runs) redefining y at the loop top; it gives y its own web there, so y is coloured
         // before the other parse state as in the target (FAKES.md)
         {
@@ -1287,7 +1287,7 @@ void msgAnalize(smartEntry* smart, const char* msg) {
                     data->charCount++;
                 } else if (strcmp(tag, "nowinse") == 0) {
                     window->flags |= WINDOW_FLAG_NO_SE;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 } else if (strcmp(tag, "center") == 0) {
                     centerStart = data->charCount;
                 } else if (strcmp(tag, "/center") == 0) {

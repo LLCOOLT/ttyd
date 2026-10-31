@@ -24,13 +24,13 @@ static BattleDataEntry data_table_yoshi[2];
 static BattleUnitKindPart parts_yoshi[1];
 static EvtWord init_event_yoshi[24];
 extern EvtWord damage_event_yoshi[];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord dead_event_yoshi[156];
 #else
 static EvtWord dead_event_yoshi[177];
 #endif
 static EvtWord attack_event_yoshi[748];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord wait_event_yoshi[6];
 #else
 static EvtWord wait_event_yoshi[7];
@@ -151,7 +151,7 @@ static BattleUnitDefense defence_yoshi = {{0, 0, 0, 0, 0}};
 /** Defence attributes of the Yoshi double's body: none, so every damage type is dealt normally. */
 static BattleUnitDefenseAttr defence_attr_yoshi = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Yoshi double in the demo, as a percent of the normal chance:
  * immune to fright, gale force, instant kill;
@@ -491,7 +491,7 @@ EVT_END()
 static EVT_BEGIN(wait_event_yoshi)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_END()
 #else
 EVT_END_PAD()

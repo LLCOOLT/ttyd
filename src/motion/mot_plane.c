@@ -147,7 +147,7 @@ s32 marioGetPlaneStatus(void) {
     return 1;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Ends a glide early: switches to the landing phase (sub-motion 50) from the current height.
  * Called from evt_mario's plane command and when the field motion is changed while flying.
@@ -372,7 +372,7 @@ void mot_plane(void) {
     }
 #endif
     flyMain();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (marioKeyOffChk() && !(mp->trigFlags & MARIO_TRIG_FLAG_SHIP_PLANE_EVT_ON)) {
         MarioWork* m = marioGetPtr();
         if ((u16)m->currMotionId == MARIO_MOTION_PLANE && (s32)m->currSubMotionId >= 12 && (s32)m->currSubMotionId < 20) {
@@ -975,7 +975,7 @@ static BOOL chkCollision(f32* outY) {
         y = mario->motPlane->tipPos.y;
         z = mario->motPlane->tipPos.z;
         mario->hitobjStandOn = NULL;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         dist = 2.0f;
         hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, x, y, z, 0.0f, -1.0f, 0.0f);
 #else

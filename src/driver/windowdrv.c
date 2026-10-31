@@ -66,7 +66,7 @@ void windowInit(void) {
 #endif
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 void windowLoadTpl(const char* name);
 
 /** the demo loads msgWindow.tpl synchronously */
@@ -1115,7 +1115,7 @@ static void _windowDispGX_Message(s32 type, s32 tailMode, u8 alpha, BOOL dark, f
 end:;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 TEXPalette* winTpl;
 #else
 BOOL tpl_loaded; // set once the frame textures (winTpl) have loaded
@@ -1124,7 +1124,7 @@ TEXPalette* winTpl;
 
 /** whether the window frame textures can be drawn (the demo loads them synchronously and has no load flag) */
 static inline BOOL windowTplReady(void) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     return TRUE;
 #else
     return tpl_loaded;

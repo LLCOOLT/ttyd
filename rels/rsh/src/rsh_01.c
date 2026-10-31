@@ -35,7 +35,7 @@ static s32 item_tbl_madam[2];
 static NpcSetupInfo npc_data[7];
 NpcSetupInfo npc_data_2[3];
 extern EvtWord evt_pikary_arrival[];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static const char* access_tbl[5];
 #else
 static const char* access_tbl[7];
@@ -367,7 +367,7 @@ static s32 item_tbl_madam[] = {
 static EVT_BEGIN(talk_madam_ring_return)
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
     CALL(evt_msg_print, 0, STRING("stg6_rsh_200"), 0, STRING("マダム"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_win_item_select, PTR(item_tbl_madam), LW(1))
 #else
     CALL(evt_win_item_select, 0, PTR(item_tbl_madam), LW(1), 0)
@@ -620,7 +620,7 @@ EVT_END()
 
 // The demo pairs each object with one message; the releases add a second message for it.
 static const char* access_tbl[] = {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     "tana_5",
     "stg6_rsh_262",
     "tana_4",
@@ -643,7 +643,7 @@ static const char* access_tbl[] = {
  */
 static EVT_BEGIN(evt_access)
     CALL(evt_mario_key_onoff, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_msg_print, 0, LW(1), 0, 0)
 #else
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_56_ROGUEPORT_STATION)
@@ -663,7 +663,7 @@ EVT_END()
 static EVT_BEGIN(evt_access_entry)
     SET_INT_READ_ADDR(PTR(&access_tbl))
     LOOP(0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         READ_INT2(LW(0), LW(1))
 #else
         READ_INT3(LW(0), LW(1), LW(2))
@@ -836,7 +836,7 @@ EVT_END()
  * says stg6_rsh_c_14, or in the releases stg6_rsh_c_09_1 once the train has reached Rogueport.
  */
 EVT_BEGIN(talk_syasyou)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_msg_print, 0, STRING("stg6_rsh_c_14"), 0, 0)
 #else
     IF_INT_EQUAL(GSWF(GSWF_TRAIN_AT_ROGUEPORT), 0)
@@ -1111,7 +1111,7 @@ EVT_BEGIN(rsh_01_init_evt_nidome)
     ELSE
         IF_INT_EQUAL(GSWF(GSWF_TRAIN_ARRIVED_ROGUEPORT), 1)
             CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_GOR1"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_GOR5"))
 #else
             CALL(evt_snd_envoff, PSND_FADE_OUT)

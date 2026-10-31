@@ -54,7 +54,7 @@ BattleUnitKind unit_barriern_z_satellite = {
     0.0f,
     0.0f,
     0.0f,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     0,
     -16,
 #else
@@ -123,7 +123,7 @@ static BattleUnitKindPart parts[] = {
     {6, "btl_un_barriern_satellite_z", "c_baria_z", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
 };
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the barriern_z_satellite (percent, 100 is normal) in the demo builds: immune to
  * poison, freeze and fright; resists most statuses (70-90%).

@@ -3120,7 +3120,7 @@ NpcSetupBattleInfo btlsetup_las_tbl[] = {
         -1, // swFlag
         NULL, // altSelect
         btlgrpsel_las_btlno_las_bunbaba_off, // select
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         NPC_BATTLE_MAX_COUNT | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
 #else
         NPC_BATTLE_MAX_COUNT | NPC_BATTLE_NO_PLAYER_ENTRY | NPC_BATTLE_MARIO_PAUSE3_VOICE, // battleFlags
@@ -3707,7 +3707,7 @@ EVT_END()
  * in JP and later the flames follow the torch objects through hi_fire_main, and all are removed at battle end.
  */
 EVT_BEGIN(stg_08_6_init_sub_event)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mapobj_get_position, STRING("hi1"), LW(0), LW(1), LW(2))
     CALL(evt_eff, STRING("__hi1"), STRING("fire"), 8, LW(0), LW(1), LW(2), FLOAT(1.0f), 1000, 0, 0, 0, 0, 0, 0)
     CALL(evt_mapobj_get_position, STRING("hi2"), LW(0), LW(1), LW(2))
@@ -3732,7 +3732,7 @@ EVT_BEGIN(stg_08_6_init_sub_event)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("hi6"), MAPOBJ_FLAG_HIDE)
 #endif
     CALL(check_battle_end)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_eff_softdelete, STRING("__hi1"))
     CALL(evt_eff_softdelete, STRING("__hi2"))
     CALL(evt_eff_softdelete, STRING("__hi3"))

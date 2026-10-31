@@ -3103,7 +3103,7 @@ u8 _vivihimoData[3][0x400] ATTRIBUTE_ALIGN(32) = {
     0x00,
 };
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // the demo's -sdata 8 puts these in .data, ahead of the chain table
 s32 vivihimoTailGroupNo[4] ATTRIBUTE_ALIGN(32) = {0, 2, -1, -1}; // G5: target .sdata is 32-aligned
 /**
@@ -3175,7 +3175,7 @@ MoaChain g_moamoa_chain_tbl[47] = {
 };
 
 //.bss
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // the demo defines these before animPoseDrawMtx, so its local static mtx is emitted first in .bss (target order mtx, g_modeling_mtx_stack, work, tanfTbl)
 f32 tanfTbl[0xB2];
 AnimationWork work;
@@ -3957,7 +3957,7 @@ GXColor animPoseGetMaterialEvtColor(s32 poseId) {
 static inline f32 apmMul(f32 a, f32 b) {
     return a * b;
 }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * The demo copies the frame buffers through small inline helpers.
  * Kept: writing the copies out as `if (n != 0) memcpy_as4(...)` changes the demo animPoseMain's registers,
@@ -4760,7 +4760,7 @@ void animPoseMain(s32 poseId) {
 
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** the demo always builds every matrix and concatenates them all */
 static void pushGXModelMtx_TransformNode__(AnimPoseNode* node) {
     Mtx trans, scale, rot, tmp;
@@ -5128,7 +5128,7 @@ static void pushGXModelMtx_JointNode__(AnimPoseNode* node, f32 sx, f32 sy, f32 s
 #endif
 
 static void animSetMaterial_Texture(s32 texCount, s32* texIdRemap, AnimPoseTexEntry* pTexEntries, AnimTexMtx* animEntries, s32 texBindsCapacity, AnimTexBind* texBinds, AnimationTextureFile* texFile);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * the demo sets up each texture object, then builds the full texture matrix
  * unless the animation is the identity.
@@ -5656,7 +5656,7 @@ static void renderProc(s32 shapeId, s32 unused) {
         GXTexObj* texObj;
         CameraEntry* camera;
         s32 index;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         Mtx* model = g_modeling_mtx;
         camera = camGetCurPtr();
         MTXConcat(camera->view, *model, camMtx);
@@ -5949,7 +5949,7 @@ static void dispProc(s32 parentId, s32 groupId, s32 xluStage, s32 nextKeyframe, 
             m = g_modeling_mtx;
             mat = pose->matrix;
             switch (type) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 case 1:
                     offA = -2.0f;
                     offB = 2.0f;

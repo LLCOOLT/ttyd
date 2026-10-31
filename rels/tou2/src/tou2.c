@@ -555,7 +555,7 @@ static USER_FUNC(evt_tou_get_rule_msg2) {
     s32 rank;
 
     if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG3_34_RETURN_TO_ROGUEPORT) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         // the demo also counts the fighters taken out of the ranking
         for (i = 0; i < rank_wp->count; i++) {
             if (rank_wp->entries[i].flags & RANK_PLAYER) {
@@ -612,7 +612,7 @@ static USER_FUNC(evt_tou_get_rule_info) {
     s32 rank;
 
     if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG3_34_RETURN_TO_ROGUEPORT) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         // the demo also counts the fighters taken out of the ranking
         for (i = 0; i < rank_wp->count; i++) {
             if (rank_wp->entries[i].flags & RANK_PLAYER) {
@@ -823,7 +823,7 @@ static USER_FUNC(evt_tou_get_next_match) {
     if (rank > 0) {
         if (reverse) {
             evtSetValue(event, args[0], list[rank - 1]);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         } else if (rank != num - 1) {
 #else
         } else if (rank + 1 < num) {
@@ -1230,7 +1230,7 @@ static void rankingInit(void) {
         }
 
         // If we're past this point in the story, Bandy Andy got "retired" and The Destructors were added.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) >= STORY_STG3_20_06_RAWK_HAWKS_WARNING) {
 #else
         if (evtGetValue(NULL, GSWF(GSWF_TOU_MAIL4_RECEIVED))) {

@@ -99,7 +99,7 @@ static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 /** Element response of the Spunia: none, every attack type is treated normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Status vulnerability of the Spunia (percent, 0 is immune): immune to dodgy, invisible. Demo values. */
 static StatusVulnerability regist = {70, 90, 70, 150, 70, 150, 150, 70, 150, 70, 150, 70, 150, 70, 70, 90, 90, 150, 70, 0, 0, 30};
 #else

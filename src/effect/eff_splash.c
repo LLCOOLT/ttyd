@@ -347,7 +347,7 @@ static void effSplashGetCol(CameraId cameraId, EffectEntry* effect) {
         work->color.a = 255;
     }
     work->hasColor = 1;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // The demo picks the water colour per map here; retail asks eff_funemizu.
     if (strcmp(gp->currentMapName, "muj_02") == 0) {
         work->color.r = 0x20;
@@ -546,7 +546,7 @@ static void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
 #endif
                     GXPosition3f32(a * sn, 0.0f, a * cs);
                     GXColor4u8((u8)(255.0f * r0), (u8)(255.0f * g0), (u8)(255.0f * b0), 255);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     GXTexCoord2f32((f32)(k & 1), 0.1f);
 #else
                     GXTexCoord2f32((f32)kb, 0.1f);
@@ -555,7 +555,7 @@ static void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
                     sn = (f32)sin(ang);
                     GXPosition3f32(b * sn, c, b * cs);
                     GXColor4u8((u8)(255.0f * r1), (u8)(255.0f * g1), (u8)(255.0f * b1), 255);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     GXTexCoord2f32((f32)(k & 1), 2.1f);
 #else
                     GXTexCoord2f32((f32)kb, 2.1f);

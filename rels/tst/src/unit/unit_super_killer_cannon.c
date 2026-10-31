@@ -60,13 +60,13 @@ BattleUnitKind unit_super_killer_cannon = {
     1,
     31,
     0,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     3,
 #else
     1,
 #endif
     70,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     2,
 #else
     3,
@@ -91,12 +91,12 @@ BattleUnitKind unit_super_killer_cannon = {
     0.0f,
     0.0f,
     0.0f,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     0.0f,
 #else
     20.0f,
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     0.0f,
 #else
     10.0f,
@@ -139,7 +139,7 @@ static BattleUnitDefense defence = {{4, 4, 4, 4, 4}};
 /** Element modifiers of the B. Bill Blaster: none, no element is special to it. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the B. Bill Blaster in the demo builds:
  * immune to sleep, stop, dizzy, poison, confusion and fright; extra prone to electric;

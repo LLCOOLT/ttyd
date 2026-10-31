@@ -14,7 +14,7 @@
 #include "libc_decls.h"
 
 //.data
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // The demo table also names each effect and lists its users.
 static const char* kemuri_patname[] = {"\203}\203\212\203I:KAMECSMALL", "\203K\203\214\203L:KAMECBIG", "-----", "\203}\203\212\203I\202\307\202\301\202\265\202\361:KAMECBIG", "Block\202\307\202\301\202\265\202\361::KAMECBIG", "\203T\203\223\203{", "\203}\203~\201[", NULL};
 static const char* kemuri_dash_patname[] = {"Mairo:KAMECSMALL", "KAMECBIG", "PINKYBOM", NULL};
@@ -373,7 +373,7 @@ void effTexSetupN64(void) {
 #if VERSION >= VERSION_US
         lang = (u32)gp->language == 0 ? "jp" : "us";
         sprintf(path, "%s/e/%s/effect_n64.tpl", getMarioStDvdRoot(), lang);
-#elif VERSION <= VERSION_DEMO_US
+#elif VERSION <= VERSION_DEMO_JP
         sprintf(path, "%s/eff/jp/effect_n64.tpl", getMarioStDvdRoot());
 #else
         sprintf(path, "%s/e/jp/effect_n64.tpl", getMarioStDvdRoot());

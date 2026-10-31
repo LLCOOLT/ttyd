@@ -183,7 +183,7 @@ EVT_END()
  * -670 in the US demo, z 200).
  */
 EVT_BEGIN(yuu_01_kaijo_init2)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_set_pos, -670, 0, 200)
 #else
     CALL(evt_mario_set_pos, -800, 0, 200)
@@ -218,14 +218,14 @@ EVT_BEGIN(minigame02_start_cam)
     CALL(evt_cam3d_evt_set, FLOAT(-560.0f), FLOAT(565.0f), FLOAT(1185.0f), FLOAT(-560.0f), FLOAT(75.0f), FLOAT(155.0f), 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_seq_wait, 2)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_cam3d_evt_set, FLOAT(550.0f), FLOAT(565.0f), FLOAT(1185.0f), FLOAT(550.0f), FLOAT(75.0f), FLOAT(155.0f), 3000, 0)
 #else
     CALL(evt_cam3d_evt_set, FLOAT(550.0f), FLOAT(565.0f), FLOAT(1185.0f), FLOAT(550.0f), FLOAT(75.0f), FLOAT(155.0f), 4000, 0)
 #endif
     WAIT_MS(500)
     CALL(evt_yuutitle_alloc, 0, 0, STRING("menu_title_minigame2"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     WAIT_MS(2000)
 #else
     WAIT_MS(3000)
@@ -286,7 +286,7 @@ EVT_BEGIN(minigame02_start)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_MINIGAME1"))
     CALL(eff_call_minigame, 0, 0, 0, 500)
     WAIT_MS(3000)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_key_onoff, 1)
 #else
     CALL(evt_cam_letter_box_onoff, 0, 0)
@@ -387,7 +387,7 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(1), LW(1))
     SET_VALUE(LW(2), -140)
     SET_VALUE(LW(3), 140)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SET_VALUE(LW(4), 3500)
     SET_VALUE(LW(5), 200)
 #else
@@ -406,7 +406,7 @@ EVT_BEGIN(yuu_01_init_evt)
     CALL(yuuminigame2_get_name, 2, LW(0), LW(1), LW(11))
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SET_VALUE(LW(2), 0)
     SET_VALUE(LW(3), 20)
     SET_VALUE(LW(4), 800)
@@ -434,7 +434,7 @@ EVT_BEGIN(yuu_01_init_evt)
     CALL(yuuminigame2_get_name, 3, LW(0), LW(1), LW(11))
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SET_VALUE(LW(2), 0)
     SET_VALUE(LW(3), -20)
 #else
@@ -445,7 +445,7 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(5), 0)
     SET_VALUE(LW(6), 4)
     SET_VALUE(LW(7), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SET_VALUE(LW(8), 40)
     SET_VALUE(LW(9), -40)
     SET_VALUE(LW(10), 3200)
@@ -462,7 +462,7 @@ EVT_BEGIN(yuu_01_init_evt)
     CALL(yuuminigame2_get_name, 4, LW(0), LW(1), LW(11))
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SET_VALUE(LW(2), 0)
     SET_VALUE(LW(3), 0)
     SET_VALUE(LW(4), 0)
@@ -489,7 +489,7 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(1), LW(1))
     SET_VALUE(LW(2), -75)
     SET_VALUE(LW(3), 75)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SET_VALUE(LW(4), 2000)
 #else
     SET_VALUE(LW(4), 1500)
@@ -509,7 +509,7 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(1), LW(1))
     SET_VALUE(LW(2), 75)
     SET_VALUE(LW(3), -75)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SET_VALUE(LW(4), 2000)
 #else
     SET_VALUE(LW(4), 1500)
@@ -528,7 +528,7 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
     SET_VALUE(LW(2), 75)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SET_VALUE(LW(3), -75)
     SET_VALUE(LW(4), 3000)
 #else
@@ -549,7 +549,7 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
     SET_VALUE(LW(2), -75)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SET_VALUE(LW(3), 75)
     SET_VALUE(LW(4), 3000)
     SET_VALUE(LW(5), 500)
@@ -701,7 +701,7 @@ EVT_BEGIN(yuu_01_init_evt)
     CALL(yuuminigame2_get_name, 17, LW(0), LW(1), LW(11))
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SET_VALUE(LW(2), 0)
     SET_VALUE(LW(3), 0)
     SET_VALUE(LW(4), 0)
@@ -726,7 +726,7 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
     SET_VALUE(LW(2), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SET_VALUE(LW(3), 0)
     SET_VALUE(LW(4), 0)
     SET_VALUE(LW(5), 0)
@@ -748,7 +748,7 @@ EVT_BEGIN(yuu_01_init_evt)
     CALL(yuuminigame2_get_name, 19, LW(0), LW(1), LW(11))
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SET_VALUE(LW(2), 0)
     SET_VALUE(LW(3), 0)
     SET_VALUE(LW(4), 0)
@@ -867,7 +867,7 @@ BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
                     data->dir.y = 0.0f;
                     data->dist = PSVECMag(&data->dir);
                     PSVECNormalize(&data->dir, &data->dir);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     data->timer = 240;
 #else
                     data->timer = 120;
@@ -932,7 +932,7 @@ BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
                     PSMTXMultVec(mtx, &data->dir, &data->dir);
                     data->dir.y = 0.0f;
                     PSVECNormalize(&data->dir, &data->dir);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     PSVECScale(&data->dir, &ofs, data->timer >= 60 ? data->dist * ((data->timer - 60) / 180.0f) : 0.0f);
 #else
                     PSVECScale(&data->dir, &ofs, data->timer >= 30 ? data->dist * ((data->timer - 30) / 90.0f) : 0.0f);
@@ -941,7 +941,7 @@ BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
                     PSVECAdd(&ofs, &pos, &ofs);
                     mario->position.x = ofs.x;
                     mario->position.z = ofs.z;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     mario->position.y = data->y - 30.0f * ((240 - data->timer) / 240.0f);
 #else
                     mario->position.y = data->y - 30.0f * ((120 - data->timer) / 120.0f);
@@ -949,7 +949,7 @@ BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
                     if (data->timer <= 0) {
                         data->state++;
                         angle = 0.0f;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         data->timer = 60;
 #else
                         data->timer = 30;
@@ -961,7 +961,7 @@ BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
                 case 1:
                     data->timer--;
                     angle = 0.0f;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     mario->position.x = data->x + -100.0f * ((60 - data->timer) / 60.0f);
 #else
                     mario->position.x = data->x + -100.0f * ((30 - data->timer) / 30.0f);
@@ -969,7 +969,7 @@ BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
                     mario->position.y = data->y - 30.0f;
                     if (data->timer <= 0) {
                         data->state++;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         data->timer = 60;
 #else
                         data->timer = 30;
@@ -979,7 +979,7 @@ BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
                 case 2:
                     data->timer--;
                     angle = 0.0f;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     mario->position.y = data->y - 30.0f * (data->timer / 60.0f);
 #else
                     mario->position.y = data->y - 30.0f * (data->timer / 30.0f);
@@ -1035,7 +1035,7 @@ void yuuminigame_main_2fune(EventEntry* event, BOOL isFirstCall) {
         case 4:
             wp->subEvent = evtEntry(minigame02_end, 0, 0);
             wp->subEvent->lwData[0] = data->coins;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (data->result == 0) {
                 data->result += 2;
             } else if (data->result < 0) {

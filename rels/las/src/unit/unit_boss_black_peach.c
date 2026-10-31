@@ -293,7 +293,7 @@ BattleUnitDefense peach_defence = {{0, 0, 0, 0, 0}};
  */
 BattleUnitDefenseAttr peach_defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of the Shadow Queen (possessing Peach):
  * percent chance that each status takes hold (100 is normal);
@@ -539,7 +539,7 @@ BattleWeapon weapon_peach_dark_drag_last_attack = {
     1, // reserved_19
     1, // bingoSlotChance
     1, // reserved_1B
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     weaponGetPowerDefault, // hpDamageFn
 #else
     NULL, // hpDamageFn
@@ -554,7 +554,7 @@ BattleWeapon weapon_peach_dark_drag_last_attack = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ALWAYS_HITS | SPECIAL_PIERCES_DEFENSE, // special
 #else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ALWAYS_HITS | SPECIAL_PIERCES_DEFENSE | SPECIAL_UNGUARDABLE, // special
@@ -945,7 +945,7 @@ BattleUnitKind unit_boss_shadow_queen = {
     0.0f,
     0.0f,
     0.0f,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     "SFX_BOSS_QUEN_DAMAGED1",
 #else
     "SFX_BOSS_QWEN_DAMAGED1",
@@ -973,7 +973,7 @@ BattleUnitDefense queen_defence = {{1, 1, 1, 1, 1}};
  */
 BattleUnitDefenseAttr queen_defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of the Shadow Queen:
  * percent chance that each status takes hold (100 is normal);
@@ -1055,7 +1055,7 @@ BattleDataEntry queen_data_table[] = {
 
 /** Parts of the Shadow Queen: 6 parts with their hit boxes, defence tables and pose tables. */
 BattleUnitKindPart queen_parts[] = {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {1, "btl_un_shadow_queen", "c_b_peach_b", 0.0f, VERSION_PICK(0.0f, 2.0f), 0.0f, 0.0f, 47.0f, 0.0f, 0.0f, 47.0f, 0.0f, 41, 61, 255, &peach_defence, &peach_defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, peach_pose_table},
 #else
     {1, "btl_un_shadow_queen", "c_b_peach_b", 0.0f, VERSION_PICK(0.0f, 2.0f), 0.0f, 0.0f, 47.0f, 0.0f, 0.0f, 47.0f, 0.0f, 41, 61, 255, &queen_defence, &queen_defence_attr, PART_ATTR_MAIN | PART_ATTR_GUARD_COVER, 0, peach_pose_table},
@@ -1161,7 +1161,7 @@ BattleUnitKind unit_boss_shadow_hand_1 = {
     0.0f,
     0.0f,
     0.0f,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     "SFX_BOSS_QUEN_DAMAGED1",
 #else
     "SFX_BOSS_QWEN_DAMAGED1",
@@ -1189,7 +1189,7 @@ BattleUnitDefense queen_hand_1_defence = {{0, 0, 0, 0, 0}};
  */
 BattleUnitDefenseAttr queen_hand_1_defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of the Shadow Queen's first big hand:
  * percent chance that each status takes hold (100 is normal);
@@ -1228,7 +1228,7 @@ PoseTableEntry queen_hand_1_pose_table[] = {
  * event scripts and values the battle looks up by tag (damage reactions, dodge, first strike and so on).
  */
 BattleDataEntry queen_hand_1_data_table[] = {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {50, queen_hand_1_dead_event},
 #else
     {49, queen_hand_1_dead_event},
@@ -1301,7 +1301,7 @@ BattleUnitKind unit_boss_shadow_hand_2 = {
     0.0f,
     0.0f,
     0.0f,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     "SFX_BOSS_QUEN_DAMAGED1",
 #else
     "SFX_BOSS_QWEN_DAMAGED1",
@@ -1329,7 +1329,7 @@ BattleUnitDefense queen_hand_2_defence = {{0, 0, 0, 0, 0}};
  */
 BattleUnitDefenseAttr queen_hand_2_defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of the Shadow Queen's second big hand:
  * percent chance that each status takes hold (100 is normal);
@@ -1368,7 +1368,7 @@ PoseTableEntry queen_hand_2_pose_table[] = {
  * event scripts and values the battle looks up by tag (damage reactions, dodge, first strike and so on).
  */
 BattleDataEntry queen_hand_2_data_table[] = {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {50, queen_hand_2_dead_event},
 #else
     {49, queen_hand_2_dead_event},
@@ -1441,7 +1441,7 @@ BattleUnitKind unit_boss_shadow_hand_small = {
     0.0f,
     0.0f,
     0.0f,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     "SFX_BOSS_QUEN_DAMAGED1",
 #else
     "SFX_BOSS_QWEN_DAMAGED1",
@@ -1469,7 +1469,7 @@ BattleUnitDefense queen_hand_small_defence = {{0, 0, 0, 0, 0}};
  */
 BattleUnitDefenseAttr queen_hand_small_defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of the Shadow Queen's small hand:
  * percent chance that each status takes hold (100 is normal);
@@ -1508,7 +1508,7 @@ PoseTableEntry queen_hand_small_pose_table[] = {
  * and values the battle looks up by tag (damage reactions, dodge, first strike and so on).
  */
 BattleDataEntry queen_hand_small_data_table[] = {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {50, queen_hand_small_dead_event},
 #else
     {49, queen_hand_small_dead_event},
@@ -2391,7 +2391,7 @@ EVT_BEGIN(queen_first_attack_message_evt)
     END_IF
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL(evt_btl_camera_set_mode, 0, 3)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_btl_camera_set_moveto, 0, 83, 141, 412, 83, 111, 0, 30, 11)
 #else
     CALL(evt_btl_camera_set_moveto, 0, 63, 141, 412, 63, 111, 0, 30, 11)
@@ -2414,7 +2414,7 @@ EVT_BEGIN(queen_next_attack_message_evt)
     END_IF
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL(evt_btl_camera_set_mode, 0, 3)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_btl_camera_set_moveto, 0, 83, 141, 412, 83, 111, 0, 30, 11)
 #else
     CALL(evt_btl_camera_set_moveto, 0, 63, 141, 412, 63, 111, 0, 30, 11)
@@ -2559,7 +2559,7 @@ EVT_BEGIN(queen_hand_big_life_check_evt)
     IF_INT_EQUAL(LW(0), 2)
         RETURN
     END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     IF_INT_NOT_EQUAL(GW(8), -1)
         RETURN
     END_IF
@@ -2582,11 +2582,11 @@ EVT_BEGIN(queen_hand_big_life_check_evt)
 #endif
         CALL(btlevtcmd_SpawnUnit, LW(0), PTR(&entry_shadow_hand_2), 0)
         SET_VALUE(GW(9), LW(0))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(btlevtcmd_OffPartsAttribute, GW(8), 1, PART_ATTR_NOT_TARGETABLE)
 #endif
         CALL(btlevtcmd_OffPartsAttribute, GW(9), 1, PART_ATTR_NOT_TARGETABLE)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(btlevtcmd_OffAttribute, GW(8), UNIT_ATTR_NO_HP_GAUGE)
 #endif
         CALL(btlevtcmd_OffAttribute, GW(9), UNIT_ATTR_NO_HP_GAUGE)
@@ -2634,7 +2634,7 @@ EVT_END()
 EVT_BEGIN(queen_hp_drain_evt)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL(evt_btl_camera_set_mode, 0, 3)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_btl_camera_set_moveto, 0, 83, 141, 412, 83, 111, 0, 30, 11)
 #else
     CALL(evt_btl_camera_set_moveto, 0, 63, 141, 412, 63, 111, 0, 30, 11)
@@ -2682,7 +2682,7 @@ EVT_BEGIN(queen_hp_drain_evt)
         WAIT_MS(300)
         CALL(queen_hp_drain_3_evt)
     END_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(queen_hp_drain_4_evt)
 #else
     BEGIN_INLINE_EVENT
@@ -2698,7 +2698,7 @@ EVT_BEGIN(queen_hp_drain_evt)
     END_INLINE_EVENT
     CALL(queen_hp_drain_4_evt)
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     IF_INT_GREATER(LW(10), 99)
         SET_VALUE(LW(10), 99)
 #else
@@ -2727,7 +2727,7 @@ EVT_BEGIN(queen_hp_drain_evt)
     CALL(evt_eff_softdelete, STRING("m_h_s4_"))
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL(evt_btl_camera_set_mode, 0, 3)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_btl_camera_set_moveto, 0, 83, 141, 412, 83, 111, 0, 30, 11)
 #else
     CALL(evt_btl_camera_set_moveto, 0, 63, 141, 412, 63, 111, 0, 30, 11)
@@ -2751,7 +2751,7 @@ EVT_END()
 EVT_BEGIN(queen_hp_drain_evt_miss)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL(evt_btl_camera_set_mode, 0, 3)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_btl_camera_set_moveto, 0, 83, 141, 412, 83, 111, 0, 30, 11)
 #else
     CALL(evt_btl_camera_set_moveto, 0, 63, 141, 412, 63, 111, 0, 30, 11)
@@ -2782,7 +2782,7 @@ EVT_BEGIN(queen_first_damage_evt)
     CALL(evt_msg_print_battle_party, STRING("stg8_las_164"))
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_PARTNER)
     WAIT_MS(300)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_btl_camera_set_moveto, 0, 83, 141, 412, 83, 111, 0, 1, 11)
 #else
     CALL(evt_btl_camera_set_moveto, 0, 63, 141, 412, 63, 111, 0, 1, 11)
@@ -2800,7 +2800,7 @@ EVT_END()
 EVT_BEGIN(queen_2_hp_msg_evt)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL(evt_btl_camera_set_mode, 0, 3)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_btl_camera_set_moveto, 0, 83, 141, 412, 83, 111, 0, 30, 11)
 #else
     CALL(evt_btl_camera_set_moveto, 0, 63, 141, 412, 63, 111, 0, 30, 11)
@@ -2818,7 +2818,7 @@ EVT_END()
 EVT_BEGIN(queen_4_hp_msg_evt)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL(evt_btl_camera_set_mode, 0, 3)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_btl_camera_set_moveto, 0, 83, 141, 412, 83, 111, 0, 30, 11)
 #else
     CALL(evt_btl_camera_set_moveto, 0, 63, 141, 412, 63, 111, 0, 30, 11)
@@ -2835,7 +2835,7 @@ EVT_END()
 /** Event script: the queen's line when she is about to die (stg8_las_168). */
 EVT_BEGIN(queen_dead_hp_msg_evt)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(250)
 #else
@@ -2856,7 +2856,7 @@ EVT_BEGIN(queen_dead_hp_msg_evt)
 #endif
     CALL(evt_msg_print, 2, STRING("stg8_las_168"), 0, BTL_UNIT_SELF)
     WAIT_MS(300)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(btlevtcmd_StatusWindowOnOff, 1)
 #else
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("KRT_S_1"))
@@ -3607,7 +3607,7 @@ EVT_BEGIN(queen_attack_event)
             CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_BLACK_PEACH_ATTACK_STEP, 3)
             CALL_CHILD(queen_attack_black_energy)
             CASE_EQUAL(3)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(btlevtcmd_DrawLots, LW(0), 4, 100, 30, 30, 30)
 #else
             CALL(btlevtcmd_DrawLots, LW(0), 4, 100, 20, 30, 30)
@@ -3639,7 +3639,7 @@ EVT_BEGIN(queen_attack_event)
         CASE_EQUAL(3)
 #if VERSION >= VERSION_US
         CALL(btlevtcmd_DrawLots, LW(0), 6, 100, 50, 60, 20, 30, 30)
-#elif VERSION <= VERSION_DEMO_US
+#elif VERSION <= VERSION_DEMO_JP
         CALL(btlevtcmd_DrawLots, LW(0), 6, 100, 50, 50, 30, 30, 30)
 #else
         CALL(btlevtcmd_DrawLots, LW(0), 6, 100, 50, 30, 20, 30, 30)
@@ -3732,7 +3732,7 @@ EVT_BEGIN(queen_dead_event)
             CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 4, LW(0))
             CALL(btlevtcmd_SetAlpha, BTL_UNIT_SELF, 5, LW(0))
             SUBTRACT(LW(0), 4)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             WAIT_MS(10)
 #else
             WAIT_MS(50)
@@ -3834,7 +3834,7 @@ EVT_BEGIN(queen_entry_event)
     CALL(evt_msg_print_battle_party, STRING("stg8_las_161"))
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_PARTNER)
     WAIT_MS(300)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_btl_camera_set_moveto, 0, 83, 141, 412, 83, 111, 0, 1, 11)
 #else
     CALL(evt_btl_camera_set_moveto, 0, 63, 141, 412, 63, 111, 0, 1, 11)
@@ -4337,7 +4337,7 @@ EVT_BEGIN(queen_hand_small_drag_attack)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BOSS_QWENH_HAND_APPEAR1"), LW(0), LW(1), LW(2), 0)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     BEGIN_INLINE_EVENT_GET_ID(LW(15))
 #else
     BEGIN_INLINE_EVENT
@@ -4420,17 +4420,17 @@ EVT_BEGIN(queen_hand_small_drag_attack)
     CALL(evt_eff, STRING("m_h_s1"), STRING("mist2"), 0, 100, 15, 0, 150, 0, -1, 0, 0, 0, 0, 0)
     CALL(evt_eff, STRING("m_h_s2"), STRING("mist2"), 0, 100, 15, 0, 150, 0, -1, 0, 0, 0, 0, 0)
     CALL(evt_eff, STRING("m_h_s3"), STRING("mist2"), 0, 100, 15, 0, 150, 0, -1, 0, 0, 0, 0, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     BEGIN_INLINE_EVENT
 #endif
         CALL(evt_snd_sfxon, STRING("SFX_BOSS_QWEN_HAND_APPEAR1_2"), 0)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     IF_INT_NOT_EQUAL(LW(15), 0)
         CALL(btlevtcmd_WaitEventEnd, LW(15))
     END_IF
 #endif
         CALL(queen_hand_small_drag_3_evt)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     END_INLINE_EVENT
 #endif
     RETURN
@@ -4542,7 +4542,7 @@ EVT_BEGIN(queen_hand_small_1000hand_attack)
         CALL(btlevtcmd_WaitEventEnd, LW(15))
     END_IF
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     BEGIN_INLINE_EVENT
         CALL(queen_hand_small_1000hand_2_evt)
     END_INLINE_EVENT
@@ -4668,7 +4668,7 @@ static USER_FUNC(queen_hand_small_1000hand_2_evt) {
                 elem->speed = 1.0f + irand(200) / 100.0f;
                 elem->pos.x = (i % 10) * 20 + irand(15);
                 elem->pos.y = hand_wp->y - elem->ofs;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 elem->pos.z = (i / 10) * -20 + 70 + irand(15);
 #else
                 elem->pos.z = (i / 10) * -15 + 70 + irand(15);
@@ -4773,7 +4773,7 @@ static USER_FUNC(queen_hand_small_drag_1_evt) {
                 elem->speed = 1.0f + irand(200) / 100.0f;
                 elem->pos.x = (i % 10) * 20 - 200 + irand(15);
                 elem->pos.y = hand_wp->y - elem->ofs;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 elem->pos.z = (i / 10) * -20 + 70 + irand(15);
 #else
                 elem->pos.z = (i / 10) * -15 + 70 + irand(15);
@@ -4893,7 +4893,7 @@ static USER_FUNC(queen_hand_small_drag_3_evt) {
                 elem->speed = 1.0f + irand(200) / 100.0f;
                 elem->pos.x = (i % 10) * 20 + irand(15);
                 elem->pos.y = hand_wp->y - elem->ofs;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 elem->pos.z = (i / 10) * -20 + 70 + irand(15);
 #else
                 elem->pos.z = (i / 10) * -15 + 70 + irand(15);
@@ -5025,7 +5025,7 @@ static USER_FUNC(queen_hand_small_entry_evt) {
                 elem->speed = 1.0f + irand(200) / 100.0f;
                 elem->pos.x = (i % 10) * 20 + irand(15);
                 elem->pos.y = hand_wp->y - elem->ofs;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 elem->pos.z = (i / 10) * -20 + 70 + irand(15);
 #else
                 elem->pos.z = (i / 10) * -15 + 70 + irand(15);
@@ -5062,7 +5062,7 @@ static USER_FUNC(queen_hand_small_entry_evt) {
  * Sprites (BREAK_SLOT_FLAG_QUEEN_FORCE_SHINE), or Stars in the demos (BREAK_SLOT_FLAG_QUEEN_FORCE_STAR).
  */
 static USER_FUNC(slot_init) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     BattleBreakSlotGetPtr()->flags |= BREAK_SLOT_FLAG_QUEEN_FORCE_STAR;
 #else
     BattleBreakSlotGetPtr()->flags |= BREAK_SLOT_FLAG_QUEEN_FORCE_SHINE;
@@ -5113,7 +5113,7 @@ static USER_FUNC(queen_hp_drain_5_evt) {
                 elem->speed = 1.0f + irand(200) / 100.0f;
                 elem->pos.x = (i % 10) * 20 + irand(15);
                 elem->pos.y = hand_wp->y - elem->ofs;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 elem->pos.z = (i / 10) * -20 + 70 + irand(15);
 #else
                 elem->pos.z = (i / 10) * -15 + 70 + irand(15);
@@ -5253,7 +5253,7 @@ static USER_FUNC(queen_hp_drain_2_evt) {
                 elem->speed = 1.0f + irand(200) / 100.0f;
                 elem->pos.x = (i % 10) * 40 - 200 + irand(15);
                 elem->pos.y = hand_wp->y - elem->ofs;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 elem->pos.z = (i / 10) * -20 + 270 + irand(15);
 #else
                 elem->pos.z = (i / 10) * -15 + 270 + irand(15);
@@ -5371,7 +5371,7 @@ static USER_FUNC(peach_hand1000_dark_drag_1_evt) {
                 elem->speed = 1.0f + irand(200) / 100.0f;
                 elem->pos.x = (i % 10) * 20 - 200 + irand(15);
                 elem->pos.y = hand_wp->y - elem->ofs;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 elem->pos.z = (i / 10) * -20 + 70 + irand(15);
 #else
                 elem->pos.z = (i / 10) * -15 + 70 + irand(15);

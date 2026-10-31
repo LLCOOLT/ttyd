@@ -289,7 +289,7 @@ EVT_BEGIN(enemy_common_dead_event)
     END_IF
     CALL(evt_npc_get_drop_item, STRING("me"), LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_item_entry, 0, LW(3), LW(0), LW(1), LW(2), ITEM_ENTRY_DROP_8S, -1, 0)
 #else
         CALL(evt_item_entry, 0, LW(3), LW(0), LW(1), LW(2), ITEM_ENTRY_DROP_8S_BADGE_RETURN, -1, 0)
@@ -298,7 +298,7 @@ EVT_BEGIN(enemy_common_dead_event)
     CALL(evt_npc_getback_item_entry, STRING("me"))
     CALL(evt_npc_get_drop_fixitem, STRING("me"), LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_item_entry, 0, LW(3), LW(0), LW(1), LW(2), ITEM_ENTRY_DROP_8S, -1, 0)
 #else
         CALL(evt_item_entry, 0, LW(3), LW(0), LW(1), LW(2), ITEM_ENTRY_DROP_8S_BADGE_RETURN, -1, 0)
@@ -323,7 +323,7 @@ EVT_BEGIN(enemy_event_dead_event_sub)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Dead event for event-controlled enemies: plays enemy_event_dead_event_sub on itself (no drops) and resumes.
  * Demo position of the retail definition below.
@@ -490,7 +490,7 @@ EVT_BEGIN(_2d_dead_rotate_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Turns on the standard field enemy flags (battle info, script-driven, jumping, move animation, land on floor,
  * enemy) and status 2. Demo position of the retail definition below.
@@ -502,7 +502,7 @@ EVT_BEGIN(enemy_common_flag_init_event)
 EVT_END()
 #endif
 
-#if VERSION <= VERSION_DEMO_US || VERSION == VERSION_EU
+#if VERSION <= VERSION_DEMO_JP || VERSION >= VERSION_DEMO_EU
 /**
  * PAL and demo only: kuriboo_move_event with the enemy flags set directly instead of
  * enemy_common_flag_init_event; nothing in the game references it
@@ -522,7 +522,7 @@ EVT_BEGIN(testnpc_move_event)
 EVT_END()
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Init event of the stationary test enemy: standard enemy flags. Demo position of the retail definition below. */
 EVT_BEGIN(testenemynpc_init_event)
     CALL_CHILD(enemy_common_flag_init_event)
@@ -545,7 +545,7 @@ EVT_BEGIN(testenemynpc_move_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Init event of the generic wandering event NPC: move and talk animations on.
  * Demo position of the retail definition below.
@@ -579,7 +579,7 @@ EVT_BEGIN(npc_urouro_return_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Init event of Goombas, Spiky Goombas, X-Nauts and Bandits: standard enemy flags.
  * Demo position of the retail definition below.
@@ -645,7 +645,7 @@ EVT_BEGIN(kuriboo_return_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Init event of Paragoombas: script-driven flying enemy flags. Demo position of the retail definition below. */
 EVT_BEGIN(patakuri_init_event)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_AUTO_UPDATE | NPC_FLAG_MOVE_ANIM | NPC_FLAG_LAND_ON_FLOOR | NPC_FLAG_ENEMY)
@@ -728,7 +728,7 @@ EVT_BEGIN(patakuri_return_event)
     WAIT_MS(500)
     CALL(evt_npc_sound_data_reset, STRING("me"))
     CALL(evt_npc_set_stay_anim, STRING("me"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_npc_reverse_ry, STRING("me"))
     WAIT_MS(500)
     CALL(evt_npc_reverse_ry, STRING("me"))
@@ -1017,7 +1017,7 @@ EVT_BEGIN(togenoko_return_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Init event of Koopa Paratroopas: flying enemy flags with wall bounce.
  * Demo position of the retail definition below.
@@ -1359,7 +1359,7 @@ EVT_BEGIN(met_return_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Init event of Parabuzzies: flying enemy flags. Demo position of the retail definition below. */
 EVT_BEGIN(patamet_init_event)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_AUTO_UPDATE | NPC_FLAG_MOVE_ANIM | NPC_FLAG_LAND_ON_FLOOR | NPC_FLAG_ENEMY)
@@ -1465,7 +1465,7 @@ EVT_BEGIN(patamet_return_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Init event of Fuzzies: jumping enemy flags. Demo position of the retail definition below. */
 EVT_BEGIN(chorobon_init_event)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_AUTO_UPDATE | NPC_FLAG_JUMPING | NPC_FLAG_LAND_ON_FLOOR | NPC_FLAG_ENEMY)
@@ -1552,7 +1552,7 @@ EVT_BEGIN(chorobon_return_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Init event of Crazee Dayzees: standard enemy flags. Demo position of the retail definition below. */
 EVT_BEGIN(pansy_init_event)
     CALL_CHILD(enemy_common_flag_init_event)
@@ -1615,7 +1615,7 @@ EVT_BEGIN(pansy_return_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Init event of Amazy Dayzees: standard enemy flags. Demo position of the retail definition below. */
 EVT_BEGIN(twinkling_pansy_init_event)
     CALL_CHILD(enemy_common_flag_init_event)
@@ -1713,7 +1713,7 @@ EVT_BEGIN(karon_move_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Dead event of bone-throwing Dry Bones: hides the bone, then the usual defeat and drops.
  * Demo position of the retail definition below.
@@ -1939,7 +1939,7 @@ EVT_BEGIN(killer_dead_event)
     END_IF
     CALL(evt_npc_get_drop_item, STRING("me"), LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_item_entry, 0, LW(3), LW(0), LW(1), LW(2), ITEM_ENTRY_DROP_8S, -1, 0)
 #else
         CALL(evt_item_entry, 0, LW(3), LW(0), LW(1), LW(2), ITEM_ENTRY_DROP_8S_BADGE_RETURN, -1, 0)
@@ -1948,7 +1948,7 @@ EVT_BEGIN(killer_dead_event)
     CALL(evt_npc_getback_item_entry, STRING("me"))
     CALL(evt_npc_get_drop_fixitem, STRING("me"), LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_item_entry, 0, LW(3), LW(0), LW(1), LW(2), ITEM_ENTRY_DROP_8S, -1, 0)
 #else
         CALL(evt_item_entry, 0, LW(3), LW(0), LW(1), LW(2), ITEM_ENTRY_DROP_8S_BADGE_RETURN, -1, 0)
@@ -2013,7 +2013,7 @@ EVT_BEGIN(killer_cannon_move_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Init event of Pokeys: script-driven enemy flags. Demo position of the retail definition below. */
 EVT_BEGIN(sambo_init_event)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_ENEMY)
@@ -2289,7 +2289,7 @@ EVT_BEGIN(sinemon_return_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Init event of Bristles (togedaruma): standard enemy flags. Demo position of the retail definition below. */
 EVT_BEGIN(togedaruma_init_event)
     CALL_CHILD(enemy_common_flag_init_event)
@@ -2454,7 +2454,7 @@ EVT_BEGIN(barriern_find_event)
     CALL(evt_npc_set_ry, STRING("me"), LW(0))
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_FIND_EVENTS)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_MOVE_ANIM)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_JUMPING)
 #endif
     LABEL(0)
@@ -2563,7 +2563,7 @@ static USER_FUNC(kamec_fire_magic) {
     s32 d = evtGetValue(event, args[3]);
     s32 e = evtGetValue(event, args[4]);
     s32 f = evtGetValue(event, args[5]);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // The demo does not name the effect after the npc.
     EffectEntry* eff = effMagic1N64Entry(0, 60, (f32)a, (f32)b, (f32)c, (f32)d, (f32)e, (f32)f);
 #else
@@ -2580,7 +2580,7 @@ static USER_FUNC(kamec_fire_magic) {
  * the full game finds it by the Magikoopa's name and lets it run out.
  */
 static USER_FUNC(kamec_fire_magic_delete) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // The demo deletes the effect whose pointer the event passes.
     effSoftDelete((EffectEntry*)evtGetValue(event, event->args[0]));
 #else
@@ -2595,7 +2595,7 @@ static USER_FUNC(kamec_fire_magic_delete) {
 
 /** Lost event of Yux: hovers through its standing poses for 2 s and resumes. */
 EVT_BEGIN(barriern_lost_event)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_JUMPING)
 #endif
     CALL(evt_npc_set_anim, STRING("me"), STRING("S_3"))
@@ -2608,7 +2608,7 @@ EVT_END()
 
 /** Return event of Yux: floats 100 units toward home. */
 EVT_BEGIN(barriern_return_event)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_JUMPING)
 #endif
     CALL(evt_set_dir_to_home, STRING("me"))
@@ -2627,7 +2627,7 @@ EVT_END()
 
 /** Blow event of Yux: puts the beam away and stops its sound, then the usual blow handling. */
 EVT_BEGIN(barriern_blow_event)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_JUMPING)
 #endif
     CALL(evt_npc_set_attack_mode, STRING("slave_0"), 0)
@@ -2639,7 +2639,7 @@ EVT_BEGIN(barriern_blow_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Init event of Piders: standard enemy flags without jumping. Demo position of the retail definition below. */
 EVT_BEGIN(piders_init_event)
     CALL_CHILD(enemy_common_flag_init_event)
@@ -2875,7 +2875,7 @@ EVT_BEGIN(pakkun_return_event)
     CALL(evt_npc_set_anim, STRING("me"), STRING("PKF_E_1"))
     WAIT_FRAMES(10)
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_INTANGIBLE)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     WAIT_FRAMES(20)
 #else
     WAIT_FRAMES(25)
@@ -2947,7 +2947,7 @@ EVT_BEGIN(dokugassun_lost_event)
     CALL(evt_npc_sound_data_reset, STRING("me"))
     CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_MOVE_ANIM)
     CALL(evt_npc_set_anim, STRING("me"), STRING("S_1"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_eff_fukidashi, 1, 0, STRING("me"), 1, 0, 0, 0, 0, 0, 0, 30)
 #endif
     CALL(evt_npc_reverse_ry, STRING("me"))
@@ -3066,7 +3066,7 @@ EVT_BEGIN(basabasa_return_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Dead event of ceiling Swoopers: the usual defeat and drops. Demo position of the retail definition below. */
 EVT_BEGIN(basabasa_dead_event)
     CALL_CHILD(enemy_common_dead_event)
@@ -3074,7 +3074,7 @@ EVT_BEGIN(basabasa_dead_event)
 EVT_END()
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Init event of flying Swoopers: flying enemy flags. Demo position of the retail definition below. */
 EVT_BEGIN(basabasa2_init_event)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_AUTO_UPDATE | NPC_FLAG_MOVE_ANIM | NPC_FLAG_LAND_ON_FLOOR | NPC_FLAG_ENEMY)
@@ -3167,7 +3167,7 @@ EVT_BEGIN(basabasa2_return_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Dead event of flying Swoopers: the usual defeat and drops. Demo position of the retail definition below. */
 EVT_BEGIN(basabasa2_dead_event)
     CALL_CHILD(enemy_common_dead_event)
@@ -3175,7 +3175,7 @@ EVT_BEGIN(basabasa2_dead_event)
 EVT_END()
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Init event of Boos: flying enemy flags. Demo position of the retail definition below. */
 EVT_BEGIN(teresa_init_event)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_AUTO_UPDATE | NPC_FLAG_MOVE_ANIM | NPC_FLAG_LAND_ON_FLOOR | NPC_FLAG_ENEMY)
@@ -3288,7 +3288,7 @@ EVT_BEGIN(teresa_return_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Dead event of Boos: the usual defeat and drops. Demo position of the retail definition below. */
 EVT_BEGIN(teresa_dead_event)
     CALL_CHILD(enemy_common_dead_event)
@@ -3296,7 +3296,7 @@ EVT_BEGIN(teresa_dead_event)
 EVT_END()
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Init event of Embers (bubble): flying enemy flags. Demo position of the retail definition below. */
 EVT_BEGIN(bubble_init_event)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_AUTO_UPDATE | NPC_FLAG_MOVE_ANIM | NPC_FLAG_LAND_ON_FLOOR | NPC_FLAG_ENEMY)
@@ -3395,7 +3395,7 @@ EVT_BEGIN(bubble_return_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Init event of Bulky Bob-ombs (hbom): standard enemy flags. Demo position of the retail definition below. */
 EVT_BEGIN(hbom_init_event)
     CALL_CHILD(enemy_common_flag_init_event)
@@ -3500,7 +3500,7 @@ EVT_BEGIN(zakowiz_move_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Dead event of the X-Naut magician tribe: hides its projectile, then the usual defeat and drops.
  * Demo position of the retail definition below.
@@ -3586,7 +3586,7 @@ EVT_BEGIN(zakowiz_blow_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Init event of the hannya tribe: enemy flags with status 2 off. Demo position of the retail definition below.
  * hannya is Spania (btl_un_hannya); hinnya is Spinia and hennya Spunia.
@@ -3893,7 +3893,7 @@ EVT_END()
  * and a hidden 10x10 magic helper slave_0 with the Magikoopa's model (KMK_Z_1).
  */
 EVT_BEGIN(kamec_init_event)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_AUTO_UPDATE | NPC_FLAG_MOVE_ANIM | NPC_FLAG_LAND_ON_FLOOR | NPC_FLAG_ENEMY)
 #else
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_AUTO_UPDATE | NPC_FLAG_LAND_ON_FLOOR | NPC_FLAG_ENEMY)
@@ -4032,7 +4032,7 @@ EVT_BEGIN(kamec_return_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Dead event of flying Magikoopas: hides its magic helper, then the usual defeat and drops.
  * Demo position of the retail definition below.
@@ -4117,7 +4117,7 @@ EVT_BEGIN(kamec2_find_event)
     ADD(LW(1), 20)
     CALL(evt_npc_flag_onoff, 0, STRING("slave_0"), NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_set_attack_mode, STRING("slave_0"), 12)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_npc_glide_position, STRING("slave_0"), LW(0), LW(1), LW(2), 1000, 0, FLOAT(0.0f), 0, 6)
 #else
     CALL(evt_npc_glide_position, STRING("slave_0"), LW(0), LW(1), LW(2), 1000, 0, FLOAT(0.0f), 0, 3)
@@ -4156,7 +4156,7 @@ EVT_BEGIN(kamec2_return_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Dead event of walking Magikoopas: hides its magic helper, then the usual defeat and drops.
  * Demo position of the retail definition below.
@@ -4211,7 +4211,7 @@ EVT_BEGIN(hbross_move_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Dead event of Hammer Bros.: hides the hammer, then the usual defeat and drops.
  * Demo position of the retail definition below.
@@ -5128,7 +5128,7 @@ EVT_BEGIN(zako2D_move_event)
         CALL(evt_npc_set_ry, STRING("me"), LW(0))
         CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_LAND_ON_FLOOR)
         CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_JUMPING)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         LOOP(30)
             CALL(evt_npc_status_onoff, 1, STRING("me"), 4096)
             WAIT_FRAMES(1)
@@ -5402,7 +5402,7 @@ EVT_BEGIN(zakoM2D_find_start_event)
         WAIT_FRAMES(24)
         CALL(evt_npc_set_anim, STRING("me"), STRING("S_1"))
     END_SIBLING_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     BEGIN_INLINE_EVENT
         CALL(evt_npc_set_anim, STRING("slave_0"), STRING("B_1"))
         CALL(evt_npc_set_ry, STRING("slave_0"), LW(0))
@@ -5439,7 +5439,7 @@ EVT_BEGIN(zakoM2D_find_start_event)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Dead event of side-scrolling X-Naut PhDs: clears its bottle's status bit, then the side-scrolling defeat.
  * Demo position of the retail definition above.
@@ -5500,7 +5500,7 @@ EVT_BEGIN(gesso2D_move_event)
         IF_INT_LESS(LW(1), LW(11))
             BREAK_LOOP
         END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         IF_INT_LESS(LW(1), 60)
 #else
         IF_INT_LESS(LW(1), 90)

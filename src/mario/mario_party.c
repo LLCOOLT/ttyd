@@ -204,7 +204,7 @@ void marioPartyKill(void) {
     marioPartyKillSlot1();
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * The demo has one function for the partner button:
  * the request flag is trigFlags 0x100000, and the wait for partyDoWork runs here (retail splits it out into

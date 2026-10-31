@@ -78,7 +78,7 @@ static BattleUnitKind unit_hyper_sinemon = {
     (BattleDataEntry*)data_table, // dataTable
 };
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Demo builds: Defence of the Hyper Cleft: 3 against every kind of hit. */
 static BattleUnitDefense defence = {{3, 3, 3, 3, 3}};
 #else
@@ -95,7 +95,7 @@ static BattleUnitDefense defence = {{3, 99, 3, 3, 3}};
  */
 static BattleUnitDefense defence_turn = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Demo builds: Defence attributes of the Hyper Cleft: none, every element hits it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 #else
@@ -103,7 +103,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo builds: Status vulnerability of the Hyper Cleft (percent chance each status takes hold):
  * immune to burn; resists sleep (50%), dizzy (50%), confusion (50%), freeze (70%), Tiny (70%),

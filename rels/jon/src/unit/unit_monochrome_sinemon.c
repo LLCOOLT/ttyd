@@ -107,7 +107,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 /** Damage reduction of the Cleft, flipped on its back: none, every attack type does full damage. */
 static BattleUnitDefense defence_turn = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Status vulnerability of the Cleft (percent, 0 is immune): immune to burn. Demo values. */
 static StatusVulnerability regist = {50, 90, 50, 100, 50, 100, 0, 70, 100, 70, 100, 70, 100, 80, 80, 50, 70, 100, 80, 100, 100, 95};
 #else

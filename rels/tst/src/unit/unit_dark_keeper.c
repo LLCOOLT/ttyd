@@ -43,7 +43,7 @@ BattleUnitKind unit_dark_keeper = {
     1,
     1,
     28,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     0,
 #else
     1,
@@ -114,7 +114,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Element reactions of Dark Craw: none, every element hits normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of Dark Craw (the demos), as the percent chance a status takes hold:
  * immune to Fright; always hit by Poison, Electric, Burn, Huge, Attack Up, Defense Up, Fast,
@@ -190,7 +190,7 @@ static BattleWeapon weapon_monban_attack = {
     1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
 #else
     {6, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
@@ -231,7 +231,7 @@ static BattleWeapon weapon_monban_throw_attack = {
     1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {5, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
 #else
     {6, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork

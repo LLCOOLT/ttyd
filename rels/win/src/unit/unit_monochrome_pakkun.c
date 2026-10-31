@@ -115,7 +115,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Element attributes of the Pale Piranha: none, so every element does its normal damage. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Pale Piranha in the demo builds,
  * as a percent of the normal chance of each status:

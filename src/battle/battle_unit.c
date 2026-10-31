@@ -1252,7 +1252,7 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
             break;
         case STATUS_CHARGE:
             unit->chargeStrength += strength;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (unit->chargeStrength < 0) {
                 unit->chargeStrength = 0;
             } else if (unit->chargeStrength > 99) {
@@ -1287,7 +1287,7 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
             unit->invisibleTurns = turns;
             break;
         case STATUS_PAYBACK:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             unit->paybackTurns = turns;
 #else
             if (turns > 0) {

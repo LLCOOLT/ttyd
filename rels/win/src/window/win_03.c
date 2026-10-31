@@ -377,7 +377,7 @@ EVT_BEGIN(win_03_init_evt)
         SPAWN_EVENT(cloud_lostitem)
     END_IF
     RETURN
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_END()
 #else
 EVT_END_PAD4()

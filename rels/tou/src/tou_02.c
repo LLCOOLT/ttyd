@@ -742,7 +742,7 @@ EVT_END()
 
 /** NPC init for the second camera operator: stands at (80, 200, -125), or (30, 200, -60) before the arena intro. */
 EVT_BEGIN(init_cam2)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_npc_set_position, STRING("me"), 80, 200, -125)
 #else
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_01_ARENA_INTRO)
@@ -894,7 +894,7 @@ EVT_BEGIN(talk_kino5)
             CASE_GREATER(0)
             CALL(evt_mario_get_party, LW(0))
             IF_INT_EQUAL(LW(0), 4)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 CALL(evt_sub_get_language, LW(0))
                 SWITCH(LW(0))
                     CASE_EQUAL(2)
@@ -954,7 +954,7 @@ EVT_BEGIN(talk_kino5)
                     ELSE
                         CALL(evt_msg_print, 0, STRING("stg3_npc_re_031"), 0, 0)
                     END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     WAIT_MS(300)
                     CALL(evt_npc_set_anim, STRING("me"), STRING("M_1"))
                     WAIT_MS(600)
@@ -1074,7 +1074,7 @@ EVT_END()
  */
 EVT_BEGIN(init_chu)
     SWITCH(GSW(GSW_STORY_PROGRESS))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CASE_LESS(STORY_STG3_20_08_MS_MOWZ)
 #else
         CASE_LESS(STORY_STG3_20_05_MAJORS_4TH_PL)
@@ -1754,7 +1754,7 @@ static void ext_fan_init(void) {
 #endif
         }
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the demo hides the first fan: ext_fan_main moves it onto Mario
     extGetPosePtr()->flags &= ~1;
 #endif
@@ -1787,7 +1787,7 @@ static void ext_fan_main(void) {
     MarioWork* mario = marioGetPtr();
     Fan* fan;
     // The releases rewrote the fan crowd update (Mario joins it only while GF(10) is set, the pose pass checks hits), so each version keeps its own body
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     s32 i;
     ExtdrvPose* pose;
     Vec dir;
@@ -2217,7 +2217,7 @@ EVT_BEGIN(mario_momikucha_msg)
         ADD(LW(0), 2)
         MULTIPLY(LW(0), 1000)
         WAIT_MS(LW(0))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_mario_get_pos, 0, LW(5), LW(7), LW(8))
         CALL(evt_sub_random, 100, LW(0))
         CALL(evt_sub_random, 100, LW(1))
@@ -2227,7 +2227,7 @@ EVT_BEGIN(mario_momikucha_msg)
 #endif
         SUBTRACT(LW(0), 50)
         SUBTRACT(LW(1), 50)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         ADD(LW(5), LW(0))
         ADD(LW(8), LW(1))
         CALL(evt_msg_toge, 2, LW(5), LW(7), LW(8))
@@ -2296,7 +2296,7 @@ EVT_BEGIN(evt_momikucha)
     CALL(evt_npc_set_position, STRING("fan"), 0, -1000, 0)
     CALL(evt_npc_set_position, STRING("fan2"), 0, -1000, 0)
     CALL(evt_npc_set_position, STRING("fan3"), 0, -1000, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_ext_entry, 250, PTR(ext_fan_data), PTR(ext_fan_init), PTR(ext_fan_main), PTR(ext_fan_dispent))
 #else
     CALL(evt_ext_entry, 200, PTR(ext_fan_data), PTR(ext_fan_init), PTR(ext_fan_main), PTR(ext_fan_dispent))

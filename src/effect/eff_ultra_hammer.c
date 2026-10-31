@@ -17,7 +17,7 @@
 // Model data in the exporter's layout: indexed vertex arrays (positions, normals, colours, texture coordinates),
 // display lists of GX commands (each padded to 32 bytes with GX_NOP) and, per list table, the list sizes in
 // 32-byte units for GXCallDisplayList.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 s16 wakka_vertex_tbl[] ATTRIBUTE_ALIGN(32) = {
     24347, 2284, -8524,
     20710, 4131, -15417,
@@ -109,7 +109,7 @@ s16 wakka_vertex_tbl[] ATTRIBUTE_ALIGN(32) = {
 };
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 s16 wakka_texcoord0_tbl[] ATTRIBUTE_ALIGN(32) = {
     24576, 0,
     25600, 0,
@@ -207,7 +207,7 @@ s16 wakka_texcoord0_tbl[] ATTRIBUTE_ALIGN(32) = {
 };
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 s8 wakka_normal_tbl[] ATTRIBUTE_ALIGN(32) = {
     0, 61, 16,
 };
@@ -490,7 +490,7 @@ u8 wakka_dl_0_size_tbl[] = {
     1, // 19
 };
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // The demo grows the ring while it scrolls; retail keeps it at 3.5.
 static f32 scale_tbl[] = {
     1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
@@ -582,7 +582,7 @@ static void effUltraHammerMain(EffectEntry* effect) {
         } else {
             if (data->scroll < 25) {
                 data->offsetX = scroll_tbl[data->scroll];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 data->scale = scale_tbl[data->scroll];
 #else
                 data->scale = 3.5f;

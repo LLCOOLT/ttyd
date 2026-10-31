@@ -146,7 +146,7 @@ static USER_FUNC(elder_talk_sub_punicheck) {
     s32 trap;
     s32 puni;
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     for (i = 1; i < 103; i++) {
         puniGetPunidat();
         puniswGetindex(LSW(0), i - 1, &puni, &pos);
@@ -329,11 +329,11 @@ EVT_BEGIN(puni_return)
             GOTO(100)
         END_IF
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         IF_INT_NOT_EQUAL(LW(0), 0)
 #endif
             IF_BITS_SET(LW(4), 1024)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 DEBUG_PUT_MSG(STRING("長老の能力"))
                 DEBUG_PUT_MSG(STRING("プニ番号"))
                 DEBUG_PUT_REG(LW(11))
@@ -344,7 +344,7 @@ EVT_BEGIN(puni_return)
         END_IF
         DEBUG_PUT_MSG(STRING("はぐれから合流しました"))
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             ELSE
 #endif
                 READ_INT2(LW(12), LW(13))
@@ -353,7 +353,7 @@ EVT_BEGIN(puni_return)
 #if VERSION >= VERSION_JP
         LABEL(100)
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             END_IF
         END_IF
 #endif
@@ -511,7 +511,7 @@ static EVT_BEGIN(elder_talk)
         CALL(evt_pouch_check_item, ITEM_LIFE_SHROOM, LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 1)
             CALL(evt_msg_print, 0, STRING("irai_10_01"), 0, STRING("me"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_win_item_select, PTR(irai_item_tbl), LW(0))
 #else
             CALL(evt_win_item_select, 0, PTR(irai_item_tbl), LW(0), 0)
@@ -534,7 +534,7 @@ static EVT_BEGIN(elder_talk)
         ELSE
             IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_1), 0)
                 CALL(evt_msg_print, 0, STRING("irai_17_00"), 0, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(evt_win_item_select, PTR(iri_17_item_tbl), LW(0))
 #else
                 CALL(evt_win_item_select, 0, PTR(iri_17_item_tbl), LW(0), 0)
@@ -597,7 +597,7 @@ EVT_END()
  */
 EVT_BEGIN(puni_1_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CASE_LESS_OR_EQUAL(STORY_STG8_END_AFTER_THE_BATTLE)
 #else
         CASE_BETWEEN(STORY_STG7_02_MAYOR_BOB, STORY_STG7_02_MAYOR_BOB)
@@ -2335,7 +2335,7 @@ EVT_END()
  * then is parked out of sight and restored to normal size.
  */
 EVT_BEGIN(dai3kanbu_suikomare)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     BEGIN_INLINE_EVENT_GET_ID(LW(1))
 #else
     BEGIN_INLINE_EVENT
@@ -2361,7 +2361,7 @@ EVT_BEGIN(dai3kanbu_suikomare)
     END_INLINE_EVENT
     CALL(evt_npc_glide_position, STRING("第三勢力幹部"), 150, 60, 30, 300, 0, 0, 0, 0)
     DELETE_EVENT(LW(0))
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     DELETE_EVENT(LW(1))
     WAIT_FRAMES(1)
 #endif
@@ -3119,13 +3119,13 @@ EVT_BEGIN(boss_battle_win)
         CALL(evt_npc_set_position, LW(14), 0, -1000, 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         WAIT_MS(1100)
 #else
         WAIT_MS(600)
 #endif
         CALL(evt_npc_get_position, LW(11), LW(0), LW(1), LW(2))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         ADD(LW(0), -40)
 #else
         ADD(LW(0), -80)
@@ -3136,13 +3136,13 @@ EVT_BEGIN(boss_battle_win)
         CALL(evt_msg_print, 0, STRING("stg2_mri_e25_00_03"), 0, 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         WAIT_MS(1100)
 #else
         WAIT_MS(600)
 #endif
         CALL(evt_npc_get_position, LW(12), LW(0), LW(1), LW(2))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         ADD(LW(0), -40)
 #else
         ADD(LW(0), -80)
@@ -3152,13 +3152,13 @@ EVT_BEGIN(boss_battle_win)
         CALL(evt_msg_print, 0, STRING("stg2_mri_e25_00_04"), 0, 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         WAIT_MS(1700)
 #else
         WAIT_MS(1200)
 #endif
         CALL(evt_npc_get_position, LW(13), LW(0), LW(1), LW(2))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         ADD(LW(0), -40)
 #else
         ADD(LW(0), -80)
@@ -3168,13 +3168,13 @@ EVT_BEGIN(boss_battle_win)
         CALL(evt_msg_print, 0, STRING("stg2_mri_e25_00_05"), 0, 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         WAIT_MS(2000)
 #else
         WAIT_MS(1500)
 #endif
         CALL(evt_npc_get_position, LW(14), LW(0), LW(1), LW(2))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         ADD(LW(0), -40)
 #else
         ADD(LW(0), -80)

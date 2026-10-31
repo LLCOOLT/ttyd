@@ -48,7 +48,7 @@ typedef struct MarioMotTblEntry {
 static void mot_talk(void);
 static void mot_getItem(void);
 static void mot_kaze(void);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static void mot_cloud(void);
 static void mot_cloud_post(void);
 #else
@@ -98,7 +98,7 @@ MarioMotTblEntry marioMotTbl[] = {
     {mot_plane, NULL, mot_plane_post},
     {mot_ship, NULL, mot_ship_post},
     {mot_yoshi, NULL, mot_yoshi_post},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {mot_cloud, NULL, mot_cloud_post},
 #else
     {mot_cloud, NULL, cloudResetAt},
@@ -226,7 +226,7 @@ void marioChgRollMotion(void) {
  */
 void marioChgJumpStandMotion(f32 v) {
     MarioWork* mario = marioGetPtr();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // The demo does not follow the camera up, and in status 0x10 only stores the height.
     if (marioChkSts(0x10)) {
         mario->mot.jump.standHeight = v;
@@ -344,7 +344,7 @@ void marioBoots(void) {
     if (!(flags & MARIO_FLAG_HAS_INPUT_JUMP)) {
         return;
     }
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     if (mario->currMotionId == MARIO_MOTION_PLANE) {
         return;
     }
@@ -824,7 +824,7 @@ void marioLandOn(void) {
             return;
         }
         if (mario->flags & MARIO_FLAG_PAPER_MODE) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             marioChgMotSub(MARIO_MOTION_STAY, FALSE); // the demo has no slit re-entry
 #else
             marioSlitReenter();
@@ -850,7 +850,7 @@ void marioLandOn(void) {
             quake_kpaLandOn();
             return;
         }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         marioChgMot(MARIO_MOTION_WALK); // the demo does not stay in the slit after landing
         return;
 #else
@@ -893,7 +893,7 @@ void marioLandOn(void) {
         return;
     }
     if (flags & MARIO_FLAG_PAPER_MODE) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         marioChgMotSub(MARIO_MOTION_STAY, FALSE);
 #else
         marioSlitReenter();
@@ -905,7 +905,7 @@ void marioLandOn(void) {
     }
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // FAKE: unreferenced stand-in (deadstripped by the linker) that only creates the demo's three stray
 // .rodata doubles 0.5, 3.0 and 0.0 between the mot_talk and earlier pools; the original function that used
 // them is not in the demo DOL. A file-scope const array or <math.h> constants place them at the start of
@@ -973,7 +973,7 @@ static void mot_talk(void) {
         if (fbat != NULL) {
             marioChgPose(((NpcEntry*)fbat)->checkPose);
         }
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         if (!strcmp(mario->animName, "M_I_3")) {
 #else
         if (!strcmp(mario->animName, "M_I_2")) {
@@ -1053,7 +1053,7 @@ BOOL marioChkJump(void) {
     if (fbatNpcTalkCheck()) {
         return FALSE;
     }
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     if (mario->hitobjStandOn && (hitGetAttr(mario->hitobjStandOn) & HIT_ATTR_DEEP_WATER)) {
         return FALSE;
     }
@@ -1125,7 +1125,7 @@ BOOL marioChkItemMotion(void) {
 
 /** Always 0: a left-over stick-rub check; marioMain's air movement would skip the stick while it returned nonzero. */
 s32 marioChkRub(void) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     MarioWork* mario = marioGetPtr();
 #endif
     return 0;
@@ -1176,7 +1176,7 @@ s32 marioRollChgChk(void) {
  */
 void marioChgMotJump2(void) {
     MarioWork* mario = marioGetPtr();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (kpaGetBodyStatus() != 2) {
 #else
     if (kpaGetBodyStatus() != 2 && mario->currMotionId != MARIO_MOTION_ROLL) {
@@ -1185,7 +1185,7 @@ void marioChgMotJump2(void) {
     }
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * In the demo the Flurrie motion lives here: party_cloud.c has no mot_cloud yet,
  * and the motion's post function resets the camera target.

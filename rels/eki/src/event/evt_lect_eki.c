@@ -695,7 +695,7 @@ EVT_BEGIN(boots_lv3_juyoitem_lecture)
         CALL(evt_npc_move_position, STRING("キノピコ"), LW(0), LW(2), 0, FLOAT(80.0f), 0)
         CALL(evt_npc_set_ry, STRING("キノピコ"), 270)
         CALL(evt_npc_set_autotalkpose, STRING("キノピコ"), STRING("S_2"), STRING("T_2"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_msg_print_add, 0, STRING("lecture_u_boots_10"))
 #else
         CALL(evt_msg_print, 0, STRING("lecture_u_boots_10"), 0, STRING("キノピコ"))

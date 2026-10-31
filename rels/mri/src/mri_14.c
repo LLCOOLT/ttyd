@@ -567,7 +567,7 @@ EVT_BEGIN(time_bomb)
     CALL(evt_item_move_3d_position, STRING("item00"), 0, 400, -340, 750, 0)
     CALL(evt_item_set_position, STRING("item00"), 0, -1000, 0)
     WAIT_MS(500)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     ADD(LW(0), 30)
     CALL(evt_party_set_pos, 0, LW(0), LW(1), LW(2))
@@ -696,7 +696,7 @@ EVT_BEGIN(time_bomb)
     CALL_CHILD(npc_dokan)
     WAIT_MS(2000)
     CALL(evt_cam3d_evt_set, 0, 105, 269, 0, 45, -76, 0, 11)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_party_set_dir, 0, 270, -1)
 #endif
     WAIT_MS(200)
@@ -868,7 +868,7 @@ static EVT_BEGIN(punipuni_ball00)
         SET_VALUE(GF(15), 1)
         CALL_CHILD(mri_punipuni_itemset)
         SET_VALUE(GF(15), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_22_LORD_CRUMP_APPEARS)
             CALL(evt_mario_key_onoff, 1)
             SET_VALUE(GF(10), 1)

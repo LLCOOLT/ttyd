@@ -132,7 +132,7 @@ EVT_BEGIN(muj_11_init_evt)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_31_FOUR_EYES)
         SPAWN_EVENT(warning_event)
     END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the demo has a heart block and a save block in this room
     CALL(evt_mobj_recovery_blk, STRING("r_blk"), 12, 0, 60, -20, 0, 0)
     CALL(evt_mobj_save_blk, STRING("s_blk"), 50, 60, -20, 0, 0)

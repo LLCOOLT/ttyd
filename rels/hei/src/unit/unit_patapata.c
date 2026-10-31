@@ -32,7 +32,7 @@ static EvtWord dmg_fall_event[189];
 static EvtWord patapata_dmg_first_attack_pos[19];
 static EvtWord attack_event_patapata[541];
 static PoseTableEntry pose_table[18];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static PoseTableEntry pose_table_turn[15];
 #else
 static PoseTableEntry pose_table_turn[17];
@@ -140,7 +140,7 @@ static BattleUnitDefense defence_patapata = {{1, 1, 1, 1, 1}};
 /** Defence attributes of the Paratroopa's body: none, so every damage type is dealt normally. */
 static BattleUnitDefenseAttr defence_patapata_attr = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Paratroopa in the demo, as a percent of the normal chance: freeze 95%;
  * raised chance for dizzy 120%, gale force 120% (and 6 other statuses lowered).
@@ -524,7 +524,7 @@ static BattleUnitDefenseAttr defence_attr = {0};
 /** Defence of the Paratroopa's body per damage type while flipped over: 0 against every damage type. */
 static BattleUnitDefense defence_turn = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Paratroopa in the demo, as a percent of the normal chance:
  * freeze 95% (and 8 other statuses lowered).

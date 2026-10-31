@@ -151,7 +151,7 @@ static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
  */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of Bowser:
  * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
@@ -683,7 +683,7 @@ static EVT_BEGIN(attack_event)
         CALL_CHILD(hip_attack_event)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_BOSS_KOOPA_OPENING_STEP, 3)
         CASE_DEFAULT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(btlevtcmd_DrawLots, LW(0), 4, 20, 30, 0, 30)
 #else
         CALL(btlevtcmd_DrawLots, LW(0), 4, 20, 20, 0, 40)

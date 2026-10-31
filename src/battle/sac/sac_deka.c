@@ -1154,7 +1154,7 @@ EVT_BEGIN(marioAttackEvent_Deka)
     WAIT_FRAMES(30)
     // The camera resets and the background and rippling floor are cleaned up.
     CALL(evt_btl_camera_set_mode, 0, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(yuka_end)
     CALL(btlevtcmd_SacBgsetMove, 1)
     CALL(end_deka)
@@ -1249,7 +1249,7 @@ static void yuka_disp(CameraId cam, void* param) {
 
     w = get_ptr();
     camera = camGetPtr(cam);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {
         m = w->mesh->address;
         {

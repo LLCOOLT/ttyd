@@ -90,7 +90,7 @@ BattleUnitKind unit_heavy_bom = {
     1,
     22,
     0,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     3,
     70,
     3,
@@ -262,7 +262,7 @@ static BattleWeapon weapon_heavy_bomb_guard_2 = {
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, // burnChance..sizeChangeStrength
     100, // atkChangeChance
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     2, // atkChangeTime
 #else
     3, // atkChangeTime
@@ -304,7 +304,7 @@ static BattleWeapon weapon_heavy_bomb_guard_3 = {
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     6, // chargeStrength
 #else
     3, // chargeStrength
@@ -325,7 +325,7 @@ static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 /** Element reactions of Bulky Bob-omb: none, every element hits normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of Bulky Bob-omb (the demos), as the percent chance a status takes hold:
  * immune to Poison; always hit by Electric, Burn, Huge, Attack Up, Defense Up, Fast, Dodgy and Invisible;
@@ -862,7 +862,7 @@ static EVT_BEGIN(explosion_event)
     CALL(btlevtcmd_GetHeight, BTL_UNIT_SELF, LW(5))
     DIVIDE(LW(5), 2)
     CALL(btlevtcmd_GetStatusMg, BTL_UNIT_SELF, LW(6))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     MULTIPLY(LW(5), LW(6))
 #else
     MULTIPLY_FLOAT(LW(5), LW(6))

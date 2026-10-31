@@ -24,7 +24,7 @@ static BattleDataEntry data_table[2];
 static EvtWord init_event[23];
 static EvtWord twink_event[56];
 static EvtWord damage_event[10];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord song_event[298];
 #else
 static EvtWord song_event[300];
@@ -108,7 +108,7 @@ static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 /** Element modifiers of the Amazy Dayzee: none, no element is special to it. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Status vulnerability of the Amazy Dayzee in the demo builds: resists most statuses. */
 static StatusVulnerability regist = {95, 10, 10, 100, 10, 100, 100, 10, 100, 10, 100, 10, 100, 10, 10, 100, 80, 100, 10, 100, 100, 10};
 #else
@@ -151,7 +151,7 @@ static BattleWeapon weapon_twinkling_pansy_attack = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
 #else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
@@ -260,7 +260,7 @@ static EVT_BEGIN(twink_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(1), 20)
     CALL(btlevtcmd_GetStatusMg, BTL_UNIT_SELF, LW(3))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     MULTIPLY(LW(1), LW(3))
 #else
     MULTIPLY_FLOAT(LW(1), LW(3))
@@ -334,7 +334,7 @@ static EVT_BEGIN(song_event)
             WAIT_FRAMES(12)
         END_LOOP
     END_SIBLING_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     WAIT_FRAMES(60)
     WAIT_FRAMES(60)
     SET_VALUE(LW(6), 0)

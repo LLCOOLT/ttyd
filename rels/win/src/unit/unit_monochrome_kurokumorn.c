@@ -117,7 +117,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Element attributes of the Dark Puff: none, so every element does its normal damage. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Dark Puff in the demo builds, as a percent of the normal chance of each status:
  * 90% for confusion, freeze, Tiny, Attack Down, Defense Down, allergy, fright, Slow;

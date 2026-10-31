@@ -432,7 +432,7 @@ typedef enum BattlePoseType {
     BTL_POSE_ITEM_USE = 52, // holding up an item
     BTL_POSE_DANGER = 56,   // low HP (status flag 0x10000000)
     BTL_POSE_PERIL = 57,    // very low HP (status flag 0x20000000)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     BTL_POSE_ESCAPE_FAIL = 58, // failed Run Away: tumble
 #else
     BTL_POSE_KISSED_CHRISTINE = 58, // target of Goombella's kiss move
@@ -849,7 +849,7 @@ typedef struct BattleUnit {
     s32 ceilFallEventId;              // 0x2C0 (US 0x2C4)
     EvtWord* actEndEvent;             // 0x2C4 (US 0x2C8), run when the unit's action ends (battle_seq)
     s32 actEndEventId;                // 0x2C8 (US 0x2CC)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     s32 slideReturnEventId; // PAL only (+4 from here): enemy_slide_return_evt of sac_enemy_slide_return, waited on by BattleWaitAllActiveEvtEnd_NoBgSetEndWait
 #endif
     EvtWord* hitEventCode; // 0x2CC (US 0x2D0), run on the attacker by BattleRunHitEventDirect

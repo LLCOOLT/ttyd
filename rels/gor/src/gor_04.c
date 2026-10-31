@@ -804,7 +804,7 @@ EVT_END()
  * In the early demos it only resets the Dried Shroom shelf flag.
  */
 static EVT_BEGIN(evt_train)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // The Dried Shroom on the passenger car shelf comes back for every trip
     SET_VALUE(GSWF(GSWF_RSH02_SHELF_DRIED_SHROOM), 0)
 #else

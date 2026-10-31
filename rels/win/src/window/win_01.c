@@ -305,13 +305,13 @@ static EVT_BEGIN(peach_mail)
     SET_VALUE(LW(4), LW(2))
 #endif
     IF_INT_EQUAL(LF(0), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_cam3d_evt_set, -184, 86, 262, -184, 38, -5, 1000, 11)
 #else
         CALL(evt_cam3d_evt_set, -184, 86, LW(3), -184, 38, LW(4), 1000, 11)
 #endif
     ELSE
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_cam3d_evt_set, 184, 86, 262, 184, 38, -5, 1000, 11)
 #else
         CALL(evt_cam3d_evt_set, 184, 86, LW(3), 184, 38, LW(4), 1000, 11)

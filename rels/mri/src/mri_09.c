@@ -139,7 +139,7 @@ static BeroEntry bero_entry_data[] = {
  * then hides the panel and releases the capture.
  */
 EVT_BEGIN(wall_roll_sub)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_paper_entry, LW(0))
 #endif
     CALL(evt_img_entry, LW(2))
@@ -259,7 +259,7 @@ EVT_END()
  * In the demo the flag test is the wrong way round and there is no else branch (marked BUG in the code).
  */
 static EVT_BEGIN(breakyuka_init)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // BUG: the demo tests the floor flag the other way round and has no ELSE (fixed in the later builds)
     IF_INT_EQUAL(GSWF(GSWF_MRI09_FLOOR_BROKEN), 1)
 #else

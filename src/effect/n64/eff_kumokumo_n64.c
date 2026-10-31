@@ -117,7 +117,7 @@ s16 batten_texcoord1_tbl[] __attribute__((aligned(32))) = {
     8192, 4096, 12288, 4096, 16384, 4096,
 };
 s8 batten_normal_tbl[] __attribute__((aligned(32))) = {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     0, 0, 64,
 #else
     0, 0, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0,

@@ -950,7 +950,7 @@ static EVT_BEGIN(evt_train)
     SET_VALUE(GF(11), 1)
 #endif
     CALL(evt_hitobj_onoff, STRING("n_bero"), 1, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the demo also clears flag 3462 here (the dried-shroom shelf flag in the releases)
     SET_VALUE(GSWF(GSWF_RSH02_SHELF_DRIED_SHROOM), 0)
 #endif
@@ -965,7 +965,7 @@ static EVT_BEGIN(evt_train)
         GOTO(0)
     END_IF
     CALL(evt_cam_ctrl_onoff, CAMERA_3D, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_party_stop, 0)
     WAIT_MS(200)
 #endif
@@ -1363,7 +1363,7 @@ static EVT_BEGIN(talk_mama)
             IF_INT_GREATER(LW(0), 0)
                 // Trouble Center request 29: Goldbob's wife asks what Mario needs, and he shows the Present.
                 CALL(evt_msg_print, 0, STRING("irai_29_14"), 0, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(evt_win_item_select, PTR(iri_29_item_tbl), LW(0))
 #else
                 CALL(evt_win_item_select, 0, PTR(iri_29_item_tbl), LW(0), 0)
@@ -1531,7 +1531,7 @@ static s32 item_tbl_madam[] = {
 static EVT_BEGIN(talk_madam_ring_return)
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
     CALL(evt_msg_print, 0, STRING("stg6_pik_04_06"), 0, STRING("マダム"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_win_item_select, PTR(item_tbl_madam), LW(1))
 #else
     CALL(evt_win_item_select, 0, PTR(item_tbl_madam), LW(1), 0)
@@ -1573,7 +1573,7 @@ static EVT_BEGIN(talk_madam)
         CALL(evt_pouch_check_item, ITEM_WRESTLING_MAG, LW(0))
         IF_INT_GREATER(LW(0), 0)
             CALL(evt_msg_print, 0, STRING("irai_23_01"), 0, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_win_item_select, PTR(iri_23_item_tbl), LW(0))
 #else
             CALL(evt_win_item_select, 0, PTR(iri_23_item_tbl), LW(0), 0)
@@ -1927,7 +1927,7 @@ EVT_BEGIN(evt_rot_door)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** The demo hides the house while Mario rides Yoshi under its floor (case events; the releases poll in `under`). */
 static EVT_BEGIN(erase_house)
     IF_INT_EQUAL(GF(11), 1)
@@ -2007,7 +2007,7 @@ EVT_BEGIN(evt_seacret)
     CALL(evt_img_free_capture, STRING("img"), 0)
     CALL(evt_img_alloc_capture, STRING("img"), 0, STRING("ofs"), 1, 0, 0, 0, 0)
     CALL(evt_img_alloc_capture, STRING("img"), 2, STRING("ofs"), 1, 0, 0, 0, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_img_set_position, STRING("img"), -4, -298)
     CALL(evt_img_set_virtual_point, STRING("img"), 0, 0, 5)
 #else
@@ -2017,7 +2017,7 @@ EVT_BEGIN(evt_seacret)
     CALL(evt_img_set_paper_anim, STRING("img"), STRING("A_1"))
     CALL(evt_img_onoff, STRING("img"), 1)
     CALL(img_flag)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("e"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("ie_1_sakai"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_set_offscreen, 1, STRING("e"), STRING("ofs"))
@@ -2060,7 +2060,7 @@ static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_badge_gat"), LW(0), LW(1), LW(2))
     CALL(evt_item_entry, STRING("item00"), ITEM_HP_DRAIN_P, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
 #else
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_BADGE_RETURN | ITEM_FLAG_NO_TOUCH)
@@ -2187,7 +2187,7 @@ EVT_BEGIN(pik_00_init_evt)
     END_INLINE_EVENT
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("bero_"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("ie_1_N"), MAPOBJ_FLAG_BBOX_CULL)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_run_case_evt, CASE_COND_UNDER, 1, STRING("a_home_yuka"), 0, PTR(erase_house), 0)
     CALL(evt_run_case_evt, CASE_COND_NOT_UNDER, 1, STRING("a_home_yuka"), 0, PTR(appear_house), 0)
 #else
@@ -2224,7 +2224,7 @@ static USER_FUNC(img_flag) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * The demo's version: while Yoshi is ridden it updates the hit object under Mario,
  * which the house floor's case events (erase_house, appear_house) react to.

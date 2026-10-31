@@ -97,7 +97,7 @@ BattleUnitKind unit_boss_batten_satellite = {
     0.0f,
     0.0f,
     0.0f,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     0,
     0,
 #else
@@ -159,7 +159,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
  */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of Grodus's satellite (Grodus X):
  * percent chance that each status takes hold (100 is normal); immune to Sleep, Poison, Fright;

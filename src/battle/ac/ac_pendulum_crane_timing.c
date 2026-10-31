@@ -178,7 +178,7 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
             work->actionCommands.outputParams[1] = _get_angle_hp(rate);
             cw->rate = rate;
             rate = _get_angle_rate(cw->angle);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             // The demo ticks only at the exact ends of the gauge.
             if (rate == 0 || rate == 100) {
                 psndSFXOn("SFX_AC_GAUGE_MOVE1");

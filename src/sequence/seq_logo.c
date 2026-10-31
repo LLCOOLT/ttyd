@@ -2,7 +2,7 @@
 #include "seq/seq_logo.h"
 #include "driver/arcdrv.h"
 #include "version.h"
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #include "driver/animdrv.h"
 #endif
 #include "driver/effdrv.h"
@@ -33,7 +33,7 @@ static LogoWork work;
 
 //.sdata
 static LogoWork* wp = &work;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 // PAL: per-language logo screen textures {logo, story text}
 static s32 logoTexTbl[6][2] = {{24, 25}, {24, 25}, {26, 27}, {28, 29}, {30, 31}, {32, 33}};
 #endif
@@ -62,7 +62,7 @@ static void progDisp(CameraId camId, void* param);
 static FileEntry* logoAsyncFirst(void);
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * The demos always start interlaced; the US demo also starts the logo files loading
  * and preloads the E3 demo's models and textures.
@@ -157,7 +157,7 @@ void seq_logoInit(SequenceWork* work) {
     wp->logoId = LOGO_NONE;
     wp->texture = fileAllocf(4, "%s/mariost.tpl", getMarioStDvdRoot());
     if (!OSIsRestart() || OSGetResetCode() & OS_RESET_SHUTDOWN) {
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         // PAL: always ask for 50Hz / 60Hz; preselect 60Hz when EURGB60 is saved
         wp->progressive = TRUE;
         wp->toggle = OSGetEuRgb60Mode() != 1;
@@ -219,7 +219,7 @@ void seq_logoExit(SequenceWork* work) {
     effTexSetup();
     marioPoseInit();
     fileFree(wp->texture);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     gp->flags |= GLOBAL_FLAG_VIDEO_MODE_SET;
 #endif
 }
@@ -448,7 +448,7 @@ void seq_logoMain(SequenceWork* work) {
 
         case 9:
             if (fadeIsFinish()) {
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 work->state++;
                 time = gp->renderTime;
 #else
@@ -583,7 +583,7 @@ static void logoDisp(CameraId camId, void* param) {
         GXGetProjectionv(projection);
         GXGetViewportv(viewport);
         GXGetScissor(&sciLeft, &sciTop, &sciWidth, &sciHeight);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         // PAL: 50Hz while the 50/60Hz question is up, then the chosen mode
         if ((!OSIsRestart() || OSGetResetCode() & OS_RESET_SHUTDOWN) && ((SequenceWork*)param)->state < 3) {
             rmode = &sRMObjHReso;
@@ -615,7 +615,7 @@ static void logoDisp(CameraId camId, void* param) {
 
             case LOGO_STORY:
             case LOGO_STORY_TEXT:
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 TEXGetGXTexObjFromPalette(*wp->texture->data, &texObj, logoTexTbl[gp->language][0]);
 #else
                 TEXGetGXTexObjFromPalette(*wp->texture->data, &texObj, 7);
@@ -665,7 +665,7 @@ static void logoDisp(CameraId camId, void* param) {
 
                     alpha = logoStoryAlpha();
                     GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, alpha});
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                     TEXGetGXTexObjFromPalette(*wp->texture->data, &texObj, logoTexTbl[gp->language][1]);
 #else
                     TEXGetGXTexObjFromPalette(*wp->texture->data, &texObj, 8);
@@ -846,7 +846,7 @@ static void dummy_draw(CameraId camId, void* param) {
     f32 scale;
     u16 height;
 
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     if (OSGetEuRgb60Mode() != 1) {
 #else
     if (OSGetProgressiveMode() != 1) {
@@ -985,7 +985,7 @@ static void progDisp(CameraId camId, void* param) {
     }
 }
 #else
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 /** PAL: the 50Hz / 60Hz (EURGB60) selection screen */
 static void progDisp(CameraId camId, void* param) {
     static OSTime time;

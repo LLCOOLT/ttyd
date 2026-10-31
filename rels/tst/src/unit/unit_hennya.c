@@ -36,7 +36,7 @@ BattleUnitKind unit_hennya = {
     0,
     1,
     1,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     36,
     0,
     1,
@@ -112,7 +112,7 @@ static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 /** Element reactions of Spunia: none, every element hits normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of Spunia (the demos), as the percent chance a status takes hold:
  * immune to Dodgy and Invisible; always hit by Poison, Electric, Burn, Huge, Attack Up,

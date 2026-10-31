@@ -86,7 +86,7 @@ EVT_BEGIN(sac_start_stardust)
 EVT_END()
 
 /** Same script, at its place in the demo's data. */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_BEGIN(sac_mario_item_on_end_evt)
     CALL(evt_eff_delete, STRING("sac_itemget"))
     CALL(evt_eff_delete, STRING("sac_treasure"))
@@ -273,7 +273,7 @@ USER_FUNC(sac_enemy_slide_return) {
         if (unit && unit->alliance == 1) {
             evt = evtEntry(enemy_slide_return_evt, 0, EVENT_START_NOW);
             evt->unitId = i;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             unit->slideReturnEventId = evt->eventId;
 #endif
         }

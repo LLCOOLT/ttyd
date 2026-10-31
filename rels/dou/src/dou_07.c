@@ -169,7 +169,7 @@ EVT_BEGIN(peramajin_before)
         // Mario has the key: the chest asks him to pick it from the item menu.
         CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
         CALL(evt_msg_print, 0, STRING("stg1_gon_majin4_09"), PTR(majin_callback), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_win_item_select, PTR(key_tbl), LW(10))
 #else
         CALL(evt_win_item_select, 0, PTR(key_tbl), LW(10), 0)
@@ -277,7 +277,7 @@ EVT_END()
 EVT_BEGIN(peramajin_after)
     // The chest has opened: Mario receives the Boat Curse and the music changes.
     CALL(evt_mario_key_onoff, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_normalize)
 #endif
     CALL(evt_party_stop, 0)

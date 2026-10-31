@@ -196,7 +196,7 @@ static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 /** Damage-type reactions of the Hammer Bro: none, so every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Hammer Bro (both demos), as the percent chance each status takes hold:
  * resists 13 statuses (down to 40% of the normal chance).

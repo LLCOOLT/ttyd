@@ -68,13 +68,13 @@ static EvtWord init_event[198];
 static EvtWord entry_event[46];
 static EvtWord damage_event[22];
 static EvtWord dead_event[261];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord phase_event[61];
 #else
 static EvtWord phase_event[68];
 #endif
 static EvtWord attack_event[29];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord ogg_attack_event[481];
 #else
 static EvtWord ogg_attack_event[491];
@@ -105,7 +105,7 @@ static StatusVulnerability regist_christine;
 static BattleDataEntry data_table_christine[2];
 static BattleUnitKindPart parts_christine[1];
 static EvtWord init_event_christine[72];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord dead_event_christine[73];
 #else
 static EvtWord dead_event_christine[80];
@@ -123,7 +123,7 @@ static BattleUnitKindPart parts_nokotarou[1];
 static EvtWord dmg_turn_event[64];
 static EvtWord init_event_nokotarou[92];
 static EvtWord damage_event_nokotarou[6];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord dead_event_nokotarou[73];
 #else
 static EvtWord dead_event_nokotarou[80];
@@ -140,7 +140,7 @@ static StatusVulnerability regist_clauda;
 static BattleDataEntry data_table_clauda[2];
 static BattleUnitKindPart parts_clauda[1];
 static EvtWord init_event_clauda[80];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord dead_event_clauda[73];
 #else
 static EvtWord dead_event_clauda[80];
@@ -154,7 +154,7 @@ static StatusVulnerability regist_yoshi;
 static BattleDataEntry data_table_yoshi[2];
 static BattleUnitKindPart parts_yoshi[1];
 static EvtWord init_event_yoshi[54];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord dead_event_yoshi[73];
 #else
 static EvtWord dead_event_yoshi[80];
@@ -279,7 +279,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
  */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of Doopliss in his own form:
  * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
@@ -1031,7 +1031,7 @@ static BattleUnitDefense defence_fmario = {0};
  */
 static BattleUnitDefenseAttr defence_attr_fmario = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of Doopliss as Mario:
  * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
@@ -1157,7 +1157,7 @@ static BattleWeapon weapon_masao_hammer = {
     2, // reserved_6F
     NULL, // acHelpMsg
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_USABLE_IF_CONFUSED, // special
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
 #else
     COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_PAYBACK, // counterResistFlags
@@ -1235,7 +1235,7 @@ static BattleWeapon weapon_masao_kaiten_hammer = {
     2, // reserved_6F
     NULL, // acHelpMsg
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_USABLE_IF_CONFUSED, // special
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
 #else
     COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_PAYBACK, // counterResistFlags
@@ -1874,7 +1874,7 @@ static BattleUnitDefense defence_christine = {0};
  */
 static BattleUnitDefenseAttr defence_attr_christine = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of Doopliss as Goombella:
  * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
@@ -2029,7 +2029,7 @@ static EVT_BEGIN(attack_event_christine)
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(14), -1, 0)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(btlevtcmd_DrawLots, LW(0), 2, 80, 20)
 #else
     CALL(btlevtcmd_DrawLots, LW(0), 2, 50, 50)
@@ -2305,7 +2305,7 @@ static BattleUnitDefenseAttr defence_attr_nokotarou = {0};
  */
 static BattleUnitDefense defence_turn_nokotarou = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of Doopliss as Koops:
  * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
@@ -2568,7 +2568,7 @@ static EVT_BEGIN(attack_event_nokotarou)
         CALL_CHILD(wakeup_event)
         RETURN
     END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(btlevtcmd_DrawLots, LW(0), 2, 80, 20)
 #else
     CALL(btlevtcmd_DrawLots, LW(0), 2, 50, 50)
@@ -2651,7 +2651,7 @@ static EVT_BEGIN(attack_event_nokotarou_koura)
         IF_INT_EQUAL(LW(6), 2)
             CALL(btlevtcmd_StartAvoid, LW(3), 40)
         END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(btlevtcmd_FaceDirectionAdd, -29999997, LW(0), 40)
 #else
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 40)
@@ -2867,7 +2867,7 @@ static BattleUnitDefense defence_clauda = {0};
  */
 static BattleUnitDefenseAttr defence_attr_clauda = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of Doopliss as Flurrie:
  * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
@@ -3146,7 +3146,7 @@ static BattleUnitDefense defence_yoshi = {0};
  */
 static BattleUnitDefenseAttr defence_attr_yoshi = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of Doopliss as Yoshi:
  * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
@@ -3469,7 +3469,7 @@ BattleUnitDefense defence_vivian = {0};
  */
 BattleUnitDefenseAttr defence_attr_vivian = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of Doopliss as Vivian:
  * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
@@ -3734,7 +3734,7 @@ BattleUnitDefense defence_sanders = {0};
  */
 BattleUnitDefenseAttr defence_attr_sanders = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of Doopliss as Bobbery:
  * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
@@ -3808,7 +3808,7 @@ BattleWeapon enemyWeapon_SandersNormalAttack = {
     2, // reserved_6F
     NULL, // acHelpMsg
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE | SPECIAL_GROUNDS_WINGED | SPECIAL_USABLE_IF_CONFUSED, // special
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
 #else
     COUNTER_RESIST_ELECTRIC | COUNTER_RESIST_TOP_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_FIERY | COUNTER_RESIST_ICY | COUNTER_RESIST_POISON | COUNTER_RESIST_EXPLOSIVE | COUNTER_RESIST_VOLATILE_EXPLOSIVE | COUNTER_RESIST_PAYBACK | COUNTER_RESIST_HOLD_FAST, // counterResistFlags
@@ -3991,7 +3991,7 @@ BattleUnitDefense defence_chuchurina = {0};
  */
 BattleUnitDefenseAttr defence_attr_chuchurina = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of Doopliss as Ms. Mowz:
  * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
@@ -4065,7 +4065,7 @@ BattleWeapon enemyWeapon_ChuchurinaNormalAttackR = {
     2, // reserved_6F
     NULL, // acHelpMsg
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE | SPECIAL_GROUNDS_WINGED | SPECIAL_USABLE_IF_CONFUSED, // special
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
 #else
     COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_PAYBACK, // counterResistFlags
@@ -4110,7 +4110,7 @@ BattleWeapon enemyWeapon_ChuchurinaNormalAttackL = {
     2, // reserved_6F
     NULL, // acHelpMsg
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE | SPECIAL_GROUNDS_WINGED | SPECIAL_USABLE_IF_CONFUSED, // special
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
 #else
     COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_PAYBACK, // counterResistFlags

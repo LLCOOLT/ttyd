@@ -43,7 +43,7 @@ void BattleBreakSlot_Start(void);
 static void BattleBreakSlotDispReel(CameraId camId, void* param);
 static void item_appear_force(BreakSlotReel* reel, s32 item);
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // the demo keeps these in .data, ahead of the effect scripts
 u16 tex_id_list_small[5] = {0x2B, 0x2D, 0x2F, 0x2E, 0x2C};
 u16 tex_id_list_big[5] = {0x30, 0x32, 0x34, 0x33, 0x31};
@@ -329,14 +329,14 @@ void BattleBreakSlot_Main(void) {
     BreakSlotReel* rr;
     s32 count;
     s32 item;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     BOOL isBreakFrame;
 #endif
     s32 k;
     s32 i;
     f32 y;
 
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     // PAL: phase 6 plays a language-dependent number of break hits (count) every i frames;
     // count and i are reused for this (separate live ranges, as in the original)
     switch (gp->language) {
@@ -486,7 +486,7 @@ void BattleBreakSlot_Main(void) {
                     BattleAudienceSoundBooing();
                 }
             }
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             isBreakFrame = FALSE;
             for (item = 1; item <= count; item++) {
                 if (slot->phaseTimer == item * i) {
@@ -602,7 +602,7 @@ void BattleBreakSlot_Main(void) {
             if (slot->phaseTimer == count + 150) {
                 BattleAudienceAddTargetNum(0.0f, updown);
                 slot->phase = 8;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 slot->flags &= ~BREAK_SLOT_FLAG_QUEEN_FORCE_STAR;
 #else
                 slot->flags &= ~BREAK_SLOT_FLAG_QUEEN_FORCE_SHINE;
@@ -803,7 +803,7 @@ void BattleBreakSlot_Main(void) {
                     if ((slot->flags & BREAK_SLOT_FLAG_LECTURE) && rr->item != 3) {
                         break;
                     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     if ((slot->flags & BREAK_SLOT_FLAG_QUEEN_FORCE_STAR) && rr->item != 2) {
                         break;
                     }
@@ -996,7 +996,7 @@ void BattleBreakSlot_PointInc(void) {
             if (slot->flags & BREAK_SLOT_FLAG_LECTURE) {
                 item_appear_force(reel, 3);
             }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (slot->flags & BREAK_SLOT_FLAG_QUEEN_FORCE_STAR) {
                 item_appear_force(reel, 2);
             }
@@ -1018,7 +1018,7 @@ void BattleBreakSlot_PointInc(void) {
             if (slot->flags & BREAK_SLOT_FLAG_LECTURE) {
                 item_appear_force(reel, 3);
             }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (slot->flags & BREAK_SLOT_FLAG_QUEEN_FORCE_STAR) {
                 item_appear_force(reel, 2);
             }

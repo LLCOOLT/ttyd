@@ -2,7 +2,7 @@
    (0x802C0F20-0x802C0F38). Splitting it out moves system.c's .rodata to 0x802C0F38, so
    MWCC anchors system.c's float/double pool there, as in the target. */
 #include "version.h"
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 /** Build date of the EU version (26 September 2004), the stamp kept as build info. */
 const char R_build_date[] = "Sep 26 2004";
 /** Build time of the EU version (15:37:03). */

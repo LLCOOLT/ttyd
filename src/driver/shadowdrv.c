@@ -1,7 +1,7 @@
 // Shadow driver: blob, cylinder, projected and depth shadows (shadowInit, shadowMain, shadowDisp).
 #include "version.h"
 // Shadow driver: blob, cylinder, projected and depth shadows.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // the demo unit is built without the main precompiled header: only the dtrigf constants lead its data
 #define DTRIGF_WITH_INITIAL_VALUES
 #include <dtrigf.h>
@@ -460,7 +460,7 @@ static u8 cube_dl_top[64] ATTRIBUTE_ALIGN(32) = {
     0x00,
 };
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // the demo's -sdata 8 keeps these in .data, ahead of the vertex table
 u8 cube_dl_bottom[32] ATTRIBUTE_ALIGN(32) = {
     0x80,
@@ -853,7 +853,7 @@ static inline void shadowSetupPolygon(void) {
     GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_RASC);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA); // no shadow alpha register in the demo
 #else
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_RASA, GX_CA_ZERO);
@@ -1653,7 +1653,7 @@ ShadowConfig* shadowGetProjShadowConfig(void) {
  * depth ramp) from the shadow light's view and projection.
  */
 static inline void shadowCalcTexMtx(ProjShadowWork* wp, Mtx texMtx, Mtx depthMtx) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     u32 is16;
     ShadowConfig* cfg = &shadowConfig[wp->configIdx];
     Mtx m;
@@ -1797,7 +1797,7 @@ const char shadowDepthViewMap8[0x28] = "projected shadow depth map (8bit depth)"
 const char shadowDepthViewResult16[0x1C] = "result scene (16bit depth)";
 const char shadowDepthViewLight16[0x2C] = "actual depth from the light (16bit depth)";
 const char shadowDepthViewMap16[0x2C] = "projected shadow depth map (16bit depth)";
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // the demo keeps a table of the depth-shadow debug view names. Its map lists it as DispModeMsg$893, a static
 // local of a debug function the demo strips, so here it stays at file scope.
 static const char* DispModeMsg[6] = {

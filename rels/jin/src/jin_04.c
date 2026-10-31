@@ -287,7 +287,7 @@ EVT_BEGIN(irekawatta_mario)
     // The Ruby Star scene plays while the music fades out.
     SET_VALUE(LW(0), -1)
     SET_VALUE(LW(1), STRING("rubystar"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL_CHILD(evt_sub_starstone)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
 #else
@@ -984,7 +984,7 @@ EVT_BEGIN(jin_04_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG4_10_DOOPLISS_BATTLE)
         CALL(evt_snd_bgmoff, PSND_FADE_OUT)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_JIN1"))
         CALL(evt_snd_set_rev_mode, 2)
 #else
@@ -993,7 +993,7 @@ EVT_BEGIN(jin_04_init_evt)
         CASE_DEFAULT
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_JIN1"))
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_JIN1"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_snd_set_rev_mode, 2)
 #endif
     END_SWITCH

@@ -188,7 +188,13 @@ def normalise_ws(line):
     return (lead + line[m.end():]).rstrip()
 
 
-VERSIONS = {"VERSION_DEMO_JP": 0, "VERSION_DEMO_US": 1, "VERSION_JP": 2, "VERSION_US": 3, "VERSION_EU": 4}
+def read_versions():
+    """The ordered VERSION_ values (`#define VERSION_US 3`) from include/version.h."""
+    text = open(os.path.join(ROOT, "include", "version.h"), encoding="utf-8").read()
+    return {m.group(1): int(m.group(2)) for m in re.finditer(r"^#define (VERSION_\w+) +(\d+)\b", text, re.M)}
+
+
+VERSIONS = read_versions()
 
 
 def eval_condition(cond, version):
@@ -458,7 +464,7 @@ def process(cf, rel, write):
     return True
 
 
-SELF_TEST_IN = """#if VERSION <= VERSION_DEMO_US
+SELF_TEST_IN = """#if VERSION <= VERSION_DEMO_JP
 EVT_BEGIN(a)
     RETURN
 EVT_END()
@@ -470,7 +476,7 @@ EVT_BEGIN(a)
     RETURN EVT_END()
 #endif
 """
-SELF_TEST_OUT = """#if VERSION <= VERSION_DEMO_US
+SELF_TEST_OUT = """#if VERSION <= VERSION_DEMO_JP
 EVT_BEGIN(a)
     RETURN
 EVT_END()

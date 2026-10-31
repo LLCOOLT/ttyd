@@ -91,7 +91,7 @@ static void effMajinaiMain(EffectEntry* effect) {
             map->entries[0].flags |= 8;
             if (!gp->inBattle) {
                 mario = marioGetPtr();
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 for (i = 0; i < 3; i++) {
                     if (mario->paperAnimGroupId[i] != -1) {
                         animPoseSetMaterialFlagOn(mario->paperAnimGroupId[i], ANIM_MATERIAL_FLAG_NO_BLEND);
@@ -107,7 +107,7 @@ static void effMajinaiMain(EffectEntry* effect) {
                 animPoseSetMaterialFlagOn(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit))->poseId, ANIM_MATERIAL_FLAG_NO_BLEND);
             }
             if (animPoseGetLoopTimes(work->poseId) >= 0.93f) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 effStardustEntry(0, 16, 60, work->position.x, 55.0f + work->position.y, work->position.z, 45.0f, 45.0f);
 #else
                 effStardustEntry(0, 16, 60, work->position.x, 55.0f * work->scale + work->position.y,
@@ -132,7 +132,7 @@ static void effMajinaiMain(EffectEntry* effect) {
             map->entries[0].flags |= 8;
             if (!gp->inBattle) {
                 mario = marioGetPtr();
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                 for (i = 0; i < 3; i++) {
                     if (mario->paperAnimGroupId[i] != -1) {
                         animPoseSetMaterialFlagOff(mario->paperAnimGroupId[i], ANIM_MATERIAL_FLAG_NO_BLEND);

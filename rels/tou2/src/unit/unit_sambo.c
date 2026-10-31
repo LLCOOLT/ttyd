@@ -129,7 +129,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Damage-type reactions of the Pokey: none, so every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Pokey (both demos), as the percent chance each status takes hold: resists 11
  * statuses (down to 50% of the normal chance).
@@ -271,7 +271,7 @@ static BattleWeapon weapon_sambo_head_attack_1 = {
     1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
 #else
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork

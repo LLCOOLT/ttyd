@@ -71,7 +71,7 @@ BattleUnitKind unit_bllizard = {
     1,
     25,
     0,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     2,
     70,
     2,
@@ -146,7 +146,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
  */
 static BattleUnitDefenseAttr defence_attr = {{0, 1, 3, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of Ice Puff (the demos), as the percent chance a status takes hold:
  * immune to Electric and Freeze; always hit by Poison, Burn, Huge, Attack Up, Defense Up, Fast,

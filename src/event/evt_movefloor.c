@@ -495,7 +495,7 @@ static USER_FUNC(moving_floor_get_stmsec) {
     if (w->flags & MOVING_FLOOR_FLAG_MID_POINT) {
         evtSetValue(event, args[1], 0);
     } else {
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         evtSetValue(event, args[1], w->stmsec * gp->framerate / 1000);
 #else
         evtSetValue(event, args[1], w->stmsec * 60 / 1000);

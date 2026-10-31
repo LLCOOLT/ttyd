@@ -127,7 +127,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Element attributes of Marilyn: none, so every element does its normal damage. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of Marilyn in the demo builds, as a percent of the normal chance of each status:
  * immune to fright, Gale Force, instant KO; 40% for freeze; 70% for Tiny, Attack Down, Defense Down, allergy,

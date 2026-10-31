@@ -91,7 +91,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 /** Defence of the Moon Cleft's body per damage type while flipped over: 0 against every damage type. */
 static BattleUnitDefense defence_turn = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Moon Cleft in the demo, as a percent of the normal chance: immune to burn;
  * sleep 30%, stop 70%, freeze 50%, instant kill 95% (and 9 other statuses lowered).

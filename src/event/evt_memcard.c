@@ -194,7 +194,7 @@ EVT_BEGIN(evt_memcard_nosave)
     RETURN
 EVT_END()
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo version of the boot-time card check: reads the card, offers to format it or create the save file, and sets
  * GF(0) once the game may start. Unlike retail it does not watch for the card being pulled mid-prompt, and a
@@ -474,7 +474,7 @@ EVT_BEGIN(evt_memcard_start)
 EVT_END()
 
 /** The release versions run the curtain fade and set GF(0) after a failed delete; the demo just returns */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_BEGIN(evt_memcard_delete)
     SET_VALUE(LW(10), LW(0))
     ADD(LW(10), 1)
@@ -532,7 +532,7 @@ EVT_END()
 #endif
 
 /** The release versions run the curtain fade and set GF(0) after a failed copy; the demo just returns */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_BEGIN(evt_memcard_copy)
     SET_VALUE(LW(10), LW(0))
     SET_VALUE(LW(11), LW(1))
@@ -619,7 +619,7 @@ EVT_END()
 #endif
 
 /** The release versions watch for a pulled card while saving, retry failed saves and add the ending prompts */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_BEGIN(evt_memcard_save)
     // Ask "Save all game progress up to this point?" (the new-file save skips the question).
     SET_VALUE(LW(10), LW(0))

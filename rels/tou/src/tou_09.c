@@ -206,7 +206,7 @@ static EVT_BEGIN(evt_toile)
     END_IF
 #endif
     BEGIN_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_party_move_pos2, 0, 210, 100, FLOAT(80.0f))
 #else
         CALL(evt_party_move_pos2, 0, 200, 110, FLOAT(80.0f))
@@ -214,7 +214,7 @@ static EVT_BEGIN(evt_toile)
 #endif
         CALL(evt_party_stop, 0)
     END_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_mov_pos2, 210, 115, FLOAT(80.0f))
 #else
     CALL(evt_mario_mov_pos2, 200, 130, FLOAT(80.0f))
@@ -232,13 +232,13 @@ static EVT_BEGIN(evt_toile)
         END_IF
     END_LOOP
     BEGIN_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_party_move_pos2, 0, 265, 100, FLOAT(80.0f))
 #else
         CALL(evt_party_move_pos2, 0, 265, 110, FLOAT(80.0f))
 #endif
     END_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_mov_pos2, 265, 115, FLOAT(80.0f))
 #else
     CALL(evt_mario_mov_pos2, 270, 130, FLOAT(80.0f))
@@ -331,7 +331,7 @@ EVT_BEGIN(tou_09_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG3_00_WELCOME_TO_GLITZVILLE, STORY_STG3_12_MINI_YOSHI_EGG)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
 #else
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))
@@ -339,7 +339,7 @@ EVT_BEGIN(tou_09_init_evt)
         CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
         CASE_GREATER_OR_EQUAL(STORY_STG3_33_PEACH_THE_SECRET_WEAPON)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
 #else
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))

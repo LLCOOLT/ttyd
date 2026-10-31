@@ -361,7 +361,7 @@ void marioChgMotAuto(void) {
     }
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Cleanup when the stay motion ends: stops the idle sound and the charge-up voice. */
 void mot_stay_post(void) {
     MarioWork* mario;

@@ -48,7 +48,7 @@ BattleUnitKind unit_boss_gonbaba;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static PoseTableEntry pose_table[7];
 static PoseTableEntry pose_table_weak[7];
 #else
@@ -60,7 +60,7 @@ static BattleUnitKindPart parts[3];
 extern EvtWord negotiation_event[];
 extern EvtWord gon_extra_eaten_event[];
 extern EvtWord gonbaba_damage_sub_event[];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord dead_event[281];
 #else
 static EvtWord dead_event[283];
@@ -254,7 +254,7 @@ BattleUnitKind unit_boss_gonbaba = {
 #endif
     0.0f,
     0.0f,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     250.0f,
 #else
     20.0f,
@@ -301,7 +301,7 @@ static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 /** Element reactions of Hooktail: none, every element hits normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of Hooktail (the demos), as the percent chance a status takes hold:
  * immune to Stop, Poison, Freeze, Huge, Tiny, Attack Down, Defense Down, Fright, Gale Force, Slow, Dodgy,
@@ -746,7 +746,7 @@ EVT_BEGIN(negotiation_event)
         CALL(evt_btl_camera_noshake, 1)
         CALL(evt_btl_camera_shake_h, 1, 7, 0, 30, 12)
     END_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_batstage_set_aud_dark, 0, 180, 0)
     CALL(evt_batstage_set_aud_dark_base, 0, 180, 0)
 #else
@@ -1501,7 +1501,7 @@ static EVT_BEGIN(init_event)
     CALL(evt_audience_flag_on, 35, 512)
     CALL(evt_audience_flag_on, 53, 512)
     CALL(evt_audience_flag_on, 54, 512)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_audience_base_flag_on, 32768)
 #else
     CALL(evt_audience_base_flag_on, 16384)

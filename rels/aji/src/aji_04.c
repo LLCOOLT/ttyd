@@ -59,7 +59,7 @@ extern EvtWord sekizou_init[];
  * the open and close scripts apply the same transform. The demo builds use 0.2217.
  */
 static EVT_BEGIN(w_door_close)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
 #else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -76,7 +76,7 @@ EVT_END()
  * the open and close scripts apply the same transform. The demo builds use 0.2217.
  */
 static EVT_BEGIN(w_door_open)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
 #else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -165,7 +165,7 @@ EVT_END()
  * while its text is shown (it is spawned next to every statue message).
  */
 EVT_BEGIN(sekizou_talk)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // opens and closes the statue's mouth three times (retail animates it from the message callbacks instead)
     LOOP(3)
         CALL(evt_sub_intpl_msec_init, 11, 0, 70, 100)
@@ -418,7 +418,7 @@ EVT_END()
 EVT_BEGIN(quiz_ok)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("dennshoku"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("dennshoku_2"), MAPOBJ_FLAG_HIDE)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_map_playanim, STRING("anm_seikai"), 1, 0)
 #else
     CALL(evt_map_playanim, STRING("anm_seikai"), 0, 0)
@@ -515,7 +515,7 @@ EVT_BEGIN(kuizu_sekizou)
     CALL(evt_msg_toge, 2, 95, 65, 0)
     SPAWN_EVENT(sekizou_talk)
     // The statue asks who Mario is and offers its quiz: challenge it or bail out.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_msg_print, 0, STRING("stg7_aji_01"), 0, 0)
 #else
     CALL(evt_msg_print, 0, STRING("stg7_aji_01"), PTR(kuti_callback), 0)
@@ -618,13 +618,13 @@ EVT_BEGIN(kuizu_sekizou)
         CALL(evt_msg_continue)
         CALL(evt_msg_toge, 2, 95, 65, 0)
         ADD(LW(13), 1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_cam3d_evt_set, -189, 72, 207, 219, 69, -80, 0, 11)
         WAIT_MS(500)
 #endif
         // A right answer earns a fanfare; the statue reacts to the first, fourth and fifth correct answers.
         IF_INT_EQUAL(LF(0), 1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             SPAWN_EVENT(quiz_ok)
 #endif
             IF_INT_EQUAL(LW(14), 4)
@@ -650,7 +650,7 @@ EVT_BEGIN(kuizu_sekizou)
                 SPAWN_EVENT(sekizou_kaiten2)
                 WAIT_MS(500)
                 SPAWN_EVENT(sekizou_talk)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(evt_msg_print, 0, STRING("stg7_aji_22"), 0, 0)
 #else
                 CALL(evt_msg_print, 0, STRING("stg7_aji_22"), PTR(kuti_callback), 0)
@@ -662,7 +662,7 @@ EVT_BEGIN(kuizu_sekizou)
                 SPAWN_EVENT(sekizou_kaiten2)
                 WAIT_MS(500)
                 SPAWN_EVENT(sekizou_talk)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(evt_msg_print, 0, STRING("stg7_aji_23"), 0, 0)
 #else
                 CALL(evt_msg_print, 0, STRING("stg7_aji_23"), PTR(kuti_callback), 0)
@@ -675,7 +675,7 @@ EVT_BEGIN(kuizu_sekizou)
                 SPAWN_EVENT(sekizou_kaiten)
                 WAIT_MS(1000)
                 SPAWN_EVENT(sekizou_talk)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(evt_msg_print, 0, STRING("stg7_aji_24"), 0, 0)
 #else
                 CALL(evt_msg_print, 0, STRING("stg7_aji_24"), PTR(kuti_callback), 0)
@@ -685,7 +685,7 @@ EVT_BEGIN(kuizu_sekizou)
                 CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI1"))
                 CALL(evt_msg_toge, 2, 95, 65, 0)
                 SPAWN_EVENT(sekizou_talk)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 // After the fifth correct answer the statue admits defeat in a rage.
                 CALL(evt_msg_print, 0, STRING("stg7_aji_25"), 0, 0)
 #else
@@ -697,7 +697,7 @@ EVT_BEGIN(kuizu_sekizou)
             CALL_CHILD(quiz_ok)
 #endif
         ELSE
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             SPAWN_EVENT(quiz_ng)
 #endif
             IF_INT_EQUAL(LW(15), 2)
@@ -719,14 +719,14 @@ EVT_BEGIN(kuizu_sekizou)
             SWITCH(LW(15))
                 CASE_EQUAL(1)
                 SPAWN_EVENT(sekizou_talk)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(evt_msg_print, 0, STRING("stg7_aji_26"), 0, 0)
 #else
                 CALL(evt_msg_print, 0, STRING("stg7_aji_26"), PTR(kuti_callback), 0)
 #endif
                 CASE_EQUAL(2)
                 SPAWN_EVENT(sekizou_talk)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(evt_msg_print, 0, STRING("stg7_aji_27"), 0, 0)
 #else
                 CALL(evt_msg_print, 0, STRING("stg7_aji_27"), PTR(kuti_callback), 0)
@@ -734,7 +734,7 @@ EVT_BEGIN(kuizu_sekizou)
                 SET_VALUE(LF(1), 1)
                 CASE_EQUAL(3)
                 SPAWN_EVENT(sekizou_talk)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(evt_msg_print, 0, STRING("stg7_aji_28"), 0, 0)
 #else
                 CALL(evt_msg_print, 0, STRING("stg7_aji_28"), PTR(kuti_callback), 0)
@@ -743,7 +743,7 @@ EVT_BEGIN(kuizu_sekizou)
                 CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
 #endif
                 CALL_CHILD(offscreen_to_normal)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
                 CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI1"))
 #endif
@@ -754,7 +754,7 @@ EVT_BEGIN(kuizu_sekizou)
                 WAIT_MS(250)
                 CALL(evt_msg_toge, 2, 95, 65, 0)
                 SPAWN_EVENT(sekizou_talk)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 // Punishment round: two Yuxes jump in and Mario must fight them.
                 CALL(evt_msg_print, 0, STRING("stg7_aji_29"), 0, 0)
 #else
@@ -813,7 +813,7 @@ EVT_BEGIN(kuizu_sekizou)
 #endif
                 CALL(evt_msg_toge, 2, 95, 65, 0)
                 SPAWN_EVENT(sekizou_talk)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(evt_msg_print, 0, STRING("stg7_aji_30"), 0, 0)
 #else
                 CALL(evt_msg_print, 0, STRING("stg7_aji_30"), PTR(kuti_callback), 0)
@@ -852,7 +852,7 @@ EVT_BEGIN(kuizu_sekizou)
                 CALL_CHILD(sekizou_kaiten)
                 CALL(evt_msg_toge, 2, 95, 65, 0)
                 SPAWN_EVENT(sekizou_talk)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 // After the fight the statue is furious that its underlings lost.
                 CALL(evt_msg_print, 0, STRING("stg7_aji_31"), 0, 0)
 #else
@@ -879,7 +879,7 @@ EVT_BEGIN(kuizu_sekizou)
     CALL(evt_item_entry, STRING("dummy"), ITEM_ELEVATOR_KEY_0x1C, 50, 100, 0, ITEM_ENTRY_FALL, -1, PTR(evt_item))
     CALL(evt_msg_toge, 2, 95, 65, 0)
     SPAWN_EVENT(sekizou_talk)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_msg_print, 0, STRING("stg7_aji_32"), 0, 0)
 #else
     CALL(evt_msg_print, 0, STRING("stg7_aji_32"), PTR(kuti_callback), 0)

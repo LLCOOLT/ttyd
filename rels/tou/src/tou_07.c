@@ -289,7 +289,7 @@ static EVT_BEGIN(evt_champion)
         CALL(evt_party_move_pos2, 0, 3, -110, FLOAT(60.0f))
         CALL(evt_party_stop, 0)
         WAIT_MS(100)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_party_move_pos2, 0, 60, -100, FLOAT(60.0f))
 #else
         CALL(evt_party_move_pos2, 0, 70, -110, FLOAT(60.0f))
@@ -468,7 +468,7 @@ EVT_BEGIN(evt_champion_re)
     CALL(evt_npc_move_position, STRING("キノシコワ"), 30, -95, 0, FLOAT(80.0f), 1)
     CALL(evt_set_dir_to_target, STRING("キノシコワ"), STRING("mario"))
     // She hands him the Champ's Belt, which is held up for the fanfare.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_item_entry, STRING("belt"), ITEM_CHAMPS_BELT, 0, -1000, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
 #else
     CALL(evt_npc_entry, STRING("ベルト"), STRING("c_bred_h"))
@@ -854,7 +854,7 @@ EVT_BEGIN(tou_07_init_evt)
         SWITCH(GSW(GSW_STORY_PROGRESS))
             CASE_BETWEEN(STORY_STG3_00_WELCOME_TO_GLITZVILLE, STORY_STG3_20_MAJORS_10TH)
             CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
 #else
             CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))

@@ -17,7 +17,7 @@ typedef enum SequenceType {
     SEQ_BATTLE = 4,
     SEQ_GAME_OVER = 5,
     SEQ_LOAD = 6,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // The demo has one more sequence before SEQ_E3.
     SEQ_E3 = 8
 #else

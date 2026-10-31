@@ -37,7 +37,7 @@
 #include "libc_decls.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 #include "mario/mariost.h"
 #endif
 
@@ -120,7 +120,7 @@ static BOOL hitIsGroup(HitEntry* target, HitEntry* group) {
  * the open and close scripts apply the same transform. The demo builds use 0.2217.
  */
 static EVT_BEGIN(w_door_close)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
 #else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -137,7 +137,7 @@ EVT_END()
  * the open and close scripts apply the same transform. The demo builds use 0.2217.
  */
 static EVT_BEGIN(w_door_open)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
 #else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -154,7 +154,7 @@ EVT_END()
  * the open and close scripts apply the same transform. The demo builds use -0.2217.
  */
 static EVT_BEGIN(e_door_close)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
 #else
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.25f))
@@ -171,7 +171,7 @@ EVT_END()
  * the open and close scripts apply the same transform. The demo builds use -0.2217.
  */
 static EVT_BEGIN(e_door_open)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
 #else
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.25f))
@@ -528,13 +528,13 @@ static USER_FUNC(mario_chk) {
         PartyEntry* party = partyGetPtr(0);
         if (mario != NULL && mario->hitobjStandOn != NULL && hitIsGroup(mario->hitobjStandOn, hitNameToPtr("A_bel"))) {
             mario->floorMove.x = 0.6f;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             mario->floorMove.x *= 60.0f / gp->framerate; // PAL: the push per frame is scaled to the frame rate
 #endif
         }
         if (party != NULL && party->hitobjUnder != NULL && hitIsGroup(party->hitobjStandOn, hitNameToPtr("A_bel"))) {
             party->floorMoveX = 0.6f;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             party->floorMoveX *= 60.0f / gp->framerate;
 #endif
         }
@@ -698,7 +698,7 @@ EVT_BEGIN(move_up_down)
         IF_INT_EQUAL(LW(1), 1)
             GOTO(0)
         END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         WAIT_MS(300)
 #else
         LABEL(5)
@@ -825,7 +825,7 @@ ShikakeMoveTbl6 up_down_tbl = {
         {"A_ugoku_2", "S_ugoku_2", 0, -150, 2800},
         {"A_ugoku_h_4", "S_ugoku_h_4", 0, 100, 3000},
         {"A_ugoku_h_5", "S_ugoku_h_5", 0, -200, 4000},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {"A_ugoku_h_6", "S_ugoku_h_6", 0, -150, 3000},
 #else
         {"A_ugoku_h_6", "S_ugoku_h_6", 40, -150, 3000},
@@ -1060,7 +1060,7 @@ static EVT_BEGIN(evt_door_msg)
         CALL(evt_mario_key_onoff, 1)
         RETURN
     END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_win_item_select, PTR(key_tbl), LW(0))
 #else
     CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
@@ -1191,7 +1191,7 @@ USER_FUNC(hit_group_chk) {
 static USER_FUNC(bg_cam_chk) {
     CameraEntry* camera = camGetPtr(CAMERA_3D);
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (marioBgmodeChk() && (camera->flags & CAM_FLAG_FOLLOW_Y_OFF)) {
 #else
     if (marioBgmodeChk() && (camera->flags & CAM_FLAG_FOLLOW_Y_OFF) && marioGetPtr()->airTimer == 0) {

@@ -526,7 +526,7 @@ EVT_BEGIN(konarikin_talk)
                     CALL(evt_pouch_check_item, ITEM_SHROOM_CAKE, LW(0))
                     IF_INT_GREATER(LW(0), 0)
                         CALL(evt_msg_print, 0, STRING("irai_29_05"), 0, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         CALL(evt_win_item_select, PTR(iri_29_item_tbl1), LW(0))
 #else
                         CALL(evt_win_item_select, 0, PTR(iri_29_item_tbl1), LW(0), 0)
@@ -545,7 +545,7 @@ EVT_BEGIN(konarikin_talk)
                     CALL(evt_pouch_check_item, ITEM_KEEL_MANGO, LW(0))
                     IF_INT_GREATER(LW(0), 0)
                         CALL(evt_msg_print, 0, STRING("irai_29_06"), 0, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         CALL(evt_win_item_select, PTR(iri_29_item_tbl2), LW(0))
 #else
                         CALL(evt_win_item_select, 0, PTR(iri_29_item_tbl2), LW(0), 0)
@@ -564,7 +564,7 @@ EVT_BEGIN(konarikin_talk)
                     CALL(evt_pouch_check_item, ITEM_FRIGHT_MASK, LW(0))
                     IF_INT_GREATER(LW(0), 0)
                         CALL(evt_msg_print, 0, STRING("irai_29_07"), 0, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         CALL(evt_win_item_select, PTR(iri_29_item_tbl3), LW(0))
 #else
                         CALL(evt_win_item_select, 0, PTR(iri_29_item_tbl3), LW(0), 0)
@@ -1045,7 +1045,7 @@ EVT_BEGIN(koopa_door_evt)
         END_IF
     END_LOOP
     BEGIN_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         // the walk target depends on Mario's angle to the door
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         SET_VALUE(LW(3), 226)
@@ -1325,7 +1325,7 @@ static EVT_BEGIN(sekai_yami_evt)
             WAIT_MS(200)
         END_LOOP
     END_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     WAIT_MS(3000)
 #else
     WAIT_MS(1000)

@@ -141,7 +141,7 @@ static EvtWord damage_event[47];
 extern EvtWord damage_sub_event[];
 static EvtWord phase_event[28];
 extern EvtWord monster_before_phase_event[];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord dead_event[126];
 #else
 static EvtWord dead_event[165];
@@ -175,7 +175,7 @@ extern EvtWord batten_leader_ice_attack_event[];
 extern EvtWord batten_leader_shikaeshi_attack_event[];
 extern EvtWord batten_leader_yokeyoke_attack_event[];
 extern EvtWord batten_leader_stop_attack_event[];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord wait_event[15];
 #else
 static EvtWord wait_event[16];
@@ -493,7 +493,7 @@ BattleUnitKind unit_boss_batten_leader = {
     68,
     66,
     7,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     68,
 #else
     70,
@@ -564,7 +564,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
  */
 BattleUnitDefenseAttr defence_attr_muteki = {{2, 2, 2, 2, 2}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo values of the status vulnerability of Grodus:
  * percent chance that each status takes hold (100 is normal); immune to Fright, Gale Force;
@@ -637,7 +637,7 @@ static PoseTableEntry pose_table_furafura[] = {
  */
 static BattleDataEntry data_table[] = {
     {9, damage_sub_event},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {50, dead_event},
 #else
     {49, dead_event},
@@ -1758,7 +1758,7 @@ static EVT_BEGIN(dead_event)
         CALL(btlevtcmd_GetUnitId, LW(1), LW(1))
 #endif
         IF_INT_NOT_EQUAL(LW(1), -1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(btlevtcmd_KillUnit, LW(1), 1)
 #else
             CALL(btlevtcmd_CheckDamageCode, LW(1), DAMAGE_FLAG_KO, LW(2))
@@ -2834,7 +2834,7 @@ static EVT_BEGIN(wait_event)
         CALL(check_satellite)
     END_LOOP
     RETURN
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_END()
 #else
 EVT_END_PAD()

@@ -35,7 +35,7 @@ extern EvtWord evt_sub_stopwatch[];
 extern EvtWord evt_sub_tree_access_entry[];
 
 extern WinMgrDesc coinget_window_desc[1];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 extern EvtWord kusa_evt[41]; // the demo scripts have no SET_TYPE(0)
 #else
 extern EvtWord kusa_evt[43];
@@ -45,7 +45,7 @@ extern EvtWord mail_evt_bom_01[65];
 extern EvtWord mail_evt_gor_01[61];
 extern EvtWord mail_evt_gor_01_2[93];
 extern EvtWord mail_evt_gor_02[87];
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 extern EvtWord mail_evt_gor_02_2[68];
 #else
 extern EvtWord mail_evt_gor_02_2[61];
@@ -62,7 +62,7 @@ extern EvtWord mail_evt_tou_01[67];
 extern EvtWord mail_evt_usu_01[61];
 extern EvtWord mail_evt_win_01[61];
 extern s32 tree_data[75];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 extern EvtWord tree_evt[249];
 #else
 extern EvtWord tree_evt[251];
@@ -85,7 +85,7 @@ USER_FUNC(N_evt_sub_status_gauge_force_update);
 #endif
 USER_FUNC(evt_sub_save_playtime);
 USER_FUNC(evt_sub_get_language);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 USER_FUNC(evt_sub_get_framerate);
 #endif
 USER_FUNC(evt_sub_countdown_start);

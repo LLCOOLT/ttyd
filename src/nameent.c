@@ -138,7 +138,7 @@ const char* latin_tbl[] = {
 #endif
 
 // The demo still loads the name entry textures from the old window folder.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #define NAME_TPL_JP "%s/window/jp/name.tpl"
 #else
 #define NAME_TPL_JP "%s/w/jp/name.tpl"
@@ -339,7 +339,7 @@ void nameEntMain(void) {
     }
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** The demo has no cursor travel check, no all-blank name check and no default partner name. */
 static s32 nameMain(void) {
     s32 off;
@@ -563,7 +563,7 @@ static s32 nameMain(void) {
                                         if (wp->type == 1 && k >= n) {
                                             strcpy(wp->name, msgSearch("name_party3"));
                                             wp->nameLen = strlen(wp->name) / 2;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                                             if (wp->nameLen >= 8) {
                                                 wp->nameLen = 7;
                                             }
@@ -588,7 +588,7 @@ static s32 nameMain(void) {
                                         if (wp->type == 1 && m >= n) {
                                             strcpy(wp->name, msgSearch("name_party3"));
                                             wp->nameLen = strlen(wp->name);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                                             if (wp->nameLen >= 8) {
                                                 wp->nameLen = 7;
                                             }
@@ -667,7 +667,7 @@ static s32 nameMain(void) {
                             if (wp->type == 1 && j >= len) {
                                 strcpy(wp->name, msgSearch("name_party3"));
                                 wp->nameLen = strlen(wp->name) / 2;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                                 if (wp->nameLen >= 8) {
                                     wp->nameLen = 7;
                                 }
@@ -692,7 +692,7 @@ static s32 nameMain(void) {
                             if (wp->type == 1 && m >= len) {
                                 strcpy(wp->name, msgSearch("name_party3"));
                                 wp->nameLen = strlen(wp->name);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
                                 if (wp->nameLen >= 8) {
                                     wp->nameLen = 7;
                                 }
@@ -941,7 +941,7 @@ static void nameEntDisp(CameraId cameraId, void* param) {
     for (j = 0; j < 9; j++) {
         for (n = 0; n < NAMEENT_COLS; n++) {
             if (wp->charTable[j * NAMEENT_COLS + n]) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 FontDrawString((f32)(n * 24 - 190 + (n / 5) * 30), (f32)(112 - j * 28), wp->charTable[j * NAMEENT_COLS + n]);
 #else
                 FontDrawString((f32)(n * 24 - 190 + (n / 5) * 30 + (24 - FontGetMessageWidth(wp->charTable[j * NAMEENT_COLS + n])) / 2), (f32)(112 - j * 28), wp->charTable[j * NAMEENT_COLS + n]);

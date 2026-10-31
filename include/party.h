@@ -174,7 +174,7 @@ typedef struct PartyWorkVivian { // party_vivian.c
     f32 shadowSize;              // 0x174, 10..20; party.c reads it as the in-use shadow size
     u8 pad_178[0x17C - 0x178];   // 0x178
     f32 followOfs;               // 0x17C, 0..-13, movePos distance behind Mario
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     s16 tailFlags; // 0x180, demo: Vivian bit 0 = tail off (retail keeps it in PartyEntry)
 #else
     u8 pad_180[0x182 - 0x180]; // 0x180
@@ -202,7 +202,7 @@ typedef struct PartyEntry {
     const char* animName;      // 0x18, current pose name (strcmp'd with "PYS_S_2" etc.)
     const char* paperAnimName; // 0x1C, partyChgPaper anim name, as MarioWork.paperAnimName
     u16 poseTime;              // 0x20, cleared on every pose/paper change (MarioWork.poseTime)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     u8 pad_22;      // 0x22, never accessed
     s8 splashTimer; // 0x23, demo: here instead of 0x4C
 #else
@@ -233,7 +233,7 @@ typedef struct PartyEntry {
     s8 flyRequest;       // 0x3F, partyMoveFlyInit: 1/3 = go behind Mario, 2 = other; cleared there, never set in C
     f32 homingDist;      // 0x40, evt_party_set_homing_dist (default 50)
     u32 reserved_44;     // 0x44, only set to 0x10
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     union {
         s32 wallStuckCount; // 0x48, demo: frames the follow walk hit a wall with its target 100+ away in height
         // The demo's code never reads these three; they share bytes with wallStuckCount so that retail
@@ -389,7 +389,7 @@ void allPartyForceRideOn(void);
 void partyDokanEnd(s32 id, s32 dir);
 void allPartyRidePlane(void);
 void allPartyRideShip(void);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 void allPartyRideJabara(void);
 #endif
 void allPartyRideOn(void);

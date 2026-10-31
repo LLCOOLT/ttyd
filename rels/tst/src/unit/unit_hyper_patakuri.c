@@ -130,7 +130,7 @@ static BattleUnitDefense defence_patakuri = {{0, 0, 0, 0, 0}};
  */
 static BattleUnitDefenseAttr defence_patakuri_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Hyper Paragoomba for its winged form (100% is the normal chance): resists Sleep
  * 80%, Confusion 80%, Freeze 80%, Tiny 80%, Attack Down 80%, Defense Down 80%, Allergic 80%, Slow 80% and
@@ -557,7 +557,7 @@ static BattleUnitDefense defence = {0};
  */
 static BattleUnitDefenseAttr defence_attr = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Hyper Paragoomba for its wingless form (100% is the normal chance): resists
  * Sleep 80%, Dizzy 80%, Confusion 80%, Freeze 80%, Tiny 80%, Attack Down 80%, Defense Down 80%, Allergic 80%,

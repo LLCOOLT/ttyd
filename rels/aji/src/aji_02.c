@@ -51,7 +51,7 @@ static EvtWord hikaru_yuka_init[83];
  * the open and close scripts apply the same transform. The demo builds use 0.2217.
  */
 static EVT_BEGIN(w_door_close)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
 #else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -68,7 +68,7 @@ EVT_END()
  * the open and close scripts apply the same transform. The demo builds use 0.2217.
  */
 static EVT_BEGIN(w_door_open)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
 #else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -342,7 +342,7 @@ static USER_FUNC(ride_chk) {
 #endif
     // panels stay lit for 30 frames after being touched
     for (i = 0; i < 30; i++) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         MarioWork* mario = marioGetPtr();
 
         if (mario->hitobjUnder != NULL) {
@@ -350,7 +350,7 @@ static USER_FUNC(ride_chk) {
         if (hit != NULL) {
 #endif
             sprintf(hitName, "A_hikaru_%02d", i + 1);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (strcmp(mario->hitobjUnder->joint->name, hitName) == 0) {
 #else
             if (strcmp(hit->joint->name, hitName) == 0) {

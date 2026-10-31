@@ -29,7 +29,7 @@ typedef struct BreakSlotReel {
 enum BreakSlotFlags {
     // Frankly's lecture (lecture_init): every reel is forced to and stops on card 3 (Shine Sprite)
     BREAK_SLOT_FLAG_LECTURE = 1 << 0,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // Shadow Queen fight (slot_init): every card is forced to and stops on card 2 (Star) until the first BINGO
     BREAK_SLOT_FLAG_QUEEN_FORCE_STAR = 1 << 1,
 #else

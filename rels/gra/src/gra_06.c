@@ -197,12 +197,12 @@ EVT_BEGIN(gra_06_saku_open)
         CALL(evt_mario_get_party, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL(evt_mario_key_onoff, 0)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             CALL(evt_party_stop, 0)
             WAIT_MS(200)
 #endif
             CALL(evt_msg_print_party, STRING("stg4_gra_20"))
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             CALL(evt_party_run, 0)
 #endif
             CALL(evt_mario_key_onoff, 1)
@@ -287,7 +287,7 @@ EVT_BEGIN(first_gra06jin)
     WAIT_FRAMES(1)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_JIN1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_GRA1"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_normalize)
 #endif
     CALL(evt_party_stop, 0)

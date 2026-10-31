@@ -139,7 +139,7 @@ EVT_BEGIN(fall_gameover)
     END_LOOP
 #if VERSION >= VERSION_US
     WAIT_MS(1000)
-#elif VERSION <= VERSION_DEMO_US
+#elif VERSION <= VERSION_DEMO_JP
     WAIT_FRAMES(120)
 #else
     WAIT_FRAMES(60)
@@ -289,7 +289,7 @@ EVT_END()
  */
 void seq_gameOverInit(SequenceWork* work) {
     winReInit();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     psndStopAllFadeOut();
     psndSetReverb(0);
     psndClearFlag(PSND_FLAG_SFX_WITH_BGM);
@@ -410,7 +410,7 @@ void seq_gameOverMain(SequenceWork* work) {
                 GXColor color = {0, 0, 0, 255};
                 fadeEntry(FADE_IN_BLACK, 1000, color);
             }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             psndBGMOn(PSND_FADE_OUT, (char*)0x93);
             marioReset();
             marioEntry();
@@ -444,7 +444,7 @@ void seq_gameOverMain(SequenceWork* work) {
             if (!fadeIsFinish()) {
                 break;
             }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             gp->resetType = 1;
 #else
             _relUnLoad();

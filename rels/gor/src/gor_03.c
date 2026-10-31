@@ -1310,7 +1310,7 @@ EVT_BEGIN(maffiaboss_train_ticket)
         CALL(evt_party_set_dir, 0, 90, 200)
     END_INLINE_EVENT
     CALL(evt_cam3d_evt_set, -584, 265, -145, -189, 200, -145, 500, 11)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_snd_bgmon, PSND_FADE_OUT | PSND_CH(1), STRING("BGM_STG0_CSN1"))
 #else
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_CSN1"))
@@ -1417,7 +1417,7 @@ EVT_BEGIN(maffiaboss_train_ticket)
 #endif
         CALL(evt_snd_bgmon, PSND_FADE_OUT | PSND_CH(1), STRING("BGM_FF_GET_KEYITEM1"))
         WAIT_MS(2000)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_snd_bgmon, PSND_FADE_OUT | PSND_CH(1), STRING("BGM_STG0_CSN1"))
 #else
         CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
@@ -1657,7 +1657,7 @@ EVT_BEGIN(maffia1_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS_OR_EQUAL(STORY_STG2_40_THOUSAND_YEAR_DOOR)
         CALL(evt_msg_print, 0, STRING("mac_2_044_02"), 0, STRING("me"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CASE_EQUAL(STORY_STG2_44_FINDING_DON_PIANTA)
         CALL(evt_msg_print, 0, STRING("mac_2_070"), 0, STRING("me"))
 #elif VERSION == VERSION_JP
@@ -1724,7 +1724,7 @@ EVT_BEGIN(maffia2_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS_OR_EQUAL(STORY_STG2_40_THOUSAND_YEAR_DOOR)
         CALL(evt_msg_print, 0, STRING("mac_2_044_03"), 0, STRING("me"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CASE_EQUAL(STORY_STG2_44_FINDING_DON_PIANTA)
         CALL(evt_msg_print, 0, STRING("mac_2_071"), 0, STRING("me"))
 #else
@@ -1890,7 +1890,7 @@ EVT_BEGIN(peton_talk_common)
                 CALL(evt_msg_print, 0, STRING("irai_19_01"), 0, STRING("ピートン"))
             ELSE
                 CALL(evt_msg_print, 0, STRING("irai_19_02"), 0, STRING("ピートン"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(evt_win_item_select, PTR(iri_19_item_tbl), LW(0))
 #else
                 CALL(evt_win_item_select, 0, PTR(iri_19_item_tbl), LW(0), 0)
@@ -2183,7 +2183,7 @@ EVT_BEGIN(exchange_keep_sub)
             SET_VALUE(LW(0), 48)
             CALL_CHILD(bteresa_n_fadein)
             CALL(yuugijou_get_montemedal, LW(1))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_msg_print_insert, 0, STRING("bunny_teresa_91"), 0, 0, LW(1))
 #elif VERSION == VERSION_JP
             CALL(evt_msg_print_insert, 0, STRING("bunny_teresa_91"), 0, STRING("バニーテレサ"), LW(1))
@@ -2302,7 +2302,7 @@ EVT_BEGIN(bteresa_talk_sub_minigame)
         CALL(evt_msg_print_add, 0, STRING("bunny_teresa_34"))
         CALL(evt_msg_select, 0, STRING("bunny_teresa_yesno2"))
         IF_INT_EQUAL(LW(0), 1)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_msg_print_add, 0, STRING("bunny_teresa_47"))
 #else
             CALL(evt_msg_print_add, 0, STRING("bunny_teresa_48"))
@@ -2332,7 +2332,7 @@ EVT_BEGIN(bteresa_talk_sub_minigame)
     CALL(yuugijou_get_montemedal, LW(0))
     IF_INT_LESS(LW(0), LW(1))
         CALL(evt_msg_print_add, 0, STRING("bunny_teresa_35"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_msg_print_add, 0, STRING("bunny_teresa_12"))
 #endif
         RETURN
@@ -2492,7 +2492,7 @@ EVT_BEGIN(bteresa_talk_sub_keihin)
     RETURN
 EVT_END()
 #else
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** The demo prints each prize-counter message as a new window and closes with bunny_teresa_12 */
 EVT_BEGIN(bteresa_talk_sub_keihin)
     CALL(evt_badgeShop_bteresa_get_kind_cnt, LW(0))
@@ -2681,7 +2681,7 @@ EVT_BEGIN(bteresa_table_talk)
     // Mario stops and Bunny Teresa turns to face him.
     CALL(setmertn, STRING("バニーテレサ"))
     CALL(evt_mario_key_onoff, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_party_stop, 0)
 #endif
     CALL(evt_set_dir_to_target, STRING("me"), STRING("mario"))
@@ -2811,7 +2811,7 @@ EVT_BEGIN(bteresa_table_talk)
     END_IF
     // Menu: Mario chooses a minigame, the prize exchange, or leaves.
     CALL(evt_exchange_msg_alloc)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     LOOP(0)
 #endif
         CALL(minigameselect_msg_set, STRING("bunny_teresa_03"), LW(0))
@@ -2857,19 +2857,19 @@ EVT_BEGIN(bteresa_table_talk)
         END_IF
         // Run the prize exchange or the chosen minigame.
         IF_INT_EQUAL(LW(0), 4)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_msg_continue)
 #endif
             CALL_CHILD(bteresa_talk_sub_keihin)
         ELSE
             CALL_CHILD(bteresa_talk_sub_minigame)
         END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     END_LOOP
 #endif
     LABEL(0)
     CALL(evt_exchange_msg_free)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_party_run, 0)
 #endif
     CALL(evt_mario_key_onoff, 1)
@@ -3173,7 +3173,7 @@ static const I3 disp_slot_icons = {{ICON_1F3, ICON_1F3, ICON_1F3}};
  */
 EVT_BEGIN(ranking_set)
     CALL(evt_mario_key_onoff, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_party_stop, 0)
 #endif
     CALL(evt_cam3d_evt_set, FLOAT(-541.8994f), FLOAT(115.5f), FLOAT(-115.0f), FLOAT(-197.0f), FLOAT(56.799805f), FLOAT(-115.0f), 600, 11)
@@ -3193,7 +3193,7 @@ EVT_BEGIN(ranking_set)
     LABEL(0)
     CALL(evt_cam3d_evt_off, 600, 11)
     WAIT_MS(600)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_party_run, 0)
 #endif
     CALL(evt_mario_key_onoff, 1)
@@ -3209,7 +3209,7 @@ EVT_END()
 EVT_BEGIN(exchange_set)
     // Mario stops at the Pianta Changer's counter.
     CALL(evt_mario_key_onoff, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_party_stop, 0)
 #endif
     // Piantas Mario left in the machine earlier are returned first.
@@ -3253,7 +3253,7 @@ EVT_BEGIN(exchange_set)
     END_IF
     // Price menu: Mario picks how many medals to buy with coins.
     CALL(evt_exchange_msg_alloc)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_unitwin_alloc)
 #else
     CALL(evt_unitwin_alloc, 0)
@@ -3295,7 +3295,7 @@ EVT_BEGIN(exchange_set)
     // Mario leaves the counter and the camera returns.
     CALL(evt_cam3d_evt_off, 600, 11)
     WAIT_MS(600)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_party_run, 0)
 #endif
     CALL(evt_mario_key_onoff, 1)
@@ -4872,7 +4872,7 @@ EVT_END()
  * his spot and has him stand facing forward (S_1).
  */
 EVT_BEGIN(uraguchi_tenin)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_npc_move_position, STRING("店員"), -508, 24, 0, FLOAT(60.0f), 0)
 #else
     CALL(evt_npc_move_position, STRING("店員"), -490, 24, 0, FLOAT(60.0f), 0)
@@ -5305,7 +5305,7 @@ EVT_END()
  * already held a different number costs 100 coins (kuji_bomb_015 to 019). Too few coins gets kuji_bomb_022_1.
  */
 EVT_BEGIN(kuzi_bomb_talk_normal)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_unitwin_alloc)
 #else
     CALL(evt_unitwin_alloc, 0)
@@ -5445,7 +5445,7 @@ EVT_END()
  * (061) or, with lottery flag 8, say it restarts tomorrow (062).
  */
 EVT_BEGIN(kuzi_bomb_talk_husei)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_unitwin_alloc)
 #else
     CALL(evt_unitwin_alloc, 0)
@@ -5624,7 +5624,7 @@ EVT_BEGIN(kuzi_bomb_talk_husei)
     CALL(evt_npc_flag_onoff, 1, STRING("グルメボム兵"), NPC_FLAG_TALK_ANIM)
     CALL(evt_npc_set_autotalkpose, STRING("グルメボム兵"), STRING("S_3"), STRING("T_3"))
     CALL(evt_npc_set_anim, STRING("グルメボム兵"), STRING("S_3"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     WAIT_MS(20000)
 #else
     WAIT_MS(3000)
@@ -5793,7 +5793,7 @@ EVT_BEGIN(kuzi_keiziban_normal)
             SET_VALUE(LW(0), 0)
         END_IF
         IF_INT_NOT_EQUAL(LW(0), 4)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_mario_set_dir, 270, 300, 0)
 #endif
             // Mario won something: the camera moves in on Lucky.
@@ -5851,7 +5851,7 @@ EVT_BEGIN(kuzi_keiziban_normal)
 #endif
             // The prize is looked up and Lucky tells Mario which one he won.
             CALL(kuzi_get_keihin, LW(0), LW(1))
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             CALL(evt_sub_get_language, LW(10))
             IF_INT_EQUAL(LW(10), 4)
                 SET_VALUE(LW(2), LW(0))
@@ -6026,11 +6026,11 @@ EVT_END()
 EVT_BEGIN(monte_evt_door_close)
     CALL(enzan_lw_save)
     CALL(evt_mario_key_onoff, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_party_stop, 0)
 #endif
     CALL_CHILD(exchange_keep_sub)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_party_run, 0)
 #endif
     CALL(evt_mario_key_onoff, 1)
@@ -6078,7 +6078,7 @@ EVT_END()
  */
 EVT_BEGIN(gor_03_init_evt)
     // Rogueport music and ambience start, or stay silent when Mario returns from a minigame.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_GOR1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_GOR4"))
 #else
@@ -6354,7 +6354,7 @@ static USER_FUNC(fall_rtn) {
                 }
                 if (get_monte_check(&m->sub.pos, &marioGetPtr()->position) == TRUE) {
                     psndSFXOn_3D(sfx2, &m->sub.pos);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     if (yuwp->tokens < 0x7FFFFFFF) {
 #else
                     if (yuwp->tokens < 99999) {
@@ -6382,7 +6382,7 @@ static USER_FUNC(fall_rtn) {
                 pos.y = 0.0f;
                 if (get_monte_check(&pos, &marioGetPtr()->position) == TRUE) {
                     psndSFXOn_3D(sfx3, &m->sub.pos);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     if (yuwp->tokens < 0x7FFFFFFF) {
 #else
                     if (yuwp->tokens < 99999) {
@@ -6890,7 +6890,7 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
                 psndSFXOn("SFX_EVT_GAME_SLOT_SUCCESS1");
                 switch (gara2[0]) {
                     case 0:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         data->monteCount = 5;
 #else
                         data->monteCount = 3;
@@ -7197,7 +7197,7 @@ static USER_FUNC(kuzi_get_keihin) {
     switch (evtGetValue(event, args[0])) {
         case 0:
             if (!evtGetValue(NULL, GSWF(GSWF_GOR03_LOTTERY_FIRST_RESULT_A))) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 item = ITEM_MUSHROOM;
 #else
                 item = ITEM_POWER_PLUS;
@@ -7209,7 +7209,7 @@ static USER_FUNC(kuzi_get_keihin) {
             break;
         case 1:
             if (!evtGetValue(NULL, GSWF(GSWF_GOR03_LOTTERY_FIRST_RESULT_B))) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 item = ITEM_MUSHROOM;
 #else
                 item = ITEM_LUCKY_DAY;

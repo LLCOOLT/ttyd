@@ -90,7 +90,7 @@ static inline f32 orbit_update(f32 x) {
 
 static USER_FUNC(alpha_init_func);
 static USER_FUNC(alpha_set_func);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 /**
  * Declaration of the PAL-only helper in evt_sub.c that writes gp->framerate (50 or 60) to its script
  * argument.
@@ -110,27 +110,27 @@ static void suifu_kyorokyoro(NanNPC* npc);
 static void alpha_tev(MapTevCallbackInfo* info);
 
 static ExtTexInfo ext_entry_data[59];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static s16 suifu_animtbl[41];
 #else
 static s16 suifu_animtbl[42];
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 s16 suifu_animtbl_run[21];
 #else
 s16 suifu_animtbl_run[22];
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static s16 elmos_animtbl[21];
 #else
 static s16 elmos_animtbl[22];
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static s16 dai3_animtbl[41];
 #else
 static s16 dai3_animtbl[42];
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 s16 dai3_animtbl_run[21];
 #else
 s16 dai3_animtbl_run[22];
@@ -303,7 +303,7 @@ static void suifu_kyorokyoro_init(NanNPC* npc) {
     npc->func = suifu_kyorokyoro;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** The demo's cannonball smoke (tama_shoot): a kemu_test burst at (x, y, z), its effect returned in arg 3. */
 static USER_FUNC(tama_shoot_kemuri_entry) {
     EvtWord* args = event->args;
@@ -839,7 +839,7 @@ static s16 suifu_animtbl[] = {
     5, 5, 6, 6, 6, 7, 7, 7,
     8, 8, 8, 9, 9, 9, 10, 10,
     10, 11, 11, 11, 12, 12, 12, 13,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     -1,
 #else
     -1, 0,
@@ -850,7 +850,7 @@ static s16 suifu_animtbl[] = {
 s16 suifu_animtbl_run[] = {
     14, 14, 15, 15, 16, 16, 17, 17,
     18, 18, 19, 19, 20, 20, 21, 21,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     22, 22, 23, 23, -1,
 #else
     22, 22, 23, 23, -1, 0,
@@ -861,7 +861,7 @@ s16 suifu_animtbl_run[] = {
 static s16 elmos_animtbl[] = {
     24, 24, 25, 25, 26, 26, 27, 27,
     28, 28, 29, 29, 30, 30, 31, 31,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     32, 32, 33, 33, -1,
 #else
     32, 32, 33, 33, -1, 0,
@@ -875,7 +875,7 @@ static s16 dai3_animtbl[] = {
     39, 39, 40, 40, 40, 41, 41, 41,
     42, 42, 42, 43, 43, 43, 44, 44,
     44, 45, 45, 45, 46, 46, 46, 47,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     -1,
 #else
     -1, 0,
@@ -886,7 +886,7 @@ static s16 dai3_animtbl[] = {
 s16 dai3_animtbl_run[] = {
     48, 48, 49, 49, 50, 50, 51, 51,
     52, 52, 53, 53, 54, 54, 55, 55,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     56, 56, 57, 57, -1,
 #else
     56, 56, 57, 57, -1, 0,
@@ -1278,7 +1278,7 @@ EVT_BEGIN(koburon_regp)
             CALL(evt_npc_get_position, STRING("me"), LW(3), LW(4), LW(5))
             CALL(evt_npc_set_position, STRING("me"), LW(3), 35, LW(5))
             CALL(evt_npc_set_anim, STRING("me"), STRING("A_1"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_KOBURON_OUT1"), LW(3), -29999996, LW(5), 0)
 #else
             CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_KOBURON_OUT1"), LW(3), 35, LW(5), 0)
@@ -1341,7 +1341,7 @@ EVT_BEGIN(koburon_dead)
 #endif
     CALL(evt_npc_set_damage_anim, STRING("me"))
     WAIT_MS(200)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
 #endif
     ADD(LW(1), 30)
@@ -1837,7 +1837,7 @@ EVT_BEGIN(tama_shoot)
         SET_VALUE(LW(1), GW(14))
         ADD(LW(1), 130)
         SET_VALUE(LW(2), GW(15))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(tama_shoot_kemuri_entry, LW(0), LW(1), LW(2), LW(10))
         CALL(tama_shoot_kemuri, LW(10), FLOAT(90.0f), FLOAT(90.0f))
 #else
@@ -3003,7 +3003,7 @@ EVT_BEGIN(kaizoku_vs_dai3)
         CALL_CHILD(iwapera_offscreen_end)
         WAIT_MS(4000)
         SPAWN_EVENT_GET_ID(PTR(cam_dai3_vs_kaizoku), LW(10))
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         CALL(evt_sub_get_framerate, LW(0))
         IF_INT_EQUAL(LW(0), 60)
             WAIT_MS(9500)
@@ -3063,7 +3063,7 @@ EVT_BEGIN(kaizoku_vs_dai3)
     CALL(evt_cam3d_evt_set, -436, 595, 725, -226, 120, -460, 0, 11)
     CALL(evt_npc_flag_onoff, 0, STRING("コルテス"), NPC_FLAG_HIDDEN)
     WAIT_MS(500)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     BEGIN_INLINE_EVENT
 #else
     CALL(evt_party_run, 0)
@@ -3260,12 +3260,12 @@ EVT_END()
  */
 EVT_BEGIN(dai3_beat_back)
     CALL(evt_mario_key_onoff, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_cont_onoff, 1)
     CALL(evt_party_cont_onoff, 0, 1)
 #endif
     CALL(evt_mario_set_pose, STRING("M_S_1"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
 #else

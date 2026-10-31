@@ -161,7 +161,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Element reactions of Big Bandit: none, every element hits normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of Big Bandit (the demos), as the percent chance a status takes hold:
  * always hit by Poison, Electric, Burn, Huge, Attack Up, Defense Up, Fast, Dodgy and Invisible;
@@ -200,7 +200,7 @@ static PoseTableEntry pose_table[] = {
     {BTL_POSE_RUN, "R_1"},
     {41, "R_1"},
     {BTL_POSE_WALK, "W_1"},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {BTL_POSE_DANGER, "I_1"},
     {BTL_POSE_PERIL, "I_1"},
 #else
@@ -220,7 +220,7 @@ static PoseTableEntry pose_table_item_have[] = {
     {2, "Y_1"},
     {9, "Y_1"},
     {5, "K_1"},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {4, "I_1"},
     {3, "I_1"},
 #else
@@ -381,7 +381,7 @@ static EVT_BEGIN(_borodo_normal_attack)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_borodo_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     IF_INT_EQUAL(LW(5), 5)
         CALL(btlevtcmd_GetStatusMg, LW(3), LW(6))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         MULTIPLY(LW(6), 40)
 #else
         MULTIPLY_FLOAT(LW(6), 40)
@@ -534,7 +534,7 @@ static EVT_BEGIN(_borodo_steal_attack)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_borodo_attack), DAMAGE_FLAG_LAST_HIT, LW(5))
     IF_INT_EQUAL(LW(5), 5)
         CALL(btlevtcmd_GetStatusMg, LW(3), LW(6))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         MULTIPLY(LW(6), 40)
 #else
         MULTIPLY_FLOAT(LW(6), 40)
@@ -749,7 +749,7 @@ static USER_FUNC(_steal_item) {
         }
         if (num > 0) {
             evtSetValue(event, itemVar, ITEM_COIN);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             evtSetValue(event, iconVar, 394);
 #else
             evtSetValue(event, iconVar, 402);

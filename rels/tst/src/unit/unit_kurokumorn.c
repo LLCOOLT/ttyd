@@ -112,7 +112,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Damage-type modifiers of the Ruff Puff: it is healed by electric attacks. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 3}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Ruff Puff (100% is the normal chance): immune to Electrified; resists Sleep
  * 60%, Stop 80%, Dizzy 80%, Confusion 70%, Freeze 70%, Tiny 70%, Attack Down 70%, Defense Down 70%, Allergic

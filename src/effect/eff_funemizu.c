@@ -60,7 +60,7 @@ static u8 gor_fune_dl_0_1[] __attribute__((aligned(32))) = {0x98, 0x00, 0x0C, 0x
 static u8 gor_fune_dl_1_0[] __attribute__((aligned(32))) = {0x98, 0x00, 0x0C, 0x1E, 0x00, 0x01, 0x0D, 0x18, 0x00, 0x00, 0x02, 0x1F, 0x00, 0x01, 0x0C, 0x19, 0x00, 0x01, 0x01, 0x20, 0x00, 0x01, 0x0E, 0x1A, 0x00, 0x01, 0x05, 0x21, 0x00, 0x01, 0x0F, 0x1B, 0x00, 0x01, 0x07, 0x22, 0x00, 0x01, 0x10, 0x1C, 0x00, 0x01, 0x09, 0x23, 0x00, 0x01, 0x11, 0x1D, 0x00, 0x00, 0x0B, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 static u8 gor_fune_dl_1_1[] __attribute__((aligned(32))) = {0x98, 0x00, 0x0C, 0x17, 0x00, 0x00, 0x17, 0x1D, 0x00, 0x00, 0x0B, 0x16, 0x00, 0x00, 0x16, 0x1C, 0x00, 0x01, 0x09, 0x15, 0x00, 0x00, 0x15, 0x1B, 0x00, 0x01, 0x07, 0x14, 0x00, 0x00, 0x14, 0x1A, 0x00, 0x01, 0x05, 0x13, 0x00, 0x00, 0x12, 0x19, 0x00, 0x01, 0x01, 0x12, 0x00, 0x00, 0x13, 0x18, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static s8 gor_fune_normal_tbl[] __attribute__((aligned(32))) = {0, 0, 64};
 #else
 static s8 gor_fune_normal_tbl[] __attribute__((aligned(32))) = {0, 0, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -283,7 +283,7 @@ static void effFunemizuMain(EffectEntry* effect) {
             return;
         }
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // The demo reads the camera through work after the splash loop has moved it, and draws in layer 8.
     if (type == 0 || type == 2) {
         dispEntry(work->cam, dispCalcZ(&position), 8, (DispCallback)effFunemizuDisp, effect);
@@ -315,7 +315,7 @@ static void effFunemizuDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx rot;
     Mtx mtx;
     GXTexObj texObj;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     f32 proj[7];
     f32 vp[6];
     f32 sx, sy, sz;
@@ -331,7 +331,7 @@ static void effFunemizuDisp(CameraId cameraId, EffectEntry* effect) {
 
     cam = camGetPtr(cameraId);
     type = work->type;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // The demo eases the water colour toward the frame buffer under the boat.
     GXSetProjection(cam->projection, cam->projType);
     GXGetProjectionv(proj);
@@ -530,7 +530,7 @@ static void effFunemizuShibukiDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
     GXSetNumTevStages(1);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 #endif

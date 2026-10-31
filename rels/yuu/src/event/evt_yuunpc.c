@@ -152,7 +152,7 @@ f32 yuusintbl[] = {
     0.999391019f, 0.999848008f,
 };
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Paper Mode course map for the NPC racers (demo version), decoded by yuunpc_maphit_init:
  * a two-digit terrain code for each of the 72 columns, then a two-digit floor depth for each,
@@ -1117,7 +1117,7 @@ static void errper_set_rtn(YuuNpc* npc) {
         case 1:
         case 3:
         case 5:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             npc->errorRate = -0.2f + 2.0f * (0.2f * (rand() / 32767.0f));
 #else
             npc->errorRate = -0.25f + 2.0f * (0.25f * (rand() / 32767.0f));
@@ -1125,7 +1125,7 @@ static void errper_set_rtn(YuuNpc* npc) {
             break;
         case -1:
         case 6:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             npc->errorRate = -0.15f + 2.0f * (0.15f * (rand() / 32767.0f));
 #else
             npc->errorRate = -0.25f + 2.0f * (0.25f * (rand() / 32767.0f));
@@ -1236,7 +1236,7 @@ void ext_yuunpc_minigame4_init_sub(void) {
                 s = irand(3);
             } while (yuunpc_wp->slot[s] != -1);
             do {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 v = irand(700) + 300;
 #else
                 v = irand(700) + 200;
@@ -1250,7 +1250,7 @@ void ext_yuunpc_minigame4_init_sub(void) {
     for (i = 0; i < yuunpc_wp->numNpc; i++, ext++, npc++) {
         npc->poseId = yuunpc_wp->numPoses;
         npc->id = i;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         if (i < 300) {
 #else
         if (i < 200) {
@@ -1264,7 +1264,7 @@ void ext_yuunpc_minigame4_init_sub(void) {
             ext->flags |= 7;
             PSMTXIdentity(*ext->mtx);
             z = 30.0f + (60.0f * (i % 4) + -750.0f);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             (*ext->mtx)[0][3] = 13.333333f * row - 500.0f;
 #else
             (*ext->mtx)[0][3] = 20.0f * row - 500.0f;
@@ -1301,7 +1301,7 @@ void ext_yuunpc_minigame4_init_sub(void) {
             s32 j2;
 
             npc->flags |= 2;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             m = i - 300;
 #else
             m = i - 200;
@@ -1477,7 +1477,7 @@ static inline f32 yuunpc_rnd10(YuuNpc* npc) /* */ {
     } while (0)
 
 // the demo plays the jump sound for every jump; the releases for one jump in 32 (c26 counts the jumps)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #define YUU_JUMP_SFX(npc) psndSFXOn_3D((const char*)0x8e0, &(npc)->pos)
 #else
 #define YUU_JUMP_SFX(npc)                                  \
@@ -1541,7 +1541,7 @@ static void yuunpc_pose_minigame4_main(void) {
     s32 c26;
 #endif
     SlitWork* mg;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     s16 h;
     s32 kind;
 #else
@@ -1602,7 +1602,7 @@ static void yuunpc_pose_minigame4_main(void) {
                     }
                 }
             }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (irand(150) == 0) {
 #else
             if (irand(100) == 0) {
@@ -1697,7 +1697,7 @@ static void yuunpc_pose_minigame4_main(void) {
                     case 5:
                     case 6:
                         // The releases index the row with k, the demos with h
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         if (h == 6) {
                             off = 0.0f;
                         } else {
@@ -1712,7 +1712,7 @@ static void yuunpc_pose_minigame4_main(void) {
 #endif
                         npc->dest.x = yuunpc_snap(px + off);
                         {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                             f32 sp = ((npc->id % 101 - 50) / 50.0f) * 10.0f;
                             npc->dest.z = npc->pos.z >= 0.0f ? 125.0f + sp : -125.0f + sp;
 #else
@@ -1838,7 +1838,7 @@ static void yuunpc_pose_minigame4_main(void) {
 #endif
                                 z = npc->pos.z;
                                 if (z >= -150.0f && z < 150.0f) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                                     f32 tt = 50.0f;
 #else
                                     f32 tt = 50.0f * kind;
@@ -1901,7 +1901,7 @@ static void yuunpc_pose_minigame4_main(void) {
 #endif
                             {
                                 if (npc->pos.z >= -150.0f + w && npc->pos.z < 150.0f) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                                     f32 tt = 50.0f;
 #else
                                     f32 tt = 50.0f * kind;
@@ -1909,7 +1909,7 @@ static void yuunpc_pose_minigame4_main(void) {
                                     if (npc->pos.z >= -150.0f + tt && npc->pos.z < 150.0f - tt + w) {
                                         d = 0.0f;
                                     } else if (npc->pos.z > 0.0f) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                                         d = -(100.0f + w) + npc->pos.z;
 #else
                                         d = npc->pos.z - (150.0f - tt + w);
@@ -1924,7 +1924,7 @@ static void yuunpc_pose_minigame4_main(void) {
                         }
                         break;
                 }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 d -= 20.0f;
 #else
                 d -= 17.0f;
@@ -1932,7 +1932,7 @@ static void yuunpc_pose_minigame4_main(void) {
                 if (d < 0.0f) {
                     d = 0.0f;
                 }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 cnt = d / 1.6666666f;
 #else
                 cnt = d / 0.0f;
@@ -1963,7 +1963,7 @@ static void yuunpc_pose_minigame4_main(void) {
                             if (cnt < 30) {
                                 n = 0;
                             } else {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                                 n = (d - 50.0f) / 3.3333333f;
 #else
                                 n = d / 2.9166667f;
@@ -1988,7 +1988,7 @@ static void yuunpc_pose_minigame4_main(void) {
                             n = 0;
                         } else {
                             cnt = 30;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                             n = (d - 50.0f) / 3.3333333f;
 #else
                             n = d / 2.9166667f;
@@ -2040,14 +2040,14 @@ static void yuunpc_pose_minigame4_main(void) {
                                 break;
                             case 8:
                             case 0x10:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                                 dz = 1.6666666f;
 #else
                                 dz = 0.0f;
 #endif
                                 break;
                             case 0:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                                 dz = 3.3333333f;
 #else
                                 dz = 2.9166667f;
@@ -2064,14 +2064,14 @@ static void yuunpc_pose_minigame4_main(void) {
                                 break;
                             case 8:
                             case 0x10:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                                 dz = -1.6666666f;
 #else
                                 dz = -0.0f;
 #endif
                                 break;
                             case 0:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                                 dz = -3.3333333f;
 #else
                                 dz = -2.9166667f;
@@ -2166,7 +2166,7 @@ static void yuunpc_pose_minigame4_main(void) {
                             }
                         }
                         // The releases play the step sound only once every 64 frames, offset per NPC
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         t = gp->retraceCount;
                         if (!(t & 0xf)) {
                             if (t & 0x10) {
@@ -2242,7 +2242,7 @@ static void yuunpc_pose_minigame4_main(void) {
                             }
                         }
                         // The releases play the step sound only once every 64 frames, offset per NPC
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         t = gp->retraceCount;
                         if (!(t & 7)) {
                             if (t & 8) {
@@ -2432,7 +2432,7 @@ EVT_BEGIN(evt_yuunpc_minigame4)
     CALL(evt_npc_flag_onoff, 1, STRING("yuusp0"), NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("yuusp1"), NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("yuusp2"), NPC_FLAG_INTANGIBLE)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_ext_entry, 1000, PTR(ext_yuunpc_minigame4_data), PTR(ext_yuunpc_minigame4_init), PTR(ext_yuunpc_minigame4_main), PTR(ext_yuunpc_dispent))
 #else
     CALL(evt_ext_entry, 900, PTR(ext_yuunpc_minigame4_data), PTR(ext_yuunpc_minigame4_init), PTR(ext_yuunpc_minigame4_main), PTR(ext_yuunpc_dispent))

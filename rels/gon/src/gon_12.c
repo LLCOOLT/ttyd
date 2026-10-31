@@ -351,7 +351,7 @@ EVT_BEGIN(gon_12_init_evt)
         SET_VALUE(GSWF(GSWF_GON12_CASTLE_KEY_CHEST_OPENED), 1)
     END_IF
     CALL(evt_mobj_itembox, STRING("mobj_box00"), -117, 0, -75, 0, 0, PTR(item_get00), GSWF(GSWF_GON12_CASTLE_KEY_CHEST_OPENED))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mobj_itembox, STRING("mobj_box01"), -56, 0, -75, 0, 0, PTR(item_get01), GSWF(GSWF_GON12_MUSHROOM_CHEST_OPENED))
 #else
     CALL(evt_mobj_itembox, STRING("mobj_box01"), -56, 0, -25, 0, 0, PTR(item_get01), GSWF(GSWF_GON12_MUSHROOM_CHEST_OPENED))

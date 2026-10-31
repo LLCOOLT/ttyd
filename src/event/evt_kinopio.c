@@ -367,7 +367,7 @@ EVT_BEGIN(kinopio_house_talk_evt)
             CALL(evt_cam3d_evt_set, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), 0, 11)
         END_INLINE_EVENT
         CALL(get_bedside, LW(0), LW(1), LW(2))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_mario_mov_pos2, LW(0), LW(2), FLOAT(60.0f))
 #else
         CALL(evt_mario_mov_pos2, LW(0), LW(2), FLOAT(90.0f))
@@ -389,7 +389,7 @@ EVT_BEGIN(kinopio_house_talk_evt)
     END_IF
     // Mario jumps into bed with a yelp and lies down flat with sleeping sounds.
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FLD_JUMP2"), LW(0), LW(1), LW(2), 0)
     CALL(evt_mario_flag_onoff, 1, 768)
 #else
@@ -410,7 +410,7 @@ EVT_BEGIN(kinopio_house_talk_evt)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_snd_sfxon_3d, STRING("SFX_OFF_MARIO_SLEEP1"), LW(0), LW(1), LW(2), 0)
         WAIT_MS(200)
         CALL(evt_snd_sfxon_3d, STRING("SFX_OFF_MARIO_SLEEP2"), LW(0), LW(1), LW(2), 0)
@@ -456,7 +456,7 @@ EVT_BEGIN(kinopio_house_talk_evt)
         ADD_FLOAT(LW(2), LW(4))
         CALL(evt_mario_set_party_pos, 1, LW(12), LW(0), LW(1), LW(2))
     END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_flag_onoff, 0, 768)
 #else
     CALL(evt_mario_flag_onoff, 0, 1792)
@@ -468,7 +468,7 @@ EVT_BEGIN(kinopio_house_talk_evt)
     CALL(evt_mario_set_dir_npc, LW(0))
     CALL(evt_party_set_dir_npc, 0, LW(0))
     CALL(evt_party_set_dir_npc, 1, LW(0))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_adjust_dir)
 #endif
     CALL(evt_npc_flag_onoff, 1, LW(0), NPC_FLAG_INSTANT_TURN)
@@ -485,7 +485,7 @@ EVT_BEGIN(kinopio_house_talk_evt)
     IF_INT_GREATER(GSW(GSW_INN_STAY_COUNT), 100)
         SET_VALUE(GSW(GSW_INN_STAY_COUNT), 100)
     END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     IF_INT_EQUAL(GSW(GSW_INN_STAY_COUNT), 50)
         CALL_CHILD(evt_50)
         RETURN
@@ -521,7 +521,7 @@ EVT_BEGIN(kinopio_house_talk_evt)
     CALL(evt_party_run, 0)
     CALL(evt_party_run, 1)
     CALL(get_npctalk, LW(0), LW(1), LW(2))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_mov_pos2, LW(0), LW(2), FLOAT(60.0f))
     CALL(evt_fade_end_wait)
 #else
@@ -546,7 +546,7 @@ EVT_END()
  * Retail adds a Lakitu cameraman who takes a photo,
  * placed per inn map (bom_02, gor_01, muj_01, nok_00, pik_04, usu_00).
  */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_BEGIN(evt_50)
     CALL(get_npcname, LW(10))
     CALL(msg_no, 9, LW(0))

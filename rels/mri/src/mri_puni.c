@@ -1671,7 +1671,7 @@ static void puniMoveHit(PuniData* p, Vec start, Vec dir, f32 dist) {
 }
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo version of the Puni's normal move: limits the speed to maxSpeed,
  * turns the Puni to face left or right by the sign of the x velocity,
@@ -3568,7 +3568,7 @@ static void puniModeWind(PuniData* p) {
  * a Puni that falls out of the world is put back at the recovery position.
  */
 static void puniModeFall(PuniData* p) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     Vec dir;
     Vec start;
 #else
@@ -3594,7 +3594,7 @@ static void puniModeFall(PuniData* p) {
         case 1:
             p->vel.x = 0.0f;
             p->vel.y -= 0.45f;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             PSVECNormalize(&p->vel, &dir);
 #else
             {
@@ -3847,7 +3847,7 @@ static void puniModeUpdraft(PuniData* p) {
  * Sharing it with the releases (as puniModeDeadSfx is) moves puniModeMain's stack slots there,
  * so the releases keep the plain function.
  */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static inline void puniModeWonderSfx(PuniData* p, const char* sfx) {
 #else
 /**
@@ -3861,7 +3861,7 @@ static void puniModeWonder(PuniData* p) {
 
     switch (p->modeStep) {
         case 0:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             psndSFXOn_3D(sfx, &p->pos);
 #else
             psndSFXOn_3D("SFX_STG2_SOAPBALL_BREAK1", &p->pos);
@@ -3894,7 +3894,7 @@ static void puniModeWonder(PuniData* p) {
             break;
     }
 }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 
 /** Wonder mode (demo build): calls puniModeWonderSfx with the bubble-pop sound. */
 static void puniModeWonder(PuniData* p) {
@@ -5177,7 +5177,7 @@ static void puniOption(void) {
     Vec diff;
     f32 dist, r2, r;
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     for (p = Punidat; p < Punidat + PUNI_DATA_MAX; p++) {
         p->flags &= ~PUNI_FLAG_CROWDED;
     }
@@ -5475,7 +5475,7 @@ static void puniSound(void) {
 
 extern double fabs(double);
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** The demo runs the mode and move dispatch inline here, without the PUNIGP_FLAG_BATTLE_FLOOR path. */
 static void puni_puni_main(void) {
     PuniTarget* tg;
@@ -7465,7 +7465,7 @@ USER_FUNC(evt_puni_landon_check) {
     count = 0;
     for (i = start; i < end; i++) {
         p = &Punidat[i];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         if ((p->flags & PUNI_FLAG_ACTIVE) && p->pos.y != y) {
 #else
         if ((p->flags & PUNI_FLAG_ACTIVE) && p->pos.y > y) {
@@ -7713,13 +7713,13 @@ static void puniCountDisp(CameraId unused, void* param) {
     c2.a = c2.a * Punigp->puniCounterAlpha / 255;
     c3.a = c3.a * Punigp->puniCounterAlpha / 255;
     PSMTXTrans(m, -160.0f, -180.0f, 0.0f);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     iconDispGxCol(m, 4, VERSION_PICK(0x203, 0x20A), c1);
 #else
     iconDispGxCol(m, 0x10, VERSION_PICK(0x203, 0x20A), c1);
 #endif
     PSMTXTrans(m, -232.0f, -178.0f, 0.0f);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     iconDispGxCol(m, 4, VERSION_PICK(0x204, 0x20B), c2);
 #else
     iconDispGxCol(m, 0x10, VERSION_PICK(0x204, 0x20B), c2);
@@ -7733,7 +7733,7 @@ static void puniCountDisp(CameraId unused, void* param) {
         iconNumberDispGx(m, num2, FALSE, c3);
     }
     PSMTXTrans(m, -140.0f, -178.0f, 0.0f);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     iconDispGxCol(m, 4, VERSION_PICK(0x1D8, 0x1E0), c3);
 #else
     iconDispGxCol(m, 0x10, VERSION_PICK(0x1D8, 0x1E0), c3);

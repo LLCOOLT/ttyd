@@ -112,7 +112,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Damage-type modifiers of the Dark Puff: none, no special weakness or immunity. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Dark Puff (100% is the normal chance): resists Sleep 80%, Confusion 90%, Freeze
  * 90%, Tiny 90%, Attack Down 90%, Defense Down 90%, Allergic 90%, Fright 90%, Slow 90% and instant KO 95%;

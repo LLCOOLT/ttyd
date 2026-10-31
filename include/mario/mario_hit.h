@@ -19,7 +19,7 @@ f32 marioChkOverheadJabara(s32* sideOut, f32* distOut);
 HitEntry* marioSearchHead_roll(Vec* pos, f32* h, f32 d);
 
 void marioChkGnd(void);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 BOOL marioChkWallAround(Vec* pos, f32 unused, f32 dir, f32 w, f32 h); // no mode argument in the demo
 #else
 BOOL marioChkWallAround(Vec* pos, s32 mode, f32 unused, f32 dir, f32 w, f32 h);

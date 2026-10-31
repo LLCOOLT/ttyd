@@ -284,7 +284,7 @@ static void effMahorn2Disp(CameraId cameraId, EffectEntry* effect) {
             GXPosition3f32(-w / 2.0f, -h / 2.0f, 0.0f);
             GXTexCoord2f32(0.0f, v);
         } else {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             // The demo counts the three segments with the outer loop counter i, so after a type 3 entry the
             // outer loop goes on at i = 4; the later versions use their own counter.
             for (i = 0; i < 3; i++) {

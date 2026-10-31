@@ -110,7 +110,7 @@ static BattleUnitDefense defence = {0};
 /** Elemental reactions of the Goomba: none, every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Goomba (percent, 100 is normal) in the demo builds: is extra vulnerable to stop
  * (120%), fright (120%), Gale Force (120%) and instant KO (150%).

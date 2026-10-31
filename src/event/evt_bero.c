@@ -37,7 +37,7 @@ s32 BeroCAM;                // only seems to be set in scripts
 f32 BeroOX, BeroOY, BeroOZ; // offset position
 f32 BeroSX, BeroSY, BeroSZ; // start position
 f32 BeroEX, BeroEY, BeroEZ; // end position
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 extern Vec BeroPT, BeroAT; // defined after the arrays below
 #else
 Vec BeroPT, BeroAT;
@@ -47,7 +47,7 @@ BOOL BeroMarioGO;
 static USER_FUNC(evt_camera_change_event_from_road);
 
 // the demo keeps these scripts in definition order (retail moves the small ones to .sdata)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Enter script for entrances without one: LW(0) = 0 so the normal entrance runs. */
 EVT_BEGIN(default_entevt)
     SET_VALUE(LW(0), 0)
@@ -657,7 +657,7 @@ USER_FUNC(bero_get_position_normal) {
     BeroSY = start.y;
     BeroSZ = start.z;
     BeroEX = end.x;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the demo has no bottomless-pit respawn
     BeroEY = end.y;
     BeroEZ = end.z;
@@ -1393,7 +1393,7 @@ EVT_END()
 
 /** Exit trigger for "none" entrances: after bero_case_init_check, changes map straight away. */
 EVT_BEGIN(bero_case_exec_none)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL_CHILD(bero_case_init_check)
 #else
     CALL(evt_mario_key_onoff, 0)
@@ -1421,7 +1421,7 @@ EVT_END()
  * then the map changes to LW(13)/LW(14).
  */
 EVT_BEGIN(bero_case_exec_road)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL_CHILD(bero_case_init_check)
 #else
     CALL(evt_mario_key_onoff, 0)
@@ -1460,7 +1460,7 @@ EVT_END()
  * The PAL release walks only 40 units on Glitzville's tou_04.
  */
 EVT_BEGIN(bero_case_exec_door)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL_CHILD(bero_case_init_check)
 #else
     CALL(evt_mario_key_onoff, 0)
@@ -1480,7 +1480,7 @@ EVT_BEGIN(bero_case_exec_door)
         CALL(evt_mario_set_force_dir, LW(0))
         CALL(evt_mario_wait_landon)
         CALL(evt_bero_mario_go_wait)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         CALL(evt_sub_get_mapname, LW(10))
         IF_STR_EQUAL(LW(10), STRING("tou_04"))
             CALL(bero_get_position_normal, 0, FLOAT(40.0f))
@@ -1698,7 +1698,7 @@ EVT_BEGIN(bero_case_exec_pipe)
     IF_INT_NOT_EQUAL(LW(0), 0)
         RETURN
     END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL_CHILD(bero_case_init_check)
 #else
     CALL(evt_mario_key_onoff, 0)
@@ -1760,7 +1760,7 @@ EVT_END()
 
 /** Exit trigger for gates: after bero_case_init_check, changes map straight away. */
 EVT_BEGIN(bero_case_exec_gate)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL_CHILD(bero_case_init_check)
 #else
     CALL(evt_mario_key_onoff, 0)
@@ -1846,7 +1846,7 @@ EVT_END()
  * Registers the exit trigger for entrance LW(0)
  * unless it is already registered (debug message "preventing double registration").
  */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_BEGIN(bero_case_switch_on)
     CALL(evt_bero_switch_on, LW(0))
     CALL(evt_bero_get_info_num, LW(1))
@@ -1874,7 +1874,7 @@ EVT_END()
 #endif
 
 /** Deletes the exit trigger for entrance LW(0) unless it is already removed. */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_BEGIN(bero_case_switch_off)
     CALL(evt_bero_switch_off, LW(0))
     CALL(evt_bero_get_info_num, LW(1))
@@ -1905,7 +1905,7 @@ EVT_END()
 #endif
 
 /** Arrival through a "none" entrance (type 0xF00): no walk-in, just gives control back to the player. */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_BEGIN(evt_bero_info_run_none)
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -1999,7 +1999,7 @@ EVT_BEGIN(evt_bero_info_run_pipe)
 EVT_END()
 
 /** Arrival through a gate entrance (type 3): no walk-in, just gives control back to the player. */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_BEGIN(evt_bero_info_run_gate)
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -2211,7 +2211,7 @@ EVT_END()
 BeroEntry* BeroINFOARR[16];
 s32 BeroSW[16];
 s32 BeroID[16];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // the demo has these in .bss (retail: .sbss), before the arrays
 Vec BeroPT, BeroAT;
 #endif

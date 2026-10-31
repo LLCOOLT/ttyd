@@ -55,7 +55,7 @@ s32 BattleAcrobatMain(BattleWork* work) {
         return EVT_RETURN_YIELD;
     }
     if ((work->badgeEquippedFlags & BADGE_FLAG_TIMING_TUTOR) && (work->stylishCurFrame > work->stylishWindowStart && work->stylishCurFrame <= work->stylishWindowEnd)) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         dispEntry(CAMERA_3D, 900.0f, 1, _accrobat_timing_icon_disp, unit);
 #else
         Vec v11 = {0};

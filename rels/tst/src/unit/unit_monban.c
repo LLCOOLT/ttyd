@@ -104,7 +104,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Damage-type modifiers of Gus: none, no special weakness or immunity. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of Gus (100% is the normal chance): immune to Fright; resists Sleep 60%, Stop 70%,
  * Dizzy 60%, Poison 40%, Confusion 60%, Electrified 40%, Freeze 60%, Huge 30%, Tiny 60%, Attack Up 30%,

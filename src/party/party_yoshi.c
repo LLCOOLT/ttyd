@@ -33,7 +33,7 @@ typedef struct YoshiWork {
     EffectEntry* effect; // 0x14
 } YoshiWork;
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // Unused in the demo: four rows of x/z signs, kept in the data ahead of the jump table.
 static f32 yoshiSignTbl[16] = {
     -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f,
@@ -77,7 +77,7 @@ static void searchGround(PartyEntry* party);
 static void searchGround2(PartyEntry* party);
 static void checkWall(PartyEntry* party, f32 spd, f32 dir);
 void L_getStick(PartyEntry* party, f32* angle, f32* speed);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 void L_yoshiFlyMove(PartyEntry* party, f32* angle);
 #else
 void L_yoshiFlyMove(PartyEntry* party);
@@ -143,7 +143,7 @@ void L_sweatMain(PartyEntry* party) {
  */
 s32 yoshiGetStatus(void) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     s32 status = 3;
 #else
     s32 status = 5;
@@ -158,7 +158,7 @@ s32 yoshiGetStatus(void) {
         status = 1;
     } else if (motion >= 20 && motion <= 22) {
         status = 2;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     } else if (motion >= 100 && motion <= 101) {
         status = 3;
     }
@@ -398,7 +398,7 @@ void yoshi_init(PartyEntry* party) {
     party->memberKind = PARTY_MEMBER_YOSHI;
     party->moveKind = 0;
     party->height = 26.0f;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     party->width = 28.0f;
 #else
     party->width = 20.0f;
@@ -445,7 +445,7 @@ void yoshi_use(PartyEntry* party) {
     f32 ox;
     f32 oz;
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (!mario->keyOffCount) {
         partyUpdateKeyData(party);
     }
@@ -545,7 +545,7 @@ void yoshi_use(PartyEntry* party) {
             return;
         case 7:
             if (!(party->flags & PARTY_FLAG_IS_EVT_USE)) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 if (marioKeyOffChk() || mario->lastGroundPos.y - 5.0f > mario->position.y) {
                     party->useMotionId = 101;
                     break;
@@ -578,7 +578,7 @@ void yoshi_use(PartyEntry* party) {
     switch (party->useMotionId) {
         case 10:
             psndSFXOn_3D((const char*)0x93F, &party->position);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         case 11:
             partyChgPose(party, "PYS_H_1");
             marioChgMot(MARIO_MOTION_YOSHI);
@@ -616,7 +616,7 @@ void yoshi_use(PartyEntry* party) {
                 mario->hitobjFront = NULL;
                 mario->hitobjPush = NULL;
                 mario->hitobjWall = NULL;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 checkWall(party, mario->baseSpeed, mario->directionView);
 #else
                 mario->hitobjHead = NULL;
@@ -641,7 +641,7 @@ void yoshi_use(PartyEntry* party) {
 #endif
                 break;
             }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (party->runMode == 8) {
                 break;
             }
@@ -699,7 +699,7 @@ void yoshi_use(PartyEntry* party) {
             mario->hitobjPush = NULL;
             mario->hitobjWall = NULL;
             dir = party->targetDir;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             spd = party->moveSpeed * ((party->flags & PARTY_FLAG_IN_SHALLOW_WATER) ? 0.75f : 1.0f);
 #else
             spd = party->moveSpeed;
@@ -769,7 +769,7 @@ void yoshi_use(PartyEntry* party) {
 
     switch (party->useMotionId) {
         case 20:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (mario->displayDirection >= 90.0f && mario->displayDirection <= 270.0f) {
                 YW(party)->dir = 1;
             } else {
@@ -821,7 +821,7 @@ void yoshi_use(PartyEntry* party) {
                 YW(party)->timer = 20;
             }
         }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             party->position.y += mario->mot.yoshi.bobSpeed;
 #else
             hit = _partySearchGround(party, 11.0f, 11.0f);
@@ -847,7 +847,7 @@ void yoshi_use(PartyEntry* party) {
             party->position.x = mario->position.x;
             party->position.z = mario->position.z;
             if (party->flags & PARTY_FLAG_IS_EVT_USE) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 party->moveSpeed = evt_yoshi_spd;
 #else
                 f32 s = evt_yoshi_spd;
@@ -857,7 +857,7 @@ void yoshi_use(PartyEntry* party) {
 #endif
             } else {
                 L_getStick(party, &angle, &speed);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 L_yoshiFlyMove(party, &angle);
 #else
                 L_yoshiFlyMove(party);
@@ -866,7 +866,7 @@ void yoshi_use(PartyEntry* party) {
             party->hitobjFront = NULL;
             party->hitobjPush = NULL;
             dir = party->targetDir;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             checkWall(party, party->moveSpeed * ((party->flags & PARTY_FLAG_IN_SHALLOW_WATER) ? 0.75f : 1.0f), dir);
 #else
             spd = party->moveSpeed;
@@ -888,7 +888,7 @@ void yoshi_use(PartyEntry* party) {
                     marioChgPose("M_Y_2");
                     mario->mot.yoshi.velX = 0.0f;
                     mario->mot.yoshi.velZ = 0.0f;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     if (party->flags & PARTY_FLAG_IS_EVT_USE) {
                         evt_yoshi_spd = 0.0f;
                         evt_yoshi_frm = -1;
@@ -928,7 +928,7 @@ void yoshi_use(PartyEntry* party) {
     }
 
     yoshi_animTimeMain(party);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (yoshiGetStatus() == 1 || yoshiGetStatus() == 2) {
         ox = 0.0f;
         oz = 0.0f;
@@ -1053,7 +1053,7 @@ void yoshi_use(PartyEntry* party) {
             party->position.x = mario->position.x;
             party->position.z = mario->position.z;
             if (party->flags & PARTY_FLAG_IS_EVT_USE) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 party->moveSpeed = evt_yoshi_spd;
 #else
                 f32 s = evt_yoshi_spd;
@@ -1063,7 +1063,7 @@ void yoshi_use(PartyEntry* party) {
 #endif
             } else {
                 L_getStick(party, &angle, &speed);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 L_yoshiFlyMove(party, &angle);
 #else
                 L_yoshiFlyMove(party);
@@ -1087,7 +1087,7 @@ void yoshi_use(PartyEntry* party) {
             mario->hitobjPush = NULL;
             mario->hitobjWall = NULL;
             dir = party->targetDir;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             checkWall(party, party->moveSpeed * ((party->flags & PARTY_FLAG_IN_SHALLOW_WATER) ? 0.75f : 1.0f), dir);
 #else
             spd = party->moveSpeed;
@@ -1144,7 +1144,7 @@ void yoshi_use(PartyEntry* party) {
         }
         return;
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     ADD_OFS(party);
 #endif
     if (party->useMotionId >= 10 && party->useMotionId <= 13 && mario->currMotionId != MARIO_MOTION_YOSHI) {
@@ -1169,7 +1169,7 @@ void yoshi_use(PartyEntry* party) {
     marioUpdateCamCollision(party->position);
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** The demo version works the fly angle in the caller's variable (passed by pointer). */
 void L_yoshiFlyMove(PartyEntry* party, f32* angle) {
     MarioWork* mario = marioGetPtr();
@@ -1314,7 +1314,7 @@ static void inertia(PartyEntry* party) {
     mario->mot.yoshi.velZ = vz;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** The demo searches 11 up into locals and has the older landing and step code. */
 static void searchGround(PartyEntry* party) {
     HitEntry* hit;
@@ -1518,7 +1518,7 @@ static void searchGround(PartyEntry* party) {
 
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** The demo searches into locals, always records the hit object, and stops the flutter sound on landing. */
 static void searchGround2(PartyEntry* party) {
     HitEntry* hit = NULL;
@@ -1664,7 +1664,7 @@ static void checkWall(PartyEntry* party, f32 spd, f32 dir) {
         party->position = pos;
     } else if (!spd) {
         f32 standDist;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         standDist = 0.5f * party->width; // the demo looks half a width ahead while standing
 #else
         standDist = spd;
@@ -1695,7 +1695,7 @@ static void checkWall(PartyEntry* party, f32 spd, f32 dir) {
         if (hit && (hitGetAttr(hit) & HIT_ATTR_SPIKES)) {
             yoshi_damageToge(party);
         }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         return; // the demo leaves the position alone while standing
 #endif
     } else {
@@ -1707,7 +1707,7 @@ static void checkWall(PartyEntry* party, f32 spd, f32 dir) {
 #if VERSION >= VERSION_US
     partyChkWallAround(party, &pos, spd, dir, party->width, mario->wPlayerCollisionBox.y);
 #else
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     marioChkWallAround(&pos, spd, dir, party->width, partyGetHeight(party)); // no mode argument in the demo
 #else
     marioChkWallAround(&pos, 1, spd, dir, party->width, mario->wPlayerCollisionBox.y);
@@ -1744,7 +1744,7 @@ void L_getStick(PartyEntry* party, f32* angle, f32* speed) {
     if (!dist) {
         ang = party->moveDir;
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     ang = revise360(ang + party->camDir);
     *angle = ang;
     if (dist > 0.0f) {

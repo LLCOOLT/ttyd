@@ -99,7 +99,7 @@ static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 /** Element modifiers of the Bombshell Bill: none, no element is special to it. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Bombshell Bill in the demo builds: immune to sleep, stop, poison and fright;
  * extra prone to electric; resists most other statuses.

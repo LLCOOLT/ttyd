@@ -57,7 +57,7 @@ static BeroEntry bero_entry_data[] = {
  */
 static EVT_BEGIN(korutesu_event)
     CALL(evt_mario_key_onoff, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_normalize)
     CALL(evt_seq_wait, 2)
 #else

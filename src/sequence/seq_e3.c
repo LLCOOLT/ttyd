@@ -28,7 +28,7 @@
 #include "driver/windowdrv.h"
 #include "mario/mario_party.h"
 #include "evt/evt_story.h"
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #include "evt/evt_cmd.h"
 #include "evt/evt_sub.h"
 #include "manager/evtmgr.h"
@@ -72,7 +72,7 @@ seq_e3_entry e3_tbl[3] = {
     { 96, 0.0f, -100.0f },
 };
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // The demo's title screen shows four characters: {anim group, walk, stay, action} for each.
 char* anim_tbl[4 * 4] = {
     "b_mario", "M_W_1", "M_S_1", "M_N_8",
@@ -113,7 +113,7 @@ static
     void pressStartGX(s32 alpha, f32 x, f32 y);
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Sets every character to the given column of anim_tbl. */
 USER_FUNC(e3PoseSetAnim) {
     s32 col = evtGetValue(event, event->args[0]);
@@ -213,7 +213,7 @@ void seq_e3Init(SequenceWork* seq) {
     wp->initTime = 0;
 #else
     OSCreateAlarm(&wp->alarm);
-#if VERSION == VERSION_US
+#if VERSION == VERSION_US || VERSION == VERSION_DEMO_US2
     OSSetAlarm(&wp->alarm, (OSTime)OS_TIMER_CLOCK * 300, alarm_handler);
 #else
     OSSetAlarm(&wp->alarm, (OSTime)OS_TIMER_CLOCK * 600, alarm_handler);
@@ -469,7 +469,7 @@ void seq_e3Main(SequenceWork* seq) {
                 pouchGetPtr()->partyData[i].HPLevel = 1;
             }
 
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             // PAL: the first scenario starts without items or badges
             if (wp->scenario != 0) {
 #endif
@@ -479,20 +479,20 @@ void seq_e3Main(SequenceWork* seq) {
                     pouchGetItem(ITEM_FIRE_FLOWER);
                     pouchGetItem(ITEM_POW_BLOCK);
                 }
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             }
 #endif
 
             pouchGetPtr()->availableBP = 20;
             pouchGetPtr()->maximumBP = 20;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             if (wp->scenario != 0) {
 #endif
                 pouchGetItem(ITEM_POWER_BOUNCE);
                 pouchGetItem(ITEM_POWER_SMASH);
                 pouchEquipBadgeID(ITEM_POWER_BOUNCE);
                 pouchEquipBadgeID(ITEM_POWER_SMASH);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             }
 #endif
             pouchReviseMarioParam();
@@ -519,7 +519,7 @@ void seq_e3Main(SequenceWork* seq) {
 // the two frames of the blinking cursor and the first scenario box (one box per scenario follows it).
 // An enum rather than #defines: the cursor's `?:` on enum constants compiles to the original code.
 typedef enum E3Texture {
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     // PAL monthry.tpl has one texture fewer before the tile and the scenario boxes
     E3_TEX_TILE = 4,
     E3_TEX_CURSOR0 = 5,
@@ -546,7 +546,7 @@ typedef enum E3Texture {
  */
 static void e3Disp(CameraId cameraId, void* param) {
     CameraEntry* camera = camGetPtr(CAMERA_2D);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     Mtx poseMtx;
     Mtx poseScale;
 #endif
@@ -624,7 +624,7 @@ static void e3Disp(CameraId cameraId, void* param) {
 #else
         // 'Press Start' overlay with alpha pulsing
         alpha = (s32)((f32)sin((f64)((f32)gp->retraceCount / 30.0f)) * 459.0f);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         {
             // PAL: per-language title texture
             s32 tbl[6] = {11, 11, 12, 13, 14, 15};
@@ -637,7 +637,7 @@ static void e3Disp(CameraId cameraId, void* param) {
             }
 
             winTexInit(*wp->handle->data);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
             winTexSet(tbl[gp->language], (Vec){0.0f, 0.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 #elif VERSION >= VERSION_US
         winTexSet(12, (Vec){0.0f, 0.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
@@ -645,7 +645,7 @@ static void e3Disp(CameraId cameraId, void* param) {
         winTexSet(11, (Vec){0.0f, 0.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 #endif
             pressStartGX(alpha, 0.0f, -110.0f);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         }
 #endif
 #endif
@@ -832,12 +832,12 @@ static
     CameraEntry* camera = camGetCurPtr();
     GXTexObj startText, gradient;
     Mtx v17, v16;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     // PAL: per-language "press start" texture
     s32 tbl[6] = {16, 16, 17, 18, 19, 20};
 #endif
 
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     TEXGetGXTexObjFromPalette(*wp->handle->data, &startText, tbl[gp->language]);
     GXLoadTexObj(&startText, GX_TEXMAP0);
     TEXGetGXTexObjFromPalette(*wp->handle->data, &gradient, 3);

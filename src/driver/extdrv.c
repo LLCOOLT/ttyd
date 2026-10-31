@@ -478,7 +478,7 @@ static u8 shadow_dl[32] ATTRIBUTE_ALIGN(32) = {
 };
 
 // The retail builds place shadow_vtx in small data; the demo keeps it in .data
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Corners of the shared shadow quad, 2.4 units square and flat on the ground, drawn under every copy. */
 static f32 shadow_vtx[16] = {
 #else

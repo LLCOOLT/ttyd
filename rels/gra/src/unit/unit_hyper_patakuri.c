@@ -126,7 +126,7 @@ static BattleUnitDefense defence_patakuri = {{0, 0, 0, 0, 0}};
 /** Defence attributes of the H. Paragoomba's body: none, so every damage type is dealt normally. */
 static BattleUnitDefenseAttr defence_patakuri_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the H. Paragoomba in the demo, as a percent of the normal chance:
  * sleep 80%, freeze 80%, instant kill 95%; raised chance for gale force 130% (and 6 other statuses lowered).
@@ -526,7 +526,7 @@ static BattleUnitDefense defence = {0};
 /** Defence attributes of the H. Paragoomba's body: none, so every damage type is dealt normally. */
 static BattleUnitDefenseAttr defence_attr = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the H. Paragoomba in the demo, as a percent of the normal chance:
  * sleep 80%, freeze 80%, instant kill 95% (and 7 other statuses lowered).

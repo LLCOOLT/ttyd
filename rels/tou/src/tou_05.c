@@ -119,7 +119,7 @@ static BeroEntry bero_data[] = {
         -1, // length
         NULL, // enterEvent
         -1, // caseType
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         NULL, // exitEvent
 #else
         (s32*)n_bero_match_reset, // exitEvent
@@ -284,7 +284,7 @@ EVT_BEGIN(evt_hiki_close)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_DRAWER_SHUT1"), LW(10), LW(11), LW(12), 0)
     SET_VALUE(LW(8), LW(0))
     SET_VALUE(LW(9), LW(1))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_sub_intpl_init, 11, 100, 0, 30)
     LOOP(31)
         CALL(evt_sub_intpl_get_value)
@@ -330,7 +330,7 @@ EVT_BEGIN(evt_hiki_open)
     // The partner comes over to the desk when it is the special drawer and Grubba's secret is still unknown.
     IF_STR_EQUAL(LW(0), STRING("hikidasi_H"))
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_31_GRUBBAS_PLANS)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_mario_key_onoff, 0)
 #endif
             BEGIN_INLINE_EVENT
@@ -356,7 +356,7 @@ EVT_BEGIN(evt_hiki_open)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_DRAWER_OPEN1"), LW(10), LW(11), LW(12), 0)
     SET_VALUE(LW(8), LW(0))
     SET_VALUE(LW(9), LW(1))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_sub_intpl_init, 11, 0, 100, 30)
     LOOP(31)
         CALL(evt_sub_intpl_get_value)
@@ -383,7 +383,7 @@ EVT_BEGIN(evt_hiki_open)
     IF_STR_EQUAL(LW(0), STRING("hikidasi_H"))
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_31_GRUBBAS_PLANS)
             CALL_CHILD(evt_takurami)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_party_run, 0)
 #else
             CALL(evt_mario_key_onoff, 1)
@@ -1527,7 +1527,7 @@ EVT_BEGIN(tou_05_init_evt)
             SWITCH(GSW(GSW_STORY_PROGRESS))
                 CASE_BETWEEN(STORY_STG3_00_WELCOME_TO_GLITZVILLE, STORY_STG3_12_MINI_YOSHI_EGG)
                 CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
 #else
                 CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))
@@ -1535,7 +1535,7 @@ EVT_BEGIN(tou_05_init_evt)
                 CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
                 CASE_GREATER_OR_EQUAL(STORY_STG3_33_PEACH_THE_SECRET_WEAPON)
                 CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
 #else
                 CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))

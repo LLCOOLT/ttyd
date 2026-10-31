@@ -37,13 +37,13 @@
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
 #include "driver/casedrv.h"
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 #include "eff/eff_nice.h"
 #endif
 
 static USER_FUNC(anim_tevcallback);
 static USER_FUNC(anim_tevcallback_mobj);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 static USER_FUNC(nice_effect_shrink);
 #endif
 
@@ -832,7 +832,7 @@ static EVT_BEGIN(talk_murabito_h)
             CALL(evt_msg_print_add, 0, STRING("irai_26_03"))
             CALL(evt_msg_select, 0, STRING("irai_26_03_s"))
             CALL(evt_msg_print_add, 0, STRING("irai_26_04"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_win_item_select, PTR(iri_26_item_tbl), LW(0))
 #else
             CALL(evt_win_item_select, 0, PTR(iri_26_item_tbl), LW(0), 0)
@@ -966,7 +966,7 @@ EVT_BEGIN(mario_jump)
         SUBTRACT(LW(0), 20)
         SUBTRACT(LW(2), 20)
 #endif
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         CALL(evt_eff, STRING("eff_nice"), STRING("nice"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
         CALL(nice_effect_shrink, STRING("eff_nice"))
 #else
@@ -990,7 +990,7 @@ EVT_BEGIN(mario_jump)
         SUBTRACT(LW(0), 20)
         SUBTRACT(LW(2), 20)
 #endif
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         CALL(evt_eff, STRING("eff_good"), STRING("nice"), 1, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
         CALL(nice_effect_shrink, STRING("eff_good"))
 #else
@@ -1034,7 +1034,7 @@ static EVT_BEGIN(talk_white)
                 IF_INT_EQUAL(LF(0), 1)
                     CALL(evt_msg_print, 0, STRING("irai_25_19"), 0, STRING("ホワイト"))
                 END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(evt_win_item_select, PTR(iri_25_item_tbl), LW(0))
 #else
                 CALL(evt_win_item_select, 0, PTR(iri_25_item_tbl), LW(0), 0)
@@ -1555,7 +1555,7 @@ static ShopperData35 shopper_data = {
     {"shop_00", "shop_01", "shop_02", "shop_03", "shop_04", "shop_05", "shop_06", "shop_07", "shop_08", "shop_09", "shop_10", "shop_11", "shop_12", "shop_13", "shop_14", "shop_15", "shop_16", "shop_17", "shop_18", "shop_19", "shop_20", "shop_21", "shop_22", "shop_23", "shop_24", "shop_25", "shop_26", "shop_27", "shop_28", "shop_29", "shop_30", "shop_31", "shop_32", "shop_33", "shop_34"}, // msgs
 };
 
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 /** PAL: the NICE / GOOD letters of Mario's jumps on White are drawn at 5/7 size */
 static USER_FUNC(nice_effect_shrink) {
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
@@ -1704,7 +1704,7 @@ static EVT_BEGIN(sekai_yami_evt)
         CALL(evt_npc_wait_pera, STRING("ボムヘイG"))
         CALL(evt_npc_reverse_ry, STRING("ボムヘイG"))
     END_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.009765625f), 3000)
 #endif
     SET_FLOAT_VALUE(LW(0), FLOAT(0.0068359375f))
@@ -1788,7 +1788,7 @@ static KinopioData kino_dt = {
     198, // breakfastItem
     {-425.0f, 50.0f, -200.0f}, // breakfastPos
     15, // ryoukin
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {-291.0f, 46.0f, -225.0f}, // bed
 #else
     {-285.0f, 46.0f, -223.0f}, // bed

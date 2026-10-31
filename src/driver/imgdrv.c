@@ -214,7 +214,7 @@ static void imgDisp(CameraId camId, void* param) {
     animPoseDrawMtx(entry->poseId, m3, 2, 0.0f, scale);
     animPoseDrawMtx(entry->poseId, m3, 3, 0.0f, scale);
     animSetPaperTexMtx(NULL, NULL, NULL);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     sysWaitDrawSync();
 #else
     e2 = wp->entries;
@@ -329,7 +329,7 @@ static inline void imgCaptureCopy(ImageShadow* sh, ImageEntry* entry) {
  */
 static void imgCapture_Prim(ImageEntry* entry, s32 id) {
     ImageShadow* sh = &entry->shadows[id];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     void* src;
 #endif
     s32 offId;
@@ -347,7 +347,7 @@ static void imgCapture_Prim(ImageEntry* entry, s32 id) {
             if (sh->flags & IMG_SHADOW_COPY_ONCE) {
                 offscreenGetTexObj(offId, &obj, &buf);
                 if (obj) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     src = buf->address;
                     w = GXGetTexObjWidth(obj);
                     h = GXGetTexObjHeight(obj);
@@ -543,7 +543,7 @@ void imgMain(void) {
                         break;
                 }
                 if (shadow != 3) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     dispEntry(entry->camId, 0.0f, 1, imgDisp, entry);
 #else
                     dispEntry(entry->camId, entry->order, 1, imgDisp, entry);

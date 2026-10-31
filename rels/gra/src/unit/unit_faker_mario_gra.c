@@ -114,7 +114,7 @@ static BattleUnitDefense defence_fmario = {{0, 0, 0, 0, 0}};
  */
 static BattleUnitDefenseAttr defence_attr_fmario = {{2, 2, 2, 2, 2}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of Doopliss as Mario in the demo, as a percent of the normal chance:
  * immune to sleep, stop, dizzy, confuse, freeze, tiny, attack down, defense down, allergic, fright,

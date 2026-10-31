@@ -81,7 +81,7 @@ extern EvtWord evt_shop_open[];
 extern EvtWord evt_shop_close[];
 extern EvtWord evt_shop_door_init[];
 static EvtWord evt_yuka_simi[45];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static const char* access_tbl[11];
 #else
 static const char* access_tbl[16];
@@ -325,7 +325,7 @@ s32 item_tbl_cook[] = {
  */
 EVT_BEGIN(talk_cook_nabe_return)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_70_00"), 0, STRING("コック"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_win_item_select, PTR(item_tbl_cook), LW(1))
 #else
     CALL(evt_win_item_select, 0, PTR(item_tbl_cook), LW(1), 0)
@@ -396,7 +396,7 @@ EVT_BEGIN(talk_cook)
         END_IF
         RETURN
         LABEL(0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_win_item_select, LW(0), LW(1))
 #else
         CALL(evt_win_item_select, 0, LW(0), LW(1), 0)
@@ -470,12 +470,12 @@ EVT_BEGIN(talk_cook)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_212"), 0, 0)
         CASE_LESS(STORY_STG6_44_END_OF_DAY_2)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_219"), 0, 0)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         CALL(evt_party_stop, 0)
         WAIT_MS(300)
 #endif
         CALL(evt_msg_print_party, STRING("stg6_rsh_219_2"))
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         CALL(evt_party_run, 0)
 #endif
         CASE_LESS(STORY_STG6_57_A_MAIL_FROM_PEACH)
@@ -519,7 +519,7 @@ EVT_BEGIN(talk_waitless_pias_return)
     CALL(evt_npc_get_reglid, STRING("ウェイトレス"), LW(10))
     DELETE_EVENT(LW(10))
     CALL(evt_msg_print, 0, STRING("stg6_rsh_195"), 0, STRING("ウェイトレス"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_win_item_select, PTR(item_tbl_waitless), LW(1))
 #else
     CALL(evt_win_item_select, 0, PTR(item_tbl_waitless), LW(1), 0)
@@ -1587,7 +1587,7 @@ EVT_END()
 
 // The demo pairs each object with one message; the releases add a second message for it.
 static const char* access_tbl[] = {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     "table_1",
     "stg6_rsh_268",
     "table_2",
@@ -1624,7 +1624,7 @@ static const char* access_tbl[] = {
  */
 static EVT_BEGIN(evt_access)
     CALL(evt_mario_key_onoff, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_msg_print, 0, LW(1), 0, 0)
 #else
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_56_ROGUEPORT_STATION)
@@ -1641,7 +1641,7 @@ EVT_END()
 static EVT_BEGIN(evt_access_entry)
     SET_INT_READ_ADDR(PTR(&access_tbl))
     LOOP(0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         READ_INT2(LW(0), LW(1))
 #else
         READ_INT3(LW(0), LW(1), LW(2))
@@ -1952,7 +1952,7 @@ EVT_BEGIN(rsh_03_init_evt_nidome)
     ELSE
         IF_INT_EQUAL(GSWF(GSWF_TRAIN_ARRIVED_ROGUEPORT), 1)
             CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_GOR1"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_GOR5"))
 #else
             CALL(evt_snd_envoff, PSND_FADE_OUT)

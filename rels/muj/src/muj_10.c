@@ -40,12 +40,12 @@ static BeroEntry bero_entry_data[3];
 extern EvtWord nazo_event[];
 extern EvtWord oidasare_event[];
 ExtTexInfo test_ext_entry_data[31];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static s16 suifu_animtbl[41];
 #else
 static s16 suifu_animtbl[42];
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static s16 elmos_animtbl[21];
 #else
 static s16 elmos_animtbl[22];
@@ -402,7 +402,7 @@ static s16 suifu_animtbl[] = {
     8, 8, 9, 9, 10, 10, 11, 11,
     12, 12, 13, 13, 14, 14, 15, 15,
     16, 16, 17, 17, 18, 18, 19, 19,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     -1,
 #else
     -1, 0,
@@ -413,7 +413,7 @@ static s16 suifu_animtbl[] = {
 static s16 elmos_animtbl[] = {
     20, 20, 21, 21, 22, 22, 23, 23,
     24, 24, 25, 25, 26, 26, 27, 27,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     28, 28, 29, 29, -1,
 #else
     28, 28, 29, 29, -1, 0,
@@ -563,7 +563,7 @@ EVT_BEGIN(senin_event)
     CALL(evt_npc_flag_onoff, 1, STRING("コルテス"), NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_NO_SHADOW | NPC_FLAG_INSTANT_TURN)
     CALL(evt_npc_set_position, STRING("水夫D"), -158, 44, -160)
     CALL(evt_npc_set_ry, STRING("水夫D"), 90)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_npc_flag_onoff, 1, STRING("水夫D"), NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_JUMPING | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR)
 #else
     CALL(evt_npc_flag_onoff, 1, STRING("水夫D"), NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_JUMPING | NPC_FLAG_INSTANT_TURN | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR)
@@ -571,7 +571,7 @@ EVT_BEGIN(senin_event)
     CALL(evt_npc_flag_onoff, 0, STRING("水夫D"), NPC_FLAG_MOVE_ANIM)
     CALL(evt_npc_set_position, STRING("モニー"), -159, 44, -257)
     CALL(evt_npc_set_ry, STRING("モニー"), 90)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_npc_flag_onoff, 1, STRING("モニー"), NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_JUMPING | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR)
 #else
     CALL(evt_npc_flag_onoff, 1, STRING("モニー"), NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_JUMPING | NPC_FLAG_INSTANT_TURN | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR)
@@ -579,7 +579,7 @@ EVT_BEGIN(senin_event)
     CALL(evt_npc_flag_onoff, 0, STRING("モニー"), NPC_FLAG_MOVE_ANIM)
     CALL(evt_npc_set_position, STRING("ピートン"), -195, 44, -264)
     CALL(evt_npc_set_ry, STRING("ピートン"), 90)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_npc_flag_onoff, 1, STRING("ピートン"), NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_JUMPING | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR)
 #else
     CALL(evt_npc_flag_onoff, 1, STRING("ピートン"), NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_JUMPING | NPC_FLAG_INSTANT_TURN | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR)
@@ -587,14 +587,14 @@ EVT_BEGIN(senin_event)
     CALL(evt_npc_flag_onoff, 0, STRING("ピートン"), NPC_FLAG_MOVE_ANIM)
     CALL(evt_npc_set_position, STRING("ガラの悪い水夫"), -45, 120, -289)
     CALL(evt_npc_set_ry, STRING("ガラの悪い水夫"), 270)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_npc_flag_onoff, 1, STRING("ガラの悪い水夫"), NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_JUMPING | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR)
 #else
     CALL(evt_npc_flag_onoff, 1, STRING("ガラの悪い水夫"), NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_JUMPING | NPC_FLAG_INSTANT_TURN | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR)
 #endif
     CALL(evt_npc_flag_onoff, 0, STRING("ガラの悪い水夫"), NPC_FLAG_MOVE_ANIM)
     CALL(evt_npc_set_position, STRING("オドオド水夫"), -18, 120, -179)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_npc_flag_onoff, 1, STRING("オドオド水夫"), NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_JUMPING | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR)
 #else
     CALL(evt_npc_flag_onoff, 1, STRING("オドオド水夫"), NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_JUMPING | NPC_FLAG_INSTANT_TURN | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR)

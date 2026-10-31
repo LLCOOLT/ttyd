@@ -139,7 +139,7 @@ static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 /** Defence attributes of the Dry Bones: none, every element hits it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Demo builds: Status vulnerability of the Dry Bones (percent chance each status takes hold):
  * immune to sleep, poison; resists stop (70%), dizzy (60%), confusion (60%), freeze (60%), Tiny (60%),

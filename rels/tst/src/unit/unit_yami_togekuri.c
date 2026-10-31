@@ -47,13 +47,13 @@ BattleUnitKind unit_yami_togekuri = {
     1,
     13,
     0,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     1,
 #else
     2,
 #endif
     70,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     1,
 #else
     0,
@@ -118,7 +118,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** The Spiky Gloomba has no elemental defence. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerabilities of the Spiky Gloomba (percent chance per status;
  * the newer releases tweak a few values).

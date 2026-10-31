@@ -172,7 +172,7 @@ s32 gesso_defence_attr_turn[] = {
 
 /** Status vulnerability table (immune to every status) used while a Blooper tentacle is flipped over. */
 s32 gesso_regist_turn[] = {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     0, 0, 0, 0, 0, 0,
 #else
     1684300900, 1684300900, 1684300900, 1684300800, 6579200, 0,
@@ -182,7 +182,7 @@ s32 gesso_regist_turn[] = {
 /** Pose table of the Blooper: maps each battle pose to the animation it plays (GSO_* animations). */
 static PoseTableEntry pose_table[] = {
     {1, "GSO_N2_1"},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {2, "GSO_K2_1"},
     {9, "GSO_K2_1"},
 #else
@@ -204,7 +204,7 @@ static PoseTableEntry pose_table[] = {
  */
 static PoseTableEntry pose_table_ceil[] = {
     {1, "GSO_N1_1"},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {2, "GSO_K1_1"},
     {9, "GSO_K1_1"},
 #else
@@ -225,7 +225,7 @@ static PoseTableEntry pose_table_ceil[] = {
 /** Pose table of the Blooper: maps each battle pose to the animation it plays (GSO_* animations). */
 PoseTableEntry gesso_pose_table_turn[] = {
     {1, "GSO_N3_1"},
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {2, "GSO_K3_1"},
     {9, "GSO_K3_1"},
 #else

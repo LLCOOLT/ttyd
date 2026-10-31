@@ -2,7 +2,7 @@
 #include "version.h"
 // Script commands and stock tables for the badge shops (Lovely Howz of Badges, Dazzle,
 // Charlieton, the Pianta Parlor prize counter): bargain and restock generation.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // the demo unit is built without the main precompiled header: only the dtrigf constants lead its data
 #define DTRIGF_WITH_INITIAL_VALUES
 #include <dtrigf.h>
@@ -116,7 +116,7 @@ s32 badge_bteresa_table_card_platinum[] = { //Pianta Parlor Platinum Card
     ITEM_QUAKE_HAMMER, ITEM_MONEY_MONEY, ITEM_ULTRA_SHROOM, ITEM_JAMMIN_JELLY, ITEM_NULL
 };
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // demo only: not referenced in the demo dol (four rows of four decreasing values, then 0)
 s32 badge_bteresa_table_nedan[] = {
     400, 200, 100, 50,
@@ -650,7 +650,7 @@ USER_FUNC(evt_badgeShop_bottakuru_dec) {
 }
 
 #pragma opt_common_subs reset
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** the demo counts the thrown badges through an inline copy of badgeShop_ThrowCheck (with its bug: always 0) */
 static inline s32 badgeShop_ThrowCount(s32 itemId) {
     int i;
@@ -676,7 +676,7 @@ USER_FUNC(evt_badgeShop_throw_get_kind_cnt) {
     long i;
 
     for (count = 0, i = 0; i < 99; i++) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         // the demo also subtracts badgeShop_ThrowCount, which is always 0 (the badgeShop_ThrowCheck bug)
         if ((badge = badgeShop_get(bdsw->bargain_table, (s16)(i + BADGE_MIN))) - badgeShop_ThrowCount(i + BADGE_MIN) > 0) {
 #else
@@ -761,7 +761,7 @@ USER_FUNC(evt_badgeShop_bteresa_get_kind_cnt) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** demo only: TRUE once word 6 of the block in LW(0) reaches the bargain count (no caller in the demo dol) */
 USER_FUNC(evt_badgeShop_getBargainKind) {
     evtSetValue(event, event->args[0], !(((s32*)event->lwData[0])[6] < bdsw->bargainNum));

@@ -159,7 +159,7 @@ s32 winRootMain(WindowWork* w) {
                 WIN_ROOT_ADD_TAB(3);
             }
             WIN_ROOT_ADD_TAB(4);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             {
                 s32 j;
                 for (j = 0; j < w->tabNum; j++) {
@@ -424,7 +424,7 @@ s32 winRootMain(WindowWork* w) {
     return 0;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // FAKE: stand-in for a function the linker stripped; codegen runs bottom-up, so
 // its 185.0f and 180.0f land in .sdata2 ahead of winRootMain's 1000.0f, as in the demo.
 void winRootStrippedPool(f32* f) {
@@ -1637,7 +1637,7 @@ WinSortData sort_6[] = {
 };
 // The demo still gives every listed enemy its own number; retail later merged
 // variants that share an entry.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Demo: the Tattle Log number of each enemy, by tattle entry; the Journal shows and sorts by it. */
 u8 enemy_monoshiri_sort_table[] = {
     0x00, 0x01, 0x02, 0x03, 0x2F, 0x30, 0x94, 0x2A, 0x62, 0x95, 0x96, 0x12, 0x24, 0x97, 0x0A, 0x0B,
@@ -1768,7 +1768,7 @@ static void sort_3_3_func(WindowWork* wp) {
 
     pouchGetHaveBadgeCnt();
     pouchHaveBadge(sel);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     pouchSortItem(!wp->sortRev ? 4 : 11);
 #else
     pouchSortItem(!wp->sortRev ? 6 : 13);
@@ -1780,7 +1780,7 @@ static void sort_3_3_func(WindowWork* wp) {
     wp->badge.page[0] = wp->badge.sel[0] / 8;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** The demo sorts the equipped list through the pouch, like the owned list. */
 static void sort_4_1_func(WindowWork* wp) {
     pouchSortItem(!wp->sortRev ? 4 : 11);
@@ -1956,7 +1956,7 @@ static void sort_4_3_func(WindowWork* wp) {
  * qqsort compare for the Journal badge log (badge ids from BADGE_MIN) by name.
  * The demo compares the names as they are; retail first folds hiragana to katakana (pouchHiraToKata).
  */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static s32 compare_func5_1(const void* a, const void* b) {
     const s16* ea = a;
     const s16* eb = b;
@@ -2071,7 +2071,7 @@ static void sort_5_2_func(WindowWork* wp) {
     wp->log.badge.idx = wp->log.badge.cursor / 28;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Journal badge log by BP cost.
  * The demo sorts by name first, then bubbles by BP cost only; its first press puts the highest cost first.
@@ -2187,7 +2187,7 @@ static void sort_5_3_func(WindowWork* wp) {
  * qqsort compare for the Journal recipe log (ids from WIN_RECIPE_MIN) by name;
  * retail folds hiragana to katakana first.
  */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static s32 compare_func6_1(const void* a, const void* b) {
     const s16* ea = a;
     const s16* eb = b;
@@ -2357,7 +2357,7 @@ static inline u32 getMonosiriPlace(const char* place) {
         "mri",
         "tou",
         "usu",
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         "gra",
         "jin",
         "muj",
@@ -2470,7 +2470,7 @@ static void sort_7_2_func(WindowWork* wp) {
  * Retail folds hiragana to katakana and names the Doopliss entries "?" (btl_un_hatena)
  * until his name is guessed in chapter 4 (STORY_STG4_14_NAME_GUESSING), as the log shows them.
  */
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static s32 compare_func3(const void* a, const void* b) {
     const WinSortEnt* ea = a;
     const WinSortEnt* eb = b;
@@ -2666,7 +2666,7 @@ static void winSortMain(WindowWork* wp) {
         wp->sortTgtX = -600.0f;
     } else if (rep & DEMO_STICK_UP) {
         psndSFXOn(SFX_NAME_WORD(0x20005));
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         wp->sortRev = 0;
 #endif
         wp->sortSel--;
@@ -2675,7 +2675,7 @@ static void winSortMain(WindowWork* wp) {
         }
     } else if (rep & DEMO_STICK_DOWN) {
         psndSFXOn(SFX_NAME_WORD(0x20005));
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         wp->sortRev = 0;
 #endif
         wp->sortSel++;
@@ -3015,7 +3015,7 @@ static void winMailDisp(WindowWork* wp) {
 #else
             winFontSetLabel((Vec){120.0f + wp->item.mailX, 8.0f + (wp->item.mailY - 56.0f), 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, mail->name);
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             GXSetScissor((u32)(32.0f + (304.0f + wp->item.mailX)), (u32)(72.0f + (240.0f - wp->item.mailY)), 0x158, 0xAE);
 #else
             GXSetScissor((u32)(32.0f + (304.0f + wp->item.mailX)), (u32)(72.0f + (240.0f - wp->item.mailY)), 0x158, 0xB1);
@@ -3030,7 +3030,7 @@ static void winMailDisp(WindowWork* wp) {
 #endif
             if (mail->flags & MAIL_FLAG_PICTURE) {
                 winTexInit((TEXPalette*)*wp->mailRes->data);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 winTexSet(mail->icon, (Vec){210.0f + wp->item.mailX, (wp->item.mailY - (f32)((wp->item.mailLines - 3) * 21)) + (f32)(wp->item.mailLine * 21), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 #else
                 winTexSet(mail->icon, (Vec){210.0f + wp->item.mailX, 7.0f + ((wp->item.mailY - (f32)((wp->item.mailLines - 1) * 21)) + (f32)(wp->item.mailLine * 21)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
@@ -3046,7 +3046,7 @@ static void winMailDisp(WindowWork* wp) {
                     if ((gp->retraceCount & 0x1F) < 0x14) {
                         winIconSet(ICON_1B6, (Vec){360.0f + wp->item.mailX, (20.0f + (wp->item.mailY - 230.0f)) - 24.0f, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
                     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 } else if (wp->item.mailLine + 8 == wp->item.mailLines) {
 #else
                 } else if (wp->item.mailLine + 6 == wp->item.mailLines) {
@@ -3074,7 +3074,7 @@ void winRootBgCaptureDisp(CameraId camId, void* param) {
     GXSetTexCopySrc(0, 0, gp->fbWidth, gp->efbHeight);
     GXSetTexCopyDst(gp->fbWidth, gp->efbHeight, GX_TF_RGB565, GX_FALSE);
     GXCopyTex(bg->texBuf->address, GX_FALSE);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     GXPixModeSync();
     DCFlushRange(bg->texBuf->address, GXGetTexBufferSize(gp->fbWidth, gp->efbHeight, GX_TF_RGB565, GX_FALSE, 0));
     GXInvalidateTexAll();
@@ -3105,14 +3105,14 @@ void winRootBgDrawDisp(CameraId camId, void* param) {
         GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
         GXSetNumTexGens(1);
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_OR);
 #else
         GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
 #endif
         GXSetZCompLoc(GX_TRUE);
         GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
 #else
         GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);

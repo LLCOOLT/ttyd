@@ -476,7 +476,7 @@ EVT_BEGIN(village_chief_talk)
                     CALL(evt_msg_print, 0, STRING("irai_17_02"), 0, 0)
                 ELSE
                     CALL(evt_msg_print, 0, STRING("irai_17_03"), 0, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     CALL(evt_win_item_select, PTR(iri_15_item_tbl), LW(0))
 #else
                     CALL(evt_win_item_select, 0, PTR(iri_15_item_tbl), LW(0), 0)
@@ -637,7 +637,7 @@ static s32 key_tbl[] = {
 static EVT_BEGIN(vivian_talk)
     CALL(evt_pouch_check_item, ITEM_SUPERBOMBOMB, LW(0))
     IF_INT_GREATER(LW(0), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_win_item_select, PTR(key_tbl), LW(0))
 #else
         CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
@@ -1477,7 +1477,7 @@ EVT_BEGIN(usu00_vivian_joinup_event)
     SET_VALUE(LW(8), STRING("ビビアン"))
     SET_VALUE(LW(9), 6)
     CALL_CHILD(all_party_lecture)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_USU1"))
 #endif
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_USU1"))
@@ -1854,7 +1854,7 @@ static KinopioData kino_dt = {
     176, // breakfastItem
     {250.0f, 16.0f, -300.0f}, // breakfastPos
     10, // ryoukin
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     {427.0f, 16.0f, -200.0f}, // bed
 #else
     {431.0f, 16.0f, -195.0f}, // bed
@@ -3581,7 +3581,7 @@ static EVT_BEGIN(sekai_yami_evt)
     SPAWN_EVENT(sekai_yami_shake)
     WAIT_MS(2000)
     CALL(evt_msg_print, 0, STRING("stg8_dark_05"), 0, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     WAIT_MS(3000)
 #else
     WAIT_MS(1500)

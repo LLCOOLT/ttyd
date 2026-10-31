@@ -23,7 +23,7 @@ typedef struct EffKemuri9N64Work {
     s32 timer;     // 0x24
     s32 counter;   // 0x28
     s32 lifetime;  // 0x2C
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     f32 anim; // 0x30, animation frame 0..8
 #else
     s32 texU;     // 0x30, texture strip cell of the current frame (0..15)
@@ -33,7 +33,7 @@ typedef struct EffKemuri9N64Work {
 #endif
 } EffKemuri9N64Work;
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** 16-wide smoke puff, used by type 1 (the Hooktail family's leg smoke). */
 static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, -8, 0, 0, 0, 0, 0, 0, 255},
@@ -75,7 +75,7 @@ EffectEntry* effKemuri9N64Entry(s32 type, s32 count, s32 life, f32 x, f32 y, f32
     work->timer = life;
     work->counter = 0;
     work->lifetime = life;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     work->anim = 0.0f;
 #else
     work->texU = 0;
@@ -117,7 +117,7 @@ static void effKemuri9Main(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     work->anim = 8.0f * (f32)work->counter / (f32)work->lifetime;
 #else
     {
@@ -152,7 +152,7 @@ static void effKemuri9Main(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effKemuri9Disp, effect);
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * The demo draws the smoke as N64 quads, blending two frames of one texture strip;
  * the later versions use a 16-cell GX texture and draw the quads directly.

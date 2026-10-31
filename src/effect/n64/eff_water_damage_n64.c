@@ -265,14 +265,14 @@ static void effWaterDamageDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx rot;
     Mtx mtx;
     GXTexObj texObj;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     void* buffer;
 #endif
     s32 i;
     s32 alpha;
     s32 ix;
     s32 iy;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     s32 dx, dy;
 #endif
 
@@ -317,7 +317,7 @@ static void effWaterDamageDisp(CameraId cameraId, EffectEntry* effect) {
     GXLoadTexObj(&texObj, GX_TEXMAP0);
     GXSetCullMode(GX_CULL_NONE);
     work++;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // the second map is a copy of the screen, shifted by each drop's position
     buffer = smartAlloc(GXGetTexBufferSize(304, 240, GX_TF_RGB565, GX_FALSE, 0), 4)->address;
     GXSetTexCopySrc(0, 0, 608, 480);
@@ -331,7 +331,7 @@ static void effWaterDamageDisp(CameraId cameraId, EffectEntry* effect) {
     GXInitTexObjLOD(&texObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&texObj, GX_TEXMAP1);
     for (i = 1; i < effect->count; i++, work++) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         dx = (s32)work->position.x + ix;
         dy = (s32)work->position.y + iy;
         dx = dx < 0 ? -(dx & 0x7F) : (dx & 0x7F);

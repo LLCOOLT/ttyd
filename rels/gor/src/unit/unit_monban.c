@@ -108,7 +108,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Defence attributes of Gus's body: none, so every damage type is dealt normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of Gus in the demo, as a percent of the normal chance: immune to fright;
  * sleep 70%, stop 70%, freeze 60%, instant kill 50% (and 15 other statuses lowered).

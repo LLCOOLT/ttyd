@@ -70,5 +70,5 @@ USER_FUNC(evt_mobj_koopa_fireber_dodai);
 USER_FUNC(evt_mobj_koopa_pole);
 
 USER_FUNC(evt_mobj_get_z_position);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #endif

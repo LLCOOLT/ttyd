@@ -6,7 +6,7 @@
 
 HitEntry* kpaChkHitobjRide(void);
 long kpaClearHitobjRide(void);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 HitEntry* kpaSearchWallFront(Vec* pos, f32* h, f32 dx, f32 dz);
 #endif
 

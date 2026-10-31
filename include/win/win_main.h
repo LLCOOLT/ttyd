@@ -20,7 +20,7 @@
 // log.recipe are 4 higher there and everything after log.recipe is 8 higher.
 
 // Directory of the window files on the disc (format prefix "%s/" is the DVD root); the demo uses "window".
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #define WIN_DIR "%s/window/"
 #else
 #define WIN_DIR "%s/w/"

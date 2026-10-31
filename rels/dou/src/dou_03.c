@@ -282,7 +282,7 @@ EVT_BEGIN(watergate_handle)
             CALL(evt_mario_key_onoff, 1)
             RETURN
         END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_win_item_select, PTR(itemsel_table), LW(0))
 #else
         CALL(evt_win_item_select, 0, PTR(itemsel_table), LW(0), 0)

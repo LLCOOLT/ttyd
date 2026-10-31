@@ -15,7 +15,7 @@
 #endif
 
 //.bss
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // the demo defines the ARAM block table first, so it ends up last in .bss
 u32 aramMemArray[8];
 #endif
@@ -119,7 +119,7 @@ void SoundInit(void) {
     sndAuxCallbackPrepareDelay(&dly);
     sndSetAuxProcessingCallbacks(0, sndAuxCallbackReverbHI, &revH, 0xFF, 0, sndAuxCallbackChorus, &cho, 0xFF, 0);
     sndVolume(0x7F, 0, 0xFF);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     sound.outputMode = SND_OUTPUTMODE_STEREO;
     sndOutputMode(SND_OUTPUTMODE_STEREO);
 #else
@@ -320,7 +320,7 @@ static void* loadDVD_callback(u32 offset, u32 bytes) {
  */
 BOOL SoundLoadDVD2(const char* path) {
     DVDEntry* entry;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     const char* root;
 #endif
     u32 length;
@@ -330,7 +330,7 @@ BOOL SoundLoadDVD2(const char* path) {
         return 0;
     }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     root = getMarioStDvdRoot();
     sprintf(str, "%s/%s%s", root, path, ".pool");
 #else
@@ -636,7 +636,7 @@ static inline void _ssDropStop(void) {
         SoundStream* stream;
         if (sound.streams[i].flags) {
             stream = &sound.streams[i];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             // as in the demo's SoundSSStopCh
             if (!(stream->flags & SOUND_SS_FLAG_ACTIVE)) {
                 stream->flags |= SOUND_SS_FLAG_STOP_REQ;
@@ -721,7 +721,7 @@ BOOL SoundDropData(void) {
         SoundStream* stream;
         if (sound.streams[i].flags) {
             stream = &sound.streams[i];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             // as in the demo's SoundSSStopCh
             if (!(stream->flags & SOUND_SS_FLAG_ACTIVE)) {
                 stream->flags |= SOUND_SS_FLAG_STOP_REQ;
@@ -807,7 +807,7 @@ BOOL SoundDropData(void) {
 
 /** Switches MusyX between mono, stereo and surround output (US and PAL only when it changes). */
 void SoundSetOutputMode(SND_OUTPUTMODE mode) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     sound.outputMode = mode;
     sndOutputMode(mode);
 #else
@@ -1430,7 +1430,7 @@ static inline u32 _ssCalcLen(SoundStreamEntry* entry) {
     if (entry->offset + SS_LOAD_BUFFER_SIZE > entry->size) {
         len = entry->size - entry->offset;
     } else {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         // The demo only shortens the read when the stream ends within the next buffer.
         if (entry->offset + 2 * SS_LOAD_BUFFER_SIZE > entry->size) {
             len -= (SS_LOAD_BUFFER_SIZE - (entry->size - (entry->offset + SS_LOAD_BUFFER_SIZE))) / 2;
@@ -1465,7 +1465,7 @@ inline void _ssDVDReadAsync(SoundStream* stream, int ch) {
     if (ch) {
         extra = entry->size + (0x20 - (entry->size % 0x20));
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // The demo always reads at least a whole buffer.
     aligned = len = _ssCalcLen(entry);
     if (len < SS_LOAD_BUFFER_SIZE) {
@@ -1538,7 +1538,7 @@ static void _ssDVDReadAsync_activeChk(s32 result, DVDFileInfo* fileInfo) {
             }
             if (entry) {
                 if (result >= 0) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     SoundIntOff();
 #endif
                     entry->offset += entry->requestLength;
@@ -1560,7 +1560,7 @@ static void _ssDVDReadAsync_activeChk(s32 result, DVDFileInfo* fileInfo) {
                     } else {
                         stream->flags &= ~SOUND_SS_FLAG_READING_1;
                     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     SoundIntOn();
 #endif
                     if (stream->count == 2) {
@@ -1570,13 +1570,13 @@ static void _ssDVDReadAsync_activeChk(s32 result, DVDFileInfo* fileInfo) {
                     } else if (sound.coverState == 2 && stream->entries[0].loaded == 1) {
                         sound.coverState = 0;
                     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                     continue; // the demo keeps searching the other streams
 #else
                     break;
 #endif
                 }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 return;
 #else
                 goto end;
@@ -1604,7 +1604,7 @@ static void _ssDVDReadAsync_activeChk(s32 result, DVDFileInfo* fileInfo) {
             stream->entries[1].curBuf = 0;
             stream->entries[0].loaded = 0;
             stream->entries[1].loaded = 0;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (stream->flags & SOUND_SS_FLAG_ADPCM) {
                 stream->entries[0].srcPos = 0;
                 stream->entries[0].pos = 0;
@@ -1618,7 +1618,7 @@ static void _ssDVDReadAsync_activeChk(s32 result, DVDFileInfo* fileInfo) {
                 sndStreamActivate(stream->entries[1].streamId);
             }
             SoundSSSetPanCh(i, stream->pan);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             SoundIntOn();
 #endif
             stream->flags |= SOUND_SS_FLAG_ACTIVE;
@@ -1862,7 +1862,7 @@ static u32 _sscallback(void* p_b1, u32 len1, void* p_b2, u32 p_l2, u32 user) {
         src8 = src8 + entry->srcPos;
         n = ((len1 + 13) / 14) * 8;
         while (n != 0) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             // The demo writes silence once the stream is stopping.
             if (stream->flags & SOUND_SS_FLAG_STOP_REQ) {
                 *(u8*)dst = 0;
@@ -1907,7 +1907,7 @@ static u32 _sscallback(void* p_b1, u32 len1, void* p_b2, u32 p_l2, u32 user) {
         dst = buffer2;
         n = ((len2 + 13) / 14) * 8;
         while (n != 0) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             // The demo writes silence once the stream is stopping.
             if (stream->flags & SOUND_SS_FLAG_STOP_REQ) {
                 *(u8*)dst = 0;
@@ -2009,7 +2009,7 @@ static u32 _sscallback(void* p_b1, u32 len1, void* p_b2, u32 p_l2, u32 user) {
     return stream->samplePos;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // FAKE: the demo had a function here that nothing called, so the linker dropped its code
 // from main.dol; its constants (3.5, 4.0, ".adp", ".song") stayed in .rodata. The original
 // body is unknown; this stand-in only recreates those constants and is dead-stripped the same way.
@@ -2042,7 +2042,7 @@ void SoundSSPlayChEx(s32 chan, const char* name, s32 aram) {
     SoundStream* stream;
     int i;
     const char* path;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     const char* paths[1];
 #endif
 
@@ -2072,13 +2072,13 @@ void SoundSSPlayChEx(s32 chan, const char* name, s32 aram) {
     if (aram) {
         stream->flags |= SOUND_SS_FLAG_ARAM;
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     sprintf(str, "%s/%s%s", getMarioStDvdRoot(), name, ".stm");
 #else
     path = getMarioStDvdRoot();
     sprintf(str, "%s/%s%s", path, name, ".stm");
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // FAKE: the stream path goes through a one-element temporary so the address of str is built in the
     // saved register first, as in the demo (behaviour-identical; see docs/FAKES.md)
     paths[0] = str;
@@ -2225,7 +2225,7 @@ static void SoundSSPlayChEx_main(s32 result, DVDFileInfo* fileInfo) {
                                      _sscallback, i | 0x100, &stream->entries[1].info);
             }
         }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         SoundSSSetPanCh(i, stream->pan);
         stream->fadeStep = stream->vol;
         stream->flags |= SOUND_SS_FLAG_FADE_IN;
@@ -2257,7 +2257,7 @@ void SoundSSStopCh(s32 chan) {
 
     if (sound.streams[chan].flags) {
         stream = &sound.streams[chan];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         if (!(stream->flags & SOUND_SS_FLAG_ACTIVE)) {
             stream->flags |= SOUND_SS_FLAG_STOP_REQ;
             return;
@@ -2269,7 +2269,7 @@ void SoundSSStopCh(s32 chan) {
             sound.slotUsed[stream->slot] = 0;
         }
         stream->flags = 0;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         SoundIntOff();
 #endif
         DVDMgrClose(stream->entries[0].dvd);

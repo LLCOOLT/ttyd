@@ -24,7 +24,7 @@ typedef struct CamShiftWork {
 
 /** The demo times the shift with the field clock (it stops in battle), retail with the render clock. */
 static inline OSTime camShiftClock(void) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     return gp->renderFieldTime;
 #else
     return gp->renderTime;

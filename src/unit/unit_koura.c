@@ -18,7 +18,7 @@ PoseTableEntry pose_table_crack_lv1[5];
 PoseTableEntry pose_table_crack_lv2[5];
 static BattleUnitKindPart parts[2];
 static EvtWord init_event[46];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord phase_event[22];
 #else
 static EvtWord phase_event[38];
@@ -200,7 +200,7 @@ EVT_END()
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL_CHILD(koura_open)
 #else
         CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
@@ -211,7 +211,7 @@ static EVT_BEGIN(phase_event)
     END_IF
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL_CHILD(koura_close)
 #else
         CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
@@ -314,7 +314,7 @@ EVT_BEGIN(damage_core)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, UW_KOURA_CRACK_STAGE, 0)
     END_SWITCH
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_DAMAGE)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     WAIT_FRAMES(30)
 #else
     WAIT_MS(500)

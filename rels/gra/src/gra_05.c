@@ -177,7 +177,7 @@ EVT_END()
 static EVT_BEGIN(out_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     SET_VALUE(LF(0), 0)
     SET_VALUE(LF(1), 0)
     CALL(evt_mario_get_exparty, LW(0))
@@ -255,7 +255,7 @@ static EVT_BEGIN(out_evt2)
     SUBTRACT(LW(1), 50)
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FLD_JUMP1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_mario_jump_pos, LW(0), LW(1), LW(2), 500, 0, -1000)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_mario_set_pos, -250, -50, 0)
 #else
     CALL(evt_party_stop, 0)

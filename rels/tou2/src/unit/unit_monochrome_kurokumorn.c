@@ -119,7 +119,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Damage-type reactions of the Dark Puff: none, so every element hurts it normally. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Dark Puff (both demos), as the percent chance each status takes hold:
  * resists 9 statuses (down to 90% of the normal chance); extra vulnerable to dizziness and Gale Force.

@@ -19,7 +19,7 @@ lottery_info* lotteryGetPtr(void) {
 // Updates the lottery from the console clock when a seller (args[0] = 0 or 1) is visited: once a day draws today's
 // number (todayNum), and on the ticket's secret prize days makes it match 4/3/2/1 digits (flags 0x1000-0x8000).
 // Flag 4 marks a clock set backwards. Writes the flags to args[1] and today's number to args[2].
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * the demo checks the draw day before the per-shop times,
  * never rerolls a prize number and keeps the buy times when the clock went back
@@ -335,7 +335,7 @@ USER_FUNC(evt_lottery) {
 
 // Buys a ticket: draws its number (written to args[0]), records the buy time and the four prize days (336-395,
 // 86-115, 26-35 and 5-10 days out), and sets flag 2. Retail draws a number sharing no trailing digits with today's.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** the demo only marks a purchase made with a broken clock */
 USER_FUNC(evt_lottery_buy) {
     EvtWord* args = event->args;

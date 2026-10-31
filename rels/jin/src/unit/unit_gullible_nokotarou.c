@@ -32,7 +32,7 @@ static BattleUnitKindPart parts_nokotarou[1];
 static EvtWord dmg_turn_event[64];
 static EvtWord init_event_nokotarou[62];
 static EvtWord damage_event_nokotarou[24];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static EvtWord dead_event_nokotarou[156];
 #else
 static EvtWord dead_event_nokotarou[177];
@@ -204,7 +204,7 @@ static BattleUnitDefenseAttr defence_attr_nokotarou = {{0, 0, 0, 0, 0}};
 /** Defence of the Koops double's body per damage type while flipped over: 0 against every damage type. */
 static BattleUnitDefense defence_turn_nokotarou = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Koops double in the demo, as a percent of the normal chance:
  * immune to fright, gale force, instant kill;
@@ -590,7 +590,7 @@ static EVT_BEGIN(attack_event_nokotarou_koura)
         IF_INT_EQUAL(LW(6), 2)
             CALL(btlevtcmd_StartAvoid, LW(3), 40)
         END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 40)
 #else
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 40)

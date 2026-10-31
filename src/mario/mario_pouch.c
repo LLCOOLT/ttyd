@@ -108,7 +108,7 @@ void pouchInit(void) {
             party->techLevel = 0;
         }
     }
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     strcpy(mpp->yoshiName, "Yoshi");
 #elif VERSION >= VERSION_US
     strcpy(mpp->yoshiName, msgSearch("name_party3"));
@@ -254,7 +254,7 @@ BOOL pouchGetItem(ItemType type) {
         return 1;
     }
     if (type == ITEM_PIANTA_TOKEN) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         if (yuwp->tokens < 0x7FFFFFFF) // the demo has no 99999 cap
 #else
         if (yuwp->tokens < 99999)
@@ -445,7 +445,7 @@ BOOL pouchRemoveItem(ItemType type) {
     return 0;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * The demo's pouchRemoveItemIndex shifts the second table wrongly:
  * it clears the slot it has just filled instead of the one it moved from (the demo's own bug;
@@ -507,7 +507,7 @@ BOOL pouchRemoveItemIndex(ItemType type, s32 index) {
     }
     for (i = index; i < maximum; p++, i++) {
         if (type == *p) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             pouchShiftDemo(table1, table2, i, maximum);
 #else
             pouchShift(table1, table2, i, maximum);
@@ -518,7 +518,7 @@ BOOL pouchRemoveItemIndex(ItemType type, s32 index) {
     return FALSE;
 }
 
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 char* strupr(char* str);
 #endif
 
@@ -557,7 +557,7 @@ void pouchHiraToKata(const char* src, char* dst) {
         }
         dst[i * 2] = 0;
     } else {
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         // PAL: sort key of a Latin name: drops <...> message tags, upper-cases, folds accented vowels to
         // A E I O U, spells the OE ligature out and drops C-cedilla
         char buf[0x400];
@@ -637,7 +637,7 @@ void pouchHiraToKata(const char* src, char* dst) {
  * JP and US inline their own copy of the kana conversion here; PAL calls pouchHiraToKata.
  */
 static inline void pouchAiueoConv(const char* src, char* dst) {
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     pouchHiraToKata(src, dst);
 }
 #else
@@ -691,7 +691,7 @@ static inline void pouchAiueoConv(const char* src, char* dst) {
 #endif
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** The demo compares the item names as they are, without the kana conversion. */
 static s32 comp_aiueo(const void* a, const void* b) {
     s16 ia = *(s16*)a;
@@ -727,7 +727,7 @@ static s32 comp_kind(const void* a, const void* b) {
     return -(x < y);
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** qqsort comparator: items by name, descending (pouchSortItem modes 7 and 9). */
 static s32 comp_aiueo_r(const void* a, const void* b) {
     s16 ia = *(s16*)a;
@@ -776,7 +776,7 @@ void pouchSortItem(s32 mode) {
     BOOL swap;
     s16 t2, t1;
     PouchData* pp[1];
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     char keyA[0x80];
     s16 bj;
     s32 l;
@@ -842,7 +842,7 @@ void pouchSortItem(s32 mode) {
             qqsort(keys, n, 2, comp_kind_r);
         memcpy(pp[0]->keyItems, keys, sizeof(keys));
     }
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     if ((u32)(mode - 4) <= 2 || (u32)(mode - 11) <= 1 || mode == 13) {
         count = 0;
         for (n = 0; n < 200; n++) {
@@ -1003,7 +1003,7 @@ void pouchSortItem(s32 mode) {
                     } else if (mode == 12) {
                         if (a->type_sort_order < b->type_sort_order)
                             swap = TRUE;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                         // The demo sorts by BP cost alone, with no tie-break on the sort order.
                     } else if (mode == 6) {
                         if (ca > cb)
@@ -1034,7 +1034,7 @@ void pouchSortItem(s32 mode) {
                         equipped[j] = t2;
                     }
                 }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 // The demo copies the lists back after every pass of the outer loop.
                 memcpy(pp[0]->badges, badges, sizeof(badges));
                 memcpy(pp[0]->equippedBadges, equipped, sizeof(equipped));
@@ -1262,7 +1262,7 @@ s32 pouchGetPartyAttackLv(PartyId partyId) {
     return party->attackLevel;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** The demo stores into the first empty slot and removes by id alone, without shifting the list. */
 BOOL pouchAddKeepItem(s16 id) {
     s32 i;
@@ -1489,7 +1489,7 @@ BOOL N_pouchUnEquipBadgeID(s32 badgeId) {
  * Adds it to the special table outside battle; the demo adds it to the bargain table, in or out of battle.
  */
 s32 pouchArriveBadge(s32 id) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     // The demo stocks an arriving badge in the bargain table.
     return badgeShop_add(bdsw->bargain_table, (s16)id, 1);
 #else

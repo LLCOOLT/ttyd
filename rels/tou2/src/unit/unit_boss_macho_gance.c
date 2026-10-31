@@ -43,7 +43,7 @@ BattleUnitKind unit_boss_macho_gance;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static BattleDataEntry data_table[2];
 #else
 static BattleDataEntry data_table[15];
@@ -87,7 +87,7 @@ BattleUnitKind unit_boss_macho_gance = {
     0,
     1,
     1,
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     70,
 #else
     71,
@@ -156,7 +156,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 /** Element reactions of the Macho Grubba: no special reaction to any element. */
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Macho Grubba (percent chance to take each status):
  * immune to growing huge, fright, gale force and instant kill; resists most other statuses.
@@ -823,7 +823,7 @@ static EVT_BEGIN(phase_event)
             LOOP(LW(5))
                 CALL(wariai_enzan_1f, LW(5), 36, FLOAT(0.0f), FLOAT(180.0f), LW(6))
                 CALL(wariai_enzan_1f, LW(5), 36, FLOAT(1.0f), FLOAT(1.1494141f), LW(7))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(btlevtcmd_SetBaseScale, BTL_UNIT_SELF, LW(7), LW(7), LW(7))
 #else
                 CALL(btlevtcmd_SetBaseScale, BTL_UNIT_SELF, LW(7), LW(7), 1)
@@ -841,7 +841,7 @@ static EVT_BEGIN(phase_event)
             LOOP(LW(5))
                 CALL(wariai_enzan_1f, LW(5), 36, FLOAT(0.0f), FLOAT(-180.0f), LW(6))
                 CALL(wariai_enzan_1f, LW(5), 36, FLOAT(1.1494141f), FLOAT(1.2998047f), LW(7))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(btlevtcmd_SetBaseScale, BTL_UNIT_SELF, LW(7), LW(7), LW(7))
 #else
                 CALL(btlevtcmd_SetBaseScale, BTL_UNIT_SELF, LW(7), LW(7), 1)

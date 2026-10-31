@@ -279,7 +279,7 @@ inline void hitPreCheck(void) {
     for (; i < wp->entries->count; entry++, i++) {
         hit = entry->hitEntries;
         for (j = 0; j < entry->hitNumJoints; j++, hit++) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             hit->flags |= HIT_FLAG_NO_GEOMETRY;
             if (hit->joint->partCount != 0) {
                 hit->flags &= ~HIT_FLAG_NO_GEOMETRY;
@@ -769,7 +769,7 @@ inline BOOL tempfunc(HitCheckQuery* query, HitVector* vector) {
     query->hitPos.x = query->targetPos.x;
     query->hitPos.y = query->targetPos.y - query->targetDistance;
     query->hitPos.z = query->targetPos.z;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     query->hitNormal = vector->normal;
 #endif
     if (dotProduct >= 0.0f) {
@@ -912,7 +912,7 @@ inline BOOL tempfunc3(HitCheckQuery* query, HitVector* vector) {
     return 1;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** The demo walks every map entry's hit objects (no active list) and has no separate straight-up case. */
 HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) {
     HitVector* vector2;
@@ -1520,7 +1520,7 @@ void hitObjGetNormal(const char* name, Vec* normal) { // 1:1
     }
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** Returns hit's joint name, or NULL for NULL (the demo has no range check). */
 const char* hitGetName(HitEntry* hit) {
     if (hit != NULL) {

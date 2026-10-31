@@ -67,7 +67,7 @@ static inline void cloudSweep(PartyEntry* party, f32 sign, s32 i) {
         (party)->moveTarget.y += 10.0f;                                               \
     }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // The demo defines its functions in a different order (the compiler emits them in reverse), has no hover helpers or
 // mot_cloud, and cloud_use is the whole breath state machine.
 

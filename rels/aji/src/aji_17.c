@@ -71,7 +71,7 @@ static void noiseDisp(CameraId cameraId, void* param);
 
 static s32 bgm_start_wait(EventEntry* event, BOOL isFirstCall);
 static USER_FUNC(bgm_start_wait);
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 static USER_FUNC(wait_move_end_50hz);
 #endif
 static s32 btn_check(EventEntry* event, BOOL isFirstCall);
@@ -194,7 +194,7 @@ static s32 peach_evt_stg4_read_quiz_data(EventEntry* event, BOOL isFirstCall) {
 static s32 bgm_start_wait(EventEntry* event, BOOL isFirstCall) {
     return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 /** PAL: at 50 Hz the next dance move waits for the previous one to end (dance_dt flag 4) */
 static s32 wait_move_end_50hz(EventEntry* event, BOOL isFirstCall) {
     if (gp->framerate != 50) {
@@ -211,7 +211,7 @@ static s32 wait_move_end_50hz(EventEntry* event, BOOL isFirstCall) {
  * the open and close scripts apply the same transform. The demo builds use 0.2217.
  */
 static EVT_BEGIN(w_door_close)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
 #else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -228,7 +228,7 @@ EVT_END()
  * the open and close scripts apply the same transform. The demo builds use 0.2217.
  */
 static EVT_BEGIN(w_door_open)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
 #else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
@@ -380,7 +380,7 @@ EVT_BEGIN(evt_emergency)
             END_IF
             WAIT_FRAMES(1)
         END_LOOP
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_sub_intpl_msec_init, 11, 255, 32, 1000)
 #else
         CALL(evt_sub_intpl_msec_init, 11, 255, 96, 1000)
@@ -393,7 +393,7 @@ EVT_BEGIN(evt_emergency)
             GOTO(0)
         END_IF
     END_IF
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_map_set_blend, 0, 255, 32, 32, 255)
 #else
     CALL(evt_map_set_blend, 0, 255, 96, 96, 255)
@@ -1471,7 +1471,7 @@ EVT_BEGIN(peach_evt_dance)
         END_IF
         SET_VALUE(LW(1), 0)
         SPAWN_EVENT_GET_ID(PTR(evt_sub_stopwatch), LW(12))
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         CALL(wait_move_end_50hz)
 #endif
         SPAWN_EVENT(peach_dance_move)
@@ -1493,7 +1493,7 @@ EVT_BEGIN(peach_evt_dance)
         END_SWITCH
         // A button prompt appears on the beat.
         CALL_CHILD(dance_btn_disp)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         CALL(wait_move_end_50hz)
 #endif
         SPAWN_EVENT(peach_dance_move)
@@ -1526,7 +1526,7 @@ EVT_BEGIN(peach_evt_dance)
             WAIT_FRAMES(1)
         END_LOOP
         ADD(LW(11), 2000)
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
         CALL(wait_move_end_50hz)
 #endif
         SPAWN_EVENT(peach_dance_move)
@@ -1552,7 +1552,7 @@ EVT_BEGIN(peach_evt_dance)
                 SPAWN_EVENT(peach_dance_action_fail)
             END_SWITCH
         END_IF
-#if VERSION == VERSION_US
+#if VERSION == VERSION_US || VERSION == VERSION_DEMO_US2
         BEGIN_INLINE_EVENT
             CALL(dance_flag_check, 4096, LW(5))
             IF_INT_NOT_EQUAL(LW(5), 0)
@@ -1561,7 +1561,7 @@ EVT_BEGIN(peach_evt_dance)
                 CALL(dance_flag_onoff, 4096, 0)
             END_IF
         END_INLINE_EVENT
-#elif VERSION == VERSION_EU
+#elif VERSION >= VERSION_DEMO_EU
         CALL_CHILD(dance_btn_clear_all) // PAL clears the buttons at once, as JP does
 #else
         CALL_CHILD(dance_btn_clear_all)

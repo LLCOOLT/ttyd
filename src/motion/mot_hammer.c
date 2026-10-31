@@ -364,7 +364,7 @@ void mot_hammer(void) {
                     psndSFXOn_3D(SFX_NAME_WORD(0x160), &m->position);
                     break;
             }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             for (i = 0; i < 5; i++) {
 #else
             for (i = 0; (u32)i < 10; i++) {
@@ -761,7 +761,7 @@ void mot_ham2_post(void) {
     marioPaperLightOn();
 #endif
     mario->dispFlags &= ~MARIO_DISP_FLAG_DIR_LOCK;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     mario->dispFlags &= ~MARIO_DISP_FLAG_FRONT_POSE;
 #else
     mario->dispFlags &= ~MARIO_DISP_FLAG_NO_MIRROR;
@@ -790,7 +790,7 @@ static HitEntry* hitEstimate(s32* out) {
     f32 h;
     s32 i;
     f32 k5 = 5.0f;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     f32 ang;
 #endif
     mario = marioGetPtr();
@@ -806,7 +806,7 @@ static HitEntry* hitEstimate(s32* out) {
     }
     sincosf(&s, &c, a);
     h = mario->wPlayerCollisionBox.y;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     ang = 3.14159265f;
     cy = (f32)cos(ang);
 #else
@@ -828,7 +828,7 @@ static HitEntry* hitEstimate(s32* out) {
             return hit;
         }
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     ang = 1.2217306f;
     cy = (f32)cos(ang);
 #else
@@ -851,7 +851,7 @@ static HitEntry* hitEstimate(s32* out) {
             return hit;
         }
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     ang = 0.78539816f;
     cy = (f32)cos(ang);
 #else
@@ -874,7 +874,7 @@ static HitEntry* hitEstimate(s32* out) {
             return hit;
         }
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     ang = 0.0f;
     cy = (f32)cos(ang);
 #else
@@ -917,7 +917,7 @@ static HitEntry* hitEstimate(s32* out) {
     return hit;
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // The demo has a table of the mobj kinds the hammer interacts with; no code reads it.
 const char* not_fullswing_mobj[] = {
     "MOBJ_RedJumpStand",

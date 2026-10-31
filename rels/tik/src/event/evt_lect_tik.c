@@ -702,7 +702,7 @@ EVT_BEGIN(plane_majin_lecture)
                 WAIT_FRAMES(1)
             END_LOOP
             LOOP(0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(98.0f), FLOAT(558.0f), FLOAT(0.0f), FLOAT(42.0f), FLOAT(-101.799805f), 0, 11)
 #endif
                 CALL(x_flag_get, 1, LW(0))
@@ -742,7 +742,7 @@ EVT_BEGIN(plane_majin_lecture)
                 END_IF
             END_LOOP
         END_INLINE_EVENT
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_cam_letter_box_disable, 1)
         CALL(mainwindow_opendisable)
         CALL(evt_mario_trigflag_onoff, 1, -2147483648)
@@ -752,7 +752,7 @@ EVT_BEGIN(plane_majin_lecture)
         CALL(evt_mario_key_onoff, 1)
 #endif
         LOOP(0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(lect_status_off)
             WAIT_FRAMES(1)
             CALL(evt_mario_get_motion, LW(3))
@@ -767,7 +767,7 @@ EVT_BEGIN(plane_majin_lecture)
             WAIT_FRAMES(1)
 #endif
         END_LOOP
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_mario_key_onoff, 0)
         CALL(lect_status_on)
@@ -824,7 +824,7 @@ EVT_BEGIN(plane_majin_lecture)
         CALL(lecture_button_seq_wait, 0, 1)
         CALL(lecture_button_flag_on_off, 0, 2, 0)
         WAIT_MS(300)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(dai_moveti_get, LW(0), LW(1), LW(2))
         ADD_FLOAT(LW(0), FLOAT(700.0f))
         SUBTRACT_FLOAT(LW(1), FLOAT(260.0f))
@@ -835,7 +835,7 @@ EVT_BEGIN(plane_majin_lecture)
         CALL(evt_msg_print, 0, STRING("mac_majin_16"), 0, STRING("ペラ魔人"))
 #endif
         CALL(evt_msg_select, 0, STRING("mac_majin_17"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         IF_INT_EQUAL(LW(0), 0)
             CALL(x_flag_set, 1, 2)
             CALL(x_flag_set, 0, 2)
@@ -900,7 +900,7 @@ EVT_BEGIN(plane_majin_lecture)
 #endif
     CALL(x_flag_set, 0, 2)
     CALL(evt_mario_paper_plane, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     LOOP(0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         IF_INT_LESS_OR_EQUAL(LW(1), -850)
@@ -917,7 +917,7 @@ EVT_BEGIN(plane_majin_lecture)
     CALL(evt_npc_set_camid, STRING("ペラ魔人"), CAMERA_3D)
     CALL(evt_npc_set_position, STRING("ペラ魔人"), 0, -1000, 0)
     RETURN
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 EVT_END()
 #else
 EVT_END_PAD()
@@ -944,7 +944,7 @@ static USER_FUNC(evt_nomal_cange) {
     MarioWork* mario = marioGetPtr();
 
     if (isFirstCall) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         marioRollCancel();
 #else
         marioRollTryCancel();

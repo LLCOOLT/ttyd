@@ -41,7 +41,7 @@ typedef struct TubuDt {
 static void capture(CameraId camera, void* param);
 static void monosiri_disp(CameraId camera, void* param);
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // Unreferenced; every demo TU that had it carries its own copy at the start of .data.
 static f32 unusedSignTbl[16] = {-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f};
 
@@ -79,7 +79,7 @@ static inline void winLogAddMenu(WindowWork* w, s32 id) {
 
 // The demo has no per-chapter tubu switches (type) and opens the moo/aji
 // route one sequence step earlier.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #define TUBU_TYPE(t) 0
 #define TUBU_SEQ_361 360
 #else
@@ -229,7 +229,7 @@ static inline void winLogAddMenu(WindowWork* w, s32 id) {
  * recipe and Tattle lists with their found counts.
  */
 void winLogInit(WindowWork* w) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     s32 j;
     s32 i;
     u32 k;
@@ -688,7 +688,7 @@ s32 winLogMain(WindowWork* w) {
             by = 120.0f + w->log.scrollY;
             for (k = 0; k < 0x5D; k++) {
                 t = &tubuDt[k];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 if (swByteGet(GSW_STORY_PROGRESS) < t->id)
                     break;
                 {
@@ -1167,7 +1167,7 @@ void winLogDisp(s32 camId, void* param, s32 idx) {
             wk->position.y = 20.0f + (v.y + (y + w->log.stoneY));
             wk = w->log.eff[i]->userdata;
             wk->position.z = v.z;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             winKageGX(w, (GXColor){0x00, 0x00, 0x00, 0x80}, v.x + (x + w->log.stoneX), (v.y + (y + w->log.stoneY)) - 30.0f, v.z, 1.0f);
 #endif
         }
@@ -1313,7 +1313,7 @@ static void mapGX(WindowWork* w, f32 x, f32 y) {
         winTexInit(*w->res->data);
         for (i = 0; i < sizeof(tubuDt) / sizeof(TubuDt); i++) {
             t = &tubuDt[i];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             if (swByteGet(GSW_STORY_PROGRESS) < t->id)
                 break;
             {
@@ -1336,35 +1336,35 @@ static void mapGX(WindowWork* w, f32 x, f32 y) {
             id = ICON_198;
             k = 1;
         } else if (sw >= 0x79 && sw < 0xA4) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             id = ICON_199;
 #else
             id = ICON_19A;
 #endif
             k = 2;
         } else if (sw >= 0xAF && sw < 0xD5) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             id = ICON_19A;
 #else
             id = ICON_19C;
 #endif
             k = 3;
         } else if (sw >= 0xDE && sw < 0x105) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             id = ICON_19B;
 #else
             id = ICON_19D;
 #endif
             k = 4;
         } else if (sw >= 0x110 && sw < 0x152) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             id = ICON_19C;
 #else
             id = ICON_199;
 #endif
             k = 5;
         } else if (sw >= 0x15C && sw < 0x175) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             id = ICON_19D;
 #else
             id = ICON_19B;
@@ -1569,7 +1569,7 @@ void monosiriMain(MonosiriWork* m) {
             m->file2 = fileAllocf(0, WIN_DIR "jp/mono.dat", getMarioStDvdRoot());
 #endif
             m->state++;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             m->alpha = 0;
             m->pose1 = -1;
             m->pose2 = -1;
@@ -1634,7 +1634,7 @@ BOOL monosiriCloseWait(MonosiriWork* m) {
 /** Frees a Tattle card: its files, models, portrait buffer and the work itself. */
 void monosiriExit(MonosiriWork* m) {
     // The release versions also reset each field after freeing it and check smart before freeing it
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (m) {
         if (m->file1) {
             fileFree(m->file1);
@@ -1938,7 +1938,7 @@ static void monosiri_disp(CameraId camera, void* param) {
         } else {
             sprintf(buf, (u32)gp->language != 0 ? "%d. %s" : "%d．%s", enemy_monoshiri_sort_table[id], msgSearch(te->enemyTag));
         }
-#elif VERSION <= VERSION_DEMO_US
+#elif VERSION <= VERSION_DEMO_JP
         id = m->id;
         te = battleGetUnitMonosiriPtr(id);
         sprintf(buf, "%d．%s", enemy_monoshiri_sort_table[id], msgSearch(te->enemyTag));
@@ -1964,7 +1964,7 @@ static void monosiri_disp(CameraId camera, void* param) {
         sprintf(buf, "%s　%s", msgSearch("menu_monosiri_derutokoro"), msgSearch(te->locationTag));
 #endif
         w = 0.75f * FontGetMessageWidth(buf);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         winFontSet((Vec){(16.0f + x) + (248.0f - w) / 2.0f, y - 210.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);
 #else
         winFontSet((Vec){1.0f + ((16.0f + x) + (248.0f - w) / 2.0f), y - 210.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);

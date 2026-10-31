@@ -4,7 +4,7 @@
 #include "battle/battle_item_data.h"
 #include "version.h"
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // the demo item table (generated from the demo data)
 ItemData itemDataTable[340] = {
     {"むこうアイテム", "in_unknown_item", "msg_unknown_item", "msg_unknown_item", 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0, 0x0, 0x0, 0x0, 0x0, 0x0, NULL},

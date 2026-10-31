@@ -654,7 +654,7 @@ static USER_FUNC(evt_nomal_cange) {
     MarioWork* mario = marioGetPtr();
 
     if (isFirstCall) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         marioRollCancel();
 #else
         marioRollTryCancel();
@@ -1035,7 +1035,7 @@ EVT_BEGIN(roll_majin_lecture)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("stg4_usu_majin3_13"), 0, STRING("ペラ魔人"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("stg4_usu_majin3_14"), 0, STRING("ペラ魔人"))
 #else
@@ -1103,20 +1103,20 @@ EVT_BEGIN(roll_majin_lecture)
         CALL(lecture_button_seq_wait, 1, 1)
         WAIT_MS(300)
         // The spirit gloats and asks if Mario got it; "I don't get it!" explains again and repeats the practice.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_msg_print_add, 0, STRING("stg4_usu_majin3_18"))
 #else
         CALL(evt_msg_toge, 1, 0, 0, 0)
         CALL(evt_msg_print, 0, STRING("stg4_usu_majin3_18"), 0, STRING("ペラ魔人"))
 #endif
         CALL(evt_msg_select, 0, STRING("stg4_usu_majin3_19"))
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         CALL(evt_msg_continue)
 #endif
         IF_INT_EQUAL(LW(0), 0)
             CALL(evt_nomal_cange)
             CALL(evt_msg_toge, 1, 0, 0, 0)
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             CALL(evt_msg_print, 0, STRING("stg4_usu_majin3_20"), 0, STRING("ペラ魔人"))
 #else
             CALL(evt_msg_print_add, 0, STRING("stg4_usu_majin3_20"))
@@ -1126,7 +1126,7 @@ EVT_BEGIN(roll_majin_lecture)
         END_IF
     END_LOOP
     // Once he understands, the spirit tells him B turns him back to normal, signs off and vanishes.
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("stg4_usu_majin3_20_1"), 0, STRING("ペラ魔人"))
 #else

@@ -33,7 +33,7 @@ typedef void* (*PartySearchHeadRetVoidptrFn)(PartyEntry*, Vec*, f32*, f32);
 static BOOL partyChkMarioFollowY(MarioWork* mario);
 void partyChgMotSlitFloor(PartyEntry* party);
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static s32 touch_wall_ct; // demo: frames the fly follow found no floor in front (reset when the way is clear)
 #else
 static f32 gnd_probe_dy; // height above a point at which the ground probes start (60)
@@ -46,7 +46,7 @@ static BOOL party_roll(PartyEntry* party);
 void partyFlyAdjustY(PartyEntry* party);
 void partyWalkChkGnd(PartyEntry* party);
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /* The demo's partner motion code: an older arrangement of the retail functions below (other order, fewer
    helpers), kept as its own copy. */
 static inline u32 partyGetFrontAttr(PartyEntry* party, f32 dir);

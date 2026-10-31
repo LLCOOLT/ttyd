@@ -5,7 +5,7 @@
 #include "evt/evt_word.h"
 #include "version.h"
 
-#if VERSION != VERSION_US // JP and PAL have this REL
+#if VERSION != VERSION_US && VERSION != VERSION_DEMO_US2 // JP and PAL have this REL
 extern EvtWord dig_00_init_evt[];
 
 void dig_thpStop(void);

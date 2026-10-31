@@ -80,7 +80,7 @@ BOOL R_bReset; // before DvdCheckTreadOn: .sbss is emitted in reverse
 BOOL DvdCheckTreadOn;
 
 //.data
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
 // PAL: the plain modes are 50Hz PAL interlaced, the _prog / Prog ones EURGB60 interlaced
 /** Video mode of the boot logo screens (448 lines, 50Hz): seq_logo sets it on a cold start or restart. */
 GXRenderModeObj sRMObjHReso = {
@@ -247,7 +247,7 @@ GXRenderModeObj GXNtsc480ProgMarioSt = {
 static void viPostCallback(u32 retraceCount);
 static void* gcDvdCheckThread(void* param);
 void gcRumbleCheck(void);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 static inline void L_gcResetCheck(void);
 #else
 void L_gcResetCheck(void);
@@ -283,7 +283,7 @@ void marioStInit(void) {
     N_setupErrorHandler();
 #endif
     DEMOPadInit();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     DVDSetAutoFatalMessaging(TRUE); // the demo has no error handler: the SDK shows the DVD error message
 #endif
     GXSetCopyClear((GXColor){0, 0, 0, 0}, 0xFFFFFF);
@@ -291,7 +291,7 @@ void marioStInit(void) {
     memset(gp, 0, sizeof(GlobalWork));
     gp->fbWidth = DEMOGetRenderModeObj()->fbWidth;
     gp->efbHeight = DEMOGetRenderModeObj()->efbHeight;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (OSIsRestart()) {
         gp->flags |= GLOBAL_FLAG_VIDEO_MODE_SET;
     }
@@ -320,7 +320,7 @@ void marioStInit(void) {
     gp->areaFadeOutDuration = 300;
     gp->areaFadeInType = FADE_OUT_BLACK;
     gp->areaFadeInDuration = 300;
-#if VERSION == VERSION_EU
+#if VERSION >= VERSION_DEMO_EU
     if (VIGetTvFormat() == VI_NTSC)
         gp->framerate = 60;
     else if (VIGetTvFormat() == VI_EURGB60)
@@ -359,7 +359,7 @@ void marioStInit(void) {
     else
         gp->framerate = 50;
     gp->language = 1;
-#elif VERSION <= VERSION_DEMO_US
+#elif VERSION <= VERSION_DEMO_JP
 #if VERSION == VERSION_DEMO_JP
     gp->language = 0; // Japanese text whatever the console font
 #else
@@ -433,7 +433,7 @@ void marioStInit(void) {
     } else {
         SoundSetOutputMode(1);
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     none_key = OSGetTime();
 #endif
 }
@@ -504,7 +504,7 @@ void marioStMain(void) {
                 break;
         }
         if (i >= 4) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             // After a minute without input: in the field or in battle, raise the kiosk timeout flag
             // (seq_game and seq_battle then end the session through SEQ_GAME_OVER in kiosk mode);
             // anywhere else, reset the game. The US demo restarts the idle timer after raising the flag.
@@ -739,7 +739,7 @@ static void* gcDvdCheckThread(void* param) {
 #endif
                 gp->dvdError = TRUE;
                 break;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             // The demo has no message for a fatal error and leaves dvdError as it is.
             case DVD_RESULT_FATAL_ERROR:
                 break;
@@ -789,7 +789,7 @@ static void* gcDvdCheckThread(void* param) {
         if (gp->dvdError) {
 #endif
             DEMOBeforeRender();
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             // The demo draws the message at 0.8 scale, centred at height 0.
             if (msgId) {
                 message = romFontGetMessage(msgId);
@@ -883,7 +883,7 @@ void gcRumbleCheck(void) {
     }
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * The demos inline the reset check into its callers (the US demo also logs the reset);
  * their restart codes are only RESTART and HOTRESET.

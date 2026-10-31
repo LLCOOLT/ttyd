@@ -118,7 +118,7 @@ static BattleUnitDefense defence_patakuri = {{0, 0, 0, 0, 0}};
 /** Defence attributes of the Paragoomba's body: none, so every damage type is dealt normally. */
 static BattleUnitDefenseAttr defence_patakuri_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Paragoomba in the demo, as a percent of the normal chance:
  * stop 120%, instant kill 150%;
@@ -443,7 +443,7 @@ static BattleUnitDefense defence = {0};
 /** Defence attributes of the Paragoomba's body: none, so every damage type is dealt normally. */
 static BattleUnitDefenseAttr defence_attr = {0};
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Status vulnerability of the Paragoomba in the demo, as a percent of the normal chance:
  * stop 120%, instant kill 150%;

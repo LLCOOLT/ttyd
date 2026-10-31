@@ -103,7 +103,7 @@ void partyPaperLightOff(PartyEntry* party) {
 }
 
 // a partner is in a pinch at this HP or below
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 #define PARTY_PINCH_HP 1
 #else
 #define PARTY_PINCH_HP 5
@@ -426,7 +426,7 @@ s32 partyKill(s32 id) {
     }
     mario = party->playerPtr;
     party_dp = &partyDataTbl[partyGetPtr(mario->currPartySlotId[id])->currentMemberId];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (party_dp->exit_func) {
 #else
     if (party_dp->exit_func && party->runMode != 11) {
@@ -459,7 +459,7 @@ s32 partyKill2(s32 id) {
     }
     mario = party->playerPtr;
     party_dp = &partyDataTbl[partyGetPtr(mario->currPartySlotId[id])->currentMemberId];
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (party_dp->exit_func) {
 #else
     if (party_dp->exit_func && party->runMode != 11) {
@@ -964,7 +964,7 @@ void N__partyChgRunMode(PartyEntry* party, s32 prev, s32 mode) {
 // FAKE: keeps the following function(s) out of line as in the target; removing it changes the code
 #pragma dont_inline on
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /** the demo only leaves the hello state (4) and runs the post function (3) on a run-mode change */
 static inline void partyLeaveRunMode(PartyEntry* party) {
     MarioWork* mario;
@@ -1026,7 +1026,7 @@ void partyChgRunMode(PartyEntry* party, s32 mode) {
  * without the mode's start-up (the change trigger is cleared). Unused in C.
  */
 void N_partyForceChgRunMode(PartyEntry* party, s32 mode, s32 sub) {
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     partyLeaveRunMode(party);
     party->trigFlags &= ~PARTY_TRIG_FLAG_CHG_RUN_MODE;
     party->runMode = mode;
@@ -1044,7 +1044,7 @@ void N_partyForceChgRunMode(PartyEntry* party, s32 mode, s32 sub) {
 #pragma dont_inline reset
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Returns the partner to the run mode she had before the current one,
  * ending her ability first (evt_party and party_move).
@@ -1127,7 +1127,7 @@ void partyMain(void) {
     s32 i;
     PartyEntry* party;
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (partyCountActive()) {
 #else
     marioGetPtr();
@@ -1213,7 +1213,7 @@ static void driveParty(PartyEntry* party) {
         case 1:
             if ((party->flags & PARTY_FLAG_CTRL_OFF) && !(party->flags & PARTY_FLAG_RUN_OFF))
                 break;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             // demo: the partner just stands and checks walls and floor, and follows Mario once he
             // moves away
             if (party->trigFlags & PARTY_TRIG_FLAG_CHG_RUN_MODE) {
@@ -1397,7 +1397,7 @@ s32 partyHelloMain(PartyEntry* party) {
     switch (party->motionStep) {
         case 0: {
             f32 x, y, z, h, dy;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             psndSFXOn_3D((const char*)0x920, &party->position);
 #endif
             x = ((MarioWork*)mario)->position.x;
@@ -1462,7 +1462,7 @@ s32 partyHelloMain(PartyEntry* party) {
                 break;
             }
             ((PartyEntry*)party)->moveFrames = 0;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             party->moveDir = ((MarioWork*)mario)->moveDirection;
             party->targetDir = ((MarioWork*)mario)->directionView;
             party->displayDirectionTarget = ((MarioWork*)mario)->displayDirectionTarget;
@@ -1566,7 +1566,7 @@ s32 partyGoodbyeMain(PartyEntry* party) {
             }
             break;
         case 10:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             psndSFXOn_3D((const char*)0x91F, &party->position);
 #else
             psndSFXOn_3D((const char*)0x2091F, &mario->position);
@@ -2026,7 +2026,7 @@ s32 partyDokanMain(PartyEntry* party) {
             party->targetDir = mario->directionView;
             party->moveDir = mario->directionView;
             partyPaperOff(party);
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             party->flags2 &= ~PARTY_DISP_FLAG_NO_MIRROR;
             party->flags2 &= ~PARTY_DISP_FLAG_DIR_LOCK;
             animPoseSetMaterialLightFlagOn(party->paperAnimGroup, ANIM_MATERIAL_LIGHT_PAPER);
@@ -2088,7 +2088,7 @@ s32 partyDokanMain(PartyEntry* party) {
 
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * Called by mot_dokan as Mario leaves the pipe:
  * makes a partner in pipe mode play her exit (step 100) for pipe kind dir and shows her shadow again.
@@ -2156,7 +2156,7 @@ void allPartyRideShip(void) {
     }
 }
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 /**
  * The demos' bellows (jabara) ride, called as Mario's bellows motion starts.
  * Retail has no bellows ride: its bellows motion calls allPartyRideOn later (not the demos' allPartyRideOn,
@@ -2428,7 +2428,7 @@ void partyRideMain(PartyEntry* party) {
 #if VERSION >= VERSION_JP
             party->flags2 |= PARTY_DISP_FLAG_HIDDEN;
 #endif
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             party->velY = 0.0f;
             party->scale = (Vec){0.0f, 0.0f, 0.0f};
             partyShadowOff(party);
@@ -2557,7 +2557,7 @@ void partyRideMain(PartyEntry* party) {
                     break;
                 }
                 (((PartyEntry*)party)->moveFrames) = 0;
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
                 party->moveDir = ((MarioWork*)mario)->moveDirection;
                 party->targetDir = ((MarioWork*)mario)->directionView;
                 party->displayDirectionTarget = ((MarioWork*)mario)->displayDirectionTarget;
@@ -2594,7 +2594,7 @@ static inline void partyChgRunMo(PartyEntry* party) {
 }
 #endif
 
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
 // The demo keeps the partner appear-position search here; retail moved it to party_move.c.
 #include "driver/hitdrv.h"
 #include "driver/npcdrv.h"
@@ -3160,7 +3160,7 @@ static void party_damage_return(PartyEntry* party) {
             }
             party->motionStep = 10;
         case 10:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
             partyChgPoseId_inl(party, 9);
 #else
             partyChgPoseId_inl(party, 8);
@@ -3221,7 +3221,7 @@ static void party_damage_return(PartyEntry* party) {
             party->motionStep = 22;
             break;
         case 22:
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
         {
             f32 sx, sy, sz;
             marioGetScreenPos(party->position, &sx, &sy, &sz);
@@ -3441,7 +3441,7 @@ static void partyPreDisp(PartyEntry* party) {
             }
         }
     }
-#if VERSION <= VERSION_DEMO_US
+#if VERSION <= VERSION_DEMO_JP
     if (party->currentMemberId == PARTY_MEMBER_VIVIAN && !(party->work.vivian.tailFlags & 1)) {
 #else
     if (N_vivianDisplayTailCheck(party)) {
