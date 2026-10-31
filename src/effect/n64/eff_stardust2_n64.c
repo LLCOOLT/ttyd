@@ -22,8 +22,8 @@ typedef struct EffStardust2N64Work {
     s32 camera;   // 0x2c
 } EffStardust2N64Work;
 
-void effStardust2Main(EffectEntry* effect);
-void effStardust2Disp(CameraId cameraId, EffectEntry* effect);
+static void effStardust2Main(EffectEntry* effect);
+static void effStardust2Disp(CameraId cameraId, EffectEntry* effect);
 
 static u8 color_rotation_data[] = {
     0xFE, 0xAC, 0xAC, 0xFE, 0xAC, 0xD5, 0xFE, 0xB4, 0x9A, 0xD5, 0xB4, 0xFE,
@@ -166,7 +166,7 @@ EffectEntry* effStardust2N64Entry(s32 type, s32 count, s32 camera, f32 x, f32 y,
 
 // Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
-void effStardust2Main(EffectEntry* effect) {
+static void effStardust2Main(EffectEntry* effect) {
     EffStardust2N64Work* w = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -199,7 +199,7 @@ void effStardust2Main(EffectEntry* effect) {
             case 1:
                 w->color = (frame + i) & 7;
                 w->velocity.z += -0.02f;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 if (frame - 1 < 14) {
                     s = 0.01f * (f32)speed_data[frame - 1];
                     w->position.x = w->velocity.x * s;
@@ -238,7 +238,7 @@ void effStardust2Main(EffectEntry* effect) {
                 break;
             case 3:
                 w->color = (frame + i + i) & 7;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 if (frame - 1 < 14) {
                     w->scale = 0.01f * (f32)scale_data[frame - 1];
 #else
@@ -265,7 +265,7 @@ void effStardust2Main(EffectEntry* effect) {
                 }
                 w->frame++;
                 frame = w->frame;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 if (frame - 1 < 14) {
                     w->scale = 0.01f * (f32)scale_data[frame - 1];
 #else
@@ -301,7 +301,7 @@ void effStardust2Main(EffectEntry* effect) {
 }
 
 #pragma opt_propagation reset
-void effStardust2Disp(CameraId cameraId, EffectEntry* effect) {
+static void effStardust2Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* cam;
     EffStardust2N64Work* w;
     s32 type;

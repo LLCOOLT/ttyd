@@ -26,7 +26,7 @@
 #include "battle/battle_event_cmd.h"
 #include "battle/battle_camera.h"
 #include "battle/sac/sac_common.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/sac/sac_deka.h"
 #include "battle/battle_sub.h"
 #include "eff/eff_starstone.h"
@@ -106,36 +106,36 @@ typedef struct DekaWork {
 } DekaWork;
 
 static DekaWork* get_ptr(void);
-USER_FUNC(get_result);
+static USER_FUNC(get_result);
 static USER_FUNC(star_stone_attack);
-USER_FUNC(get_ride_pos);
+static USER_FUNC(get_ride_pos);
 static USER_FUNC(star_stone_appear);
 static USER_FUNC(wait_game_end);
 static USER_FUNC(start_game);
-USER_FUNC(wait_star_stone_take_on);
-void create_timing(void);
-void yuka_disp(CameraId cam, void* param);
-void yuka_capture(CameraId cam, void* param);
+static USER_FUNC(wait_star_stone_take_on);
+static void create_timing(void);
+static void yuka_disp(CameraId cam, void* param);
+static void yuka_capture(CameraId cam, void* param);
 static void disp_3D_alpha(CameraId cam, void* param);
 static void disp_3D(CameraId cam, void* param);
 static void disp_3D(CameraId cam, void* param);
 static void disp_2D(CameraId cam, void* param);
-void main_enemy_sub(BattleUnit* unit, s32* n);
-void main_enemy(void);
+static void main_enemy_sub(BattleUnit* unit, s32* n);
+static void main_enemy(void);
 static void main_star(void);
-void main_timing(s32 idx);
-void main_gauge(void);
+static void main_timing(s32 idx);
+static void main_gauge(void);
 static void main_base(void);
 static void yuka_main(void);
 static void yuka_init(void);
-USER_FUNC(main_deka);
+static USER_FUNC(main_deka);
 
 static EVT_BEGIN(nice_event)
     CALL(btlevtcmd_ACSuccessEffect, LW(0), 0, 100, 0)
     RETURN
 EVT_END()
 
-USER_FUNC(main_deka) {
+static USER_FUNC(main_deka) {
     EvtWord* args;
     DekaWork* w = get_ptr();
     s32 i;
@@ -146,7 +146,7 @@ USER_FUNC(main_deka) {
         w->unitId = evtGetValue(event, args[0]);
         yuka_init();
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (w->tex->address == NULL) {
         return 2;
     }
@@ -293,15 +293,15 @@ static void yuka_main(void) {
     }
 }
 
-USER_FUNC(yuka_end) {
+static USER_FUNC(yuka_end) {
     DekaWork* w = get_ptr();
 
     smartFree(w->tex);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     w->tex->address = NULL;
 #endif
     smartFree(w->mesh);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     w->mesh->address = NULL;
 #endif
     mapGrpFlagOff("stg_b_yuka", 0x400001);
@@ -446,7 +446,7 @@ static void main_base(void) {
     }
 }
 
-void main_gauge(void) {
+static void main_gauge(void) {
     DekaWork* w = get_ptr();
 
     switch (w->gaugeState) {
@@ -497,7 +497,7 @@ void main_gauge(void) {
 
 // inlining off for main_timing, as in the original (the object differs without it)
 #pragma dont_inline on
-void main_timing(s32 idx) {
+static void main_timing(s32 idx) {
     DekaWork* w = get_ptr();
     DekaTiming* t = &w->timing[idx];
 
@@ -704,7 +704,7 @@ static void main_star(void) {
 
 // inlining off for main_enemy, as in the original (the object differs without it)
 #pragma dont_inline on
-void main_enemy(void) {
+static void main_enemy(void) {
     BattleWork* bw = _battleWorkPointer;
     DekaWork* w = get_ptr();
     s32 n = 0;
@@ -723,7 +723,7 @@ void main_enemy(void) {
 }
 #pragma dont_inline reset
 
-void main_enemy_sub(BattleUnit* unit, s32* n) {
+static void main_enemy_sub(BattleUnit* unit, s32* n) {
     DekaWork* w = get_ptr();
     YukaMesh* m = w->mesh->address;
     f32 x;
@@ -809,7 +809,7 @@ void main_enemy_sub(BattleUnit* unit, s32* n) {
     (*n)++;
 }
 
-USER_FUNC(end_deka) {
+static USER_FUNC(end_deka) {
     DekaWork* w = get_ptr();
 
     effDelete(((EffStarStoneWork*)w->eff->userdata)->dust);
@@ -925,7 +925,7 @@ static void disp_3D(CameraId cam, void* param) {
 static void disp_3D_alpha(CameraId cam, void* param) {
 }
 
-void yuka_capture(CameraId cam, void* param) {
+static void yuka_capture(CameraId cam, void* param) {
     CameraEntry save;
     Vec c;
     DekaWork* w = get_ptr();
@@ -1077,7 +1077,7 @@ EVT_BEGIN(marioAttackEvent_Deka)
     END_SIBLING_EVENT
     WAIT_FRAMES(30)
     CALL(evt_btl_camera_set_mode, 0, 0)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(yuka_end)
     CALL(btlevtcmd_SacBgsetMove, 1)
     CALL(end_deka)
@@ -1090,7 +1090,7 @@ EVT_BEGIN(marioAttackEvent_Deka)
             CALL(btlevtcmd_SetUnitWork, LW(14), 3, 0)
         END_IF
     END_IF
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(yuka_end)
     CALL(end_deka)
 #endif
@@ -1152,7 +1152,7 @@ EVT_END()
         (fifo)->f32 = _z;      \
     }
 
-void yuka_disp(CameraId cam, void* param) {
+static void yuka_disp(CameraId cam, void* param) {
     DekaWork* w;
     CameraEntry* camera;
     YukaMesh* m;
@@ -1162,7 +1162,7 @@ void yuka_disp(CameraId cam, void* param) {
 
     w = get_ptr();
     camera = camGetPtr(cam);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     {
         m = w->mesh->address;
         {
@@ -1212,7 +1212,7 @@ static DekaWork* get_ptr(void) {
 }
 #pragma dont_inline reset
 
-void create_timing(void) {
+static void create_timing(void) {
     DekaWork* w = get_ptr();
     DekaTiming* ta;
     DekaTiming* t;
@@ -1302,7 +1302,7 @@ s32 weaponGetPower_Deka(BattleUnit* attacker, BattleWeapon* weapon, BattleUnit* 
     return get_ptr()->result + 1;
 }
 
-USER_FUNC(wait_star_stone_take_on) {
+static USER_FUNC(wait_star_stone_take_on) {
     return get_ptr()->starState == 4 ? 2 : 0;
 }
 
@@ -1322,7 +1322,7 @@ static USER_FUNC(star_stone_appear) {
     return 2;
 }
 
-USER_FUNC(get_ride_pos) {
+static USER_FUNC(get_ride_pos) {
     DekaWork* w = get_ptr();
     EvtWord* args = event->args;
     f32 k = 64.0f;
@@ -1348,7 +1348,7 @@ static USER_FUNC(star_stone_attack) {
     }
 }
 
-USER_FUNC(get_result) {
+static USER_FUNC(get_result) {
     DekaWork* w = get_ptr();
     evtSetValue(event, event->args[0], w->result);
     return 2;

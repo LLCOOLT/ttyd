@@ -3099,7 +3099,7 @@ u8 _vivihimoData[3][0x400] ATTRIBUTE_ALIGN(32) = {
     0x00,
 };
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo's -sdata 8 puts these in .data, ahead of the chain table
 s32 vivihimoTailGroupNo[4] ATTRIBUTE_ALIGN(32) = {0, 2, -1, -1}; // G5: target .sdata is 32-aligned
 void* vivihimoData[4] = {
@@ -3110,7 +3110,7 @@ void* vivihimoData[4] = {
 };
 #endif
 
-const s32 g_moamoa_chain_num = 0x2F;
+const s32 g_moamoa_chain_max = 0x2F;
 MoaChain g_moamoa_chain_tbl[47] = {
     { "joint_00", "jointdai1_A01" },
     { "jointdai1_A01", "jointdai1_A02" },
@@ -3162,7 +3162,7 @@ MoaChain g_moamoa_chain_tbl[47] = {
 };
 
 //.bss
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo defines these before animPoseDrawMtx, so its local static mtx is emitted first in .bss (target order mtx, g_modeling_mtx_stack, work, tanfTbl)
 f32 tanfTbl[0xB2];
 AnimationWork work;
@@ -3174,7 +3174,7 @@ extern f32 tanfTbl[0xB2];
 #endif
 
 //.sdata
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 s32 vivihimoTailGroupNo[4] ATTRIBUTE_ALIGN(32) = {0, 2, -1, -1}; // G5: target .sdata is 32-aligned
 void* vivihimoData[4] = {
     NULL,
@@ -3186,18 +3186,17 @@ void* vivihimoData[4] = {
 static AnimationWork* wp = &work;
 
 //.sbss
-s32 anim_unused_sbss;
 Mtx* g_modeling_mtx;
 s32 g_modeling_mtx_lv;
 
 // local declarations
 void animPoseRefresh(void);
-void animPaperPoseDisp(CameraId camId, void* param);
-void animPaperPoseDispSub(s32 unused, AnimationPose* pose);
-void renderProc(s32 shapeId, s32 unused);
-void pushGXModelMtx_JointNode__(AnimPoseNode* node, f32 sx, f32 sy, f32 sz);
-void pushGXModelMtx_TransformNode__(AnimPoseNode* node);
-void evalProc(s32 parentId, s32 groupId);
+static void animPaperPoseDisp(CameraId camId, void* param);
+static void animPaperPoseDispSub(s32 unused, AnimationPose* pose);
+static void renderProc(s32 shapeId, s32 unused);
+static void pushGXModelMtx_JointNode__(AnimPoseNode* node, f32 sx, f32 sy, f32 sz);
+static void pushGXModelMtx_TransformNode__(AnimPoseNode* node);
+static void evalProc(s32 parentId, s32 groupId);
 
 AnimationWork* animGetPtr(void) {
     return wp;
@@ -3210,7 +3209,7 @@ OSTime animTimeGetTime(BOOL globalTime) {
     return OSTicksToMilliseconds(gp->renderTime);
 }
 
-void initTestHeap(void) {
+static void initTestHeap(void) {
     if (!wp->testHeap) { // allocate 1.5MiB test heap
         wp->testHeap = __memAlloc(HEAP_DEFAULT, TESTHEAP_SIZE);
     }
@@ -3218,7 +3217,7 @@ void initTestHeap(void) {
 }
 
 // heavily inlined
-void* testAlloc(u32 size) {
+static void* testAlloc(u32 size) {
     void* alloc = wp->testAlloc;
 
     if (size & 31) {
@@ -3279,10 +3278,10 @@ int __cvt_ull_flt();
 int __div2i();
 int printf(const char*, ...);
 void _animPoseDrawMtx(AnimationPose* pose, Mtx matrix, s32 xluMode, f32 rotY, f32 scale);
-void animPose_AllocBuffer(AnimationPose* pose);
-void animSetMaterial_Texture(s32 texCount, s32* texIdRemap, AnimPoseTexEntry* pTexEntries, AnimTexMtx* animEntries, s32 texBindsCapacity, AnimTexBind* texBinds, AnimationTextureFile* texFile);
-void dispProc(s32 parentId, s32 groupId, s32 xluStage, s32 nextKeyframe, f32 blend);
-void materialProc(s32 shapeId, s32 xluStage);
+static void animPose_AllocBuffer(AnimationPose* pose);
+static void animSetMaterial_Texture(s32 texCount, s32* texIdRemap, AnimPoseTexEntry* pTexEntries, AnimTexMtx* animEntries, s32 texBindsCapacity, AnimTexBind* texBinds, AnimationTextureFile* texFile);
+static void dispProc(s32 parentId, s32 groupId, s32 xluStage, s32 nextKeyframe, f32 blend);
+static void materialProc(s32 shapeId, s32 xluStage);
 void animInit(void) {
     int i;
     FileEntry* file;
@@ -3342,7 +3341,7 @@ inline AnimationPoseData* animPoseGetBaseData(AnimationPose* pose) {
 
 // Allocates the pose's vertex buffers. animPoseGetBaseData is animPoseGetAnimBaseDataPtr for a pose pointer; the
 // original inlines that lookup at every use.
-void animPose_AllocBuffer(AnimationPose* pose) {
+static void animPose_AllocBuffer(AnimationPose* pose) {
     pose->bufferVtxPos = testAlloc(sizeof(Vec) * animPoseGetBaseData(pose)->bufferPosNum);
     pose->vtxArrayPos = testAlloc(sizeof(Vec) * animPoseGetBaseData(pose)->bufferPosNum);
 
@@ -3895,7 +3894,7 @@ GXColor animPoseGetMaterialEvtColor(s32 poseId) {
 static inline f32 apmMul(f32 a, f32 b) {
     return a * b;
 }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo copies the frame buffers through small inline helpers. Kept: writing the copies out as
 // `if (n != 0) memcpy_as4(...)` changes the demo animPoseMain's registers, and calling the helpers from the later
 // versions' animPoseMain changes theirs.
@@ -4684,9 +4683,9 @@ void animPoseMain(s32 poseId) {
 
 #endif
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo always builds every matrix and concatenates them all
-void pushGXModelMtx_TransformNode__(AnimPoseNode* node) {
+static void pushGXModelMtx_TransformNode__(AnimPoseNode* node) {
     Mtx trans, scale, rot, tmp;
     Mtx sc1, sc2, sc3;
     Mtx rc1, rc2, rc3;
@@ -4729,7 +4728,7 @@ void pushGXModelMtx_TransformNode__(AnimPoseNode* node) {
     PSMTXConcat(g_modeling_mtx_stack[g_modeling_mtx_lv - 1], trans, g_modeling_mtx_stack[g_modeling_mtx_lv]);
 }
 
-void pushGXModelMtx_JointNode__(AnimPoseNode* node, f32 sx, f32 sy, f32 sz) {
+static void pushGXModelMtx_JointNode__(AnimPoseNode* node, f32 sx, f32 sy, f32 sz) {
     Mtx trans, scale, iscale, rot, tmp;
 
     PSMTXTrans(trans, node->translation.x, node->translation.y, node->translation.z);
@@ -4772,7 +4771,7 @@ void pushGXModelMtx_JointNode__(AnimPoseNode* node, f32 sx, f32 sy, f32 sz) {
     PSMTXConcat(g_modeling_mtx_stack[g_modeling_mtx_lv - 1], trans, g_modeling_mtx_stack[g_modeling_mtx_lv]);
 }
 #else
-void pushGXModelMtx_TransformNode__(AnimPoseNode* node) {
+static void pushGXModelMtx_TransformNode__(AnimPoseNode* node) {
     Mtx trans, scale, rot, tmp;
     Mtx sc1, sc2, sc3;
     Mtx rc1, rc2, rc3;
@@ -4895,7 +4894,7 @@ void pushGXModelMtx_TransformNode__(AnimPoseNode* node) {
     }
     PSMTXConcat(g_modeling_mtx_stack[g_modeling_mtx_lv - 1], p, g_modeling_mtx_stack[g_modeling_mtx_lv]);
 }
-void pushGXModelMtx_JointNode__(AnimPoseNode* node, f32 sx, f32 sy, f32 sz) {
+static void pushGXModelMtx_JointNode__(AnimPoseNode* node, f32 sx, f32 sy, f32 sz) {
     Mtx trans, scale, iscale, rot, tmp;
     MtxPtr p;
     u32 flags;
@@ -5041,11 +5040,11 @@ void pushGXModelMtx_JointNode__(AnimPoseNode* node, f32 sx, f32 sy, f32 sz) {
 
 #include "sdk/texPalette.h"
 
-void animSetMaterial_Texture(s32 texCount, s32* texIdRemap, AnimPoseTexEntry* pTexEntries, AnimTexMtx* animEntries, s32 texBindsCapacity, AnimTexBind* texBinds, AnimationTextureFile* texFile);
-#if VERSION == VERSION_DEMO
+static void animSetMaterial_Texture(s32 texCount, s32* texIdRemap, AnimPoseTexEntry* pTexEntries, AnimTexMtx* animEntries, s32 texBindsCapacity, AnimTexBind* texBinds, AnimationTextureFile* texFile);
+#if VERSION <= VERSION_DEMO_US
 // the demo sets up each texture object, then builds the full texture matrix unless the animation is the identity.
 // The local declaration order is load-bearing: it decides the register colouring (wrapFlags r30, params r23-r29).
-void animSetMaterial_Texture(s32 texCount, s32* texIdRemap, AnimPoseTexEntry* pTexEntries, AnimTexMtx* animEntries, s32 texBindsCapacity, AnimTexBind* texBinds, AnimationTextureFile* texFile) {
+static void animSetMaterial_Texture(s32 texCount, s32* texIdRemap, AnimPoseTexEntry* pTexEntries, AnimTexMtx* animEntries, s32 texBindsCapacity, AnimTexBind* texBinds, AnimationTextureFile* texFile) {
     u32 mipmap;
     u32 texId;
     s32 id;
@@ -5177,7 +5176,7 @@ void animSetMaterial_Texture(s32 texCount, s32* texIdRemap, AnimPoseTexEntry* pT
     }
 }
 #else
-void animSetMaterial_Texture(s32 texCount_, s32* texIdRemap_, AnimPoseTexEntry* pTexEntries_, AnimTexMtx* animEntries, s32 texBindsCapacity, AnimTexBind* texBinds, AnimationTextureFile* texFile) {
+static void animSetMaterial_Texture(s32 texCount_, s32* texIdRemap_, AnimPoseTexEntry* pTexEntries_, AnimTexMtx* animEntries, s32 texBindsCapacity, AnimTexBind* texBinds, AnimationTextureFile* texFile) {
     s32 texCount;
     s32* texIdRemap;
     AnimPoseTexEntry* pTexEntries;
@@ -5407,9 +5406,14 @@ inline BOOL animSetMaterial_ChangeTexture(AnimationPoseData* data, AnimPoseShape
     return FALSE;
 }
 
-static s32 tbl[4] = {2, 1, 3, 0}; // target g5_tbl_s1109 (g5_tbl_s1109 in the stopgap)
+// Sets GX culling for a shape's cull mode. The demo map has one static local tbl$1109 that materialProc and
+// renderProc both read, so the table sits in a helper both inline.
+static inline void animSetCullMode(s32 cullMode) {
+    static s32 tbl[4] = {2, 1, 3, 0};
+    GXSetCullMode(tbl[cullMode]);
+}
 
-void materialProc(s32 shapeId, s32 xluStage) {
+static void materialProc(s32 shapeId, s32 xluStage) {
     AnimationPoseData* cd;
     int i;
     s32 drawCount;
@@ -5422,13 +5426,13 @@ void materialProc(s32 shapeId, s32 xluStage) {
     BOOL check1;
     s32 dispMode;
     AnimPoseShape* shape;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     Mtx camMtx;
     Mtx invCamMtx;
 #endif
     Vec lightPos;
     if (shapeId != (-1)) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         camera = camGetCurPtr();
         PSMTXConcat(camera->view, *g_modeling_mtx, camMtx);
         GXLoadPosMtxImm(camMtx, 0);
@@ -5441,7 +5445,7 @@ void materialProc(s32 shapeId, s32 xluStage) {
         drawCount = shape->shapeDrawCount;
         draw = &wp->curPoseData->draws[shape->shapeDrawStart];
         if ((dispMode == 0 && wp->currDispMode == 2) || dispMode == wp->currDispMode || wp->curPose->materialColor.a != 0xFF || wp->curPose->materialColor2.a != 0xFF) {
-            GXSetCullMode(tbl[shape->cullMode]);
+            animSetCullMode(shape->cullMode);
             for (i = 0; i < drawCount; i++, draw++) {
                 s32 texCount = draw->texCount;
                 if ((u32)wp->curPose->disableDraw == 0) {
@@ -5512,7 +5516,7 @@ void materialProc(s32 shapeId, s32 xluStage) {
 static inline AnimationPoseData* rpCurData(void) {
     return wp->curPoseData;
 }
-void renderProc(s32 shapeId, s32 unused) {
+static void renderProc(s32 shapeId, s32 unused) {
     AnimationPoseData* cd;
     s32 texIndex;
     int i;
@@ -5540,7 +5544,7 @@ void renderProc(s32 shapeId, s32 unused) {
         GXTexObj* texObj;
         CameraEntry* camera;
         s32 index;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         Mtx* model = g_modeling_mtx;
         camera = camGetCurPtr();
         MTXConcat(camera->view, *model, camMtx);
@@ -5574,7 +5578,7 @@ void renderProc(s32 shapeId, s32 unused) {
             f32* buffer;
             s32 firstDrawId;
             f32* texVtxIndices[8];
-            GXSetCullMode(tbl[shape->cullMode]);
+            animSetCullMode(shape->cullMode);
             data = wp->curPoseData;
             clr0VtxSize = (s32)sizeof(GXColor) * clr0FirstVtx;
             buffer = data->texVtxBuffer;
@@ -5766,9 +5770,9 @@ void renderProc(s32 shapeId, s32 unused) {
 
 // dispProc
 
-void materialProc(s32 shapeId, s32 xluStage);
+static void materialProc(s32 shapeId, s32 xluStage);
 
-void dispProc(s32 parentId, s32 groupId, s32 xluStage, s32 nextKeyframe, f32 blend) {
+static void dispProc(s32 parentId, s32 groupId, s32 xluStage, s32 nextKeyframe, f32 blend) {
     AnimPoseGroup* group;
     AnimPoseGroup* parent;
     AnimPoseNode* node;
@@ -5828,7 +5832,7 @@ void dispProc(s32 parentId, s32 groupId, s32 xluStage, s32 nextKeyframe, f32 ble
             m = g_modeling_mtx;
             mat = pose->matrix;
             switch (type) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 case 1:
                     offA = -2.0f;
                     offB = 2.0f;
@@ -6260,7 +6264,7 @@ void animPoseAutoRelease(s32 type) {
     animPoseRefresh();
 }
 
-void animPaperPoseDisp(CameraId camId, void* param) {
+static void animPaperPoseDisp(CameraId camId, void* param) {
     int i;
     AnimationPose* pose;
 
@@ -6273,7 +6277,7 @@ void animPaperPoseDisp(CameraId camId, void* param) {
 
 #include "sdk/DEMOInit.h"
 void _animPoseDrawMtx(AnimationPose* pose, Mtx matrix, s32 xluMode, f32 rotY, f32 scale);
-void animPaperPoseDispSub(s32 unused, AnimationPose* arg) {
+static void animPaperPoseDispSub(s32 unused, AnimationPose* arg) {
     AnimationPose* pose;
     AnimData* d;
     Mtx m, save;
@@ -6633,7 +6637,7 @@ BOOL animPoseTestXLU(s32 poseId) {
     return (animPoseGetAnimBaseDataPtr(poseId)->flags >> 3) & 1;
 }
 
-void evalProc(s32 parentId, s32 groupId) {
+static void evalProc(s32 parentId, s32 groupId) {
     AnimPoseGroup* group;
     AnimPoseGroup* parent;
     AnimPoseNode* node;
@@ -6891,7 +6895,7 @@ const char* animPoseGetGroupName(s32 poseId, s32 group) {
 
 // .bss definitions last, reverse target order: emitted g_modeling_mtx_stack, work, tanfTbl as in the target
 // (asm references alone would order them by first use)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 f32 tanfTbl[0xB2];
 AnimationWork work;
 Mtx g_modeling_mtx_stack[32];

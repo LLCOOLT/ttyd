@@ -12,9 +12,9 @@
 #include <dolphin/mtx.h>
 #include "libc_decls.h"
 
-void effSandarsMain(EffectEntry* effect);
-void effSandarsDisp(CameraId cameraId, EffectEntry* effect);
-void effSandarsDisp2(CameraId cameraId, EffectEntry* effect);
+static void effSandarsMain(EffectEntry* effect);
+static void effSandarsDisp(CameraId cameraId, EffectEntry* effect);
+static void effSandarsDisp2(CameraId cameraId, EffectEntry* effect);
 
 static u8 scale_data[] = {0, 0, 0, 13, 0x1C, 0x2C, 0x3C, 0x4B, 0x59, 0x65, 0x6F, 0x75, 0x78, 0x4B, 0};
 
@@ -99,7 +99,7 @@ static inline Vec effSandarsMakeVec(f32 x, f32 y, f32 z) {
     return pos;
 }
 
-void effSandarsMain(EffectEntry* effect) {
+static void effSandarsMain(EffectEntry* effect) {
     EffSandarsWork* work = effect->userdata;
     Vec pos2;
     f32 bx, by, bz;
@@ -176,7 +176,7 @@ void effSandarsMain(EffectEntry* effect) {
     dispEntry(camId, dispCalcZ(&pos2), 2, (DispCallback)effSandarsDisp, effect);
 }
 
-void effSandarsDisp(CameraId cameraId, EffectEntry* effect) {
+static void effSandarsDisp(CameraId cameraId, EffectEntry* effect) {
     EffSandarsWork* work;
     Mtx mtx;
     Mtx rot;
@@ -203,7 +203,7 @@ void effSandarsDisp(CameraId cameraId, EffectEntry* effect) {
     animPoseDrawMtx(work->poseId, view, 3, 0.0f, 4.0f);
 }
 
-void effSandarsDisp2(CameraId cameraId, EffectEntry* effect) {
+static void effSandarsDisp2(CameraId cameraId, EffectEntry* effect) {
     EffSandarsWork* work;
     CameraEntry* camera;
     f32 neg;

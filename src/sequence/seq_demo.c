@@ -132,7 +132,7 @@ static u16 VolumeTable[] = {
 // clang-format on
 
 //.bss
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #include "manager/filemgr.h"
 
 // work for the demo's movie sequence (seq_demoInit and on, at the end of the file)
@@ -160,9 +160,9 @@ AIDCallback OldAIDCallback;
 BOOL Initialized;
 
 // Forward Declarations
-void __THPSimpleDVDCallback(s32 result, DVDFileInfo* fileInfo);
+static void __THPSimpleDVDCallback(s32 result, DVDFileInfo* fileInfo);
 BOOL VideoDecode(u8* videoFrame);
-void THPAudioMixCallback(void);
+static void THPAudioMixCallback(void);
 void THPGXRestore(void);
 void THPGXYuv2RgbSetup(GXRenderModeObj* rmode);
 void THPGXYuv2RgbDraw(u8* y_data, u8* u_data, u8* v_data, s16 x, s16 y, s16 textureWidth, s16 textureHeight,
@@ -398,7 +398,7 @@ void ReadFrameAsync(void) {
     }
 }
 
-void __THPSimpleDVDCallback(s32 result, DVDFileInfo* fileInfo) {
+static void __THPSimpleDVDCallback(s32 result, DVDFileInfo* fileInfo) {
     if (result == DVD_RESULT_FATAL_ERROR) {
         SimpleControl.dvdError = TRUE;
     } else if (result != DVD_RESULT_CANCELED) {
@@ -607,7 +607,7 @@ s32 THPSimpleDrawCurrentFrame(GXRenderModeObj* rmode, u32 x, u32 y, u32 polygonW
     return -1;
 }
 
-void MixAudio(s16* destination, s16* source, u32 sample) {
+static void MixAudio(s16* destination, s16* source, u32 sample) {
     u32 sampleNum, requestSample, i;
     s32 mix;
     s16 *dst, *libsrc, *thpsrc;
@@ -788,7 +788,7 @@ u32 THPSimpleGetTotalFrame(void) {
     return 0;
 }
 
-void THPAudioMixCallback(void) {
+static void THPAudioMixCallback(void) {
     if (AudioSystem == 0) {
         SoundBufferIndex ^= 1;
         AIInitDMA((u32)SoundBuffer[SoundBufferIndex], BYTES_PER_AUDIO_FRAME);
@@ -995,7 +995,7 @@ void THPGXYuv2RgbDraw(u8* y_data, u8* u_data, u8* v_data, s16 x, s16 y, s16 text
     GXEnd();
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 /* The demo's movie sequence: plays demo.thp, then returns to the title screen. */
 
 #include "driver/camdrv.h"
@@ -1016,7 +1016,7 @@ void THPGXYuv2RgbDraw(u8* y_data, u8* u_data, u8* v_data, s16 x, s16 y, s16 text
 
 static SeqDemoWork* wp = &work;
 
-void seq_demoDisp(CameraId cameraId, void* param);
+static void demoDisp(CameraId cameraId, void* param);
 
 void seq_demoInit(SequenceWork* seq) {
     iconReInit();
@@ -1073,11 +1073,11 @@ void seq_demoMain(SequenceWork* seq) {
             break;
     }
     if (seq->state < 2) {
-        dispEntry(CAMERA_2D, 0.0f, 0, seq_demoDisp, NULL);
+        dispEntry(CAMERA_2D, 0.0f, 0, demoDisp, NULL);
     }
 }
 
-void seq_demoDisp(CameraId cameraId, void* param) {
+static void demoDisp(CameraId cameraId, void* param) {
     GXRenderModeObj* rmode;
     THPVideoInfo video;
     THPAudioInfo audio;
@@ -1107,11 +1107,11 @@ void seq_demoDisp(CameraId cameraId, void* param) {
                   camera->viewport[4], camera->viewport[5]);
     GXSetScissor(camera->scissor[0], camera->scissor[1], camera->scissor[2], camera->scissor[3]);
     TEXGetGXTexObjFromPalette(*wp->tpl->data, &texObj, 5);
-    gxsubChgMode(-1);
-    gxsubSetTexObj(&texObj);
+    gxsubMiscSetGX(-1);
+    gxsubFillSetTexObj(&texObj);
     color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
-    gxsubDrawQuad(-274, 210, GXGetTexObjWidth(&texObj) / 3, GXGetTexObjHeight(&texObj) / 3, &color);
-    gxsubSetTexObj(NULL);
-    gxsubChgMode(-1);
+    gxsubFillGX(-274, 210, GXGetTexObjWidth(&texObj) / 3, GXGetTexObjHeight(&texObj) / 3, &color);
+    gxsubFillSetTexObj(NULL);
+    gxsubMiscSetGX(-1);
 }
 #endif

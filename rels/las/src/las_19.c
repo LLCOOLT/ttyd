@@ -13,7 +13,6 @@
 #include "evt/evt_party.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "las.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
@@ -254,7 +253,7 @@ EVT_BEGIN(change_map_evt)
             END_LOOP
             IF_INT_EQUAL(GF(0), 0)
                 CALL(evt_snd_sfxon, STRING("SFX_STG8_MAP_MOVE1"), 0)
-                SPAWN_EVENT(PTR(cam_shake))
+                SPAWN_EVENT(cam_shake)
             END_IF
             ADD(LW(0), 1)
             IF_INT_EQUAL(LW(0), 18)
@@ -303,7 +302,9 @@ EVT_BEGIN(las_19_init_evt)
         END_IF
     END_IF
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 2)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG8_08_THE_NEW_PATH)
@@ -316,9 +317,9 @@ EVT_BEGIN(las_19_init_evt)
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("chgmap_evt"))
         CALL(evt_npc_check_delete, STRING("マホーン１"))
-        SPAWN_EVENT(PTR(change_map_evt))
+        SPAWN_EVENT(change_map_evt)
     ELSE
-        CALL_CHILD(PTR(evt_bero_info_run))
+        CALL_CHILD(evt_bero_info_run)
     END_IF
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG8_06_MOVING_PLANETS)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_under"), MAPOBJ_FLAG_HIDE)
@@ -334,7 +335,7 @@ EVT_BEGIN(las_19_init_evt)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_kai_23"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_kai_24"), MAPOBJ_FLAG_HIDE)
         CALL(evt_npc_check_delete, STRING("マホーン１"))
-        SPAWN_EVENT(PTR(hikari_evt))
+        SPAWN_EVENT(hikari_evt)
     END_IF
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_06_MOVING_PLANETS)
         CALL(evt_mobj_switch_float_blk, STRING("switch1"), 375, -320, -45, STRING(""), 2, PTR(switch1_evt), 0)

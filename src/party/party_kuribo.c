@@ -26,7 +26,7 @@ BOOL christineGetStatus(void) {
     return TRUE;
 }
 
-USER_FUNC(pre_kurio_use) {
+static USER_FUNC(pre_kurio_use) {
     HitEntry* hit;
     char* msg;
     MarioWork* mario;
@@ -36,7 +36,7 @@ USER_FUNC(pre_kurio_use) {
         return EVT_RETURN_DONE;
     }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (!(party->flags & PARTY_FLAG_IS_GROUNDED)) {
         return EVT_RETURN_DONE;
     }
@@ -165,13 +165,13 @@ USER_FUNC(pre_kurio_use) {
     }
 }
 
-USER_FUNC(post_kurio_use) {
+static USER_FUNC(post_kurio_use) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
 
     if (!party) {
         return EVT_RETURN_DONE;
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     party->useMotionId = 10;
     marioStSystemLevel(0);
     psndClearFlag(PSND_FLAG_MUTE_SFX);
@@ -206,13 +206,13 @@ EVT_END()
 f32 PSVECDistance(const Vec*, const Vec*);
 
 void kuribo_use_post(PartyEntry* party) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     party->flags &= ~PARTY_FLAG_DISABLE_FLOORS;
     party->flags &= ~PARTY_FLAG_FORCE_FALL;
 #endif
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo starts the message right where Goombella stands; retail first walks her next to Mario.
 void kuribo_use(PartyEntry* party) {
     EventEntry* evt;

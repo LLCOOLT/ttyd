@@ -160,16 +160,16 @@ extern BattleUnitKind unit_hotdog_master;
 extern BattleUnitKind unit_marco;
 
 // Test drop tables in the main DOL (battle_database_common.c) used by the tst battle setups.
-extern ItemDropData battle_item_test_kuriboo[];
-extern ItemDropData battle_item_test_togekuri[];
-extern ItemDropData battle_item_test_patakuri[];
-extern ItemDropData battle_item_test_hyper_kuriboo[];
-extern ItemDropData battle_item_test_hyper_togekuri[];
-extern ItemDropData battle_item_test_hyper_patakuri[];
-extern ItemDropData battle_item_test_yami_kuriboo[];
-extern ItemDropData battle_item_test_yami_noko[];
-extern ItemDropData battle_item_test_yami_pata[];
-extern ItemDropData battle_item_test_killer_cannon[];
+extern ItemDropData battle_item_sinabita_kinoko[];
+extern ItemDropData battle_item_kirakira_otoshi[];
+extern ItemDropData battle_item_koorino_ibuki[];
+extern ItemDropData battle_item_fire_flower[];
+extern ItemDropData battle_item_yurayura_jishin[];
+extern ItemDropData battle_item_suitooru[];
+extern ItemDropData battle_item_dekadeka_drink[];
+extern ItemDropData battle_item_pow_block[];
+extern ItemDropData battle_item_funyafunya_kun[];
+extern ItemDropData battle_item_kinoko[];
 
 // Battle setups in battle_bgset_test.c, registered by tst.c's _prolog (relSetBtlAddr).
 extern NpcSetupBattleInfo btlsetup_tst_tbl[];

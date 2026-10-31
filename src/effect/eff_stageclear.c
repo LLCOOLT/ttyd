@@ -31,8 +31,8 @@ typedef struct StageClearWork {
     s32 done;          // 0x28
 } StageClearWork;
 
-void effStageClearMain(EffectEntry* effect);
-void effStageClearDisp(CameraId cameraId, EffectEntry* effect);
+static void effStageClearMain(EffectEntry* effect);
+static void effStageClearDisp(CameraId cameraId, EffectEntry* effect);
 
 #if VERSION <= VERSION_JP
 static s32 tex_jp[] = {0x9C, 0x9D, 0x9E, 0x9F, 0xA0, 0xA1, 0xA2, 0xA3};
@@ -182,7 +182,7 @@ EffectEntry* effStageClearEntry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effStageClearMain(EffectEntry* effect) {
+static void effStageClearMain(EffectEntry* effect) {
     StageClearWork* work = effect->userdata;
     Vec pos;
     Vec tmp;
@@ -249,7 +249,7 @@ void effStageClearMain(EffectEntry* effect) {
     }
 }
 
-void effStageClearDisp(CameraId cameraId, EffectEntry* effect) {
+static void effStageClearDisp(CameraId cameraId, EffectEntry* effect) {
     StageClearWork* work = effect->userdata;
     CameraEntry* cam;
     f32 scale;

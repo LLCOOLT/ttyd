@@ -22,7 +22,7 @@
 #endif
 #include <math.h>
 
-BOOL chkfilter(HitCheckQuery* query, HitEntry* entry) {
+static BOOL chkfilter(HitCheckQuery* query, HitEntry* entry) {
     MapObjectEntry* mobj;
     marioGetPtr();
     if (entry->attributes & 0x80080) {
@@ -43,7 +43,7 @@ BOOL chkfilter(HitCheckQuery* query, HitEntry* entry) {
     return TRUE;
 }
 
-BOOL chkfilterYoshi(HitCheckQuery* query, HitEntry* entry) {
+static BOOL chkfilterYoshi(HitCheckQuery* query, HitEntry* entry) {
     MapObjectEntry* mobj;
     marioGetPtr();
     if (entry->attributes & 0x80080) {
@@ -67,7 +67,7 @@ BOOL chkfilterYoshi(HitCheckQuery* query, HitEntry* entry) {
     return TRUE;
 }
 
-BOOL chkfilterNokotaro(HitCheckQuery* query, HitEntry* entry) {
+static BOOL chkfilterNokotaro(HitCheckQuery* query, HitEntry* entry) {
     MapObjectEntry* mobj;
     marioGetPtr();
     if (entry->attributes & 0x800005) {
@@ -160,10 +160,10 @@ void partyChkGnd(PartyEntry* party) {
 
     if (!(party->flags & PARTY_FLAG_FORCE_FALL)) {
         attr = 0;
-#if VERSION == VERSION_DEMO
-        hit = partySearchGroundSelf(party, 11.0f, party->velY);
-#else
+#if VERSION <= VERSION_DEMO_US
         hit = partySearchGround(party, 11.0f, party->velY);
+#else
+        hit = _partySearchGround(party, 11.0f, party->velY);
 #endif
         if (hit) {
             attr = hitGetAttr(hit);
@@ -205,7 +205,7 @@ static inline f32 partyNrmSet(PartyEntry* party, Vec n) {
     return partyNrmTo(&n);
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static inline HitEntry* partyHitCheckGnd(PartyEntry* party, Vec* pos, Vec* dir, f32 dist, f32* outY, Vec* outNrm) {
     HitCheckQuery query;
     Vec d = *dir;
@@ -238,7 +238,7 @@ static inline HitEntry* partyHitCheckGnd(PartyEntry* party, Vec* pos, Vec* dir, 
 }
 
 /* partyChkGnd's ground search: writes the party's own groundY/dropDepth */
-HitEntry* partySearchGroundSelf(PartyEntry* party, f32 range, f32 depth) {
+HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth) {
     HitEntry* hit;
     s32 i;
     f32 nsx, probeY, nsz, len, sx, sz, px, baseY, pz, ox, oz, gy, rad, d;
@@ -328,7 +328,7 @@ HitEntry* partySearchGroundSelf(PartyEntry* party, f32 range, f32 depth) {
 
 /* the demo's ground search reports the floor height and drop depth through out-pointers and takes the first
    acceptable probe instead of the highest one */
-HitEntry* partySearchGround(PartyEntry* party, f32* outY, f32* outDepth, f32 range, f32 depth) {
+HitEntry* _partySearchGround(PartyEntry* party, f32* outY, f32* outDepth, f32 range, f32 depth) {
     HitEntry* hit;
     s32 i;
     f32 nsx, probeY, nsz, len, sx, sz, px, baseY, pz, ox, oz, gy, rad, d;
@@ -417,7 +417,7 @@ HitEntry* partySearchGround(PartyEntry* party, f32* outY, f32* outDepth, f32 ran
 }
 
 #else
-HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth) {
+HitEntry* _partySearchGround(PartyEntry* party, f32 range, f32 depth) {
     HitEntry* hit;
     HitEntry* best;
     s32 i;
@@ -535,7 +535,7 @@ HitEntry* partyChkFrontStep(PartyEntry* party, f32 range, f32* outY, f32* outDis
         party->groundRot = zero;
     }
     party->groundSlope = 0.0f;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     h = partyGetHeight(party);
 #else
     h = 0.5f * partyGetHeight(party);
@@ -590,7 +590,7 @@ HitEntry* partyChkFrontStep(PartyEntry* party, f32 range, f32* outY, f32* outDis
 }
 
 static inline void partyWallSlide(Vec* out, Vec n, f32 d, f32 sn, f32 cs) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     Vec unused = {0.0f, 0.0f, 0.0f};
 #endif
     f32 mx = sn * d;
@@ -600,7 +600,7 @@ static inline void partyWallSlide(Vec* out, Vec n, f32 d, f32 sn, f32 cs) {
     out->z += 0.5f * (mz - dot * n.z);
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static inline HitEntry* partyHitCheckDistNrm(PartyEntry* party, Vec* pos, Vec* dir, Vec* outNrm, f32* dist) {
     HitCheckQuery query;
     HitEntry* hit;
@@ -973,7 +973,7 @@ HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
         dir.z = cs;
         hit = partyHitCheckInl(party, &p, &dir, &outPos, &nrm, &d);
         if (hit) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             party->frontWallDist = d;
 #endif
             partyWallSlide(pos, nrm, dist, sn, cs);
@@ -993,7 +993,7 @@ HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
         hit = partyHitCheckInl(party, &p, &dir, &outPos, &nrm, &d);
         if (hit) {
             if (partyNrmTo(&nrm) >= 45.0f) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 party->frontWallDist = d;
 #endif
                 partyWallSlide(pos, nrm, dist, sn, cs);
@@ -1001,7 +1001,7 @@ HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
             }
         }
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     party->frontWallDist = -1.0f;
 #endif
     pos->x += dist * sn;
@@ -1187,7 +1187,7 @@ void partyChkWallAround(PartyEntry* party, Vec* pos, f32 spd, f32 dir, f32 width
     if (party->flags & PARTY_FLAG_PAPER_MODE) {
         width = 6.0f;
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     marioChkWallAround(pos, spd, dir, width, height); // no mode argument in the demo
 #else
     marioChkWallAround(pos, 1, spd, dir, width, height);

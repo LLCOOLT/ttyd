@@ -188,7 +188,7 @@ def normalise_ws(line):
     return (lead + line[m.end():]).rstrip()
 
 
-VERSIONS = {"VERSION_DEMO": 0, "VERSION_JP": 1, "VERSION_US": 2, "VERSION_EU": 3}
+VERSIONS = {"VERSION_DEMO_JP": 0, "VERSION_DEMO_US": 1, "VERSION_JP": 2, "VERSION_US": 3, "VERSION_EU": 4}
 
 
 def eval_condition(cond, version):
@@ -458,7 +458,7 @@ def process(cf, rel, write):
     return True
 
 
-SELF_TEST_IN = """#if VERSION == VERSION_DEMO
+SELF_TEST_IN = """#if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(a)
     RETURN
 EVT_END()
@@ -470,7 +470,7 @@ EVT_BEGIN(a)
     RETURN EVT_END()
 #endif
 """
-SELF_TEST_OUT = """#if VERSION == VERSION_DEMO
+SELF_TEST_OUT = """#if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(a)
     RETURN
 EVT_END()

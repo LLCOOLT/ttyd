@@ -55,7 +55,7 @@ static s32* wp[1];
 static DigAnim anim_tbl[DIG_ANIM_COUNT];
 
 static USER_FUNC(z);
-void movie_draw(CameraId camera, void* param);
+static void movie_draw(CameraId camera, void* param);
 
 extern EvtWord evt_action_1_2[];
 extern EvtWord evt_action_1[];
@@ -92,7 +92,7 @@ void dig_thpStop(void) {
     }
 }
 
-void movie_draw(CameraId camera, void* param) {
+static void movie_draw(CameraId camera, void* param) {
     u16 width;
     u16 height;
     const char* msg;
@@ -118,7 +118,7 @@ void movie_draw(CameraId camera, void* param) {
     }
 }
 
-USER_FUNC(movie) {
+static USER_FUNC(movie) {
     u32 type;
 
     if (isFirstCall) {
@@ -137,19 +137,19 @@ USER_FUNC(movie) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(sound_fade) {
+static USER_FUNC(sound_fade) {
     THPSimpleSetVolume(0, 2000);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(gravity_scale) {
+static USER_FUNC(gravity_scale) {
     NpcEntry* npc = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
 
     npc->jumpGravity = 0.1f;
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_action_sub) {
+static USER_FUNC(evt_action_sub) {
     EvtWord* args = event->args;
     s32 idx;
     u32* maskp;
@@ -211,54 +211,54 @@ static s32* wp[] = {
 };
 
 static DigAnim anim_tbl[DIG_ANIM_COUNT] = {
-    {/*"ダイジェストマリオ"*/"\x83\x5F\x83\x43\x83\x57\x83\x46\x83\x58\x83\x67\x83\x7D\x83\x8A\x83\x49", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT | DIG_ACTION_JUMP, 0},
-    {/*"ルイージ"*/"\x83\x8B\x83\x43\x81\x5B\x83\x57", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT | DIG_ACTION_JUMP, 0},
-    {/*"ダイジェストピーチ"*/"\x83\x5F\x83\x43\x83\x57\x83\x46\x83\x58\x83\x67\x83\x73\x81\x5B\x83\x60", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"ダイジェストピーチ２"*/"\x83\x5F\x83\x43\x83\x57\x83\x46\x83\x58\x83\x67\x83\x73\x81\x5B\x83\x60\x82\x51", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"クッパ"*/"\x83\x4E\x83\x62\x83\x70", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT | DIG_ACTION_FALL, 0},
-    {/*"カメックババ"*/"\x83\x4A\x83\x81\x83\x62\x83\x4E\x83\x6F\x83\x6F", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"第三勢力総統"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x91\x8D\x93\x9D", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"軍団ザコ敵"*/"\x8C\x52\x92\x63\x83\x55\x83\x52\x93\x47", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"マジョリン"*/"\x83\x7D\x83\x57\x83\x87\x83\x8A\x83\x93", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"マリリン"*/"\x83\x7D\x83\x8A\x83\x8A\x83\x93", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"クリスチーヌ"*/"\x83\x4E\x83\x8A\x83\x58\x83\x60\x81\x5B\x83\x6B", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT | DIG_ACTION_JUMP, 0},
-    {/*"ノコタロウ"*/"\x83\x6D\x83\x52\x83\x5E\x83\x8D\x83\x45", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"クラウダ"*/"\x83\x4E\x83\x89\x83\x45\x83\x5F", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"ヨッシー"*/"\x83\x88\x83\x62\x83\x56\x81\x5B", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"チュチュリーナ"*/"\x83\x60\x83\x85\x83\x60\x83\x85\x83\x8A\x81\x5B\x83\x69", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"キノじい"*/"\x83\x4C\x83\x6D\x82\xB6\x82\xA2", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"クリハカセ"*/"\x83\x4E\x83\x8A\x83\x6E\x83\x4A\x83\x5A", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"パラシュートボム"*/"\x83\x70\x83\x89\x83\x56\x83\x85\x81\x5B\x83\x67\x83\x7B\x83\x80", DIG_ACTION_FALL, 0},
-    {/*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"クリボー"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"パワーアップ屋"*/"\x83\x70\x83\x8F\x81\x5B\x83\x41\x83\x62\x83\x76\x89\xAE", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"キノピオ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"ノコリン"*/"\x83\x6D\x83\x52\x83\x8A\x83\x93", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"プニ族"*/"\x83\x76\x83\x6A\x91\xB0", DIG_ACTION_EVENT, 0},
-    {/*"トゲ族"*/"\x83\x67\x83\x51\x91\xB0", DIG_ACTION_EVENT, 0},
-    {/*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"美女"*/"\x94\xFC\x8F\x97", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"ブレッドハート"*/"\x83\x75\x83\x8C\x83\x62\x83\x68\x83\x6E\x81\x5B\x83\x67", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"パンジーさん"*/"\x83\x70\x83\x93\x83\x57\x81\x5B\x82\xB3\x82\xF1", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT | DIG_ACTION_WALK, 0},
-    {/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"グルメキノピオ"*/"\x83\x4F\x83\x8B\x83\x81\x83\x4C\x83\x6D\x83\x73\x83\x49", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"ホワイト将軍"*/"\x83\x7A\x83\x8F\x83\x43\x83\x67\x8F\xAB\x8C\x52", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"モニー"*/"\x83\x82\x83\x6A\x81\x5B", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"ボッタクール"*/"\x83\x7B\x83\x62\x83\x5E\x83\x4E\x81\x5B\x83\x8B", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"フラワーさん"*/"\x83\x74\x83\x89\x83\x8F\x81\x5B\x82\xB3\x82\xF1", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"星マニア"*/"\x90\xAF\x83\x7D\x83\x6A\x83\x41", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"バニーテレサ"*/"\x83\x6F\x83\x6A\x81\x5B\x83\x65\x83\x8C\x83\x54", DIG_ACTION_POP_UP | DIG_ACTION_WALK, 0},
-    {/*"キザ野郎"*/"\x83\x4C\x83\x55\x96\xEC\x98\x59", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"ウスグラ店おじさん"*/"\x83\x45\x83\x58\x83\x4F\x83\x89\x93\x58\x82\xA8\x82\xB6\x82\xB3\x82\xF1", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"ハンマーブロス"*/"\x83\x6E\x83\x93\x83\x7D\x81\x5B\x83\x75\x83\x8D\x83\x58", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT | DIG_ACTION_EVENT, 0},
-    {/*"ホネノコ"*/"\x83\x7A\x83\x6C\x83\x6D\x83\x52", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
-    {/*"チョロボン"*/"\x83\x60\x83\x87\x83\x8D\x83\x7B\x83\x93", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"ダイジェストマリオ", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT | DIG_ACTION_JUMP, 0},
+    {"ルイージ", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT | DIG_ACTION_JUMP, 0},
+    {"ダイジェストピーチ", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"ダイジェストピーチ２", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"クッパ", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT | DIG_ACTION_FALL, 0},
+    {"カメックババ", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"第三勢力総統", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"第三勢力幹部", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"軍団ザコ敵", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"マジョリン", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"マリリン", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"クリスチーヌ", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT | DIG_ACTION_JUMP, 0},
+    {"ノコタロウ", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"クラウダ", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"ヨッシー", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"サンダース", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"チュチュリーナ", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"キノじい", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"クリハカセ", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"パラシュートボム", DIG_ACTION_FALL, 0},
+    {"ノコノコ", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"クリボー", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"パワーアップ屋", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"キノピオ", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"ノコリン", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"プニ族", DIG_ACTION_EVENT, 0},
+    {"トゲ族", DIG_ACTION_EVENT, 0},
+    {"キノシコワ", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"美女", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"ガンス", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"ブレッドハート", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"ランペル", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"パンジーさん", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT | DIG_ACTION_WALK, 0},
+    {"ガラの悪い水夫", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"マルコ", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"ポワン探偵", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"グルメキノピオ", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"ホワイト将軍", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"モニー", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"ボッタクール", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"フラワーさん", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"星マニア", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"バニーテレサ", DIG_ACTION_POP_UP | DIG_ACTION_WALK, 0},
+    {"キザ野郎", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"ウスグラ店おじさん", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"ハンマーブロス", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT | DIG_ACTION_EVENT, 0},
+    {"ホネノコ", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
+    {"チョロボン", DIG_ACTION_POP_UP | DIG_ACTION_POP_UP_WAIT, 0},
 };
 
 EVT_BEGIN(evt_action_1_2)
@@ -318,13 +318,13 @@ EVT_END()
 
 EVT_BEGIN(evt_action_1)
     SET_VALUE(LF(0), 0)
-    CALL_CHILD(PTR(evt_action_1_2))
+    CALL_CHILD(evt_action_1_2)
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_action_2)
     SET_VALUE(LF(0), 1)
-    CALL_CHILD(PTR(evt_action_1_2))
+    CALL_CHILD(evt_action_1_2)
     RETURN
 EVT_END()
 
@@ -387,23 +387,23 @@ EVT_BEGIN(evt_action)
         CALL(evt_npc_status_onoff, 1, LW(10), 2)
         CALL(evt_npc_set_tribe, LW(10), LW(1))
         IF_BITS_SET(LW(2), DIG_ACTION_POP_UP)
-            SPAWN_EVENT(PTR(evt_action_1))
+            SPAWN_EVENT(evt_action_1)
             GOTO(0)
         END_IF
         IF_BITS_SET(LW(2), DIG_ACTION_POP_UP_WAIT)
-            SPAWN_EVENT(PTR(evt_action_2))
+            SPAWN_EVENT(evt_action_2)
             GOTO(0)
         END_IF
         IF_BITS_SET(LW(2), DIG_ACTION_JUMP)
-            SPAWN_EVENT(PTR(evt_action_jump))
+            SPAWN_EVENT(evt_action_jump)
             GOTO(0)
         END_IF
         IF_BITS_SET(LW(2), DIG_ACTION_FALL)
-            SPAWN_EVENT(PTR(evt_action_fall))
+            SPAWN_EVENT(evt_action_fall)
             GOTO(0)
         END_IF
         IF_BITS_SET(LW(2), DIG_ACTION_WALK)
-            SPAWN_EVENT(PTR(evt_action_walk))
+            SPAWN_EVENT(evt_action_walk)
             GOTO(0)
         END_IF
         IF_BITS_SET(LW(2), DIG_ACTION_EVENT)
@@ -430,7 +430,7 @@ EVT_BEGIN(dig_00_init_evt)
     CALL(z, LW(0))
     CALL(evt_cam3d_evt_set, 0, 0, LW(0), 0, 0, 0, 0, 11)
     CALL(evt_cam_letter_box_disable, 1)
-    SPAWN_EVENT(PTR(evt_action))
+    SPAWN_EVENT(evt_action)
     SET_VALUE(GF(0), 0)
     BEGIN_INLINE_EVENT
         SET_TYPE(0)

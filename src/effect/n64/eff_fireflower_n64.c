@@ -55,8 +55,8 @@ static effN64Vtx size32x32_tex32x32_vtx[] = {
     {-16, 32, 2, 0, 1024, 255, 255, 255, 255},
 };
 
-void effFireFlowerMain(EffectEntry* effect);
-void effFireFlowerDisp(CameraId cameraId, EffectEntry* effect);
+static void effFireFlowerMain(EffectEntry* effect);
+static void effFireFlowerDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effFireFlowerN64Entry(s32 type, f32 x, f32 y, f32 z, s32 lifetime) {
     EffectEntry* effect;
@@ -114,7 +114,7 @@ EffectEntry* effFireFlowerN64Entry(s32 type, f32 x, f32 y, f32 z, s32 lifetime) 
     return effect;
 }
 
-void effFireFlowerMain(EffectEntry* effect) {
+static void effFireFlowerMain(EffectEntry* effect) {
     EffFireFlowerN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -226,7 +226,7 @@ void effFireFlowerMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effFireFlowerDisp, effect);
 }
 
-void effFireFlowerDisp(CameraId cameraId, EffectEntry* effect) {
+static void effFireFlowerDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffFireFlowerN64Work* work;
     s32 i;

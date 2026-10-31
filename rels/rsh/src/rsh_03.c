@@ -31,21 +31,24 @@
 #include "evt/evt_pouch.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "data_tables.h"
 #include "version.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
 #include "driver/mapdrv.h"
 
+// mario_flag's copy of the last NPC talked to. The demo map has it as a static local of mario_flag (tmp$729);
+// as one it would be emitted before camAt and camPt in .bss, so it stays at file scope.
 static char tmp[32];
 Vec camPt;
 Vec camAt;
 EffectEntry* effFireEntry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 lifetime);
 
-USER_FUNC(fire);
+static USER_FUNC(fire);
 static USER_FUNC(mario_flag);
+#if VERSION >= VERSION_JP
 USER_FUNC(npc_alpha_except_tenin);
+#endif
 #if VERSION >= VERSION_US
 USER_FUNC(evt_sub_get_language);
 #endif
@@ -78,12 +81,16 @@ extern EvtWord evt_shop_open[];
 extern EvtWord evt_shop_close[];
 extern EvtWord evt_shop_door_init[];
 static EvtWord evt_yuka_simi[45];
+#if VERSION <= VERSION_DEMO_US
+static const char* access_tbl[11];
+#else
 static const char* access_tbl[16];
+#endif
 extern EvtWord rsh_03_init_evt[];
 static const char* window_tbl[5];
 extern EvtWord rsh_03_init_evt_nidome[];
 
-USER_FUNC(iri_22_make_item_tbl) {
+static USER_FUNC(iri_22_make_item_tbl) {
     EvtWord* args = event->args;
     u8 bought;
     s32 n;
@@ -129,7 +136,7 @@ static USER_FUNC(mario_flag) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(omiseHozon) {
+static USER_FUNC(omiseHozon) {
     CameraEntry* cam = camGetPtr(CAMERA_3D);
 
     camPt = cam->cameraPos;
@@ -137,7 +144,7 @@ USER_FUNC(omiseHozon) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(omiseFukki) {
+static USER_FUNC(omiseFukki) {
     CameraEntry* cam = camGetPtr(CAMERA_3D);
 
     cam->presetPos = cam->cameraPos;
@@ -289,10 +296,14 @@ s32 item_tbl_cook[] = {
 
 EVT_BEGIN(talk_cook_nabe_return)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_70_00"), 0, STRING("コック"))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_win_item_select, PTR(item_tbl_cook), LW(1))
+#else
     CALL(evt_win_item_select, 0, PTR(item_tbl_cook), LW(1), 0)
+#endif
     IF_INT_NOT_EQUAL(LW(1), -1)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_70_01"), 0, STRING("コック"))
-        CALL(evt_item_entry, STRING("orei"), ITEM_STAR_PIECE, 0, 0, 0, 17, -1, 0)
+        CALL(evt_item_entry, STRING("orei"), ITEM_STAR_PIECE, 0, 0, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
         CALL(evt_item_get_item, STRING("orei"))
         CALL(evt_item_get_item_end_wait, STRING("orei"))
         SET_VALUE(GSWF(GSWF_RSH03_STAR_PIECE_GALLEY_POT), 1)
@@ -343,7 +354,11 @@ EVT_BEGIN(talk_cook)
         END_IF
         RETURN
         LABEL(0)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_win_item_select, LW(0), LW(1))
+#else
         CALL(evt_win_item_select, 0, LW(0), LW(1), 0)
+#endif
         SWITCH(LW(1))
             CASE_EQUAL(169)
             CALL(evt_pouch_remove_item, ITEM_GOLDEN_LEAF, LW(0))
@@ -373,7 +388,7 @@ EVT_BEGIN(talk_cook)
     END_IF
     CALL(evt_pouch_check_item, ITEM_GALLEY_POT, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
-        CALL_CHILD(PTR(talk_cook_nabe_return))
+        CALL_CHILD(talk_cook_nabe_return)
         RETURN
     END_IF
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -448,7 +463,11 @@ EVT_BEGIN(talk_waitless_pias_return)
     CALL(evt_npc_get_reglid, STRING("ウェイトレス"), LW(10))
     DELETE_EVENT(LW(10))
     CALL(evt_msg_print, 0, STRING("stg6_rsh_195"), 0, STRING("ウェイトレス"))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_win_item_select, PTR(item_tbl_waitless), LW(1))
+#else
     CALL(evt_win_item_select, 0, PTR(item_tbl_waitless), LW(1), 0)
+#endif
     IF_INT_NOT_EQUAL(LW(1), -1)
 #if VERSION >= VERSION_US
         CALL(evt_mario_adjust_dir)
@@ -460,7 +479,7 @@ EVT_BEGIN(talk_waitless_pias_return)
             ADD(LW(0), 18)
         END_IF
         ADD(LW(1), 18)
-        CALL(evt_item_entry, STRING("yubiwa"), ITEM_SHELL_EARRINGS, LW(0), LW(1), LW(2), 17, -1, 0)
+        CALL(evt_item_entry, STRING("yubiwa"), ITEM_SHELL_EARRINGS, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
         CALL(evt_mario_set_pose, STRING("M_C_3"))
         WAIT_MS(1000)
         CALL(evt_mario_set_pose, STRING("M_S_1"))
@@ -473,7 +492,7 @@ EVT_BEGIN(talk_waitless_pias_return)
         CALL(evt_npc_set_anim, STRING("ウェイトレス"), STRING("A_1"))
         WAIT_MS(500)
 #endif
-        CALL(evt_item_entry, STRING("orei"), ITEM_STAR_PIECE, 0, 0, 0, 17, -1, 0)
+        CALL(evt_item_entry, STRING("orei"), ITEM_STAR_PIECE, 0, 0, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
         CALL(evt_item_get_item, STRING("orei"))
         CALL(evt_item_get_item_end_wait, STRING("orei"))
         SET_VALUE(GSWF(GSWF_RSH03_STAR_PIECE_WAITRESS), 1)
@@ -532,7 +551,7 @@ static EVT_BEGIN(talk_waitless)
     END_IF
     CALL(evt_pouch_check_item, ITEM_SHELL_EARRINGS, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
-        CALL_CHILD(PTR(talk_waitless_pias_return))
+        CALL_CHILD(talk_waitless_pias_return)
         RETURN
     END_IF
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -610,7 +629,7 @@ EVT_END()
 
 static NpcSetupInfo npc_data[] = {
     {
-        /*"コック"*/"\x83\x52\x83\x62\x83\x4E", // name
+        "コック", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_JUMPING | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR, // flags
         0, // reactionFlags
         init_cook, // initEvent
@@ -622,7 +641,7 @@ static NpcSetupInfo npc_data[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ウェイトレス"*/"\x83\x45\x83\x46\x83\x43\x83\x67\x83\x8C\x83\x58", // name
+        "ウェイトレス", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_JUMPING | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR, // flags
         0, // reactionFlags
         init_waitless, // initEvent
@@ -634,7 +653,7 @@ static NpcSetupInfo npc_data[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"店員"*/"\x93\x58\x88\xF5", // name
+        "店員", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_JUMPING | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -758,7 +777,7 @@ EVT_BEGIN(evt_lanch_missing)
     CALL(evt_cam3d_evt_set, 25, 102, 174, 25, 50, -122, 500, 11)
     WAIT_MS(500)
     SET_VALUE(LW(0), STRING("コック"))
-    SPAWN_EVENT(PTR(dir_target))
+    SPAWN_EVENT(dir_target)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_26"), 0, STRING("コック"))
     WAIT_MS(300)
     BEGIN_INLINE_EVENT
@@ -775,7 +794,7 @@ EVT_BEGIN(evt_lanch_missing)
     CALL(evt_cam3d_evt_set, 45, 75, 75, 45, 40, -122, 200, 11)
     WAIT_MS(200)
     SET_VALUE(LW(0), STRING("ポワン探偵"))
-    SPAWN_EVENT(PTR(dir_target))
+    SPAWN_EVENT(dir_target)
     CALL(evt_msg_print, 0, STRING("stg6_rsh_28"), 0, STRING("ポワン探偵"))
     WAIT_MS(300)
     CALL(evt_cam3d_evt_set, 0, 102, 174, 0, 50, -122, 0, 11)
@@ -884,7 +903,7 @@ EVT_END()
 static EVT_BEGIN(talk_powan)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_02_A_CASE_OF_LOST_STEW)
-        CALL_CHILD(PTR(evt_lanch_missing))
+        CALL_CHILD(evt_lanch_missing)
         CASE_DEFAULT
         IF_INT_EQUAL(GSWF(GSWF_RSH03_PENNINGTON_LUNCH_CASE_TALK), 0)
             SET_INT_READ_ADDR(PTR(&msg_tbl))
@@ -934,7 +953,7 @@ EVT_END()
 
 NpcSetupInfo npc_data_lunch[] = {
     {
-        /*"コック"*/"\x83\x52\x83\x62\x83\x4E", // name
+        "コック", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_JUMPING | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR, // flags
         0, NULL, NULL, // reactionFlags..regularEvent
         talk_cook, // talkEvent
@@ -944,7 +963,7 @@ NpcSetupInfo npc_data_lunch[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ウェイトレス"*/"\x83\x45\x83\x46\x83\x43\x83\x67\x83\x8C\x83\x58", // name
+        "ウェイトレス", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_JUMPING | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR, // flags
         0, NULL, NULL, // reactionFlags..regularEvent
         talk_waitless, // talkEvent
@@ -954,7 +973,7 @@ NpcSetupInfo npc_data_lunch[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"店員"*/"\x93\x58\x88\xF5", // name
+        "店員", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_JUMPING | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -963,7 +982,7 @@ NpcSetupInfo npc_data_lunch[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"トロン"*/"\x83\x67\x83\x8D\x83\x93", // name
+        "トロン", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_JUMPING | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR, // flags
         0, NULL, NULL, // reactionFlags..regularEvent
         talk_toron, // talkEvent
@@ -973,7 +992,7 @@ NpcSetupInfo npc_data_lunch[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93", // name
+        "サラリーマン", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_JUMPING | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR, // flags
         0, NULL, NULL, // reactionFlags..regularEvent
         talk_sarary, // talkEvent
@@ -983,7 +1002,7 @@ NpcSetupInfo npc_data_lunch[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", // name
+        "ポワン探偵", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_JUMPING | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR, // flags
         0, NULL, NULL, // reactionFlags..regularEvent
         talk_powan, // talkEvent
@@ -996,15 +1015,15 @@ NpcSetupInfo npc_data_lunch[] = {
 };
 
 static const char* msg_tbl[] = {
-    /*"コック"*/"\x83\x52\x83\x62\x83\x4E",
+    "コック",
     "stg6_rsh_18_01",
-    /*"トロン"*/"\x83\x67\x83\x8D\x83\x93",
+    "トロン",
     "stg6_rsh_18_02",
-    /*"サラリーマン"*/"\x83\x54\x83\x89\x83\x8A\x81\x5B\x83\x7D\x83\x93",
+    "サラリーマン",
     "stg6_rsh_18_03",
-    /*"ウェイトレス"*/"\x83\x45\x83\x46\x83\x43\x83\x67\x83\x8C\x83\x58",
+    "ウェイトレス",
     "stg6_rsh_18_04",
-    /*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3",
+    "ポワン探偵",
     "stg6_rsh_18_05",
 };
 
@@ -1130,7 +1149,7 @@ static ShopDb trade_list[] = {
 };
 
 static ShopperData35 shopper_data = {
-    /*"店員"*/"\x93\x58\x88\xF5", // name
+    "店員", // name
     evt_shop_moamoa_talk, // fook_evt
     NULL, // buy_evt
     {"stg6_shop_00", "stg6_shop_01", "stg6_shop_02", "stg6_shop_03", "stg6_shop_04", "stg6_shop_05", "stg6_shop_06", "stg6_shop_07", "stg6_shop_08", "stg6_shop_09", "stg6_shop_10", "stg6_shop_11", "stg6_shop_12", "stg6_shop_13", "stg6_shop_14", "stg6_shop_15", "stg6_shop_16", "stg6_shop_17", "stg6_shop_18", "stg6_shop_19", "stg6_shop_20", "stg6_shop_21", "stg6_shop_22", "stg6_shop_23", "stg6_shop_24", "stg6_shop_25", "stg6_shop_26", "stg6_shop_27", "stg6_shop_28", "stg6_shop_29", "stg6_shop_30", "stg6_shop_31", "stg6_shop_32", "stg6_shop_33", "stg6_shop_34"}, // msgs
@@ -1157,6 +1176,7 @@ EVT_BEGIN(shop_door_close)
     RETURN
 EVT_END()
 
+#if VERSION >= VERSION_JP
 USER_FUNC(npc_alpha_except_tenin) {
     s32 alpha = evtGetValue(event, event->args[0]);
     NpcWork* wp = npcGetWorkPtr();
@@ -1171,6 +1191,7 @@ USER_FUNC(npc_alpha_except_tenin) {
     }
     return EVT_RETURN_DONE;
 }
+#endif
 
 EVT_BEGIN(evt_shop_open)
     CALL(evt_mario_key_onoff, 0)
@@ -1188,7 +1209,7 @@ EVT_BEGIN(evt_shop_open)
         ADD(LW(12), 50)
         CALL(evt_party_move_pos, 1, LW(10), LW(12), 300)
     END_INLINE_EVENT
-    CALL_CHILD(PTR(shop_door_open))
+    CALL_CHILD(shop_door_open)
     BEGIN_INLINE_EVENT
         CALL(evt_hit_get_position, STRING("tobira_omise"), LW(10), LW(11), LW(12))
         SUBTRACT(LW(12), 30)
@@ -1200,7 +1221,7 @@ EVT_BEGIN(evt_shop_open)
     CALL(evt_hit_get_position, STRING("tobira_omise"), LW(10), LW(11), LW(12))
     SUBTRACT(LW(12), 10)
     CALL(evt_party_move_pos, 1, LW(10), LW(12), 300)
-    CALL_CHILD(PTR(shop_door_close))
+    CALL_CHILD(shop_door_close)
     CALL(omiseHozon)
     CALL(evt_img_entry, STRING("capture_img"))
     CALL(evt_img_set_paper, STRING("capture_img"), STRING("OFF_d_jaba"))
@@ -1213,6 +1234,7 @@ EVT_BEGIN(evt_shop_open)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("tobira"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("s_tobira_omise"), MAPOBJ_FLAG_HIDE)
     BEGIN_INLINE_EVENT
+#if VERSION >= VERSION_JP
         CALL(evt_sub_intpl_msec_init, 11, 255, 0, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
@@ -1224,6 +1246,7 @@ EVT_BEGIN(evt_shop_open)
         END_LOOP
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
+#endif
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_OFF6_SHOP_IN1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
@@ -1257,6 +1280,7 @@ EVT_BEGIN(evt_shop_close)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_OFF6_SHOP_OUT1"), LW(0), LW(1), LW(2), 0)
+#if VERSION >= VERSION_JP
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         CALL(evt_sub_intpl_msec_init, 11, 0, 255, 500)
@@ -1268,6 +1292,7 @@ EVT_BEGIN(evt_shop_close)
                 BREAK_LOOP
             END_IF
         END_LOOP
+#endif
     END_INLINE_EVENT
     CALL(evt_img_clear_virtual_point, STRING("capture_img"))
     CALL(evt_img_set_paper_anim, STRING("capture_img"), STRING("A_2"))
@@ -1288,13 +1313,13 @@ EVT_BEGIN(evt_shop_close)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("shop_close_sc"), MAPOBJ_FLAG_HIDE)
 #endif
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("close"), MAPOBJ_FLAG_HIDE)
-#if VERSION >= VERSION_US
+#if VERSION <= VERSION_JP
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("shop_close_sc"), MAPOBJ_FLAG_HIDE)
+#else
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("D_close"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("F_close"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("I_close"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("Sp_close"), MAPOBJ_FLAG_HIDE)
-#else
-        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("shop_close_sc"), MAPOBJ_FLAG_HIDE)
 #endif
     END_IF
 #if VERSION >= VERSION_US
@@ -1345,7 +1370,7 @@ EVT_BEGIN(evt_shop_close)
         SUBTRACT(LW(12), 30)
         CALL(evt_party_move_pos, 1, LW(10), LW(12), 300)
     END_INLINE_EVENT
-    CALL_CHILD(PTR(shop_door_open))
+    CALL_CHILD(shop_door_open)
     CALL(evt_cam3d_evt_off, 500, 11)
     BEGIN_INLINE_EVENT
         CALL(evt_hit_get_position, STRING("tobira_omise"), LW(10), LW(11), LW(12))
@@ -1363,7 +1388,7 @@ EVT_BEGIN(evt_shop_close)
         CALL(evt_party_move_pos, 1, LW(10), LW(12), 300)
     END_INLINE_EVENT
     WAIT_MS(500)
-    CALL_CHILD(PTR(shop_door_close))
+    CALL_CHILD(shop_door_close)
     CALL(evt_hitobj_attr_onoff, 0, 0, STRING("tobira_omise"), 8388608)
     CALL(evt_hitobj_attr_onoff, 0, 0, STRING("tobira_omise_heya"), 8388608)
     CALL(evt_party_run, 1)
@@ -1372,7 +1397,7 @@ EVT_BEGIN(evt_shop_close)
     RETURN
 EVT_END()
 
-USER_FUNC(fire) {
+static USER_FUNC(fire) {
     const char* name = (const char*)evtGetValue(event, event->args[0]);
     Vec pos;
 
@@ -1412,7 +1437,20 @@ static EVT_BEGIN(evt_yuka_simi)
     RETURN
 EVT_END()
 
+// The demo pairs each object with one message; the releases add a second message for it.
 static const char* access_tbl[] = {
+#if VERSION <= VERSION_DEMO_US
+    "table_1",
+    "stg6_rsh_268",
+    "table_2",
+    "stg6_rsh_268",
+    "oubun",
+    "stg6_rsh_269",
+    "shokki",
+    "stg6_rsh_270",
+    "memo",
+    "stg6_rsh_271",
+#else
     "table_1",
     "stg6_rsh_268",
     "stg6_rsh_268",
@@ -1428,16 +1466,21 @@ static const char* access_tbl[] = {
     "memo",
     "stg6_rsh_271",
     "stg6_rsh_271",
+#endif
     NULL,
 };
 
 static EVT_BEGIN(evt_access)
     CALL(evt_mario_key_onoff, 0)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_msg_print, 0, LW(1), 0, 0)
+#else
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_56_ROGUEPORT_STATION)
         CALL(evt_msg_print, 0, LW(1), 0, 0)
     ELSE
         CALL(evt_msg_print, 0, LW(2), 0, 0)
     END_IF
+#endif
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -1445,7 +1488,11 @@ EVT_END()
 static EVT_BEGIN(evt_access_entry)
     SET_INT_READ_ADDR(PTR(&access_tbl))
     LOOP(0)
+#if VERSION <= VERSION_DEMO_US
+        READ_INT2(LW(0), LW(1))
+#else
         READ_INT3(LW(0), LW(1), LW(2))
+#endif
         IF_INT_EQUAL(LW(0), 0)
             BREAK_LOOP
         END_IF
@@ -1478,14 +1525,14 @@ EVT_BEGIN(rsh_03_init_evt)
         CALL(evt_npc_set_ry, STRING("サラリーマン"), 90)
         CALL(evt_npc_set_position, STRING("ポワン探偵"), 45, 1, -135)
         CALL(evt_npc_set_ry, STRING("ポワン探偵"), 270)
-        SPAWN_EVENT(PTR(evt_lunch_talk))
+        SPAWN_EVENT(evt_lunch_talk)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("nabe"), MAPOBJ_FLAG_HIDE)
         CASE_LESS(STORY_STG6_01_THE_CONDUCTOR)
         CALL(evt_npc_setup, PTR(npc_data))
         CASE_BETWEEN(STORY_STG6_05_GALLEY_KETTLE_DISCOVERED, STORY_STG7_00_START)
         CALL(evt_npc_setup, PTR(npc_data))
     END_SWITCH
-    CALL_CHILD(PTR(evt_shop_door_init))
+    CALL_CHILD(evt_shop_door_init)
     CALL(evt_shop_setup, PTR(obj_list), PTR(goods_list), PTR(&shopper_data), PTR(trade_list))
     BEGIN_INLINE_EVENT
         LOOP(10)
@@ -1501,7 +1548,7 @@ EVT_BEGIN(rsh_03_init_evt)
             WAIT_FRAMES(1)
         END_LOOP
     END_INLINE_EVENT
-    CALL_CHILD(PTR(evt_access_entry))
+    CALL_CHILD(evt_access_entry)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG6_02_A_CASE_OF_LOST_STEW, STORY_STG6_04_GRILLING_HEFF_T)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_POWAN1"))
@@ -1544,9 +1591,9 @@ EVT_END()
 EVT_BEGIN(rsh_03_a_init_evt)
     SET_VALUE(LW(0), PTR(bero_data_a))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(rsh_03_init_evt))
-    CALL_CHILD(PTR(evt_rsh_moamoa_on_window))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(rsh_03_init_evt)
+    CALL_CHILD(evt_rsh_moamoa_on_window)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG6_01_THE_CONDUCTOR, STORY_STG6_20_END_OF_DAY_1)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("s_yuka"), MAPOBJ_FLAG_HIDE)
@@ -1560,7 +1607,7 @@ EVT_BEGIN(rsh_03_a_init_evt)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("s_yuka"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("s_yuka_simi"), MAPOBJ_FLAG_HIDE)
     END_SWITCH
-    SPAWN_EVENT(PTR(evt_sub_mail_event))
+    SPAWN_EVENT(evt_sub_mail_event)
 #if VERSION >= VERSION_US
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("open"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("D_open"), MAPOBJ_FLAG_HIDE)
@@ -1589,8 +1636,8 @@ EVT_END()
 EVT_BEGIN(rsh_03_b_init_evt)
     SET_VALUE(LW(0), PTR(bero_data_b))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(rsh_03_init_evt))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(rsh_03_init_evt)
 #if VERSION >= VERSION_US
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("open"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("D_open"), MAPOBJ_FLAG_HIDE)
@@ -1627,12 +1674,12 @@ static const char* window_tbl[] = {
 EVT_BEGIN(rsh_03_c_init_evt)
     SET_VALUE(LW(0), PTR(bero_data_c))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(rsh_03_init_evt))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(rsh_03_init_evt)
     CALL(evt_map_playanim, STRING("rousoku"), 1, 0)
     CALL(evt_map_playanim, STRING("hosi"), 1, 0)
     SET_VALUE(LW(0), PTR(&window_tbl))
-    CALL_CHILD(PTR(evt_rsh_window))
+    CALL_CHILD(evt_rsh_window)
     CALL(fire, STRING("rousoku_1"))
     CALL(fire, STRING("rousoku_2"))
 #if VERSION >= VERSION_US
@@ -1718,7 +1765,7 @@ EVT_BEGIN(rsh_03_init_evt_nidome)
         END_IF
     END_IF
     CALL(evt_npc_setup, PTR(npc_data))
-    CALL_CHILD(PTR(evt_shop_door_init))
+    CALL_CHILD(evt_shop_door_init)
     CALL(evt_shop_setup, PTR(obj_list), PTR(goods_list), PTR(&shopper_data), PTR(trade_list))
     IF_INT_EQUAL(GSWF(GSWF_TRAIN_ARRIVED_POSHLEY), 1)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG6_PIK1"))
@@ -1727,7 +1774,11 @@ EVT_BEGIN(rsh_03_init_evt_nidome)
     ELSE
         IF_INT_EQUAL(GSWF(GSWF_TRAIN_ARRIVED_ROGUEPORT), 1)
             CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_GOR1"))
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_GOR5"))
+#else
             CALL(evt_snd_envoff, PSND_FADE_OUT)
+#endif
             CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
         ELSE
             CALL(evt_sub_get_mapname, LW(0))
@@ -1743,8 +1794,10 @@ EVT_BEGIN(rsh_03_init_evt_nidome)
             END_IF
         END_IF
     END_IF
-    CALL_CHILD(PTR(evt_rsh_03_rnd_npc_entry))
-    CALL_CHILD(PTR(evt_access_entry))
+    CALL_CHILD(evt_rsh_03_rnd_npc_entry)
+#if VERSION >= VERSION_JP
+    CALL_CHILD(evt_access_entry)
+#endif
 #if VERSION >= VERSION_US
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("open"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("D_open"), MAPOBJ_FLAG_HIDE)
@@ -1773,8 +1826,8 @@ EVT_END()
 EVT_BEGIN(rsh_03_a_init_evt_nidome)
     SET_VALUE(LW(0), PTR(bero_data_a))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(rsh_03_init_evt_nidome))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(rsh_03_init_evt_nidome)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("s_yuka"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("s_yuka_simi"), MAPOBJ_FLAG_HIDE)
     RETURN
@@ -1783,20 +1836,20 @@ EVT_END()
 EVT_BEGIN(rsh_03_b_init_evt_nidome)
     SET_VALUE(LW(0), PTR(bero_data_b))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(rsh_03_init_evt_nidome))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(rsh_03_init_evt_nidome)
     RETURN
 EVT_END()
 
 EVT_BEGIN(rsh_03_c_init_evt_nidome)
     SET_VALUE(LW(0), PTR(bero_data_c))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(rsh_03_init_evt_nidome))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(rsh_03_init_evt_nidome)
     CALL(evt_map_playanim, STRING("rousoku"), 1, 0)
     CALL(evt_map_playanim, STRING("hosi"), 1, 0)
     SET_VALUE(LW(0), PTR(&window_tbl))
-    CALL_CHILD(PTR(evt_rsh_window))
+    CALL_CHILD(evt_rsh_window)
     CALL(fire, STRING("rousoku_1"))
     CALL(fire, STRING("rousoku_2"))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("shop_close_yuka1"), MAPOBJ_FLAG_HIDE)

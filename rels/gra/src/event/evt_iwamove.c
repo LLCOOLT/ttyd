@@ -35,7 +35,7 @@ USER_FUNC(evt_iwamove_init) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_iwamove_main) {
+static USER_FUNC(evt_iwamove_main) {
     IwaMoveWork* wk = (IwaMoveWork*)event->lwData[0];
     MarioWork* mario = marioGetPtr();
 

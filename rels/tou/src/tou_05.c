@@ -24,14 +24,14 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "tou.h"
 #include "mario/mariost.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
 #include "driver/mapdrv.h"
+#include "mario/mario.h"
 
-void gans_msg_callback(s32 type, void** work);
+static void gans_msg_callback(s32 type, void** work);
 
 extern EvtWord evt_hiki_open[];
 static EvtWord evt_kinoshikowa[222];
@@ -78,6 +78,7 @@ static EVT_BEGIN(n_door_close)
     RETURN
 EVT_END()
 
+#if VERSION >= VERSION_JP
 EVT_BEGIN(n_bero_match_reset)
     IF_INT_EQUAL(GSWF(GSWF_TOU_MATCH_RESERVED), 1)
         DEBUG_PUT_MSG(STRING("登録していた試合をリセット"))
@@ -86,6 +87,7 @@ EVT_BEGIN(n_bero_match_reset)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
+#endif
 
 static BeroEntry bero_data[] = {
     {
@@ -98,7 +100,11 @@ static BeroEntry bero_data[] = {
         -1, // length
         NULL, // enterEvent
         -1, // caseType
+#if VERSION <= VERSION_DEMO_US
+        NULL, // exitEvent
+#else
         (s32*)n_bero_match_reset, // exitEvent
+#endif
         "tou_04", // nextMapName
         "s_bero_5", // nextBeroName
         5, // enterAnimeType
@@ -124,7 +130,9 @@ static BeroEntry bero_data[] = {
 };
 
 EVT_BEGIN(evt_takurami)
+#if VERSION >= VERSION_JP
     CALL(evt_mario_key_onoff, 0)
+#endif
     CALL(evt_msg_print_party, STRING("stg3_tou_456_01"))
     CALL(evt_party_stop, 0)
     CALL(evt_party_move_pos2, 0, 100, 60, FLOAT(60.0f))
@@ -145,11 +153,11 @@ EVT_BEGIN(evt_takurami)
     CALL(evt_npc_flag_onoff, 1, STRING("ガンス"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_set_dir_to_target, STRING("ガンス"), STRING("mario"))
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, -180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL_CHILD(PTR(n_door_open))
+        CALL_CHILD(n_door_open)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
@@ -159,11 +167,11 @@ EVT_BEGIN(evt_takurami)
     BEGIN_INLINE_EVENT
         WAIT_MS(800)
         SET_VALUE(LW(1), 0)
-        SPAWN_EVENT(PTR(bero_close_door_play_se))
+        SPAWN_EVENT(bero_close_door_play_se)
         CALL(evt_sub_intpl_msec_init, 11, -180, 0, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL_CHILD(PTR(n_door_open))
+            CALL_CHILD(n_door_open)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
@@ -190,11 +198,11 @@ EVT_BEGIN(evt_takurami)
     WAIT_MS(300)
     CALL(evt_npc_move_position, STRING("ガンス"), 0, -130, 0, FLOAT(100.0f), 1)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL_CHILD(PTR(n_door_open))
+        CALL_CHILD(n_door_open)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
@@ -205,11 +213,11 @@ EVT_BEGIN(evt_takurami)
     END_INLINE_EVENT
     WAIT_MS(500)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_close_door_play_se))
+    SPAWN_EVENT(bero_close_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL_CHILD(PTR(n_door_open))
+        CALL_CHILD(n_door_open)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
@@ -220,46 +228,63 @@ EVT_BEGIN(evt_takurami)
     WAIT_MS(300)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_31_GRUBBAS_PLANS)
     SET_VALUE(LW(0), 0)
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_hiki_close)
+#if VERSION >= VERSION_JP
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
+#endif
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_2"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_get_position, LW(0), LW(10), LW(11), LW(12))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_DRAWER_SHUT1"), LW(10), LW(11), LW(12), 0)
     SET_VALUE(LW(8), LW(0))
     SET_VALUE(LW(9), LW(1))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_sub_intpl_init, 11, 100, 0, 30)
+    LOOP(31)
+        CALL(evt_sub_intpl_get_value)
+#else
     CALL(evt_sub_intpl_msec_init, 11, 100, 0, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
+#endif
         DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
         CALL(evt_mapobj_trans, 1, LW(8), 0, 0, LW(0))
         CALL(evt_hit_bind_update, LW(9))
         WAIT_FRAMES(1)
+#if VERSION >= VERSION_JP
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
+#endif
     END_LOOP
     SET_VALUE(LW(0), LW(8))
     SET_VALUE(LW(1), LW(9))
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, LW(1), 0, PTR(evt_hiki_open), 0)
+#if VERSION >= VERSION_JP
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_cam_letter_box_disable, 0)
+#endif
     CALL(evt_exit_case_evt)
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_hiki_open)
+#if VERSION >= VERSION_JP
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
+#endif
     IF_STR_EQUAL(LW(0), STRING("hikidasi_H"))
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_31_GRUBBAS_PLANS)
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_mario_key_onoff, 0)
+#endif
             BEGIN_INLINE_EVENT
                 CALL(evt_party_stop, 0)
                 WAIT_MS(100)
@@ -281,41 +306,57 @@ EVT_BEGIN(evt_hiki_open)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_DRAWER_OPEN1"), LW(10), LW(11), LW(12), 0)
     SET_VALUE(LW(8), LW(0))
     SET_VALUE(LW(9), LW(1))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_sub_intpl_init, 11, 0, 100, 30)
+    LOOP(31)
+        CALL(evt_sub_intpl_get_value)
+#else
     CALL(evt_sub_intpl_msec_init, 11, 0, 100, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
+#endif
         DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
         CALL(evt_mapobj_trans, 1, LW(8), 0, 0, LW(0))
         CALL(evt_hit_bind_update, LW(9))
         WAIT_FRAMES(1)
+#if VERSION >= VERSION_JP
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
+#endif
     END_LOOP
     SET_VALUE(LW(0), LW(8))
     SET_VALUE(LW(1), LW(9))
     CALL(evt_run_case_evt, CASE_COND_PUSH, 1, LW(1), 0, PTR(evt_hiki_close), 0)
     IF_STR_EQUAL(LW(0), STRING("hikidasi_H"))
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_31_GRUBBAS_PLANS)
-            CALL_CHILD(PTR(evt_takurami))
+            CALL_CHILD(evt_takurami)
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_party_run, 0)
+#else
             CALL(evt_mario_key_onoff, 1)
             CALL(evt_party_run, 0)
             CALL(evt_cam_letter_box_disable, 0)
+#endif
             CALL(evt_exit_case_evt)
             RETURN
         END_IF
     END_IF
     IF_STR_EQUAL(LW(0), STRING("hikidasi_N"))
         IF_INT_EQUAL(GSWF(GSWF_TOU05_DRAWER_STAR_PIECE_TAKEN), 0)
-            CALL(evt_item_entry, STRING("item02"), ITEM_STAR_PIECE, 0, -1000, 0, 16, -1, 0)
+            CALL(evt_item_entry, STRING("item02"), ITEM_STAR_PIECE, 0, -1000, 0, ITEM_ENTRY_FIXED, -1, 0)
             CALL(evt_item_get_item, STRING("item02"))
             SET_VALUE(GSWF(GSWF_TOU05_DRAWER_STAR_PIECE_TAKEN), 1)
             SET_VALUE(GSWF(GSWF_TOU05_STAR_PIECE_DRAWER), 1)
         END_IF
     END_IF
+#if VERSION >= VERSION_JP
     CALL(evt_mario_key_onoff, 1)
+#endif
     CALL(evt_party_run, 0)
+#if VERSION >= VERSION_JP
     CALL(evt_cam_letter_box_disable, 0)
+#endif
     CALL(evt_exit_case_evt)
     RETURN
 EVT_END()
@@ -379,7 +420,7 @@ static EVT_BEGIN(talk_gans)
         CALL(evt_eff_fukidashi, 0, STRING("a"), 0, 4, 0, 0, 0, 0, 0, 0, 0)
         WAIT_MS(1500)
         SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_03_GRUBBA)
-        CALL_CHILD(PTR(evt_kinoshikowa))
+        CALL_CHILD(evt_kinoshikowa)
     END_IF
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -489,7 +530,7 @@ static EVT_BEGIN(talk_kinoshikowa)
             CALL(evt_npc_set_anim, STRING("me"), STRING("M_1"))
             WAIT_MS(200)
             CALL(evt_msg_print, 0, STRING("irai_23_02"), 0, 0)
-            CALL(evt_item_entry, STRING("pm"), ITEM_WRESTLING_MAG, 0, -1000, 0, 17, -1, 0)
+            CALL(evt_item_entry, STRING("pm"), ITEM_WRESTLING_MAG, 0, -1000, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
             CALL(evt_item_get_item, STRING("pm"))
             CALL(evt_item_get_item_end_wait, STRING("pm"))
             CALL(evt_npc_set_ry, STRING("me"), 270)
@@ -506,7 +547,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"ガンス"*/"\x83\x4B\x83\x93\x83\x58", // name
+        "ガンス", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_gans, // initEvent
@@ -518,7 +559,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F", // name
+        "キノシコワ", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_kinoshikowa, // initEvent
@@ -537,11 +578,11 @@ static EVT_BEGIN(evt_kinoshikowa)
     WAIT_MS(300)
     CALL(evt_npc_set_position, STRING("キノシコワ"), 0, 0, -180)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, -180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL_CHILD(PTR(n_door_open))
+        CALL_CHILD(n_door_open)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
@@ -549,11 +590,11 @@ static EVT_BEGIN(evt_kinoshikowa)
     BEGIN_INLINE_EVENT
         WAIT_MS(2000)
         SET_VALUE(LW(1), 0)
-        SPAWN_EVENT(PTR(bero_close_door_play_se))
+        SPAWN_EVENT(bero_close_door_play_se)
         CALL(evt_sub_intpl_msec_init, 11, -180, 0, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL_CHILD(PTR(n_door_open))
+            CALL_CHILD(n_door_open)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
@@ -588,11 +629,11 @@ static EVT_BEGIN(evt_kinoshikowa)
     END_INLINE_EVENT
     CALL(evt_npc_move_position, STRING("キノシコワ"), 0, -120, 0, FLOAT(50.0f), 1)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL_CHILD(PTR(n_door_open))
+        CALL_CHILD(n_door_open)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
@@ -695,11 +736,11 @@ static EVT_BEGIN(evt_sensyu)
         CALL(evt_npc_move_position, STRING("ガンス"), -10, -120, 0, FLOAT(80.0f), 1)
         CALL(evt_npc_move_position, STRING("ガンス"), 10, -120, 0, FLOAT(80.0f), 1)
         SET_VALUE(LW(1), 0)
-        SPAWN_EVENT(PTR(bero_open_door_play_se))
+        SPAWN_EVENT(bero_open_door_play_se)
         CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL_CHILD(PTR(n_door_open))
+            CALL_CHILD(n_door_open)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
@@ -768,7 +809,7 @@ EVT_BEGIN(evt_sensyu2)
         CALL(evt_eff_fukidashi, 0, STRING("a"), 0, 4, 0, 0, 0, 0, 0, 0, 0)
         WAIT_MS(1500)
         SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_04_GONZALES_IS_BORN)
-        CALL_CHILD(PTR(evt_kinoshikowa))
+        CALL_CHILD(evt_kinoshikowa)
     END_IF
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_mario_key_onoff, 1)
@@ -778,13 +819,13 @@ EVT_END()
 static EVT_BEGIN(evt_1st_leagu)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
-    CALL(evt_npc_set_position, STRING(/*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F"), 0, 0, -160)
+    CALL(evt_npc_set_position, STRING("キノシコワ"), 0, 0, -160)
     CALL(evt_mario_set_pos, 0, 0, -165)
     CALL(evt_party_set_pos, 0, 0, 0, -180)
     CALL(evt_mario_set_dir, 90, 0, 0)
     CALL(evt_party_set_dir, 0, 90, 0)
-    CALL(evt_npc_set_position, STRING(/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58"), 125, 0, 25)
-    CALL(evt_set_dir_to_target, STRING(/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58"), STRING("mario"))
+    CALL(evt_npc_set_position, STRING("ガンス"), 125, 0, 25)
+    CALL(evt_set_dir_to_target, STRING("ガンス"), STRING("mario"))
     CALL(evt_mapobj_trans, 1, STRING("hikidasi_H"), 0, 0, 10)
     CALL(evt_cam3d_evt_set, 75, 100, 371, 75, 37, 13, 0, 11)
     CALL(evt_seq_wait, 2)
@@ -802,9 +843,9 @@ static EVT_BEGIN(evt_1st_leagu)
     END_LOOP
     SET_VALUE(GF(0), 0)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_status_onoff, 1, STRING(/*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F"), 2)
-        CALL(evt_npc_move_position, STRING(/*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F"), 1, -100, 0, FLOAT(50.0f), 1)
-        CALL(evt_npc_move_position, STRING(/*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F"), 50, -100, 0, FLOAT(50.0f), 1)
+        CALL(evt_npc_status_onoff, 1, STRING("キノシコワ"), 2)
+        CALL(evt_npc_move_position, STRING("キノシコワ"), 1, -100, 0, FLOAT(50.0f), 1)
+        CALL(evt_npc_move_position, STRING("キノシコワ"), 50, -100, 0, FLOAT(50.0f), 1)
         SET_VALUE(GF(0), 1)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
@@ -830,11 +871,15 @@ static EVT_BEGIN(evt_1st_leagu)
             END_IF
         END_LOOP
     END_INLINE_EVENT
-    CALL(evt_eff_fukidashi, 1, 0, STRING(/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58"), 0, 0, 0, 0, 0, 0, 0, 0)
-    CALL(evt_npc_get_position, STRING(/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58"), LW(0), LW(1), LW(2))
-    CALL(evt_npc_sound_data_set, STRING(/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58"), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(evt_npc_jump_position_nohit, STRING(/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58"), LW(0), LW(1), LW(2), 300, 20)
-    CALL(evt_npc_sound_data_reset, STRING(/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58"))
+    CALL(evt_eff_fukidashi, 1, 0, STRING("ガンス"), 0, 0, 0, 0, 0, 0, 0, 0)
+    CALL(evt_npc_get_position, STRING("ガンス"), LW(0), LW(1), LW(2))
+#if VERSION >= VERSION_JP
+    CALL(evt_npc_sound_data_set, STRING("ガンス"), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR, 0, EVT_NULLPTR)
+#endif
+    CALL(evt_npc_jump_position_nohit, STRING("ガンス"), LW(0), LW(1), LW(2), 300, 20)
+#if VERSION >= VERSION_JP
+    CALL(evt_npc_sound_data_reset, STRING("ガンス"))
+#endif
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_2"), MAPOBJ_FLAG_HIDE)
     WAIT_MS(300)
     SET_VALUE(LW(0), STRING("hikidasi_H"))
@@ -846,41 +891,41 @@ static EVT_BEGIN(evt_1st_leagu)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
-    CALL(evt_set_dir_to_target, STRING(/*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F"), STRING(/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58"))
-    CALL(evt_msg_print, 0, STRING("stg3_tou_287"), 0, STRING(/*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F"))
+    CALL(evt_set_dir_to_target, STRING("キノシコワ"), STRING("ガンス"))
+    CALL(evt_msg_print, 0, STRING("stg3_tou_287"), 0, STRING("キノシコワ"))
     WAIT_MS(300)
-    CALL(evt_msg_print, 0, STRING("stg3_tou_288"), 0, STRING(/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58"))
+    CALL(evt_msg_print, 0, STRING("stg3_tou_288"), 0, STRING("ガンス"))
     WAIT_MS(300)
-    CALL(evt_msg_print, 0, STRING("stg3_tou_289"), 0, STRING(/*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F"))
+    CALL(evt_msg_print, 0, STRING("stg3_tou_289"), 0, STRING("キノシコワ"))
     WAIT_MS(300)
-    CALL(evt_msg_print, 0, STRING("stg3_tou_290"), 0, STRING(/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58"))
+    CALL(evt_msg_print, 0, STRING("stg3_tou_290"), 0, STRING("ガンス"))
     WAIT_MS(300)
     CALL(evt_cam3d_evt_set, 15, 90, 269, 15, 37, -26, 4000, 11)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_move_position, STRING(/*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F"), 70, -100, 0, FLOAT(50.0f), 1)
-        CALL(evt_set_dir_to_target, STRING(/*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F"), STRING("mario"))
+        CALL(evt_npc_move_position, STRING("キノシコワ"), 70, -100, 0, FLOAT(50.0f), 1)
+        CALL(evt_set_dir_to_target, STRING("キノシコワ"), STRING("mario"))
     END_INLINE_EVENT
-    CALL(evt_npc_status_onoff, 1, STRING(/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58"), 2)
-    CALL(evt_npc_move_position, STRING(/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58"), 110, 85, 0, FLOAT(50.0f), 1)
-    CALL(evt_npc_move_position, STRING(/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58"), 25, 50, 0, FLOAT(50.0f), 1)
-    CALL(evt_npc_move_position, STRING(/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58"), 25, -10, 0, FLOAT(50.0f), 1)
-    CALL(evt_set_dir_to_target, STRING(/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58"), STRING("mario"))
-    CALL(evt_msg_print, 0, STRING("stg3_tou_291"), 0, STRING(/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58"))
+    CALL(evt_npc_status_onoff, 1, STRING("ガンス"), 2)
+    CALL(evt_npc_move_position, STRING("ガンス"), 110, 85, 0, FLOAT(50.0f), 1)
+    CALL(evt_npc_move_position, STRING("ガンス"), 25, 50, 0, FLOAT(50.0f), 1)
+    CALL(evt_npc_move_position, STRING("ガンス"), 25, -10, 0, FLOAT(50.0f), 1)
+    CALL(evt_set_dir_to_target, STRING("ガンス"), STRING("mario"))
+    CALL(evt_msg_print, 0, STRING("stg3_tou_291"), 0, STRING("ガンス"))
     WAIT_MS(300)
     CALL(evt_pouch_add_coin, 30)
     CALL(evt_mario_set_pose, STRING("M_I_U"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     ADD(LW(1), 50)
-    CALL(evt_item_entry, STRING("coin"), ITEM_COIN, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("coin"), ITEM_COIN, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     WAIT_MS(1000)
     CALL(evt_item_delete, STRING("coin"))
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL(evt_msg_print, 0, STRING("stg3_tou_292_02"), 0, 0)
-    CALL(evt_msg_print, 0, STRING("stg3_tou_292"), 0, STRING(/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58"))
+    CALL(evt_msg_print, 0, STRING("stg3_tou_292"), 0, STRING("ガンス"))
     WAIT_MS(300)
-    CALL(evt_msg_print, 0, STRING("stg3_tou_293"), 0, STRING(/*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F"))
+    CALL(evt_msg_print, 0, STRING("stg3_tou_293"), 0, STRING("キノシコワ"))
     WAIT_MS(300)
-    CALL(evt_npc_move_position, STRING(/*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F"), 0, -100, 0, FLOAT(50.0f), 1)
+    CALL(evt_npc_move_position, STRING("キノシコワ"), 0, -100, 0, FLOAT(50.0f), 1)
     SET_VALUE(LW(1), 0)
     SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
@@ -892,8 +937,8 @@ static EVT_BEGIN(evt_1st_leagu)
         END_IF
     END_LOOP
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_move_position, STRING(/*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F"), 0, -200, 0, FLOAT(50.0f), 1)
-        CALL(evt_npc_set_position, STRING(/*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F"), 0, -1000, 0)
+        CALL(evt_npc_move_position, STRING("キノシコワ"), 0, -200, 0, FLOAT(50.0f), 1)
+        CALL(evt_npc_set_position, STRING("キノシコワ"), 0, -1000, 0)
     END_INLINE_EVENT
     CALL(evt_party_run, 0)
     CALL(evt_mario_mov_pos2, 0, -200, FLOAT(60.0f))
@@ -989,11 +1034,11 @@ EVT_BEGIN(evt_nozoki)
         WAIT_MS(300)
         CALL(evt_npc_move_position, STRING("キノシコワ"), 0, -120, 0, FLOAT(80.0f), 1)
         SET_VALUE(LW(1), 0)
-        SPAWN_EVENT(PTR(bero_open_door_play_se))
+        SPAWN_EVENT(bero_open_door_play_se)
         CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL_CHILD(PTR(n_door_open))
+            CALL_CHILD(n_door_open)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
@@ -1004,11 +1049,11 @@ EVT_BEGIN(evt_nozoki)
         END_INLINE_EVENT
         WAIT_MS(500)
         SET_VALUE(LW(1), 0)
-        SPAWN_EVENT(PTR(bero_close_door_play_se))
+        SPAWN_EVENT(bero_close_door_play_se)
         CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL_CHILD(PTR(n_door_open))
+            CALL_CHILD(n_door_open)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
@@ -1052,11 +1097,11 @@ EVT_BEGIN(evt_nozoki)
         CALL(evt_npc_move_position, STRING("ガンス"), 115, -80, 0, FLOAT(80.0f), 1)
         CALL(evt_npc_move_position, STRING("ガンス"), 0, -120, 0, FLOAT(80.0f), 1)
         SET_VALUE(LW(1), 0)
-        SPAWN_EVENT(PTR(bero_open_door_play_se))
+        SPAWN_EVENT(bero_open_door_play_se)
         CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL_CHILD(PTR(n_door_open))
+            CALL_CHILD(n_door_open)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
@@ -1067,11 +1112,11 @@ EVT_BEGIN(evt_nozoki)
         END_INLINE_EVENT
         WAIT_MS(500)
         SET_VALUE(LW(1), 0)
-        SPAWN_EVENT(PTR(bero_close_door_play_se))
+        SPAWN_EVENT(bero_close_door_play_se)
         CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL_CHILD(PTR(n_door_open))
+            CALL_CHILD(n_door_open)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
@@ -1159,10 +1204,10 @@ EVT_BEGIN(evt_sensyu_reentry)
     CALL(evt_npc_move_position, STRING("キノシコワ"), 40, -80, 0, FLOAT(70.0f), 0)
     WAIT_FRAMES(1)
     CALL(evt_msg_print, 0, STRING("stg3_tou_re_005_2"), 0, STRING("キノシコワ"))
-    CALL(evt_mario_dispflag_onoff, 1, 2)
+    CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_POSE_LOCK)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_mario_jump_pos, LW(0), LW(1), LW(2), 300, 1, 10)
-    CALL(evt_mario_dispflag_onoff, 0, 2)
+    CALL(evt_mario_dispflag_onoff, 0, MARIO_DISP_FLAG_POSE_LOCK)
     CALL(evt_msg_print, 0, STRING("stg3_tou_re_005_3"), 0, STRING("キノシコワ"))
     CALL(evt_mario_set_pose, STRING("M_N_B"))
     WAIT_MS(600)
@@ -1185,10 +1230,12 @@ EVT_END()
 EVT_BEGIN(tou_05_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_map_playanim, STRING("anm_camera"), 1, 0)
-    CALL(evt_item_entry, STRING("item01"), ITEM_STAR_PIECE, -135, 0, 105, 16, GSWF(GSWF_TOU05_STAR_PIECE), 0)
+    CALL(evt_item_entry, STRING("item01"), ITEM_STAR_PIECE, -135, 0, 105, ITEM_ENTRY_FIXED, GSWF(GSWF_TOU05_STAR_PIECE), 0)
+#if VERSION >= VERSION_JP
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("paifu"), MAPOBJ_FLAG_BBOX_CULL)
+#endif
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("fall"))
         CALL(evt_mario_key_onoff, 0)
@@ -1266,17 +1313,17 @@ EVT_BEGIN(tou_05_init_evt)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_03_GRUBBA)
         SET_VALUE(LW(0), 1)
         IF_INT_EQUAL(GSWF(GSWF_TOU_GRUBBA_ESCORT_PENDING), 0)
-            SPAWN_EVENT(PTR(evt_sensyu))
+            SPAWN_EVENT(evt_sensyu)
         ELSE
             SET_VALUE(GSWF(GSWF_TOU_GRUBBA_ESCORT_PENDING), 0)
-            SPAWN_EVENT(PTR(evt_sensyu2))
+            SPAWN_EVENT(evt_sensyu2)
         END_IF
     END_IF
     IF_INT_EQUAL(GSWF(GSWF_TOU_PROMOTION_PENDING), 1)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG3_GANCE1"))
         CALL(evt_snd_envoff, PSND_FADE_OUT)
         SET_VALUE(LW(0), 1)
-        SPAWN_EVENT(PTR(evt_1st_leagu))
+        SPAWN_EVENT(evt_1st_leagu)
     ELSE
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kami_2"), MAPOBJ_FLAG_HIDE)
     END_IF
@@ -1288,11 +1335,19 @@ EVT_BEGIN(tou_05_init_evt)
             SWITCH(GSW(GSW_STORY_PROGRESS))
                 CASE_BETWEEN(STORY_STG3_00_WELCOME_TO_GLITZVILLE, STORY_STG3_12_MINI_YOSHI_EGG)
                 CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
+#if VERSION <= VERSION_DEMO_US
+                CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
+#else
                 CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))
+#endif
                 CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
                 CASE_GREATER_OR_EQUAL(STORY_STG3_33_PEACH_THE_SECRET_WEAPON)
                 CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
+#if VERSION <= VERSION_DEMO_US
+                CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
+#else
                 CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))
+#endif
                 CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
                 CASE_DEFAULT
                 CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU1"))
@@ -1324,7 +1379,7 @@ EVT_BEGIN(tou_05_init_evt)
         CALL(evt_bero_get_entername, LW(0))
         IF_STR_NOT_EQUAL(LW(0), STRING("fall"))
             IF_INT_EQUAL(GSWF(GSWF_TOU_REENTERED_LEAGUE), 0)
-                SPAWN_EVENT(PTR(evt_sensyu_reentry))
+                SPAWN_EVENT(evt_sensyu_reentry)
             END_IF
         END_IF
     END_IF
@@ -1334,7 +1389,7 @@ EVT_BEGIN(tou_05_init_evt)
     RETURN
 EVT_END()
 
-void gans_msg_callback(s32 type, void** work) {
+static void gans_msg_callback(s32 type, void** work) {
     EventEntry* evt = ((MsgWinData*)*work)->event;
     if (type == 2) {
         evtSetValue(evt, GW(10), evtGetValue(evt, GW(10)) + 1);

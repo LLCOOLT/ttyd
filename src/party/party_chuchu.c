@@ -33,7 +33,7 @@ typedef struct ChuchuParty {
     u8 state;              // 0x39
     u8 pad3A;              // 0x3A
     u8 moveMode;           // 0x3B
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     u8 pad3C[0x54 - 0x3C]; // 0x3C, the demo PartyEntry is 4 bytes shorter here
 #else
     u8 pad3C[0x58 - 0x3C]; // 0x3C
@@ -41,7 +41,7 @@ typedef struct ChuchuParty {
     Vec position;          // 0x58
     u8 pad64[0x94 - 0x64]; // 0x64
     Vec target;            // 0x94
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     u8 padA0[0xD8 - 0x9C]; // 0xA0, the demo PartyEntry is 0x14 shorter here
 #else
     u8 padA0[0xF0 - 0xA0]; // 0xA0
@@ -52,7 +52,7 @@ typedef struct ChuchuParty {
     f32 moveDir;   // 0xFC
     f32 targetDir; // 0x100
     f32 moveSpeed; // 0x104
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     u8 pad108[0x10C - 0x108]; // 0x108, PartyEntry.targetSpeed (not in the demo)
 #endif
     f32 displayDirection;       // 0x10C
@@ -70,13 +70,13 @@ typedef struct ChuchuTreasure {
     s32 z;
 } ChuchuTreasure;
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 extern s32 mobjCheckKururingFloorItem(MapObjectEntry* mobj);
 #endif
 extern USER_FUNC(evt_msg_print);
 
 char* mobj_list[] = {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     "MOBJ_TreasureBox",
     "MOBJ_BigTreasureBox",
     "MOBJ_GrayTreasureBox",
@@ -97,9 +97,9 @@ char* mobj_list[] = {
 
 static const Vec vecA = {0.0f, 0.0f, 0.0f};
 
-USER_FUNC(set_msg);
-USER_FUNC(search_result);
-USER_FUNC(post_msg);
+static USER_FUNC(set_msg);
+static USER_FUNC(search_result);
+static USER_FUNC(post_msg);
 
 EVT_BEGIN(msg_evt)
     CALL(set_msg)
@@ -111,7 +111,7 @@ EVT_BEGIN(msg_evt)
     RETURN
 EVT_END()
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 ChuchuTreasure chuchu_treasure_tbl[] = {
     {"hei_00", 0xF840715E, -468, 139, -127},
     {"hei_00", 0xF8406272, -408, 139, -127},
@@ -157,14 +157,14 @@ ChuchuTreasure chuchu_treasure_tbl[] = {
 static const Vec vecB = {0.0f, 0.0f, 0.0f};
 #endif
 
-USER_FUNC(search_result) {
+static USER_FUNC(search_result) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
 
     if (isFirstCall) {
         if ((u32)event->lwData[0] == 0 || event->lwData[1] == 0) {
             return EVT_RETURN_DONE;
         }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         if (event->lwData[1] == 1) {
             if (party) {
                 ((EffFukidashiEntryRetVoidptrS32Fn)effFukidashiEntry)(6, 0, -2, 0.0f, 18.0f, 0.0f, 0.0f, 0.0f, sysMsec2Frame(1500));
@@ -186,9 +186,9 @@ USER_FUNC(search_result) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo stops at the first item or block in range and has no buried treasure table.
-USER_FUNC(set_msg) {
+static USER_FUNC(set_msg) {
     int pass;
     ChuchuParty* cp = (ChuchuParty*)partyGetPtr(marioGetPartyId());
     MarioWork* player = cp->player;
@@ -265,7 +265,7 @@ static inline int chuchu_findTreasure2(ChuchuParty* cpp, f32 range, Vec* bestPos
     return found;
 }
 
-USER_FUNC(set_msg) {
+static USER_FUNC(set_msg) {
     MapObjectEntry* mobj;
     ItemEntry* item;
     int found;
@@ -353,7 +353,7 @@ USER_FUNC(set_msg) {
 }
 #endif
 
-USER_FUNC(post_msg) {
+static USER_FUNC(post_msg) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
 
     event->lwData[0] = 0;
@@ -363,7 +363,7 @@ USER_FUNC(post_msg) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 BOOL chuchu_searchObject(void) {
     char** name;
     ChuchuParty* cp = (ChuchuParty*)partyGetPtr(marioGetPartyId());
@@ -461,7 +461,7 @@ void chuchu_move(PartyEntry* party) {
         // FAKE: the call passes a second argument partyWalkInit does not take (no effect); the cast keeps it.
         ((void (*)(PartyEntry*, s32))partyWalkInit)(party, 1);
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     partyUpdMoveSpd(party);
 #endif
     partyWalkMain(party);

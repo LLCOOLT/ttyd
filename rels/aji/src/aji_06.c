@@ -25,7 +25,6 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "aji.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -58,24 +57,24 @@ s32 g_Kusuri_B;
 s32 g_Kusuri_G;
 s32 g_Kusuri_R;
 
-USER_FUNC(kusuri_color_get);
-USER_FUNC(kusuri_color_init);
-USER_FUNC(kusuri_color_set);
-USER_FUNC(kusuri_color_set_rgb);
-USER_FUNC(kusuri_list_add);
-USER_FUNC(kusuri_list_get_no);
-USER_FUNC(kusuri_list_init);
-USER_FUNC(peach_chg_pose);
-USER_FUNC(peach_evt_seikai_check);
-USER_FUNC(peach_evt_toumei_onoff);
-USER_FUNC(peach_set_scale);
-USER_FUNC(yuka_anim_reverse_end);
-USER_FUNC(yuka_anim_reverse_play);
-void kusuri_4_color_tev(MapTevCallbackInfo* info);
-void kusuri_3_color_tev(MapTevCallbackInfo* info);
-void kusuri_2_color_tev(MapTevCallbackInfo* info);
-void kusuri_1_color_tev(MapTevCallbackInfo* info);
-void kusuri_naka_color_tev(MapTevCallbackInfo* info);
+static USER_FUNC(kusuri_color_get);
+static USER_FUNC(kusuri_color_init);
+static USER_FUNC(kusuri_color_set);
+static USER_FUNC(kusuri_color_set_rgb);
+static USER_FUNC(kusuri_list_add);
+static USER_FUNC(kusuri_list_get_no);
+static USER_FUNC(kusuri_list_init);
+static USER_FUNC(peach_chg_pose);
+static USER_FUNC(peach_evt_seikai_check);
+static USER_FUNC(peach_evt_toumei_onoff);
+static USER_FUNC(peach_set_scale);
+static USER_FUNC(yuka_anim_reverse_end);
+static USER_FUNC(yuka_anim_reverse_play);
+static void kusuri_4_color_tev(MapTevCallbackInfo* info);
+static void kusuri_3_color_tev(MapTevCallbackInfo* info);
+static void kusuri_2_color_tev(MapTevCallbackInfo* info);
+static void kusuri_1_color_tev(MapTevCallbackInfo* info);
+static void kusuri_naka_color_tev(MapTevCallbackInfo* info);
 
 static BeroEntry bero_entry_data[2];
 static BeroEntry bero_peach_data[2];
@@ -244,18 +243,18 @@ EVT_END()
 EVT_BEGIN(peach_evt_kaihei_open_all)
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(0), STRING("S_kaihei1"))
-        CALL_CHILD(PTR(peach_evt_kaihei_open))
+        CALL_CHILD(peach_evt_kaihei_open)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(0), STRING("S_kaihei2"))
-        CALL_CHILD(PTR(peach_evt_kaihei_open))
+        CALL_CHILD(peach_evt_kaihei_open)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(0), STRING("S_kaihei3"))
-        CALL_CHILD(PTR(peach_evt_kaihei_open))
+        CALL_CHILD(peach_evt_kaihei_open)
     END_INLINE_EVENT
     SET_VALUE(LW(0), STRING("S_kaihei4"))
-    CALL_CHILD(PTR(peach_evt_kaihei_open))
+    CALL_CHILD(peach_evt_kaihei_open)
     RETURN
 EVT_END()
 
@@ -278,18 +277,18 @@ EVT_END()
 EVT_BEGIN(peach_evt_kaihei_close_all)
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(0), STRING("S_kaihei1"))
-        CALL_CHILD(PTR(peach_evt_kaihei_close))
+        CALL_CHILD(peach_evt_kaihei_close)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(0), STRING("S_kaihei2"))
-        CALL_CHILD(PTR(peach_evt_kaihei_close))
+        CALL_CHILD(peach_evt_kaihei_close)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(0), STRING("S_kaihei3"))
-        CALL_CHILD(PTR(peach_evt_kaihei_close))
+        CALL_CHILD(peach_evt_kaihei_close)
     END_INLINE_EVENT
     SET_VALUE(LW(0), STRING("S_kaihei4"))
-    CALL_CHILD(PTR(peach_evt_kaihei_close))
+    CALL_CHILD(peach_evt_kaihei_close)
     RETURN
 EVT_END()
 
@@ -325,7 +324,11 @@ EVT_BEGIN(peach_evt_kusuri_select)
         SET_VALUE(LF(0), 1)
     END_IF
     IF_INT_EQUAL(LF(0), 1)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_win_item_select, PTR(kusuri_list), LW(1))
+#else
         CALL(evt_win_item_select, 0, PTR(kusuri_list), LW(1), 0)
+#endif
     ELSE
         SET_VALUE(LW(1), -1)
     END_IF
@@ -356,7 +359,7 @@ EVT_BEGIN(peach_evt_pick_kusuri)
         CALL(evt_del_case_evt, 0, GW(5))
         DELETE_EVENT(GW(0))
         SET_VALUE(LW(0), STRING("S_pato1"))
-        CALL_CHILD(PTR(peach_evt_pato_off))
+        CALL_CHILD(peach_evt_pato_off)
     END_IF
     SET_VALUE(LSWF(5), 0)
     RETURN
@@ -456,7 +459,7 @@ EVT_BEGIN(peach_evt_kaihei1)
     CALL(evt_mario_key_onoff, 0)
     IF_INT_EQUAL(LSWF(6), 0)
         IF_INT_EQUAL(LSW(1), 0)
-            CALL_CHILD(PTR(peach_evt_kusuri_select))
+            CALL_CHILD(peach_evt_kusuri_select)
             SET_VALUE(LSW(1), LW(0))
             SWITCH(LSW(1))
                 CASE_EQUAL(1)
@@ -477,7 +480,7 @@ EVT_BEGIN(peach_evt_kaihei1)
                 SET_VALUE(LSWF(4), 0)
             END_SWITCH
             IF_INT_GREATER(LSW(1), 0)
-                CALL(evt_item_entry, LW(0), LW(1), -110, 31, -107, 17, -1, 0)
+                CALL(evt_item_entry, LW(0), LW(1), -110, 31, -107, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
                 CALL(evt_pouch_check_item, LW(1), LW(2))
                 IF_INT_GREATER(LW(2), 0)
                     CALL(evt_pouch_remove_item, LW(1), LW(2))
@@ -486,12 +489,12 @@ EVT_BEGIN(peach_evt_kaihei1)
             SET_VALUE(LW(0), LSW(1))
             SUBTRACT(LW(0), 1)
             POKE_INT(LW(0), PTR(g_Kusuri1_No))
-            CALL_CHILD(PTR(peach_evt_check_all_kusuri_set))
+            CALL_CHILD(peach_evt_check_all_kusuri_set)
             CALL(evt_map_set_flush_onoff, 0, 1, STRING("S_mizu1"))
             CALL(evt_map_set_flush_color, 0, STRING("S_mizu1"), 255, 0, 0, 255)
         ELSE
             SET_VALUE(LW(0), LSW(1))
-            CALL_CHILD(PTR(peach_evt_pick_kusuri))
+            CALL_CHILD(peach_evt_pick_kusuri)
             SET_VALUE(LSW(1), 0)
         END_IF
     ELSE
@@ -510,11 +513,11 @@ EVT_BEGIN(peach_evt_kaihei1)
         END_IF
         SET_VALUE(LW(0), STRING("S_mizu1"))
         SET_VALUE(LW(1), LSW(1))
-        CALL_CHILD(PTR(peach_evt_kusuri_dasu))
+        CALL_CHILD(peach_evt_kusuri_dasu)
         IF_INT_EQUAL(LF(0), 1)
             SET_VALUE(LW(0), STRING("hika1"))
             SET_VALUE(LW(1), STRING("kesu1"))
-            SPAWN_EVENT(PTR(peach_evt_seikai_evt))
+            SPAWN_EVENT(peach_evt_seikai_evt)
         END_IF
     END_IF
     CALL(evt_mario_key_onoff, 1)
@@ -527,7 +530,7 @@ EVT_BEGIN(peach_evt_kaihei2)
     CALL(evt_mario_key_onoff, 0)
     IF_INT_EQUAL(LSWF(6), 0)
         IF_INT_EQUAL(LSW(2), 0)
-            CALL_CHILD(PTR(peach_evt_kusuri_select))
+            CALL_CHILD(peach_evt_kusuri_select)
             SET_VALUE(LSW(2), LW(0))
             SWITCH(LSW(2))
                 CASE_EQUAL(1)
@@ -548,7 +551,7 @@ EVT_BEGIN(peach_evt_kaihei2)
                 SET_VALUE(LSWF(4), 0)
             END_SWITCH
             IF_INT_GREATER(LSW(2), 0)
-                CALL(evt_item_entry, LW(0), LW(1), -65, 31, -107, 17, -1, 0)
+                CALL(evt_item_entry, LW(0), LW(1), -65, 31, -107, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
                 CALL(evt_pouch_check_item, LW(1), LW(2))
                 IF_INT_GREATER(LW(2), 0)
                     CALL(evt_pouch_remove_item, LW(1), LW(2))
@@ -557,10 +560,10 @@ EVT_BEGIN(peach_evt_kaihei2)
             SET_VALUE(LW(0), LSW(2))
             SUBTRACT(LW(0), 1)
             POKE_INT(LW(0), PTR(g_Kusuri2_No))
-            CALL_CHILD(PTR(peach_evt_check_all_kusuri_set))
+            CALL_CHILD(peach_evt_check_all_kusuri_set)
         ELSE
             SET_VALUE(LW(0), LSW(2))
-            CALL_CHILD(PTR(peach_evt_pick_kusuri))
+            CALL_CHILD(peach_evt_pick_kusuri)
             SET_VALUE(LSW(2), 0)
         END_IF
     ELSE
@@ -579,11 +582,11 @@ EVT_BEGIN(peach_evt_kaihei2)
         END_IF
         SET_VALUE(LW(0), STRING("S_mizu2"))
         SET_VALUE(LW(1), LSW(2))
-        CALL_CHILD(PTR(peach_evt_kusuri_dasu))
+        CALL_CHILD(peach_evt_kusuri_dasu)
         IF_INT_EQUAL(LF(0), 1)
             SET_VALUE(LW(0), STRING("hika2"))
             SET_VALUE(LW(1), STRING("kesu2"))
-            SPAWN_EVENT(PTR(peach_evt_seikai_evt))
+            SPAWN_EVENT(peach_evt_seikai_evt)
         END_IF
     END_IF
     CALL(evt_mario_key_onoff, 1)
@@ -596,7 +599,7 @@ EVT_BEGIN(peach_evt_kaihei3)
     CALL(evt_mario_key_onoff, 0)
     IF_INT_EQUAL(LSWF(6), 0)
         IF_INT_EQUAL(LSW(3), 0)
-            CALL_CHILD(PTR(peach_evt_kusuri_select))
+            CALL_CHILD(peach_evt_kusuri_select)
             SET_VALUE(LSW(3), LW(0))
             SWITCH(LSW(3))
                 CASE_EQUAL(1)
@@ -617,7 +620,7 @@ EVT_BEGIN(peach_evt_kaihei3)
                 SET_VALUE(LSWF(4), 0)
             END_SWITCH
             IF_INT_GREATER(LSW(3), 0)
-                CALL(evt_item_entry, LW(0), LW(1), -10, 31, -107, 17, -1, 0)
+                CALL(evt_item_entry, LW(0), LW(1), -10, 31, -107, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
                 CALL(evt_pouch_check_item, LW(1), LW(2))
                 IF_INT_GREATER(LW(2), 0)
                     CALL(evt_pouch_remove_item, LW(1), LW(2))
@@ -626,10 +629,10 @@ EVT_BEGIN(peach_evt_kaihei3)
             SET_VALUE(LW(0), LSW(3))
             SUBTRACT(LW(0), 1)
             POKE_INT(LW(0), PTR(g_Kusuri3_No))
-            CALL_CHILD(PTR(peach_evt_check_all_kusuri_set))
+            CALL_CHILD(peach_evt_check_all_kusuri_set)
         ELSE
             SET_VALUE(LW(0), LSW(3))
-            CALL_CHILD(PTR(peach_evt_pick_kusuri))
+            CALL_CHILD(peach_evt_pick_kusuri)
             SET_VALUE(LSW(3), 0)
         END_IF
     ELSE
@@ -648,11 +651,11 @@ EVT_BEGIN(peach_evt_kaihei3)
         END_IF
         SET_VALUE(LW(0), STRING("S_mizu3"))
         SET_VALUE(LW(1), LSW(3))
-        CALL_CHILD(PTR(peach_evt_kusuri_dasu))
+        CALL_CHILD(peach_evt_kusuri_dasu)
         IF_INT_EQUAL(LF(0), 1)
             SET_VALUE(LW(0), STRING("hika3"))
             SET_VALUE(LW(1), STRING("kesu3"))
-            SPAWN_EVENT(PTR(peach_evt_seikai_evt))
+            SPAWN_EVENT(peach_evt_seikai_evt)
         END_IF
     END_IF
     CALL(evt_mario_key_onoff, 1)
@@ -665,7 +668,7 @@ EVT_BEGIN(peach_evt_kaihei4)
     CALL(evt_mario_key_onoff, 0)
     IF_INT_EQUAL(LSWF(6), 0)
         IF_INT_EQUAL(LSW(4), 0)
-            CALL_CHILD(PTR(peach_evt_kusuri_select))
+            CALL_CHILD(peach_evt_kusuri_select)
             SET_VALUE(LSW(4), LW(0))
             SWITCH(LSW(4))
                 CASE_EQUAL(1)
@@ -686,7 +689,7 @@ EVT_BEGIN(peach_evt_kaihei4)
                 SET_VALUE(LSWF(4), 0)
             END_SWITCH
             IF_INT_GREATER(LSW(4), 0)
-                CALL(evt_item_entry, LW(0), LW(1), 35, 31, -107, 17, -1, 0)
+                CALL(evt_item_entry, LW(0), LW(1), 35, 31, -107, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
                 CALL(evt_pouch_check_item, LW(1), LW(2))
                 IF_INT_GREATER(LW(2), 0)
                     CALL(evt_pouch_remove_item, LW(1), LW(2))
@@ -695,10 +698,10 @@ EVT_BEGIN(peach_evt_kaihei4)
             SET_VALUE(LW(0), LSW(4))
             SUBTRACT(LW(0), 1)
             POKE_INT(LW(0), PTR(g_Kusuri4_No))
-            CALL_CHILD(PTR(peach_evt_check_all_kusuri_set))
+            CALL_CHILD(peach_evt_check_all_kusuri_set)
         ELSE
             SET_VALUE(LW(0), LSW(4))
-            CALL_CHILD(PTR(peach_evt_pick_kusuri))
+            CALL_CHILD(peach_evt_pick_kusuri)
             SET_VALUE(LSW(4), 0)
         END_IF
     ELSE
@@ -717,11 +720,11 @@ EVT_BEGIN(peach_evt_kaihei4)
         END_IF
         SET_VALUE(LW(0), STRING("S_mizu4"))
         SET_VALUE(LW(1), LSW(4))
-        CALL_CHILD(PTR(peach_evt_kusuri_dasu))
+        CALL_CHILD(peach_evt_kusuri_dasu)
         IF_INT_EQUAL(LF(0), 1)
             SET_VALUE(LW(0), STRING("hika4"))
             SET_VALUE(LW(1), STRING("kesu4"))
-            SPAWN_EVENT(PTR(peach_evt_seikai_evt))
+            SPAWN_EVENT(peach_evt_seikai_evt)
         END_IF
     END_IF
     CALL(evt_mario_key_onoff, 1)
@@ -894,8 +897,8 @@ EVT_BEGIN(peach_evt_kusuri_nomu)
         CALL(evt_msg_print, 0, STRING("peach_aji_234"), 0, STRING("mario"))
         CALL(evt_msg_print, 0, STRING("peach_aji_235"), 0, 0)
         CALL(evt_msg_print, 0, STRING("peach_aji_236"), 0, STRING("mario"))
-        SPAWN_EVENT(PTR(peach_evt_sugata_modoru))
-        CALL_CHILD(PTR(peach_evt_kaihei_open_all))
+        SPAWN_EVENT(peach_evt_sugata_modoru)
+        CALL_CHILD(peach_evt_kaihei_open_all)
         CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui1"), 0, PTR(peach_evt_tyogo_entry), GW(5))
         CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui2"), 0, PTR(peach_evt_kaihei1), GW(6))
         CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui3"), 0, PTR(peach_evt_kaihei2), GW(7))
@@ -1017,7 +1020,7 @@ EVT_BEGIN(peach_evt_tyogo_sub)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_map_pauseanim, 0, STRING("yuka"))
     CALL(evt_snd_sfxoff, GW(3))
-    CALL_CHILD(PTR(peach_evt_wait_memo))
+    CALL_CHILD(peach_evt_wait_memo)
     CALL(evt_msg_print, 0, STRING("peach_aji_230"), 0, 0)
     SET_VALUE(LW(0), STRING("S_pato2"))
     SPAWN_EVENT_GET_ID(PTR(peach_evt_pato_on), GW(0))
@@ -1102,8 +1105,8 @@ EVT_BEGIN(peach_evt_tyogo_sub)
     CALL(evt_snd_sfxoff, GW(3))
     DELETE_EVENT(GW(0))
     SET_VALUE(LW(0), STRING("S_pato2"))
-    CALL_CHILD(PTR(peach_evt_pato_off))
-    CALL_CHILD(PTR(peach_evt_wait_memo))
+    CALL_CHILD(peach_evt_pato_off)
+    CALL_CHILD(peach_evt_wait_memo)
     CALL(evt_msg_print, 0, STRING("peach_aji_230_01"), 0, 0)
     SET_VALUE(LW(0), STRING("S_pato3"))
     SPAWN_EVENT_GET_ID(PTR(peach_evt_pato_on), GW(0))
@@ -1134,7 +1137,7 @@ EVT_BEGIN(peach_evt_tyogo_sub)
     WAIT_MS(LW(3))
     DELETE_EVENT(GW(0))
     SET_VALUE(LW(0), STRING("S_pato3"))
-    CALL_CHILD(PTR(peach_evt_pato_off))
+    CALL_CHILD(peach_evt_pato_off)
     IF_INT_GREATER(LW(1), 25000)
         IF_INT_LESS(LW(1), 35000)
             DEBUG_PUT_MSG(STRING("ほどよい　かねつじかん"))
@@ -1176,10 +1179,10 @@ EVT_BEGIN(peach_evt_tyogo)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_PEACH_ELEVATOR_ACCESS1"), LW(0), LW(1), LW(2), 0)
-    CALL_CHILD(PTR(peach_evt_kaihei_close_all))
+    CALL_CHILD(peach_evt_kaihei_close_all)
     DELETE_EVENT(GW(0))
     SET_VALUE(LW(0), STRING("S_pato1"))
-    CALL_CHILD(PTR(peach_evt_pato_off))
+    CALL_CHILD(peach_evt_pato_off)
     SET_VALUE(LSWF(6), 1)
     CALL(evt_mapobj_get_position, STRING("S_sui_1"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_PEACH_MACHINE_SWITCH1"), LW(0), LW(1), LW(2), 0)
@@ -1249,7 +1252,7 @@ EVT_BEGIN(peach_evt_tyogo)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(5)
     END_IF
-    CALL_CHILD(PTR(peach_evt_tyogo_sub))
+    CALL_CHILD(peach_evt_tyogo_sub)
     CALL(evt_sub_intpl_msec_init, 0, -152, -42, 3300)
     LABEL(12)
     CALL(evt_sub_intpl_msec_get_value)
@@ -1300,7 +1303,7 @@ EVT_BEGIN(peach_evt_tyogo)
     CALL(evt_map_pauseanim, 0, STRING("yuka"))
     CALL(evt_snd_sfxoff, GW(3))
     DELETE_EVENT(GW(1))
-    SPAWN_EVENT(PTR(peach_evt_hari_off))
+    SPAWN_EVENT(peach_evt_hari_off)
     SET_VALUE(LSWF(6), 0)
     IF_INT_EQUAL(GW(13), 9)
         SET_VALUE(LSWF(9), 1)
@@ -1308,7 +1311,7 @@ EVT_BEGIN(peach_evt_tyogo)
         SET_VALUE(LSWF(9), 0)
     END_IF
     CALL(evt_mario_key_onoff, 0)
-    CALL_CHILD(PTR(peach_evt_wait_memo))
+    CALL_CHILD(peach_evt_wait_memo)
     CALL(evt_msg_print, 0, STRING("peach_aji_231"), 0, 0)
     CALL(evt_msg_select, 0, STRING("peach_aji_227_sel"))
     IF_INT_EQUAL(LW(0), 0)
@@ -1327,7 +1330,7 @@ EVT_BEGIN(peach_evt_tyogo)
         CALL(evt_mapobj_trans, 0, STRING("S_bika"), 0, -100, 0)
         SET_VALUE(LSWF(10), 0)
         DELETE_EVENT(GW(2))
-        CALL_CHILD(PTR(peach_evt_kaihei_open_all))
+        CALL_CHILD(peach_evt_kaihei_open_all)
         CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui1"), 0, PTR(peach_evt_tyogo_entry), GW(5))
         SET_VALUE(LW(0), STRING("S_pato1"))
         SPAWN_EVENT_GET_ID(PTR(peach_evt_pato_on), GW(0))
@@ -1337,7 +1340,7 @@ EVT_BEGIN(peach_evt_tyogo)
 EVT_END()
 
 EVT_BEGIN(peach_evt_tyogo_entry)
-    SPAWN_EVENT(PTR(peach_evt_tyogo))
+    SPAWN_EVENT(peach_evt_tyogo)
     CALL(evt_exit_case_evt)
     RETURN
 EVT_END()
@@ -1436,16 +1439,16 @@ static EVT_BEGIN(peach_evt_stg5)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_dami"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_get_position, STRING("S_dami1"), LW(0), LW(1), LW(2))
     SUBTRACT(LW(1), 3)
-    CALL(evt_item_entry, STRING("kusuri_aka"), ITEM_RED_POTION, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("kusuri_aka"), ITEM_RED_POTION, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_mapobj_get_position, STRING("S_dami2"), LW(0), LW(1), LW(2))
     SUBTRACT(LW(1), 3)
-    CALL(evt_item_entry, STRING("kusuri_ao"), ITEM_BLUE_POTION, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("kusuri_ao"), ITEM_BLUE_POTION, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_mapobj_get_position, STRING("S_dami3"), LW(0), LW(1), LW(2))
     SUBTRACT(LW(1), 3)
-    CALL(evt_item_entry, STRING("kusuri_ki"), ITEM_ORANGE_POTION, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("kusuri_ki"), ITEM_ORANGE_POTION, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_mapobj_get_position, STRING("S_dami4"), LW(0), LW(1), LW(2))
     SUBTRACT(LW(1), 3)
-    CALL(evt_item_entry, STRING("kusuri_mid"), ITEM_GREEN_POTION, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("kusuri_mid"), ITEM_GREEN_POTION, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_kusuri1"), 0, PTR(peach_evt_kusuri_aka), 0)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_kusuri2"), 0, PTR(peach_evt_kusuri_ao), 0)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_kusuri3"), 0, PTR(peach_evt_kusuri_ki), 0)
@@ -1480,10 +1483,10 @@ static EVT_BEGIN(peach_evt_stg5)
     CALL(evt_bero_exec_wait, 65536)
     CALL(evt_mario_adjust_dir)
     SET_VALUE(LW(0), STRING("s_bero"))
-    CALL_CHILD(PTR(bero_case_switch_off))
+    CALL_CHILD(bero_case_switch_off)
     CALL(evt_bero_overwrite, STRING("s_bero"), PTR(bero_peach_data))
     SET_VALUE(LW(0), STRING("s_bero"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     WAIT_MS(1000)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_msg_print, 0, STRING("peach_aji_221"), 0, 0)
@@ -1509,7 +1512,7 @@ static EVT_BEGIN(peach_evt_stg5)
     CALL(evt_msg_print, 0, STRING("peach_aji_224"), 0, STRING("mario"))
     CALL(evt_msg_print, 0, STRING("peach_aji_225"), 0, 0)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_COOKING1"))
-    CALL_CHILD(PTR(peach_evt_kaihei_open_all))
+    CALL_CHILD(peach_evt_kaihei_open_all)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -1560,7 +1563,7 @@ EVT_BEGIN(peach_evt_tadashii_kusuri)
     CALL(evt_msg_print, 0, STRING("peach_aji_257"), 0, STRING("mario"))
     CALL(evt_msg_print, 0, STRING("peach_aji_258"), 0, 0)
     SET_VALUE(GSWF(GSWF_AJI06_PEACH5_RIGHT_POTION), 1)
-    CALL_CHILD(PTR(peach_evt_kaihei_close_all))
+    CALL_CHILD(peach_evt_kaihei_close_all)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_exit_case_evt)
     RETURN
@@ -1572,11 +1575,11 @@ EVT_BEGIN(peach_evt_door)
         CALL(evt_msg_print, 0, STRING("peach_aji_255_01"), 0, 0)
     ELSE
         SET_VALUE(LW(1), 0)
-        SPAWN_EVENT(PTR(bero_open_door_play_se))
+        SPAWN_EVENT(bero_open_door_play_se)
         CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
-            CALL_CHILD(PTR(s_door_open))
+            CALL_CHILD(s_door_open)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
@@ -1598,10 +1601,10 @@ EVT_END()
 static EVT_BEGIN(peach_evt_stg5_1)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_dami"), MAPOBJ_FLAG_HIDE)
-    CALL(evt_item_entry, STRING("kusuri_aka"), ITEM_RED_POTION, -110, 31, -107, 17, -1, 0)
-    CALL(evt_item_entry, STRING("kusuri_ao"), ITEM_BLUE_POTION, -65, 31, -107, 17, -1, 0)
-    CALL(evt_item_entry, STRING("kusuri_ki"), ITEM_ORANGE_POTION, -10, 31, -107, 17, -1, 0)
-    CALL(evt_item_entry, STRING("kusuri_mid"), ITEM_GREEN_POTION, 35, 31, -107, 17, -1, 0)
+    CALL(evt_item_entry, STRING("kusuri_aka"), ITEM_RED_POTION, -110, 31, -107, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
+    CALL(evt_item_entry, STRING("kusuri_ao"), ITEM_BLUE_POTION, -65, 31, -107, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
+    CALL(evt_item_entry, STRING("kusuri_ki"), ITEM_ORANGE_POTION, -10, 31, -107, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
+    CALL(evt_item_entry, STRING("kusuri_mid"), ITEM_GREEN_POTION, 35, 31, -107, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui2"), 0, PTR(peach_evt_matigai_kusuri), LW(0))
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui3"), 0, PTR(peach_evt_matigai_kusuri), LW(1))
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui4"), 0, PTR(peach_evt_matigai_kusuri), LW(2))
@@ -1617,7 +1620,7 @@ static EVT_BEGIN(peach_evt_stg5_1)
     CALL(evt_seq_wait, 2)
     CALL(evt_bero_exec_wait, 65536)
     SET_VALUE(LW(0), STRING("s_bero"))
-    CALL_CHILD(PTR(bero_case_switch_off))
+    CALL_CHILD(bero_case_switch_off)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("s_bero"), 0, PTR(peach_evt_door), 0)
     CALL(evt_msg_print, 0, STRING("peach_aji_251"), 0, 0)
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_3"), STRING("P_T_3"))
@@ -1703,10 +1706,12 @@ EVT_BEGIN(aji_06_init_evt)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI2"))
     END_IF
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 1)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("tenjo"))
         CALL(evt_cam_letter_box_disable, 1)
@@ -1741,8 +1746,8 @@ EVT_BEGIN(aji_06_init_evt)
             CALL(evt_cam_letter_box_disable, 0)
         END_INLINE_EVENT
     END_IF
-    SPAWN_EVENT(PTR(evt_emergency))
-    SPAWN_EVENT(PTR(kikai_init))
+    SPAWN_EVENT(evt_emergency)
+    SPAWN_EVENT(kikai_init)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_20_LORD_CRUMP_DEFEATED)
         CALL(evt_npc_check_delete, STRING("軍団ザコ魔法使い"))
     END_IF
@@ -1750,7 +1755,7 @@ EVT_BEGIN(aji_06_init_evt)
         CALL(evt_mario_set_mode, 1)
         CALL(evt_mario_kill_party, 0)
         CALL(evt_npc_check_delete, STRING("軍団ザコ魔法使い"))
-        SPAWN_EVENT(PTR(peach_evt_stg5))
+        SPAWN_EVENT(peach_evt_stg5)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_45_PEACH_POTION_PUZZLE)
         CALL(evt_mario_set_mode, 1)
@@ -1763,7 +1768,7 @@ EVT_BEGIN(aji_06_init_evt)
         CALL(evt_mario_kill_party, 0)
         CALL(peach_evt_toumei_onoff, 1)
         CALL(evt_npc_check_delete, STRING("軍団ザコ魔法使い"))
-        SPAWN_EVENT(PTR(peach_evt_stg5_1))
+        SPAWN_EVENT(peach_evt_stg5_1)
     END_IF
     CALL(evt_mario_get_mode, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -1781,7 +1786,7 @@ EVT_BEGIN(aji_06_init_evt)
     RETURN
 EVT_END()
 
-USER_FUNC(yuka_anim_reverse_end) {
+static USER_FUNC(yuka_anim_reverse_end) {
     yuka_anim.flags |= 2;
     return EVT_RETURN_DONE;
 }
@@ -1796,7 +1801,7 @@ static USER_FUNC(yuka_anim_reverse_replay) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(yuka_anim_reverse_play) {
+static USER_FUNC(yuka_anim_reverse_play) {
     f32 frame;
 
     if (isFirstCall) {
@@ -1825,12 +1830,12 @@ USER_FUNC(yuka_anim_reverse_play) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(peach_chg_pose) {
+static USER_FUNC(peach_chg_pose) {
     marioChgPose((const char*)evtGetValue(event, event->args[0]));
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(peach_evt_toumei_onoff) {
+static USER_FUNC(peach_evt_toumei_onoff) {
     EvtWord* args = event->args;
     MarioWork* mario = marioGetPtr();
 
@@ -1846,7 +1851,7 @@ USER_FUNC(peach_evt_toumei_onoff) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(peach_set_scale) {
+static USER_FUNC(peach_set_scale) {
     f32 scale = evtGetFloat(event, event->args[0]);
     MarioWork* mario = marioGetPtr();
 
@@ -1858,7 +1863,7 @@ USER_FUNC(peach_set_scale) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(peach_evt_seikai_check) {
+static USER_FUNC(peach_evt_seikai_check) {
     EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     s32 v = evtGetValue(event, args[1]);
@@ -1871,7 +1876,7 @@ USER_FUNC(peach_evt_seikai_check) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(kusuri_list_get_no) {
+static USER_FUNC(kusuri_list_get_no) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 i;
@@ -1882,7 +1887,7 @@ USER_FUNC(kusuri_list_get_no) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(kusuri_list_add) {
+static USER_FUNC(kusuri_list_add) {
     s32 no = evtGetValue(event, event->args[0]);
     s32 i;
 
@@ -1892,7 +1897,7 @@ USER_FUNC(kusuri_list_add) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(kusuri_list_init) {
+static USER_FUNC(kusuri_list_init) {
     s32 i;
 
     for (i = 0; i < 5; i++) {
@@ -1901,7 +1906,7 @@ USER_FUNC(kusuri_list_init) {
     return EVT_RETURN_DONE;
 }
 
-void kusuri_4_color_tev(MapTevCallbackInfo* info) {
+static void kusuri_4_color_tev(MapTevCallbackInfo* info) {
     GXTevStageID stage = info->tevStage;
 
     GXSetTevOrder(stage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
@@ -1913,7 +1918,7 @@ void kusuri_4_color_tev(MapTevCallbackInfo* info) {
     info->tevStage++;
 }
 
-void kusuri_3_color_tev(MapTevCallbackInfo* info) {
+static void kusuri_3_color_tev(MapTevCallbackInfo* info) {
     GXTevStageID stage = info->tevStage;
 
     GXSetTevOrder(stage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
@@ -1925,7 +1930,7 @@ void kusuri_3_color_tev(MapTevCallbackInfo* info) {
     info->tevStage++;
 }
 
-void kusuri_2_color_tev(MapTevCallbackInfo* info) {
+static void kusuri_2_color_tev(MapTevCallbackInfo* info) {
     GXTevStageID stage = info->tevStage;
 
     GXSetTevOrder(stage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
@@ -1937,7 +1942,7 @@ void kusuri_2_color_tev(MapTevCallbackInfo* info) {
     info->tevStage++;
 }
 
-void kusuri_1_color_tev(MapTevCallbackInfo* info) {
+static void kusuri_1_color_tev(MapTevCallbackInfo* info) {
     GXTevStageID stage = info->tevStage;
 
     GXSetTevOrder(stage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
@@ -1949,7 +1954,7 @@ void kusuri_1_color_tev(MapTevCallbackInfo* info) {
     info->tevStage++;
 }
 
-void kusuri_naka_color_tev(MapTevCallbackInfo* info) {
+static void kusuri_naka_color_tev(MapTevCallbackInfo* info) {
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
     GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
@@ -1961,7 +1966,7 @@ void kusuri_naka_color_tev(MapTevCallbackInfo* info) {
     info->texCoord = 0;
 }
 
-USER_FUNC(kusuri_color_get) {
+static USER_FUNC(kusuri_color_get) {
     EvtWord* args = event->args;
 
     evtSetValue(event, args[0], KUSURI_COL.r);
@@ -1970,7 +1975,7 @@ USER_FUNC(kusuri_color_get) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(kusuri_color_set_rgb) {
+static USER_FUNC(kusuri_color_set_rgb) {
     EvtWord* args = event->args;
     s32 r = evtGetValue(event, args[0]);
     s32 g = evtGetValue(event, args[1]);
@@ -1982,7 +1987,7 @@ USER_FUNC(kusuri_color_set_rgb) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(kusuri_color_set) {
+static USER_FUNC(kusuri_color_set) {
     EvtWord* args = event->args;
     s32 no = evtGetValue(event, args[0]);
     s32 frames = evtGetValue(event, args[1]);
@@ -2039,7 +2044,7 @@ USER_FUNC(kusuri_color_set) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(kusuri_color_init) {
+static USER_FUNC(kusuri_color_init) {
     KUSURI_COL.r = 0;
     KUSURI_COL.g = 0;
     KUSURI_COL.b = 0;

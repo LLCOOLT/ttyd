@@ -6,6 +6,9 @@
 #include "memory.h"
 #include <dolphin/mtx.h>
 
+static void effLasMonDisp(CameraId cameraId, EffectEntry* effect);
+static void effLasMonMain(EffectEntry* effect);
+
 typedef struct EffLasMonWork {
     s32 type;     // 0x0
     Vec position; // 0x4
@@ -39,7 +42,7 @@ EffectEntry* effLasMonEntry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effLasMonMain(EffectEntry* effect) {
+static void effLasMonMain(EffectEntry* effect) {
     EffLasMonWork* work = effect->userdata;
     Vec position;
     BOOL inBattle;
@@ -87,7 +90,7 @@ void effLasMonMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effLasMonDisp, effect);
 }
 
-void effLasMonDisp(CameraId cameraId, EffectEntry* effect) {
+static void effLasMonDisp(CameraId cameraId, EffectEntry* effect) {
     EffLasMonWork* work = effect->userdata;
     Mtx mtx;
     Mtx scale;

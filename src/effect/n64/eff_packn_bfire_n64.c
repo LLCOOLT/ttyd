@@ -32,8 +32,8 @@ typedef struct EffPacknBfireWork {
     f32 drot;        // 0x78
 } EffPacknBfireWork;
 
-void effPacknBfireMain(EffectEntry* effect);
-void effPacknBfireDisp(CameraId cameraId, EffectEntry* effect);
+static void effPacknBfireMain(EffectEntry* effect);
+static void effPacknBfireDisp(CameraId cameraId, EffectEntry* effect);
 
 static effN64Vtx size64x64_tex32x32_vtx[] = {
     {-32, -32, 0, 0, 0, 0, 0, 0, 255},
@@ -131,7 +131,7 @@ EffectEntry* effPacknBfireN64Entry(s32 type, s32 frames, s32 life, f32 x, f32 y,
     return effect;
 }
 
-void effPacknBfireMain(EffectEntry* effect) {
+static void effPacknBfireMain(EffectEntry* effect) {
     EffPacknBfireWork* work;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -201,7 +201,7 @@ void effPacknBfireMain(EffectEntry* effect) {
     }
 }
 
-void effPacknBfireDisp(CameraId cameraId, EffectEntry* effect) {
+static void effPacknBfireDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffPacknBfireWork* work;
     GXTexObj texObj;

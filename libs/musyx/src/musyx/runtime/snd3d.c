@@ -24,7 +24,6 @@
 S3D_DEFINE_SQRT(sqrtf)
 
 static u8 s3dCallCnt;
-u8 gap_08_80418DD9_sbss[7];
 static SND_EMITTER* s3dEmitterRoot;
 static SND_LISTENER* s3dListenerRoot;
 #ifdef SND3D_UNUSED /* dead-stripped from this game build */

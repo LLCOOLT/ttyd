@@ -23,7 +23,6 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_cam.h"
 #include "evt/evt_eff.h"
-#include "party/party_motion.h"
 #include "battle/battle_database_common.h"
 #include "eff/n64/eff_glass_n64.h"
 #include "eff/n64/eff_pokopi_thunder_n64.h"
@@ -42,21 +41,23 @@ static s32 xlw[16];
 s32 xlw2[16];
 char xmemo[20];
 EventEntry* xevt;
-void _light_point_callback(BattleUnitPart* part, s32 group);
+static void _light_point_callback(BattleUnitPart* part, s32 group);
 
 static USER_FUNC(_set_draw_callback);
-USER_FUNC(btl_hitoffsetx);
-USER_FUNC(btlevtcmd_AnimeGetPose);
-USER_FUNC(datastrcopy);
+static USER_FUNC(btl_hitoffsetx);
+static USER_FUNC(btlevtcmd_AnimeGetPose);
+static USER_FUNC(datastrcopy);
 static USER_FUNC(enzan_lw_load);
-USER_FUNC(enzan_lw_load2);
+static USER_FUNC(enzan_lw_load2);
 static USER_FUNC(enzan_lw_save);
-USER_FUNC(enzan_lw_save2);
-USER_FUNC(pose_check_evt_run);
-USER_FUNC(pose_check_evt_stop);
+static USER_FUNC(enzan_lw_save2);
+static USER_FUNC(pose_check_evt_run);
+static USER_FUNC(pose_check_evt_stop);
+#if VERSION >= VERSION_JP
 USER_FUNC(_hp_gauge_flag_on);
-USER_FUNC(battenSatelliteToOutside);
-USER_FUNC(battenSatelliteToInside);
+#endif
+static USER_FUNC(battenSatelliteToOutside);
+static USER_FUNC(battenSatelliteToInside);
 
 BattleWeapon weapon_batten_leader_thunder;
 BattleWeapon weapon_batten_leader_fire;
@@ -125,7 +126,11 @@ static EvtWord damage_event[47];
 extern EvtWord damage_sub_event[];
 static EvtWord phase_event[28];
 extern EvtWord monster_before_phase_event[];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord dead_event[126];
+#else
 static EvtWord dead_event[165];
+#endif
 static Vec splineTableIn1_1[5];
 static Vec splineTableIn2_1[5];
 static Vec splineTableIn2_2[5];
@@ -155,7 +160,11 @@ extern EvtWord batten_leader_ice_attack_event[];
 extern EvtWord batten_leader_shikaeshi_attack_event[];
 extern EvtWord batten_leader_yokeyoke_attack_event[];
 extern EvtWord batten_leader_stop_attack_event[];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord wait_event[15];
+#else
 static EvtWord wait_event[16];
+#endif
 
 EVT_BEGIN(batten_leader_zoom)
     CALL(evt_btl_camera_set_mode, 0, 3)
@@ -449,7 +458,11 @@ BattleUnitKind unit_boss_batten_leader = {
     68,
     66,
     7,
+#if VERSION <= VERSION_DEMO_US
+    68,
+#else
     70,
+#endif
     0.0f,
     33.0f,
     0.0f,
@@ -504,7 +517,11 @@ static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 BattleUnitDefenseAttr defence_attr_muteki = {{2, 2, 2, 2, 2}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {30, 30, 30, 100, 30, 100, 100, 30, 100, 50, 100, 50, 100, 30, 30, 0, 0, 100, 30, 100, 100, 1};
+#else
 static StatusVulnerability regist = {30, 30, 30, 100, 30, 100, 100, 30, 100, 60, 100, 60, 100, 75, 30, 0, 0, 100, 30, 100, 100, 1};
+#endif
 
 u8 defencecopy[8] __attribute__((aligned(4))) = { // defenses[5] copied into the part defense, padded to 8
     1, 1, 1, 1, 1, 0, 0, 0,
@@ -527,8 +544,8 @@ static PoseTableEntry pose_table[] = {
     {40, "W_1"},
     {56, "X_1"},
     {57, "X_1"},
-    {65, "T_1"},
-    {69, "S_1"},
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static PoseTableEntry pose_table_furafura[] = {
@@ -548,24 +565,28 @@ static PoseTableEntry pose_table_furafura[] = {
     {40, "W_1"},
     {56, "X_1"},
     {57, "X_1"},
-    {65, "T_3"},
-    {69, "X_1"},
+    {BTL_POSE_TALK, "T_3"},
+    {BTL_POSE_STAY_DEFAULT, "X_1"},
 };
 
 static BattleDataEntry data_table[] = {
     {9, damage_sub_event},
+#if VERSION <= VERSION_DEMO_US
+    {50, dead_event},
+#else
     {49, dead_event},
+#endif
     {0, NULL},
 };
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_batten_leader", "c_shuryo", 0.0f, 0.0f, 0.0f, 0.0f, 56.0f, 0.0f, -6.0f, 55.0f, 0.0f, 53, 69, 255, &defence, &defence_attr, 0x9, 0, pose_table},
     {2, "btl_un_batten_leader", "c_shuryo", 0.0f, 0.0f, 0.0f, 18.0f, 9.0f, 0.0f, 16.0f, 15.0f, 0.0f, 64, 36, 255, &defence, &defence_attr, 0x80800000, 0, NULL},
-    {3, /*"電源ランプ"*/"\x93\x64\x8C\xB9\x83\x89\x83\x93\x83\x76", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x2010000, 0, pose_table},
-    {4, /*"頭のランプ１"*/"\x93\xAA\x82\xCC\x83\x89\x83\x93\x83\x76\x82\x50", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x2010000, 0, pose_table},
-    {5, /*"頭のランプ２"*/"\x93\xAA\x82\xCC\x83\x89\x83\x93\x83\x76\x82\x51", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x2010000, 0, pose_table},
-    {6, /*"頭のランプ３"*/"\x93\xAA\x82\xCC\x83\x89\x83\x93\x83\x76\x82\x52", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x2010000, 0, pose_table},
-    {7, /*"杖のランプ１"*/"\x8F\xF1\x82\xCC\x83\x89\x83\x93\x83\x76\x82\x50", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x2010000, 0, pose_table},
+    {3, "電源ランプ", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x2010000, 0, pose_table},
+    {4, "頭のランプ１", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x2010000, 0, pose_table},
+    {5, "頭のランプ２", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x2010000, 0, pose_table},
+    {6, "頭のランプ３", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x2010000, 0, pose_table},
+    {7, "杖のランプ１", "c_shuryo", 0.0f, 80.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 15, 15, 255, &defence, &defence_attr, 0x2010000, 0, pose_table},
 };
 
 EVT_BEGIN(hakai_snd_event)
@@ -1314,7 +1335,7 @@ EVT_BEGIN(maiframeanimcheck)
         CALL(btlevtcmd_AnimeGetPose, BTL_UNIT_SELF, 1, LW(1))
         IF_STR_NOT_EQUAL(LW(0), LW(1))
             CALL(datastrcopy, LW(1))
-            CALL_CHILD(PTR(light_pose_change))
+            CALL_CHILD(light_pose_change)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
@@ -1387,7 +1408,7 @@ static EVT_BEGIN(entry_event)
     SET_VALUE(LW(0), 0)
     SET_VALUE(LW(6), 4)
     CALL_CHILD(sub_call_satellite)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     CALL(check_satellite)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -1397,7 +1418,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SWITCH(LW(0))
@@ -1416,10 +1437,12 @@ static EVT_BEGIN(damage_event)
 EVT_END()
 
 EVT_BEGIN(damage_sub_event)
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_CheckDamageCode, LW(10), 256, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(_hp_gauge_flag_on, LW(10))
     END_IF
+#endif
     CALL(btlevtcmd_GetDamage, LW(10), LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetHitPos, LW(10), LW(11), LW(0), LW(1), LW(2))
@@ -1469,12 +1492,12 @@ EVT_END()
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(player_before_phase_event))
+        CALL_CHILD(player_before_phase_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(monster_before_phase_event))
+        CALL_CHILD(monster_before_phase_event)
         GOTO(99)
     END_IF
     LABEL(99)
@@ -1498,7 +1521,7 @@ EVT_BEGIN(monster_before_phase_event)
             CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_SELF)
             CALL(btlevtcmd_StatusWindowOnOff, 0)
             SET_VALUE(LW(0), 1)
-            CALL_CHILD(PTR(batten_leader_zoom))
+            CALL_CHILD(batten_leader_zoom)
             CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("E_1"))
             WAIT_MS(1000)
             CALL(evt_msg_print, 2, STRING("stg8_las_66"), 0, BTL_UNIT_SELF)
@@ -1516,7 +1539,7 @@ EVT_BEGIN(monster_before_phase_event)
             CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_SELF)
             CALL(btlevtcmd_StatusWindowOnOff, 0)
             SET_VALUE(LW(0), 1)
-            CALL_CHILD(PTR(batten_leader_zoom))
+            CALL_CHILD(batten_leader_zoom)
             CALL(evt_msg_print, 2, STRING("stg8_las_67"), 0, BTL_UNIT_SELF)
             WAIT_MS(300)
             CALL(btlevtcmd_StatusWindowOnOff, 1)
@@ -1533,8 +1556,8 @@ EVT_BEGIN(monster_before_phase_event)
             CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_furafura))
             CALL(btlevtcmd_StatusWindowOnOff, 0)
             SET_VALUE(LW(0), 1)
-            CALL_CHILD(PTR(batten_leader_zoom))
-            CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, 65)
+            CALL_CHILD(batten_leader_zoom)
+            CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
             CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 43)
             CALL(evt_msg_print, 2, STRING("stg8_las_68"), 0, BTL_UNIT_SELF)
             WAIT_MS(300)
@@ -1551,23 +1574,31 @@ static EVT_BEGIN(dead_event)
     SET_VALUE(LW(0), 9)
     LOOP(4)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(0), LW(1))
+#if VERSION >= VERSION_JP
         CALL(btlevtcmd_GetUnitId, LW(1), LW(1))
+#endif
         IF_INT_NOT_EQUAL(LW(1), -1)
+#if VERSION <= VERSION_DEMO_US
+            CALL(btlevtcmd_KillUnit, LW(1), 1)
+#else
             CALL(btlevtcmd_CheckDamageCode, LW(1), 512, LW(2))
             IF_INT_EQUAL(LW(2), 0)
                 SET_VALUE(LW(10), LW(1))
                 BEGIN_INLINE_EVENT
-                    CALL_CHILD(PTR(subsetevt_dead_core))
+                    CALL_CHILD(subsetevt_dead_core)
                     CALL(btlevtcmd_GetBodyId, LW(10), LW(11))
                     CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(11), 16777216)
                     CALL(btlevtcmd_OnPartsAttribute, LW(10), LW(11), 33554432)
                 END_INLINE_EVENT
                 WAIT_MS(200)
             END_IF
+#endif
         END_IF
         ADD(LW(0), 1)
     END_LOOP
+#if VERSION >= VERSION_JP
     WAIT_MS(1000)
+#endif
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     CALL(pose_check_evt_stop)
     CALL(enzan_lw_save)
@@ -1598,8 +1629,10 @@ static EVT_BEGIN(dead_event)
     DELETE_EVENT(LW(0))
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
     DELETE_EVENT(LW(0))
+#if VERSION >= VERSION_JP
     SET_VALUE(LW(10), -2)
-    CALL_CHILD(PTR(subsetevt_dead_core_nospin_norotate))
+    CALL_CHILD(subsetevt_dead_core_nospin_norotate)
+#endif
     RETURN
 EVT_END()
 
@@ -1891,7 +1924,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_get_turn, LW(0))
     IF_INT_LESS_OR_EQUAL(LW(0), 1)
         SET_VALUE(LW(9), PTR(&weapon_batten_leader_thunder))
-        CALL_CHILD(PTR(batten_leader_thunder_attack_event))
+        CALL_CHILD(batten_leader_thunder_attack_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(2))
@@ -1900,44 +1933,44 @@ static EVT_BEGIN(attack_event)
         SWITCH(LW(0))
             CASE_EQUAL(0)
             SET_VALUE(LW(9), PTR(&weapon_batten_leader_thunder))
-            CALL_CHILD(PTR(batten_leader_thunder_attack_event))
+            CALL_CHILD(batten_leader_thunder_attack_event)
             CASE_EQUAL(1)
             SET_VALUE(LW(9), PTR(&weapon_batten_leader_fire))
-            CALL_CHILD(PTR(batten_leader_fire_attack_event))
+            CALL_CHILD(batten_leader_fire_attack_event)
             CASE_EQUAL(2)
             SET_VALUE(LW(9), PTR(&weapon_batten_leader_ice))
-            CALL_CHILD(PTR(batten_leader_ice_attack_event))
+            CALL_CHILD(batten_leader_ice_attack_event)
             CASE_EQUAL(3)
             SET_VALUE(LW(9), PTR(&weapon_batten_leader_shikaeshi))
-            CALL_CHILD(PTR(batten_leader_shikaeshi_attack_event))
+            CALL_CHILD(batten_leader_shikaeshi_attack_event)
             CASE_EQUAL(4)
             SET_VALUE(LW(9), PTR(&weapon_batten_leader_yokeyoke))
-            CALL_CHILD(PTR(batten_leader_yokeyoke_attack_event))
+            CALL_CHILD(batten_leader_yokeyoke_attack_event)
             CASE_EQUAL(5)
             SET_VALUE(LW(9), PTR(&weapon_batten_leader_stop))
-            CALL_CHILD(PTR(batten_leader_stop_attack_event))
+            CALL_CHILD(batten_leader_stop_attack_event)
         END_SWITCH
     ELSE
         CALL(btlevtcmd_DrawLots, LW(0), 6, 60, 40, 30, 20, 20, 20)
         SWITCH(LW(0))
             CASE_EQUAL(0)
             SET_VALUE(LW(9), PTR(&weapon_batten_leader_thunder))
-            CALL_CHILD(PTR(batten_leader_thunder_attack_event))
+            CALL_CHILD(batten_leader_thunder_attack_event)
             CASE_EQUAL(1)
             SET_VALUE(LW(9), PTR(&weapon_batten_leader_fire))
-            CALL_CHILD(PTR(batten_leader_fire_attack_event))
+            CALL_CHILD(batten_leader_fire_attack_event)
             CASE_EQUAL(2)
             SET_VALUE(LW(9), PTR(&weapon_batten_leader_ice))
-            CALL_CHILD(PTR(batten_leader_ice_attack_event))
+            CALL_CHILD(batten_leader_ice_attack_event)
             CASE_EQUAL(3)
             SET_VALUE(LW(9), PTR(&weapon_batten_leader_shikaeshi))
-            CALL_CHILD(PTR(batten_leader_shikaeshi_attack_event))
+            CALL_CHILD(batten_leader_shikaeshi_attack_event)
             CASE_EQUAL(4)
             SET_VALUE(LW(9), PTR(&weapon_batten_leader_yokeyoke))
-            CALL_CHILD(PTR(batten_leader_yokeyoke_attack_event))
+            CALL_CHILD(batten_leader_yokeyoke_attack_event)
             CASE_EQUAL(5)
             SET_VALUE(LW(9), PTR(&weapon_batten_leader_stop))
-            CALL_CHILD(PTR(batten_leader_stop_attack_event))
+            CALL_CHILD(batten_leader_stop_attack_event)
         END_SWITCH
     END_IF
     LABEL(99)
@@ -2263,13 +2296,13 @@ EVT_BEGIN(batten_leader_ice_attack_event)
         CASE_END
     END_SWITCH
     LABEL(90)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     WAIT_MS(300)
     GOTO(98)
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     LABEL(98)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     RETURN
@@ -2478,9 +2511,13 @@ static EVT_BEGIN(wait_event)
         CALL(check_satellite)
     END_LOOP
     RETURN
+#if VERSION <= VERSION_DEMO_US
+EVT_END()
+#else
 EVT_END_PAD()
+#endif
 
-USER_FUNC(btlevtcmd_AnimeGetPose) {
+static USER_FUNC(btlevtcmd_AnimeGetPose) {
     s32 id;
     EvtWord* args = event->args;
     s32 partNo;
@@ -2510,7 +2547,7 @@ static USER_FUNC(enzan_lw_load) {
     }
     return EVT_RETURN_DONE;
 }
-USER_FUNC(enzan_lw_save2) {
+static USER_FUNC(enzan_lw_save2) {
     s32 i;
 
     for (i = 0; i < 16; i++) {
@@ -2518,7 +2555,7 @@ USER_FUNC(enzan_lw_save2) {
     }
     return EVT_RETURN_DONE;
 }
-USER_FUNC(enzan_lw_load2) {
+static USER_FUNC(enzan_lw_load2) {
     s32 i;
 
     for (i = 0; i < 16; i++) {
@@ -2526,7 +2563,7 @@ USER_FUNC(enzan_lw_load2) {
     }
     return EVT_RETURN_DONE;
 }
-USER_FUNC(datastrcopy) {
+static USER_FUNC(datastrcopy) {
     s8* s = (s8*)evtGetValue(event, event->args[0]);
     s32 i;
 
@@ -2536,7 +2573,7 @@ USER_FUNC(datastrcopy) {
     xmemo[i] = 0;
     return EVT_RETURN_DONE;
 }
-USER_FUNC(pose_check_evt_run) {
+static USER_FUNC(pose_check_evt_run) {
     xevt = evtEntryType(maiframeanimcheck, event->priority, 0, event->type);
     xevt->unitId = event->unitId;
     xevt->ownerNPC = event->ownerNPC;
@@ -2546,11 +2583,11 @@ USER_FUNC(pose_check_evt_run) {
     xevt->ufBase = event->ufBase;
     return EVT_RETURN_DONE;
 }
-USER_FUNC(pose_check_evt_stop) {
+static USER_FUNC(pose_check_evt_stop) {
     evtDeleteID(xevt->eventId);
     return EVT_RETURN_DONE;
 }
-USER_FUNC(btl_hitoffsetx) {
+static USER_FUNC(btl_hitoffsetx) {
     s32 id;
     EvtWord* args = event->args;
     s32 partNo;
@@ -2588,7 +2625,7 @@ static USER_FUNC(_set_draw_callback) {
     p7->attributes |= PART_ATTR_HIDDEN;
     return EVT_RETURN_DONE;
 }
-void _light_point_callback(BattleUnitPart* part, s32 group) {
+static void _light_point_callback(BattleUnitPart* part, s32 group) {
     BattleUnit* unit;
     s32 poseId;
     s32 idx;
@@ -2638,6 +2675,7 @@ void _light_point_callback(BattleUnitPart* part, s32 group) {
         } break;
     }
 }
+#if VERSION >= VERSION_JP
 USER_FUNC(_hp_gauge_flag_on) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -2651,6 +2689,7 @@ USER_FUNC(_hp_gauge_flag_on) {
     }
     return EVT_RETURN_DONE;
 }
+#endif
 static u8 battenSatelliteTo_Init(BattleUnit* unit, s32 n, Vec* table) {
     SatelliteSpline* sp;
 
@@ -2697,7 +2736,7 @@ static u8 battenSatelliteTo_Main(BattleUnit* unit, s32 n) {
     sp->frame++;
     return TRUE;
 }
-USER_FUNC(battenSatelliteToInside) {
+static USER_FUNC(battenSatelliteToInside) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 num = evtGetValue(event, args[1]);
@@ -2753,7 +2792,7 @@ USER_FUNC(battenSatelliteToInside) {
     }
     return moving == FALSE ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
-USER_FUNC(battenSatelliteToOutside) {
+static USER_FUNC(battenSatelliteToOutside) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 num = evtGetValue(event, args[1]);

@@ -29,8 +29,8 @@ typedef struct EffFlowerN64Work {
     s32 texIdx;   // 0x44
 } EffFlowerN64Work;
 
-void effFlowerMain(EffectEntry* effect);
-void effFlowerDisp(CameraId cameraId, EffectEntry* effect);
+static void effFlowerMain(EffectEntry* effect);
+static void effFlowerDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effFlowerN64Entry(s32 type, f32 x, f32 y, f32 z, s32 lifetime) {
     EffectEntry* effect;
@@ -79,7 +79,7 @@ EffectEntry* effFlowerN64Entry(s32 type, f32 x, f32 y, f32 z, s32 lifetime) {
     return effect;
 }
 
-void effFlowerMain(EffectEntry* effect) {
+static void effFlowerMain(EffectEntry* effect) {
     EffFlowerN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -139,7 +139,7 @@ void effFlowerMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effFlowerDisp, effect);
 }
 
-void effFlowerDisp(CameraId cameraId, EffectEntry* effect) {
+static void effFlowerDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffFlowerN64Work* work;
     GXTexObj texObj;

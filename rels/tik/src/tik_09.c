@@ -6,7 +6,6 @@
 #include "evt/evt_map.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "tik.h"
 
 static BeroEntry bero_entry_data[3];
@@ -76,7 +75,7 @@ EVT_BEGIN(tik_09_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    SPAWN_EVENT(PTR(evt_tik09_dokan))
+    CALL_CHILD(evt_bero_info_run)
+    SPAWN_EVENT(evt_tik09_dokan)
     RETURN
 EVT_END()

@@ -87,8 +87,8 @@ effN64Vtx size16x24_tex32x32_r_flower_vtx[] = {
     {-4, 9, 0, 0, 1024, 36, 190, 20, 255},
 };
 
-void effRecoverHeartMain(EffectEntry* effect);
-void effRecoverHeartDisp(CameraId cameraId, EffectEntry* effect);
+static void effRecoverHeartMain(EffectEntry* effect);
+static void effRecoverHeartDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effRecoverHeartN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
@@ -149,7 +149,7 @@ EffectEntry* effRecoverHeartN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effRecoverHeartMain(EffectEntry* effect) {
+static void effRecoverHeartMain(EffectEntry* effect) {
     s32 lifetime;
     EffRecoverHeartN64Work* work = effect->userdata;
     Vec position;
@@ -205,7 +205,7 @@ void effRecoverHeartMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effRecoverHeartDisp, effect);
 }
 
-void effRecoverHeartDisp(CameraId cameraId, EffectEntry* effect) {
+static void effRecoverHeartDisp(CameraId cameraId, EffectEntry* effect) {
     s32 j;
     CameraEntry* camera;
     EffRecoverHeartN64Work* work;

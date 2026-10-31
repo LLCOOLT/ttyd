@@ -40,7 +40,6 @@
 #include "evt/evt_snd.h"
 #include "evt/evt_window.h"
 #include "mario/mario_motion.h"
-#include "party/party_motion.h"
 #include "statuswindow.h"
 #include "driver/mapdrv.h"
 #include "evt/evt_story.h"
@@ -79,7 +78,7 @@ typedef struct SplineWork {
     s32 manual;   // 0x28
 } SplineWork;
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 // coin_fmt is only used by a function the linker stripped; force_active keeps the string in .rodata
 #pragma force_active on
 static const char coin_fmt[] = "%f%f%f";
@@ -88,21 +87,21 @@ static const char coin_fmt[] = "%f%f%f";
 
 static const GXColor coin_black = {0x00, 0x00, 0x00, 0xFF};
 
-USER_FUNC(bgm_start_wait);
+static USER_FUNC(bgm_start_wait);
 #if VERSION >= VERSION_US
 USER_FUNC(evt_sub_scale_by_fps);
 #endif
-USER_FUNC(get_stop);
-USER_FUNC(irai_mail_check);
-USER_FUNC(mail_evt_gor_04_keyoff_check);
-USER_FUNC(set_stop);
-USER_FUNC(stageclear_wait);
-USER_FUNC(stone_bg);
-USER_FUNC(stone_bg_open);
-USER_FUNC(stone_ry);
-void coingetDisp(WinMgrEntry* entry);
+static USER_FUNC(get_stop);
+static USER_FUNC(irai_mail_check);
+static USER_FUNC(mail_evt_gor_04_keyoff_check);
+static USER_FUNC(set_stop);
+static USER_FUNC(stageclear_wait);
+static USER_FUNC(stone_bg);
+static USER_FUNC(stone_bg_open);
+static USER_FUNC(stone_ry);
+static void coingetDisp(WinMgrEntry* entry);
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 extern EvtWord evt_sub_starstone[1030];
 #else
 extern EvtWord evt_sub_starstone[VERSION_PICK(1043, 1084)];
@@ -114,7 +113,7 @@ s32 evt_sub_mail_event_end[1];
 
 // the demo keeps this file's data in definition order: stopwatch, the tree data and scripts, the grass data and
 // scripts, then the coin window (retail puts the small objects in .sdata)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(evt_sub_stopwatch)
     LOOP(0)
         WAIT_FRAMES(1)
@@ -136,7 +135,7 @@ s32 tree_data[] = {
     FLOAT(0.0f), FLOAT(0.0f), FLOAT(0.0f),
 };
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 EVT_BEGIN(evt_sub_stopwatch)
     LOOP(0)
         WAIT_FRAMES(1)
@@ -210,7 +209,7 @@ EVT_BEGIN(tree_evt)
     END_LOOP
     RETURN
 EVT_END()
-#elif VERSION == VERSION_DEMO
+#elif VERSION <= VERSION_DEMO_US
 EVT_BEGIN(tree_evt)
     SET_VALUE(LF(0), 0)
     IF_INT_NOT_EQUAL(LW(3), 0)
@@ -336,7 +335,7 @@ EVT_BEGIN(evt_sub_tree_access_entry)
     RETURN
 EVT_END()
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static s32 kusa_data[] = {
     FLOAT(0.0f), FLOAT(-1.874f), FLOAT(-2.999f), FLOAT(-2.22f), FLOAT(-0.776f), FLOAT(0.0f), FLOAT(-0.776f), FLOAT(-2.22f),
     FLOAT(-2.999f), FLOAT(-2.443f), FLOAT(-1.22f), FLOAT(0.0f),
@@ -361,7 +360,7 @@ EVT_BEGIN(kusa_evt)
     END_LOOP
     RETURN
 EVT_END()
-#elif VERSION == VERSION_DEMO
+#elif VERSION <= VERSION_DEMO_US
 EVT_BEGIN(kusa_evt)
     CALL(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
     CALL(evt_snd_sfxon_3d, STRING("SFX_GRASS_SHAKE1"), LW(10), LW(11), LW(12), 0)
@@ -411,7 +410,7 @@ EVT_BEGIN(evt_sub_kusa_access_entry)
     RETURN
 EVT_END()
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 WinMgrDesc coinget_window_desc[] = {
     {0, 0, 8, -175, 120, 350, 42, {0xE1, 0xD7, 0x9B, 0xFF}, NULL, coingetDisp},
 };
@@ -682,7 +681,7 @@ EVT_BEGIN(evt_sub_starstone)
         SET_VALUE(LW(0), 22)
     END_IF
     SET_VALUE(LF(10), 0)
-    CALL_CHILD(PTR(evt_memcard_save_wrapper))
+    CALL_CHILD(evt_memcard_save_wrapper)
     CALL(evt_mario_init_camid)
     CALL(evt_party_init_camid, 0)
     CALL(evt_party_init_camid, 1)
@@ -757,7 +756,7 @@ EVT_BEGIN(evt_sub_starstone)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
-#elif VERSION == VERSION_DEMO
+#elif VERSION <= VERSION_DEMO_US
 EVT_BEGIN(evt_sub_starstone)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -1332,7 +1331,7 @@ EVT_BEGIN(evt_sub_starstone)
         SET_VALUE(LW(0), 22)
     END_IF
     SET_VALUE(LF(10), 0)
-    CALL_CHILD(PTR(evt_memcard_save))
+    CALL_CHILD(evt_memcard_save)
     CALL(evt_mario_init_camid)
     CALL(evt_party_init_camid, 0)
     CALL(evt_party_init_camid, 1)
@@ -1423,7 +1422,6 @@ EVT_BEGIN(evt_sub_mail_vibration)
     RETURN
 EVT_END()
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(mail_evt)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
@@ -1454,38 +1452,6 @@ EVT_BEGIN(mail_evt)
     CALL(evt_cam_letter_box_disable, 0)
     RETURN
 EVT_END()
-#else
-EVT_BEGIN(mail_evt)
-    CALL(evt_cam_letter_box_disable, 1)
-    CALL(evt_mario_key_onoff, 0)
-    CALL(evt_mario_normalize)
-    CALL(evt_party_yoshi_ride, 0, 0)
-    CALL(evt_mario_wait_rideon)
-    CALL(evt_mario_balloon_bikkuri)
-    CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
-    CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_MAIL_RECEPTION3"))
-    SPAWN_EVENT_GET_ID(PTR(evt_sub_mail_vibration), LW(10))
-    WAIT_MS(500)
-    CALL(evt_win_one_message, 0)
-    DELETE_EVENT(LW(10))
-    WAIT_FRAMES(1)
-    CALL(evt_sub_rumble_onoff, 1, 0)
-    CALL(evt_mario_balloon_off)
-    CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
-    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
-    IF_INT_EQUAL(GSWF(GSWF_MAIL_TUTORIAL_SEEN), 0)
-        SET_VALUE(GSWF(GSWF_MAIL_TUTORIAL_SEEN), 1)
-        CALL(evt_msg_print, 0, STRING("mail_first_hit"), 0, 0)
-    ELSE
-        IF_INT_EQUAL(GSWF(GSWF_MAIL_OPENED_ONCE), 0)
-            CALL(evt_msg_print, 0, STRING("mail_first_hit"), 0, 0)
-        END_IF
-    END_IF
-    CALL(evt_mario_key_onoff, 1)
-    CALL(evt_cam_letter_box_disable, 0)
-    RETURN
-EVT_END()
-#endif
 
 EVT_BEGIN(mail_evt_nok_01)
     IF_INT_EQUAL(GSWF(GSWF_MAIL_FRANKLY_SENT), 1)
@@ -1508,7 +1474,7 @@ EVT_BEGIN(mail_evt_nok_01)
     SET_VALUE(GSWF(GSWF_MAIL_FRANKLY_SENT), 1)
     CALL(evt_pouch_receive_mail, 16)
     CALL(evt_pouch_receive_mail, 26)
-    CALL_CHILD(PTR(mail_evt))
+    CALL_CHILD(mail_evt)
     RETURN
 EVT_END()
 
@@ -1535,7 +1501,7 @@ EVT_BEGIN(mail_evt_gor_03)
                 SET_VALUE(LF(0), 1)
             END_IF
             IF_INT_EQUAL(LF(0), 1)
-                CALL_CHILD(PTR(mail_evt))
+                CALL_CHILD(mail_evt)
                 SET_VALUE(LF(0), 0)
             END_IF
         END_IF
@@ -1567,7 +1533,7 @@ EVT_BEGIN(mail_evt_gor_02)
                 SET_VALUE(LF(0), 1)
             END_IF
             IF_INT_EQUAL(LF(0), 1)
-                CALL_CHILD(PTR(mail_evt))
+                CALL_CHILD(mail_evt)
                 SET_VALUE(LF(0), 0)
             END_IF
         END_IF
@@ -1596,7 +1562,7 @@ EVT_BEGIN(mail_evt_gor_01)
     END_LOOP
     SET_VALUE(GSWF(GSWF_MAIL_PETUNI_SENT), 1)
     CALL(evt_pouch_receive_mail, 19)
-    CALL_CHILD(PTR(mail_evt))
+    CALL_CHILD(mail_evt)
     RETURN
 EVT_END()
 
@@ -1627,7 +1593,7 @@ EVT_BEGIN(mail_evt_gor_04)
                 SET_VALUE(LF(0), 1)
             END_IF
             IF_INT_EQUAL(LF(0), 1)
-                CALL_CHILD(PTR(mail_evt))
+                CALL_CHILD(mail_evt)
                 SET_VALUE(LF(0), 0)
             END_IF
         END_IF
@@ -1636,42 +1602,21 @@ EVT_BEGIN(mail_evt_gor_04)
     RETURN
 EVT_END()
 
+EVT_BEGIN(mail_evt_rsh_03_a)
+    IF_INT_EQUAL(GSWF(GSWF_MAIL_PA_PATCH_SENT), 1)
+        RETURN
+    END_IF
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    LOOP(0)
+        SET_VALUE(LW(10), LW(0))
+        SET_VALUE(LW(11), LW(1))
+        SET_VALUE(LW(12), LW(2))
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
 #if VERSION >= VERSION_US
-EVT_BEGIN(mail_evt_rsh_03_a)
-    IF_INT_EQUAL(GSWF(GSWF_MAIL_PA_PATCH_SENT), 1)
-        RETURN
-    END_IF
-    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-    LOOP(0)
-        SET_VALUE(LW(10), LW(0))
-        SET_VALUE(LW(11), LW(1))
-        SET_VALUE(LW(12), LW(2))
-        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_sub_check_intersect, LW(0), LW(2), LW(10), LW(12), -100, -2000, -100, 2000, LW(5))
-        IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_45_DAY_3_STARTS)
-            IF_INT_EQUAL(LW(5), 1)
-                BREAK_LOOP
-            END_IF
-        END_IF
-        WAIT_FRAMES(1)
-    END_LOOP
-    SET_VALUE(GSWF(GSWF_MAIL_PA_PATCH_SENT), 1)
-    CALL(evt_pouch_receive_mail, 21)
-    CALL_CHILD(PTR(mail_evt))
-    RETURN
-EVT_END()
 #else
-EVT_BEGIN(mail_evt_rsh_03_a)
-    IF_INT_EQUAL(GSWF(GSWF_MAIL_PA_PATCH_SENT), 1)
-        RETURN
-    END_IF
-    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-    LOOP(0)
-        SET_VALUE(LW(10), LW(0))
-        SET_VALUE(LW(11), LW(1))
-        SET_VALUE(LW(12), LW(2))
-        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_sub_check_intersect, LW(0), LW(2), LW(10), LW(12), 400, -2000, 400, 2000, LW(5))
+#endif
         IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_45_DAY_3_STARTS)
             IF_INT_EQUAL(LW(5), 1)
                 BREAK_LOOP
@@ -1681,10 +1626,9 @@ EVT_BEGIN(mail_evt_rsh_03_a)
     END_LOOP
     SET_VALUE(GSWF(GSWF_MAIL_PA_PATCH_SENT), 1)
     CALL(evt_pouch_receive_mail, 21)
-    CALL_CHILD(PTR(mail_evt))
+    CALL_CHILD(mail_evt)
     RETURN
 EVT_END()
-#endif
 
 EVT_BEGIN(mail_evt_hom_00)
     IF_INT_EQUAL(GSWF(GSWF_MAIL_KING_K_SENT), 1)
@@ -1706,7 +1650,7 @@ EVT_BEGIN(mail_evt_hom_00)
     END_LOOP
     SET_VALUE(GSWF(GSWF_MAIL_KING_K_SENT), 1)
     CALL(evt_pouch_receive_mail, 22)
-    CALL_CHILD(PTR(mail_evt))
+    CALL_CHILD(mail_evt)
     RETURN
 EVT_END()
 
@@ -1737,7 +1681,7 @@ EVT_BEGIN(mail_evt_gor_02_2)
     END_LOOP
     SET_VALUE(GSWF(GSWF_MAIL_ZIP_TOAD_SENT), 1)
     CALL(evt_pouch_receive_mail, 23)
-    CALL_CHILD(PTR(mail_evt))
+    CALL_CHILD(mail_evt)
     RETURN
 EVT_END()
 
@@ -1763,7 +1707,7 @@ EVT_BEGIN(mail_evt_bom_01)
     END_LOOP
     SET_VALUE(GSWF(GSWF_MAIL_RAWK_HAWK_SENT), 1)
     CALL(evt_pouch_receive_mail, 24)
-    CALL_CHILD(PTR(mail_evt))
+    CALL_CHILD(mail_evt)
     RETURN
 EVT_END()
 
@@ -1792,7 +1736,7 @@ EVT_BEGIN(mail_evt_tik_00)
     SET_VALUE(GSWF(GSWF_MAIL_GHOST_T_SENT), 1)
     CALL(evt_pouch_receive_mail, 25)
     CALL(evt_pouch_receive_mail, 33)
-    CALL_CHILD(PTR(mail_evt))
+    CALL_CHILD(mail_evt)
     RETURN
 EVT_END()
 
@@ -1816,7 +1760,7 @@ EVT_BEGIN(mail_evt_win_01)
     END_LOOP
     SET_VALUE(GSWF(GSWF_MAIL_RDM_ISSUE1_SENT), 1)
     CALL(evt_pouch_receive_mail, 27)
-    CALL_CHILD(PTR(mail_evt))
+    CALL_CHILD(mail_evt)
     RETURN
 EVT_END()
 
@@ -1842,7 +1786,7 @@ EVT_BEGIN(mail_evt_tou_01)
     CALL(evt_pouch_receive_mail, 28)
     SET_VALUE(GSWF(GSWF_MRI07_DOUBLE_POINTS_SALE), 1)
     CALL(evt_sub_save_playtime, GSW(GSW_MRI07_DOUBLE_POINTS_TIME))
-    CALL_CHILD(PTR(mail_evt))
+    CALL_CHILD(mail_evt)
     RETURN
 EVT_END()
 
@@ -1856,7 +1800,7 @@ EVT_BEGIN(mail_evt_usu_01)
         SET_VALUE(LW(11), LW(1))
         SET_VALUE(LW(12), LW(2))
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         CALL(evt_sub_check_intersect, LW(0), LW(2), LW(10), LW(12), 300, -2000, 300, 2000, LW(5))
 #else
         CALL(evt_sub_check_intersect, LW(0), LW(2), LW(10), LW(12), 110, -2000, 110, 2000, LW(5))
@@ -1960,78 +1904,8 @@ EVT_BEGIN(mail_evt_pik_00)
     RETURN
 EVT_END()
 
-#if VERSION >= VERSION_US
-EVT_BEGIN(evt_sub_mail_event)
-    CALL(evt_sub_get_system_flag, LW(0))
-    IF_BITS_SET(LW(0), GLOBAL_FLAG_KIOSK)
-        RETURN
-    END_IF
-    CALL(evt_mario_get_mode, LW(0))
-    IF_INT_NOT_EQUAL(LW(0), 0)
-        RETURN
-    END_IF
-    CALL(evt_sub_get_mapname, LW(0))
-    IF_STR_EQUAL(LW(0), STRING("nok_01"))
-        CALL_CHILD(PTR(mail_evt_nok_01))
-        RETURN
-    END_IF
-    IF_STR_EQUAL(LW(0), STRING("gor_03"))
-        CALL_CHILD(PTR(mail_evt_gor_03))
-        RETURN
-    END_IF
-    IF_STR_EQUAL(LW(0), STRING("gor_02"))
-        SPAWN_EVENT(PTR(mail_evt_gor_02))
-        CALL_CHILD(PTR(mail_evt_gor_02_2))
-        RETURN
-    END_IF
-    IF_STR_EQUAL(LW(0), STRING("gor_01"))
-        SPAWN_EVENT(PTR(mail_evt_gor_01_2))
-        CALL_CHILD(PTR(mail_evt_gor_01))
-        RETURN
-    END_IF
-    IF_STR_EQUAL(LW(0), STRING("gor_04"))
-        CALL_CHILD(PTR(mail_evt_gor_04))
-        RETURN
-    END_IF
-    IF_STR_EQUAL(LW(0), STRING("rsh_02_a"))
-        CALL_CHILD(PTR(mail_evt_rsh_03_a))
-        RETURN
-    END_IF
-    IF_STR_EQUAL(LW(0), STRING("rsh_03_a"))
-        CALL_CHILD(PTR(mail_evt_rsh_03_a_2))
-        RETURN
-    END_IF
-    IF_STR_EQUAL(LW(0), STRING("hom_00"))
-        CALL_CHILD(PTR(mail_evt_hom_00))
-        RETURN
-    END_IF
-    IF_STR_EQUAL(LW(0), STRING("bom_01"))
-        CALL_CHILD(PTR(mail_evt_bom_01))
-        RETURN
-    END_IF
-    IF_STR_EQUAL(LW(0), STRING("tik_00"))
-        CALL_CHILD(PTR(mail_evt_tik_00))
-        RETURN
-    END_IF
-    IF_STR_EQUAL(LW(0), STRING("win_01"))
-        CALL_CHILD(PTR(mail_evt_win_01))
-        RETURN
-    END_IF
-    IF_STR_EQUAL(LW(0), STRING("tou_01"))
-        CALL_CHILD(PTR(mail_evt_tou_01))
-        RETURN
-    END_IF
-    IF_STR_EQUAL(LW(0), STRING("usu_01"))
-        CALL_CHILD(PTR(mail_evt_usu_01))
-        RETURN
-    END_IF
-    IF_STR_EQUAL(LW(0), STRING("pik_00"))
-        CALL_CHILD(PTR(mail_evt_pik_00))
-        RETURN
-    END_IF
-    RETURN
-EVT_END()
-#else
+// Written out instead of EVT_BEGIN/EVT_END: JP and the demos end it without the end opcode (evt_sub_mail_event_end
+// below follows it in .data)
 EvtWord evt_sub_mail_event[] = {
     CALL(evt_sub_get_system_flag, LW(0))
     IF_BITS_SET(LW(0), GLOBAL_FLAG_KIOSK)
@@ -2064,9 +1938,17 @@ EvtWord evt_sub_mail_event[] = {
         CALL_CHILD(mail_evt_gor_04)
         RETURN
     END_IF
+#if VERSION >= VERSION_US
+    IF_STR_EQUAL(LW(0), STRING("rsh_02_a"))
+        CALL_CHILD(mail_evt_rsh_03_a)
+        RETURN
+    END_IF
+#endif
     IF_STR_EQUAL(LW(0), STRING("rsh_03_a"))
         CALL_CHILD(mail_evt_rsh_03_a_2)
+#if VERSION <= VERSION_JP
         CALL_CHILD(mail_evt_rsh_03_a)
+#endif
         RETURN
     END_IF
     IF_STR_EQUAL(LW(0), STRING("hom_00"))
@@ -2098,8 +1980,10 @@ EvtWord evt_sub_mail_event[] = {
         RETURN
     END_IF
     RETURN
-};
+#if VERSION >= VERSION_US
+    OPCODE_END_SCRIPT
 #endif
+};
 
 // Nothing left in the code reads evt_sub_mail_event_end; force_active keeps it in the link
 #pragma force_active on
@@ -2564,7 +2448,7 @@ USER_FUNC(evt_sub_countdown_set_restart_time) {
     return EVT_RETURN_DONE;
 }
 
-void coingetDisp(WinMgrEntry* entry) {
+static void coingetDisp(WinMgrEntry* entry) {
     s32* work = entry->param;
     char buf[0x400];
     if (work[1]) {
@@ -2669,7 +2553,7 @@ USER_FUNC(evt_sub_get_coin) {
     MarioWork* mario = marioGetPtr();
     Vec a = mario->position;
     Vec b = a;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     Vec scr;
 #endif
     f32 rad = reviseAngle((100.0f * camGetPtr(CAMERA_3D)->viewYaw + 5.0f) / 100.0f);
@@ -2699,7 +2583,7 @@ USER_FUNC(evt_sub_get_coin) {
     work = event->wInterpWork;
     switch (state) {
         case 0:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             // the demo draws the coin icon in 2D at Mario's screen position
             iconEntry2D("iraiCoin", ICON_18B);
             getScreenPoint(&b, &scr);
@@ -2765,7 +2649,7 @@ USER_FUNC(evt_sub_get_coin) {
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
-USER_FUNC(stone_ry) {
+static USER_FUNC(stone_ry) {
     EvtWord* args = event->args;
     char* name = (char*)evtGetValue(event, args[0]);
     s32 ang = evtGetValue(event, args[1]);
@@ -2775,7 +2659,7 @@ USER_FUNC(stone_ry) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(stone_bg) {
+static USER_FUNC(stone_bg) {
     char* name;
     CameraEntry* cam;
     EffectEntry* eff;
@@ -2795,27 +2679,27 @@ USER_FUNC(stone_bg) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(stone_bg_open) {
+static USER_FUNC(stone_bg_open) {
     EffectEntry* e = effNameToPtr("sub_bg");
     ((ItemGetWork*)e->userdata)->state = 1;
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(stageclear_wait) {
+static USER_FUNC(stageclear_wait) {
     return effStageClearEndChk(effNameToPtr("sub_clear")) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(set_stop) {
+static USER_FUNC(set_stop) {
     stop = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(get_stop) {
+static USER_FUNC(get_stop) {
     evtSetValue(event, event->args[0], stop);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(bgm_start_wait) {
+static USER_FUNC(bgm_start_wait) {
     return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
@@ -2897,7 +2781,7 @@ USER_FUNC(evt_sub_check_intersect) {
             }                                                      \
         }                                                          \
     }
-USER_FUNC(irai_mail_check) {
+static USER_FUNC(irai_mail_check) {
     EvtWord* args = event->args;
     s32 arg = evtGetValue(event, args[0]);
     s32 ret = 0;
@@ -2916,7 +2800,7 @@ USER_FUNC(irai_mail_check) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(mail_evt_gor_04_keyoff_check) {
+static USER_FUNC(mail_evt_gor_04_keyoff_check) {
     EvtWord* args = event->args;
     s32 a = marioCtrlOffChk();
     s32 b = marioKeyOffChk();

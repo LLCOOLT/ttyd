@@ -45,7 +45,7 @@ void marioGetStick(f32* dir, f32* mag);
 
 RubWork rubwork;
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo has no respawn position in MarioWork: falling out of eki_04, gon_10 or muj_00 puts Mario at a fixed
 // spot for that map, and anywhere else at (0, 74, 0) with the partners.
 void marioBottomless(void) {
@@ -352,7 +352,7 @@ void marioSetForceMove(f32 dir, s32 time, f32 speed) {
 #else
         marioChgMot(speed > mario->baseWalkSpeed ? MARIO_MOTION_DASH : MARIO_MOTION_WALK);
 #endif
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         mario->moveDirection = dir;
         mario->directionView = dir;
         mario->forceMoveTimer = time;
@@ -380,7 +380,7 @@ void marioUpdateKeyData(void) {
     mario->buttonRepeat = gp->buttonRepeat[0] & mask;
     mario->buttonUp = gp->buttonUp[0] & mask;
     // The demo has no CTRL_OFF_2 lock (and keeps its input lock bits elsewhere, see MarioTrigFlags).
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (!(mario->flags & (MARIO_FLAG_CTRL_OFF | MARIO_FLAG_KEY_OFF))) {
 #else
     if (!(mario->flags & (MARIO_FLAG_CTRL_OFF | MARIO_FLAG_CTRL_OFF_2 | MARIO_FLAG_KEY_OFF))) {
@@ -402,7 +402,7 @@ void marioUpdateKeyData(void) {
             mario->analogB = 0;
         }
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if ((mario->flags & (MARIO_FLAG_CTRL_OFF | MARIO_FLAG_KEY_OFF)) || !marioChkKey()) {
 #else
     if ((mario->flags & (MARIO_FLAG_CTRL_OFF | MARIO_FLAG_CTRL_OFF_2 | MARIO_FLAG_KEY_OFF)) || !marioChkKey()) {
@@ -460,7 +460,7 @@ void marioGetStick(f32* dir, f32* mag) {
     *mag = m;
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 s32 N_marioGetMovementSpeed(void) {
     MarioWork* mario = marioGetPtr();
     s8 x = mario->wStickDir1;
@@ -480,7 +480,7 @@ void marioGetRubInit(void) {
     rubwork.revDir = -1;
 }
 
-s32 chkRevolveDir(s32* cw, s32* ccw) {
+static s32 chkRevolveDir(s32* cw, s32* ccw) {
     s32 base;
     s32 i;
     RubWork* rw = &rubwork;
@@ -538,7 +538,7 @@ s32 chkRevolveDir(s32* cw, s32* ccw) {
     return -1;
 }
 
-s32 checkOneRevolution(s32 dir) {
+static s32 checkOneRevolution(s32 dir) {
     RubWork* rw;
     s32 idx;
     s32 j;

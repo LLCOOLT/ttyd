@@ -25,7 +25,11 @@ static EvtWord dmg_fall_event[189];
 static EvtWord patapata_dmg_first_attack_pos[19];
 static EvtWord attack_event_patapata[541];
 static PoseTableEntry pose_table[18];
+#if VERSION <= VERSION_DEMO_US
+static PoseTableEntry pose_table_turn[15];
+#else
 static PoseTableEntry pose_table_turn[17];
+#endif
 static BattleDataEntry data_table[3];
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
@@ -47,7 +51,11 @@ BattleUnitKind unit_yami_pata = {
     1,
     17,
     0,
+#if VERSION <= VERSION_DEMO_US
+    2,
+#else
     1,
+#endif
     70,
     1,
     50,
@@ -144,7 +152,11 @@ static BattleUnitDefense defence_patapata = {{2, 2, 2, 2, 2}};
 
 static BattleUnitDefenseAttr defence_patapata_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist_patapata = {75, 80, 100, 100, 75, 100, 100, 75, 100, 75, 100, 75, 100, 75, 70, 80, 100, 100, 75, 100, 100, 70};
+#else
 static StatusVulnerability regist_patapata = {75, 80, 105, 100, 70, 100, 100, 70, 100, 85, 100, 85, 100, 85, 80, 75, 95, 100, 70, 100, 100, 70};
+#endif
 
 static BattleUnitKindPart parts_patapata[] = {
     {1, "btl_un_yami_pata", "c_yaminoko", 0.0f, 0.0f, 0.0f, 0.0f, 30.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence_patapata, &defence_patapata_attr, 0x600809, 0, pose_table_patapata},
@@ -167,8 +179,8 @@ static PoseTableEntry pose_table_patapata[] = {
     {40, "PTP_W_1"},
     {56, "PTP_X_1"},
     {57, "PTP_X_1"},
-    {65, "PTP_T_1"},
-    {69, "PTP_S_1"},
+    {BTL_POSE_TALK, "PTP_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "PTP_S_1"},
 };
 
 static BattleDataEntry data_table_patapata[] = {
@@ -411,8 +423,8 @@ static PoseTableEntry pose_table[] = {
     {40, "NKT_W_1"},
     {56, "NKT_X_1"},
     {57, "NKT_X_1"},
-    {65, "NKT_T_1"},
-    {69, "NKT_S_1"},
+    {BTL_POSE_TALK, "NKT_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "NKT_S_1"},
 };
 
 static PoseTableEntry pose_table_turn[] = {
@@ -427,12 +439,14 @@ static PoseTableEntry pose_table_turn[] = {
     {30, "NKT_Q_1"},
     {31, "NKT_D_1"},
     {39, "NKT_D_1"},
+#if VERSION >= VERSION_JP
     {42, "NKT_R_1"},
     {40, "NKT_W_1"},
+#endif
     {56, "NKT_K_2"},
     {57, "NKT_K_2"},
-    {65, "NKT_S_2"},
-    {69, "NKT_S_2"},
+    {BTL_POSE_TALK, "NKT_S_2"},
+    {BTL_POSE_STAY_DEFAULT, "NKT_S_2"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -447,7 +461,11 @@ static BattleUnitDefenseAttr defence_attr = {0};
 
 static BattleUnitDefense defence_turn = {0};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {75, 80, 75, 100, 75, 100, 100, 75, 100, 75, 100, 75, 100, 75, 80, 80, 70, 100, 75, 100, 100, 70};
+#else
 static StatusVulnerability regist = {75, 80, 70, 100, 70, 100, 100, 70, 100, 85, 100, 85, 100, 85, 80, 75, 70, 100, 70, 100, 100, 70};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {
@@ -492,7 +510,11 @@ static BattleWeapon weapon_nokonoko_attack = {
     2, // reserved_6F
     NULL, // acHelpMsg
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
+#if VERSION <= VERSION_DEMO_US
+    COUNTER_RESIST_ALL, // counterResistFlags
+#else
     COUNTER_RESIST_ELECTRIC | COUNTER_RESIST_TOP_SPIKY | COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_FIERY | COUNTER_RESIST_ICY | COUNTER_RESIST_POISON | COUNTER_RESIST_EXPLOSIVE | COUNTER_RESIST_VOLATILE_EXPLOSIVE | COUNTER_RESIST_HOLD_FAST, // counterResistFlags
+#endif
     TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
@@ -520,7 +542,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -745,7 +767,7 @@ static EVT_BEGIN(attack_event)
     WAIT_MS(250)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_NOKO_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(10.0f), FLOAT(0.39941406f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 40)

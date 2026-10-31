@@ -6,7 +6,6 @@
 #include "evt/evt_map.h"
 #include "evt/evt_mobj.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "jin.h"
 #include "evt/evt_story.h"
 
@@ -83,8 +82,8 @@ EVT_BEGIN(jin_11_init_evt)
     CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(evt_usu_kagemario_party_kill)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), -50, 60, -40, 0, 0)
     CALL(evt_mobj_powerupblk, STRING("pblk00"), 40, 60, -40, 0, GSWF(GSWF_JIN11_SHINE_SPRITE), 0)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG4_13_03_BREAKING_THE_FLOOR)

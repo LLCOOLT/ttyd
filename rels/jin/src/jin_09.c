@@ -10,7 +10,6 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "jin.h"
 #include "evt/evt_story.h"
 
@@ -51,8 +50,8 @@ EVT_BEGIN(jin_09_init_evt)
     CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(evt_usu_kagemario_party_kill)
     CALL(evt_mobj_powerupblk, STRING("blk00"), -120, 60, 90, 0, GSWF(GSWF_JIN09_SHINE_SPRITE), 0)
     BEGIN_INLINE_EVENT
         LOOP(0)

@@ -7,7 +7,6 @@
 #include "evt/evt_mario.h"
 #include "evt/evt_mobj.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "tik.h"
 #include "evt/evt_story.h"
 
@@ -54,7 +53,7 @@ static BeroEntry bero_entry_data[] = {
 static EVT_BEGIN(item_get00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("item00"), ITEM_MUSHROOM, LW(0), LW(1), LW(2), 16, -1, 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_MUSHROOM, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_item, STRING("item00"))
@@ -68,7 +67,7 @@ EVT_BEGIN(tik_14_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_mobj_itembox, STRING("mobj_box00"), 0, 25, -110, 0, 0, PTR(item_get00), GSWF(GSWF_TIK14_CHEST_OPENED))
     RETURN
 EVT_END()

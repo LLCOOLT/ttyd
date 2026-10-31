@@ -209,7 +209,7 @@ void mot_hip(void) {
                 break;
             }
             fall = marioGetFallSpd();
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             hit = marioChkLandon(&y, fall);
 #else
             hit = marioSearchGround(&y, &tmp1, &tmp2, fall, fall);
@@ -232,14 +232,14 @@ void mot_hip(void) {
                 mario->rotOfs.y = 0.0f;
                 mario->airTimer = 0;
                 mario->jumpPeakAirTime = 0;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 mario->dispOfs2.y = 0.0f;
 #endif
                 marioChgPose("M_A_1B");
                 attr = hitGetAttr(hit);
                 if (attr & 0x200) {
                     set_damage_root_ypos(mario->position.y);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                     d = -0.4f;
                     mario->jumpVelocityY = d;
                     mario->jumpAccelerationY = d;
@@ -260,7 +260,7 @@ void mot_hip(void) {
                     return;
                 }
                 psndSFXOn_3D((char*)0x159, &mario->position);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 evtEntry(marioBgmodeChk() == 0 ? quake_evt : quake_bgmode_evt, 0, 0);
 #else
                 evtEntryType(marioBgmodeChk() == 0 ? quake_evt : quake_bgmode_evt, 0, 0, 0);
@@ -305,7 +305,7 @@ void mot_hip(void) {
 }
 
 // JP and US do not inline U_chkground into mot_hip (PAL's longer copy and the demo's are too big anyway)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 // FAKE: keeps the following function(s) out of line as in the target; removing it changes the code
 #pragma dont_inline on
 #endif
@@ -339,7 +339,7 @@ s32 U_chkground(void) {
         attr = hitGetAttr(hit);
         if (attr & 0x200) {
             set_damage_root_ypos(mario->position.y);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             v = -0.4f;
             mario->jumpVelocityY = v;
             mario->jumpAccelerationY = v;
@@ -359,7 +359,7 @@ s32 U_chkground(void) {
     return 0;
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 #pragma dont_inline reset
 #endif
 

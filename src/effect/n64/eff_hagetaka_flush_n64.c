@@ -22,7 +22,7 @@ typedef struct EffHagetakaFlushN64Work {
     f32 scale;     // 0x2C
 } EffHagetakaFlushN64Work;
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo defines the colours first
 static u8 color_rotation_data[] = {
     0xFF, 0xFF, 0x52, 0xFF, 0xFF, 0x52, 0xB5, 0x94,
@@ -38,7 +38,7 @@ static effN64Vtx size16x16_tex64x64_vtx[] = {
     {-8, 8, 0, 0, 3072, 0, 0, 0, 255},
 };
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 static u8 color_rotation_data[] = {
     0xFF, 0xFF, 0x52, 0xFF, 0xFF, 0x52, 0xB5, 0x94,
     0x00, 0xB5, 0x94, 0x00, 0xFF, 0xFF, 0xD6, 0xFF,
@@ -46,8 +46,8 @@ static u8 color_rotation_data[] = {
 };
 #endif
 
-void effHagetakaFlushMain(EffectEntry* effect);
-void effHagetakaFlushDisp(CameraId cameraId, EffectEntry* effect);
+static void effHagetakaFlushMain(EffectEntry* effect);
+static void effHagetakaFlushDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effHagetakaFlushN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -75,7 +75,7 @@ EffectEntry* effHagetakaFlushN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 
     return effect;
 }
 
-void effHagetakaFlushMain(EffectEntry* effect) {
+static void effHagetakaFlushMain(EffectEntry* effect) {
     EffHagetakaFlushN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -106,7 +106,7 @@ void effHagetakaFlushMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effHagetakaFlushDisp, effect);
 }
 
-void effHagetakaFlushDisp(CameraId cameraId, EffectEntry* effect) {
+static void effHagetakaFlushDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffHagetakaFlushN64Work* work;
     s32 alpha;

@@ -26,8 +26,8 @@ typedef struct EffSheepWork {
     s32 sfxId;     // 0x30
 } EffSheepWork;
 
-void effSheepDisp(CameraId cameraId, EffectEntry* effect);
-void effSheepMain(EffectEntry* effect);
+static void effSheepDisp(CameraId cameraId, EffectEntry* effect);
+static void effSheepMain(EffectEntry* effect);
 
 EffectEntry* effSheepEntry(s32 type, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
@@ -77,7 +77,7 @@ EffectEntry* effSheepEntry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effSheepMain(EffectEntry* effect) {
+static void effSheepMain(EffectEntry* effect) {
     EffSheepWork* work = effect->userdata;
     const char* sfx1;
     const char* sfx2;
@@ -196,7 +196,7 @@ void effSheepMain(EffectEntry* effect) {
     }
 }
 
-void effSheepDisp(CameraId cameraId, EffectEntry* effect) {
+static void effSheepDisp(CameraId cameraId, EffectEntry* effect) {
     EffSheepWork* work = effect->userdata;
     Mtx trans;
     Mtx scale;

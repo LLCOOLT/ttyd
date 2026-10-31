@@ -30,7 +30,6 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "data_tables.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -39,7 +38,7 @@
 
 static BOOL _hitIsGroupSub(HitEntry* target, HitEntry* node, BOOL checkSibling);
 
-USER_FUNC(dou_mario_kaiten_hosei);
+static USER_FUNC(dou_mario_kaiten_hosei);
 static BOOL hitIsGroup(HitEntry* target, HitEntry* group);
 
 static ExtTexInfo ext_entry_data[31];
@@ -279,7 +278,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"水夫C"*/"\x90\x85\x95\x76\x43", // name
+        "水夫C", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         suifu_c_init, // initEvent
@@ -291,7 +290,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"水夫D"*/"\x90\x85\x95\x76\x44", // name
+        "水夫D", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         suifu_d_init, // initEvent
@@ -303,7 +302,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"水夫E"*/"\x90\x85\x95\x76\x45", // name
+        "水夫E", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         suifu_e_init, // initEvent
@@ -315,7 +314,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"モニー"*/"\x83\x82\x83\x6A\x81\x5B", // name
+        "モニー", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         mony_init, // initEvent
@@ -327,7 +326,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ピートン"*/"\x83\x73\x81\x5B\x83\x67\x83\x93", // name
+        "ピートン", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         peton_init, // initEvent
@@ -822,7 +821,7 @@ EVT_BEGIN(ukishima_watari)
                     CALL(evt_sub_random, 50, LW(10))
                     ADD(LW(10), 100)
                     WAIT_MS(LW(10))
-                    SPAWN_EVENT(PTR(ukishima_watari_run))
+                    SPAWN_EVENT(ukishima_watari_run)
                     ADD(LW(5), 1)
                 END_IF
             END_IF
@@ -847,7 +846,7 @@ EVT_BEGIN(ukishima_watari)
     SET_VALUE(GSWF(GSWF_DOU11_SAILORS_CROSSED), 1)
     CALL(evt_hitobj_onoff, STRING("fune_atari"), 1, 0)
     CALL(evt_mario_key_onoff, 1)
-    SPAWN_EVENT(PTR(suifu_orei))
+    SPAWN_EVENT(suifu_orei)
     RETURN
 EVT_END()
 
@@ -864,7 +863,7 @@ EVT_BEGIN(ukishima_check)
         WAIT_MS(2000)
         CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
         CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
-        SPAWN_EVENT(PTR(ukishima_watari))
+        SPAWN_EVENT(ukishima_watari)
     END_IF
     RETURN
 EVT_END()
@@ -958,9 +957,13 @@ static EVT_BEGIN(ukishima_apper)
 EVT_END()
 
 EVT_BEGIN(ukishima_init1)
+#if VERSION <= VERSION_DEMO_US
+    IF_INT_EQUAL(GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED), 0)
+#else
     SET_VALUE(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
     ADD(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED))
     IF_INT_LESS(LW(0), 1)
+#endif
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_taru_n01"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_taru_n01"), 1, 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_taru_n02"), MAPOBJ_FLAG_HIDE)
@@ -974,27 +977,34 @@ EVT_BEGIN(ukishima_part1)
     WAIT_MS(500)
     CALL(evt_cam3d_evt_set, 280, 174, 527, 280, 79, -14, 500, 11)
     WAIT_MS(1000)
+#if VERSION <= VERSION_DEMO_US
+    SET_VALUE(GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED), 1)
+#endif
     SET_VALUE(LW(2), STRING("S_taru_n01"))
     SET_VALUE(LW(3), STRING("A_taru_n01"))
-    SPAWN_EVENT(PTR(ukishima_apper))
+    SPAWN_EVENT(ukishima_apper)
     BEGIN_INLINE_EVENT
         WAIT_MS(700)
         SET_VALUE(LW(2), STRING("S_taru_n02"))
         SET_VALUE(LW(3), STRING("A_taru_n02"))
-        SPAWN_EVENT(PTR(ukishima_apper))
+        SPAWN_EVENT(ukishima_apper)
     END_INLINE_EVENT
     WAIT_MS(2500)
-    SPAWN_EVENT(PTR(pukapuka_watari_init01))
+    SPAWN_EVENT(pukapuka_watari_init01)
     WAIT_MS(1000)
-    CALL_CHILD(PTR(ukishima_check))
+    CALL_CHILD(ukishima_check)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(ukishima_init2)
+#if VERSION <= VERSION_DEMO_US
+    IF_INT_EQUAL(GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED), 0)
+#else
     SET_VALUE(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
     ADD(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED))
     IF_INT_LESS(LW(0), 2)
+#endif
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_taru_n03"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_taru_n03"), 1, 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_taru_n04"), MAPOBJ_FLAG_HIDE)
@@ -1008,32 +1018,36 @@ EVT_BEGIN(ukishima_part2)
     WAIT_MS(500)
     CALL(evt_cam3d_evt_set, 525, 174, 527, 525, 79, -14, 500, 11)
     WAIT_MS(1000)
+#if VERSION <= VERSION_DEMO_US
+    SET_VALUE(GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED), 1)
+#endif
     SET_VALUE(LW(2), STRING("S_taru_n03"))
     SET_VALUE(LW(3), STRING("A_taru_n03"))
-    SPAWN_EVENT(PTR(ukishima_apper))
+    SPAWN_EVENT(ukishima_apper)
     BEGIN_INLINE_EVENT
         WAIT_MS(700)
         SET_VALUE(LW(2), STRING("S_taru_n04"))
         SET_VALUE(LW(3), STRING("A_taru_n04"))
-        CALL_CHILD(PTR(ukishima_apper))
+        CALL_CHILD(ukishima_apper)
     END_INLINE_EVENT
     WAIT_MS(2500)
-    SPAWN_EVENT(PTR(pukapuka_watari_init02))
+    SPAWN_EVENT(pukapuka_watari_init02)
     WAIT_MS(1000)
-    CALL_CHILD(PTR(ukishima_check))
+    CALL_CHILD(ukishima_check)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
+#if VERSION >= VERSION_JP
 EVT_BEGIN(ukishima_switch1_evt)
     SET_VALUE(GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED), 1)
     SET_VALUE(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
     ADD(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED))
     IF_INT_EQUAL(LW(0), 1)
-        SPAWN_EVENT(PTR(ukishima_part1))
+        SPAWN_EVENT(ukishima_part1)
     END_IF
     IF_INT_EQUAL(LW(0), 2)
-        SPAWN_EVENT(PTR(ukishima_part2))
+        SPAWN_EVENT(ukishima_part2)
     END_IF
     RETURN
 EVT_END()
@@ -1043,13 +1057,14 @@ EVT_BEGIN(ukishima_switch2_evt)
     SET_VALUE(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
     ADD(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED))
     IF_INT_EQUAL(LW(0), 1)
-        SPAWN_EVENT(PTR(ukishima_part1))
+        SPAWN_EVENT(ukishima_part1)
     END_IF
     IF_INT_EQUAL(LW(0), 2)
-        SPAWN_EVENT(PTR(ukishima_part2))
+        SPAWN_EVENT(ukishima_part2)
     END_IF
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(torinoko_suifu_pukapuka)
     LOOP(0)
@@ -1176,7 +1191,7 @@ EVT_BEGIN(torinoko_suifu_init)
     CALL(evt_npc_change_interrupt, STRING("ピートン"), 6, 0)
     CALL(evt_nannpc_init, PTR(ext_entry_data), 0, 0, 0, 101)
     CALL(evt_nannpc_set_subfunc, 1, PTR(nannpc_ext_main_sub_fast))
-    SPAWN_EVENT(PTR(torinoko_suifu_pukapuka))
+    SPAWN_EVENT(torinoko_suifu_pukapuka)
     SET_INT_READ_ADDR(PTR(suifudata))
     SET_VALUE(LW(0), 0)
     LOOP(100)
@@ -1373,8 +1388,13 @@ EVT_END()
 
 EVT_BEGIN(escapeway_event)
     CALL(evt_mario_key_onoff, 0)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_mario_normalize)
+    CALL(evt_bero_exec_wait, 65536)
+#else
     CALL(evt_bero_exec_wait, 65536)
     CALL(evt_mario_normalize)
+#endif
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("stg5_dou_17_01"), 0, STRING("水夫D"))
     BEGIN_INLINE_EVENT
@@ -1399,6 +1419,7 @@ EVT_BEGIN(escapeway_event)
     RETURN
 EVT_END()
 
+#if VERSION >= VERSION_JP
 EVT_BEGIN(bombwall_escape_move)
     CALL(evt_npc_flag_onoff, 1, STRING("水夫C"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     BEGIN_INLINE_EVENT
@@ -1419,19 +1440,25 @@ EVT_BEGIN(bombwall_escape_move)
     CALL(evt_mario_set_dir, 90, 200, 0)
     RETURN
 EVT_END()
+#endif
 
 static EVT_BEGIN(bombwall_bomb)
     CALL(evt_mario_key_onoff, 0)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_mario_normalize)
+#endif
     BEGIN_INLINE_EVENT
         WAIT_MS(200)
         CALL(evt_mapobj_get_position, STRING("S_ana_before"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_OFF_WALL_BREAK1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
+#if VERSION >= VERSION_JP
     BEGIN_INLINE_EVENT
         CALL(evt_mario_wait_landon)
         CALL(evt_mario_normalize)
-        SPAWN_EVENT(PTR(bombwall_escape_move))
+        SPAWN_EVENT(bombwall_escape_move)
     END_INLINE_EVENT
+#endif
     CALL(evt_img_entry, STRING("capture_img"))
     CALL(evt_img_set_paper, STRING("capture_img"), STRING("OFF_d_bom_ver2"))
     CALL(evt_offscreen_entry, STRING("offscreen"))
@@ -1470,9 +1497,9 @@ static EVT_BEGIN(bombwall_bomb)
         END_IF
     END_LOOP
     CALL(evt_mario_wait_landon)
-    SPAWN_EVENT(PTR(bombwall_after))
+    SPAWN_EVENT(bombwall_after)
     SET_VALUE(LW(0), STRING("n_bero"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     CALL(evt_hitobj_attr_onoff, 1, 1, STRING("n_bero"), 4)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_36_HOLE_IN_THE_WALL)
     WAIT_FRAMES(2)
@@ -1492,14 +1519,14 @@ static EVT_BEGIN(bombwall_init)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_hibimae"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ana_before"), MAPOBJ_FLAG_HIDE)
         SET_VALUE(LW(0), STRING("n_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_hitobj_attr_onoff, 1, 0, STRING("n_bero"), 4)
         CASE_BETWEEN(STORY_STG5_34_KICKED_OFF, STORY_STG5_35_ESCAPE_ROUTE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_hibiato"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ana_before"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ana_before1"), MAPOBJ_FLAG_HIDE)
         SET_VALUE(LW(0), STRING("n_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_hitobj_attr_onoff, 1, 0, STRING("n_bero"), 4)
         CALL(evt_paper_entry, STRING("OFF_d_bom_ver2"))
         CALL(evt_run_case_evt, CASE_COND_BOBBERY, 1, STRING("n_bero"), 0, PTR(bombwall_bomb), 0)
@@ -1507,7 +1534,7 @@ static EVT_BEGIN(bombwall_init)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_hibiato"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ana_after"), MAPOBJ_FLAG_HIDE)
         SET_VALUE(LW(0), STRING("n_bero"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
         CALL(evt_hitobj_attr_onoff, 1, 1, STRING("n_bero"), 4)
     END_SWITCH
     RETURN
@@ -1673,17 +1700,17 @@ EVT_BEGIN(bombwall_after)
         CALL(evt_npc_move_position, STRING("モニー"), 770, -185, 0, FLOAT(180.0f), 0)
         CALL(evt_npc_set_position, STRING("モニー"), 0, -1000, 0)
     END_INLINE_EVENT
-    SPAWN_EVENT(PTR(bombwall_suifuout_secheck))
+    SPAWN_EVENT(bombwall_suifuout_secheck)
     SET_VALUE(LW(0), 0)
     CALL(evt_snd_sfxon, STRING("SFX_STG5_KINOPIO_MOVE3"), 0)
     LOOP(0)
-        SPAWN_EVENT(PTR(bombwall_suifuout))
+        SPAWN_EVENT(bombwall_suifuout)
         ADD(LW(0), 1)
         IF_INT_EQUAL(LW(0), 95)
             BREAK_LOOP
         END_IF
         WAIT_MS(60)
-        SPAWN_EVENT(PTR(bombwall_suifuout))
+        SPAWN_EVENT(bombwall_suifuout)
         ADD(LW(0), 1)
         IF_INT_EQUAL(LW(0), 95)
             BREAK_LOOP
@@ -1726,7 +1753,7 @@ static EVT_BEGIN(dai3_shurai_after)
     RETURN
 EVT_END()
 
-USER_FUNC(dou_mario_kaiten_hosei) {
+static USER_FUNC(dou_mario_kaiten_hosei) {
     const char* name = (const char*)evtGetValue(event, event->args[0]);
     HitEntry* hit = hitNameToPtr(name);
     MarioWork* mario = marioGetPtr();
@@ -2046,7 +2073,7 @@ static EVT_BEGIN(dou_puka_event_1)
     IF_INT_NOT_EQUAL(LW(3), 0)
         CALL_CHILD(LW(3))
     END_IF
-    CALL_CHILD(PTR(dou_puka_event))
+    CALL_CHILD(dou_puka_event)
     SET_VALUE(GW(1), 2)
     RETURN
 EVT_END()
@@ -2109,7 +2136,7 @@ static EVT_BEGIN(dou_puka_event_2)
     IF_INT_NOT_EQUAL(LW(3), 0)
         CALL_CHILD(LW(3))
     END_IF
-    CALL_CHILD(PTR(dou_puka_event))
+    CALL_CHILD(dou_puka_event)
     SET_VALUE(GW(3), 2)
     RETURN
 EVT_END()
@@ -2172,7 +2199,7 @@ static EVT_BEGIN(dou_puka_event_3)
     IF_INT_NOT_EQUAL(LW(3), 0)
         CALL_CHILD(LW(3))
     END_IF
-    CALL_CHILD(PTR(dou_puka_event))
+    CALL_CHILD(dou_puka_event)
     SET_VALUE(GW(5), 2)
     RETURN
 EVT_END()
@@ -2235,7 +2262,7 @@ EVT_BEGIN(dou_puka_event_4)
     IF_INT_NOT_EQUAL(LW(3), 0)
         CALL_CHILD(LW(3))
     END_IF
-    CALL_CHILD(PTR(dou_puka_event))
+    CALL_CHILD(dou_puka_event)
     SET_VALUE(GW(7), 2)
     RETURN
 EVT_END()
@@ -2288,18 +2315,18 @@ EVT_BEGIN(pukapuka_watari_init01)
     SET_VALUE(LW(1), STRING("A_taru_n01"))
     SET_VALUE(LW(2), STRING("A_taru_n01"))
     SET_VALUE(LW(3), PTR(evt_ride_taru))
-    CALL_CHILD(PTR(dou_puka_event_init1))
-    SPAWN_EVENT(PTR(dou_puka_event_main1))
-    SPAWN_EVENT(PTR(dou_puka_event_sub1))
+    CALL_CHILD(dou_puka_event_init1)
+    SPAWN_EVENT(dou_puka_event_main1)
+    SPAWN_EVENT(dou_puka_event_sub1)
     CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("A_taru_n01"), 0, PTR(dou_puka_event_1), 0)
     CALL(evt_run_case_evt, CASE_COND_NOT_STAND_ON, 1, STRING("A_taru_n01"), 0, PTR(dou_puka_event_rev_1), 0)
     SET_VALUE(LW(0), STRING("S_taru_n02"))
     SET_VALUE(LW(1), STRING("A_taru_n02"))
     SET_VALUE(LW(2), STRING("A_taru_n02"))
     SET_VALUE(LW(3), PTR(evt_ride_taru))
-    CALL_CHILD(PTR(dou_puka_event_init2))
-    SPAWN_EVENT(PTR(dou_puka_event_main2))
-    SPAWN_EVENT(PTR(dou_puka_event_sub2))
+    CALL_CHILD(dou_puka_event_init2)
+    SPAWN_EVENT(dou_puka_event_main2)
+    SPAWN_EVENT(dou_puka_event_sub2)
     CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("A_taru_n02"), 0, PTR(dou_puka_event_2), 0)
     CALL(evt_run_case_evt, CASE_COND_NOT_STAND_ON, 1, STRING("A_taru_n02"), 0, PTR(dou_puka_event_rev_2), 0)
     RETURN
@@ -2310,18 +2337,18 @@ EVT_BEGIN(pukapuka_watari_init02)
     SET_VALUE(LW(1), STRING("A_taru_n03"))
     SET_VALUE(LW(2), STRING("A_taru_n03"))
     SET_VALUE(LW(3), PTR(evt_ride_taru))
-    CALL_CHILD(PTR(dou_puka_event_init3))
-    SPAWN_EVENT(PTR(dou_puka_event_main3))
-    SPAWN_EVENT(PTR(dou_puka_event_sub3))
+    CALL_CHILD(dou_puka_event_init3)
+    SPAWN_EVENT(dou_puka_event_main3)
+    SPAWN_EVENT(dou_puka_event_sub3)
     CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("A_taru_n03"), 0, PTR(dou_puka_event_3), 0)
     CALL(evt_run_case_evt, CASE_COND_NOT_STAND_ON, 1, STRING("A_taru_n03"), 0, PTR(dou_puka_event_rev_3), 0)
     SET_VALUE(LW(0), STRING("S_taru_n04"))
     SET_VALUE(LW(1), STRING("A_taru_n04"))
     SET_VALUE(LW(2), STRING("A_taru_n04"))
     SET_VALUE(LW(3), PTR(evt_ride_taru))
-    CALL_CHILD(PTR(dou_puka_event_init4))
-    SPAWN_EVENT(PTR(dou_puka_event_main4))
-    SPAWN_EVENT(PTR(dou_puka_event_sub4))
+    CALL_CHILD(dou_puka_event_init4)
+    SPAWN_EVENT(dou_puka_event_main4)
+    SPAWN_EVENT(dou_puka_event_sub4)
     CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("A_taru_n04"), 0, PTR(dou_puka_event_4), 0)
     CALL(evt_run_case_evt, CASE_COND_NOT_STAND_ON, 1, STRING("A_taru_n04"), 0, PTR(dou_puka_event_rev_4), 0)
     RETURN
@@ -2373,62 +2400,74 @@ EVT_BEGIN(dou_11_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_npc_set_tribe, STRING("モニー"), STRING("モニー（指輪）"))
     CALL(evt_npc_set_tribe, STRING("ピートン"), STRING("ピートン（指輪）"))
     CALL(evt_map_playanim, STRING("nami"), 1, 0)
     CALL(evt_map_playanim, STRING("moku"), 1, 0)
-    SPAWN_EVENT(PTR(bombwall_init))
+    SPAWN_EVENT(bombwall_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG5_29_WAVE_DODGING)
         IF_INT_EQUAL(GSWF(GSWF_DOU11_STRANDED_SAILORS_SEEN), 0)
-            SPAWN_EVENT(PTR(torinoko_suifu))
+            SPAWN_EVENT(torinoko_suifu)
         END_IF
         IF_INT_EQUAL(GSWF(GSWF_DOU11_SAILORS_CROSSED), 0)
-            SPAWN_EVENT(PTR(torinoko_suifu_init))
-            SPAWN_EVENT(PTR(torinoko_suifu_sakebu))
+            SPAWN_EVENT(torinoko_suifu_init)
+            SPAWN_EVENT(torinoko_suifu_sakebu)
         END_IF
         CASE_EQUAL(STORY_STG5_34_KICKED_OFF)
-        SPAWN_EVENT(PTR(escapeway_event))
+        SPAWN_EVENT(escapeway_event)
     END_SWITCH
     IF_INT_EQUAL(GSWF(GSWF_DOU11_SAILORS_CROSSED), 1)
         CALL(evt_hitobj_onoff, STRING("fune_atari"), 1, 0)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_29_WAVE_DODGING)
         IF_INT_EQUAL(GSWF(GSWF_DOU11_SAILORS_CROSSED), 1)
-            SPAWN_EVENT(PTR(watarikiri_suifu_init))
+            SPAWN_EVENT(watarikiri_suifu_init)
             CALL(evt_npc_set_position, STRING("モニー"), 681, 50, -75)
             CALL(evt_npc_set_ry_lr, STRING("モニー"), 1)
             CALL(evt_npc_set_position, STRING("ピートン"), 714, 50, -78)
             CALL(evt_npc_set_ry_lr, STRING("ピートン"), 1)
             SET_VALUE(GW(10), 0)
-            SPAWN_EVENT(PTR(suifu_orei))
+            SPAWN_EVENT(suifu_orei)
         END_IF
     END_IF
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_30_SHIPWRECKED_SAILORS)
         IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_35_ESCAPE_ROUTE)
-            SPAWN_EVENT(PTR(watarikiri_suifu_init))
+            SPAWN_EVENT(watarikiri_suifu_init)
         END_IF
     END_IF
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_mobj_switch_blue, 2, STRING("mobj01"), -220, 120, -450, PTR(ukishima_part1), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
+#else
     CALL(evt_mobj_switch_blue, 2, STRING("mobj01"), -220, 120, -450, PTR(ukishima_switch1_evt), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
+#endif
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_mobj_switch_blue, 2, STRING("mobj02"), 80, 120, -450, PTR(ukishima_part2), GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED))
+#else
     CALL(evt_mobj_switch_blue, 2, STRING("mobj02"), 80, 120, -450, PTR(ukishima_switch2_evt), GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED))
-    SPAWN_EVENT(PTR(ukishima_init1))
-    SPAWN_EVENT(PTR(ukishima_init2))
+#endif
+    SPAWN_EVENT(ukishima_init1)
+    SPAWN_EVENT(ukishima_init2)
+#if VERSION <= VERSION_DEMO_US
+    IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_32_CORTEZS_WARNING)
+#else
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_33_CORTEZ_AND_THE_TREASURE)
+#endif
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_taru_n03"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_taru_n03"), 1, 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_taru_n04"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_taru_n04"), 1, 0)
     END_IF
-    SPAWN_EVENT(PTR(haikei_funeyure))
+    SPAWN_EVENT(haikei_funeyure)
     CALL(evt_map_entry_airport_harbor, 0, STRING("S_hikou"), STRING("A_hikou"))
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG5_30_SHIPWRECKED_SAILORS)
         CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints_1st))
     ELSE
         CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
     END_IF
-    CALL_CHILD(PTR(evt_gazigazi_entry))
+    CALL_CHILD(evt_gazigazi_entry)
     SET_VALUE(LW(0), STRING("s11fune1"))
     SET_VALUE(LW(1), 0)
     SPAWN_EVENT_GET_ID(PTR(dou_puka_event_main0), LW(10))
@@ -2456,18 +2495,25 @@ EVT_BEGIN(dou_11_init_evt)
     SET_VALUE(LW(0), STRING("S_bin04"))
     SET_VALUE(LW(1), 0)
     SPAWN_EVENT_GET_ID(PTR(dou_puka_event_main17), LW(10))
+#if VERSION <= VERSION_DEMO_US
+    IF_INT_EQUAL(GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED), 1)
+        SPAWN_EVENT(pukapuka_watari_init01)
+    END_IF
+    IF_INT_EQUAL(GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED), 1)
+#else
     SET_VALUE(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED))
     ADD(LW(0), GSWF(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
-        SPAWN_EVENT(PTR(pukapuka_watari_init01))
+        SPAWN_EVENT(pukapuka_watari_init01)
     END_IF
     IF_INT_GREATER_OR_EQUAL(LW(0), 2)
-        SPAWN_EVENT(PTR(pukapuka_watari_init02))
+#endif
+        SPAWN_EVENT(pukapuka_watari_init02)
     END_IF
     CALL(evt_map_entry_airport_harbor, 1, STRING("S_Ship_Change_01"), STRING("Ship_Change_01"))
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_40_TRUE_IDENTITY)
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG5_41_RETURN_TO_THE_GROTTO)
-            SPAWN_EVENT(PTR(dai3_shurai_after))
+            SPAWN_EVENT(dai3_shurai_after)
         END_IF
     END_IF
     CALL(evt_hitobj_onoff, STRING("A_ana_before"), 1, 0)

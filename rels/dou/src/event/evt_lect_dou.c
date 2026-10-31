@@ -29,8 +29,8 @@
 #include "evt/evt_npc.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_window.h"
+#include "mot/mot_roll.h"
 #include "mot/mot_slit.h"
-#include "party/party_motion.h"
 #include "pmario_sound.h"
 #include "statuswindow.h"
 #include "dou.h"
@@ -52,8 +52,6 @@ static inline void effitemget_cam_move(CameraEntry* camera, Vec ofs) {
     camera->curveA = 11;
 }
 static Vec daiv;
-void marioRollTryCancel(void);
-BOOL marioRollKeyDisable(void);
 
 static USER_FUNC(dai_moveti_get);
 static USER_FUNC(dai_moveti_set);
@@ -118,12 +116,12 @@ static USER_FUNC(lect_mario_ido_sum) {
     return EVT_RETURN_BLOCK;
 }
 
-static USER_FUNC(lect_status_on) {
+static USER_FUNC(lect_status_off) {
     statusWinForceClose();
     return EVT_RETURN_DONE;
 }
 
-static USER_FUNC(lect_status_off) {
+static USER_FUNC(lect_status_on) {
     statusWinForceCloseClear();
     return EVT_RETURN_DONE;
 }
@@ -192,7 +190,7 @@ static void lecture_button_disp(CameraId camera, void* param) {
             }
             pos = disp->pos;
             pos.y += ofs;
-            iconDispGxAlpha(&pos, 0x50, btn->iconId, btn->alpha, 1.0f);
+            iconDispGxAlpha(&pos, ICON_FLAG_NO_MAP_BLEND | ICON_FLAG_2D, btn->iconId, btn->alpha, 1.0f);
         }
     }
 }
@@ -649,7 +647,7 @@ EVT_BEGIN(ship_majin_lecture)
         CALL(evt_mario_key_onoff, 1)
         CALL(evt_mario_key_onoff, 1)
         LOOP(0)
-            CALL(lect_status_on)
+            CALL(lect_status_off)
             WAIT_FRAMES(1)
             CALL(evt_mario_get_motion, LW(3))
             IF_INT_EQUAL(LW(3), 25)
@@ -658,7 +656,7 @@ EVT_BEGIN(ship_majin_lecture)
         END_LOOP
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_mario_key_onoff, 0)
-        CALL(lect_status_off)
+        CALL(lect_status_on)
         CALL(evt_mario_trigflag_onoff, 0, MARIO_TRIG_FLAG_DISABLE_STICK)
         CALL(evt_mario_trigflag_onoff, 0, MARIO_TRIG_FLAG_DISABLE_SUB_STICK)
         CALL(evt_mario_set_enable_key, 0)
@@ -728,7 +726,7 @@ EVT_BEGIN(ship_majin_lecture)
         CALL(evt_mario_key_onoff, 1)
         CALL(evt_mario_key_onoff, 1)
         LOOP(0)
-            CALL(lect_status_on)
+            CALL(lect_status_off)
             CALL(evt_mario_get_motion, LW(3))
             IF_INT_NOT_EQUAL(LW(3), 25)
                 BREAK_LOOP
@@ -737,7 +735,7 @@ EVT_BEGIN(ship_majin_lecture)
         END_LOOP
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_mario_key_onoff, 0)
-        CALL(lect_status_off)
+        CALL(lect_status_on)
         CALL(evt_mario_trigflag_onoff, 0, MARIO_TRIG_FLAG_DISABLE_STICK)
         CALL(evt_mario_trigflag_onoff, 0, MARIO_TRIG_FLAG_DISABLE_SUB_STICK)
         CALL(evt_mario_set_enable_key, 0)
@@ -779,10 +777,18 @@ EVT_BEGIN(ship_majin_lecture)
         END_INLINE_EVENT
         CALL(evt_msg_print_add, 0, STRING("stg1_gon_majin4_15_1"))
         CALL(evt_msg_select, 0, STRING("stg1_gon_majin4_16"))
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_msg_continue)
+#endif
         CALL(evt_cam_letter_box_disable, 0)
         IF_INT_EQUAL(LW(0), 0)
             CALL(evt_mario_set_dir, 90, 300, 0)
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_msg_toge, 1, 0, 0, 0)
+            CALL(evt_msg_print, 0, STRING("stg1_gon_majin4_17"), 0, STRING("ペラ魔人"))
+#else
             CALL(evt_msg_print_add, 0, STRING("stg1_gon_majin4_17"))
+#endif
         ELSE
             CALL(x_flag_set, 0, 2)
             WAIT_FRAMES(2)
@@ -807,7 +813,11 @@ EVT_BEGIN(ship_majin_lecture)
         END_LOOP
     END_INLINE_EVENT
     CALL(evt_msg_toge, 1, 0, 0, 0)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_msg_print, 0, STRING("stg1_gon_majin4_18"), 0, STRING("ペラ魔人"))
+#else
     CALL(evt_msg_print_add, 0, STRING("stg1_gon_majin4_18"))
+#endif
     CALL(x_flag_wait, 0, 2)
     CALL(lect_map_cam_chg, STRING("S_Ship_Change_01"), 4)
     CALL(evt_npc_set_anim, STRING("ペラ魔人"), STRING("P_2"))
@@ -833,7 +843,11 @@ static USER_FUNC(evt_nomal_cange) {
     MarioWork* mario = marioGetPtr();
 
     if (isFirstCall) {
+#if VERSION <= VERSION_DEMO_US
+        marioRollCancel(); // the demo has no marioRollTryCancel
+#else
         marioRollTryCancel();
+#endif
         if (mario->flags & MARIO_FLAG_PAPER_MODE) {
             motSlitCancel3();
         }

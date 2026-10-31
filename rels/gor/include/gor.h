@@ -34,7 +34,7 @@ typedef struct CookRecipe {
     const char* out;
 } CookRecipe;
 extern CookRecipe R_cookbook_recipe_table[];
-extern s32 R_mystery_cook_list[];
+extern s32 naniga_okorukana_list[];
 typedef struct SimpleRecipe {
     const char* ingredient;
     const char* result;

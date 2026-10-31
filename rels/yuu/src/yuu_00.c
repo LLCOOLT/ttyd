@@ -30,7 +30,6 @@
 #include "evt/evt_sub.h"
 #include "evt/evt_yuugijou.h"
 #include "party.h"
-#include "party/party_motion.h"
 #include "evt/evt_yuuranking.h"
 #include "yuu.h"
 #include "icon_ids.h"
@@ -55,22 +54,30 @@ static void* yuunpc_wp;
 static Monte* monte_p;
 #define MONTETABLE (montetable)
 
-USER_FUNC(evt_change_plane);
+static USER_FUNC(evt_change_plane);
 static USER_FUNC(fall_rtn);
 static USER_FUNC(re_fall_rtn);
+#if VERSION >= VERSION_JP
 USER_FUNC(yuu_00_cam_shift_reset);
-USER_FUNC(yuuminigame1_opening_chk);
-USER_FUNC(yuuminigame1_opening_on_off);
-USER_FUNC(yuuminigame1_set_phase);
+#endif
+static USER_FUNC(yuuminigame1_opening_chk);
+static USER_FUNC(yuuminigame1_opening_on_off);
+static USER_FUNC(yuuminigame1_set_phase);
 #if VERSION >= VERSION_US
 USER_FUNC(evt_sub_get_language);
 #endif
 BOOL yuuminigame1_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp, HikokiWork* data);
 
 static MonteTable montetable[] = {
+#if VERSION <= VERSION_DEMO_US
+    {-1200.0f, -800.0f, 450.0f, 400.0f, 2},
+    {-800.0f, -300.0f, 400.0f, 300.0f, 2},
+    {-300.0f, 200.0f, 300.0f, 150.0f, 1},
+#else
     {-1200.0f, -800.0f, 450.0f, 200.0f, 2},
     {-800.0f, -300.0f, 300.0f, 100.0f, 2},
     {-300.0f, 200.0f, 200.0f, 100.0f, 1},
+#endif
     {0},
 };
 
@@ -274,12 +281,12 @@ EVT_END()
 
 EVT_BEGIN(minigame01_main)
     CALL(evt_mario_key_onoff, 0)
-    CALL_CHILD(PTR(yuu_00_kaijo_init))
+    CALL_CHILD(yuu_00_kaijo_init)
     CALL(evt_yuuminigame_alloc, LW(0), 0)
     CALL(yuuminigame_set_dataadr, 0, LW(0))
     CALL(evt_mario_kill_party, 0)
     CALL(evt_mario_kill_party, 1)
-    CALL_CHILD(PTR(light_sub_event))
+    CALL_CHILD(light_sub_event)
     CALL(evt_snd_sfxon, STRING("SFX_EVT_GAME_AUDIENCE1"), GW(10))
     CALL(yuuminigame_get_dataadr, 0, LW(0))
     CALL(yuuminigame1_set_phase, LW(0), 1)
@@ -290,12 +297,24 @@ EVT_BEGIN(minigame01_start_cam)
     CALL(evt_cam3d_evt_set, FLOAT(-1230.0f), FLOAT(360.0f), FLOAT(1140.0f), FLOAT(-1230.0f), FLOAT(160.0f), FLOAT(-10.0f), 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_seq_wait, 2)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_cam3d_evt_set, FLOAT(700.0f), FLOAT(360.0f), FLOAT(1140.0f), FLOAT(700.0f), FLOAT(160.0f), FLOAT(-10.0f), 4000, 0)
+#else
     CALL(evt_cam3d_evt_set, FLOAT(700.0f), FLOAT(360.0f), FLOAT(1140.0f), FLOAT(700.0f), FLOAT(160.0f), FLOAT(-10.0f), 6000, 0)
+#endif
     WAIT_MS(1000)
     CALL(evt_yuutitle_alloc, 0, 0, STRING("menu_title_minigame1"))
-    WAIT_MS(3000)
-    CALL(evt_yuutitle_free)
+#if VERSION <= VERSION_DEMO_US
     WAIT_MS(2000)
+#else
+    WAIT_MS(3000)
+#endif
+    CALL(evt_yuutitle_free)
+#if VERSION <= VERSION_DEMO_US
+    WAIT_MS(1000)
+#else
+    WAIT_MS(2000)
+#endif
     RETURN
 EVT_END()
 
@@ -306,7 +325,7 @@ EVT_BEGIN(minigame01_start_cam_cancel)
     WAIT_FRAMES(1)
     CALL(evt_mario_wait_move_end)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
-    CALL_CHILD(PTR(yuu_00_kaijo_init2))
+    CALL_CHILD(yuu_00_kaijo_init2)
     RETURN
 EVT_END()
 
@@ -825,14 +844,14 @@ EVT_BEGIN(minigame01_start)
                 IF_BITS_SET(LW(9), 768)
                     DELETE_EVENT(LW(8))
                     CALL(evt_seq_wait, 2)
-                    CALL_CHILD(PTR(minigame01_start_cam_cancel))
+                    CALL_CHILD(minigame01_start_cam_cancel)
                     BREAK_LOOP
                 END_IF
             END_IF
             WAIT_FRAMES(1)
         END_LOOP
         CALL(yuuminigame1_opening_on_off, LW(0), 0)
-        CALL_CHILD(PTR(yuu_00_kaijo_init2))
+        CALL_CHILD(yuu_00_kaijo_init2)
         CALL(evt_cam3d_evt_off, 0, 11)
         WAIT_FRAMES(1)
     END_IF
@@ -848,24 +867,32 @@ EVT_BEGIN(minigame01_start)
     CALL(eff_call_minigame, 0, 0, 0, 500)
     WAIT_MS(3000)
     CALL(evt_change_plane)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_mario_key_onoff, 1)
+#else
     CALL(evt_cam_letter_box_onoff, 0, 0)
     CALL(evt_cam_letter_box_disable, 1)
+#endif
     WAIT_MS(1000)
     CALL(evt_yuucounter_alloc, 0, 70, 0, 0)
+#if VERSION >= VERSION_JP
     CALL(evt_mario_key_onoff, 1)
+#endif
     RETURN
 EVT_END()
 
 EVT_BEGIN(minigame01_end)
+#if VERSION >= VERSION_JP
     CALL(evt_cam_letter_box_onoff, 1, 0)
     CALL(evt_cam_letter_box_disable, 0)
+#endif
     CALL(evt_snd_sfxon, STRING("SFX_EVT_GAME_AUDIENCE2"), 0)
 #if VERSION >= VERSION_US
     CALL(yuu_atai_push, LW(0))
     CALL(yuu_atai_push, LW(1))
     CALL(yuu_atai_push, LW(2))
     SET_VALUE(LW(0), LW(3))
-    CALL_CHILD(PTR(minigame01_floor_delete))
+    CALL_CHILD(minigame01_floor_delete)
     CALL(yuu_atai_pop, LW(2))
     CALL(yuu_atai_pop, LW(1))
     CALL(yuu_atai_pop, LW(0))
@@ -941,10 +968,12 @@ EVT_BEGIN(minigame01_end)
     CALL(evt_fade_out, 1000)
     CALL(re_fall_rtn)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
-    CALL_CHILD(PTR(yuu_00_kaijo_init2))
+    CALL_CHILD(yuu_00_kaijo_init2)
+#if VERSION >= VERSION_JP
     CALL(yuu_00_cam_shift_reset)
+#endif
     WAIT_MS(500)
-    CALL_CHILD(PTR(light_sub_event))
+    CALL_CHILD(light_sub_event)
     CALL(evt_snd_sfxon, STRING("SFX_EVT_GAME_AUDIENCE1"), GW(10))
     CALL(evt_fade_in, 1000)
     RETURN
@@ -952,8 +981,8 @@ EVT_END()
 
 EVT_BEGIN(yuu_00_init_evt)
     CALL(evt_map_playanim, STRING("neon_02"), 1, 0)
-    SPAWN_EVENT(PTR(minigame01_main))
-    CALL_CHILD(PTR(evt_yuunpc_minigame1))
+    SPAWN_EVENT(minigame01_main)
+    CALL_CHILD(evt_yuunpc_minigame1)
 #if VERSION >= VERSION_US
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("saka_k_1"), MAPOBJ_FLAG_DISABLE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("saka_k_2"), MAPOBJ_FLAG_DISABLE)
@@ -1036,10 +1065,12 @@ EVT_BEGIN(yuu_00_init_evt)
     RETURN
 EVT_END()
 
+#if VERSION >= VERSION_JP
 USER_FUNC(yuu_00_cam_shift_reset) {
     camShiftReset();
     return EVT_RETURN_DONE;
 }
+#endif
 
 static const char yuu00_gnd_02[] = "A_ground_02";
 static const char yuu00_gnd_05[] = "A_ground_05";
@@ -1175,12 +1206,12 @@ static USER_FUNC(re_fall_rtn) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_change_plane) {
+static USER_FUNC(evt_change_plane) {
     marioChgMot(0x18);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(yuuminigame1_set_phase) {
+static USER_FUNC(yuuminigame1_set_phase) {
     EvtWord* args = event->args;
     HikokiWork* data = ((MiniGameWork*)evtGetValue(event, args[0]))->data;
 
@@ -1188,7 +1219,7 @@ USER_FUNC(yuuminigame1_set_phase) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(yuuminigame1_opening_on_off) {
+static USER_FUNC(yuuminigame1_opening_on_off) {
     EvtWord* args = event->args;
     HikokiWork* data = ((MiniGameWork*)evtGetValue(event, args[0]))->data;
 
@@ -1200,7 +1231,7 @@ USER_FUNC(yuuminigame1_opening_on_off) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(yuuminigame1_opening_chk) {
+static USER_FUNC(yuuminigame1_opening_chk) {
     EvtWord* args = event->args;
     MiniGameWork* wp = (MiniGameWork*)evtGetValue(event, args[0]);
 

@@ -10,7 +10,6 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
 #include "evt/evt_map.h"
-#include "party/party_motion.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 #include "evt/evt_msg.h"
@@ -23,7 +22,11 @@ BattleUnitKind unit_boss_bunbaba;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
+#if VERSION <= VERSION_DEMO_US
+static PoseTableEntry pose_table[7];
+#else
 static PoseTableEntry pose_table[9];
+#endif
 static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[2];
 BattleWeapon weapon_bunbaba_fumituke_attack;
@@ -76,7 +79,11 @@ BattleUnitKind unit_boss_bunbaba = {
 #endif
     0.0f,
     0.0f,
+#if VERSION <= VERSION_DEMO_US
+    250.0f,
+#else
     20.0f,
+#endif
     0.0f,
     250.0f,
     0.0f,
@@ -114,18 +121,24 @@ static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {40, 40, 40, 100, 40, 100, 100, 0, 0, 0, 100, 0, 100, 40, 40, 0, 0, 100, 40, 0, 0, 1};
+#else
 static StatusVulnerability regist = {30, 30, 30, 100, 30, 100, 100, 0, 0, 0, 100, 0, 100, 70, 30, 0, 0, 100, 30, 0, 0, 1};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "GNB_N_1"},
     {5, "GNB_X_1"},
+#if VERSION >= VERSION_JP
     {3, "GNB_X_1"},
     {2, "GNB_D2_1"},
+#endif
     {28, "GNB_S_3"},
-    {65, "GNB_T_3"},
+    {BTL_POSE_TALK, "GNB_T_3"},
     {31, "GNB_S_3"},
     {39, "GNB_D_1"},
-    {69, "GNB_S_3"},
+    {BTL_POSE_STAY_DEFAULT, "GNB_S_3"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -480,7 +493,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -955,7 +968,11 @@ EVT_BEGIN(mega_attack_event)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(1750)
+#if VERSION <= VERSION_DEMO_US
+        CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_BREATH_FIRE1"), EVT_NULLPTR, 0, -300, 0, 0, EVT_NULLPTR)
+#else
         CALL(btlevtcmd_snd_se_offset, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_MEGABREATH1"), EVT_NULLPTR, 0, -300, 0, 0, EVT_NULLPTR)
+#endif
         ADD(LW(11), 45)
         SUBTRACT(LW(8), 10)
         CALL(evt_eff, 0, STRING("gonbaba_breath"), 2, LW(6), LW(7), LW(8), FLOAT(3.0f), LW(11), 0, 0, 0, 0, 0, 0)
@@ -1038,77 +1055,81 @@ static EVT_BEGIN(attack_event)
         CASE_EQUAL(0)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
         SET_VALUE(LW(9), PTR(&weapon_bunbaba_poison_attack))
-        CALL_CHILD(PTR(poison_attack_event))
+        CALL_CHILD(poison_attack_event)
         CASE_EQUAL(1)
         CALL(btlevtcmd_DrawLots, LW(0), 3, 10, 10, 20)
         SWITCH(LW(0))
             CASE_EQUAL(0)
             SET_VALUE(LW(9), PTR(&weapon_bunbaba_fumituke_attack))
-            CALL_CHILD(PTR(fumituke_attack_event))
+            CALL_CHILD(fumituke_attack_event)
             CASE_EQUAL(1)
             SET_VALUE(LW(9), PTR(&weapon_bunbaba_kamituki_attack))
-            CALL_CHILD(PTR(kamituki_attack_event))
+            CALL_CHILD(kamituki_attack_event)
             CASE_EQUAL(2)
             SET_VALUE(LW(9), PTR(&weapon_bunbaba_poison_attack))
-            CALL_CHILD(PTR(poison_attack_event))
+            CALL_CHILD(poison_attack_event)
         END_SWITCH
         CASE_EQUAL(2)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 3)
         SET_VALUE(LW(9), PTR(&weapon_bunbaba_eq_attack))
-        CALL_CHILD(PTR(eq_attack_event))
+        CALL_CHILD(eq_attack_event)
         CASE_EQUAL(3)
+#if VERSION <= VERSION_DEMO_US
+        CALL(btlevtcmd_DrawLots, LW(0), 4, 10, 10, 20, 10)
+#else
         CALL(btlevtcmd_DrawLots, LW(0), 4, 10, 10, 20, 15)
+#endif
         SWITCH(LW(0))
             CASE_EQUAL(0)
             SET_VALUE(LW(9), PTR(&weapon_bunbaba_fumituke_attack))
-            CALL_CHILD(PTR(fumituke_attack_event))
+            CALL_CHILD(fumituke_attack_event)
             CASE_EQUAL(1)
             SET_VALUE(LW(9), PTR(&weapon_bunbaba_kamituki_attack))
-            CALL_CHILD(PTR(kamituki_attack_event))
+            CALL_CHILD(kamituki_attack_event)
             CASE_EQUAL(2)
             SET_VALUE(LW(9), PTR(&weapon_bunbaba_poison_attack))
-            CALL_CHILD(PTR(poison_attack_event))
+            CALL_CHILD(poison_attack_event)
             CASE_EQUAL(3)
             SET_VALUE(LW(9), PTR(&weapon_bunbaba_eq_attack))
-            CALL_CHILD(PTR(eq_attack_event))
+            CALL_CHILD(eq_attack_event)
         END_SWITCH
         CASE_EQUAL(4)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 5)
         SET_VALUE(LW(9), PTR(&weapon_bunbaba_charge))
-        CALL_CHILD(PTR(charge_event))
+        CALL_CHILD(charge_event)
         CASE_EQUAL(5)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 7)
         SET_VALUE(LW(9), PTR(&weapon_bunbaba_mega_attack))
-        CALL_CHILD(PTR(mega_attack_event))
+        CALL_CHILD(mega_attack_event)
         CALL(btlevtcmd_StatusWindowOnOff, 0)
         CALL(evt_msg_print, 2, STRING("stg8_las_49_06"), 0, BTL_UNIT_SELF)
         CALL(btlevtcmd_StatusWindowOnOff, 1)
         CASE_EQUAL(6)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 7)
         SET_VALUE(LW(9), PTR(&weapon_bunbaba_mega_attack))
-        CALL_CHILD(PTR(mega_attack_event))
+        CALL_CHILD(mega_attack_event)
         CASE_EQUAL(7)
         CALL(btlevtcmd_DrawLots, LW(0), 6, 10, 10, 20, 10, 20, 0)
         SWITCH(LW(0))
             CASE_EQUAL(0)
             SET_VALUE(LW(9), PTR(&weapon_bunbaba_fumituke_attack))
-            CALL_CHILD(PTR(fumituke_attack_event))
+            CALL_CHILD(fumituke_attack_event)
             CASE_EQUAL(1)
             SET_VALUE(LW(9), PTR(&weapon_bunbaba_kamituki_attack))
-            CALL_CHILD(PTR(kamituki_attack_event))
+            CALL_CHILD(kamituki_attack_event)
             CASE_EQUAL(2)
             SET_VALUE(LW(9), PTR(&weapon_bunbaba_poison_attack))
-            CALL_CHILD(PTR(poison_attack_event))
+            CALL_CHILD(poison_attack_event)
             CASE_EQUAL(3)
             SET_VALUE(LW(9), PTR(&weapon_bunbaba_eq_attack))
-            CALL_CHILD(PTR(eq_attack_event))
+            CALL_CHILD(eq_attack_event)
             CASE_EQUAL(4)
             CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 6)
             SET_VALUE(LW(9), PTR(&weapon_bunbaba_charge))
-            CALL_CHILD(PTR(charge_event))
+            CALL_CHILD(charge_event)
             CASE_EQUAL(5)
             SET_VALUE(LW(9), PTR(&weapon_bunbaba_mega_attack))
-            CALL_CHILD(PTR(mega_attack_event))
+            CALL_CHILD(mega_attack_event)
         END_SWITCH
     END_SWITCH
     LABEL(99)

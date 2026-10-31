@@ -21,14 +21,14 @@
 #include "evt/evt_sub.h"
 #include "evt/evt_win.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "tik.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
 #include "driver/mapdrv.h"
+#include "mario/mario.h"
 
 static USER_FUNC(effect_stardust);
-USER_FUNC(majinaisi_ryokin_kaisu);
+static USER_FUNC(majinaisi_ryokin_kaisu);
 static USER_FUNC(setmertn);
 
 s32 majinaisi_ryokin_kaisu_tbl[6];
@@ -89,7 +89,11 @@ EVT_BEGIN(majinaisi_table_talk)
         RETURN
     END_IF
     CALL(evt_msg_print_add, 0, STRING("majinaisi_04"))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_unitwin_alloc)
+#else
     CALL(evt_unitwin_alloc, 0)
+#endif
     CALL(unitwincoin_disp_onoff, 1)
     CALL(evt_msg_select, 0, STRING("majinaisi_05"))
     IF_INT_EQUAL(LW(0), 3)
@@ -157,7 +161,7 @@ EVT_BEGIN(majinaisi_table_talk)
     CALL(evt_map_checkanim, STRING("anm_men"), LW(0), LW(1))
     WAIT_MS(LW(1))
     CALL(evt_npc_set_anim, STRING("me"), STRING("H_1"))
-    CALL(evt_mario_dispflag_onoff, 1, 1)
+    CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_HIDDEN)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_INCANT_CUBE3"), LW(0), LW(1), LW(2), 0)
     CALL(evt_sub_intpl_msec_init, 11, 0, 60, 1000)
@@ -263,7 +267,7 @@ EVT_BEGIN(majinaisi_table_talk)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(3)
     END_IF
-    CALL(evt_mario_dispflag_onoff, 0, 1)
+    CALL(evt_mario_dispflag_onoff, 0, MARIO_DISP_FLAG_HIDDEN)
     DELETE_EVENT(GW(0))
     CALL(evt_eff_softdelete, STRING("aaax"))
     CALL(evt_snd_sfxoff, GW(1))
@@ -346,7 +350,11 @@ EVT_BEGIN(majinaisi_direct_talk)
                 CALL(evt_pouch_check_item, ITEM_CAKE_MIX, LW(0))
                 IF_INT_GREATER(LW(0), 0)
                     CALL(evt_msg_print, 0, STRING("irai_14_04"), 0, 0)
+#if VERSION <= VERSION_DEMO_US
+                    CALL(evt_win_item_select, PTR(iri_14_item_tbl), LW(0))
+#else
                     CALL(evt_win_item_select, 0, PTR(iri_14_item_tbl), LW(0), 0)
+#endif
                     IF_INT_NOT_EQUAL(LW(0), -1)
                         CALL(evt_pouch_remove_item, ITEM_CAKE_MIX, LW(0))
                         CALL(evt_msg_print, 0, STRING("irai_14_05"), 0, 0)
@@ -373,7 +381,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"まじない師"*/"\x82\xDC\x82\xB6\x82\xC8\x82\xA2\x8E\x74", // name
+        "まじない師", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         majinaisi_init, // initEvent
@@ -393,7 +401,7 @@ EVT_BEGIN(tik_12_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("e_yuka_s"), MAPOBJ_FLAG_NO_BLEND)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("group2"), MAPOBJ_FLAG_NO_BLEND)
@@ -422,7 +430,7 @@ static USER_FUNC(setmertn) {
     event->ownerNPC = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
     return EVT_RETURN_DONE;
 }
-USER_FUNC(majinaisi_ryokin_kaisu) {
+static USER_FUNC(majinaisi_ryokin_kaisu) {
     EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     evtSetValue(event, args[1], majinaisi_ryokin_kaisu_tbl[idx * 2]);

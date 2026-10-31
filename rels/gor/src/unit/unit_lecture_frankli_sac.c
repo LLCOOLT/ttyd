@@ -24,9 +24,9 @@ f32 point[4];
 #include "battle/battle_break_slot.h"
 
 static USER_FUNC(_battle_set_lecture_unit_id);
-USER_FUNC(_set_actend_event);
+static USER_FUNC(_set_actend_event);
 static USER_FUNC(lecture_init);
-void spot_square_disp(CameraId cameraId, void* param);
+static void spot_square_disp(CameraId cameraId, void* param);
 
 BattleUnitKind unit_lecture_frankli_sac;
 static BattleUnitDefense defence;
@@ -117,7 +117,7 @@ static PoseTableEntry pose_table[] = {
     {28, "S_1"},
     {31, "D_2"},
     {39, "D_2"},
-    {69, "S_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -136,7 +136,7 @@ EVT_BEGIN(_test_event)
     RETURN
 EVT_END()
 
-USER_FUNC(_set_actend_event) {
+static USER_FUNC(_set_actend_event) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     s32 id = evtGetValue(event, args[0]);
@@ -182,32 +182,32 @@ static USER_FUNC(lecture_init) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(get_actkind) {
+static USER_FUNC(get_actkind) {
     evtSetValue(event, event->args[0], _battleWorkPointer->commandMenu.actType);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(get_ac_result) {
+static USER_FUNC(get_ac_result) {
     evtSetValue(event, event->args[0], _battleWorkPointer->lastAcSuccess);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(aud_joy) {
+static USER_FUNC(aud_joy) {
     BattleAudienceJoySACLecture();
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(aud_inc) {
+static USER_FUNC(aud_inc) {
     BattleAudienceAddAudienceNum(5);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(aud_dec) {
+static USER_FUNC(aud_dec) {
     BattleAudienceAddAudienceNum(-5);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(hammer_on) {
+static USER_FUNC(hammer_on) {
     BattleAudience* aud = BattleAudienceBaseGetPtr();
     BattleAudienceMember* member = BattleAudienceGetPtr(48);
 
@@ -220,7 +220,7 @@ USER_FUNC(hammer_on) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(aud_attack_init) {
+static USER_FUNC(aud_attack_init) {
     BattleWork* wp = _battleWorkPointer;
 
     wp->lectureFlags |= 1;
@@ -228,17 +228,17 @@ USER_FUNC(aud_attack_init) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(aud_attack_end) {
+static USER_FUNC(aud_attack_end) {
     _battleWorkPointer->lectureFlags |= 1;
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(blinkAP) {
+static USER_FUNC(blinkAP) {
     statusAPBlink(160);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(spot_square) {
+static USER_FUNC(spot_square) {
     EvtWord* args = event->args;
     s32 time;
     s32 wait;
@@ -264,7 +264,7 @@ USER_FUNC(spot_square) {
     return darkCount >= wait + time * 2 ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
-void Quads2D(f32 x0, f32 y0, f32 x1, f32 y1) {
+static void Quads2D(f32 x0, f32 y0, f32 x1, f32 y1) {
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(x0, y0, 0.0f);
     GXPosition3f32(x1, y0, 0.0f);
@@ -272,7 +272,7 @@ void Quads2D(f32 x0, f32 y0, f32 x1, f32 y1) {
     GXPosition3f32(x0, y1, 0.0f);
 }
 
-void spot_square_disp(CameraId cameraId, void* param) {
+static void spot_square_disp(CameraId cameraId, void* param) {
     CameraEntry* cam;
     Mtx mtx;
 
@@ -301,10 +301,18 @@ void spot_square_disp(CameraId cameraId, void* param) {
 
 EVT_BEGIN(stop_wait_event)
     CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_MARIO)
+#if VERSION <= VERSION_DEMO_US
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_MARIO, 1, STRING("M_S_1"))
+#else
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_MARIO, 1)
+#endif
     CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_PARTNER)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_PARTNER, LW(0))
+#if VERSION <= VERSION_DEMO_US
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_PARTNER, LW(0), 43)
+#else
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_PARTNER, LW(0))
+#endif
     RETURN
 EVT_END()
 
@@ -332,7 +340,7 @@ static EVT_BEGIN(phase_event)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_get_turn, LW(0))
         IF_INT_EQUAL(LW(0), 1)
-            CALL_CHILD(PTR(stop_wait_event))
+            CALL_CHILD(stop_wait_event)
             CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("T_1"))
             CALL(btlevtcmd_SetStayPose, BTL_UNIT_SELF, STRING("S_1"))
             CALL(btlevtcmd_StatusWindowOnOff, 0)
@@ -361,13 +369,15 @@ static EVT_BEGIN(phase_event)
 EVT_END()
 
 EVT_BEGIN(actend_event)
-    CALL_CHILD(PTR(stop_wait_event))
+#if VERSION >= VERSION_JP
+    CALL_CHILD(stop_wait_event)
+#endif
     CALL(get_actkind, LW(0))
     IF_INT_EQUAL(LW(0), 4)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_LECTURE, 0, LW(0))
         IF_INT_EQUAL(LW(0), 1)
             WAIT_MS(1000)
-            CALL_CHILD(PTR(stop_wait_event))
+            CALL_CHILD(stop_wait_event)
             CALL(btlevtcmd_StatusWindowOnOff, 0)
             WAIT_MS(500)
             CALL(evt_btl_camera_set_mode, 0, 3)
@@ -410,7 +420,7 @@ EVT_BEGIN(actend_event)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_LECTURE, 0, LW(0))
         IF_INT_EQUAL(LW(0), 2)
             WAIT_MS(200)
-            CALL_CHILD(PTR(stop_wait_event))
+            CALL_CHILD(stop_wait_event)
             CALL(get_ac_result, LW(0))
             IF_INT_EQUAL(LW(0), 1)
                 CALL(btlevtcmd_GetUnitWork, BTL_UNIT_LECTURE, 1, LW(0))
@@ -455,7 +465,9 @@ EVT_BEGIN(actend_event)
                     CALL(evt_btl_camera_set_mode, 0, 3)
                     CALL(evt_btl_camera_set_moveto, 0, -30, 29, 499, -30, -3, 5, 30, 11)
                     WAIT_FRAMES(120)
+#if VERSION >= VERSION_JP
                     CALL(evt_msg_toge, 1, 0, 0, 0)
+#endif
                     CALL(evt_msg_print, 2, STRING("mac_0_b_t3_014_2"), 0, BTL_UNIT_LECTURE)
                     CALL(evt_btl_camera_set_mode, 0, 0)
                     CALL(evt_btl_camera_set_moveSpeedLv, 0, 3)
@@ -500,7 +512,7 @@ EVT_BEGIN(actend_event)
     IF_INT_EQUAL(LW(0), 3)
         WAIT_MS(200)
         CALL(aud_attack_end)
-        CALL_CHILD(PTR(stop_wait_event))
+        CALL_CHILD(stop_wait_event)
         CALL(evt_msg_print, 2, STRING("mac_0_b_t3_014_4"), 0, BTL_UNIT_LECTURE)
         CALL(evt_btl_camera_set_mode, 0, 3)
         CALL(evt_btl_camera_set_moveto, 0, 92, 94, 320, 92, 44, 13, 30, 11)
@@ -517,7 +529,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 2)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))

@@ -38,10 +38,10 @@ typedef struct EffNanigaWork {
     s32 sfxId;     // 0x4C
 } EffNanigaWork;
 
-void effNanigaMain(EffectEntry* effect);
-void effNanigaDisp(CameraId cameraId, EffectEntry* effect);
-void effNanigaDisp2(CameraId cameraId, EffectEntry* effect);
-void effNanigaDisp3(CameraId cameraId, EffectEntry* effect);
+static void effNanigaMain(EffectEntry* effect);
+static void effNanigaDisp(CameraId cameraId, EffectEntry* effect);
+static void effNanigaDisp2(CameraId cameraId, EffectEntry* effect);
+static void effNanigaDisp3(CameraId cameraId, EffectEntry* effect);
 
 static EVT_BEGIN(sound_evt)
     CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_WHAT3"), LW(0), LW(1), LW(2), 0)
@@ -113,7 +113,7 @@ EffectEntry* effNanigaEntry(s32 type, f32 x, f32 y, f32 z, s32* list, s32 item) 
     return effect;
 }
 
-void effNanigaMain(EffectEntry* effect) {
+static void effNanigaMain(EffectEntry* effect) {
     EffNanigaWork* work = effect->userdata;
     BOOL inBattle;
     Vec pos;
@@ -274,7 +274,7 @@ void effNanigaMain(EffectEntry* effect) {
     }
 }
 
-void effNanigaDisp(CameraId cameraId, EffectEntry* effect) {
+static void effNanigaDisp(CameraId cameraId, EffectEntry* effect) {
     EffNanigaWork* work = effect->userdata;
     CameraEntry* camera = camGetPtr(cameraId);
     Mtx mT, mR, mS, mC;
@@ -349,7 +349,7 @@ void effNanigaDisp(CameraId cameraId, EffectEntry* effect) {
     work->scale = oldScale;
 }
 
-void effNanigaDisp2(CameraId cameraId, EffectEntry* effect) {
+static void effNanigaDisp2(CameraId cameraId, EffectEntry* effect) {
     EffNanigaWork* work = effect->userdata;
     Mtx mT, mR, mS, mC;
 
@@ -367,7 +367,7 @@ void effNanigaDisp2(CameraId cameraId, EffectEntry* effect) {
     animPoseDrawMtx(work->pose, mC, 3, 0.0f, 10.0f);
 }
 
-void effNanigaDisp3(CameraId cameraId, EffectEntry* effect) {
+static void effNanigaDisp3(CameraId cameraId, EffectEntry* effect) {
     EffNanigaWork* work = effect->userdata;
     ItemData* item;
     Mtx mT, mR, mS, mC;

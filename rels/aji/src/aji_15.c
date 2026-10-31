@@ -14,14 +14,13 @@
 #include "evt/evt_npc.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "aji.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
 #include "driver/casedrv.h"
 
-USER_FUNC(peach_chk_aftershower);
-USER_FUNC(peach_set_pos);
+static USER_FUNC(peach_chk_aftershower);
+static USER_FUNC(peach_set_pos);
 
 static BeroEntry bero_entry_data[2];
 extern EvtWord peach_evt_yuge[];
@@ -80,7 +79,7 @@ EVT_BEGIN(peach_evt_yuge)
     RETURN
 EVT_END()
 
-USER_FUNC(peach_set_pos) {
+static USER_FUNC(peach_set_pos) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
@@ -356,7 +355,7 @@ EVT_END()
 EVT_BEGIN(aji_15_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_20_LORD_CRUMP_DEFEATED)
         CALL(evt_npc_check_delete, STRING("軍団ザコエリート"))
     END_IF
@@ -370,16 +369,18 @@ EVT_BEGIN(aji_15_init_evt)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_PEACH1"))
         CALL(evt_snd_envoff, PSND_FADE_OUT)
     END_IF
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 1)
-    CALL_CHILD(PTR(peach_evt_syawa_init))
+#endif
+    CALL_CHILD(peach_evt_syawa_init)
     IF_INT_EQUAL(GSWF(GSWF_AJI15_PEACH1_SHOWER_ROOM_ENTERED), 0)
         SET_VALUE(GSWF(GSWF_AJI15_PEACH1_SHOWER_ROOM_ENTERED), 1)
     END_IF
-    SPAWN_EVENT(PTR(evt_emergency))
+    SPAWN_EVENT(evt_emergency)
     RETURN
 EVT_END()
 
-USER_FUNC(peach_chk_aftershower) {
+static USER_FUNC(peach_chk_aftershower) {
     EvtWord* args = event->args;
 
     if (marioGetPtr()->peachFlags & 0x10) {

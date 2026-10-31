@@ -16,8 +16,8 @@ static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, 8, 0, 0, 32, 0, 0, 0, 255},
 };
 
-void effGuruguruMain(EffectEntry* effect);
-void effGuruguruDisp(CameraId cameraId, EffectEntry* effect);
+static void effGuruguruMain(EffectEntry* effect);
+static void effGuruguruDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effGuruguruN64Entry(s32 type, s32 num, f32 x, f32 y, f32 z, f32 radius) {
     EffectEntry* effect;
@@ -52,7 +52,7 @@ EffectEntry* effGuruguruN64Entry(s32 type, s32 num, f32 x, f32 y, f32 z, f32 rad
     return effect;
 }
 
-void effGuruguruMain(EffectEntry* effect) {
+static void effGuruguruMain(EffectEntry* effect) {
     EffGuruguruN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -89,7 +89,7 @@ void effGuruguruMain(EffectEntry* effect) {
     }
 }
 
-void effGuruguruDisp(CameraId cameraId, EffectEntry* effect) {
+static void effGuruguruDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera = camGetPtr(cameraId);
     EffGuruguruN64Work* work = effect->userdata;
     Mtx mtx;

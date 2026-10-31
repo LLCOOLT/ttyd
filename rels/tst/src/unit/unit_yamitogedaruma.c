@@ -6,7 +6,7 @@
 #include "battle/battle_camera.h"
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 #include "evt/evt_eff.h"
@@ -36,11 +36,19 @@ BattleUnitKind unit_yamitogedaruma = {
     0,
     1,
     1,
+#if VERSION <= VERSION_DEMO_US
+    40,
+    0,
+    1,
+    70,
+    4,
+#else
     34,
     1,
     2,
     70,
     2,
+#endif
     50,
     9999,
     46,
@@ -101,7 +109,11 @@ static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefense defence_turn = {0};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {20, 70, 30, 100, 30, 100, 100, 50, 100, 50, 100, 50, 100, 50, 50, 30, 55, 100, 50, 100, 100, 30};
+#else
 static StatusVulnerability regist = {20, 80, 20, 100, 20, 100, 100, 40, 100, 50, 100, 50, 100, 100, 40, 30, 20, 100, 40, 100, 100, 30};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "TGD_N_1"},
@@ -120,8 +132,8 @@ static PoseTableEntry pose_table[] = {
     {42, "TGD_S_4"},
     {56, "TGD_X_1"},
     {57, "TGD_X_1"},
-    {65, "TGD_T_1"},
-    {69, "TGD_S_4"},
+    {BTL_POSE_TALK, "TGD_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "TGD_S_4"},
 };
 
 static PoseTableEntry pose_table_turn[] = {
@@ -138,8 +150,8 @@ static PoseTableEntry pose_table_turn[] = {
     {39, "TGD_D_2"},
     {56, "TGD_X_2"},
     {57, "TGD_X_2"},
-    {65, "TGD_S_5"},
-    {69, "TGD_S_5"},
+    {BTL_POSE_TALK, "TGD_S_5"},
+    {BTL_POSE_STAY_DEFAULT, "TGD_S_5"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -168,7 +180,11 @@ static BattleWeapon weapon_togedaruma_attack = {
     1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
+#if VERSION <= VERSION_DEMO_US
+    {7, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+#else
     {8, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+#endif
     NULL, // fpDamageFn
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
@@ -261,7 +277,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 

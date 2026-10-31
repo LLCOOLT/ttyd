@@ -24,8 +24,8 @@ typedef struct EffOpukuWcurtainN64Work {
     f32 speed[12];  // 0x5C
 } EffOpukuWcurtainN64Work;
 
-void effOpukuWcurtainMain(EffectEntry* effect);
-void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect);
+static void effOpukuWcurtainMain(EffectEntry* effect);
+static void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effOpukuWcurtainN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -62,7 +62,7 @@ EffectEntry* effOpukuWcurtainN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 
     return effect;
 }
 
-void effOpukuWcurtainMain(EffectEntry* effect) {
+static void effOpukuWcurtainMain(EffectEntry* effect) {
     EffOpukuWcurtainN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -101,7 +101,7 @@ void effOpukuWcurtainMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effOpukuWcurtainDisp, effect);
 }
 
-void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
+static void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffOpukuWcurtainN64Work* work;
     Mtx mtx;

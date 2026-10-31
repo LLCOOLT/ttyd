@@ -12,6 +12,9 @@
 #include "evt/evt_cam.h"
 #include "version.h"
 
+static void effLevelupDisp(CameraId cameraId, EffectEntry* effect);
+static void effLevelupMain(EffectEntry* effect);
+
 typedef struct EffLevelupWork {
     s32 type;    // 0x0
     f32 x;       // 0x4
@@ -31,11 +34,7 @@ u16 y_trans[] = {500, 500, 479, 458, 437, 416, 395, 375, 354, 333, 312, 291, 270
 static s32 texid_tbl[2][6] = {{146, 147, 148, 149, 150, 151}, {146, 147, 148, 149, 150, 151}};
 u16 y_trans[] = {500, 500, 479, 458, 437, 416, 395, 375, 354, 333, 312, 291, 270, 250, 229, 208, 187, 166, 145, 125, 104, 83, 62, 41, 20, 0, 5, 10, 15, 20, 25, 20, 15, 10, 4, 0, 5, 10, 15, 20, 25, 20, 15, 10, 4, 0};
 #endif
-#if VERSION >= VERSION_US
 u8 y_scale[] = {0, 13, 40, 69, 98, 126, 149, 166, 175, 165, 136, 100, 67, 50, 73, 117, 130, 113, 100};
-#else
-u8 y_scale[] = {0, 13, 40, 69, 98, 126, 149, 166, 175, 165, 136, 100, 67, 50, 73, 117, 130, 113, 100};
-#endif
 
 static EVT_BEGIN(evt_shake)
     CALL(evt_cam_shake, 4, FLOAT(0.001953125f), FLOAT(0.001953125f), 50)
@@ -102,7 +101,7 @@ EffectEntry* effLevelupEntry(s32 type, f32 x, f32 y, f32 z, s32 limit) {
     return effect;
 }
 
-void effLevelupMain(EffectEntry* effect) {
+static void effLevelupMain(EffectEntry* effect) {
     EffLevelupWork* work = effect->userdata;
     Vec position2;
     Vec position = {0.0f, 0.0f, 0.0f};
@@ -173,7 +172,7 @@ void effLevelupMain(EffectEntry* effect) {
     }
 }
 
-void effLevelupDisp(CameraId cameraId, EffectEntry* effect) {
+static void effLevelupDisp(CameraId cameraId, EffectEntry* effect) {
     s32 ofs;
     s32 tofs;
     s32 xofs;

@@ -20,7 +20,6 @@
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
 #include "evt/evt_telop.h"
-#include "party/party_motion.h"
 #include "win.h"
 #include "cam_kaiten.h"
 #include "evt/evt_story.h"
@@ -35,8 +34,8 @@ static USER_FUNC(cam_kaiten_get_para);
 static USER_FUNC(cam_kaiten_init);
 static USER_FUNC(cam_kaiten_set_direct);
 static USER_FUNC(cam_kaiten_set_para);
-USER_FUNC(camps25);
-USER_FUNC(camps30);
+static USER_FUNC(camps25);
+static USER_FUNC(camps30);
 
 static BeroEntry bero_entry_data[3];
 
@@ -186,14 +185,14 @@ EVT_BEGIN(win_06_init_evt)
     END_IF
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_tree_mki"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_kusa"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("group22"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_oku_01H081"), MAPOBJ_FLAG_BBOX_CULL)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_END_TO_STAGE_2)
-        CALL_CHILD(PTR(welcome_wonderforest_init))
-        SPAWN_EVENT(PTR(welcome_wonderforest))
+        CALL_CHILD(welcome_wonderforest_init)
+        SPAWN_EVENT(welcome_wonderforest)
     END_IF
     CALL(evt_mobj_save_blk, STRING("mobj_save"), 275, 60, -50, 0, 0)
     RETURN
@@ -323,14 +322,14 @@ static USER_FUNC(cam_kaiten_init) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(camps25) {
+static USER_FUNC(camps25) {
     f32 fovY = 25.0f;
 
     camGetPtr(CAMERA_3D)->fovY = fovY;
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(camps30) {
+static USER_FUNC(camps30) {
     f32 fovY = 30.0f;
 
     camGetPtr(CAMERA_3D)->fovY = fovY;

@@ -23,8 +23,8 @@ typedef struct EffPointGetWork {
     s32 state;    // 0x20
 } EffPointGetWork;
 
-void effPointGetMain(EffectEntry* effect);
-void effPointGetDisp(CameraId cameraId, EffectEntry* effect);
+static void effPointGetMain(EffectEntry* effect);
+static void effPointGetDisp(CameraId cameraId, EffectEntry* effect);
 
 #if VERSION >= VERSION_US
 typedef struct PointGetTex {
@@ -98,7 +98,7 @@ EffectEntry* effPointGetEntry(s32 type, f32 x, f32 y, f32 z, s32 number, s32 dur
     return effect;
 }
 
-void effPointGetMain(EffectEntry* effect) {
+static void effPointGetMain(EffectEntry* effect) {
     EffPointGetWork* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -110,7 +110,7 @@ void effPointGetMain(EffectEntry* effect) {
     work->timer++;
     switch (work->state) {
         case 0:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             work->position.x = intplGetValue(11, -1000.0f, 50.0f * work->scale, work->timer, 45);
 #else
             work->position.x = intplGetValue(11, -1000.0f, 0.0f, work->timer, 45);
@@ -133,7 +133,7 @@ void effPointGetMain(EffectEntry* effect) {
             }
             break;
         case 2:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             work->position.x = intplGetValue(11, 50.0f * work->scale, 1000.0f, work->timer, 60);
 #else
             work->position.x = intplGetValue(11, 0.0f, 1000.0f, work->timer, 60);
@@ -147,9 +147,9 @@ void effPointGetMain(EffectEntry* effect) {
     dispEntry(CAMERA_2D, dispCalcZ(&position), 2, (DispCallback)effPointGetDisp, effect);
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo draws the point count as three fixed digit cells (leading zeros skipped) after the header.
-void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
+static void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     EffPointGetWork* work = effect->userdata;
     CameraEntry* camera = camGetPtr(cameraId);
     f32 scale = work->scale;
@@ -257,7 +257,7 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 #elif VERSION >= VERSION_US
-void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
+static void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     f32 w;
     f32 w1;
     EffPointGetWork* work = effect->userdata;
@@ -402,7 +402,7 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 #else
-void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
+static void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     EffPointGetWork* work = effect->userdata;
     CameraEntry* camera = camGetPtr(cameraId);
     f32 scale = work->scale;

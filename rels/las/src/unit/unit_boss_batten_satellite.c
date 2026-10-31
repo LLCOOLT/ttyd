@@ -10,7 +10,7 @@
 #include "battle/battle_camera.h"
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 #include "system.h"
@@ -92,8 +92,13 @@ BattleUnitKind unit_boss_batten_satellite = {
     0.0f,
     0.0f,
     0.0f,
+#if VERSION <= VERSION_DEMO_US
+    0,
+    0,
+#else
     -3,
     -6,
+#endif
     0.0f,
     0.0f,
     0.0f,
@@ -141,7 +146,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {0, 75, 75, 0, 10, 100, 100, 75, 100, 75, 100, 75, 100, 75, 75, 0, 75, 100, 75, 100, 100, 90};
+#else
 static StatusVulnerability regist = {0, 75, 90, 0, 10, 100, 100, 75, 100, 75, 100, 75, 100, 95, 75, 0, 90, 100, 75, 100, 100, 90};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
@@ -160,8 +169,8 @@ static PoseTableEntry pose_table[] = {
     {40, "S_1"},
     {56, "X_1"},
     {57, "X_1"},
-    {65, "A_1"},
-    {69, "S_1"},
+    {BTL_POSE_TALK, "A_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -251,7 +260,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -265,7 +274,7 @@ EVT_END()
 
 static EVT_BEGIN(attack_event)
     SET_VALUE(LW(9), PTR(&weapon_batten_satellite_attack))
-    CALL_CHILD(PTR(batten_satellite_attack_attack_event))
+    CALL_CHILD(batten_satellite_attack_attack_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -273,7 +282,7 @@ EVT_END()
 EVT_BEGIN(batten_satellite_attack_attack_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("F_1"))
     WAIT_MS(400)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
     CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))

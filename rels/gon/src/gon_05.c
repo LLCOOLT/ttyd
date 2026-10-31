@@ -14,7 +14,6 @@
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "gon.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -223,7 +222,7 @@ static EVT_BEGIN(init_0)
 EVT_END()
 
 static EVT_BEGIN(main_0)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     SET_TYPE(239)
 #endif
     CALL(evt_mobj_hitevt_onoff, STRING("me"), 0)
@@ -453,7 +452,7 @@ EVT_BEGIN(init_1)
 EVT_END()
 
 EVT_BEGIN(main_1)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     SET_TYPE(239)
 #endif
     CALL(evt_mobj_hitevt_onoff, STRING("me"), 0)
@@ -672,7 +671,7 @@ s32 key_tbl00[] = {
 EVT_BEGIN(evt_chk00)
     CALL(evt_pouch_check_item, ITEM_CASTLE_KEY_0x0C, LW(0))
     IF_INT_GREATER(LW(0), 0)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         CALL(evt_win_item_select, PTR(key_tbl00), LW(0))
 #else
         CALL(evt_win_item_select, 0, PTR(key_tbl00), LW(0), 0)
@@ -686,7 +685,7 @@ EVT_END()
 
 static EVT_BEGIN(evt_unlock00)
     SET_VALUE(LW(0), STRING("w_bero_3"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_13_03_LOCK_2)
     RETURN
 EVT_END()
@@ -698,7 +697,7 @@ s32 key_tbl01[] = {
 EVT_BEGIN(evt_chk01)
     CALL(evt_pouch_check_item, ITEM_CASTLE_KEY_0x0E, LW(0))
     IF_INT_GREATER(LW(0), 0)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         CALL(evt_win_item_select, PTR(key_tbl01), LW(0))
 #else
         CALL(evt_win_item_select, 0, PTR(key_tbl01), LW(0), 0)
@@ -712,7 +711,7 @@ EVT_END()
 
 static EVT_BEGIN(evt_unlock01)
     SET_VALUE(LW(0), STRING("w_bero_5"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_15_04_LOCK_4)
     RETURN
 EVT_END()
@@ -725,7 +724,7 @@ EVT_END()
 EVT_BEGIN(gon_05_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_GON1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_GON1"))
     CALL(evt_snd_set_rev_mode, 2)
@@ -766,36 +765,27 @@ EVT_BEGIN(gon_05_init_evt)
     CALL(evt_npc_set_width, STRING("\"カロン03\""), 30)
     CALL(evt_npc_set_height, STRING("\"カロン03\""), 7)
     CALL(evt_mobj_float_blk, STRING("blk_0"), 120, 815, 150, 2, 2, 0, LSWF(4))
-    CALL_CHILD(PTR(init_0))
+    CALL_CHILD(init_0)
     CALL(evt_mobj_switch_float_blk, STRING("sw_0"), 20, 1399, 150, STRING("blk_0"), 2, PTR(main_0), LSWF(4))
     CALL(evt_mobj_flag_onoff, 1, STRING("blk_0"), MOBJ_FLAG_NO_CULL)
     CALL(evt_mobj_float_blk, STRING("blk_1"), 200, 0, -150, 0, 2, 0, LSWF(5))
-    CALL_CHILD(PTR(init_1))
+    CALL_CHILD(init_1)
     CALL(evt_mobj_switch_float_blk, STRING("sw_1"), FLOAT(-2.5f), 100, -175, STRING("blk_1"), 0, PTR(main_1), LSWF(5))
     CALL(evt_mobj_flag_onoff, 1, STRING("blk_1"), MOBJ_FLAG_NO_CULL)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_15_03_KEY_4)
-#if VERSION == VERSION_DEMO
-        CALL(evt_item_entry, STRING("key00"), ITEM_CASTLE_KEY_0x0E, 200, 1340, 150, 15, -1, PTR(key_get))
-#else
-        CALL(evt_item_entry, STRING("key00"), ITEM_CASTLE_KEY_0x0E, 200, 1340, 150, 16, -1, PTR(key_get))
-#endif
+        CALL(evt_item_entry, STRING("key00"), ITEM_CASTLE_KEY_0x0E, 200, 1340, 150, ITEM_ENTRY_FIXED, -1, PTR(key_get))
     END_IF
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("item00"), ITEM_STAR_PIECE, -200, 240, -150, 15, GSWF(GSWF_GON05_STAR_PIECE), 0)
-    CALL(evt_item_entry, STRING("item01"), ITEM_LAST_STAND_P, 210, 915, 150, 15, GSWF(GSWF_GON05_LAST_STAND_P_TAKEN), 0)
-#else
-    CALL(evt_item_entry, STRING("item00"), ITEM_STAR_PIECE, -200, 240, -150, 16, GSWF(GSWF_GON05_STAR_PIECE), 0)
-    CALL(evt_item_entry, STRING("item01"), ITEM_LAST_STAND_P, 210, 915, 150, 16, GSWF(GSWF_GON05_LAST_STAND_P_TAKEN), 0)
-#endif
+    CALL(evt_item_entry, STRING("item00"), ITEM_STAR_PIECE, -200, 240, -150, ITEM_ENTRY_FIXED, GSWF(GSWF_GON05_STAR_PIECE), 0)
+    CALL(evt_item_entry, STRING("item01"), ITEM_LAST_STAND_P, 210, 915, 150, ITEM_ENTRY_FIXED, GSWF(GSWF_GON05_LAST_STAND_P_TAKEN), 0)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_13_03_LOCK_2)
         CALL(evt_mobj_lock, STRING("mobj_lock00"), ITEM_CASTLE_KEY_0x0C, -240, 750, 0, 90, PTR(evt_chk00), PTR(evt_unlock00), GSWF(GSWF_GON05_DOOR_A_UNLOCKED))
         SET_VALUE(LW(0), STRING("w_bero_3"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     END_IF
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_15_04_LOCK_4)
         CALL(evt_mobj_lock, STRING("mobj_lock01"), ITEM_CASTLE_KEY_0x0E, -240, 1900, 0, 90, PTR(evt_chk01), PTR(evt_unlock01), GSWF(GSWF_GON05_DOOR_B_UNLOCKED))
         SET_VALUE(LW(0), STRING("w_bero_5"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     END_IF
     CALL(evt_mobj_save_blk, STRING("mobj_save"), 0, 60, 0, 0, 0)
     CALL(evt_mobj_powerupblk, STRING("pblk00"), -200, 1950, -150, 0, GSWF(GSWF_GON05_SHINE_SPRITE), 0)

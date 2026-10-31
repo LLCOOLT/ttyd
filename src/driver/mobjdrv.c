@@ -46,7 +46,7 @@ typedef struct CubeJoint {
     MapFileJointPart part;
 } CubeJoint;
 
-#if VERSION != VERSION_DEMO // small data in retail; in the demo's .data each sits before its joint
+#if VERSION >= VERSION_JP // small data in retail; in the demo's .data each sits before its joint
 CubeDrawMode cubeMSJ = {{0, 1, 0, 0, 0, (s32)0x80000000}, 0};
 
 CubeDrawMode front2MSJ = {{0, 1, 0, 0, 0, 0}, 0};
@@ -255,7 +255,7 @@ u32 cubeDN[1230] = {
 
 CubeMesh cubeDP = {0, {0}, 0, 6, 0, cubeDDT, {cubeDN, &cubeDN[205], &cubeDN[410], &cubeDN[615], &cubeDN[820], &cubeDN[1025]}};
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 CubeDrawMode cubeMSJ = {{0, 1, 0, 0, 0, (s32)0x80000000}, 0};
 #endif
 CubeJoint cubeDJ = {
@@ -277,7 +277,7 @@ CubeJoint frontDJ = {
     { NULL, (MapFileMesh*)&frontDP },
 };
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 CubeDrawMode front2MSJ = {{0, 1, 0, 0, 0, 0}, 0};
 #endif
 CubeMesh front2DP = {0, {0}, 0, 5, 0, cubeDDT, {cubeDN, &cubeDN[205], &cubeDN[410], &cubeDN[615], &cubeDN[820]}};
@@ -297,7 +297,7 @@ static MapObjectWork work[MAX_MOBJ_WORK];
 
 #define mobjGetWorkFlag(flag) (flag ? &work[1] : &work[0])
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 int mobjCheckKururingFloorItem(MapObjectEntry* entry);
 #else
 static inline int mobjCheckKururingFloorItem(MapObjectEntry* entry);
@@ -322,7 +322,7 @@ inline MapObjectWork* mobjGetWork(void) {
     }
 }
 
-void mobjDispXLU(CameraId camId, void* param) {
+static void mobjDispXLU(CameraId camId, void* param) {
     MapObjectEntry* entry = param; // cast to correct type
 
     if (entry->flags & MOBJ_FLAG_PAPER_TEX) {
@@ -341,7 +341,7 @@ void mobjDispXLU(CameraId camId, void* param) {
     }
 }
 
-void mobjDisp(CameraId camId, void* param) {
+static void mobjDisp(CameraId camId, void* param) {
     MapObjectEntry* entry = param; // cast to correct type
     DispEntry* disp;
 
@@ -371,7 +371,7 @@ void mobjDisp(CameraId camId, void* param) {
     }
 }
 
-void mobjDisp_OffscreenXLU(CameraId camId, void* param) {
+static void mobjDisp_OffscreenXLU(CameraId camId, void* param) {
     MapObjectEntry* entry = param; // cast to correct type
     u16 left, top, right, bottom;
 
@@ -465,7 +465,7 @@ void mobjHitEntry(MapObjectEntry* entry, s32 type) {
             strcat(entry->hitObj[0].name, entry->name);
             *(char**)(entry->hitObj[0].jointData + 8) = entry->hitObj[0].name;
             entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[0].jointData + 8), mtx);
-#if VERSION != VERSION_DEMO // the demo hit objects have no mobj back pointer
+#if VERSION >= VERSION_JP // the demo hit objects have no mobj back pointer
             entry->hitObj[0].hitObject->mobj = entry;
 #endif
             break;
@@ -488,7 +488,7 @@ void mobjHitEntry(MapObjectEntry* entry, s32 type) {
             strcat(entry->hitObj[0].name, entry->name);
             *(char**)(entry->hitObj[0].jointData + 8) = entry->hitObj[0].name;
             entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[0].jointData + 8), mtx);
-#if VERSION != VERSION_DEMO // the demo hit objects have no mobj back pointer
+#if VERSION >= VERSION_JP // the demo hit objects have no mobj back pointer
             entry->hitObj[0].hitObject->mobj = entry;
 #endif
             break;
@@ -511,7 +511,7 @@ void mobjHitEntry(MapObjectEntry* entry, s32 type) {
             strcat(entry->hitObj[0].name, entry->name);
             *(char**)(entry->hitObj[0].jointData + 8) = entry->hitObj[0].name;
             entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[0].jointData + 8), mtx);
-#if VERSION != VERSION_DEMO // the demo hit objects have no mobj back pointer
+#if VERSION >= VERSION_JP // the demo hit objects have no mobj back pointer
             entry->hitObj[0].hitObject->mobj = entry;
 #endif
             memcpy(entry->hitObj[1].jointData + 8, &front2DJ, sizeof(CubeJoint));
@@ -519,7 +519,7 @@ void mobjHitEntry(MapObjectEntry* entry, s32 type) {
             strcat(entry->hitObj[1].name, entry->name);
             *(char**)(entry->hitObj[1].jointData + 8) = entry->hitObj[1].name;
             entry->hitObj[1].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[1].jointData + 8), mtx);
-#if VERSION != VERSION_DEMO // the demo hit objects have no mobj back pointer
+#if VERSION >= VERSION_JP // the demo hit objects have no mobj back pointer
             entry->hitObj[1].hitObject->mobj = entry;
 #endif
             break;
@@ -710,7 +710,7 @@ void mobjMain(void) {
                     entry->position.y += entry->velocity.y;
                     entry->velocity.y -= entry->gravity;
                 } else {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                     dist = 1.0f + (f32)__fabs(entry->velocity.y);
                     if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, entry->position.x,
                                        10.0f + entry->position.y, entry->position.z, 0.0f, -10.0f, 0.0f) != NULL) {
@@ -760,7 +760,7 @@ void mobjMain(void) {
                         hit = 1;
                         goto hitDone;
                     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                     if ((entry->flags & MOBJ_HIT_FRONT_ACTION) && mario->hitobjFront == hitPtr &&
                         (mario->buttonTrg & PAD_BUTTON_A) && !partyFlag) {
 #else
@@ -843,7 +843,7 @@ void mobjMain(void) {
             if ((u32)marioStGetSystemLevel() != 0) {
                 entry->flags &= ~MOBJ_FLAG_HIT;
             }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             {
                 MarioMotion motion = marioGetPtr()->currMotionId;
                 if (motion == 0x1f || motion == 0x20) {
@@ -950,7 +950,7 @@ MapObjectEntry* mobjNameToPtrNoAssert(const char* name) {
     return entry;
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo searches the mobj list for the entry whose first hit object is hitObj
 MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hitObj) {
     int i;
@@ -1058,7 +1058,7 @@ void mobjCalcMtx2(MapObjectEntry* entry) {
 }
 
 BOOL mobjGetHint(MapObjectEntry* entry) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (entry == NULL) {
         return 0;
     }
@@ -1090,7 +1090,7 @@ s32 mobjCheckItemboxOpen(MapObjectEntry* entry) {
     }
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // FAKE: stand-in for the stripped function whose constants open the .sdata2 pool; the demo's fall code uses
 // 1 + |vy| and a -10 ray, so its constants come in this order (and its 2.0 opens the .rodata doubles)
 void mobjStrippedFallPool(MapObjectEntry* entry) {
@@ -1159,7 +1159,7 @@ MapObjectEntry* mobjNearDistCheck2(f32 x, f32 y, f32 z, f32 minMagnitude, char**
     entry = wp->entries;
     ret = NULL;
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     unusedVec = (Vec){0.0f, 0.0f, 0.0f};
 #endif
     _pos = (Vec){0.0f, 0.0f, 0.0f};
@@ -1208,7 +1208,7 @@ MapObjectEntry* mobjNearDistCheck2(f32 x, f32 y, f32 z, f32 minMagnitude, char**
 
 const char kururinName[] = "MOBJ_KururinFloor";
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 int mobjCheckKururingFloorItem(MapObjectEntry* entry) { // was always inlined in retail but not in demo
 #else
 static inline int mobjCheckKururingFloorItem(MapObjectEntry* entry) { // was always inlined in retail but not in demo
@@ -1226,7 +1226,7 @@ static inline int mobjCheckKururingFloorItem(MapObjectEntry* entry) { // was alw
     }
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 // FAKE: retail stand-in for the stripped fall function (see the demo one above): its 0.0f, 10.0f, 1.0f,
 // -1.0f and -0.5f open the .sdata2 pool in the target order. Dead-stripped at link.
 void mobjStrippedFallPool(MapObjectEntry* entry) {

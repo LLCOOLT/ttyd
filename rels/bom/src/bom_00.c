@@ -12,7 +12,7 @@
 #include "evt/evt_party.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
+#include "party.h"
 #include "bom.h"
 #include "data_tables.h"
 #include "evt/evt_story.h"
@@ -34,7 +34,7 @@ static TreeAccess tree_tbl[] = {
 
 static EVT_BEGIN(evt_tree)
     SET_VALUE(LW(0), PTR(tree_tbl))
-    CALL_CHILD(PTR(evt_sub_tree_access_entry))
+    CALL_CHILD(evt_sub_tree_access_entry)
     RETURN
 EVT_END()
 
@@ -149,19 +149,19 @@ EVT_END()
 EVT_BEGIN(bom_00_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_BOM1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_BOM1"))
-    CALL_CHILD(PTR(evt_bom_snowfall))
-    CALL_CHILD(PTR(evt_tree))
+    CALL_CHILD(evt_bom_snowfall)
+    CALL_CHILD(evt_tree)
     CALL(evt_mobj_brick, STRING("mobj_badge_gat2"), 215, 65, -75, ITEM_DOUBLE_DIP_P, 12, 0, GSWF(GSWF_BOM00_DOUBLE_DIP_P_BLOCK_HIT))
     CALL(evt_mobj_kururing_floor, STRING("kururin1"), -300, 5, 0, STRING("S_gra02_dai"), 125, GSWF(GSWF_BOM00_STAR_PIECE_PANEL))
     IF_INT_EQUAL(GSWF(GSWF_BOM_FAHR_REACHED), 0)
         SWITCH(GSW(GSW_STORY_PROGRESS))
             CASE_LESS(STORY_STG6_71_01)
-            SPAWN_EVENT(PTR(first_evt2))
+            SPAWN_EVENT(first_evt2)
             CASE_DEFAULT
-            SPAWN_EVENT(PTR(first_evt))
+            SPAWN_EVENT(first_evt)
         END_SWITCH
     ELSE
         IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_71_01)

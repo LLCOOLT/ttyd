@@ -99,7 +99,11 @@ static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {95, 10, 10, 100, 10, 100, 100, 10, 100, 10, 100, 10, 100, 10, 10, 100, 80, 100, 10, 100, 100, 10};
+#else
 static StatusVulnerability regist = {50, 10, 10, 100, 30, 100, 100, 10, 100, 10, 100, 10, 100, 10, 10, 100, 60, 100, 10, 100, 100, 10};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_twinkling_pansy", "c_kpansy", 0.0f, 0.0f, 0.0f, 0.0f, 29.0f, 0.0f, 0.0f, 34.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
@@ -131,7 +135,11 @@ static BattleWeapon weapon_twinkling_pansy_attack = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
+#if VERSION <= VERSION_DEMO_US
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
+#else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
+#endif
     COUNTER_RESIST_ALL, // counterResistFlags
     TARGET_WEIGHT_RANDOM, // targetWeightFlags
     75, // sleepChance
@@ -160,10 +168,10 @@ static EVT_BEGIN(attack_event)
     CALL(evt_sub_random, LW(0), LW(1))
     IF_INT_LESS(LW(1), 20)
         SET_VALUE(LW(9), PTR(&weapon_twinkling_pansy_attack))
-        CALL_CHILD(PTR(song_event))
+        CALL_CHILD(song_event)
         GOTO(99)
     END_IF
-    CALL_CHILD(PTR(escape_event))
+    CALL_CHILD(escape_event)
     GOTO(99)
     LABEL(99)
     RETURN
@@ -186,8 +194,8 @@ static PoseTableEntry pose_table[] = {
     {40, "PAN_W_1"},
     {56, "PAN_X_1"},
     {57, "PAN_X_1"},
-    {65, "PAN_T_1"},
-    {69, "PAN_S_1"},
+    {BTL_POSE_TALK, "PAN_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "PAN_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -200,7 +208,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
-    SPAWN_EVENT(PTR(twink_event))
+    SPAWN_EVENT(twink_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -227,7 +235,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -326,7 +334,7 @@ static EVT_BEGIN(song_event)
     END_LOOP
     CALL(evt_map_blend_off, 0)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     WAIT_MS(500)
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)

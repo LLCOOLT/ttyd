@@ -104,7 +104,11 @@ static BattleUnitDefense defence_fmario = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr_fmario = {{2, 2, 2, 2, 2}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist_fmario = {0, 0, 0, 100, 0, 100, 100, 0, 100, 0, 100, 0, 100, 0, 0, 0, 0, 100, 0, 100, 100, 0};
+#else
 static StatusVulnerability regist_fmario = {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+#endif
 
 static PoseTableEntry pose_table_fmario_stay[] = {
     {1, "EM_N_1"},
@@ -120,8 +124,8 @@ static PoseTableEntry pose_table_fmario_stay[] = {
     {40, "EM_W_1"},
     {56, "EM_D_3"},
     {57, "EM_D_3"},
-    {65, "EM_T_1"},
-    {69, "EM_S_1"},
+    {BTL_POSE_TALK, "EM_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "EM_S_1"},
 };
 
 static BattleDataEntry data_table_fmario[] = {
@@ -324,7 +328,7 @@ EVT_END()
 static EVT_BEGIN(damage_event_fmario)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -339,16 +343,16 @@ static EVT_BEGIN(attack_event_fmario)
     SWITCH(LW(0))
         CASE_EQUAL(0)
         SET_VALUE(LW(9), PTR(&weapon_masao_jump))
-        CALL_CHILD(PTR(marioAttackEvent_NormalJump))
+        CALL_CHILD(marioAttackEvent_NormalJump)
         CASE_EQUAL(1)
         SET_VALUE(LW(9), PTR(&weapon_masao_hammer))
-        CALL_CHILD(PTR(marioAttackEvent_NormalHammer))
+        CALL_CHILD(marioAttackEvent_NormalHammer)
         CASE_EQUAL(2)
         SET_VALUE(LW(9), PTR(&weapon_masao_kururin_jump))
-        CALL_CHILD(PTR(marioAttackEvent_KururinJump))
+        CALL_CHILD(marioAttackEvent_KururinJump)
         CASE_EQUAL(3)
         SET_VALUE(LW(9), PTR(&weapon_masao_kaiten_hammer))
-        CALL_CHILD(PTR(marioAttackEvent_KaitenHammer))
+        CALL_CHILD(marioAttackEvent_KaitenHammer)
     END_SWITCH
     LABEL(90)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)

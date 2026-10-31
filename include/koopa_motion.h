@@ -8,8 +8,6 @@ void kpa_walk(void);
 
 void quake_kpaLandOn(void);
 
-void kpaSwimMove(void);
-
 void kpaSetSpec(void);
 BOOL kpaHipAttackOk(void);
 void kpa_stay(void);

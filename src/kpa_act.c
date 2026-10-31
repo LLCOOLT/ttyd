@@ -18,7 +18,7 @@ typedef struct KpaScore {
 } KpaScore;
 
 KpaScore* ksdp;
-USER_FUNC(kpa_score_disp_main);
+static USER_FUNC(kpa_score_disp_main);
 EVT_BEGIN(kpa_score_disp_evt)
     LOOP(0)
         CALL(kpa_score_disp_main)
@@ -27,9 +27,9 @@ EVT_BEGIN(kpa_score_disp_evt)
     RETURN
 EVT_END()
 
-void kpaScoreDisp(void);
+static void kpaScoreDisp(void);
 
-void kpaScoreDisp(void) {
+static void kpaScoreDisp(void) {
     Mtx m;
     Mtx scale;
     s32 i;
@@ -45,7 +45,7 @@ void kpaScoreDisp(void) {
     }
 }
 
-USER_FUNC(kpa_score_disp_main) {
+static USER_FUNC(kpa_score_disp_main) {
     s32 i;
     for (i = 0; i < 50; i++) {
         if (ksdp[i].timer != 0) {

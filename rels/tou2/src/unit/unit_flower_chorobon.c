@@ -103,7 +103,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {90, 90, 80, 100, 80, 100, 100, 65, 100, 70, 100, 70, 100, 65, 65, 85, 85, 100, 65, 100, 100, 95};
+#else
 static StatusVulnerability regist = {85, 85, 80, 100, 85, 100, 100, 70, 100, 90, 100, 90, 100, 95, 60, 85, 80, 100, 80, 100, 100, 95};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_flower_chorobon", "c_chorobon_f", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
@@ -207,7 +211,11 @@ static BattleWeapon weapon_chorobon_magic_attack = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
+#if VERSION <= VERSION_DEMO_US
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
+#else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
+#endif
     COUNTER_RESIST_ALL, // counterResistFlags
     TARGET_WEIGHT_UNUSED_2000, // targetWeightFlags
     0, // sleepChance
@@ -244,11 +252,11 @@ static EVT_BEGIN(attack_event)
     CALL(evt_sub_random, LW(0), LW(1))
     IF_INT_LESS(LW(1), 50)
         LABEL(10)
-        CALL_CHILD(PTR(drain_attack_event))
+        CALL_CHILD(drain_attack_event)
         GOTO(99)
     END_IF
     LABEL(20)
-    CALL_CHILD(PTR(magic_attack_event))
+    CALL_CHILD(magic_attack_event)
     GOTO(99)
     LABEL(99)
     RETURN
@@ -381,8 +389,8 @@ static PoseTableEntry pose_table[] = {
     {40, "CBN_W_1"},
     {56, "CBN_X_1"},
     {57, "CBN_X_1"},
-    {65, "CBN_T_1"},
-    {69, "CBN_S_1"},
+    {BTL_POSE_TALK, "CBN_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "CBN_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -467,7 +475,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -476,7 +484,7 @@ static EVT_BEGIN(counter_damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_GetDamageCode, LW(10), LW(0))
-    CALL_CHILD(PTR(subsetevt_counter_damage))
+    CALL_CHILD(subsetevt_counter_damage)
     CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 512, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 2048, LW(0))
@@ -484,7 +492,7 @@ static EVT_BEGIN(counter_damage_event)
             RETURN
         END_IF
     END_IF
-    CALL_CHILD(PTR(return_event))
+    CALL_CHILD(return_event)
     RETURN
 EVT_END()
 
@@ -493,7 +501,7 @@ static EVT_BEGIN(return_event)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(4.0f), FLOAT(0.5996094f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
     SET_VALUE(LW(8), 40)
-    CALL_CHILD(PTR(rabbit_move))
+    CALL_CHILD(rabbit_move)
     RETURN
 EVT_END()
 

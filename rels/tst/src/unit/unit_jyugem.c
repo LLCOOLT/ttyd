@@ -107,7 +107,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {80, 90, 100, 100, 80, 100, 100, 70, 100, 80, 100, 80, 100, 80, 80, 90, 100, 100, 80, 100, 100, 95};
+#else
 static StatusVulnerability regist = {80, 90, 105, 100, 80, 100, 100, 100, 100, 90, 100, 90, 100, 95, 80, 90, 100, 100, 80, 100, 100, 95};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "JGM_N_1"},
@@ -125,8 +129,8 @@ static PoseTableEntry pose_table[] = {
     {40, "JGM_W_1"},
     {56, "JGM_I_1"},
     {57, "JGM_I_1"},
-    {65, "JGM_T_1"},
-    {69, "JGM_S_1"},
+    {BTL_POSE_TALK, "JGM_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "JGM_S_1"},
 };
 
 static PoseTableEntry pose_table_hold[] = {
@@ -145,8 +149,8 @@ static PoseTableEntry pose_table_hold[] = {
     {40, "JGM_S_2"},
     {56, "JGM_S_2"},
     {57, "JGM_S_2"},
-    {65, "JGM_S_2"},
-    {69, "JGM_S_2"},
+    {BTL_POSE_TALK, "JGM_S_2"},
+    {BTL_POSE_STAY_DEFAULT, "JGM_S_2"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -157,7 +161,7 @@ static BattleDataEntry data_table[] = {
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_jyugem", "c_jugemu", 0.0f, 0.0f, 0.0f, 0.0f, 35.0f, 0.0f, 0.0f, 50.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
-    {2, /*"パイポ"*/"\x83\x70\x83\x43\x83\x7C", "c_jugemu", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
+    {2, "パイポ", "c_jugemu", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
 };
 
 static BattleWeapon weapon_jyugem_attack = {
@@ -225,7 +229,7 @@ static EVT_BEGIN(damage_event)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(btldefaultevt_Damage))
+        CALL_CHILD(btldefaultevt_Damage)
     ELSE
         CALL(btlevtcmd_GetDamage, LW(10), LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 1)
@@ -264,7 +268,7 @@ static EVT_BEGIN(damage_event)
             CALL(btlevtcmd_OffPartsCounterAttribute, LW(10), 1, 1)
             CALL(btlevtcmd_AnimeSetPoseTable, LW(10), 1, PTR(pose_table))
             CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
-            CALL_CHILD(PTR(btldefaultevt_Damage))
+            CALL_CHILD(btldefaultevt_Damage)
         ELSE
             CALL(btlevtcmd_GetDamageCode, LW(10), LW(0))
             IF_INT_EQUAL(LW(0), 22)
@@ -309,7 +313,7 @@ static EVT_BEGIN(damage_event)
                 END_INLINE_EVENT
             END_IF
             LABEL(90)
-            CALL_CHILD(PTR(btldefaultevt_Damage))
+            CALL_CHILD(btldefaultevt_Damage)
         END_IF
     END_IF
     RETURN
@@ -412,7 +416,7 @@ static EVT_BEGIN(attack_event)
                 SUBTRACT(LW(2), 10)
                 CALL(btlevtcmd_CheckSpace, LW(3), LW(0), LW(1), LW(2), 40, 0, 0, 0)
                 IF_INT_EQUAL(LW(3), -1)
-                    CALL_CHILD(PTR(friend_event))
+                    CALL_CHILD(friend_event)
                     GOTO(99)
                 END_IF
             ELSE
@@ -428,7 +432,7 @@ static EVT_BEGIN(attack_event)
                 ADD(LW(2), 10)
                 CALL(btlevtcmd_CheckSpace, LW(3), LW(0), LW(1), LW(2), 40, 0, 0, 0)
                 IF_INT_EQUAL(LW(3), -1)
-                    CALL_CHILD(PTR(friend_event))
+                    CALL_CHILD(friend_event)
                     GOTO(99)
                 END_IF
             ELSE
@@ -444,11 +448,11 @@ static EVT_BEGIN(attack_event)
     SET_VALUE(LW(11), 65)
     IF_INT_LESS(LW(10), LW(11))
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
-        CALL_CHILD(PTR(normal_attack_event))
+        CALL_CHILD(normal_attack_event)
         GOTO(99)
     ELSE
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
-        CALL_CHILD(PTR(normal_attack_event))
+        CALL_CHILD(normal_attack_event)
         GOTO(99)
     END_IF
     LABEL(99)

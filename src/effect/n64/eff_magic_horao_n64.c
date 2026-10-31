@@ -37,8 +37,8 @@ static effN64Vtx size64x64_tex64x64_vtx[] = {
     {-3200, 6400, 0, 0, 2048, 0, 0, 0, 0xFF},
 };
 
-void effMagicHoraoMain(EffectEntry* effect);
-void effMagicHoraoDisp(CameraId cameraId, EffectEntry* effect);
+static void effMagicHoraoMain(EffectEntry* effect);
+static void effMagicHoraoDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effMagicHoraoN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a, s32 b, f32 c, s32 d, f32 e, s32 f) {
     EffectEntry* effect;
@@ -70,7 +70,7 @@ EffectEntry* effMagicHoraoN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a, s32 b, 
     return effect;
 }
 
-void effMagicHoraoMain(EffectEntry* effect) {
+static void effMagicHoraoMain(EffectEntry* effect) {
     EffMagicHoraoN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -137,7 +137,7 @@ void effMagicHoraoMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effMagicHoraoDisp, effect);
 }
 
-void effMagicHoraoDisp(CameraId cameraId, EffectEntry* effect) {
+static void effMagicHoraoDisp(CameraId cameraId, EffectEntry* effect) {
     effN64Vtx* vtx;
     effN64Vtx* v;
     s32 i;

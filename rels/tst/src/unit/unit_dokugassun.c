@@ -14,7 +14,7 @@
 #include "battle/battle_camera.h"
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_sub.h"
@@ -30,7 +30,11 @@ static StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_dokugassun_attack;
 static BattleWeapon weapon_dokugassun_poisongas_attack;
+#if VERSION <= VERSION_DEMO_US
+static EvtWord poisongas_event[274];
+#else
 static EvtWord poisongas_event[303];
+#endif
 static PoseTableEntry pose_table[17];
 static BattleDataEntry data_table[3];
 static EvtWord init_event[37];
@@ -41,7 +45,11 @@ static EvtWord counter_event[2];
 static EvtWord unison_phase_event[140];
 static EvtWord normal_attack_event[386];
 static EvtWord charge_event[58];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord wait_event[12];
+#else
 static EvtWord wait_event[13];
+#endif
 
 BattleUnitKind unit_dokugassun = {
     166,
@@ -50,11 +58,19 @@ BattleUnitKind unit_dokugassun = {
     0,
     1,
     1,
+#if VERSION <= VERSION_DEMO_US
+    45,
+    0,
+    1,
+    70,
+    4,
+#else
     34,
     2,
     2,
     70,
     2,
+#endif
     50,
     9999,
     35,
@@ -113,7 +129,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {50, 70, 70, 0, 60, 100, 100, 60, 100, 60, 100, 60, 100, 60, 60, 60, 80, 100, 60, 100, 100, 20};
+#else
 static StatusVulnerability regist = {65, 65, 90, 0, 60, 100, 100, 100, 100, 80, 100, 80, 100, 80, 50, 60, 85, 100, 60, 100, 100, 20};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_dokugassun", "c_kmoon_g", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 30, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
@@ -185,7 +205,11 @@ static BattleWeapon weapon_dokugassun_poisongas_attack = {
     COUNTER_RESIST_ALL, // counterResistFlags
     TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, // sleepChance..dizzyTime
+#if VERSION <= VERSION_DEMO_US
+    50, // poisonChance
+#else
     70, // poisonChance
+#endif
     10, // poisonTime
     1, // poisonStrength
     0, 0, 0, 0, 0, 0, 0, 0, // confuseChance..burnTime
@@ -208,20 +232,29 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, 512, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         SET_VALUE(LW(9), PTR(&weapon_dokugassun_poisongas_attack))
-        CALL_CHILD(PTR(poisongas_event))
+        CALL_CHILD(poisongas_event)
         GOTO(99)
     END_IF
+#if VERSION <= VERSION_DEMO_US
+    SET_VALUE(LW(0), 70)
+    ADD(LW(0), 30)
+#else
     SET_VALUE(LW(0), 65)
     ADD(LW(0), 35)
+#endif
     SUBTRACT(LW(0), 1)
     CALL(evt_sub_random, LW(0), LW(1))
+#if VERSION <= VERSION_DEMO_US
+    SET_VALUE(LW(0), 70)
+#else
     SET_VALUE(LW(0), 65)
+#endif
     IF_INT_LESS(LW(1), LW(0))
         SET_VALUE(LW(9), PTR(&weapon_dokugassun_attack))
-        CALL_CHILD(PTR(normal_attack_event))
+        CALL_CHILD(normal_attack_event)
         GOTO(99)
     END_IF
-    CALL_CHILD(PTR(charge_event))
+    CALL_CHILD(charge_event)
     GOTO(99)
     LABEL(99)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -245,10 +278,12 @@ static EVT_BEGIN(poisongas_event)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("R_1"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_KUMO_MOVE3"), EVT_NULLPTR, 0, LW(15))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, -40, LW(1), LW(2), 30, 0, 4, 0, -1)
+#endif
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_DOKU_KUMO_CHARGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
@@ -343,8 +378,8 @@ static PoseTableEntry pose_table[] = {
     {42, "R_1"},
     {56, "X_1"},
     {57, "X_1"},
-    {65, "T_1"},
-    {69, "S_1"},
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -361,7 +396,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
-    SPAWN_EVENT(PTR(barrier_event))
+    SPAWN_EVENT(barrier_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -393,7 +428,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -626,4 +661,8 @@ static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, 1, 1, 1)
     RETURN
+#if VERSION <= VERSION_DEMO_US
+EVT_END()
+#else
 EVT_END_PAD()
+#endif

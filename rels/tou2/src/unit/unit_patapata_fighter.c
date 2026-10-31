@@ -143,7 +143,11 @@ static BattleUnitDefense defence_patapata = {{1, 1, 1, 1, 1}};
 
 static BattleUnitDefenseAttr defence_patapata_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist_patapata = {90, 90, 110, 100, 85, 100, 100, 85, 100, 85, 100, 85, 100, 85, 85, 90, 110, 100, 90, 100, 100, 100};
+#else
 static StatusVulnerability regist_patapata = {85, 90, 110, 100, 80, 100, 100, 80, 100, 95, 100, 95, 100, 95, 80, 85, 100, 100, 90, 100, 100, 100};
+#endif
 
 static BattleUnitKindPart parts_patapata[] = {
     {1, "btl_un_patapata_fighter", "c_touginoko", 0.0f, 0.0f, 0.0f, 0.0f, 30.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence_patapata, &defence_patapata_attr, 0x600809, 0, pose_table_patapata},
@@ -166,8 +170,8 @@ static PoseTableEntry pose_table_patapata[] = {
     {40, "PTP_W_1"},
     {56, "PTP_X_1"},
     {57, "PTP_X_1"},
-    {65, "PTP_T_1"},
-    {69, "PTP_S_1"},
+    {BTL_POSE_TALK, "PTP_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "PTP_S_1"},
 };
 
 static BattleDataEntry data_table_patapata[] = {
@@ -409,8 +413,8 @@ static PoseTableEntry pose_table[] = {
     {40, "NKT_W_1"},
     {56, "NKT_X_1"},
     {57, "NKT_X_1"},
-    {65, "NKT_T_1"},
-    {69, "NKT_S_1"},
+    {BTL_POSE_TALK, "NKT_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "NKT_S_1"},
 };
 
 static PoseTableEntry pose_table_turn[] = {
@@ -425,12 +429,14 @@ static PoseTableEntry pose_table_turn[] = {
     {30, "NKT_Q_1"},
     {31, "NKT_D_1"},
     {39, "NKT_D_1"},
+#if VERSION >= VERSION_JP
     {42, "NKT_R_1"},
     {40, "NKT_W_1"},
+#endif
     {56, "NKT_K_2"},
     {57, "NKT_K_2"},
-    {65, "NKT_S_2"},
-    {69, "NKT_S_2"},
+    {BTL_POSE_TALK, "NKT_S_2"},
+    {BTL_POSE_STAY_DEFAULT, "NKT_S_2"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -445,7 +451,11 @@ static BattleUnitDefenseAttr defence_attr = {0};
 
 static BattleUnitDefense defence_turn = {0};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {90, 90, 80, 100, 85, 100, 100, 85, 100, 85, 100, 85, 100, 85, 85, 90, 80, 100, 85, 100, 100, 100};
+#else
 static StatusVulnerability regist = {85, 90, 80, 100, 80, 100, 100, 80, 100, 95, 100, 95, 100, 95, 80, 85, 80, 100, 80, 100, 100, 100};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {
@@ -518,7 +528,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -743,7 +753,7 @@ static EVT_BEGIN(attack_event)
     WAIT_MS(250)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_NOKO_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(10.0f), FLOAT(0.39941406f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 40)

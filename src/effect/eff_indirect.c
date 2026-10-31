@@ -51,7 +51,7 @@ EffectEntry* effIndirectEntry(s32 type, s32 duration, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effIndirectMain(EffectEntry* effect) {
+static void effIndirectMain(EffectEntry* effect) {
     EffIndirectWork* work = effect->userdata;
     Vec position;
 
@@ -87,7 +87,7 @@ void effIndirectMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D_EFFECTB, dispCalcZ(&position), 2, (DispCallback)effIndirectDisp, effect);
 }
 
-void effIndirectDisp(CameraId cameraId, EffectEntry* effect) {
+static void effIndirectDisp(CameraId cameraId, EffectEntry* effect) {
     EffIndirectWork* work = effect->userdata;
     CameraEntry* camera;
     s32 type;
@@ -99,7 +99,7 @@ void effIndirectDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx scale;
     Mtx final;
     GXTexObj texObj;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     void* indTex;
     f32 indMtx[2][3];
 #endif
@@ -107,7 +107,7 @@ void effIndirectDisp(CameraId cameraId, EffectEntry* effect) {
     camera = camGetPtr(CAMERA_2D);
     type = work->type;
     alpha = work->alpha;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     indTex = work->work->address;
 #endif
     GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
@@ -137,7 +137,7 @@ void effIndirectDisp(CameraId cameraId, EffectEntry* effect) {
     GXPixModeSync();
     GXInitTexObj(&texObj, buffer, 304, 240, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
     GXLoadTexObj(&texObj, GX_TEXMAP1);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // The demo still bends the screen copy through an indirect texture; retail draws it straight.
     GXInitTexObj(&texObj, indTex, 64, 64, GX_TF_IA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
     GXLoadTexObj(&texObj, GX_TEXMAP2);
@@ -161,7 +161,7 @@ void effIndirectDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXConcat(mtx, camera->view, mtx);
     PSMTXConcat(mtx, final, mtx);
     GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX3x4);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     indMtx[0][0] = 0.5f;
     indMtx[0][1] = 0.0f;
     indMtx[0][2] = 0.0f;
@@ -209,7 +209,7 @@ void effIndirectDisp(CameraId cameraId, EffectEntry* effect) {
     GXPosition3f32(-size / 2, -size / 2, 0.0f);
     GXTexCoord2f32(0.0f, v);
     GXEnd();
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     GXSetNumIndStages(0);
     GXSetTevDirect(GX_TEVSTAGE1);
 #endif

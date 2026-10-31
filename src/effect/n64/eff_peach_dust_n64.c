@@ -135,11 +135,11 @@ static effN64Vtx size8x8_tex22x22_vtx[] = {
     {-8, 8, 0, 4928, 704, 0, 0, 0, 255},
 };
 
-void effPeachDustMain(EffectEntry* effect);
-void effPeachDustDisp(CameraId cameraId, EffectEntry* effect);
+static void effPeachDustMain(EffectEntry* effect);
+static void effPeachDustDisp(CameraId cameraId, EffectEntry* effect);
 
-void effPeachDustMain(EffectEntry* effect);
-void effPeachDustDisp(CameraId cameraId, EffectEntry* effect);
+static void effPeachDustMain(EffectEntry* effect);
+static void effPeachDustDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effPeachDustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 unused, f32 scale) {
     u8* base;
@@ -208,7 +208,7 @@ EffectEntry* effPeachDustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 unused, f32
     return effect;
 }
 
-void effPeachDustMain(EffectEntry* effect) {
+static void effPeachDustMain(EffectEntry* effect) {
     EffPeachDustParticle* p = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -236,7 +236,7 @@ void effPeachDustMain(EffectEntry* effect) {
         } else {
             p->frame++;
             f = p->frame;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             if (f - 1 < 25) {
                 p->scale = 0.4f * (0.01f * scale_data[f - 1]);
 #else
@@ -260,7 +260,7 @@ void effPeachDustMain(EffectEntry* effect) {
     }
 }
 
-void effPeachDustDisp(CameraId cameraId, EffectEntry* effect) {
+static void effPeachDustDisp(CameraId cameraId, EffectEntry* effect) {
     EffPeachDustParticle* p;
     s32 i;
     s32 tex;

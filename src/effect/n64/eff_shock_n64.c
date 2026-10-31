@@ -111,8 +111,8 @@ effN64Vtx testsrc_shock_v[] = {
     {-178, -103, 0, 453, -330, 0xFF, 0xFF, 0xFF, 0xFF},
 };
 
-void effShockMain(EffectEntry* effect);
-void effShockDisp(CameraId cameraId, EffectEntry* effect);
+static void effShockMain(EffectEntry* effect);
+static void effShockDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effShockN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a, f32 b) {
     EffectEntry* effect;
@@ -163,7 +163,7 @@ EffectEntry* effShockN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a, f32 b) {
     return effect;
 }
 
-void effShockMain(EffectEntry* effect) {
+static void effShockMain(EffectEntry* effect) {
     EffShockN64Work* w = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -206,7 +206,7 @@ void effShockMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effShockDisp, effect);
 }
 
-void effShockDisp(CameraId cameraId, EffectEntry* effect) {
+static void effShockDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffShockN64Work* w;
     s32 type;

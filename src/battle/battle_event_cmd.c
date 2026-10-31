@@ -2792,8 +2792,8 @@ USER_FUNC(btlevtcmd_JumpSetting) {
 }
 
 /* movers begin (half_B) */
-void _UnitMoveSoundControl(BattleUnit* unit);
-void _UnitMoveSoundControlEnd(BattleUnit* unit);
+static void _UnitMoveSoundControl(BattleUnit* unit);
+static void _UnitMoveSoundControlEnd(BattleUnit* unit);
 
 static inline Vec becMvVecA(f32 x, f32 y, f32 z) {
     Vec v = {0.0f, 0.0f, 0.0f};
@@ -3353,8 +3353,8 @@ USER_FUNC(btlevtcmd_PartsFaceDirectionSub) {
 #include "data/item_data.h"
 s32 BattleEnemyUseItemCheck(BattleUnit* unit);
 #include "driver/animdrv.h"
-void _MoveSoundControlEndCore(BattleUnit* unit, BecSndWork* work);
-void _MoveSoundControlCore(BattleUnit* unit, BecSndWork* work, BattleUnitPart* part, f32 x, f32 y, f32 z);
+static void _MoveSoundControlEndCore(BattleUnit* unit, BecSndWork* work);
+static void _MoveSoundControlCore(BattleUnit* unit, BecSndWork* work, BattleUnitPart* part, f32 x, f32 y, f32 z);
 #include "eff/n64/eff_coin_n64.h"
 #include "battle/battle_detect.h"
 static inline void bec_coin(BattleUnit* unit, s32 item) {
@@ -3481,11 +3481,11 @@ USER_FUNC(btlevtcmd_DispItemIcon) {
     time = evtGetValue(event, args[4]);
     if (isFirstCall) {
         event->userdata[0] = time;
-#if VERSION == VERSION_DEMO
-        event->userdatap[1] = itemEntry(x, y, z, NULL, item, 0x10, -1, 0);
+#if VERSION <= VERSION_DEMO_US
+        event->userdatap[1] = itemEntry(x, y, z, NULL, item, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0);
         itemFlagOn(event->userdatap[1], ITEM_FLAG_BADGE_RETURN);
 #else
-        event->userdatap[1] = itemEntry(x, y, z, NULL, item, 0x11, -1, 0);
+        event->userdatap[1] = itemEntry(x, y, z, NULL, item, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0);
 #endif
         return EVT_RETURN_BLOCK;
     }
@@ -3529,12 +3529,12 @@ USER_FUNC(btlevtcmd_CommandFlyItem) {
                 pos.y += unit->sizeMultiplier * BtlUnit_GetHeight(unit);
             }
         }
-#if VERSION == VERSION_DEMO
-        event->userdatap[1] = itemEntry(pos.x, pos.y, pos.z, NULL, item, 0x10, -1, 0);
+#if VERSION <= VERSION_DEMO_US
+        event->userdatap[1] = itemEntry(pos.x, pos.y, pos.z, NULL, item, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0);
         effItemGetEntry(10, pos.x, 12.0f + pos.y, pos.z - 5.0f);
         itemFlagOn(event->userdatap[1], ITEM_FLAG_BADGE_RETURN);
 #else
-        event->userdatap[1] = itemEntry(pos.x, pos.y, pos.z, NULL, item, 0x11, -1, 0);
+        event->userdatap[1] = itemEntry(pos.x, pos.y, pos.z, NULL, item, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0);
         effItemGetEntry(10, pos.x, 12.0f + pos.y, pos.z - 5.0f);
 #endif
         if (kind == 0xDE) {
@@ -4127,7 +4127,7 @@ USER_FUNC(btlevtcmd_GetConfuseActEvent) {
     while (!evt) {
         evt = BattleSetConfuseAct(_battleWorkPointer, unit);
         i++;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         if (i > 10) {
 #else
         if (i > 20) {
@@ -4540,8 +4540,8 @@ USER_FUNC(btlevtcmd_JumpPartsContinue) {
     return EVT_RETURN_BLOCK;
 }
 
-void _PartsMoveSoundControl(BattleUnitPart* part);
-void _PartsMoveSoundControlEnd(BattleUnitPart* part);
+static void _PartsMoveSoundControl(BattleUnitPart* part);
+static void _PartsMoveSoundControlEnd(BattleUnitPart* part);
 
 USER_FUNC(btlevtcmd_FallPartsPosition) {
     s32 id;
@@ -5083,8 +5083,8 @@ USER_FUNC(btlevtcmd_ACSuccessEffect) {
     psndSFX_pit(psndSFXOn_3D(name, &pos), 0);
     return EVT_RETURN_DONE;
 }
-#elif VERSION == VERSION_DEMO
-// The demo has fixed widths, a different base scale, and no scaling or clamping of the position.
+#elif VERSION == VERSION_DEMO_US
+// The US demo has fixed widths, a different base scale, and no scaling or clamping of the position.
 USER_FUNC(btlevtcmd_ACSuccessEffect) {
     EvtWord* args = event->args;
     s32 type;
@@ -6338,19 +6338,19 @@ USER_FUNC(btlevtcmd_SetPartsJumpSound) {
 
 // inlining off for _UnitMoveSoundControl, _PartsMoveSoundControl, _MoveSoundControlCore and 3 more, as in the original (the object differs without it)
 #pragma dont_inline on
-void _UnitMoveSoundControl(BattleUnit* unit) {
+static void _UnitMoveSoundControl(BattleUnit* unit) {
     f32 x, y, z;
     BtlUnit_GetPos(unit, &x, &y, &z);
     _MoveSoundControlCore(unit, &unit->moveSnd, NULL, x, y, z);
 }
 
-void _PartsMoveSoundControl(BattleUnitPart* part) {
+static void _PartsMoveSoundControl(BattleUnitPart* part) {
     f32 x, y, z;
     BtlUnit_GetPartsPos(part, &x, &y, &z);
     _MoveSoundControlCore(part->owner, &part->moveSnd, part, x, y, z);
 }
 
-void _MoveSoundControlCore(BattleUnit* unit, BecSndWork* work, BattleUnitPart* part, f32 x, f32 y, f32 z) {
+static void _MoveSoundControlCore(BattleUnit* unit, BecSndWork* work, BattleUnitPart* part, f32 x, f32 y, f32 z) {
     Vec pos;
     Vec cur;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -6390,11 +6390,11 @@ void _MoveSoundControlCore(BattleUnit* unit, BecSndWork* work, BattleUnitPart* p
     }
 }
 
-void _UnitMoveSoundControlEnd(BattleUnit* unit) {
+static void _UnitMoveSoundControlEnd(BattleUnit* unit) {
     _MoveSoundControlEndCore(unit, &unit->moveSnd);
 }
 
-void _PartsMoveSoundControlEnd(BattleUnitPart* part) {
+static void _PartsMoveSoundControlEnd(BattleUnitPart* part) {
     _MoveSoundControlEndCore(part->owner, &part->moveSnd);
 }
 
@@ -6408,7 +6408,7 @@ const char* _mario_attack_voice_table[10] = {
     "SFX_VOICE_MARIO_AC2_2", "SFX_VOICE_MARIO_AC2_3", "SFX_VOICE_MARIO_AC2_4",
     "SFX_VOICE_MARIO_AC2_5",
 };
-void _MoveSoundControlEndCore(BattleUnit* unit, BecSndWork* work) {
+static void _MoveSoundControlEndCore(BattleUnit* unit, BecSndWork* work) {
     if ((u32)work->sfxId != 0xFFFFFFFF) {
         psndSFXOff(work->sfxId);
         work->sfxId = -1;
@@ -6538,8 +6538,8 @@ USER_FUNC(btlevtcmd_InviteApInfoReport) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION == VERSION_DEMO || VERSION == VERSION_EU
-USER_FUNC(btlevtcmd_SetEventHit) {
+#if VERSION <= VERSION_DEMO_US || VERSION == VERSION_EU
+USER_FUNC(btlevtcmd_SetCounterAcCallBack) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
     BattleUnit* unit;

@@ -10,6 +10,9 @@
 #include "mario/mariost.h"
 #include "memory.h"
 #include <dolphin/mtx.h>
+
+static void effRankupDisp(CameraId cameraId, EffectEntry* effect);
+static void effRankupMain(EffectEntry* effect);
 #if VERSION >= VERSION_US
 const char* eff_rankup_str_tbl[6] = {"EFF_Rankup", "EFF_Rankup_us", "EFF_Rankup_ge", "EFF_Rankup_fr", "EFF_Rankup_sp", "EFF_Rankup_it"};
 #endif
@@ -47,7 +50,7 @@ EffectEntry* effRankupEntry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effRankupMain(EffectEntry* effect) {
+static void effRankupMain(EffectEntry* effect) {
     EffRankupWork* work = effect->userdata;
     Vec position;
     BOOL inBattle;
@@ -103,7 +106,7 @@ void effRankupMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effRankupDisp, effect);
 }
 
-void effRankupDisp(CameraId cameraId, EffectEntry* effect) {
+static void effRankupDisp(CameraId cameraId, EffectEntry* effect) {
     EffRankupWork* work = effect->userdata;
     Mtx mtx;
     Mtx scale;

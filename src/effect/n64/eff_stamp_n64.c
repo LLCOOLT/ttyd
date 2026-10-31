@@ -15,8 +15,8 @@ static effN64Vtx size16x16_tex64x32_vtx[] = {
     {-10, 16, 0, 0, 1024, 0, 0, 0, 255},
 };
 
-void effStampMain(EffectEntry* effect);
-void effStampDisp(CameraId cameraId, EffectEntry* effect);
+static void effStampMain(EffectEntry* effect);
+static void effStampDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effStampN64Entry(s32 type, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
@@ -83,7 +83,7 @@ EffectEntry* effStampN64Entry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effStampMain(EffectEntry* effect) {
+static void effStampMain(EffectEntry* effect) {
     EffStampN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -122,7 +122,7 @@ void effStampMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effStampDisp, effect);
 }
 
-void effStampDisp(CameraId cameraId, EffectEntry* effect) {
+static void effStampDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffStampN64Work* work;
     s32 i;

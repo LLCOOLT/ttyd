@@ -8,7 +8,6 @@
 #include "evt/evt_mobj.h"
 #include "evt/evt_npc.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "hei.h"
 #include "data_tables.h"
 #include "version.h"
@@ -66,7 +65,7 @@ static TreeAccess ki_data[] = {
 EVT_BEGIN(evt_kusa_8)
     CALL(evt_item_delete_check, STRING("item_kusa_8"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_kusa_8"), ITEM_COIN, 200, 75, 60, 4, GSWF(GSWF_HEI06_BUSH_COIN_TAKEN), 0)
+        CALL(evt_item_entry, STRING("item_kusa_8"), ITEM_COIN, 200, 75, 60, ITEM_ENTRY_LAUNCH, GSWF(GSWF_HEI06_BUSH_COIN_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -87,21 +86,17 @@ static KusaAccess kusa_data[] = {
 EVT_BEGIN(hei_06_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_HEI1"))
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_HEI1"))
     CALL(evt_npc_change_fbat_mode, 1)
     SET_VALUE(LW(0), PTR(ki_data))
-    CALL_CHILD(PTR(evt_sub_tree_access_entry))
+    CALL_CHILD(evt_sub_tree_access_entry)
     SET_VALUE(LW(0), PTR(kusa_data))
-    CALL_CHILD(PTR(evt_sub_kusa_access_entry))
+    CALL_CHILD(evt_sub_kusa_access_entry)
     CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 5, 375, 160, -75, 0, 0)
     CALL(evt_mobj_badgeblk, STRING("mobj_hatenablk"), -25, 110, -75, ITEM_FIRE_FLOWER, 0, GSWF(GSWF_HEI06_FIRE_FLOWER_BLOCK_HIT), 0)
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("item_00"), ITEM_INN_COUPON, 50, 50, 105, 15, GSWF(GSWF_HEI06_INN_COUPON_TAKEN), 0)
-#else
-    CALL(evt_item_entry, STRING("item_00"), ITEM_INN_COUPON, 50, 50, 105, 16, GSWF(GSWF_HEI06_INN_COUPON_TAKEN), 0)
-#endif
+    CALL(evt_item_entry, STRING("item_00"), ITEM_INN_COUPON, 50, 50, 105, ITEM_ENTRY_FIXED, GSWF(GSWF_HEI06_INN_COUPON_TAKEN), 0)
     RETURN
 EVT_END()

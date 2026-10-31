@@ -9,12 +9,12 @@
 
 #include "battle/battle_detect.h"
 
-void* _check_status_recover_item(BattleUnit* self);
-void* _check_status_support_item(BattleUnit* self);
-void* _check_status_attack_item(BattleUnit* self);
-void* _check_attack_item(BattleUnit* self);
-void* _check_fp_recover_item(BattleUnit* self);
-void* _check_hp_recover_item(BattleUnit* self);
+static void* _check_status_recover_item(BattleUnit* self);
+static void* _check_status_support_item(BattleUnit* self);
+static void* _check_status_attack_item(BattleUnit* self);
+static void* _check_attack_item(BattleUnit* self);
+static void* _check_fp_recover_item(BattleUnit* self);
+static void* _check_hp_recover_item(BattleUnit* self);
 
 #define SETUP()                                   \
     BattleWork* wp;                               \
@@ -93,7 +93,7 @@ void* BattleEnemyUseItemCheck(BattleUnit* self) {
     }
 }
 
-void* _check_hp_recover_item(BattleUnit* self) {
+static void* _check_hp_recover_item(BattleUnit* self) {
     SETUP()
     for (i = 0; i < targets->numTargets; i++) {
         GETUNIT();
@@ -106,7 +106,7 @@ void* _check_hp_recover_item(BattleUnit* self) {
     return NULL;
 }
 
-void* _check_fp_recover_item(BattleUnit* self) {
+static void* _check_fp_recover_item(BattleUnit* self) {
     SETUP()
     for (i = 0; i < targets->numTargets; i++) {
         s32 max;
@@ -121,7 +121,7 @@ void* _check_fp_recover_item(BattleUnit* self) {
     return NULL;
 }
 
-void* _check_attack_item(BattleUnit* self) {
+static void* _check_attack_item(BattleUnit* self) {
     SETUP()
     if (targets->numTargets <= 0) {
         return NULL;
@@ -140,7 +140,7 @@ void* _check_attack_item(BattleUnit* self) {
     RET();
 }
 
-void* _check_status_attack_item(BattleUnit* self) {
+static void* _check_status_attack_item(BattleUnit* self) {
     SETUP()
     if (targets->numTargets <= 0) {
         return NULL;
@@ -181,7 +181,7 @@ void* _check_status_attack_item(BattleUnit* self) {
     return NULL;
 }
 
-void* _check_status_support_item(BattleUnit* self) {
+static void* _check_status_support_item(BattleUnit* self) {
     SETUP()
     if (targets->numTargets <= 0) {
         return NULL;
@@ -221,7 +221,7 @@ void* _check_status_support_item(BattleUnit* self) {
     return NULL;
 }
 
-void* _check_status_recover_item(BattleUnit* self) {
+static void* _check_status_recover_item(BattleUnit* self) {
     SETUP()
     if (targets->numTargets <= 0) {
         return NULL;

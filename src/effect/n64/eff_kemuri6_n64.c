@@ -40,8 +40,8 @@ static effN64Vtx kmr_a_1_v[] = {
     {7, -8, 0, 512, 512, 255, 255, 255, 255},
 };
 
-void effKemuri6Main(EffectEntry* effect);
-void effKemuri6Disp(CameraId cameraId, EffectEntry* effect);
+static void effKemuri6Main(EffectEntry* effect);
+static void effKemuri6Disp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effKemuri6N64Entry(s32 type, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
@@ -79,7 +79,7 @@ EffectEntry* effKemuri6N64Entry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effKemuri6Main(EffectEntry* effect) {
+static void effKemuri6Main(EffectEntry* effect) {
     EffKemuri6N64Work* work;
     int i;
     BOOL disp;
@@ -129,7 +129,7 @@ void effKemuri6Main(EffectEntry* effect) {
     }
 }
 
-void effKemuri6Disp(CameraId cameraId, EffectEntry* effect) {
+static void effKemuri6Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffKemuri6N64Work* work;
     int i;

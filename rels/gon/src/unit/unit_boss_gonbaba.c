@@ -18,7 +18,6 @@
 #include "evt/evt_eff.h"
 #include "evt/evt_map.h"
 #include "evt/evt_msg.h"
-#include "party/party_motion.h"
 #include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "evt/evt_sub.h"
@@ -26,11 +25,11 @@
 
 u8* lightGetPaperCraft(void);
 
-s32 weaponGetPower_Gonbaba(BattleUnit* attacker, BattleWeapon* weapon, BattleUnit* target, BattleUnitPart* part);
+static s32 weaponGetPower_Gonbaba(BattleUnit* attacker, BattleWeapon* weapon, BattleUnit* target, BattleUnitPart* part);
 static USER_FUNC(_leg_smoke_effect);
-USER_FUNC(_btlgon_get_escape_param);
-USER_FUNC(_set_gonbaba_light);
-USER_FUNC(_wait_damage_event_end);
+static USER_FUNC(_btlgon_get_escape_param);
+static USER_FUNC(_set_gonbaba_light);
+static USER_FUNC(_wait_damage_event_end);
 
 BattleWeapon weapon_gonbaba_fumituke_attack;
 BattleWeapon weapon_gonbaba_firebreath_attack;
@@ -39,7 +38,7 @@ BattleUnitKind unit_boss_gonbaba;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static PoseTableEntry pose_table[7];
 static PoseTableEntry pose_table_weak[7];
 #else
@@ -59,7 +58,7 @@ extern EvtWord firebreath_attack_event[];
 static EvtWord wait_event[6];
 
 // Hooktail's attack power: the weapon's base power minus the attack drop in the attacker's work[0] (at least 1).
-s32 weaponGetPower_Gonbaba(BattleUnit* attacker, BattleWeapon* weapon, BattleUnit* target, BattleUnitPart* part) {
+static s32 weaponGetPower_Gonbaba(BattleUnit* attacker, BattleWeapon* weapon, BattleUnit* target, BattleUnitPart* part) {
     s32 power = weapon->hpDamageWork[0];
 
     power -= attacker->work[0];
@@ -232,7 +231,7 @@ BattleUnitKind unit_boss_gonbaba = {
 #endif
     0.0f,
     0.0f,
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     250.0f,
 #else
     20.0f,
@@ -274,7 +273,7 @@ static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static StatusVulnerability regist = {10, 0, 50, 0, 50, 10, 100, 0, 0, 0, 50, 0, 100, 0, 100, 0, 0, 100, 0, 0, 0, 0};
 #else
 static StatusVulnerability regist = {20, 0, 50, 0, 50, 10, 100, 0, 0, 0, 50, 0, 100, 0, 100, 0, 0, 100, 0, 0, 0, 0};
@@ -283,45 +282,29 @@ static StatusVulnerability regist = {20, 0, 50, 0, 50, 10, 100, 0, 0, 0, 50, 0, 
 static PoseTableEntry pose_table[] = {
     {1, "GNB_N_1"},
     {5, "GNB_X_1"},
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     {2, "GNB_Z_1"},
     {3, "GNB_X_1"},
 #endif
     {28, "GNB_S_3"},
-#if VERSION == VERSION_DEMO
-    {63, "GNB_T_3"},
-#else
-    {65, "GNB_T_3"},
-#endif
+    {BTL_POSE_TALK, "GNB_T_3"},
     {31, "GNB_S_3"},
     {39, "GNB_D_1"},
-#if VERSION == VERSION_DEMO
-    {67, "GNB_S_3"},
-#else
-    {69, "GNB_S_3"},
-#endif
+    {BTL_POSE_STAY_DEFAULT, "GNB_S_3"},
 };
 
 static PoseTableEntry pose_table_weak[] = {
     {1, "GNB_N_1"},
     {5, "GNB_X_1"},
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     {2, "GNB_N_1"},
     {3, "GNB_X_1"},
 #endif
     {28, "GNB_S_4"},
-#if VERSION == VERSION_DEMO
-    {63, "GNB_T_4"},
-#else
-    {65, "GNB_T_4"},
-#endif
+    {BTL_POSE_TALK, "GNB_T_4"},
     {31, "GNB_S_4"},
     {39, "GNB_V_1"},
-#if VERSION == VERSION_DEMO
-    {67, "GNB_S_4"},
-#else
-    {69, "GNB_S_4"},
-#endif
+    {BTL_POSE_STAY_DEFAULT, "GNB_S_4"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -431,7 +414,7 @@ static EVT_BEGIN(battle_entry_event)
     RETURN
 EVT_END()
 
-USER_FUNC(_btlgon_get_escape_param) {
+static USER_FUNC(_btlgon_get_escape_param) {
     EvtWord* args = event->args;
     s32 x = evtGetValue(event, args[0]);
     s32 y = evtGetValue(event, args[1]);
@@ -658,7 +641,7 @@ EVT_BEGIN(negotiation_event)
         CALL(evt_btl_camera_noshake, 1)
         CALL(evt_btl_camera_shake_h, 1, 7, 0, 30, 12)
     END_INLINE_EVENT
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(evt_batstage_set_aud_dark, 0, 180, 0)
     CALL(evt_batstage_set_aud_dark_base, 0, 180, 0)
 #else
@@ -915,11 +898,7 @@ EVT_BEGIN(negotiation_event)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_MARIO, LW(3))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_MARIO, LW(3), STRING("M_I_Y"))
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_PARTNER, LW(4))
-#if VERSION == VERSION_DEMO
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_PARTNER, LW(4), 67)
-#else
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_PARTNER, LW(4), 69)
-#endif
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_PARTNER, LW(4), BTL_POSE_STAY_DEFAULT)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_reset_turn)
     CALL(evt_btl_camera_set_prilimit, 0)
@@ -931,7 +910,7 @@ EVT_BEGIN(negotiation_event)
     RETURN
 EVT_END()
 
-USER_FUNC(_set_gonbaba_light) {
+static USER_FUNC(_set_gonbaba_light) {
     u8* light = lightGetPaperCraft();
     Mtx mtx;
 
@@ -1051,7 +1030,7 @@ EVT_BEGIN(gon_extra_eaten_event)
     RETURN
 EVT_END()
 
-USER_FUNC(_wait_damage_event_end) {
+static USER_FUNC(_wait_damage_event_end) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
     s32 id;
@@ -1072,7 +1051,7 @@ USER_FUNC(_wait_damage_event_end) {
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -1176,7 +1155,7 @@ EVT_BEGIN(gonbaba_damage_sub_event)
             RETURN
         END_IF
     END_IF
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_WaitAttackEnd)
 #endif
     CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("GNB_T_4"))
@@ -1209,7 +1188,7 @@ EVT_BEGIN(gonbaba_damage_sub_event)
         RETURN
     END_IF
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 3)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_WaitAttackEnd)
 #endif
     CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("GNB_T_4"))
@@ -1350,7 +1329,7 @@ static EVT_BEGIN(init_event)
     CALL(evt_audience_flag_on, 35, 512)
     CALL(evt_audience_flag_on, 53, 512)
     CALL(evt_audience_flag_on, 54, 512)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(evt_audience_base_flag_on, 32768)
 #else
     CALL(evt_audience_base_flag_on, 16384)
@@ -1382,16 +1361,16 @@ static EVT_BEGIN(attack_event)
     SWITCH(LW(0))
         CASE_EQUAL(0)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, 1)
-        CALL_CHILD(PTR(firebreath_attack_event))
+        CALL_CHILD(firebreath_attack_event)
         CASE_EQUAL(1)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, 2)
-        CALL_CHILD(PTR(fumituke_attack_event))
+        CALL_CHILD(fumituke_attack_event)
         CASE_DEFAULT
         CALL(evt_sub_random, 99, LW(0))
         IF_INT_LESS(LW(0), 50)
-            CALL_CHILD(PTR(fumituke_attack_event))
+            CALL_CHILD(fumituke_attack_event)
         ELSE
-            CALL_CHILD(PTR(firebreath_attack_event))
+            CALL_CHILD(firebreath_attack_event)
         END_IF
     END_SWITCH
     RETURN

@@ -110,7 +110,6 @@ struct CameraEntry {
 void camInit(void);
 void camMain(void);
 void camDraw(void);
-void camLetterBoxDraw(CameraId cameraId, void* param);
 
 void camLoadRoad(CameraId cameraId, const char* filename);
 void camUnLoadRoad(CameraId cameraId);

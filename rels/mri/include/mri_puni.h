@@ -181,7 +181,7 @@ typedef struct PuniData {
     s32 flags2;    // 0x8
     u16 mode;      // 0xC, PuniMode
     u16 prevMode;  // 0xE, PuniMode
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     s32 modeHistIdx;   // 0x10, demo: index into modeHist (0-127)
     u16 modeHist[128]; // 0x14, demo: mode of each of the last 128 frames
 #else

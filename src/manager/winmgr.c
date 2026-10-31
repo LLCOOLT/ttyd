@@ -44,19 +44,19 @@ s32 select_comp_bteresa(const void* a, const void* b);
 // iconDispGx flags for the 2D window icons and the list cursor (the demo's icon flag bits differ).
 
 // local prototypes
-void select_main(WinMgrEntry* entry);
-void select_disp(WinMgrEntry* entry);
+static void select_main(WinMgrEntry* entry);
+static void select_disp(WinMgrEntry* entry);
 
-void select_disp_party(WinMgrEntry* entry);
-void select_disp_mario(WinMgrEntry* entry);
-void select_disp_luigi(WinMgrEntry* entry);
-void select_disp2(WinMgrEntry* entry);
-void select_main3(WinMgrEntry* entry);
-void select_disp3(WinMgrEntry* entry);
-void select_disp3_party(WinMgrEntry* entry);
-void select_disp3_mario(WinMgrEntry* entry);
-void winMgrDisp(CameraId camId, void* param);
-void winMgrSeq(WinMgrEntry* entry);
+static void select_disp_party(WinMgrEntry* entry);
+static void select_disp_mario(WinMgrEntry* entry);
+static void select_disp_luigi(WinMgrEntry* entry);
+static void select_disp2(WinMgrEntry* entry);
+static void select_main3(WinMgrEntry* entry);
+static void select_disp3(WinMgrEntry* entry);
+static void select_disp3_party(WinMgrEntry* entry);
+static void select_disp3_mario(WinMgrEntry* entry);
+static void winMgrDisp(CameraId camId, void* param);
+static void winMgrSeq(WinMgrEntry* entry);
 s32 select_comp_type(const void* a, const void* b);
 s32 select_comp_starpiece(const void* a, const void* b);
 
@@ -67,7 +67,7 @@ static s16* mario_status_point_table[3];
 
 //.sdata
 static WinMgrWork* wp = &work;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // Unreferenced; every demo TU that had it carries its own copy at the start of .data.
 static f32 unusedSignTbl[16] = {-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f};
 #endif
@@ -99,7 +99,7 @@ static inline const char* mario_status_name(s32 id) {
 #endif
 }
 static s32 mario_status_henka_table[] = {5, 5, 3};
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 s32 mario_status_max_table[] = {200, 200, 99};
 #endif
 
@@ -107,7 +107,7 @@ WinMgrDesc select_desc[] = {
     {0, 1, 8, -24, 116, 300, 240, {0xFF, 0xFF, 0xFF, 0xFF}, select_main, select_disp},
     {2, 0, 8, -280, 120, 240, 45, {0xFF, 0xFF, 0xFF, 0xFF}, NULL, select_disp2},
     {0, 0, 8, -240, -130, 500, 80, {0xFF, 0xFF, 0xFF, 0xFF}, select_main3, select_disp3},
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     {0, 1, 8, -24, 116, 300, 240, {0xFF, 0xFF, 0xFF, 0xFF}, select_main, select_disp},
     {2, 0, 8, -280, 120, 240, 69, {0xFF, 0xFF, 0xFF, 0xFF}, NULL, select_disp2},
     {0, 0, 8, -240, -130, 500, 80, {0xFF, 0xFF, 0xFF, 0xFF}, select_main3, select_disp3},
@@ -150,7 +150,7 @@ WinMgrSelectTbl select_desc_tbl[] = {
     {3, select_mario_desc},
     {3, select_desc},
     {3, select_desc},
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     {3, select_desc},
     {3, select_desc},
     {3, select_desc},
@@ -177,16 +177,16 @@ static const char name_party6[12];
 // The party list helpers, defined at the end of the file. The demo has them as plain functions (deferred
 // inlining still inlines them, and their out-of-line copies stay); later versions made them static inline,
 // which also narrows the party index to u16.
-#if VERSION == VERSION_DEMO
-const char* select_party_name(s32 id);
-s32 select_party_icon_color(s32 icon);
+#if VERSION <= VERSION_DEMO_US
+static const char* party_name_table_rtn(s32 id);
+static s32 iconid_conv(s32 icon);
 #else
-static inline const char* select_party_name(u16 id);
-static inline s32 select_party_icon_color(s32 icon);
+static inline const char* party_name_table_rtn(u16 id);
+static inline s32 iconid_conv(s32 icon);
 #endif
 
 // The demo has no party rank checks.
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 USER_FUNC(evt_win_party_lankup_chk) {
     PouchData* pouch;
     u16* p;
@@ -273,7 +273,7 @@ void winMgrReInit(void) {
     memset(wp->entries, 0, wp->numEntries * sizeof(WinMgrEntry));
 }
 
-void winMgrDisp(CameraId camId, void* param) {
+static void winMgrDisp(CameraId camId, void* param) {
     WinMgrEntry* entry = param;
     Mtx rot;
     Mtx scale;
@@ -323,7 +323,7 @@ void winMgrMain(void) {
     }
 }
 
-void winMgrSeq(WinMgrEntry* entry) {
+static void winMgrSeq(WinMgrEntry* entry) {
     entry->flags |= 4;
     switch (entry->description->type) {
         case 0:
@@ -770,13 +770,13 @@ WinMgrSelect* winMgrSelectEntry(EvtWord type, s32 newItem, BOOL cancelable) {
                             cnt++;
                         }
                     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                     else if (*mario_status_point_table[j] + mario_status_henka_table[j] > mario_status_max_table[j]) {
                         over = 1;
                     }
 #endif
                 }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 // the demo has no stat cap check
                 if (cnt == 2) {
                     sel->items[i].flags |= 3;
@@ -820,7 +820,7 @@ WinMgrSelect* winMgrSelectEntry(EvtWord type, s32 newItem, BOOL cancelable) {
                     sel->items[sel->numItems++].id = i + 240;
                 }
             }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             qqsort(sel->items, sel->numItems, 4, select_comp_type);
 #endif
             break;
@@ -832,7 +832,7 @@ WinMgrSelect* winMgrSelectEntry(EvtWord type, s32 newItem, BOOL cancelable) {
             for (i = 0; i < 99; i++) {
                 m = (s16)badgeShop_get(bdsw->starmaniac_table, i + 240);
                 if (m - badgeShop_ThrowCheck(i + 240) > 0) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                     sel->items[sel->numItems++].id = i + 240;
                 }
             }
@@ -924,7 +924,7 @@ WinMgrSelect* winMgrSelectEntry(EvtWord type, s32 newItem, BOOL cancelable) {
     return sel;
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo does not sort the badge shop lists
 #elif VERSION == VERSION_EU
 s32 select_comp_starpiece(const void* a, const void* b) {
@@ -951,7 +951,7 @@ s32 select_comp_starpiece(const void* a, const void* b) {
             }
 #endif
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 s32 select_comp_type(const void* a, const void* b) {
     s16 x = itemDataTable[((const WinMgrSelectItem*)a)->id].type_sort_order;
     s16 y = itemDataTable[((const WinMgrSelectItem*)b)->id].type_sort_order;
@@ -979,7 +979,7 @@ s32 winMgrSelect(WinMgrSelect* sel) {
         if (sel->flags & WINMGR_SELECT_CANCELED) {
             return -1;
         }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         if (sel->newItem && sel->cursor == 0 && (sel->flags & WINMGR_SELECT_CANCELABLE)) {
             return -1;
         }
@@ -1004,12 +1004,12 @@ s32 winMgrSelectOther(WinMgrSelect* sel, EventEntry* evt) {
             case 6:
             case 7:
                 evt->lwData[1] = party_id_table[id];
-                name = select_party_name(id);
+                name = party_name_table_rtn(id);
                 evt->lwData[3] = (EvtWord)name;
                 break;
             case 8:
                 evt->lwData[2] = party_id_table[id];
-                name = select_party_name(id);
+                name = party_name_table_rtn(id);
                 evt->lwData[4] = (EvtWord)name;
                 break;
             case 9:
@@ -1035,7 +1035,7 @@ s32 winMgrSelectOther(WinMgrSelect* sel, EventEntry* evt) {
                 evt->lwData[1] = id;
                 evt->lwData[2] = (EvtWord)VERSION_PICK(itemDataTable[id].id, msgSearch(itemDataTable[id].name));
                 evt->lwData[3] = itemDataTable[id].sell_price;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 evt->lwData[4] = sel->cursor;
 #endif
                 break;
@@ -1112,13 +1112,13 @@ void winMgrSelectDelete(WinMgrSelect* sel) {
     __memFree(heap, sel3);
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 s32 winMgrSelectGetCursor(WinMgrSelect* sel) {
     return sel->cursor;
 }
 #endif
 
-void select_main(WinMgrEntry* entry) {
+static void select_main(WinMgrEntry* entry) {
     WinMgrSelect* sel = entry->param;
     s32 prev;
     s32 i;
@@ -1223,7 +1223,7 @@ void select_main(WinMgrEntry* entry) {
     }
 }
 
-void select_disp(WinMgrEntry* entry) {
+static void select_disp(WinMgrEntry* entry) {
     WinMgrSelect* sel = entry->param;
     u32 left, top, wd, ht;
     GXColor black = {0x00, 0x00, 0x00, 0xFF};
@@ -1271,7 +1271,7 @@ void select_disp(WinMgrEntry* entry) {
                 winIconSet(ICON_092, (Vec){entry->x + 15, sel->scrollY + (ofs + (entry->y - 44 - i * 24)), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xC0});
             }
 #endif
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             winIconInit();
 #else
             if (sel->items[i].flags & 1) {
@@ -1285,7 +1285,7 @@ void select_disp(WinMgrEntry* entry) {
 #if VERSION >= VERSION_US
             winFontSetWidth((Vec){entry->x + 60, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
                             *((sel->items[i].flags & 1) ? &gray : &black), 185.0f, msgSearch(item->name));
-#elif VERSION == VERSION_DEMO
+#elif VERSION <= VERSION_DEMO_US
             winFontSet((Vec){entry->x + 60, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
                        black, msgSearch(item->name));
 #else
@@ -1332,7 +1332,7 @@ void select_disp(WinMgrEntry* entry) {
             winFontInit();
             winFontSetWidth((Vec){entry->x + entry->width - 10 - tw, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
                             *((sel->items[i].flags & 1) ? &gray : &black), 30.0f, buf);
-#elif VERSION == VERSION_DEMO
+#elif VERSION <= VERSION_DEMO_US
             tw = FontGetMessageWidth(buf);
             winFontInit();
             winFontSet((Vec){entry->x + entry->width - 10 - tw, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
@@ -1352,7 +1352,7 @@ void select_disp(WinMgrEntry* entry) {
         }
         GXSetScissor(left, top, wd, ht);
         switch (sel->type) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             case 2:
 #endif
             case 11:
@@ -1360,7 +1360,7 @@ void select_disp(WinMgrEntry* entry) {
             case 13:
                 msg = msgSearch("msg_window_title_2");
                 break;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             case 14:
                 msg = msgSearch("msg_window_title_3");
                 break;
@@ -1392,7 +1392,7 @@ void select_disp(WinMgrEntry* entry) {
             case 3:
             case 11:
             case 12:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             case 15:
             case 17:
 #else
@@ -1432,8 +1432,8 @@ void select_disp(WinMgrEntry* entry) {
     }
 }
 
-void select_disp_party(WinMgrEntry* entry) {
-#if VERSION == VERSION_DEMO
+static void select_disp_party(WinMgrEntry* entry) {
+#if VERSION <= VERSION_DEMO_US
     // the demo declares the row counter first
     s32 i;
     WinMgrSelect* sel = entry->param;
@@ -1484,21 +1484,21 @@ void select_disp_party(WinMgrEntry* entry) {
                 ofs = ofs + 0.0f;
             }
             winFontInit();
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             winFontSet((Vec){entry->x + 60, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
-                       *((sel->items[i].flags & 1) ? &gray : &black), select_party_name(sel->items[i].id));
+                       *((sel->items[i].flags & 1) ? &gray : &black), party_name_table_rtn(sel->items[i].id));
 #else
             winFontSet((Vec){entry->x + 60, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f},
-                       (Vec){FontGetMessageWidth(select_party_name(sel->items[i].id)) > 170 ? 170.0f / FontGetMessageWidth(select_party_name(sel->items[i].id)) : 1.0f, 1.0f, 1.0f},
-                       *((sel->items[i].flags & 1) ? &gray : &black), select_party_name(sel->items[i].id));
+                       (Vec){FontGetMessageWidth(party_name_table_rtn(sel->items[i].id)) > 170 ? 170.0f / FontGetMessageWidth(party_name_table_rtn(sel->items[i].id)) : 1.0f, 1.0f, 1.0f},
+                       *((sel->items[i].flags & 1) ? &gray : &black), party_name_table_rtn(sel->items[i].id));
 #endif
             if (sel->items[i].flags & 1) {
                 winIconGrayInit();
             } else {
                 winIconInit();
             }
-            winIconSet(select_party_icon_color(party_icon_table[sel->items[i].id]), (Vec){entry->x + 35, sel->scrollY + (ofs + (entry->y - 44 - i * 24)), 0.0f}, (Vec){0.55f, 0.55f, 0.55f}, iconcol);
-#if VERSION == VERSION_DEMO
+            winIconSet(iconid_conv(party_icon_table[sel->items[i].id]), (Vec){entry->x + 35, sel->scrollY + (ofs + (entry->y - 44 - i * 24)), 0.0f}, (Vec){0.55f, 0.55f, 0.55f}, iconcol);
+#if VERSION <= VERSION_DEMO_US
             winIconInit();
             for (j = 0; j < pouch->partyData[party_id_table[sel->items[i].id]].techLevel; j++) {
 #else
@@ -1553,7 +1553,7 @@ void select_disp_party(WinMgrEntry* entry) {
     }
 }
 
-void select_disp_mario(WinMgrEntry* entry) {
+static void select_disp_mario(WinMgrEntry* entry) {
 #if VERSION >= VERSION_US
     f32 tw;
 #endif
@@ -1678,7 +1678,7 @@ void select_disp_mario(WinMgrEntry* entry) {
     }
 }
 
-void select_disp_luigi(WinMgrEntry* entry) {
+static void select_disp_luigi(WinMgrEntry* entry) {
 #if VERSION >= VERSION_US
     f32 tw;
 #endif
@@ -1736,7 +1736,7 @@ void select_disp_luigi(WinMgrEntry* entry) {
             }
         }
         GXSetScissor(left, top, wd, ht);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         msg = msgSearch("msg_window_title_6");
 #else
         switch (sel->type) {
@@ -1762,7 +1762,7 @@ void select_disp_luigi(WinMgrEntry* entry) {
         winFontInit();
         winFontSetEdge((Vec){ent->x + w, ent->y + 14, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white, msg);
 #endif
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         switch (sel->type) {
             case 17:
                 PSMTXTrans(mtx, ent->x + 268, ent->y - 18, 0.0f);
@@ -1785,7 +1785,7 @@ void select_disp_luigi(WinMgrEntry* entry) {
     }
 }
 
-void select_disp2(WinMgrEntry* entry) {
+static void select_disp2(WinMgrEntry* entry) {
     WinMgrSelect* sel = entry->param;
     const char* msg;
     u16 w;
@@ -1878,11 +1878,11 @@ void select_disp2(WinMgrEntry* entry) {
 #endif
 }
 
-void select_main3(WinMgrEntry* entry) {
+static void select_main3(WinMgrEntry* entry) {
     winMgrHelpMain(entry);
 }
 
-void select_disp3(WinMgrEntry* entry) {
+static void select_disp3(WinMgrEntry* entry) {
     WinMgrSelect* sel = entry->param;
 
     if (!(wp->entries[sel->descriptorId[2]].flags & 4)) {
@@ -1892,7 +1892,7 @@ void select_disp3(WinMgrEntry* entry) {
     }
 }
 
-void select_disp3_party(WinMgrEntry* entry) {
+static void select_disp3_party(WinMgrEntry* entry) {
     WinMgrSelect* sel = entry->param;
     PouchData* pouch;
     char buf[0x48];
@@ -1920,7 +1920,7 @@ void select_disp3_party(WinMgrEntry* entry) {
     }
 }
 
-void select_disp3_mario(WinMgrEntry* entry) {
+static void select_disp3_mario(WinMgrEntry* entry) {
     WinMgrSelect* sel = entry->param;
     char buf[0x48];
     const char* help;
@@ -1928,7 +1928,7 @@ void select_disp3_mario(WinMgrEntry* entry) {
     pouchGetPtr();
     if (!(wp->entries[sel->descriptorId[2]].flags & 4)) {
         if (sel->items[sel->cursor].flags & 2) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             help = "helperr";
 #else
             if (sel->items[sel->cursor].flags & 4) {
@@ -1961,10 +1961,10 @@ static const char name_party5[] = "name_party5";
 static const char name_party2[] = "name_party2";
 static const char name_party6[] = "name_party6";
 
-#if VERSION == VERSION_DEMO
-s32 select_party_icon_color(s32 icon) {
+#if VERSION <= VERSION_DEMO_US
+static s32 iconid_conv(s32 icon) {
 #else
-static inline s32 select_party_icon_color(s32 icon) {
+static inline s32 iconid_conv(s32 icon) {
 #endif
     if (icon == ICON_158) {
         switch (pouchGetPartyColor(4)) {
@@ -1995,10 +1995,10 @@ static inline s32 select_party_icon_color(s32 icon) {
     return icon;
 }
 
-#if VERSION == VERSION_DEMO
-const char* select_party_name(s32 id) {
+#if VERSION <= VERSION_DEMO_US
+static const char* party_name_table_rtn(s32 id) {
 #else
-static inline const char* select_party_name(u16 id) {
+static inline const char* party_name_table_rtn(u16 id) {
 #endif
     const char* name;
     // id is a party_id_table index (0-6); there is no default, another value would return name unset

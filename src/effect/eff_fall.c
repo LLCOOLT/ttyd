@@ -88,10 +88,10 @@ static EVT_BEGIN(evt_shake)
 EVT_END()
 
 EffectEntry* effKemuri1N64Entry(s32 type, f32 a2, f32 a3, f32 a4, f32 a5);
-void effFallMain(EffectEntry* effect);
-void effFallDisp(CameraId cameraId, EffectEntry* effect);
-void effFallDispInseki(CameraId cameraId, EffectEntry* effect);
-void effFallDispWater(CameraId cameraId, EffectEntry* effect);
+static void effFallMain(EffectEntry* effect);
+static void effFallDisp(CameraId cameraId, EffectEntry* effect);
+static void effFallDispInseki(CameraId cameraId, EffectEntry* effect);
+static void effFallDispWater(CameraId cameraId, EffectEntry* effect);
 
 static inline f32 fall_sinf(f32 x) {
     f32 a = 0.00761f;
@@ -360,7 +360,7 @@ static inline void effFallRelease(EffectEntry* effect) {
 }
 // FAKE: the seven sfx names are spelled SFX_NAME_WORD("lit") at each call (no locals) so each becomes a hoisted
 // loop-invariant @ temp (UNBLOCK.log lever); plain literals in calls are not hoisted. Same string addresses.
-void effFallMain(EffectEntry* effect) {
+static void effFallMain(EffectEntry* effect) {
     Vec sndPos;
     EffFallElem* e;
     s32 i;
@@ -886,7 +886,7 @@ void effFallMain(EffectEntry* effect) {
 
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
-void effFallDisp(CameraId cameraId, EffectEntry* effect) {
+static void effFallDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx trans;
     Mtx scl;
     Mtx rot;
@@ -1077,7 +1077,7 @@ void effFallDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-void effFallDispInseki(CameraId cameraId, EffectEntry* effect) {
+static void effFallDispInseki(CameraId cameraId, EffectEntry* effect) {
     Mtx trans;
     Mtx scl;
     Mtx rot;
@@ -1131,7 +1131,7 @@ void effFallDispInseki(CameraId cameraId, EffectEntry* effect) {
 }
 
 static const GXColor white255 = {255, 255, 255, 255};
-void effFallDispWater(CameraId cameraId, EffectEntry* effect) {
+static void effFallDispWater(CameraId cameraId, EffectEntry* effect) {
     Mtx trans;
     Mtx scl;
     Mtx rot;

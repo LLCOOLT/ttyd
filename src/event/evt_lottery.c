@@ -15,7 +15,7 @@ lottery_info* lotteryGetPtr(void) {
     return &gp->lotteryInfo;
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo checks the draw day before the per-shop times, never rerolls a prize number
 // and keeps the buy times when the clock went back
 USER_FUNC(evt_lottery) {
@@ -323,7 +323,7 @@ USER_FUNC(evt_lottery) {
 }
 #endif
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo only marks a purchase made with a broken clock
 USER_FUNC(evt_lottery_buy) {
     EvtWord* args = event->args;

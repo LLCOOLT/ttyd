@@ -8,7 +8,7 @@
 #include "evt/evt_mario.h"
 #include "evt/evt_party.h"
 #include "evt/evt_seq.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "hom.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
@@ -23,19 +23,21 @@ EVT_BEGIN(hom_12_init_evt)
     CALL(evt_party_set_pos, 0, 0, -1000, 0)
     CALL(evt_party_set_pos, 1, 0, -1000, 0)
     IF_INT_EQUAL(GSWF(GSWF_TRAIN_RETURN_TRIP), 0)
-        CALL_CHILD(PTR(hom_10_evt_resha_right))
-        CALL_CHILD(PTR(hom_10_evt_resha_start3))
+        CALL_CHILD(hom_10_evt_resha_right)
+        CALL_CHILD(hom_10_evt_resha_start3)
         SET_VALUE(LW(0), 500)
         SET_VALUE(LW(1), -500)
+#if VERSION >= VERSION_JP
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("renketu"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("renketu_1"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("renketu_2"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("renketu_3"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("renketu_4"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("renketu_5"), MAPOBJ_FLAG_HIDE)
+#endif
     ELSE
-        CALL_CHILD(PTR(hom_10_evt_resha_left))
-        CALL_CHILD(PTR(hom_10_evt_resha_start4))
+        CALL_CHILD(hom_10_evt_resha_left)
+        CALL_CHILD(hom_10_evt_resha_start4)
         SET_VALUE(LW(0), 0)
         SET_VALUE(LW(1), 1000)
         CALL(evt_mapobj_trans, 1, STRING("train"), -1500, 0, 0)

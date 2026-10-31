@@ -23,7 +23,11 @@ static PoseTableEntry pose_table[18];
 static BattleDataEntry data_table[2];
 static EvtWord init_event[21];
 static EvtWord damage_event[10];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord song_event[298];
+#else
 static EvtWord song_event[300];
+#endif
 static EvtWord escape_event[96];
 static EvtWord wait_event[6];
 
@@ -97,7 +101,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {95, 30, 30, 100, 30, 100, 100, 30, 100, 30, 100, 30, 100, 30, 30, 100, 80, 100, 30, 100, 100, 30};
+#else
 static StatusVulnerability regist = {95, 30, 30, 100, 50, 100, 100, 30, 100, 30, 100, 30, 100, 30, 30, 100, 80, 100, 30, 100, 100, 30};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_pansy", "c_pansy", 0.0f, 0.0f, 0.0f, 0.0f, 29.0f, 0.0f, 0.0f, 34.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
@@ -129,7 +137,11 @@ BattleWeapon weapon_pansy_attack = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
+#if VERSION <= VERSION_DEMO_US
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
+#else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
+#endif
     COUNTER_RESIST_ALL, // counterResistFlags
     TARGET_WEIGHT_RANDOM, // targetWeightFlags
 #if VERSION >= VERSION_US
@@ -166,11 +178,11 @@ static EVT_BEGIN(attack_event)
     CALL(evt_sub_random, LW(0), LW(1))
     IF_INT_LESS(LW(1), 70)
         SET_VALUE(LW(9), PTR(&weapon_pansy_attack))
-        CALL_CHILD(PTR(song_event))
+        CALL_CHILD(song_event)
         GOTO(99)
     END_IF
     LABEL(10)
-    CALL_CHILD(PTR(escape_event))
+    CALL_CHILD(escape_event)
     GOTO(99)
     LABEL(99)
     RETURN
@@ -193,8 +205,8 @@ static PoseTableEntry pose_table[] = {
     {40, "PAN_W_1"},
     {56, "PAN_X_1"},
     {57, "PAN_X_1"},
-    {65, "PAN_T_1"},
-    {69, "PAN_S_1"},
+    {BTL_POSE_TALK, "PAN_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "PAN_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -214,7 +226,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -259,9 +271,15 @@ static EVT_BEGIN(song_event)
             WAIT_FRAMES(12)
         END_LOOP
     END_SIBLING_EVENT
+#if VERSION <= VERSION_DEMO_US
+    WAIT_FRAMES(60)
+    WAIT_FRAMES(60)
+    SET_VALUE(LW(6), 0)
+#else
     WAIT_FRAMES(120)
     SET_VALUE(LW(6), 0)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
+#endif
     LABEL(10)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     SWITCH(LW(5))
@@ -313,7 +331,7 @@ static EVT_BEGIN(song_event)
     END_LOOP
     CALL(evt_map_blend_off, 0)
     CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     WAIT_MS(500)
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)

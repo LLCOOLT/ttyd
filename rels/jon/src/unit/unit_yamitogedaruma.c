@@ -8,7 +8,7 @@
 #include "battle/battle_camera.h"
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 #include "evt/evt_eff.h"
@@ -103,7 +103,11 @@ static BattleUnitDefenseAttr defence_attr = {{0, VERSION_PICK(0, 2), 0, 0, 0}};
 
 static BattleUnitDefense defence_turn = {0};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {30, 70, 30, 100, 30, 100, 100, 50, 100, 50, 100, 50, 100, 50, 50, 30, 55, 100, 50, 100, 100, 30};
+#else
 static StatusVulnerability regist = {20, 80, 20, 100, 20, 100, VERSION_PICK(100, 0), 40, 100, 50, 100, 50, 100, 100, 40, 30, 20, 100, 40, 100, 100, 30};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "TGD_N_1"},
@@ -122,8 +126,8 @@ static PoseTableEntry pose_table[] = {
     {42, "TGD_S_4"},
     {56, "TGD_X_1"},
     {57, "TGD_X_1"},
-    {65, "TGD_T_1"},
-    {69, "TGD_S_4"},
+    {BTL_POSE_TALK, "TGD_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "TGD_S_4"},
 };
 
 static PoseTableEntry pose_table_turn[] = {
@@ -140,8 +144,8 @@ static PoseTableEntry pose_table_turn[] = {
     {39, "TGD_D_2"},
     {56, "TGD_X_2"},
     {57, "TGD_X_2"},
-    {65, "TGD_S_5"},
-    {69, "TGD_S_5"},
+    {BTL_POSE_TALK, "TGD_S_5"},
+    {BTL_POSE_STAY_DEFAULT, "TGD_S_5"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -263,7 +267,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 

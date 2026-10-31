@@ -57,7 +57,7 @@ USER_FUNC(evt_pouch_remove_item) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 USER_FUNC(N_evt_pouch_remove_item_index) {
     EvtWord* args = event->args;
     s32 a = evtGetValue(event, args[0]);
@@ -85,7 +85,7 @@ USER_FUNC(evt_pouch_add_keepitem) {
 
 USER_FUNC(evt_pouch_remove_keepitem) {
     EvtWord* args = event->args;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (pouchRemoveKeepItem(evtGetValue(event, args[0]))) {
         evtSetValue(event, args[1], 0);
     } else {
@@ -109,7 +109,7 @@ USER_FUNC(evt_pouch_check_item) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 GETTER(L_evt_pouch_get_hp, RAW_GET(pouchGetHP))
 SETTER(L_evt_pouch_set_hp, RAW_SET(pouchSetHP))
 #endif

@@ -18,7 +18,6 @@
 #include "evt/evt_memcard.h"
 #include "evt/evt_npc.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "mri.h"
 #include "data_tables.h"
 #include "mario/mario_pouch.h"
@@ -49,8 +48,8 @@
 static u8* bp;
 
 static USER_FUNC(evtflash);
-void bossrobot_batu(CameraId camera, void* param);
-void mri_stg3_012_cb(s32 type, void* param);
+static void bossrobot_batu(CameraId camera, void* param);
+static void mri_stg3_012_cb(s32 type, void* param);
 
 s32 puni_return_data[204];
 extern EvtWord puni_return[];
@@ -140,7 +139,7 @@ static USER_FUNC(elder_talk_sub_punicheck) {
     s32 trap;
     s32 puni;
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     for (i = 1; i < 103; i++) {
         puniGetPunidat();
         puniswGetindex(LSW(0), i - 1, &puni, &pos);
@@ -282,7 +281,7 @@ EVT_BEGIN(puni_return)
         ADD(LW(11), -1)
         CALL(evt_puni_get_lsw_index, LSW(0), LW(11), LW(0), LW(1), LW(2), LW(3))
         CALL(evt_puni_get_flag, LW(10), LW(4))
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         CALL(evt_puni_get_trap_index, LW(10), LW(5))
         IF_INT_EQUAL(LW(10), 1)
             IF_INT_EQUAL(GSWF(GSWF_MRI03_PUNIO_WAITING_AT_CELL), 1)
@@ -299,31 +298,31 @@ EVT_BEGIN(puni_return)
             GOTO(100)
         END_IF
 #endif
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         IF_INT_NOT_EQUAL(LW(0), 0)
 #endif
             IF_BITS_SET(LW(4), 1024)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 DEBUG_PUT_MSG(STRING("長老の能力"))
                 DEBUG_PUT_MSG(STRING("プニ番号"))
                 DEBUG_PUT_REG(LW(11))
 #endif
                 DEBUG_PUT_MSG(STRING("同じエリアにいます"))
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             GOTO(100)
         END_IF
         DEBUG_PUT_MSG(STRING("はぐれから合流しました"))
 #endif
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             ELSE
 #endif
                 READ_INT2(LW(12), LW(13))
                 CALL(evt_puni_set_lsw_index, LSW(0), LW(11), 0, 0, 0, 0)
                 CALL(evt_puni_init_puni, LW(10), 1, LW(12), 0, LW(13), 0)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         LABEL(100)
 #endif
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             END_IF
         END_IF
 #endif
@@ -377,7 +376,7 @@ EVT_BEGIN(elder_talk_sub)
             CALL(evt_cam3d_evt_off, 500, 11)
             CALL(evt_mario_set_dir, 270, 200, 0)
             WAIT_MS(500)
-            CALL_CHILD(PTR(puni_return))
+            CALL_CHILD(puni_return)
             WAIT_MS(2000)
             CALL(evt_npc_set_autotalkpose, STRING("me"), STRING("S_1"), STRING("T_1"))
             WAIT_FRAMES(1)
@@ -458,7 +457,7 @@ static EVT_BEGIN(elder_talk)
         CALL(evt_pouch_check_item, ITEM_LIFE_SHROOM, LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 1)
             CALL(evt_msg_print, 0, STRING("irai_10_01"), 0, STRING("me"))
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             CALL(evt_win_item_select, PTR(irai_item_tbl), LW(0))
 #else
             CALL(evt_win_item_select, 0, PTR(irai_item_tbl), LW(0), 0)
@@ -481,7 +480,7 @@ static EVT_BEGIN(elder_talk)
         ELSE
             IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_1), 0)
                 CALL(evt_msg_print, 0, STRING("irai_17_00"), 0, 0)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 CALL(evt_win_item_select, PTR(iri_17_item_tbl), LW(0))
 #else
                 CALL(evt_win_item_select, 0, PTR(iri_17_item_tbl), LW(0), 0)
@@ -489,11 +488,7 @@ static EVT_BEGIN(elder_talk)
                 IF_INT_NOT_EQUAL(LW(0), -1)
                     CALL(evt_pouch_remove_item, ITEM_ROUTING_SLIP, LW(0))
                     CALL(evt_msg_print, 0, STRING("irai_17_01"), 0, 0)
-#if VERSION == VERSION_DEMO
-                    CALL(evt_item_entry, STRING("kairanban"), ITEM_ROUTING_SLIP, 0, -1000, 0, 16, -1, 0)
-#else
-                    CALL(evt_item_entry, STRING("kairanban"), ITEM_ROUTING_SLIP, 0, -1000, 0, 17, -1, 0)
-#endif
+                    CALL(evt_item_entry, STRING("kairanban"), ITEM_ROUTING_SLIP, 0, -1000, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
                     CALL(evt_item_get_item, STRING("kairanban"))
                     CALL(evt_item_get_item_end_wait, STRING("kairanban"))
                     SET_VALUE(GSWF(GSWF_TROUBLE_WORK_1), 1)
@@ -515,7 +510,7 @@ static EVT_BEGIN(elder_talk)
         IF_INT_EQUAL(GSWF(GSWF_MRI01_ELDER_POWERS_EXPLAINED), 0)
             CALL(evt_msg_print, 0, STRING("stg2_mri_e15_28"), 0, STRING("me"))
         ELSE
-            CALL_CHILD(PTR(elder_talk_sub))
+            CALL_CHILD(elder_talk_sub)
         END_IF
         CASE_BETWEEN(STORY_STG2_26_PRAISE_FROM_THE_PUNI, STORY_STG8_END_AFTER_THE_BATTLE)
         CALL(evt_msg_print, 0, STRING("stg2_mri_re_001"), 0, STRING("me"))
@@ -539,7 +534,7 @@ EVT_END()
 
 EVT_BEGIN(puni_1_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         CASE_LESS_OR_EQUAL(STORY_STG8_END_AFTER_THE_BATTLE)
 #else
         CASE_BETWEEN(STORY_STG7_02_MAYOR_BOB, STORY_STG7_02_MAYOR_BOB)
@@ -550,7 +545,7 @@ EVT_BEGIN(puni_1_talk)
             CALL(evt_msg_print, 0, STRING("stg2_mri_re_000_1"), 0, STRING("me"))
             SET_VALUE(GSWF(GSWF_STG7_WHITE_BOGGLY_HINT), 1)
         END_IF
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         CASE_LESS_OR_EQUAL(STORY_STG8_END_AFTER_THE_BATTLE)
         CALL(evt_msg_print, 0, STRING("stg2_mri_re_000"), 0, STRING("me"))
 #endif
@@ -583,13 +578,13 @@ EVT_BEGIN(puni_2_talk)
 EVT_END()
 
 EVT_BEGIN(puni_init)
-    CALL_CHILD(PTR(npc_init_evt))
+    CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(baba_init)
-    CALL_CHILD(PTR(npc_init_evt))
+    CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
@@ -686,11 +681,7 @@ static EVT_BEGIN(sister_talk)
             CALL(evt_npc_jump_position_nohit, STRING("me"), LW(0), LW(1), LW(2), 200, 18)
             CALL(evt_msg_print, 0, STRING("stg2_mri_re_012"), 0, STRING("me"))
             CALL(evt_msg_print, 0, STRING("stg2_mri_re_014"), 0, STRING("me"))
-#if VERSION == VERSION_DEMO
-            CALL(evt_item_entry, STRING("puniko_item"), ITEM_MYSTIC_EGG, 0, -1000, 0, 15, -1, 0)
-#else
-            CALL(evt_item_entry, STRING("puniko_item"), ITEM_MYSTIC_EGG, 0, -1000, 0, 16, -1, 0)
-#endif
+            CALL(evt_item_entry, STRING("puniko_item"), ITEM_MYSTIC_EGG, 0, -1000, 0, ITEM_ENTRY_FIXED, -1, 0)
             CALL(evt_item_get_item, STRING("puniko_item"))
             CALL(evt_msg_print, 0, STRING("stg2_mri_re_015"), 0, STRING("me"))
             SET_VALUE(GSWF(GSWF_MRI01_PETUNI_QUIZ_EGG_GIVEN), 1)
@@ -699,14 +690,14 @@ static EVT_BEGIN(sister_talk)
         END_IF
     ELSE
         CALL(evt_msg_print_add, 0, STRING("stg2_mri_re_016"))
-        SPAWN_EVENT(PTR(sister_jump))
+        SPAWN_EVENT(sister_jump)
     END_IF
     RETURN
 EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"ガイド"*/"\x83\x4B\x83\x43\x83\x68", // name
+        "ガイド", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         guide_init, // initEvent
@@ -718,7 +709,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ライバル"*/"\x83\x89\x83\x43\x83\x6F\x83\x8B", // name
+        "ライバル", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         rival_init, // initEvent
@@ -730,7 +721,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", // name
+        "プニ族長老", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         elder_init, // initEvent
@@ -742,7 +733,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"プニ族１"*/"\x83\x76\x83\x6A\x91\xB0\x82\x50", // name
+        "プニ族１", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         puni_1_init, // initEvent
@@ -754,7 +745,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"プニ族２"*/"\x83\x76\x83\x6A\x91\xB0\x82\x51", // name
+        "プニ族２", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         puni_2_init, // initEvent
@@ -766,7 +757,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"プニ族"*/"\x83\x76\x83\x6A\x91\xB0", // name
+        "プニ族", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         puni_init, // initEvent
@@ -776,7 +767,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"プニ族B"*/"\x83\x76\x83\x6A\x91\xB0\x42", // name
+        "プニ族B", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         puni_init, // initEvent
@@ -786,7 +777,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ガイド妹"*/"\x83\x4B\x83\x43\x83\x68\x96\x85", // name
+        "ガイド妹", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         sister_init, // initEvent
@@ -803,28 +794,28 @@ static NpcSetupInfo npcEnt[] = {
 EVT_BEGIN(bero_00_doa_close)
     SET_VALUE(LW(9), 1)
     SET_VALUE(LW(10), STRING("S_doa_l_a"))
-    SPAWN_EVENT(PTR(evt_mri_door_close))
+    SPAWN_EVENT(evt_mri_door_close)
     RETURN
 EVT_END()
 
 EVT_BEGIN(bero_00_doa_open)
     SET_VALUE(LW(9), 1)
     SET_VALUE(LW(10), STRING("S_doa_l_a"))
-    SPAWN_EVENT(PTR(evt_mri_door_open))
+    SPAWN_EVENT(evt_mri_door_open)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(bero_01_doa_close)
     SET_VALUE(LW(9), 1)
     SET_VALUE(LW(10), STRING("S_doa_r_a"))
-    SPAWN_EVENT(PTR(evt_mri_door_close))
+    SPAWN_EVENT(evt_mri_door_close)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(bero_01_doa_open)
     SET_VALUE(LW(9), 1)
     SET_VALUE(LW(10), STRING("S_doa_r_a"))
-    SPAWN_EVENT(PTR(evt_mri_door_open))
+    SPAWN_EVENT(evt_mri_door_open)
     RETURN
 EVT_END()
 
@@ -900,7 +891,7 @@ EVT_BEGIN(bigtree_firstbattle)
     END_LOOP
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     BEGIN_INLINE_EVENT
         CALL(evt_mario_dispflag_onoff, 1, 4)
         CALL(evt_mario_set_dir, 90, 200, 0)
@@ -953,7 +944,7 @@ EVT_BEGIN(bigtree_firstbattle)
     WAIT_MS(580)
     SET_VALUE(LW(9), 1)
     SET_VALUE(LW(10), STRING("S_doa_r_a"))
-    SPAWN_EVENT(PTR(evt_mri_door_open_pure))
+    SPAWN_EVENT(evt_mri_door_open_pure)
     WAIT_MS(1580)
     CALL(evt_npc_set_position, STRING("ガイド"), -20, 0, 50)
     CALL(evt_mario_set_pos, -60, 0, 30)
@@ -962,7 +953,7 @@ EVT_BEGIN(bigtree_firstbattle)
         WAIT_MS(1500)
         SET_VALUE(LW(9), 1)
         SET_VALUE(LW(10), STRING("S_doa_r_a"))
-        SPAWN_EVENT(PTR(evt_mri_door_close_pure))
+        SPAWN_EVENT(evt_mri_door_close_pure)
     END_INLINE_EVENT
     SET_VALUE(LW(10), STRING("第三勢力部下Ａ"))
     SET_VALUE(LW(11), STRING("第三勢力部下Ｂ"))
@@ -1045,12 +1036,12 @@ EVT_BEGIN(bigtree_firstbattle)
         CALL(evt_npc_move_position, LW(11), -9, 50, 0, FLOAT(180.0f), 0)
     END_INLINE_EVENT
     WAIT_MS(250)
-    CALL(evt_npc_release_fieldnpc, 1)
+    CALL(evt_npc_release_filednpc, 1)
     CALL(evt_npc_set_battle_info, LW(10), 4)
     CALL(evt_npc_battle_start, LW(10))
     CALL(evt_npc_wait_battle_end)
     CALL(evt_mario_key_onoff, 1)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(evt_party_run, 0)
 #endif
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_11_X_NAUT_BATTLE)
@@ -1071,7 +1062,7 @@ EVT_BEGIN(bigtree_firstbattle)
     CALL(evt_npc_flag_onoff, 1, LW(11), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
     CALL(evt_map_playanim, STRING("doalight01"), 0, 0)
     CALL(evt_cam3d_evt_set, -20, 125, 450, -20, 45, 7, 0, 11)
-    SPAWN_EVENT(PTR(meet_rival))
+    SPAWN_EVENT(meet_rival)
     RETURN
 EVT_END()
 
@@ -1114,7 +1105,7 @@ EVT_BEGIN(meet_rival)
         WAIT_MS(1000)
         SET_VALUE(LW(9), 1)
         SET_VALUE(LW(10), STRING("S_doa_r_a"))
-        CALL_CHILD(PTR(evt_mri_door_close_pure))
+        CALL_CHILD(evt_mri_door_close_pure)
         WAIT_MS(600)
         CALL(evt_mapobj_get_position, STRING("S_lights_r"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_DOOR_UNLOCK"), LW(0), LW(1), LW(2), 0)
@@ -1682,7 +1673,7 @@ EVT_BEGIN(rival_nakama)
     CALL(evt_mario_normalize)
     CALL(evt_party_stop, 0)
     CALL(evt_mario_set_dir, 270, 200, 0)
-    CALL_CHILD(PTR(mri_guide_goryu))
+    CALL_CHILD(mri_guide_goryu)
     CALL(evt_puni_get_position, 1, LW(0), LW(1), LW(2))
     CALL(evt_puni_set_position, 1, 0, -1000, 0)
     CALL(evt_puni_set_mode, 1, PUNI_MODE_INERT)
@@ -1862,11 +1853,7 @@ EVT_BEGIN(rival_nakama)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_CHOUROU_PUNIDAMA1"), LW(0), LW(1), LW(2), 0)
     ADD(LW(1), 5)
     ADD(LW(2), -2)
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("item00"), ITEM_PUNI_ORB, LW(0), LW(1), LW(2), 15, -1, 0)
-#else
-    CALL(evt_item_entry, STRING("item00"), ITEM_PUNI_ORB, LW(0), LW(1), LW(2), 16, -1, 0)
-#endif
+    CALL(evt_item_entry, STRING("item00"), ITEM_PUNI_ORB, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
     ADD(LW(1), 8)
     CALL(evt_item_move_3d_position, STRING("item00"), LW(0), LW(1), LW(2), 500, 0)
@@ -1921,7 +1908,7 @@ EVT_BEGIN(rival_nakama)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_15_11_PUNIES)
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
-    SPAWN_EVENT(PTR(elder_kaisetsu))
+    SPAWN_EVENT(elder_kaisetsu)
     RETURN
 EVT_END()
 
@@ -1989,7 +1976,7 @@ EVT_BEGIN(elder_kaisetsu)
     RETURN
 EVT_END()
 
-void bossrobot_batu(CameraId camera, void* param) {
+static void bossrobot_batu(CameraId camera, void* param) {
     u8* alpha = param;
     NpcEntry* robot = npcNameToPtr("ボスロボット");
     NpcEntry* batu = npcNameToPtr("ボスロボットバツ");
@@ -2072,7 +2059,7 @@ static USER_FUNC(akari_charge_entry) {
     return EVT_RETURN_DONE;
 }
 
-void mri_stg3_012_cb(s32 type, void* param) {
+static void mri_stg3_012_cb(s32 type, void* param) {
     u16* work = *(u16**)param;
 
     switch (type) {
@@ -2231,12 +2218,12 @@ EVT_BEGIN(boss_robot_pera_after)
 EVT_END()
 
 EVT_BEGIN(boss_battle)
-    CALL(evt_npc_set_position, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), -320, 0, 30)
-    CALL(evt_npc_set_ry, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), 90)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
-    CALL(evt_npc_set_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), -250, 0, 30)
-    CALL(evt_npc_set_ry, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), 270)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_set_position, STRING("プニ族長老"), -320, 0, 30)
+    CALL(evt_npc_set_ry, STRING("プニ族長老"), 90)
+    CALL(evt_npc_flag_onoff, 1, STRING("プニ族長老"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_set_position, STRING("第三勢力幹部"), -250, 0, 30)
+    CALL(evt_npc_set_ry, STRING("第三勢力幹部"), 270)
+    CALL(evt_npc_flag_onoff, 1, STRING("第三勢力幹部"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
     LOOP(0)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         IF_INT_LESS_OR_EQUAL(LW(0), 0)
@@ -2267,12 +2254,12 @@ EVT_BEGIN(boss_battle)
             BREAK_LOOP
         END_IF
     END_LOOP
-    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_00"), 0, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"))
-    CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
-    CALL(evt_npc_jump_position_nohit, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2), 225, 30)
-    CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
-    CALL(evt_npc_jump_position_nohit, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2), 225, 30)
-    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_01"), 0, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"))
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_00"), 0, STRING("プニ族長老"))
+    CALL(evt_npc_get_position, STRING("第三勢力幹部"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_jump_position_nohit, STRING("第三勢力幹部"), LW(0), LW(1), LW(2), 225, 30)
+    CALL(evt_npc_get_position, STRING("第三勢力幹部"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_jump_position_nohit, STRING("第三勢力幹部"), LW(0), LW(1), LW(2), 225, 30)
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_01"), 0, STRING("第三勢力幹部"))
     BEGIN_INLINE_EVENT
         WAIT_MS(300)
         CALL(evt_cam3d_evt_set, FLOAT(-285.0f), FLOAT(150.19922f), FLOAT(538.2998f), FLOAT(-285.0f), FLOAT(57.0f), FLOAT(7.0f), 1000, 9)
@@ -2281,12 +2268,12 @@ EVT_BEGIN(boss_battle)
         WAIT_MS(200)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_get_position, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), LW(0), LW(1), LW(2))
+        CALL(evt_npc_get_position, STRING("プニ族長老"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_CHOUROU_BIG1"), LW(0), LW(1), LW(2), 0)
         CALL(evt_sub_intpl_msec_init, 2, FLOAT(1.0f), FLOAT(3.0f), 200)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
-            CALL(evt_npc_set_scale, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), LW(0), LW(0), LW(0))
+            CALL(evt_npc_set_scale, STRING("プニ族長老"), LW(0), LW(0), LW(0))
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
@@ -2294,37 +2281,37 @@ EVT_BEGIN(boss_battle)
         END_LOOP
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
+        CALL(evt_npc_get_position, STRING("第三勢力幹部"), LW(0), LW(1), LW(2))
         ADD(LW(0), 10)
-        CALL(evt_npc_move_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(2), 200, 0, 0)
+        CALL(evt_npc_move_position, STRING("第三勢力幹部"), LW(0), LW(2), 200, 0, 0)
     END_INLINE_EVENT
     SET_VALUE(GF(0), 1)
     SET_VALUE(GF(1), 1)
     SET_VALUE(GF(2), 1)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(1), LW(2), LW(3))
+        CALL(evt_npc_get_position, STRING("第三勢力幹部"), LW(1), LW(2), LW(3))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_KANBU_SMALL1"), LW(1), LW(2), LW(3), 0)
         SET_FLOAT_VALUE(LW(0), FLOAT(0.7998047f))
-        CALL(evt_npc_set_scale, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(0), LW(0))
+        CALL(evt_npc_set_scale, STRING("第三勢力幹部"), LW(0), LW(0), LW(0))
         WAIT_WHILE(GF(0))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_KANBU_SMALL1"), LW(1), LW(2), LW(3), 0)
         SET_FLOAT_VALUE(LW(0), FLOAT(0.6699219f))
-        CALL(evt_npc_set_scale, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(0), LW(0))
+        CALL(evt_npc_set_scale, STRING("第三勢力幹部"), LW(0), LW(0), LW(0))
         WAIT_WHILE(GF(1))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_KANBU_SMALL1"), LW(1), LW(2), LW(3), 0)
         SET_FLOAT_VALUE(LW(0), FLOAT(0.5292969f))
-        CALL(evt_npc_set_scale, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(0), LW(0))
+        CALL(evt_npc_set_scale, STRING("第三勢力幹部"), LW(0), LW(0), LW(0))
         WAIT_WHILE(GF(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_KANBU_SMALL1"), LW(1), LW(2), LW(3), 0)
         SET_FLOAT_VALUE(LW(0), FLOAT(0.39941406f))
-        CALL(evt_npc_set_scale, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(0), LW(0))
+        CALL(evt_npc_set_scale, STRING("第三勢力幹部"), LW(0), LW(0), LW(0))
     END_INLINE_EVENT
-    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_02"), 0, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"))
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_02"), 0, STRING("プニ族長老"))
     BEGIN_INLINE_EVENT
         CALL(evt_sub_intpl_msec_init, 5, FLOAT(3.0f), FLOAT(1.0f), 200)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
-            CALL(evt_npc_set_scale, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), LW(0), LW(0), LW(0))
+            CALL(evt_npc_set_scale, STRING("プニ族長老"), LW(0), LW(0), LW(0))
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
@@ -2338,37 +2325,37 @@ EVT_BEGIN(boss_battle)
     SET_VALUE(GF(2), 0)
     CALL(evt_msg_continue)
     SET_FLOAT_VALUE(LW(0), FLOAT(1.0f))
-    CALL(evt_npc_set_scale, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(0), LW(0))
+    CALL(evt_npc_set_scale, STRING("第三勢力幹部"), LW(0), LW(0), LW(0))
     CALL(evt_cam3d_evt_set, -240, 86, 302, -240, 35, 7, 0, 11)
-    CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_position, STRING("第三勢力幹部"), LW(0), LW(1), LW(2))
     ADD(LW(0), 10)
-    CALL(evt_npc_move_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(2), 200, 0, 0)
-    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_03"), 0, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"))
+    CALL(evt_npc_move_position, STRING("第三勢力幹部"), LW(0), LW(2), 200, 0, 0)
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_03"), 0, STRING("第三勢力幹部"))
     CALL(evt_cam3d_evt_set, -275, 86, 302, -275, 35, 7, 500, 11)
     WAIT_MS(500)
-    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_04"), 0, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"))
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_04"), 0, STRING("プニ族長老"))
     BEGIN_INLINE_EVENT
         CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0048828125f), FLOAT(0.0f), 50)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_get_position, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), LW(0), LW(1), LW(2))
+        CALL(evt_npc_get_position, STRING("プニ族長老"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_CHOUROU_WAIST1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
-    CALL(evt_npc_set_anim, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), STRING("D_1"))
-    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_04_00"), 0, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"))
+    CALL(evt_npc_set_anim, STRING("プニ族長老"), STRING("D_1"))
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_04_00"), 0, STRING("プニ族長老"))
     WAIT_MS(500)
-    CALL(evt_npc_set_autotalkpose, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), STRING("D_1"), STRING("D_1"))
+    CALL(evt_npc_set_autotalkpose, STRING("プニ族長老"), STRING("D_1"), STRING("D_1"))
     WAIT_FRAMES(1)
-    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_04_01"), 0, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"))
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_04_01"), 0, STRING("プニ族長老"))
     WAIT_FRAMES(1)
-    CALL(evt_npc_set_anim, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), STRING("S_2"))
-    CALL(evt_npc_set_autotalkpose, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), STRING("S_1"), STRING("T_1"))
+    CALL(evt_npc_set_anim, STRING("プニ族長老"), STRING("S_2"))
+    CALL(evt_npc_set_autotalkpose, STRING("プニ族長老"), STRING("S_1"), STRING("T_1"))
     WAIT_MS(333)
-    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_04_02"), 0, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"))
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_04_02"), 0, STRING("第三勢力幹部"))
     WAIT_MS(250)
     CALL(evt_msg_print_party, STRING("stg2_mri_e24_05"))
-    CALL(evt_eff_fukidashi, 1, STRING(""), STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), 0, 0, 0, 0, 0, 0, 0, 60)
-    CALL(evt_npc_set_ry, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), 90)
+    CALL(evt_eff_fukidashi, 1, STRING(""), STRING("第三勢力幹部"), 0, 0, 0, 0, 0, 0, 0, 60)
+    CALL(evt_npc_set_ry, STRING("第三勢力幹部"), 90)
     CALL(evt_mario_set_pos, -100, 0, 30)
     CALL(evt_party_set_pos, 0, -70, 0, 30)
     WAIT_MS(1000)
@@ -2388,14 +2375,14 @@ EVT_BEGIN(boss_battle)
     CALL(evt_msg_print_party, STRING("stg2_mri_e24_05_01"))
     CALL(evt_cam3d_evt_set, -230, 88, 253, -230, 45, 7, 500, 11)
     WAIT_MS(500)
-    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_06"), 0, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"))
-    CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_06"), 0, STRING("第三勢力幹部"))
+    CALL(evt_npc_get_position, STRING("第三勢力幹部"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_BOMB_SWITCH_APPEAR1"), LW(0), LW(1), LW(2), 0)
-    CALL(evt_npc_set_anim, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), STRING("I_6"))
+    CALL(evt_npc_set_anim, STRING("第三勢力幹部"), STRING("I_6"))
     WAIT_MS(1000)
-    CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_position, STRING("第三勢力幹部"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_BOMB_TIMER_SET1"), LW(0), LW(1), LW(2), 0)
-    CALL(evt_npc_set_anim, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), STRING("I_7"))
+    CALL(evt_npc_set_anim, STRING("第三勢力幹部"), STRING("I_7"))
     CALL(evt_sub_countdown_flag_onoff, 1, 8)
     CALL(evt_countdown_stop)
     BEGIN_INLINE_EVENT_GET_ID(LW(10))
@@ -2411,32 +2398,32 @@ EVT_BEGIN(boss_battle)
         CALL(evt_sub_countdown_end)
     END_INLINE_EVENT
     WAIT_MS(1000)
-    CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_position, STRING("第三勢力幹部"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_BOMB_SWITCH_AWAY1"), LW(0), LW(1), LW(2), 0)
-    CALL(evt_npc_set_anim, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), STRING("I_8"))
+    CALL(evt_npc_set_anim, STRING("第三勢力幹部"), STRING("I_8"))
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_set, -180, 152, 548, -180, 57, 7, 0, 11)
     WAIT_MS(333)
-    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_07"), 0, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"))
-    CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_07"), 0, STRING("第三勢力幹部"))
+    CALL(evt_npc_get_position, STRING("第三勢力幹部"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_BOMB_SWITCH_APPEAR1"), LW(0), LW(1), LW(2), 0)
-    CALL(evt_npc_set_anim, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), STRING("I_6"))
+    CALL(evt_npc_set_anim, STRING("第三勢力幹部"), STRING("I_6"))
     WAIT_MS(1000)
-    CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_position, STRING("第三勢力幹部"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_BOMB_TIMER_SET1"), LW(0), LW(1), LW(2), 0)
-    CALL(evt_npc_set_anim, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), STRING("I_7"))
+    CALL(evt_npc_set_anim, STRING("第三勢力幹部"), STRING("I_7"))
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_set, 150, 186, 549, 150, 90, 7, 500, 11)
-    CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_position, STRING("第三勢力幹部"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_BOMB_SWITCH_AWAY1"), LW(0), LW(1), LW(2), 0)
-    CALL(evt_npc_set_anim, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), STRING("I_8"))
+    CALL(evt_npc_set_anim, STRING("第三勢力幹部"), STRING("I_8"))
     WAIT_MS(1000)
     DELETE_EVENT(LW(10))
     CALL(evt_mario_set_dir, 90, 0, 0)
     CALL(evt_mario_set_pos, -120, 0, 30)
     CALL(evt_party_set_dir, 0, 90, 0)
     CALL(evt_party_set_pos, 0, -150, 0, 30)
-    SET_VALUE(LW(10), STRING(/*"ボスロボット"*/"\x83\x7B\x83\x58\x83\x8D\x83\x7B\x83\x62\x83\x67"))
+    SET_VALUE(LW(10), STRING("ボスロボット"))
     CALL(evt_npc_set_anim, LW(10), STRING("Z_1"))
     CALL(evt_npc_set_position, LW(10), 150, 240, 30)
     CALL(evt_npc_flag_onoff, 1, LW(10), NPC_FLAG_TALK_ANIM)
@@ -2449,11 +2436,11 @@ EVT_BEGIN(boss_battle)
     CALL(evt_npc_sound_data_set, LW(10), 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
     CALL(evt_npc_glide_position, LW(10), 150, 100, 30, 0, FLOAT(120.0f), 0, 0, 0)
     CALL(evt_snd_sfxoff, LW(9))
-    CALL(evt_npc_set_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), -100, 0, 30)
-    CALL(evt_npc_set_ry, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), 90)
-    CALL(evt_npc_move_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), 150, 30, 0, FLOAT(180.0f), 0)
+    CALL(evt_npc_set_position, STRING("第三勢力幹部"), -100, 0, 30)
+    CALL(evt_npc_set_ry, STRING("第三勢力幹部"), 90)
+    CALL(evt_npc_move_position, STRING("第三勢力幹部"), 150, 30, 0, FLOAT(180.0f), 0)
     WAIT_MS(500)
-    CALL(evt_npc_get_position, STRING(/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_get_position, STRING("第三勢力幹部"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_FLD_NPC_KANBU_JUMP1"), LW(0), LW(1), LW(2), 0)
     CALL_CHILD(dai3kanbu_suikomare)
     WAIT_MS(200)
@@ -2473,7 +2460,7 @@ EVT_BEGIN(boss_battle)
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_set, 150, 185, 400, 150, 115, 7, 500, 11)
     WAIT_MS(500)
-    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_08"), 0, STRING(/*"ボスロボット"*/"\x83\x7B\x83\x58\x83\x8D\x83\x7B\x83\x62\x83\x67"))
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e24_08"), 0, STRING("ボスロボット"))
     CALL(evt_cam3d_evt_set, 145, 186, 549, 145, 90, 7, 500, 11)
     WAIT_MS(500)
     CALL(evt_snd_sfxon, STRING("SFX_STG2_BOSS_LIGHT1"), 0)
@@ -2518,16 +2505,16 @@ EVT_BEGIN(boss_battle)
     CALL(evt_npc_set_anim, LW(10), STRING("S_3"))
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_set, -20, 167, 549, -20, 71, 7, 1500, 11)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"ボスロボット"*/"\x83\x7B\x83\x58\x83\x8D\x83\x7B\x83\x62\x83\x67"), NPC_FLAG_MOVE_ANIM)
+    CALL(evt_npc_flag_onoff, 1, STRING("ボスロボット"), NPC_FLAG_MOVE_ANIM)
     BEGIN_INLINE_EVENT_GET_ID(LW(12))
         CALL(evt_npc_move_position, LW(10), -20, 30, 1500, 0, 0)
     END_INLINE_EVENT
     WAIT_MS(1300)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_24_BOSS_BATTLE)
-    CALL(evt_npc_release_fieldnpc, 1)
-    CALL(evt_npc_set_battle_info, STRING(/*"ボスロボット"*/"\x83\x7B\x83\x58\x83\x8D\x83\x7B\x83\x62\x83\x67"), 20)
-    CALL(evt_npc_battle_start, STRING(/*"ボスロボット"*/"\x83\x7B\x83\x58\x83\x8D\x83\x7B\x83\x62\x83\x67"))
+    CALL(evt_npc_release_filednpc, 1)
+    CALL(evt_npc_set_battle_info, STRING("ボスロボット"), 20)
+    CALL(evt_npc_battle_start, STRING("ボスロボット"))
     CALL(evt_npc_wait_battle_end)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_MRI3"))
     DELETE_EVENT(LW(12))
@@ -2540,9 +2527,9 @@ EVT_BEGIN(boss_battle)
     CALL(evt_mario_set_dir, 90, 0, 0)
     CALL(evt_party_set_pos, 0, -10, 0, 5)
     CALL(evt_party_set_dir, 0, 90, 0)
-    CALL(evt_npc_set_ry, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), 90)
-    CALL(evt_npc_set_position, STRING(/*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56"), -100, 0, 30)
-    CALL(evt_npc_set_position, STRING(/*"ボスロボット"*/"\x83\x7B\x83\x58\x83\x8D\x83\x7B\x83\x62\x83\x67"), 90, 0, 30)
+    CALL(evt_npc_set_ry, STRING("プニ族長老"), 90)
+    CALL(evt_npc_set_position, STRING("プニ族長老"), -100, 0, 30)
+    CALL(evt_npc_set_position, STRING("ボスロボット"), 90, 0, 30)
     CALL(evt_cam3d_evt_set, 70, 156, 549, 70, 60, 7, 0, 11)
     SET_VALUE(LW(0), 0)
     SPAWN_EVENT(boss_battle_win)
@@ -2824,11 +2811,7 @@ EVT_BEGIN(boss_battle_win)
         MULTIPLY(LW(13), 9)
         ADD(LW(13), LW(0))
         CALL(evt_npc_set_position, STRING("ダミー"), LW(0), LW(1), LW(2))
-#if VERSION == VERSION_DEMO
-        CALL(evt_item_entry, STRING("item00"), ITEM_EMERALD_STAR, 0, -1000, 0, 15, -1, 0)
-#else
-        CALL(evt_item_entry, STRING("item00"), ITEM_EMERALD_STAR, 0, -1000, 0, 16, -1, 0)
-#endif
+        CALL(evt_item_entry, STRING("item00"), ITEM_EMERALD_STAR, 0, -1000, 0, ITEM_ENTRY_FIXED, -1, 0)
         SET_VALUE(LW(8), STRING("ダミー"))
         SET_VALUE(LW(9), STRING("item00"))
         SPAWN_EVENT_GET_ID(PTR(starstone_item), LW(15))
@@ -2923,13 +2906,13 @@ EVT_BEGIN(boss_battle_win)
         CALL(evt_npc_set_position, LW(14), 0, -1000, 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         WAIT_MS(1100)
 #else
         WAIT_MS(600)
 #endif
         CALL(evt_npc_get_position, LW(11), LW(0), LW(1), LW(2))
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         ADD(LW(0), -40)
 #else
         ADD(LW(0), -80)
@@ -2939,13 +2922,13 @@ EVT_BEGIN(boss_battle_win)
         CALL(evt_msg_print, 0, STRING("stg2_mri_e25_00_03"), 0, 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         WAIT_MS(1100)
 #else
         WAIT_MS(600)
 #endif
         CALL(evt_npc_get_position, LW(12), LW(0), LW(1), LW(2))
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         ADD(LW(0), -40)
 #else
         ADD(LW(0), -80)
@@ -2955,13 +2938,13 @@ EVT_BEGIN(boss_battle_win)
         CALL(evt_msg_print, 0, STRING("stg2_mri_e25_00_04"), 0, 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         WAIT_MS(1700)
 #else
         WAIT_MS(1200)
 #endif
         CALL(evt_npc_get_position, LW(13), LW(0), LW(1), LW(2))
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         ADD(LW(0), -40)
 #else
         ADD(LW(0), -80)
@@ -2971,13 +2954,13 @@ EVT_BEGIN(boss_battle_win)
         CALL(evt_msg_print, 0, STRING("stg2_mri_e25_00_05"), 0, 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         WAIT_MS(2000)
 #else
         WAIT_MS(1500)
 #endif
         CALL(evt_npc_get_position, LW(14), LW(0), LW(1), LW(2))
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         ADD(LW(0), -40)
 #else
         ADD(LW(0), -80)
@@ -3040,25 +3023,21 @@ EVT_BEGIN(boss_battle_win)
     CALL(evt_item_get_position, STRING("item00"), LW(0), LW(1), LW(2))
     CALL(evt_item_set_position, STRING("item00"), 0, -1000, 0)
     SET_VALUE(LW(10), STRING("item01"))
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, LW(10), ITEM_EMERALD_STAR, LW(0), LW(1), LW(2), 15, -1, 0)
-#else
-    CALL(evt_item_entry, LW(10), ITEM_EMERALD_STAR, LW(0), LW(1), LW(2), 16, -1, 0)
-#endif
+    CALL(evt_item_entry, LW(10), ITEM_EMERALD_STAR, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, LW(10), ITEM_FLAG_NO_TOUCH)
     SET_VALUE(LW(0), 2)
     SET_VALUE(LW(1), LW(10))
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
 #endif
-    CALL_CHILD(PTR(evt_sub_starstone))
+    CALL_CHILD(evt_sub_starstone)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(door_switch_init)
     IF_INT_EQUAL(GSWF(GSWF_MRI05_WEST_DOOR_UNLOCKED), 0)
         SET_VALUE(LW(0), STRING("e_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     ELSE
         CALL(evt_map_playanim, STRING("doalight01"), 2, 0)
     END_IF
@@ -3118,14 +3097,14 @@ EVT_BEGIN(evt_ueki_03)
             SET_VALUE(LW(0), -245)
             SET_VALUE(LW(1), -15)
             SET_VALUE(LW(2), STRING("kpa_stg3_006_2"))
-            CALL_CHILD(PTR(ueki_puni_nigeru))
+            CALL_CHILD(ueki_puni_nigeru)
             SET_VALUE(GSWF(GSWF_MRI01_BOWSER_PLANTER_SCENE_DONE), 1)
             CALL(evt_mario_key_onoff, 1)
         END_IF
     ELSE
         CALL(evt_item_delete_check, STRING("item_ueki_03"), LW(0))
         IF_INT_EQUAL(LW(0), 1)
-            CALL(evt_item_entry, STRING("item_ueki_03"), ITEM_COIN, -240, 0, -20, 4, GSWF(GSWF_MRI01_PLANTER_COIN_TAKEN), 0)
+            CALL(evt_item_entry, STRING("item_ueki_03"), ITEM_COIN, -240, 0, -20, ITEM_ENTRY_LAUNCH, GSWF(GSWF_MRI01_PLANTER_COIN_TAKEN), 0)
         END_IF
     END_IF
     RETURN
@@ -3133,7 +3112,7 @@ EVT_END()
 
 static EVT_BEGIN(evt_ueki_08)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_05_BOWSER_THE_GREAT_TREE)
-        SPAWN_EVENT(PTR(mri_01_koopa_second_evt))
+        SPAWN_EVENT(mri_01_koopa_second_evt)
     END_IF
     RETURN
 EVT_END()
@@ -3183,11 +3162,11 @@ EVT_BEGIN(mri_01_koopa_first_evt)
     CALL(evt_bero_exec_wait, 65536)
     CALL(evt_fade_end_wait)
     SET_VALUE(LW(0), STRING("w_bero"))
-    CALL_CHILD(PTR(bero_case_switch_off))
+    CALL_CHILD(bero_case_switch_off)
     SET_VALUE(LW(0), STRING("e_bero"))
-    CALL_CHILD(PTR(bero_case_switch_off))
+    CALL_CHILD(bero_case_switch_off)
     SET_VALUE(LW(0), STRING("dokan"))
-    CALL_CHILD(PTR(bero_case_switch_off))
+    CALL_CHILD(bero_case_switch_off)
     BEGIN_INLINE_EVENT
         WAIT_MS(300)
         CALL(evt_npc_move_position, STRING("ババ"), -355, 30, 0, FLOAT(60.0f), 0)
@@ -3432,7 +3411,7 @@ EVT_BEGIN(mri_01_koopa_second_evt)
 #if VERSION >= VERSION_US
     CALL_CHILD(evt_memcard_save_wrapper)
 #else
-    CALL_CHILD(PTR(evt_memcard_save))
+    CALL_CHILD(evt_memcard_save)
 #endif
     CALL(evt_mario_set_mode, 0)
     CALL(evt_fade_set_mapchange_type, 1, FADE_STORY_BOWSER_A1, 0, FADE_STORY_BOWSER_A3, 0)
@@ -3455,17 +3434,17 @@ EVT_BEGIN(mri_01_init_evt)
         SET_VALUE(LW(7), 0)
         SET_VALUE(LW(8), 0)
         SET_VALUE(LW(9), 0)
-        CALL_CHILD(PTR(mri_puni_init))
+        CALL_CHILD(mri_puni_init)
     END_IF
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     IF_INT_EQUAL(LF(0), 0)
-        SPAWN_EVENT(PTR(puni_disp_info))
+        SPAWN_EVENT(puni_disp_info)
     END_IF
-    SPAWN_EVENT(PTR(mri_countdown))
+    SPAWN_EVENT(mri_countdown)
     SET_VALUE(LW(0), PTR(ueki_access_data))
-    CALL_CHILD(PTR(evt_sub_kusa_access_entry))
+    CALL_CHILD(evt_sub_kusa_access_entry)
     CALL(evt_map_playanim, STRING("mizu_01"), 1, 0)
     CALL(evt_map_playanim, STRING("mizu_02"), 1, 0)
     CALL(evt_map_playanim, STRING("awa_01"), 1, 0)
@@ -3478,7 +3457,7 @@ EVT_BEGIN(mri_01_init_evt)
     SET_VALUE(LW(1), 0)
     SET_VALUE(LW(2), -45)
     SET_FLOAT_VALUE(LW(3), FLOAT(1.0f))
-    SPAWN_EVENT(PTR(mri_waterfall_effect))
+    SPAWN_EVENT(mri_waterfall_effect)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG2_23_TIME_BOMB_ACTIVATED, STORY_STG2_23_01_X_NAUT_BATTLE)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
@@ -3496,33 +3475,33 @@ EVT_BEGIN(mri_01_init_evt)
     END_IF
     CALL(evt_npc_setup, PTR(npcEnt))
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_10_SECRET_ENTRANCE_REVEALED)
-        SPAWN_EVENT(PTR(bigtree_firstbattle))
+        SPAWN_EVENT(bigtree_firstbattle)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_11_X_NAUT_BATTLE)
-        SPAWN_EVENT(PTR(meet_rival))
+        SPAWN_EVENT(meet_rival)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_14_PUNI_ELDER_FREED)
-        SPAWN_EVENT(PTR(rival_nakama))
+        SPAWN_EVENT(rival_nakama)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_23_01_X_NAUT_BATTLE)
-        CALL_CHILD(PTR(boss_battle_init))
-        SPAWN_EVENT(PTR(boss_battle))
+        CALL_CHILD(boss_battle_init)
+        SPAWN_EVENT(boss_battle)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_24_BOSS_BATTLE)
-        CALL_CHILD(PTR(boss_battle_init))
+        CALL_CHILD(boss_battle_init)
         SET_VALUE(LW(0), 1)
-        CALL_CHILD(PTR(boss_battle_win_init))
-        SPAWN_EVENT(PTR(boss_battle_win))
+        CALL_CHILD(boss_battle_win_init)
+        SPAWN_EVENT(boss_battle_win)
     END_IF
-    SPAWN_EVENT(PTR(door_switch_init))
+    SPAWN_EVENT(door_switch_init)
     IF_INT_EQUAL(GSW(GSW_MRI_PUNI_CUR_MAP), 2)
         IF_INT_EQUAL(GSW(GSW_MRI_PUNI_PREV_MAP), 1)
-            SPAWN_EVENT(PTR(puni_mario_wait))
+            SPAWN_EVENT(puni_mario_wait)
         END_IF
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_15_11_PUNIES)
         IF_INT_EQUAL(GSWF(GSWF_MRI01_ELDER_POWERS_EXPLAINED), 0)
-            SPAWN_EVENT(PTR(elder_kaisetsu))
+            SPAWN_EVENT(elder_kaisetsu)
         END_IF
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_04_PEACH_BACK_TO_TEC)
@@ -3535,7 +3514,7 @@ EVT_BEGIN(mri_01_init_evt)
         CALL(evt_npc_set_position, STRING("ババ"), 0, -1000, 0)
         CALL(evt_npc_set_ry, STRING("ババ"), 90)
         CALL(evt_npc_change_interrupt, STRING("ババ"), 6, PTR(baba_talk))
-        SPAWN_EVENT(PTR(mri_01_koopa_first_evt))
+        SPAWN_EVENT(mri_01_koopa_first_evt)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_05_BOWSER_THE_GREAT_TREE)
         CALL(evt_mario_set_mode, 2)
@@ -3547,11 +3526,11 @@ EVT_BEGIN(mri_01_init_evt)
         CALL(evt_npc_set_ry, STRING("ババ"), 90)
         CALL(evt_npc_change_interrupt, STRING("ババ"), 6, PTR(baba_talk))
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         SET_VALUE(LW(0), STRING("e_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         SET_VALUE(LW(0), STRING("dokan"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_npc_set_position, STRING("ライバル"), -198, -5, 53)
         CALL(evt_npc_set_ry, STRING("ライバル"), 270)
         CALL(evt_npc_flag_onoff, 1, STRING("ライバル"), NPC_FLAG_INTANGIBLE)
@@ -3575,14 +3554,14 @@ EVT_BEGIN(mri_01_init_evt)
             CALL(evt_mario_set_dir, 90, 0, 0)
             BEGIN_INLINE_EVENT
                 CALL(evt_seq_wait, 2)
-                SPAWN_EVENT(PTR(mri_01_koopa_second_evt))
+                SPAWN_EVENT(mri_01_koopa_second_evt)
             END_INLINE_EVENT
         END_IF
     END_IF
     CALL(evt_sub_get_system_flag, LW(0))
     IF_BITS_SET(LW(0), GLOBAL_FLAG_KIOSK)
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     END_IF
     RETURN
 EVT_END()

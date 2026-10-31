@@ -105,7 +105,7 @@ EffectEntry* effBreakEntry(s32 type, s32 duration, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effBreakMain(EffectEntry* effect) {
+static void effBreakMain(EffectEntry* effect) {
     EffBreakWork* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -182,7 +182,7 @@ void effBreakMain(EffectEntry* effect) {
     }
 }
 
-void effBreakDisp(CameraId cameraId, EffectEntry* effect) {
+static void effBreakDisp(CameraId cameraId, EffectEntry* effect) {
     EffBreakWork* work = effect->userdata;
     CameraEntry* camera = camGetPtr(cameraId);
     f32 scale = work->scale;

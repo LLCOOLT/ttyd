@@ -17,7 +17,6 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "aji.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -216,8 +215,10 @@ EVT_BEGIN(evt_tensou2)
             END_IF
         END_LOOP
     END_INLINE_EVENT
+#if VERSION >= VERSION_JP
     CALL(evt_mario_get_pos, 0, LW(2), LW(3), LW(4))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_WARP1_2"), LW(2), LW(3), LW(4), 0)
+#endif
     CALL(evt_mario_get_pos, 0, LW(2), LW(3), LW(4))
     CALL(evt_party_get_pos, 0, LW(5), LW(6), LW(7))
     CALL(evt_sub_intpl_msec_init, 12, 70, 0, 1000)
@@ -272,7 +273,7 @@ EVT_BEGIN(tensou_init)
     CALL(evt_mario_set_pos, -115, 9, 0)
     CALL(evt_party_set_pos, 0, -90, 9, 0)
     CALL(evt_party_set_pos, 1, -100, 9, -10)
-    SPAWN_EVENT(PTR(evt_tensou2))
+    SPAWN_EVENT(evt_tensou2)
     RETURN
 EVT_END()
 
@@ -284,16 +285,18 @@ EVT_END()
 EVT_BEGIN(aji_07_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI4"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 1)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(tensou_init))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(tensou_init)
     CALL(evt_map_playanim, STRING("anm_PC"), 1, 0)
     CALL(evt_map_playanim, STRING("anm_terop"), 1, 0)
     CALL(evt_map_playanim, STRING("anm_tiktik"), 1, 0)
     IF_INT_EQUAL(GSWF(GSWF_AJI07_COG_TAKEN), 0)
-        CALL(evt_item_entry, STRING("haguruma"), ITEM_COG, -65, 100, -120, 16, -1, PTR(evt_haguruma))
+        CALL(evt_item_entry, STRING("haguruma"), ITEM_COG, -65, 100, -120, ITEM_ENTRY_FIXED, -1, PTR(evt_haguruma))
     END_IF
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("tenjo"))
@@ -329,6 +332,6 @@ EVT_BEGIN(aji_07_init_evt)
             CALL(evt_cam_letter_box_disable, 0)
         END_INLINE_EVENT
     END_IF
-    SPAWN_EVENT(PTR(evt_emergency))
+    SPAWN_EVENT(evt_emergency)
     RETURN
 EVT_END()

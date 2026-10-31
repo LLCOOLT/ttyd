@@ -22,7 +22,3 @@ extern BattleUnitKind unit_patatogemet;
 extern BattleUnitKind unit_sambo_mummy;
 
 extern EvtWord evt_sw_complete[];
-
-// User functions defined in the area's files (global symbols in the original REL).
-// eki_02.c
-USER_FUNC(hit_move);

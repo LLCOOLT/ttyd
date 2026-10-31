@@ -11,7 +11,6 @@
 #include "evt/evt_mobj.h"
 #include "evt/evt_npc.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "tik.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
@@ -117,9 +116,9 @@ EVT_BEGIN(tik_18_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
-    CALL_CHILD(PTR(evt_gazigazi_entry))
+    CALL_CHILD(evt_gazigazi_entry)
     CALL(evt_map_playanim, STRING("anm_mizu"), 1, 0)
     IF_INT_EQUAL(GSWF(GSWF_TIK18_CLOUD_BLOWN), 0)
         CALL(evt_cloud_init)
@@ -136,7 +135,12 @@ EVT_BEGIN(tik_18_init_evt)
         CALL(evt_npc_check_delete, STRING("ハンニャー２"))
     END_IF
     CALL(evt_map_entry_airport_harbor, 1, STRING("S_Ship_Change_01"), STRING("ue"))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_mobj_badgeblk, STRING("mobj_01"), 110, 0, -30, ITEM_SLOW_SHROOM, 0, GSWF(GSWF_TIK18_SLOW_SHROOM_BLOCK_HIT), 0)
+    CALL(evt_mobj_badgeblk, STRING("mobj_02"), 310, 0, -30, ITEM_GRADUAL_SYRUP, 0, GSWF(GSWF_TIK18_GRADUAL_SYRUP_BLOCK_HIT), 0)
+#else
     CALL(evt_mobj_badgeblk, STRING("mobj_01"), 110, 0, -38, ITEM_SLOW_SHROOM, 0, GSWF(GSWF_TIK18_SLOW_SHROOM_BLOCK_HIT), 0)
     CALL(evt_mobj_badgeblk, STRING("mobj_02"), 310, 0, -38, ITEM_GRADUAL_SYRUP, 0, GSWF(GSWF_TIK18_GRADUAL_SYRUP_BLOCK_HIT), 0)
+#endif
     RETURN
 EVT_END()

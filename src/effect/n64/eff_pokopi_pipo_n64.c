@@ -44,8 +44,8 @@ static effN64Vtx size32x32_tex32x32_vtx[] = {
 static u8 w_scale_data[7] = {110, 150, 130, 110, 100, 95, 100};
 static u8 h_scale_data[7] = {80, 60, 80, 100, 120, 110, 100};
 
-void effPokopiPipoMain(EffectEntry* effect);
-void effPokopiPipoDisp(CameraId cameraId, EffectEntry* effect);
+static void effPokopiPipoMain(EffectEntry* effect);
+static void effPokopiPipoDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effPokopiPipoN64Entry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 x2, f32 y2, f32 z2, f32 scale) {
     EffectEntry* effect;
@@ -96,7 +96,7 @@ EffectEntry* effPokopiPipoN64Entry(s32 type, s32 duration, f32 x, f32 y, f32 z, 
     return effect;
 }
 
-void effPokopiPipoMain(EffectEntry* effect) {
+static void effPokopiPipoMain(EffectEntry* effect) {
     EffPokopiPipoN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -145,7 +145,7 @@ void effPokopiPipoMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effPokopiPipoDisp, effect);
 }
 
-void effPokopiPipoDisp(CameraId cameraId, EffectEntry* effect) {
+static void effPokopiPipoDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffPokopiPipoN64Work* work;
     s32 alpha;

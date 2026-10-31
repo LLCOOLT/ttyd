@@ -191,9 +191,15 @@ BattleStageData dou_btlstage_data[] = {
         NULL, NULL, NULL, NULL, NULL, NULL, // initEvt..bgA2Evt
         bgset_dou_wave_event, // bgBEvt
         NULL, 0, // bgCEvt..reserved_1B0
+#if VERSION <= VERSION_DEMO_US
+        0, // disableBgA1Destroy
+        0, // disableBgA2Destroy
+        0, // disableBgBDestroy
+#else
         1, // disableBgA1Destroy
         1, // disableBgA2Destroy
         1, // disableBgBDestroy
+#endif
     },
     {
         "bti_01", // globalStageDataDir
@@ -1196,7 +1202,7 @@ NpcBattleSelect btlgrpsel_dou_btlno_dou_13_99_off[] = {
 
 NpcSetupBattleInfo btlsetup_dou_tbl[] = {
     {
-        /*"マップstg_05_3"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x35\x5F\x33", // name
+        "マップstg_05_3", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1206,7 +1212,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"マップstg_05_4"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x35\x5F\x34", // name
+        "マップstg_05_4", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1216,7 +1222,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"マップstg_05_5"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x35\x5F\x35", // name
+        "マップstg_05_5", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1226,7 +1232,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU01エルモス"*/"\x44\x4F\x55\x30\x31\x83\x47\x83\x8B\x83\x82\x83\x58", // name
+        "DOU01エルモス", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1236,7 +1242,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU02バブル"*/"\x44\x4F\x55\x30\x32\x83\x6F\x83\x75\x83\x8B", // name
+        "DOU02バブル", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1246,7 +1252,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU02バブル"*/"\x44\x4F\x55\x30\x32\x83\x6F\x83\x75\x83\x8B", // name
+        "DOU02バブル", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1256,7 +1262,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU03キラー大砲"*/"\x44\x4F\x55\x30\x33\x83\x4C\x83\x89\x81\x5B\x91\xE5\x96\x43", // name
+        "DOU03キラー大砲", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1266,7 +1272,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU03キラー"*/"\x44\x4F\x55\x30\x33\x83\x4C\x83\x89\x81\x5B", // name
+        "DOU03キラー", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1276,7 +1282,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU03ヘビーボム"*/"\x44\x4F\x55\x30\x33\x83\x77\x83\x72\x81\x5B\x83\x7B\x83\x80", // name
+        "DOU03ヘビーボム", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1286,7 +1292,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU03ヘビーボム"*/"\x44\x4F\x55\x30\x33\x83\x77\x83\x72\x81\x5B\x83\x7B\x83\x80", // name
+        "DOU03ヘビーボム", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1296,7 +1302,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU05エルモス"*/"\x44\x4F\x55\x30\x35\x83\x47\x83\x8B\x83\x82\x83\x58", // name
+        "DOU05エルモス", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1306,7 +1312,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU05パタメット"*/"\x44\x4F\x55\x30\x35\x83\x70\x83\x5E\x83\x81\x83\x62\x83\x67", // name
+        "DOU05パタメット", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1316,7 +1322,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU06パタメット"*/"\x44\x4F\x55\x30\x36\x83\x70\x83\x5E\x83\x81\x83\x62\x83\x67", // name
+        "DOU06パタメット", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1326,7 +1332,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU06パタメット"*/"\x44\x4F\x55\x30\x36\x83\x70\x83\x5E\x83\x81\x83\x62\x83\x67", // name
+        "DOU06パタメット", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1336,7 +1342,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU06パタメット"*/"\x44\x4F\x55\x30\x36\x83\x70\x83\x5E\x83\x81\x83\x62\x83\x67", // name
+        "DOU06パタメット", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1346,7 +1352,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU07エルモス"*/"\x44\x4F\x55\x30\x37\x83\x47\x83\x8B\x83\x82\x83\x58", // name
+        "DOU07エルモス", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1356,7 +1362,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU08ヘビーボム"*/"\x44\x4F\x55\x30\x38\x83\x77\x83\x72\x81\x5B\x83\x7B\x83\x80", // name
+        "DOU08ヘビーボム", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1366,7 +1372,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU09バブル"*/"\x44\x4F\x55\x30\x39\x83\x6F\x83\x75\x83\x8B", // name
+        "DOU09バブル", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1376,7 +1382,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU09エルモス"*/"\x44\x4F\x55\x30\x39\x83\x47\x83\x8B\x83\x82\x83\x58", // name
+        "DOU09エルモス", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1386,7 +1392,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU12キラー大砲"*/"\x44\x4F\x55\x31\x32\x83\x4C\x83\x89\x81\x5B\x91\xE5\x96\x43", // name
+        "DOU12キラー大砲", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1396,7 +1402,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU12キラー大砲"*/"\x44\x4F\x55\x31\x32\x83\x4C\x83\x89\x81\x5B\x91\xE5\x96\x43", // name
+        "DOU12キラー大砲", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1406,7 +1412,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU12キラー"*/"\x44\x4F\x55\x31\x32\x83\x4C\x83\x89\x81\x5B", // name
+        "DOU12キラー", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1416,7 +1422,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU13キラー大砲"*/"\x44\x4F\x55\x31\x33\x83\x4C\x83\x89\x81\x5B\x91\xE5\x96\x43", // name
+        "DOU13キラー大砲", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1426,7 +1432,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU13キラー大砲"*/"\x44\x4F\x55\x31\x33\x83\x4C\x83\x89\x81\x5B\x91\xE5\x96\x43", // name
+        "DOU13キラー大砲", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1436,7 +1442,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU13キラー大砲"*/"\x44\x4F\x55\x31\x33\x83\x4C\x83\x89\x81\x5B\x91\xE5\x96\x43", // name
+        "DOU13キラー大砲", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1446,7 +1452,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU13キラー大砲"*/"\x44\x4F\x55\x31\x33\x83\x4C\x83\x89\x81\x5B\x91\xE5\x96\x43", // name
+        "DOU13キラー大砲", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1456,7 +1462,7 @@ NpcSetupBattleInfo btlsetup_dou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"DOU13キラー"*/"\x44\x4F\x55\x31\x33\x83\x4C\x83\x89\x81\x5B", // name
+        "DOU13キラー", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect

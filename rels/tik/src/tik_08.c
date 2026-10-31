@@ -7,7 +7,6 @@
 #include "evt/evt_mobj.h"
 #include "evt/evt_msg.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "tik.h"
 #include "evt/evt_story.h"
 #include "driver/camdrv.h"
@@ -30,7 +29,7 @@ EVT_BEGIN(oshimodo_event_sub)
 EVT_END()
 
 static EVT_BEGIN(oshimodo_event)
-    SPAWN_EVENT(PTR(oshimodo_event_sub))
+    SPAWN_EVENT(oshimodo_event_sub)
     SET_VALUE(GSWF(GSWF_TIK08_TWILIGHT_PIPE_REACHED), 1)
     SET_VALUE(LW(0), 0)
     RETURN
@@ -130,21 +129,21 @@ EVT_BEGIN(tik_08_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_51_FRANKLYS_HOUSE)
         SET_VALUE(LW(0), STRING("dokan"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_bero_overwrite, STRING("dokan"), PTR(bero_oshimodo))
         SET_VALUE(LW(0), STRING("dokan"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
     END_IF
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_52_DARKLY)
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG4_00_WELCOME_TO_STAGE_4)
             SET_VALUE(LW(0), STRING("dokan"))
-            CALL_CHILD(PTR(bero_case_switch_off))
+            CALL_CHILD(bero_case_switch_off)
             CALL(evt_bero_overwrite, STRING("dokan"), PTR(bero_entry_data2))
             SET_VALUE(LW(0), STRING("dokan"))
-            CALL_CHILD(PTR(bero_case_switch_on))
+            CALL_CHILD(bero_case_switch_on)
         END_IF
     END_IF
     CALL(evt_mobj_signboard, STRING("board"), 85, 0, 0, PTR(evt_kanban), 0)

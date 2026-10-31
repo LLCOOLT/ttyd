@@ -41,8 +41,8 @@ static s32 pos_data[30] = {
     120, -30, 50, 10, 50,  30, 100, 30, 15,  40,  100, 40,  140, 90,  25,
 };
 
-void effTimestampMain(EffectEntry* effect);
-void effTimestampDisp(CameraId cameraId, EffectEntry* effect);
+static void effTimestampMain(EffectEntry* effect);
+static void effTimestampDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effTimestampN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 lifetime) {
     EffectEntry* effect;
@@ -89,7 +89,7 @@ EffectEntry* effTimestampN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 
     return effect;
 }
 
-void effTimestampMain(EffectEntry* effect) {
+static void effTimestampMain(EffectEntry* effect) {
     EffTimestampN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -145,7 +145,7 @@ void effTimestampMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effTimestampDisp, effect);
 }
 
-void effTimestampDisp(CameraId cameraId, EffectEntry* effect) {
+static void effTimestampDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffTimestampN64Work* work;
     GXTexObj texObj;

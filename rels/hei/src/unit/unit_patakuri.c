@@ -112,7 +112,7 @@ static BattleUnitDefense defence_patakuri = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_patakuri_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static StatusVulnerability regist_patakuri = {100, 120, 120, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120, 150, 100, 100, 100, 100, 150};
 #else
 static StatusVulnerability regist_patakuri = {100, 110, 120, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 110, 110, 100, 100, 100, 100, 150};
@@ -176,13 +176,8 @@ static PoseTableEntry pose_table_patakuri[] = {
     {40, "PTK_W_1"},
     {56, "PTK_I_1"},
     {57, "PTK_I_1"},
-#if VERSION == VERSION_DEMO
-    {63, "PTK_T_1"},
-    {67, "PTK_S_1"},
-#else
-    {65, "PTK_T_1"},
-    {69, "PTK_S_1"},
-#endif
+    {BTL_POSE_TALK, "PTK_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "PTK_S_1"},
 };
 
 static BattleDataEntry data_table_patakuri[] = {
@@ -320,11 +315,7 @@ static EVT_BEGIN(attack_event_patakuri)
     CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 50)
     SUBTRACT(LW(1), 10)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -20, 1, 0, 0)
-#if VERSION == VERSION_DEMO
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 67)
-#else
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
-#endif
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     WAIT_MS(500)
     GOTO(98)
     LABEL(91)
@@ -379,13 +370,8 @@ static PoseTableEntry pose_table[] = {
     {40, "KUR_W_1"},
     {56, "KUR_I_1"},
     {57, "KUR_I_1"},
-#if VERSION == VERSION_DEMO
-    {63, "KUR_T_1"},
-    {67, "KUR_S_1"},
-#else
-    {65, "KUR_T_1"},
-    {69, "KUR_S_1"},
-#endif
+    {BTL_POSE_TALK, "KUR_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "KUR_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -397,7 +383,7 @@ static BattleUnitDefense defence = {0};
 
 static BattleUnitDefenseAttr defence_attr = {0};
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static StatusVulnerability regist = {100, 120, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120, 120, 100, 100, 100, 100, 150};
 #else
 static StatusVulnerability regist = {100, 110, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 110, 100, 100, 100, 100, 100, 150};
@@ -473,7 +459,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -573,11 +559,7 @@ static EVT_BEGIN(attack_event)
     LABEL(90)
     CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-#if VERSION == VERSION_DEMO
-    SET_VALUE(LW(15), 67)
-#else
-    SET_VALUE(LW(15), 69)
-#endif
+    SET_VALUE(LW(15), BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, LW(15))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MoveDirectionAdd, BTL_UNIT_SELF, LW(0), 30)
@@ -594,11 +576,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_kuriboo_attack))
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_kuriboo_attack), 256, LW(5))
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-#if VERSION == VERSION_DEMO
-    SET_VALUE(LW(15), 67)
-#else
-    SET_VALUE(LW(15), 69)
-#endif
+    SET_VALUE(LW(15), BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, LW(15))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 0)

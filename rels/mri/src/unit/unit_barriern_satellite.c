@@ -48,7 +48,7 @@ BattleUnitKind unit_barriern_satellite = {
     0.0f,
     0.0f,
     0.0f,
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     0,
     -16,
 #else
@@ -111,7 +111,7 @@ static BattleUnitKindPart parts[] = {
     {6, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
 };
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static StatusVulnerability regist = {80, 100, 100, 0, 90, 100, 0, 0, 100, 90, 100, 90, 100, 90, 90, 0, 100, 100, 90, 100, 100, 100};
 #else
 static StatusVulnerability regist = {80, 100, 100, 0, 90, 100, 0, 0, 100, 90, 100, 90, 100, 95, 90, 0, 100, 100, 90, 100, 100, 100};
@@ -134,11 +134,7 @@ static PoseTableEntry pose_table[] = {
     {40, "W_2"},
     {56, "X_2"},
     {57, "X_2"},
-#if VERSION == VERSION_DEMO
-    {67, "S_2"},
-#else
-    {69, "S_2"},
-#endif
+    {BTL_POSE_STAY_DEFAULT, "S_2"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -159,7 +155,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 

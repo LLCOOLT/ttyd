@@ -14,7 +14,6 @@
 #include "evt/evt_mobj.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "las.h"
 #include "rel_module.h"
 #include "driver/mapdrv.h"

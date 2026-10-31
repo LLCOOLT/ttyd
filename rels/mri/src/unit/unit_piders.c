@@ -15,7 +15,7 @@
 #include "battle/battle_event_cmd.h"
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "manager/evtmgr_cmd.h"
 #include "unit/unit_piders.h"
@@ -48,7 +48,7 @@ static EvtWord dmg_first_attack_pos[19];
 static EvtWord yarn_event[44];
 static EvtWord entry_event[48];
 static EvtWord damage_event[10];
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static EvtWord dead_event[183];
 static EvtWord blow_dead_event[98];
 #else
@@ -63,7 +63,7 @@ static EvtWord renzoku_attack_event[149];
 static EvtWord renzoku_attack_event_sub[55];
 static EvtWord renzoku_attack_event_sub_no_last[10];
 static EvtWord renzoku_attack_event_sub_last[79];
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static EvtWord wait_event[6];
 #else
 static EvtWord wait_event[7];
@@ -126,7 +126,7 @@ BattleUnitKind unit_piders = {
     0,
     0,
     2,
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     0,
 #else
     100,
@@ -151,7 +151,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static StatusVulnerability regist = {90, 100, 50, 100, 90, 100, 100, 90, 100, 90, 100, 90, 100, 90, 90, 100, 70, 100, 90, 100, 100, 95};
 #else
 static StatusVulnerability regist = {90, 90, 50, 100, 90, 100, 100, 90, 100, 90, 100, 90, 100, 95, 90, 100, 70, 100, 90, 100, 100, 95};
@@ -174,13 +174,8 @@ static PoseTableEntry pose_table[] = {
     {42, "PAI_W_1"},
     {56, "PAI_X_1"},
     {57, "PAI_X_1"},
-#if VERSION == VERSION_DEMO
-    {63, "PAI_S_1"},
-    {67, "PAI_S_1"},
-#else
-    {65, "PAI_S_1"},
-    {69, "PAI_S_1"},
-#endif
+    {BTL_POSE_TALK, "PAI_S_1"},
+    {BTL_POSE_STAY_DEFAULT, "PAI_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -443,7 +438,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 1)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 255)
     CALL(piders_yarn_init)
-    SPAWN_EVENT(PTR(yarn_event))
+    SPAWN_EVENT(yarn_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -496,7 +491,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -543,7 +538,7 @@ static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_OnAttribute, LW(10), 268435456)
     CALL(btlevtcmd_SetMaxMoveCount, LW(10), 0)
     CALL(btlevtcmd_OnAttribute, LW(10), 33554432)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_SetPos, LW(10), 0, -1000, 0)
 #endif
     CALL(btlevtcmd_KillUnit, LW(10), 1)
@@ -574,7 +569,7 @@ static EVT_BEGIN(blow_dead_event)
     CALL(btlevtcmd_OnAttribute, LW(10), 268435456)
     CALL(btlevtcmd_SetMaxMoveCount, LW(10), 0)
     CALL(btlevtcmd_OnAttribute, LW(10), 33554432)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_SetPos, LW(10), 0, -1000, 0)
 #endif
     CALL(btlevtcmd_KillUnit, LW(10), 1)
@@ -679,9 +674,9 @@ static EVT_BEGIN(unison_phase_event)
     IF_INT_EQUAL(LW(14), 1)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
         IF_INT_EQUAL(LW(0), 1)
-            CALL_CHILD(PTR(move_kuuchu_event))
+            CALL_CHILD(move_kuuchu_event)
         ELSE
-            CALL_CHILD(PTR(move_kuutei_event))
+            CALL_CHILD(move_kuutei_event)
         END_IF
         GOTO(99)
     END_IF
@@ -690,28 +685,28 @@ static EVT_BEGIN(unison_phase_event)
     MODULO(LW(15), 2)
     IF_INT_EQUAL(LW(15), 1)
         IF_INT_EQUAL(LW(13), 0)
-            CALL_CHILD(PTR(move_kuuchu_event))
+            CALL_CHILD(move_kuuchu_event)
             GOTO(99)
         ELSE
-            CALL_CHILD(PTR(move_kuutei_event))
+            CALL_CHILD(move_kuutei_event)
             GOTO(99)
         END_IF
     ELSE
         MODULO(LW(14), 2)
         IF_INT_EQUAL(LW(14), 1)
             IF_INT_EQUAL(LW(13), 0)
-                CALL_CHILD(PTR(move_kuuchu_event))
+                CALL_CHILD(move_kuuchu_event)
                 GOTO(99)
             ELSE
-                CALL_CHILD(PTR(move_kuutei_event))
+                CALL_CHILD(move_kuutei_event)
                 GOTO(99)
             END_IF
         ELSE
             IF_INT_EQUAL(LW(13), 0)
-                CALL_CHILD(PTR(move_kuutei_event))
+                CALL_CHILD(move_kuutei_event)
                 GOTO(99)
             ELSE
-                CALL_CHILD(PTR(move_kuuchu_event))
+                CALL_CHILD(move_kuuchu_event)
                 GOTO(99)
             END_IF
         END_IF
@@ -737,11 +732,11 @@ static EVT_BEGIN(attack_event)
     CALL(evt_sub_random, LW(0), LW(1))
     IF_INT_LESS(LW(1), 50)
         SET_VALUE(LW(9), PTR(&weapon_piders_attack))
-        CALL_CHILD(PTR(normal_attack_event))
+        CALL_CHILD(normal_attack_event)
         GOTO(99)
     END_IF
     SET_VALUE(LW(9), PTR(&weapon_piders_renzoku_attack))
-    CALL_CHILD(PTR(renzoku_attack_event))
+    CALL_CHILD(renzoku_attack_event)
     GOTO(99)
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
@@ -817,13 +812,13 @@ static EVT_BEGIN(piders_attack_common_event1)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 2, STRING("PAI_A_2a"))
     CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_GetStatusMg, BTL_UNIT_SELF, LW(1))
     SET_FLOAT_VALUE(LW(0), FLOAT(30.0f))
     MULTIPLY_FLOAT(LW(0), LW(1))
     CALL(btlevtcmd_SetPartsRotateOffset, BTL_UNIT_SELF, 2, 0, LW(0), 0)
 #endif
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(btlevtcmd_SetPartsRotateOffset, BTL_UNIT_SELF, 2, 0, 20, 0)
@@ -877,13 +872,13 @@ static EVT_BEGIN(piders_attack_common_event1_2)
     CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 2, 16777216)
     CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 11, LW(0))
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_GetStatusMg, BTL_UNIT_SELF, LW(1))
     SET_FLOAT_VALUE(LW(0), FLOAT(30.0f))
     MULTIPLY_FLOAT(LW(0), LW(1))
     CALL(btlevtcmd_SetPartsRotateOffset, BTL_UNIT_SELF, 2, 0, LW(0), 0)
 #endif
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     IF_INT_EQUAL(LW(0), 1)
         CALL(btlevtcmd_SetPartsRotateOffset, BTL_UNIT_SELF, 2, 0, 20, 0)
     ELSE
@@ -951,7 +946,7 @@ static EVT_BEGIN(normal_attack_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
@@ -961,13 +956,13 @@ static EVT_BEGIN(normal_attack_event)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     SET_VALUE(LW(7), 3)
-    CALL_CHILD(PTR(piders_attack_common_event1))
-    SPAWN_EVENT(PTR(piders_attack_common_event2))
+    CALL_CHILD(piders_attack_common_event1)
+    SPAWN_EVENT(piders_attack_common_event2)
     SET_VALUE(LW(8), 1)
     SET_VALUE(LW(5), 5)
-    CALL_CHILD(PTR(piders_attack_common_event3))
+    CALL_CHILD(piders_attack_common_event3)
     SET_VALUE(LW(10), 0)
-    CALL_CHILD(PTR(damage_check_event_sub))
+    CALL_CHILD(damage_check_event_sub)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(500)
     LABEL(99)
@@ -981,7 +976,7 @@ static EVT_BEGIN(renzoku_attack_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
@@ -1003,18 +998,18 @@ static EVT_BEGIN(renzoku_attack_event)
     SET_VALUE(LW(5), 5)
     SET_VALUE(LW(6), 8)
     SET_VALUE(LW(7), 3)
-    CALL_CHILD(PTR(piders_attack_common_event1))
+    CALL_CHILD(piders_attack_common_event1)
     LOOP(3)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(5), LW(3))
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(6), LW(4))
-        CALL_CHILD(PTR(piders_attack_common_event3))
-        SPAWN_EVENT(PTR(renzoku_attack_event_sub))
+        CALL_CHILD(piders_attack_common_event3)
+        SPAWN_EVENT(renzoku_attack_event_sub)
         ADD(LW(5), 1)
         ADD(LW(6), 1)
         ADD(LW(7), 1)
         WAIT_FRAMES(30)
     END_LOOP
-    SPAWN_EVENT(PTR(piders_attack_common_event2))
+    SPAWN_EVENT(piders_attack_common_event2)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(250)
     LABEL(99)
@@ -1028,7 +1023,7 @@ static EVT_BEGIN(renzoku_attack_event_sub)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(1), LW(4))
     LOOP(0)
         IF_INT_GREATER_OR_EQUAL(LW(0), 7)
-            CALL_CHILD(PTR(renzoku_attack_event_sub_last))
+            CALL_CHILD(renzoku_attack_event_sub_last)
             BREAK_LOOP
         END_IF
         ADD(LW(0), 1)
@@ -1037,7 +1032,7 @@ static EVT_BEGIN(renzoku_attack_event_sub)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(1), LW(10))
         IF_INT_EQUAL(LW(3), LW(8))
             IF_INT_EQUAL(LW(4), LW(10))
-                CALL_CHILD(PTR(renzoku_attack_event_sub_no_last))
+                CALL_CHILD(renzoku_attack_event_sub_no_last)
                 BREAK_LOOP
             END_IF
         END_IF
@@ -1048,7 +1043,7 @@ EVT_END()
 static EVT_BEGIN(renzoku_attack_event_sub_no_last)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(10), 1)
-    CALL_CHILD(PTR(damage_check_event_sub))
+    CALL_CHILD(damage_check_event_sub)
     RETURN
 EVT_END()
 
@@ -1076,7 +1071,7 @@ static EVT_BEGIN(renzoku_attack_event_sub_last)
     ELSE
         SET_VALUE(LW(8), 1)
         SET_VALUE(LW(10), 0)
-        CALL_CHILD(PTR(damage_check_event_sub))
+        CALL_CHILD(damage_check_event_sub)
     END_IF
     RETURN
 EVT_END()
@@ -1084,7 +1079,7 @@ EVT_END()
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 EVT_END()
 #else
 EVT_END_PAD()

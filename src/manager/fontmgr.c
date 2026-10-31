@@ -40,7 +40,7 @@ const char* fontname[2] = {"papermarioset_JPN", "popjoyB22"};
 #endif
 
 // The demo draws message icons with display flag 4 (retail 0x10) and keeps the fonts under font/
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #define FONT_ICON_FLAGS 4
 #define FONT_DIR "font"
 #else
@@ -60,7 +60,7 @@ BinaryFontHeader* pfh; // pointer to font header
 
 // local prototypes
 void JUTFont_DrawStart(GXColor color);
-void _JUTFont_DrawPos(u16 code, s16 x, s16 y);
+static void _JUTFont_DrawPos(u16 code, s16 x, s16 y);
 u16 JUTFont_CodeToGlyph(u32 code);
 #if VERSION >= VERSION_US
 void FontDrawStringVecPitch(Vec pos, f32 pitch, const s8* msg);
@@ -113,7 +113,7 @@ void fontmgrInit(void) {
 void fontmgrTexSetup(void) {
 #if VERSION >= VERSION_US
     JUTFontSetup(gp->language);
-#elif VERSION == VERSION_DEMO
+#elif VERSION == VERSION_DEMO_US
     JUTFontSetup(1);
 #else
     JUTFontSetup(0);
@@ -1062,7 +1062,7 @@ static inline void fontPos(const s16 x, s16 y, GXColor* hsv, u8 hue) {
     fontHueX(hsv, x, hue);
 }
 
-void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
+static void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
     s32 row;
     u8 hue;
     s16 x1;

@@ -23,8 +23,8 @@ s32 evtID = 1;
 f32 evtSpd = 1.0f;
 
 // local definitions
-void make_pri_table(void);
-void evtEntryRunCheck(EventEntry* entry);
+static void make_pri_table(void);
+static void evtEntryRunCheck(EventEntry* entry);
 
 EventWork* evtGetWork(void) {
     return gp->inBattle ? &work[1] : &work[0];
@@ -32,7 +32,7 @@ EventWork* evtGetWork(void) {
 
 // FAKE: keeps the following function(s) out of line as in the target; removing it changes the code
 #pragma dont_inline on
-void make_pri_table(void) {
+static void make_pri_table(void) {
     EventWork* wp = evtGetWork();
     EventEntry* entry = wp->entries;
     s32 idI, idJ;
@@ -135,7 +135,7 @@ void evtmgrReInit(void) {
     evt_msg_init();
 }
 
-void evtEntryRunCheck(EventEntry* entry) {
+static void evtEntryRunCheck(EventEntry* entry) {
     switch (_mariostSystemLevel) {
         case 1:
             evtStopAll(1);

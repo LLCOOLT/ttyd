@@ -187,7 +187,7 @@ typedef enum BattleAudienceFlags {
     AUDIENCE_FLAG_GUARD_BAD = 0x80,     // a guard failed
     AUDIENCE_FLAG_STYLISH_GOOD = 0x100, // a stylish move landed
     AUDIENCE_FLAG_STYLISH_BAD = 0x200,  // a stylish move was tried and failed
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     AUDIENCE_FLAG_STYLISH_MISSED = 0x400, // the last stylish try missed; a later success or no-try clears it
     AUDIENCE_FLAG_ENEMY_DAMAGED = 0x800,
 #else
@@ -215,7 +215,7 @@ typedef struct BattleAudience {
     BattleAudienceMember members[AUDIENCE_MEMBER_MAX]; // 0x1BC
     BattleAudienceItem items[AUDIENCE_ITEM_MAX];       // 0xF25C
     BattleAudienceStar starpower[AUDIENCE_ITEM_MAX];   // 0x10E7C
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // the demo keeps the counters before the sounds and window, with a few more of them
     f32 audienceDeltaMultiplier;          // 0x133FC
     f32 targetAudienceCount;              // 0x13400

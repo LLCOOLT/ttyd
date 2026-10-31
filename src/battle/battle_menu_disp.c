@@ -22,39 +22,39 @@ typedef void (*FontDrawStringCenterMtxLocalFn)(Mtx, const char*);
 #define WP_SUBMENU(wp) ((wp)->commandMenu.subMenu)
 
 void DrawMultiItemWin(void);
-void DrawSubMenuCommonProcess(f32* x, f32* y, Mtx* a, Vec* b, f32* c, Mtx* d);
-void DrawMainIcon(BattleSubMenu* menu, BattleCommandAct* acts, Mtx* a, Vec* b, f32* c);
-#if VERSION == VERSION_DEMO
-void DrawSubIcon(BattleSubMenu* menu, Mtx* a, s32* enabled, u16* icons, const char** names, s32* costs, s32* p34, void* party);
+static void DrawSubMenuCommonProcess(f32* x, f32* y, Mtx* a, Vec* b, f32* c, Mtx* d);
+static void DrawMainIcon(BattleSubMenu* menu, BattleCommandAct* acts, Mtx* a, Vec* b, f32* c);
+#if VERSION <= VERSION_DEMO_US
+static void DrawSubIcon(BattleSubMenu* menu, Mtx* a, s32* enabled, u16* icons, const char** names, s32* costs, s32* p34, void* party);
 #else
-void DrawSubIcon(BattleSubMenu* menu, Mtx* a, s32* enabled, u16* icons, const char** names, s32* costs, s32* p34, void* party, s32 y);
+static void DrawSubIcon(BattleSubMenu* menu, Mtx* a, s32* enabled, u16* icons, const char** names, s32* costs, s32* p34, void* party, s32 y);
 #endif
-void DrawMenuCursorAndScrollArrow(const Vec* v);
-void DrawMenuHelpWin(const char* help, f32 x, f32 y);
+static void DrawMenuCursorAndScrollArrow(const Vec* v);
+static void DrawMenuHelpWin(const char* help, f32 x, f32 y);
 void DrawChangePartyWin(void);
 void DrawOperationWin(void);
 void DrawWeaponWin(void);
 void DrawMainMenu(BattleWork* wp);
-void DrawMenuPinchMark(void);
+static void DrawMenuPinchMark(void);
 #include "battle/battle_audience.h"
 #include "driver/camdrv.h"
 #include "driver/icondrv.h"
 #include "pmario_sound.h"
-#if VERSION == VERSION_DEMO
-void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, u16 icon, const char* name, s32 cost, s32 p34, void* party);
+#if VERSION <= VERSION_DEMO_US
+static void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, u16 icon, const char* name, s32 cost, s32 p34, void* party);
 #else
-void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, u16 icon, const char* name, s32 cost, s32 p34, void* party, s32 y);
+static void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, u16 icon, const char* name, s32 cost, s32 p34, void* party, s32 y);
 #endif
-void DrawMainIconCircle(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, Vec v, f32 s);
-void DrawMainIconHukidasi(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, f32 s);
-void DrawMenuPartyChangeButton_Sub(u32 id, f32 x, f32 y, f32 angle);
-void DrawMenuPartyChangeButton(void);
-void DrawSubMenuCommonProcessSub1(BattleSubMenu* menu, BattleCursor* cursor, s32 prev, s32 key);
+static void DrawMainIconCircle(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, Vec v, f32 s);
+static void DrawMainIconHukidasi(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, f32 s);
+static void DrawMenuPartyChangeButton_Sub(u32 id, f32 x, f32 y, f32 angle);
+static void DrawMenuPartyChangeButton(void);
+static void DrawSubMenuCommonProcessSub1(BattleSubMenu* menu, BattleCursor* cursor, s32 prev, s32 key);
 #include "mario/mariost.h"
 #include "sdk/texPalette.h"
 #include "icon_ids.h"
-void GetRingCenter(Vec* out);
-void GetRingOffset(f32 angle, f32* x, f32* y);
+static void GetRingCenter(Vec* out);
+static void GetRingOffset(f32 angle, f32* x, f32* y);
 f32 kakutable[3][5] = {{240.0f, 120.0f, 0.0f, 0.0f, 0.0f}, {270.0f, 180.0f, 90.0f, 0.0f, 0.0f}, {270.0f, 203.0f, 157.0f, 90.0f, 0.0f}};
 
 //.sdata
@@ -115,7 +115,7 @@ void battleMenuDispEnd(void) {
     fileFree(_battleWorkPointer->menuTex);
 }
 
-void GetRingCenter(Vec* out) {
+static void GetRingCenter(Vec* out) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit = BattleGetUnitPtr(wp, wp->activeUnitId);
 
@@ -128,13 +128,13 @@ void GetRingCenter(Vec* out) {
     }
 }
 
-void GetRingOffset(f32 angle, f32* x, f32* y) {
+static void GetRingOffset(f32 angle, f32* x, f32* y) {
     f32 t = 4.712389f - angle;
     *x = 80.0f * (f32)cos(t);
     *y = 35.0f * (f32)sin(t);
 }
 
-void DrawMainIcon(BattleSubMenu* menu, BattleCommandAct* acts, Mtx* a, Vec* b, f32* c) {
+static void DrawMainIcon(BattleSubMenu* menu, BattleCommandAct* acts, Mtx* a, Vec* b, f32* c) {
     s32 order[5];
     f32 z[6];
     BattleWork* wp = _battleWorkPointer;
@@ -178,7 +178,7 @@ void DrawMainIcon(BattleSubMenu* menu, BattleCommandAct* acts, Mtx* a, Vec* b, f
     }
 }
 
-void DrawMainIconHukidasi(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, f32 s) {
+static void DrawMainIconHukidasi(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, f32 s) {
     GXColor tev;
     GXColor col;
     Mtx rot;
@@ -267,7 +267,7 @@ void DrawMainIconHukidasi(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, f32
     ((FontDrawStringCenterMtxLocalFn)FontDrawStringCenterMtx)(out, name);
 }
 
-void DrawMainIconCircle(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, Vec v, f32 s) {
+static void DrawMainIconCircle(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, Vec v, f32 s) {
     GXColor tev;
     Mtx rot;
     Mtx scl;
@@ -347,10 +347,10 @@ void DrawMainIconCircle(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, Vec v
     }
 }
 
-#if VERSION == VERSION_DEMO
-void DrawSubIcon(BattleSubMenu* menu, Mtx* a, s32* enabled, u16* icons, const char** names, s32* costs, s32* p34, void* party) {
+#if VERSION <= VERSION_DEMO_US
+static void DrawSubIcon(BattleSubMenu* menu, Mtx* a, s32* enabled, u16* icons, const char** names, s32* costs, s32* p34, void* party) {
 #else
-void DrawSubIcon(BattleSubMenu* menu, Mtx* a, s32* enabled, u16* icons, const char** names, s32* costs, s32* p34, void* party, s32 y) {
+static void DrawSubIcon(BattleSubMenu* menu, Mtx* a, s32* enabled, u16* icons, const char** names, s32* costs, s32* p34, void* party, s32 y) {
 #endif
     Mtx out[7];
     Mtx m;
@@ -367,7 +367,7 @@ void DrawSubIcon(BattleSubMenu* menu, Mtx* a, s32* enabled, u16* icons, const ch
         if ((s32)menu->scrollPos + i < cursor->count && (menu->rowFlags[i] & 1)) {
             PSMTXTrans(m, 100.0f, 35.0f - 24.0f * i + ofs, 0.0f);
             PSMTXConcat(m, a[i], out[i]);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             DrawSubIconSub(menu, i, out[i], enabled[i], icons[i], names[i], costs[i], p34[i], party);
 #else
             DrawSubIconSub(menu, i, out[i], enabled[i], icons[i], names[i], costs[i], p34[i], party, y);
@@ -376,10 +376,10 @@ void DrawSubIcon(BattleSubMenu* menu, Mtx* a, s32* enabled, u16* icons, const ch
     }
 }
 
-#if VERSION == VERSION_DEMO
-void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, u16 icon, const char* name, s32 cost, s32 p34, void* party) {
+#if VERSION <= VERSION_DEMO_US
+static void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, u16 icon, const char* name, s32 cost, s32 p34, void* party) {
 #else
-void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, u16 icon, const char* name, s32 cost, s32 p34, void* party, s32 y) {
+static void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, u16 icon, const char* name, s32 cost, s32 p34, void* party, s32 y) {
 #endif
     BattleWork* wp = _battleWorkPointer;
     CameraEntry* cam;
@@ -460,7 +460,7 @@ void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, u16 icon, co
         FontDrawColor(fc);
     }
     PSMTXTrans(trn, -104.0f, 22.0f, 0.0f);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     PSMTXScale(scl, 0.8f, 0.8f, 0.8f);
 #else
 #if VERSION == VERSION_EU
@@ -549,7 +549,8 @@ void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, u16 icon, co
         PSMTXConcat(out, scl, out);
         FontDrawStringMtx(out, msgSearch("btl_cost_disp_AP"));
     }
-#if VERSION == VERSION_DEMO
+    // Two copies: the demos place the HP numbers from a running x; the releases use fixed spots per language.
+#if VERSION <= VERSION_DEMO_US
     if (party != NULL) {
         s16* p = (s16*)(((u8*)party) + ((i + ((s32)menu->scrollPos)) * 0x18));
         s32 n;
@@ -719,7 +720,7 @@ void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, u16 icon, co
 #endif
 }
 
-void DrawMenuPartyChangeButton(void) {
+static void DrawMenuPartyChangeButton(void) {
     Vec p;
     Vec q;
     s32 id;
@@ -776,7 +777,7 @@ void DrawMenuPartyChangeButton(void) {
     }
 }
 
-void DrawMenuPartyChangeButton_Sub(u32 id, f32 x, f32 y, f32 angle) {
+static void DrawMenuPartyChangeButton_Sub(u32 id, f32 x, f32 y, f32 angle) {
     Mtx mtx;
 
     PSMTXRotRad(mtx, 'y', 0.017453292f * angle);
@@ -902,7 +903,7 @@ void N_DrawMenuPartyPinchMark(void) {
     }
 }
 
-void DrawMenuPinchMark(void) {
+static void DrawMenuPinchMark(void) {
     BattleUnit* unit = BattleGetMarioPtr(_battleWorkPointer);
     btlDispGXInit2D();
     if (unit->position.x > -120.0f) {
@@ -914,7 +915,7 @@ void DrawMenuPinchMark(void) {
     }
 }
 #else
-void DrawMenuPinchMark(void) {
+static void DrawMenuPinchMark(void) {
     Mtx m;
     Mtx out;
     GXTexObj texobj;
@@ -994,7 +995,7 @@ void DrawMenuPinchMark(void) {
 }
 #endif
 
-void DrawMenuHelpWin(const char* msg, f32 x, f32 y) {
+static void DrawMenuHelpWin(const char* msg, f32 x, f32 y) {
     f32 tx;
     s8 lines[4][0x30];
     s32 line;
@@ -1052,7 +1053,7 @@ void DrawMenuHelpWin(const char* msg, f32 x, f32 y) {
     }
 }
 
-void DrawMenuCursorAndScrollArrow(const Vec* v) {
+static void DrawMenuCursorAndScrollArrow(const Vec* v) {
     Vec pos;
     BattleWork* wp = _battleWorkPointer;
     BattleSubMenu* menu = WP_SUBMENU(wp);
@@ -1094,7 +1095,7 @@ void DrawMenuCursorAndScrollArrow(const Vec* v) {
     iconDispGx(&pos, ICON_DISP_2D | ICON_DISP_FLIP_X, ICON_1F0, 1.0f);
 }
 
-void InitSubMenuCommonProcess(BattleSubMenu** out, BattleCursor** mainCursor, BattleCursor* cursor) {
+static void InitSubMenuCommonProcess(BattleSubMenu** out, BattleCursor** mainCursor, BattleCursor* cursor) {
     BattleWork* wp = _battleWorkPointer;
     s32 i;
 
@@ -1122,7 +1123,7 @@ void InitSubMenuCommonProcess(BattleSubMenu** out, BattleCursor** mainCursor, Ba
     }
 }
 
-void InitSubMenuCommonProcess2(BattleSubMenu* menu, BattleCursor* cursor) {
+static void InitSubMenuCommonProcess2(BattleSubMenu* menu, BattleCursor* cursor) {
     s32 i;
     s32 idx = cursor->absPos;
 
@@ -1142,7 +1143,7 @@ void InitSubMenuCommonProcess2(BattleSubMenu* menu, BattleCursor* cursor) {
     }
 }
 
-void InitSubMenuCommonProcess3(BattleSubMenu* menu, BattleCursor* cursor) {
+static void InitSubMenuCommonProcess3(BattleSubMenu* menu, BattleCursor* cursor) {
     s32 i;
     s32 idx = cursor->absPos;
 
@@ -1162,7 +1163,7 @@ void InitSubMenuCommonProcess3(BattleSubMenu* menu, BattleCursor* cursor) {
     }
 }
 
-void DrawSubMenuCommonProcessSub1(BattleSubMenu* menu, BattleCursor* cursor, s32 prev, s32 key) {
+static void DrawSubMenuCommonProcessSub1(BattleSubMenu* menu, BattleCursor* cursor, s32 prev, s32 key) {
     s32 i;
 
     if (key == 6 && cursor->count > 6 && prev == cursor->count - 6 && cursor->relPos == 0 && cursor->absPos != 1) {
@@ -1204,7 +1205,7 @@ void DrawSubMenuCommonProcessSub1(BattleSubMenu* menu, BattleCursor* cursor, s32
     }
 }
 
-void DrawSubMenuCommonProcess(f32* x, f32* y, Mtx* a, Vec* b, f32* c, Mtx* d) {
+static void DrawSubMenuCommonProcess(f32* x, f32* y, Mtx* a, Vec* b, f32* c, Mtx* d) {
     Mtx tm;
     Mtx sm;
     f32 ox;
@@ -1792,7 +1793,7 @@ void DrawWeaponWin(void) {
 #if VERSION == VERSION_EU
     DrawSubIcon(menu, rowMtx, enabled, icons, names, costs, p34, NULL, 220); // name width that the label is scaled down to fit
 #else
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     DrawSubIcon(menu, rowMtx, enabled, icons, names, costs, p34, NULL);
 #else
     DrawSubIcon(menu, rowMtx, enabled, icons, names, costs, p34, NULL, 0);
@@ -1881,7 +1882,7 @@ void DrawOperationWin(void) {
                 icons[i] = ICON_18B;
             }
             names[i] = items[idx].name;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             costs[i] = items->cost; // the demo reads the first row's cost for every row
 #else
             costs[i] = items[idx].cost;
@@ -1890,7 +1891,7 @@ void DrawOperationWin(void) {
         }
     }
     DrawMainIcon(menu, wp->commandMenu.act, iconMtx, iconPos, iconAngle);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     DrawSubIcon(menu, rowMtx, enabled, icons, names, costs, p34, NULL);
 #else
     DrawSubIcon(menu, rowMtx, enabled, icons, names, costs, p34, NULL, 0);
@@ -1969,7 +1970,7 @@ void DrawChangePartyWin(void) {
 #if VERSION == VERSION_EU
     DrawSubIcon(menu, rowMtx, enabled, icons, names, costs, p34, items, 150); // name width that the label is scaled down to fit
 #else
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     DrawSubIcon(menu, rowMtx, enabled, icons, names, costs, p34, items);
 #else
     DrawSubIcon(menu, rowMtx, enabled, icons, names, costs, p34, items, 1);
@@ -2046,7 +2047,7 @@ void DrawMultiItemWin(void) {
         }
     }
     DrawMainIcon(menu, wp->commandMenu.act, iconMtx, iconPos, iconAngle);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     DrawSubIcon(menu, rowMtx, enabled, icons, names, costs, p34, NULL);
 #else
     DrawSubIcon(menu, rowMtx, enabled, icons, names, costs, p34, NULL, 0);

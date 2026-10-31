@@ -42,7 +42,7 @@ void _prolog(void) {
     evtEntryType(evt_bress, 0, 0, 0);
 }
 
-USER_FUNC(bress) {
+static USER_FUNC(bress) {
     static f32 offset[8] = {0.0f, 10.0f, 24.0f, 10.0f, 15.0f, 20.0f, 20.0f, 10.0f};
     MarioWork* mario = marioGetPtr();
     PartyEntry* party = partyGetPtr(0);
@@ -74,13 +74,21 @@ USER_FUNC(bress) {
             timers[i]--;
         }
     }
+#if VERSION <= VERSION_DEMO_US
+    if (mario != NULL && event->userdata[0] == 0 && !marioChkSts(4) && !marioChkSts(0x10) && !marioChkSts(8)) {
+#else
     if (mario != NULL && event->userdata[0] == 0 && !marioChkSts(4) && !marioChkSts(0x10) && !marioChkSts(8) &&
         vivianGetStatus() != 2) {
+#endif
         effMistEntry(4, 30, mario->position.x, 24.0f + mario->position.y, mario->position.z, 270.0f - mario->displayDirection);
         event->userdata[0] = irand(60) + 60;
     }
+#if VERSION <= VERSION_DEMO_US
+    if (party != NULL && event->userdata[1] == 0 && !marioChkSts(4) && !marioChkSts(0x10) && !marioChkSts(8)) {
+#else
     if (party != NULL && event->userdata[1] == 0 && !marioChkSts(4) && !marioChkSts(0x10) && !marioChkSts(8) &&
         vivianGetStatus() != 2) {
+#endif
         effMistEntry(4, 30, party->position.x, party->position.y + offset[party->currentMemberId], party->position.z,
                      270.0f - party->displayDirection);
         event->userdata[1] = irand(60) + 60;

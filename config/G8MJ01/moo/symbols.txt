@@ -1,6 +1,6 @@
-party_reset = .text:0x00000000; // type:function size:0x4C
-mario_reset = .text:0x0000004C; // type:function size:0x48
-party_kirimomi = .text:0x00000094; // type:function size:0xA4
+party_reset = .text:0x00000000; // type:function size:0x4C scope:local
+mario_reset = .text:0x0000004C; // type:function size:0x48 scope:local
+party_kirimomi = .text:0x00000094; // type:function size:0xA4 scope:local
 mario_kirimomi = .text:0x00000138; // type:function size:0xA0 scope:local
 z = .text:0x000001D8; // type:function size:0x78 scope:local
 mario_kirimomi = .text:0x00000250; // type:function size:0x10C scope:local

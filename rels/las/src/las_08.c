@@ -12,12 +12,11 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "las.h"
 #include "evt/evt_story.h"
 
-USER_FUNC(hi_onoff);
-USER_FUNC(mugen_kairou_get_list);
+static USER_FUNC(hi_onoff);
+static USER_FUNC(mugen_kairou_get_list);
 
 static BeroEntry bero_entry_data[5];
 BeroEntry e_bero_1_matigai[1];
@@ -296,7 +295,7 @@ EVT_BEGIN(taimatu_evt)
         READ_INT2(LW(0), LW(1))
         CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, LW(0), MAPOBJ_FLAG_HIDE)
     END_LOOP
-    SPAWN_EVENT(PTR(hikari_anim))
+    SPAWN_EVENT(hikari_anim)
     RETURN
 EVT_END()
 
@@ -305,7 +304,7 @@ s32 mugen_kairou_list[] = {
 };
 
 EVT_BEGIN(mugen_kairou_init)
-    CALL_CHILD(PTR(taimatu_evt))
+    CALL_CHILD(taimatu_evt)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_01_02_LOCK)
         CALL(mugen_kairou_get_list, GSW(GSW_LAS08_CORRIDOR_STREAK), LW(0))
         CALL(hi_onoff, LW(0), 1)
@@ -316,22 +315,22 @@ EVT_BEGIN(mugen_kairou_init)
             CASE_EQUAL(7)
             IF_INT_LESS(GSW(GSW_LAS08_CORRIDOR_STREAK), 6)
                 SET_VALUE(LW(0), STRING("e_bero_1"))
-                CALL_CHILD(PTR(bero_case_switch_off))
+                CALL_CHILD(bero_case_switch_off)
                 CALL(evt_bero_overwrite, STRING("e_bero_1"), PTR(e_bero_1_seikai))
                 SET_VALUE(LW(0), STRING("e_bero_1"))
-                CALL_CHILD(PTR(bero_case_switch_on))
+                CALL_CHILD(bero_case_switch_on)
             END_IF
             CASE_EQUAL(3)
             SET_VALUE(LW(0), STRING("e_bero_2"))
-            CALL_CHILD(PTR(bero_case_switch_off))
+            CALL_CHILD(bero_case_switch_off)
             CALL(evt_bero_overwrite, STRING("e_bero_2"), PTR(e_bero_2_seikai))
             SET_VALUE(LW(0), STRING("e_bero_2"))
-            CALL_CHILD(PTR(bero_case_switch_on))
+            CALL_CHILD(bero_case_switch_on)
             SET_VALUE(LW(0), STRING("e_bero_1"))
-            CALL_CHILD(PTR(bero_case_switch_off))
+            CALL_CHILD(bero_case_switch_off)
             CALL(evt_bero_overwrite, STRING("e_bero_1"), PTR(e_bero_1_matigai))
             SET_VALUE(LW(0), STRING("e_bero_1"))
-            CALL_CHILD(PTR(bero_case_switch_on))
+            CALL_CHILD(bero_case_switch_on)
         END_SWITCH
     ELSE
         CALL(hi_onoff, 4, 1)
@@ -345,17 +344,19 @@ EVT_END()
 EVT_BEGIN(las_08_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 2)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    SPAWN_EVENT(PTR(mugen_kairou_init))
+    CALL_CHILD(evt_bero_info_run)
+    SPAWN_EVENT(mugen_kairou_init)
     RETURN
 EVT_END()
 
 EffectEntry* effTorchEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 
-USER_FUNC(hi_onoff) {
+static USER_FUNC(hi_onoff) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
     s32 on = evtGetValue(event, args[1]);
@@ -373,7 +374,7 @@ USER_FUNC(hi_onoff) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(mugen_kairou_get_list) {
+static USER_FUNC(mugen_kairou_get_list) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
 

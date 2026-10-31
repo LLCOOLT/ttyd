@@ -13,8 +13,8 @@
 #include "libc_decls.h"
 #include <math.h>
 
-void effCloudMain(EffectEntry* effect);
-void effCloudDisp(CameraId cameraId, EffectEntry* effect);
+static void effCloudMain(EffectEntry* effect);
+static void effCloudDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effCloudN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -122,7 +122,7 @@ EffectEntry* effCloudN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 s
     return effect;
 }
 
-void effCloudMain(EffectEntry* effect) {
+static void effCloudMain(EffectEntry* effect) {
     EffCloudN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -191,7 +191,7 @@ void effCloudMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effCloudDisp, effect);
 }
 
-void effCloudDisp(CameraId cameraId, EffectEntry* effect) {
+static void effCloudDisp(CameraId cameraId, EffectEntry* effect) {
     EffCloudN64Work* work;
     f32 scale;
     s32 frame;

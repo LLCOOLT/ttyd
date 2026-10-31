@@ -27,40 +27,40 @@ static inline f32 sinf(f32 x) {
 }
 #include <string.h>
 
-void mapBuildTexture(MapObject* obj, TEXPalette* texture, void* table);
+static void mapBuildTexture(MapObject* obj, TEXPalette* texture, void* table);
 int __cvt_dbl_usll();
 int __cvt_ull_flt();
 int __div2i();
-void _mapDispMapGrp(CameraId cam, MapObject* obj);
-void _mapDispMapGrp_NoMaterial(CameraId cam, MapObject* obj);
-void _mapDispMapObj(CameraId cam, MapObject* obj);
-void _mapDispMapObj_NoMaterial(CameraId cam, MapObject* obj);
-MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 index);
-void _mapLoad(MapWork* wp, BOOL group, const char* map);
-void _setOffScrnId(MapObject* obj, s32 id, BOOL doNext);
-void makeDisplayList(BOOL group);
-MapObject* mapEntry(MapFileJoint* joint, Mtx mtx, s32 index);
-MapObject* mapEntrySub(MapFileJoint* joint, MapObject* parent, Mtx mtx, BOOL isRoot, s32 index);
-void mapFlgOff(MapObject* obj, u32 flags, BOOL doNext);
-void mapFlgOn(MapObject* obj, u32 flags, BOOL doNext);
+static void _mapDispMapGrp(CameraId cam, MapObject* obj);
+static void _mapDispMapGrp_NoMaterial(CameraId cam, MapObject* obj);
+static void _mapDispMapObj(CameraId cam, MapObject* obj);
+static void _mapDispMapObj_NoMaterial(CameraId cam, MapObject* obj);
+static MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 index);
+static void _mapLoad(MapWork* wp, BOOL group, const char* map);
+static void _setOffScrnId(MapObject* obj, s32 id, BOOL doNext);
+static void makeDisplayList(BOOL group);
+static MapObject* mapEntry(MapFileJoint* joint, Mtx mtx, s32 index);
+static MapObject* mapEntrySub(MapFileJoint* joint, MapObject* parent, Mtx mtx, BOOL isRoot, s32 index);
+static void mapFlgOff(MapObject* obj, u32 flags, BOOL doNext);
+static void mapFlgOn(MapObject* obj, u32 flags, BOOL doNext);
 void mapGetBoundingBox(Vec* min, Vec* max);
-void mapGetJointsSub(MapFileJoint* joint, s32* numJoints);
-void mapObjGetPosSub(MapObject* obj, Vec* sum, s32* count, BOOL doNext);
-void mapReCalcMatrix(MapObject* obj, Mtx mtx, BOOL force);
+static void mapGetJointsSub(MapFileJoint* joint, s32* numJoints);
+static void mapObjGetPosSub(MapObject* obj, Vec* sum, s32* count, BOOL doNext);
+static void mapReCalcMatrix(MapObject* obj, Mtx mtx, BOOL force);
 MapFileJoint* mapSearchDmdJoint(MapFileJoint* joint, const char* name);
-MapFileJoint* mapSearchDmdJointSub(MapFileJoint* joint, const char* name);
-MapFileJoint* mapSearchDmdJointSub2(MapFileJoint* joint, const char* name, const char* prefix);
-s32 mapSetLight(MapObject* obj, LightEntry** lights);
-void mapSetMaterial(MapObject* obj, void* material);
-void mapSetPolygon(MapObject* obj, MapFileMesh* mesh);
-void mapSetPolygonVtxDesc(MapObject* obj, MapFileMesh* mesh);
-void setColor(MapObject* obj, GXColor color, BOOL doNext);
-void mapDispMapGrp(CameraId cam, MapObject* obj);
-void mapDispMapGrp_bbox(CameraId cam, MapObject* obj);
-void mapDispMapGrp_off(CameraId cam, MapObject* obj);
-void mapDispMapObj(CameraId cam, MapObject* obj);
-void mapDispMapObj_bbox(CameraId cam, MapObject* obj);
-void mapDispMapObj_off(CameraId cam, MapObject* obj);
+static MapFileJoint* mapSearchDmdJointSub(MapFileJoint* joint, const char* name);
+static MapFileJoint* mapSearchDmdJointSub2(MapFileJoint* joint, const char* name, const char* prefix);
+static s32 mapSetLight(MapObject* obj, LightEntry** lights);
+static void mapSetMaterial(MapObject* obj, void* material);
+static void mapSetPolygon(MapObject* obj, MapFileMesh* mesh);
+static void mapSetPolygonVtxDesc(MapObject* obj, MapFileMesh* mesh);
+static void setColor(MapObject* obj, GXColor color, BOOL doNext);
+static void mapDispMapGrp(CameraId cam, MapObject* obj);
+static void mapDispMapGrp_bbox(CameraId cam, MapObject* obj);
+static void mapDispMapGrp_off(CameraId cam, MapObject* obj);
+static void mapDispMapObj(CameraId cam, MapObject* obj);
+static void mapDispMapObj_bbox(CameraId cam, MapObject* obj);
+static void mapDispMapObj_off(CameraId cam, MapObject* obj);
 
 #define TWO_PI 6.28318530717958647692528676655900576839433879875021f
 
@@ -83,7 +83,7 @@ GXTexObj projTexObj;
 void* projTexImgRef;
 Mtx projMtx;
 BOOL __mapdrv_make_dl;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 BOOL disableMapDraw;
 #endif
 s32 error_count;
@@ -93,26 +93,26 @@ BOOL mapClipOffFlag;
 s32 activeGroup;
 MapWork* mapWork; // allocates two entries
 
-void mapGetJointsSub(MapFileJoint* joint, s32* numJoints);
+static void mapGetJointsSub(MapFileJoint* joint, s32* numJoints);
 #define lightGetNearObj(pos, out, count, flags) ((s32 (*)(Vec*, LightEntry**, s32, LightEntryFlags))lightGetNearObj)(pos, out, count, flags)
 
 // local prototypes
-void mapGetJointsSub(MapFileJoint* joint, s32* numJoints);
+static void mapGetJointsSub(MapFileJoint* joint, s32* numJoints);
 void mapGetBoundingBox(Vec* min, Vec* max);
 void mapGetBoundingBox(Vec* min, Vec* max);
-void mapBuildTexture(MapObject* obj, TEXPalette* texture, void* table);
-void mapBuildTexture(MapObject* obj, TEXPalette* texture, void* table);
-MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 index);
-MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 index);
-MapObject* mapEntrySub(MapFileJoint* joint, MapObject* parent, Mtx mtx, BOOL isRoot, s32 index);
-MapObject* mapEntrySub(MapFileJoint* joint, MapObject* parent, Mtx mtx, BOOL isRoot, s32 index);
-MapObject* mapEntry(MapFileJoint* joint, Mtx mtx, s32 index);
-MapObject* mapEntry(MapFileJoint* joint, Mtx mtx, s32 index);
-void _mapLoad(MapWork* wp, BOOL group, const char* map);
-void makeDisplayList(BOOL group);
-void makeDisplayList(BOOL group);
+static void mapBuildTexture(MapObject* obj, TEXPalette* texture, void* table);
+static void mapBuildTexture(MapObject* obj, TEXPalette* texture, void* table);
+static MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 index);
+static MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 index);
+static MapObject* mapEntrySub(MapFileJoint* joint, MapObject* parent, Mtx mtx, BOOL isRoot, s32 index);
+static MapObject* mapEntrySub(MapFileJoint* joint, MapObject* parent, Mtx mtx, BOOL isRoot, s32 index);
+static MapObject* mapEntry(MapFileJoint* joint, Mtx mtx, s32 index);
+static MapObject* mapEntry(MapFileJoint* joint, Mtx mtx, s32 index);
+static void _mapLoad(MapWork* wp, BOOL group, const char* map);
+static void makeDisplayList(BOOL group);
+static void makeDisplayList(BOOL group);
 // anim functions?
-void _mapLoad(MapWork* wp, BOOL group, const char* map);
+static void _mapLoad(MapWork* wp, BOOL group, const char* map);
 
 void mapErrorEntry(s32 type, const char* name) { // 1:1
     MapError* error = error_data;
@@ -129,7 +129,7 @@ const char* getMapDataDvdRoot(void) {
     return ".";
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 void N_mapDispOff(void) {
     disableMapDraw = TRUE;
 }
@@ -147,7 +147,7 @@ s32 mapGetActiveGroup(void) {
     return activeGroup;
 }
 
-void mapGetJointsSub(MapFileJoint* joint, s32* numJoints) { // 1:1
+static void mapGetJointsSub(MapFileJoint* joint, s32* numJoints) { // 1:1
     (*numJoints)++;
     if (joint->child) {
         mapGetJointsSub(joint->child, numJoints);
@@ -229,7 +229,7 @@ static inline s32 mapSearchTexName(MapTexTable* table, char* name) {
     return -1;
 }
 
-void mapBuildTexture(MapObject* obj, TEXPalette* texture, void* table) {
+static void mapBuildTexture(MapObject* obj, TEXPalette* texture, void* table) {
     int i;
     int j;
     int k;
@@ -298,7 +298,7 @@ void mapBuildTexture(MapObject* obj, TEXPalette* texture, void* table) {
     }
 }
 
-MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 index) {
+static MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 index) {
     MapWork* wp = &mapWork[activeGroup];
     MapObject* obj;
     s32 i;
@@ -414,7 +414,7 @@ MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 index) {
             obj->flags |= 4;
         }
     } else {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         OSPanic("mapdrv.c", 0x2c1, "\x83\x57\x83\x87\x83\x43\x83\x93\x83\x67\x82\xcc\x83\x66\x81\x5b\x83\x5e\x82\xcc\x8e\x77\x92\xe8\x82\xc9\x82\xa8\x82\xa9\x82\xb5\x82\xc8\x82\xe0\x82\xcc\x82\xaa\x82\xa0\x82\xe9\n");
 #elif VERSION == VERSION_EU
         OSPanic("mapdrv.c", 0x2e8, "\x83\x57\x83\x87\x83\x43\x83\x93\x83\x67\x82\xcc\x83\x66\x81\x5b\x83\x5e\x82\xcc\x8e\x77\x92\xe8\x82\xc9\x82\xa8\x82\xa9\x82\xb5\x82\xc8\x82\xe0\x82\xcc\x82\xaa\x82\xa0\x82\xe9\n");
@@ -438,7 +438,7 @@ MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 index) {
     return obj;
 }
 
-MapObject* mapEntrySub(MapFileJoint* joint, MapObject* parent, Mtx mtx, BOOL isRoot, s32 index) {
+static MapObject* mapEntrySub(MapFileJoint* joint, MapObject* parent, Mtx mtx, BOOL isRoot, s32 index) {
     MapObject* obj = _mapEnt(joint, parent, mtx, index);
     if (joint->child) {
         obj->child = mapEntrySub(joint->child, obj, obj->modelWorldMtx, FALSE, index);
@@ -451,7 +451,7 @@ MapObject* mapEntrySub(MapFileJoint* joint, MapObject* parent, Mtx mtx, BOOL isR
     return obj;
 }
 
-MapObject* mapEntry(MapFileJoint* joint, Mtx mtx, s32 index) {
+static MapObject* mapEntry(MapFileJoint* joint, Mtx mtx, s32 index) {
     MapWork* wp = (0, &mapWork[activeGroup]); // FAKE: the comma expression gives wp the target register (r31, not r30)
     u32 size;
 
@@ -466,11 +466,11 @@ f32 (*shadowGetCharShadowProjTexMtx(void))[4];
 f32 (*shadowGetDepthShadowDepthMtx(void))[4];
 f32 (*shadowGetDepthShadowProjTexMtx(void))[4];
 f32 (*shadowGetProjShadowProjTexMtx(void))[4];
-void mapSetMaterial(MapObject* obj, void* material);
-void mapSetMaterial(MapObject* obj, void* material);
+static void mapSetMaterial(MapObject* obj, void* material);
+static void mapSetMaterial(MapObject* obj, void* material);
 static inline void mapResetPaperCraftAmbColor(void);
 
-void makeDisplayList(BOOL group) {
+static void makeDisplayList(BOOL group) {
     static const GXCullMode culling[4] = {GX_CULL_FRONT, GX_CULL_BACK, GX_CULL_ALL, GX_CULL_NONE};
     MapEntry* e;
     MapWork* wp = mapGetWork();
@@ -491,7 +491,7 @@ void makeDisplayList(BOOL group) {
     total = 0;
     for (pass = 0; pass < 2; pass++) {
         obj = e->objects;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         for (k = 0; k < 8; k++) {
             obj->displayList[k] = NULL;
             obj->displayListSize[k] = 0;
@@ -823,7 +823,7 @@ found:
 }
 
 // The demo keeps the full file names under ./map/<name>/.
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #define MAP_PATH_DAT "./map/%s/map.dat"
 #define MAP_PATH_TPL "./map/%s/texture.tpl"
 #define MAP_PATH_CAMROAD "./map/%s/camera_road.bin"
@@ -833,7 +833,7 @@ found:
 #define MAP_PATH_CAMROAD "./m/%s/c"
 #endif
 
-void _mapLoad(MapWork* wp, BOOL group, const char* map) {
+static void _mapLoad(MapWork* wp, BOOL group, const char* map) {
     MapFileInfo* info;
     u32 datSize, k;
     int i;
@@ -1001,7 +1001,7 @@ void _mapLoad(MapWork* wp, BOOL group, const char* map) {
             o->flags |= 0x100;
         }
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     disableMapDraw = FALSE;
 #endif
 }
@@ -1012,7 +1012,7 @@ void mapUnLoad(void) {
     int i;
     MapWork* wp;
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     sysWaitDrawSync();
 #endif
     entry = mapWork->entries;
@@ -1035,7 +1035,7 @@ void mapUnLoad(void) {
             entry->dispListSize = 0;
         }
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     disableMapDraw = FALSE;
 #endif
     hitReInit();
@@ -1067,7 +1067,7 @@ void mapUnLoad(void) {
     memset(wp, 0, sizeof(MapWork));
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo reads each map's LZ77-compressed archive "<root>/b/<map>" itself: mapPreLoad starts the read, mapLoad
 // unpacks it into the arc slot before loading the map.
 BOOL mapPreLoad(const char* map) {
@@ -1132,7 +1132,7 @@ void mapLoad(const char* map) {
 
 // Frees the battle map (group 1) and brings the field map (group 0) back from ARAM. The demo reloads the field map
 // with its own locals and declaration order: either version's locals in the other version change the registers.
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 // FAKE: opt_common_subs off for this function only. With CSE on, `wp = mapWork` (last loop) becomes a CSE temp created
 // before the lifetime-split temps, so wp's register lands above i's. With it off, the second web of the reused `wp` is a
 // split temp; split temps are created in order of the variables' first reference (i before wp before entry), which gives
@@ -1140,7 +1140,7 @@ void mapLoad(const char* map) {
 #pragma opt_common_subs off
 #endif
 void bmapUnLoad(void) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     MapWork* wp2;
     MapEntry* entry3;
     int j;
@@ -1155,7 +1155,7 @@ void bmapUnLoad(void) {
     MapWork* wp;
 #endif
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     sysWaitDrawSync();
 #endif
     i = 0;
@@ -1178,7 +1178,7 @@ void bmapUnLoad(void) {
             entry->dispListSize = 0;
         }
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     disableMapDraw = FALSE;
 #endif
     hitReInit();
@@ -1207,7 +1207,7 @@ void bmapUnLoad(void) {
     arcDelete(1);
     arcDelete(2);
     memset(wp, 0, sizeof(MapWork));
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     j = 0;
     // FAKE: a dead guard between j = 0 and the mapWork load keeps the target's li-before-lwz order (docs/FAKES.md).
     {
@@ -1263,11 +1263,11 @@ void bmapUnLoad(void) {
     }
 #endif
 }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 #pragma opt_common_subs reset
 #endif
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 BOOL bmapPreLoad(const char* map, const char* map2) {
     FileEntry* file = NULL;
     FileEntry* file2 = NULL;
@@ -1286,14 +1286,14 @@ BOOL bmapPreLoad(const char* map, const char* map2) {
 #endif
 
 void bmapLoad(const char* map, const char* map2) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     char path[256];
 #endif
     MapWork* wp;
     MapEntry* entry;
     MapEntry* e;
     int i;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     FileEntry* file;
     u32 size;
     void* arc;
@@ -1338,7 +1338,7 @@ void bmapLoad(const char* map, const char* map2) {
     wp = (0, &mapWork[1]); // FAKE: the comma expression keeps the target register order for wp
     activeGroup = 1;
     memset(wp, 0, sizeof(MapWork));
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // the demo reads the battle map archives itself
     if (map != NULL) {
         sprintf(path, "%s/b/%s", getMarioStDvdRoot(), map);
@@ -1482,7 +1482,7 @@ void mapCalcAnimMatrix(Mtx out, Mtx in, MapEntryAnimData* anim, MapAnimJoint* jo
     }
 }
 
-void mapReCalcMatrix(MapObject* obj, Mtx mtx, BOOL force) {
+static void mapReCalcMatrix(MapObject* obj, Mtx mtx, BOOL force) {
     BOOL dirty = FALSE;
 
     if (obj->flags & 0x200) {
@@ -1752,7 +1752,7 @@ void mapMain(void) {
     f32 v[9];
     f32 cv[5];
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     for (i = 0; i < wp->entries[0].count; i++) {
         entry = &wp->entries[i];
 #else
@@ -1868,21 +1868,21 @@ void mapMain(void) {
     }
 }
 
-void mapSetTextureMatrix(MapMaterial* mat);
+static void mapSetTextureMatrix(MapMaterial* mat);
 
-void _mapDispMapObj(CameraId cam, MapObject* obj);
-void _mapDispMapObj(CameraId cam, MapObject* obj);
+static void _mapDispMapObj(CameraId cam, MapObject* obj);
+static void _mapDispMapObj(CameraId cam, MapObject* obj);
 static inline void mapSetObjFog(MapObject* obj);
-void _mapDispMapGrp(CameraId cam, MapObject* obj);
-void _mapDispMapGrp(CameraId cam, MapObject* obj);
-void _mapDispMapGrp_NoMaterial(CameraId cam, MapObject* obj);
-void _mapDispMapGrp_NoMaterial(CameraId cam, MapObject* obj);
-void mapSetPolygon(MapObject* obj, MapFileMesh* mesh);
-void mapSetPolygon(MapObject* obj, MapFileMesh* mesh);
-void mapSetTextureMatrix(MapMaterial* mat);
-void mapSetTextureMatrix(struct MapMaterial* mat);
-void mapSetPolygonVtxDesc(MapObject* obj, MapFileMesh* mesh);
-void mapSetPolygonVtxDesc(MapObject* obj, MapFileMesh* mesh);
+static void _mapDispMapGrp(CameraId cam, MapObject* obj);
+static void _mapDispMapGrp(CameraId cam, MapObject* obj);
+static void _mapDispMapGrp_NoMaterial(CameraId cam, MapObject* obj);
+static void _mapDispMapGrp_NoMaterial(CameraId cam, MapObject* obj);
+static void mapSetPolygon(MapObject* obj, MapFileMesh* mesh);
+static void mapSetPolygon(MapObject* obj, MapFileMesh* mesh);
+static void mapSetTextureMatrix(MapMaterial* mat);
+static void mapSetTextureMatrix(struct MapMaterial* mat);
+static void mapSetPolygonVtxDesc(MapObject* obj, MapFileMesh* mesh);
+static void mapSetPolygonVtxDesc(MapObject* obj, MapFileMesh* mesh);
 
 static inline BOOL mapObjIsTranslucent(u32 flags, GXColor objColor, GXColor matColor) {
     if ((flags & 0x40) && objColor.a != 0xFF) {
@@ -1907,7 +1907,7 @@ static inline void callPackedLists(MapFileMesh* mesh) {
     }
 }
 
-void _mapDispMapObj(CameraId cam, MapObject* obj) {
+static void _mapDispMapObj(CameraId cam, MapObject* obj) {
     CameraEntry* camera;
     CameraEntry* cur;
     MapFileJoint* joint;
@@ -2046,7 +2046,7 @@ void _mapDispMapObj(CameraId cam, MapObject* obj) {
     }
 }
 
-void _mapDispMapGrp(CameraId cam, MapObject* obj) {
+static void _mapDispMapGrp(CameraId cam, MapObject* obj) {
     _mapDispMapObj(cam, obj);
     if (obj->child) {
         _mapDispMapGrp(cam, obj->child);
@@ -2056,15 +2056,15 @@ void _mapDispMapGrp(CameraId cam, MapObject* obj) {
     }
 }
 
-void mapDispMapObj(CameraId cam, MapObject* obj) {
+static void mapDispMapObj(CameraId cam, MapObject* obj) {
     _mapDispMapObj(cam, obj);
 }
 
-void mapDispMapGrp(CameraId cam, MapObject* obj) {
+static void mapDispMapGrp(CameraId cam, MapObject* obj) {
     _mapDispMapGrp(cam, obj);
 }
 
-void mapDispMapObj_off(CameraId cam, MapObject* obj) {
+static void mapDispMapObj_off(CameraId cam, MapObject* obj) {
     u16 left, top, right, bottom;
 
     sysWaitDrawSync();
@@ -2075,7 +2075,7 @@ void mapDispMapObj_off(CameraId cam, MapObject* obj) {
     offscreenAddBoundingBox(obj->offscreenId, left, top, right, bottom);
 }
 
-void mapDispMapGrp_off(CameraId cam, MapObject* obj) {
+static void mapDispMapGrp_off(CameraId cam, MapObject* obj) {
     u16 left, top, right, bottom;
 
     sysWaitDrawSync();
@@ -2107,7 +2107,7 @@ void test_kururing_mapdisp(CameraId cam) {
     }
 }
 
-void _mapDispMapObj_NoMaterial(CameraId cam, MapObject* obj) {
+static void _mapDispMapObj_NoMaterial(CameraId cam, MapObject* obj) {
     Mtx mtx;
     Mtx nrm;
     int i;
@@ -2130,7 +2130,7 @@ void _mapDispMapObj_NoMaterial(CameraId cam, MapObject* obj) {
     }
 }
 
-void _mapDispMapGrp_NoMaterial(CameraId cam, MapObject* obj) {
+static void _mapDispMapGrp_NoMaterial(CameraId cam, MapObject* obj) {
     _mapDispMapObj_NoMaterial(cam, obj);
     if (obj->child) {
         _mapDispMapGrp_NoMaterial(cam, obj->child);
@@ -2140,7 +2140,7 @@ void _mapDispMapGrp_NoMaterial(CameraId cam, MapObject* obj) {
     }
 }
 
-void mapDispMapObj_bbox(CameraId cam, MapObject* obj) {
+static void mapDispMapObj_bbox(CameraId cam, MapObject* obj) {
     sysWaitDrawSync();
     GXClearBoundingBox();
     _mapDispMapObj_NoMaterial(cam, obj);
@@ -2148,7 +2148,7 @@ void mapDispMapObj_bbox(CameraId cam, MapObject* obj) {
     GXReadBoundingBox(&obj->screenRect[0], &obj->screenRect[1], &obj->screenRect[2], &obj->screenRect[3]);
 }
 
-void mapDispMapGrp_bbox(CameraId cam, MapObject* obj) {
+static void mapDispMapGrp_bbox(CameraId cam, MapObject* obj) {
     sysWaitDrawSync();
     GXClearBoundingBox();
     _mapDispMapGrp_NoMaterial(cam, obj);
@@ -2186,7 +2186,7 @@ void mapDisp(void) {
     MapFileJoint* joint;
     BOOL clipped;
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (disableMapDraw) {
         return;
     }
@@ -2316,7 +2316,7 @@ void mapDisp(void) {
     }
 }
 
-s32 mapSetLight(MapObject* obj, LightEntry** lights) {
+static s32 mapSetLight(MapObject* obj, LightEntry** lights) {
     Vec pos;
     s32 count;
     s32 i;
@@ -3185,7 +3185,7 @@ static inline void mapSetObjFog(MapObject* obj) {
     }
 }
 
-void mapSetTextureMatrix(MapMaterial* mat) {
+static void mapSetTextureMatrix(MapMaterial* mat) {
     s32 j;
     s32 k;
     s32 i;
@@ -3245,7 +3245,7 @@ void mapSetTextureMatrix(MapMaterial* mat) {
     }
 }
 
-void mapSetMaterial(MapObject* obj, void* material) {
+static void mapSetMaterial(MapObject* obj, void* material) {
     MapMaterial* mat = material;
     GXColor ambient;
     GXColor ambColor = {0x00, 0x00, 0x00, 0xFF};
@@ -3506,7 +3506,7 @@ const GXVtxAttrFmtList attr_fmt[12] = {
     { GX_VA_NULL, GX_POS_XY, GX_U8, 0 },
 };
 
-void mapSetPolygon(MapObject* obj, MapFileMesh* mesh) {
+static void mapSetPolygon(MapObject* obj, MapFileMesh* mesh) {
     MapWork* wp;
     void* pos;
     void* nrm;
@@ -3585,7 +3585,7 @@ void mapSetPolygon(MapObject* obj, MapFileMesh* mesh) {
     }
 }
 
-void mapSetPolygonVtxDesc(MapObject* obj, MapFileMesh* mesh) {
+static void mapSetPolygonVtxDesc(MapObject* obj, MapFileMesh* mesh) {
 
     MapWork* wp;
     u32 mask;
@@ -3625,7 +3625,7 @@ void mapSetPolygonVtxDesc(MapObject* obj, MapFileMesh* mesh) {
     }
 }
 
-MapFileJoint* mapSearchDmdJointSub(MapFileJoint* joint, const char* name) {
+static MapFileJoint* mapSearchDmdJointSub(MapFileJoint* joint, const char* name) {
     MapFileJoint* found;
 
     if (!strcmp(joint->name, name)) {
@@ -3646,7 +3646,7 @@ MapFileJoint* mapSearchDmdJointSub(MapFileJoint* joint, const char* name) {
     return NULL;
 }
 
-MapFileJoint* mapSearchDmdJointSub2(MapFileJoint* joint, const char* name, const char* prefix) {
+static MapFileJoint* mapSearchDmdJointSub2(MapFileJoint* joint, const char* name, const char* prefix) {
     MapFileJoint* found;
     char path[256];
 
@@ -3714,7 +3714,7 @@ void mapObjFlagOn(const char* name, u32 flags) {
         error_count %= 32;
         return;
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     obj->flags |= flags;
 #else
     if (!(flags & 0x100) || obj->displayListSize[0]) {
@@ -3737,8 +3737,8 @@ void mapObjFlagOff(const char* name, u32 flags) {
     obj->flags &= ~flags;
 }
 
-void mapFlgOn(MapObject* obj, u32 flags, BOOL doNext) {
-#if VERSION == VERSION_DEMO
+static void mapFlgOn(MapObject* obj, u32 flags, BOOL doNext) {
+#if VERSION <= VERSION_DEMO_US
     obj->flags |= flags;
 #else
     if (!(flags & 0x100) || obj->displayListSize[0]) {
@@ -3753,7 +3753,7 @@ void mapFlgOn(MapObject* obj, u32 flags, BOOL doNext) {
     }
 }
 
-void mapFlgOff(MapObject* obj, u32 flags, BOOL doNext) {
+static void mapFlgOff(MapObject* obj, u32 flags, BOOL doNext) {
     obj->flags &= ~flags;
     if (obj->child) {
         mapFlgOff(obj->child, flags, TRUE);
@@ -3791,7 +3791,7 @@ void mapGrpFlagOff(const char* name, u32 flags) {
     mapFlgOff(obj, flags, FALSE);
 }
 
-void _setOffScrnId(MapObject* obj, s32 id, BOOL doNext) {
+static void _setOffScrnId(MapObject* obj, s32 id, BOOL doNext) {
     obj->offscreenId = id;
     if (id != -1) {
         obj->flags |= 0x80;
@@ -3908,7 +3908,7 @@ void mapObjScale(const char* name, f32 x, f32 y, f32 z) {
     }
 }
 
-void mapObjGetPosSub(MapObject* obj, Vec* sum, s32* count, BOOL doNext) {
+static void mapObjGetPosSub(MapObject* obj, Vec* sum, s32* count, BOOL doNext) {
     Vec pos;
 
     if (obj->child) {
@@ -4013,7 +4013,7 @@ void mapObjSetColor(const char* name, GXColor* color) {
     }
 }
 
-void setColor(MapObject* obj, GXColor color, BOOL doNext) {
+static void setColor(MapObject* obj, GXColor color, BOOL doNext) {
     if (obj) {
         obj->color = color;
         obj->flags |= 0x40;
@@ -4216,7 +4216,7 @@ static void mapStrippedPool(const char** str, f32* val) {
     val[1] = 0.0f;
     val[2] = 0.5f;
     val[3] = 2.0f;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     str[1] = "%s/map/%s/map.dat";
 #else
     str[1] = "%s/m/%s/d";

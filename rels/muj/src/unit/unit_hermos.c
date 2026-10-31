@@ -138,7 +138,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 3, 1, 1, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {50, 90, 75, 25, 75, 100, 0, 50, 100, 75, 100, 75, 100, 75, 75, 50, 90, 100, 75, 100, 100, 95};
+#else
 static StatusVulnerability regist = {50, 90, 105, 100, 75, 100, 0, 50, 100, 90, 100, 90, 100, 95, 75, 50, 90, 100, 75, 100, 100, 95};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
@@ -157,8 +161,8 @@ static PoseTableEntry pose_table[] = {
     {40, "W_1"},
     {56, "X_1"},
     {57, "X_1"},
-    {65, "T_1"},
-    {69, "S_1"},
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -196,7 +200,11 @@ static BattleWeapon weapon_bubble_attack = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
+#if VERSION <= VERSION_DEMO_US
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
+#else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
+#endif
     COUNTER_RESIST_FIERY | COUNTER_RESIST_ICY | COUNTER_RESIST_POISON, // counterResistFlags
     TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
@@ -234,7 +242,11 @@ static BattleWeapon weapon_bubble_fire_attack = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
+#if VERSION <= VERSION_DEMO_US
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
+#else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE, // special
+#endif
     COUNTER_RESIST_ALL, // counterResistFlags
     TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
@@ -277,7 +289,11 @@ static BattleWeapon weapon_bubble_all_fire_attack = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
+#if VERSION <= VERSION_DEMO_US
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
+#else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE, // special
+#endif
     COUNTER_RESIST_ALL, // counterResistFlags
     TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
@@ -319,7 +335,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -341,7 +357,7 @@ static EVT_BEGIN(damage_fire_explosion_event)
             ADD(LW(2), 10)
             CALL(btlevtcmd_CheckSpace, LW(3), LW(0), LW(1), LW(2), 40, 0, 0, 0)
             IF_INT_EQUAL(LW(3), -1)
-                CALL_CHILD(PTR(friend_event))
+                CALL_CHILD(friend_event)
                 WAIT_MS(500)
                 GOTO(99)
             END_IF
@@ -356,7 +372,7 @@ static EVT_BEGIN(damage_fire_explosion_event)
             SUBTRACT(LW(2), 10)
             CALL(btlevtcmd_CheckSpace, LW(3), LW(0), LW(1), LW(2), 40, 0, 0, 0)
             IF_INT_EQUAL(LW(3), -1)
-                CALL_CHILD(PTR(friend_event))
+                CALL_CHILD(friend_event)
                 WAIT_MS(500)
                 GOTO(99)
             END_IF
@@ -411,17 +427,17 @@ static EVT_BEGIN(attack_event)
     SET_VALUE(LW(0), 50)
     IF_INT_LESS(LW(1), LW(0))
         SET_VALUE(LW(9), PTR(&weapon_bubble_attack))
-        CALL_CHILD(PTR(normal_attack_event))
+        CALL_CHILD(normal_attack_event)
         GOTO(99)
     END_IF
     ADD(LW(0), 30)
     IF_INT_LESS(LW(1), LW(0))
         SET_VALUE(LW(9), PTR(&weapon_bubble_fire_attack))
-        CALL_CHILD(PTR(fire_attack_event))
+        CALL_CHILD(fire_attack_event)
         GOTO(99)
     END_IF
     SET_VALUE(LW(9), PTR(&weapon_bubble_all_fire_attack))
-    CALL_CHILD(PTR(all_fire_attack_event))
+    CALL_CHILD(all_fire_attack_event)
     GOTO(99)
     LABEL(99)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -555,7 +571,11 @@ static USER_FUNC(eff_fire) {
     f32 z;
 
     if (isFirstCall) {
+#if VERSION <= VERSION_DEMO_US
+        eff = effFireEntry(6, 90, 0.0f, -1000.0f, 0.0f, 1.0f);
+#else
         eff = effFireEntry(6, 106, 0.0f, -1000.0f, 0.0f, 1.0f);
+#endif
         ((EffFireWork*)eff->userdata)->scaleX = 0.0f;
         ((EffFireWork*)eff->userdata)->scaleY = 0.0f;
     }

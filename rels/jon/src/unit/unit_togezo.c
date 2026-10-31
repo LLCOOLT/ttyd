@@ -11,7 +11,7 @@
 #include "battle/battle_sub.h"
 #include "evt/evt_eff.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 
 BattleUnitKind unit_togezo;
 static BattleUnitDefense defence;
@@ -24,7 +24,11 @@ static BattleUnitDefense defence_guard;
 static BattleUnitDefenseAttr defence_attr_guard;
 static StatusVulnerability regist_guard;
 static PoseTableEntry pose_table[15];
+#if VERSION <= VERSION_DEMO_US
+static PoseTableEntry pose_table_turn[12];
+#else
 static PoseTableEntry pose_table_turn[14];
+#endif
 static PoseTableEntry pose_table_guard[12];
 static BattleDataEntry data_table[5];
 static BattleDataEntry data_table_turn[3];
@@ -111,7 +115,11 @@ static BattleUnitDefense defence = {{3, 3, 3, 3, 3}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {90, 90, 80, 100, 90, 100, 100, 80, 100, 90, 100, 90, 100, 90, 90, 100, 80, 100, 90, 100, 100, 100};
+#else
 static StatusVulnerability regist = {80, 90, 80, 100, 80, 100, 100, 70, 100, 90, 100, 90, 100, 95, 90, 100, 30, 100, 90, 100, 100, 100};
+#endif
 
 static BattleUnitDefense defence_turn = {0};
 
@@ -139,8 +147,8 @@ static PoseTableEntry pose_table[] = {
     {39, "TGZ_D_1"},
     {40, "TGZ_W_1"},
     {42, "TGZ_R_1"},
-    {65, "TGZ_T_1"},
-    {69, "TGZ_S_1"},
+    {BTL_POSE_TALK, "TGZ_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "TGZ_S_1"},
 };
 
 static PoseTableEntry pose_table_turn[] = {
@@ -155,9 +163,11 @@ static PoseTableEntry pose_table_turn[] = {
     {30, "TGZ_Q_2"},
     {31, "TGZ_S_1"},
     {39, "TGZ_D_3"},
+#if VERSION >= VERSION_JP
     {40, "TGZ_W_1"},
     {42, "TGZ_R_1"},
-    {69, "TGZ_S_2"},
+#endif
+    {BTL_POSE_STAY_DEFAULT, "TGZ_S_2"},
 };
 
 static PoseTableEntry pose_table_guard[] = {
@@ -172,7 +182,7 @@ static PoseTableEntry pose_table_guard[] = {
     {30, "TGZ_P_1"},
     {31, "TGZ_P_1"},
     {39, "TGZ_P_1"},
-    {69, "TGZ_P_1"},
+    {BTL_POSE_STAY_DEFAULT, "TGZ_P_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -223,7 +233,11 @@ static BattleWeapon weapon_togezo_attack = {
     2, // reserved_6F
     NULL, // acHelpMsg
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
+#if VERSION <= VERSION_DEMO_US
+    COUNTER_RESIST_ALL, // counterResistFlags
+#else
     COUNTER_RESIST_ELECTRIC | COUNTER_RESIST_TOP_SPIKY | COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_FIERY | COUNTER_RESIST_ICY | COUNTER_RESIST_POISON | COUNTER_RESIST_EXPLOSIVE | COUNTER_RESIST_VOLATILE_EXPLOSIVE | COUNTER_RESIST_HOLD_FAST, // counterResistFlags
+#endif
     TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
@@ -273,7 +287,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -316,7 +330,7 @@ static EVT_BEGIN(wakeup_event)
     CALL(btlevtcmd_OnPartsCounterAttribute, LW(10), LW(11), 1)
     CALL(btlevtcmd_OnPartsCounterAttribute, LW(10), LW(11), 4)
     CALL(btlevtcmd_ChangeDataTable, LW(10), PTR(data_table))
-    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 69)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_SetFallAccel, LW(10), FLOAT(1.0f))
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_JumpPosition, LW(10), LW(0), LW(1), LW(2), 18, -1)
@@ -327,7 +341,7 @@ EVT_END()
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
-        CALL_CHILD(PTR(wakeup_event))
+        CALL_CHILD(wakeup_event)
         RETURN
     END_IF
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
@@ -338,7 +352,7 @@ static EVT_BEGIN(attack_event)
     END_IF
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL_CHILD(PTR(guard_cancel_event))
+        CALL_CHILD(guard_cancel_event)
         GOTO(99)
     ELSE
         SET_VALUE(LW(0), 50)
@@ -346,10 +360,10 @@ static EVT_BEGIN(attack_event)
         SUBTRACT(LW(0), 1)
         CALL(evt_sub_random, LW(0), LW(1))
         IF_INT_LESS(LW(1), 50)
-            CALL_CHILD(PTR(normal_attack_event))
+            CALL_CHILD(normal_attack_event)
             GOTO(99)
         END_IF
-        CALL_CHILD(PTR(guard_event))
+        CALL_CHILD(guard_event)
         GOTO(99)
     END_IF
     LABEL(99)

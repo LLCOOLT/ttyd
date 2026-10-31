@@ -44,12 +44,12 @@ typedef struct StickRotateWork {
 #define PAD(m) (BattlePadCheckNow(m))
 
 static void actionCommandDisp(f32 x, f32 y);
-void actionCommandDisp2(f32 x, f32 y);
-u16 _get_icon_id(s8 dir);
+static void actionCommandDisp2(f32 x, f32 y);
+static u16 _get_icon_id(s8 dir);
 
 // inlining off for _GetInputDir, _CalcRollDir, as in the original (the object differs without it)
 #pragma dont_inline on
-s32 _GetInputDir(void) {
+static s32 _GetInputDir(void) {
     if (AC_PARAMS(_battleWorkPointer)->button != 0 && !PAD(AC_PARAMS(_battleWorkPointer)->button)) {
         return -1;
     }
@@ -74,7 +74,7 @@ s32 _GetInputDir(void) {
     return BattlePadCheckNow(BTL_PAD_STICK_LEFT) != 0U ? 7 : 0;
 }
 
-s32 _CalcRollDir(void) {
+static s32 _CalcRollDir(void) {
     StickRotateWork* w = (StickRotateWork*)_battleWorkPointer->actionCommands.work;
     s8 cur = w->dir;
     s8 prev = w->prevDir;
@@ -376,7 +376,7 @@ void battleAcDisp_StickRotate(CameraId cameraId, void* param) {
 
 // no automatic inlining for _get_icon_id, actionCommandDisp, actionCommandDisp2, as in the original (the object differs without it)
 #pragma auto_inline off
-u16 _get_icon_id(s8 dir) {
+static u16 _get_icon_id(s8 dir) {
     switch (dir) {
         case 1:
             return ICON_07C;
@@ -441,7 +441,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     }
 }
 
-void actionCommandDisp2(f32 x, f32 y) {
+static void actionCommandDisp2(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
     StickRotateParams* p = AC_PARAMS(work);

@@ -40,10 +40,10 @@ typedef struct {
 
 BreakSlotReel* BattleBreakSlotReelGetPtr(s32 no);
 void BattleBreakSlot_Start(void);
-void BattleBreakSlotDispReel(CameraId camId, void* param);
-void item_appear_force(BreakSlotReel* reel, s32 item);
+static void BattleBreakSlotDispReel(CameraId camId, void* param);
+static void item_appear_force(BreakSlotReel* reel, s32 item);
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo keeps these in .data, ahead of the effect scripts
 u16 tex_id_list_small[5] = {0x2B, 0x2D, 0x2F, 0x2E, 0x2C};
 u16 tex_id_list_big[5] = {0x30, 0x32, 0x34, 0x33, 0x31};
@@ -200,7 +200,7 @@ EVT_END()
 u16 tex_id_list_small[5] = {0x41, 0x43, 0x45, 0x44, 0x42};
 u16 tex_id_list_big[5] = {0x46, 0x48, 0x4A, 0x49, 0x47};
 #else
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 u16 tex_id_list_small[5] = {0x2B, 0x2D, 0x2F, 0x2E, 0x2C};
 u16 tex_id_list_big[5] = {0x30, 0x32, 0x34, 0x33, 0x31};
 #endif
@@ -565,7 +565,7 @@ void BattleBreakSlot_Main(void) {
             if (slot->phaseTimer == count + 150) {
                 BattleAudienceAddTargetNum(0.0f, updown);
                 slot->phase = 8;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 slot->flags &= ~2;
 #else
                 slot->flags &= ~4;
@@ -757,7 +757,7 @@ void BattleBreakSlot_Main(void) {
                         BattleBreakSlotReelGetPtr(1)->item == 4 && rr->item == 4) {
                         break;
                     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                     if ((slot->flags & 2) && BattleBreakSlotReelGetPtr(0)->item == 4 &&
                         BattleBreakSlotReelGetPtr(1)->item == 4 && rr->item == 4) {
                         break;
@@ -766,7 +766,7 @@ void BattleBreakSlot_Main(void) {
                     if ((slot->flags & 1) && rr->item != 3) {
                         break;
                     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                     if ((slot->flags & 2) && rr->item != 2) {
                         break;
                     }
@@ -827,7 +827,7 @@ void BattleBreakSlot_Disp(void) {
     dispEntry(CAMERA_2D, 490.0f, 0, BattleBreakSlotDispReel, NULL);
 }
 
-void BattleBreakSlotDispReel(CameraId camId, void* param) {
+static void BattleBreakSlotDispReel(CameraId camId, void* param) {
     Mtx trans;
     Mtx scale;
     Mtx pivot;
@@ -946,7 +946,7 @@ void BattleBreakSlot_PointInc(void) {
             if (slot->flags & 1) {
                 item_appear_force(reel, 3);
             }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             if (slot->flags & 2) {
                 item_appear_force(reel, 2);
             }
@@ -968,7 +968,7 @@ void BattleBreakSlot_PointInc(void) {
             if (slot->flags & 1) {
                 item_appear_force(reel, 3);
             }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             if (slot->flags & 2) {
                 item_appear_force(reel, 2);
             }
@@ -1050,7 +1050,7 @@ void BattleBreakSlot_HideReel(void) {
 
 // inlining off for item_appear_force, as in the original (the object differs without it)
 #pragma dont_inline on
-void item_appear_force(BreakSlotReel* reel, s32 item) {
+static void item_appear_force(BreakSlotReel* reel, s32 item) {
     s32 i;
 
     for (i = 0; i < reel->numCards; i++) {

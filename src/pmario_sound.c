@@ -33,7 +33,7 @@ typedef struct SoundBGMEntry {
 } SoundBGMEntry; // scope 1: scopeTimer starts at 0xFF
 
 //.data
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // demo sound tables: the demo's sound ids, volumes and entries differ throughout, and its ENV list ends at id 0x75
 SoundBGMEntry psbgmlist[] = {
     { "", 0, "", 0x00, 0x00, 0x00, 0x00 },
@@ -9866,7 +9866,7 @@ const char psdb_bgm_txt[0x28] = "%s/sound/proj/pmario_sound_bgm_txt.db";
 const char psdb_env_txt[0x28] = "%s/sound/proj/pmario_sound_env_txt.db";
 const char psdb_sfx_txt[0x28] = "%s/sound/proj/pmario_sound_sfx_txt.db";
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // demo: silent_tbl is too big for the demo's .sdata and sits in .data before angleABTBL
 s32 silent_tbl[] = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
 #endif
@@ -9896,7 +9896,7 @@ PaperSoundWork psnd;
 u8 _buf[0x80];
 
 //.sdata
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 s32 silent_tbl[] = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
 #endif
 
@@ -9905,10 +9905,10 @@ BOOL init_f = 0;
 BOOL _psndPushGroup_trg = 0;
 
 // local definitions
-void psndBGMMain(void);
-void psndENVMain(void);
-void psndSFXMain(void);
-s32 __psndSFXOn(const char* name, u8 vol, u8 pan, u16 pitch, Vec* pos, u32 posOnly, u16 dist, s32 ignoreSfxOff);
+static void psndBGMMain(void);
+static void psndENVMain(void);
+static void psndSFXMain(void);
+static s32 __psndSFXOn(const char* name, u8 vol, u8 pan, u16 pitch, Vec* pos, u32 posOnly, u16 dist, s32 ignoreSfxOff);
 
 // Direction from (x1, y1) to (x2, y2) in degrees (0-360), using angleABTBL to correct a linear estimate. The game
 // has two copies: this file-local one and the global one in system.c. The original names both angleABf (this
@@ -9980,7 +9980,7 @@ static f32 psndAngleABf(f32 x1, f32 y1, f32 x2, f32 y2) {
 }
 
 // calc3D, returns the first bit of SND_3DINFO (vol, pan, span, unused)
-u32 calc3D(s32 id, Vec* pos, u8 vol, u16 dist) {
+static u32 calc3D(s32 id, Vec* pos, u8 vol, u16 dist) {
     static u8 PAN[4];
     Vec v = *pos;
     f32 d;
@@ -10084,7 +10084,7 @@ u32 calc3D(s32 id, Vec* pos, u8 vol, u16 dist) {
 }
 
 // number of pssfxlist entries
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #define PSSFX_COUNT 4230
 #else
 #define PSSFX_COUNT 4242
@@ -10137,7 +10137,7 @@ void psndInit(void) {
     psnd.sfxSerial = 0;
     psnd.sfxDelay = 0;
     psnd.flags = 0;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     psnd.sfxCooldown = 0;
 #endif
     psnd.envVolume = 0x64;
@@ -10150,7 +10150,7 @@ void psndInit(void) {
 
 void psndMain(void) {
     if (init_f) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         if (psnd.sfxCooldown) {
             psnd.sfxCooldown--;
         }
@@ -10206,7 +10206,7 @@ void psndStopAllFadeOut(void) {
     int i;
 
     psndBGMOff_f_d(PSND_FADE_OUT, 1000, FALSE);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     psndBGMOff_f_d(PSND_CH(1), 1000, FALSE);
 #else
     psndBGMOff_f_d(PSND_FADE_OUT | PSND_CH(1), 1000, FALSE);
@@ -10265,7 +10265,7 @@ s32 psndGetFlag(void) {
     return psnd.flags;
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // demo: the reverb reset is in psndBGMOn_f_d, and the SFX fade-out of psndSFXAllOff is written out here
 void psndMapChange(void) {
     PaperSoundWork* wp = &psnd;
@@ -10310,7 +10310,7 @@ void psndSFXAllOff(void) {
     }
     if (wp->sfxFadeState != 2) {
         wp->sfxFadeState = 2;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         // the demo fades the SFX out over 60 frames here
         wp->sfxFadeMax = 60;
         wp->sfxFadeTime = 60;
@@ -10349,7 +10349,7 @@ void psndBGM_rate(s32 id, u16 rate) {
     }
 }
 
-void psndBGMMain(void) {
+static void psndBGMMain(void) {
     PaperSoundBGM* bgm;
     PaperSoundFade* fade;
     s32 i;
@@ -10491,7 +10491,7 @@ void psndBGMMain(void) {
 
 // the demo's psndBGMOn_f_d has no fade-out time parameter (it always fades the old BGM out over 750 ms)
 BOOL psndBGMOn(u32 flags, char* bgm_name) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     return psndBGMOn_f_d(flags, bgm_name, 1000, 0);
 #else
     return psndBGMOn_f_d(flags, bgm_name, 1000, 750, 0);
@@ -10499,7 +10499,7 @@ BOOL psndBGMOn(u32 flags, char* bgm_name) {
 }
 
 BOOL psndBGMOn_f(u32 flags, char* bgm_name, u32 fadetime, s32 unused) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     return psndBGMOn_f_d(flags, bgm_name, fadetime, unused);
 #else
     return psndBGMOn_f_d(flags, bgm_name, fadetime, 750, unused);
@@ -10536,7 +10536,7 @@ static inline s32 psndSongFindCh(void) {
 }
 // The BGM table index of name (or the id it encodes); 0 when it is not in the table. The demo returns it, the
 // other versions store it through pi.
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static inline s32 psndBGMSearch(char* name) {
     SoundBGMEntry* entry;
     s32 i;
@@ -10572,7 +10572,7 @@ static inline void psndBGMSearchP(char* name, s32* pi) {
     }
 }
 #endif
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 BOOL psndBGMOn_f_d(u32 flags, char* bgm_name, u32 fadetime, s32 unused) {
     PaperSoundBGM* bgm;
     PaperSoundFade* fade2;
@@ -11021,7 +11021,7 @@ BOOL psndBGMOff_f_d(s32 flags, u32 fadetime, u32 someswitch) {
     if (bgm->listId == 0xFFFFFFFF) {
         return FALSE;
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // the demo always applies these checks (someswitch is unused) and does not restart BGM 0x92
     if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) >= STORY_STG2_23_TIME_BOMB_ACTIVATED && evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG2_24_BOSS_BATTLE && bgm->listId == 0xA4) {
         return FALSE;
@@ -11125,13 +11125,13 @@ s32 psndBGMPlayTime(s32 id) {
     PaperSoundBGM* bgm = &psbgm[id & 0xF];
 
     if (bgm->listId == 0xFFFFFFFF) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         return 0;
 #else
         return 600000;
 #endif
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // the demo returns microseconds
     return OSTicksToMicroseconds(gp->renderTime - bgm->startTime);
 #else
@@ -11149,7 +11149,7 @@ static inline s32 sfxvol(PaperSoundEffect* s) {
 }
 #define SFX_VOL(s) sfxvol(s)
 
-void psndSFXMain(void) {
+static void psndSFXMain(void) {
     SoundEffectEntry* e;
     u32 j;
     unsigned int none;
@@ -11405,7 +11405,7 @@ void psndSFXMain(void) {
     psnd.sfxDelay = 0;
 }
 
-s32 __psndSFXOn(const char* name, u8 vol, u8 pan, u16 pitch, Vec* pos, u32 posOnly, u16 dist, s32 ignoreSfxOff) {
+static s32 __psndSFXOn(const char* name, u8 vol, u8 pan, u16 pitch, Vec* pos, u32 posOnly, u16 dist, s32 ignoreSfxOff) {
     s32 sid;
     s32 k;
     PaperSoundEffect* s;
@@ -11424,7 +11424,7 @@ s32 __psndSFXOn(const char* name, u8 vol, u8 pan, u16 pitch, Vec* pos, u32 posOn
     if ((psnd.flags & PSND_FLAG_SFX_OFF) && (ignoreSfxOff == 0)) {
         return -1;
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if ((((sid == 0x5B) || (sid == 0x8CA)) || (((u32)(sid - 0x1BE)) <= 1)) || (sid == 0x205)) {
         if (psnd.sfxCooldown) {
             return -1;
@@ -11489,7 +11489,7 @@ s32 __psndSFXOn(const char* name, u8 vol, u8 pan, u16 pitch, Vec* pos, u32 posOn
         sfx->flags |= PSND_SFX_ENV;
     }
     if ((sid == 0x518) || (sid == 0x742)) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         sfx->flags |= PSND_SFX_WITH_BGM | PSND_SFX_KEEP;
 #else
         sfx->flags |= PSND_SFX_KEEP | PSND_SFX_SPECIAL;
@@ -11504,7 +11504,7 @@ s32 __psndSFXOn(const char* name, u8 vol, u8 pan, u16 pitch, Vec* pos, u32 posOn
     if (id & PSND_ID_EXEMPT) {
         sfx->flags |= PSND_SFX_EXEMPT;
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (id & PSND_ID_KEEP) {
         sfx->flags |= PSND_SFX_KEEP;
     }
@@ -11677,7 +11677,7 @@ u8 psndSFX_get_vol(s32 id) {
     return sfx->volume;
 }
 
-void psndENV_stop(u32 id) {
+static void psndENV_stop(u32 id) {
     s32 i;
     PaperSoundEnv* e;
 
@@ -11799,7 +11799,7 @@ static inline void psndENVApply(PaperSoundEnv* e) {
     }
 }
 
-void psndENVMain(void) {
+static void psndENVMain(void) {
     s32 i;
     PaperSoundEnv* e;
     s32 lim = 100;
@@ -11870,7 +11870,7 @@ void psndENVMain(void) {
                             if (s->channel != 0xFFFFFFFF || (s->flags & PSND_SFX_PENDING))
                                 break;
                         }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                         // the demo does not restart a one-shot ambient sound: it stays in its last state
                         e->sfx = -1;
                         e->state++;
@@ -11916,7 +11916,7 @@ void psndENVMain(void) {
                         e->state++;
                         break;
                     case 1:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                         // the demo only checks that the sound still exists, and does not restart it
                         if (e->sfx == 0xFFFFFFFF || psndSFXChk(e->sfx) != 0) {
                             e->sfx = -1;
@@ -12011,7 +12011,7 @@ typedef struct PairU32_ {
     u32 a, b;
 } PairU32_;
 // number of psenvlistname entries; it also ends psenvlist
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #define PSENV_COUNT 0x75
 #else
 #define PSENV_COUNT 0x76
@@ -12052,7 +12052,7 @@ BOOL psndENVOn_f_d(u32 flags, const char* name, u32 fadetime, s32 unused) {
     list = psenvlist;
     id = psndENVSearch(psenvlistname, name);
     idx = flags & 0xF;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     fade = &psnd.fade[idx];
 #endif
     if (psnd.flags & PSND_FLAG_ENV_OFF)
@@ -12064,7 +12064,7 @@ BOOL psndENVOn_f_d(u32 flags, const char* name, u32 fadetime, s32 unused) {
     if ((cur = *env) != 0) {
         if (!(flags & PSND_FADE_RESTART)) {
             if (flags & PSND_FADE_RESUME) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 fade = &psnd.fade[idx];
 #endif
                 if (flags & PSND_FADE_IN) {
@@ -12085,7 +12085,7 @@ BOOL psndENVOn_f_d(u32 flags, const char* name, u32 fadetime, s32 unused) {
                 }
                 goto end;
             }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             if (cur == id)
                 goto end;
 #else
@@ -12133,7 +12133,7 @@ BOOL psndENVOn_f_d(u32 flags, const char* name, u32 fadetime, s32 unused) {
         }
     }
     *env = id;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     fade = &psnd.fade[idx];
 #endif
     fade->state = 0;
@@ -12193,7 +12193,7 @@ BOOL psndENVOff_f_d(u32 flags, u32 fadetime, s32 unused) {
         }
 
     } else if (flags & PSND_FADE_HOLD) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         fade->state = 4;
         fade->time = fadetime / PSND_FRAME_MS;
         fade->timeMax = fade->time;

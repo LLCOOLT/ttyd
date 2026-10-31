@@ -9,7 +9,6 @@
 #include "evt/evt_msg.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "dou.h"
 #include "evt/evt_story.h"
 
@@ -53,9 +52,14 @@ static BeroEntry bero_entry_data[] = {
 
 static EVT_BEGIN(korutesu_event)
     CALL(evt_mario_key_onoff, 0)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_mario_normalize)
+    CALL(evt_seq_wait, 2)
+#else
     CALL(evt_seq_wait, 2)
     CALL(evt_bero_exec_wait, 65536)
     CALL(evt_mario_normalize)
+#endif
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_SURPRISED2_3"), LW(0), LW(1), LW(2), 0)
     CALL(evt_eff_fukidashi, 0, STRING(""), 0, 0, 0, 0, 0, 0, 0, 0, 60)
@@ -74,12 +78,12 @@ EVT_BEGIN(dou_01_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     WAIT_FRAMES(1)
     CALL(evt_mobj_jumpstand_blue, 0, STRING("mobj_jump00"), 400, 92, 375, -21, 0, 0)
     CALL(evt_mobj_jumpstand_blue, 0, STRING("mobj_jump01"), 350, -45, 50, -15, 0, 0)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_19_01_ENTERING_THE_GROTTO)
-        SPAWN_EVENT(PTR(korutesu_event))
+        SPAWN_EVENT(korutesu_event)
     END_IF
     RETURN
 EVT_END()

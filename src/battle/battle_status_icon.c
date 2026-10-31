@@ -23,11 +23,11 @@ struct IconDispTableEntry {
     s32 flags;                                                                                      // 0xC, StatusIconEntryFlags copied to the entry
 };
 
-BOOL _bsi_default_turn(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry);
-BOOL _bsi_guruguru(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry);
-BOOL _bsi_biribiri(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry);
-BOOL _bsi_allergy(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry);
-BOOL _bsi_regeneration(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry);
+static BOOL _bsi_default_turn(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry);
+static BOOL _bsi_guruguru(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry);
+static BOOL _bsi_biribiri(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry);
+static BOOL _bsi_allergy(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry);
+static BOOL _bsi_regeneration(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry);
 
 #if VERSION >= VERSION_US
 IconDispTableEntry _disp_table[0x17] = {
@@ -289,7 +289,7 @@ void BattleStatusIconDisp(CameraId camId, void* param) {
 
 #include "system.h"
 
-BOOL _bsi_default_turn(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
+static BOOL _bsi_default_turn(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
     s32 type = disp->statusType;
     s8 turns, strength;
     s32 kind;
@@ -315,7 +315,7 @@ BOOL _bsi_default_turn(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkSta
     return TRUE;
 }
 
-BOOL _bsi_guruguru(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
+static BOOL _bsi_guruguru(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
     int type = disp->statusType;
     s8 turns, strength;
     Vec v;
@@ -339,7 +339,7 @@ BOOL _bsi_guruguru(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusI
     return TRUE;
 }
 
-BOOL _bsi_allergy(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
+static BOOL _bsi_allergy(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
     int type = disp->statusType;
     s8 turns, strength;
     if (!BtlUnit_CheckStatus(unit, (s8)type)) {
@@ -362,7 +362,7 @@ BOOL _bsi_allergy(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIc
     return TRUE;
 }
 
-BOOL _bsi_biribiri(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
+static BOOL _bsi_biribiri(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
     s32 type = disp->statusType;
     s8 turns, strength;
     if (!BtlUnit_CheckStatus(unit, (s8)disp->statusType)) {
@@ -404,7 +404,7 @@ BOOL _bsi_biribiri(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusI
     return TRUE;
 }
 
-BOOL _bsi_regeneration(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
+static BOOL _bsi_regeneration(BattleUnit* unit, IconDispTableEntry* disp, BattleWorkStatusIconEntry* entry) {
     s32 type = disp->statusType;
     s16* ctr;
     GXColor c0, c1, col;

@@ -57,7 +57,7 @@ EVT_BEGIN(sac_mario_item_on_evt)
 EVT_END()
 
 // The demo places this script after sac_start_stardust in its data (see the second copy below).
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 EVT_BEGIN(sac_mario_item_on_end_evt)
     CALL(evt_eff_delete, STRING("sac_itemget"))
     CALL(evt_eff_delete, STRING("sac_treasure"))
@@ -76,7 +76,7 @@ EVT_BEGIN(sac_start_stardust)
 EVT_END()
 
 // Same script, at its place in the demo's data.
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(sac_mario_item_on_end_evt)
     CALL(evt_eff_delete, STRING("sac_itemget"))
     CALL(evt_eff_delete, STRING("sac_treasure"))

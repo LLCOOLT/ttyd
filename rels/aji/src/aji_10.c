@@ -24,7 +24,6 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "evt/evt_shuryolight.h"
 #include "aji.h"
 #include "evt/evt_story.h"
@@ -35,14 +34,14 @@ typedef struct MonitorWork {
     s32 kanbu;
 } MonitorWork;
 static MonitorWork* monitor_wp;
-void monitor_cap_capture(CameraId cameraId, void* param);
+static void monitor_cap_capture(CameraId cameraId, void* param);
 
 static USER_FUNC(peach_evt_toumei);
 static USER_FUNC(peach_set_pose);
 static USER_FUNC(viewport);
 
-void monitor_cap_tev(MapTevCallbackInfo* info);
-void monitor_cap_capture(CameraId cameraId, void* param);
+static void monitor_cap_tev(MapTevCallbackInfo* info);
+static void monitor_cap_capture(CameraId cameraId, void* param);
 
 static BeroEntry bero_entry_data[3];
 static BeroEntry bero_peach_data[2];
@@ -56,7 +55,11 @@ extern EvtWord kanbu_init[];
 static NpcSetupInfo npcEnt[9];
 
 static EVT_BEGIN(w_door_close)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("door_w_A"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("door_w_B"), 0, 0, LW(0))
@@ -64,7 +67,11 @@ static EVT_BEGIN(w_door_close)
 EVT_END()
 
 static EVT_BEGIN(w_door_open)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("door_w_A"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("door_w_B"), 0, 0, LW(0))
@@ -72,7 +79,11 @@ static EVT_BEGIN(w_door_open)
 EVT_END()
 
 static EVT_BEGIN(e_door_close)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("door_e_A"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("door_e_B"), 0, 0, LW(0))
@@ -80,7 +91,11 @@ static EVT_BEGIN(e_door_close)
 EVT_END()
 
 static EVT_BEGIN(e_door_open)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("door_e_A"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("door_e_B"), 0, 0, LW(0))
@@ -176,7 +191,7 @@ static USER_FUNC(monitor_kanbu_flag_onoff) {
     return EVT_RETURN_DONE;
 }
 
-void monitor_cap_capture(CameraId cameraId, void* param) {
+static void monitor_cap_capture(CameraId cameraId, void* param) {
     CameraEntry saved = *camGetCurPtr();
     Mtx44 projMtx;
     Mtx lookAt;
@@ -252,7 +267,7 @@ static USER_FUNC(monitor_cap_evt) {
     return EVT_RETURN_BLOCK;
 }
 
-void monitor_cap_tev(MapTevCallbackInfo* info) {
+static void monitor_cap_tev(MapTevCallbackInfo* info) {
     Mtx proj;
     Mtx view;
     GXTexObj tex;
@@ -417,22 +432,22 @@ static EVT_BEGIN(peach_evt_stg1)
     CALL(viewport, 0, 0, 608, 480)
     WAIT_MS(500)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
     LABEL(2)
     CALL(evt_sub_intpl_msec_get_value)
-    CALL_CHILD(PTR(w_door_open))
+    CALL_CHILD(w_door_open)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(2)
     END_IF
     BEGIN_INLINE_EVENT
         WAIT_MS(1400)
         SET_VALUE(LW(1), 0)
-        SPAWN_EVENT(PTR(bero_close_door_play_se))
+        SPAWN_EVENT(bero_close_door_play_se)
         CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
         LABEL(3)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL_CHILD(PTR(w_door_close))
+        CALL_CHILD(w_door_close)
         IF_INT_EQUAL(LW(1), 1)
             GOTO(3)
         END_IF
@@ -529,7 +544,7 @@ static EVT_BEGIN(peach_evt_stg1)
     CALL(evt_msg_print, 0, STRING("peach_aji_04"), 0, STRING("mario"))
     CALL(evt_cam3d_evt_set, 125, 226, 576, 125, 110, -13, 0, 11)
     WAIT_FRAMES(1)
-    CALL_CHILD(PTR(monitor_on))
+    CALL_CHILD(monitor_on)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_set_dir, 90, 500, 0)
         WAIT_MS(500)
@@ -612,7 +627,7 @@ static EVT_BEGIN(peach_evt_stg1)
     END_INLINE_EVENT
     CALL(evt_npc_move_position, STRING("手下２"), -120, 0, 0, 60, 0)
     CALL(evt_npc_flag_onoff, 1, STRING("手下３"), NPC_FLAG_HIDDEN)
-    CALL_CHILD(PTR(monitor_off))
+    CALL_CHILD(monitor_off)
     WAIT_MS(700)
     CALL(evt_msg_print, 0, STRING("peach_aji_17"), 0, STRING("シュリョー"))
     CALL(evt_cam3d_evt_set, 0, 119, 183, 0, 80, -13, 0, 11)
@@ -734,22 +749,22 @@ static EVT_BEGIN(peach_evt_stg2)
     WAIT_FRAMES(1)
     CALL(evt_npc_set_position, STRING("手下２"), -420, 0, 0)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
     LABEL(0)
     CALL(evt_sub_intpl_msec_get_value)
-    CALL_CHILD(PTR(w_door_open))
+    CALL_CHILD(w_door_open)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(0)
     END_IF
     BEGIN_INLINE_EVENT
         WAIT_MS(1400)
         SET_VALUE(LW(1), 0)
-        SPAWN_EVENT(PTR(bero_close_door_play_se))
+        SPAWN_EVENT(bero_close_door_play_se)
         CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
         LABEL(1)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL_CHILD(PTR(w_door_close))
+        CALL_CHILD(w_door_close)
         IF_INT_EQUAL(LW(1), 1)
             GOTO(1)
         END_IF
@@ -907,7 +922,7 @@ EVT_BEGIN(peach_evt_stg3_syuryo_talk)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_npc_flag_onoff, 1, STRING("シュリョー"), NPC_FLAG_INTANGIBLE)
-    CALL_CHILD(PTR(peach_move))
+    CALL_CHILD(peach_move)
     CALL(evt_mario_set_dir, 90, 200, 0)
     WAIT_MS(300)
     CALL(evt_set_dir_to_target, STRING("シュリョー"), STRING("mario"))
@@ -1023,7 +1038,7 @@ static EVT_BEGIN(peach_evt_stg5)
     CALL(evt_msg_print, 0, STRING("peach_aji_199"), 0, STRING("カンブー"))
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("peach_aji_200"), 0, STRING("シュリョー"))
-    CALL_CHILD(PTR(monitor_off))
+    CALL_CHILD(monitor_off)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("peach_aji_201"), 0, STRING("シュリョー"))
     CALL(evt_cam3d_evt_set, 165, 170, 530, 165, 85, -13, 800, 11)
@@ -1142,31 +1157,31 @@ EVT_BEGIN(eff_test)
 EVT_END()
 
 static EVT_BEGIN(teshita1_init)
-    CALL_CHILD(PTR(npc_init_evt))
+    CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(teshita2_init)
-    CALL_CHILD(PTR(npc_init_evt))
+    CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(teshita3_init)
-    CALL_CHILD(PTR(npc_init_evt))
+    CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
 EVT_BEGIN(kanbu_init)
-    CALL_CHILD(PTR(npc_init_evt))
+    CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(syuryo_init)
-    CALL_CHILD(PTR(npc_init_evt))
+    CALL_CHILD(npc_init_evt)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_02_PEACH_INCOGNITO)
         CALL(evt_npc_set_position, STRING("me"), -100, 0, 0)
         CALL(evt_npc_change_interrupt, STRING("me"), 6, PTR(peach_evt_stg3_syuryo_talk))
@@ -1177,7 +1192,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"手下１"*/"\x8E\xE8\x89\xBA\x82\x50", // name
+        "手下１", // name
         0, 0, // flags..reactionFlags
         teshita1_init, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -1186,7 +1201,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"手下２"*/"\x8E\xE8\x89\xBA\x82\x51", // name
+        "手下２", // name
         NPC_FLAG_INTANGIBLE, // flags
         0, // reactionFlags
         teshita2_init, // initEvent
@@ -1196,7 +1211,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"手下３"*/"\x8E\xE8\x89\xBA\x82\x52", // name
+        "手下３", // name
         NPC_FLAG_INTANGIBLE, // flags
         0, // reactionFlags
         teshita3_init, // initEvent
@@ -1206,7 +1221,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"カンブー"*/"\x83\x4A\x83\x93\x83\x75\x81\x5B", // name
+        "カンブー", // name
         NPC_FLAG_INTANGIBLE, // flags
         0, // reactionFlags
         kanbu_init, // initEvent
@@ -1216,7 +1231,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"シュリョー"*/"\x83\x56\x83\x85\x83\x8A\x83\x87\x81\x5B", // name
+        "シュリョー", // name
         NPC_FLAG_INTANGIBLE, // flags
         0, // reactionFlags
         syuryo_init, // initEvent
@@ -1226,7 +1241,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"マジョリン"*/"\x83\x7D\x83\x57\x83\x87\x83\x8A\x83\x93", // name
+        "マジョリン", // name
         0, 0, // flags..reactionFlags
         npc_init_evt, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -1235,7 +1250,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"マリリン"*/"\x83\x7D\x83\x8A\x83\x8A\x83\x93", // name
+        "マリリン", // name
         0, 0, // flags..reactionFlags
         npc_init_evt, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -1244,7 +1259,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ビビアン"*/"\x83\x72\x83\x72\x83\x41\x83\x93", // name
+        "ビビアン", // name
         0, 0, // flags..reactionFlags
         npc_init_evt, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -1263,7 +1278,9 @@ EVT_BEGIN(aji_10_init_evt)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI5"))
     END_IF
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 1)
+#endif
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("monitor"), MAPOBJ_FLAG_HIDE)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_00_START)
         DEBUG_PUT_MSG(STRING("npc setup"))
@@ -1275,18 +1292,18 @@ EVT_BEGIN(aji_10_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG1_17_FATHER_AND_SON_REUNITED)
         CALL(evt_mario_set_mode, 1)
-        CALL_CHILD(PTR(monitor_init))
-        SPAWN_EVENT(PTR(peach_evt_stg1))
+        CALL_CHILD(monitor_init)
+        SPAWN_EVENT(peach_evt_stg1)
         CASE_EQUAL(STORY_STG2_25_AFTER_THE_BOSS_BATTLE)
         CALL(evt_mario_set_mode, 1)
         CALL(evt_npc_entry, STRING("研究員"), STRING("c_zako_m"))
         CALL(evt_npc_set_tribe, STRING("研究員"), STRING("第三勢力研究員"))
         CALL(evt_npc_set_stay_anim, STRING("研究員"))
         CALL(evt_npc_flag_onoff, 1, STRING("研究員"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
-        SPAWN_EVENT(PTR(peach_evt_stg2))
+        SPAWN_EVENT(peach_evt_stg2)
         CASE_EQUAL(STORY_STG3_32_BOSS_BATTLE)
         CALL(evt_mario_set_mode, 1)
-        SPAWN_EVENT(PTR(peach_evt_stg3))
+        SPAWN_EVENT(peach_evt_stg3)
         CASE_EQUAL(STORY_STG3_33_02_PEACH_INCOGNITO)
         CALL(evt_mario_set_mode, 1)
         CASE_EQUAL(STORY_STG4_15_04_SHADOW_SIRENS_AND_DOOPLISS)
@@ -1295,11 +1312,11 @@ EVT_BEGIN(aji_10_init_evt)
         CALL(evt_npc_set_tribe, STRING("研究員"), STRING("第三勢力研究員"))
         CALL(evt_npc_set_stay_anim, STRING("研究員"))
         CALL(evt_npc_flag_onoff, 1, STRING("研究員"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
-        SPAWN_EVENT(PTR(peach_evt_stg4))
+        SPAWN_EVENT(peach_evt_stg4)
         CASE_EQUAL(STORY_STG5_43_X_NAUTS_RETREAT)
         CALL(evt_mario_set_mode, 1)
-        CALL_CHILD(PTR(monitor_init))
-        SPAWN_EVENT(PTR(peach_evt_stg5))
+        CALL_CHILD(monitor_init)
+        SPAWN_EVENT(peach_evt_stg5)
         CASE_BETWEEN(STORY_STG5_45_PEACH_POTION_PUZZLE, STORY_STG5_46_PEACH_DISK_SEARCH)
         CALL(evt_mario_set_mode, 1)
         CALL(peach_evt_toumei)
@@ -1311,18 +1328,18 @@ EVT_BEGIN(aji_10_init_evt)
         BEGIN_INLINE_EVENT
             CALL(evt_bero_exec_wait, 65536)
             SET_VALUE(LW(0), STRING("e_bero"))
-            CALL_CHILD(PTR(bero_case_switch_off))
+            CALL_CHILD(bero_case_switch_off)
             CALL(evt_bero_overwrite, STRING("e_bero"), PTR(bero_peach_data))
             SET_VALUE(LW(0), STRING("e_bero"))
-            CALL_CHILD(PTR(bero_case_switch_on))
+            CALL_CHILD(bero_case_switch_on)
         END_INLINE_EVENT
         CASE_EQUAL(STORY_STG6_54_WELCOME_BACK)
         CALL(evt_mario_set_mode, 1)
-        SPAWN_EVENT(PTR(peach_evt_stg6))
+        SPAWN_EVENT(peach_evt_stg6)
     END_SWITCH
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_map_playanim, STRING("comp"), 1, 0)
     CALL(evt_map_playanim, STRING("kabe"), 1, 0)
     CALL(evt_map_playanim, STRING("sikaku"), 1, 0)
@@ -1335,9 +1352,9 @@ EVT_BEGIN(aji_10_init_evt)
     SET_VALUE(GSWF(GSWF_AJI10_VISITED), 1)
     IF_INT_EQUAL(GSWF(GSWF_AJI10_VISITED), 0)
         SET_VALUE(LW(0), STRING("e_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     END_IF
-    SPAWN_EVENT(PTR(evt_emergency))
+    SPAWN_EVENT(evt_emergency)
     CALL(evt_mario_get_mode, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_mario_kill_party, 0)
@@ -1346,12 +1363,12 @@ EVT_BEGIN(aji_10_init_evt)
         END_IF
         IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_33_02_PEACH_INCOGNITO)
             SET_VALUE(LW(0), STRING("e_bero"))
-            CALL_CHILD(PTR(bero_case_switch_off))
+            CALL_CHILD(bero_case_switch_off)
         END_IF
         IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_45_PEACH_POTION_PUZZLE)
             IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_46_PEACH_DISK_SEARCH)
                 SET_VALUE(LW(0), STRING("e_bero"))
-                CALL_CHILD(PTR(bero_case_switch_on))
+                CALL_CHILD(bero_case_switch_on)
             END_IF
         END_IF
     END_IF

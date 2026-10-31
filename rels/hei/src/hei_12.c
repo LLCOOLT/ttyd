@@ -10,7 +10,6 @@
 #include "evt/evt_mario.h"
 #include "evt/evt_npc.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "hei.h"
 #include "npc_event.h"
 #include "version.h"
@@ -77,7 +76,7 @@ static EVT_BEGIN(evt_chorobon)
     IF_INT_EQUAL(LW(0), 1)
         CALL(npc_set_me)
         CALL(npc_dead)
-        CALL_CHILD(PTR(enemy_common_dead_event))
+        CALL_CHILD(enemy_common_dead_event)
     ELSE
         BEGIN_INLINE_EVENT
             CALL(evt_npc_flag_onoff, 1, STRING("チョロボン"), NPC_FLAG_ENEMY)
@@ -94,7 +93,7 @@ EVT_END()
 EVT_BEGIN(hei_12_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_TORIDE1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_HEI3"))
     CALL(evt_snd_set_rev_mode, 1)
@@ -106,7 +105,7 @@ EVT_BEGIN(hei_12_init_evt)
         CALL(evt_npc_change_fbat_mode, 7)
     ELSE
         CALL(evt_npc_change_fbat_mode, 1)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         CALL(evt_npc_check, STRING("チョロボン"), LW(0))
         IF_INT_EQUAL(LW(0), 1)
             CALL(evt_npc_set_battle_info, STRING("チョロボン"), 23)
@@ -114,7 +113,7 @@ EVT_BEGIN(hei_12_init_evt)
 #endif
     END_IF
     IF_INT_EQUAL(GSWF(GSWF_HEI_SUN_STONE_TAKEN), 0)
-        CALL(evt_item_entry, STRING("sun_st"), ITEM_SUN_STONE, 0, 0, 0, 0, -1, PTR(evt_chorobon))
+        CALL(evt_item_entry, STRING("sun_st"), ITEM_SUN_STONE, 0, 0, 0, ITEM_ENTRY_STAY, -1, PTR(evt_chorobon))
     END_IF
     CALL(evt_map_playanim, STRING("mizu"), 1, 0)
     CALL(evt_map_set_tevcallback, 1, PTR(hei_test_water_tev))

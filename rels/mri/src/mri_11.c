@@ -17,7 +17,6 @@
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_urouro.h"
-#include "party/party_motion.h"
 #include "mri_puni.h"
 #include "data_tables.h"
 #include "evt/evt_story.h"
@@ -177,7 +176,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"トゲ族７"*/"\x83\x67\x83\x51\x91\xB0\x82\x56", // name
+        "トゲ族７", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         toge_7_init, // initEvent
@@ -189,7 +188,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"トゲ族８"*/"\x83\x67\x83\x51\x91\xB0\x82\x57", // name
+        "トゲ族８", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         toge_8_init, // initEvent
@@ -201,7 +200,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"トゲ族９"*/"\x83\x67\x83\x51\x91\xB0\x82\x58", // name
+        "トゲ族９", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         toge_9_init, // initEvent
@@ -213,7 +212,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"トゲ族１０"*/"\x83\x67\x83\x51\x91\xB0\x82\x50\x82\x4F", // name
+        "トゲ族１０", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         toge_10_init, // initEvent
@@ -225,7 +224,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"トゲ族１１"*/"\x83\x67\x83\x51\x91\xB0\x82\x50\x82\x50", // name
+        "トゲ族１１", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         toge_11_init, // initEvent
@@ -363,7 +362,7 @@ static EVT_BEGIN(puni_win)
         WAIT_MS(1000)
         CALL(evt_mri_puni_win_end, -450, 0, 0, -350, 0, 0)
     END_INLINE_EVENT
-    CALL_CHILD(PTR(puni_win_offscreen))
+    CALL_CHILD(puni_win_offscreen)
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
         CALL(evt_snd_bgmon_f, PSND_FADE_IN | PSND_FADE_OUT, STRING("BGM_STG2_MRI2"), 3000)
@@ -410,11 +409,11 @@ static EVT_BEGIN(puni_winlose_check)
         WAIT_FRAMES(1)
     END_LOOP
     IF_INT_EQUAL(LW(10), 1)
-        SPAWN_EVENT(PTR(puni_lose))
+        SPAWN_EVENT(puni_lose)
         RETURN
     END_IF
     IF_INT_EQUAL(LW(11), 1)
-        SPAWN_EVENT(PTR(puni_win))
+        SPAWN_EVENT(puni_win)
         CALL(evt_hitobj_onoff, STRING("A_gra_l"), 1, 1)
         RETURN
     END_IF
@@ -442,13 +441,13 @@ static EVT_BEGIN(toge_enter)
         WAIT_MS(500)
         SET_VALUE(LW(12), 14)
         MULTIPLY(LW(12), LW(11))
-        SPAWN_EVENT(PTR(toge_enter_sub))
+        SPAWN_EVENT(toge_enter_sub)
         ADD(LW(10), 5)
         WAIT_MS(500)
         SET_VALUE(LW(12), -14)
         MULTIPLY(LW(12), LW(11))
         SUBTRACT(LW(12), -14)
-        SPAWN_EVENT(PTR(toge_enter_sub))
+        SPAWN_EVENT(toge_enter_sub)
         ADD(LW(10), 5)
         ADD(LW(11), -1)
         IF_INT_EQUAL(LW(11), 0)
@@ -472,7 +471,7 @@ static EVT_BEGIN(puni_vs_toge_battlewait)
         CALL(evt_msg_toge, 1, 0, 0, 0)
         CALL(evt_msg_print, 0, STRING("stg2_mri_e17_01_03"), 0, 0)
     END_INLINE_EVENT
-    SPAWN_EVENT(PTR(puni_winlose_check))
+    SPAWN_EVENT(puni_winlose_check)
     RETURN
 EVT_END()
 
@@ -495,14 +494,14 @@ static EVT_BEGIN(puni_vs_toge_init)
     CALL(evt_cam3d_evt_set, 275, 140, 516, -275, 50, 0, 1000, 11)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
     WAIT_MS(1000)
-    CALL_CHILD(PTR(mri_guide_goryu))
-    CALL_CHILD(PTR(toge_enter))
+    CALL_CHILD(mri_guide_goryu)
+    CALL_CHILD(toge_enter)
     CALL(evt_puni_set_mode, 1, PUNI_MODE_JOIN)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG2_PUNITOGE1"))
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_puni_all_movestop, 0)
     CALL(evt_mario_key_onoff, 1)
-    SPAWN_EVENT(PTR(puni_vs_toge_battlewait))
+    SPAWN_EVENT(puni_vs_toge_battlewait)
     RETURN
 EVT_END()
 
@@ -525,8 +524,8 @@ static EVT_BEGIN(puni_vs_toge)
     CALL(evt_cam3d_evt_set, 275, 140, 516, -275, 50, 0, 1000, 11)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
     WAIT_MS(1000)
-    CALL_CHILD(PTR(mri_guide_goryu))
-    CALL_CHILD(PTR(toge_enter))
+    CALL_CHILD(mri_guide_goryu)
+    CALL_CHILD(toge_enter)
     CALL(evt_puni_flag_onoff, 1, 0, 262144)
     CALL(evt_npc_flag_onoff, 1, STRING("ガイドsp"), NPC_FLAG_TALK_ANIM)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG2_PUNITOGE1"))
@@ -542,7 +541,7 @@ static EVT_BEGIN(puni_vs_toge)
     SET_VALUE(GSWF(GSWF_MRI11_JABBI_FIGHT2_STARTED), 1)
     CALL(evt_puni_all_movestop, 0)
     CALL(evt_mario_key_onoff, 1)
-    SPAWN_EVENT(PTR(puni_vs_toge_battlewait))
+    SPAWN_EVENT(puni_vs_toge_battlewait)
     RETURN
 EVT_END()
 
@@ -568,15 +567,15 @@ EVT_BEGIN(mri_11_init_evt)
         SET_VALUE(LW(8), 0)
         SET_VALUE(LW(9), 0)
     END_IF
-    CALL_CHILD(PTR(mri_puni_init))
+    CALL_CHILD(mri_puni_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_npc_setup, PTR(npcEnt))
-    SPAWN_EVENT(PTR(puni_disp_info))
-    SPAWN_EVENT(PTR(mri_countdown))
+    SPAWN_EVENT(puni_disp_info)
+    SPAWN_EVENT(mri_countdown)
     SET_VALUE(LW(0), PTR(ueki_access_data))
-    CALL_CHILD(PTR(evt_sub_kusa_access_entry))
+    CALL_CHILD(evt_sub_kusa_access_entry)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG2_23_TIME_BOMB_ACTIVATED, STORY_STG2_23_01_X_NAUT_BATTLE)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
@@ -596,12 +595,12 @@ EVT_BEGIN(mri_11_init_evt)
     SET_VALUE(LW(1), 0)
     SET_VALUE(LW(2), -150)
     SET_FLOAT_VALUE(LW(3), FLOAT(1.0f))
-    SPAWN_EVENT(PTR(mri_waterfall_effect))
+    SPAWN_EVENT(mri_waterfall_effect)
     IF_INT_EQUAL(GSWF(GSWF_MRI11_JABBI_FIGHT2_STARTED), 0)
-        SPAWN_EVENT(PTR(puni_vs_toge))
+        SPAWN_EVENT(puni_vs_toge)
     ELSE
         IF_INT_EQUAL(GSWF(GSWF_MRI11_JABBI_FIGHT2_WON), 0)
-            SPAWN_EVENT(PTR(puni_vs_toge_init))
+            SPAWN_EVENT(puni_vs_toge_init)
         END_IF
     END_IF
     IF_INT_EQUAL(GSWF(GSWF_MRI11_JABBI_FIGHT2_WON), 0)

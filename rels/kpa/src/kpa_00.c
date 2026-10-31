@@ -5,7 +5,6 @@
 #include "evt/evt_cmd.h"
 #include "evt/evt_memcard.h"
 #include "evt/evt_npc.h"
-#include "party/party_motion.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_cam.h"
 #include "evt/evt_fade.h"
@@ -162,9 +161,9 @@ EVT_BEGIN(kpa_00_fly_evt)
     SET_VALUE(LF(10), 0)
     SET_VALUE(LW(0), 3)
 #if VERSION >= VERSION_US
-    CALL_CHILD(PTR(evt_memcard_save_wrapper))
+    CALL_CHILD(evt_memcard_save_wrapper)
 #else
-    CALL_CHILD(PTR(evt_memcard_save))
+    CALL_CHILD(evt_memcard_save)
 #endif
     CALL(evt_mario_set_mode, 0)
     CALL(evt_fade_set_mapchange_type, 1, FADE_STORY_BOWSER_A1, 0, FADE_STORY_BOWSER_A3, 0)
@@ -174,7 +173,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"ババ"*/"\x83\x6F\x83\x6F", // name
+        "ババ", // name
         NPC_FLAG_INTANGIBLE, // flags
         0, // reactionFlags
         npc_init_evt, // initEvent
@@ -184,7 +183,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", // name
+        "飛クッパ", // name
         NPC_FLAG_INTANGIBLE, // flags
         0, // reactionFlags
         npc_init_evt, // initEvent

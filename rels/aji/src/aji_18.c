@@ -17,7 +17,6 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "aji.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -51,7 +50,11 @@ static USER_FUNC(make_list) {
 }
 
 static EVT_BEGIN(w_door_close)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("S_door1_1"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("S_door1_2"), 0, 0, LW(0))
@@ -59,7 +62,11 @@ static EVT_BEGIN(w_door_close)
 EVT_END()
 
 static EVT_BEGIN(w_door_open)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("S_door1_1"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("S_door1_2"), 0, 0, LW(0))
@@ -67,7 +74,11 @@ static EVT_BEGIN(w_door_open)
 EVT_END()
 
 static EVT_BEGIN(e_door_close)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("S_door2_1"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("S_door2_2"), 0, 0, LW(0))
@@ -75,7 +86,11 @@ static EVT_BEGIN(e_door_close)
 EVT_END()
 
 static EVT_BEGIN(e_door_open)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("S_door2_1"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("S_door2_2"), 0, 0, LW(0))
@@ -137,7 +152,11 @@ EVT_BEGIN(evt_machine)
         RETURN
     END_IF
     CALL(make_list)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_win_item_select, PTR(key_list), LW(10))
+#else
     CALL(evt_win_item_select, 0, PTR(key_list), LW(10), 0)
+#endif
     SWITCH(LW(10))
         CASE_EQUAL(29)
         IF_INT_EQUAL(LW(0), 0)
@@ -183,7 +202,7 @@ EVT_BEGIN(evt_machine)
                 SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_16_FACTORY_DOOR)
                 CALL(evt_del_case_evt, 0, GW(10))
                 SET_VALUE(LW(0), STRING("e_bero"))
-                CALL_CHILD(PTR(bero_case_switch_on))
+                CALL_CHILD(bero_case_switch_on)
                 CALL(evt_cam3d_evt_set, -140, 90, 369, 150, 60, -98, 500, 11)
                 WAIT_MS(1200)
                 CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_lights1_m"), MAPOBJ_FLAG_HIDE)
@@ -255,10 +274,12 @@ EVT_BEGIN(aji_18_init_evt)
     CALL(sysflag)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI1"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 1)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_16_FACTORY_DOOR)
         SET_VALUE(GSWF(GSWF_AJI18_CARD_KEY_SLOT_1), 1)
         SET_VALUE(GSWF(GSWF_AJI18_CARD_KEY_SLOT_2), 1)
@@ -307,7 +328,7 @@ EVT_BEGIN(aji_18_init_evt)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_16_FACTORY_DOOR)
         CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("e_bero"), 0, PTR(key_lock_koujyou), GW(10))
         SET_VALUE(LW(0), STRING("e_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights1_m"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_lights1_r"), MAPOBJ_FLAG_HIDE)
     ELSE
@@ -318,7 +339,7 @@ EVT_BEGIN(aji_18_init_evt)
         CASE_BETWEEN(STORY_STG7_20_LORD_CRUMP_DEFEATED, STORY_STG7_25_00_1_BOWSER_POSHLEY_SANCTUM)
         CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("e_bero"), 0, PTR(key_lock_koujyou), 0)
         SET_VALUE(LW(0), STRING("e_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_lights1_m"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_lights1_r"), MAPOBJ_FLAG_HIDE)
     END_SWITCH
@@ -340,9 +361,9 @@ EVT_BEGIN(aji_18_init_evt)
 #else
             END_IF
 #endif
-            SPAWN_EVENT(PTR(evt_koopa_after))
+            SPAWN_EVENT(evt_koopa_after)
         END_IF
     END_SWITCH
-    SPAWN_EVENT(PTR(evt_emergency))
+    SPAWN_EVENT(evt_emergency)
     RETURN
 EVT_END()

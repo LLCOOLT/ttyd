@@ -10,8 +10,8 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-void effMarioBalloonMain(EffectEntry* effect);
-void effMarioBalloonDisp(CameraId cameraId, EffectEntry* effect);
+static void effMarioBalloonMain(EffectEntry* effect);
+static void effMarioBalloonDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effMarioBalloonEntry(s32 type, NpcEntry* npc) {
     EffectEntry* effect;
@@ -38,7 +38,7 @@ EffectEntry* effMarioBalloonEntry(s32 type, NpcEntry* npc) {
     return effect;
 }
 
-void effMarioBalloonMain(EffectEntry* effect) {
+static void effMarioBalloonMain(EffectEntry* effect) {
     MarioBalloonWork* work = effect->userdata;
     NpcEntry* npc;
     MarioWork* mario;
@@ -63,7 +63,7 @@ void effMarioBalloonMain(EffectEntry* effect) {
     dispEntry(work->camera, dispCalcZ(&pos), 8, (DispCallback)effMarioBalloonDisp, effect);
 }
 
-void effMarioBalloonDisp(CameraId cameraId, EffectEntry* effect) {
+static void effMarioBalloonDisp(CameraId cameraId, EffectEntry* effect) {
     MarioBalloonWork* work = effect->userdata;
     Mtx mT, mR, mS, mTA, mN;
     GXTexObj texObj;

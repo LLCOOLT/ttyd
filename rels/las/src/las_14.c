@@ -31,7 +31,6 @@
 #include "evt/evt_mobj.h"
 #include "evt/evt_msg.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "driver/mapdrv.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
@@ -40,8 +39,8 @@ static CloudMapWork* cloud;
 static u8 cloud_once_flag;
 
 static USER_FUNC(evt_cloud_main);
-USER_FUNC(evt_las_cloud_ent);
-USER_FUNC(evt_las_cloud_init);
+static USER_FUNC(evt_las_cloud_ent);
+static USER_FUNC(evt_las_cloud_init);
 
 static BeroEntry bero_entry_data[2];
 static const char* capturemap[3];
@@ -187,7 +186,7 @@ static BeroEntry bero_entry_data[] = {
 static EVT_BEGIN(box_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("key"), ITEM_PALACE_KEY_0x29, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("key"), ITEM_PALACE_KEY_0x29, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("box"))
     CALL(evt_item_get_item, STRING("key"))
     CALL(evt_mario_key_onoff, 1)
@@ -243,10 +242,12 @@ EVT_END()
 EVT_BEGIN(las_14_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST2"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 2)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_hitobj_onoff, STRING("A_taka"), 1, 0)
     IF_INT_EQUAL(GSWF(GSWF_LAS14_FLURRIE_GUST_SOLVED), 0)
         CALL(evt_las_cloud_init)
@@ -413,7 +414,7 @@ static USER_FUNC(evt_cloud_main) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(evt_las_cloud_init) {
+static USER_FUNC(evt_las_cloud_init) {
     s32 i;
 
     cloud = _mapAlloc(sizeof(CloudMapWork) * 16);
@@ -426,7 +427,7 @@ USER_FUNC(evt_las_cloud_init) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_las_cloud_ent) {
+static USER_FUNC(evt_las_cloud_ent) {
     EvtWord* args = event->args;
     char** groups;
     char* hitName;

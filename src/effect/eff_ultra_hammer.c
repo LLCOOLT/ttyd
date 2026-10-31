@@ -17,7 +17,7 @@
 // Model data in the exporter's layout: indexed vertex arrays (positions, normals, colours, texture coordinates),
 // display lists of GX commands (each padded to 32 bytes with GX_NOP) and, per list table, the list sizes in
 // 32-byte units for GXCallDisplayList.
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 s16 wakka_vertex_tbl[] ATTRIBUTE_ALIGN(32) = {
     24347, 2284, -8524,
     20710, 4131, -15417,
@@ -109,7 +109,7 @@ s16 wakka_vertex_tbl[] ATTRIBUTE_ALIGN(32) = {
 };
 #endif
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 s16 wakka_texcoord0_tbl[] ATTRIBUTE_ALIGN(32) = {
     24576, 0,
     25600, 0,
@@ -207,7 +207,7 @@ s16 wakka_texcoord0_tbl[] ATTRIBUTE_ALIGN(32) = {
 };
 #endif
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 s8 wakka_normal_tbl[] ATTRIBUTE_ALIGN(32) = {
     0, 61, 16,
 };
@@ -488,9 +488,9 @@ u8 wakka_dl_0_size_tbl[] = {
     1, // 19
 };
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo grows the ring while it scrolls; retail keeps it at 3.5.
-f32 hammer_scale_tbl[] = {
+static f32 scale_tbl[] = {
     1.0f, 1.0f, 1.0f, 1.0f, 1.0f,
     1.2f, 1.4f, 1.6f, 1.8f, 2.0f,
     2.2f, 2.4f, 2.6f, 2.8f, 3.0f,
@@ -508,8 +508,8 @@ f32 scroll_tbl[] = {
     -2.9166667f, -3.0625f, -3.2083333f, -3.3541667f, -3.5f
 };
 
-void effUltraHammerMain(EffectEntry* effect);
-void effUltraHammerDisp(enum CameraId camId, void* param);
+static void effUltraHammerMain(EffectEntry* effect);
+static void effUltraHammerDisp(enum CameraId camId, void* param);
 
 EffectEntry* effUltraHammerEntry(BOOL mode, s32 counter, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -548,7 +548,7 @@ EffectEntry* effUltraHammerEntry(BOOL mode, s32 counter, f32 x, f32 y, f32 z, f3
     return effect;
 }
 
-void effUltraHammerMain(EffectEntry* effect) {
+static void effUltraHammerMain(EffectEntry* effect) {
     EffUltraHammerData* data;
     Vec position;
     int i;
@@ -572,8 +572,8 @@ void effUltraHammerMain(EffectEntry* effect) {
         } else {
             if (data->scroll < 25) {
                 data->offsetX = scroll_tbl[data->scroll];
-#if VERSION == VERSION_DEMO
-                data->scale = hammer_scale_tbl[data->scroll];
+#if VERSION <= VERSION_DEMO_US
+                data->scale = scale_tbl[data->scroll];
 #else
                 data->scale = 3.5f;
 #endif
@@ -596,7 +596,7 @@ inline Vec initializeVec(Vec* input) {
     return temp;
 }
 
-void effUltraHammerDisp(enum CameraId camId, void* param) {
+static void effUltraHammerDisp(enum CameraId camId, void* param) {
     u32 fmtLoop[2]; // FAKE: register-promoted array (vtx fmt + loop counter); separate scalars differ
     CameraEntry* cam;
     EffUltraHammerData* data;

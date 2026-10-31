@@ -29,7 +29,6 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "kpa_act.h"
-#include "party/party_motion.h"
 #include "pik.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -145,10 +144,10 @@ EVT_BEGIN(evt_return_sub)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_54_WELCOME_BACK)
     CALL(evt_fade_set_mapchange_type, 1, FADE_STORY_MARIO_A1, 0, FADE_STORY_MARIO_A3, 0)
     SET_VALUE(LW(0), STRING("s_bero"))
-    CALL_CHILD(PTR(bero_case_switch_off))
+    CALL_CHILD(bero_case_switch_off)
     CALL(evt_bero_overwrite, STRING("s_bero"), PTR(s_bero_peach))
     SET_VALUE(LW(0), STRING("s_bero"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_mario_key_onoff, 1)
     BEGIN_INLINE_EVENT
@@ -166,15 +165,15 @@ EVT_END()
 
 EVT_BEGIN(evt_return)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_53_THE_REAL_GARNET_STAR)
-        SPAWN_EVENT(PTR(evt_return_sub))
+        SPAWN_EVENT(evt_return_sub)
     END_IF
-    CALL_CHILD(PTR(haikei_off))
+    CALL_CHILD(haikei_off)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_go)
-    CALL_CHILD(PTR(haikei_on))
+    CALL_CHILD(haikei_on)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
@@ -368,7 +367,7 @@ EVT_END()
 
 static NpcSetupInfo npc_data[] = {
     {
-        /*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", // name
+        "ポワン探偵", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_powan, // initEvent
@@ -380,7 +379,7 @@ static NpcSetupInfo npc_data[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"マジョリン"*/"\x83\x7D\x83\x57\x83\x87\x83\x8A\x83\x93", // name
+        "マジョリン", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_majo, // initEvent
@@ -390,7 +389,7 @@ static NpcSetupInfo npc_data[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"マリリン"*/"\x83\x7D\x83\x8A\x83\x8A\x83\x93", // name
+        "マリリン", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_mari, // initEvent
@@ -400,7 +399,7 @@ static NpcSetupInfo npc_data[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", // name
+        "ランペル", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_ramp, // initEvent
@@ -410,7 +409,7 @@ static NpcSetupInfo npc_data[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"パタクリ"*/"\x83\x70\x83\x5E\x83\x4E\x83\x8A", // name
+        "パタクリ", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         patakuri_init, // initEvent
@@ -420,7 +419,7 @@ static NpcSetupInfo npc_data[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ババ"*/"\x83\x6F\x83\x6F", // name
+        "ババ", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         baba_init, // initEvent
@@ -445,17 +444,17 @@ static USER_FUNC(npc_set_pos) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(hoshi) {
+static USER_FUNC(hoshi) {
     event->lwData[10] = (EvtWord)effStarStoneEntry(5, 0.0f, 60.0f, -950.0f, 1.0f);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(hoshi_delete) {
+static USER_FUNC(hoshi_delete) {
     effSoftDelete((EffectEntry*)event->lwData[10]);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(hoshi_r) {
+static USER_FUNC(hoshi_r) {
     EffectEntry* eff = (EffectEntry*)event->lwData[10];
 
     ((EffStarStoneWork*)eff->userdata)->rotY = evtGetValue(event, event->args[0]);
@@ -466,7 +465,7 @@ USER_FUNC(hoshi_r) {
 // are kept in the event's userdata words as raw float bits between frames.
 #pragma opt_propagation off
 #pragma opt_lifetimes off
-USER_FUNC(hoshi_jump) {
+static USER_FUNC(hoshi_jump) {
     Vec* pos = &((EffStarStoneWork*)((EffectEntry*)event->lwData[10])->userdata)->position;
     NpcEntry* npc = npcNameToPtr("マジョリン");
     f32 vy;
@@ -512,7 +511,7 @@ USER_FUNC(hoshi_jump) {
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
-USER_FUNC(get_starstone_seq) {
+static USER_FUNC(get_starstone_seq) {
     EvtWord* args = event->args;
     EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
 
@@ -577,7 +576,7 @@ static USER_FUNC(stone_bg) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(reset_stone_cam) {
+static USER_FUNC(reset_stone_cam) {
     EffectEntry* eff = effNameToPtr("nise");
 
     ((EffStarStoneWork*)eff->userdata)->cam = 4;
@@ -603,7 +602,7 @@ EVT_BEGIN(evt_garnet)
     CALL(evt_npc_status_onoff, 1, STRING("ポワン探偵"), 2)
     CALL(evt_npc_move_position, STRING("ポワン探偵"), -30, 600, 1000, 0, 1)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_close_door_play_se))
+    SPAWN_EVENT(bero_close_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 70, 0, 500)
     LABEL(1)
     CALL(evt_sub_intpl_msec_get_value)
@@ -650,8 +649,10 @@ EVT_BEGIN(evt_garnet)
     END_INLINE_EVENT
     WAIT_MS(1000)
     CALL(evt_npc_majo_disp_off, STRING("マリリン"))
+#if VERSION >= VERSION_JP
     CALL(evt_npc_set_position, STRING("マジョリン"), 0, -1000, 0)
     CALL(evt_npc_set_position, STRING("マリリン"), 0, -1000, 0)
+#endif
     LOOP(2)
         CALL(evt_npc_reverse_ry, STRING("ランペル"))
         WAIT_MS(400)
@@ -720,7 +721,9 @@ EVT_BEGIN(evt_garnet)
     WAIT_MS(500)
     CALL(evt_cam3d_evt_off, 500, 11)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_51_3_SURPRISE_GUESTS)
+#if VERSION >= VERSION_JP
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
+#endif
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -744,7 +747,7 @@ static EVT_BEGIN(evt_sw)
     CALL(evt_snd_sfxoff, LW(9))
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_52_THE_HIDDEN_PIPE)
     SET_VALUE(LW(0), 1)
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
     CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SUCCESS1"))
     WAIT_MS(1000)
@@ -775,7 +778,9 @@ EVT_END()
 
 EVT_BEGIN(pik_02_koopa_evt)
     CALL(evt_snd_envoff, PSND_FADE_OUT)
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 2)
+#endif
     CALL(evt_mario_key_onoff, 0)
     CALL(starstone_entry, STRING("nise"), 5, 0, 57, -955, 1)
     CALL(evt_mario_set_pos, 60, 0, -500)
@@ -784,8 +789,10 @@ EVT_BEGIN(pik_02_koopa_evt)
     CALL(evt_npc_set_ry, STRING("ババ"), 270)
     CALL(evt_cam3d_evt_set, 0, 360, -338, 0, 250, -1130, 0, 11)
     CALL(evt_seq_wait, 2)
+#if VERSION >= VERSION_JP
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_KUPPA1"))
     CALL(evt_snd_bgm_scope, 0, 1)
+#endif
     CALL(evt_cam3d_evt_set, 0, 150, -338, 0, 40, -1130, 7000, 0)
     BEGIN_INLINE_EVENT
         CALL(evt_npc_move_position, STRING("ババ"), 140, -880, 0, 60, 0)
@@ -1086,7 +1093,7 @@ EVT_BEGIN(pik_02_koopa_evt)
 #if VERSION >= VERSION_US
     CALL_CHILD(evt_memcard_save_wrapper)
 #else
-    CALL_CHILD(PTR(evt_memcard_save))
+    CALL_CHILD(evt_memcard_save)
 #endif
     CALL(evt_mario_set_mode, 0)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
@@ -1109,24 +1116,31 @@ EVT_BEGIN(pik_02_init_evt)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_51_3_SURPRISE_GUESTS)
         SET_VALUE(LW(0), PTR(bero_data))
         CALL(evt_bero_get_info)
-        CALL_CHILD(PTR(bero_case_entry))
-        CALL_CHILD(PTR(haikei_off))
+        CALL_CHILD(bero_case_entry)
+        CALL_CHILD(haikei_off)
     ELSE
         SET_VALUE(LW(0), PTR(bero_data))
         CALL(evt_bero_get_info)
-        CALL_CHILD(PTR(evt_bero_info_run))
+        CALL_CHILD(evt_bero_info_run)
     END_IF
     IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_25_00_BOWSER_POSHLEY_HEIGHTS)
         CALL(evt_snd_bgmoff, PSND_FADE_OUT)
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_PIK2"))
         CALL(evt_snd_set_rev_mode, 2)
+#if VERSION <= VERSION_DEMO_US
+    ELSE
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_KUPPA1"))
+        CALL(evt_snd_bgm_scope, 0, 1)
+        CALL(evt_snd_envoff, PSND_FADE_OUT)
+        CALL(evt_snd_set_rev_mode, 2)
+#endif
     END_IF
     CALL(evt_npc_setup, PTR(npc_data))
     CALL(evt_hit_bind_mapobj, STRING("a_ka_ten"), STRING("ka_ten"))
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_52_THE_HIDDEN_PIPE)
         CALL(evt_mobj_switch_blue, 0, STRING("sw"), -300, 330, -975, PTR(evt_sw), 0)
         SET_VALUE(LW(0), 1)
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     ELSE
         CALL(evt_mapobj_trans, 1, STRING("ka_ten"), 0, 150, 0)
         CALL(evt_hit_bind_update, STRING("a_ka_ten"))
@@ -1138,24 +1152,24 @@ EVT_BEGIN(pik_02_init_evt)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("dai_a"), 0, PTR(evt_daiza), 0)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("door_1"), MAPOBJ_FLAG_BBOX_CULL)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_51_3_SURPRISE_GUESTS)
-        SPAWN_EVENT(PTR(evt_garnet))
+        SPAWN_EVENT(evt_garnet)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_54_WELCOME_BACK)
         BEGIN_INLINE_EVENT
             CALL(evt_bero_exec_wait, 65536)
             CALL(evt_fade_set_mapchange_type, 1, FADE_STORY_MARIO_A1, 0, FADE_STORY_MARIO_A3, 0)
             SET_VALUE(LW(0), STRING("s_bero"))
-            CALL_CHILD(PTR(bero_case_switch_off))
+            CALL_CHILD(bero_case_switch_off)
             CALL(evt_bero_overwrite, STRING("s_bero"), PTR(s_bero_peach))
             SET_VALUE(LW(0), STRING("s_bero"))
-            CALL_CHILD(PTR(bero_case_switch_on))
+            CALL_CHILD(bero_case_switch_on)
         END_INLINE_EVENT
     END_IF
-    CALL_CHILD(PTR(nise_starstone_init))
+    CALL_CHILD(nise_starstone_init)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_25_00_BOWSER_POSHLEY_HEIGHTS)
         CALL(evt_mario_set_mode, 2)
         CALL(evt_mario_kill_party, 0)
-        SPAWN_EVENT(PTR(pik_02_koopa_evt))
+        SPAWN_EVENT(pik_02_koopa_evt)
     END_IF
     CALL(evt_map_entry_airport_harbor, 0, STRING("hikou"), STRING("a_hi1"))
 #if VERSION >= VERSION_US

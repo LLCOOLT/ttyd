@@ -23,7 +23,7 @@ void BattleAcHelpSetDispType(s32 type) {
 void BattleAcHelpInit(void) {
     // stubbed in retail
 }
-void _ac_help_disp(CameraId cameraId, void* param);
+static void _ac_help_disp(CameraId cameraId, void* param);
 void BattleAcHelpMain(void) {
     BattleWork* wp = _battleWorkPointer;
     s32* type = &wp->acHelpDispType;
@@ -33,7 +33,7 @@ void BattleAcHelpMain(void) {
     if (_ac_help_disp) {
     }
 }
-void _ac_help_disp(CameraId cameraId, void* param) {
+static void _ac_help_disp(CameraId cameraId, void* param) {
     u16 lines;
     const char* msgs[2]; // FAKE: register-promoted array; one msg pointer differs
     BattleWork* wp = _battleWorkPointer;

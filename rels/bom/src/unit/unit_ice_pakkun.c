@@ -108,7 +108,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 1, 3, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {80, 80, 60, 100, 75, 100, 100, 0, 100, 70, 100, 70, 100, 70, 70, 20, 30, 100, 70, 100, 100, 95};
+#else
 static StatusVulnerability regist = {100, 70, 40, 100, 80, 100, 100, 0, 100, 85, 100, 85, 100, 85, 70, 10, 40, 100, 70, 100, 100, 95};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_ice_pakkun", "c_pakflwr_a", 0.0f, 0.0f, 0.0f, 0.0f, 40.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0x1, pose_table},
@@ -157,7 +161,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(9), PTR(&weapon_ice_pakkun_attack))
-        CALL_CHILD(PTR(normal_attack_event))
+        CALL_CHILD(normal_attack_event)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
@@ -168,7 +172,7 @@ static EVT_BEGIN(attack_event)
         RETURN
     END_IF
     SET_VALUE(LW(9), PTR(&weapon_ice_pakkun_attack))
-    CALL_CHILD(PTR(normal_attack_event))
+    CALL_CHILD(normal_attack_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -190,8 +194,8 @@ static PoseTableEntry pose_table[] = {
     {42, "PKF_S_1"},
     {56, "PKF_X_1"},
     {57, "PKF_X_1"},
-    {65, "PKF_T_1"},
-    {69, "PKF_S_1"},
+    {BTL_POSE_TALK, "PKF_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "PKF_S_1"},
 };
 
 static PoseTableEntry pose_table_ceil[] = {
@@ -211,8 +215,8 @@ static PoseTableEntry pose_table_ceil[] = {
     {42, "PKF_S_3"},
     {56, "PKF_X_2"},
     {57, "PKF_X_2"},
-    {65, "PKF_S_3"},
-    {69, "PKF_S_3"},
+    {BTL_POSE_TALK, "PKF_S_3"},
+    {BTL_POSE_STAY_DEFAULT, "PKF_S_3"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -269,7 +273,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -283,7 +287,7 @@ static EVT_BEGIN(counter_damage_event)
             RETURN
         END_IF
     END_IF
-    CALL_CHILD(PTR(return_event))
+    CALL_CHILD(return_event)
     RETURN
 EVT_END()
 

@@ -10,9 +10,9 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-void effBattenMain(EffectEntry* effect);
-void effBattenDisp(CameraId cameraId, EffectEntry* effect);
-void effBattenDisp2(CameraId cameraId, EffectEntry* effect);
+static void effBattenMain(EffectEntry* effect);
+static void effBattenDisp(CameraId cameraId, EffectEntry* effect);
+static void effBattenDisp2(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effBattenEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -54,7 +54,7 @@ EffectEntry* effBattenEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 sca
     return effect;
 }
 
-void effBattenMain(EffectEntry* effect) {
+static void effBattenMain(EffectEntry* effect) {
     EffBattenWork* work;
     s32 done;
     s32 type;
@@ -163,7 +163,7 @@ void effBattenMain(EffectEntry* effect) {
     }
 }
 
-void effBattenDisp(CameraId cameraId, EffectEntry* effect) {
+static void effBattenDisp(CameraId cameraId, EffectEntry* effect) {
     EffBattenWork* work;
     s32 i;
     CameraEntry* camera;
@@ -226,7 +226,7 @@ void effBattenDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-void effBattenDisp2(CameraId cameraId, EffectEntry* effect) {
+static void effBattenDisp2(CameraId cameraId, EffectEntry* effect) {
     EffBattenWork* work;
     Mtx mtx;
     Mtx scale;

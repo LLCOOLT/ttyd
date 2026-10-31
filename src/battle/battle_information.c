@@ -123,7 +123,7 @@ void BattleInformationSetDropMaterial(FieldBattleInfo* info) {
     random = group->randomItemWeight;
     none = group->noItemWeight;
     type = 0;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) <= STORY_STG0_16_FRANKLYS_HOUSE) {
         random = 0;
         held = 0;
@@ -132,7 +132,7 @@ void BattleInformationSetDropMaterial(FieldBattleInfo* info) {
 #endif
     n = pouchEquipCheckBadge(ITEM_ITEM_HOG);
     if (n >= 1) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         held *= n * 2 + 2;
         random *= n * 2 + 2;
 #else

@@ -1,6 +1,7 @@
 // evt_item.c: script commands for field items: spawning, bouncing, collecting and flags (itemdrv).
 #pragma once
 
+#include "driver/itemdrv.h"
 #include "evt/evt_cmd.h"
 
 USER_FUNC(evt_item_delete);

@@ -80,9 +80,9 @@ static EVT_BEGIN(kpa_fall)
             SET_FLOAT_VALUE(LW(3), FLOAT(4.5f))
         END_SWITCH
         CALL(evt_eff, STRING(""), STRING("splash"), 2, LW(0), LW(1), LW(2), LW(3), 0, 0, 0, 0, 0, 0, 0)
-        CALL_CHILD(PTR(kpa_fall_sub))
+        CALL_CHILD(kpa_fall_sub)
     ELSE
-        CALL_CHILD(PTR(kpa_dead))
+        CALL_CHILD(kpa_dead)
     END_IF
     RETURN
 EVT_END()
@@ -107,7 +107,7 @@ static EVT_BEGIN(jumpstand_evt)
     CALL(evt_mobj_get_position, STRING("me"), LW(0), LW(1), LW(2))
     SET_VALUE(LW(3), LW(1))
     ADD(LW(3), 800)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(evt_mario_jump_jumpstand, LW(0), LW(1), LW(2), LW(0), LW(3), LW(2), LW(0), LW(3), LW(2), 2000, 1)
 #else
     CALL(evt_mario_jump_jumpstand, LW(0), LW(1), LW(2), LW(0), LW(3), LW(2), LW(0), LW(3), LW(2), 4000, 3)
@@ -121,18 +121,18 @@ static NpcSetupInfo npcEnt[] = {
 
 EVT_BEGIN(kpa_05_init_evt)
     CALL(evt_npc_setup, PTR(npcEnt))
-    CALL_CHILD(PTR(kpa_init))
+    CALL_CHILD(kpa_init)
     CALL(evt_mario_set_pos, -1500, 150, -5)
     CALL(evt_cam_road_reset)
     SET_VALUE(LW(0), PTR(kpa_act_stg3_mobj))
-    CALL_CHILD(PTR(kpa_read_mobj))
+    CALL_CHILD(kpa_read_mobj)
     SET_VALUE(LW(0), PTR(kpa_act_stg3_item))
-    CALL_CHILD(PTR(kpa_read_item))
+    CALL_CHILD(kpa_read_item)
     CALL(evt_map_playanim, STRING("anm_magu"), 1, 0)
-    SPAWN_EVENT(PTR(kpa_fall))
+    SPAWN_EVENT(kpa_fall)
     CALL(kpa_status_init, 3, GSW(GSW_KPA_LIVES), GSW(GSW_KPA_TIME_LEFT))
     SET_VALUE(LSW(1), 2)
-    SPAWN_EVENT(PTR(kpa_stage_start))
+    SPAWN_EVENT(kpa_stage_start)
     SPAWN_EVENT_GET_ID(PTR(kpa_time), GW(15))
     RETURN
 EVT_END()

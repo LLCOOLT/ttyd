@@ -34,7 +34,7 @@ static EvtWord wait_event[6];
 
 // dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
 #pragma dont_inline on
-void fire_bros_get_next_target(s32* unitIdx, s32* partIdx) {
+static void fire_bros_get_next_target(s32* unitIdx, s32* partIdx) {
     BattleWorkWeaponTargets* wt = &_battleWorkPointer->weaponTargets;
 
     wt->currentTarget++;
@@ -51,7 +51,7 @@ void fire_bros_get_next_target(s32* unitIdx, s32* partIdx) {
 
 // dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
 #pragma dont_inline on
-void fire_bros_get_target(s32* unitIdx, s32* partIdx) {
+static void fire_bros_get_target(s32* unitIdx, s32* partIdx) {
     BattleWorkWeaponTargets* wt = &_battleWorkPointer->weaponTargets;
     BattleWorkTarget* target = &wt->targets[wt->targetIndices[wt->currentTarget]];
 
@@ -60,7 +60,7 @@ void fire_bros_get_target(s32* unitIdx, s32* partIdx) {
 }
 #pragma dont_inline reset
 
-USER_FUNC(fire_bros_nagemakuri_set_target) {
+static USER_FUNC(fire_bros_nagemakuri_set_target) {
     EvtWord* args = event->args;
     s32 unitIdx[20];
     s32 partIdx[20];
@@ -152,11 +152,23 @@ BattleUnitKind unit_fire_bros = {
     data_table,
 };
 
+#if VERSION <= VERSION_DEMO_US
+static BattleUnitDefense defence = {{1, 99, 1, 1, 1}};
+#else
 static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
+#endif
 
+#if VERSION <= VERSION_DEMO_US
+static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
+#else
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+#endif
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {80, 80, 70, 100, 80, 100, 100, 70, 100, 80, 100, 80, 100, 80, 80, 40, 60, 100, 80, 100, 100, 95};
+#else
 static StatusVulnerability regist = {80, 80, 70, 100, 80, 100, 100, 70, 100, 80, 100, 80, 100, 95, 80, 70, 60, 100, 80, 100, 100, 95};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "BRO_N_1"},
@@ -175,8 +187,8 @@ static PoseTableEntry pose_table[] = {
     {40, "BRO_W_1"},
     {56, "BRO_X_1"},
     {57, "BRO_X_1"},
-    {65, "BRO_T_1"},
-    {69, "BRO_S_1"},
+    {BTL_POSE_TALK, "BRO_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "BRO_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -322,14 +334,14 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(normal_attack_event))
+        CALL_CHILD(normal_attack_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
@@ -345,10 +357,10 @@ static EVT_BEGIN(attack_event)
         SUBTRACT(LW(0), 1)
         CALL(evt_sub_random, LW(0), LW(1))
         IF_INT_LESS(LW(1), 30)
-            CALL_CHILD(PTR(renzoku_attack_event))
+            CALL_CHILD(renzoku_attack_event)
             GOTO(99)
         END_IF
-        CALL_CHILD(PTR(nagemakuri_attack_event))
+        CALL_CHILD(nagemakuri_attack_event)
         GOTO(99)
     ELSE
         SET_VALUE(LW(0), 70)
@@ -356,10 +368,10 @@ static EVT_BEGIN(attack_event)
         SUBTRACT(LW(0), 1)
         CALL(evt_sub_random, LW(0), LW(1))
         IF_INT_LESS(LW(1), 70)
-            CALL_CHILD(PTR(normal_attack_event))
+            CALL_CHILD(normal_attack_event)
             GOTO(99)
         END_IF
-        CALL_CHILD(PTR(renzoku_attack_event))
+        CALL_CHILD(renzoku_attack_event)
         GOTO(99)
     END_IF
     LABEL(99)
@@ -435,7 +447,7 @@ EVT_END()
 
 static EVT_BEGIN(damage_check_no_last)
     SET_VALUE(LW(7), 0)
-    CALL_CHILD(PTR(damage_check_sub))
+    CALL_CHILD(damage_check_sub)
     RETURN
 EVT_END()
 
@@ -479,7 +491,7 @@ static EVT_BEGIN(damage_check_last)
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), 256, LW(5))
     ELSE
         SET_VALUE(LW(7), 1)
-        CALL_CHILD(PTR(damage_check_sub))
+        CALL_CHILD(damage_check_sub)
     END_IF
     RETURN
 EVT_END()
@@ -654,7 +666,7 @@ static EVT_BEGIN(normal_attack_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
@@ -673,7 +685,7 @@ static EVT_BEGIN(normal_attack_event)
     SET_VALUE(LW(14), 1)
     SET_VALUE(LW(6), PTR(&weapon_fire_bros_attack))
     SET_VALUE(LW(8), 0)
-    SPAWN_EVENT(PTR(fire_move_event))
+    SPAWN_EVENT(fire_move_event)
     LOOP(0)
         WAIT_FRAMES(1)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
@@ -694,7 +706,7 @@ static EVT_BEGIN(renzoku_attack_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
@@ -714,7 +726,7 @@ static EVT_BEGIN(renzoku_attack_event)
     SET_VALUE(LW(14), 0)
     SET_VALUE(LW(6), PTR(&weapon_fire_bros_renzoku_attack))
     SET_VALUE(LW(8), 0)
-    SPAWN_EVENT(PTR(fire_move_event))
+    SPAWN_EVENT(fire_move_event)
     WAIT_FRAMES(12)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("BRO_A_2A"))
     WAIT_FRAMES(20)
@@ -722,7 +734,7 @@ static EVT_BEGIN(renzoku_attack_event)
     SET_VALUE(LW(14), 1)
     SET_VALUE(LW(6), PTR(&weapon_fire_bros_renzoku_attack))
     SET_VALUE(LW(8), 0)
-    SPAWN_EVENT(PTR(fire_move_event))
+    SPAWN_EVENT(fire_move_event)
     LOOP(0)
         WAIT_FRAMES(1)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
@@ -743,7 +755,7 @@ static EVT_BEGIN(nagemakuri_attack_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
@@ -803,10 +815,10 @@ static EVT_BEGIN(nagemakuri_attack_event)
             CALL(btlevtcmd_GetPartsWork, BTL_UNIT_SELF, LW(15), LW(11), LW(4))
             CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(14))
             CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(14))
-            CALL_CHILD(PTR(nagemakuri_judge_last_attack_event))
+            CALL_CHILD(nagemakuri_judge_last_attack_event)
             SET_VALUE(LW(6), PTR(&weapon_fire_bros_nagemakuri_attack))
             SET_VALUE(LW(8), 1)
-            SPAWN_EVENT(PTR(fire_move_event))
+            SPAWN_EVENT(fire_move_event)
             CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, 0, 1)
             WAIT_FRAMES(15)
             ADD(LW(15), 1)

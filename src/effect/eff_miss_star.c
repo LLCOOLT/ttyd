@@ -7,6 +7,9 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
+static void effMissStarDisp(CameraId cameraId, EffectEntry* effect);
+static void effMissStarMain(EffectEntry* effect);
+
 typedef struct EffMissStarWork {
     Vec position;  // 0x0
     Vec velocity;  // 0xC
@@ -29,7 +32,7 @@ Vec spd_tbl[15] = {
     { 2.0f, -3.0f, 0.0f }, { 1.0f, -4.0f, 0.0f }, { 0.0f, -4.5f, 0.0f },
 };
 
-Vec scale_tbl[15] = {
+static Vec scale_tbl[15] = {
     { 1.0f, 1.0f, 1.0f },    { 0.8f, 0.8f, 0.8f },    { 0.9f, 0.9f, 0.9f },
     { 1.1f, 1.1f, 1.1f },    { 1.0f, 1.0f, 1.0f },    { 0.8f, 0.8f, 0.8f },
     { 0.9f, 0.9f, 0.9f },    { 1.1f, 1.1f, 1.1f },    { 1.0f, 1.0f, 1.0f },
@@ -92,7 +95,7 @@ EffectEntry* effMissStarEntry(s32 count, s32 delay, f32 x, f32 y, f32 z, s32 ind
     return effect;
 }
 
-void effMissStarMain(EffectEntry* effect) {
+static void effMissStarMain(EffectEntry* effect) {
     EffMissStarWork* work = effect->userdata;
     Vec position;
     Vec position2;
@@ -137,7 +140,7 @@ void effMissStarMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position2), 1, (DispCallback)effMissStarDisp, effect);
 }
 
-void effMissStarDisp(CameraId cameraId, EffectEntry* effect) {
+static void effMissStarDisp(CameraId cameraId, EffectEntry* effect) {
     EffMissStarWork* work = effect->userdata;
     GXTexObj texObj;
     Mtx mtx;

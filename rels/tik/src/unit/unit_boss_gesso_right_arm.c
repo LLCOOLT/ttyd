@@ -24,12 +24,16 @@ static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
 static PoseTableEntry pose_table[4];
+#if VERSION >= VERSION_JP
 BattleDataEntry gesso_right_arm_data_table[13];
+#endif
 static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[1];
 static EvtWord init_event[25];
 static EvtWord damage_event[31];
+#if VERSION >= VERSION_JP
 extern EvtWord gesso_right_arm_damage_event[];
+#endif
 BattleWeapon weapon_gesso_right_arm_front_attack;
 BattleWeapon weapon_gesso_right_arm_rear_attack;
 static EvtWord attack_event[273];
@@ -99,7 +103,11 @@ BattleUnitKind unit_boss_gesso_right_arm = {
     1,
     parts,
     init_event,
+#if VERSION <= VERSION_DEMO_US
+    data_table,
+#else
     gesso_right_arm_data_table,
+#endif
 };
 
 static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
@@ -112,9 +120,10 @@ static PoseTableEntry pose_table[] = {
     {28, "GSO_S1_1"},
     {31, "GSO_S1_1"},
     {39, "GSO_D1_1"},
-    {69, "GSO_S1_1"},
+    {BTL_POSE_STAY_DEFAULT, "GSO_S1_1"},
 };
 
+#if VERSION >= VERSION_JP
 BattleDataEntry gesso_right_arm_data_table[] = {
     {24, gesso_right_arm_damage_event},
     {25, gesso_right_arm_damage_event},
@@ -130,6 +139,7 @@ BattleDataEntry gesso_right_arm_data_table[] = {
     {35, gesso_right_arm_damage_event},
     {36, gesso_right_arm_damage_event},
 };
+#endif
 
 static BattleDataEntry data_table[] = {
     {10, gesso_arm_damage_pose_event},
@@ -154,7 +164,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
     IF_INT_NOT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_GetUnitWork, LW(3), 4, LW(0))
@@ -165,6 +175,7 @@ static EVT_BEGIN(damage_event)
     RETURN
 EVT_END()
 
+#if VERSION >= VERSION_JP
 EVT_BEGIN(gesso_right_arm_damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
@@ -178,11 +189,11 @@ EVT_BEGIN(gesso_right_arm_damage_event)
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_RunDataEventChild, LW(10), 10)
     END_SIBLING_EVENT
-    CALL_CHILD(PTR(subsetevt_damage))
+    CALL_CHILD(subsetevt_damage)
     CALL(btlevtcmd_CheckDamageCode, LW(10), 1024, LW(1))
     IF_INT_NOT_EQUAL(LW(1), 0)
         WAIT_FRAMES(30)
-        CALL_CHILD(PTR(subsetevt_dead))
+        CALL_CHILD(subsetevt_dead)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_CheckDamageCode, LW(10), 256, LW(1))
@@ -201,6 +212,7 @@ EVT_BEGIN(gesso_right_arm_damage_event)
     END_IF
     RETURN
 EVT_END()
+#endif
 
 static EVT_BEGIN(phase_event)
     RETURN
@@ -465,9 +477,9 @@ EVT_BEGIN(gesso_fall_check)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(3), 1, PTR(gesso_pose_table_turn))
     CALL(btlevtcmd_SetHpGaugeOffset, LW(3), 0, 0)
     CALL(btlevtcmd_SetStatusIconOffset, LW(3), 46, 118)
-    CALL(btlevtcmd_SetPartsDefenceTable, LW(3), 1, PTR(R_defence_turn))
-    CALL(btlevtcmd_SetPartsDefenceAttrTable, LW(3), 1, PTR(R_defence_attr_turn))
-    CALL(btlevtcmd_SetRegistStatus, LW(3), PTR(R_regist_turn))
+    CALL(btlevtcmd_SetPartsDefenceTable, LW(3), 1, PTR(gesso_defence_turn))
+    CALL(btlevtcmd_SetPartsDefenceAttrTable, LW(3), 1, PTR(gesso_defence_attr_turn))
+    CALL(btlevtcmd_SetRegistStatus, LW(3), PTR(gesso_regist_turn))
     CALL(btlevtcmd_SetHitOffset, LW(3), 1, -15, -90, 0)
     CALL(btlevtcmd_SetStatusIconOffset, BTL_UNIT_SELF, 55, 113)
     CALL(evt_btl_camera_shake_h, 0, 6, 0, 30, 4)

@@ -95,13 +95,8 @@ static PoseTableEntry pose_table[] = {
     {39, "D_1"},
     {40, "W_1"},
     {42, "R_1"},
-#if VERSION == VERSION_DEMO
-    {63, "T_1"},
-    {67, "S_1"},
-#else
-    {65, "T_1"},
-    {69, "S_1"},
-#endif
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static BattleDataEntry data_table[] = {

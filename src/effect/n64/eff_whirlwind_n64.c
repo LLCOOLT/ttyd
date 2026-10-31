@@ -43,8 +43,8 @@ effN64Vtx eff_whirlwind_v[] = {
     {-5, 2, -9, 597, 512, 0xFF, 0xFF, 0xFF, 0xFF},
 };
 
-void effWhirlwindMain(EffectEntry* effect);
-void effWhirlwindDisp(CameraId cameraId, EffectEntry* effect);
+static void effWhirlwindMain(EffectEntry* effect);
+static void effWhirlwindDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effWhirlwindN64Entry(s32 type, MarioWork* target, f32 scale, s32 life) {
     f32 quarter;
@@ -141,7 +141,7 @@ EffectEntry* effWhirlwindN64Entry(s32 type, MarioWork* target, f32 scale, s32 li
     return effect;
 }
 
-void effWhirlwindMain(EffectEntry* effect) {
+static void effWhirlwindMain(EffectEntry* effect) {
     EffWhirlwindN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -211,7 +211,7 @@ void effWhirlwindMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effWhirlwindDisp, effect);
 }
 
-void effWhirlwindDisp(CameraId cameraId, EffectEntry* effect) {
+static void effWhirlwindDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffWhirlwindN64Work* work;
     s32 i;

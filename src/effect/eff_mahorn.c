@@ -5,6 +5,9 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include "version.h"
+
+static void effMahornDisp(CameraId cameraId, EffectEntry* effect);
+static void effMahornMain(EffectEntry* effect);
 // US effect texture ids are 0x1C lower for these entries.
 #define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
 
@@ -68,7 +71,7 @@ EffectEntry* effMahornEntry(s32 type, s32 count, s32 duration, f32 x, f32 y, f32
     return effect;
 }
 
-void effMahornMain(EffectEntry* effect) {
+static void effMahornMain(EffectEntry* effect) {
     EffMahornWork* work = effect->userdata;
     Vec position;
     s32 i;
@@ -105,7 +108,7 @@ void effMahornMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effMahornDisp, effect);
 }
 
-void effMahornDisp(CameraId cameraId, EffectEntry* effect) {
+static void effMahornDisp(CameraId cameraId, EffectEntry* effect) {
     BOOL odd;
     EffMahornWork* work = effect->userdata;
     s32 alpha, i;

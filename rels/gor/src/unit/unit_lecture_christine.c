@@ -13,13 +13,13 @@
 #include "battle/battle_camera.h"
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_msg.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "unit/party/unit_party_christine.h"
 #include "battle/battle_database_common.h"
 #include "gor.h"
 
 static USER_FUNC(_battle_set_lecture_unit_id);
-USER_FUNC(_set_lecture_mode);
+static USER_FUNC(_set_lecture_mode);
 static USER_FUNC(_krb_get_dir);
 
 BattleUnitKind unit_lecture_christine;
@@ -39,7 +39,7 @@ BattleWeapon lec_weapon_zutsuki_1;
 BattleWeapon lec_weapon_zutsuki_2;
 extern EvtWord lecture_zutsuki_attack_event[];
 
-USER_FUNC(_get_defence_ac_result) {
+static USER_FUNC(_get_defence_ac_result) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
     s32 var = args[0];
@@ -63,7 +63,7 @@ USER_FUNC(_get_defence_ac_result) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_config_key_record) {
+static USER_FUNC(_config_key_record) {
     s32 record = event->args[0];
     BattleWork* wp = _battleWorkPointer;
     BattleWorkPad* pad = &wp->actionCommands.pad;
@@ -190,7 +190,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -232,7 +232,7 @@ static EVT_BEGIN(wait_event)
 EVT_END()
 
 static EVT_BEGIN(attack_event)
-    CALL_CHILD(PTR(lecture_zutsuki_attack_event))
+    CALL_CHILD(lecture_zutsuki_attack_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_LECTURE, 1, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(3)
@@ -376,36 +376,52 @@ EVT_BEGIN(lecture_zutsuki_attack_event)
         CALL(btlevtcmd_SetTalkPose, BTL_UNIT_LECTURE, STRING("T_1"))
         CALL(btlevtcmd_SetStayPose, BTL_UNIT_LECTURE, STRING("S_1"))
         CALL(evt_msg_print, 2, STRING("mac_0_b_t2_006"), 0, BTL_UNIT_LECTURE)
+#if VERSION >= VERSION_JP
         WAIT_FRAMES(1)
+#endif
         LABEL(11)
         CALL(btlevtcmd_PadCheckTrigger, 0, 256, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             WAIT_FRAMES(1)
             GOTO(11)
         END_IF
+#if VERSION >= VERSION_JP
         WAIT_MS(50)
+#endif
         BEGIN_INLINE_EVENT
+#if VERSION >= VERSION_JP
             WAIT_MS(100)
+#endif
             CALL(evt_msg_continue)
         END_INLINE_EVENT
+#if VERSION >= VERSION_JP
         WAIT_MS(100)
+#endif
         CASE_EQUAL(7)
         CALL(btlevtcmd_SetTalkPose, BTL_UNIT_LECTURE, STRING("T_1"))
         CALL(btlevtcmd_SetStayPose, BTL_UNIT_LECTURE, STRING("S_1"))
         CALL(evt_msg_print, 2, STRING("mac_0_b_t2_014"), 0, BTL_UNIT_LECTURE)
+#if VERSION >= VERSION_JP
         WAIT_FRAMES(1)
+#endif
         LABEL(12)
         CALL(btlevtcmd_PadCheckTrigger, 0, 512, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             WAIT_FRAMES(1)
             GOTO(12)
         END_IF
+#if VERSION >= VERSION_JP
         WAIT_MS(50)
+#endif
         BEGIN_INLINE_EVENT
+#if VERSION >= VERSION_JP
             WAIT_MS(100)
+#endif
             CALL(evt_msg_continue)
         END_INLINE_EVENT
+#if VERSION >= VERSION_JP
         WAIT_MS(100)
+#endif
     END_SWITCH
     BEGIN_INLINE_EVENT
         CALL(evt_btl_camera_set_moveSpeedLv, 0, 0)
@@ -503,7 +519,7 @@ static USER_FUNC(_battle_set_lecture_unit_id) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_set_lecture_mode) {
+static USER_FUNC(_set_lecture_mode) {
     BattleWork* wp = _battleWorkPointer;
     s32 id = BattleTransID(event, -3);
     BattleUnit* unit = BattleGetUnitPtr(wp, id);

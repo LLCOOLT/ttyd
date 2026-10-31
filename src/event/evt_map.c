@@ -387,7 +387,7 @@ static USER_FUNC(check) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(check2) {
+static USER_FUNC(check2) {
     EvtWord* args = event->args;
     MarioWork* mp = marioGetPtr();
     evtSetValue(event, args[0], 0);
@@ -446,7 +446,7 @@ USER_FUNC(evt_map_replace_mapobj) {
         case 0:
             effTorchEntry(0, pos.x, pos.y - 3.0f, pos.z, 0.6f);
             break;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         case 1:
             effFireEntry(5, 0, pos.x, pos.y, pos.z, 0.4f);
             break;

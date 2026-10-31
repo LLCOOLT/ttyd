@@ -6,7 +6,7 @@
 #include "battle/battle_camera.h"
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 #include "evt/evt_eff.h"
@@ -32,11 +32,19 @@ BattleUnitKind unit_hennya = {
     0,
     1,
     1,
+#if VERSION <= VERSION_DEMO_US
+    36,
+    0,
+    1,
+    70,
+    3,
+#else
     33,
     1,
     3,
     70,
     1,
+#endif
     50,
     9999,
     26,
@@ -95,7 +103,11 @@ static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {70, 90, 70, 150, 70, 150, 150, 70, 150, 70, 150, 70, 150, 70, 70, 90, 90, 150, 70, 0, 0, 30};
+#else
 static StatusVulnerability regist = {70, 90, 70, 150, 70, 150, 150, 70, 150, 90, 150, 90, 150, 90, 70, 80, 80, 150, 70, 0, 0, 30};
+#endif
 
 static BattleDataEntry data_table[] = {
     {37, dmg_avoid_counter_thorn_head_event},
@@ -160,8 +172,8 @@ static PoseTableEntry pose_table[] = {
     {42, "R_1"},
     {56, "X_1"},
     {57, "X_1"},
-    {65, "T_1"},
-    {69, "S_1"},
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static EVT_BEGIN(init_event)
@@ -199,7 +211,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 

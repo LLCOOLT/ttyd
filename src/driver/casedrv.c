@@ -92,7 +92,7 @@ void caseMain(void) {
     HitEntry* push;
     HitEntry* hammer;
     HitEntry* head;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     s32 fbatMode;
 #endif
 
@@ -106,7 +106,7 @@ void caseMain(void) {
     hammer = mario->hitobjHammer;
     head = mario->hitobjHead;
     btn = mario->buttonTrg;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // the demo has no N_fbatPreventMarioEventChk: only field battle modes 0 and 1 allow case events
     if ((u32)marioStGetSystemLevel() == 0 && !winCheck() && gp->inBattle == 0 &&
         ((fbatMode = fbatGetPointer()->mode) == 0 || fbatMode == 1) && marioCaseEventValidChk()) {

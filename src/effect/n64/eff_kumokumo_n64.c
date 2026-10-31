@@ -115,7 +115,7 @@ s16 batten_texcoord1_tbl[] __attribute__((aligned(32))) = {
     8192, 4096, 12288, 4096, 16384, 4096,
 };
 s8 batten_normal_tbl[] __attribute__((aligned(32))) = {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     0, 0, 64,
 #else
     0, 0, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -155,8 +155,8 @@ u8 rz_tbl[] = {0x00, 0x09, 0x12, 0x1C, 0x25, 0x2F, 0x39, 0x43, 0x4D, 0x57, 0x61,
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX1, GX_TEX_ST, GX_S16, 14);    \
     GXSetArray(GX_VA_TEX1, tex1, 4);
 
-void effKumokumoMain(EffectEntry* effect);
-void effKumokumoDisp(CameraId cameraId, EffectEntry* effect);
+static void effKumokumoMain(EffectEntry* effect);
+static void effKumokumoDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effKumokumoN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 rot, f32 unused, f32 scale) {
     EffectEntry* effect;
@@ -295,7 +295,7 @@ EffectEntry* effKumokumoN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 ro
     return effect;
 }
 
-void effKumokumoMain(EffectEntry* effect) {
+static void effKumokumoMain(EffectEntry* effect) {
     EffKumokumoN64Particle* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -437,7 +437,7 @@ static inline void kkDraw(void* vtx, void* tex0, void* tex1, void* norm, void* c
     }
 }
 
-void effKumokumoDisp(CameraId cameraId, EffectEntry* effect) {
+static void effKumokumoDisp(CameraId cameraId, EffectEntry* effect) {
     EffKumokumoN64Particle* work;
     s32 alpha;
     s32 type;

@@ -10,8 +10,8 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-void effMahojinMain(EffectEntry* effect);
-void effMahojinDisp(CameraId cameraId, EffectEntry* effect);
+static void effMahojinMain(EffectEntry* effect);
+static void effMahojinDisp(CameraId cameraId, EffectEntry* effect);
 
 s32 mahojin_rate;
 
@@ -107,7 +107,7 @@ EffectEntry* effMahojinEntry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effMahojinMain(EffectEntry* effect) {
+static void effMahojinMain(EffectEntry* effect) {
     EffMahojinWork* p;
     s32 i;
     EffMahojinWork* work = effect->userdata;
@@ -258,7 +258,7 @@ void effMahojinMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effMahojinDisp, effect);
 }
 
-void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
+static void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx mtx;
     f32 z[16];
     s32 idx[16];

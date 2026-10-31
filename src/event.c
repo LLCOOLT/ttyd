@@ -17,6 +17,222 @@
 #include "version.h"
 #include "evt/evt_story.h"
 
+static void stage4_00_init(void);
+static void stage4_04_01_init(void);
+static void stage4_04_init(void);
+static void stage4_05_init(void);
+static void stage4_09_05_init(void);
+static void stage4_10_init(void);
+static void stg0_05_init(void);
+static void stg0_08_init(void);
+static void stg0_11_init(void);
+static void stg0_12_02_init(void);
+static void stg0_13_init00(void);
+static void stg0_16_init(void);
+static void stg1_01a_init(void);
+static void stg1_03_init(void);
+static void stg1_06_01_init(void);
+static void stg1_08_init(void);
+static void stg1_09_02_init(void);
+static void stg1_09_init(void);
+static void stg1_10_init(void);
+static void stg1_12_02_init(void);
+static void stg1_13_01_init(void);
+static void stg1_13_02_init(void);
+static void stg1_13_03_init(void);
+static void stg1_13_init(void);
+static void stg1_14_init(void);
+static void stg1_15_02_init(void);
+static void stg1_15_03_init(void);
+static void stg1_15_04_init(void);
+static void stg1_16_init00(void);
+static void stg1_16_init01(void);
+static void stg1_17_init(void);
+static void stg1_19_init(void);
+static void stg1_20_init(void);
+static void stg1_30_init(void);
+static void stg1_30_init01(void);
+static void stg1_35_init01(void);
+static void stg2_00_init(void);
+static void stg2_03_03_init(void);
+static void stg2_09_init(void);
+static void stg2_10_init(void);
+static void stg2_11_init(void);
+static void stg2_12_01_init(void);
+static void stg2_14_init(void);
+static void stg2_15_init(void);
+static void stg2_16_init00(void);
+static void stg2_16_init01(void);
+static void stg2_18_init01(void);
+static void stg2_18_init02(void);
+static void stg2_19_init(void);
+static void stg2_20_init(void);
+static void stg2_21_01_init(void);
+static void stg2_21_02_init(void);
+static void stg2_21_03_init(void);
+static void stg2_21_04_init(void);
+static void stg2_21_06_init00(void);
+static void stg2_21_06_init01(void);
+static void stg2_21_init00(void);
+static void stg2_21_init02(void);
+static void stg2_23_01_init(void);
+static void stg2_23_init(void);
+static void stg2_25_02_init(void);
+static void stg2_25_init(void);
+static void stg2_26_init(void);
+static void stg2_40_init(void);
+static void stg2_44_init(void);
+static void stg2_47_init(void);
+static void stg2_end_init(void);
+static void stg3_06_init(void);
+static void stg3_07_init__6(void);
+static void stg3_07_init__7(void);
+static void stg3_07_init__8(void);
+static void stg3_07_init__9(void);
+static void stg3_10_init__5(void);
+static void stg3_12_2_init(void);
+static void stg3_12_init__1(void);
+static void stg3_12_init__2(void);
+static void stg3_12_init__3(void);
+static void stg3_12_init__4(void);
+static void stg3_20_01_init(void);
+static void stg3_20_02_init(void);
+static void stg3_20_06_init(void);
+static void stg3_20_07_00_init(void);
+static void stg3_20_08_init(void);
+static void stg3_20_09_init(void);
+static void stg3_20_12_init(void);
+static void stg3_20_13_init(void);
+static void stg3_20_14_init(void);
+static void stg3_20_15_init(void);
+static void stg3_20_init_1(void);
+static void stg3_20_init_10(void);
+static void stg3_20_init_2(void);
+static void stg3_20_init_3(void);
+static void stg3_20_init_4(void);
+static void stg3_20_init_5(void);
+static void stg3_20_init_6(void);
+static void stg3_20_init_7(void);
+static void stg3_20_init_8(void);
+static void stg3_20_init_9(void);
+static void stg3_21_init(void);
+static void stg3_30_init(void);
+static void stg3_31_00_init(void);
+static void stg3_31_init(void);
+static void stg3_32_init(void);
+static void stg3_33_03_init(void);
+static void stg3_33_04_init(void);
+static void stg3_33_init(void);
+static void stg3_34_init(void);
+static void stg3_35_init(void);
+static void stg3_50_init(void);
+static void stg3_52_init(void);
+static void stg3_end_init(void);
+static void stg4_11_init(void);
+static void stg4_13_02_init(void);
+static void stg4_13_03_init(void);
+static void stg4_13_init(void);
+static void stg4_14_init(void);
+static void stg4_15_03_init(void);
+static void stg4_15_init(void);
+static void stg4_16_init(void);
+static void stg4_30_init(void);
+static void stg4_35_init(void);
+static void stg4_36_init(void);
+static void stg4_37_init(void);
+static void stg4_end_init(void);
+static void stg5_12_init01(void);
+static void stg5_15_init01(void);
+static void stg5_15_init02(void);
+static void stg5_17_init(void);
+static void stg5_18_init(void);
+static void stg5_18_init_02(void);
+static void stg5_19_01_init(void);
+static void stg5_19_init00(void);
+static void stg5_19_init01(void);
+static void stg5_19_init02(void);
+static void stg5_21_01_init00(void);
+static void stg5_21_init00(void);
+static void stg5_21_init01(void);
+static void stg5_21_init03(void);
+static void stg5_22_init00(void);
+static void stg5_22_init01(void);
+static void stg5_29_init(void);
+static void stg5_30_init01(void);
+static void stg5_30_init02(void);
+static void stg5_43_init(void);
+static void stg5_47_init(void);
+static void stg5_58_init(void);
+static void stg5_59_01_init(void);
+static void stg5_60_init(void);
+static void stg5_62_init(void);
+static void stg5_63_init(void);
+static void stg5_64_01_init(void);
+static void stg5_64_02_init(void);
+static void stg5_64_03_init(void);
+static void stg5_64_init(void);
+static void stg5_65_init(void);
+static void stg5_66_init(void);
+static void stg6_00_init(void);
+static void stg6_06_init(void);
+static void stg6_12_init(void);
+static void stg6_13_init(void);
+static void stg6_18_init(void);
+static void stg6_19_init(void);
+static void stg6_20_init(void);
+static void stg6_22_init(void);
+static void stg6_24_init(void);
+static void stg6_27_init(void);
+static void stg6_29_init(void);
+static void stg6_30_init(void);
+static void stg6_32_init(void);
+static void stg6_33_init(void);
+static void stg6_34_init(void);
+static void stg6_37_init(void);
+static void stg6_38_init(void);
+static void stg6_39_init(void);
+static void stg6_44_init(void);
+static void stg6_47_00_init(void);
+static void stg6_54_init(void);
+static void stg6_56_init(void);
+static void stg6_70_init(void);
+static void stg6_71_01_init(void);
+static void stg6_72_init(void);
+static void stg6_end_init01(void);
+static void stg6_end_init02(void);
+static void stg7_01_init(void);
+static void stg7_03_white_0(void);
+static void stg7_03_white_1(void);
+static void stg7_03_white_2(void);
+static void stg7_03_white_3(void);
+static void stg7_03_white_4(void);
+static void stg7_03_white_5(void);
+static void stg7_04_init(void);
+static void stg7_06_init(void);
+static void stg7_10_init(void);
+static void stg7_11_init(void);
+static void stg7_15_init(void);
+static void stg7_15_room_A_init(void);
+static void stg7_15_room_B_init(void);
+static void stg7_15_room_C_init(void);
+static void stg7_16_init(void);
+static void stg7_17_init(void);
+static void stg7_19_init(void);
+static void stg7_20_init(void);
+static void stg7_25_00_init(void);
+static void stg7_50_init(void);
+static void stg7_51_init(void);
+static void stg7_52_init(void);
+static void stg8_01_02_init(void);
+static void stg8_02_init(void);
+static void stg8_05_init(void);
+static void stg8_06_init(void);
+static void stg8_10_init(void);
+static void stg8_11_init(void);
+static void stg8_13_init(void);
+static void stg8_14_init(void);
+static void stg8_15_init(void);
+
 // NAME_EN("..."): the English event name. The US and PAL EventData have an extra nameEn field after
 // nameJp (include/event.h); JP and the demo have only the Japanese name.
 #if VERSION >= VERSION_US
@@ -550,7 +766,7 @@ EventData stage9_evt[] = {
     {0, 0, 0, 403, "STG9_00", "クリスチーヌ２" NAME_EN("Goombella 2"), "gor_00", "epilogue2", NULL},
     {0, 0, 0, 403, "STG9_00", "マリオの家２" NAME_EN("Mario's House 2"), "aaa_00", "epilogue2", NULL},
     {0, 1, 0, 404, "STG9_01", "スタッフロール" NAME_EN("End Credits"), "end_00", "", NULL},
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     {0, 1, 0, 405, "STG9_02", "クリア後（最初）" NAME_EN("Return to Rogueport"), "gor_00", "", NULL},
 #else
     {0, 1, 0, 405, "STG9_02", "クリア後（最初）" NAME_EN("Return to Rogueport"), "gor_00", "", N_stg9_02_init},
@@ -588,106 +804,106 @@ void stg0_00_init(void) {
     statusWinForceUpdate();
 }
 
-void stg0_05_init(void) {
+static void stg0_05_init(void) {
     swSet(GSWF_GOR00_GOOMBELLA_ASSAULTED_SEEN);
 }
 
-void stg0_08_init(void) {
+static void stg0_08_init(void) {
     partyJoin(PARTNER_GOOMBELLA);
 }
 
-void stg0_11_init(void) {
+static void stg0_11_init(void) {
     swSet(GSWF_GOR02_FRANKLY_INTRO_SEEN);
 }
 
-void stg0_12_02_init(void) {
+static void stg0_12_02_init(void) {
     swSet(GSWF_TIK04_SWITCH_PRESSED);
 }
 
-void stg0_13_init00(void) {
+static void stg0_13_init00(void) {
     pouchGetItem(ITEM_PLANE_CURSE);
     swSet(GSWF_TIK04_BLACK_KEY_TAKEN);
 }
 
-void stg0_16_init(void) {
+static void stg0_16_init(void) {
     pouchGetStarStone(0);
 }
 
 // Stage 1 ----------------------------------------------------------------------------
-void stg1_01a_init(void) {
+static void stg1_01a_init(void) {
     swSet(GSWF_HEI01_BUSH_PIPE_REVEALED);
 }
 
-void stg1_03_init(void) {
+static void stg1_03_init(void) {
     swSet(GSWF_MAIL_FRANKLY_SENT);
     pouchReceiveMail(0x10);
     pouchReceiveMail(0x1A);
 }
 
-void stg1_06_01_init(void) {
+static void stg1_06_01_init(void) {
     pouchGetItem(ITEM_MOON_STONE);
     swSet(GSWF_HEI_MOON_STONE_TAKEN);
     pouchGetItem(ITEM_SUN_STONE);
     swSet(GSWF_HEI_SUN_STONE_TAKEN);
 }
 
-void stg1_08_init(void) {
+static void stg1_08_init(void) {
     partyJoin(PARTNER_KOOPS);
     swSet(GSWF_HEI01_KOOPS_ASKED_TO_JOIN);
     swSet(GSWF_HEI01_KOOPIE_KOO_FAREWELL);
 }
 
-void stg1_09_init(void) {
+static void stg1_09_init(void) {
     pouchRemoveItem(ITEM_MOON_STONE);
     pouchRemoveItem(ITEM_SUN_STONE);
 }
 
-void stg1_09_02_init(void) {
+static void stg1_09_02_init(void) {
     // stubbed
 }
 
-void stg1_10_init(void) {
+static void stg1_10_init(void) {
     // stubbed
 }
 
-void stg1_12_02_init(void) {
+static void stg1_12_02_init(void) {
     pouchGetItem(ITEM_CASTLE_KEY_0x0D);
 }
 
-void stg1_13_init(void) {
+static void stg1_13_init(void) {
     pouchRemoveItem(ITEM_CASTLE_KEY_0x0D);
 }
 
-void stg1_13_01_init(void) {
+static void stg1_13_01_init(void) {
     pouchGetItem(ITEM_BLACK_KEY_0x22);
 }
 
-void stg1_13_02_init(void) {
+static void stg1_13_02_init(void) {
     pouchRemoveItem(ITEM_BLACK_KEY_0x22);
     pouchGetItem(ITEM_PAPER_CURSE);
 }
 
-void stg1_13_03_init(void) {
+static void stg1_13_03_init(void) {
     pouchGetItem(ITEM_CASTLE_KEY_0x0C);
 }
 
-void stg1_14_init(void) {
+static void stg1_14_init(void) {
     pouchRemoveItem(ITEM_CASTLE_KEY_0x0C);
 }
 
-void stg1_15_02_init(void) {
+static void stg1_15_02_init(void) {
     pouchGetItem(ITEM_CASTLE_KEY_0x0F);
 }
 
-void stg1_15_03_init(void) {
+static void stg1_15_03_init(void) {
     pouchRemoveItem(ITEM_CASTLE_KEY_0x0F);
 }
 
-void stg1_15_04_init(void) {
+static void stg1_15_04_init(void) {
     pouchGetItem(ITEM_CASTLE_KEY_0x0E);
 }
 
-void stg1_16_init00(void) {
+static void stg1_16_init00(void) {
     pouchRemoveItem(ITEM_CASTLE_KEY_0x0E);
     pouchGetItem(ITEM_ATTACK_FX_R);
     pouchGetItem(ITEM_POWER_BOUNCE);
@@ -697,40 +913,40 @@ void stg1_16_init00(void) {
     pouchReviseMarioParam();
 }
 
-void stg1_16_init01(void) {
+static void stg1_16_init01(void) {
     swSet(GSWF_GON11_HOOKTAIL_INTRO_SKIP);
 }
 
-void stg1_17_init(void) {
+static void stg1_17_init(void) {
     pouchGetItem(ITEM_DIAMOND_STAR);
     pouchGetStarStone(1);
 }
 
-void stg1_19_init(void) {
+static void stg1_19_init(void) {
     swSet(GSWF_AJI15_PEACH1_SHOWER_ROOM_ENTERED);
     swSet(GSWF_AJI16_PEACH1_AFTER_SHOWER_REMARK);
     swSet(GSWF_AJI01_PEACH1_DOOR_OPENED);
 }
 
-void stg1_20_init(void) {
+static void stg1_20_init(void) {
     marioSetCharMode(0);
 }
 
-void stg1_30_init(void) {
+static void stg1_30_init(void) {
     pouchReceiveMail(0);
     pouchOpenMail(0);
 }
 
-void stg1_30_init01(void) {
+static void stg1_30_init01(void) {
     swSet(GSWF_GOR01_LENS_DELIVERED);
     swSet(GSWF_GOR01_ZESS_BLOCKS_GATE);
 }
 
-void stg1_35_init01(void) {
+static void stg1_35_init01(void) {
     swSet(GSWF_TIK03_SECRET_DOOR_OPEN);
 }
 
-void stg2_00_init(void) {
+static void stg2_00_init(void) {
     PouchData* pouch;
 
     pouch = pouchGetPtr();
@@ -741,70 +957,70 @@ void stg2_00_init(void) {
     pouch->level = 3;
 }
 
-void stg2_03_03_init(void) {
+static void stg2_03_03_init(void) {
     // stubbed
 }
 
-void stg2_09_init(void) {
+static void stg2_09_init(void) {
     pouchGetItem(ITEM_NECKLACE);
 }
 
-void stg2_10_init(void) {
+static void stg2_10_init(void) {
     pouchRemoveItem(ITEM_NECKLACE);
     partyJoin(PARTNER_FLURRIE);
     swSet(GSWF_MAIL_RDM_ISSUE1_SENT);
     pouchReceiveMail(0x1B);
 }
 
-void stg2_11_init(void) {
+static void stg2_11_init(void) {
     swSet(GSWF_MRI00_PUNIO_FOLLOWING);
 }
 
-void stg2_12_01_init(void) {
+static void stg2_12_01_init(void) {
     swSet(GSWF_MRI_PUNIO_IN_PUNI_GROUP);
     swByteSet(GSW_MRI_PUNI_FOLLOWERS, 0);
 }
 
-void stg2_14_init(void) {
+static void stg2_14_init(void) {
     pouchGetItem(ITEM_RED_KEY);
     swSet(GSWF_MRI04_RED_KEY_TAKEN);
 }
 
-void stg2_15_init(void) {
+static void stg2_15_init(void) {
     pouchRemoveItem(ITEM_RED_KEY);
     swSet(GSWF_MRI03_RED_CELL_UNLOCKED);
     swSet(GSWF_MRI03_RED_CELL_DOOR_OPEN);
 }
 
-void stg2_16_init00(void) {
+static void stg2_16_init00(void) {
     swSet(GSWF_MRI_RIVAL_IN_PUNI_GROUP);
     swByteSet(GSW_MRI_PUNI_FOLLOWERS, 9);
     pouchGetItem(ITEM_PUNI_ORB);
 }
 
-void stg2_16_init01(void) {
+static void stg2_16_init01(void) {
     swSet(GSWF_MRI01_ELDER_POWERS_EXPLAINED);
 }
 
-void stg2_18_init01(void) {
+static void stg2_18_init01(void) {
     swSet(GSWF_MRI_JABBI_IN_PUNI_GROUP);
 }
 
-void stg2_18_init02(void) {
+static void stg2_18_init02(void) {
     swSet(GSWF_MRI08_JABBI_FIGHT_STARTED);
     swSet(GSWF_MRI08_JABBI_FIGHT_WON);
 }
 
-void stg2_19_init(void) {
+static void stg2_19_init(void) {
     swSet(GSWF_MRI09_BLUE_KEY_CHEST_OPENED);
     pouchGetItem(ITEM_BLUE_KEY);
 }
 
-void stg2_20_init(void) {
+static void stg2_20_init(void) {
     swSet(GSWF_MRI03_PUNIO_WAITING_AT_CELL);
 }
 
-void stg2_21_init00(void) {
+static void stg2_21_init00(void) {
     pouchRemoveItem(ITEM_BLUE_KEY);
     swSet(GSWF_MRI03_BLUE_CELL_UNLOCKED);
     swSet(GSWF_MRI03_BLUE_CELL_DOOR_OPEN);
@@ -813,12 +1029,12 @@ void stg2_21_init00(void) {
     swByteSet(GSW_MRI_PUNI_FOLLOWERS, 0x62);
 }
 
-void stg2_21_init02(void) {
+static void stg2_21_init02(void) {
     swSet(GSWF_MRI11_JABBI_FIGHT2_STARTED);
     swSet(GSWF_MRI11_JABBI_FIGHT2_WON);
 }
 
-void stg2_21_01_init(void) {
+static void stg2_21_01_init(void) {
     swByteSet(GSW_MRI_PUNI_TRAPPED_BITS, 0xF6);
     swByteSet(GSW_MRI_PUNI_TRAPPED_BITS + 1, 0xFF);
     swByteSet(GSW_MRI_PUNI_TRAPPED_BITS + 2, 0xFF);
@@ -834,19 +1050,19 @@ void stg2_21_01_init(void) {
     swByteSet(GSW_MRI_PUNI_TRAPPED_BITS + 12, 0x7F);
 }
 
-void stg2_21_02_init(void) {
+static void stg2_21_02_init(void) {
     swSet(GSWF_MRI17_STRANGE_STATUE_SEEN);
 }
 
-void stg2_21_03_init(void) {
+static void stg2_21_03_init(void) {
     swSet(GSWF_MRI09_WALL_PANELS_ROLLED);
 }
 
-void stg2_21_04_init(void) {
+static void stg2_21_04_init(void) {
     pouchGetItem(ITEM_SUPER_BOOTS);
 }
 
-void stg2_21_06_init00(void) {
+static void stg2_21_06_init00(void) {
     swByteSet(GSW_MRI_PUNI_TRAPPED_BITS, 0);
     swByteSet(GSW_MRI_PUNI_TRAPPED_BITS + 1, 0);
     swByteSet(GSW_MRI_PUNI_TRAPPED_BITS + 2, 0);
@@ -862,53 +1078,53 @@ void stg2_21_06_init00(void) {
     swByteSet(GSW_MRI_PUNI_TRAPPED_BITS + 12, 0);
 }
 
-void stg2_21_06_init01(void) {
+static void stg2_21_06_init01(void) {
     swSet(GSWF_MRI16_WATER_SWITCH_PRESSED);
 }
 
-void stg2_23_init(void) {
+static void stg2_23_init(void) {
     swSet(GSWF_MRI14_TIME_BOMB_SCENE_PENDING);
 }
 
-void stg2_23_01_init(void) {
+static void stg2_23_01_init(void) {
     swClear(GSWF_MRI14_TIME_BOMB_SCENE_PENDING);
     swSet(GSWF_MRI_BOMB_COUNTDOWN_PENDING);
 }
 
-void stg2_25_init(void) {
+static void stg2_25_init(void) {
     swClear(GSWF_MRI_BOMB_COUNTDOWN_PENDING);
     pouchGetItem(ITEM_EMERALD_STAR);
     pouchGetStarStone(2);
 }
 
-void stg2_25_02_init(void) {
+static void stg2_25_02_init(void) {
     swSet(GSWF_AJI16_PEACH2_SCENE_DONE);
 }
 
-void stg2_26_init(void) {
+static void stg2_26_init(void) {
     marioSetCharMode(0);
 }
 
-void stg2_40_init(void) {
+static void stg2_40_init(void) {
     swSet(GSWF_MRI_LEFT_TREE_AFTER_STG2);
     pouchReceiveMail(1);
     pouchOpenMail(1);
 }
 
-void stg2_44_init(void) {
+static void stg2_44_init(void) {
     swSet(GSWF_GOR03_SYNDICATE_BACKDOOR_OPEN);
 }
 
-void stg2_47_init(void) {
+static void stg2_47_init(void) {
     pouchGetItem(ITEM_BLIMP_TICKET);
 }
 
-void stg2_end_init(void) {
+static void stg2_end_init(void) {
     swSet(GSWF_MAIL_KOOPLEY_SENT);
     pouchReceiveMail(0x11);
 }
 
-void stg3_06_init(void) {
+static void stg3_06_init(void) {
     swSet(GSWF_TOU_MATCH_RESERVED);
     swByteSet(GSW_TOU_OPPONENT_ID, 0x13);
     swByteSet(GSW_TOU_MATCH_RULE, 0x2B);
@@ -916,7 +1132,7 @@ void stg3_06_init(void) {
     swByteSet(GSW_TOU_MATCH_RULE_PARAM2, 1);
 }
 
-void stg3_07_init__9(void) {
+static void stg3_07_init__9(void) {
     int i;
 
     for (i = 0; i < 1; i++) {
@@ -931,7 +1147,7 @@ void stg3_07_init__9(void) {
     swSet(GSWF_TOU_LAST_RULE_MET);
 }
 
-void stg3_07_init__8(void) {
+static void stg3_07_init__8(void) {
     int i;
 
     for (i = 0; i < 2; i++) {
@@ -942,7 +1158,7 @@ void stg3_07_init__8(void) {
     swSet(GSWF_TOU_RANK18_SCENE);
 }
 
-void stg3_07_init__7(void) {
+static void stg3_07_init__7(void) {
     int i;
 
     for (i = 0; i < 3; i++) {
@@ -952,7 +1168,7 @@ void stg3_07_init__7(void) {
     swSet(GSWF_TOU_RANK17_SCENE);
 }
 
-void stg3_07_init__6(void) {
+static void stg3_07_init__6(void) {
     int i;
 
     for (i = 0; i < 4; i++) {
@@ -962,7 +1178,7 @@ void stg3_07_init__6(void) {
     swSet(GSWF_TOU_RANK16_SCENE);
 }
 
-void stg3_10_init__5(void) {
+static void stg3_10_init__5(void) {
     int i;
 
     for (i = 0; i < 5; i++) {
@@ -972,7 +1188,7 @@ void stg3_10_init__5(void) {
     swSet(GSWF_TOU_RANK15_SCENE);
 }
 
-void stg3_12_init__4(void) {
+static void stg3_12_init__4(void) {
     u8 copytobyte[8]; // stack+8/12
     int i;
 
@@ -990,7 +1206,7 @@ void stg3_12_init__4(void) {
     pouchReceiveMail(0x1C);
 }
 
-void stg3_12_init__3(void) {
+static void stg3_12_init__3(void) {
     int i;
 
     for (i = 0; i < 7; i++) {
@@ -1000,7 +1216,7 @@ void stg3_12_init__3(void) {
     swSet(GSWF_TOU_RANK13_SCENE);
 }
 
-void stg3_12_init__2(void) {
+static void stg3_12_init__2(void) {
     int i;
 
     for (i = 0; i < 8; i++) {
@@ -1010,7 +1226,7 @@ void stg3_12_init__2(void) {
     swSet(GSWF_TOU_RANK12_KING_K_GONE);
 }
 
-void stg3_12_init__1(void) {
+static void stg3_12_init__1(void) {
     int i;
 
     for (i = 0; i < 9; i++) {
@@ -1020,14 +1236,14 @@ void stg3_12_init__1(void) {
     swSet(GSWF_TOU_RANK11_SWOOPS_JOINS);
 }
 
-void stg3_12_2_init(void) {
+static void stg3_12_2_init(void) {
     yoshiSetColor();
     pouchSetYoshiName((char*)msgSearch("name_party3"));
     partyJoin(PARTNER_YOSHI);
     swSet(GSWF_TOU_IRON_CLEFTS_OPENING_SEEN);
 }
 
-void stg3_20_init_10(void) {
+static void stg3_20_init_10(void) {
     int i;
 
     for (i = 0; i < 10; i++) {
@@ -1040,7 +1256,7 @@ void stg3_20_init_10(void) {
     pouchOpenMail(6);
 }
 
-void stg3_20_init_9(void) {
+static void stg3_20_init_9(void) {
     int i;
 
     for (i = 0; i < 11; i++) {
@@ -1050,7 +1266,7 @@ void stg3_20_init_9(void) {
     swSet(GSWF_TOU_RANK9_SCENE);
 }
 
-void stg3_20_init_8(void) {
+static void stg3_20_init_8(void) {
     int i;
 
     for (i = 0; i < 12; i++) {
@@ -1060,18 +1276,18 @@ void stg3_20_init_8(void) {
     swSet(GSWF_TOU_MAIL1_RECEIVED);
 }
 
-void stg3_20_01_init(void) {
+static void stg3_20_01_init(void) {
     pouchReceiveMail(7);
     pouchOpenMail(7);
 }
 
-void stg3_20_02_init(void) {
+static void stg3_20_02_init(void) {
     pouchGetItem(ITEM_SUPER_HAMMER);
     pouchReceiveMail(8);
     pouchOpenMail(8);
 }
 
-void stg3_20_init_7(void) {
+static void stg3_20_init_7(void) {
     int i;
 
     for (i = 0; i < 13; i++) {
@@ -1085,7 +1301,7 @@ void stg3_20_init_7(void) {
     pouchOpenMail(9);
 }
 
-void stg3_20_init_6(void) {
+static void stg3_20_init_6(void) {
     int i;
 
     for (i = 0; i < 14; i++) {
@@ -1096,7 +1312,7 @@ void stg3_20_init_6(void) {
     swClear(GSWF_TOU08_SKIP_TO_143);
 }
 
-void stg3_20_init_5(void) {
+static void stg3_20_init_5(void) {
     int i;
 
     for (i = 0; i < 15; i++) {
@@ -1106,7 +1322,7 @@ void stg3_20_init_5(void) {
     swSet(GSWF_TOU_BOWSER_RAID_DONE);
 }
 
-void stg3_20_init_4(void) {
+static void stg3_20_init_4(void) {
     int i;
 
     for (i = 0; i < 16; i++) {
@@ -1117,27 +1333,27 @@ void stg3_20_init_4(void) {
     swSet(GSWF_TOU08_SKIP_TO_144);
 }
 
-void stg3_20_06_init(void) {
+static void stg3_20_06_init(void) {
     swClear(GSWF_TOU08_SKIP_TO_144);
     pouchReceiveMail(10);
     pouchOpenMail(10);
 }
 
-void stg3_20_07_00_init(void) {
+static void stg3_20_07_00_init(void) {
     pouchGetItem(ITEM_STORAGE_KEY_0x12);
 }
 
-void stg3_20_08_init(void) {
+static void stg3_20_08_init(void) {
     pouchReceiveMail(11);
     pouchOpenMail(11);
 }
 
-void stg3_20_09_init(void) {
+static void stg3_20_09_init(void) {
     pouchReceiveMail(12);
     pouchOpenMail(12);
 }
 
-void stg3_20_12_init(void) {
+static void stg3_20_12_init(void) {
     pouchRemoveItem(ITEM_STORAGE_KEY_0x12);
     swSet(GSWF_TOU06_BLOCK_A_BROKEN);
     swSet(GSWF_TOU06_BLOCK_B_BROKEN);
@@ -1149,7 +1365,7 @@ void stg3_20_12_init(void) {
     swSet(GSWF_TOU06_BLOCK_H_BROKEN);
 }
 
-void stg3_20_init_3(void) {
+static void stg3_20_init_3(void) {
     int i;
 
     for (i = 0; i < 17; i++) {
@@ -1161,7 +1377,7 @@ void stg3_20_init_3(void) {
     pouchOpenMail(13);
 }
 
-void stg3_20_init_2(void) {
+static void stg3_20_init_2(void) {
     int i;
 
     for (i = 0; i < 18; i++) {
@@ -1173,7 +1389,7 @@ void stg3_20_init_2(void) {
     swSet(GSWF_TOU_PARTNER_POISON_CURED);
 }
 
-void stg3_20_init_1(void) {
+static void stg3_20_init_1(void) {
     int i;
 
     for (i = 0; i < 19; i++) {
@@ -1187,21 +1403,21 @@ void stg3_20_init_1(void) {
     pouchOpenMail(14);
 }
 
-void stg3_20_13_init(void) {
+static void stg3_20_13_init(void) {
     swClear(GSWF_TOU08_SKIP_TO_153);
 }
 
-void stg3_20_14_init(void) {
+static void stg3_20_14_init(void) {
     pouchGetItem(ITEM_STORAGE_KEY_0x13);
     pouchReceiveMail(15);
     pouchOpenMail(15);
 }
 
-void stg3_20_15_init(void) {
+static void stg3_20_15_init(void) {
     pouchRemoveItem(ITEM_STORAGE_KEY_0x13);
 }
 
-void stg3_21_init(void) {
+static void stg3_21_init(void) {
     swSet(GSWF_TOU_MATCH_RESERVED);
     swByteSet(GSW_TOU_OPPONENT_ID, 0);
     swSet(GSWF_TOU_TITLE_MATCH_RESERVED);
@@ -1210,7 +1426,7 @@ void stg3_21_init(void) {
     swByteSet(GSW_TOU_MATCH_RULE_PARAM2, 1);
 }
 
-void stg3_30_init(void) {
+static void stg3_30_init(void) {
     int i;
 
     for (i = 0; i < 20; i++) {
@@ -1230,36 +1446,36 @@ void stg3_30_init(void) {
     swSet(GSWF_TOU_RAWK_HAWK_PHASE3_SEEN);
 }
 
-void stg3_31_00_init(void) {
+static void stg3_31_00_init(void) {
     swClear(GSWF_TOU_MATCH_RESULT_PENDING);
     pouchGetItem(ITEM_CHAMPS_BELT);
     pouchReceiveMail(0x2B);
     pouchOpenMail(0x2B);
 }
 
-void stg3_31_init(void) {
+static void stg3_31_init(void) {
     swClear(GSWF_TOU_MATCH_RESULT_PENDING);
 }
 
-void stg3_32_init(void) {
+static void stg3_32_init(void) {
     swSet(GSWF_TOU05_DUCT_GRATE_FALLEN);
 }
 
-void stg3_33_init(void) {
+static void stg3_33_init(void) {
     pouchGetItem(ITEM_GOLD_STAR);
     pouchGetStarStone(3);
 }
 
-void stg3_33_03_init(void) {
+static void stg3_33_03_init(void) {
     swSet(GSWF_AJI09_PEACH3_UNIFORM_TAKEN);
     swSet(GSWF_AJI09_PEACH3_DISGUISED);
 }
 
-void stg3_33_04_init(void) {
+static void stg3_33_04_init(void) {
     swClear(GSWF_AJI09_PEACH3_DISGUISED);
 }
 
-void stg3_34_init(void) {
+static void stg3_34_init(void) {
     int i;
 
     swSet(GSWF_TOU02_LOBBY_CROWD_SEEN);
@@ -1278,86 +1494,86 @@ void stg3_34_init(void) {
     swClear(GSWF_TOU02_LOBBY_CROWD_CHAMP_SEEN);
 }
 
-void stg3_35_init(void) {
+static void stg3_35_init(void) {
     swSet(GSWF_TOU_LEFT_AS_CHAMPION);
 }
 
-void stg3_50_init(void) {
+static void stg3_50_init(void) {
     pouchReceiveMail(2);
     pouchOpenMail(2);
 }
 
-void stg3_52_init(void) {
+static void stg3_52_init(void) {
     swSet(GSWF_TIK08_TWILIGHT_PIPE_REACHED);
     swSet(GSWF_MAIL_KOOPIE_KOO_SENT);
     pouchReceiveMail(0x12);
 }
 
-void stg3_end_init(void) {
+static void stg3_end_init(void) {
     // stubbed
 }
 
-void stage4_00_init(void) {
+static void stage4_00_init(void) {
     // stubbed
 }
 
-void stage4_04_init(void) {
+static void stage4_04_init(void) {
     pouchGetItem(ITEM_SHOP_KEY);
 }
 
-void stage4_04_01_init(void) {
+static void stage4_04_01_init(void) {
     pouchRemoveItem(ITEM_SHOP_KEY);
     swSet(GSWF_GRA00_BLACK_KEY_TAKEN);
     pouchGetItem(ITEM_BLACK_KEY_0x23);
 }
 
-void stage4_05_init(void) {
+static void stage4_05_init(void) {
     pouchRemoveItem(ITEM_BLACK_KEY_0x23);
     pouchGetItem(ITEM_TUBE_CURSE);
     swSet(GSWF_MAIL_RDM_ISSUE3_SENT);
     pouchReceiveMail(0x1D);
 }
 
-void stage4_09_05_init(void) {
+static void stage4_09_05_init(void) {
     pouchGetItem(ITEM_STEEPLE_KEY_0x16);
 }
 
-void stage4_10_init(void) {
+static void stage4_10_init(void) {
     pouchRemoveItem(ITEM_STEEPLE_KEY_0x16);
 }
 
-void stg4_11_init(void) {
+static void stg4_11_init(void) {
     partyLeft(PARTNER_GOOMBELLA);
     partyLeft(PARTNER_KOOPS);
     partyLeft(PARTNER_FLURRIE);
     partyLeft(PARTNER_YOSHI);
 }
 
-void stg4_13_init(void) {
+static void stg4_13_init(void) {
     pouchGetItem(ITEM_SUPERBOMBOMB);
 }
 
-void stg4_13_02_init(void) {
+static void stg4_13_02_init(void) {
     pouchRemoveItem(ITEM_SUPERBOMBOMB);
     partyJoin(PARTNER_VIVIAN);
 }
 
-void stg4_13_03_init(void) {
+static void stg4_13_03_init(void) {
     swSet(GSWF_GRA01_VIVIAN_FIRST_TRAIL_TALK);
 }
 
-void stg4_14_init(void) {
+static void stg4_14_init(void) {
     pouchGetItem(ITEM_THE_LETTER_P);
     swSet(GSWF_GRA01_VIVIAN_FIRST_TRAIL_TALK);
     swSet(GSWF_JIN08_STEEPLE_KEY_TAKEN);
     swSet(GSWF_JIN08_DOOR_UNLOCKED);
 }
 
-void stg4_15_init(void) {
+static void stg4_15_init(void) {
     pouchRemoveItem(ITEM_THE_LETTER_P);
 }
 
-void stg4_15_03_init(void) {
+static void stg4_15_03_init(void) {
     partyJoin(PARTNER_GOOMBELLA);
     partyJoin(PARTNER_KOOPS);
     partyJoin(PARTNER_FLURRIE);
@@ -1366,137 +1582,137 @@ void stg4_15_03_init(void) {
     pouchGetStarStone(4);
 }
 
-void stg4_16_init(void) {
+static void stg4_16_init(void) {
     marioSetCharMode(0);
 }
 
-void stg4_30_init(void) {
+static void stg4_30_init(void) {
     pouchReceiveMail(3);
     pouchOpenMail(3);
 }
 
-void stg4_35_init(void) {
+static void stg4_35_init(void) {
     swSet(GSWF_GOR02_BOBBERY_DOOR_OPEN);
     swSet(GSWF_GOR02_BOBBERY_DECLINE_SCENE_DONE);
 }
 
-void stg4_36_init(void) {
+static void stg4_36_init(void) {
     pouchGetItem(ITEM_OLD_LETTER);
 }
 
-void stg4_37_init(void) {
+static void stg4_37_init(void) {
     pouchRemoveItem(ITEM_OLD_LETTER);
 }
 
-void stg4_end_init(void) {
+static void stg4_end_init(void) {
     swSet(GSWF_MAIL_PETUNI_SENT);
     pouchReceiveMail(0x13);
 }
 
-void stg5_12_init01(void) {
+static void stg5_12_init01(void) {
     swSet(GSWF_MUJ01_SKIP_TO_SHOW_OF_HANDS);
 }
 
-void stg5_15_init01(void) {
+static void stg5_15_init01(void) {
     swSet(GSWF_MUJ03_RUNAWAY_SAILOR_SEEN);
 }
 
-void stg5_15_init02(void) {
+static void stg5_15_init02(void) {
     swSet(GSWF_MUJ01_TIMID_SAILOR_PERSUADED);
 }
 
-void stg5_17_init(void) {
+static void stg5_17_init(void) {
     pouchGetItem(ITEM_COCONUT);
 }
 
-void stg5_18_init(void) {
+static void stg5_18_init(void) {
     pouchGetItem(ITEM_CHUCKOLA_COLA);
     pouchRemoveItem(ITEM_COCONUT);
 }
 
-void stg5_18_init_02(void) {
+static void stg5_18_init_02(void) {
     pouchRemoveItem(ITEM_CHUCKOLA_COLA);
     partyJoin(PARTNER_BOBBERY);
 }
 
-void stg5_19_init00(void) {
+static void stg5_19_init00(void) {
     // stubbed
 }
 
-void stg5_19_init01(void) {
+static void stg5_19_init01(void) {
     pouchGetItem(ITEM_SKULL_GEM);
 }
 
-void stg5_19_init02(void) {
+static void stg5_19_init02(void) {
     pouchRemoveItem(ITEM_SKULL_GEM);
     swSet(GSWF_MUJ05_SKULL_GEM_PLACED);
     swSet(GSWF_MUJ05_SKULL_ROCK_OPENED);
 }
 
-void stg5_19_01_init(void) {
+static void stg5_19_01_init(void) {
     // stubbed
 }
 
-void stg5_21_init00(void) {
+static void stg5_21_init00(void) {
     swSet(GSWF_DOU05_BIG_DOOR_SWITCH_PRESSED);
 }
 
-void stg5_21_init01(void) {
+static void stg5_21_init01(void) {
     swSet(GSWF_DOU04_GROTTO_KEY_TAKEN);
     swSet(GSWF_DOU05_DOOR_UNLOCKED);
 }
 
-void stg5_21_init03(void) {
+static void stg5_21_init03(void) {
     swSet(GSWF_DOU09_BOMB_WALL_BLOWN);
 }
 
-void stg5_21_01_init00(void) {
+static void stg5_21_01_init00(void) {
     pouchGetItem(ITEM_BLACK_KEY_0x24);
 }
 
-void stg5_22_init00(void) {
+static void stg5_22_init00(void) {
     pouchRemoveItem(ITEM_BLACK_KEY_0x24);
     pouchGetItem(ITEM_BOAT_CURSE);
 }
 
-void stg5_22_init01(void) {
+static void stg5_22_init01(void) {
     pouchGetItem(ITEM_GATE_HANDLE);
 }
 
-void stg5_29_init(void) {
+static void stg5_29_init(void) {
     pouchRemoveItem(ITEM_GATE_HANDLE);
 }
 
-void stg5_30_init01(void) {
+static void stg5_30_init01(void) {
     swSet(GSWF_DOU11_STRANDED_SAILORS_SEEN);
 }
 
-void stg5_30_init02(void) {
+static void stg5_30_init02(void) {
     swSet(GSWF_DOU11_ISLAND_SWITCH_A_PRESSED);
     swSet(GSWF_DOU11_ISLAND_SWITCH_B_PRESSED);
     swSet(GSWF_DOU11_SAILORS_CROSSED);
 }
 
-void stg5_43_init(void) {
+static void stg5_43_init(void) {
     pouchGetItem(ITEM_SAPPHIRE_STAR);
     pouchGetStarStone(5);
 }
 
-void stg5_47_init(void) {
+static void stg5_47_init(void) {
     swSet(GSWF_AJI11_PEACH5_ROOM_REMARK);
     swSet(GSWF_AJI11_PEACH5_DATA_DISK_TAKEN);
     swSet(GSWF_AJI11_PEACH5_DISK_READ);
 }
 
-void stg5_58_init(void) {
+static void stg5_58_init(void) {
     marioSetCharMode(0);
 }
 
-void stg5_59_01_init(void) {
+static void stg5_59_01_init(void) {
     swSet(GSWF_GOR00_SHIP_ARRIVAL_AT_DOCK);
 }
 
-void stg5_60_init(void) {
+static void stg5_60_init(void) {
     pouchReceiveMail(4);
     pouchOpenMail(4);
     swSet(GSWF_MAIL_RDM_ISSUE4_SENT);
@@ -1504,103 +1720,103 @@ void stg5_60_init(void) {
     swClear(GSWF_GOR00_SHIP_ARRIVAL_AT_DOCK);
 }
 
-void stg5_62_init(void) {
+static void stg5_62_init(void) {
     swSet(GSWF_GOR03_DON_PIANTA_STG5_SCENE);
 }
 
-void stg5_63_init(void) {
+static void stg5_63_init(void) {
     swSet(GSWF_GOR00_SAIL_TO_KEELHAUL);
 }
 
-void stg5_64_init(void) {
+static void stg5_64_init(void) {
     swClear(GSWF_GOR00_SAIL_TO_KEELHAUL);
 }
 
-void stg5_64_01_init(void) {
+static void stg5_64_01_init(void) {
     swSet(GSWF_MUJ05_WEDDING_RING_TAKEN);
     pouchGetItem(ITEM_WEDDING_RING);
 }
 
-void stg5_64_02_init(void) {
+static void stg5_64_02_init(void) {
     pouchRemoveItem(ITEM_WEDDING_RING);
 }
 
-void stg5_64_03_init(void) {
+static void stg5_64_03_init(void) {
     swSet(GSWF_GOR00_SHIP_ARRIVAL_PENDING);
 }
 
-void stg5_65_init(void) {
+static void stg5_65_init(void) {
     swClear(GSWF_GOR00_SHIP_ARRIVAL_PENDING);
     swSet(GSWF_GOR03_DON_PIANTA_STG5_SCENE);
 }
 
-void stg5_66_init(void) {
+static void stg5_66_init(void) {
     pouchGetItem(ITEM_TRAIN_TICKET);
     swSet(GSWF_GOR03_DON_PIANTA_STG5_SCENE);
 }
 
-void stg6_00_init(void) {
+static void stg6_00_init(void) {
     swSet(GSWF_MAIL_BOO_SENT);
     pouchReceiveMail(0x14);
 }
 
-void stg6_06_init(void) {
+static void stg6_06_init(void) {
     pouchGetItem(ITEM_GALLEY_POT);
 }
 
-void stg6_12_init(void) {
+static void stg6_12_init(void) {
     pouchGetItem(ITEM_AUTOGRAPH);
 }
 
-void stg6_13_init(void) {
+static void stg6_13_init(void) {
     pouchRemoveItem(ITEM_AUTOGRAPH);
 }
 
-void stg6_18_init(void) {
+static void stg6_18_init(void) {
     pouchGetItem(ITEM_RAGGED_DIARY);
 }
 
-void stg6_19_init(void) {
+static void stg6_19_init(void) {
     pouchRemoveItem(ITEM_RAGGED_DIARY);
     pouchGetItem(ITEM_BLANKET);
 }
 
-void stg6_20_init(void) {
+static void stg6_20_init(void) {
     pouchRemoveItem(ITEM_BLANKET);
 }
 
-void stg6_22_init(void) {
+static void stg6_22_init(void) {
     swSet(GSWF_MAIL_RDM_ISSUE5_SENT);
     pouchReceiveMail(0x1F);
 }
 
-void stg6_24_init(void) {
+static void stg6_24_init(void) {
     pouchGetItem(ITEM_VITAL_PAPER);
 }
 
-void stg6_27_init(void) {
+static void stg6_27_init(void) {
     pouchRemoveItem(ITEM_VITAL_PAPER);
     pouchGetItem(ITEM_GOLD_RING);
     pouchGetItem(ITEM_SHELL_EARRINGS);
 }
 
-void stg6_29_init(void) {
+static void stg6_29_init(void) {
     pouchGetItem(ITEM_STATION_KEY_0x18);
 }
 
-void stg6_30_init(void) {
+static void stg6_30_init(void) {
     pouchRemoveItem(ITEM_STATION_KEY_0x18);
 }
 
-void stg6_32_init(void) {
+static void stg6_32_init(void) {
     pouchGetItem(ITEM_STATION_KEY_0x19);
 }
 
-void stg6_33_init(void) {
+static void stg6_33_init(void) {
     pouchRemoveItem(ITEM_STATION_KEY_0x19);
 }
 
-void stg6_34_init(void) {
+static void stg6_34_init(void) {
     swSet(GSWF_EKI03_POSTER_5_BLOWN);
     swSet(GSWF_EKI03_POSTER_6_BLOWN);
     swSet(GSWF_EKI03_POSTER_7_BLOWN);
@@ -1614,135 +1830,135 @@ void stg6_34_init(void) {
     swSet(GSWF_EKI03_POSTER_15_BLOWN);
 }
 
-void stg6_37_init(void) {
+static void stg6_37_init(void) {
     pouchGetItem(ITEM_ULTRA_BOOTS);
 }
 
-void stg6_38_init(void) {
+static void stg6_38_init(void) {
     pouchGetItem(ITEM_ELEVATOR_KEY_0x1A);
 }
 
-void stg6_39_init(void) {
+static void stg6_39_init(void) {
     pouchRemoveItem(ITEM_ELEVATOR_KEY_0x1A);
 }
 
-void stg6_44_init(void) {
+static void stg6_44_init(void) {
     swSet(GSWF_MAIL_KING_K_SENT);
     pouchReceiveMail(0x16);
 }
 
-void stg6_47_00_init(void) {
+static void stg6_47_00_init(void) {
     swSet(GSWF_MAIL_PA_PATCH_SENT);
     pouchReceiveMail(0x15);
 }
 
-void stg6_54_init(void) {
+static void stg6_54_init(void) {
     pouchGetItem(ITEM_GARNET_STAR);
     pouchGetStarStone(6);
 }
 
-void stg6_56_init(void) {
+static void stg6_56_init(void) {
     marioSetCharMode(0);
 }
 
-void stg6_70_init(void) {
+static void stg6_70_init(void) {
     pouchReceiveMail(5);
     pouchOpenMail(5);
 }
 
-void stg6_71_01_init(void) {
+static void stg6_71_01_init(void) {
     swSet(GSWF_MAIL_ZIP_TOAD_SENT);
     pouchReceiveMail(0x17);
     gp->retraceLocalTime += (OSTime)OS_TIMER_CLOCK * 180;
 }
 
-void stg6_72_init(void) {
+static void stg6_72_init(void) {
     // stubbed
 }
 
-void stg6_end_init01(void) {
+static void stg6_end_init01(void) {
     pouchGetItem(ITEM_ULTRA_HAMMER);
     swSet(GSWF_GOR01_ULTRA_HAMMER_CHEST_OPENED);
 }
 
-void stg6_end_init02(void) {
+static void stg6_end_init02(void) {
     swSet(GSWF_TIK07_BIG_BLOCK_BROKEN);
 }
 
-void stg7_01_init(void) {
+static void stg7_01_init(void) {
     swSet(GSWF_BOM_FAHR_REACHED);
 }
 
-void stg7_03_white_0(void) {
+static void stg7_03_white_0(void) {
     swSet(GSWF_MAIL_RDM_ISSUE6_SENT);
     pouchReceiveMail(0x20);
     swSet(GSWF_PIK00_GOLDBOB_CANNON_APPROVAL);
     pouchGetItem(ITEM_GOLDBOB_GUIDE);
 }
 
-void stg7_03_white_1(void) {
+static void stg7_03_white_1(void) {
     swSet(GSWF_STG7_WHITE_PETALBURG_HINT);
 }
 
-void stg7_03_white_2(void) {
+static void stg7_03_white_2(void) {
     swSet(GSWF_STG7_WHITE_KEELHAUL_HINT);
 }
 
-void stg7_03_white_3(void) {
+static void stg7_03_white_3(void) {
     swSet(GSWF_STG7_WHITE_GLITZVILLE_HINT);
 }
 
-void stg7_03_white_4(void) {
+static void stg7_03_white_4(void) {
     swSet(GSWF_STG7_WHITE_BOGGLY_HINT);
 }
 
-void stg7_03_white_5(void) {
+static void stg7_03_white_5(void) {
     swSet(GSWF_STG7_WHITE_TWILIGHT_HINT);
     swSet(GSWF_MAIL_RAWK_HAWK_SENT);
     pouchReceiveMail(0x18);
 }
 
-void stg7_04_init(void) {
+static void stg7_04_init(void) {
     swSet(GSWF_BOM02_GENERAL_WHITE_WOKEN);
 }
 
-void stg7_06_init(void) {
+static void stg7_06_init(void) {
     pouchRemoveItem(ITEM_GOLDBOB_GUIDE);
 }
 
-void stg7_10_init(void) {
+static void stg7_10_init(void) {
     pouchGetItem(ITEM_ELEVATOR_KEY_0x1B);
 }
 
-void stg7_11_init(void) {
+static void stg7_11_init(void) {
     pouchRemoveItem(ITEM_ELEVATOR_KEY_0x1B);
 }
 
-void stg7_15_init(void) {
+static void stg7_15_init(void) {
     pouchGetItem(ITEM_ELEVATOR_KEY_0x1C);
 }
 
-void stg7_15_room_A_init(void) {
+static void stg7_15_room_A_init(void) {
     pouchRemoveItem(ITEM_ELEVATOR_KEY_0x1C);
 }
 
-void stg7_15_room_B_init(void) {
+static void stg7_15_room_B_init(void) {
     pouchGetItem(ITEM_CARD_KEY_0x1D);
     swSet(GSWF_AJI05_CARD_KEY_TAKEN);
 }
 
-void stg7_15_room_C_init(void) {
+static void stg7_15_room_C_init(void) {
     pouchGetItem(ITEM_CARD_KEY_0x1E);
     swSet(GSWF_AJI12_CARD_KEY_TAKEN);
 }
 
-void stg7_16_init(void) {
+static void stg7_16_init(void) {
     pouchGetItem(ITEM_CARD_KEY_0x1F);
     swSet(GSWF_AJI11_CARD_KEY_TAKEN);
     swSet(GSWF_AJI10_VISITED);
 }
 
-void stg7_17_init(void) {
+static void stg7_17_init(void) {
     pouchRemoveItem(ITEM_CARD_KEY_0x1D);
     pouchRemoveItem(ITEM_CARD_KEY_0x1E);
     pouchRemoveItem(ITEM_CARD_KEY_0x1F);
@@ -1751,25 +1967,25 @@ void stg7_17_init(void) {
     swSet(GSWF_AJI18_CARD_KEY_SLOT_3);
 }
 
-void stg7_19_init(void) {
+static void stg7_19_init(void) {
     swSet(GSWF_AJI13_CARD_KEY_TAKEN);
     pouchGetItem(ITEM_CARD_KEY_0x20);
 }
 
-void stg7_20_init(void) {
+static void stg7_20_init(void) {
     pouchRemoveItem(ITEM_CARD_KEY_0x20);
 }
 
-void stg7_25_00_init(void) {
+static void stg7_25_00_init(void) {
     pouchGetItem(ITEM_CRYSTAL_STAR);
     pouchGetStarStone(7);
 }
 
-void stg7_50_init(void) {
+static void stg7_50_init(void) {
     swSet(GSWF_TIK00_TELEPORTER_ARRIVAL);
 }
 
-void stg7_51_init(void) {
+static void stg7_51_init(void) {
     swSet(GSWF_MAIL_GHOST_T_SENT);
     pouchReceiveMail(0x19);
     pouchReceiveMail(0x21);
@@ -1777,19 +1993,19 @@ void stg7_51_init(void) {
     swSet(GSWF_TIK00_STG7_DOOR_OPENED);
 }
 
-void stg7_52_init(void) {
+static void stg7_52_init(void) {
     // stubbed
 }
 
-void stg8_01_02_init(void) {
+static void stg8_01_02_init(void) {
     pouchGetItem(ITEM_PALACE_KEY_0x2E);
 }
 
-void stg8_02_init(void) {
+static void stg8_02_init(void) {
     pouchRemoveItem(ITEM_PALACE_KEY_0x2E);
 }
 
-void stg8_05_init(void) {
+static void stg8_05_init(void) {
     swSet(GSWF_LAS26_GLOOMTAIL_BODY_CLEARED);
     swSet(GSWF_LAS09_CHOMP_STATUE_1_BOMBED);
     swSet(GSWF_LAS09_CHOMP_STATUE_2_BOMBED);
@@ -1799,7 +2015,7 @@ void stg8_05_init(void) {
     pouchGetItem(ITEM_STAR_KEY);
 }
 
-void stg8_06_init(void) {
+static void stg8_06_init(void) {
     pouchRemoveItem(ITEM_STAR_KEY);
     swSet(GSWF_LAS10_RIDDLE_TOWER_ENTERED);
     swSet(GSWF_LAS10_TOWER_LOCK_1);
@@ -1836,27 +2052,27 @@ void stg8_06_init(void) {
     swSet(GSWF_LAS18_KEY_CHEST_OPENED);
 }
 
-void stg8_10_init(void) {
+static void stg8_10_init(void) {
     pouchGetItem(ITEM_PALACE_KEY_0x2F);
 }
 
-void stg8_11_init(void) {
+static void stg8_11_init(void) {
     pouchRemoveItem(ITEM_PALACE_KEY_0x2F);
     swSet(GSWF_LAS22_DOOR_UNLOCKED);
 }
 
-void stg8_13_init(void) {
+static void stg8_13_init(void) {
     swSet(GSWF_LAS24_BLOCK_UNCOVERED);
     swSet(GSWF_LAS24_BIG_BLOCK_BROKEN);
     swSet(GSWF_LAS24_FLOOR_BROKEN);
 }
 
-void stg8_14_init(void) {
+static void stg8_14_init(void) {
     pouchGetItem(ITEM_PALACE_KEY_0x30);
     swSet(GSWF_LAS24_KEY_CHEST_OPENED);
 }
 
-void stg8_15_init(void) {
+static void stg8_15_init(void) {
     pouchRemoveItem(ITEM_PALACE_KEY_0x30);
     swSet(GSWF_LAS25_DOOR_UNLOCKED);
 }

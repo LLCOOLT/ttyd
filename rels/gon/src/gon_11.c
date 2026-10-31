@@ -38,7 +38,6 @@
 #include "evt/evt_party.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "driver/mapdrv.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -203,11 +202,11 @@ EVT_BEGIN(gonbaba_event)
     CALL(evt_seq_wait, 2)
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(1), 0)
-        SPAWN_EVENT(PTR(bero_close_door_play_se))
+        SPAWN_EVENT(bero_close_door_play_se)
         CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL_CHILD(PTR(door01_close))
+            CALL_CHILD(door01_close)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
@@ -219,7 +218,7 @@ EVT_BEGIN(gonbaba_event)
         CALL(evt_party_move_pos2, 0, -490, 0, FLOAT(120.0f))
     END_INLINE_EVENT
     CALL(evt_mario_mov_pos2, -450, 0, FLOAT(120.0f))
-    SPAWN_EVENT(PTR(bero_case_entry))
+    SPAWN_EVENT(bero_case_entry)
     WAIT_MS(1300)
     CALL(evt_msg_print, 0, STRING("stg1_gon_19"), 0, 0)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -236,8 +235,8 @@ EVT_BEGIN(gonbaba_event)
         CALL(evt_npc_wait_anim, STRING("ゴンババ"), FLOAT(1.0f))
         CALL(evt_npc_set_anim, STRING("ゴンババ"), STRING("GNB_S_1"))
     END_INLINE_EVENT
-    SPAWN_EVENT(PTR(gonbaba_standup_shake))
-    SPAWN_EVENT(PTR(gonbaba_fog_change))
+    SPAWN_EVENT(gonbaba_standup_shake)
+    SPAWN_EVENT(gonbaba_fog_change)
     CALL(evt_cam3d_evt_set, -900, 31, 490, -205, 175, 20, 4500, 11)
     BEGIN_INLINE_EVENT
         WAIT_MS(1800)
@@ -296,7 +295,7 @@ EVT_BEGIN(gonbaba_event)
     CALL(evt_party_set_pos, 0, -25, 10, 150)
     CALL(evt_mario_set_dir, 270, 0, 0)
     CALL(evt_party_set_dir, 0, 90, -1)
-    SPAWN_EVENT(PTR(gonbaba_down_shake))
+    SPAWN_EVENT(gonbaba_down_shake)
     BEGIN_INLINE_EVENT
         WAIT_MS(300)
         CALL(evt_npc_flag_onoff, 1, STRING("ゴンババ"), NPC_FLAG_JUMPING | NPC_FLAG_LAND_ON_FLOOR)
@@ -480,11 +479,7 @@ EVT_BEGIN(gonbaba_event)
     CALL(evt_cam3d_evt_set, 245, 75, 450, 245, 50, 200, 500, 11)
     WAIT_MS(500)
     CALL(evt_npc_set_anim, STRING("ノコタロウ父"), STRING("NKP_A_1"))
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("stone"), ITEM_DIAMOND_STAR, 245, 45, 220, 16, -1, 0)
-#else
-    CALL(evt_item_entry, STRING("stone"), ITEM_DIAMOND_STAR, 245, 45, 220, 17, -1, 0)
-#endif
+    CALL(evt_item_entry, STRING("stone"), ITEM_DIAMOND_STAR, 245, 45, 220, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     WAIT_MS(500)
     CALL(evt_item_get_position, STRING("stone"), LW(0), LW(1), LW(2))
     SET_FLOAT_VALUE(LW(3), FLOAT(-1.0f))
@@ -539,18 +534,18 @@ EVT_BEGIN(gonbaba_event)
     WAIT_MS(2000)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_16_HOOKTAIL)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_17_FATHER_AND_SON_REUNITED)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
 #else
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
 #endif
     CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(evt_snd_envoff_f, PSND_FADE_OUT, 2000)
 #endif
     SET_VALUE(LW(0), 1)
     SET_VALUE(LW(1), STRING("stone"))
-    CALL_CHILD(PTR(evt_sub_starstone))
+    CALL_CHILD(evt_sub_starstone)
     RETURN
 EVT_END()
 
@@ -693,7 +688,7 @@ static USER_FUNC(evt_cloud_main) {
     if (party == NULL) {
         return EVT_RETURN_BLOCK;
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (party->currentMemberId != PARTY_MEMBER_FLURRIE) {
         return EVT_RETURN_BLOCK;
     }
@@ -726,7 +721,7 @@ static USER_FUNC(evt_cloud_main) {
             animPaperPoseEntry(wp->animName, group);
             offscreenEntry(wp->offscreenName);
             off = offscreenNameToPtr(wp->offscreenName);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             off->texFmt = off->copyFmt = 6;
 #else
             off->texFmt = off->copyFmt = 4;
@@ -833,7 +828,7 @@ static USER_FUNC(evt_cloud_main) {
 }
 #pragma dont_inline reset
 
-USER_FUNC(evt_iri_16_cloud_init) {
+static USER_FUNC(evt_iri_16_cloud_init) {
     s32 i;
 
     cloud = _mapAlloc(sizeof(CloudMapWork) * 16);
@@ -846,7 +841,7 @@ USER_FUNC(evt_iri_16_cloud_init) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_iri_16_cloud_ent) {
+static USER_FUNC(evt_iri_16_cloud_ent) {
     EvtWord* args = event->args;
     char** groups;
     char* hitName;
@@ -890,11 +885,7 @@ USER_FUNC(evt_iri_16_cloud_ent) {
 EVT_BEGIN(iri_16_box_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("mb"), ITEM_ATTACK_FX_B_KEY_ITEM, LW(0), LW(1), LW(2), 16, -1, 0)
-#else
-    CALL(evt_item_entry, STRING("mb"), ITEM_ATTACK_FX_B_KEY_ITEM, LW(0), LW(1), LW(2), 17, -1, 0)
-#endif
+    CALL(evt_item_entry, STRING("mb"), ITEM_ATTACK_FX_B_KEY_ITEM, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("box"))
     CALL(evt_item_get_item, STRING("mb"))
     CALL(evt_item_get_item_end_wait, STRING("mb"))
@@ -942,7 +933,7 @@ EVT_BEGIN(gon_11_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_16_HOOKTAIL)
         CASE_DEFAULT
-        CALL_CHILD(PTR(evt_bero_info_run))
+        CALL_CHILD(evt_bero_info_run)
     END_SWITCH
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_16_HOOKTAIL)
@@ -961,13 +952,13 @@ EVT_BEGIN(gon_11_init_evt)
     ELSE
         CALL(evt_npc_flag_onoff, 1, STRING("ゴンババ"), NPC_FLAG_NO_BILLBOARD)
         CALL(evt_npc_set_scale, STRING("ゴンババ"), FLOAT(1.2998047f), FLOAT(1.2998047f), FLOAT(1.2998047f))
-        SPAWN_EVENT(PTR(gonbaba_event))
+        SPAWN_EVENT(gonbaba_event)
     END_IF
     CALL(evt_npc_flag_onoff, 1, STRING("ゴンババ"), NPC_FLAG_ALWAYS_VISIBLE)
     CALL(evt_light_charalight_all_onoff, 1)
     CALL(evt_light_npc_lighting_onoff, 1, STRING("ゴンババ"))
-    CALL_CHILD(PTR(iri_16_init))
-#if VERSION != VERSION_DEMO
+    CALL_CHILD(iri_16_init)
+#if VERSION >= VERSION_JP
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_16_HOOKTAIL)
         CALL(evt_npc_delete, STRING("ノコタロウ父"))
         CALL(evt_npc_delete, STRING("ゴンババ"))

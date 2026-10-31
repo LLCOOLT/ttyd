@@ -25,7 +25,7 @@ s8 Pos[6] ATTRIBUTE_ALIGN(32) = {1, 0, 0, -1, 0, 0};
 s8 Nrm[3] ATTRIBUTE_ALIGN(32) = {0, 0, 127};
 u8 Col[4] ATTRIBUTE_ALIGN(32) = {0xFF, 0xFF, 0xFF, 0xFF};
 
-void vivihimoDisp(CameraId camId, HimoWork* w);
+static void vivihimoDisp(CameraId camId, HimoWork* w);
 
 void vivihimo(Mtx a, Mtx b, f32 speed, f32 scale, f32 offA, f32 offB) {
     HimoWork w;
@@ -104,7 +104,7 @@ static inline void himoMtx(HimoWork* w, Mtx out, f32 t, Vec* p) {
     out[2][3] = p->z;
 }
 
-void vivihimoDisp(CameraId camId, HimoWork* w) {
+static void vivihimoDisp(CameraId camId, HimoWork* w) {
     CameraEntry* cam;
     Vec* pts;
     f32* t1;

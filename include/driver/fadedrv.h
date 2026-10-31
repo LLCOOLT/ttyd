@@ -21,7 +21,7 @@ typedef enum FadeType {
     FADE_OUT_SPOT = 4,    // [0] as FADE_IN_SPOT, closing
     FADE_IN_SPOT_3D = 5,  // [0] as FADE_IN_SPOT on CAMERA_3D
     FADE_OUT_SPOT_3D = 6, // [0] as FADE_OUT_SPOT on CAMERA_3D
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     FADE_IN_SPOT2 = 7,  // fadeEntry turns it into FADE_IN_SPOT
     FADE_OUT_SPOT2 = 8, // fadeEntry turns it into FADE_OUT_SPOT
 #endif

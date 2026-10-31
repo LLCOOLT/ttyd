@@ -16,7 +16,7 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "unit/unit_mario.h"
 #include "evt/evt_msg.h"
@@ -41,7 +41,11 @@ static EvtWord damage_event[10];
 static EvtWord dead_event[74];
 static EvtWord phase_event[106];
 static EvtWord attack_event[24];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord ogg_attack_event[481];
+#else
 static EvtWord ogg_attack_event[491];
+#endif
 static EvtWord wait_event[6];
 static BattleUnitDefense defence_fmario;
 static BattleUnitDefenseAttr defence_attr_fmario;
@@ -179,7 +183,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {60, 60, 60, 80, 60, 80, 100, 60, 100, 60, 100, 60, 100, 60, 60, 0, 0, 100, 60, 100, 100, 0};
+#else
 static StatusVulnerability regist = {60, 60, 70, 100, 60, 100, 100, 50, 100, 80, 100, 80, 100, 90, 60, 0, 0, 100, 60, 100, 100, 0};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
@@ -198,8 +206,8 @@ static PoseTableEntry pose_table[] = {
     {40, "W_1"},
     {56, "X_1"},
     {57, "X_1"},
-    {65, "T_1"},
-    {69, "S_1"},
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -356,14 +364,14 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 2)
-        CALL_CHILD(PTR(to_faker_mario))
+        CALL_CHILD(to_faker_mario)
         RETURN
     END_IF
     CALL(btlevtcmd_WaitAttackEnd)
@@ -382,7 +390,7 @@ static EVT_BEGIN(dead_event)
     CALL(evt_btl_camera_set_prilimit, 0)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
     SET_VALUE(LW(10), -2)
-    CALL_CHILD(PTR(subsetevt_dead_core_nospin_norotate))
+    CALL_CHILD(subsetevt_dead_core_nospin_norotate)
     RETURN
 EVT_END()
 
@@ -396,7 +404,7 @@ static EVT_BEGIN(phase_event)
                 CALL(btlevtcmd_get_turn, LW(0))
                 IF_INT_GREATER_OR_EQUAL(LW(0), 5)
                     CALL(btlevtcmd_PhaseEventStartDeclare, BTL_UNIT_SELF)
-                    CALL_CHILD(PTR(to_faker_mario))
+                    CALL_CHILD(to_faker_mario)
                     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
                 END_IF
             END_IF
@@ -406,7 +414,7 @@ static EVT_BEGIN(phase_event)
                 CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
                 CALL(btlevtcmd_PhaseEventStartDeclare, BTL_UNIT_SELF)
                 CALL(btlevtcmd_StatusWindowOnOff, 0)
-                CALL_CHILD(PTR(rampell_zoom))
+                CALL_CHILD(rampell_zoom)
                 CALL(evt_msg_print, 2, STRING("stg4_jin_08_01"), 0, BTL_UNIT_SELF)
                 WAIT_MS(200)
                 CALL(btlevtcmd_StatusWindowOnOff, 1)
@@ -417,7 +425,7 @@ static EVT_BEGIN(phase_event)
                 CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(1))
                 IF_INT_LESS(LW(0), LW(1))
                     CALL(btlevtcmd_PhaseEventStartDeclare, BTL_UNIT_SELF)
-                    CALL_CHILD(PTR(to_faker_mario))
+                    CALL_CHILD(to_faker_mario)
                     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
                 END_IF
             END_SWITCH
@@ -434,7 +442,7 @@ static EVT_BEGIN(attack_event)
         RETURN
     END_IF
     SET_VALUE(LW(9), PTR(&weapon_rampell_attack))
-    CALL_CHILD(PTR(ogg_attack_event))
+    CALL_CHILD(ogg_attack_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -537,9 +545,13 @@ static EVT_BEGIN(ogg_attack_event)
     GOTO(98)
     LABEL(91)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_AnimeSetMotionSpeed, BTL_UNIT_SELF, 1, FLOAT(1.0f))
+#endif
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_AnimeSetMotionSpeed, BTL_UNIT_SELF, 1, FLOAT(2.0f))
+#endif
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 15, 0)
         CALL(evt_sub_intpl_init, 4, 135, 0, 20)
@@ -582,7 +594,11 @@ static BattleUnitDefense defence_fmario = {0};
 
 static BattleUnitDefenseAttr defence_attr_fmario = {0};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist_fmario = {50, 50, 50, 50, 50, 50, 100, 40, 100, 50, 100, 50, 100, 25, 50, 0, 0, 100, 50, 100, 100, 3};
+#else
 static StatusVulnerability regist_fmario = {50, 50, 70, 50, 50, 50, 100, 40, 100, 70, 100, 70, 100, 90, 50, 0, 0, 100, 50, 100, 100, 3};
+#endif
 
 static PoseTableEntry pose_table_fmario_stay[] = {
     {1, "EM_N_1"},
@@ -598,8 +614,8 @@ static PoseTableEntry pose_table_fmario_stay[] = {
     {40, "EM_W_1"},
     {56, "EM_D_3"},
     {57, "EM_D_3"},
-    {65, "EM_T_1"},
-    {69, "EM_S_1"},
+    {BTL_POSE_TALK, "EM_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "EM_S_1"},
 };
 
 static BattleDataEntry data_table_fmario[] = {
@@ -685,7 +701,11 @@ static BattleWeapon weapon_masao_hammer = {
     2, // reserved_6F
     NULL, // acHelpMsg
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_USABLE_IF_CONFUSED, // special
+#if VERSION <= VERSION_DEMO_US
+    COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
+#else
     COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_PAYBACK, // counterResistFlags
+#endif
     TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
@@ -757,7 +777,11 @@ static BattleWeapon weapon_masao_kaiten_hammer = {
     2, // reserved_6F
     NULL, // acHelpMsg
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_USABLE_IF_CONFUSED, // special
+#if VERSION <= VERSION_DEMO_US
+    COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
+#else
     COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_PAYBACK, // counterResistFlags
+#endif
     TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
@@ -848,7 +872,7 @@ EVT_END()
 static EVT_BEGIN(damage_event_fmario)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -863,16 +887,16 @@ static EVT_BEGIN(attack_event_fmario)
     SWITCH(LW(0))
         CASE_EQUAL(0)
         SET_VALUE(LW(9), PTR(&weapon_masao_jump))
-        CALL_CHILD(PTR(marioAttackEvent_NormalJump))
+        CALL_CHILD(marioAttackEvent_NormalJump)
         CASE_EQUAL(1)
         SET_VALUE(LW(9), PTR(&weapon_masao_hammer))
-        CALL_CHILD(PTR(marioAttackEvent_NormalHammer))
+        CALL_CHILD(marioAttackEvent_NormalHammer)
         CASE_EQUAL(2)
         SET_VALUE(LW(9), PTR(&weapon_masao_kururin_jump))
-        CALL_CHILD(PTR(marioAttackEvent_KururinJump))
+        CALL_CHILD(marioAttackEvent_KururinJump)
         CASE_EQUAL(3)
         SET_VALUE(LW(9), PTR(&weapon_masao_kaiten_hammer))
-        CALL_CHILD(PTR(marioAttackEvent_KaitenHammer))
+        CALL_CHILD(marioAttackEvent_KaitenHammer)
     END_SWITCH
     LABEL(90)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)

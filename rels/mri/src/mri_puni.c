@@ -34,11 +34,11 @@
 #include "eff/eff_n64.h"
 #include "driver/envdrv.h"
 #include "evt/evt_story.h"
-void puniHagurePos(PuniData* p);
-void puniMapdata_MRI_06_getidx(f32 x, f32 z, s32* bx, s32* bz);
-void puniMapdata_MRI_09_getidx(f32 x, f32 z, s32* bx, s32* bz);
-void puniMapdata_MRI_16_getidx(f32 x, f32 z, s32* bx, s32* bz);
-void puniMapdata_MRI_09_getpos(s32 bx, s32 bz, f32* x, f32* z);
+static void puniHagurePos(PuniData* p);
+static void puniMapdata_MRI_06_getidx(f32 x, f32 z, s32* bx, s32* bz);
+static void puniMapdata_MRI_09_getidx(f32 x, f32 z, s32* bx, s32* bz);
+static void puniMapdata_MRI_16_getidx(f32 x, f32 z, s32* bx, s32* bz);
+static void puniMapdata_MRI_09_getpos(s32 bx, s32 bz, f32* x, f32* z);
 extern int abs(int);
 
 u16 puni_nom_patern_data[] = {
@@ -613,7 +613,7 @@ u8 puniMapdata_MRI_16[] = {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x20, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x20, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x20, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x20, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x20, 0x00, 0x03, 0x00, 0x03, 0x00, 0x03, 0x00, 0x03, 0x00, 0x03, 0x00, 0x03, 0x00, 0x03, 0x00, 0x20, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x20, 0x00, 0x10, 0x00, 0x10, 0x00, 0x10, 0x00, 0x10, 0x00, 0x10, 0x00, 0x10, 0x00, 0x10, 0x00, 0x20, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x20, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x20, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x20, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x20, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x20, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x20, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00,
 };
 
-void puniMapdata_MRI_06_getidx(f32 x, f32 z, s32* bx, s32* bz) {
+static void puniMapdata_MRI_06_getidx(f32 x, f32 z, s32* bx, s32* bz) {
     if (x <= -420.0) {
         *bx = -1;
     } else if (x <= -350.0) {
@@ -709,7 +709,7 @@ static void puniMapdata_MRI_06_getpos(s32 bx, s32 bz, f32* x, f32* z) {
     }
 }
 
-void puniMapdata_MRI_09_getidx(f32 x, f32 z, s32* bx, s32* bz) {
+static void puniMapdata_MRI_09_getidx(f32 x, f32 z, s32* bx, s32* bz) {
     if (x <= -300.0) {
         *bx = -1;
     } else if (x <= -200.0) {
@@ -740,7 +740,7 @@ void puniMapdata_MRI_09_getidx(f32 x, f32 z, s32* bx, s32* bz) {
     }
 }
 
-void puniMapdata_MRI_09_getpos(s32 bx, s32 bz, f32* x, f32* z) {
+static void puniMapdata_MRI_09_getpos(s32 bx, s32 bz, f32* x, f32* z) {
     switch (bx) {
         case 1:
             *x = -250.0f;
@@ -780,7 +780,7 @@ void puniMapdata_MRI_09_getpos(s32 bx, s32 bz, f32* x, f32* z) {
     }
 }
 
-void puniMapdata_MRI_16_getidx(f32 x, f32 z, s32* bx, s32* bz) {
+static void puniMapdata_MRI_16_getidx(f32 x, f32 z, s32* bx, s32* bz) {
     if (x <= -350.0) {
         *bx = -1;
     } else if (x <= -200.0) {
@@ -1382,7 +1382,7 @@ int puniMoveAtari(PuniData* p, Vec start, Vec dir, int reflect, f32 dist) {
     return ret;
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 /* FAKE: hitCheckFilter called through a cast with the three start floats listed first. EABI assigns float and
    pointer args to f1-f6 and r3-r10 independently, so the registers and the call are identical; the reorder makes
    the start loads code-generate before the pointer args, so they read r4 directly (scheduling). */
@@ -1473,7 +1473,7 @@ static void puniMoveHit(PuniData* p, Vec start, Vec dir, f32 dist) {
 }
 #endif
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 void puniMoveDecel(PuniData* p) {
     Vec start;
     Vec dir;
@@ -1619,7 +1619,7 @@ void puniMoveDecel(PuniData* p) {
     }
 }
 
-void puniMoveLimitedNormal(PuniData* p) {
+static void puniMoveLimitedNormal(PuniData* p) {
     Vec start;
     Vec dir;
     Vec s2;
@@ -1680,7 +1680,7 @@ void puniMoveLimitedNormal(PuniData* p) {
     }
 }
 
-void puniMoveNormal(PuniData* p) {
+static void puniMoveNormal(PuniData* p) {
     Vec start;
     Vec dir;
     Vec s2;
@@ -2519,7 +2519,7 @@ static void puniModeMass(PuniData* p) {
     }
     a = gp->retraceCount & 0xF;
     b = p->index & 0xF;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (Punigp->floor == 18) {
         a = b;
     }
@@ -3070,8 +3070,8 @@ static void puniModeWind_kaiten(PuniData* p) {
     }
 }
 
-void puniModeWind(PuniData* p);
-void puniModeWind(PuniData* p) {
+static void puniModeWind(PuniData* p);
+static void puniModeWind(PuniData* p) {
     MarioWork* mario = marioGetPtr();
     f32 hz, hy, hx;
     f32 nz, ny, nx;
@@ -3192,7 +3192,7 @@ void puniModeWind(PuniData* p) {
 }
 
 static void puniModeFall(PuniData* p) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     Vec dir;
     Vec start;
 #else
@@ -3218,7 +3218,7 @@ static void puniModeFall(PuniData* p) {
         case 1:
             p->vel.x = 0.0f;
             p->vel.y -= 0.45f;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             PSVECNormalize(&p->vel, &dir);
 #else
             {
@@ -3283,7 +3283,7 @@ static void puniModeFall(PuniData* p) {
                 } else {
                     p->modeVar0 = 0xF;
                 }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 if (Punigp->floor == 0x12 && p->pos.y < -300.0f) {
                     s32 zero = 0;
                     puniswTrapSetindex(p->index, &zero);
@@ -3456,7 +3456,9 @@ static void puniModeUpdraft(PuniData* p) {
     }
 }
 
-#if VERSION == VERSION_DEMO
+// The demo's puni main loop calls puniModeWonderSfx directly with the sound name. Sharing it with the releases
+// (as puniModeDeadSfx is) moves puniModeMain's stack slots there, so the releases keep the plain function.
+#if VERSION <= VERSION_DEMO_US
 static inline void puniModeWonderSfx(PuniData* p, const char* sfx) {
 #else
 static void puniModeWonder(PuniData* p) {
@@ -3465,7 +3467,7 @@ static void puniModeWonder(PuniData* p) {
 
     switch (p->modeStep) {
         case 0:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             psndSFXOn_3D(sfx, &p->pos);
 #else
             psndSFXOn_3D("SFX_STG2_SOAPBALL_BREAK1", &p->pos);
@@ -3498,9 +3500,9 @@ static void puniModeWonder(PuniData* p) {
             break;
     }
 }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 
-void puniModeWonder(PuniData* p) {
+static void puniModeWonder(PuniData* p) {
     puniModeWonderSfx(p, "SFX_STG2_SOAPBALL_BREAK1");
 }
 #endif
@@ -4294,11 +4296,11 @@ void puniModeAwayjump(PuniData* p);
 void puniModeAway(PuniData* p);
 void puniModeDamage(PuniData* p);
 void puniModeRecover(PuniData* p);
-void puniModeWind(PuniData* p);
+static void puniModeWind(PuniData* p);
 void puniModeFall(PuniData* p);
 void puniModeUpdraft(PuniData* p);
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 void puniModeMain(PuniData* p);
 #endif
 static inline void puniModeCheckPos(PuniData* p) {
@@ -4321,7 +4323,7 @@ static inline void puniModeCheckPos(PuniData* p) {
     }
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 void puniModeMain(PuniData* p) {
     switch (p->mode) {
         case PUNI_MODE_IDLE:
@@ -4514,7 +4516,7 @@ static inline void puniMoveHitInl(PuniData* p, Vec* s2, Vec* d2, f32 dist) {
     }
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 void puniMoveMain(PuniData* p) {
     switch (p->mode) {
         case PUNI_MODE_IDLE:
@@ -4677,7 +4679,7 @@ static void puniOption(void) {
     Vec diff;
     f32 dist, r2, r;
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     for (p = Punidat; p < Punidat + PUNI_DATA_MAX; p++) {
         p->flags &= ~PUNI_FLAG_CROWDED;
     }
@@ -4743,7 +4745,7 @@ static void puniOption(void) {
         if (!(p->flags & PUNI_FLAG_CROWDED)) {
             p->flags &= ~PUNI_FLAG_PUSHING;
         }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         if (PSVECMag(&p->vel) >= 8.0f) {
             PSVECNormalize(&p->vel, &p->vel);
             PSVECScale(&p->vel, &p->vel, 8.0f);
@@ -4752,7 +4754,7 @@ static void puniOption(void) {
     }
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 static void puniCollideAll(void) {
     PuniData* p;
     PuniData* q;
@@ -4963,8 +4965,8 @@ static void puniSound(void) {
 
 extern double fabs(double);
 
-#if VERSION == VERSION_DEMO
-// The demo runs the mode and move dispatch inline here, without the 0x20 (floor 9/12) path.
+#if VERSION <= VERSION_DEMO_US
+// The demo runs the mode and move dispatch inline here, without the PUNIGP_FLAG_BATTLE_FLOOR path.
 static void puni_puni_main(void) {
     PuniTarget* tg;
     s32 i, k, j;
@@ -5130,7 +5132,7 @@ static void puni_puni_main(void) {
                     break;
                 case PUNI_MODE_WONDER:
                     p->flags |= PUNI_FLAG_STRAY;
-                    // FAKE: same (u32) round trip as case 12.
+                    // FAKE: same (u32) round trip as PUNI_MODE_DEAD.
                     puniModeWonderSfx(p, (const char*)(u32) "SFX_STG2_SOAPBALL_BREAK1");
                     break;
                 case PUNI_MODE_FUNBARI:
@@ -5244,7 +5246,7 @@ static void puni_puni_main(void) {
     Punigp->prevAllMode = Punigp->allMode;
 }
 #else
-void puni_puni_main(void) {
+static void puni_puni_main(void) {
     PuniTarget* tg;
     s32 i, k, j;
     MarioWork* mario;
@@ -5815,7 +5817,7 @@ static USER_FUNC(evt_puni_setup) {
                 break;
         }
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (Punigp->floor == 9 || Punigp->floor == 12) {
         Punigp->flags |= PUNIGP_FLAG_BATTLE_FLOOR;
     }
@@ -6045,7 +6047,7 @@ static inline s32 puniFloorToInt(f32 v) {
     return i;
 }
 
-void puniHagurePos(PuniData* p) {
+static void puniHagurePos(PuniData* p) {
     Vec cur;
     Vec a;
     Vec c;
@@ -6768,7 +6770,7 @@ USER_FUNC(evt_puni_landon_check) {
     count = 0;
     for (i = start; i < end; i++) {
         p = &Punidat[i];
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         if ((p->flags & PUNI_FLAG_ACTIVE) && p->pos.y != y) {
 #else
         if ((p->flags & PUNI_FLAG_ACTIVE) && p->pos.y > y) {
@@ -6984,13 +6986,13 @@ static void puniCountDisp(CameraId unused, void* param) {
     c2.a = c2.a * Punigp->puniCounterAlpha / 255;
     c3.a = c3.a * Punigp->puniCounterAlpha / 255;
     PSMTXTrans(m, -160.0f, -180.0f, 0.0f);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     iconDispGxCol(m, 4, VERSION_PICK(0x203, 0x20A), c1);
 #else
     iconDispGxCol(m, 0x10, VERSION_PICK(0x203, 0x20A), c1);
 #endif
     PSMTXTrans(m, -232.0f, -178.0f, 0.0f);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     iconDispGxCol(m, 4, VERSION_PICK(0x204, 0x20B), c2);
 #else
     iconDispGxCol(m, 0x10, VERSION_PICK(0x204, 0x20B), c2);
@@ -7004,7 +7006,7 @@ static void puniCountDisp(CameraId unused, void* param) {
         iconNumberDispGx(m, num2, FALSE, c3);
     }
     PSMTXTrans(m, -140.0f, -178.0f, 0.0f);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     iconDispGxCol(m, 4, VERSION_PICK(0x1D8, 0x1E0), c3);
 #else
     iconDispGxCol(m, 0x10, VERSION_PICK(0x1D8, 0x1E0), c3);

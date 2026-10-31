@@ -1,7 +1,7 @@
 // Shadow driver: blob, cylinder, projected and depth shadows (shadowInit, shadowMain, shadowDisp).
 #include "version.h"
 // Shadow driver: blob, cylinder, projected and depth shadows.
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo unit is built without the main precompiled header: only the dtrigf constants lead its data
 #define DTRIGF_WITH_INITIAL_VALUES
 #include <dtrigf.h>
@@ -17,16 +17,16 @@
 #include "driver/mobjdrv.h"
 #include "eff/eff_n64.h"
 
-void shadowCharShadowDisp_Collision(CameraId cameraId, void* param);
-void shadowCharShadowDisp_Projection(CameraId cameraId, void* param);
-void shadowCharShadowDisp_Polygon(CameraId cameraId, void* param);
-void shadowCharShadowDisp_Texture(CameraId cameraId, void* param);
-void cylinderShadowDraw(CameraId cameraId, void* param);
-void cylinder(ShadowEntry* entry);
-void projShadowEnd(CameraId cameraId, void* param);
-void depthShadowEnd(CameraId cameraId, void* param);
-void shadowDisp(CameraId cameraId, void* param);
-BOOL _filter(HitCheckQuery* query, HitEntry* hit);
+static void shadowCharShadowDisp_Collision(CameraId cameraId, void* param);
+static void shadowCharShadowDisp_Projection(CameraId cameraId, void* param);
+static void shadowCharShadowDisp_Polygon(CameraId cameraId, void* param);
+static void shadowCharShadowDisp_Texture(CameraId cameraId, void* param);
+static void cylinderShadowDraw(CameraId cameraId, void* param);
+static void cylinder(ShadowEntry* entry);
+static void projShadowEnd(CameraId cameraId, void* param);
+static void depthShadowEnd(CameraId cameraId, void* param);
+static void shadowDisp(CameraId cameraId, void* param);
+static BOOL _filter(HitCheckQuery* query, HitEntry* hit);
 
 static ShadowConfig shadowConfig[2] = {
     { 0, { -100.0f, 256.0f, 335.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, -20.0f, 20.0f, 356.0f, 741.0f, 0, 3, 0, -4.47f },
@@ -456,7 +456,7 @@ static u8 cube_dl_top[64] ATTRIBUTE_ALIGN(32) = {
     0x00,
 };
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo's -sdata 8 keeps these in .data, ahead of the vertex table
 u8 cube_dl_bottom[32] ATTRIBUTE_ALIGN(32) = {
     0x80,
@@ -699,7 +699,7 @@ CharShadowWork* cswp = &char_shadow_work;
 ProjShadowWork* pswp = &proj_shadow_work;
 DepthShadowWork* dswp = &depth_shadow_work;
 u16 ShadowSizeTbl[4] = {0x190, 0x100, 0x80, 0x40};
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 u8 cube_dl_bottom[32] ATTRIBUTE_ALIGN(32) = {
     0x80,
     0x00,
@@ -837,7 +837,7 @@ static inline void shadowSetupPolygon(void) {
     GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_RASC);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA); // no shadow alpha register in the demo
 #else
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_RASA, GX_CA_ZERO);
@@ -882,7 +882,7 @@ static inline void shadowBegin(ProjShadowWork* wp, BOOL depth) {
     PSMTXCopy(wp->view, camGetCurPtr()->view);
 }
 
-void shadowDisp(CameraId cameraId, void* param) {
+static void shadowDisp(CameraId cameraId, void* param) {
     DispEntry* disp;
     CameraEntry* cam;
 
@@ -956,7 +956,7 @@ void shadowDisp(CameraId cameraId, void* param) {
 #pragma push
 // FAKE: keeps the dead stores that the target has; removing it changes the code
 #pragma opt_dead_assignments off
-BOOL _filter(HitCheckQuery* query, HitEntry* hit) {
+static BOOL _filter(HitCheckQuery* query, HitEntry* hit) {
     f32 t = 20.0f; // FAKE: dead store (kept by opt_dead_assignments off) that puts 20.0f at its target .sdata2 slot
 
     if ((hitGetAttr(hit) & 0x80000000) && (*(u32*)mobjHitObjPtrToPtr(hit) & 0x800)) {
@@ -966,7 +966,7 @@ BOOL _filter(HitCheckQuery* query, HitEntry* hit) {
 }
 #pragma pop
 
-void shadowCharShadowDisp_Collision(CameraId cameraId, void* param) {
+static void shadowCharShadowDisp_Collision(CameraId cameraId, void* param) {
     ShadowEntry* entry = cswp->entries;
     s32 i;
     f32(*m)[4];
@@ -1016,7 +1016,7 @@ void shadowCharShadowDisp_Collision(CameraId cameraId, void* param) {
     }
 }
 
-void shadowCharShadowDisp_Projection(CameraId cameraId, void* param) {
+static void shadowCharShadowDisp_Projection(CameraId cameraId, void* param) {
     ShadowConfig* cfg;
     CharShadowWork* wp;
     ShadowEntry* entry;
@@ -1122,7 +1122,7 @@ void shadowCharShadowDisp_Projection(CameraId cameraId, void* param) {
     }
 }
 
-void shadowCharShadowDisp_Polygon(CameraId cameraId, void* param) {
+static void shadowCharShadowDisp_Polygon(CameraId cameraId, void* param) {
     ShadowEntry* entry = cswp->entries;
     f32(*view)[4];
     s32 i;
@@ -1169,7 +1169,7 @@ static inline void shadowSetMat(void) {
     GXSetChanMatColor(GX_COLOR0A0, cswp->color);
 }
 
-void shadowCharShadowDisp_Texture(CameraId cameraId, void* param) {
+static void shadowCharShadowDisp_Texture(CameraId cameraId, void* param) {
     ShadowEntry* entry = cswp->entries;
     f32(*view)[4];
     s32 i;
@@ -1239,7 +1239,7 @@ void shadowCharShadowDisp_Texture(CameraId cameraId, void* param) {
 
 // FAKE: keeps the following function(s) out of line as in the target; removing it changes the code
 #pragma dont_inline on
-void cylinder(ShadowEntry* entry) {
+static void cylinder(ShadowEntry* entry) {
     f32 inner;
     f32 a;
     f32 b;
@@ -1307,7 +1307,7 @@ static inline void shadowSetMatZero(void) {
     GXSetChanMatColor(GX_COLOR0A0, (GXColor){0, 0, 0, 0});
 }
 
-void cylinderShadowDraw(CameraId cameraId, void* param) {
+static void cylinderShadowDraw(CameraId cameraId, void* param) {
     ShadowEntry* entry = cswp->entries;
     f32(*view)[4];
     s32 i;
@@ -1330,7 +1330,7 @@ void cylinderShadowDraw(CameraId cameraId, void* param) {
         }
         PSMTXConcat(view, entry->mtx, m);
         GXLoadPosMtxImm(m, GX_PNMTX0);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         shadowSetTev(entry->alpha);
 #endif
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
@@ -1383,7 +1383,7 @@ s32 shadowEntry(f32 x, f32 y, f32 z, f32 size) {
     entry->volume = 1.0f;
     entry->decay = 0.2f;
     entry->decay2 = 0.4f;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     entry->alpha = 0xFF;
 #endif
     cswp->numEntries++;
@@ -1410,7 +1410,7 @@ s32 shadowEntryMode(s32 mode, f32 x, f32 y, f32 z, f32 size) {
     entry->volume = 1.0f;
     entry->decay = 0.2f;
     entry->decay2 = 0.4f;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     entry->alpha = 0xFF;
 #endif
     cswp->numEntries++;
@@ -1424,7 +1424,7 @@ void shadowSetType(s32 id, u8 type) {
     entry->type = type;
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 void U_shadowSetMode(s32 id, u8 alpha) {
     ShadowEntry* entry = &cswp->entries[id];
     entry->alpha = alpha;
@@ -1559,7 +1559,7 @@ ShadowConfig* shadowGetProjShadowConfig(void) {
 }
 
 static inline void shadowCalcTexMtx(ProjShadowWork* wp, Mtx texMtx, Mtx depthMtx) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     u32 is16;
     ShadowConfig* cfg = &shadowConfig[wp->configIdx];
     Mtx m;
@@ -1611,7 +1611,7 @@ static inline void shadowRestoreView(void) {
     PSMTXCopy(tmp_view, camGetCurPtr()->view);
 }
 
-void projShadowEnd(CameraId cameraId, void* param) {
+static void projShadowEnd(CameraId cameraId, void* param) {
     ProjShadowWork* wp = param;
     u16 size;
     ShadowConfig* cfg;
@@ -1648,7 +1648,7 @@ void projShadowEnd(CameraId cameraId, void* param) {
     wp->flags |= 1;
 }
 
-void depthShadowEnd(CameraId cameraId, void* param) {
+static void depthShadowEnd(CameraId cameraId, void* param) {
     ShadowConfig* cfg;
     u32 texFmt;
     u32 copyFmt;
@@ -1694,9 +1694,10 @@ const char shadowDepthViewMap8[0x28] = "projected shadow depth map (8bit depth)"
 const char shadowDepthViewResult16[0x1C] = "result scene (16bit depth)";
 const char shadowDepthViewLight16[0x2C] = "actual depth from the light (16bit depth)";
 const char shadowDepthViewMap16[0x2C] = "projected shadow depth map (16bit depth)";
-#if VERSION == VERSION_DEMO
-// the demo keeps a table of the depth-shadow debug view names
-const char* depthShadowViewName[6] = {
+#if VERSION <= VERSION_DEMO_US
+// the demo keeps a table of the depth-shadow debug view names. Its map lists it as DispModeMsg$893, a static
+// local of a debug function the demo strips, so here it stays at file scope.
+static const char* DispModeMsg[6] = {
     shadowDepthViewResult8,
     shadowDepthViewLight8,
     shadowDepthViewMap8,

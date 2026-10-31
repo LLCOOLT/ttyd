@@ -2,12 +2,12 @@
 
 Contributions are welcome: clearer names and types, comments that explain what code does, documentation, and anything that makes the code easier to read while every version still builds byte-identical. Please open an issue in this repository for questions.
 
-## The four-version check
+## The five-version check
 
-Every change must keep all four versions byte-identical. Before you commit, build each version whose game files you have and confirm the check line:
+Every change must keep all five versions byte-identical. Before you commit, build each version whose game files you have and confirm the check line:
 
 ```sh
-for v in G8MJ01 G8ME01 G8MP01 G8ME01_DEMO; do
+for v in G8MJ01 G8ME01 G8MP01 G8ME01_DEMO G8MJ01_DEMO; do
     python configure.py --version $v && ninja || break
 done
 ```
@@ -18,6 +18,7 @@ done
 | `G8ME01` | `30 files OK` |
 | `G8MP01` | `33 files OK` |
 | `G8ME01_DEMO` | `7 files OK` |
+| `G8MJ01_DEMO` | `33 files OK` |
 
 This applies to every kind of change, including comment-only and header-only edits:
 
@@ -56,12 +57,12 @@ Replacing a fake with natural C that still matches is always welcome; then delet
 
 When code differs between versions (see [VERSIONS.md](VERSIONS.md)):
 
-- **Pick the right condition.** Compare `VERSION` with the ordered values from `include/version.h`: US-and-PAL code goes inside `#if VERSION >= VERSION_US`, JP-and-demo code inside `#if VERSION <= VERSION_JP`, and code for one version inside `#if VERSION == VERSION_EU` (or `_JP`, `_US`, `_DEMO`). Include `version.h` before the first condition. `python tools/check_versions.py` checks this (it needs no game files, and the lint job runs it on every push and pull request); configure.py's `VERSION_G8M*` macros are for `version.h` and the library code only.
+- **Pick the right condition.** Compare `VERSION` with the ordered values from `include/version.h`: US-and-PAL code goes inside `#if VERSION >= VERSION_US`, code of JP and both demos inside `#if VERSION <= VERSION_JP`, code of both demos inside `#if VERSION <= VERSION_DEMO_US`, and code for one version inside `#if VERSION == VERSION_EU` (or `_JP`, `_US`, `_DEMO_US`, `_DEMO_JP`). The two demos share their code, so a demo difference covers both unless the Japanese demo shows otherwise; `VERSION == VERSION_DEMO_US` is for what only the US demo has, mostly its English text. Include `version.h` before the first condition. `python tools/check_versions.py` checks this (it needs no game files, and the lint job runs it on every push and pull request); configure.py's `VERSION_G8M*` macros are for `version.h` and the library code only.
 - **Keep it small.** Wrap only the statements, members or values that differ, not a whole function, unless most of it differs. For a single value, use `VERSION_PICK(jp, us)` from `include/version.h`; for frame counts and easing that the US code scales by the frame rate, use `FPS_FRAMES(n)` and `FPS_EASE(n)`.
 - **Structs.** A member that exists only in some versions sits inside the `#ifdef` in the struct itself, so every field access stays correct for every version. Put the version's offset in the member's comment when it helps (`// 0x2CC (US 0x2D0)`).
 - **Say why.** Start the block with a short comment when the difference is not obvious (`// PAL: the plain modes are 50Hz ...`).
 - **Units and data.** A unit that exists only in some versions is listed once as `Matching` in `configure.py`; its address ranges and symbols go in the `config/<version>/splits.txt` and `symbols.txt` of each version that has it, and the splits alone decide which versions build it.
-- **Check all four builds.**
+- **Check all five builds.**
 
 ## Commit messages
 
@@ -74,4 +75,4 @@ demo: mapdrv links from C (bmapUnLoad dead guard, see FAKES.md)
 docs: VERSIONS.md lists the REL sets
 ```
 
-Add a body when the reason is not obvious. Keep each commit to one topic, and make sure every commit passes the four-version check on its own.
+Add a body when the reason is not obvious. Keep each commit to one topic, and make sure every commit passes the five-version check on its own.

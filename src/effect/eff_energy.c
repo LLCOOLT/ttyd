@@ -63,7 +63,7 @@ EffectEntry* effEnergyEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 siz
     return effect;
 }
 
-void effEnergyMain(EffectEntry* effect) {
+static void effEnergyMain(EffectEntry* effect) {
     EffEnergyWork* work = effect->userdata;
     Vec position;
 
@@ -99,7 +99,7 @@ void effEnergyMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effEnergyDisp, effect);
 }
 
-void effEnergyDisp(CameraId cameraId, EffectEntry* effect) {
+static void effEnergyDisp(CameraId cameraId, EffectEntry* effect) {
     EffEnergyWork* work = effect->userdata;
     CameraEntry* camera;
     s32 type;

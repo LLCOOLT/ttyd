@@ -17,7 +17,6 @@
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
 #include "evt/evt_telop.h"
-#include "party/party_motion.h"
 #include "gon.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -123,7 +122,7 @@ EVT_BEGIN(honenoko_oidasare_evt)
     CALL(evt_party_cont_onoff, 0, 0)
     CALL(evt_mario_cont_onoff, 0)
     SET_FLOAT_VALUE(LW(0), FLOAT(180.0f))
-    CALL_CHILD(PTR(door01_close))
+    CALL_CHILD(door01_close)
     CALL(evt_seq_wait, 2)
     CALL(evt_mario_set_pose, STRING("M_I_O"))
     CALL(evt_mario_get_party, LW(0))
@@ -137,11 +136,11 @@ EVT_BEGIN(honenoko_oidasare_evt)
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
         SET_VALUE(LW(1), 2)
-        SPAWN_EVENT(PTR(bero_close_door_play_se))
+        SPAWN_EVENT(bero_close_door_play_se)
         CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL_CHILD(PTR(door01_close))
+            CALL_CHILD(door01_close)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
@@ -291,7 +290,7 @@ EVT_BEGIN(honenoko_oidasare_evt)
     CALL(evt_mario_key_onoff, 1)
     SET_VALUE(GSWF(GSWF_GON03_PUSHED_OUT), 0)
     SET_VALUE(LW(0), STRING("e_bero"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     RETURN
 EVT_END()
 
@@ -326,7 +325,7 @@ EVT_BEGIN(gon_01_GATEEVENT_evt)
     CALL(evt_mario_mov_pos2, -300, 0, FLOAT(120.0f))
     CALL(evt_party_stop, 0)
     WAIT_MS(500)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(evt_msg_print_party, STRING("E3_stg1_gon_00"))
 #else
     CALL(evt_mario_get_party, LW(0))
@@ -373,26 +372,22 @@ EVT_BEGIN(gon_01_init_evt)
     IF_INT_EQUAL(GSWF(GSWF_GON03_PUSHED_OUT), 1)
         SET_VALUE(LW(0), PTR(bero_entry_data))
         CALL(evt_bero_get_info)
-        SPAWN_EVENT(PTR(bero_case_entry))
+        SPAWN_EVENT(bero_case_entry)
         SET_VALUE(LW(0), STRING("e_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
-        SPAWN_EVENT(PTR(honenoko_oidasare_evt))
+        CALL_CHILD(bero_case_switch_off)
+        SPAWN_EVENT(honenoko_oidasare_evt)
     ELSE
         SET_VALUE(LW(0), PTR(bero_entry_data))
         CALL(evt_bero_get_info)
-        CALL_CHILD(PTR(evt_bero_info_run))
+        CALL_CHILD(evt_bero_info_run)
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_09_HOOKTAIL_CASTLE)
             SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_09_HOOKTAIL_CASTLE)
-            SPAWN_EVENT(PTR(gon_01_GATEEVENT_evt))
+            SPAWN_EVENT(gon_01_GATEEVENT_evt)
         END_IF
     END_IF
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("item00"), ITEM_HP_PLUS, 330, -150, 0, 15, GSWF(GSWF_GON01_HP_PLUS_TAKEN), 0)
-#else
-    CALL(evt_item_entry, STRING("item00"), ITEM_HP_PLUS, 330, -150, 0, 16, GSWF(GSWF_GON01_HP_PLUS_TAKEN), 0)
-#endif
+    CALL(evt_item_entry, STRING("item00"), ITEM_HP_PLUS, 330, -150, 0, ITEM_ENTRY_FIXED, GSWF(GSWF_GON01_HP_PLUS_TAKEN), 0)
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
-    CALL_CHILD(PTR(evt_gazigazi_entry))
+    CALL_CHILD(evt_gazigazi_entry)
     CALL(evt_map_playanim, STRING("m_mizu01"), 1, 0)
     CALL(evt_map_entry_airport_harbor, 0, STRING("hikou"), STRING("a_hi"))
     CALL(evt_map_entry_airport_harbor, 0, STRING("hikou1"), STRING("a_hi1"))

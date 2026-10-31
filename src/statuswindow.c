@@ -69,17 +69,17 @@ s16 journal_icon_tbl[6] = {0x218, 0x239, 0x239, 0x239, 0x23A, 0x23B};
 static SWork* wp;
 
 // The demo draws the status window icons with icon flag 0x4, retail with 0x10.
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #define SW_ICON_FLAGS 0x4
 #else
 #define SW_ICON_FLAGS 0x10
 #endif
 
-void statusWinDisp(CameraId camId, void* param);
-void gaugeDisp(s32 sp, f32 x, f32 y);
-void statusGetValue(SVal* values);
-BOOL valueCheck(void);
-void valueUpdate(void);
+static void statusWinDisp(CameraId camId, void* param);
+static void gaugeDisp(s32 sp, f32 x, f32 y);
+static void statusGetValue(SVal* values);
+static BOOL valueCheck(void);
+static void valueUpdate(void);
 
 void statusWinInit(void) {
     wp = __memAlloc(HEAP_DEFAULT, sizeof(SWork));
@@ -154,7 +154,7 @@ void statusWinMain(void) {
                         wp->idle = gp->framerate * 10;
                         if (!wp->forcedClose && !wp->forceTimer && !statusWinCheck()) {
                             statusWinOpen();
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                             wp->flags |= 0x100;
 #endif
                         }
@@ -244,7 +244,7 @@ void statusWinMain(void) {
 // order gives the target's argument evaluation order.
 #define iconDispGxScaleFirst ((void (*)(f32, Vec*, s16, u16))iconDispGx)
 
-void gaugeDisp(s32 sp, f32 x, f32 y) {
+static void gaugeDisp(s32 sp, f32 x, f32 y) {
     s32 i;
     s32 max;
     s32 full;
@@ -294,7 +294,7 @@ numDisp(f32 x, f32 y, s32 value, BOOL small) {
     iconNumberDispGx(m, value, small, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 }
 
-void statusWinDisp(CameraId camId, void* param) {
+static void statusWinDisp(CameraId camId, void* param) {
     alwaysDtEntry* e;
     s32 i;
     s32 blinkOn;
@@ -397,12 +397,13 @@ void statusWinDisp(CameraId camId, void* param) {
         numDisp(186.0f + x - 6.0f - 10.0f, 4.0f + (2.0f + (y - 78.0f)), wp->cur.partyMaxHp, 1);
     }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (wp->flags & 0x100 && !gp->inBattle) {
         y2 = -180.0f + (wp->openY - wp->y);
         MTXTrans(m2, -190.0f, y2, 0.0f);
         MTXScale(s2, 0.75f, 0.75f, 0.75f);
         MTXConcat(m2, s2, m2);
+        // US and PAL pick the menu icons (and the badge icon's offset) per language; JP and the demos use fixed icons
 #if VERSION >= VERSION_US
         iconDispGxCol(m2, 0x10, ICON_212, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         if (swByteGet(GSW_STORY_PROGRESS) >= STORY_STG0_07_GOOMBELLA_JOINS || partyChkJoin(1)) {
@@ -453,7 +454,7 @@ void statusWinDisp(CameraId camId, void* param) {
 #endif
 }
 
-void statusGetValue(SVal* values) {
+static void statusGetValue(SVal* values) {
     BattleWork* bw;
     BattleUnit* mario;
     BattleUnit* party;
@@ -467,7 +468,7 @@ void statusGetValue(SVal* values) {
         values->maxAp = pouchGetMaxAP();
         values->starPoints = pouchGetStarPoint();
         values->coins = pouchGetCoin();
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         // the demo remembers the last partner in cur.lastParty and shows it while in bg mode
         if (!marioBgmodeChk()) {
             values->party = marioGetParty();
@@ -510,7 +511,7 @@ void statusGetValue(SVal* values) {
     }
 }
 
-BOOL valueCheck(void) {
+static BOOL valueCheck(void) {
     SVal v;
     BOOL changed = FALSE;
 
@@ -579,7 +580,7 @@ static inline s32 calcStep(s32 target, s32 cur) {
     return d;
 }
 
-void valueUpdate(void) {
+static void valueUpdate(void) {
     static s32 count;
     SVal v;
     s32 d;
@@ -594,7 +595,7 @@ void valueUpdate(void) {
         return;
     }
     d = calcStep(v.coins, wp->cur.coins);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (d && !(count % 6)) {
 #else
     if (d && !(count % 8)) {
@@ -720,7 +721,7 @@ void statusAPBlink(s32 frames) {
 }
 
 // The demo has no N_statusClearBlink.
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 void N_statusClearBlink(void) {
     wp->blink = 0;
 }

@@ -37,7 +37,7 @@ static PoseTableEntry pose_table[] = {
     {31, "NKT_S_1"},
     {39, "NKT_D_1"},
     {40, "NKT_W_1"},
-    {69, "NKT_W_1"},
+    {BTL_POSE_STAY_DEFAULT, "NKT_W_1"},
 };
 
 static PoseTableEntry pose_table_turn[] = {
@@ -46,7 +46,7 @@ static PoseTableEntry pose_table_turn[] = {
     {30, "NKT_Q_1B"},
     {31, "NKT_S_1"},
     {39, "NKT_B_1"},
-    {69, "NKT_B_1"},
+    {BTL_POSE_STAY_DEFAULT, "NKT_B_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -175,7 +175,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -218,7 +218,7 @@ EVT_END()
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
-        CALL_CHILD(PTR(wakeup_event))
+        CALL_CHILD(wakeup_event)
         RETURN
     END_IF
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))

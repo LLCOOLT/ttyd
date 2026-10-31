@@ -7,6 +7,9 @@
 #include <dolphin/mtx.h>
 #include "libc_decls.h"
 
+static void effSparkDisp(CameraId cameraId, EffectEntry* effect);
+static void effSparkMain(EffectEntry* effect);
+
 typedef struct EffSparkParticle {
     s32 type;    // 0x0
     f32 x;       // 0x4
@@ -83,7 +86,7 @@ EffectEntry* effSparkEntry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effSparkMain(EffectEntry* effect) {
+static void effSparkMain(EffectEntry* effect) {
     EffSparkParticle* p = effect->userdata;
     s32 i;
     s32 type;
@@ -170,7 +173,7 @@ void effSparkMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), prio, (DispCallback)effSparkDisp, effect);
 }
 
-void effSparkDisp(CameraId cameraId, EffectEntry* effect) {
+static void effSparkDisp(CameraId cameraId, EffectEntry* effect) {
     EffSparkParticle* p = effect->userdata;
     CameraEntry* camera;
     GXTexObj texObj;

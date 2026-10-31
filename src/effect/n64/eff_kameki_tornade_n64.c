@@ -21,8 +21,8 @@
 
 void tri2();
 
-void effKamekiTornadeMain(EffectEntry* effect);
-void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect);
+static void effKamekiTornadeMain(EffectEntry* effect);
+static void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect);
 
 void DCFlushRange(void* addr, u32 nBytes);
 void GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts);
@@ -97,7 +97,7 @@ EffectEntry* effKamekiTornadeN64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f
     return effect;
 }
 
-void effKamekiTornadeMain(EffectEntry* effect) {
+static void effKamekiTornadeMain(EffectEntry* effect) {
     EffKamekiTornadeN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -161,7 +161,7 @@ void effKamekiTornadeMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effKamekiTornadeDisp, effect);
 }
 
-void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
+static void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
     f32 scale;
     s32 i;
     EffKamekiTornadeN64Work* work;

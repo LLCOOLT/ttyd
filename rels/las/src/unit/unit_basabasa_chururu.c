@@ -152,8 +152,8 @@ static PoseTableEntry pose_table[] = {
     {40, "CYU_W_1"},
     {56, "CYU_X_1"},
     {57, "CYU_X_1"},
-    {65, "CYU_T_1"},
-    {69, "CYU_S_1"},
+    {BTL_POSE_TALK, "CYU_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "CYU_S_1"},
 };
 
 static PoseTableEntry pose_table_ceil[] = {
@@ -173,8 +173,8 @@ static PoseTableEntry pose_table_ceil[] = {
     {40, "CYU_S_1"},
     {56, "CYU_X_2"},
     {57, "CYU_X_2"},
-    {65, "CYU_T_2"},
-    {69, "CYU_S_2"},
+    {BTL_POSE_TALK, "CYU_T_2"},
+    {BTL_POSE_STAY_DEFAULT, "CYU_S_2"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -198,7 +198,11 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_basabasa_chururu", "c_cyuru", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table_ceil},
 };
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {70, 75, 90, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 70, 70, 70, 100, 100, 70, 100, 100, 95};
+#else
 static StatusVulnerability regist = {70, 75, 100, 100, 70, 100, 100, 70, 100, 80, 100, 80, 100, 90, 70, 70, 85, 100, 70, 100, 100, 95};
+#endif
 
 static BattleWeapon weapon_basabasa_attack = {
     NULL, 0, // name..icon
@@ -287,7 +291,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 16, -18, 0)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL_CHILD(PTR(ceil_sky_event))
+        CALL_CHILD(ceil_sky_event)
         CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     END_IF
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -295,7 +299,7 @@ static EVT_BEGIN(init_event)
 EVT_END()
 
 static EVT_BEGIN(dmg_first_attack_pos)
-    CALL_CHILD(PTR(ceil_sky_event))
+    CALL_CHILD(ceil_sky_event)
     CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), 10, LW(2))
     CALL(btlevtcmd_WaitAttackEnd)
     RETURN
@@ -304,14 +308,14 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(damage_event_ceil)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 512, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 2048, LW(0))
@@ -323,25 +327,25 @@ static EVT_BEGIN(damage_event_ceil)
     IF_INT_EQUAL(LW(12), 0)
         RETURN
     END_IF
-    CALL_CHILD(PTR(ceil_sky_event))
+    CALL_CHILD(ceil_sky_event)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, 0, 0, 0, -1)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(counter_damage_event)
-    CALL_CHILD(PTR(ceil_sky_event))
+    CALL_CHILD(ceil_sky_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_GetDamageCode, LW(10), LW(0))
-    CALL_CHILD(PTR(subsetevt_counter_damage))
+    CALL_CHILD(subsetevt_counter_damage)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(ceil_fall_ready_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
-    CALL_CHILD(PTR(ceil_sky_event))
+    CALL_CHILD(btldefaultevt_Damage)
+    CALL_CHILD(ceil_sky_event)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, 0, 0, 0, -1)
     RETURN
 EVT_END()

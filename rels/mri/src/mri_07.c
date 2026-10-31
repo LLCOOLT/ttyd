@@ -14,7 +14,6 @@
 #include "evt/evt_msg.h"
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "mri_puni.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -50,7 +49,7 @@ static ShopItem goods_list[] = {
 };
 
 static ShopDb trade_list[] = {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     {ITEM_HP_DRAIN_BADGE, 5, 0},
 #else
     {ITEM_HP_DRAIN_ITEM, 5, 0},
@@ -69,7 +68,7 @@ static ShopDb trade_list[] = {
 };
 
 static ShopperData35 shopper_data = {
-    /*"プニ店員"*/"\x83\x76\x83\x6A\x93\x58\x88\xF5", // name
+    "プニ店員", // name
     NULL, NULL, // fook_evt..buy_evt
     {"stg2_shop_00", "stg2_shop_01", "stg2_shop_02", "stg2_shop_03", "stg2_shop_04", "stg2_shop_05", "stg2_shop_06", "stg2_shop_07", "stg2_shop_08", "stg2_shop_09", "stg2_shop_10", "stg2_shop_11", "stg2_shop_12", "stg2_shop_13", "stg2_shop_14", "stg2_shop_15", "stg2_shop_16", "stg2_shop_17", "stg2_shop_18", "stg2_shop_19", "stg2_shop_20", "stg2_shop_21", "stg2_shop_22", "stg2_shop_23", "stg2_shop_24", "stg2_shop_25", "stg2_shop_26", "stg2_shop_27", "stg2_shop_28", "stg2_shop_29", "stg2_shop_30", "stg2_shop_31", "stg2_shop_32", "stg2_shop_33", "stg2_shop_34"}, // msgs
 };
@@ -78,7 +77,7 @@ EVT_BEGIN(chibitoge_nakama)
     CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_TOGETTI_JUMP1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_npc_jump_position_nohit, STRING("me"), -167, 44, 41, 400, 50)
-    CALL_CHILD(PTR(mri_guide_goryu))
+    CALL_CHILD(mri_guide_goryu)
     CALL(evt_puni_flag_onoff, 1, 0, 262144)
     CALL(evt_npc_flag_onoff, 1, STRING("ガイドsp"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_msg_print, 0, STRING("stg2_mri_f01_00"), 0, STRING("ガイドsp"))
@@ -88,7 +87,7 @@ EVT_BEGIN(chibitoge_nakama)
     CALL(evt_msg_print, 0, STRING("stg2_mri_f01_01"), 0, STRING("プニ店員"))
     CALL(evt_cam3d_evt_off, 0, 11)
     WAIT_FRAMES(1)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(evt_party_stop, 0)
 #endif
     CALL(evt_msg_print_party, STRING("stg2_mri_f01_02"))
@@ -134,7 +133,7 @@ EVT_BEGIN(chibitoge_nakama)
     CALL(evt_puni_flag_onoff, 1, 1, 262144)
     CALL(evt_puni_set_mode, 1, PUNI_MODE_JOIN)
     CALL(evt_npc_flag_onoff, 0, STRING("ガイドsp"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(evt_party_run, 0)
 #endif
     RETURN
@@ -156,7 +155,7 @@ static EVT_BEGIN(chibitoge_init)
 EVT_END()
 
 static EVT_BEGIN(chibitoge_talk)
-    CALL_CHILD(PTR(chibitoge_nakama))
+    CALL_CHILD(chibitoge_nakama)
     RETURN
 EVT_END()
 
@@ -220,7 +219,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"ちびトゲ"*/"\x82\xBF\x82\xD1\x83\x67\x83\x51", // name
+        "ちびトゲ", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         chibitoge_init, // initEvent
@@ -232,7 +231,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"プニ店員"*/"\x83\x76\x83\x6A\x93\x58\x88\xF5", // name
+        "プニ店員", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         punishop_init, // initEvent
@@ -244,7 +243,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"プニ情報屋"*/"\x83\x76\x83\x6A\x8F\xEE\x95\xF1\x89\xAE", // name
+        "プニ情報屋", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         puniinfo_init, // initEvent
@@ -286,12 +285,12 @@ EVT_BEGIN(mri_07_init_evt)
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(9), 0)
-    CALL_CHILD(PTR(mri_puni_init))
+    CALL_CHILD(mri_puni_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    SPAWN_EVENT(PTR(puni_disp_info))
-    SPAWN_EVENT(PTR(mri_countdown))
+    CALL_CHILD(evt_bero_info_run)
+    SPAWN_EVENT(puni_disp_info)
+    SPAWN_EVENT(mri_countdown)
     CALL(evt_map_playanim, STRING("mizu_01"), 1, 0)
     CALL(evt_map_playanim, STRING("mizu_02"), 1, 0)
     CALL(evt_map_playanim, STRING("awa_01"), 1, 0)

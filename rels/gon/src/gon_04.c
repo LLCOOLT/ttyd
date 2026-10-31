@@ -20,7 +20,6 @@
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "gon.h"
 #include "data_tables.h"
 #include "version.h"
@@ -205,7 +204,7 @@ EVT_BEGIN(evt_gon_04flowblock_updown1_init)
 EVT_END()
 
 EVT_BEGIN(evt_gon_04flowblock_updown1)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     SET_TYPE(239)
 #endif
     CALL(evt_mobj_hitevt_onoff, STRING("me"), 0)
@@ -435,7 +434,7 @@ EVT_BEGIN(evt_gon_04flowblock_updown2_init)
 EVT_END()
 
 EVT_BEGIN(evt_gon_04flowblock_updown2)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     SET_TYPE(239)
 #endif
     CALL(evt_mobj_hitevt_onoff, STRING("me"), 0)
@@ -777,7 +776,7 @@ EVT_BEGIN(evt_kaidan_pera)
     CALL(evt_cam3d_evt_set, 250, 125, 650, 250, 80, -140, 450, 11)
     WAIT_MS(1500)
     SET_VALUE(LW(0), GSWF(GSWF_GON04_STAIRS_FLIPPED))
-    CALL_CHILD(PTR(evt_kaidan_pera_anime))
+    CALL_CHILD(evt_kaidan_pera_anime)
     WAIT_MS(1000)
     IF_INT_EQUAL(GSWF(GSWF_GON04_STAIRS_FLIPPED), 0)
         SET_VALUE(GSWF(GSWF_GON04_STAIRS_FLIPPED), 1)
@@ -874,7 +873,7 @@ EVT_END()
 EVT_BEGIN(evt_hashi_pera0)
     SET_VALUE(GF(10), 1)
     SET_VALUE(LW(0), 0)
-    CALL_CHILD(PTR(evt_hashi_pera))
+    CALL_CHILD(evt_hashi_pera)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_14_PAPER_BRIDGE_RIGHT)
     SET_VALUE(GF(10), 0)
     RETURN
@@ -883,7 +882,7 @@ EVT_END()
 EVT_BEGIN(evt_hashi_pera1)
     SET_VALUE(GF(10), 1)
     SET_VALUE(LW(0), 1)
-    CALL_CHILD(PTR(evt_hashi_pera))
+    CALL_CHILD(evt_hashi_pera)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_14_01_PAPER_BRIDGE_LEFT)
     SET_VALUE(GF(10), 0)
     RETURN
@@ -910,7 +909,7 @@ static s32 key_tbl[] = {
 static EVT_BEGIN(evt_chk)
     CALL(evt_pouch_check_item, ITEM_CASTLE_KEY_0x0D, LW(0))
     IF_INT_GREATER(LW(0), 0)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         CALL(evt_win_item_select, PTR(key_tbl), LW(0))
 #else
         CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
@@ -924,7 +923,7 @@ EVT_END()
 
 static EVT_BEGIN(evt_unlock)
     SET_VALUE(LW(0), STRING("e_bero_1"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_12_02_LOCK)
     RETURN
 EVT_END()
@@ -937,7 +936,7 @@ EVT_END()
 EVT_BEGIN(gon_04_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_cam_road_reset)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_GON1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_GON1"))
@@ -980,46 +979,34 @@ EVT_BEGIN(gon_04_init_evt)
     CALL(evt_npc_set_height, STRING("\"カロン03\""), 7)
     CALL(evt_npc_change_fbat_mode, 1)
     CALL(evt_mobj_switch_red, 0, STRING("mobj1"), 250, 150, -120, PTR(evt_kaidan_pera), 0)
-    SPAWN_EVENT(PTR(evt_kaidan_pera_init))
+    SPAWN_EVENT(evt_kaidan_pera_init)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("fuyu_box01"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("a_fuyu_box01"), 1, 0)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("fuyu_box02"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("a_fuyu_box02"), 1, 0)
     CALL(evt_mobj_float_blk, STRING("mobj_fltbl01"), FLOAT(582.5f), 150, FLOAT(-137.5f), 1, 0, 0, LSWF(6))
     CALL(evt_mobj_float_blk, STRING("mobj_fltbl02"), 395, 150, -125, 2, 1, 0, LSWF(7))
-    CALL_CHILD(PTR(evt_gon_04flowblock_updown1_init))
-    CALL_CHILD(PTR(evt_gon_04flowblock_updown2_init))
+    CALL_CHILD(evt_gon_04flowblock_updown1_init)
+    CALL_CHILD(evt_gon_04flowblock_updown2_init)
     CALL(evt_mobj_switch_float_blk, STRING("mobj_fltsw01"), 550, 75, 137, STRING("mobj_fltbl01"), 1, PTR(evt_gon_04flowblock_updown1), LSWF(6))
     CALL(evt_mobj_switch_float_blk, STRING("mobj_fltsw02"), 450, 75, 60, STRING("mobj_fltbl02"), 2, PTR(evt_gon_04flowblock_updown2), LSWF(7))
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_12_01_KEY)
-#if VERSION == VERSION_DEMO
-        CALL(evt_item_entry, STRING("key00"), ITEM_CASTLE_KEY_0x0D, -150, 150, -125, 15, -1, PTR(key_get))
-#else
-        CALL(evt_item_entry, STRING("key00"), ITEM_CASTLE_KEY_0x0D, -150, 150, -125, 16, -1, PTR(key_get))
-#endif
+        CALL(evt_item_entry, STRING("key00"), ITEM_CASTLE_KEY_0x0D, -150, 150, -125, ITEM_ENTRY_FIXED, -1, PTR(key_get))
     END_IF
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("item00"), ITEM_STAR_PIECE, 150, 400, -125, 15, GSWF(GSWF_GON04_STAR_PIECE_1), 0)
-#else
-    CALL(evt_item_entry, STRING("item00"), ITEM_STAR_PIECE, 150, 400, -125, 16, GSWF(GSWF_GON04_STAR_PIECE_1), 0)
-#endif
+    CALL(evt_item_entry, STRING("item00"), ITEM_STAR_PIECE, 150, 400, -125, ITEM_ENTRY_FIXED, GSWF(GSWF_GON04_STAR_PIECE_1), 0)
 #if VERSION >= VERSION_US
-    CALL(evt_item_entry, STRING("item01"), ITEM_STAR_PIECE, 420, 910, -175, 16, GSWF(GSWF_GON04_STAR_PIECE_2), 0)
+    CALL(evt_item_entry, STRING("item01"), ITEM_STAR_PIECE, 420, 910, -175, ITEM_ENTRY_FIXED, GSWF(GSWF_GON04_STAR_PIECE_2), 0)
 #else
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("item01"), ITEM_STAR_PIECE, 400, 900, -175, 15, GSWF(GSWF_GON04_STAR_PIECE_2), 0)
-#else
-    CALL(evt_item_entry, STRING("item01"), ITEM_STAR_PIECE, 400, 900, -175, 16, GSWF(GSWF_GON04_STAR_PIECE_2), 0)
-#endif
+    CALL(evt_item_entry, STRING("item01"), ITEM_STAR_PIECE, 400, 900, -175, ITEM_ENTRY_FIXED, GSWF(GSWF_GON04_STAR_PIECE_2), 0)
 #endif
     CALL(evt_mobj_lv_blk, STRING("mobj_blk00"), 395, 200, -125, 0, GSWF(GSWF_GON04_BIG_BLOCK_A_BROKEN), STRING("MOBJ_Lv1BigBlock"))
     CALL(evt_mobj_lv_blk, STRING("mobj_blk01"), 445, 150, -125, 0, GSWF(GSWF_GON04_BIG_BLOCK_B_BROKEN), STRING("MOBJ_Lv2BigBlock"))
     CALL(evt_mobj_lv_blk, STRING("mobj_blk02"), FLOAT(545.0f), 150, -125, 0, GSWF(GSWF_GON04_BIG_BLOCK_C_BROKEN), STRING("MOBJ_Lv2BigBlock"))
-    SPAWN_EVENT(PTR(evt_hashi))
+    SPAWN_EVENT(evt_hashi)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_12_02_LOCK)
         CALL(evt_mobj_lock, STRING("mobj_lock00"), ITEM_CASTLE_KEY_0x0D, 595, 160, -50, 270, PTR(evt_chk), PTR(evt_unlock), GSWF(GSWF_GON04_DOOR_UNLOCKED))
         SET_VALUE(LW(0), STRING("e_bero_1"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     END_IF
     CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 6, 550, 960, -125, 0, 0)
     CALL(evt_mobj_powerupblk, STRING("pblk1"), -250, 60, -130, 0, GSWF(GSWF_GON04_SHINE_SPRITE), 0)

@@ -28,7 +28,7 @@ enum {
 
 typedef struct SignalTimingWork {
     s32 hits; // 0x0
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     s32 misses; // 0x4, retail only: the demo has no miss count (later fields are 4 lower)
 #endif
     s32 index;      // 0x8
@@ -69,11 +69,11 @@ s32 ac_signaltiming_ok_frame_range[7] = {20, 16, 12, 10, 6, 4, 2};
 s32 ac_signaltiming_ok_frame_range_2[7] = {30, 30, 30, 30, 25, 20, 15};
 
 static void actionCommandDisp(f32 x, f32 y);
-s32 _get_ok_frame_range(s32 difficulty);
+static s32 _get_ok_frame_range(s32 difficulty);
 
 // inlining off for _get_ok_frame_range, as in the original (the object differs without it)
 #pragma dont_inline on
-s32 _get_ok_frame_range(s32 difficulty) {
+static s32 _get_ok_frame_range(s32 difficulty) {
     BattleWork* work = _battleWorkPointer;
     switch (ST_MODE(work)) {
         case 1:
@@ -120,7 +120,7 @@ s32 battleAcMain_SignalTiming(BattleWork* work) {
                 disp->iconY = 0.0f;
                 *(&disp->slideTimer) = 20;
                 w->hits = 0;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 w->misses = 0;
 #endif
                 w->frame = 0;
@@ -244,7 +244,7 @@ s32 battleAcMain_SignalTiming(BattleWork* work) {
                     got = 1;
                     good = 1;
                 }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 if ((w->hits + w->misses) >= ST_COUNT(work)) {
                     got = 0;
                 }
@@ -270,7 +270,7 @@ s32 battleAcMain_SignalTiming(BattleWork* work) {
                             ac->acState = 1002;
                         }
                     } else if ((w->index >= ST_LEAD(work)) && (w->index < (ST_COUNT(work) + ST_LEAD(work)))) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                         w->misses++;
 #endif
                         if (w->frame >= w->rangeStart) {
@@ -288,7 +288,7 @@ s32 battleAcMain_SignalTiming(BattleWork* work) {
                     w->pressed = 1;
                     ST_OUT_RESULT(work) = -1;
                     if ((w->index >= ST_LEAD(work)) && (w->index < (ST_COUNT(work) + ST_LEAD(work)))) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                         w->misses++;
 #endif
                         w->results[w->index - ST_LEAD(work)] = -1;

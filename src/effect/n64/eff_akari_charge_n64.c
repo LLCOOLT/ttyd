@@ -20,8 +20,8 @@ static effN64Vtx size2x8_tex8x16_vtx[] = {
     {-4, 20, 0, 0, 1024, 255, 0, 0, 255},
 };
 
-void effAkariChargeMain(EffectEntry* effect);
-void effAkariChargeDisp(CameraId cameraId, EffectEntry* effect);
+static void effAkariChargeMain(EffectEntry* effect);
+static void effAkariChargeDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effAkariChargeN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 size) {
     EffectEntry* effect;
@@ -67,7 +67,7 @@ EffectEntry* effAkariChargeN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z,
     return effect;
 }
 
-void effAkariChargeMain(EffectEntry* effect) {
+static void effAkariChargeMain(EffectEntry* effect) {
     EffAkariChargeN64Elem* p = effect->userdata;
     s32 i;
     s32 type;
@@ -146,7 +146,7 @@ void effAkariChargeMain(EffectEntry* effect) {
     }
 }
 
-void effAkariChargeDisp(CameraId cameraId, EffectEntry* effect) {
+static void effAkariChargeDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffAkariChargeN64Elem* p;
     s32 i;

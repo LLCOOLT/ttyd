@@ -36,10 +36,10 @@ typedef struct EffMagic2N64Work {
 static u8 color_rotation_data[24] = {0xFF, 0xC5, 0x9C, 0xFF, 0x9C, 0xFF, 0xFF, 0x73, 0xD6, 0xFF, 0x9C, 0xFF,
                                      0xFF, 0xC5, 0x7B, 0xFF, 0xB4, 0xFF, 0xDE, 0x73, 0xFF, 0xFF, 0x94, 0x9C};
 
-void effMagic2Main(EffectEntry* effect);
-void effMagic2Disp(CameraId cameraId, EffectEntry* effect);
-void magic2_2_line_dl(void);
-void magic2_4_dl(void);
+static void effMagic2Main(EffectEntry* effect);
+static void effMagic2Disp(CameraId cameraId, EffectEntry* effect);
+static void magic2_2_line_dl(void);
+static void magic2_4_dl(void);
 
 effN64Vtx stg_magic2_2_line_v[] = {
     {-87, 50, 0, 5461, 2048, 255, 255, 255, 0},
@@ -140,7 +140,7 @@ EffectEntry* effMagic2N64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 scal
 
 // Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_common_subs off
-void effMagic2Main(EffectEntry* effect) {
+static void effMagic2Main(EffectEntry* effect) {
     EffMagic2N64Work* w = effect->userdata;
     Vec position;
     Vec pos2;
@@ -211,7 +211,7 @@ void effMagic2Main(EffectEntry* effect) {
 }
 
 #pragma opt_common_subs reset
-void effMagic2Disp(CameraId cameraId, EffectEntry* effect) {
+static void effMagic2Disp(CameraId cameraId, EffectEntry* effect) {
     s32 fov;
     s32 half;
     EffMagic2N64Work* w;
@@ -299,7 +299,7 @@ void effMagic2Disp(CameraId cameraId, EffectEntry* effect) {
     GXSetScissorBoxOffset(0, 0);
 }
 
-void magic2_2_line_dl(void) {
+static void magic2_2_line_dl(void) {
     GXTexObj texObj;
     GXSetNumChans(1);
     GXSetChanCtrl(4, 0, 0, 1, 0, 0, 2);
@@ -342,7 +342,7 @@ void magic2_2_line_dl(void) {
     tri2(15, 14, 25, 0, 15, 25, 24, 0);
 }
 
-void magic2_4_dl(void) {
+static void magic2_4_dl(void) {
     GXTexObj texObj;
     GXSetNumChans(1);
     GXSetChanCtrl(4, 0, 0, 1, 0, 0, 2);

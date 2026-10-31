@@ -38,10 +38,10 @@ typedef struct TubuDt {
     const char* map;
 } TubuDt;
 
-void capture(CameraId camera, void* param);
-void monosiri_disp(CameraId camera, void* param);
+static void capture(CameraId camera, void* param);
+static void monosiri_disp(CameraId camera, void* param);
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // Unreferenced; every demo TU that had it carries its own copy at the start of .data.
 static f32 unusedSignTbl[16] = {-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f};
 
@@ -72,7 +72,7 @@ static inline void winLogAddMenu(WindowWork* w, s32 id) {
 
 // The demo has no per-chapter tubu switches (type) and opens the moo/aji
 // route one sequence step earlier.
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #define TUBU_TYPE(t) 0
 #define TUBU_SEQ_361 360
 #else
@@ -178,7 +178,7 @@ TubuDt tubuDt[] = {
 
 // Order-forced: the same winLogAddMenu as the demo copy above; its static msg_help is emitted where the
 // function is defined, after tubuDt in retail and before it in the demo.
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 s32 stone_tbl[] = {ITEM_DIAMOND_STAR, ITEM_EMERALD_STAR, ITEM_GOLD_STAR, ITEM_RUBY_STAR, ITEM_SAPPHIRE_STAR, ITEM_GARNET_STAR, ITEM_CRYSTAL_STAR};
 
 static inline void winLogAddMenu(WindowWork* w, s32 id) {
@@ -205,7 +205,7 @@ static inline void winLogAddMenu(WindowWork* w, s32 id) {
 #endif
 
 void winLogInit(WindowWork* w) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     s32 j;
     s32 i;
     u32 k;
@@ -254,7 +254,7 @@ void winLogInit(WindowWork* w) {
         }
         ((EffStarStoneWork*)e->userdata)->cam = 8;
         ((EffStarStoneWork*)e->userdata)->flags &= ~4;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         ((EffStarStoneWork*)e->userdata)->flags |= 0x20;
 #endif
     }
@@ -303,7 +303,7 @@ void winLogInit(WindowWork* w) {
         area = "tik";
     if (!strcmp(gp->currentMapName, "gra_06"))
         area = "jin";
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (!strcmp(gp->currentMapName, "muj_10") || !strcmp(gp->currentMapName, "muj_11") || !strcmp(gp->currentMapName, "muj_12"))
         area = "dou";
 #endif
@@ -646,7 +646,7 @@ s32 winLogMain(WindowWork* w) {
             by = 120.0f + w->log.scrollY;
             for (k = 0; k < 0x5D; k++) {
                 t = &tubuDt[k];
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 if (swByteGet(GSW_STORY_PROGRESS) < t->id)
                     break;
                 {
@@ -1071,8 +1071,8 @@ void winLogMain2(WindowWork* w) {
     w->log.recipe.f2C += (w->log.recipe.tf2C - w->log.recipe.f2C) / FPS_EASE(6.0f);
 }
 
-void mapGX(WindowWork* w, f32 x, f32 y);
-void monoshiriGX(WindowWork* w, f32 x, f32 y);
+static void mapGX(WindowWork* w, f32 x, f32 y);
+static void monoshiriGX(WindowWork* w, f32 x, f32 y);
 
 void winLogDisp(s32 camId, void* param, s32 idx) {
     static const GXColor kW = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -1106,7 +1106,7 @@ void winLogDisp(s32 camId, void* param, s32 idx) {
             PSMTXRotRad(m2, 'y', 0.017453292f * (51.42857f * i - w->log.fE80));
             PSMTXMultVec(m2, &v, &v);
             PSMTXMultVec(m1, &v, &v);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             winKageGX(w, (GXColor){0x00, 0x00, 0x00, 0x80}, v.x + (x + w->log.fE68), (v.y + (y + w->log.fE70)) - 30.0f, v.z, 1.0f);
 #endif
             wk = w->log.eff[i]->userdata;
@@ -1115,11 +1115,11 @@ void winLogDisp(s32 camId, void* param, s32 idx) {
             wk->position.y = 20.0f + (v.y + (y + w->log.fE70));
             wk = w->log.eff[i]->userdata;
             wk->position.z = v.z;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             winKageGX(w, (GXColor){0x00, 0x00, 0x00, 0x80}, v.x + (x + w->log.fE68), (v.y + (y + w->log.fE70)) - 30.0f, v.z, 1.0f);
 #endif
         }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         for (i = 0; i < 7; i++) {
             effStarStoneDraw(CAMERA_2D, w->log.eff[i]);
         }
@@ -1212,7 +1212,7 @@ static inline double fabs(double x) {
     return __fabs(x);
 }
 
-void mapGX(WindowWork* w, f32 x, f32 y) {
+static void mapGX(WindowWork* w, f32 x, f32 y) {
     static f32 pos_tbl[7][2] = {
         {165.0f, 68.0f},
         {0.0f, 75.0f},
@@ -1250,7 +1250,7 @@ void mapGX(WindowWork* w, f32 x, f32 y) {
         winTexInit(*w->res->data);
         for (i = 0; i < sizeof(tubuDt) / sizeof(TubuDt); i++) {
             t = &tubuDt[i];
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             if (swByteGet(GSW_STORY_PROGRESS) < t->id)
                 break;
             {
@@ -1273,35 +1273,35 @@ void mapGX(WindowWork* w, f32 x, f32 y) {
             id = ICON_198;
             k = 1;
         } else if (sw >= 0x79 && sw < 0xA4) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             id = ICON_199;
 #else
             id = ICON_19A;
 #endif
             k = 2;
         } else if (sw >= 0xAF && sw < 0xD5) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             id = ICON_19A;
 #else
             id = ICON_19C;
 #endif
             k = 3;
         } else if (sw >= 0xDE && sw < 0x105) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             id = ICON_19B;
 #else
             id = ICON_19D;
 #endif
             k = 4;
         } else if (sw >= 0x110 && sw < 0x152) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             id = ICON_19C;
 #else
             id = ICON_199;
 #endif
             k = 5;
         } else if (sw >= 0x15C && sw < 0x175) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             id = ICON_19D;
 #else
             id = ICON_19B;
@@ -1348,7 +1348,7 @@ void mapGX(WindowWork* w, f32 x, f32 y) {
     }
 }
 
-void monoshiriGX(WindowWork* w, f32 x, f32 y) {
+static void monoshiriGX(WindowWork* w, f32 x, f32 y) {
     GXColor k1;
     GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     GXColor k2;
@@ -1391,7 +1391,7 @@ void monoshiriGX(WindowWork* w, f32 x, f32 y) {
         if (w->log.enemyPage * 16 + i >= w->log.enemyNum)
             break;
         if (swGet(id + GSWF_TATTLE_BASE)) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             if (id == 0x4D || id == 0x87) {
                 if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG4_14_NAME_GUESSING) {
                     name = msgSearch("btl_un_hatena");
@@ -1453,7 +1453,7 @@ MonosiriWork* monosiriInit(s32 id, f32 x, f32 y) {
     m->y = y;
     m->curX = 500.0f;
     m->curY = -300.0f;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     m->alpha = 0;
     m->pose1 = -1;
     m->pose2 = -1;
@@ -1491,7 +1491,7 @@ void monosiriMain(MonosiriWork* m) {
             m->file2 = fileAllocf(0, WIN_DIR "jp/mono.dat", getMarioStDvdRoot());
 #endif
             m->state++;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             m->alpha = 0;
             m->pose1 = -1;
             m->pose2 = -1;
@@ -1552,7 +1552,8 @@ BOOL monosiriCloseWait(MonosiriWork* m) {
 }
 
 void monosiriExit(MonosiriWork* m) {
-#if VERSION == VERSION_DEMO
+    // The release versions also reset each field after freeing it and check smart before freeing it
+#if VERSION <= VERSION_DEMO_US
     if (m) {
         if (m->file1) {
             fileFree(m->file1);
@@ -1609,7 +1610,7 @@ typedef struct MonoDatFile {
     u32 size;         // 0x4
 } MonoDatFile;
 
-void capture(CameraId camera, void* param) {
+static void capture(CameraId camera, void* param) {
     MonosiriWork* m = param;
     AnimData* data;
     Vec min;
@@ -1699,16 +1700,16 @@ void capture(CameraId camera, void* param) {
     animPosePeraOn(m->pose1);
     if (m->id == 0x6B) {
         gpos = *animPoseGetAnimPosePtr(m->pose1)->worldPositions;
-        cnt = smartAlloc(g_moamoa_chain_num * 4, 3)->address;
+        cnt = smartAlloc(g_moamoa_chain_max * 4, 3)->address;
         idx = smartAlloc(2000, 3)->address;
-        memset(cnt, 0, g_moamoa_chain_num * 4);
+        memset(cnt, 0, g_moamoa_chain_max * 4);
         for (i = 0; 500 > i; i++) {
-            idx[i] = cnt[i % g_moamoa_chain_num]++;
+            idx[i] = cnt[i % g_moamoa_chain_max]++;
         }
         animPoseSetMaterialFlagOn(m->pose2, ANIM_MATERIAL_FLAG_NO_BLEND | ANIM_MATERIAL_FLAG_NO_BLEND2);
         animPosePeraOff(m->pose2);
         for (i = 0; i < 500; i++) {
-            k = i % g_moamoa_chain_num;
+            k = i % g_moamoa_chain_max;
             f = (f32)idx[i] / (f32)cnt[k];
             a = &gpos[animPoseGetGroupIdx(m->pose1, g_moamoa_chain_tbl[k].from)];
             b = &gpos[animPoseGetGroupIdx(m->pose1, g_moamoa_chain_tbl[k].to)];
@@ -1737,7 +1738,7 @@ void capture(CameraId camera, void* param) {
     GXSetScissor(sx, sy, sw, sh);
 }
 
-void monosiri_disp(CameraId camera, void* param) {
+static void monosiri_disp(CameraId camera, void* param) {
     MonosiriWork* m = param;
     GXColor black = {0x00, 0x00, 0x00, 0xFF};
     char buf[256];
@@ -1762,7 +1763,7 @@ void monosiri_disp(CameraId camera, void* param) {
 
     x = m->curX;
     y = m->curY;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (m->file1)
 #endif
     {
@@ -1845,7 +1846,7 @@ void monosiri_disp(CameraId camera, void* param) {
         } else {
             sprintf(buf, (u32)gp->language != 0 ? "%d. %s" : "%d．%s", enemy_monoshiri_sort_table[id], msgSearch(te->enemyTag));
         }
-#elif VERSION == VERSION_DEMO
+#elif VERSION <= VERSION_DEMO_US
         id = m->id;
         te = battleGetUnitMonosiriPtr(id);
         sprintf(buf, "%d．%s", enemy_monoshiri_sort_table[id], msgSearch(te->enemyTag));
@@ -1871,7 +1872,7 @@ void monosiri_disp(CameraId camera, void* param) {
         sprintf(buf, "%s　%s", msgSearch("menu_monosiri_derutokoro"), msgSearch(te->locationTag));
 #endif
         w = 0.75f * FontGetMessageWidth(buf);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         winFontSet((Vec){(16.0f + x) + (248.0f - w) / 2.0f, y - 210.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);
 #else
         winFontSet((Vec){1.0f + ((16.0f + x) + (248.0f - w) / 2.0f), y - 210.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);

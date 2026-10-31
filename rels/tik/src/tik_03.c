@@ -15,7 +15,6 @@
 #include "evt/evt_party.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "tik.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
@@ -23,7 +22,11 @@
 
 extern EvtWord bero_05_custom_in[];
 extern EvtWord bero_05_custom_out[];
+#if VERSION <= VERSION_DEMO_US
+static BeroEntry bero_entry_data[6];
+#else
 static BeroEntry bero_entry_data[3];
+#endif
 static BeroEntry bero_entry_data2[2];
 static NpcSetupInfo npcEnt[2];
 extern EvtWord puni_soguu_3[];
@@ -74,6 +77,56 @@ static BeroEntry bero_entry_data[] = {
         1, // exitAnimeType
         0, 0, // enterAnimeArg..exitAnimeArg
     },
+#if VERSION <= VERSION_DEMO_US
+    {
+        "s_bero_2", // hitName
+        0, 0, // type..sfxId
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        "tik_04", // nextMapName
+        "n_bero_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "s_bero_3", // hitName
+        0, 0, // type..sfxId
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        "tik_04", // nextMapName
+        "n_bero_3", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "s_bero_4", // hitName
+        0, 0, // type..sfxId
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        "tik_04", // nextMapName
+        "n_bero_4", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+#endif
     {
         "dokan", // hitName
         2, // type
@@ -136,14 +189,14 @@ static EVT_BEGIN(guide_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG1_33_A_PUNI_PLEA_FOR_HELP)
         WAIT_MS(1000)
-        CALL_CHILD(PTR(puni_switch))
+        CALL_CHILD(puni_switch)
     END_SWITCH
     RETURN
 EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"ガイド"*/"\x83\x4B\x83\x43\x83\x68", // name
+        "ガイド", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         guide_init, // initEvent
@@ -392,7 +445,7 @@ EVT_BEGIN(puni_switch)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("kabe_2"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("a_para_d"), 1, 0)
     CALL(evt_hitobj_onoff, STRING("a_para_d1"), 1, 0)
-    CALL_CHILD(PTR(anm_para_snd))
+    CALL_CHILD(anm_para_snd)
     CALL(evt_npc_set_position, STRING("me"), 230, -50, 80)
     CALL(evt_npc_flag_onoff, 0, STRING("ガイド"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_party_run, 0)
@@ -443,14 +496,14 @@ EVT_BEGIN(tik03_switch_evt)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("kabe_2"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_para_d"), 1, 0)
         SET_VALUE(GSWF(GSWF_TIK03_SECRET_DOOR_OPEN), 1)
-        CALL_CHILD(PTR(anm_para_snd))
+        CALL_CHILD(anm_para_snd)
         WAIT_MS(800)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("para"), MAPOBJ_FLAG_HIDE)
     ELSE
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("para"), MAPOBJ_FLAG_HIDE)
         CALL(evt_map_playanim, STRING("anm_rapa"), 0, 0)
         SET_VALUE(GSWF(GSWF_TIK03_SECRET_DOOR_OPEN), 0)
-        CALL_CHILD(PTR(anm_rapa_snd))
+        CALL_CHILD(anm_rapa_snd)
         WAIT_MS(800)
         CALL(evt_hitobj_onoff, STRING("a_para_d"), 0, 1)
         CALL(evt_hitobj_onoff, STRING("a_para_d1"), 0, 1)
@@ -464,10 +517,10 @@ EVT_BEGIN(tik_03_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_npc_setup, PTR(npcEnt))
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_32_PUNI_ENCOUNTER_2)
-        SPAWN_EVENT(PTR(puni_soguu_3))
+        SPAWN_EVENT(puni_soguu_3)
     END_IF
     IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_33_A_PUNI_PLEA_FOR_HELP)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kabe_2"), MAPOBJ_FLAG_HIDE)
@@ -482,16 +535,16 @@ EVT_BEGIN(tik_03_init_evt)
         END_IF
     END_IF
     IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_34_PUNIS_SECRET_PASSAGE)
-        SPAWN_EVENT(PTR(puni_nakama))
+        SPAWN_EVENT(puni_nakama)
     END_IF
-    CALL(evt_item_entry, STRING("item_00"), ITEM_DAMAGE_DODGE, -450, -50, -50, 16, GSWF(GSWF_TIK03_DAMAGE_DODGE_TAKEN), 0)
+    CALL(evt_item_entry, STRING("item_00"), ITEM_DAMAGE_DODGE, -450, -50, -50, ITEM_ENTRY_FIXED, GSWF(GSWF_TIK03_DAMAGE_DODGE_TAKEN), 0)
     CALL(evt_mobj_kururing_floor, STRING("kururin1"), 325, -50, 0, STRING("kakoi"), 125, GSWF(GSWF_TIK03_STAR_PIECE_PANEL))
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG2_00_BOGGLY_WOODS)
         SET_VALUE(LW(0), STRING("dokan"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_bero_overwrite, STRING("dokan"), PTR(bero_entry_data2))
         SET_VALUE(LW(0), STRING("dokan"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
     END_IF
     RETURN
 EVT_END()

@@ -32,7 +32,6 @@
 #include "evt/evt_twoddisp.h"
 #include "koopa.h"
 #include "kpa_act.h"
-#include "party/party_motion.h"
 #include "kpa.h"
 #include "driver/icondrv.h"
 #include "driver/itemdrv.h"
@@ -48,21 +47,21 @@ typedef struct KpaGameWork {
     u8 time;
 } KpaGameWork;
 KpaGameWork* kwp;
-void kpa_stageclear_disp(CameraId camera, void* param);
-void kpa_status_disp(CameraId camera, void* param);
+static void kpa_stageclear_disp(CameraId camera, void* param);
+static void kpa_status_disp(CameraId camera, void* param);
 #define NUMERIC_ID ((u16*)numeric_id)
 
-USER_FUNC(kpa_add_coin);
-USER_FUNC(kpa_get_msg);
-USER_FUNC(kpa_make_item_name);
-USER_FUNC(kpa_make_mobj_name);
+static USER_FUNC(kpa_add_coin);
+static USER_FUNC(kpa_get_msg);
+static USER_FUNC(kpa_make_item_name);
+static USER_FUNC(kpa_make_mobj_name);
 USER_FUNC(kpa_mobj_on);
-USER_FUNC(kpa_muteki_check);
-USER_FUNC(kpa_nohitenemy_ct_clear);
-USER_FUNC(kpa_pole_hitoff);
-USER_FUNC(kpa_set_time);
-USER_FUNC(kpa_status_main);
-USER_FUNC(kpa_time_countdown);
+static USER_FUNC(kpa_muteki_check);
+static USER_FUNC(kpa_nohitenemy_ct_clear);
+static USER_FUNC(kpa_pole_hitoff);
+static USER_FUNC(kpa_set_time);
+static USER_FUNC(kpa_status_main);
+static USER_FUNC(kpa_time_countdown);
 USER_FUNC(kpa_fire_off);
 
 s32 numeric_id[5];
@@ -172,11 +171,7 @@ EVT_BEGIN(kpa_read_item)
         END_IF
         CALL(kpa_make_item_name, LW(2))
         READ_INT2(LW(3), LW(4))
-#if VERSION == VERSION_DEMO
-        CALL(evt_item_entry, LW(2), ITEM_COIN, LW(3), LW(4), 0, 15, -1, PTR(kpa_coin_evt))
-#else
-        CALL(evt_item_entry, LW(2), ITEM_COIN, LW(3), LW(4), 0, 16, -1, PTR(kpa_coin_evt))
-#endif
+        CALL(evt_item_entry, LW(2), ITEM_COIN, LW(3), LW(4), 0, ITEM_ENTRY_FIXED, -1, PTR(kpa_coin_evt))
         CALL(evt_item_flag_on, LW(2), ITEM_FLAG_INSTANT_GET)
     END_LOOP
     RETURN
@@ -219,7 +214,7 @@ USER_FUNC(kpa_mobj_on) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(kpa_make_mobj_name) {
+static USER_FUNC(kpa_make_mobj_name) {
     static char name[16];
     static s32 no;
     EvtWord* args = event->args;
@@ -230,7 +225,7 @@ USER_FUNC(kpa_make_mobj_name) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(kpa_make_item_name) {
+static USER_FUNC(kpa_make_item_name) {
     static char name[16];
     static s32 no;
     EvtWord* args = event->args;
@@ -241,7 +236,7 @@ USER_FUNC(kpa_make_item_name) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(kpa_add_coin) {
+static USER_FUNC(kpa_add_coin) {
     EvtWord* args = event->args;
 
     kpaAddCoinPos(1, &(Vec){evtGetFloat(event, args[0]), evtGetFloat(event, args[1]), evtGetFloat(event, args[2])});
@@ -256,7 +251,7 @@ EVT_BEGIN(kpa_dead)
     SET_VALUE(LSWF(3), 1)
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_cam_letter_box_onoff, 0, 0)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(kpa_fire_off)
 #endif
     CALL(evt_mario_key_onoff, 0)
@@ -335,25 +330,25 @@ EVT_BEGIN(kpa_fall_sub)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
-    CALL_CHILD(PTR(kpa_dead))
+    CALL_CHILD(kpa_dead)
     RETURN
 EVT_END()
 
-USER_FUNC(kpa_nohitenemy_ct_clear) {
+static USER_FUNC(kpa_nohitenemy_ct_clear) {
     MarioWork* mario = marioGetPtr();
 
     mario->kpaNoHitTimer = 0;
     return EVT_RETURN_DONE;
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 USER_FUNC(kpa_fire_off) {
     kpaFireDelete();
     return EVT_RETURN_DONE;
 }
 #endif
 
-USER_FUNC(kpa_set_scale) {
+static USER_FUNC(kpa_set_scale) {
     f32 scale = evtGetFloat(event, event->args[0]);
     MarioWork* mario = marioGetPtr();
 
@@ -475,7 +470,7 @@ EVT_BEGIN(kpa_stage_start)
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("KPA2_S_1"), STRING("KPA2_T_1"))
     CALL(evt_msg_print, 0, LW(0), 0, STRING("mario"))
     CALL(evt_fade_out, 1000)
-    SPAWN_EVENT(PTR(kpa_bgm_change))
+    SPAWN_EVENT(kpa_bgm_change)
     CALL(evt_snd_envoff, PSND_FADE_OUT)
     CALL(evt_map_blend_off, 0)
     CALL(evt_map_blend_off, 1)
@@ -552,11 +547,11 @@ EVT_BEGIN(kpa_time)
         END_IF
     END_LOOP
     CALL(kpa_pole_hitoff)
-    CALL_CHILD(PTR(kpa_dead))
+    CALL_CHILD(kpa_dead)
     RETURN
 EVT_END()
 
-USER_FUNC(kpa_get_msg) {
+static USER_FUNC(kpa_get_msg) {
     static char label[16];
     EvtWord* args = event->args;
     s32 n = kwp->lives;
@@ -570,7 +565,7 @@ USER_FUNC(kpa_get_msg) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(kpa_muteki_check) {
+static USER_FUNC(kpa_muteki_check) {
     event->lwData[0] = kpaMutekiCheck();
     return EVT_RETURN_DONE;
 }
@@ -582,7 +577,7 @@ USER_FUNC(kpa_muteki_check) {
 #define KPA_ICON_OFS 0
 #endif
 
-void kpa_status_disp(CameraId camera, void* param) {
+static void kpa_status_disp(CameraId camera, void* param) {
     Vec pos;
     s32 digit[6];
     s32 i;
@@ -667,7 +662,7 @@ void kpa_status_disp(CameraId camera, void* param) {
     }
 }
 
-USER_FUNC(kpa_status_main) {
+static USER_FUNC(kpa_status_main) {
     dispEntry(CAMERA_2D, 1000.0f, 0, kpa_status_disp, NULL);
     return EVT_RETURN_DONE;
 }
@@ -697,7 +692,7 @@ USER_FUNC(kpa_status_init) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(kpa_set_time) {
+static USER_FUNC(kpa_set_time) {
     EvtWord* args = event->args;
     s32 sec = evtGetValue(event, args[0]) / 1000;
     s32 time = 180 - (sec + evtGetValue(event, args[1]) * 10);
@@ -710,7 +705,7 @@ USER_FUNC(kpa_set_time) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(kpa_pole_hitoff) {
+static USER_FUNC(kpa_pole_hitoff) {
     MapObjectEntry* mobj = mobjNameToPtrNoAssert("pole");
 
     if (mobj != NULL) {
@@ -719,7 +714,7 @@ USER_FUNC(kpa_pole_hitoff) {
     return EVT_RETURN_DONE;
 }
 
-void kpa_stageclear_disp(CameraId camera, void* param) {
+static void kpa_stageclear_disp(CameraId camera, void* param) {
     FontDrawStart();
     FontDrawScale(2.0f);
     FontDrawEdge();
@@ -739,12 +734,12 @@ EVT_BEGIN(kpa_stage_clear)
     RETURN
 EVT_END()
 
-USER_FUNC(kpa_stageclear_disp_entry) {
+static USER_FUNC(kpa_stageclear_disp_entry) {
     dispEntry(CAMERA_2D, 1000.0f, 0, kpa_stageclear_disp, NULL);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(kpa_time_countdown) {
+static USER_FUNC(kpa_time_countdown) {
     KpaGameWork* wp = kwp;
 
     if (wp->time != 0) {
@@ -755,7 +750,7 @@ USER_FUNC(kpa_time_countdown) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(kpa_get_cam_pt) {
+static USER_FUNC(kpa_get_cam_pt) {
     EvtWord* args = event->args;
     CameraEntry* cam = camGetPtr(CAMERA_3D);
 

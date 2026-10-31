@@ -17,7 +17,7 @@
 // FAKE: battle_message.c calls windowDispGX_Waku_col through this prototype (the types it was compiled with) instead of the one in driver/windowdrv.h; same registers, behaviour-identical.
 typedef void (*WindowDispWakuColPtrFn)(u16, GXColor*, f32, f32, f32, f32, f32);
 
-void _disp(CameraId cameraId, void* param);
+static void _disp(CameraId cameraId, void* param);
 
 // s32 type, s32 x, s32 y, const char* msg, s32 frames
 USER_FUNC(btlevtcmd_AnnounceMessage) {
@@ -75,7 +75,7 @@ USER_FUNC(btlevtcmd_AnnounceMessage) {
     return event->userdata[0] <= 0;
 }
 
-void _disp(CameraId cameraId, void* param) {
+static void _disp(CameraId cameraId, void* param) {
     BattleAnnounce* announce = &_battleWorkPointer->announce;
     GXColor* col;
     u16 lines;

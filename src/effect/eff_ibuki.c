@@ -10,8 +10,8 @@
 #include "eff/n64/eff_vapor_n64.h"
 #include "libc_decls.h"
 
-void effIbukiMain(EffectEntry* effect);
-void effIbukiDisp(CameraId cameraId, EffectEntry* effect);
+static void effIbukiMain(EffectEntry* effect);
+static void effIbukiDisp(CameraId cameraId, EffectEntry* effect);
 
 typedef struct EffIbukiWork {
     s32 type;     // 0x0
@@ -104,7 +104,7 @@ EffectEntry* effIbukiEntry(s32 type, s32 life, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effIbukiMain(EffectEntry* effect) {
+static void effIbukiMain(EffectEntry* effect) {
     s32 delay;
     EffIbukiWork* work = effect->userdata;
     s32 i;
@@ -197,7 +197,7 @@ void effIbukiMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effIbukiDisp, effect);
 }
 
-void effIbukiDisp(CameraId cameraId, EffectEntry* effect) {
+static void effIbukiDisp(CameraId cameraId, EffectEntry* effect) {
     s32 i;
     u8* sz;
     u8** dl;

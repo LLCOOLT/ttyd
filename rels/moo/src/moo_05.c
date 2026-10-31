@@ -11,7 +11,6 @@
 #include "evt/evt_offscreen.h"
 #include "evt/evt_paper.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "moo.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -89,7 +88,7 @@ static EVT_BEGIN(rock_evt0)
 #endif
     SET_VALUE(LW(10), STRING("S_iwa_07"))
     SET_VALUE(LW(11), STRING("A_iwa_07"))
-    CALL_CHILD(PTR(rock_main))
+    CALL_CHILD(rock_main)
 #if VERSION <= VERSION_JP
     SET_VALUE(GSWF(GSWF_MOO05_ROCK_BOMBED), 1)
     CALL(evt_mario_key_onoff, 1)
@@ -101,7 +100,7 @@ EVT_END()
 EVT_BEGIN(moo_05_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_MON1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_MOO1"))
     CALL(evt_map_playanim, STRING("hosi_01"), 1, 0)

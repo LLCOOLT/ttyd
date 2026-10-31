@@ -13,7 +13,7 @@
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_sub.h"
@@ -112,7 +112,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 1, 3, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {70, 70, 80, 100, 60, 0, 100, 0, 100, 60, 100, 60, 100, 70, 60, 70, 80, 100, 60, 100, 100, 95};
+#else
 static StatusVulnerability regist = {65, 65, 95, 100, 60, 0, 100, 0, 100, 75, 100, 75, 100, 90, 65, 70, 85, 100, 65, 100, 100, 95};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_bllizard", "c_kmoon_b", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 30, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
@@ -212,7 +216,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, 64, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         SET_VALUE(LW(9), PTR(&weapon_bllizard_bllizard_attack))
-        CALL_CHILD(PTR(bllizard_event))
+        CALL_CHILD(bllizard_event)
         GOTO(99)
     END_IF
     SET_VALUE(LW(0), 70)
@@ -222,10 +226,10 @@ static EVT_BEGIN(attack_event)
     SET_VALUE(LW(0), 70)
     IF_INT_LESS(LW(1), LW(0))
         SET_VALUE(LW(9), PTR(&weapon_bllizard_attack))
-        CALL_CHILD(PTR(normal_attack_event))
+        CALL_CHILD(normal_attack_event)
         GOTO(99)
     END_IF
-    CALL_CHILD(PTR(charge_event))
+    CALL_CHILD(charge_event)
     GOTO(99)
     LABEL(99)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -351,8 +355,8 @@ static PoseTableEntry pose_table[] = {
     {42, "R_1"},
     {56, "X_1"},
     {57, "X_1"},
-    {65, "T_1"},
-    {69, "S_1"},
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -369,7 +373,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
-    SPAWN_EVENT(PTR(barrier_event))
+    SPAWN_EVENT(barrier_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -411,7 +415,7 @@ static EVT_BEGIN(damage_event)
             CALL(eff_ice_barrier_end, BTL_UNIT_SELF)
         END_IF
     END_IF
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 

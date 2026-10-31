@@ -22,7 +22,7 @@ void yuuminigame_init_3roll(EventEntry* event, BOOL isFirstCall);
 void yuuminigame_main_3roll(EventEntry* event, BOOL isFirstCall);
 void yuuminigame_init_4slit(EventEntry* event, BOOL isFirstCall);
 void yuuminigame_main_4slit(EventEntry* event, BOOL isFirstCall);
-void evt_yuuminigame_disp_func(CameraId camera, void* param);
+static void evt_yuuminigame_disp_func(CameraId camera, void* param);
 
 static EvtWord main_evt[4];
 
@@ -146,8 +146,13 @@ USER_FUNC(evt_yuuminigame_alloc) {
             wp->init = yuuminigame_init_4slit;
             wp->main = yuuminigame_main_4slit;
             wp->disp = yuuminigame_disp_4slit;
+#if VERSION <= VERSION_DEMO_US
+            wp->data = _mapAlloc(0x24);
+            memset(wp->data, 0, 0x24);
+#else
             wp->data = _mapAlloc(0x28);
             memset(wp->data, 0, 0x28);
+#endif
             yuunpc_yuuminigame4_ptr = wp;
             break;
     }
@@ -155,7 +160,7 @@ USER_FUNC(evt_yuuminigame_alloc) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_yuuminigame_main_func) {
+static USER_FUNC(evt_yuuminigame_main_func) {
     MiniGameWork* wp = (MiniGameWork*)event->lwData[0];
 
     if (wp->flags & MINIGAME_FLAG_QUIT) {
@@ -174,7 +179,7 @@ disp:
     return EVT_RETURN_BLOCK;
 }
 
-void evt_yuuminigame_disp_func(CameraId camera, void* param) {
+static void evt_yuuminigame_disp_func(CameraId camera, void* param) {
     ((MiniGameWork*)param)->disp(camera, param);
 }
 

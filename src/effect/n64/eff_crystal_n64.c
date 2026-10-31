@@ -9,8 +9,8 @@
 #include <dolphin/mtx.h>
 #include "libc_decls.h"
 
-void effCrystalMain(EffectEntry* effect);
-void effCrystalDisp(CameraId cameraId, EffectEntry* effect);
+static void effCrystalMain(EffectEntry* effect);
+static void effCrystalDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effCrystalN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -67,7 +67,7 @@ EffectEntry* effCrystalN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32
     return effect;
 }
 
-void effCrystalMain(EffectEntry* effect) {
+static void effCrystalMain(EffectEntry* effect) {
     EffCrystalN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -212,7 +212,7 @@ effN64Vtx size100x100_tex32x32_vtx[] = {
     {-50, 50, -1, 0, 1024, 0, 0, 0, 255},
 };
 
-void effCrystalDisp(CameraId cameraId, EffectEntry* effect) {
+static void effCrystalDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffCrystalN64Work* work;
     GXTexObj texObj;

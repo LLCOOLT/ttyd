@@ -35,8 +35,8 @@ static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, 8, 0, 0, 1024, 0, 0, 0, 255},
 };
 
-void effRappaMain(EffectEntry* effect);
-void effRappaDisp(CameraId cameraId, EffectEntry* effect);
+static void effRappaMain(EffectEntry* effect);
+static void effRappaDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effRappaN64Entry(s32 type, s32 num, f32 x, f32 y, f32 z, f32 pitch, f32 yaw) {
     EffectEntry* effect;
@@ -86,7 +86,7 @@ EffectEntry* effRappaN64Entry(s32 type, s32 num, f32 x, f32 y, f32 z, f32 pitch,
     return effect;
 }
 
-void effRappaMain(EffectEntry* effect) {
+static void effRappaMain(EffectEntry* effect) {
     EffRappaN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -129,7 +129,7 @@ static inline GXColor mkcol(u8 r, u8 g, u8 b, u8 a) {
     return c;
 }
 
-void effRappaDisp(CameraId cameraId, EffectEntry* effect) {
+static void effRappaDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     s32 j0, j1, j2;
     EffRappaN64Work* work;

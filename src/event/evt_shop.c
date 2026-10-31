@@ -40,7 +40,7 @@
 #define SHOP_PTS(p) ((p)->shopPoints)
 
 // demo-only numbering: the 2D icon flag is 4 (retail 0x10), the list window sounds are 0x12/0x13 (retail 0x2A/0x2B)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #define SHOP_SFX_LIST_OPEN 0x12
 #define SHOP_SFX_LIST_CLOSE 0x13
 #else
@@ -52,38 +52,38 @@
 static ShopWork* _wp;
 char mapname[16];
 
-void list_disp(WinMgrEntry* entry);
-void title_disp(WinMgrEntry* entry);
-void point_disp(WinMgrEntry* entry);
-void help_disp(WinMgrEntry* entry);
-void help_main(WinMgrEntry* entry);
-void name_disp(WinMgrEntry* entry);
+static void list_disp(WinMgrEntry* entry);
+static void title_disp(WinMgrEntry* entry);
+static void point_disp(WinMgrEntry* entry);
+static void help_disp(WinMgrEntry* entry);
+static void help_main(WinMgrEntry* entry);
+static void name_disp(WinMgrEntry* entry);
 
-USER_FUNC(add_shop_point);
-USER_FUNC(chk_shop_point);
-USER_FUNC(disp_list);
+static USER_FUNC(add_shop_point);
+static USER_FUNC(chk_shop_point);
+static USER_FUNC(disp_list);
 static USER_FUNC(disp_off);
-USER_FUNC(evt_shop_main_func);
-USER_FUNC(exchange_shop_point);
-USER_FUNC(get_buy_evt);
-USER_FUNC(get_fook_evt);
-USER_FUNC(get_msg);
+static USER_FUNC(evt_shop_main_func);
+static USER_FUNC(exchange_shop_point);
+static USER_FUNC(get_buy_evt);
+static USER_FUNC(get_fook_evt);
+static USER_FUNC(get_msg);
 static USER_FUNC(get_ptr);
-USER_FUNC(get_shop_point);
+static USER_FUNC(get_shop_point);
 static USER_FUNC(get_value);
-USER_FUNC(item_data_db_arrange);
-USER_FUNC(item_data_db_restore);
-USER_FUNC(keep_pouchcheck_func);
-USER_FUNC(name_price);
-USER_FUNC(point_disp_onoff);
-USER_FUNC(point_wait);
-USER_FUNC(reset_shop_point);
-USER_FUNC(sell_pouchcheck_func);
-USER_FUNC(set_buy_item_id);
-USER_FUNC(shop_flag_onoff);
-USER_FUNC(shop_point_item);
-USER_FUNC(shopper_name);
-USER_FUNC(unkeep_pouchcheck_func);
+static USER_FUNC(item_data_db_arrange);
+static USER_FUNC(item_data_db_restore);
+static USER_FUNC(keep_pouchcheck_func);
+static USER_FUNC(name_price);
+static USER_FUNC(point_disp_onoff);
+static USER_FUNC(point_wait);
+static USER_FUNC(reset_shop_point);
+static USER_FUNC(sell_pouchcheck_func);
+static USER_FUNC(set_buy_item_id);
+static USER_FUNC(shop_flag_onoff);
+static USER_FUNC(shop_point_item);
+static USER_FUNC(shopper_name);
+static USER_FUNC(unkeep_pouchcheck_func);
 
 static const GXColor shop_name_color = {0xFF, 0xFF, 0xFF, 0xFF};
 static const GXColor shop_price_color = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -103,7 +103,7 @@ ShopPoint shopPointList[11];
 WinMgrDesc list_desc[3];
 extern EvtWord shopper_talk_evt[];
 extern EvtWord first_shopping_evt[];
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static EvtWord sell_evt[193];
 #else
 static EvtWord sell_evt[VERSION_PICK(196, 207)];
@@ -131,7 +131,7 @@ WinMgrDesc list_desc[] = {
     {2, 0, 8, -250, -130, 150, 45, {0xF0, 0xF0, 0xF0, 0xFF}, NULL, point_disp},
 };
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo defines the prize list script here, in .data (retail: .sdata); nothing in the demo runs it
 EVT_BEGIN(evt_shoplist)
     CALL(evt_mario_key_onoff, 0)
@@ -141,14 +141,13 @@ EVT_BEGIN(evt_shoplist)
 EVT_END()
 #endif
 
-#if VERSION >= VERSION_US
 static EVT_BEGIN(buy_evt)
     CALL(evt_mario_normalize)
     SET_VALUE(LW(10), LW(0))
     CALL(disp_off, LW(10))
     IF_INT_EQUAL(GSWF(GSWF_SHOP_FIRST_VISIT), 0)
         SET_VALUE(GSWF(GSWF_SHOP_FIRST_VISIT), 1)
-        CALL_CHILD(PTR(first_shopping_evt))
+        CALL_CHILD(first_shopping_evt)
         RETURN
     END_IF
     CALL(shopper_name, LW(9))
@@ -158,6 +157,7 @@ static EVT_BEGIN(buy_evt)
     CALL(get_value, LW(10), LW(11), LW(12), LW(13))
     CALL(get_msg, LW(10), 0, LW(14))
     CALL(evt_sub_get_language, LW(0))
+#if VERSION >= VERSION_US
     SWITCH(LW(0))
         CASE_EQUAL(0)
         CALL(evt_msg_print_insert, 0, LW(14), 0, LW(9), LW(11), LW(13))
@@ -166,6 +166,13 @@ static EVT_BEGIN(buy_evt)
         CALL(evt_msg_fmt_str, 1, LW(14), LW(14), LW(11))
         CALL(evt_msg_print, 1, LW(14), 0, LW(9))
     END_SWITCH
+#else
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print_insert, 0, LW(14), 0, LW(9), LW(13), LW(11))
+    ELSE
+        CALL(evt_msg_print_insert, 0, LW(14), 0, LW(9), LW(11), LW(13))
+    END_IF
+#endif
     CALL(get_msg, LW(10), 24, LW(14))
     CALL(evt_msg_select, 0, LW(14))
     IF_INT_EQUAL(LW(0), 1)
@@ -203,8 +210,12 @@ static EVT_BEGIN(buy_evt)
     WAIT_MS(200)
     CALL(evt_win_coin_off, LW(8))
     CALL(point_disp_onoff, 0)
+#if VERSION >= VERSION_US
     CALL(get_msg, LW(10), 11, LW(14))
     CALL(evt_msg_print_add, 0, LW(14))
+#else
+    CALL(evt_msg_continue)
+#endif
     CALL(evt_sub_get_system_flag, LW(0))
     IF_BITS_CLEAR(LW(0), GLOBAL_FLAG_KIOSK)
         IF_INT_EQUAL(GSWF(GSWF_ITEM_TUTORIAL_SEEN), 0)
@@ -222,6 +233,7 @@ static EVT_BEGIN(buy_evt)
         CALL(get_shop_point, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 300)
             CALL(get_msg, LW(10), 26, LW(14))
+#if VERSION >= VERSION_US
             CALL(evt_sub_get_language, LW(0))
             SWITCH(LW(0))
                 CASE_EQUAL(0)
@@ -231,117 +243,9 @@ static EVT_BEGIN(buy_evt)
                 CALL(evt_msg_print, 1, LW(14), 0, LW(9))
                 CASE_END
             END_SWITCH
-        ELSE
-            CALL(get_msg, LW(10), 34, LW(14))
-            CALL(evt_msg_print, 0, LW(14), 0, LW(9))
-            CALL(evt_win_coin_on, 0, LW(8))
-            CALL(point_disp_onoff, 1)
-            CALL(reset_shop_point)
-            CALL(evt_win_coin_wait, LW(8))
-            CALL(point_wait)
-            WAIT_MS(500)
-            CALL(evt_win_coin_off, LW(8))
-            CALL(point_disp_onoff, 0)
-            SET_VALUE(LF(0), 1)
-        END_IF
-        CALL(evt_pouch_add_item, LW(1), LW(0))
-        IF_INT_EQUAL(LW(0), -1)
-            CALL(get_msg, LW(10), 27, LW(14))
-            CALL(evt_msg_print, 0, LW(14), 0, LW(9))
-            IF_INT_EQUAL(LF(0), 1)
-                SET_VALUE(GSWF(GSWF_SHOP_MAX_POINTS_PRIZE_HELD), 1)
-            END_IF
-            GOTO(123)
-            RETURN
-        END_IF
-        CALL(exchange_shop_point)
-    END_LOOP
-    LABEL(123)
-    CALL(get_buy_evt, LW(1))
-    IF_INT_NOT_EQUAL(LW(1), 0)
-        SET_VALUE(LW(0), LW(12))
-        CALL_CHILD(LW(1))
-    END_IF
-    RETURN
-EVT_END()
 #else
-static EVT_BEGIN(buy_evt)
-    CALL(evt_mario_normalize)
-    SET_VALUE(LW(10), LW(0))
-    CALL(disp_off, LW(10))
-    IF_INT_EQUAL(GSWF(GSWF_SHOP_FIRST_VISIT), 0)
-        SET_VALUE(GSWF(GSWF_SHOP_FIRST_VISIT), 1)
-        CALL_CHILD(PTR(first_shopping_evt))
-        RETURN
-    END_IF
-    CALL(shopper_name, LW(9))
-    CALL(evt_set_dir_to_target, LW(9), STRING("mario"))
-    CALL(evt_win_coin_on, 0, LW(8))
-    CALL(point_disp_onoff, 1)
-    CALL(get_value, LW(10), LW(11), LW(12), LW(13))
-    CALL(get_msg, LW(10), 0, LW(14))
-    CALL(evt_sub_get_language, LW(0))
-    IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(evt_msg_print_insert, 0, LW(14), 0, LW(9), LW(13), LW(11))
-    ELSE
-        CALL(evt_msg_print_insert, 0, LW(14), 0, LW(9), LW(11), LW(13))
-    END_IF
-    CALL(get_msg, LW(10), 24, LW(14))
-    CALL(evt_msg_select, 0, LW(14))
-    IF_INT_EQUAL(LW(0), 1)
-        CALL(get_msg, LW(10), 22, LW(14))
-        CALL(evt_msg_print_add, 0, LW(14))
-        CALL(evt_win_coin_off, LW(8))
-        CALL(point_disp_onoff, 0)
-        RETURN
-    END_IF
-    CALL(evt_pouch_get_coin, LW(0))
-    IF_INT_LESS(LW(0), LW(13))
-        CALL(get_msg, LW(10), 1, LW(14))
-        CALL(evt_msg_print_add, 0, LW(14))
-        CALL(evt_win_coin_off, LW(8))
-        CALL(point_disp_onoff, 0)
-        RETURN
-    END_IF
-    CALL(evt_pouch_add_item, LW(12), LW(0))
-    IF_INT_EQUAL(LW(0), -1)
-        CALL(get_msg, LW(10), 2, LW(14))
-        CALL(evt_msg_print_add, 0, LW(14))
-        CALL(evt_win_coin_off, LW(8))
-        CALL(point_disp_onoff, 0)
-        RETURN
-    END_IF
-    CALL(set_buy_item_id, LW(12))
-    CALL(evt_sub_load_progresstime, GSW(GSW_MRI07_DOUBLE_POINTS_TIME), LW(0))
-    CALL(evt_sub_load_progresstime, GSW(GSW_USU01_DOUBLE_POINTS_TIME), LW(1))
-    CALL(evt_sub_load_progresstime, GSW(GSW_RSH03_DOUBLE_POINTS_TIME), LW(2))
-    CALL(add_shop_point, 1, LW(0), LW(1), LW(2))
-    MULTIPLY(LW(13), -1)
-    CALL(evt_pouch_add_coin, LW(13))
-    CALL(evt_win_coin_wait, LW(8))
-    CALL(point_wait)
-    WAIT_MS(200)
-    CALL(evt_win_coin_off, LW(8))
-    CALL(point_disp_onoff, 0)
-    CALL(evt_msg_continue)
-    CALL(evt_sub_get_system_flag, LW(0))
-    IF_BITS_CLEAR(LW(0), GLOBAL_FLAG_KIOSK)
-        IF_INT_EQUAL(GSWF(GSWF_ITEM_TUTORIAL_SEEN), 0)
-            SET_VALUE(GSWF(GSWF_ITEM_TUTORIAL_SEEN), 1)
-            CALL(evt_msg_print, 0, STRING("item_first_hit"), 0, 0)
-        END_IF
-    END_IF
-    LOOP(0)
-        CALL(chk_shop_point, LW(0), LW(1), LW(2))
-        IF_INT_EQUAL(LW(0), -1)
-            GOTO(123)
-            RETURN
-        END_IF
-        SET_VALUE(LF(0), 0)
-        CALL(get_shop_point, LW(0))
-        IF_INT_NOT_EQUAL(LW(0), 300)
-            CALL(get_msg, LW(10), 26, LW(14))
             CALL(evt_msg_print_insert, 0, LW(14), 0, LW(9), LW(2))
+#endif
         ELSE
             CALL(get_msg, LW(10), 34, LW(14))
             CALL(evt_msg_print, 0, LW(14), 0, LW(9))
@@ -375,9 +279,7 @@ static EVT_BEGIN(buy_evt)
     END_IF
     RETURN
 EVT_END()
-#endif
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(shopper_talk_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(get_ptr, LW(10))
@@ -395,7 +297,7 @@ EVT_BEGIN(shopper_talk_evt)
     END_IF
     IF_INT_EQUAL(GSWF(GSWF_SHOP_FIRST_VISIT), 0)
         SET_VALUE(GSWF(GSWF_SHOP_FIRST_VISIT), 1)
-        CALL_CHILD(PTR(first_shopping_evt))
+        CALL_CHILD(first_shopping_evt)
         CALL(evt_mario_key_onoff, 1)
         RETURN
     END_IF
@@ -478,6 +380,7 @@ EVT_BEGIN(shopper_talk_evt)
         END_IF
         CALL(get_msg, LW(10), 28, LW(14))
         IF_INT_EQUAL(LF(10), 0)
+#if VERSION >= VERSION_US
             CALL(evt_sub_get_language, LW(0))
             SWITCH(LW(0))
                 CASE_EQUAL(0)
@@ -486,9 +389,13 @@ EVT_BEGIN(shopper_talk_evt)
                 CALL(evt_msg_fmt_str, 0, LW(14), LW(14), LW(2))
                 CALL(evt_msg_print, 1, LW(14), 0, 0)
             END_SWITCH
+#else
+            CALL(evt_msg_print_insert, 0, LW(14), 0, 0, LW(2))
+#endif
         ELSE
             SET_VALUE(LF(10), 0)
             CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
+#if VERSION >= VERSION_US
             CALL(evt_sub_get_language, LW(0))
             SWITCH(LW(0))
                 CASE_EQUAL(0)
@@ -505,143 +412,9 @@ EVT_BEGIN(shopper_talk_evt)
                 CALL(evt_msg_print, 1, LW(14), 0, 0)
 #endif
             END_SWITCH
-        END_IF
-        IF_INT_EQUAL(GSWF(GSWF_SHOP_MAX_POINTS_PRIZE_HELD), 0)
-            CALL(exchange_shop_point)
-        END_IF
-        SET_VALUE(LF(0), 1)
-        IF_INT_EQUAL(GSWF(GSWF_SHOP_MAX_POINTS_PRIZE_HELD), 1)
-            SET_VALUE(GSWF(GSWF_SHOP_MAX_POINTS_PRIZE_HELD), 0)
-        END_IF
-    END_LOOP
-    CALL(shop_flag_onoff, 1, 16384)
-    CALL(get_msg, LW(10), 23, LW(14))
-    CALL(evt_msg_select, 0, LW(14))
-    CALL(shop_flag_onoff, 0, 16384)
-    SWITCH(LW(0))
-        CASE_EQUAL(0)
-        CALL(get_msg, LW(10), 5, LW(14))
-        CALL(evt_msg_print_add, 0, LW(14))
-        CASE_EQUAL(1)
-        CALL_CHILD(PTR(sell_evt))
-        CASE_EQUAL(2)
-        CALL_CHILD(PTR(keep_evt))
-        CASE_EQUAL(3)
-        CALL_CHILD(PTR(unkeep_evt))
-        CASE_EQUAL(4)
-        CALL_CHILD(PTR(point_evt))
-        CASE_EQUAL(5)
-        CALL(evt_msg_continue)
-    END_SWITCH
-    CALL(evt_mario_key_onoff, 1)
-    RETURN
-EVT_END()
 #else
-EVT_BEGIN(shopper_talk_evt)
-    CALL(evt_mario_key_onoff, 0)
-    CALL(get_ptr, LW(10))
-    SET_VALUE(LF(10), 0)
-    CALL(get_fook_evt, LW(0))
-    IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL_CHILD(LW(0))
-        IF_INT_EQUAL(LW(0), -1)
-            CALL(evt_mario_key_onoff, 1)
-            RETURN
-        END_IF
-        IF_INT_EQUAL(LW(0), -100)
-            SET_VALUE(LF(10), 1)
-        END_IF
-    END_IF
-    IF_INT_EQUAL(GSWF(GSWF_SHOP_FIRST_VISIT), 0)
-        SET_VALUE(GSWF(GSWF_SHOP_FIRST_VISIT), 1)
-        CALL_CHILD(PTR(first_shopping_evt))
-        CALL(evt_mario_key_onoff, 1)
-        RETURN
-    END_IF
-    SET_VALUE(LF(0), 0)
-    LOOP(0)
-        CALL(chk_shop_point, LW(0), LW(1), LW(2))
-        IF_INT_EQUAL(GSWF(GSWF_SHOP_MAX_POINTS_PRIZE_HELD), 1)
-            SET_VALUE(LW(0), 0)
-            CALL(shop_point_item, 300, LW(1), LW(2))
-        END_IF
-        IF_INT_EQUAL(LW(0), -1)
-            IF_INT_EQUAL(LF(0), 1)
-                CALL(evt_mario_key_onoff, 1)
-                RETURN
-            END_IF
-            SET_VALUE(LF(11), 0)
-            CALL(evt_sub_get_mapname, LW(0))
-            IF_STR_EQUAL(LW(0), STRING("mri_07"))
-                IF_INT_EQUAL(GSWF(GSWF_MRI07_DOUBLE_POINTS_SALE), 1)
-                    CALL(evt_sub_load_progresstime, GSW(GSW_MRI07_DOUBLE_POINTS_TIME), LW(0))
-                    IF_INT_LESS(LW(0), 900000)
-                        SET_VALUE(LW(14), STRING("stg2_shop_04_1"))
-                        SET_VALUE(LF(11), 1)
-                    END_IF
-                END_IF
-            END_IF
-            CALL(evt_sub_get_mapname, LW(0))
-            IF_STR_EQUAL(LW(0), STRING("usu_01"))
-                IF_INT_EQUAL(GSWF(GSWF_USU01_DOUBLE_POINTS_SALE), 1)
-                    CALL(evt_sub_load_progresstime, GSW(GSW_USU01_DOUBLE_POINTS_TIME), LW(0))
-                    IF_INT_LESS(LW(0), 900000)
-                        SET_VALUE(LW(14), STRING("usugurashop_04_1"))
-                        SET_VALUE(LF(11), 1)
-                    END_IF
-                END_IF
-            END_IF
-            SET_VALUE(LF(12), 0)
-            CALL(evt_sub_get_mapname, LW(0))
-            IF_STR_EQUAL(LW(0), STRING("rsh_03_a"))
-                SET_VALUE(LF(12), 1)
-            END_IF
-            IF_STR_EQUAL(LW(0), STRING("rsh_03_b"))
-                SET_VALUE(LF(12), 1)
-            END_IF
-            IF_STR_EQUAL(LW(0), STRING("rsh_03_c"))
-                SET_VALUE(LF(12), 1)
-            END_IF
-            IF_INT_EQUAL(LF(12), 1)
-                IF_INT_EQUAL(GSWF(GSWF_RSH03_DOUBLE_POINTS_SALE), 1)
-                    CALL(evt_sub_load_progresstime, GSW(GSW_RSH03_DOUBLE_POINTS_TIME), LW(0))
-                    IF_INT_LESS(LW(0), 900000)
-                        SET_VALUE(LW(14), STRING("stg6_shop_04_1"))
-                        SET_VALUE(LF(11), 1)
-                    END_IF
-                END_IF
-            END_IF
-            IF_INT_EQUAL(LF(11), 0)
-                CALL(get_msg, LW(10), 4, LW(14))
-            END_IF
-            IF_INT_EQUAL(LF(10), 0)
-                CALL(evt_msg_print, 0, LW(14), 0, 0)
-            ELSE
-                SET_VALUE(LF(10), 0)
-                CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
-                CALL(evt_msg_print_add, 0, LW(14))
-            END_IF
-            BREAK_LOOP
-        END_IF
-        CALL(evt_pouch_add_item, LW(1), LW(0))
-        IF_INT_EQUAL(LW(0), -1)
-            CALL(get_msg, LW(10), 29, LW(14))
-            IF_INT_EQUAL(LF(10), 0)
-                CALL(evt_msg_print, 0, LW(14), 0, 0)
-            ELSE
-                SET_VALUE(LF(10), 0)
-                CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
-                CALL(evt_msg_print_add, 0, LW(14))
-            END_IF
-            BREAK_LOOP
-        END_IF
-        CALL(get_msg, LW(10), 28, LW(14))
-        IF_INT_EQUAL(LF(10), 0)
-            CALL(evt_msg_print_insert, 0, LW(14), 0, 0, LW(2))
-        ELSE
-            SET_VALUE(LF(10), 0)
-            CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
             CALL(evt_msg_print_add_insert, 0, LW(14), LW(2))
+#endif
         END_IF
         IF_INT_EQUAL(GSWF(GSWF_SHOP_MAX_POINTS_PRIZE_HELD), 0)
             CALL(exchange_shop_point)
@@ -660,20 +433,19 @@ EVT_BEGIN(shopper_talk_evt)
         CALL(get_msg, LW(10), 5, LW(14))
         CALL(evt_msg_print_add, 0, LW(14))
         CASE_EQUAL(1)
-        CALL_CHILD(PTR(sell_evt))
+        CALL_CHILD(sell_evt)
         CASE_EQUAL(2)
-        CALL_CHILD(PTR(keep_evt))
+        CALL_CHILD(keep_evt)
         CASE_EQUAL(3)
-        CALL_CHILD(PTR(unkeep_evt))
+        CALL_CHILD(unkeep_evt)
         CASE_EQUAL(4)
-        CALL_CHILD(PTR(point_evt))
+        CALL_CHILD(point_evt)
         CASE_EQUAL(5)
         CALL(evt_msg_continue)
     END_SWITCH
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
-#endif
 EVT_BEGIN(first_shopping_evt)
     CALL(shopper_name, LW(9))
     CALL(evt_set_dir_to_target, LW(9), STRING("mario"))
@@ -769,7 +541,7 @@ static EVT_BEGIN(sell_evt)
     GOTO(0)
     RETURN
 EVT_END()
-#elif VERSION == VERSION_DEMO
+#elif VERSION <= VERSION_DEMO_US
                         static EVT_BEGIN(sell_evt)
     CALL(sell_pouchcheck_func)
     IF_INT_EQUAL(LW(0), 0)
@@ -954,7 +726,7 @@ EVT_BEGIN(keep_evt)
     GOTO(0)
     RETURN
 EVT_END()
-#elif VERSION == VERSION_DEMO
+#elif VERSION <= VERSION_DEMO_US
                         EVT_BEGIN(keep_evt)
     CALL(keep_pouchcheck_func)
     IF_INT_EQUAL(LW(0), 0)
@@ -1056,7 +828,6 @@ EVT_END()
 EVT_END()
 #endif
 
-#if VERSION == VERSION_DEMO
 EVT_BEGIN(unkeep_evt)
     CALL(unkeep_pouchcheck_func)
     IF_INT_EQUAL(LW(0), 0)
@@ -1072,63 +843,21 @@ EVT_BEGIN(unkeep_evt)
     CALL(get_msg, LW(10), 19, LW(14))
     CALL(evt_msg_print_add, 0, LW(14))
     LABEL(0)
+#if VERSION <= VERSION_DEMO_US
     CALL(evt_win_item_select, 5, LW(1))
-    IF_INT_LESS_OR_EQUAL(LW(1), 0)
-        CALL(get_msg, LW(10), 22, LW(14))
-        CALL(evt_msg_print, 0, LW(14), 0, STRING("me"))
-        RETURN
-    END_IF
-    CALL(evt_pouch_remove_keepitem, LW(1), LW(0))
-    CALL(evt_pouch_add_item, LW(1), LW(0))
-    CALL(unkeep_pouchcheck_func)
-    SET_VALUE(LF(0), 0)
-    IF_INT_EQUAL(LW(0), 0)
-        SET_VALUE(LF(0), 1)
-    END_IF
-    IF_INT_EQUAL(LW(1), 0)
-        SET_VALUE(LF(0), 1)
-    END_IF
-    IF_INT_EQUAL(LF(0), 1)
-        CALL(get_msg, LW(10), 20, LW(14))
-        CALL(evt_msg_print, 0, LW(14), 0, STRING("me"))
-        RETURN
-    END_IF
-    CALL(get_msg, LW(10), 21, LW(14))
-    CALL(evt_msg_print, 0, LW(14), 0, STRING("me"))
-    CALL(get_msg, LW(10), 24, LW(14))
-    CALL(evt_msg_select, 0, LW(14))
-    IF_INT_EQUAL(LW(0), 1)
-        CALL(get_msg, LW(10), 22, LW(14))
-        CALL(evt_msg_print_add, 0, LW(14))
-        RETURN
-    END_IF
-    CALL(evt_msg_continue)
-    GOTO(0)
-    RETURN
-EVT_END()
 #else
-                        EVT_BEGIN(unkeep_evt)
-    CALL(unkeep_pouchcheck_func)
-    IF_INT_EQUAL(LW(0), 0)
-        CALL(get_msg, LW(10), 17, LW(14))
-        CALL(evt_msg_print_add, 0, LW(14))
-        RETURN
-    END_IF
-    IF_INT_EQUAL(LW(1), 0)
-        CALL(get_msg, LW(10), 18, LW(14))
-        CALL(evt_msg_print_add, 0, LW(14))
-        RETURN
-    END_IF
-    CALL(get_msg, LW(10), 19, LW(14))
-    CALL(evt_msg_print_add, 0, LW(14))
-    LABEL(0)
     CALL(evt_win_item_select, 1, 5, LW(1), LW(4))
+#endif
     IF_INT_LESS_OR_EQUAL(LW(1), 0)
         CALL(get_msg, LW(10), 22, LW(14))
         CALL(evt_msg_print, 0, LW(14), 0, STRING("me"))
         RETURN
     END_IF
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_pouch_remove_keepitem, LW(1), LW(0))
+#else
     CALL(evt_pouch_remove_keepitem, LW(1), LW(4), LW(0))
+#endif
     CALL(evt_pouch_add_item, LW(1), LW(0))
     CALL(unkeep_pouchcheck_func)
     SET_VALUE(LF(0), 0)
@@ -1156,7 +885,6 @@ EVT_END()
     GOTO(0)
     RETURN
 EVT_END()
-#endif
 
 #if VERSION >= VERSION_US
 EVT_BEGIN(point_evt)
@@ -1188,7 +916,7 @@ EVT_END()
 u16 point_disp_icons[] = {0x226, 0x227, 0x228, 0x227, 0x229, 0x22A};
 #endif
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 EVT_BEGIN(evt_shoplist)
     CALL(evt_mario_key_onoff, 0)
     CALL(disp_list)
@@ -1202,7 +930,7 @@ static EVT_BEGIN(main_evt)
     RETURN
 EVT_END()
 
-void name_disp(WinMgrEntry* entry) {
+static void name_disp(WinMgrEntry* entry) {
     ShopWork* wp = _wp;
     const char* name;
     s32 i;
@@ -1234,11 +962,11 @@ void name_disp(WinMgrEntry* entry) {
     }
 }
 
-void help_main(WinMgrEntry* entry) {
+static void help_main(WinMgrEntry* entry) {
     winMgrHelpMain(entry);
 }
 
-void help_disp(WinMgrEntry* entry) {
+static void help_disp(WinMgrEntry* entry) {
     ShopWork* wp = _wp;
     s32 off = wp->cur * (s32)sizeof(ShopItem);
     ShopItem* items = wp->items;
@@ -1254,7 +982,7 @@ void help_disp(WinMgrEntry* entry) {
 extern u16 point_disp_icons[];
 #endif
 
-void point_disp(WinMgrEntry* entry) {
+static void point_disp(WinMgrEntry* entry) {
     ShopWork* wp = _wp;
     PouchData* pouch = pouchGetPtr();
     s32 diff;
@@ -1292,7 +1020,7 @@ void point_disp(WinMgrEntry* entry) {
     }
 }
 
-void title_disp(WinMgrEntry* entry) {
+static void title_disp(WinMgrEntry* entry) {
     const char* msg;
 #if VERSION >= VERSION_US
     f32 w;
@@ -1330,7 +1058,7 @@ void title_disp(WinMgrEntry* entry) {
 }
 
 #if VERSION >= VERSION_US
-void list_disp(WinMgrEntry* entry) {
+static void list_disp(WinMgrEntry* entry) {
     PouchData* pouch;
     const char* msg;
     s32 i;
@@ -1421,7 +1149,7 @@ void list_disp(WinMgrEntry* entry) {
     }
 }
 #else
-void list_disp(WinMgrEntry* entry) {
+static void list_disp(WinMgrEntry* entry) {
     PouchData* pouch;
     const char* msg;
     u32 mask;
@@ -1482,7 +1210,7 @@ void list_disp(WinMgrEntry* entry) {
 }
 #endif
 
-USER_FUNC(disp_list) {
+static USER_FUNC(disp_list) {
     if (isFirstCall) {
         event->userdata[0] = winMgrEntry(&list_desc[0]);
         event->userdata[1] = winMgrEntry(&list_desc[1]);
@@ -1528,7 +1256,7 @@ USER_FUNC(evt_shop_setup) {
         sprintf(buf, "shp%d", i);
         iconEntry(buf, itemDataTable[wp->items[i].id].icon_id);
         iconSetPos(buf, pos.x, pos.y + 6.0f, pos.z);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         iconFlagOn(buf, 0x80); // the demo icon driver numbers this flag 0x80
 #else
         iconFlagOn(buf, 0x40);
@@ -1563,13 +1291,13 @@ USER_FUNC(evt_shop_setup) {
         wp->win[i] = winMgrEntry(&window_desc[i]);
     }
     wp->sel = -1;
-#if VERSION != VERSION_DEMO
+#if VERSION != VERSION_DEMO_US
     evtRunCaseEntry(9, TRUE, "a_shop_keihin", 0, evt_shoplist, 0);
 #endif
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(point_disp_onoff) {
+static USER_FUNC(point_disp_onoff) {
     s32 on = evtGetValue(event, event->args[0]);
     PouchData* pouch = pouchGetPtr();
     ShopWork* wp = _wp;
@@ -1582,10 +1310,10 @@ USER_FUNC(point_disp_onoff) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(point_wait) {
+static USER_FUNC(point_wait) {
     ShopWork* wp = _wp;
     PouchData* pouch = pouchGetPtr();
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     return wp->points != SHOP_PTS(pouch) ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 #else
     if (wp->points != SHOP_PTS(pouch)) {
@@ -1596,7 +1324,7 @@ USER_FUNC(point_wait) {
 #endif
 }
 
-USER_FUNC(shop_flag_onoff) {
+static USER_FUNC(shop_flag_onoff) {
     EvtWord* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     s32 mask = evtGetValue(event, args[1]);
@@ -1609,14 +1337,14 @@ USER_FUNC(shop_flag_onoff) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(get_shop_point) {
+static USER_FUNC(get_shop_point) {
     EvtWord* args = event->args;
     PouchData* pouch = pouchGetPtr();
     evtSetValue(event, args[0], SHOP_PTS(pouch));
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(add_shop_point) {
+static USER_FUNC(add_shop_point) {
     EvtWord* args = event->args;
     s32 add = evtGetValue(event, args[0]);
     s32 t1 = evtGetValue(event, args[1]);
@@ -1640,14 +1368,14 @@ USER_FUNC(add_shop_point) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(reset_shop_point) {
+static USER_FUNC(reset_shop_point) {
     PouchData* pouch = pouchGetPtr();
     SHOP_PTS(pouch) = 0;
     pouch->shopPointRewardFlags = 0;
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(chk_shop_point) {
+static USER_FUNC(chk_shop_point) {
     EvtWord* args = event->args;
     PouchData* pouch = pouchGetPtr();
     s32 i = 0;
@@ -1677,7 +1405,7 @@ USER_FUNC(chk_shop_point) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(exchange_shop_point) {
+static USER_FUNC(exchange_shop_point) {
     PouchData* pouch = pouchGetPtr();
     ShopPoint* p;
     s32 i = 0;
@@ -1692,7 +1420,7 @@ USER_FUNC(exchange_shop_point) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(shop_point_item) {
+static USER_FUNC(shop_point_item) {
     EvtWord* args = event->args;
     s32 pts = evtGetValue(event, args[0]);
     ShopPoint* p;
@@ -1711,7 +1439,7 @@ USER_FUNC(shop_point_item) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(shopper_name) {
+static USER_FUNC(shopper_name) {
     evtSetValue(event, event->args[0], (EvtWord)_wp->shopper->name);
     return EVT_RETURN_DONE;
 }
@@ -1731,7 +1459,7 @@ static USER_FUNC(get_value) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(get_msg) {
+static USER_FUNC(get_msg) {
     EvtWord* args = event->args;
     ShopWork* wp = (ShopWork*)evtGetValue(event, args[0]);
     s32 i = evtGetValue(event, args[1]);
@@ -1739,12 +1467,12 @@ USER_FUNC(get_msg) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(get_buy_evt) {
+static USER_FUNC(get_buy_evt) {
     evtSetValue(event, event->args[0], (EvtWord)_wp->shopper->buy_evt);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(set_buy_item_id) {
+static USER_FUNC(set_buy_item_id) {
     _wp->buyItem = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
@@ -1754,12 +1482,12 @@ static USER_FUNC(get_ptr) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(get_fook_evt) {
+static USER_FUNC(get_fook_evt) {
     evtSetValue(event, event->args[0], (EvtWord)_wp->shopper->fook_evt);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(name_price) {
+static USER_FUNC(name_price) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     evtSetValue(event, args[1], (EvtWord)msgSearch(itemDataTable[id].name));
@@ -1767,13 +1495,13 @@ USER_FUNC(name_price) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(sell_pouchcheck_func) {
+static USER_FUNC(sell_pouchcheck_func) {
     pouchGetPtr();
     event->lwData[0] = pouchGetHaveItemCnt();
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(item_data_db_arrange) {
+static USER_FUNC(item_data_db_arrange) {
     ShopDb* db = _wp->db;
     if (db) {
         for (; db->id; db++) {
@@ -1784,7 +1512,7 @@ USER_FUNC(item_data_db_arrange) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(item_data_db_restore) {
+static USER_FUNC(item_data_db_restore) {
     ShopDb* db = _wp->db;
     if (db) {
         for (; db->id; db++) {
@@ -1794,21 +1522,21 @@ USER_FUNC(item_data_db_restore) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(keep_pouchcheck_func) {
+static USER_FUNC(keep_pouchcheck_func) {
     pouchGetPtr();
     event->lwData[0] = pouchGetHaveItemCnt();
     event->lwData[1] = pouchGetEmptyKeepItemCnt();
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(unkeep_pouchcheck_func) {
+static USER_FUNC(unkeep_pouchcheck_func) {
     pouchGetPtr();
     event->lwData[0] = pouchGetKeepItemCnt();
     event->lwData[1] = pouchGetEmptyHaveItemCnt();
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_shop_main_func) {
+static USER_FUNC(evt_shop_main_func) {
     ShopWork* wp;
     MarioWork* mario;
     PartyEntry* party;
@@ -1842,7 +1570,7 @@ USER_FUNC(evt_shop_main_func) {
         }
         return EVT_RETURN_BLOCK;
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (winGhostDiaryChk()) {
 #else
     if (winGhostDiaryChk() || N_itemPickUpFromFieldCheck()) {

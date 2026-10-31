@@ -67,19 +67,19 @@ typedef struct SysWork {
 
 SysWork* g_wp;
 
-USER_FUNC(bg);
-USER_FUNC(display);
-USER_FUNC(init);
+static USER_FUNC(bg);
+static USER_FUNC(display);
+static USER_FUNC(init);
 #if VERSION >= VERSION_US
 USER_FUNC(sys_01_start_end_wait);
 #endif
-USER_FUNC(start);
-void display_func(CameraId cameraId, void* param);
+static USER_FUNC(start);
+static void display_func(CameraId cameraId, void* param);
 #if VERSION >= VERSION_US
 void sys_01_msg_tex_capture_func(CameraId cameraId, void* param);
 #endif
-s32 getLightColor(f32 angle);
-void sys_01_release(void);
+static s32 getLightColor(f32 angle);
+static void sys_01_release(void);
 
 extern EvtWord dummy_evt[];
 #if VERSION >= VERSION_US
@@ -189,15 +189,13 @@ EVT_BEGIN(dummy_evt)
     RETURN
 EVT_END()
 
+static u32 niji_tbl[] = {
 #if VERSION >= VERSION_US
-static u32 niji_tbl[] = {
     19, 26, 24, 27, 22, 22,
-};
 #else
-static u32 niji_tbl[] = {
     19, 22,
-};
 #endif
+};
 
 static const char* msg_tbl[] = {
     "msg_stg_seq_prolouge", "msg_stg_seq_stg1", "msg_stg_seq_stg2", "msg_stg_seq_stg3", "msg_stg_seq_stg4", "msg_stg_seq_stg5", "msg_stg_seq_stg6", "msg_stg_seq_stg7",
@@ -221,14 +219,14 @@ void _epilog(void) {
 void _unresolved(void) {
 }
 
-void sys_01_release(void) {
+static void sys_01_release(void) {
     if (g_wp->file != NULL) {
         fileFree(g_wp->file);
     }
     g_wp = NULL;
 }
 
-s32 getLightColor(f32 angle) {
+static s32 getLightColor(f32 angle) {
     f32 a = fmod(angle, 360.0);
     s32 c;
 
@@ -359,7 +357,7 @@ void sys_01_msg_tex_capture_func(CameraId cameraId, void* param) {
 }
 #endif
 
-void display_func(CameraId cameraId, void* param) {
+static void display_func(CameraId cameraId, void* param) {
     SysWork* wp = param;
     CameraEntry* camera = camGetPtr(cameraId);
     s32 i;
@@ -1039,7 +1037,7 @@ EVT_BEGIN(sys_01_init_evt)
     WAIT_MS(3000)
     CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_WHITE, 1800, FADE_IN_WHITE, 1800)
     CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_WHITE, 1800, FADE_IN_WHITE, 1800)
-    SPAWN_EVENT(PTR(evt_start))
+    SPAWN_EVENT(evt_start)
     RETURN
 EVT_END()
 
@@ -1123,7 +1121,7 @@ EVT_BEGIN(evt_start)
     RETURN
 EVT_END()
 
-USER_FUNC(display) {
+static USER_FUNC(display) {
     SysWork* wp;
 #if VERSION >= VERSION_US
     s32 type = evtGetValue(event, event->args[0]);
@@ -1192,7 +1190,7 @@ USER_FUNC(display) {
     g_wp = wp;
     switch (wp->state) {
         case 0:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             if (fileAsyncf(4, NULL, "%s/eff/%s/effect_sys.tpl", getMarioStDvdRoot(), lang_prefix[gp->language]) != NULL) {
                 wp->file = fileAllocf(4, "%s/eff/%s/effect_sys.tpl", getMarioStDvdRoot(), lang_prefix[gp->language]);
 #else
@@ -1254,7 +1252,7 @@ USER_FUNC(display) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(start) {
+static USER_FUNC(start) {
     SysWork* wp = g_wp;
 
     gp->flags |= GLOBAL_FLAG_CURTAIN_OPEN;
@@ -1265,7 +1263,7 @@ USER_FUNC(start) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(bg) {
+static USER_FUNC(bg) {
     EffectEntry* eff = effItemGetEntry(0, 0.0f, 0.0f, 0.0f);
 
     ((ItemGetWork*)eff->userdata)->state = 1;
@@ -1273,7 +1271,7 @@ USER_FUNC(bg) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(init) {
+static USER_FUNC(init) {
     return EVT_RETURN_DONE;
 }
 

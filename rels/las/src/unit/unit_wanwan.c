@@ -31,13 +31,21 @@ static BattleWeapon weapon_wanwan_attack;
 static EvtWord init_event[41];
 static EvtWord chain_event[23];
 static EvtWord damage_event[33];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord counter_damage_event[115];
+#else
 static EvtWord counter_damage_event[68];
+#endif
 static EvtWord dead_event[200];
 static EvtWord attack_event[452];
 static EvtWord wait_event[476];
 static EvtWord sound_gensui_event[22];
 static EvtWord wait_sound_event1[25];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord wait_sound_event2[11];
+#else
 static EvtWord wait_sound_event2[12];
+#endif
 
 BattleUnitKind unit_wanwan = {
     127,
@@ -86,8 +94,13 @@ BattleUnitKind unit_wanwan = {
     36.0f,
     0,
     0,
+#if VERSION <= VERSION_DEMO_US
+    -1,
+    0,
+#else
     0,
     2,
+#endif
     100,
     0,
     0.0f,
@@ -109,7 +122,11 @@ static BattleUnitDefense defence = {{5, 99, 99, 5, 5}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 2, 2, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {0, 65, 65, 100, 65, 100, 100, 65, 100, 65, 100, 65, 100, 65, 65, 45, 30, 100, 65, 100, 100, 90};
+#else
 static StatusVulnerability regist = {0, 70, 65, 100, 65, 100, 0, 70, 100, 90, 100, 90, 100, 95, 65, 45, 30, 100, 65, 100, 100, 90};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "WAN_N_1"},
@@ -129,8 +146,8 @@ static PoseTableEntry pose_table[] = {
     {40, "WAN_W_1"},
     {56, "WAN_X_1"},
     {57, "WAN_X_1"},
-    {65, "WAN_S_1A"},
-    {69, "WAN_S_1A"},
+    {BTL_POSE_TALK, "WAN_S_1A"},
+    {BTL_POSE_STAY_DEFAULT, "WAN_S_1A"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -206,7 +223,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
     CALL(chain_init, BTL_UNIT_SELF)
-    SPAWN_EVENT(PTR(chain_event))
+    SPAWN_EVENT(chain_event)
     CALL(btlevtcmd_SetJumpSound, BTL_UNIT_SELF, STRING("0"), STRING("SFX_ENM_WAN_LANDING1"))
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 127)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -232,7 +249,7 @@ static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 2)
     CALL(btlevtcmd_OnAttribute, LW(10), 4)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     CALL(btlevtcmd_OffAttribute, LW(10), 4)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
     RETURN
@@ -245,6 +262,16 @@ static EVT_BEGIN(counter_damage_event)
     CALL(btlevtcmd_PartsFaceDirectionSub, LW(10), 1, LW(2), 25)
     ADD(LW(3), 25)
     CALL(btlevtcmd_DivePartsPosition, LW(10), 1, LW(2), LW(3), LW(4), 5, 0, 0, 0, -1)
+#if VERSION <= VERSION_DEMO_US
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_SetPartsFallAccel, LW(10), 1, FLOAT(1.0f))
+    CALL(btlevtcmd_GetPartsPos, LW(10), 1, LW(2), LW(3), LW(4))
+    CALL(btlevtcmd_TransStageFloorPosition, LW(2), LW(3), LW(4))
+    CALL(btlevtcmd_FaceDirectionSub, LW(10), LW(2), 30)
+    CALL(btlevtcmd_JumpPartsPosition, LW(10), 1, LW(2), LW(3), LW(4), 20, -1)
+    CALL(btlevtcmd_FaceDirectionSub, LW(10), LW(2), 15)
+    CALL(btlevtcmd_JumpPartsPosition, LW(10), 1, LW(2), LW(3), LW(4), 10, -1)
+#endif
     WAIT_FRAMES(30)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 512, LW(0))
@@ -581,7 +608,11 @@ static EVT_BEGIN(wait_sound_event2)
     WAIT_FRAMES(LW(10))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_WAN_WAIT4"), LW(11), 0, EVT_NULLPTR)
     RETURN
+#if VERSION <= VERSION_DEMO_US
+EVT_END()
+#else
 EVT_END_PAD()
+#endif
 
 static USER_FUNC(chain_main) {
     BattleWork* wp = _battleWorkPointer;
@@ -642,22 +673,33 @@ static USER_FUNC(chain_main) {
     dx = x1 - x2;
     dy = y1 - y2;
     dz = z1 - z2;
+#if VERSION <= VERSION_DEMO_US
+    len = (f32)sqrt(dx * dx + dy * dy + dz * dz) / 7;
+#else
     len = (f32)sqrt(dx * dx + dy * dy + dz * dz) / 8;
+#endif
     if (len < 10.0f) {
         len = 10.0f;
     }
     sag = 300.0f / (len * len);
+#if VERSION >= VERSION_JP
+    // keep the chomp below the top of the stage
     part = BtlUnit_GetPartsPtr(unit, 1);
     BtlUnit_GetPartsPos(part, &x, &y, &z);
     if (y > 110.0f) {
         y = 110.0f;
     }
     BtlUnit_SetPartsPos(part, x, y, z);
+#endif
     BtlUnit_GetPartsPos(BtlUnit_GetPartsPtr(unit, 1), &x, &y, &z);
     x += -(unit->faceDirection * 16);
     y += 16.0f;
     BtlUnit_SetPartsPos(BtlUnit_GetPartsPtr(unit, 2), x, y, z);
+#if VERSION <= VERSION_DEMO_US
+    for (i = 2; i <= 6; i++) {
+#else
     for (i = 2; i <= 7; i++) {
+#endif
         BtlUnit_GetPartsPos(BtlUnit_GetPartsPtr(unit, i), &x1, &y1, &z1);
         part = BtlUnit_GetPartsPtr(unit, i + 1);
         BtlUnit_GetPartsPos(part, &x2, &y2, &z2);

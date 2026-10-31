@@ -18,7 +18,6 @@
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "gon.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -142,7 +141,7 @@ static EVT_BEGIN(init_0)
 EVT_END()
 
 static EVT_BEGIN(main_0)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     SET_TYPE(239)
 #endif
     CALL(evt_mobj_hitevt_onoff, STRING("me"), 0)
@@ -361,7 +360,7 @@ static s32 key_tbl[] = {
 static EVT_BEGIN(evt_chk)
     CALL(evt_pouch_check_item, ITEM_CASTLE_KEY_0x0F, LW(0))
     IF_INT_GREATER(LW(0), 0)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         CALL(evt_win_item_select, PTR(key_tbl), LW(0))
 #else
         CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
@@ -375,7 +374,7 @@ EVT_END()
 
 static EVT_BEGIN(evt_unlock)
     SET_VALUE(LW(0), STRING("e_bero_2"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_15_02_LOCK_3)
     RETURN
 EVT_END()
@@ -402,7 +401,7 @@ EVT_BEGIN(nokkosu_talk)
 #else
     CALL(evt_msg_print, 0, STRING("irai_07_00"), 0, STRING("me"))
 #endif
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     LOOP(0)
         CALL(evt_mario_party_use_check, LW(0))
         IF_INT_EQUAL(LW(0), 0)
@@ -460,11 +459,7 @@ EVT_BEGIN(nokkosu_talk)
     CALL(evt_npc_wait_pera, STRING("me"))
     CALL(evt_party_run, 0)
 #endif
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("irai_item"), ITEM_SPECIAL_CARD, 0, -1000, 0, 15, -1, 0)
-#else
-    CALL(evt_item_entry, STRING("irai_item"), ITEM_SPECIAL_CARD, 0, -1000, 0, 16, -1, 0)
-#endif
+    CALL(evt_item_entry, STRING("irai_item"), ITEM_SPECIAL_CARD, 0, -1000, 0, ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("irai_item"), ITEM_FLAG_NO_TOUCH)
     CALL(evt_item_get_item, STRING("irai_item"))
     CALL(evt_msg_print, 0, STRING("irai_07_07"), 0, STRING("me"))
@@ -484,7 +479,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"ノッコス"*/"\x83\x6D\x83\x62\x83\x52\x83\x58", // name
+        "ノッコス", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         nokkosu_init, // initEvent
@@ -501,7 +496,7 @@ static NpcSetupInfo npcEnt[] = {
 EVT_BEGIN(gon_08_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_GON1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_GON1"))
@@ -534,13 +529,9 @@ EVT_BEGIN(gon_08_init_evt)
     CALL(evt_npc_set_width, STRING("\"カロン02\""), 30)
     CALL(evt_npc_set_height, STRING("\"カロン02\""), 7)
     CALL(evt_npc_change_fbat_mode, 1)
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("item_00"), ITEM_LIFE_SHROOM, -215, 500, 10, 15, GSWF(GSWF_GON08_LIFE_SHROOM_TAKEN), 0)
-#else
-    CALL(evt_item_entry, STRING("item_00"), ITEM_LIFE_SHROOM, -215, 500, 10, 16, GSWF(GSWF_GON08_LIFE_SHROOM_TAKEN), 0)
-#endif
+    CALL(evt_item_entry, STRING("item_00"), ITEM_LIFE_SHROOM, -215, 500, 10, ITEM_ENTRY_FIXED, GSWF(GSWF_GON08_LIFE_SHROOM_TAKEN), 0)
     CALL(evt_mobj_float_blk, STRING("blk_0"), 0, 0, 0, 0, 2, 0, LSWF(3))
-    CALL_CHILD(PTR(init_0))
+    CALL_CHILD(init_0)
     CALL(evt_mobj_switch_float_blk, STRING("sw_0"), 0, 100, -185, STRING("blk_0"), 0, PTR(main_0), LSWF(3))
     CALL(evt_mobj_flag_onoff, 1, STRING("blk_0"), MOBJ_FLAG_NO_CULL)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("fuyu_boxS"), MAPOBJ_FLAG_HIDE)
@@ -548,7 +539,7 @@ EVT_BEGIN(gon_08_init_evt)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_15_02_LOCK_3)
         CALL(evt_mobj_lock, STRING("mobj_lock00"), ITEM_CASTLE_KEY_0x0F, 240, 710, 0, 270, PTR(evt_chk), PTR(evt_unlock), GSWF(GSWF_GON08_DOOR_UNLOCKED))
         SET_VALUE(LW(0), STRING("e_bero_2"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     END_IF
     RETURN
 EVT_END()

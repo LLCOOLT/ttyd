@@ -112,7 +112,7 @@ static PoseTableEntry pose_table[] = {
     {28, "S_1"},
     {31, "S_1"},
     {39, "S_1"},
-    {69, "S_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -123,7 +123,7 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_wanawana", "nakayama_test4", 0.0f, 0.0f, 0.0f, 0.0f, 40.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
-void replace_disp(CameraId camera, void* param) {
+static void replace_disp(CameraId camera, void* param) {
     WanaWork* wp = param;
     CameraEntry saved;
     AnimationPoseData* data;
@@ -167,7 +167,7 @@ void replace_disp(CameraId camera, void* param) {
     wp->ready = 1;
 }
 
-void replace_callback(BattleUnitPart* part, s32 type) {
+static void replace_callback(BattleUnitPart* part, s32 type) {
     WanaWork* wp = (WanaWork*)part->owner->countersetWeapon;
 
     if (wp->ready) {
@@ -184,7 +184,7 @@ void replace_callback(BattleUnitPart* part, s32 type) {
     }
 }
 
-USER_FUNC(replace_evt) {
+static USER_FUNC(replace_evt) {
     BattleUnitPart* part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 1);
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, BattleTransID(event, -2));
     AnimationPoseData* data = animPoseGetAnimBaseDataPtr(part->poseId);
@@ -234,7 +234,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 

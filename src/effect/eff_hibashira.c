@@ -83,7 +83,7 @@ EffectEntry* effHibashiraEntry(s32 type, s32 count, s32 duration, f32 x, f32 y, 
     return effect;
 }
 
-void effHibashiraMain(EffectEntry* effect) {
+static void effHibashiraMain(EffectEntry* effect) {
     s32 k;
     EffHibashiraWork* work = effect->userdata;
     EffHibashiraWork* pillar;
@@ -171,7 +171,7 @@ void effHibashiraMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effHibashiraDisp, effect);
 }
 
-void effHibashiraDisp(CameraId cameraId, EffectEntry* effect) {
+static void effHibashiraDisp(CameraId cameraId, EffectEntry* effect) {
     EffHibashiraWork* work = effect->userdata;
     s32 i, alpha;
     Mtx mtx;

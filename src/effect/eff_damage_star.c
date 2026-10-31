@@ -323,8 +323,8 @@ MayaPoly damageStar_effAnimRST[] = {
 MayaPolyList damageStar_effAnimRSTDt = {2, damageStar_effAnimRST};
 MayaAnimData damageStar_effAnimDt = {{0}, 65.0f, &damageStar_effAnimRSTDt};
 
-void effDamageStarMain(EffectEntry* effect);
-void effDamageStarDisp(CameraId cameraId, EffectEntry* effect);
+static void effDamageStarMain(EffectEntry* effect);
+static void effDamageStarDisp(CameraId cameraId, EffectEntry* effect);
 
 // Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
@@ -386,7 +386,7 @@ EffectEntry* effDamageStarEntry(s32 type, s32 number, f32 x, f32 y, f32 z, f32 s
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
-void effDamageStarMain(EffectEntry* effect) {
+static void effDamageStarMain(EffectEntry* effect) {
     DamageStarWork* work = effect->userdata;
     Vec calcPos;
     Vec pos = {0.0f, 0.0f, 0.0f};
@@ -459,7 +459,7 @@ void effDamageStarMain(EffectEntry* effect) {
     GXPosition3f32(-(h), -(h), 0.0f); \
     GXTexCoord2f32(0.0f, 1.0f);
 
-void effDamageStarDisp(CameraId cameraId, EffectEntry* effect) {
+static void effDamageStarDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* cam;
     GXColor color;
     DamageStarWork* work;

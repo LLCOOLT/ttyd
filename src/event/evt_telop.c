@@ -43,7 +43,7 @@ static const char* msg_tbl[] = {
 static TelopWork work;
 static TelopWork* wp = &work;
 
-void telop(CameraId cameraId, void* param);
+static void telop(CameraId cameraId, void* param);
 
 USER_FUNC(evt_telop_entry) {
     EvtWord* args = event->args;
@@ -96,7 +96,7 @@ USER_FUNC(evt_telop_entry) {
     return EVT_RETURN_BLOCK;
 }
 
-void telop(CameraId cameraId, void* param) {
+static void telop(CameraId cameraId, void* param) {
     GXTexObj texObj;
     Mtx mtx;
     Mtx scaleMtx;

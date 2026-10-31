@@ -148,7 +148,11 @@ f32 yuusintbl[] = {
     0.999391019f, 0.999848008f,
 };
 
+#if VERSION <= VERSION_DEMO_US
+signed char hitdata[] = "000000000000000000000000001617181911121314151122231102030405060607080910000000000000000000020304050606060611000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000747474747474744949242400000000000000000000000000000000000000000000000000□□□□□□□□□□□□□□□□□■□□□□□□□■□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□■□□□□□□□■□□□□■■□□□□□□□□□□□□□□□□□■■■■■□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□■□□■□□□□■■□□□□□□□□□□□□□□□□□■■■■■□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□■□□■□□□□■■□□□□□□□□□□□□□□□□□■■■■■□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□■□□□□■□□□□□□□■■□□□□□□□□□□□□□□□□□■■■■■□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□■□□□□■□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□■□□□□□□□□□□□□□□□□□□";
+#else
 signed char hitdata[] = "000000000000000000000000001617181911121314151122231102030405060607080910000000000000000000242526272828282828000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000747474747474744949242400000000000000000000000000000000000000000000000000□□□□□□□□□□□□□□□□□■□□□□□□□■□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□■□□□□□□□■□□□□■■□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□■□□■□□□□■■□□□□□□□□□□□□□□□□□■■■■■□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□■□□■□□□□■■□□□□□□□□□□□□□□□□□■■■■■□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□■□□□□■□□□□□□□■■□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□■□□□□■□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□";
+#endif
 
 ExtTexInfo ext_yuunpc_minigame1_data[] = {
     {"c_kinopiko", "KNF_S_1", 0.0f},
@@ -269,7 +273,7 @@ s32 chusan_act_tbl[] = {
     1, 2, 3, 3, 3, 2, 1, 0,
 };
 
-void yuunpc_maphit_init(void) {
+static void yuunpc_maphit_init(void) {
     signed char key[3] = "\x81\xA1";
     s32 i;
     s32 j;
@@ -295,7 +299,7 @@ void yuunpc_maphit_init(void) {
     }
 }
 
-void yuunpc_pose_init(YuuNpcData* data) {
+static void yuunpc_pose_init(YuuNpcData* data) {
     char name[32];
     char anim[32];
     s32 n = 0;
@@ -350,7 +354,7 @@ void yuunpc_pose_init(YuuNpcData* data) {
     }
 }
 
-s32 yuunpc_pose_check(const char* name, const char* anim) {
+static s32 yuunpc_pose_check(const char* name, const char* anim) {
     YuuNpcPose* pose = yuunpc_wp->pose;
     s32 i;
 
@@ -408,7 +412,7 @@ static inline void pose_change_inl(YuuNpc* npc, s16 id, f32 speed, f32 frame) {
     }
 }
 
-void yuunpc_pose_change(YuuNpc* npc, s16 id, f32 speed, f32 frame) {
+static void yuunpc_pose_change(YuuNpc* npc, s16 id, f32 speed, f32 frame) {
     YuuNpcPose* cur = &yuunpc_wp->pose[npc->poseId];
     YuuNpcPose* pose = &yuunpc_wp->pose[id];
 
@@ -451,11 +455,11 @@ void yuunpc_pose_change(YuuNpc* npc, s16 id, f32 speed, f32 frame) {
     }
 }
 
-void yuunpc_pose_change2(YuuNpc* npc, const char* name, const char* anim, f32 speed) {
+static void yuunpc_pose_change2(YuuNpc* npc, const char* name, const char* anim, f32 speed) {
     pose_change_inl(npc, yuunpc_pose_check(name, anim), speed, rand() / 32767.0f);
 }
 
-void yuunpc_set_jump_pose(const char* name, const char* anim, f32 jump) {
+static void yuunpc_set_jump_pose(const char* name, const char* anim, f32 jump) {
     s32 id = yuunpc_pose_check(name, anim);
 
     if (id >= 0) {
@@ -463,7 +467,7 @@ void yuunpc_set_jump_pose(const char* name, const char* anim, f32 jump) {
     }
 }
 
-f32 yuunpc_pose_sub(ExtdrvPose* ext, YuuNpc* npc) {
+static f32 yuunpc_pose_sub(ExtdrvPose* ext, YuuNpc* npc) {
     YuuNpcPose* pose = &yuunpc_wp->pose[npc->poseId];
     f32 t;
     f32 a;
@@ -517,7 +521,7 @@ f32 yuunpc_pose_sub(ExtdrvPose* ext, YuuNpc* npc) {
     return t;
 }
 
-void ext_yuunpc_minigame1_init(void) {
+static void ext_yuunpc_minigame1_init(void) {
     f32 ytbl[5] = {260.0f, 220.0f, 180.0f, 140.0f, 100.0f};
     f32 ztbl[8] = {-7.0f, -1.0f, 5.0f, -5.0f, 1.0f, 7.0f, -3.0f, 3.0f};
     s32 i;
@@ -571,7 +575,7 @@ void ext_yuunpc_minigame1_init(void) {
     }
 }
 
-void yuunpc_pose_minigame1_main(void) {
+static void yuunpc_pose_minigame1_main(void) {
     s32 i;
     ExtdrvPose* ext;
     f32 right;
@@ -628,7 +632,7 @@ void yuunpc_pose_minigame1_main(void) {
     }
 }
 
-void ext_yuunpc_minigame2_init(void) {
+static void ext_yuunpc_minigame2_init(void) {
     f32 ytbl[4] = {170.0f, 130.0f, 90.0f, 50.0f};
     f32 ztbl[8] = {-7.0f, -1.0f, 5.0f, -5.0f, 1.0f, 7.0f, -3.0f, 3.0f};
     s32 i;
@@ -682,7 +686,7 @@ void ext_yuunpc_minigame2_init(void) {
     }
 }
 
-void yuunpc_pose_minigame2_main(void) {
+static void yuunpc_pose_minigame2_main(void) {
     s32 i;
     ExtdrvPose* ext;
     f32 right;
@@ -747,7 +751,7 @@ void yuunpc_pose_minigame2_main(void) {
     }
 }
 
-void ext_yuunpc_minigame3_init(void) {
+static void ext_yuunpc_minigame3_init(void) {
     f32 ytbl[4] = {200.0f, 160.0f, 120.0f, 80.0f};
     f32 ztbl[8] = {-7.0f, -1.0f, 5.0f, -5.0f, 1.0f, 7.0f, -3.0f, 3.0f};
     s32 i;
@@ -801,7 +805,7 @@ void ext_yuunpc_minigame3_init(void) {
     }
 }
 
-void yuunpc_pose_minigame3_main(void) {
+static void yuunpc_pose_minigame3_main(void) {
     s32 i;
     ExtdrvPose* ext;
     f32 right;
@@ -870,7 +874,7 @@ static inline s32 yuunpc_hit_get(f32 x, const f32* zp) {
     return yuunpc_wp->hit[(s32)((*zp - -150.0f) / 50.0f) * 72 + (s32)((x - -1800.0f) / 50.0f)];
 }
 
-s32 hitcheck(YuuNpc* npc) {
+static s32 hitcheck(YuuNpc* npc) {
     Vec v;
     Vec p;
     f32 x, z;
@@ -937,9 +941,12 @@ s32 hitcheck(YuuNpc* npc) {
     return 0;
 }
 
-// dont_inline: MWCC would inline this function into its callers; the original calls it (checked by removing it).
+// dont_inline: MWCC would inline this function into its callers; the releases call it (checked by removing it).
+// The demo inlines it.
+#if VERSION >= VERSION_JP
 #pragma dont_inline on
-s32 fallcheck(YuuNpc* npc) {
+#endif
+static s32 fallcheck(YuuNpc* npc) {
     s32 out = 0;
     s32 h;
     f32 y;
@@ -965,9 +972,11 @@ s32 fallcheck(YuuNpc* npc) {
     }
     return 0;
 }
+#if VERSION >= VERSION_JP
 #pragma dont_inline reset
+#endif
 
-s32 goalincheck(YuuNpc* npc) {
+static s32 goalincheck(YuuNpc* npc) {
     f32 r = npc->speed;
     f32 dz = npc->pos.z - npc->dest.z;
     f32 dx = npc->pos.x - npc->dest.x;
@@ -983,7 +992,7 @@ s32 goalincheck(YuuNpc* npc) {
     return 0;
 }
 
-void errper_set_rtn(YuuNpc* npc) {
+static void errper_set_rtn(YuuNpc* npc) {
     switch (npc->state) {
         case 0:
         case 2:
@@ -993,11 +1002,19 @@ void errper_set_rtn(YuuNpc* npc) {
         case 1:
         case 3:
         case 5:
+#if VERSION <= VERSION_DEMO_US
+            npc->errorRate = -0.2f + 2.0f * (0.2f * (rand() / 32767.0f));
+#else
             npc->errorRate = -0.25f + 2.0f * (0.25f * (rand() / 32767.0f));
+#endif
             break;
         case -1:
         case 6:
+#if VERSION <= VERSION_DEMO_US
+            npc->errorRate = -0.15f + 2.0f * (0.15f * (rand() / 32767.0f));
+#else
             npc->errorRate = -0.25f + 2.0f * (0.25f * (rand() / 32767.0f));
+#endif
             break;
         default:
             npc->errorRate = -0.1f + 2.0f * (0.1f * (rand() / 32767.0f));
@@ -1089,7 +1106,11 @@ void ext_yuunpc_minigame4_init_sub(void) {
                 s = irand(3);
             } while (yuunpc_wp->slot[s] != -1);
             do {
+#if VERSION <= VERSION_DEMO_US
+                v = irand(700) + 300;
+#else
                 v = irand(700) + 200;
+#endif
             } while (yuunpc_wp->slot[(s + 1) % 3] == v || yuunpc_wp->slot[(s + 2) % 3] == v);
             yuunpc_wp->slot[s] = v;
         }
@@ -1099,7 +1120,11 @@ void ext_yuunpc_minigame4_init_sub(void) {
     for (i = 0; i < yuunpc_wp->numNpc; i++, ext++, npc++) {
         npc->poseId = yuunpc_wp->numPoses;
         npc->id = i;
+#if VERSION <= VERSION_DEMO_US
+        if (i < 300) {
+#else
         if (i < 200) {
+#endif
             s32 row;
             f32 z;
             s16 id;
@@ -1109,7 +1134,11 @@ void ext_yuunpc_minigame4_init_sub(void) {
             ext->flags |= 7;
             PSMTXIdentity(*ext->mtx);
             z = 30.0f + (60.0f * (i % 4) + -750.0f);
+#if VERSION <= VERSION_DEMO_US
+            (*ext->mtx)[0][3] = 13.333333f * row - 500.0f;
+#else
             (*ext->mtx)[0][3] = 20.0f * row - 500.0f;
+#endif
             (*ext->mtx)[1][3] = ytbl[(s32)((z - -750.0f) / 60.0f)];
             (*ext->mtx)[2][3] = z + ztbl[row % 8];
             ext->dir = irand(2) * 180 + 90;
@@ -1142,7 +1171,11 @@ void ext_yuunpc_minigame4_init_sub(void) {
             s32 j2;
 
             npc->flags |= 2;
+#if VERSION <= VERSION_DEMO_US
+            m = i - 300;
+#else
             m = i - 200;
+#endif
             cols = sqrtf(700.0f);
             row = m / cols;
             col = m % cols;
@@ -1271,7 +1304,7 @@ void ext_yuunpc_minigame4_init_sub(void) {
     }
 }
 
-void ext_yuunpc_minigame4_init(void) {
+static void ext_yuunpc_minigame4_init(void) {
     yuunpc_wp = _mapAlloc(sizeof(YuuNpcWork));
     memset(yuunpc_wp, 0, sizeof(YuuNpcWork));
     yuunpc_wp->numNpc = extGetPoseNum();
@@ -1308,6 +1341,19 @@ static inline f32 yuunpc_rnd10(YuuNpc* npc) /* */ {
         (npc)->speed = 0.0f;                                                 \
     } while (0)
 
+// the demo plays the jump sound for every jump; the releases for one jump in 32 (c26 counts the jumps)
+#if VERSION <= VERSION_DEMO_US
+#define YUU_JUMP_SFX(npc) psndSFXOn_3D((const char*)0x8e0, &(npc)->pos)
+#else
+#define YUU_JUMP_SFX(npc)                                  \
+    do {                                                   \
+        if (!(c26 & 0x1f)) {                               \
+            psndSFXOn_3D((const char*)0x8e0, &(npc)->pos); \
+        }                                                  \
+        c26++;                                             \
+    } while (0)
+#endif
+
 #define YUU_JUMP(npc)                                                                                                                      \
     do {                                                                                                                                   \
         (npc)->moveMode = 4;                                                                                                               \
@@ -1315,10 +1361,7 @@ static inline f32 yuunpc_rnd10(YuuNpc* npc) /* */ {
         (npc)->vy = 6.5f;                                                                                                                  \
         (npc)->dir.x = 1.0f;                                                                                                               \
         (npc)->dir.z = 0.0f;                                                                                                               \
-        if (!(c26 & 0x1f)) {                                                                                                               \
-            psndSFXOn_3D((const char*)0x8e0, &(npc)->pos);                                                                                 \
-        }                                                                                                                                  \
-        c26++;                                                                                                                             \
+        YUU_JUMP_SFX(npc);                                                                                                                 \
     } while (0)
 
 #define YUU_RUN(npc)                                                         \
@@ -1343,20 +1386,27 @@ static inline f32 yuunpc_rnd10(YuuNpc* npc) /* */ {
         }                                                                                                      \
     } while (0)
 
-void yuunpc_pose_minigame4_main(void) {
+static void yuunpc_pose_minigame4_main(void) {
     s32 i;
     ExtdrvPose* ext;
     f32 right;
     f32 camX = camGetPtr(CAMERA_3D)->cameraAt.x;
     f32 y, z, x;
     YuuNpc* npc;
+#if VERSION >= VERSION_JP
     s32 c28;
     s32 c27;
     s32 c26;
+#endif
     SlitWork* mg;
+#if VERSION <= VERSION_DEMO_US
+    s16 h;
+    s32 kind;
+#else
     s32 kind;
     s16 h;
     s16 k;
+#endif
     f32 px;
     f32 off;
     f32 w;
@@ -1370,7 +1420,9 @@ void yuunpc_pose_minigame4_main(void) {
     s32 n;
     u32 t;
 
+#if VERSION >= VERSION_JP
     c28 = c27 = c26 = 0;
+#endif
     ext = extGetPosePtr();
     npc = yuunpc_wp->npcs;
     right = 500.0f + camX;
@@ -1408,7 +1460,11 @@ void yuunpc_pose_minigame4_main(void) {
                     }
                 }
             }
+#if VERSION <= VERSION_DEMO_US
+            if (irand(150) == 0) {
+#else
             if (irand(100) == 0) {
+#endif
                 if (irand(101) <= 80) {
                     ext->dir = angleABf(camX, 0.0f, x, z);
                 } else {
@@ -1462,9 +1518,13 @@ void yuunpc_pose_minigame4_main(void) {
             }
             if (npc->moveMode != 3 && npc->moveMode != 4) {
                 px = npc->pos.x;
+#if VERSION >= VERSION_JP
                 kind = 1;
+#endif
                 h = yuunpc_hitY_get(px);
+#if VERSION >= VERSION_JP
                 k = h;
+#endif
                 switch (h) {
                     case 0:
                     case 1:
@@ -1480,6 +1540,7 @@ void yuunpc_pose_minigame4_main(void) {
                             }
                         }
                         break;
+#if VERSION >= VERSION_JP
                     case 24:
                     case 25:
                     case 26:
@@ -1487,20 +1548,35 @@ void yuunpc_pose_minigame4_main(void) {
                     case 28:
                         kind = 2;
                         k -= 22;
+#endif
                     case 2:
                     case 3:
                     case 4:
                     case 5:
                     case 6:
+                        // The releases index the row with k, the demos with h
+#if VERSION <= VERSION_DEMO_US
+                        if (h == 6) {
+                            off = 0.0f;
+                        } else {
+                            off = (3 - (h - 2)) * 50.0f;
+                        }
+#else
                         if (k == 6) {
                             off = 0.0f;
                         } else {
                             off = (3 - (k - 2)) * 50.0f;
                         }
+#endif
                         npc->dest.x = yuunpc_snap(px + off);
                         {
+#if VERSION <= VERSION_DEMO_US
+                            f32 sp = ((npc->id % 101 - 50) / 50.0f) * 10.0f;
+                            npc->dest.z = npc->pos.z >= 0.0f ? 125.0f + sp : -125.0f + sp;
+#else
                             f32 sp = ((npc->id % 101 - 50) / 50.0f) * (50.0f * (kind - 1) / 2.0f + 10.0f);
                             npc->dest.z = npc->pos.z >= 0.0f ? 150.0f - 50.0f * kind / 2.0f + sp : -150.0f + 50.0f * kind / 2.0f + sp;
+#endif
                         }
                         npc->dest.y = npc->pos.y;
                         break;
@@ -1597,9 +1673,11 @@ void yuunpc_pose_minigame4_main(void) {
                             case 20:
                             case 21:
                             case 22:
+#if VERSION >= VERSION_JP
                             case 24:
                             case 25:
                             case 26:
+#endif
                                 if (npc->pos.z >= -150.0f && npc->pos.z < 150.0f + w) {
                                     d = 150.0f + w - npc->pos.z;
                                 } else {
@@ -1612,11 +1690,17 @@ void yuunpc_pose_minigame4_main(void) {
                                 break;
                             case 5:
                             case 6:
+#if VERSION >= VERSION_JP
                             case 27:
                             case 28:
+#endif
                                 z = npc->pos.z;
                                 if (z >= -150.0f && z < 150.0f) {
+#if VERSION <= VERSION_DEMO_US
+                                    f32 tt = 50.0f;
+#else
                                     f32 tt = 50.0f * kind;
+#endif
                                     f32 a = -150.0f + tt + w;
                                     if (z >= a && z < 150.0f - tt) {
                                         d = 0.0f;
@@ -1652,9 +1736,11 @@ void yuunpc_pose_minigame4_main(void) {
                             case 20:
                             case 21:
                             case 22:
+#if VERSION >= VERSION_JP
                             case 24:
                             case 25:
                             case 26:
+#endif
                                 if (npc->pos.z >= -150.0f + w && npc->pos.z < 150.0f) {
                                     d = -(-150.0f + w) + npc->pos.z;
                                 } else {
@@ -1667,14 +1753,25 @@ void yuunpc_pose_minigame4_main(void) {
                                 break;
                             case 5:
                             case 6:
+#if VERSION >= VERSION_JP
                             case 27:
-                            case 28: {
+                            case 28:
+#endif
+                            {
                                 if (npc->pos.z >= -150.0f + w && npc->pos.z < 150.0f) {
+#if VERSION <= VERSION_DEMO_US
+                                    f32 tt = 50.0f;
+#else
                                     f32 tt = 50.0f * kind;
+#endif
                                     if (npc->pos.z >= -150.0f + tt && npc->pos.z < 150.0f - tt + w) {
                                         d = 0.0f;
                                     } else if (npc->pos.z > 0.0f) {
+#if VERSION <= VERSION_DEMO_US
+                                        d = -(100.0f + w) + npc->pos.z;
+#else
                                         d = npc->pos.z - (150.0f - tt + w);
+#endif
                                     } else {
                                         d = -(-150.0f + w) + npc->pos.z;
                                     }
@@ -1685,11 +1782,19 @@ void yuunpc_pose_minigame4_main(void) {
                         }
                         break;
                 }
+#if VERSION <= VERSION_DEMO_US
+                d -= 20.0f;
+#else
                 d -= 17.0f;
+#endif
                 if (d < 0.0f) {
                     d = 0.0f;
                 }
+#if VERSION <= VERSION_DEMO_US
+                cnt = d / 1.6666666f;
+#else
                 cnt = d / 0.0f;
+#endif
                 switch (npc->flags & 0x18) {
                     case 0:
                         if (mg->state == 0) {
@@ -1716,7 +1821,11 @@ void yuunpc_pose_minigame4_main(void) {
                             if (cnt < 30) {
                                 n = 0;
                             } else {
+#if VERSION <= VERSION_DEMO_US
+                                n = (d - 50.0f) / 3.3333333f;
+#else
                                 n = d / 2.9166667f;
+#endif
                             }
                         }
                         if (!(yuunpc_wp->flags & 1) && npc->goal.x > npc->pos.x && n <= 0) {
@@ -1737,7 +1846,11 @@ void yuunpc_pose_minigame4_main(void) {
                             n = 0;
                         } else {
                             cnt = 30;
+#if VERSION <= VERSION_DEMO_US
+                            n = (d - 50.0f) / 3.3333333f;
+#else
                             n = d / 2.9166667f;
+#endif
                         }
                         if (npc->goal.x == npc->pos.x || mg->state == 0 || ((mg->state == 4 || mg->state == 8) && cnt + n >= mg->timer)) {
                             npc->flags &= ~8;
@@ -1785,10 +1898,18 @@ void yuunpc_pose_minigame4_main(void) {
                                 break;
                             case 8:
                             case 0x10:
+#if VERSION <= VERSION_DEMO_US
+                                dz = 1.6666666f;
+#else
                                 dz = 0.0f;
+#endif
                                 break;
                             case 0:
+#if VERSION <= VERSION_DEMO_US
+                                dz = 3.3333333f;
+#else
                                 dz = 2.9166667f;
+#endif
                                 break;
                         }
                         break;
@@ -1801,10 +1922,18 @@ void yuunpc_pose_minigame4_main(void) {
                                 break;
                             case 8:
                             case 0x10:
+#if VERSION <= VERSION_DEMO_US
+                                dz = -1.6666666f;
+#else
                                 dz = -0.0f;
+#endif
                                 break;
                             case 0:
+#if VERSION <= VERSION_DEMO_US
+                                dz = -3.3333333f;
+#else
                                 dz = -2.9166667f;
+#endif
                                 break;
                         }
                         break;
@@ -1894,6 +2023,17 @@ void yuunpc_pose_minigame4_main(void) {
                                 }
                             }
                         }
+                        // The releases play the step sound only once every 64 frames, offset per NPC
+#if VERSION <= VERSION_DEMO_US
+                        t = gp->retraceCount;
+                        if (!(t & 0xf)) {
+                            if (t & 0x10) {
+                                psndSFXOn_3D((const char*)0x8de, &npc->pos);
+                            } else {
+                                psndSFXOn_3D((const char*)0x8df, &npc->pos);
+                            }
+                        }
+#else
                         if (!(c28 & 0x3f)) {
                             t = gp->retraceCount + i;
                             if (!(t & 0xf)) {
@@ -1905,6 +2045,7 @@ void yuunpc_pose_minigame4_main(void) {
                             }
                         }
                         c28++;
+#endif
                         break;
                     case 2:
                         if (goalincheck(npc) == -1) {
@@ -1958,6 +2099,17 @@ void yuunpc_pose_minigame4_main(void) {
                                 }
                             }
                         }
+                        // The releases play the step sound only once every 64 frames, offset per NPC
+#if VERSION <= VERSION_DEMO_US
+                        t = gp->retraceCount;
+                        if (!(t & 7)) {
+                            if (t & 8) {
+                                psndSFXOn_3D((const char*)0x8de, &npc->pos);
+                            } else {
+                                psndSFXOn_3D((const char*)0x8df, &npc->pos);
+                            }
+                        }
+#else
                         if (!(c27 & 0x3f)) {
                             t = gp->retraceCount + i;
                             if (!(t & 7)) {
@@ -1969,6 +2121,7 @@ void yuunpc_pose_minigame4_main(void) {
                             }
                         }
                         c27++;
+#endif
                         break;
                     case 3:
                     case 4:
@@ -2010,7 +2163,7 @@ void yuunpc_pose_minigame4_main(void) {
     }
 }
 
-void yuunpc_disp(CameraId camera, void* param) {
+static void yuunpc_disp(CameraId camera, void* param) {
     extLoadRenderMode();
     extLoadVertex();
     extLoadTexture();
@@ -2019,23 +2172,23 @@ void yuunpc_disp(CameraId camera, void* param) {
     extLoadTextureExit();
 }
 
-void ext_yuunpc_dispent(void) {
+static void ext_yuunpc_dispent(void) {
     dispEntry(4, 0.0f, 1, yuunpc_disp, NULL);
 }
 
-void ext_yuunpc_minigame1_main(void) {
+static void ext_yuunpc_minigame1_main(void) {
     yuunpc_pose_minigame1_main();
 }
 
-void ext_yuunpc_minigame2_main(void) {
+static void ext_yuunpc_minigame2_main(void) {
     yuunpc_pose_minigame2_main();
 }
 
-void ext_yuunpc_minigame3_main(void) {
+static void ext_yuunpc_minigame3_main(void) {
     yuunpc_pose_minigame3_main();
 }
 
-void ext_yuunpc_minigame4_main(void) {
+static void ext_yuunpc_minigame4_main(void) {
     yuunpc_pose_minigame4_main();
 }
 
@@ -2118,7 +2271,11 @@ EVT_BEGIN(evt_yuunpc_minigame4)
     CALL(evt_npc_flag_onoff, 1, STRING("yuusp0"), NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("yuusp1"), NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("yuusp2"), NPC_FLAG_INTANGIBLE)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_ext_entry, 1000, PTR(ext_yuunpc_minigame4_data), PTR(ext_yuunpc_minigame4_init), PTR(ext_yuunpc_minigame4_main), PTR(ext_yuunpc_dispent))
+#else
     CALL(evt_ext_entry, 900, PTR(ext_yuunpc_minigame4_data), PTR(ext_yuunpc_minigame4_init), PTR(ext_yuunpc_minigame4_main), PTR(ext_yuunpc_dispent))
+#endif
     BEGIN_INLINE_EVENT
         CALL(evt_seq_wait, 2)
         CALL(evt_npc_delete, STRING("yuunpc0"))

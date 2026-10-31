@@ -23,14 +23,13 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "las.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
 #include "driver/mapdrv.h"
 #include "driver/camdrv.h"
 
-USER_FUNC(bonbaba_wait_landon);
+static USER_FUNC(bonbaba_wait_landon);
 
 static BeroEntry bero_entry_data[3];
 static NpcSetupInfo npcEnt[2];
@@ -89,7 +88,7 @@ static BeroEntry bero_entry_data[] = {
 static EVT_BEGIN(box_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("key"), ITEM_STAR_KEY, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("key"), ITEM_STAR_KEY, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("box"))
     CALL(evt_item_get_item, STRING("key"))
     CALL(evt_mario_key_onoff, 1)
@@ -113,24 +112,29 @@ EVT_BEGIN(bonbaba_evt)
     CALL(evt_party_run, 0)
     CALL(evt_party_set_homing_dist, 0, FLOAT(50.0f))
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_close_door_play_se))
+    SPAWN_EVENT(bero_close_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(10))
         IF_INT_EQUAL(LW(10), 0)
             SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
-            CALL_CHILD(PTR(w_door_close))
+            CALL_CHILD(w_door_close)
             BREAK_LOOP
         ELSE
-            CALL_CHILD(PTR(w_door_close))
+            CALL_CHILD(w_door_close)
         END_IF
     END_LOOP
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("stg8_las_44"), 0, STRING("ボンババ"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FIND1_3"), LW(0), LW(1), LW(2), 0)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_eff_fukidashi, 0, STRING(""), 0, 0, 0, 0, 0, 0, 0, 0, 60)
+    CALL(evt_eff_fukidashi, 3, STRING(""), 0, 0, 0, 0, 0, 0, 0, 0, 60)
+#else
     CALL(evt_eff_fukidashi, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60)
     CALL(evt_eff_fukidashi, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60)
+#endif
     WAIT_MS(1000)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER2"))
     BEGIN_INLINE_EVENT
@@ -178,10 +182,15 @@ EVT_BEGIN(bonbaba_evt)
     CALL(evt_msg_print, 0, STRING("stg8_las_48"), 0, STRING("ボンババ"))
     CALL(evt_cam3d_evt_set, -299, 25, 748, -328, 134, -34, 3000, 11)
     WAIT_MS(2500)
+#if VERSION >= VERSION_JP
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+#endif
     CALL(evt_npc_set_battle_info, STRING("ボンババ"), 14)
     CALL(evt_npc_battle_start, STRING("ボンババ"))
     CALL(evt_npc_wait_battle_end)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST3"))
+#endif
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_archi1"), MAPOBJ_FLAG_HIDE)
     CALL(evt_cam3d_evt_set, 0, 25, 845, 0, 100, 150, 0, 11)
     WAIT_FRAMES(1)
@@ -290,14 +299,21 @@ EVT_BEGIN(bonbaba_evt)
     WAIT_MS(300)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FIND1"), LW(0), LW(1), LW(2), 0)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_eff_fukidashi, 0, STRING(""), 0, 0, 0, 0, 0, 0, 0, 0, 60)
+    CALL(evt_eff_fukidashi, 3, STRING(""), 0, 0, 0, 0, 0, 0, 0, 0, 60)
+#else
     CALL(evt_eff_fukidashi, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60)
     CALL(evt_eff_fukidashi, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60)
+#endif
     WAIT_MS(1000)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_04_GLOOMTAIL)
     CALL(evt_hitobj_onoff, STRING("baba"), 1, 1)
     CALL(evt_npc_flag_onoff, 1, STRING("ボンババ"), NPC_FLAG_INTANGIBLE)
-    CALL_CHILD(PTR(bero_case_entry))
+    CALL_CHILD(bero_case_entry)
+#if VERSION >= VERSION_JP
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
+#endif
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -323,14 +339,14 @@ EVT_BEGIN(bonbaba_init)
     RETURN
 EVT_END()
 
-USER_FUNC(bonbaba_wait_landon) {
+static USER_FUNC(bonbaba_wait_landon) {
     // ボンババ
     return npcNameToPtr("\x83\x7B\x83\x93\x83\x6F\x83\x6F")->groundHit ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"ボンババ"*/"\x83\x7B\x83\x93\x83\x6F\x83\x6F", // name
+        "ボンババ", // name
         NPC_FLAG_NO_BILLBOARD | NPC_FLAG_TALK_ANIM | NPC_FLAG_ALWAYS_VISIBLE, // flags
         0, // reactionFlags
         bonbaba_init, // initEvent
@@ -353,11 +369,17 @@ static EVT_BEGIN(sekai_yami_evt)
     CALL(evt_npc_set_tribe, STRING("クリハカセ"), STRING("クリハカセ"))
     CALL(evt_npc_set_position, STRING("クリハカセ"), -58, 0, -280)
     CALL(evt_npc_set_ry, STRING("クリハカセ"), 270)
+#if VERSION >= VERSION_JP
     CALL(evt_npc_flag_onoff, 1, STRING("クリハカセ"), NPC_FLAG_TALK_ANIM)
+#endif
     CALL(evt_seq_wait, 2)
     WAIT_MS(1000)
     CALL(evt_snd_sfxon, STRING("SFX_STG8_CEILING_BREAK1"), LW(10))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_eff64, STRING(""), STRING("hokori_n64"), 0, -58, 200, -280, 60, 0, 0, 0, 0, 0, 0, 0)
+#else
     CALL(evt_eff64, 0, STRING("hokori_n64"), 0, -58, 200, -280, 60, 0, 0, 0, 0, 0, 0, 0)
+#endif
     WAIT_MS(1000)
     CALL(evt_snd_sfxoff, LW(10))
     WAIT_MS(1000)
@@ -423,16 +445,26 @@ EVT_BEGIN(las_26_init_evt)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_03_THE_PALACE_GARDEN)
         CALL(evt_snd_bgmoff, PSND_FADE_OUT)
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
+#if VERSION >= VERSION_JP
         CALL(evt_snd_set_rev_mode, 2)
+#endif
     ELSE
         IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
             CALL(evt_snd_bgmoff, PSND_FADE_OUT)
             CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS8"))
+#if VERSION >= VERSION_JP
             CALL(evt_snd_set_rev_mode, 2)
+#endif
         ELSE
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST3"))
+#else
             CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+#endif
             CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
+#if VERSION >= VERSION_JP
             CALL(evt_snd_set_rev_mode, 2)
+#endif
         END_IF
     END_IF
     SET_VALUE(LW(0), PTR(bero_entry_data))
@@ -454,9 +486,9 @@ EVT_BEGIN(las_26_init_evt)
         CALL(evt_hitobj_onoff, STRING("A_yukamae"), 1, 0)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_03_THE_PALACE_GARDEN)
-        SPAWN_EVENT(PTR(bonbaba_evt))
+        SPAWN_EVENT(bonbaba_evt)
     ELSE
-        CALL_CHILD(PTR(evt_bero_info_run))
+        CALL_CHILD(evt_bero_info_run)
     END_IF
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG8_03_THE_PALACE_GARDEN)
@@ -474,7 +506,7 @@ EVT_BEGIN(las_26_init_evt)
         CALL(evt_mobj_itembox, STRING("box"), 270, 0, 178, 0, 0, PTR(box_evt), GSWF(GSWF_LAS26_STAR_KEY_CHEST_OPENED))
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
-        SPAWN_EVENT(PTR(sekai_yami_evt))
+        SPAWN_EVENT(sekai_yami_evt)
     END_IF
     CALL(evt_mobj_badgeblk, STRING("mobj_01"), 1000, 60, -150, ITEM_ULTRA_SHROOM, 0, GSWF(GSWF_LAS26_ULTRA_SHROOM_BLOCK_HIT), 0)
     CALL(evt_mobj_badgeblk, STRING("mobj_02"), 1365, 60, -150, ITEM_JAMMIN_JELLY, 0, GSWF(GSWF_LAS26_JAMMIN_JELLY_BLOCK_HIT), 0)

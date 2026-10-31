@@ -6,6 +6,9 @@
 #include "memory.h"
 #include <dolphin/mtx.h>
 
+static void effNokotarouDisp(CameraId cameraId, EffectEntry* effect);
+static void effNokotarouMain(EffectEntry* effect);
+
 EffectEntry* effNokotarouEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 size) {
     EffectEntry* effect;
     EffNokotarouWork* work;
@@ -37,7 +40,7 @@ EffectEntry* effNokotarouEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 
     return effect;
 }
 
-void effNokotarouMain(EffectEntry* effect) {
+static void effNokotarouMain(EffectEntry* effect) {
     EffNokotarouWork* work = effect->userdata;
     Vec position;
     BOOL inBattle;
@@ -82,7 +85,7 @@ void effNokotarouMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effNokotarouDisp, effect);
 }
 
-void effNokotarouDisp(CameraId cameraId, EffectEntry* effect) {
+static void effNokotarouDisp(CameraId cameraId, EffectEntry* effect) {
     EffNokotarouWork* work = effect->userdata;
     Mtx mtx;
     Mtx rot;

@@ -34,8 +34,6 @@
 #include "evt/evt_pouch.h"
 #include "driver/casedrv.h"
 
-#if VERSION == VERSION_EU
-// PAL: the request names and texts get 101 bytes each, and there is no unused tail
 typedef struct IraiWork {
     s32 state;
     s32 count;
@@ -47,34 +45,25 @@ typedef struct IraiWork {
     s32 yubiY;
     s32 cursorTimer;
     f32 scroll;
+#if VERSION == VERSION_EU
+    // PAL: the request names and texts get 101 bytes each, and there is no unused tail
     char client[30][101];
     char contents[30][101];
-} IraiWork;
 #else
-typedef struct IraiWork {
-    s32 state;
-    s32 count;
-    s32 list[30];
-    s32 cursor;
-    s32 last;
-    s32 top;
-    s32 yubiX;
-    s32 yubiY;
-    s32 cursorTimer;
-    f32 scroll;
     char client[30][21];
     char contents[30][31];
-    u8 textWork[0x416C - 0x6B4];
-} IraiWork; /* textWork: never accessed */
+    u8 textWork[0x416C - 0x6B4]; // never accessed
 #endif
-void irai_window_disp(CameraId camera, void* param);
+} IraiWork;
 
-USER_FUNC(irai_cancel_func);
-USER_FUNC(irai_check_func);
-USER_FUNC(irai_end_func);
-USER_FUNC(irai_init_func);
-USER_FUNC(irai_main_func);
-USER_FUNC(irai_start_func);
+static void irai_window_disp(CameraId camera, void* param);
+
+static USER_FUNC(irai_cancel_func);
+static USER_FUNC(irai_check_func);
+static USER_FUNC(irai_end_func);
+static USER_FUNC(irai_init_func);
+static USER_FUNC(irai_main_func);
+static USER_FUNC(irai_start_func);
 
 const char* irai_msg_client[30];
 const char* irai_msg_contents[30];
@@ -318,9 +307,9 @@ EVT_BEGIN(gor_irai_lecture)
     RETURN
 EVT_END()
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(gor_irai_main)
     IF_INT_EQUAL(GSWF(GSWF_TROUBLE_LECTURE_HEARD), 0)
+#if VERSION >= VERSION_US
         BEGIN_INLINE_EVENT
             CALL(evt_mario_set_dir, 270, 200, 0)
         END_INLINE_EVENT
@@ -330,88 +319,46 @@ EVT_BEGIN(gor_irai_main)
         BEGIN_INLINE_EVENT
             CALL(evt_party_set_dir, 1, 270, 200)
         END_INLINE_EVENT
-        CALL_CHILD(PTR(gor_irai_lecture))
-        RETURN
-    END_IF
-    CALL(evt_mario_key_onoff, 0)
-    CALL(irai_init_func)
-    LABEL(10)
-    CALL(irai_main_func)
-    CALL(irai_check_func)
-    IF_INT_EQUAL(LW(0), -1)
-        GOTO(100)
-    END_IF
-    SET_INT_READ_ADDR(PTR(&irai_msg_exposition))
-    SET_VALUE(LW(0), LW(11))
-    ADD(LW(0), -1)
-    READ_INT_INDEXED(LW(1), LW(0))
-    CALL(evt_msg_toge, 1, 0, 0, 0)
-    CALL(evt_msg_print, 0, LW(1), 0, 0)
-    CALL(evt_msg_toge, 1, 0, 0, 0)
-    CALL(evt_msg_print, 0, LW(12), 0, 0)
-    CALL(evt_msg_select, 0, STRING("irai_01"))
-    IF_INT_EQUAL(LW(0), 0)
-        CALL(evt_msg_print_add, 0, STRING("irai_73"))
-        CALL(irai_start_func)
-        SET_INT_READ_ADDR(PTR(irai_start_event))
-        SET_VALUE(LW(0), LW(11))
-        ADD(LW(0), -1)
-        READ_INT_INDEXED(LW(1), LW(0))
-        SPAWN_EVENT(LW(1))
-        SET_VALUE(GSW(GSW_TROUBLE_ACTIVE), LW(11))
-        DEBUG_PUT_REG(GSW(GSW_TROUBLE_ACTIVE))
-    ELSE
-        CALL(evt_msg_continue)
-        GOTO(10)
-    END_IF
-    LABEL(100)
-    CALL(irai_end_func)
-    CALL(evt_mario_key_onoff, 1)
-    RETURN
-EVT_END()
-#else
-EVT_BEGIN(gor_irai_main)
-    IF_INT_EQUAL(GSWF(GSWF_TROUBLE_LECTURE_HEARD), 0)
-        CALL_CHILD(PTR(gor_irai_lecture))
-        RETURN
-    END_IF
-    CALL(evt_mario_key_onoff, 0)
-    CALL(irai_init_func)
-    LABEL(10)
-    CALL(irai_main_func)
-    CALL(irai_check_func)
-    IF_INT_EQUAL(LW(0), -1)
-        GOTO(100)
-    END_IF
-    SET_INT_READ_ADDR(PTR(&irai_msg_exposition))
-    SET_VALUE(LW(0), LW(11))
-    ADD(LW(0), -1)
-    READ_INT_INDEXED(LW(1), LW(0))
-    CALL(evt_msg_toge, 1, 0, 0, 0)
-    CALL(evt_msg_print, 0, LW(1), 0, 0)
-    CALL(evt_msg_toge, 1, 0, 0, 0)
-    CALL(evt_msg_print, 0, LW(12), 0, 0)
-    CALL(evt_msg_select, 0, STRING("irai_01"))
-    IF_INT_EQUAL(LW(0), 0)
-        CALL(evt_msg_print_add, 0, STRING("irai_73"))
-        CALL(irai_start_func)
-        SET_INT_READ_ADDR(PTR(irai_start_event))
-        SET_VALUE(LW(0), LW(11))
-        ADD(LW(0), -1)
-        READ_INT_INDEXED(LW(1), LW(0))
-        SPAWN_EVENT(LW(1))
-        SET_VALUE(GSW(GSW_TROUBLE_ACTIVE), LW(11))
-        DEBUG_PUT_REG(GSW(GSW_TROUBLE_ACTIVE))
-    ELSE
-        CALL(evt_msg_continue)
-        GOTO(10)
-    END_IF
-    LABEL(100)
-    CALL(irai_end_func)
-    CALL(evt_mario_key_onoff, 1)
-    RETURN
-EVT_END()
 #endif
+        CALL_CHILD(gor_irai_lecture)
+        RETURN
+    END_IF
+    CALL(evt_mario_key_onoff, 0)
+    CALL(irai_init_func)
+    LABEL(10)
+    CALL(irai_main_func)
+    CALL(irai_check_func)
+    IF_INT_EQUAL(LW(0), -1)
+        GOTO(100)
+    END_IF
+    SET_INT_READ_ADDR(PTR(&irai_msg_exposition))
+    SET_VALUE(LW(0), LW(11))
+    ADD(LW(0), -1)
+    READ_INT_INDEXED(LW(1), LW(0))
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_msg_print, 0, LW(1), 0, 0)
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_msg_print, 0, LW(12), 0, 0)
+    CALL(evt_msg_select, 0, STRING("irai_01"))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print_add, 0, STRING("irai_73"))
+        CALL(irai_start_func)
+        SET_INT_READ_ADDR(PTR(irai_start_event))
+        SET_VALUE(LW(0), LW(11))
+        ADD(LW(0), -1)
+        READ_INT_INDEXED(LW(1), LW(0))
+        SPAWN_EVENT(LW(1))
+        SET_VALUE(GSW(GSW_TROUBLE_ACTIVE), LW(11))
+        DEBUG_PUT_REG(GSW(GSW_TROUBLE_ACTIVE))
+    ELSE
+        CALL(evt_msg_continue)
+        GOTO(10)
+    END_IF
+    LABEL(100)
+    CALL(irai_end_func)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
 
 EVT_BEGIN(gor_irai_tenshu_main)
     SET_VALUE(LW(0), GSWF(GSWF_TROUBLE_01_SOLVED))
@@ -452,7 +399,7 @@ EVT_BEGIN(gor_irai_tenshu_main)
         RETURN
     END_IF
     IF_INT_EQUAL(GSWF(GSWF_TROUBLE_LECTURE_HEARD), 0)
-        CALL_CHILD(PTR(gor_irai_lecture))
+        CALL_CHILD(gor_irai_lecture)
         RETURN
     END_IF
     CALL(evt_mario_key_onoff, 0)
@@ -508,7 +455,7 @@ EVT_BEGIN(gor_irai_tenshu_main)
     RETURN
 EVT_END()
 
-void irai_flag_clear(void) {
+static void irai_flag_clear(void) {
     s32 i;
 
     for (i = GSWF(GSWF_TROUBLE_WORK_BASE); i <= GSWF(GSWF_TROUBLE_WORK_LAST); i++) {
@@ -519,7 +466,7 @@ void irai_flag_clear(void) {
     }
 }
 
-void irai_flag_disp(void) {
+static void irai_flag_disp(void) {
     s32 i;
 
     for (i = GSWF(GSWF_TROUBLE_WORK_BASE); i <= GSWF(GSWF_TROUBLE_WORK_LAST); i++) {
@@ -528,7 +475,7 @@ void irai_flag_disp(void) {
     }
 }
 
-USER_FUNC(irai_start_func) {
+static USER_FUNC(irai_start_func) {
     irai_flag_clear();
     return EVT_RETURN_DONE;
 }
@@ -537,7 +484,7 @@ static inline s32 irai_get_no(EventEntry* event) {
     return evtGetValue(event, event->args[0]) - 1;
 }
 
-USER_FUNC(irai_cancel_func) {
+static USER_FUNC(irai_cancel_func) {
     s32 no = irai_get_no(event);
     s32* items;
     ItemType item;
@@ -560,7 +507,7 @@ USER_FUNC(irai_cancel_func) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(irai_init_func) {
+static USER_FUNC(irai_init_func) {
     IraiWork* wp;
     s32 seq;
     s32 n;
@@ -644,7 +591,7 @@ USER_FUNC(irai_init_func) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(irai_main_func) {
+static USER_FUNC(irai_main_func) {
     IraiWork* wp = (IraiWork*)event->lwData[10];
     s32 prev;
     s32 n;
@@ -652,19 +599,19 @@ USER_FUNC(irai_main_func) {
     switch (wp->state) {
         case 0:
             iconEntry2D("iraiYubi", VERSION_PICK(0x1F0, 0x1F8));
-            iconFlagOn("iraiYubi", 4);
+            iconFlagOn("iraiYubi", ICON_FLAG_FLIP_X);
             iconEntry2D("iraiArrowUp", VERSION_PICK(0x205, 0x20C));
-            iconFlagOn("iraiArrowUp", 8);
+            iconFlagOn("iraiArrowUp", ICON_FLAG_FLIP_Y);
             iconEntry2D("iraiArrowDown", VERSION_PICK(0x205, 0x20C));
             iconEntry2D("iraiLButton", VERSION_PICK(0x7E, 0x86));
             iconSetScale("iraiLButton", 0.8f);
             iconEntry2D("iraiRButton", VERSION_PICK(0x80, 0x88));
             iconSetScale("iraiRButton", 0.8f);
-            iconFlagOn("iraiYubi", 2);
-            iconFlagOn("iraiArrowUp", 2);
-            iconFlagOn("iraiArrowDown", 2);
-            iconFlagOn("iraiLButton", 2);
-            iconFlagOn("iraiRButton", 2);
+            iconFlagOn("iraiYubi", ICON_FLAG_HIDDEN);
+            iconFlagOn("iraiArrowUp", ICON_FLAG_HIDDEN);
+            iconFlagOn("iraiArrowDown", ICON_FLAG_HIDDEN);
+            iconFlagOn("iraiLButton", ICON_FLAG_HIDDEN);
+            iconFlagOn("iraiRButton", ICON_FLAG_HIDDEN);
             wp->state = 1;
             psndSFXOn((const char*)0x2A);
             break;
@@ -748,24 +695,24 @@ USER_FUNC(irai_main_func) {
             wp->yubiX = -129;
             wp->yubiY = 120 - (wp->cursor - wp->top) * 30;
             iconSetPos("iraiYubi", wp->yubiX, wp->yubiY, 0.0f);
-            iconFlagOff("iraiYubi", 2);
+            iconFlagOff("iraiYubi", ICON_FLAG_HIDDEN);
             iconSetPos("iraiArrowUp", 231.0f, 178.0f, 0.0f);
             iconSetPos("iraiArrowDown", 231.0f, -190.0f, 0.0f);
             iconSetPos("iraiLButton", 261.0f, 146.0f, 0.0f);
             iconSetPos("iraiRButton", 261.0f, -190.0f, 0.0f);
             if (wp->top == 0) {
-                iconFlagOn("iraiArrowUp", 2);
-                iconFlagOn("iraiLButton", 2);
+                iconFlagOn("iraiArrowUp", ICON_FLAG_HIDDEN);
+                iconFlagOn("iraiLButton", ICON_FLAG_HIDDEN);
             } else {
-                iconFlagOff("iraiArrowUp", 2);
-                iconFlagOff("iraiLButton", 2);
+                iconFlagOff("iraiArrowUp", ICON_FLAG_HIDDEN);
+                iconFlagOff("iraiLButton", ICON_FLAG_HIDDEN);
             }
             if (wp->top >= wp->count - 10) {
-                iconFlagOn("iraiArrowDown", 2);
-                iconFlagOn("iraiRButton", 2);
+                iconFlagOn("iraiArrowDown", ICON_FLAG_HIDDEN);
+                iconFlagOn("iraiRButton", ICON_FLAG_HIDDEN);
             } else {
-                iconFlagOff("iraiArrowDown", 2);
-                iconFlagOff("iraiRButton", 2);
+                iconFlagOff("iraiArrowDown", ICON_FLAG_HIDDEN);
+                iconFlagOff("iraiRButton", ICON_FLAG_HIDDEN);
             }
             break;
         case 100:
@@ -793,7 +740,7 @@ USER_FUNC(irai_main_func) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(irai_check_func) {
+static USER_FUNC(irai_check_func) {
     if (event->lwData[0] != -1) {
         event->lwData[12] = (EvtWord)irai_msg_kakunin[event->lwData[0] - 1];
         event->lwData[11] = event->lwData[0];
@@ -804,11 +751,12 @@ USER_FUNC(irai_check_func) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(irai_end_func) {
+static USER_FUNC(irai_end_func) {
     _mapFree((void*)event->lwData[10]);
     return EVT_RETURN_DONE;
 }
 
+// US and PAL fit the window texts to their boxes (centred and squeezed); JP and the demos draw them as they are
 #if VERSION >= VERSION_US
 
 // US: text centered in a boxW-wide box at x, x-squeezed to maxW; w is the width variable of the caller.
@@ -837,7 +785,7 @@ USER_FUNC(irai_end_func) {
         FontDrawString(x, v, msg);                                                          \
     }
 
-void irai_window_disp(CameraId camera, void* param) {
+static void irai_window_disp(CameraId camera, void* param) {
     IraiWork* wp = param;
     u32 left;
     u32 top;
@@ -904,7 +852,7 @@ static inline f32 iraiAddI(f32 a, s32 b) {
     return a + b;
 }
 
-void irai_window_disp(CameraId camera, void* param) {
+static void irai_window_disp(CameraId camera, void* param) {
     f32 negX;
     IraiWork* wp = param;
     u32 left;

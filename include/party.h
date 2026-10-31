@@ -48,7 +48,7 @@ typedef enum PartyFlags {
     PARTY_FLAG_MOT_SLIT_FLOOR = (1 << 13),
     PARTY_FLAG_IS_RIDING_PLANE = (1 << 16),
     PARTY_FLAG_IS_RIDING_SHIP = (1 << 17),
-    PARTY_FLAG_IS_RIDING_JABARA = (1 << 18), // bellows ride (the demo's allPartyRideOn); cleared with the plane and ship bits
+    PARTY_FLAG_IS_RIDING_JABARA = (1 << 18), // bellows ride (the demo's allPartyRideJabara); cleared with the plane and ship bits
     PARTY_FLAG_IS_BEHIND_MARIO = (1 << 19),
     PARTY_FLAG_SLEEP_ON = (1 << 22),
     PARTY_FLAG_BG_MODE = (1 << 23),
@@ -168,7 +168,7 @@ typedef struct PartyWorkVivian { // party_vivian.c
     f32 shadowSize;              // 0x174, 10..20; party.c reads it as the in-use shadow size
     u8 pad_178[0x17C - 0x178];   // 0x178
     f32 followOfs;               // 0x17C, 0..-13, movePos distance behind Mario
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     s16 tailFlags; // 0x180, demo: Vivian bit 0 = tail off (retail keeps it in PartyEntry)
 #else
     u8 pad_180[0x182 - 0x180]; // 0x180
@@ -196,7 +196,7 @@ typedef struct PartyEntry {
     const char* animName;      // 0x18, current pose name (strcmp'd with "PYS_S_2" etc.)
     const char* paperAnimName; // 0x1C, partyChgPaper anim name, as MarioWork.paperAnimName
     u16 poseTime;              // 0x20, cleared on every pose/paper change (MarioWork.poseTime)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     u8 pad_22;      // 0x22, never accessed
     s8 splashTimer; // 0x23, demo: here instead of 0x4C
 #else
@@ -206,7 +206,7 @@ typedef struct PartyEntry {
     s16 forceMoveFrames; // 0x28, partySetForceMove frame count; evt_party_move waits for 0
     s16 mutekiTimer;     // 0x2A, copied from MarioWork 0x4C (marioSetMutekiTime)
     s8 kemuriTimer;      // 0x2C, frames between effKemuri2Entry dust puffs (mario_kemuri)
-    s8 footstepTimer;    // 0x2D, partyPlaySfxFootstep frame counter
+    s8 footstepTimer;    // 0x2D, partyWalkSe frame counter
     s8 dirKind;          // 0x2E, set from the pipe exit dir (partyDokanEnd)
     s8 currentSlotId;    // 0x2F
     s8 port;             // 0x30, controller port (partyUpdateKeyData)
@@ -227,7 +227,7 @@ typedef struct PartyEntry {
     s8 flyRequest;       // 0x3F, partyMoveFlyInit: 1/3 = go behind Mario, 2 = other; cleared there, never set in C
     f32 homingDist;      // 0x40, evt_party_set_homing_dist (default 50)
     u32 reserved_44;     // 0x44, only set to 0x10
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     union {
         s32 wallStuckCount; // 0x48, demo: frames the follow walk hit a wall with its target 100+ away in height
         // The demo's code never reads these three; they share bytes with wallStuckCount so that retail
@@ -289,13 +289,13 @@ typedef struct PartyEntry {
             f32 groundRotZ;             // 0xCC, groundRot.z
         };
     };
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     u8 pad_D0[0xE0 - 0xD0]; // 0xD0, never accessed
 #endif
     f32 groundSlope; // 0xE0, floor angle from partyNrmSet; steps only up to 30
-    f32 groundY;     // 0xE4, floor height found by partySearchGround
+    f32 groundY;     // 0xE4, floor height found by _partySearchGround
     f32 dropDepth;   // 0xE8, height of a drop below the search depth (0 on floor, -1 none)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     f32 frontWallDist; // 0xEC, distance to the front wall (-1 = none); not in the demo
 #endif
     f32 height;    // 0xF0
@@ -304,7 +304,7 @@ typedef struct PartyEntry {
     f32 moveDir;   // 0xFC, copied from targetDir when moving
     f32 targetDir; // 0x100, angleABf from position to the move target
     f32 moveSpeed; // 0x104, distance/18 etc.
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     f32 targetSpeed; // 0x108, partySetTargetSpd; follow speed = targetSpeed * playerGravity * partySpdRate; not in the demo
 #endif
     f32 displayDirection;            // 0x10C, copied from MarioWork displayDirection
@@ -356,7 +356,7 @@ f32 partyGetHeight(PartyEntry* party);
 void partyInitCamId(PartyEntry* party);
 void partyKeyOff(void);
 void partyKeyOn(void);
-void partyRestoreRunMode(PartyEntry* party);
+void partyPrevRunMode(PartyEntry* party);
 void partyRun(PartyEntry* party);
 void partyStop(PartyEntry* party);
 void party_force_ride_yoshi(PartyEntry* party);
@@ -383,8 +383,10 @@ void allPartyForceRideOn(void);
 void partyDokanEnd(s32 id, s32 dir);
 void allPartyRidePlane(void);
 void allPartyRideShip(void);
+#if VERSION <= VERSION_DEMO_US
+void allPartyRideJabara(void);
+#endif
 void allPartyRideOn(void);
-void L_allPartyRideOn(void);
 void allPartyRideOff(void);
 void allPartyRideOff2(void);
 void partySetCamId(PartyEntry* party, s32 cameraId);

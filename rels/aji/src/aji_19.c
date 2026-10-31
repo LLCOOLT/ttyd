@@ -17,7 +17,6 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_telop.h"
-#include "party/party_motion.h"
 #include "aji.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
@@ -35,7 +34,11 @@ static BeroEntry bero_entry_data[3];
 extern EvtWord evt_hajimete[];
 
 static EVT_BEGIN(w_door_close)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("S_door1_1"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("S_door1_2"), 0, 0, LW(0))
@@ -43,7 +46,11 @@ static EVT_BEGIN(w_door_close)
 EVT_END()
 
 static EVT_BEGIN(w_door_open)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("S_door1_1"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("S_door1_2"), 0, 0, LW(0))
@@ -51,7 +58,11 @@ static EVT_BEGIN(w_door_open)
 EVT_END()
 
 static EVT_BEGIN(e_door_close)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("S_door2_1"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("S_door2_2"), 0, 0, LW(0))
@@ -59,7 +70,11 @@ static EVT_BEGIN(e_door_close)
 EVT_END()
 
 static EVT_BEGIN(e_door_open)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("S_door2_1"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("S_door2_2"), 0, 0, LW(0))
@@ -124,10 +139,12 @@ EVT_END()
 EVT_BEGIN(aji_19_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI1"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 1)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_map_playanim, STRING("hosi_01"), 1, 0)
     CALL(evt_map_playanim, STRING("hosi_02"), 1, 0)
     CALL(evt_map_playanim, STRING("hosi_03"), 1, 0)
@@ -136,7 +153,7 @@ EVT_BEGIN(aji_19_init_evt)
         CALL(mario_chk)
     END_INLINE_EVENT
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_07_01_INSIDE_THE_BUILDING)
-        SPAWN_EVENT(PTR(evt_hajimete))
+        SPAWN_EVENT(evt_hajimete)
     END_IF
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("kanaami2"), MAPOBJ_FLAG_BBOX_CULL)
     RETURN

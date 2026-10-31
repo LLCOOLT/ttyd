@@ -25,7 +25,6 @@
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "pmario_sound.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -152,13 +151,13 @@ EVT_BEGIN(tsuritenjo_event)
     CALL(evt_mario_normalize)
     CALL(evt_mario_set_pos, 620, 0, 0)
     CALL(evt_party_set_pos, 0, 670, 0, 0)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(evt_cam_road_reset)
 #endif
     CALL(evt_bero_mario_go_init)
     CALL(evt_seq_wait, 2)
     SET_VALUE(LW(1), 1)
-    SPAWN_EVENT(PTR(bero_play_enter_anime))
+    SPAWN_EVENT(bero_play_enter_anime)
     CALL(evt_bero_mario_go_wait)
     BEGIN_INLINE_EVENT
         CALL(evt_party_move_pos2, 0, 570, 0, FLOAT(150.0f))
@@ -189,7 +188,7 @@ EVT_BEGIN(tsuritenjo_event)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_13_01_50_SECONDS_TO_ESCAPE)
     CALL(evt_npc_change_fbat_mode, 1)
     CALL(evt_npc_start_for_event)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
 #endif
     CALL(evt_mario_key_onoff, 1)
@@ -299,7 +298,7 @@ static EVT_BEGIN(evt_majin)
                     CALL(evt_mario_set_dir, 270, 200, 0)
                 END_IF
             END_INLINE_EVENT
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             CALL(evt_win_item_select, PTR(key_tbl), LW(0))
 #else
             CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
@@ -323,7 +322,7 @@ static EVT_BEGIN(evt_majin)
                 ADD(LW(1), 50)
                 CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
                 CALL(evt_msg_print, 0, STRING("stg1_gon_12_11"), PTR(majin_callback), 0)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 CALL(evt_mario_set_pose, STRING("M_I_N"))
 #endif
                 CALL(evt_cam3d_evt_set, 380, 110, 330, 380, 57, 23, 500, 11)
@@ -338,7 +337,7 @@ static EVT_BEGIN(evt_majin2)
     CALL(evt_npc_change_fbat_mode, 7)
     CALL(evt_npc_stop_for_event)
     CALL(evt_mario_key_onoff, 0)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(evt_mario_normalize)
 #endif
     CALL(evt_mobj_wait_animation_end, STRING("box"))
@@ -370,8 +369,8 @@ static EVT_BEGIN(evt_majin2)
     CALL(lect_cam_save)
     CALL(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
     WAIT_FRAMES(1)
-    CALL_CHILD(PTR(slit_majin_lecture_init))
-    CALL_CHILD(PTR(slit_majin_lecture))
+    CALL_CHILD(slit_majin_lecture_init)
+    CALL_CHILD(slit_majin_lecture)
     LOOP(6)
         CALL(evt_mario_dispflag_onoff, 1, 1)
         WAIT_MS(100)
@@ -415,10 +414,10 @@ EVT_BEGIN(gon_06_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_13_A_SUSPICIOUS_ROOM)
-        SPAWN_EVENT(PTR(bero_case_entry))
-        SPAWN_EVENT(PTR(tsuritenjo_event))
+        SPAWN_EVENT(bero_case_entry)
+        SPAWN_EVENT(tsuritenjo_event)
     ELSE
-        CALL_CHILD(PTR(evt_bero_info_run))
+        CALL_CHILD(evt_bero_info_run)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_GON1"))
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_GON1"))
         CALL(evt_snd_set_rev_mode, 2)
@@ -479,11 +478,7 @@ EVT_BEGIN(gon_06_init_evt)
     CALL(evt_npc_set_width, STRING("\"カロン05\""), 30)
     CALL(evt_npc_set_height, STRING("\"カロン05\""), 7)
     CALL(evt_mobj_switch_red, 0, STRING("mobj_switch1"), 92, 0, 120, PTR(evt_ori_open), GSWF(GSWF_GON06_CELL_SWITCH))
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("item01"), ITEM_ATTACK_FX_R, -100, 0, -100, 15, GSWF(GSWF_GON06_ATTACK_FX_R_TAKEN), 0)
-#else
-    CALL(evt_item_entry, STRING("item01"), ITEM_ATTACK_FX_R, -100, 0, -100, 16, GSWF(GSWF_GON06_ATTACK_FX_R_TAKEN), 0)
-#endif
+    CALL(evt_item_entry, STRING("item01"), ITEM_ATTACK_FX_R, -100, 0, -100, ITEM_ENTRY_FIXED, GSWF(GSWF_GON06_ATTACK_FX_R_TAKEN), 0)
     CALL(evt_sub_rumble_onoff, 1, 0)
     WAIT_FRAMES(1)
     CALL(evt_npc_change_fbat_mode, 1)

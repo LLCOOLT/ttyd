@@ -26,12 +26,11 @@ typedef struct EffSmallStarN64Work {
     u8 camera;    // 0x30
 } EffSmallStarN64Work;
 
-static f32 kaiten;
-
-void effSmallStarMain(EffectEntry* effect);
-void effSmallStarDisp(CameraId cameraId, EffectEntry* effect);
+static void effSmallStarMain(EffectEntry* effect);
+static void effSmallStarDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effSmallStarN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 dx, f32 dy, f32 dz) {
+    static f32 kaiten;
     EffectEntry* effect;
     EffSmallStarN64Work* w;
     f32 px, py, pz;
@@ -212,7 +211,7 @@ static inline f32 _cosf(f32 x) {
 inline f32 alphaf(f32 m, s32 x) {
     return x * m;
 }
-void effSmallStarMain(EffectEntry* effect) {
+static void effSmallStarMain(EffectEntry* effect) {
     EffSmallStarN64Work* w = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -288,7 +287,7 @@ static inline u8 color_rot_get(s32 idx) {
     return color_rotation_data[idx % 36];
 }
 
-void effSmallStarDisp(CameraId cameraId, EffectEntry* effect) {
+static void effSmallStarDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     s32 a, b, c;
     EffSmallStarN64Work* w;

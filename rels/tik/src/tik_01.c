@@ -20,7 +20,6 @@
 #include "evt/evt_paper.h"
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "tik.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -53,7 +52,7 @@ EVT_BEGIN(dokan_2_in_evt)
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG0_19_BLOOPER_BATTLE)
             CALL(evt_pouch_get_equipbadgecnt, LW(0))
             IF_INT_EQUAL(LW(0), 0)
-                SPAWN_EVENT(PTR(lecture_badge_after_00_evt))
+                SPAWN_EVENT(lecture_badge_after_00_evt)
             END_IF
         END_IF
     END_IF
@@ -463,7 +462,7 @@ EVT_BEGIN(wall_bomb01)
         CALL(evt_snd_sfxon_3d, STRING("SFX_OFF_WALL_BREAK1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
     SET_VALUE(LW(0), STRING("e_bero_2"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     CALL(evt_hitobj_attr_onoff, 1, 1, STRING("e_bero_2"), 4)
     SET_VALUE(GSWF(GSWF_TIK01_WALL2_BOMBED), 1)
     CALL(evt_img_entry, STRING("capture_img"))
@@ -500,8 +499,12 @@ EVT_END()
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("item00"), ITEM_DEFEND_PLUS_P, LW(0), LW(1), LW(2), 16, -1, 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_DEFEND_PLUS_P, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
+#else
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_BADGE_RETURN | ITEM_FLAG_NO_TOUCH)
+#endif
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_item, STRING("item00"))
     CALL(evt_mario_key_onoff, 1)
@@ -509,7 +512,9 @@ static EVT_BEGIN(mobj_box00)
 EVT_END()
 
 EVT_BEGIN(tik_01_init_evt)
+#if VERSION >= VERSION_JP
     SET_VALUE(GSWF(GSWF_LOG_MAP_TIK_ROUTE_SHOWN), 1)
+#endif
     IF_INT_EQUAL(GSWF(GSWF_TIK01_BGM_STARTED), 1)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
     ELSE
@@ -520,7 +525,7 @@ EVT_BEGIN(tik_01_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     IF_INT_EQUAL(GSWF(GSWF_GOR01_LENS_ARRIVED), 0)
         IF_INT_EQUAL(GSWF(GSWF_GOR01_LENS_ORDERED_ALT), 1)
             IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_17_FATHER_AND_SON_REUNITED)
@@ -540,7 +545,7 @@ EVT_BEGIN(tik_01_init_evt)
     IF_INT_EQUAL(GSWF(GSWF_TIK01_WALL2_BOMBED), 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("bom_kabe_4"), MAPOBJ_FLAG_HIDE)
         SET_VALUE(LW(0), STRING("e_bero_2"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_hitobj_attr_onoff, 1, 0, STRING("e_bero_2"), 4)
         CALL(evt_run_case_evt, CASE_COND_BOBBERY, 1, STRING("e_bero_2"), 0, PTR(wall_bomb01), 0)
     ELSE
@@ -565,13 +570,13 @@ EVT_BEGIN(tik_01_init_evt)
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(11), 0)
     SET_VALUE(LW(12), 0)
-    SPAWN_EVENT(PTR(moving_floor))
+    SPAWN_EVENT(moving_floor)
     CALL(evt_map_entry_airport_harbor, 0, STRING("hikou"), STRING("a_hi1"))
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG0_16_FRANKLYS_HOUSE)
         CALL(evt_npc_check_delete, STRING("トゲクリボー"))
     END_IF
     IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG0_10_01_FRANKLYS_TUTORIAL)
-        SPAWN_EVENT(PTR(gorotuki_sanninngumi))
+        SPAWN_EVENT(gorotuki_sanninngumi)
     ELSE
         CALL(evt_hitobj_onoff, STRING("a_rec"), 1, 0)
     END_IF

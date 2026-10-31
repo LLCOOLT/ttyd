@@ -18,7 +18,6 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
 #include "driver/mapdrv.h"
@@ -89,7 +88,7 @@ static BeroEntry bero_data[] = {
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"ガードマン"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93", // name
+        "ガードマン", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -114,11 +113,11 @@ EVT_BEGIN(evt_tojikome)
     CALL(evt_npc_status_onoff, 1, STRING("ガードマン"), 2)
     CALL(evt_seq_wait, 2)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, -180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL_CHILD(PTR(n_door_open))
+        CALL_CHILD(n_door_open)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
@@ -126,11 +125,11 @@ EVT_BEGIN(evt_tojikome)
     BEGIN_INLINE_EVENT
         WAIT_MS(4000)
         SET_VALUE(LW(1), 0)
-        SPAWN_EVENT(PTR(bero_close_door_play_se))
+        SPAWN_EVENT(bero_close_door_play_se)
         CALL(evt_sub_intpl_msec_init, 11, -180, 0, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL_CHILD(PTR(n_door_open))
+            CALL_CHILD(n_door_open)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
@@ -164,11 +163,11 @@ EVT_BEGIN(evt_tojikome)
     WAIT_MS(500)
     CALL(evt_npc_move_position, STRING("ガードマン"), 0, -100, 0, FLOAT(70.0f), 1)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL_CHILD(PTR(n_door_open))
+        CALL_CHILD(n_door_open)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
@@ -176,11 +175,11 @@ EVT_BEGIN(evt_tojikome)
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
         SET_VALUE(LW(1), 0)
-        SPAWN_EVENT(PTR(bero_close_door_play_se))
+        SPAWN_EVENT(bero_close_door_play_se)
         CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL_CHILD(PTR(n_door_open))
+            CALL_CHILD(n_door_open)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
@@ -263,8 +262,8 @@ EVT_END()
 EVT_BEGIN(tou_11_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_tou_locker_init))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(evt_tou_locker_init)
     CALL(evt_npc_setup, PTR(npcEnt))
     IF_INT_EQUAL(GSWF(GSWF_TOU11_POSTER_BLOWN), 0)
         CALL(evt_cloud_init)
@@ -275,13 +274,17 @@ EVT_BEGIN(tou_11_init_evt)
     END_IF
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kuro_1"), MAPOBJ_FLAG_HIDE)
     SET_VALUE(LW(0), 0)
-    CALL_CHILD(PTR(bero_case_switch_off))
+    CALL_CHILD(bero_case_switch_off)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("n_bero"), 0, PTR(evt_tojikome_msg), 0)
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("nidome"))
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
+#else
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))
-        SPAWN_EVENT(PTR(evt_tojikome_nidome))
+#endif
+        SPAWN_EVENT(evt_tojikome_nidome)
         CALL(evt_mario_set_pos, 30, 0, -100)
         CALL(evt_party_set_pos, 0, 60, 0, -100)
         CALL(evt_cam_road_reset)
@@ -289,8 +292,12 @@ EVT_BEGIN(tou_11_init_evt)
     END_IF
     IF_STR_EQUAL(LW(0), STRING("sandome"))
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
+#else
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))
-        SPAWN_EVENT(PTR(evt_tojikome_sandome))
+#endif
+        SPAWN_EVENT(evt_tojikome_sandome)
         CALL(evt_mario_set_pos, 30, 0, -100)
         CALL(evt_party_set_pos, 0, 60, 0, -100)
         CALL(evt_mario_set_dir, 90, 0, 0)
@@ -301,17 +308,25 @@ EVT_BEGIN(tou_11_init_evt)
     IF_INT_EQUAL(GSWF(GSWF_TOU_TITLE_MATCH_RESERVED), 1)
         CALL(evt_snd_bgmoff, PSND_FADE_OUT)
         CALL(evt_snd_envoff, PSND_FADE_OUT)
-        SPAWN_EVENT(PTR(evt_tojikome))
+        SPAWN_EVENT(evt_tojikome)
         RETURN
     END_IF
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG3_00_WELCOME_TO_GLITZVILLE, STORY_STG3_12_MINI_YOSHI_EGG)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
+#else
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))
+#endif
         CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
         CASE_GREATER_OR_EQUAL(STORY_STG3_33_PEACH_THE_SECRET_WEAPON)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
+#else
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))
+#endif
         CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
         CASE_DEFAULT
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU1"))

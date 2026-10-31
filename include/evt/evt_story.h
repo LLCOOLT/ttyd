@@ -573,6 +573,8 @@ typedef enum GswfId {
     GSWF_SHOP_FIRST_VISIT = 0,
     // The 300-shop-point prize was earned while Mario's pockets were full; the shop holds it and pays it out on the next talk
     GSWF_SHOP_MAX_POINTS_PRIZE_HELD = 1,
+    // The gor_01 badge shop clerk gave the first-talk greeting (first_shopping_evt, badgeshop_30) (Japanese demo only)
+    GSWF_GOR01_BADGE_SHOP_FIRST_TALK = 2,
     // Talked to Wonky (the item buyer in the Rogueport sewers) once; later talks skip his introduction
     GSWF_TIK00_WONKY_FIRST_TALK = 3,
     // Talked to Grifty the minstrel once (short greeting afterwards)
@@ -1682,6 +1684,7 @@ typedef enum GswfId {
     GSWF_AJI06_PEACH5_RIGHT_POTION = 4210,
     GSWF_AJI02_SUPER_SHROOM_BLOCK_HIT = 4211, // Got the Super Shroom from the block in aji_02
     GSWF_AJI05_SLEEPY_SHEEP_BLOCK_HIT = 4212, // Got the Sleepy Sheep from the block in aji_05
+    GSWF_AJI09_REPEL_CAPE_TAKEN = 4213,       // Picked up the Repel Cape in aji_09 (Japanese demo only)
     GSWF_AJI12_HP_DRAIN_BLOCK_HIT = 4214,     // Got the HP Drain from the block in aji_12
     GSWF_AJI13_ULTRA_SHROOM = 4215,           // Picked up the Ultra Shroom in aji_13
     // Won the second crane-game badge prize (Feeling Fine P) in aji_03

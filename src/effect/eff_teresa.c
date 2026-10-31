@@ -8,6 +8,9 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
+static void effTeresaDisp(CameraId cameraId, EffectEntry* effect);
+static void effTeresaMain(EffectEntry* effect);
+
 typedef struct EffTeresaWork {
     s32 type;                    // 0x0
     Vec position;                // 0x4
@@ -50,7 +53,7 @@ EffectEntry* effTeresaEntry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effTeresaMain(EffectEntry* effect) {
+static void effTeresaMain(EffectEntry* effect) {
     EffTeresaWork* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -99,7 +102,7 @@ void effTeresaMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effTeresaDisp, effect);
 }
 
-void effTeresaDisp(CameraId cameraId, EffectEntry* effect) {
+static void effTeresaDisp(CameraId cameraId, EffectEntry* effect) {
     EffTeresaWork* work = effect->userdata;
     CameraEntry* camera;
     s32 type;

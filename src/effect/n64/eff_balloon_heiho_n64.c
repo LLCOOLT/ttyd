@@ -29,8 +29,8 @@ static effN64Vtx size32x64_tex32x64_vtx[] = {
     {16, 0, 0, 1024, 0, 0, 0, 0, 255},
 };
 
-void effBalloonHeihoMain(EffectEntry* effect);
-void effBalloonHeihoDisp(CameraId cameraId, EffectEntry* effect);
+static void effBalloonHeihoMain(EffectEntry* effect);
+static void effBalloonHeihoDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effBalloonHeihoN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 accel, f32 scale) {
     EffectEntry* effect;
@@ -54,7 +54,7 @@ EffectEntry* effBalloonHeihoN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z
     return effect;
 }
 
-void effBalloonHeihoMain(EffectEntry* effect) {
+static void effBalloonHeihoMain(EffectEntry* effect) {
     EffBalloonHeihoN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -77,7 +77,7 @@ void effBalloonHeihoMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effBalloonHeihoDisp, effect);
 }
 
-void effBalloonHeihoDisp(CameraId cameraId, EffectEntry* effect) {
+static void effBalloonHeihoDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffBalloonHeihoN64Work* work;
     s32 type;

@@ -12,7 +12,6 @@
 #include "evt/evt_mobj.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "eki.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -128,7 +127,7 @@ EVT_BEGIN(evt_boots)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("tbox"), LW(0), LW(1), LW(2))
     CALL(lect_juyoitem_rel_set, PTR(all_juyoitem_lecture_rel))
-    CALL(evt_item_entry, STRING("boots"), ITEM_ULTRA_BOOTS, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("boots"), ITEM_ULTRA_BOOTS, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("tbox"))
     CALL(evt_item_get_important_item, STRING("boots"))
     CALL(evt_item_get_item, STRING("boots"))
@@ -145,7 +144,7 @@ EVT_END()
 
 static EVT_BEGIN(evt_head)
     CALL(evt_item_delete, STRING("elvkey"))
-    CALL(evt_item_entry, STRING("elvkey"), ITEM_ELEVATOR_KEY_0x1A, -135, 166, -70, 4, -1, PTR(evt_elvkey))
+    CALL(evt_item_entry, STRING("elvkey"), ITEM_ELEVATOR_KEY_0x1A, -135, 166, -70, ITEM_ENTRY_LAUNCH, -1, PTR(evt_elvkey))
     CALL(evt_item_set_move_dir_speed, STRING("elvkey"), FLOAT(135.0f), FLOAT(90.0f))
     CALL(evt_item_set_gravity, STRING("elvkey"), FLOAT(1.0f))
     CALL(evt_item_set_bound_rate, STRING("elvkey"), FLOAT(0.5996094f))
@@ -158,7 +157,7 @@ EVT_END()
 EVT_BEGIN(eki_05_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_EKI2"))
     SET_VALUE(GF(0), 0)
@@ -168,7 +167,7 @@ EVT_BEGIN(eki_05_init_evt)
         CALL(evt_mobj_itembox, STRING("tbox"), -85, 295, 0, 1, 0, PTR(evt_boots), GSWF(GSWF_EKI05_ULTRA_BOOTS_CHEST_OPENED))
     END_IF
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_37_ELEVATOR_KEY)
-        CALL(evt_item_entry, STRING("elvkey"), ITEM_ELEVATOR_KEY_0x1A, -135, 136, -70, 17, -1, PTR(evt_elvkey))
+        CALL(evt_item_entry, STRING("elvkey"), ITEM_ELEVATOR_KEY_0x1A, -135, 136, -70, ITEM_ENTRY_FIXED_NO_TOUCH, -1, PTR(evt_elvkey))
         CALL(evt_run_case_evt, CASE_COND_HEAD, 1, STRING("a_t_2"), 0, PTR(evt_head), 0)
     END_IF
     BEGIN_INLINE_EVENT
@@ -190,7 +189,7 @@ EVT_BEGIN(eki_05_init_evt)
         CALL(evt_seq_wait, 2)
         CALL(evt_bero_exec_wait, 65536)
         SET_VALUE(LW(0), STRING("w_bero_1"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_hitobj_attr_onoff, 0, 0, STRING("w_bero_1"), 8388612)
     END_INLINE_EVENT
 #endif

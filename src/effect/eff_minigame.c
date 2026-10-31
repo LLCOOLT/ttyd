@@ -28,8 +28,8 @@ typedef struct EffMiniGameWork {
     s32 alpha;       // 0x34
 } EffMiniGameWork;
 
-void effMiniGameMain(EffectEntry* effect);
-void effMiniGameDisp(CameraId cameraId, EffectEntry* effect);
+static void effMiniGameMain(EffectEntry* effect);
+static void effMiniGameDisp(CameraId cameraId, EffectEntry* effect);
 
 #if VERSION >= VERSION_US
 typedef struct MiniGameTbl {
@@ -184,7 +184,7 @@ EffectEntry* effMiniGameEntry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effMiniGameMain(EffectEntry* effect) {
+static void effMiniGameMain(EffectEntry* effect) {
     EffMiniGameWork* work = effect->userdata;
     Vec pos;
     Vec tmp;
@@ -428,7 +428,7 @@ void effMiniGameMain(EffectEntry* effect) {
     }
 }
 
-void effMiniGameDisp(CameraId cameraId, EffectEntry* effect) {
+static void effMiniGameDisp(CameraId cameraId, EffectEntry* effect) {
     EffMiniGameWork* work = effect->userdata;
     CameraEntry* cam;
     EffMiniGameWork* p;

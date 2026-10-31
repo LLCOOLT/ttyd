@@ -12,7 +12,6 @@
 #include "evt/evt_msg.h"
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "tou.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
@@ -57,7 +56,7 @@ static EVT_BEGIN(evt_dakuto)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("s_deguti"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("deguti"), 1, 0)
     SET_VALUE(LW(0), 1)
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_30_04_AIR_DUCT_EXIT)
         SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_30_04_AIR_DUCT_EXIT)
     ELSE
@@ -135,11 +134,19 @@ EVT_BEGIN(tou_13_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG3_00_WELCOME_TO_GLITZVILLE, STORY_STG3_12_MINI_YOSHI_EGG)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
+#else
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU7"))
+#endif
         CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
         CASE_GREATER_OR_EQUAL(STORY_STG3_33_PEACH_THE_SECRET_WEAPON)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
+#else
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU7"))
+#endif
         CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
         CASE_DEFAULT
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU1"))
@@ -148,7 +155,7 @@ EVT_BEGIN(tou_13_init_evt)
     END_SWITCH
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG3_30_04_AIR_DUCT_EXIT)
         SET_VALUE(LF(0), 0)
@@ -164,16 +171,16 @@ EVT_BEGIN(tou_13_init_evt)
     IF_INT_EQUAL(LF(0), 0)
         CALL(evt_run_case_evt, CASE_COND_HAMMER_2, 1, STRING("deguti"), 0, PTR(evt_dakuto), 0)
         SET_VALUE(LW(0), 1)
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     ELSE
         CALL(evt_hitobj_onoff, STRING("deguti"), 1, 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("s_deguti"), MAPOBJ_FLAG_HIDE)
     END_IF
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_30_03_EAVESDROPPING)
-        SPAWN_EVENT(PTR(evt_nusumi))
+        SPAWN_EVENT(evt_nusumi)
     END_IF
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_30_02_AIR_DUCT_1ST_TIME)
-        SPAWN_EVENT(PTR(evt_first))
+        SPAWN_EVENT(evt_first)
     END_IF
     RETURN
 EVT_END()

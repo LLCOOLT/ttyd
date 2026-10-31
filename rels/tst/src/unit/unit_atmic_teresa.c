@@ -13,7 +13,7 @@
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "data_tables.h"
 #include "driver/extdrv.h"
@@ -163,8 +163,8 @@ static PoseTableEntry pose_table[] = {
     {40, "W_1"},
     {56, "X_1"},
     {57, "X_1"},
-    {65, "T_1"},
-    {69, "S_1"},
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 PoseTableEntry pose_table_kaokakusi[] = {
@@ -183,8 +183,8 @@ PoseTableEntry pose_table_kaokakusi[] = {
     {40, "A_1"},
     {56, "A_1"},
     {57, "A_1"},
-    {65, "T_1"},
-    {69, "A_1"},
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "A_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -195,7 +195,11 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_atmic_teresa", "c_atmic_trs", 0.0f, 0.0f, 0.0f, 10.0f, 80.0f, 0.0f, 0.0f, 110.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
 };
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {40, 40, 40, 40, 40, 40, 100, 30, 0, 0, 100, 0, 100, 40, 40, 0, 10, 100, 40, 100, 100, 5};
+#else
 static StatusVulnerability regist = {40, 40, 40, 100, 40, 100, 100, 30, 0, 0, 100, 0, 100, 80, 40, 0, 10, 100, 40, 100, 100, 5};
+#endif
 
 BattleWeapon weapon_atmic_teresa_press = {
     NULL, 0, // name..icon
@@ -258,7 +262,11 @@ BattleWeapon weapon_atmic_teresa_bikkuri = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
+#if VERSION <= VERSION_DEMO_US
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
+#else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE, // special
+#endif
     COUNTER_RESIST_ALL, // counterResistFlags
     0, 0, 0, // targetWeightFlags..sleepTime
     50, // stopChance
@@ -300,7 +308,11 @@ BattleWeapon weapon_atmic_teresa_surprise = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
+#if VERSION <= VERSION_DEMO_US
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_DIMINISHING_BY_TARGET | SPECIAL_PIERCES_DEFENSE | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
+#else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_DIMINISHING_BY_TARGET | SPECIAL_PIERCES_DEFENSE, // special
+#endif
     COUNTER_RESIST_ALL, // counterResistFlags
     0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
     0, 0, // poisonTime..poisonStrength
@@ -362,7 +374,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
     CALL(atmic_teresa_id_set, BTL_UNIT_SELF)
-    CALL_CHILD(PTR(teresa_entry))
+    CALL_CHILD(teresa_entry)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -370,7 +382,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -390,15 +402,15 @@ static EVT_BEGIN(attack_event)
         CALL(evt_sub_random, LW(1), LW(0))
         SET_VALUE(LW(1), 30)
         IF_INT_LESS(LW(0), LW(1))
-            CALL_CHILD(PTR(kaokakusi_event))
+            CALL_CHILD(kaokakusi_event)
             GOTO(99)
         END_IF
         ADD(LW(1), 20)
         IF_INT_LESS(LW(0), LW(1))
-            CALL_CHILD(PTR(press_event))
+            CALL_CHILD(press_event)
             GOTO(99)
         END_IF
-        CALL_CHILD(PTR(bikkuri_event))
+        CALL_CHILD(bikkuri_event)
         GOTO(99)
     ELSE
         SET_VALUE(LW(1), 50)
@@ -407,10 +419,10 @@ static EVT_BEGIN(attack_event)
         CALL(evt_sub_random, LW(1), LW(0))
         SET_VALUE(LW(1), 50)
         IF_INT_LESS(LW(0), LW(1))
-            CALL_CHILD(PTR(surprise_event))
+            CALL_CHILD(surprise_event)
             GOTO(99)
         END_IF
-        CALL_CHILD(PTR(breath_event))
+        CALL_CHILD(breath_event)
         GOTO(99)
     END_IF
     LABEL(99)

@@ -23,7 +23,7 @@
 BOOL BattleStatusChangeAnnouceMain_Unit(BattleUnit* unit);
 void BattleStatusChangeMsgSetAnnouce(BattleUnit* unit, s32 index, s32 changed);
 void BattleStatusChangeInfoWorkInit(BattleUnit* unit);
-void _st_chg_msg_disp(void);
+static void _st_chg_msg_disp(void);
 
 typedef struct StChgMsgData {
     s8 type;
@@ -33,7 +33,7 @@ typedef struct StChgMsgData {
 } StChgMsgData;
 
 // Status Type Priority Data. The demo defines it first; its .data follows that order (retail keeps it in .sdata).
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 s8 _st_pri_data[] = {
     STATUS_CHARGE, //charge is elevated
     STATUS_POISON, //poison is elevated
@@ -91,7 +91,7 @@ StChgMsgData _st_chg_msg_data[] = {
     { -1, "", "", "" },
 };
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 //.sdata
 // Status Type Priority Data
 s8 _st_pri_data[] = {
@@ -124,17 +124,17 @@ s8 _st_pri_data[] = {
 #endif
 
 // local prototypes
-void BSE_Sleep(BattleUnit* unit);
-void BSE_SleepDelete(BattleUnit* unit);
-void BSE_Biribiri(BattleUnit* unit);
-void BSE_BiribiriDelete(BattleUnit* unit);
-void BSE_Fire(BattleUnit* unit);
-void BSE_FireDelete(BattleUnit* unit);
-void BSE_Freeze(BattleUnit* unit);
-void BSE_FreezeDelete(BattleUnit* unit);
-void BSE_Kagegakure(BattleUnit* unit);
-void BSE_KagegakureDelete(BattleUnit* unit);
-s32 _get_pri(s8 type);
+static void BSE_Sleep(BattleUnit* unit);
+static void BSE_SleepDelete(BattleUnit* unit);
+static void BSE_Biribiri(BattleUnit* unit);
+static void BSE_BiribiriDelete(BattleUnit* unit);
+static void BSE_Fire(BattleUnit* unit);
+static void BSE_FireDelete(BattleUnit* unit);
+static void BSE_Freeze(BattleUnit* unit);
+static void BSE_FreezeDelete(BattleUnit* unit);
+static void BSE_Kagegakure(BattleUnit* unit);
+static void BSE_KagegakureDelete(BattleUnit* unit);
+static s32 _get_pri(s8 type);
 
 void BattleStatusEffectInit(BattleUnit* unit) {
     ; // stubbed in retail
@@ -163,7 +163,7 @@ EffectEntry* effSparkEntry(s32, s32, f32, f32, f32, f32);
 
 // BSE_Sleep, BSE_SleepDelete, BSE_Biribiri and 1 more size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
-void BSE_Sleep(BattleUnit* unit) {
+static void BSE_Sleep(BattleUnit* unit) {
     f32 x, y, z;
     f32* wk;
     f32 dx, dy;
@@ -193,14 +193,14 @@ void BSE_Sleep(BattleUnit* unit) {
     }
 }
 
-void BSE_SleepDelete(BattleUnit* unit) {
+static void BSE_SleepDelete(BattleUnit* unit) {
     if (EFF_SLEEP(unit) != NULL) {
         effDelete(EFF_SLEEP(unit));
         EFF_SLEEP(unit) = NULL;
     }
 }
 
-void BSE_Biribiri(BattleUnit* unit) {
+static void BSE_Biribiri(BattleUnit* unit) {
     f32 x, y, z;
     f32* wk;
     f32 dy;
@@ -228,7 +228,7 @@ void BSE_Biribiri(BattleUnit* unit) {
     }
 }
 
-void BSE_BiribiriDelete(BattleUnit* unit) {
+static void BSE_BiribiriDelete(BattleUnit* unit) {
     if (EFF_SPARK(unit) != NULL) {
         effDelete(EFF_SPARK(unit));
         EFF_SPARK(unit) = NULL;
@@ -241,7 +241,7 @@ void BSE_BiribiriDelete(BattleUnit* unit) {
 
 // BSE_Fire, BSE_FireDelete, BSE_Freeze and 1 more size-optimised, as in the original (the object differs without it)
 #pragma optimize_for_size on
-void BSE_Fire(BattleUnit* unit) {
+static void BSE_Fire(BattleUnit* unit) {
     f32 x, y, z;
     f32* wk;
     BOOL on = FALSE;
@@ -266,14 +266,14 @@ void BSE_Fire(BattleUnit* unit) {
     }
 }
 
-void BSE_FireDelete(BattleUnit* unit) {
+static void BSE_FireDelete(BattleUnit* unit) {
     if (EFF_FIRE(unit) != NULL) {
         effDelete(EFF_FIRE(unit));
         EFF_FIRE(unit) = NULL;
     }
 }
 
-void BSE_Freeze(BattleUnit* unit) {
+static void BSE_Freeze(BattleUnit* unit) {
     f32 x, y, z;
     f32* wk;
     f32 a, b, sc;
@@ -304,7 +304,7 @@ void BSE_Freeze(BattleUnit* unit) {
     }
 }
 
-void BSE_FreezeDelete(BattleUnit* unit) {
+static void BSE_FreezeDelete(BattleUnit* unit) {
     if (EFF_ICE(unit) != NULL) {
         effSoftDelete(EFF_ICE(unit));
         EFF_ICE(unit) = NULL;
@@ -313,7 +313,7 @@ void BSE_FreezeDelete(BattleUnit* unit) {
 
 #pragma optimize_for_size reset
 
-void BSE_Kagegakure(BattleUnit* unit) {
+static void BSE_Kagegakure(BattleUnit* unit) {
     char name[0x10];
     f32 x, y, z;
     BOOL on = FALSE;
@@ -338,7 +338,7 @@ void BSE_Kagegakure(BattleUnit* unit) {
     }
 }
 
-void BSE_KagegakureDelete(BattleUnit* unit) {
+static void BSE_KagegakureDelete(BattleUnit* unit) {
     if (unit->kageIcon != NULL) {
         iconDelete(unit->kageIcon->name);
         unit->kageIcon = NULL;
@@ -427,7 +427,7 @@ void BattleStatusChangeInfoWorkInit(BattleUnit* unit) {
 // inlining off for _get_pri, BattleStatusChangeInfoSetAnnouce, BattleStatusChangeAnnouceMain and 6 more, as in the original (the object differs without it)
 #pragma dont_inline on
 // type is a StatusEffectType stored as s8 in _st_pri_data
-s32 _get_pri(s8 type) {
+static s32 _get_pri(s8 type) {
     s8* val;
     s32 priority = 24; // _st_pri_data has 24 entries: the first gets 24, the last 1
 
@@ -637,7 +637,7 @@ BOOL BattleStatusChangeMsgMain(BattleWork* wp) {
         dispEntry(CAMERA_2D, 900.0f, 1, (DispCallback)_st_chg_msg_disp, 0);
         break;
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (ret) {
         for (i = 0; i < BATTLE_UNIT_MAX; i++) {
             BattleUnit* unit = BattleGetUnitPtr(wp, i);
@@ -651,7 +651,7 @@ BOOL BattleStatusChangeMsgMain(BattleWork* wp) {
 
 typedef void (*WakuColByRefFunc)(u16, GXColor*, f32, f32, f32, f32, f32);
 
-void _st_chg_msg_disp(void) {
+static void _st_chg_msg_disp(void) {
     StChgWork* st = &_battleWorkPointer->announce.stChg;
     f32 y;
     f32 x;

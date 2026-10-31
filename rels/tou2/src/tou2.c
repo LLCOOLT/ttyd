@@ -385,31 +385,31 @@ static void disp_proc(CameraId cameraId, void* param) {
         Vec pos = cursorPos;
         pos.x = 15.0f + left;
         pos.y = y - 24.0f;
-        iconDispGx(&pos, 0x10, ICON_123, 0.8f);
+        iconDispGx(&pos, ICON_FLAG_2D, ICON_123, 0.8f);
     }
     GXSetScissor(0, 0, 608, 480);
     if (dwp->page > 0) {
         {
             Vec pos = upArrowPos;
             pos.x = left + winW;
-            iconDispGx(&pos, 0x10, ICON_205, -1.0f);
+            iconDispGx(&pos, ICON_FLAG_2D, ICON_205, -1.0f);
         }
         {
             Vec pos = upButtonPos;
             pos.x = left + winW;
-            iconDispGx(&pos, 0x10, ICON_07E, 0.6f);
+            iconDispGx(&pos, ICON_FLAG_2D, ICON_07E, 0.6f);
         }
     }
     if (dwp->page < 1) {
         {
             Vec pos = downArrowPos;
             pos.x = left + winW;
-            iconDispGx(&pos, 0x10, ICON_205, 1.0f);
+            iconDispGx(&pos, ICON_FLAG_2D, ICON_205, 1.0f);
         }
         {
             Vec pos = downButtonPos;
             pos.x = left + winW;
-            iconDispGx(&pos, 0x10, ICON_080, 0.6f);
+            iconDispGx(&pos, ICON_FLAG_2D, ICON_080, 0.6f);
         }
     }
 }
@@ -496,6 +496,15 @@ static USER_FUNC(evt_tou_get_rule_msg2) {
     s32 rank;
 
     if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG3_34_RETURN_TO_ROGUEPORT) {
+#if VERSION <= VERSION_DEMO_US
+        // the demo also counts the fighters taken out of the ranking
+        for (i = 0; i < rank_wp->count; i++) {
+            if (rank_wp->entries[i].flags & RANK_PLAYER) {
+                break;
+            }
+        }
+        rank = i;
+#else
         rank = 0;
         for (i = 0; i < rank_wp->count; i++) {
             if (!(rank_wp->entries[i].flags & RANK_HIDDEN)) {
@@ -505,6 +514,7 @@ static USER_FUNC(evt_tou_get_rule_msg2) {
                 rank++;
             }
         }
+#endif
         if (rank > 10) {
             rules = ruleDt_2bu;
             num = 10;
@@ -537,6 +547,15 @@ static USER_FUNC(evt_tou_get_rule_info) {
     s32 rank;
 
     if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG3_34_RETURN_TO_ROGUEPORT) {
+#if VERSION <= VERSION_DEMO_US
+        // the demo also counts the fighters taken out of the ranking
+        for (i = 0; i < rank_wp->count; i++) {
+            if (rank_wp->entries[i].flags & RANK_PLAYER) {
+                break;
+            }
+        }
+        rank = i;
+#else
         rank = 0;
         for (i = 0; i < rank_wp->count; i++) {
             if (!(rank_wp->entries[i].flags & RANK_HIDDEN)) {
@@ -546,6 +565,7 @@ static USER_FUNC(evt_tou_get_rule_info) {
                 rank++;
             }
         }
+#endif
         if (rank > 10) {
             rules = ruleDt_2bu;
             num = 10;
@@ -709,7 +729,11 @@ static USER_FUNC(evt_tou_get_next_match) {
     if (rank > 0) {
         if (reverse) {
             evtSetValue(event, args[0], list[rank - 1]);
+#if VERSION <= VERSION_DEMO_US
+        } else if (rank != num - 1) {
+#else
         } else if (rank + 1 < num) {
+#endif
             evtSetValue(event, args[0], list[rank + 1]);
         } else {
             evtSetValue(event, args[0], list[rank - 1]);
@@ -980,6 +1004,7 @@ static void insert(s32* arr, s32 n, s32 from, s32 to) {
     }
 }
 
+#if VERSION >= VERSION_JP
 USER_FUNC(tou2_rankingReset) {
     s32 i;
 
@@ -998,6 +1023,7 @@ USER_FUNC(tou2_rankingReset) {
     rankingInit();
     return EVT_RETURN_DONE;
 }
+#endif
 
 static USER_FUNC(evt_rankingReInit) {
     rankingExit();
@@ -1085,7 +1111,11 @@ static void rankingInit(void) {
         }
 
         // If we're past this point in the story, Bandy Andy got "retired" and The Destructors were added.
+#if VERSION <= VERSION_DEMO_US
+        if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) >= STORY_STG3_20_06_RAWK_HAWKS_WARNING) {
+#else
         if (evtGetValue(NULL, GSWF(GSWF_TOU_MAIL4_RECEIVED))) {
+#endif
             rank_wp->entries[FIGHTER_BANDITS].flags |= RANK_HIDDEN;
             rank_wp->entries[FIGHTER_SPINIA].flags &= ~RANK_HIDDEN;
 

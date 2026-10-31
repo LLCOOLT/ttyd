@@ -54,4 +54,3 @@ typedef struct effKemuriData {
 EffectEntry* effKemuriEntry(s32 type, f32 x, f32 y, f32 z, f32 dir);
 // type: callers pass 0; not read
 EffectEntry* effKemuri2Entry(s32 type, f32 x, f32 y, f32 z, f32 dx, f32 dz);
-void effKemuriMain(EffectEntry* effect);

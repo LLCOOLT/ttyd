@@ -11,7 +11,7 @@
 #include "battle/battle_camera.h"
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_sub.h"
@@ -110,7 +110,11 @@ static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {0, 85, 40, 0, 40, 100, 100, 40, 100, 40, 100, 40, 100, 40, 40, 0, 50, 100, 40, 100, 100, 85};
+#else
 static StatusVulnerability regist = {0, 65, 20, 0, 20, 100, 100, 60, 100, 80, 100, 80, 100, 80, 60, 0, 60, 100, 60, 100, 100, 85};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_black_karon", "c_karon_b_h", 0.0f, 0.0f, 0.0f, 0.0f, 35.0f, 0.0f, 0.0f, 45.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
@@ -222,8 +226,8 @@ static PoseTableEntry pose_table[] = {
     {40, "KRN_W_1"},
     {56, "KRN_X_1"},
     {57, "KRN_X_1"},
-    {65, "KRN_T_1"},
-    {69, "KRN_S_1"},
+    {BTL_POSE_TALK, "KRN_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "KRN_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -250,7 +254,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -367,12 +371,12 @@ EVT_END()
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(normal_attack_event))
+        CALL_CHILD(normal_attack_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
-        CALL_CHILD(PTR(rebirth_event))
+        CALL_CHILD(rebirth_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
@@ -389,12 +393,12 @@ static EVT_BEGIN(attack_event)
     CALL(evt_sub_random, LW(0), LW(1))
     SET_VALUE(LW(0), 50)
     IF_INT_LESS(LW(1), LW(0))
-        CALL_CHILD(PTR(normal_attack_event))
+        CALL_CHILD(normal_attack_event)
         GOTO(99)
     END_IF
     ADD(LW(0), 30)
     IF_INT_LESS(LW(1), LW(0))
-        CALL_CHILD(PTR(link_attack_event))
+        CALL_CHILD(link_attack_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -407,7 +411,7 @@ static EVT_BEGIN(attack_event)
             SUBTRACT(LW(2), 10)
             CALL(btlevtcmd_CheckSpace, LW(3), LW(0), LW(1), LW(2), 40, 0, 0, 0)
             IF_INT_EQUAL(LW(3), -1)
-                CALL_CHILD(PTR(call_friend_event))
+                CALL_CHILD(call_friend_event)
                 WAIT_MS(500)
                 GOTO(99)
             END_IF
@@ -423,7 +427,7 @@ static EVT_BEGIN(attack_event)
             CALL(btlevtcmd_CheckSpace, LW(3), LW(0), LW(1), LW(2), 40, 0, 0, 0)
             IF_INT_EQUAL(LW(3), -1)
                 CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 180, 0)
-                CALL_CHILD(PTR(call_friend_event))
+                CALL_CHILD(call_friend_event)
                 CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
                 WAIT_MS(500)
                 GOTO(99)
@@ -598,7 +602,7 @@ static EVT_BEGIN(link_attack_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
@@ -611,13 +615,13 @@ static EVT_BEGIN(link_attack_event)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
     SET_VALUE(LW(12), 2)
-    SPAWN_EVENT(PTR(link_attack_event_sub))
+    SPAWN_EVENT(link_attack_event_sub)
     WAIT_FRAMES(40)
     SET_VALUE(LW(12), 3)
-    SPAWN_EVENT(PTR(link_attack_event_sub))
+    SPAWN_EVENT(link_attack_event_sub)
     WAIT_FRAMES(35)
     SET_VALUE(LW(12), 4)
-    SPAWN_EVENT(PTR(link_attack_event_sub))
+    SPAWN_EVENT(link_attack_event_sub)
     LOOP(0)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
         IF_INT_EQUAL(LW(0), -1)

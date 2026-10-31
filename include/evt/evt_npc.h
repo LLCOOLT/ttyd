@@ -48,7 +48,6 @@ USER_FUNC(evt_npc_set_rotate);
 USER_FUNC(evt_npc_add_rotate);
 USER_FUNC(evt_npc_set_rotate_offset);
 USER_FUNC(evt_npc_move_position);
-f32 _intplGetFloat(s32 mode, f32 t);
 
 NpcEntry* evtNpcNameToPtr(EventEntry* event, const char* name);
 NpcEntry* evtNpcNameToPtr_NoAssert(EventEntry* event, const char* name);
@@ -132,7 +131,7 @@ USER_FUNC(evt_npc_kamek_kemuri1);
 USER_FUNC(evt_npc_kamek_kemuri2);
 USER_FUNC(evt_fbat_trans_floor_position);
 USER_FUNC(evt_fbat_trans_floor_position_wide);
-USER_FUNC(evt_npc_release_fieldnpc);
+USER_FUNC(evt_npc_release_filednpc);
 
 USER_FUNC(evt_npc_set_damage_anim);
 USER_FUNC(evt_npc_set_confuse_anim);
@@ -141,7 +140,3 @@ USER_FUNC(evt_npc_set_stay_anim);
 USER_FUNC(evt_npc_set_talk_anim);
 USER_FUNC(evt_npc_set_walk_anim);
 USER_FUNC(evt_npc_set_run_anim);
-f32 _get_target_dir(EventEntry* event, NpcEntry* npc, const char* targetName);
-void _npc_check_coin(NpcEntry* npc, s32* value);
-void _npc_check_coin_group(NpcEntry* npc, s32* value);
-void _kamek_houki_kemuri(NpcEntry* npc, s32 animState);

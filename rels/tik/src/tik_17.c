@@ -13,7 +13,6 @@
 #include "evt/evt_mobj.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "tik.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
@@ -148,7 +147,7 @@ EVT_END()
 static EVT_BEGIN(evt_switch_00_after)
     IF_INT_EQUAL(GSWF(GSWF_TIK17_PIPE_PIK_OPEN), 0)
         SET_VALUE(LW(0), STRING("dokan_1"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     END_IF
     RETURN
 EVT_END()
@@ -168,7 +167,7 @@ static EVT_BEGIN(evt_switch_00)
     END_LOOP
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("dokan_1_k"), MAPOBJ_FLAG_HIDE)
     SET_VALUE(LW(0), STRING("dokan_1"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     RETURN
 EVT_END()
 
@@ -185,7 +184,7 @@ EVT_END()
 static EVT_BEGIN(evt_switch_01_after)
     IF_INT_EQUAL(GSWF(GSWF_TIK17_PIPE_MUJ_OPEN), 0)
         SET_VALUE(LW(0), STRING("dokan_2"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     END_IF
     RETURN
 EVT_END()
@@ -205,15 +204,19 @@ static EVT_BEGIN(evt_switch_01)
     END_LOOP
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("dokan_2_k"), MAPOBJ_FLAG_HIDE)
     SET_VALUE(LW(0), STRING("dokan_2"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(mobj_box01)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box01"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("item01"), ITEM_FP_PLUS, LW(0), LW(1), LW(2), 16, -1, 0)
+    CALL(evt_item_entry, STRING("item01"), ITEM_FP_PLUS, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_item_flag_on, STRING("item01"), ITEM_FLAG_NO_TOUCH)
+#else
     CALL(evt_item_flag_on, STRING("item01"), ITEM_FLAG_BADGE_RETURN | ITEM_FLAG_NO_TOUCH)
+#endif
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box01"))
     CALL(evt_item_get_item, STRING("item01"))
     CALL(evt_mario_key_onoff, 1)
@@ -224,21 +227,25 @@ EVT_BEGIN(tik_17_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK7"))
     CALL(evt_snd_set_rev_mode, 2)
-    CALL_CHILD(PTR(evt_switch_00_init))
-    CALL_CHILD(PTR(evt_switch_01_init))
+    CALL_CHILD(evt_switch_00_init)
+    CALL_CHILD(evt_switch_01_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_switch_00_after))
-    CALL_CHILD(PTR(evt_switch_01_after))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(evt_switch_00_after)
+    CALL_CHILD(evt_switch_01_after)
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
-    CALL_CHILD(PTR(evt_gazigazi_entry))
+    CALL_CHILD(evt_gazigazi_entry)
     CALL(evt_map_playanim, STRING("anm_mizu"), 1, 0)
     CALL(evt_mobj_lv_blk, STRING("block"), 0, 0, 0, 0, GSWF(GSWF_TIK17_BIG_BLOCK_BROKEN), STRING("MOBJ_Lv2BigBigBlock"))
     IF_INT_EQUAL(GSWF(GSWF_TIK17_BIG_BLOCK_BROKEN), 0)
         CALL(evt_mobj_flag_onoff, 1, STRING("block"), MOBJ_FLAG_NO_CULL)
     END_IF
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_mobj_itembox, STRING("mobj_box01"), -125, 100, -125, 0, 0, PTR(mobj_box01), GSWF(GSWF_TIK17_FP_PLUS_CHEST_OPENED))
+#else
     CALL(evt_mobj_itembox, STRING("mobj_box01"), -125, 100, -110, 0, 0, PTR(mobj_box01), GSWF(GSWF_TIK17_FP_PLUS_CHEST_OPENED))
+#endif
     SET_VALUE(LW(0), STRING("dai_3"))
     SET_VALUE(LW(1), STRING("a_dai_3"))
     SET_VALUE(LW(2), 0)
@@ -249,7 +256,7 @@ EVT_BEGIN(tik_17_init_evt)
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(11), 0)
     SET_VALUE(LW(12), 0)
-    SPAWN_EVENT(PTR(moving_floor))
+    SPAWN_EVENT(moving_floor)
     CALL(evt_mobj_tornadoswitch_blue, 0, STRING("switch00"), -125, 0, 0, PTR(evt_switch_00), GSWF(GSWF_TIK17_PIPE_PIK_OPEN))
     CALL(evt_mobj_tornadoswitch_blue, 0, STRING("switch01"), 125, 0, 0, PTR(evt_switch_01), GSWF(GSWF_TIK17_PIPE_MUJ_OPEN))
     RETURN

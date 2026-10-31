@@ -24,8 +24,8 @@ typedef struct EffUpdownWork {
 
 // FAKE: local prototype: iconGetTexObj takes the icon id as u16 (icondrv.h: s16/s32 by version); this file was compiled with it and the header prototype changes the code.
 extern void iconGetTexObj(GXTexObj* texObj, u16 iconId);
-void effUpdownMain(EffectEntry* effect);
-void effUpdownDisp(CameraId cameraId, EffectEntry* effect);
+static void effUpdownMain(EffectEntry* effect);
+static void effUpdownDisp(CameraId cameraId, EffectEntry* effect);
 
 static u16 icon_id[10] = {ICON_1DA, ICON_1DC, ICON_1DE, ICON_1E0, ICON_1E2, ICON_1E4, ICON_1E6, ICON_1E8, ICON_1EA, ICON_1EC};
 
@@ -58,7 +58,7 @@ EffectEntry* effUpdownEntry(s32 type, f32 x, f32 y, f32 z, s32 number, s32 timer
     return effect;
 }
 
-void effUpdownMain(EffectEntry* effect) {
+static void effUpdownMain(EffectEntry* effect) {
     EffUpdownWork* work = effect->userdata;
     s32 type = work->type;
     s32 mode;
@@ -151,7 +151,7 @@ static void polygon(s32 type, s32 alpha, f32 x, f32 y, f32 w, f32 h, f32 s, f32 
     GXTexCoord2f32(0.0f, t);
 }
 
-void effUpdownDisp(CameraId cameraId, EffectEntry* effect) {
+static void effUpdownDisp(CameraId cameraId, EffectEntry* effect) {
     EffUpdownWork* work = effect->userdata;
     CameraEntry* camera = camGetPtr(cameraId);
     s32 number = work->number;

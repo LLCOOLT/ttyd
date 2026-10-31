@@ -42,8 +42,8 @@ static effN64Vtx opuku_jetwrain_vtx[16] = {
     {-144, -104, -320, 0x280, 0x280, 0, 0, 0, 255},
 };
 
-void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect);
-void effOpukuJetwrainMain(EffectEntry* effect);
+static void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect);
+static void effOpukuJetwrainMain(EffectEntry* effect);
 
 inline f32 sind(f32 deg) {
     return sin(6.2831855f * deg / 360.0f);
@@ -96,7 +96,7 @@ EffectEntry* effOpukuJetwrainN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, 
     return effect;
 }
 
-void effOpukuJetwrainMain(EffectEntry* effect) {
+static void effOpukuJetwrainMain(EffectEntry* effect) {
     s32 life;
     EffOpukuJetwrainWork* work;
     Vec position;
@@ -159,7 +159,7 @@ void effOpukuJetwrainMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effOpukuJetwrainDisp, effect);
 }
 
-void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
+static void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
     s32 px;
     EffOpukuJetwrainWork* work;
     s32 alpha;

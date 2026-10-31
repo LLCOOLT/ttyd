@@ -42,7 +42,6 @@
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
 #include "evt/evt_telop.h"
-#include "party/party_motion.h"
 #include "mri_puni.h"
 #include "driver/mapdrv.h"
 #include "driver/envdrv.h"
@@ -265,10 +264,10 @@ EVT_BEGIN(seal_bigtree2)
     CALL(evt_msg_print_party, STRING("stg2_mri_e03_07"))
     WAIT_MS(300)
     SET_VALUE(LW(0), STRING("me"))
-    SPAWN_EVENT(PTR(mri_puni_jump_se))
+    SPAWN_EVENT(mri_puni_jump_se)
     CALL(evt_npc_jump_position_nohit, STRING("me"), 10, 155, -230, 200, 20)
     SET_VALUE(LW(0), STRING("me"))
-    SPAWN_EVENT(PTR(mri_puni_jump_se))
+    SPAWN_EVENT(mri_puni_jump_se)
     CALL(evt_npc_jump_position_nohit, STRING("me"), 10, 155, -230, 200, 20)
     CALL(evt_cam3d_evt_set, 5, 277, 176, 5, 200, -216, 500, 11)
     WAIT_MS(700)
@@ -289,10 +288,10 @@ EVT_BEGIN(seal_bigtree2)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_03_02_SEALED_ENTRANCE_2)
     CALL(evt_mario_key_onoff, 1)
     SET_VALUE(LW(0), STRING("w_bero"))
-    CALL_CHILD(PTR(bero_case_switch_off))
+    CALL_CHILD(bero_case_switch_off)
     CALL(evt_bero_overwrite, STRING("w_bero"), PTR(bero_lostitem))
     SET_VALUE(LW(0), STRING("w_bero"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     RETURN
 EVT_END()
 
@@ -323,12 +322,12 @@ EVT_END()
 static EVT_BEGIN(guide_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG2_03_THE_GREAT_TREE)
-        SPAWN_EVENT(PTR(seal_bigtree))
+        SPAWN_EVENT(seal_bigtree)
         CASE_EQUAL(STORY_STG2_03_01_SEALED_ENTRANCE)
-        SPAWN_EVENT(PTR(seal_bigtree2))
+        SPAWN_EVENT(seal_bigtree2)
         CASE_EQUAL(STORY_STG2_10_SECRET_ENTRANCE_REVEALED)
         CALL(evt_msg_print, 0, STRING("stg2_mri_e10_05"), 0, STRING("me"))
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         CASE_EQUAL(STORY_STG2_26_PRAISE_FROM_THE_PUNI)
 #else
         CASE_GREATER_OR_EQUAL(STORY_STG2_26_PRAISE_FROM_THE_PUNI)
@@ -491,7 +490,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"ガイド"*/"\x83\x4B\x83\x43\x83\x68", // name
+        "ガイド", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         guide_init, // initEvent
@@ -503,7 +502,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ライバル"*/"\x83\x89\x83\x43\x83\x6F\x83\x8B", // name
+        "ライバル", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         rival_init, // initEvent
@@ -515,7 +514,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ちびトゲ"*/"\x82\xBF\x82\xD1\x83\x67\x83\x51", // name
+        "ちびトゲ", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         chibitoge_init, // initEvent
@@ -527,7 +526,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ガイド妹"*/"\x83\x4B\x83\x43\x83\x68\x96\x85", // name
+        "ガイド妹", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         sister_init, // initEvent
@@ -539,7 +538,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", // name
+        "プニ族長老", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         elder_init, // initEvent
@@ -551,7 +550,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ファビオ"*/"\x83\x74\x83\x40\x83\x72\x83\x49", // name
+        "ファビオ", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         fabio_init, // initEvent
@@ -567,13 +566,13 @@ static NpcSetupInfo npcEnt[] = {
 
 static EVT_BEGIN(bero_01_doa_close)
     SET_VALUE(LW(10), STRING("S_doa"))
-    SPAWN_EVENT(PTR(evt_mri_door_naname_close))
+    SPAWN_EVENT(evt_mri_door_naname_close)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(bero_01_doa_open)
     SET_VALUE(LW(10), STRING("S_doa"))
-    SPAWN_EVENT(PTR(evt_mri_door_naname_open))
+    SPAWN_EVENT(evt_mri_door_naname_open)
     RETURN
 EVT_END()
 
@@ -753,7 +752,7 @@ static USER_FUNC(evt_cloud_main) {
     if (party == NULL) {
         return EVT_RETURN_BLOCK;
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (party->currentMemberId != 5) {
         return EVT_RETURN_BLOCK;
     }
@@ -994,7 +993,7 @@ EVT_BEGIN(open_bigtree)
     CALL(evt_npc_set_position, STRING("ガイド"), LW(0), LW(1), LW(2))
     CALL(evt_mario_clear_party, 1)
     SET_VALUE(LW(0), STRING("ガイド"))
-    SPAWN_EVENT(PTR(mri_puni_jump_se))
+    SPAWN_EVENT(mri_puni_jump_se)
     CALL(evt_npc_jump_position_nohit, STRING("ガイド"), 54, 143, -202, 200, 20)
     CALL(evt_cam3d_evt_set, 187, 288, 213, 187, 205, -216, 2000, 11)
     CALL(evt_npc_set_anim, STRING("ガイド"), STRING("W_1"))
@@ -1010,7 +1009,7 @@ EVT_BEGIN(open_bigtree)
     END_LOOP
     WAIT_MS(200)
     SET_VALUE(LW(0), STRING("ガイド"))
-    SPAWN_EVENT(PTR(mri_puni_jump_se))
+    SPAWN_EVENT(mri_puni_jump_se)
     CALL(evt_npc_jump_position_nohit, STRING("ガイド"), 191, 192, -184, 200, 20)
     SET_VALUE(LW(0), STRING("ガイド"))
     SPAWN_EVENT_GET_ID(PTR(mri_puni_walk_se), LW(9))
@@ -1042,11 +1041,11 @@ EVT_BEGIN(open_bigtree)
     CALL(evt_map_playanim, STRING("light"), 0, 0)
     WAIT_MS(1000)
     SET_VALUE(LW(10), STRING("S_doa"))
-    CALL_CHILD(PTR(evt_mri_door_naname_open_pure))
+    CALL_CHILD(evt_mri_door_naname_open_pure)
     BEGIN_INLINE_EVENT
         WAIT_MS(1500)
         SET_VALUE(LW(10), STRING("S_doa"))
-        SPAWN_EVENT(PTR(evt_mri_door_naname_close_pure))
+        SPAWN_EVENT(evt_mri_door_naname_close_pure)
     END_INLINE_EVENT
     SET_VALUE(LW(0), STRING("ガイド"))
     SPAWN_EVENT_GET_ID(PTR(mri_puni_walk_se), LW(9))
@@ -1061,7 +1060,7 @@ EVT_BEGIN(open_bigtree)
     CALL(evt_npc_flag_onoff, 0, STRING("ガイド"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_10_SECRET_ENTRANCE_REVEALED)
     SET_VALUE(LW(0), STRING("ne_bero"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -1079,7 +1078,7 @@ EVT_BEGIN(mario_see_you)
     CALL(evt_cam3d_evt_set, 180, 130, 567, 180, 44, 127, 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_puni_wait_systemmode, 2)
-    CALL_CHILD(PTR(mario_see_you_init))
+    CALL_CHILD(mario_see_you_init)
     CALL(evt_mario_cont_onoff, 1)
     CALL(evt_party_cont_onoff, 0, 1)
     CALL(evt_seq_wait, 2)
@@ -1112,7 +1111,7 @@ EVT_BEGIN(mario_see_you)
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_off, 1000, 11)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_26_PRAISE_FROM_THE_PUNI)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
 #endif
     CALL(evt_party_run, 0)
@@ -1263,7 +1262,7 @@ EVT_END()
 
 static EVT_BEGIN(sekai_yami_evt)
     CALL(evt_puni_wait_systemmode, 2)
-    SPAWN_EVENT(PTR(puni_set))
+    SPAWN_EVENT(puni_set)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
@@ -1300,24 +1299,24 @@ static EVT_BEGIN(sekai_yami_evt)
     SET_VALUE(LSWF(3), 1)
     SET_VALUE(GW(0), -800)
     SET_VALUE(LW(0), STRING("ライバル"))
-    SPAWN_EVENT(PTR(sekai_yami_npc))
+    SPAWN_EVENT(sekai_yami_npc)
     SET_VALUE(LW(0), STRING("ガイド"))
     SPAWN_EVENT_GET_ID(PTR(sekai_yami_npc), GW(1))
     SET_VALUE(LW(0), STRING("ガイド妹"))
     SPAWN_EVENT_GET_ID(PTR(sekai_yami_npc), GW(2))
     SET_VALUE(LW(0), STRING("プニ族長老"))
-    SPAWN_EVENT(PTR(sekai_yami_npc))
+    SPAWN_EVENT(sekai_yami_npc)
     SET_VALUE(LW(0), 6)
-    SPAWN_EVENT(PTR(sekai_yami_puni))
+    SPAWN_EVENT(sekai_yami_puni)
     SET_VALUE(LW(0), 39)
-    SPAWN_EVENT(PTR(sekai_yami_puni))
+    SPAWN_EVENT(sekai_yami_puni)
     SET_VALUE(LW(0), 88)
-    SPAWN_EVENT(PTR(sekai_yami_puni))
+    SPAWN_EVENT(sekai_yami_puni)
     SET_VALUE(LW(0), 46)
-    SPAWN_EVENT(PTR(sekai_yami_puni))
+    SPAWN_EVENT(sekai_yami_puni)
     SET_VALUE(LW(0), 64)
-    SPAWN_EVENT(PTR(sekai_yami_puni))
-#if VERSION != VERSION_DEMO
+    SPAWN_EVENT(sekai_yami_puni)
+#if VERSION >= VERSION_JP
     BEGIN_INLINE_EVENT
         WAIT_MS(3000)
         CALL(evt_sub_intpl_msec_init, 11, 255, 0, 1000)
@@ -1365,7 +1364,7 @@ EVT_END()
 
 static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_puni_wait_systemmode, 2)
-    SPAWN_EVENT(PTR(puni_set))
+    SPAWN_EVENT(puni_set)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
@@ -1379,7 +1378,7 @@ static EVT_BEGIN(minnnanokoe_evt)
     CALL(evt_npc_set_ry, STRING("プニ族長老"), 270)
     CALL(evt_npc_set_position, STRING("ライバル"), -100, 0, 225)
     CALL(evt_npc_set_ry, STRING("ライバル"), 270)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_yuka_hika_02"), MAPOBJ_FLAG_HIDE)
 #endif
     CALL(evt_map_set_tevcallback, 1, PTR(envSetYami))
@@ -1558,11 +1557,11 @@ EVT_BEGIN(mri_00_init_evt)
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(9), 0)
-    CALL_CHILD(PTR(mri_puni_init))
-    CALL_CHILD(PTR(evt_switch_init))
+    CALL_CHILD(mri_puni_init)
+    CALL_CHILD(evt_switch_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_cam_road_reset)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_05_BOWSER_PETALBURG)
         CALL(evt_mario_get_party, LW(15))
@@ -1579,22 +1578,22 @@ EVT_BEGIN(mri_00_init_evt)
 #else
         END_IF
 #endif
-        SPAWN_EVENT(PTR(mario_see_you))
+        SPAWN_EVENT(mario_see_you)
     END_IF
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_GREATER_OR_EQUAL(STORY_STG2_25_05_BOWSER_PETALBURG)
         IF_INT_EQUAL(GSWF(GSWF_MRI_LEFT_TREE_AFTER_STG2), 0)
 #endif
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_26_PRAISE_FROM_THE_PUNI)
 #endif
             BEGIN_INLINE_EVENT
                 CALL(evt_puni_wait_systemmode, 2)
-                SPAWN_EVENT(PTR(mario_see_you_init))
+                SPAWN_EVENT(mario_see_you_init)
             END_INLINE_EVENT
         END_IF
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     END_SWITCH
 #endif
     CALL(evt_map_playanim, STRING("hikari_01"), 1, 0)
@@ -1606,12 +1605,12 @@ EVT_BEGIN(mri_00_init_evt)
     SET_VALUE(LW(1), 1)
     SET_VALUE(LW(2), -295)
     SET_FLOAT_VALUE(LW(3), FLOAT(1.0f))
-    SPAWN_EVENT(PTR(mri_waterfall_effect))
+    SPAWN_EVENT(mri_waterfall_effect)
     SET_VALUE(LW(0), 531)
     SET_VALUE(LW(1), 1)
     SET_VALUE(LW(2), 118)
     SET_FLOAT_VALUE(LW(3), FLOAT(1.0f))
-    SPAWN_EVENT(PTR(mri_waterfall_effect))
+    SPAWN_EVENT(mri_waterfall_effect)
     SET_VALUE(LF(0), 0)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
         CALL(evt_bero_get_entername, LW(0))
@@ -1638,26 +1637,26 @@ EVT_BEGIN(mri_00_init_evt)
             CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_MRI2"))
         END_IF
     END_IF
-    CALL(evt_item_entry, STRING("i"), ITEM_FP_PLUS, 528, 0, 110, 0, GSWF(GSWF_MRI00_FP_PLUS_TAKEN), 0)
+    CALL(evt_item_entry, STRING("i"), ITEM_FP_PLUS, 528, 0, 110, ITEM_ENTRY_STAY, GSWF(GSWF_MRI00_FP_PLUS_TAKEN), 0)
     CALL(evt_npc_setup, PTR(npcEnt))
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_10_SECRET_ENTRANCE_REVEALED)
         IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_AFTER_THE_BOSS_BATTLE)
             IF_INT_EQUAL(GSWF(GSWF_MRI00_PUNIO_FOLLOWING), 1)
-                CALL_CHILD(PTR(odoriko_1_init))
-                CALL_CHILD(PTR(odoriko_2_init))
-                CALL_CHILD(PTR(odoriko_3_init))
+                CALL_CHILD(odoriko_1_init)
+                CALL_CHILD(odoriko_2_init)
+                CALL_CHILD(odoriko_3_init)
             END_IF
         END_IF
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_02_TO_THE_GREAT_TREE)
-        SPAWN_EVENT(PTR(first_bigtree))
+        SPAWN_EVENT(first_bigtree)
     END_IF
     IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_09_FLURRIE_JOINS)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_non"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mri_cloud_init)
         CALL(evt_mri_cloud_ent, PTR(&capturemap), STRING("A_kaze"), PTR(open_bigtree))
         SET_VALUE(LW(0), STRING("ne_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     ELSE
         CALL(evt_map_playanim, STRING("light"), 2, 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_tree_futa"), MAPOBJ_FLAG_HIDE)
@@ -1666,10 +1665,10 @@ EVT_BEGIN(mri_00_init_evt)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
         CALL(evt_bero_get_entername, LW(0))
         IF_STR_EQUAL(LW(0), STRING("sekai_yami1"))
-            SPAWN_EVENT(PTR(sekai_yami_evt))
+            SPAWN_EVENT(sekai_yami_evt)
         END_IF
         IF_STR_EQUAL(LW(0), STRING("minnnanokoe"))
-            SPAWN_EVENT(PTR(minnnanokoe_evt))
+            SPAWN_EVENT(minnnanokoe_evt)
         END_IF
     END_IF
 #if VERSION >= VERSION_US

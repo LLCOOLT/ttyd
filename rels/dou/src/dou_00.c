@@ -16,18 +16,17 @@
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
 #include "evt/evt_telop.h"
-#include "party/party_motion.h"
 #include "dou.h"
 #include "evt/evt_story.h"
 
-void water_tev(MapTevCallbackInfo* info);
+static void water_tev(MapTevCallbackInfo* info);
 
 static BeroEntry bero_entry_data[3];
 extern EvtWord totsunyu_event[];
 
 static EVT_BEGIN(bero_in_event)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_19_SKULL_ROCK)
-        CALL_CHILD(PTR(totsunyu_event))
+        CALL_CHILD(totsunyu_event)
     END_IF
     SET_VALUE(LW(0), 0)
     RETURN
@@ -92,7 +91,7 @@ EVT_BEGIN(totsunyu_event)
     WAIT_MS(1000)
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("stg5_dou_00"), 0, 0)
-    SPAWN_EVENT(PTR(back_light))
+    SPAWN_EVENT(back_light)
     WAIT_MS(200)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_19_01_ENTERING_THE_GROTTO)
     CALL(evt_mario_key_onoff, 1)
@@ -108,17 +107,17 @@ EVT_BEGIN(dou_00_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     WAIT_FRAMES(1)
     CALL(evt_map_playanim, STRING("nami"), 1, 0)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), 30, 85, -75, 0, 0)
-    CALL(evt_item_entry, STRING("item_01"), ITEM_RUIN_POWDER, -245, 0, 85, 16, GSWF(GSWF_DOU00_RUIN_POWDER_TAKEN), 0)
+    CALL(evt_item_entry, STRING("item_01"), ITEM_RUIN_POWDER, -245, 0, 85, ITEM_ENTRY_FIXED, GSWF(GSWF_DOU00_RUIN_POWDER_TAKEN), 0)
     CALL(evt_map_set_tevcallback, 1, PTR(water_tev))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("s00_suimen"), MAPOBJ_TEV_CALLBACK(1))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("s00_suimen"), MAPOBJ_FLAG_DISPLAY_LIST)
     RETURN
 EVT_END()
 
-void water_tev(MapTevCallbackInfo* info) {
+static void water_tev(MapTevCallbackInfo* info) {
     envSetWater(info);
 }

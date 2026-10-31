@@ -10,7 +10,6 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_map.h"
 #include "evt/evt_msg.h"
-#include "party/party_motion.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 #include "evt/evt_eff.h"
@@ -23,8 +22,16 @@ BattleUnitKind unit_boss_zonbaba;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
+#if VERSION <= VERSION_DEMO_US
+static PoseTableEntry pose_table[7];
+#else
 static PoseTableEntry pose_table[9];
+#endif
+#if VERSION <= VERSION_DEMO_US
+static PoseTableEntry pose_table_weak[7];
+#else
 static PoseTableEntry pose_table_weak[9];
+#endif
 static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[2];
 BattleWeapon weapon_zonbaba_fumituke_attack;
@@ -82,7 +89,11 @@ BattleUnitKind unit_boss_zonbaba = {
 #endif
     0.0f,
     0.0f,
+#if VERSION <= VERSION_DEMO_US
+    250.0f,
+#else
     20.0f,
+#endif
     0.0f,
     250.0f,
     0.0f,
@@ -125,25 +136,29 @@ static StatusVulnerability regist = {0, 0, 0, 100, 0, 100, 100, 0, 0, 0, 100, 0,
 static PoseTableEntry pose_table[] = {
     {1, "GNB_N_1"},
     {5, "GNB_X_1"},
+#if VERSION >= VERSION_JP
     {3, "GNB_X_1"},
     {2, "GNB_Z_1"},
+#endif
     {28, "GNB_S_3"},
-    {65, "GNB_T_3"},
+    {BTL_POSE_TALK, "GNB_T_3"},
     {31, "GNB_S_3"},
     {39, "GNB_D_1"},
-    {69, "GNB_S_3"},
+    {BTL_POSE_STAY_DEFAULT, "GNB_S_3"},
 };
 
 static PoseTableEntry pose_table_weak[] = {
     {1, "GNB_N_1"},
     {5, "GNB_X_1"},
+#if VERSION >= VERSION_JP
     {3, "GNB_X_1"},
     {2, "GNB_N_1"},
+#endif
     {28, "GNB_S_4"},
-    {65, "GNB_T_4"},
+    {BTL_POSE_TALK, "GNB_T_4"},
     {31, "GNB_S_4"},
     {39, "GNB_V_1"},
-    {69, "GNB_S_4"},
+    {BTL_POSE_STAY_DEFAULT, "GNB_S_4"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -546,7 +561,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -1047,30 +1062,34 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(0)
+#if VERSION <= VERSION_DEMO_US
+        CALL(btlevtcmd_DrawLots, LW(0), 6, 30, 15, 10, 10, 10, 10)
+#else
         CALL(btlevtcmd_DrawLots, LW(0), 6, 25, 20, 10, 10, 10, 10)
+#endif
         SWITCH(LW(0))
             CASE_EQUAL(0)
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_fumituke_attack))
-            CALL_CHILD(PTR(fumituke_attack_event))
+            CALL_CHILD(fumituke_attack_event)
             CASE_EQUAL(1)
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_kamituki_attack))
-            CALL_CHILD(PTR(kamituki_attack_event))
+            CALL_CHILD(kamituki_attack_event)
             CASE_EQUAL(2)
             SET_VALUE(LW(13), STRING("SFX_BOSS_GNB_BREATH_COLD1"))
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_cold_attack))
-            CALL_CHILD(PTR(breath2_attack_event))
+            CALL_CHILD(breath2_attack_event)
             CASE_EQUAL(3)
             SET_VALUE(LW(13), STRING("SFX_BOSS_GNB_BREATH_CHANGE1"))
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_confuze_attack))
-            CALL_CHILD(PTR(breath1_attack_event))
+            CALL_CHILD(breath1_attack_event)
             CASE_EQUAL(4)
             SET_VALUE(LW(13), STRING("SFX_BOSS_GNB_BREATH_CHANGE1"))
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_sleep_attack))
-            CALL_CHILD(PTR(breath2_attack_event))
+            CALL_CHILD(breath2_attack_event)
             CASE_EQUAL(5)
             SET_VALUE(LW(13), STRING("SFX_BOSS_GNB_BREATH_CHANGE1"))
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_minimini_attack))
-            CALL_CHILD(PTR(breath1_attack_event))
+            CALL_CHILD(breath1_attack_event)
         END_SWITCH
         CASE_EQUAL(1)
         SET_VALUE(LW(1), 0)
@@ -1078,33 +1097,37 @@ static EVT_BEGIN(attack_event)
         IF_INT_NOT_EQUAL(LW(0), 0)
             SET_VALUE(LW(1), 20)
         END_IF
+#if VERSION <= VERSION_DEMO_US
+        CALL(btlevtcmd_DrawLots, LW(0), 7, 30, 15, 10, 10, 10, 10, LW(1))
+#else
         CALL(btlevtcmd_DrawLots, LW(0), 7, 25, 20, 10, 10, 10, 10, LW(1))
+#endif
         SWITCH(LW(0))
             CASE_EQUAL(0)
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_fumituke_attack))
-            CALL_CHILD(PTR(fumituke_attack_event))
+            CALL_CHILD(fumituke_attack_event)
             CASE_EQUAL(1)
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_kamituki_attack))
-            CALL_CHILD(PTR(kamituki_attack_event))
+            CALL_CHILD(kamituki_attack_event)
             CASE_EQUAL(2)
             SET_VALUE(LW(13), STRING("SFX_BOSS_GNB_BREATH_COLD1"))
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_cold_attack))
-            CALL_CHILD(PTR(breath2_attack_event))
+            CALL_CHILD(breath2_attack_event)
             CASE_EQUAL(3)
             SET_VALUE(LW(13), STRING("SFX_BOSS_GNB_BREATH_CHANGE1"))
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_confuze_attack))
-            CALL_CHILD(PTR(breath1_attack_event))
+            CALL_CHILD(breath1_attack_event)
             CASE_EQUAL(4)
             SET_VALUE(LW(13), STRING("SFX_BOSS_GNB_BREATH_CHANGE1"))
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_sleep_attack))
-            CALL_CHILD(PTR(breath2_attack_event))
+            CALL_CHILD(breath2_attack_event)
             CASE_EQUAL(5)
             SET_VALUE(LW(13), STRING("SFX_BOSS_GNB_BREATH_CHANGE1"))
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_minimini_attack))
-            CALL_CHILD(PTR(breath1_attack_event))
+            CALL_CHILD(breath1_attack_event)
             CASE_EQUAL(6)
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_recover))
-            CALL_CHILD(PTR(recover_event))
+            CALL_CHILD(recover_event)
         END_SWITCH
         CASE_EQUAL(2)
         SET_VALUE(LW(1), 0)
@@ -1112,33 +1135,37 @@ static EVT_BEGIN(attack_event)
         IF_INT_NOT_EQUAL(LW(0), 0)
             SET_VALUE(LW(1), 50)
         END_IF
+#if VERSION <= VERSION_DEMO_US
+        CALL(btlevtcmd_DrawLots, LW(0), 7, 30, 15, 10, 10, 10, 10, LW(1))
+#else
         CALL(btlevtcmd_DrawLots, LW(0), 7, 25, 20, 10, 10, 10, 10, LW(1))
+#endif
         SWITCH(LW(0))
             CASE_EQUAL(0)
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_fumituke_attack))
-            CALL_CHILD(PTR(fumituke_attack_event))
+            CALL_CHILD(fumituke_attack_event)
             CASE_EQUAL(1)
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_kamituki_attack))
-            CALL_CHILD(PTR(kamituki_attack_event))
+            CALL_CHILD(kamituki_attack_event)
             CASE_EQUAL(2)
             SET_VALUE(LW(13), STRING("SFX_BOSS_GNB_BREATH_COLD1"))
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_cold_attack))
-            CALL_CHILD(PTR(breath2_attack_event))
+            CALL_CHILD(breath2_attack_event)
             CASE_EQUAL(3)
             SET_VALUE(LW(13), STRING("SFX_BOSS_GNB_BREATH_CHANGE1"))
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_confuze_attack))
-            CALL_CHILD(PTR(breath1_attack_event))
+            CALL_CHILD(breath1_attack_event)
             CASE_EQUAL(4)
             SET_VALUE(LW(13), STRING("SFX_BOSS_GNB_BREATH_CHANGE1"))
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_sleep_attack))
-            CALL_CHILD(PTR(breath2_attack_event))
+            CALL_CHILD(breath2_attack_event)
             CASE_EQUAL(5)
             SET_VALUE(LW(13), STRING("SFX_BOSS_GNB_BREATH_CHANGE1"))
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_minimini_attack))
-            CALL_CHILD(PTR(breath1_attack_event))
+            CALL_CHILD(breath1_attack_event)
             CASE_EQUAL(6)
             SET_VALUE(LW(9), PTR(&weapon_zonbaba_recover))
-            CALL_CHILD(PTR(recover_event))
+            CALL_CHILD(recover_event)
         END_SWITCH
     END_SWITCH
     LABEL(99)

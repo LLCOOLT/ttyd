@@ -13,7 +13,6 @@
 #include "evt/evt_party.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "jin.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
@@ -84,8 +83,12 @@ EVT_END()
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("item00"), ITEM_FLOWER_SAVER, LW(0), LW(1), LW(2), 16, -1, 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_FLOWER_SAVER, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
+#else
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_BADGE_RETURN | ITEM_FLAG_NO_TOUCH)
+#endif
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_item, STRING("item00"))
     CALL(evt_mario_key_onoff, 1)
@@ -99,8 +102,8 @@ EVT_BEGIN(jin_06_init_evt)
     CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(evt_usu_kagemario_party_kill)
     CALL(evt_mobj_itembox, STRING("mobj_box00"), 650, 0, -150, 0, 0, PTR(mobj_box00), GSWF(GSWF_JIN06_FLOWER_SAVER_CHEST_OPENED))
     CALL(evt_mobj_jumpstand_red, 0, STRING("mobj_jump"), 0, 0, 0, PTR(jin_06_jumpstand), 0)
     IF_INT_NOT_EQUAL(GSWF(GSWF_STG4_DROP_IN_ENTRANCE), 0)

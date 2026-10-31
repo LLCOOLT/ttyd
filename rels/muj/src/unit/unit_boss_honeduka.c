@@ -94,7 +94,7 @@ static PoseTableEntry pose_table[] = {
     {28, "KRT_Z_1"},
     {31, "KRT_Z_1"},
     {39, "KRT_Z_1"},
-    {69, "KRT_Z_1"},
+    {BTL_POSE_STAY_DEFAULT, "KRT_Z_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -118,13 +118,17 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
 EVT_BEGIN(honeduka_damage_sub_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(3))
+#if VERSION <= VERSION_DEMO_US
+    CALL(btlevtcmd_RunDataEventChild, LW(3), 70)
+#else
     CALL(btlevtcmd_RunDataEventChild, LW(3), 71)
+#endif
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()

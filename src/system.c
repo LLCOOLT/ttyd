@@ -36,7 +36,7 @@ static f32 angleABTBL[] = { 1.0f,       1.273187f,  1.27303f,   1.272768f,  1.27
 const char* build_date_ptr = R_build_date;
 const char* build_time_ptr = R_build_time;
 
-// FAKE: stand-in for the assertion helper JP, US and the demo strip (PAL keeps it, below); it only
+// FAKE: stand-in for the assertion helper JP, US and both demos strip (PAL keeps it, below); it only
 // keeps the original's message string in its place in .rodata.
 #if VERSION != VERSION_EU
 const char* systemStrippedPool0(void) {
@@ -244,7 +244,7 @@ static u8 tmp1[0x100];
 
 static s32 (*comp)(const void* a, const void* b);
 
-void fsort(void** base, u32 n) {
+static void fsort(void** base, u32 n) {
     static void** lo;
     static void** hi;
     static void** gt;
@@ -517,7 +517,7 @@ static inline DEMOPadStatus* GET_DEMO_PAD_STATUS(u32 i) {
 
 void makeKey(void) {
     s32 delay;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // The demo keeps button/dirs in 32-bit locals: with no u16 masks to fold, the global optimiser's constant
     // propagation changes nothing in makeKey, so its dead-li deletion never runs and loop 2's count register
     // is colour-coalesced with i's zero (the demo's loop-2 register assignment).
@@ -592,7 +592,7 @@ void makeKey(void) {
     }
 #endif
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (gp->rumbleEnabled) {
         for (i = 0; i < 4; i++) {
             if (gp->rumbleHardStop[i]) {
@@ -1021,7 +1021,7 @@ void systemStrippedPool1(const char** str, f32* f, f64* d, f32 x) {
 #else
 void systemStrippedPool1(const char** str, f32* f, f64* d, f32 x) {
     f[0] = 1.0f;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // the demo's small-data limit leaves the 6-byte names in .rodata, so the whole name table stays
     str[0] = "LINEAR";
     str[1] = "ACCEL";

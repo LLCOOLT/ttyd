@@ -20,11 +20,10 @@
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
 
-USER_FUNC(map_anim_flag_off);
+static USER_FUNC(map_anim_flag_off);
 static USER_FUNC(peach_evt_toumei);
 
 static BeroEntry bero_entry_data[2];
@@ -39,7 +38,11 @@ extern EvtWord peach_evt_tana1[];
 extern EvtWord peach_evt_tana2[];
 
 static EVT_BEGIN(w_door_close)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("door_w_A"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("door_w_B"), 0, 0, LW(0))
@@ -47,7 +50,11 @@ static EVT_BEGIN(w_door_close)
 EVT_END()
 
 static EVT_BEGIN(w_door_open)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("door_w_A"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("door_w_B"), 0, 0, LW(0))
@@ -148,7 +155,7 @@ EVT_BEGIN(evt_gajigaji_main)
     CALL(evt_npc_set_scale, LW(10), LW(0), LW(0), LW(0))
     CALL(evt_sub_random, 100, LW(0))
     IF_INT_LESS(LW(0), 50)
-        SPAWN_EVENT(PTR(evt_gajigaji_anim))
+        SPAWN_EVENT(evt_gajigaji_anim)
     END_IF
     LOOP(0)
         CALL(evt_sub_random, 600, LW(0))
@@ -165,22 +172,22 @@ EVT_END()
 EVT_BEGIN(evt_gajigaji)
     SET_VALUE(LW(0), STRING("gazi1"))
     SET_VALUE(LW(1), -280)
-    SPAWN_EVENT(PTR(evt_gajigaji_main))
+    SPAWN_EVENT(evt_gajigaji_main)
     SET_VALUE(LW(0), STRING("gazi2"))
     SET_VALUE(LW(1), -275)
-    SPAWN_EVENT(PTR(evt_gajigaji_main))
+    SPAWN_EVENT(evt_gajigaji_main)
     SET_VALUE(LW(0), STRING("gazi3"))
     SET_VALUE(LW(1), -270)
-    SPAWN_EVENT(PTR(evt_gajigaji_main))
+    SPAWN_EVENT(evt_gajigaji_main)
     SET_VALUE(LW(0), STRING("gazi4"))
     SET_VALUE(LW(1), -265)
-    SPAWN_EVENT(PTR(evt_gajigaji_main))
+    SPAWN_EVENT(evt_gajigaji_main)
     SET_VALUE(LW(0), STRING("gazi5"))
     SET_VALUE(LW(1), -260)
-    SPAWN_EVENT(PTR(evt_gajigaji_main))
+    SPAWN_EVENT(evt_gajigaji_main)
     SET_VALUE(LW(0), STRING("gazi6"))
     SET_VALUE(LW(1), -255)
-    SPAWN_EVENT(PTR(evt_gajigaji_main))
+    SPAWN_EVENT(evt_gajigaji_main)
     RETURN
 EVT_END()
 
@@ -195,7 +202,11 @@ EVT_BEGIN(peach_evt_disksys)
         CALL(evt_mario_key_onoff, 1)
         RETURN
     END_IF
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_win_item_select, PTR(item_list), LW(0))
+#else
     CALL(evt_win_item_select, 0, PTR(item_list), LW(0), 0)
+#endif
     IF_INT_NOT_EQUAL(LW(0), -1)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("monitor_02"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("monitor_03"), MAPOBJ_FLAG_HIDE)
@@ -233,7 +244,7 @@ EVT_END()
 EVT_BEGIN(peach_evt_tana1)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_msg_print, 0, STRING("peach_aji_245"), 0, STRING("mario"))
-    CALL(evt_item_entry, STRING("disk"), ITEM_DATA_DISK, 0, -1000, 0, 17, -1, 0)
+    CALL(evt_item_entry, STRING("disk"), ITEM_DATA_DISK, 0, -1000, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     WAIT_FRAMES(1)
     CALL(evt_item_get_item, STRING("disk"))
     WAIT_MS(500)
@@ -280,10 +291,10 @@ static EVT_BEGIN(peach_evt_stg5)
     CALL(evt_seq_wait, 2)
     CALL(evt_bero_exec_wait, 65536)
     SET_VALUE(LW(0), STRING("w_bero"))
-    CALL_CHILD(PTR(bero_case_switch_off))
+    CALL_CHILD(bero_case_switch_off)
     CALL(evt_bero_overwrite, STRING("w_bero"), PTR(bero_peach_data))
     SET_VALUE(LW(0), STRING("w_bero"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     IF_INT_EQUAL(GSWF(GSWF_AJI11_PEACH5_ROOM_REMARK), 0)
         CALL(evt_mario_key_onoff, 0)
         WAIT_MS(500)
@@ -302,10 +313,12 @@ EVT_BEGIN(aji_11_init_evt)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
     END_SWITCH
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI6"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 1)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_map_playanim, STRING("sikaku"), 1, 0)
     CALL(evt_map_playanim, STRING("mizu_1"), 1, 0)
     CALL(evt_map_playanim, STRING("mizu_2"), 1, 0)
@@ -314,7 +327,7 @@ EVT_BEGIN(aji_11_init_evt)
     CALL(evt_map_playanim, STRING("mizutama_2"), 1, 0)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG7_00_START)
         IF_INT_EQUAL(GSWF(GSWF_AJI11_CARD_KEY_TAKEN), 0)
-            CALL(evt_item_entry, STRING("dummy"), ITEM_CARD_KEY_0x1F, 50, 25, 25, 16, -1, PTR(key_evt))
+            CALL(evt_item_entry, STRING("dummy"), ITEM_CARD_KEY_0x1F, 50, 25, 25, ITEM_ENTRY_FIXED, -1, PTR(key_evt))
         END_IF
     END_IF
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("monitor_02"), MAPOBJ_FLAG_HIDE)
@@ -323,15 +336,15 @@ EVT_BEGIN(aji_11_init_evt)
         IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_46_PEACH_DISK_SEARCH)
             CALL(evt_mario_set_mode, 1)
             CALL(evt_mario_kill_party, 0)
-            SPAWN_EVENT(PTR(peach_evt_stg5))
+            SPAWN_EVENT(peach_evt_stg5)
         END_IF
     END_IF
-    SPAWN_EVENT(PTR(evt_gajigaji))
-    SPAWN_EVENT(PTR(evt_emergency))
+    SPAWN_EVENT(evt_gajigaji)
+    SPAWN_EVENT(evt_emergency)
     RETURN
 EVT_END()
 
-USER_FUNC(map_anim_flag_off) {
+static USER_FUNC(map_anim_flag_off) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 mask = evtGetValue(event, args[1]);

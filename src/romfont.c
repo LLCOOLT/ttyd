@@ -4,7 +4,7 @@
 #include "dolphin/types.h"
 #include "memory.h"
 #include "version.h"
-#if VERSION == VERSION_DEMO || VERSION >= VERSION_US
+#if VERSION != VERSION_JP
 #include "mario/mariost.h"
 #endif
 #include <dolphin/os.h>
@@ -196,7 +196,7 @@ const char* msg_it[21] = {
 
 static const char** msg_tbl[6] = {msg_jp, msg_us, msg_ge, msg_fr, msg_sp, msg_it};
 #else
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 const char* msg_jp[9] = {
 #else
 const char* msg_jp[10] = {
@@ -209,7 +209,7 @@ const char* msg_jp[10] = {
     "ディスクカバーが開いています。\n\nゲームを続ける場合は、\nディスクカバーを閉めてください。",
     "ペーパーマリオＲＰＧの\nディスクをセットしてください。",
     "ディスクを読めませんでした。\n\nくわしくは、本体の取扱説明書を\nお読みください。",
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     "エラーが発生しました。\n\n本体のパワーボタンを押して電源をOFFにし、\n本体の取扱説明書の指示に従ってください。",
 #endif
     NULL
@@ -231,10 +231,10 @@ static const char** msg_tbl[2] = { msg_jp, msg_us };
 #endif
 
 // local prototypes
-void romFontMake(void);
+static void romFontMake(void);
 
 const char* romFontGetMessage(s32 msg) {
-#if VERSION == VERSION_DEMO || VERSION >= VERSION_US
+#if VERSION != VERSION_JP
     if (wp->language != 0 && (u32)gp->language == 0) {
         return msg_tbl[1][msg];
     }
@@ -255,7 +255,7 @@ void romFontInit(void) {
     romFontMake();
 }
 
-void romFontMake(void) {
+static void romFontMake(void) {
     char c[16];
     s32 width;
     OSFontHeader* fontData;

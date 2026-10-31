@@ -32,18 +32,18 @@
 #include "evt/evt_pouch.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
+#include "party.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "version.h"
 #include "evt/evt_story.h"
 
 static u8* _ap;
-void puniModeEventparent(PuniData* puni);
+static void puniModeEventparent(PuniData* puni);
 
 static void alpha_tev(MapTevCallbackInfo* info);
 static USER_FUNC(alpha_init_func);
 static USER_FUNC(alpha_set_func);
-void puniModeEventparent(PuniData* puni);
+static void puniModeEventparent(PuniData* puni);
 
 extern EvtWord jail_alpha_mario_check[];
 extern EvtWord jail_alpha[];
@@ -144,7 +144,7 @@ EVT_BEGIN(jail_alpha)
     IF_INT_EQUAL(GSWF(GSWF_MRI03_STAR_PIECE_PANEL), 0)
         CALL(evt_map_blend_set_mobj_flag, 1, STRING("kururin1"), ANIM_MATERIAL_FLAG_NO_BLEND)
     END_IF
-    SPAWN_EVENT(PTR(jail_alpha_mario_check))
+    SPAWN_EVENT(jail_alpha_mario_check)
     SET_VALUE(LW(10), 255)
     SET_VALUE(GW(2), 255)
     SET_VALUE(GW(3), 255)
@@ -220,7 +220,7 @@ EVT_BEGIN(elder_rescue)
     CALL(evt_npc_flag_onoff, 1, STRING("プニ族長老"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("ガイド"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("ガイド"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
-    CALL_CHILD(PTR(mri_guide_goryu))
+    CALL_CHILD(mri_guide_goryu)
     CALL(evt_puni_set_mode, 1, PUNI_MODE_INERT)
     CALL(evt_puni_get_position, 1, LW(0), LW(1), LW(2))
     CALL(evt_puni_set_position, 1, 0, -1000, 0)
@@ -489,7 +489,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"プニ族長老"*/"\x83\x76\x83\x6A\x91\xB0\x92\xB7\x98\x56", // name
+        "プニ族長老", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         elder_init, // initEvent
@@ -501,7 +501,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ガイド妹"*/"\x83\x4B\x83\x43\x83\x68\x96\x85", // name
+        "ガイド妹", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         sister_init, // initEvent
@@ -513,7 +513,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ガイド"*/"\x83\x4B\x83\x43\x83\x68", // name
+        "ガイド", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         guide_init, // initEvent
@@ -525,7 +525,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"プニ族３"*/"\x83\x76\x83\x6A\x91\xB0\x82\x52", // name
+        "プニ族３", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         puni_3_init, // initEvent
@@ -668,13 +668,13 @@ EVT_BEGIN(evt_opendoor00)
 EVT_END()
 
 static EVT_BEGIN(evt_unlock00)
-    CALL_CHILD(PTR(red_jail_open))
-    SPAWN_EVENT(PTR(elder_rescue))
+    CALL_CHILD(red_jail_open)
+    SPAWN_EVENT(elder_rescue)
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_unlock00_01)
-    SPAWN_EVENT(PTR(red_jail_open))
+    SPAWN_EVENT(red_jail_open)
     RETURN
 EVT_END()
 
@@ -685,7 +685,7 @@ s32 key_table00[] = {
 EVT_BEGIN(evt_check00)
     CALL(evt_pouch_check_item, ITEM_RED_KEY, LW(0))
     IF_INT_GREATER(LW(0), 0)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         CALL(evt_win_item_select, PTR(key_table00), LW(0))
 #else
         CALL(evt_win_item_select, 0, PTR(key_table00), LW(0), 0)
@@ -721,7 +721,7 @@ EVT_BEGIN(blue_jail_open)
 #endif
     CALL(evt_mario_key_onoff, 1)
 #if VERSION <= VERSION_JP
-    SPAWN_EVENT(PTR(guide_sister))
+    SPAWN_EVENT(guide_sister)
     CALL(evt_exit_case_evt)
 #endif
     RETURN
@@ -741,7 +741,7 @@ static EVT_BEGIN(evt_unlock01)
 #else
     CALL(evt_pouch_remove_item, ITEM_BLUE_KEY, LW(0))
 #endif
-    SPAWN_EVENT(PTR(blue_jail_open))
+    SPAWN_EVENT(blue_jail_open)
     RETURN
 EVT_END()
 
@@ -752,7 +752,7 @@ s32 key_table01[] = {
 EVT_BEGIN(evt_check01)
     CALL(evt_win_item_maketable, PTR(key_table01), LW(10))
     IF_INT_NOT_EQUAL(LW(10), 0)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         CALL(evt_win_item_select, LW(10), LW(0))
 #else
         CALL(evt_win_item_select, 0, LW(10), LW(0), 0)
@@ -818,7 +818,7 @@ EVT_BEGIN(bluejail_event)
     DELETE_EVENT(GW(0))
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envoff, PSND_FADE_OUT)
-    CALL_CHILD(PTR(bluejail_alpha))
+    CALL_CHILD(bluejail_alpha)
     CALL(evt_npc_set_position, STRING("ガイド妹"), -192, 0, -120)
     CALL(evt_npc_set_ry_lr, STRING("ガイド妹"), 1)
     CALL(evt_npc_flag_onoff, 1, STRING("ガイド妹"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
@@ -846,11 +846,7 @@ EVT_BEGIN(bluejail_event)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e19_00"), 0, STRING("プニ族"))
     CALL(evt_npc_get_position, STRING("ガイド妹"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_PUNIKO_KINOKO1"), LW(0), LW(1), LW(2), 0)
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("item00"), ITEM_DRIED_SHROOM, LW(0), LW(1), LW(2), 15, -1, 0)
-#else
-    CALL(evt_item_entry, STRING("item00"), ITEM_DRIED_SHROOM, LW(0), LW(1), LW(2), 16, -1, 0)
-#endif
+    CALL(evt_item_entry, STRING("item00"), ITEM_DRIED_SHROOM, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
     ADD(LW(0), 20)
     CALL(evt_item_move_3d_position, STRING("item00"), LW(0), LW(1), LW(2), 300, 0)
@@ -919,7 +915,7 @@ s32 JailAwayTable_New[] = {
     -220, -25, -190, 0, -160, 40, 10000,
 };
 
-void puniModeEventparent(PuniData* puni) {
+static void puniModeEventparent(PuniData* puni) {
     s32* tbl = JailAwayTable_New;
     s32 i;
     s32 bestIdx;
@@ -1087,8 +1083,8 @@ EVT_BEGIN(guide_sister)
         CALL(evt_puni_flag_onoff, LW(10), 0, 1048576)
         ADD(LW(10), 1)
     END_LOOP
-    SPAWN_EVENT(PTR(mario_kirimomi_event))
-    SPAWN_EVENT(PTR(party_kirimomi_event))
+    SPAWN_EVENT(mario_kirimomi_event)
+    SPAWN_EVENT(party_kirimomi_event)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_NOKO_SAIKAI1"))
     CALL(evt_npc_flag_onoff, 1, STRING("ガイド"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("ガイド妹"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
@@ -1173,11 +1169,7 @@ EVT_BEGIN(guide_sister)
     WAIT_MS(200)
     CALL(evt_npc_get_position, LW(11), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_PUNIKO_KINOKO1"), LW(0), LW(1), LW(2), 0)
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("item00"), ITEM_DRIED_SHROOM, LW(0), LW(1), LW(2), 15, -1, 0)
-#else
-    CALL(evt_item_entry, STRING("item00"), ITEM_DRIED_SHROOM, LW(0), LW(1), LW(2), 16, -1, 0)
-#endif
+    CALL(evt_item_entry, STRING("item00"), ITEM_DRIED_SHROOM, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
     ADD(LW(0), 20)
     CALL(evt_item_move_3d_position, STRING("item00"), LW(0), LW(1), LW(2), 500, 0)
@@ -1199,7 +1191,7 @@ EVT_BEGIN(guide_sister)
     END_INLINE_EVENT
     CALL(evt_npc_set_anim, LW(10), STRING("T_1"))
     WAIT_MS(2000)
-    SPAWN_EVENT(PTR(kinoko_small))
+    SPAWN_EVENT(kinoko_small)
     CALL(evt_msg_print, 0, STRING("stg2_mri_e20_07"), 0, LW(10))
     WAIT_FRAMES(1)
     DELETE_EVENT(LW(9))
@@ -1279,7 +1271,7 @@ EVT_END()
 
 EVT_BEGIN(toraware_elder)
     CALL(evt_mario_key_onoff, 0)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(evt_puni_wait_systemmode, 2)
 #endif
     CALL(evt_bero_exec_wait, 65536)
@@ -1290,8 +1282,8 @@ EVT_BEGIN(toraware_elder)
     BEGIN_INLINE_EVENT
         CALL(evt_party_set_dir, 0, 270, 200)
     END_INLINE_EVENT
-#if VERSION != VERSION_DEMO
-    CALL_CHILD(PTR(mri_guide_hagure_check))
+#if VERSION >= VERSION_JP
+    CALL_CHILD(mri_guide_hagure_check)
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_puni_set_lsw_index, LSW(0), 0, 0, 0, 0, 0)
         CALL(evt_puni_set_trap_index, 1, 0)
@@ -1401,7 +1393,7 @@ EVT_BEGIN(guide_sister_before)
     CALL(evt_party_set_dir, 0, 270, 0)
     CALL(evt_bero_exec_wait, 65536)
     WAIT_MS(500)
-    CALL_CHILD(PTR(mri_guide_hagure_check))
+    CALL_CHILD(mri_guide_hagure_check)
     IF_INT_NOT_EQUAL(LW(1), 0)
         CALL(evt_puni_set_position, 1, 240, 0, 0)
         CALL(evt_puni_move_position, 1, 240, 40, FLOAT(120.0f))
@@ -1446,14 +1438,14 @@ EVT_BEGIN(mri_03_init_evt)
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(9), 0)
-    CALL_CHILD(PTR(mri_puni_init))
+    CALL_CHILD(mri_puni_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    SPAWN_EVENT(PTR(puni_disp_info))
-    SPAWN_EVENT(PTR(mri_countdown))
+    CALL_CHILD(evt_bero_info_run)
+    SPAWN_EVENT(puni_disp_info)
+    SPAWN_EVENT(mri_countdown)
     SET_VALUE(LW(0), PTR(ueki_access_data))
-    CALL_CHILD(PTR(evt_sub_kusa_access_entry))
+    CALL_CHILD(evt_sub_kusa_access_entry)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG2_23_TIME_BOMB_ACTIVATED, STORY_STG2_23_01_X_NAUT_BATTLE)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
@@ -1476,33 +1468,33 @@ EVT_BEGIN(mri_03_init_evt)
     CALL(evt_map_playanim, STRING("hikari_01"), 1, 0)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG2_12_RIVAL_ARRIVAL, STORY_STG2_19_01_PUNIO_AND_PETUNI_BEFORE)
-        SPAWN_EVENT(PTR(jail_init_00))
+        SPAWN_EVENT(jail_init_00)
     END_SWITCH
     CALL(evt_mobj_lock, STRING("mobj_lock00"), ITEM_RED_KEY, 65, 10, -70, 0, PTR(evt_check00), PTR(evt_unlock00), GSWF(GSWF_MRI03_RED_CELL_UNLOCKED))
     IF_INT_EQUAL(GSWF(GSWF_MRI03_RED_CELL_UNLOCKED), 1)
         IF_INT_EQUAL(GSWF(GSWF_MRI03_RED_CELL_DOOR_OPEN), 1)
-            SPAWN_EVENT(PTR(evt_opendoor00))
+            SPAWN_EVENT(evt_opendoor00)
         ELSE
-            SPAWN_EVENT(PTR(evt_unlock00_01))
+            SPAWN_EVENT(evt_unlock00_01)
         END_IF
     END_IF
     CALL(evt_mobj_lock, STRING("mobj_lock01"), PTR(key_table01), -245, 10, -70, 0, PTR(evt_check01), PTR(evt_unlock01), GSWF(GSWF_MRI03_BLUE_CELL_UNLOCKED))
     IF_INT_EQUAL(GSWF(GSWF_MRI03_BLUE_CELL_UNLOCKED), 1)
         IF_INT_EQUAL(GSWF(GSWF_MRI03_BLUE_CELL_DOOR_OPEN), 1)
-            SPAWN_EVENT(PTR(evt_opendoor01))
+            SPAWN_EVENT(evt_opendoor01)
         ELSE
-            SPAWN_EVENT(PTR(evt_unlock01))
+            SPAWN_EVENT(evt_unlock01)
         END_IF
     END_IF
     SPAWN_EVENT_GET_ID(PTR(jail_alpha), GW(0))
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_18_JABBLE)
-        SPAWN_EVENT(PTR(bluejail_event))
+        SPAWN_EVENT(bluejail_event)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_12_01_A_DARK_FIGURE)
-        SPAWN_EVENT(PTR(toraware_elder))
+        SPAWN_EVENT(toraware_elder)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_19_INSIDE_THE_BLUE_CELL)
-        SPAWN_EVENT(PTR(guide_sister_before))
+        SPAWN_EVENT(guide_sister_before)
     END_IF
     RETURN
 EVT_END()

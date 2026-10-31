@@ -27,7 +27,7 @@
 #include "evt/evt_cam.h"
 #include <dolphin/pad.h>
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 s32 m_w_7_sync[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 9, 8, 7, 5, 3, 1, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 9, 8, 6, 4, 3, 2, 1, 0, 0, 0, 0, 0};
 #endif
 
@@ -41,7 +41,7 @@ static EVT_BEGIN(quake_evt)
     RETURN
 EVT_END()
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo defines the sync table after the quake scripts.
 s32 m_w_7_sync[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 9, 8, 7, 5, 3, 1, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 9, 8, 6, 4, 3, 2, 1, 0, 0, 0, 0, 0};
 #endif
@@ -78,7 +78,7 @@ static inline void bomheiStopSfx(PartyEntry* party) {
 
 // Stops the sounds of a bomb use; the demo also has a third one, liftSfxId.
 static inline void bomheiStopUseSfx(PartyEntry* party) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if ((u32)party->work.bomhei.liftSfxId != 0xFFFFFFFFU) {
         psndSFXOff(party->work.bomhei.liftSfxId);
         party->work.bomhei.liftSfxId = -1;
@@ -136,7 +136,7 @@ u8 bomheiGetStatus() {
     return status;
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 void bomhei_exit(PartyEntry* party) {
     party->playerPtr->flags &= ~(MARIO_FLAG_ACTIVE << 13);
     bomheiStopUseSfx(party);
@@ -180,9 +180,9 @@ void bomhei_use_post(PartyEntry* party) {
     BOMHEI_FREE(party);
 }
 
-void bomhei_use_main(PartyEntry* party);
-void mario_controll(PartyEntry* party);
-HitEntry* check_front(PartyEntry* party);
+static void bomhei_use_main(PartyEntry* party);
+static void mario_controll(PartyEntry* party);
+static HitEntry* check_front(PartyEntry* party);
 
 void bomhei_use(PartyEntry* party) {
     MarioWork* mario;
@@ -287,9 +287,9 @@ void bomhei_use_post(PartyEntry* party) {
     BOMHEI_FREE(party);
 }
 
-void bomhei_use_main(PartyEntry* party);
-void mario_controll(PartyEntry* party);
-HitEntry* check_front(PartyEntry* party);
+static void bomhei_use_main(PartyEntry* party);
+static void mario_controll(PartyEntry* party);
+static HitEntry* check_front(PartyEntry* party);
 
 void bomhei_use(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
@@ -355,7 +355,7 @@ static inline s16 bomheiToS16(f32 x) {
 
 #define BWORK(p) ((BomheiWork*)(p)->useStruct)
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo checks only the first hit object present.
 static inline void bomheiChkHitAttr(PartyEntry* party) {
     u32 attr;
@@ -424,14 +424,14 @@ static inline void bomheiSetHoldPos(PartyEntry* party) {
     party->displayDirection = mario->displayDirection;
 }
 
-void bomhei_use_main(PartyEntry* party) {
+static void bomhei_use_main(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     f32 x, z;
     f32 tmp;
 
     if (party->trigFlags & PARTY_TRIG_FLAG_CHG_RUN_MODE) {
         party->trigFlags &= ~PARTY_TRIG_FLAG_CHG_RUN_MODE;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         party->flags &= ~(PARTY_FLAG_IS_JUMPING | PARTY_FLAG_IS_FALLING | PARTY_FLAG_IS_STEPPING);
         party->flags &= ~(PARTY_FLAG_DISABLE_FRONT_WALL_CHK | PARTY_FLAG_FORCE_FALL);
         party->flags &= ~PARTY_FLAG_DISABLE_FLOORS;
@@ -491,7 +491,7 @@ void bomhei_use_main(PartyEntry* party) {
             }
             bomheiSetHoldPos(party);
             bomheiChkHitAttr(party);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             if ((party->flags & PARTY_FLAG_IS_EVT_USE) || !(mario->buttonHold & PAD_BUTTON_X)) {
 #else
             if ((party->flags & PARTY_FLAG_IS_EVT_USE) ||
@@ -504,7 +504,7 @@ void bomhei_use_main(PartyEntry* party) {
 
     switch (party->useMotionId) {
         case 20:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             party->work.bomhei.liftSfxId = psndSFXOn_3D((const char*)0x939, &party->playerPtr->position);
 #else
             psndSFXOn_3D((const char*)0x939, &party->playerPtr->position);
@@ -546,7 +546,7 @@ void bomhei_use_main(PartyEntry* party) {
             break;
         case 22:
             partyMoveNoHosei(party);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             if (party->hitobjStandOn != NULL) {
                 party->useMotionId = !(BWORK(party)->flags & 4) ? 30 : 50;
             }
@@ -585,7 +585,7 @@ void bomhei_use_main(PartyEntry* party) {
             break;
     }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (BWORK(party)->timer > 0) {
         BWORK(party)->timer--;
         if (BWORK(party)->timer == (s16)sysMsec2Frame(2500)) {
@@ -649,7 +649,7 @@ void bomhei_use_main(PartyEntry* party) {
                 psndSFXOff(party->work.bomhei.sfxId);
                 party->work.bomhei.sfxId = -1;
             }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             party->work.bomhei.sfxId2 = psndSFXOn_3D((const char*)0x93D, &party->playerPtr->position);
 #else
             if ((u32)party->work.bomhei.sfxId2 == 0xFFFFFFFFU) {
@@ -691,7 +691,7 @@ void bomhei_use_main(PartyEntry* party) {
         case 60: {
             EffectEntry* eff;
             bomheiStopSfx(party);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             psndSFXOn_3D((const char*)0x93B, &party->position);
 #endif
             BWORK(party)->timer = 0;
@@ -702,7 +702,7 @@ void bomhei_use_main(PartyEntry* party) {
             } else {
                 evtEntryType(quake_evt, 0, 0, 0);
             }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             psndSFXOn_3D((const char*)0x93B, &party->position);
 #endif
             eff = effSandarsEntry(pouchGetPartyAttackLv((PartyId)3), party->position.x,
@@ -731,7 +731,7 @@ void bomhei_use_main(PartyEntry* party) {
         case 80:
             if (--party->moveFrames <= 0) {
                 Vec pos;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 partyGetReturnPos(&pos);
 #else
                 partyGetAppearPos(party, &pos);
@@ -752,17 +752,17 @@ void bomhei_use_main(PartyEntry* party) {
         case 81: {
             HitEntry* hit;
             f32 limit;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             f32 groundY, dropDepth;
 #endif
             f32 sx, sy, sz;
             if (37.0f + mario->position.y > party->position.y) {
                 party->flags &= ~PARTY_FLAG_FORCE_FALL;
             }
-#if VERSION == VERSION_DEMO
-            hit = partySearchGround(party, &groundY, &dropDepth, 11.0f, party->velY);
+#if VERSION <= VERSION_DEMO_US
+            hit = _partySearchGround(party, &groundY, &dropDepth, 11.0f, party->velY);
 #else
-            hit = partySearchGround(party, 11.0f, party->velY);
+            hit = _partySearchGround(party, 11.0f, party->velY);
 #endif
             limit = mario->screenY - 25.0f;
             marioGetScreenPos(party->position, &sx, &sy, &sz);
@@ -844,7 +844,7 @@ s32 mario_bomhei_keychk2() {
     return 1;
 }
 
-void mario_controll(PartyEntry* party) {
+static void mario_controll(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     s32 cnt;
 
@@ -908,7 +908,7 @@ void mario_controll(PartyEntry* party) {
     }
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo probes straight down from the moved point and keeps the point itself.
 static inline BOOL bomheiChkReturnGround(Vec* pos, f32 dist, f32 angle) {
     f32 x, y, z;
@@ -1037,7 +1037,7 @@ void partyGetReturnPos(Vec* out) {
     out->z = z;
 }
 
-HitEntry* check_front(PartyEntry* party) {
+static HitEntry* check_front(PartyEntry* party) {
     const s32 angles[8] = {0, 45, -45, 90, -90, 135, -135, 180};
     static const Vec down = {0.0f, -1.0f, 0.0f};
     HitCheckQuery q;

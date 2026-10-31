@@ -115,7 +115,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {70, 80, 70, 100, 80, 100, 100, 70, 100, 75, 100, 75, 100, 70, 70, 90, 80, 100, 70, 100, 100, 95};
+#else
 static StatusVulnerability regist = {80, 80, 80, 100, 80, 100, 100, 70, 100, 90, 100, 90, 100, 90, 70, 90, 70, 100, 70, 100, 100, 95};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
@@ -132,8 +136,8 @@ static PoseTableEntry pose_table[] = {
     {39, "D_1"},
     {42, "R_1"},
     {40, "W_1"},
-    {65, "T_1"},
-    {69, "S_1"},
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -142,7 +146,11 @@ static BattleDataEntry data_table[] = {
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_gundan_zako_magician", "c_zako_m", 0.0f, 0.0f, 0.0f, 0.0f, 28.0f, 0.0f, 0.0f, 38.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
+#if VERSION <= VERSION_DEMO_US
+    {2, "btl_un_gundan_zako_magician", "c_zako_m", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
+#else
     {2, "btl_un_gundan_zako_magician", "c_zako_m", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13018000, 0, pose_table},
+#endif
 };
 
 static BattleWeapon weapon_gundan_zako_magician_fire_bottle = {
@@ -168,7 +176,11 @@ static BattleWeapon weapon_gundan_zako_magician_fire_bottle = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
+#if VERSION <= VERSION_DEMO_US
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
+#else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
+#endif
     COUNTER_RESIST_ALL, // counterResistFlags
     TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
@@ -206,7 +218,11 @@ static BattleWeapon weapon_gundan_zako_magician_hunyahunya_bottle = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
+#if VERSION <= VERSION_DEMO_US
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
+#else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
+#endif
     COUNTER_RESIST_ALL, // counterResistFlags
     TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
@@ -286,7 +302,11 @@ static BattleWeapon weapon_gundan_zako_magician_minimini_bottle = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
+#if VERSION <= VERSION_DEMO_US
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
+#else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE, // special
+#endif
     COUNTER_RESIST_ALL, // counterResistFlags
     TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
@@ -420,14 +440,14 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(fire_bottle_event))
+        CALL_CHILD(fire_bottle_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
@@ -454,35 +474,35 @@ static EVT_BEGIN(attack_event)
     CALL(evt_sub_random, LW(0), LW(1))
     SET_VALUE(LW(0), 20)
     IF_INT_LESS(LW(1), LW(0))
-        CALL_CHILD(PTR(fire_bottle_event))
+        CALL_CHILD(fire_bottle_event)
         GOTO(99)
     END_IF
     ADD(LW(0), 10)
     IF_INT_LESS(LW(1), LW(0))
-        CALL_CHILD(PTR(hunyahunya_bottle_event))
+        CALL_CHILD(hunyahunya_bottle_event)
         GOTO(99)
     END_IF
     ADD(LW(0), 10)
     IF_INT_LESS(LW(1), LW(0))
         CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 7, LW(2))
         IF_INT_EQUAL(LW(2), 0)
-            CALL_CHILD(PTR(yokeyoke_bottle_event))
+            CALL_CHILD(yokeyoke_bottle_event)
             GOTO(99)
         END_IF
     END_IF
     ADD(LW(0), 20)
     IF_INT_LESS(LW(1), LW(0))
-        CALL_CHILD(PTR(minimini_bottle_event))
+        CALL_CHILD(minimini_bottle_event)
         GOTO(99)
     END_IF
     ADD(LW(0), 10)
     IF_INT_LESS(LW(1), LW(0))
-        CALL_CHILD(PTR(one_recover_event))
+        CALL_CHILD(one_recover_event)
         GOTO(99)
     END_IF
     ADD(LW(0), 5)
     IF_INT_LESS(LW(1), LW(0))
-        CALL_CHILD(PTR(all_recover_event))
+        CALL_CHILD(all_recover_event)
         GOTO(99)
     END_IF
     GOTO(10)
@@ -495,7 +515,7 @@ static EVT_BEGIN(attack_event)
     CALL(evt_sub_random, LW(0), LW(1))
     SET_VALUE(LW(0), 60)
     IF_INT_LESS(LW(1), LW(0))
-        CALL_CHILD(PTR(fire_bottle_event))
+        CALL_CHILD(fire_bottle_event)
         GOTO(99)
     END_IF
     ADD(LW(0), 20)
@@ -503,7 +523,7 @@ static EVT_BEGIN(attack_event)
         CALL(kanbu_get_id, LW(3), LW(4))
         CALL(btlevtcmd_CheckStatus, LW(3), 7, LW(2))
         IF_INT_EQUAL(LW(2), 0)
-            CALL_CHILD(PTR(yokeyoke_bottle_event_with_kanbu))
+            CALL_CHILD(yokeyoke_bottle_event_with_kanbu)
             GOTO(99)
         END_IF
     END_IF
@@ -512,7 +532,7 @@ static EVT_BEGIN(attack_event)
         CALL(kanbu_get_id, LW(3), LW(4))
         CALL(btlevtcmd_CheckStatus, LW(3), 23, LW(2))
         IF_INT_EQUAL(LW(2), 0)
-            CALL_CHILD(PTR(ziwaziwa_bottle_event))
+            CALL_CHILD(ziwaziwa_bottle_event)
             GOTO(99)
         END_IF
     END_IF
@@ -745,13 +765,13 @@ static EVT_BEGIN(fire_bottle_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
-    CALL_CHILD(PTR(attack_common_event1))
-    CALL_CHILD(PTR(attack_common_event2))
+    CALL_CHILD(attack_common_event1)
+    CALL_CHILD(attack_common_event2)
     LABEL(99)
     RETURN
 EVT_END()
@@ -764,13 +784,13 @@ static EVT_BEGIN(hunyahunya_bottle_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
-    CALL_CHILD(PTR(attack_common_event1))
-    CALL_CHILD(PTR(attack_common_event2))
+    CALL_CHILD(attack_common_event1)
+    CALL_CHILD(attack_common_event2)
     LABEL(99)
     RETURN
 EVT_END()
@@ -987,8 +1007,8 @@ EVT_END()
 static EVT_BEGIN(yokeyoke_bottle_event_with_kanbu)
     SET_VALUE(LW(9), PTR(&weapon_gundan_zako_magician_yokeyoke_bottle))
     CALL(kanbu_get_id, LW(3), LW(4))
-    CALL_CHILD(PTR(attack_common_event1))
-    CALL_CHILD(PTR(attack_common_event3))
+    CALL_CHILD(attack_common_event1)
+    CALL_CHILD(attack_common_event3)
     LABEL(99)
     RETURN
 EVT_END()
@@ -996,8 +1016,8 @@ EVT_END()
 static EVT_BEGIN(ziwaziwa_bottle_event)
     SET_VALUE(LW(9), PTR(&weapon_gundan_zako_magician_ziwaziwa_bottle))
     CALL(kanbu_get_id, LW(3), LW(4))
-    CALL_CHILD(PTR(attack_common_event1))
-    CALL_CHILD(PTR(attack_common_event3))
+    CALL_CHILD(attack_common_event1)
+    CALL_CHILD(attack_common_event3)
     LABEL(99)
     RETURN
 EVT_END()

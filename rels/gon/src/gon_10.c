@@ -6,7 +6,7 @@
 #include "evt/evt_map.h"
 #include "evt/evt_mobj.h"
 #include "evt/evt_npc.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "gon.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
@@ -88,7 +88,7 @@ static BeroEntry bero_entry_data[] = {
 EVT_BEGIN(gon_10_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_GON3"))
     CALL(evt_npc_change_fbat_mode, 1)

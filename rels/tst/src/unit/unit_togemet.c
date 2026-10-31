@@ -6,7 +6,7 @@
 #include "battle/battle_camera.h"
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 #include "evt/evt_eff.h"
@@ -14,7 +14,11 @@
 BattleUnitKind unit_togemet;
 static PoseTableEntry pose_table[17];
 static PoseTableEntry pose_table_ceil[17];
+#if VERSION <= VERSION_DEMO_US
+static PoseTableEntry pose_table_turn[14];
+#else
 static PoseTableEntry pose_table_turn[16];
+#endif
 static BattleDataEntry data_table[4];
 static BattleDataEntry data_table_ceil[14];
 static BattleWeapon weapon_met_attack;
@@ -26,16 +30,32 @@ static BattleUnitDefenseAttr defence_attr_turn;
 static StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
 static EvtWord init_event[12];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord init_event2[142];
+#else
 static EvtWord init_event2[148];
+#endif
 static EvtWord dmg_avoid_counter_thorn_head_event[61];
 static EvtWord damage_event[10];
 static EvtWord dmg_turn_event[82];
 static EvtWord attack_event[546];
 static EvtWord wait_event[6];
 static EvtWord damage_event_ceil[49];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord counter_damage_event_ceil[70];
+#else
 static EvtWord counter_damage_event_ceil[76];
+#endif
+#if VERSION <= VERSION_DEMO_US
+static EvtWord ceil_fall_ready_event[157];
+#else
 static EvtWord ceil_fall_ready_event[163];
+#endif
+#if VERSION <= VERSION_DEMO_US
+static EvtWord attack_event_ceil[420];
+#else
 static EvtWord attack_event_ceil[426];
+#endif
 static EvtWord wait_event_ceil[6];
 
 BattleUnitKind unit_togemet = {
@@ -121,7 +141,7 @@ static PoseTableEntry pose_table[] = {
     {42, "TMT_R_1"},
     {56, "TMT_X_1"},
     {57, "TMT_X_1"},
-    {69, "TMT_S_1"},
+    {BTL_POSE_STAY_DEFAULT, "TMT_S_1"},
 };
 
 static PoseTableEntry pose_table_ceil[] = {
@@ -141,7 +161,7 @@ static PoseTableEntry pose_table_ceil[] = {
     {42, "STM_R_1"},
     {56, "STM_X_1"},
     {57, "STM_X_1"},
-    {69, "STM_S_1"},
+    {BTL_POSE_STAY_DEFAULT, "STM_S_1"},
 };
 
 static PoseTableEntry pose_table_turn[] = {
@@ -156,11 +176,13 @@ static PoseTableEntry pose_table_turn[] = {
     {30, "TMT_Q_2"},
     {31, "TMT_A_1"},
     {39, "TMT_S_3"},
+#if VERSION >= VERSION_JP
     {40, "TMT_W_1"},
     {42, "TMT_R_1"},
+#endif
     {56, "TMT_S_3"},
     {57, "TMT_S_3"},
-    {69, "TMT_S_3"},
+    {BTL_POSE_STAY_DEFAULT, "TMT_S_3"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -210,7 +232,11 @@ static BattleWeapon weapon_met_attack = {
     2, // reserved_6F
     NULL, // acHelpMsg
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
+#if VERSION <= VERSION_DEMO_US
+    COUNTER_RESIST_ALL, // counterResistFlags
+#else
     COUNTER_RESIST_ELECTRIC | COUNTER_RESIST_TOP_SPIKY | COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_FIERY | COUNTER_RESIST_ICY | COUNTER_RESIST_POISON | COUNTER_RESIST_EXPLOSIVE | COUNTER_RESIST_VOLATILE_EXPLOSIVE | COUNTER_RESIST_HOLD_FAST, // counterResistFlags
+#endif
     TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
@@ -246,7 +272,11 @@ static BattleWeapon weapon_met_ceil_attack = {
     2, // reserved_6F
     NULL, // acHelpMsg
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE | SPECIAL_FLIPS_SHELLED | SPECIAL_GROUNDS_WINGED, // special
+#if VERSION <= VERSION_DEMO_US
+    COUNTER_RESIST_ALL, // counterResistFlags
+#else
     COUNTER_RESIST_ELECTRIC | COUNTER_RESIST_TOP_SPIKY | COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_FIERY | COUNTER_RESIST_ICY | COUNTER_RESIST_POISON | COUNTER_RESIST_EXPLOSIVE | COUNTER_RESIST_VOLATILE_EXPLOSIVE | COUNTER_RESIST_HOLD_FAST, // counterResistFlags
+#endif
     TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
@@ -267,7 +297,11 @@ static BattleUnitDefense defence_turn = {0};
 
 static BattleUnitDefenseAttr defence_attr_turn = {0};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {60, 90, 75, 100, 75, 100, 0, 75, 100, 75, 100, 75, 100, 75, 75, 60, 65, 100, 75, 100, 100, 95};
+#else
 static StatusVulnerability regist = {75, 90, 75, 100, 75, 100, 0, 75, 100, 90, 100, 90, 100, 95, 75, 60, 30, 100, 75, 100, 100, 95};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_togemet", "c_met", 0.0f, 0.0f, 0.0f, 0.0f, 23.0f, 0.0f, 0.0f, 28.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0x1, pose_table},
@@ -275,7 +309,7 @@ static BattleUnitKindPart parts[] = {
 
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(15))
-    CALL_CHILD(PTR(init_event2))
+    CALL_CHILD(init_event2)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -307,7 +341,9 @@ static EVT_BEGIN(init_event2)
         CALL(btlevtcmd_SetEventCeilFall, BTL_UNIT_SELF, PTR(ceil_fall_ready_event))
         CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, -50, 0)
         CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, -50, 0)
+#if VERSION >= VERSION_JP // the JP demo has no kiss move offsets
         CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 14, -17, 0)
+#endif
     END_IF
     CALL(btlevtcmd_SetRunSound, BTL_UNIT_SELF, STRING("SFX_ENM_MET_MOVE1L"), STRING("SFX_ENM_MET_MOVE1R"), 0, 3, 3)
     CALL(btlevtcmd_SetWalkSound, BTL_UNIT_SELF, STRING("SFX_ENM_MET_MOVE1L"), STRING("SFX_ENM_MET_MOVE1R"), 0, 6, 6)
@@ -338,7 +374,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -376,7 +412,7 @@ static EVT_BEGIN(wakeup_event)
     CALL(btlevtcmd_SetPartsDefenceAttrTable, LW(10), LW(11), PTR(&defence_attr))
     CALL(btlevtcmd_OffStatusFlag, LW(10), 1)
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table))
-    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 69)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_INSIDE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(1.0f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -498,7 +534,7 @@ static EVT_BEGIN(attack_event)
     WAIT_MS(250)
     CALL(evt_snd_sfxoff, LW(15))
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ENM_MET_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(10.0f), FLOAT(0.39941406f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -542,7 +578,7 @@ EVT_END()
 static EVT_BEGIN(damage_event_ceil)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 512, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 2048, LW(0))
@@ -556,7 +592,7 @@ static EVT_BEGIN(damage_event_ceil)
     END_IF
     CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(ceil_fall_ready_event))
+        CALL_CHILD(ceil_fall_ready_event)
     END_IF
     RETURN
 EVT_END()
@@ -570,14 +606,16 @@ static EVT_BEGIN(counter_damage_event_ceil)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
     CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 14, 17, 0)
+#endif
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), 0, LW(2))
-    CALL_CHILD(PTR(init_event2))
+    CALL_CHILD(init_event2)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_GetDamageCode, LW(10), LW(0))
-    CALL_CHILD(PTR(subsetevt_counter_damage))
+    CALL_CHILD(subsetevt_counter_damage)
     RETURN
 EVT_END()
 
@@ -597,14 +635,16 @@ static EVT_BEGIN(ceil_fall_ready_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
     CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 14, 17, 0)
+#endif
     CALL_CHILD(init_event2)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_SetPartsDefenceTable, LW(10), LW(11), PTR(&defence_turn))
     CALL(btlevtcmd_SetPartsDefenceAttrTable, LW(10), LW(11), PTR(&defence_attr_turn))
     CALL(btlevtcmd_AnimeSetPoseTable, LW(10), LW(11), PTR(pose_table_turn))
-    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), 69)
+    CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_OnStatusFlag, LW(10), 1)
     CALL(btlevtcmd_SetOverTurnCount, LW(10), 1)
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(1.0f))
@@ -705,8 +745,10 @@ static EVT_BEGIN(attack_event_ceil)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
     CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_SetKissHitOffset, BTL_UNIT_SELF, 14, 17, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
+#endif
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(3.0f), FLOAT(0.19921875f))
     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 25)

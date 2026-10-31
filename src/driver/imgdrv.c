@@ -23,12 +23,12 @@ static ImageWork* wp = &work;
 
 // local prototypes
 static void zFill(void);
-void imgDisp(CameraId camId, void* param);
-void imgDisp_ProjPlane(CameraId camId, void* param);
-void imgCapture_Prim(ImageEntry* entry, s32 id);
-void imgCapture(CameraId camId, void* param);
+static void imgDisp(CameraId camId, void* param);
+static void imgDisp_ProjPlane(CameraId camId, void* param);
+static void imgCapture_Prim(ImageEntry* entry, s32 id);
+static void imgCapture(CameraId camId, void* param);
 
-void imgShadowDisp(CameraId camId, void* param);
+static void imgShadowDisp(CameraId camId, void* param);
 
 static void zFill(void) {
     static s32 depth_image[32] ATTRIBUTE_ALIGN(32) = {// GX texture: 32-byte aligned (US .data placement shows it)
@@ -94,7 +94,7 @@ static void zFill(void) {
     GXSetColorUpdate(GX_TRUE);
 }
 
-void imgDisp(CameraId camId, void* param) {
+static void imgDisp(CameraId camId, void* param) {
     ImageEntry* entry = param;
     ImageShadow* sh;
     GXTexObj* texs[3];
@@ -143,12 +143,12 @@ void imgDisp(CameraId camId, void* param) {
         }
     }
     if (first == -1) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         entry->flags |= 0x10000000;
 #endif
         return;
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     entry->flags &= ~0x10000000;
 #endif
     animSetPaperTexMtx(mp[0], mp[1], mp[2]);
@@ -204,7 +204,7 @@ void imgDisp(CameraId camId, void* param) {
     animPoseDrawMtx(entry->poseId, m3, 2, 0.0f, scale);
     animPoseDrawMtx(entry->poseId, m3, 3, 0.0f, scale);
     animSetPaperTexMtx(NULL, NULL, NULL);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     sysWaitDrawSync();
 #else
     e2 = wp->entries;
@@ -218,7 +218,7 @@ void imgDisp(CameraId camId, void* param) {
 #endif
 }
 
-void imgDisp_ProjPlane(CameraId camId, void* param) {
+static void imgDisp_ProjPlane(CameraId camId, void* param) {
     ImageEntry* entry = param;
     static const Vec lightPos = {0.0f, 0.0f, 0.0f};
     static const GXColor color1 = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -303,9 +303,9 @@ static inline void imgCaptureCopy(ImageShadow* sh, ImageEntry* entry) {
     sh->data = data;
 }
 
-void imgCapture_Prim(ImageEntry* entry, s32 id) {
+static void imgCapture_Prim(ImageEntry* entry, s32 id) {
     ImageShadow* sh = &entry->shadows[id];
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     void* src;
 #endif
     s32 offId;
@@ -323,7 +323,7 @@ void imgCapture_Prim(ImageEntry* entry, s32 id) {
             if (sh->flags & 0x100) {
                 offscreenGetTexObj(offId, &obj, &buf);
                 if (obj) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                     src = buf->address;
                     w = GXGetTexObjWidth(obj);
                     h = GXGetTexObjHeight(obj);
@@ -385,7 +385,7 @@ void imgCapture_Prim(ImageEntry* entry, s32 id) {
     }
 }
 
-void imgCapture(CameraId camId, void* param) {
+static void imgCapture(CameraId camId, void* param) {
     s32 type = gp->inBattle != 0;
     int i, count;
     ImageEntry* entry;
@@ -504,7 +504,7 @@ void imgMain(void) {
                         break;
                 }
                 if (shadow != 3) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                     dispEntry(entry->camId, 0.0f, 1, imgDisp, entry);
 #else
                     dispEntry(entry->camId, entry->order, 1, imgDisp, entry);
@@ -586,7 +586,7 @@ void imgSetShadow(ImageEntry* entry, s32 shadowId) {
     entry->shadowId = shadowId;
 }
 
-void imgShadowDisp(CameraId camId, void* param) {
+static void imgShadowDisp(CameraId camId, void* param) {
     ImageShadow* sh;
     ImageEntry* entry = param;
     GXTexObj* objs[3];
@@ -635,12 +635,12 @@ void imgShadowDisp(CameraId camId, void* param) {
         }
     }
     if (first == -1) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         entry->flags |= 0x10000000;
 #endif
         return;
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     entry->flags &= ~0x10000000;
 #endif
     animSetPaperTexMtx((void*)mp[0], (void*)mp[1], (void*)mp[2]);

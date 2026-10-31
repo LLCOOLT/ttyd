@@ -32,8 +32,8 @@ static effN64Vtx size24x24_tex32x32_vtx[] = {
     {-12, 12, 0, 0, 1024, 0, 0, 0, 255},
 };
 
-void effRotHammerFailMain(EffectEntry* effect);
-void effRotHammerFailDisp(CameraId cameraId, EffectEntry* effect);
+static void effRotHammerFailMain(EffectEntry* effect);
+static void effRotHammerFailDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effRotHammerFailN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -69,7 +69,7 @@ EffectEntry* effRotHammerFailN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f
     return effect;
 }
 
-void effRotHammerFailMain(EffectEntry* effect) {
+static void effRotHammerFailMain(EffectEntry* effect) {
     EffRotHammerFailN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -100,7 +100,7 @@ void effRotHammerFailMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effRotHammerFailDisp, effect);
 }
 
-void effRotHammerFailDisp(CameraId cameraId, EffectEntry* effect) {
+static void effRotHammerFailDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffRotHammerFailN64Work* work;
     s32 isSix;

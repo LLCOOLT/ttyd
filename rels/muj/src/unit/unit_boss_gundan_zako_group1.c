@@ -29,16 +29,16 @@
 
 void zakogun_ext_main1(void);
 void zakogun_ext_main3(void);
-void zakogun_ext_disp(CameraId camera, void* param);
+static void zakogun_ext_disp(CameraId camera, void* param);
 
 USER_FUNC(zakogun_attack1);
-USER_FUNC(zakogun_end_sukima);
-USER_FUNC(zakogun_start_sukima);
+static USER_FUNC(zakogun_end_sukima);
+static USER_FUNC(zakogun_start_sukima);
 USER_FUNC(zakogun_dead1);
 void zakogun_ext_main1(void);
-void zakogun_ext_disp(CameraId camera, void* param);
-void zakogun_ext_main(void);
-void zakogun_ext_init(void);
+static void zakogun_ext_disp(CameraId camera, void* param);
+static void zakogun_ext_main(void);
+static void zakogun_ext_init(void);
 
 BattleUnitKind unit_boss_gundan_zako_group1;
 static BattleUnitDefense defence;
@@ -207,7 +207,7 @@ static PoseTableEntry pose_table[] = {
     {28, "Z_1"},
     {31, "Z_1"},
     {39, "Z_1"},
-    {69, "Z_1"},
+    {BTL_POSE_STAY_DEFAULT, "Z_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -311,7 +311,7 @@ static EVT_BEGIN(damage_event)
         CALL(zakogun_damage_pose)
         CALL(zakogun_start_sukima, 0)
     END_IF
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     CALL(zakogun_damage_pose_cancel)
     CALL(zakogun_end_sukima)
     RETURN
@@ -379,7 +379,7 @@ static EVT_BEGIN(attack_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
@@ -394,7 +394,7 @@ static EVT_BEGIN(attack_event)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     CALL(zakogun_set_target_id, LW(3))
     BEGIN_SIBLING_EVENT
-        CALL_CHILD(PTR(hit_check_event))
+        CALL_CHILD(hit_check_event)
     END_SIBLING_EVENT
     CALL(zakogun_attack1)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -507,7 +507,7 @@ EVT_BEGIN(zakogun_entry)
     RETURN
 EVT_END()
 
-void zakogun_ext_init(void) {
+static void zakogun_ext_init(void) {
     u8* flags = &_battleWorkPointer->stageObjectWork.flags;
     BattleStageObject* body;
     BattleStageObject* wire;
@@ -523,7 +523,7 @@ void zakogun_ext_init(void) {
     *flags |= STAGE_OBJ_FLAG_IRON_FRAME_GONE | STAGE_OBJ_FLAG_NO_IRON_FRAME_FALL;
 }
 
-void zakogun_ext_main(void) {
+static void zakogun_ext_main(void) {
     switch (work->flag) {
         case 0:
             zakogun_ext_main1();
@@ -538,7 +538,7 @@ void zakogun_ext_main(void) {
     dispEntry(CAMERA_3D, 0.0f, 1, zakogun_ext_disp, NULL);
 }
 
-void zakogun_ext_disp(CameraId camera, void* param) {
+static void zakogun_ext_disp(CameraId camera, void* param) {
     extLoadRenderMode();
     extLoadVertex();
     extLoadTexture();
@@ -1163,7 +1163,7 @@ USER_FUNC(zakogun_escape1) {
     return n == 6 ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(zakogun_start_sukima) {
+static USER_FUNC(zakogun_start_sukima) {
     s32 mode = evtGetValue(event, event->args[0]);
     s32 i;
 
@@ -1181,7 +1181,7 @@ USER_FUNC(zakogun_start_sukima) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(zakogun_end_sukima) {
+static USER_FUNC(zakogun_end_sukima) {
     s32 i;
 
     for (i = 0; i < 6; i++) {

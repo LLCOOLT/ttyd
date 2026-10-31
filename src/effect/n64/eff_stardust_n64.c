@@ -72,8 +72,8 @@ static effN64Vtx size8x8_tex22x22_vtx[] = {
     {-8, 8, 0, 4928, 704, 0, 0, 0, 255},
 };
 
-void effStardustMain(EffectEntry* effect);
-void effStardustDisp(CameraId cameraId, EffectEntry* effect);
+static void effStardustMain(EffectEntry* effect);
+static void effStardustDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a) {
     s32 lifeA;
@@ -197,7 +197,7 @@ EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a) {
     return effect;
 }
 
-void effStardustMain(EffectEntry* effect) {
+static void effStardustMain(EffectEntry* effect) {
     EffStardustN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -288,7 +288,7 @@ void effStardustMain(EffectEntry* effect) {
     }
 }
 
-void effStardustDisp(CameraId cameraId, EffectEntry* effect) {
+static void effStardustDisp(CameraId cameraId, EffectEntry* effect) {
     EffStardustN64Work* work;
     s32 i;
     CameraEntry* camera;

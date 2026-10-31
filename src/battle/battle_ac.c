@@ -16,7 +16,7 @@
 #define AC_GUARD_TIMER(wp) ((wp)->actionCommands.countdown)
 
 // local prototypes
-s32 BattleACPadCheckRecordTrigger(s32 chan, s32 mask);
+static s32 BattleACPadCheckRecordTrigger(s32 chan, s32 mask);
 
 void BattleActionCommandManagerInit(BattleWork* wp) {
     BtlPad_WorkInit(&wp->actionCommands.pad);
@@ -210,7 +210,7 @@ s32 BattleActionCommandCheckDefence(BattleUnit* unit, BattleWeapon* weapon) {
     BtlPad_WorkInit(pad);
     return wp->actionCommands.defenseResult;
 }
-s32 BattleACPadCheckRecordTrigger(s32 chan, s32 mask) {
+static s32 BattleACPadCheckRecordTrigger(s32 chan, s32 mask) {
     return _battleWorkPointer->actionCommands.pad.buttonsPressedHistory[chan] & mask;
 }
 #pragma dont_inline reset

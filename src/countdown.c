@@ -98,7 +98,7 @@ void countDownMain(void) {
                 }
                 break;
             case 1:
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 if ((wp->flags & 2) != 0) {
                     psndSFXOff(wp->sfxId);
                     wp->sfxId = -1;

@@ -29,8 +29,8 @@ typedef struct EffButterflyN64Work {
 
 static s8 y_data[30] = {-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18, -19, -17, -15, -13, -11, -9, -7, -5, -3, -1, 0, 0};
 
-void effButterflyMain(EffectEntry* effect);
-void effButterflyDisp(CameraId cameraId, EffectEntry* effect);
+static void effButterflyMain(EffectEntry* effect);
+static void effButterflyDisp(CameraId cameraId, EffectEntry* effect);
 
 effN64Vtx but_02_v[] = {
     {0, 0, 250, 0, 2048, 255, 255, 255, 255},
@@ -242,7 +242,7 @@ EffectEntry* effButterflyN64Entry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effButterflyMain(EffectEntry* effect) {
+static void effButterflyMain(EffectEntry* effect) {
     EffButterflyN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -312,7 +312,7 @@ void effButterflyMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 1, (DispCallback)effButterflyDisp, effect);
 }
 
-void effButterflyDisp(CameraId cameraId, EffectEntry* effect) {
+static void effButterflyDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffButterflyN64Work* work;
     GXTexObj texObj;

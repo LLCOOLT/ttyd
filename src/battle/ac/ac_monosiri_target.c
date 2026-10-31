@@ -40,7 +40,7 @@ s32 _frame_table[] = {240, 180, 120, 90, 70, 40, 20};
 
 // inlining off for _getmaxcount, as in the original (the object differs without it)
 #pragma dont_inline on
-s32 _getmaxcount(void) {
+static s32 _getmaxcount(void) {
     return _frame_table[BattleActionCommandGetDifficulty(_battleWorkPointer)];
 }
 #pragma dont_inline reset

@@ -39,21 +39,21 @@ const char R_no_messages_US[] = "<col ff0000ff>No messages.<col>\n<key>";
 
 // the text of a loaded message file (the demo keeps it in a smart heap block)
 static inline const char* msgEntryText(MessageEntry* entry) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     return entry->address->address;
 #else
     return entry->address;
 #endif
 }
 
-void msgWindow_Disp(CameraId camId, void* param);
-void msgWindow_Main(WindowEntry* window);
-void msgWindow_Clear_Main(WindowEntry* window);
-void msgWindow_Delete(WindowEntry* window);
-void selectWindow_Main(WindowEntry* window);
+static void msgWindow_Disp(CameraId camId, void* param);
+static void msgWindow_Main(WindowEntry* window);
+static void msgWindow_Clear_Main(WindowEntry* window);
+static void msgWindow_Delete(WindowEntry* window);
+static void selectWindow_Main(WindowEntry* window);
 
-s32 msgMain(smartEntry* smart);
-void selectWindow_Disp(CameraId camId, void* param);
+static s32 msgMain(smartEntry* smart);
+static void selectWindow_Disp(CameraId camId, void* param);
 
 typedef struct MsgLookupEntry {
     u32 startaddr; // 0x0
@@ -87,7 +87,7 @@ MsgIcon msgIcon[] = {
     {"ANM_PAD_START", ICON_20D}
 };
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 s32 msgWindowOpen_SE_Data[] = {
     0x16, 0x17, 0x1A, 0x1B, 0x20, 0x21, 0x1C, 0x1D,
     0x20, 0x21, 0x1C, 0x1D, 0x18, 0x19, 0x22, 0x23,
@@ -97,9 +97,8 @@ s32 msgWindowOpen_SE_Data[] = {
 
 //.sbss
 MessageWork msgWork;
-#if VERSION == VERSION_DEMO
-static smartEntry msgEmptyText; // stands in for a message file that failed to load
-s32 msg_unused_sbss;            // the demo has one more word here that nothing uses
+#if VERSION <= VERSION_DEMO_US
+static smartEntry dummySmartList; // stands in for a message file that failed to load
 #endif
 BOOL msgSEflag;             // msgSEInit and related functions are unused
 const char* msgSortDvdData; // the text msg_compare sorts the lookup table by
@@ -107,8 +106,8 @@ u16 g5_active_s772;
 
 //.sdata
 MessageWork* msgw = &msgWork;
-#if VERSION == VERSION_DEMO
-static char msgEmptyString[] = ""; // the text of msgEmptyText
+#if VERSION <= VERSION_DEMO_US
+static char NoMessage[] = ""; // the text of dummySmartList
 #endif
 #if VERSION >= VERSION_US
 const char* ErrMessage[7] = {R_no_messages_JP, R_no_messages_US, R_no_messages_DE, R_no_messages_FR,
@@ -126,7 +125,7 @@ const char* language_dir[7] = {"msg/JP", "msg/US", "msg/DE", "msg/FR", "msg/SP",
 const char* language_dir[2] = {"msg", "emsg"};
 #endif
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo's sound table follows the pose names in .data
 s32 msgWindowOpen_SE_Data[] = {
     0x16, 0x17, 0x1A, 0x1B, 0x20, 0x21, 0x1C, 0x1D,
@@ -136,8 +135,8 @@ s32 msgWindowOpen_SE_Data[] = {
 #endif
 
 // local prototypes
-int msg_compare(const void* a, const void* b);
-void msgDispKeyWait_render(s32 wXluStage);
+static int msg_compare(const void* a, const void* b);
+static void msgDispKeyWait_render(s32 wXluStage);
 
 void msgInit(void) {
     msgw->poseId = animPoseEntry("hoshi_2", 2);
@@ -152,7 +151,7 @@ void msgInit(void) {
     msgLoad("global", 1);
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo loads the text into a smart heap block and points a missing file at an empty text
 void msgLoad(const char* filename, s32 index) {
     MessageEntry* entry;
@@ -169,7 +168,7 @@ void msgLoad(const char* filename, s32 index) {
     entry = &msgw->entries[index];
     sprintf(filepath, "./%s/%s.txt", language_dir[gp->language], filename);
     if (entry->address) {
-        if (entry->address != &msgEmptyText) {
+        if (entry->address != &dummySmartList) {
             smartFree(entry->address);
         }
         entry->address = NULL;
@@ -187,8 +186,8 @@ void msgLoad(const char* filename, s32 index) {
     }
     if (!entry->address) {
         entry->length = 0;
-        entry->address = &msgEmptyText;
-        msgEmptyText.address = msgEmptyString;
+        entry->address = &dummySmartList;
+        dummySmartList.address = NoMessage;
     }
     msgptr = msgEntryText(entry);
     msgcount = 0;
@@ -222,27 +221,21 @@ void msgLoad(const char* filename, s32 index) {
 }
 #else
 void msgLoad(const char* filename, s32 index) {
-#if VERSION >= VERSION_US
     MessageEntry* entry;
     const char* str;
     MsgLookupEntry* lookup;
     const char* msgptr;
     int i;
+#if VERSION >= VERSION_US
     s32 msgcount;
     DVDEntry* dvd;
     s32 max;
     s32 len;
-    u32 ofs;
 #else
-    MessageEntry* entry;
-    const char* str;
-    MsgLookupEntry* lookup;
-    const char* msgptr;
-    int i;
     DVDEntry* dvd;
     s32 msgcount;
-    u32 ofs;
 #endif
+    u32 ofs;
     char filepath[64];
     char dvdpath[128];
 
@@ -379,7 +372,7 @@ static inline void msgVoiceSE(smartEntry* smart) {
     }
 }
 
-s32 msgMain(smartEntry* smart) {
+static s32 msgMain(smartEntry* smart) {
     MsgWinData* data = smart->address;
     MsgChar* entry;
     s32 i;
@@ -526,8 +519,8 @@ s32 msgMain(smartEntry* smart) {
     return 3;
 }
 
-BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y);
-BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
+static BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y);
+static BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
     s32 al;
     s32 hide;
     s32 w;
@@ -788,7 +781,7 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
     return ret;
 }
 
-void msgDispKeyWait_render(s32 wXluStage) {
+static void msgDispKeyWait_render(s32 wXluStage) {
     AnimationWork* wp = animGetPtr();
 
     GXSetZMode(GX_TRUE, GX_ALWAYS, GX_FALSE);
@@ -882,7 +875,7 @@ void msgAnalize(smartEntry* smart, const char* msg) {
     u16 ih;
     f32 maxScale;
     const char* next;
-#if VERSION != VERSION_DEMO
+#if VERSION != VERSION_DEMO_US
     BOOL isHM;
 #endif
     s32 i;
@@ -944,7 +937,7 @@ void msgAnalize(smartEntry* smart, const char* msg) {
     }
 
     while (TRUE) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         // FAKE: dead guard (never runs) redefining y at the loop top; it gives y its own web there, so y is coloured
         // before the other parse state as in the target (FAKES.md)
         {
@@ -1270,14 +1263,14 @@ void msgAnalize(smartEntry* smart, const char* msg) {
                     }
 #endif
                 } else if (strcmp(tag, "icon") == 0) {
-#if VERSION != VERSION_DEMO
+#if VERSION != VERSION_DEMO_US
                     isHM = FALSE;
 #endif
                     if ((((s8)args[0]) >= '0') && (((s8)args[0]) <= '9')) {
                         sscanf(args, "%d%f%d%d%d", &iconId, &iconScale, &iconOfsX, &iconOfsY, &iconAdvance);
                     } else {
                         sscanf(args, "%s%f%d%d%d", name, &iconScale, &iconOfsX, &iconOfsY, &iconAdvance);
-#if VERSION != VERSION_DEMO
+#if VERSION != VERSION_DEMO_US
                         if (strcmp(name, "HM") == 0) {
                             isHM = TRUE;
                         }
@@ -1287,7 +1280,7 @@ void msgAnalize(smartEntry* smart, const char* msg) {
                             iconId = 0;
                         }
                     }
-#if VERSION != VERSION_DEMO
+#if VERSION != VERSION_DEMO_US
                     if (!isHM)
 #endif
                     {
@@ -1310,7 +1303,7 @@ void msgAnalize(smartEntry* smart, const char* msg) {
                         time += step;
                         data->charCount++;
                     }
-#if VERSION != VERSION_DEMO
+#if VERSION != VERSION_DEMO_US
                     else {
 #if VERSION >= VERSION_US
                         if ((u32)gp->language == 0) {
@@ -1520,7 +1513,7 @@ MessageWork* L_msgGetWork(void) {
     return &msgWork;
 }
 
-int msg_compare(const void* a, const void* b) {
+static int msg_compare(const void* a, const void* b) {
     s32 result = strcmp(msgSortDvdData + *(const u32*)a, msgSortDvdData + *(const u32*)b);
     if (result > 0) {
         return 1;
@@ -1712,7 +1705,7 @@ s32 msgWindow_Entry(const char* msg, s32 callback, u16 priority) {
 }
 
 #pragma optimize_for_size on
-void msgWindow_Delete(WindowEntry* window) {
+static void msgWindow_Delete(WindowEntry* window) {
     MsgWinData* data;
     s32 i;
 
@@ -1805,7 +1798,7 @@ static inline void msgWinNextPage(WindowEntry* window) {
 
 // FAKE: #pragma opt_common_subs off: no common subexpression elimination in msgWindow_Main, so its fields are reloaded as in the target; without it 445 of its 492 instructions differ (same length: reloads and registers)
 #pragma opt_common_subs off
-void msgWindow_Main(WindowEntry* window) {
+static void msgWindow_Main(WindowEntry* window) {
     smartEntry* smart = window->userdata;
     MsgWinData* data = smart->address;
     s32 se;
@@ -1990,7 +1983,7 @@ void msgWindow_Main(WindowEntry* window) {
 }
 
 #pragma opt_common_subs reset
-void msgWindow_Clear_Main(WindowEntry* window) {
+static void msgWindow_Clear_Main(WindowEntry* window) {
     MsgWinData* data = WIN_DATA(window);
 
     switch (WIN_STATE(window)) {
@@ -2050,7 +2043,7 @@ void msgWindow_Clear_Main(WindowEntry* window) {
     dispEntry(CAMERA_2D, 400.0f - window->priority, 0, msgWindow_Disp, window);
 }
 
-void msgWindow_Disp(CameraId camId, void* param) {
+static void msgWindow_Disp(CameraId camId, void* param) {
     CameraEntry* camera = camGetCurPtr();
     BOOL ret = FALSE;
     WindowEntry* window = param;
@@ -2121,7 +2114,7 @@ void msgWindow_Disp(CameraId camId, void* param) {
                 ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
             }
             break;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         case 2:
         case 4:
         case 10:
@@ -2163,7 +2156,7 @@ void msgWindow_Disp(CameraId camId, void* param) {
     }
 }
 
-void selectWindow_Main(WindowEntry* window) {
+static void selectWindow_Main(WindowEntry* window) {
     MsgWinData* data = window->userdata->address;
     s8 prev;
 
@@ -2238,7 +2231,7 @@ void selectWindow_Main(WindowEntry* window) {
     dispEntry(CAMERA_2D, 400.0f - window->priority, 0, selectWindow_Disp, window);
 }
 
-void selectWindow_Disp(CameraId camId, void* param) {
+static void selectWindow_Disp(CameraId camId, void* param) {
     WindowEntry* window = param; // cast to correct type
     MsgWinData* data = window->userdata->address;
     Vec pos;

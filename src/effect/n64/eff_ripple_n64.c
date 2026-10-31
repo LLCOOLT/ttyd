@@ -16,8 +16,8 @@ effN64Vtx size16x16_tex32x32_0_vtx[] = {
     {-8, 0, 8, 0, 1024, 0, 0, 0, 255},
 };
 
-void effRippleMain(EffectEntry* effect);
-void effRippleDisp(CameraId cameraId, EffectEntry* effect);
+static void effRippleMain(EffectEntry* effect);
+static void effRippleDisp(CameraId cameraId, EffectEntry* effect);
 
 __declspec(section ".rodata") static Vec rippleZeroVec = {0.0f, 0.0f, 0.0f};
 void effRippleN64SetRxRz(EffectEntry* effect, f32 rx, f32 rz) {
@@ -26,7 +26,7 @@ void effRippleN64SetRxRz(EffectEntry* effect, f32 rx, f32 rz) {
     work->rz = rz;
 }
 
-void effRippleDisp(CameraId cameraId, EffectEntry* effect) {
+static void effRippleDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     s32 type;
     EffRippleN64Work* work;
@@ -86,7 +86,7 @@ void effRippleDisp(CameraId cameraId, EffectEntry* effect) {
     tri2(0, 1, 2, 0, 0, 2, 3, 0);
 }
 
-void effRippleMain(EffectEntry* effect) {
+static void effRippleMain(EffectEntry* effect) {
     EffRippleN64Work* work;
     EffectEntry* e;
     EffRippleN64Work* w;

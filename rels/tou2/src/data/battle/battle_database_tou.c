@@ -1222,7 +1222,7 @@ NpcBattleSelect btlgrpsel_tou_btlno_tou_01_24_off[] = {
 
 NpcSetupBattleInfo btlsetup_tou_tbl[] = {
     {
-        /*"マップstg_03_0"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x33\x5F\x30", // name
+        "マップstg_03_0", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1232,7 +1232,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"クリクリブラザーズ"*/"\x83\x4E\x83\x8A\x83\x4E\x83\x8A\x83\x75\x83\x89\x83\x55\x81\x5B\x83\x59", // name
+        "クリクリブラザーズ", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1244,7 +1244,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"コウラーズ"*/"\x83\x52\x83\x45\x83\x89\x81\x5B\x83\x59", // name
+        "コウラーズ", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1256,7 +1256,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"サンボ三兄弟"*/"\x83\x54\x83\x93\x83\x7B\x8E\x4F\x8C\x5A\x92\xED", // name
+        "サンボ三兄弟", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1268,7 +1268,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"ボンバーズ"*/"\x83\x7B\x83\x93\x83\x6F\x81\x5B\x83\x59", // name
+        "ボンバーズ", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1280,7 +1280,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"クモーンズ"*/"\x83\x4E\x83\x82\x81\x5B\x83\x93\x83\x59", // name
+        "クモーンズ", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1292,7 +1292,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"ジュゲムとイタい仲間たち"*/"\x83\x57\x83\x85\x83\x51\x83\x80\x82\xC6\x83\x43\x83\x5E\x82\xA2\x92\x87\x8A\xD4\x82\xBD\x82\xBF", // name
+        "ジュゲムとイタい仲間たち", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1304,7 +1304,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"ハイパーズ"*/"\x83\x6E\x83\x43\x83\x70\x81\x5B\x83\x59", // name
+        "ハイパーズ", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1316,7 +1316,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"ボロドーズ"*/"\x83\x7B\x83\x8D\x83\x68\x81\x5B\x83\x59", // name
+        "ボロドーズ", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1328,7 +1328,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"クッパぐんだんズ"*/"\x83\x4E\x83\x62\x83\x70\x82\xAE\x82\xF1\x82\xBE\x82\xF1\x83\x59", // name
+        "クッパぐんだんズ", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1340,7 +1340,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"こうてつウォリアーズ"*/"\x82\xB1\x82\xA4\x82\xC4\x82\xC2\x83\x45\x83\x48\x83\x8A\x83\x41\x81\x5B\x83\x59", // name
+        "こうてつウォリアーズ", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1352,7 +1352,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_CHUBOSS_BATTLE1", // bgmName
     },
     {
-        /*"ザ・トゲトゲン"*/"\x83\x55\x81\x45\x83\x67\x83\x51\x83\x67\x83\x51\x83\x93", // name
+        "ザ・トゲトゲン", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1364,7 +1364,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"ヤミトゲダルマー"*/"\x83\x84\x83\x7E\x83\x67\x83\x51\x83\x5F\x83\x8B\x83\x7D\x81\x5B", // name
+        "ヤミトゲダルマー", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1376,7 +1376,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"ザ・ウラウラン"*/"\x83\x55\x81\x45\x83\x45\x83\x89\x83\x45\x83\x89\x83\x93", // name
+        "ザ・ウラウラン", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1388,7 +1388,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"レッドデビルズ"*/"\x83\x8C\x83\x62\x83\x68\x83\x66\x83\x72\x83\x8B\x83\x59", // name
+        "レッドデビルズ", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1400,7 +1400,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"トリプルブロス"*/"\x83\x67\x83\x8A\x83\x76\x83\x8B\x83\x75\x83\x8D\x83\x58", // name
+        "トリプルブロス", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1412,7 +1412,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"ザ・マホーンズ"*/"\x83\x55\x81\x45\x83\x7D\x83\x7A\x81\x5B\x83\x93\x83\x59", // name
+        "ザ・マホーンズ", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1424,7 +1424,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"キラーボムヘイズ"*/"\x83\x4C\x83\x89\x81\x5B\x83\x7B\x83\x80\x83\x77\x83\x43\x83\x59", // name
+        "キラーボムヘイズ", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1436,7 +1436,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"バーストワンワン"*/"\x83\x6F\x81\x5B\x83\x58\x83\x67\x83\x8F\x83\x93\x83\x8F\x83\x93", // name
+        "バーストワンワン", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1448,7 +1448,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"トゲノコエース"*/"\x83\x67\x83\x51\x83\x6D\x83\x52\x83\x47\x81\x5B\x83\x58", // name
+        "トゲノコエース", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1460,7 +1460,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"ナイトウィングス"*/"\x83\x69\x83\x43\x83\x67\x83\x45\x83\x42\x83\x93\x83\x4F\x83\x58", // name
+        "ナイトウィングス", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1472,7 +1472,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"スネイルズ"*/"\x83\x58\x83\x6C\x83\x43\x83\x8B\x83\x59", // name
+        "スネイルズ", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1484,7 +1484,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"ブレッドハート"*/"\x83\x75\x83\x8C\x83\x62\x83\x68\x83\x6E\x81\x5B\x83\x67", // name
+        "ブレッドハート", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1496,7 +1496,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_BOSS_STG3_CHAMP1", // bgmName
     },
     {
-        /*"マッチョガンス"*/"\x83\x7D\x83\x62\x83\x60\x83\x87\x83\x4B\x83\x93\x83\x58", // name
+        "マッチョガンス", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1508,7 +1508,7 @@ NpcSetupBattleInfo btlsetup_tou_tbl[] = {
         "BGM_BOSS_STG3_GANCE1", // bgmName
     },
     {
-        /*"乱入クッパ"*/"\x97\x90\x93\xFC\x83\x4E\x83\x62\x83\x70", // name
+        "乱入クッパ", // name
         "tou_03", // mapName
         0, // fixedItem
         -1, // swFlag

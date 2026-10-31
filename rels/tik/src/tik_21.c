@@ -11,7 +11,6 @@
 #include "evt/evt_mobj.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "tik.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -88,8 +87,12 @@ static HitDamageReturn hitDmgRetPoints[] = {
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("item00"), ITEM_SPIKE_SHIELD, LW(0), LW(1), LW(2), 16, -1, 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_SPIKE_SHIELD, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
+#else
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_BADGE_RETURN | ITEM_FLAG_NO_TOUCH)
+#endif
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_item, STRING("item00"))
     CALL(evt_mario_key_onoff, 1)
@@ -102,9 +105,9 @@ EVT_BEGIN(tik_21_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
-    SPAWN_EVENT(PTR(hari_trap))
+    SPAWN_EVENT(hari_trap)
     CALL(evt_mobj_itembox, STRING("mobj_box00"), 150, 0, -100, 0, 0, PTR(mobj_box00), GSWF(GSWF_TIK21_SPIKE_SHIELD_CHEST_OPENED))
     RETURN
 EVT_END()

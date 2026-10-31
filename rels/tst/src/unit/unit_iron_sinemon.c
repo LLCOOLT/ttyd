@@ -27,13 +27,21 @@ static BattleUnitDefense defence_turn;
 static StatusVulnerability regist;
 static BattleUnitKindPart parts[1];
 static BattleWeapon weapon_iron_sinemon_attack;
+#if VERSION <= VERSION_DEMO_US
+static PoseTableEntry pose_table[17];
+#else
 static PoseTableEntry pose_table[18];
+#endif
 static BattleDataEntry data_table[3];
 static EvtWord init_event1[18];
 static EvtWord init_event_sub[47];
 static EvtWord dmg_avoid_counter_thorn_head_event[76];
 static EvtWord damage_event[102];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord phase_event[164];
+#else
 static EvtWord phase_event[188];
+#endif
 static EvtWord attack_event[385];
 static EvtWord wait_event[6];
 
@@ -170,10 +178,12 @@ static PoseTableEntry pose_table[] = {
     {50, "SIN_A_1a"},
     {40, "SIN_W_1"},
     {42, "SIN_R_1"},
-    {65, "SIN_T_1"},
+#if VERSION >= VERSION_JP
+    {BTL_POSE_TALK, "SIN_T_1"},
+#endif
     {56, "SIN_I_1"},
     {57, "SIN_I_1"},
-    {69, "SIN_S_1"},
+    {BTL_POSE_STAY_DEFAULT, "SIN_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -186,7 +196,7 @@ static EVT_BEGIN(init_event1)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     CALL(get_id, LW(0), LW(1))
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, LW(1))
-    CALL_CHILD(PTR(init_event_sub))
+    CALL_CHILD(init_event_sub)
     RETURN
 EVT_END()
 
@@ -194,7 +204,7 @@ static EVT_BEGIN(init_event2)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
     CALL(get_id, LW(0), LW(1))
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, LW(0))
-    CALL_CHILD(PTR(init_event_sub))
+    CALL_CHILD(init_event_sub)
     RETURN
 EVT_END()
 
@@ -237,7 +247,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), -1)
         RETURN
@@ -275,13 +285,25 @@ static EVT_BEGIN(phase_event)
     IF_INT_EQUAL(LW(0), 1)
         RETURN
     END_IF
+#if VERSION <= VERSION_DEMO_US
+    DEBUG_PUT_MSG(STRING("ぺぺぺまん２"))
+#endif
     IF_INT_EQUAL(GSWF(GSWF_TOU_IRON_CLEFTS_BEATEN), 1)
         RETURN
     END_IF
+#if VERSION <= VERSION_DEMO_US
+    DEBUG_PUT_MSG(STRING("ぺぺぺまん３"))
+#endif
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
+#if VERSION <= VERSION_DEMO_US
+        DEBUG_PUT_MSG(STRING("ぺぺぺまん４"))
+#endif
         CALL(btlevtcmd_get_turn, LW(0))
         IF_INT_EQUAL(LW(0), 1)
+#if VERSION <= VERSION_DEMO_US
+            DEBUG_PUT_MSG(STRING("ぺぺぺまん５"))
+#endif
             CALL(btlevtcmd_PhaseEventStartDeclare, BTL_UNIT_PARTNER)
             CALL(btlevtcmd_PhaseEventStartDeclare, BTL_UNIT_SELF)
             CALL(evt_btl_camera_set_prilimit, 1)
@@ -300,20 +322,28 @@ static EVT_BEGIN(phase_event)
             CALL(btlevtcmd_StatusWindowOnOff, 0)
             CALL(yoshi_exist, LW(0))
             IF_INT_EQUAL(LW(0), 0)
-                CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, 65)
-                CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 69)
+#if VERSION >= VERSION_JP
+                CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
+                CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, BTL_POSE_STAY_DEFAULT)
+#endif
                 CALL(evt_msg_print, 2, STRING("stg3_tou_268"), 0, BTL_UNIT_SELF)
                 CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
-                CALL(btlevtcmd_SetTalkPoseType, LW(0), 65)
-                CALL(btlevtcmd_SetStayPoseType, LW(0), 69)
+#if VERSION >= VERSION_JP
+                CALL(btlevtcmd_SetTalkPoseType, LW(0), BTL_POSE_TALK)
+                CALL(btlevtcmd_SetStayPoseType, LW(0), BTL_POSE_STAY_DEFAULT)
+#endif
                 CALL(evt_msg_print, 2, STRING("stg3_tou_269"), 0, LW(0))
             ELSE
-                CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, 65)
-                CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 69)
+#if VERSION >= VERSION_JP
+                CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
+                CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, BTL_POSE_STAY_DEFAULT)
+#endif
                 CALL(evt_msg_print, 2, STRING("stg3_tou_270"), 0, BTL_UNIT_SELF)
                 CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
-                CALL(btlevtcmd_SetTalkPoseType, LW(0), 65)
-                CALL(btlevtcmd_SetStayPoseType, LW(0), 69)
+#if VERSION >= VERSION_JP
+                CALL(btlevtcmd_SetTalkPoseType, LW(0), BTL_POSE_TALK)
+                CALL(btlevtcmd_SetStayPoseType, LW(0), BTL_POSE_STAY_DEFAULT)
+#endif
                 CALL(evt_msg_print, 2, STRING("stg3_tou_271"), 0, LW(0))
             END_IF
             CALL(btlevtcmd_StatusWindowOnOff, 1)

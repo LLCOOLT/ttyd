@@ -28,11 +28,9 @@
 #pragma explicit_zero_data reset
 s32 vivian_cancel_req;
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 void N_marioForceVivianAnime(void) {
-    static const u32 vivian_sdata2_pad = 0;
     MarioWork* mario = marioGetPtr();
-    (void)&vivian_sdata2_pad;
 
     marioPaperOff();
     marioChgPaper(NULL);
@@ -54,7 +52,7 @@ void mot_vivian(void) {
         mario->airTimer = 0;
         mario->currSubMotionId = 0;
         mario->baseSpeed = 0.0f;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         mario->hitobjFront = NULL;
         mario->hitobjFrontA = NULL;
         mario->hitobjPush = NULL;
@@ -63,7 +61,7 @@ void mot_vivian(void) {
     }
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static inline void L_partyVivianTailStop(PartyEntry* party) {
     if (party->currentMemberId == PARTY_MEMBER_VIVIAN) {
         party->work.vivian.tailFlags |= 1; // the demo keeps the tail flags in the Vivian work
@@ -88,7 +86,7 @@ void mot_vivian_post(void) {
         marioPaperOff();
         {
             Vec zero = {0.0f, 0.0f, 0.0f};
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             mario->dispOfs = zero;
 #else
             mario->dispOfs2 = zero;
@@ -110,7 +108,7 @@ void mot_vivian_post(void) {
             partyChgPoseId(party, 1);
             L_partyVivianTailStart(party);
         }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         camFollowYOn();
 #endif
     } else if (party && party->currentMemberId == PARTY_MEMBER_VIVIAN && (party->flags & PARTY_FLAG_IS_BEING_USED)) {
@@ -127,7 +125,7 @@ void vivian_init(PartyEntry* party) {
     party->height = 35.0f;
     party->width = 24.0f;
     party->work.vivian.shadowSize = 10.0f;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     party->work.vivian.tailFlags = 0;
 #else
     party->tailFlags = 0;
@@ -169,7 +167,7 @@ void vivianUnhold(PartyEntry* party) {
     }
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 void L_partyVivianTailStop(PartyEntry* party) {
     if (party->currentMemberId == PARTY_MEMBER_VIVIAN) {
         party->tailFlags |= 1;
@@ -202,7 +200,7 @@ BOOL N_vivianDisplayTailCheck(PartyEntry* party) {
 void vivianShadow(PartyEntry* party) {
     f32 dx, dy, dz;
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (party && party->currentMemberId == PARTY_MEMBER_VIVIAN)
 #endif
     {
@@ -229,7 +227,8 @@ void vivian_move(PartyEntry* party) {
     vivianShadow(party);
 }
 
-#if VERSION == VERSION_DEMO
+// The demo's vivianFollow/vivian_use are older (fixed hide offset, ground search in vivian_use): one copy each
+#if VERSION <= VERSION_DEMO_US
 // demo: Vivian always hides 13 behind Mario, with no ground search outside the hidden state
 static inline void vivianFollow(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;

@@ -41,7 +41,6 @@
 #include "evt/evt_window.h"
 #include "mot/mot_roll.h"
 #include "mot/mot_slit.h"
-#include "party/party_motion.h"
 #include "pmario_sound.h"
 #include "statuswindow.h"
 #include "usu.h"
@@ -169,7 +168,7 @@ static void lecture_button_disp(CameraId camera, void* param) {
             }
             pos = disp->pos;
             pos.y += ofs;
-            iconDispGxAlpha(&pos, 0x50, btn->iconId, btn->alpha, 1.0f);
+            iconDispGxAlpha(&pos, ICON_FLAG_NO_MAP_BLEND | ICON_FLAG_2D, btn->iconId, btn->alpha, 1.0f);
         }
     }
 }
@@ -562,7 +561,11 @@ static USER_FUNC(evt_nomal_cange) {
     MarioWork* mario = marioGetPtr();
 
     if (isFirstCall) {
+#if VERSION <= VERSION_DEMO_US
+        marioRollCancel();
+#else
         marioRollTryCancel();
+#endif
         if (mario->flags & MARIO_FLAG_PAPER_MODE) {
             motSlitCancel3();
         }
@@ -600,7 +603,6 @@ EVT_BEGIN(vivian_party_lecture_init)
     RETURN
 EVT_END()
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(vivian_party_lecture)
     CALL(evt_msg_print, 0, STRING("lecture_friends_12_0_1"), 0, 0)
     CALL(evt_msg_print, 0, STRING("lecture_friends_12_1"), 0, 0)
@@ -634,70 +636,26 @@ EVT_BEGIN(vivian_party_lecture)
     CALL(evt_msg_print_add, 0, STRING("lecture_friends_13"))
     CALL(evt_party_vivian_unhold, 0)
     CALL(evt_cam_letter_box_disable, 0)
+#if VERSION <= VERSION_JP
+    CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(80.0f), FLOAT(455.7998f), FLOAT(0.0f), FLOAT(30.0f), FLOAT(-101.799805f), 1000, 0)
+#endif
     CALL(evt_party_stop, 0)
     WAIT_FRAMES(16)
+#if VERSION >= VERSION_US
     CALL(evt_mario_wait_landon)
     CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(80.0f), FLOAT(455.7998f), FLOAT(0.0f), FLOAT(30.0f), FLOAT(-101.799805f), 1000, 0)
-    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-    SUBTRACT(LW(0), 40)
-    CALL(evt_party_move_pos2, 0, LW(0), LW(2), FLOAT(80.0f))
-    CALL(evt_party_set_dir, 0, 90, 300)
-    WAIT_MS(1000)
-    CALL(evt_msg_print_add, 0, STRING("lecture_friends_14"))
-    CALL(evt_party_set_pose, 0, STRING("PTR_O_1"))
-    WAIT_MS(1000)
-    CALL(evt_party_set_pose, 0, STRING("PTR_S_1"))
-    RETURN
-EVT_END()
-#else
-EVT_BEGIN(vivian_party_lecture)
-    CALL(evt_msg_print, 0, STRING("lecture_friends_12_0_1"), 0, 0)
-    CALL(evt_msg_print, 0, STRING("lecture_friends_12_1"), 0, 0)
-    CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(105.0f), FLOAT(597.0f), FLOAT(0.0f), FLOAT(63.0f), FLOAT(-101.799805f), 1000, 11)
-    WAIT_MS(1000)
-    CALL(evt_cam_letter_box_disable, 1)
-    CALL(evt_party_vivian_hold, 0)
-    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-    ADD(LW(0), 200)
-    ADD(LW(1), 50)
-    CALL(evt_npc_start_for_one_event, STRING("テレサ"))
-    CALL(evt_npc_flag_onoff, 1, STRING("テレサ"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
-    CALL(evt_npc_flag_onoff, 1, STRING("テレサ"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
-    CALL(evt_npc_set_position, STRING("テレサ"), LW(0), LW(1), LW(2))
-    CALL(evt_npc_set_camid, STRING("テレサ"), 7)
-    CALL(evt_npc_set_ry, STRING("テレサ"), 270)
-    CALL(evt_npc_get_position, STRING("テレサ"), LW(0), LW(1), LW(2))
-    SUBTRACT(LW(0), 200)
-    CALL(evt_npc_move_position, STRING("テレサ"), LW(0), LW(2), 0, FLOAT(80.0f), 0)
-    CALL(evt_eff_fukidashi, 1, STRING("fuki"), STRING("テレサ"), 1, 0, 0, 0, 0, 0, 0, 60)
-    CALL(efffukidashichange_cam, STRING("fuki"), 7)
-    WAIT_MS(1000)
-    LOOP(2)
-        CALL(evt_npc_reverse_ry, STRING("テレサ"))
-        WAIT_MS(800)
-    END_LOOP
-    SUBTRACT(LW(0), 200)
-    CALL(evt_npc_move_position, STRING("テレサ"), LW(0), LW(2), 0, FLOAT(80.0f), 0)
-    CALL(evt_npc_set_position, STRING("テレサ"), 0, -1000, 0)
-    CALL(evt_npc_stop_for_one_event, STRING("テレサ"))
-    CALL(evt_msg_print_add, 0, STRING("lecture_friends_13"))
-    CALL(evt_party_vivian_unhold, 0)
-    CALL(evt_cam_letter_box_disable, 0)
-    CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(80.0f), FLOAT(455.7998f), FLOAT(0.0f), FLOAT(30.0f), FLOAT(-101.799805f), 1000, 0)
-    CALL(evt_party_stop, 0)
-    WAIT_FRAMES(16)
-    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-    SUBTRACT(LW(0), 40)
-    CALL(evt_party_move_pos2, 0, LW(0), LW(2), FLOAT(80.0f))
-    CALL(evt_party_set_dir, 0, 90, 300)
-    WAIT_MS(1000)
-    CALL(evt_msg_print_add, 0, STRING("lecture_friends_14"))
-    CALL(evt_party_set_pose, 0, STRING("PTR_O_1"))
-    WAIT_MS(1000)
-    CALL(evt_party_set_pose, 0, STRING("PTR_S_1"))
-    RETURN
-EVT_END()
 #endif
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    SUBTRACT(LW(0), 40)
+    CALL(evt_party_move_pos2, 0, LW(0), LW(2), FLOAT(80.0f))
+    CALL(evt_party_set_dir, 0, 90, 300)
+    WAIT_MS(1000)
+    CALL(evt_msg_print_add, 0, STRING("lecture_friends_14"))
+    CALL(evt_party_set_pose, 0, STRING("PTR_O_1"))
+    WAIT_MS(1000)
+    CALL(evt_party_set_pose, 0, STRING("PTR_S_1"))
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(all_party_lecture_otosub)
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
@@ -790,7 +748,7 @@ EVT_BEGIN(all_party_lecture)
     CALL(lect_test_systemlevel)
     SWITCH(LW(9))
         CASE_EQUAL(6)
-        CALL_CHILD(PTR(vivian_party_lecture_init))
+        CALL_CHILD(vivian_party_lecture_init)
     END_SWITCH
     LOOP(6)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -805,7 +763,7 @@ EVT_BEGIN(all_party_lecture)
     CALL(evt_mario_dispflag_onoff, 0, 1)
     SWITCH(LW(9))
         CASE_EQUAL(6)
-        CALL_CHILD(PTR(vivian_party_lecture))
+        CALL_CHILD(vivian_party_lecture)
     END_SWITCH
     LOOP(6)
         CALL(evt_mario_dispflag_onoff, 1, 1)
@@ -924,7 +882,12 @@ EVT_BEGIN(roll_majin_lecture)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("stg4_usu_majin3_13"), 0, STRING("ペラ魔人"))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_msg_print, 0, STRING("stg4_usu_majin3_14"), 0, STRING("ペラ魔人"))
+#else
     CALL(evt_msg_print_add, 0, STRING("stg4_usu_majin3_14"))
+#endif
     LOOP(0)
         CALL(lecture_button_flag_on_off, 0, 2, 1)
         CALL(lecture_button_set_icon_id, 0, ICON_080)
@@ -969,7 +932,9 @@ EVT_BEGIN(roll_majin_lecture)
             END_IF
             WAIT_FRAMES(1)
         END_LOOP
+#if VERSION >= VERSION_JP
         CALL(evt_msg_continue)
+#endif
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_mario_key_onoff, 0)
         CALL(lect_status_on)
@@ -983,18 +948,34 @@ EVT_BEGIN(roll_majin_lecture)
         CALL(lecture_button_seq_wait, 0, 1)
         CALL(lecture_button_seq_wait, 1, 1)
         WAIT_MS(300)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_msg_print_add, 0, STRING("stg4_usu_majin3_18"))
+#else
         CALL(evt_msg_toge, 1, 0, 0, 0)
         CALL(evt_msg_print, 0, STRING("stg4_usu_majin3_18"), 0, STRING("ペラ魔人"))
+#endif
         CALL(evt_msg_select, 0, STRING("stg4_usu_majin3_19"))
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_msg_continue)
+#endif
         IF_INT_EQUAL(LW(0), 0)
             CALL(evt_nomal_cange)
             CALL(evt_msg_toge, 1, 0, 0, 0)
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_msg_print, 0, STRING("stg4_usu_majin3_20"), 0, STRING("ペラ魔人"))
+#else
             CALL(evt_msg_print_add, 0, STRING("stg4_usu_majin3_20"))
+#endif
         ELSE
             BREAK_LOOP
         END_IF
     END_LOOP
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_msg_print, 0, STRING("stg4_usu_majin3_20_1"), 0, STRING("ペラ魔人"))
+#else
     CALL(evt_msg_print_add, 0, STRING("stg4_usu_majin3_20_1"))
+#endif
     CALL(evt_nomal_cange)
     CALL(evt_msg_print_add, 0, STRING("stg4_usu_majin3_21"))
     CALL(evt_npc_set_anim, STRING("ペラ魔人"), STRING("P_2"))

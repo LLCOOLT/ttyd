@@ -18,7 +18,7 @@
 #include "battle/battle_event_cmd.h"
 #include "battle/battle_camera.h"
 #include "battle/battle_weapon_power.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "evt/evt_eff.h"
 #include "evt/evt_sub.h"
@@ -78,7 +78,11 @@ static EvtWord trans_magic_event[49];
 static EvtWord yokeyoke_magic_event[49];
 static EvtWord recover_magic_event[70];
 static EvtWord bunsin_event[152];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord spawn_event[72];
+#else
 static EvtWord spawn_event[76];
+#endif
 static EvtWord wait_event[386];
 
 BattleUnitKind unit_super_mahorn = {
@@ -195,9 +199,17 @@ static BattleUnitDefense defence = {{2, 2, 2, 2, 2}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {10, 50, 50, 100, 40, 100, 100, 40, 100, 40, 100, 40, 100, 40, 40, 30, 75, 100, 40, 100, 100, 90};
+#else
 static StatusVulnerability regist = {10, 50, 90, 100, 40, 100, 100, 50, 100, 85, 100, 85, 100, 90, 40, 30, 85, 100, 40, 100, 100, 90};
+#endif
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist_bunsin = {0, 0, 0, 100, 0, 100, 100, 0, 100, 0, 100, 0, 100, 0, 0, 0, 0, 100, 0, 100, 100, 90};
+#else
 static StatusVulnerability regist_bunsin = {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_super_mahorn", "c_maho_b", 0.0f, 0.0f, 0.0f, 0.0f, 30.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
@@ -229,7 +241,11 @@ static BattleWeapon weapon_mahorn_attack_magic = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
+#if VERSION <= VERSION_DEMO_US
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
+#else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE, // special
+#endif
     COUNTER_RESIST_ALL, // counterResistFlags
     TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
@@ -517,7 +533,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(9), PTR(&weapon_mahorn_attack_punch))
-        CALL_CHILD(PTR(attack_punch_event))
+        CALL_CHILD(attack_punch_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
@@ -532,18 +548,18 @@ static EVT_BEGIN(attack_event)
     END_IF
     CALL(mahorn_get_live_num, LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL_CHILD(PTR(bunsin_event))
+        CALL_CHILD(bunsin_event)
         RETURN
     ELSE
         CALL(mahorn_get_bunsin, LW(1), LW(2), LW(3), LW(4), LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 1)
             CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
             IF_INT_NOT_EQUAL(LW(0), 0)
-                CALL_CHILD(PTR(subsetevt_confuse_flustered))
+                CALL_CHILD(subsetevt_confuse_flustered)
                 GOTO(99)
             END_IF
             SET_VALUE(LW(9), PTR(&weapon_mahorn_attack_magic))
-            CALL_CHILD(PTR(attack_magic_event))
+            CALL_CHILD(attack_magic_event)
             GOTO(99)
         ELSE
             LABEL(10)
@@ -561,49 +577,49 @@ static EVT_BEGIN(attack_event)
             SET_VALUE(LW(0), 30)
             IF_INT_LESS(LW(1), LW(0))
                 SET_VALUE(LW(9), PTR(&weapon_mahorn_attack_punch))
-                CALL_CHILD(PTR(attack_punch_event))
+                CALL_CHILD(attack_punch_event)
                 GOTO(99)
             END_IF
             ADD(LW(0), 60)
             IF_INT_LESS(LW(1), LW(0))
                 SET_VALUE(LW(9), PTR(&weapon_mahorn_attack_magic))
-                CALL_CHILD(PTR(attack_magic_event))
+                CALL_CHILD(attack_magic_event)
                 GOTO(99)
             END_IF
             ADD(LW(0), 10)
             IF_INT_LESS(LW(1), LW(0))
                 SET_VALUE(LW(9), PTR(&weapon_mahorn_all_attack_magic))
-                CALL_CHILD(PTR(all_attack_magic_event))
+                CALL_CHILD(all_attack_magic_event)
                 GOTO(99)
             END_IF
             ADD(LW(0), 8)
             IF_INT_LESS(LW(1), LW(0))
                 SET_VALUE(LW(9), PTR(&weapon_mahorn_dekadeka_magic))
-                CALL_CHILD(PTR(dekadeka_magic_event))
+                CALL_CHILD(dekadeka_magic_event)
                 GOTO(99)
             END_IF
             ADD(LW(0), 8)
             IF_INT_LESS(LW(1), LW(0))
                 SET_VALUE(LW(9), PTR(&weapon_mahorn_katikati_magic))
-                CALL_CHILD(PTR(katikati_magic_event))
+                CALL_CHILD(katikati_magic_event)
                 GOTO(99)
             END_IF
             ADD(LW(0), 8)
             IF_INT_LESS(LW(1), LW(0))
                 SET_VALUE(LW(9), PTR(&weapon_mahorn_trans_magic))
-                CALL_CHILD(PTR(trans_magic_event))
+                CALL_CHILD(trans_magic_event)
                 GOTO(99)
             END_IF
             ADD(LW(0), 8)
             IF_INT_LESS(LW(1), LW(0))
                 SET_VALUE(LW(9), PTR(&weapon_mahorn_yokeyoke_magic))
-                CALL_CHILD(PTR(yokeyoke_magic_event))
+                CALL_CHILD(yokeyoke_magic_event)
                 GOTO(99)
             END_IF
             ADD(LW(0), 8)
             IF_INT_LESS(LW(1), LW(0))
                 SET_VALUE(LW(9), PTR(&weapon_mahorn_recover_magic))
-                CALL_CHILD(PTR(recover_magic_event))
+                CALL_CHILD(recover_magic_event)
                 GOTO(99)
             END_IF
             GOTO(10)
@@ -636,8 +652,8 @@ static PoseTableEntry pose_table[] = {
     {42, "MAH_R_1"},
     {56, "MAH_X_1"},
     {57, "MAH_X_1"},
-    {65, "MAH_T_1"},
-    {69, "MAH_S_1"},
+    {BTL_POSE_TALK, "MAH_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "MAH_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -668,7 +684,7 @@ static EVT_BEGIN(init_event)
     CALL(set_hand_dest, BTL_UNIT_SELF, 3, FLOAT(25.0f), FLOAT(30.0f), FLOAT(10.0f))
     CALL(set_hand_dest, BTL_UNIT_SELF, 4, FLOAT(-25.0f), FLOAT(10.0f), FLOAT(-10.0f))
     CALL(set_hand_dest, BTL_UNIT_SELF, 5, FLOAT(25.0f), FLOAT(10.0f), FLOAT(10.0f))
-    SPAWN_EVENT(PTR(hand_ctrl_event))
+    SPAWN_EVENT(hand_ctrl_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, 0)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, 0)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -760,15 +776,15 @@ static EVT_BEGIN(damage_event)
         END_IF
     ELSE
         SET_VALUE(LW(0), -2)
-        CALL_CHILD(PTR(bunsin_kill_event))
+        CALL_CHILD(bunsin_kill_event)
         RETURN
     END_IF
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))
     IF_INT_NOT_EQUAL(LW(0), -1)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
         IF_INT_EQUAL(LW(0), 1)
-            CALL_CHILD(PTR(mahorn_subset_bunsin_all_kill))
+            CALL_CHILD(mahorn_subset_bunsin_all_kill)
         END_IF
     END_IF
     RETURN
@@ -782,13 +798,13 @@ static EVT_BEGIN(mahorn_subset_bunsin_all_kill)
             CALL(btlevtcmd_WaitAttackEnd)
             CALL(mahorn_get_bunsin, LW(1), LW(2), LW(3), LW(4), LW(0))
             SET_VALUE(LW(0), LW(1))
-            SPAWN_EVENT(PTR(bunsin_kill_event))
+            SPAWN_EVENT(bunsin_kill_event)
             SET_VALUE(LW(0), LW(2))
-            SPAWN_EVENT(PTR(bunsin_kill_event))
+            SPAWN_EVENT(bunsin_kill_event)
             SET_VALUE(LW(0), LW(3))
-            SPAWN_EVENT(PTR(bunsin_kill_event))
+            SPAWN_EVENT(bunsin_kill_event)
             SET_VALUE(LW(0), LW(4))
-            SPAWN_EVENT(PTR(bunsin_kill_event))
+            SPAWN_EVENT(bunsin_kill_event)
             LOOP(0)
                 CALL(mahorn_get_bunsin, LW(1), LW(2), LW(3), LW(4), LW(0))
                 IF_INT_EQUAL(LW(0), 0)
@@ -885,7 +901,7 @@ static EVT_BEGIN(avoid_miss_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(0), -2)
-        CALL_CHILD(PTR(bunsin_kill_event))
+        CALL_CHILD(bunsin_kill_event)
     END_IF
     RETURN
 EVT_END()
@@ -900,7 +916,7 @@ static EVT_BEGIN(bunsin_kill_event)
         GOTO(10)
     END_IF
     CALL(btlevtcmd_SetUnitWork, LW(0), 6, 1)
-    CALL_CHILD(PTR(alpha_down_event))
+    CALL_CHILD(alpha_down_event)
     LABEL(10)
     CALL(btlevtcmd_WaitAttackEnd)
     CALL(btlevtcmd_KillUnit, LW(0), 0)
@@ -1360,12 +1376,12 @@ static EVT_BEGIN(attack_magic_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
-    CALL_CHILD(PTR(attack_enemy_common_event))
+    CALL_CHILD(attack_enemy_common_event)
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     RETURN
@@ -1378,12 +1394,12 @@ static EVT_BEGIN(confuse_magic_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
-    CALL_CHILD(PTR(attack_enemy_common_event))
+    CALL_CHILD(attack_enemy_common_event)
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     RETURN
@@ -1396,12 +1412,12 @@ static EVT_BEGIN(all_attack_magic_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
-    CALL_CHILD(PTR(attack_enemy_all_common_event))
+    CALL_CHILD(attack_enemy_all_common_event)
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     RETURN
@@ -1454,7 +1470,7 @@ static EVT_BEGIN(dekadeka_magic_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
-    CALL_CHILD(PTR(support_friend_common_event))
+    CALL_CHILD(support_friend_common_event)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     WAIT_FRAMES(10)
@@ -1472,7 +1488,7 @@ static EVT_BEGIN(katikati_magic_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
-    CALL_CHILD(PTR(support_friend_common_event))
+    CALL_CHILD(support_friend_common_event)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     WAIT_FRAMES(10)
@@ -1490,7 +1506,7 @@ static EVT_BEGIN(trans_magic_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
-    CALL_CHILD(PTR(support_friend_common_event))
+    CALL_CHILD(support_friend_common_event)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     WAIT_FRAMES(10)
@@ -1508,7 +1524,7 @@ static EVT_BEGIN(yokeyoke_magic_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
-    CALL_CHILD(PTR(support_friend_common_event))
+    CALL_CHILD(support_friend_common_event)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     WAIT_FRAMES(10)
@@ -1526,7 +1542,7 @@ static EVT_BEGIN(recover_magic_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
-    CALL_CHILD(PTR(support_friend_common_event))
+    CALL_CHILD(support_friend_common_event)
     CALL(btlevtcmd_RecoverHp, LW(3), LW(4), 10)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     ADD(LW(1), 30)
@@ -1605,7 +1621,9 @@ static EVT_BEGIN(spawn_event)
     CALL(btlevtcmd_SetHomePos, LW(3), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(13))
     CALL(mahorn_copy_status, LW(13), LW(3))
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_OffAttribute, LW(3), 33554432)
+#endif
     CALL(btlevtcmd_SetUnitWork, LW(3), 4, 1)
     CALL(btlevtcmd_SetEventAttack, LW(3), PTR(attack_event_bunsin))
     CALL(btlevtcmd_SetRegistStatus, LW(3), PTR(&regist_bunsin))

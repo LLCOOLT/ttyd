@@ -34,10 +34,3 @@ extern BattleUnitKind unit_kuriboo;
 extern BattleUnitKind unit_patamet;
 
 USER_FUNC(evt_dou_normal_puka);
-
-// User functions defined in the area's files (global symbols in the original REL).
-// dou_04.c
-USER_FUNC(evt_mario_check_menu);
-USER_FUNC(evt_mapgrp_translate2);
-// dou_05.c
-USER_FUNC(cam_displacement);

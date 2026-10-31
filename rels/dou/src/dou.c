@@ -11,7 +11,7 @@
 #include "dou.h"
 #include "rel_module.h"
 
-USER_FUNC(dou_mario_pos_osreport_func);
+static USER_FUNC(dou_mario_pos_osreport_func);
 
 f32 dou_normal_puka_data[16];
 extern EvtWord dou_puka_event_sub[];
@@ -86,16 +86,16 @@ EVT_BEGIN(dou_puka_event)
     SET_VALUE(LW(8), LW(1))
     SET_VALUE(LW(2), -10)
     SET_VALUE(LW(3), 200)
-    CALL_CHILD(PTR(dou_puka_event_sub))
+    CALL_CHILD(dou_puka_event_sub)
     SET_VALUE(LW(2), -8)
     SET_VALUE(LW(3), 150)
-    CALL_CHILD(PTR(dou_puka_event_sub))
+    CALL_CHILD(dou_puka_event_sub)
     SET_VALUE(LW(2), -5)
     SET_VALUE(LW(3), 100)
-    CALL_CHILD(PTR(dou_puka_event_sub))
+    CALL_CHILD(dou_puka_event_sub)
     SET_VALUE(LW(2), -2)
     SET_VALUE(LW(3), 50)
-    CALL_CHILD(PTR(dou_puka_event_sub))
+    CALL_CHILD(dou_puka_event_sub)
     RETURN
 EVT_END()
 
@@ -117,7 +117,7 @@ USER_FUNC(evt_dou_normal_puka) {
     evtSetFloat(event, event->args[0], dou_normal_puka_data[event->lwData[0] & 0xF]);
     return EVT_RETURN_DONE;
 }
-USER_FUNC(dou_mario_pos_osreport_func) {
+static USER_FUNC(dou_mario_pos_osreport_func) {
     MarioWork* mario = marioGetPtr();
 
     keyGetButtonTrg(0);

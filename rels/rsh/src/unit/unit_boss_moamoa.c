@@ -78,19 +78,19 @@ static u32 moamoa_rand_prev;
 static u32 moamoa_rand_cur;
 #endif
 int rand(void);
-void moamoa_mainUnitIdClear(void);
+static void moamoa_mainUnitIdClear(void);
 static f32 randf(f32 min, f32 max);
-USER_FUNC(moamoa1_on);
-void moamoa_pose(BtlMoamoa* elem);
-void moamoa_draw(CameraId cameraId, void* param);
+static USER_FUNC(moamoa1_on);
+static void moamoa_pose(BtlMoamoa* elem);
+static void moamoa_draw(CameraId cameraId, void* param);
 
-USER_FUNC(moamoa_set_bodyScale);
+static USER_FUNC(moamoa_set_bodyScale);
 static void ext_moamoa_main(void);
 static void ext_moamoa_init(void);
-USER_FUNC(moamoa2_on);
-USER_FUNC(moamoa1_on);
-USER_FUNC(moamoa_bomb);
-USER_FUNC(moamoa_guruguru);
+static USER_FUNC(moamoa2_on);
+static USER_FUNC(moamoa1_on);
+static USER_FUNC(moamoa_bomb);
+static USER_FUNC(moamoa_guruguru);
 
 BattleUnitKind unit_boss_moamoa;
 BattleUnitDefense moamoa_defence;
@@ -139,7 +139,7 @@ USER_FUNC(boss_moamoa_check_zenei_kouei) {
     return 2;
 }
 
-USER_FUNC(evt_moamoa_mainUnitIdClear) {
+static USER_FUNC(evt_moamoa_mainUnitIdClear) {
     moamoa_mainUnitIdClear();
     return 2;
 }
@@ -168,7 +168,7 @@ f32 moamoa_randf(f32 min, f32 max) {
 }
 #endif
 
-void moamoa_mainUnitIdClear(void) {
+static void moamoa_mainUnitIdClear(void) {
     wp->unitId = -1;
 }
 
@@ -204,8 +204,13 @@ BattleUnitKind unit_boss_moamoa = {
     0.0f,
     0.0f,
     0.0f,
+#if VERSION <= VERSION_DEMO_US
+    250.0f,
+    0.0f,
+#else
     15.0f,
     10.0f,
+#endif
     80.0f,
     0.0f,
     0.0f,
@@ -254,14 +259,14 @@ PoseTableEntry moamoa1_pose_table[] = {
     {28, "S_1_1"},
     {31, "D_1_1"},
     {39, "D_1_1"},
-    {69, "S_1_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1_1"},
 };
 
 PoseTableEntry moamoa1_weakness_pose_table[] = {
     {28, "S_1_3"},
     {31, "D_1_3"},
     {39, "D_1_3"},
-    {69, "S_1_3"},
+    {BTL_POSE_STAY_DEFAULT, "S_1_3"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -416,8 +421,8 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(4))
     SET_VALUE(LW(5), 6)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, LW(5), -1)
-    CALL_CHILD(PTR(evt_moamoa))
-    SPAWN_EVENT(PTR(MOAMOA_SET_BODYSCALE))
+    CALL_CHILD(evt_moamoa)
+    SPAWN_EVENT(MOAMOA_SET_BODYSCALE)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -425,7 +430,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -676,9 +681,9 @@ static EVT_BEGIN(phase_event)
                             END_SWITCH
                             CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
                             IF_INT_NOT_EQUAL(LW(1), 1)
-                                CALL_CHILD(PTR(moamoa_tentacl_on))
+                                CALL_CHILD(moamoa_tentacl_on)
                             ELSE
-                                CALL_CHILD(PTR(moamoa_mouth_on))
+                                CALL_CHILD(moamoa_mouth_on)
                             END_IF
                             CALL(btlevtcmd_SetHitOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
                             CALL(btlevtcmd_SetHitCursorOffset, BTL_UNIT_SELF, 1, 0, 0, 0)
@@ -800,7 +805,7 @@ static ExtTexInfo ext_moamoa_data[] = {
     {0},
 };
 
-USER_FUNC(moamoa_guruguru) {
+static USER_FUNC(moamoa_guruguru) {
     s32 i;
     BtlMoamoa* elem;
     ExtdrvPose* pose;
@@ -849,7 +854,7 @@ USER_FUNC(moamoa_guruguru) {
     return 2;
 }
 
-USER_FUNC(moamoa_bomb) {
+static USER_FUNC(moamoa_bomb) {
     ExtdrvPose* p2;
     BtlMoamoa* e2;
     s32 k;
@@ -920,7 +925,7 @@ USER_FUNC(moamoa_bomb) {
     return 0;
 }
 
-USER_FUNC(moamoa1_on) {
+static USER_FUNC(moamoa1_on) {
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, wp->unitId);
     s32 i;
     BattleUnitPart* part;
@@ -971,7 +976,7 @@ USER_FUNC(moamoa1_on) {
     return 2;
 }
 
-USER_FUNC(moamoa2_on) {
+static USER_FUNC(moamoa2_on) {
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, wp->unitId);
     BtlMoamoa* elem;
     AnimationPose* ap;
@@ -1007,7 +1012,7 @@ USER_FUNC(moamoa2_on) {
     return 2;
 }
 
-USER_FUNC(moamoa_on) {
+static USER_FUNC(moamoa_on) {
     s32 i;
     BtlMoamoa* elem;
     MoamoaExtData* d;
@@ -1054,13 +1059,13 @@ USER_FUNC(moamoa_on) {
     for (i = 0; i < ap->numWorldPositions; i++, p++) {
         *p = (Vec){0.0f, -1000.0f, 0.0f};
     }
-    for (i = 0; i < g_moamoa_chain_num; i++) {
+    for (i = 0; i < g_moamoa_chain_max; i++) {
         wp->chainIdx[i][0] = animPoseGetGroupIdx(wp->poseId[0], g_moamoa_chain_tbl[i].from);
         wp->chainIdx[i][1] = animPoseGetGroupIdx(wp->poseId[0], g_moamoa_chain_tbl[i].to);
     }
     elem = wp->elems;
     for (i = 0; i < wp->count; i++, elem++) {
-        elem->chain = i % g_moamoa_chain_num;
+        elem->chain = i % g_moamoa_chain_max;
         elem->order = wp->chainNum[elem->chain]++;
     }
     moamoa1_on(event, isFirstCall);
@@ -1166,7 +1171,7 @@ static EVT_BEGIN(evt_moamoa)
     RETURN
 EVT_END()
 
-void moamoa_pose(BtlMoamoa* elem) {
+static void moamoa_pose(BtlMoamoa* elem) {
     static const char* group_tbl[][2] = {
         {"c_n_moa_a", "S_1"},
         {"c_n_moa_b", "S_1"},
@@ -1341,7 +1346,7 @@ static void ext_moamoa_main(void) {
     dispEntry(CAMERA_3D, 0.0f, 1, moamoa_draw, NULL);
 }
 
-void moamoa_draw(CameraId cameraId, void* param) {
+static void moamoa_draw(CameraId cameraId, void* param) {
     extLoadRenderMode();
     extLoadVertex();
     extLoadTexture();
@@ -1350,7 +1355,7 @@ void moamoa_draw(CameraId cameraId, void* param) {
     extLoadTextureExit();
 }
 
-USER_FUNC(moamoa_set_bodyScale) {
+static USER_FUNC(moamoa_set_bodyScale) {
     BattleUnit* unit;
     s32 n;
 

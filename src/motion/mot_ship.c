@@ -1,7 +1,7 @@
 // Mario's paper boat motion (boat panel): turning into the boat, steering, swirls (whirlpools), the dash and
 // turning back.
 #include "version.h"
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo unit is built without the main precompiled header: only the dtrigf constants lead its data
 #define DTRIGF_WITH_INITIAL_VALUES
 #include <dtrigf.h>
@@ -47,7 +47,7 @@ typedef struct MotShipWork {
     Vec harborPos;               // 0x3C: docking target (checkHarbor)
 } MotShipWork;                   // size 0x48
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo's small-data limit puts shipData in .data, ahead of the events
 f32 shipData[6] = {-0.05f, -0.7f, 0.02f, 0.02f, 2.0f, 0.01f};
 #endif
@@ -74,7 +74,7 @@ EVT_BEGIN(sound_evt2)
     RETURN
 EVT_END()
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 f32 shipData[6] = {-0.05f, -0.7f, 0.02f, 0.02f, 2.0f, 0.01f};
 #endif
 const char* paper_ship[4] = {"p_hune", "p_hune_g", "p_hune_y", "p_hune_v"};
@@ -94,13 +94,13 @@ static inline s32 harborKind(HitEntry* hit) {
     return k;
 }
 
-BOOL checkHarbor(Vec* out);
+static BOOL checkHarbor(Vec* out);
 
 double __fabs(double);
 
 #define SHIP_DIR (marioGetPtr()->motShip->flags & 1)
 
-void shipMove(void);
+static void shipMove(void);
 #define EFFP() ((EffFunemizuWork*)marioGetPtr()->motShip->wakeEff->userdata)
 s32 N_marioShipGetDir(void) {
     marioGetPtr();
@@ -224,7 +224,7 @@ void mot_ship_post(void) {
     if (mario->dispFlags & MARIO_DISP_FLAG_PAPER_ON) {
         marioPaperOff();
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // the demo keeps Mario's collision box and resets only the draw offset and rotation
     mario->dispFlags &= ~MARIO_DISP_FLAG_FRONT_POSE;
     mario->dispFlags &= ~MARIO_DISP_FLAG_DIR_LOCK;
@@ -240,7 +240,7 @@ void mot_ship_post(void) {
             marioGetPtr()->motShip->sfxId = t;
         }
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     {
         Vec zero = {0.0f, 0.0f, 0.0f};
         mario->dispOfs = zero;
@@ -356,7 +356,7 @@ void mot_ship(void) {
             m->jumpPeakAirTime = 0;
             m->baseSpeed = 0.0f;
             marioGetPtr()->motShip->turnSpeed = 0.0f;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             N_marioSetBottomlessRespawnPosOnBeroEntry(m->position.x, m->position.y, m->position.z);
 #endif
             shipDecideDir(m, &p1, &p2);
@@ -781,7 +781,7 @@ void mot_ship(void) {
                     r27 = 1;
                 }
             } else {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 if (m->displayDirection <= -540.0f) {
                     m->displayDirection = -540.0f;
 #else
@@ -812,7 +812,7 @@ void mot_ship(void) {
             marioChgMot(MARIO_MOTION_FALL);
             marioSetFallPara();
             allPartyRideOff();
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             N_marioSetBottomlessRespawnPosOnBeroEntry(m->position.x, m->position.y, m->position.z);
             N_marioReloadMapOnBottomlessOff();
 #endif
@@ -931,9 +931,9 @@ BOOL marioChkShipMoveMode(void) {
 #define SHIP_WORK marioGetPtr()->motShip
 #define SHIP_DISP marioGetPtr()->motShip
 
-void shipMove(void) {
+static void shipMove(void) {
     MarioWork* m = marioGetPtr();
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // the demo clamps the swirl with its own variable (swirlMax) and keeps the negative limit in nmax
     f32 spd;
     f32 swirlMax;
@@ -970,7 +970,7 @@ void shipMove(void) {
         movePos(&dx, &dz, marioGetPtr()->motShip->swirlX, marioGetPtr()->motShip->swirlY);
         marioGetPtr()->motShip->dispX += dx;
         marioGetPtr()->motShip->dispY += dz;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         swirlMax = shipData[4];
         if (marioGetPtr()->motShip->dispX > swirlMax) {
             swirlMax = shipData[4];
@@ -1025,7 +1025,7 @@ void shipMove(void) {
             }
         } else {
             vx += ((tx - 1.0f) - vx) * shipData[rateIdx];
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             nmax = -max;
             if (vx <= nmax) {
                 vx = nmax;
@@ -1043,7 +1043,7 @@ void shipMove(void) {
             }
         } else {
             vz += ((tz - 1.0f) - vz) * shipData[rateIdx];
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             nmax = -max;
             if (vz <= nmax) {
                 vz = nmax;
@@ -1100,7 +1100,7 @@ void shipMove(void) {
             marioGetPtr()->motShip->sfxId = snd;
         }
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (((u32)(marioGetPtr()->motShip->sfxId)) != 0xFFFFFFFFU) {
         psndSFX_pos(marioGetPtr()->motShip->sfxId, (&m->position));
     }
@@ -1117,7 +1117,7 @@ void shipStrippedPool(f32* p) {
 
 // Looks for a harbour (boat panel dock) 40 units ahead, to the left and to the right of Mario; stores its rounded
 // position in *out.
-BOOL checkHarbor(Vec* out) {
+static BOOL checkHarbor(Vec* out) {
     f32 ix, iy, iz;
     f32 tx, ty, tz, sn, cs, hx, hy, hz, dist, nx, ny, nz;
     Vec p1, p2, p3;

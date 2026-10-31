@@ -91,10 +91,10 @@ static inline f32 pt_frand(void) {
     return (f32)(u32)seed * 2.3283064e-10f;
 }
 
-void effParticleDisp(CameraId cameraId, EffectEntry* effect);
-void effParticleMain(EffectEntry* effect);
-void EmitterEmit(EffectEntry* effect, ParticleEmitter* emitter);
-void ParticleEmit(EffectEntry* effect, ParticleItem* p, ParticleEmitter* emitter);
+static void effParticleDisp(CameraId cameraId, EffectEntry* effect);
+static void effParticleMain(EffectEntry* effect);
+static void EmitterEmit(EffectEntry* effect, ParticleEmitter* emitter);
+static void ParticleEmit(EffectEntry* effect, ParticleItem* p, ParticleEmitter* emitter);
 
 static inline f32 pt_gauss(void) {
     static f32 y2;
@@ -124,7 +124,7 @@ void particleStrippedPool(f32* f, s32 i) {
     *f = (f32)i;
 }
 
-void ParticleEmit(EffectEntry* effect, ParticleItem* p, ParticleEmitter* emitter) {
+static void ParticleEmit(EffectEntry* effect, ParticleItem* p, ParticleEmitter* emitter) {
     ParticleWork* work = effect->userdata;
     f32 w;
     f32 r;
@@ -147,7 +147,7 @@ void ParticleEmit(EffectEntry* effect, ParticleItem* p, ParticleEmitter* emitter
     PSVECAdd(&emitter->pos, &p->pos, &p->pos);
 }
 
-void EmitterEmit(EffectEntry* effect, ParticleEmitter* emitter) {
+static void EmitterEmit(EffectEntry* effect, ParticleEmitter* emitter) {
     ParticleWork* work = effect->userdata;
     u32 prev, n;
     s32 idx;
@@ -238,7 +238,7 @@ EffectEntry* effParticleEntry(s32 type, f32 x, f32 y, f32 z, f32 dx, f32 dy, f32
     return effect;
 }
 
-void effParticleMain(EffectEntry* effect) {
+static void effParticleMain(EffectEntry* effect) {
     ParticleWork* work = effect->userdata;
     Vec zero = {0.0f, 0.0f, 0.0f};
     Vec pos;
@@ -290,7 +290,7 @@ void effParticleMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&pos), 2, (DispCallback)effParticleDisp, effect);
 }
 
-void effParticleDisp(CameraId cameraId, EffectEntry* effect) {
+static void effParticleDisp(CameraId cameraId, EffectEntry* effect) {
     ParticleWork* work = effect->userdata;
     CameraEntry* cam = camGetPtr(cameraId);
     s32 alpha = work->alpha;

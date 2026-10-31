@@ -22,6 +22,8 @@
 #include <math.h>
 #include "version.h"
 
+static f32 _intplGetFloat(s32 mode, f32 t);
+
 extern char* strcat(char* dest, const char* src);
 
 #pragma optimize_for_size on
@@ -91,7 +93,7 @@ USER_FUNC(evt_npc_slave_entry) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // FAKE: the demo's .rodata keeps an orphan "%f%f%f" just before "_s%d"; an unreferenced static that prints an NPC position
 // leaves the string where the original's stripped code did
 static void npc_report_pos(NpcEntry* npc) {
@@ -534,7 +536,7 @@ USER_FUNC(evt_npc_move_position) {
     }
 
     // Integrate move offset along heading (flag 0x10000 freezes it; the demo has no freeze flag)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (!(npc->jumpFlags & 0x10000))
 #endif
     {
@@ -1101,7 +1103,7 @@ USER_FUNC(evt_npc_homing_target) {
 }
 
 // intplGetValue, but for a normalized t in [0, 1]
-f32 _intplGetFloat(s32 mode, f32 t) {
+static f32 _intplGetFloat(s32 mode, f32 t) {
     f32 v, u, c;
     f32 r;
 
@@ -1470,7 +1472,7 @@ USER_FUNC(evt_npc_set_camid) {
 
 // FAKE: keeps the following function(s) out of line as in the target; removing it changes the code
 #pragma dont_inline on
-f32 _get_target_dir(EventEntry* event, NpcEntry* npc, const char* targetName) {
+static f32 _get_target_dir(EventEntry* event, NpcEntry* npc, const char* targetName) {
     Vec target, position, diff;
 
     if (strcmp(targetName, "mario") == 0) {
@@ -1932,7 +1934,7 @@ USER_FUNC(evt_npc_wait_battle_end) {
     if (party) {
         partyCtrlOn();
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     psndClearFlag(PSND_FLAG_SFX_WITH_BGM);
 #else
     L_psndBGM_stop();
@@ -2040,7 +2042,7 @@ USER_FUNC(evt_npc_get_drop_item) {
     if (npc->battleInfo.battleFlags & NPC_BATTLE_NO_ITEM) {
         evtSetValue(event, index, 0);
     } else {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         evtSetValue(event, index, 0); // the demo never reports a dropped item
 #else
         evtSetValue(event, index, npc->battleInfo.itemDropped);
@@ -2101,11 +2103,11 @@ USER_FUNC(evt_npc_get_drop_flower) {
 
 // FAKE: keeps the following function(s) out of line as in the target; removing it changes the code
 #pragma dont_inline on
-void _npc_check_coin(NpcEntry* npc, s32* value) {
+static void _npc_check_coin(NpcEntry* npc, s32* value) {
     *value += npc->btlCoinDropCount;
 }
 
-void _npc_check_coin_group(NpcEntry* npc, s32* value) {
+static void _npc_check_coin_group(NpcEntry* npc, s32* value) {
     NpcEntry* next = npc->next;
     int i;
 
@@ -2424,7 +2426,7 @@ USER_FUNC(evt_npc_calc_score) {
 
 // FAKE: keeps the following function(s) out of line as in the target; removing it changes the code
 #pragma dont_inline on
-void _kamek_houki_kemuri(NpcEntry* npc, s32 animState) {
+static void _kamek_houki_kemuri(NpcEntry* npc, s32 animState) {
     static u8 cnt;
     f32 a2, a5;
     u8 mask;
@@ -2452,7 +2454,7 @@ void _kamek_houki_kemuri(NpcEntry* npc, s32 animState) {
         }
         effect = effKemuri10N64Entry(0, a2, (18.0f * npc->scale.x) + npc->position.y, npc->position.z, a5, 0.0f, 0.0f,
                                      npc->scale.x);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         if (!strcmp(gp->currentMapName, "kpa_01")) {
             ((EffKemuri10N64Work*)effect->userdata)->camera = 7;
         }
@@ -2755,7 +2757,7 @@ USER_FUNC(evt_npc_sound_data_set) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_npc_release_fieldnpc) {
+USER_FUNC(evt_npc_release_filednpc) {
     BOOL set = evtGetValue(event, *event->args);
     NpcWork* wp = npcGetWorkPtr();
     if (set) {

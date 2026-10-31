@@ -30,8 +30,8 @@ effN64Vtx size8x8_tex32x32_vtx[] = {
     {-4, 4, 0, 0, 1024, 0, 0, 0, 255},
 };
 
-void effHokoriMain(EffectEntry* effect);
-void effHokoriDisp(CameraId cameraId, EffectEntry* effect);
+static void effHokoriMain(EffectEntry* effect);
+static void effHokoriDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effHokoriN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z) {
     s32 count;
@@ -87,7 +87,7 @@ EffectEntry* effHokoriN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effHokoriMain(EffectEntry* effect) {
+static void effHokoriMain(EffectEntry* effect) {
     EffHokoriN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -128,7 +128,7 @@ void effHokoriMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effHokoriDisp, effect);
 }
 
-void effHokoriDisp(CameraId cameraId, EffectEntry* effect) {
+static void effHokoriDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffHokoriN64Work* work;
     GXTexObj tex;

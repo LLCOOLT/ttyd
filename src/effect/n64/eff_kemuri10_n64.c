@@ -51,8 +51,8 @@ static effN64Vtx stg_houki_kemuri_v[] = {
     {0, 50, 20, 1024, 512, 255, 255, 255, 255},
 };
 
-void effKemuri10Main(EffectEntry* effect);
-void effKemuri10Disp(CameraId cameraId, EffectEntry* effect);
+static void effKemuri10Main(EffectEntry* effect);
+static void effKemuri10Disp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effKemuri10N64Entry(s32 type, f32 x, f32 y, f32 z, f32 dx, f32 dy, f32 dz, f32 scale) {
     EffectEntry* effect;
@@ -139,13 +139,13 @@ EffectEntry* effKemuri10N64Entry(s32 type, f32 x, f32 y, f32 z, f32 dx, f32 dy, 
     work->rot[1][3] = zr;
     work->rot[2][3] = zr;
     work->scale = 0.1f * scale;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     work->camera = 4;
 #endif
     return effect;
 }
 
-void effKemuri10Main(EffectEntry* effect) {
+static void effKemuri10Main(EffectEntry* effect) {
     EffKemuri10N64Work* work;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -159,7 +159,7 @@ void effKemuri10Main(EffectEntry* effect) {
     tmp.z = work->position.z;
     position = tmp;
     timer = work->timer;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     camera = work->camera;
 #endif
     work->timer = timer - 1;
@@ -192,14 +192,14 @@ void effKemuri10Main(EffectEntry* effect) {
         work->scale *= 1.05f;
         work++;
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effKemuri10Disp, effect);
 #else
     dispEntry((CameraId)camera, dispCalcZ(&position), 2, (DispCallback)effKemuri10Disp, effect);
 #endif
 }
 
-void effKemuri10Disp(CameraId cameraId, EffectEntry* effect) {
+static void effKemuri10Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera = camGetPtr(cameraId);
     EffKemuri10N64Work* work = effect->userdata;
     s32 idx;

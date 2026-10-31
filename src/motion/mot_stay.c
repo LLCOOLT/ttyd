@@ -85,7 +85,7 @@ void mot_stay(void) {
             mario->wMotionTimer = 0;
         }
         mario->trigFlags &= ~MARIO_TRIG_FLAG_JABARA_CHK;
-#elif VERSION != VERSION_DEMO
+#elif VERSION >= VERSION_JP
         mario->wMotionTimer = 0;
 #endif
         mario->lastGroundPos = mario->position;
@@ -95,7 +95,7 @@ void mot_stay(void) {
         mario->idleKeyTimer = 0;
         marioSoundInit();
         marioResetCamFollowRate();
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         if (mario->flags & MARIO_FLAG_IS_8_BIT) {
             marioChgPose("M_S_1");
             if (!(mario->flags & MARIO_FLAG_FORCED_MOVEMENT)) {
@@ -124,7 +124,7 @@ void mot_stay(void) {
             } else {
                 marioChgPoseTime("M_U_2", 10);
             }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         }
 #endif
         if (!(mario->flags & MARIO_FLAG_FORCED_MOVEMENT)) {
@@ -132,7 +132,7 @@ void mot_stay(void) {
         }
         mario->flags &= ~MARIO_FLAG_IS_PUSHING;
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (mario->flags & MARIO_FLAG_IS_8_BIT) {
         marioChkJump();
         if (mario->controlStickSensitivity > 0.0f) {
@@ -340,7 +340,7 @@ void marioChgMotAuto(void) {
     }
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 void mot_stay_post(void) {
     MarioWork* mario;
     mario = marioGetPtr();

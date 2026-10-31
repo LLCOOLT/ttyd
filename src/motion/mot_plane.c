@@ -22,7 +22,7 @@
 #include "version.h"
 #include <dolphin/pad.h>
 
-BOOL chkCollision(f32* outY);
+static BOOL chkCollision(f32* outY);
 static void flyMain(void);
 
 f32 planeData[41] = {
@@ -114,7 +114,7 @@ s32 marioGetPlaneStatus(void) {
     return 1;
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 void mario_plane_cancel(void) {
     MarioWork* mario = marioGetPtr();
     if ((u16)mario->currMotionId == MARIO_MOTION_PLANE && (s32)mario->currSubMotionId >= 12 && (s32)mario->currSubMotionId < 20) {
@@ -314,7 +314,7 @@ void mot_plane(void) {
     }
 #endif
     flyMain();
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (marioKeyOffChk() && !(mp->trigFlags & MARIO_TRIG_FLAG_SHIP_PLANE_EVT_ON)) {
         MarioWork* m = marioGetPtr();
         if ((u16)m->currMotionId == MARIO_MOTION_PLANE && (s32)m->currSubMotionId >= 12 && (s32)m->currSubMotionId < 20) {
@@ -472,7 +472,7 @@ void mot_plane(void) {
             break;
         case 70: {
             Vec p;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             set_damage_root_ypos(mp->position.y);
 #endif
             p = mp->position;
@@ -817,7 +817,7 @@ static f32 planeDead270(void) {
     return 270.0f;
 }
 
-BOOL chkCollision(f32* outY) {
+static BOOL chkCollision(f32* outY) {
     Vec dir, hpos, v, v2;
     f32 s1, c1, s0, c0, s2, c2;
     f32 ox, oy, oz, dist, nx, ny, nz;
@@ -898,7 +898,7 @@ BOOL chkCollision(f32* outY) {
         y = mario->motPlane->tipPos.y;
         z = mario->motPlane->tipPos.z;
         mario->hitobjStandOn = NULL;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         dist = 2.0f;
         hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, x, y, z, 0.0f, -1.0f, 0.0f);
 #else
@@ -911,7 +911,7 @@ BOOL chkCollision(f32* outY) {
             *outY = oy;
         }
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (!ret) {
         PSVECSubtract(&mario->motPlane->tipPos, &mario->motPlane->frontPos, &dir);
         dist = PSVECMag(&dir);

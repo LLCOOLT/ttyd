@@ -28,8 +28,8 @@ typedef struct EffFireSparkN64Work {
     f32 speedZ;         // 0x6c
 } EffFireSparkN64Work;
 
-void effFireSparkMain(EffectEntry* effect);
-void effFireSparkDisp(CameraId cameraId, EffectEntry* effect);
+static void effFireSparkMain(EffectEntry* effect);
+static void effFireSparkDisp(CameraId cameraId, EffectEntry* effect);
 
 static f32 scale_data[30] = {
     0.01f, 0.05f, 0.1f, 0.2f, 0.35f, 0.5f, 0.65f, 0.8f, 0.95f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.95f, 0.8f, 0.65f, 0.5f, 0.35f, 0.2f, 0.1f, 0.05f, 0.01f,
@@ -89,7 +89,7 @@ EffectEntry* effFireSparkN64Entry(s32 type, s32 count, s32 lifetime, f32 x, f32 
     return effect;
 }
 
-void effFireSparkMain(EffectEntry* effect) {
+static void effFireSparkMain(EffectEntry* effect) {
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
     f32 halfX;
@@ -168,7 +168,7 @@ void effFireSparkMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effFireSparkDisp, effect);
 }
 
-void effFireSparkDisp(CameraId cameraId, EffectEntry* effect) {
+static void effFireSparkDisp(CameraId cameraId, EffectEntry* effect) {
     s32 i;
     EffFireSparkN64Work* work;
     CameraEntry* camera;

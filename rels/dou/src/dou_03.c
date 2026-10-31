@@ -18,7 +18,6 @@
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "dou.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
@@ -163,7 +162,7 @@ EVT_BEGIN(watergate_handle_init)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG5_22_FLOODGATE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("S_reba"), MAPOBJ_FLAG_HIDE)
         SET_VALUE(LW(0), STRING("s_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_hitobj_attr_onoff, 1, 0, STRING("s_bero"), 128)
         CALL(evt_hitobj_onoff, STRING("A_reba"), 1, 0)
     ELSE
@@ -257,7 +256,11 @@ EVT_BEGIN(watergate_handle)
             CALL(evt_mario_key_onoff, 1)
             RETURN
         END_IF
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_win_item_select, PTR(itemsel_table), LW(0))
+#else
         CALL(evt_win_item_select, 0, PTR(itemsel_table), LW(0), 0)
+#endif
         IF_INT_EQUAL(LW(0), -1)
             RETURN
         END_IF
@@ -294,10 +297,10 @@ EVT_BEGIN(watergate_handle)
         CALL(evt_mapobj_get_position, STRING("s03_mon"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_FLOODGATE_UP2"), LW(0), LW(1), LW(2), LW(9))
         DELETE_EVENT(GW(10))
-        SPAWN_EVENT(PTR(nagare_taru))
-        SPAWN_EVENT(PTR(nagare_taru_se))
+        SPAWN_EVENT(nagare_taru)
+        SPAWN_EVENT(nagare_taru_se)
         DELETE_EVENT(GW(11))
-        SPAWN_EVENT(PTR(nagare_bin))
+        SPAWN_EVENT(nagare_bin)
         WAIT_MS(2000)
         CALL(evt_cam3d_evt_off, 300, 11)
         WAIT_MS(500)
@@ -305,11 +308,15 @@ EVT_BEGIN(watergate_handle)
         CALL(evt_snd_sfxon, STRING("SFX_STG5_ELMOS_VOICE1"), 0)
         CALL(evt_msg_print, 0, STRING("stg5_dou_02"), 0, 0)
         WAIT_MS(500)
+#if VERSION >= VERSION_JP
         CALL(evt_party_stop, 0)
+#endif
         CALL(evt_msg_print_party, STRING("stg5_dou_03"))
+#if VERSION >= VERSION_JP
         CALL(evt_party_run, 0)
+#endif
         SET_VALUE(LW(0), STRING("s_bero"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
         CALL(evt_hitobj_attr_onoff, 1, 1, STRING("s_bero"), 128)
         SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_22_FLOODGATE)
         CALL(evt_mario_key_onoff, 1)
@@ -424,18 +431,18 @@ EVT_BEGIN(dou_03_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_map_playanim, STRING("nami"), 1, 0)
     CALL(evt_map_playanim, STRING("moku"), 1, 0)
     CALL(evt_map_playanim, STRING("tubo"), 1, 0)
     CALL(evt_mobj_kururing_floor, STRING("kururin1"), 450, 275, -550, STRING("s03_iwadan2"), 125, GSWF(GSWF_DOU03_STAR_PIECE_PANEL))
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_makimaki"), 0, PTR(watergate_handle), 0)
-    SPAWN_EVENT(PTR(watergate_handle_init))
+    SPAWN_EVENT(watergate_handle_init)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_20_THE_BLUE_BLOCK)
         CALL(evt_mapobj_trans, 0, STRING("tetu"), 1, 100, 0)
     END_IF
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
-    CALL_CHILD(PTR(evt_gazigazi_entry))
+    CALL_CHILD(evt_gazigazi_entry)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG5_22_FLOODGATE)
         SET_VALUE(LW(0), STRING("S_taru"))
         SET_VALUE(LW(1), STRING("A_taru"))

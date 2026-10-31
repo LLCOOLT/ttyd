@@ -2,7 +2,7 @@
 #include "seq/seq_logo.h"
 #include "driver/arcdrv.h"
 #include "version.h"
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #include "driver/animdrv.h"
 #endif
 #include "driver/effdrv.h"
@@ -54,31 +54,41 @@ enum LogoScreen {
 };
 
 // local prototypes
-void logoDisp(CameraId camId, void* param);
-void dummy_draw(CameraId camId, void* param);
-void progDisp(CameraId camId, void* param);
+static void logoDisp(CameraId camId, void* param);
+static void dummy_draw(CameraId camId, void* param);
+static void progDisp(CameraId camId, void* param);
 
 #if VERSION <= VERSION_JP
 static FileEntry* logoAsyncFirst(void);
 #endif
 
-#if VERSION == VERSION_DEMO
-// The demo always starts interlaced and preloads the E3 demo's models and textures.
+#if VERSION <= VERSION_DEMO_US
+// The demos always start interlaced; the US demo also starts the logo files loading and preloads the E3 demo's
+// models and textures.
 void seq_logoInit(SequenceWork* work) {
     memset(wp, 0, sizeof(LogoWork));
+#if VERSION == VERSION_DEMO_JP
+    // the store demo loads its logo textures from its own file
+    wp->texture = fileAllocf(4, "%s/monthry.tpl", getMarioStDvdRoot());
+#else
     wp->texture = fileAllocf(4, "%s/mariost.tpl", getMarioStDvdRoot());
+#endif
     wp->progressive = FALSE;
+#if VERSION == VERSION_DEMO_US
     work->state = 0;
     logoAsyncFirst();
+#endif
     VIConfigure(&sRMObjHReso);
     VIFlush();
     VIWaitForRetrace();
+#if VERSION == VERSION_DEMO_US
     animGroupBaseAsync("c_pkr", 0, NULL);
     animGroupBaseAsync("c_pnk", 0, NULL);
     animGroupBaseAsync("c_windy", 0, NULL);
     animGroupBaseAsync("OFF_d_meku", 0, NULL);
     animGroupBaseAsync("EFF_Mugi", 0, NULL);
     fileAsyncf(4, 0, "%s/e3.tpl", getMarioStDvdRoot());
+#endif
 }
 
 #elif VERSION <= VERSION_JP
@@ -194,7 +204,7 @@ void seq_logoExit(SequenceWork* work) {
     effTexSetup();
     marioPoseInit();
     fileFree(wp->texture);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     gp->flags |= GLOBAL_FLAG_VIDEO_MODE_SET;
 #endif
 }
@@ -221,7 +231,7 @@ void seq_logoMain(SequenceWork* work) {
             if (fadeIsFinish() && !wp->progressive) {
                 work->state++;
                 time = gp->renderTime;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 // The demo sets this flag in seq_logoExit instead.
                 gp->flags |= GLOBAL_FLAG_VIDEO_MODE_SET;
 #endif
@@ -536,7 +546,7 @@ void seq_logoMain(SequenceWork* work) {
 #endif
 
 // param is unused
-void logoDisp(CameraId camId, void* param) {
+static void logoDisp(CameraId camId, void* param) {
     GXRenderModeObj* rmode;
     f32 width, height, x, y;
 
@@ -805,7 +815,7 @@ static FileEntry* logoAsyncFirst(void) {
     return fileAsyncf(0, 0, "%s/b/first", getMarioStDvdRoot());
 }
 #endif
-void dummy_draw(CameraId camId, void* param) {
+static void dummy_draw(CameraId camId, void* param) {
     GXRenderModeObj* rmode;
     f32 scale;
     u16 height;
@@ -830,7 +840,7 @@ void dummy_draw(CameraId camId, void* param) {
 
 #if VERSION <= VERSION_JP
 // param is unused
-void progDisp(CameraId camId, void* param) {
+static void progDisp(CameraId camId, void* param) {
     static OSTime time; // time instance 2
     const char* msg;
     f32 width;
@@ -930,7 +940,7 @@ void progDisp(CameraId camId, void* param) {
                     wp->progressive = 0;
                     gp->flags &= ~GLOBAL_FLAG_PROGRESSIVE;
                 }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 gp->flags |= GLOBAL_FLAG_VIDEO_MODE_SET;
 #endif
                 break;
@@ -947,7 +957,7 @@ void progDisp(CameraId camId, void* param) {
 #else
 #if VERSION == VERSION_EU
 // PAL: the 50Hz / 60Hz (EURGB60) selection screen
-void progDisp(CameraId camId, void* param) {
+static void progDisp(CameraId camId, void* param) {
     static OSTime time;
     const char* msg;
     f32 width;
@@ -1063,7 +1073,7 @@ void progDisp(CameraId camId, void* param) {
 }
 
 #else
-void progDisp(CameraId camId, void* param) {
+static void progDisp(CameraId camId, void* param) {
     static OSTime time;
     const char* msg;
     f32 width;

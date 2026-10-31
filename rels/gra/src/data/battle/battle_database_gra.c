@@ -105,7 +105,11 @@ BattleStageObjectData gra_btlobject_data[] = {
     {"kusa_3", 2, 1, {-77.0f, 0.0f, 77.0f}, 20, 40, {0}},
     {"kusa_4", 2, 1, {-155.0f, 0.0f, 71.0f}, 30, 30, {0}},
     {"kusamura_mae", 2, 1, {0.0f, 0.0f, 72.0f}, 0, 60, {0}},
+#if VERSION <= VERSION_DEMO_US
+    {"kusamura_usiro", 2, 1, {0.0f, 0.0f, -70.0f}, 10, 50, {0}},
+#else
     {"kusamura_usiro", 2, 1, {0.0f, 0.0f, -65.0f}, 10, 50, {0}},
+#endif
     {"iwa", 2, 1, {0.0f, 0.0f, -71.0f}, 20, 40, {0}},
     {"ki_1", 2, 0, {100.0f, 0.0f, -51.0f}, 0, 60, {0}},
     {"ki_2", 2, 0, {-123.0f, 0.0f, -48.0f}, 10, 50, {0}},
@@ -1512,7 +1516,7 @@ NpcBattleSelect btlgrpsel_gra_btlno_gra_05_03_off[] = {
 
 NpcSetupBattleInfo btlsetup_gra_tbl[] = {
     {
-        /*"マップstg_04_0"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x34\x5F\x30", // name
+        "マップstg_04_0", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1522,7 +1526,7 @@ NpcSetupBattleInfo btlsetup_gra_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"マップstg_04_1"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x34\x5F\x31", // name
+        "マップstg_04_1", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1532,7 +1536,7 @@ NpcSetupBattleInfo btlsetup_gra_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"GRA00ランペルその１"*/"\x47\x52\x41\x30\x30\x83\x89\x83\x93\x83\x79\x83\x8B\x82\xBB\x82\xCC\x82\x50", // name
+        "GRA00ランペルその１", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1543,7 +1547,7 @@ NpcSetupBattleInfo btlsetup_gra_tbl[] = {
         "BGM_BOSS_STG4_RUNPELL1", // bgmName
     },
     {
-        /*"GRA00ランペルその２"*/"\x47\x52\x41\x30\x30\x83\x89\x83\x93\x83\x79\x83\x8B\x82\xBB\x82\xCC\x82\x51", // name
+        "GRA00ランペルその２", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1554,7 +1558,7 @@ NpcSetupBattleInfo btlsetup_gra_tbl[] = {
         "BGM_BOSS_STG4_RUNPELL1", // bgmName
     },
     {
-        /*"GRA01ハイパークリボー"*/"\x47\x52\x41\x30\x31\x83\x6E\x83\x43\x83\x70\x81\x5B\x83\x4E\x83\x8A\x83\x7B\x81\x5B", // name
+        "GRA01ハイパークリボー", // name
         NULL, 0, // mapName..fixedItem
         GSWF(GSWF_STG4_MARIO_IS_SHADOW), // swFlag
         btlgrpsel_gra_btlno_gra_01_01_on, // altSelect
@@ -1564,7 +1568,7 @@ NpcSetupBattleInfo btlsetup_gra_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"GRA01ハイパーパタクリ"*/"\x47\x52\x41\x30\x31\x83\x6E\x83\x43\x83\x70\x81\x5B\x83\x70\x83\x5E\x83\x4E\x83\x8A", // name
+        "GRA01ハイパーパタクリ", // name
         NULL, 0, // mapName..fixedItem
         GSWF(GSWF_STG4_MARIO_IS_SHADOW), // swFlag
         btlgrpsel_gra_btlno_gra_01_03_on, // altSelect
@@ -1574,7 +1578,7 @@ NpcSetupBattleInfo btlsetup_gra_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"GRA01ハイパートゲクリ"*/"\x47\x52\x41\x30\x31\x83\x6E\x83\x43\x83\x70\x81\x5B\x83\x67\x83\x51\x83\x4E\x83\x8A", // name
+        "GRA01ハイパートゲクリ", // name
         NULL, 0, // mapName..fixedItem
         GSWF(GSWF_STG4_MARIO_IS_SHADOW), // swFlag
         btlgrpsel_gra_btlno_gra_01_04_on, // altSelect
@@ -1584,7 +1588,7 @@ NpcSetupBattleInfo btlsetup_gra_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"GRA03ハイパークリボー"*/"\x47\x52\x41\x30\x33\x83\x6E\x83\x43\x83\x70\x81\x5B\x83\x4E\x83\x8A\x83\x7B\x81\x5B", // name
+        "GRA03ハイパークリボー", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1594,7 +1598,7 @@ NpcSetupBattleInfo btlsetup_gra_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"GRA03パンジーさん"*/"\x47\x52\x41\x30\x33\x83\x70\x83\x93\x83\x57\x81\x5B\x82\xB3\x82\xF1", // name
+        "GRA03パンジーさん", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1604,7 +1608,7 @@ NpcSetupBattleInfo btlsetup_gra_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"GRA03パンジーさん"*/"\x47\x52\x41\x30\x33\x83\x70\x83\x93\x83\x57\x81\x5B\x82\xB3\x82\xF1", // name
+        "GRA03パンジーさん", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1614,7 +1618,7 @@ NpcSetupBattleInfo btlsetup_gra_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"GRA04パンジーさん"*/"\x47\x52\x41\x30\x34\x83\x70\x83\x93\x83\x57\x81\x5B\x82\xB3\x82\xF1", // name
+        "GRA04パンジーさん", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1624,7 +1628,7 @@ NpcSetupBattleInfo btlsetup_gra_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"GRA05ハイパーシンエモン"*/"\x47\x52\x41\x30\x35\x83\x6E\x83\x43\x83\x70\x81\x5B\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93", // name
+        "GRA05ハイパーシンエモン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1634,7 +1638,7 @@ NpcSetupBattleInfo btlsetup_gra_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"GRA05ハイパーシンエモン"*/"\x47\x52\x41\x30\x35\x83\x6E\x83\x43\x83\x70\x81\x5B\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93", // name
+        "GRA05ハイパーシンエモン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect

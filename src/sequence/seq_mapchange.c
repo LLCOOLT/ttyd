@@ -131,7 +131,7 @@ static const LangTbl lang_tbl = {{"jp", "us"}};
 // The demo's map change differs in the DEMO blocks below: no SFX stop, the REL is unloaded inline and the
 // sound mode is not set in step 1, psndMapChange runs right after the unload, and the respawn point is not set.
 void seq_mapChangeMain(SequenceWork* work) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     BOOL newarea = strcmp(_next_area, gp->currentAreaName) ? TRUE : FALSE;
 #else
     BOOL newarea = strcmp(_next_area, gp->currentAreaName) != 0;
@@ -156,7 +156,7 @@ void seq_mapChangeMain(SequenceWork* work) {
             gp->mapFadeInDuration = 300;
             gp->areaFadeInType = FADE_OUT_BLACK;
             gp->areaFadeInDuration = 300;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             psndSFXAllOff();
 #endif
             if (!newarea) {
@@ -164,7 +164,7 @@ void seq_mapChangeMain(SequenceWork* work) {
             } else {
                 gp->didAreaChange = TRUE;
             }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             area_name = getAreaName();
             fileAsyncf(0, 0, mc_rel_fmt, getMarioStDvdRoot(), area_name);
             mapPreLoad(_next_map);
@@ -177,7 +177,7 @@ void seq_mapChangeMain(SequenceWork* work) {
             work->state++;
             break;
         case 1:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             if (fadeIsFinish()) {
                 if (gp->relocationBase) {
                     ((void (*)(void))((OSModuleHeader*)gp->relocationBase)->epilog)();
@@ -269,7 +269,7 @@ void seq_mapChangeMain(SequenceWork* work) {
                     psndClearFlag(PSND_FLAG_WAIT_BGM_1);
                 }
                 setupDataBase(_next_area, _next_map);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 psndMapChange();
 #endif
                 evtCode = mapDataPtr(_next_map)->eventAddr;
@@ -309,7 +309,7 @@ void seq_mapChangeMain(SequenceWork* work) {
             MarioWork* mario;
             PartyEntry* party;
             PartyEntry* extraParty;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             if (strncmp(_next_map, "dmo", 3) && strncmp(_next_map, "dig", 3) && strncmp(_next_map, "sys", 3)) {
 #else
             if (strncmp(_next_map, "dmo", 3) && strncmp(_next_map, "dig", 3) && strncmp(_next_map, "end", 3) &&
@@ -354,7 +354,7 @@ void seq_mapChangeMain(SequenceWork* work) {
                             extraParty->position.x += -30.0f * (f32)cos(camGetPtr(CAMERA_3D)->viewYaw);
                             extraParty->position.z += 30.0f * (f32)sin(camGetPtr(CAMERA_3D)->viewYaw);
                         }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                         if (!strcmp(gp->currentMapName, "dou_05") && party) {
                             party->position = mario->position;
                             party->position.x -= 30.0f;
@@ -377,7 +377,7 @@ void seq_mapChangeMain(SequenceWork* work) {
                             }
                         }
 #endif
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                         N_marioSetBottomlessRespawnPos(mario->position.x, 10.0f + mario->position.y, mario->position.z);
 #endif
                         marioKeyOff();
@@ -467,7 +467,7 @@ void _load(const char* prevMapName, const char* newMapName, const char* beroName
         msgLoad(mapFile, 0);
     }
     setupDataLoad(map->mapName);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     sprintf(mapFile, "./bg/%s.tpl", newMapName);
 #else
     sprintf(mapFile, "./b/%s.tpl", newMapName);

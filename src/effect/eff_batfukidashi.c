@@ -54,7 +54,7 @@ EffectEntry* effCoinFukidashiEntry(s32 type, s32 number, s32 duration, f32 x, f3
     return effect;
 }
 
-void effCoinFukidashiMain(EffectEntry* effect) {
+static void effCoinFukidashiMain(EffectEntry* effect) {
     EffCoinFukidashiWork* work = effect->userdata;
     Vec position;
 
@@ -88,7 +88,7 @@ void effCoinFukidashiMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effCoinFukidashiDisp, effect);
 }
 
-void effCoinFukidashiDisp(CameraId cameraId, EffectEntry* effect) {
+static void effCoinFukidashiDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffCoinFukidashiWork* work;
     s32 alpha;

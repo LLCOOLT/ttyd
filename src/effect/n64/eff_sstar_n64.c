@@ -67,8 +67,8 @@ effN64Vtx shooting_dust_vtx[10] = {
     {0, -11, 0, 896, 2048, 0, 0, 0, 191},
 };
 
-void effSstarMain(EffectEntry* effect);
-void effSstarDisp(CameraId cameraId, EffectEntry* effect);
+static void effSstarMain(EffectEntry* effect);
+static void effSstarDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effSstarN64Entry(s32 type, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32 tz, f32 speed) {
     EffectEntry* effect;
@@ -143,7 +143,7 @@ EffectEntry* effSstarN64Entry(s32 type, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32
     return effect;
 }
 
-void effSstarMain(EffectEntry* effect) {
+static void effSstarMain(EffectEntry* effect) {
     EffSstarN64Work* w = effect->userdata;
     MarioWork* mario = marioGetPtr();
     Vec pos;
@@ -184,7 +184,7 @@ void effSstarMain(EffectEntry* effect) {
             w->rotZ = angleABf(0.0f, 0.0f, -w->velocity.y, w->screenSpeedX);
         }
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (mario->position.y - w->position.y > 300.0f) {
         w->life = -1;
     }
@@ -207,7 +207,7 @@ void effSstarMain(EffectEntry* effect) {
     }
 }
 
-void effSstarDisp(CameraId cameraId, EffectEntry* effect) {
+static void effSstarDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffSstarN64Work* w;
     s32 i;

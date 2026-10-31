@@ -10,7 +10,6 @@
 #include "evt/evt_map.h"
 #include "evt/evt_mobj.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "tik.h"
 #include "evt/evt_story.h"
 
@@ -53,9 +52,9 @@ EVT_BEGIN(tik_20_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
-    CALL_CHILD(PTR(evt_gazigazi_entry))
+    CALL_CHILD(evt_gazigazi_entry)
     CALL(evt_map_playanim, STRING("anm_mizu"), 1, 0)
     CALL(evt_map_entry_airport_harbor, 1, STRING("S_Ship_Change_01"), STRING("ue"))
     SET_VALUE(LW(0), STRING("dai_3"))
@@ -68,8 +67,8 @@ EVT_BEGIN(tik_20_init_evt)
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(11), 0)
     SET_VALUE(LW(12), 0)
-    SPAWN_EVENT(PTR(moving_floor))
-    CALL(evt_item_entry, STRING("item_01"), ITEM_DEFEND_PLUS, 180, 100, -125, 16, GSWF(GSWF_TIK20_DEFEND_PLUS_TAKEN), 0)
+    SPAWN_EVENT(moving_floor)
+    CALL(evt_item_entry, STRING("item_01"), ITEM_DEFEND_PLUS, 180, 100, -125, ITEM_ENTRY_FIXED, GSWF(GSWF_TIK20_DEFEND_PLUS_TAKEN), 0)
     CALL(evt_mobj_powerupblk, STRING("pblk01"), -50, 60, -75, 0, GSWF(GSWF_TIK20_SHINE_SPRITE_1), 0)
     CALL(evt_mobj_powerupblk, STRING("pblk02"), 0, 100, -25, 0, GSWF(GSWF_TIK20_SHINE_SPRITE_2), 0)
     CALL(evt_mobj_powerupblk, STRING("pblk03"), 50, 60, -75, 0, GSWF(GSWF_TIK20_SHINE_SPRITE_3), 0)

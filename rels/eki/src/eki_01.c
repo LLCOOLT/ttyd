@@ -12,7 +12,6 @@
 #include "evt/evt_pouch.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "eki.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
@@ -161,7 +160,11 @@ static s32 key_tbl[] = {
 static EVT_BEGIN(evt_chk)
     CALL(evt_pouch_check_item, ITEM_STATION_KEY_0x19, LW(0))
     IF_INT_GREATER(LW(0), 0)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_win_item_select, PTR(key_tbl), LW(0))
+#else
         CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
+#endif
         IF_INT_EQUAL(LW(0), -1)
             CALL(evt_mobj_exec_cancel, STRING("me"))
         END_IF
@@ -171,7 +174,7 @@ EVT_END()
 
 static EVT_BEGIN(evt_lock)
     SET_VALUE(LW(0), 0)
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_32_UNLOCKING_THE_DOOR)
     RETURN
 EVT_END()
@@ -209,7 +212,7 @@ EVT_END()
 EVT_BEGIN(eki_01_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_EKI2_2"))
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_30_ORIGAMI_STAIRS)
@@ -226,7 +229,7 @@ EVT_BEGIN(eki_01_init_evt)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_32_UNLOCKING_THE_DOOR)
         CALL(evt_mobj_lock, STRING("lock"), ITEM_STATION_KEY_0x19, 394, 10, 0, -80, PTR(evt_chk), PTR(evt_lock), GSWF(GSWF_EKI01_DOOR_UNLOCKED))
         SET_VALUE(LW(0), 0)
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     END_IF
     CALL(evt_cloud_init)
     IF_INT_EQUAL(GSWF(GSWF_EKI01_PAPER_1_BLOWN), 0)

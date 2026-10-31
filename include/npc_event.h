@@ -211,4 +211,4 @@ extern EvtWord zakowiz_lost_event[];
 extern EvtWord zakowiz_move_event[];
 extern EvtWord zakowiz_return_event[];
 
-extern EvtWord npc_loiter_move_event[];
+extern EvtWord testnpc_move_event[];

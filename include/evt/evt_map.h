@@ -36,4 +36,3 @@ USER_FUNC(evt_map_replace_mapobj);
 USER_FUNC(N_evt_mapdisp_onoff);
 
 USER_FUNC(evt_map_get_flush_color);
-USER_FUNC(check2);

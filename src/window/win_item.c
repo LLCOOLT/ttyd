@@ -34,11 +34,11 @@ typedef s32 (*PouchGetMaxHPRetS32Fn)(void);
 // FAKE: win_item.c calls pouchGetMaxFP through this prototype (the types it was compiled with) instead of the one in mario/mario_pouch.h; same registers, behaviour-identical.
 typedef s32 (*PouchGetMaxFPRetS32Fn)(void);
 
-void itemUseDisp(WinMgrEntry* entry);
-void itemUseDisp2(WinMgrEntry* entry);
-void itemUseDisp(WinMgrEntry* entry);
-void itemUseDisp2(WinMgrEntry* entry);
-void item_disp(WindowWork* w, f32 xo, f32 yo);
+static void itemUseDisp(WinMgrEntry* entry);
+static void itemUseDisp2(WinMgrEntry* entry);
+static void itemUseDisp(WinMgrEntry* entry);
+static void itemUseDisp2(WinMgrEntry* entry);
+static void item_disp(WindowWork* w, f32 xo, f32 yo);
 
 static const char* luigi_book_1[] = {
     "msg_luigi_book1_txt1",
@@ -122,13 +122,13 @@ static const char* luigi_book_5[] = {
 
 const char** luigi_book_list[] = {luigi_book_1, luigi_book_2, luigi_book_3, luigi_book_4, luigi_book_5};
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 u16 menu_skip_list[] = {1, 9, 10, 11, 6, 7, 8, 5, 3, 2, 4, 0x32, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78};
 #else
 u16 menu_skip_list[] = {9, 10, 11, 6, 7, 8, 5, 3, 2, 4, 0x32, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78};
 #endif
 #define MENU_SKIP_NUM (sizeof(menu_skip_list) / sizeof(menu_skip_list[0]))
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #define WI_MAIL_TPL "%s/window/jp/mail.tpl" // the demo keeps the menu files in window/
 #else
 #define WI_MAIL_TPL "%s/w/jp/mail.tpl"
@@ -310,7 +310,7 @@ s32 winItemMain(WindowWork* w) {
                         w->item.state = 100;
                         w->item.bookTgtX = -170.0f;
                         w->item.bookTgtY = 160.0f;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                         w->flags |= 0x8000;
 #endif
                         book = luigi_book_list[c - 0x37];
@@ -398,7 +398,7 @@ s32 winItemMain(WindowWork* w) {
                     w->item.state = 10;
                     w->item.bookTgtX = 320.0f;
                     w->item.bookTgtY = -240.0f;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                     w->flags &= ~0x8000;
                     w->helpX = w->helpTgtX;
                     w->helpY = w->helpTgtY;
@@ -412,7 +412,7 @@ s32 winItemMain(WindowWork* w) {
                     w->item.state = 10;
                     w->item.bookTgtX = 320.0f;
                     w->item.bookTgtY = -240.0f;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                     w->flags &= ~0x8000;
                     w->helpX = w->helpTgtX;
                     w->helpY = w->helpTgtY;
@@ -421,7 +421,7 @@ s32 winItemMain(WindowWork* w) {
             } else if (w->buttonTrg & PAD_BUTTON_START) {
                 w->item.bookTgtX = 320.0f;
                 w->item.bookTgtY = -240.0f;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 w->flags &= ~0x8000;
                 w->helpX = w->helpTgtX;
                 w->helpY = w->helpTgtY;
@@ -442,7 +442,7 @@ s32 winItemMain(WindowWork* w) {
                 mail = mailGetPtr(w->item.mail[w->item.mailSel].id);
                 FontGetMessageWidthLine(msgSearch(mail->body), &w->item.mailLines);
                 w->item.mailLines++;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 w->item.mailLines += 7;
                 w->item.mailLine = 0;
                 if (mail->flags & 0x1000) {
@@ -543,7 +543,7 @@ s32 winItemMain(WindowWork* w) {
                         w->item.mailLine--;
                     }
                 } else if (keyGetDirRep(0) & DEMO_SUBSTICK_DOWN) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                     if (w->item.mailLine + 8 < w->item.mailLines) {
 #else
                     if (w->item.mailLine + 6 < w->item.mailLines) {
@@ -578,7 +578,7 @@ s32 winItemMain(WindowWork* w) {
                 winMgrClose(w->useWin[1]);
             } else if (w->buttonTrg & PAD_BUTTON_A) {
                 mp = marioGetPtr();
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 psndSFXOn(SFX_NAME_WORD(0x20012));
                 if (mp->currMotionId != MARIO_MOTION_SHIP && mp->currMotionId != MARIO_MOTION_PLANE &&
                     ((w->item.useTarget < 2 && !marioBgmodeChk()) || (w->item.useTarget < 1 && marioBgmodeChk()))) {
@@ -627,14 +627,14 @@ s32 winItemMain(WindowWork* w) {
                 }
                 if (w->item.useTarget < 1) {
                     ((PouchSetHPS32Fn)pouchSetHP)(pouchGetHP() + itemDataTable[w->item.useItem].hp_restored);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                     ((PouchSetFPS32Fn)pouchSetFP)(pouchGetFP() + itemDataTable[w->item.useItem].fp_restored);
                     ((PouchSetAPS32Fn)pouchSetAP)(pouchGetAP() + itemDataTable[w->item.useItem].sp_restored);
 #endif
                 } else {
                     party = list[w->item.useTarget - 1]->partyId;
                     pouchSetPartyHP(party, pouchGetPartyHP(party) + itemDataTable[w->item.useItem].hp_restored);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                     ((PouchSetFPS32Fn)pouchSetFP)(pouchGetFP() + itemDataTable[w->item.useItem].fp_restored);
                     ((PouchSetAPS32Fn)pouchSetAP)(pouchGetAP() + itemDataTable[w->item.useItem].sp_restored);
 #endif
@@ -751,7 +751,7 @@ void winItemDisp(s32 camId, void* param, s32 n) {
     item_disp(w, x, y);
 }
 
-void item_disp(WindowWork* w, f32 xo, f32 yo) {
+static void item_disp(WindowWork* w, f32 xo, f32 yo) {
     GXColor white = {255, 255, 255, 255};
     GXColor white2;
     GXColor black = {0, 0, 0, 255};
@@ -863,13 +863,13 @@ static const char* hpfp_name_table[7][2] = {
 #define WI_FP_NAME "ＦＰ"
 #endif
 
-void itemUseDisp(WinMgrEntry* entry) {
+static void itemUseDisp(WinMgrEntry* entry) {
     WindowWork* w = winGetPtr();
     GXColor black = {0, 0, 0, 255};
     GXColor white2;
     GXColor white3;
     GXColor white = {255, 255, 255, 255};
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     WindowPartyDt* list[11];
 #else
     WindowPartyDt* list[9];
@@ -951,7 +951,7 @@ void itemUseDisp(WinMgrEntry* entry) {
 #else
                 winFontSet((Vec){entry->x + 310, entry->y - 10 - off, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "%d", ((PouchGetMaxHPRetS32Fn)pouchGetMaxHP)());
 #endif
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 if (itemDataTable[w->item.useItem].fp_restored) {
                     if (w->item.blink % 20 > 15) {
                         continue;
@@ -988,7 +988,7 @@ void itemUseDisp(WinMgrEntry* entry) {
                 }
                 winIconSet(list[i - 1]->nameMsgId, (Vec){entry->x + 30, yoff + (entry->y - 20 - i * 28), 0.0f}, (Vec){0.65f, 0.65f, 0.65f}, white3);
                 winFontInit();
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 winFontSet((Vec){entry->x + 50, yoff + (entry->y - 8 - i * 28), 0.0f}, (Vec){FontGetMessageWidth(name) < 160.0f ? 1.0f : 160.0f / FontGetMessageWidth(name), 1.0f, 1.0f}, black, name);
 #else
                 winFontSet((Vec){entry->x + 50, yoff + (entry->y - 8 - i * 28), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, name);
@@ -1019,7 +1019,7 @@ void itemUseDisp(WinMgrEntry* entry) {
     winTexSet(0, (Vec){w->helpX, w->helpY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
 }
 
-void itemUseDisp2(WinMgrEntry* entry) {
+static void itemUseDisp2(WinMgrEntry* entry) {
     WindowWork* wp = winGetPtr();
     GXColor color = {0, 0, 0, 255};
     if (!winMgrAction(wp->useWin[1])) {

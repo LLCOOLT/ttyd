@@ -20,7 +20,7 @@
 #include <dolphin/pad.h>
 #include "eff/eff_mizutama.h"
 
-f32 kpaStickSpd(s32 dash);
+static f32 kpaStickSpd(s32 dash);
 
 typedef struct V3 {
     s32 a, b, c;
@@ -105,7 +105,7 @@ BOOL kpaHipAttackOk(void) {
     return ((KPW(mario)->flags >> 4) & 1) ^ 1;
 }
 
-f32 kpaStickSpd(s32 dash) {
+static f32 kpaStickSpd(s32 dash) {
     MarioWork* mario = marioGetPtr();
     f32 stick = (s8)mario->wStickDir1;
     f32 spd;
@@ -215,7 +215,7 @@ void kpa_walk(void) {
         m->flags &= ~(MARIO_FLAG_IS_JUMPING | MARIO_FLAG_IS_FALLING | MARIO_FLAG_IS_STEPPING | MARIO_FLAG_HAS_INPUT_JUMP);
         m->currSubMotionId = 0;
         m->multiTimer = 0;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         // the demo walks with W_1 in the side view or when the stick is pushed
         if (kpaGetStageViewType() == 0) {
             if (m->controlStickSensitivity) {
@@ -423,7 +423,7 @@ void kpa_fall(void) {
         mario->currSubMotionId = 0;
         if (mario->currMotionId != MARIO_MOTION_FALL_2) {
             if ((s32)(u8)mario->characterId == 2) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 kpaChgPose("KPA_J_1B", "KPA2_J_1B");
 #else
                 if (!kpaFireAttackCheck()) {
@@ -492,7 +492,7 @@ void kpa_hip(void) {
         mario->baseSpeed = 0.0f;
         marioChgPose("KPA2_J_1C");
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (mario->fallStartPos.y >= mario->position.y && ((u32)mario->dispFlags & MARIO_DISP_FLAG_CAM_FOLLOW_Y_OFF) && mario->position.y > 75.0f) {
         camFollowYOn();
     }
@@ -706,7 +706,7 @@ void kpa_powdown(void) {
 
 // FAKE: keeps the following function(s) out of line as in the target; removing it changes the code
 #pragma dont_inline on
-void kpaSwimMove(void) {
+static void kpaSwimMove(void) {
     MarioWork* mario = marioGetPtr();
     f32 spd = mario->kpaSpeed;
     f32 stick = (s8)mario->wStickDir1;
@@ -731,7 +731,7 @@ void kpaSwimMove(void) {
         }
     }
     mario->kpaSpeed = spd;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     f31 = 0.03f * __fabsf(spd);
     if (f31 >= 1.0f) {
         f31 = 1.0f;
@@ -753,7 +753,7 @@ void kpaSwimMove(void) {
         }
     }
     mario->moveDist = f31;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     movePos(&mario->position.x, &mario->position.z, mario->baseSpeed, mario->directionView);
 #endif
 }
@@ -956,7 +956,7 @@ void kpa_swim(void) {
             mario->currSubMotionId = 0x29;
             mario->multiTimer = 0x18;
         case 0x29:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             if (mario->buttonTrg & PAD_BUTTON_A) {
 #else
             if ((mario->buttonTrg & PAD_BUTTON_A) && !kpaFireAttackCheck()) {

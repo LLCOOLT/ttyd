@@ -20,6 +20,7 @@
 #include "manager/evtmgr_cmd.h"
 #include "unit/unit_chorobon_gundan.h"
 #include "battle/battle_sub.h"
+#include "version.h"
 #include "evt/evt_ext.h"
 #include "evt/evt_npc.h"
 #include "libc_decls.h"
@@ -61,7 +62,11 @@ static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
 BattleWeapon weapon_chorobon_gundan_attack;
 static EvtWord init_event[26];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord damage_event[80];
+#else
 static EvtWord damage_event[59];
+#endif
 static EvtWord attack_event[217];
 static EvtWord wait_event[6];
 ExtTexInfo chorogun_ext_entry_data[21];
@@ -138,7 +143,11 @@ BattleUnitKind unit_chorobon_gundan = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
+#if VERSION <= VERSION_DEMO_US
+    0x2240000,
+#else
     0x240000,
+#endif
     &regist.v,
     1,
     parts,
@@ -167,7 +176,7 @@ static PoseTableEntry pose_table[] = {
     {50, "CBN_A_1"},
     {42, "CBN_R_1"},
     {40, "CBN_W_1"},
-    {69, "CBN_S_1"},
+    {BTL_POSE_STAY_DEFAULT, "CBN_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -215,6 +224,7 @@ BattleWeapon weapon_chorobon_gundan_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
+#if VERSION >= VERSION_JP
 EVT_BEGIN(chorogun_dead_reward)
     CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
@@ -234,6 +244,7 @@ EVT_BEGIN(chorogun_dead_reward)
     END_IF
     RETURN
 EVT_END()
+#endif
 
 static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventWait, BTL_UNIT_SELF, PTR(wait_event))
@@ -264,9 +275,18 @@ static EVT_BEGIN(damage_event)
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
+#if VERSION <= VERSION_DEMO_US
+    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_btl_camera_set_mode, 0, 0)
+        CALL(chorogun_escape)
+        CALL(btlevtcmd_KillUnit, BTL_UNIT_SELF, 0)
+        GOTO(99)
+    END_IF
+#endif
     CALL(chorogun_get_alive_num, LW(0))
     IF_INT_LESS_OR_EQUAL(LW(0), 500)
-        CALL_CHILD(PTR(escape_chorogun_event))
+        CALL_CHILD(escape_chorogun_event)
         GOTO(99)
     END_IF
     LABEL(99)

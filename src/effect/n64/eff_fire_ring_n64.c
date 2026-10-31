@@ -25,8 +25,8 @@ typedef struct EffFireRingN64Work {
     u8 r, g, b;         // 0x50
 } EffFireRingN64Work;
 
-void effFireRingMain(EffectEntry* effect);
-void effFireRingDisp(CameraId cameraId, EffectEntry* effect);
+static void effFireRingMain(EffectEntry* effect);
+static void effFireRingDisp(CameraId cameraId, EffectEntry* effect);
 
 static effN64Vtx stg__s_v[] = {
     {99, 0, 205, 9173, 4096, 255, 255, 255, 255},
@@ -124,7 +124,7 @@ EffectEntry* effFireRingN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f3
     return effect;
 }
 
-void effFireRingMain(EffectEntry* effect) {
+static void effFireRingMain(EffectEntry* effect) {
     EffFireRingN64Work* work;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -180,7 +180,7 @@ void effFireRingMain(EffectEntry* effect) {
     }
 }
 
-void effFireRingDisp(CameraId cameraId, EffectEntry* effect) {
+static void effFireRingDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffFireRingN64Work* work;
     GXTexObj texObj;

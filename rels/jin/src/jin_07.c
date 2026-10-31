@@ -29,7 +29,6 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "data_tables.h"
 #include "evt/evt_story.h"
 #include "libc_decls.h"
@@ -49,7 +48,7 @@ typedef struct SenTeresaPath {
 static SenTeresaPath* pTeresa;
 static s32 g_nNumEndProc[1];
 s32 g_nNumOutBox[1];
-void computePosHermite(ExtdrvPose* pose, SenTeresaPath* ter);
+static void computePosHermite(ExtdrvPose* pose, SenTeresaPath* ter);
 // Float wrapper of cos(), the inline cosf of the original C library headers
 // (renamed: the math.h used here declares cosf as an external function).
 static inline f32 cosf_inline(f32 x) {
@@ -190,13 +189,13 @@ EVT_END()
 
 static EVT_BEGIN(evt_unlock)
     SET_VALUE(LW(0), STRING("w_bero_1"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     RETURN
 EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"テレサ"*/"\x83\x65\x83\x8C\x83\x54", // name
+        "テレサ", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -263,7 +262,7 @@ inline f32 jin07HermiteMul3(f32 a, f32 b, f32 c) {
     return (a * b) * c;
 }
 
-void computePosHermite(ExtdrvPose* pose, SenTeresaPath* ter) {
+static void computePosHermite(ExtdrvPose* pose, SenTeresaPath* ter) {
     Vec m0 = {0.0f, 0.0f, 0.0f};
     Vec m1 = {1.0f, 0.0f, 0.0f};
     f32 t = ter->t;
@@ -352,7 +351,7 @@ static void senteresa_ext_shadow_disp(void) {
     extDrawShadow();
 }
 
-USER_FUNC(senteresa_get_position) {
+static USER_FUNC(senteresa_get_position) {
     EvtWord* args = event->args;
     ExtdrvPose* pose = extGetPosePtr();
 
@@ -363,7 +362,7 @@ USER_FUNC(senteresa_get_position) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(senteresa_okure_move_init) {
+static USER_FUNC(senteresa_okure_move_init) {
     EvtWord* args = event->args;
 
     event->lwData[10] = evtGetValue(event, args[0]);
@@ -375,7 +374,7 @@ USER_FUNC(senteresa_okure_move_init) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(senteresa_okure_move) {
+static USER_FUNC(senteresa_okure_move) {
     EvtWord* args = event->args;
     NpcEntry* npc = npcNameToPtr("テレサ");
     f32 t = evtGetFloat(event, args[0]);
@@ -548,7 +547,7 @@ EVT_BEGIN(evt_teresa_box_open)
                     CALL(evt_msg_print_add, 0, STRING("stg4_jin_70"))
                     SET_VALUE(LW(0), 150)
                 END_SWITCH
-                CALL(evt_item_entry, STRING("teresa"), LW(0), LW(1), LW(2), LW(3), 4, -1, 0)
+                CALL(evt_item_entry, STRING("teresa"), LW(0), LW(1), LW(2), LW(3), ITEM_ENTRY_LAUNCH, -1, 0)
                 ADD(LW(2), 5)
                 CALL(evt_item_set_move_dir_speed, STRING("teresa"), 0, FLOAT(0.0f))
                 CALL(evt_item_set_gravity, STRING("teresa"), FLOAT(1.0f))
@@ -583,11 +582,11 @@ EVT_BEGIN(jin_07_init_evt)
     CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(evt_usu_kagemario_party_kill)
     CALL(evt_npc_setup, PTR(npcEnt))
-    SPAWN_EVENT(PTR(jin_07_juyo_oumu_vivian))
-    CALL(evt_item_entry, STRING("item_00"), ITEM_STAR_PIECE, 220, 75, -20, 16, GSWF(GSWF_JIN07_STAR_PIECE), 0)
+    SPAWN_EVENT(jin_07_juyo_oumu_vivian)
+    CALL(evt_item_entry, STRING("item_00"), ITEM_STAR_PIECE, 220, 75, -20, ITEM_ENTRY_FIXED, GSWF(GSWF_JIN07_STAR_PIECE), 0)
     IF_INT_NOT_EQUAL(GSWF(GSWF_STG4_DROP_IN_ENTRANCE), 0)
         SET_VALUE(GSWF(GSWF_STG4_DROP_IN_ENTRANCE), 0)
         BEGIN_INLINE_EVENT
@@ -600,16 +599,18 @@ EVT_BEGIN(jin_07_init_evt)
             CALL(evt_cam_road_reset)
             CALL(evt_seq_wait, 2)
             CALL(evt_mario_wait_landon)
+#if VERSION >= VERSION_JP
             CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
+#endif
             CALL(evt_mario_key_onoff, 1)
         END_INLINE_EVENT
     END_IF
     IF_INT_EQUAL(GSWF(GSWF_JIN08_DOOR_UNLOCKED), 1)
         SET_VALUE(LW(0), STRING("w_bero_1"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
     ELSE
         SET_VALUE(LW(0), STRING("w_bero_1"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     END_IF
     IF_INT_EQUAL(GSWF(GSWF_JIN08_DOOR_UNLOCKED), 0)
         CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("w_bero_1"), 0, PTR(evt_locked), 0)

@@ -15,6 +15,8 @@
 #include "libc_decls.h"
 #include <math.h>
 
+static void envGlare(EnvironmentGlare* glare);
+
 //.data
 
 EnvironmentGlare envGlare0 = {
@@ -138,13 +140,13 @@ s32 tpl_ok = 0;
 
 // local prototypes
 void _callback(s32 result, DVDFileInfo* fileInfo);
-void envCapture(CameraId camId, void* param);
-void envCapture2(CameraId camId, void* param);
-void envDisp(CameraId camId, void* param);
-void envDisp2(CameraId camId, void* param);
-void envDisp_DepthOfField(void);
-void envDisp_Blur(void);
-void envDisp_FF(void);
+static void envCapture(CameraId camId, void* param);
+static void envCapture2(CameraId camId, void* param);
+static void envDisp(CameraId camId, void* param);
+static void envDisp2(CameraId camId, void* param);
+static void envDisp_DepthOfField(void);
+static void envDisp_Blur(void);
+static void envDisp_FF(void);
 
 // there is no function so we'll make a macro
 #define envGetWork() (gp->inBattle ? &work[1] : &work[0])
@@ -191,7 +193,7 @@ void envTexSetup(void) { // 1:1
     }
 }
 
-void envCapture(CameraId camId, void* param) { // 1:1
+static void envCapture(CameraId camId, void* param) { // 1:1
     EnvironmentWork* wp = envGetWork();
     u16 var0, var1, var2, var3;
     u32 size;
@@ -222,7 +224,7 @@ void envCapture(CameraId camId, void* param) { // 1:1
     }
 }
 
-void envCapture2(CameraId camId, void* param) { // 1:1
+static void envCapture2(CameraId camId, void* param) { // 1:1
     EnvironmentWork* wp = envGetWork();
     u16 var0, var1;
 
@@ -244,7 +246,7 @@ void envCapture2(CameraId camId, void* param) { // 1:1
     }
 }
 
-void envDisp(CameraId camId, void* param) {
+static void envDisp(CameraId camId, void* param) {
     f32 vp[GX_VIEWPORT_SZ];
     f32 pm[GX_PROJECTION_SZ];
 
@@ -257,7 +259,7 @@ void envDisp(CameraId camId, void* param) {
     GXSetProjectionv(pm);
 }
 
-void envDisp2(CameraId camId, void* param) { // almost 1:1, needs extra addi
+static void envDisp2(CameraId camId, void* param) { // almost 1:1, needs extra addi
     f32 vp[GX_VIEWPORT_SZ];
     f32 pm[GX_PROJECTION_SZ];
     EnvironmentWork* wp;
@@ -401,7 +403,7 @@ static const GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
 // pointer under opt_propagation off gives addi r0 + mr), and loop 2's zero inits become the target's li/mr copies.
 // i2 is an `int` array: an s32 (long) element is not scalarized (the int-typed loop compares count as a different
 // type), so it would stay in memory. The `(s32)` cast in `(s32)i2[0] == 3` stops CSE with the `3 == i2[0]` below.
-void envDisp_DepthOfField(void) {
+static void envDisp_DepthOfField(void) {
     GXTevColorArg cin;
     s32 first2[1];
     s32 coord2[1];
@@ -575,7 +577,7 @@ typedef struct EnvBlurWork {
     u8 pad14[4]; // 0x14
 } EnvBlurWork;
 
-void envDisp_Blur(void) {
+static void envDisp_Blur(void) {
     EnvironmentWork* wp = envGetWork();
     EnvBlurWork* blur = (EnvBlurWork*)&wp->blurWork;
     CameraEntry* cam;
@@ -658,7 +660,7 @@ void envBlurOff(void) {
 }
 
 // almost 1:1, needs some regalloc work and type changes
-void envGlare(EnvironmentGlare* glare) {
+static void envGlare(EnvironmentGlare* glare) {
     static f32 frame_cnt = 0.0f;
     EnvironmentWork* envWork = envGetWork();
     s16 sx;
@@ -849,7 +851,7 @@ void envGlareFilterZ(f32 zscale) {
 // FAKE: #pragma opt_propagation off and opt_lifetimes off for envDisp_FF: no copy propagation or lifetime splitting, which gives the target temporaries and registers; without them envDisp_FF is 375 instructions instead of 368
 #pragma opt_propagation off
 #pragma opt_lifetimes off
-void envDisp_FF(void) {
+static void envDisp_FF(void) {
     EnvironmentWork* wp = envGetWork();
     f32 r;
     f32 angle;
@@ -910,7 +912,7 @@ typedef struct EnvTexMtxWork {
 
 double acos(double);
 
-void envTevLoadTexMtxImm(s32 type, GXTexMtx id, GXTexMtx id2, GXTexMtxType mtxType) {
+static void envTevLoadTexMtxImm(s32 type, GXTexMtx id, GXTexMtx id2, GXTexMtxType mtxType) {
     static f32 a = 0.0f;
     EnvironmentWork* wp = envGetWork();
     Mtx m0, m2, m1, m3, m4, m5, m6, m7;

@@ -88,57 +88,57 @@ typedef struct AudSound {
     }
 
 // local prototypes
-FileEntry* tplRead(const char* path);
-#if VERSION == VERSION_DEMO
-u8 check_exe_phase_evt_status(BattleAudienceMember* member);
+static FileEntry* tplRead(const char* path);
+#if VERSION <= VERSION_DEMO_US
+static u8 check_exe_phase_evt_status(BattleAudienceMember* member);
 #else
-u8 check_exe_phase_evt_status(s32 index, s32 type);
+static u8 check_exe_phase_evt_status(s32 index, s32 type);
 #endif
-void BattleAudienceSettingAudience(void);
-void BattleAudienceGuestTPLRead(s32 index, AudienceMemberType member, const char* tplName);
-void BattleAudienceCtrlProcess(void);
-void BattleAudienceSetThrowItemMax(void);
+static void BattleAudienceSettingAudience(void);
+static void BattleAudienceGuestTPLRead(s32 index, AudienceMemberType member, const char* tplName);
+static void BattleAudienceCtrlProcess(void);
+static void BattleAudienceSetThrowItemMax(void);
 BattleUnit* BattleAudienceDetectTargetPlayer(void);
-void BattleAudienceItemCtrlProcess(void);
-void BattleAudienceApSrcCtrlProcess(void);
-BOOL BattleAudienceApSrcEntry(void);
-void BattleAudienceWinCtrlProcess(void);
-void BattleAudienceGXInit(void);
-void BattleAudienceAnimProcess(void);
-void BattleAudienceDispAudience(CameraId camId, void* param);
-void BattleAudienceDispItem(CameraId camId, void* param);
-void BattleAudienceDispApSrc(CameraId camId, void* param);
-void BattleAudienceDispWin(CameraId camId, void* param);
-void BattleAudience_Entry_Sub(s32 index, s32 type, u8 status);
+static void BattleAudienceItemCtrlProcess(void);
+static void BattleAudienceApSrcCtrlProcess(void);
+static BOOL BattleAudienceApSrcEntry(void);
+static void BattleAudienceWinCtrlProcess(void);
+static void BattleAudienceGXInit(void);
+static void BattleAudienceAnimProcess(void);
+static void BattleAudienceDispAudience(CameraId camId, void* param);
+static void BattleAudienceDispItem(CameraId camId, void* param);
+static void BattleAudienceDispApSrc(CameraId camId, void* param);
+static void BattleAudienceDispWin(CameraId camId, void* param);
+static void BattleAudience_Entry_Sub(s32 index, s32 type, u8 status);
 s32 BattleAudience_NoUsedHaitiRand(void);
 s32 BattleAudience_NoUsedFCHaitiRand(void);
 s32 BattleAudience_GetPPAudienceNum(void);
 s32 BattleAudience_GetPPAudienceNumKind(s32 type);
-s32 BattleAudience_GetPPAudienceNum_R(void);
-s32 BattleAudience_GetPPAudienceNum_L(void);
-s32 BattleAudience_GetPPAudienceNum_RL_Sub(s32 offset);
-BOOL BattleAudience_GetPPAudienceNum_Sub(s32 id);
-#if VERSION == VERSION_DEMO
-void BattleAudienceNumToTargetSub(void);
+static s32 BattleAudience_GetPPAudienceNum_R(void);
+static s32 BattleAudience_GetPPAudienceNum_L(void);
+static s32 BattleAudience_GetPPAudienceNum_RL_Sub(s32 offset);
+static BOOL BattleAudience_GetPPAudienceNum_Sub(s32 id);
+#if VERSION <= VERSION_DEMO_US
+static void BattleAudienceNumToTargetSub(void);
 #else
-s32 BattleAudienceNumToTargetSub(void);
+static s32 BattleAudienceNumToTargetSub(void);
 #endif
-void BattleAudienceAddTargetNumSub(f32 value);
+static void BattleAudienceAddTargetNumSub(f32 value);
 void BattleAudienceAddPuni(s32 num);
-void BattleAudienceAddPhaseEvtList(s32 type);
-void BattleAudienceCheer(s32 type);
-void BattleAudienceJoy(s32 type);
-void BattleAudienceJoy_Sub(s32 a, s32 b, s32 c, s32 type);
-s32 BattleAudienceDetectPakkunEatTargetSub2(s32 index, s32 dir);
-s32 BattleAudienceDetectPakkunEatTargetSub(s32 index, s32 dir1, s32 dir2);
+static void BattleAudienceAddPhaseEvtList(s32 type);
+static void BattleAudienceCheer(s32 type);
+static void BattleAudienceJoy(s32 type);
+static void BattleAudienceJoy_Sub(s32 a, s32 b, s32 c, s32 type);
+static s32 BattleAudienceDetectPakkunEatTargetSub2(s32 index, s32 dir);
+static s32 BattleAudienceDetectPakkunEatTargetSub(s32 index, s32 dir1, s32 dir2);
 void BattleAudienceSoundNoiseAlways(void);
-s32 BattleAudienceSound0(const char* name);
-s32 BattleAudienceSound1(const char* name, s32 right, s32 left);
-void BattleAudienceSoundGetInfo1(s32 right, s32 left, u8* vol, Vec* pos);
-s32 BattleAudienceSound2(const char* name, s32 index);
-void BattleAudienceSoundGetInfo2(s32 index, Vec* pos);
-void BattleAudienceSoundMain(void);
-void BattleAudienceNoiseMain(void);
+static s32 BattleAudienceSound0(const char* name);
+static s32 BattleAudienceSound1(const char* name, s32 right, s32 left);
+static void BattleAudienceSoundGetInfo1(s32 right, s32 left, u8* vol, Vec* pos);
+static s32 BattleAudienceSound2(const char* name, s32 index);
+static void BattleAudienceSoundGetInfo2(s32 index, Vec* pos);
+static void BattleAudienceSoundMain(void);
+static void BattleAudienceNoiseMain(void);
 
 #define AUD_U8CALL(fn, i) (((u8 (*)(s32))(fn))(i))
 
@@ -289,7 +289,7 @@ s32 haiti_data_front_narrow[][10] = {
 #endif
 
 //@@ tplRead
-FileEntry* tplRead(const char* path) {
+static FileEntry* tplRead(const char* path) {
     return fileAllocf(4, "%s/%s", getMarioStDvdRoot(), path);
 }
 
@@ -405,7 +405,7 @@ void BattleAudience_ActInit(void) {
     audience->flags &= ~AUDIENCE_FLAG_GUARD_BAD;
     audience->flags &= ~AUDIENCE_FLAG_STYLISH_GOOD;
     audience->flags &= ~AUDIENCE_FLAG_STYLISH_BAD;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     audience->flags &= ~AUDIENCE_FLAG_STYLISH_MISSED;
 #endif
     audience->flags &= ~AUDIENCE_FLAG_ENEMY_DAMAGED;
@@ -430,7 +430,7 @@ void BattleAudience_PerAct(void) {
     }
     if (audience->flags & AUDIENCE_FLAG_FROZEN)
         return;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     audience->stylishTotal += audience->numStylishCommandsThisAttack;
     if (audience->stylishTotal > 100) {
         audience->stylishTotal = 100;
@@ -496,7 +496,7 @@ void BattleAudience_PerAct(void) {
         if (delta <= -10.0f)
             BattleAudienceAddPhaseEvtList(13);
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (audience->impendingBonuses && ((audience->flags & AUDIENCE_FLAG_STYLISH_GOOD) || (audience->flags & AUDIENCE_FLAG_STYLISH_BAD))) {
         if (audience->flags & AUDIENCE_FLAG_STYLISH_GOOD) {
             audience->acStreak++;
@@ -562,7 +562,7 @@ BOOL BattleAudience_CheckReaction(void) {
         return TRUE;
     }
     audience->event = NULL;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (audience->flags & AUDIENCE_FLAG_FROZEN) {
         return FALSE;
     }
@@ -571,9 +571,9 @@ BOOL BattleAudience_CheckReaction(void) {
 }
 
 //@@ check_exe_phase_evt_status
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo checks the system control and type at each call site (PHASE_EVT_IF).
-u8 check_exe_phase_evt_status(BattleAudienceMember* member) {
+static u8 check_exe_phase_evt_status(BattleAudienceMember* member) {
     u8 status = member->status;
 
     if (status == 13)
@@ -592,7 +592,7 @@ u8 check_exe_phase_evt_status(BattleAudienceMember* member) {
     return TRUE;
 }
 #else
-u8 check_exe_phase_evt_status(s32 index, s32 type) {
+static u8 check_exe_phase_evt_status(s32 index, s32 type) {
     BattleAudienceMember* member;
     u8 status;
 
@@ -655,7 +655,7 @@ void BattleAudience_PerPhase(u32 value) {
 // address of `member` and moves it to the stack in every version (the frame grows by 16 bytes).
 // An #if at each of the 30 call sites (tried) would turn every one-line test, several of them inside one-line
 // loops, into a six-line block with the demo's pointer fetch; the macro keeps the reaction list readable.
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #define PHASE_EVT_IF(i, t, more)      \
     member = BattleAudienceGetPtr(i); \
     if ((u8)BattleAudience_GetSysCtrl(i) && member->type == (t) && check_exe_phase_evt_status(member) more)
@@ -905,7 +905,7 @@ BOOL BattleAudience_CheckReactionPerPhase(void) {
                         for (i = 0; i < AUDIENCE_MEMBER_MAX; i++) {
                             PHASE_EVT_IF(i, 8, &&PHASE_EVT_STATUS(i) != 17) {
                                 BattleAudience_ChangeStatus(i, 17);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                                 member->statusTimer = 5;
 #else
                                 BattleAudienceGetPtr(i)->statusTimer = 5;
@@ -1193,7 +1193,7 @@ void BattleAudience_End(void) {
 
 //@@ BattleAudienceSettingAudience
 
-void BattleAudienceSettingAudience(void) {
+static void BattleAudienceSettingAudience(void) {
     s32 hasKind = 0;
     s32 target;
     s32 sum;
@@ -1489,7 +1489,7 @@ void BattleAudienceSettingAudience(void) {
 }
 
 //@@ BattleAudienceGuestTPLRead
-void BattleAudienceGuestTPLRead(s32 id, AudienceMemberType member, const char* path) {
+static void BattleAudienceGuestTPLRead(s32 id, AudienceMemberType member, const char* path) {
     char full_path[256];
 
     BattleAudience* audience = BattleAudienceBaseGetPtr();
@@ -1502,7 +1502,7 @@ void BattleAudienceGuestTPLRead(s32 id, AudienceMemberType member, const char* p
 
 //@@ BattleAudienceCtrlProcess
 
-void BattleAudienceCtrlProcess(void) {
+static void BattleAudienceCtrlProcess(void) {
     s32 chance;
     BattleWork* wp = _battleWorkPointer;
     BattleDebugCtrl* bflags = &wp->debug;
@@ -1652,7 +1652,7 @@ BOOL BattleAudienceItemOn(s32 index, u16 itemId, s32 numItems) {
         return FALSE;
     if (audience_kind[member->type].itemTable->type == 0)
         return FALSE;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (itemId >= 0x79 && itemId < 0xEC && swGet(GSWF_ITEM_TUTORIAL_SEEN) == 0)
         return FALSE;
     st = index % 20;
@@ -1699,7 +1699,7 @@ BOOL BattleAudienceItemOn(s32 index, u16 itemId, s32 numItems) {
 }
 
 //@@ BattleAudienceSetThrowItemMax
-void BattleAudienceSetThrowItemMax(void) {
+static void BattleAudienceSetThrowItemMax(void) {
     BattleAudience* audience = BattleAudienceBaseGetPtr();
     s32 r = irand(100);
 
@@ -1773,7 +1773,7 @@ BattleUnit* BattleAudienceDetectTargetPlayer(void) {
 
 //@@ BattleAudienceItemCtrlProcess
 extern double __fabs(double);
-void BattleAudienceItemCtrlProcess(void) {
+static void BattleAudienceItemCtrlProcess(void) {
     Vec hv;
     s32 i;
     BattleWork* wp = _battleWorkPointer;
@@ -2070,7 +2070,7 @@ void BattleAudienceItemCtrlProcess(void) {
 
 //@@ BattleAudienceApSrcCtrlProcess
 extern void statusGetApPos(Vec* pos);
-void BattleAudienceApSrcCtrlProcess(void) {
+static void BattleAudienceApSrcCtrlProcess(void) {
     BattleAudience* base = BattleAudienceBaseGetPtr();
     BattleAudienceStar* star;
     s32 cnt;
@@ -2198,7 +2198,7 @@ void BattleAudienceApSrcCtrlProcess(void) {
 }
 
 //@@ BattleAudienceApSrcEntry
-BOOL BattleAudienceApSrcEntry(void) {
+static BOOL BattleAudienceApSrcEntry(void) {
     BattleAudienceStar* star;
     CameraEntry* cam;
     s32 list[200];
@@ -2250,7 +2250,7 @@ BOOL BattleAudienceApSrcEntry(void) {
 }
 
 //@@ BattleAudienceWinCtrlProcess
-void BattleAudienceWinCtrlProcess(void) {
+static void BattleAudienceWinCtrlProcess(void) {
     BattleAudience* base = BattleAudienceBaseGetPtr();
     BattleAudienceWindow* win = BattleAudienceWinGetPtr();
     f32 diff = (f32)base->currentAudienceIntCount - win->count;
@@ -2289,7 +2289,7 @@ void BattleAudienceWinCtrlProcess(void) {
 }
 
 //@@ BattleAudienceGXInit
-void BattleAudienceGXInit(void) {
+static void BattleAudienceGXInit(void) {
     BattleAudienceBaseGetPtr();
     GXSetCullMode(GX_CULL_NONE);
     GXClearVtxDesc();
@@ -2312,7 +2312,7 @@ void BattleAudienceGXInit(void) {
 }
 
 //@@ BattleAudienceAnimProcess
-void BattleAudienceAnimProcess(void) {
+static void BattleAudienceAnimProcess(void) {
     BattleAudienceMember* m;
     s32 i;
     s32* pc;
@@ -2406,7 +2406,7 @@ void BattleAudienceAnimProcess(void) {
         GXWGFifo.f32 = _s; \
         GXWGFifo.f32 = _t; \
     } while (0)
-void BattleAudienceDispAudience(CameraId camId, void* param) {
+static void BattleAudienceDispAudience(CameraId camId, void* param) {
     f32 sx, cx, sy, cy, sz, cz;
     f32 nhw;
     f32 ox, oy, oz;
@@ -2432,17 +2432,17 @@ void BattleAudienceDispAudience(CameraId camId, void* param) {
     GXSetCullMode(GX_CULL_NONE);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
 #endif
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
 #endif
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     GXSetNumChans(1);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_VTX, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
 #else
     GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_VTX, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
@@ -2521,7 +2521,7 @@ void BattleAudienceDispAudience(CameraId camId, void* param) {
         scl[1][3] += oy;
         scl[2][3] += oz;
         PSMTXConcat(rot, scl, scl);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         if (m->type != 2) {
             scl[0][3] = scl[0][3] + (m->hopX + (-ox + m->position.x));
             scl[1][3] = scl[1][3] + (m->hopY + (-oy + m->position.y));
@@ -2574,13 +2574,13 @@ void BattleAudienceDispAudience(CameraId camId, void* param) {
             }
             if (flip == 1)
                 off += 4;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             // the demo sends the member colour with every vertex instead
             GXSetChanMatColor(GX_COLOR0A0, (GXColor){cr, cg, cb, ca});
 #endif
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             AUD_POS(nhw + m->dispOffset.x, 40.0f + m->dispOffset.y, m->dispOffset.z);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             GXWGFifo.u8 = cr;
             GXWGFifo.u8 = cg;
             GXWGFifo.u8 = cb;
@@ -2588,7 +2588,7 @@ void BattleAudienceDispAudience(CameraId camId, void* param) {
 #endif
             AUD_TEX(uvs[off * 2], uvs[off * 2 + 1]);
             AUD_POS(hw + m->dispOffset.x, 40.0f + m->dispOffset.y, m->dispOffset.z);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             GXWGFifo.u8 = cr;
             GXWGFifo.u8 = cg;
             GXWGFifo.u8 = cb;
@@ -2596,7 +2596,7 @@ void BattleAudienceDispAudience(CameraId camId, void* param) {
 #endif
             AUD_TEX(uvs[(off + 1) * 2], uvs[(off + 1) * 2 + 1]);
             AUD_POSS(hw, 0.0f, 0.0f);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             GXWGFifo.u8 = cr;
             GXWGFifo.u8 = cg;
             GXWGFifo.u8 = cb;
@@ -2604,7 +2604,7 @@ void BattleAudienceDispAudience(CameraId camId, void* param) {
 #endif
             AUD_TEX(uvs[(off + 2) * 2], uvs[(off + 2) * 2 + 1]);
             AUD_POSS(nhw, 0.0f, 0.0f);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             GXWGFifo.u8 = cr;
             GXWGFifo.u8 = cg;
             GXWGFifo.u8 = cb;
@@ -2616,7 +2616,7 @@ void BattleAudienceDispAudience(CameraId camId, void* param) {
 }
 
 //@@ BattleAudienceDispItem
-void BattleAudienceDispItem(CameraId camId, void* param) {
+static void BattleAudienceDispItem(CameraId camId, void* param) {
     BattleAudienceItem* item;
     s32 i;
     u16 iconId;
@@ -2641,7 +2641,7 @@ void BattleAudienceDispItem(CameraId camId, void* param) {
 }
 
 //@@ BattleAudienceDispApSrc
-void BattleAudienceDispApSrc(CameraId camId, void* param) {
+static void BattleAudienceDispApSrc(CameraId camId, void* param) {
     s32 i;
     BattleAudienceStar* star;
     Mtx rot;
@@ -2669,7 +2669,7 @@ void BattleAudienceDispApSrc(CameraId camId, void* param) {
     }
 }
 //@@ BattleAudienceDispWin
-void BattleAudienceDispWin(CameraId camId, void* param) {
+static void BattleAudienceDispWin(CameraId camId, void* param) {
     BattleAudienceWindow* win;
     Mtx mtx;
 
@@ -2683,7 +2683,7 @@ void BattleAudienceDispWin(CameraId camId, void* param) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = 17.0f + win->x;
         pos.y = win->y - 40.0f;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         iconDispGx(&pos, ICON_DISP_2D, ICON_209, 0.85f);
 #else
         iconDispGx(&pos, ICON_DISP_2D, ICON_209, 0.8f);
@@ -2739,7 +2739,7 @@ BOOL BattleAudience_Entry(s32 index, AudienceMemberType type, u8 status) {
 }
 
 //@@ BattleAudience_Entry_Sub
-void BattleAudience_Entry_Sub(s32 index, s32 type, u8 status) {
+static void BattleAudience_Entry_Sub(s32 index, s32 type, u8 status) {
     BattleAudienceMember* m;
     u8* stage;
     s32 row;
@@ -2784,7 +2784,7 @@ void BattleAudience_Entry_Sub(s32 index, s32 type, u8 status) {
     m->baseScale = (Vec){1.0f, 1.0f, 1.0f};
     m->dispOffset = (Vec){0.0f, 0.0f, 0.0f};
     m->angle = 270.0f;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if ((index >= 2 && index <= 17) || (index >= 22 && index <= 37) || (index >= 42 && index <= 57)) {
 #else
     if ((index >= 4 && index <= 15) || (index >= 24 && index <= 35) || (index >= 44 && index <= 55)) {
@@ -2981,7 +2981,8 @@ void BattleAudience_SetTarget(s32 index) {
     BattleAudienceMember* member;
     s32 i;
 
-#if VERSION == VERSION_DEMO
+    // Two copies: the demos mark the member only while it holds an item; the releases always do.
+#if VERSION <= VERSION_DEMO_US
     member = BattleAudienceGetPtr(index);
     if (member->status == 7 && member->itemId != -1) {
         member->flags |= MEMBER_FLAG_TARGETED;
@@ -3166,7 +3167,8 @@ s32 BattleAudience_HaitiRandForFallObject(void) {
     s32 row = irand(3);
     s32 col = 10;
 
-#if VERSION == VERSION_DEMO
+    // Two copies: the demos spread falling objects over wider column ranges.
+#if VERSION <= VERSION_DEMO_US
     irand(18);
     switch (row) {
         case 0:
@@ -3384,18 +3386,18 @@ s32 BattleAudience_GetPPAudienceNumKind(s32 type) {
 }
 
 //@@ BattleAudience_GetPPAudienceNum_R
-s32 BattleAudience_GetPPAudienceNum_R(void) {
+static s32 BattleAudience_GetPPAudienceNum_R(void) {
     return BattleAudience_GetPPAudienceNum_RL_Sub(10);
 }
 
 //@@ BattleAudience_GetPPAudienceNum_L
-s32 BattleAudience_GetPPAudienceNum_L(void) {
+static s32 BattleAudience_GetPPAudienceNum_L(void) {
     return BattleAudience_GetPPAudienceNum_RL_Sub(0);
 }
 
 //@@ BattleAudience_GetPPAudienceNum_RL_Sub
 #pragma push
-s32 BattleAudience_GetPPAudienceNum_RL_Sub(s32 offset) {
+static s32 BattleAudience_GetPPAudienceNum_RL_Sub(s32 offset) {
     s32 i, j, index, count;
 
     BattleAudienceBaseGetPtr();
@@ -3413,7 +3415,7 @@ s32 BattleAudience_GetPPAudienceNum_RL_Sub(s32 offset) {
 #pragma pop
 
 //@@ BattleAudience_GetPPAudienceNum_Sub
-BOOL BattleAudience_GetPPAudienceNum_Sub(s32 id) {
+static BOOL BattleAudience_GetPPAudienceNum_Sub(s32 id) {
     BattleAudienceMember* member = BattleAudienceGetPtr(id);
 
     if (!AUD_U8CALL(BattleAudience_GetExist, id)) {
@@ -3498,7 +3500,7 @@ void BattleAudienceNumToTarget(void) {
     if (audience->flags & AUDIENCE_FLAG_FROZEN) {
         return;
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     BattleAudienceNumToTargetSub();
 #endif
     num = audience->targetAudienceCount + audience->addedAudienceCount;
@@ -3508,7 +3510,7 @@ void BattleAudienceNumToTarget(void) {
     if (num > audience->maxAudience) {
         num = audience->maxAudience;
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     BattleAudienceAddAudienceNum(num - audience->presentCount);
     BattleAudienceNumToTargetSub();
 #else
@@ -3517,8 +3519,8 @@ void BattleAudienceNumToTarget(void) {
 }
 
 //@@ BattleAudienceNumToTargetSub
-#if VERSION == VERSION_DEMO
-void BattleAudienceNumToTargetSub(void) {
+#if VERSION <= VERSION_DEMO_US
+static void BattleAudienceNumToTargetSub(void) {
     BattleAudience* audience = BattleAudienceBaseGetPtr();
     s32 i;
 
@@ -3530,7 +3532,7 @@ void BattleAudienceNumToTargetSub(void) {
     }
 }
 #else
-s32 BattleAudienceNumToTargetSub(void) {
+static s32 BattleAudienceNumToTargetSub(void) {
     s32 i, count;
 
     BattleAudienceBaseGetPtr();
@@ -3582,7 +3584,7 @@ void BattleAudienceAddTargetNum(f32 value, f32 value2) {
 }
 
 //@@ BattleAudienceAddTargetNumSub
-void BattleAudienceAddTargetNumSub(f32 value) {
+static void BattleAudienceAddTargetNumSub(f32 value) {
     f32 subtract;
     s32 skew;
 
@@ -3701,7 +3703,7 @@ void BattleAudiencePuniAllEscape(void) {
         member = BattleAudienceGetPtr(i);
         if (AUD_U8CALL(BattleAudience_GetEscapeChangeOK, i) && member->type == 7) {
             BattleAudience_ChangeStatus(i, 12);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             audience->targetAudienceCount -= 1.0f;
 #else
             audience->addedAudienceCount -= 1.0f;
@@ -3728,7 +3730,7 @@ void BattleAudienceAddPuni(s32 num) {
                 return;
             }
             if (BattleAudience_Entry(id, 7, 11) == TRUE) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 audience->targetAudienceCount += 1.0f;
 #else
                 audience->addedAudienceCount += 1.0f;
@@ -3739,7 +3741,7 @@ void BattleAudienceAddPuni(s32 num) {
 }
 
 //@@ BattleAudienceAddPhaseEvtList
-void BattleAudienceAddPhaseEvtList(s32 type) {
+static void BattleAudienceAddPhaseEvtList(s32 type) {
     s32 i;
     BattleAudience* p = BattleAudienceBaseGetPtr();
 
@@ -3753,7 +3755,7 @@ void BattleAudienceAddPhaseEvtList(s32 type) {
 }
 
 //@@ BattleAudienceCheer
-void BattleAudienceCheer(s32 type) {
+static void BattleAudienceCheer(s32 type) {
     BattleAudience* audience = BattleAudienceBaseGetPtr();
 
     if (audience->starPowerGain > 800) {
@@ -3773,7 +3775,7 @@ void BattleAudienceCheer(s32 type) {
 }
 
 //@@ BattleAudienceJoy
-void BattleAudienceJoy(s32 type) {
+static void BattleAudienceJoy(s32 type) {
     BattleAudience* audience = BattleAudienceBaseGetPtr();
 
     switch (type) {
@@ -3807,7 +3809,7 @@ void BattleAudienceJoy(s32 type) {
                     BattleAudienceJoy_Sub(50, 40, 10, type);
                     break;
             }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             audience->joyLevel++;
             if (audience->joyLevel > 4) {
                 audience->joyLevel = 4;
@@ -3832,7 +3834,7 @@ void BattleAudienceJoyEnding(void) {
 #pragma push
 // loop invariants optimisation off for BattleAudienceJoy_Sub, BattleAudienceDetectPakkunEatTargetSub2, BattleAudienceDetectPakkunEatTargetSub and 66 more: the original register allocation and scheduling need it
 #pragma opt_loop_invariants off
-void BattleAudienceJoy_Sub(s32 a, s32 b, s32 c, s32 type) {
+static void BattleAudienceJoy_Sub(s32 a, s32 b, s32 c, s32 type) {
     BattleAudienceMember* member;
     s32 i;
     s32 total;
@@ -3872,7 +3874,7 @@ void BattleAudienceJoy_Sub(s32 a, s32 b, s32 c, s32 type) {
 #pragma pop
 
 //@@ BattleAudienceDetectPakkunEatTargetSub2
-s32 BattleAudienceDetectPakkunEatTargetSub2(s32 index, s32 dir) {
+static s32 BattleAudienceDetectPakkunEatTargetSub2(s32 index, s32 dir) {
     s32 id;
 
     BattleAudienceBaseGetPtr();
@@ -3888,7 +3890,7 @@ s32 BattleAudienceDetectPakkunEatTargetSub2(s32 index, s32 dir) {
 }
 
 //@@ BattleAudienceDetectPakkunEatTargetSub
-s32 BattleAudienceDetectPakkunEatTargetSub(s32 index, s32 dir1, s32 dir2) {
+static s32 BattleAudienceDetectPakkunEatTargetSub(s32 index, s32 dir1, s32 dir2) {
     s32 a = BattleAudienceDetectPakkunEatTargetSub2(index, dir1);
     s32 b = BattleAudienceDetectPakkunEatTargetSub2(index, dir2);
 
@@ -4414,12 +4416,12 @@ void BattleAudienceSoundStop(s32 index) {
 }
 
 //@@ BattleAudienceSound0
-s32 BattleAudienceSound0(const char* name) {
+static s32 BattleAudienceSound0(const char* name) {
     return psndSFXOn(name);
 }
 
 //@@ BattleAudienceSound1
-s32 BattleAudienceSound1(const char* name, s32 right, s32 left) {
+static s32 BattleAudienceSound1(const char* name, s32 right, s32 left) {
     u8 vol;
     Vec pos;
     s32 id;
@@ -4431,7 +4433,7 @@ s32 BattleAudienceSound1(const char* name, s32 right, s32 left) {
 }
 
 //@@ BattleAudienceSoundGetInfo1
-void BattleAudienceSoundGetInfo1(s32 right, s32 left, u8* vol, Vec* pos) {
+static void BattleAudienceSoundGetInfo1(s32 right, s32 left, u8* vol, Vec* pos) {
     s32 sum = right + left;
 
     if (sum == 0) {
@@ -4449,7 +4451,7 @@ void BattleAudienceSoundGetInfo1(s32 right, s32 left, u8* vol, Vec* pos) {
 }
 
 //@@ BattleAudienceSound2
-s32 BattleAudienceSound2(const char* name, s32 index) {
+static s32 BattleAudienceSound2(const char* name, s32 index) {
     Vec pos;
 
     BattleAudienceSoundGetInfo2(index, &pos);
@@ -4457,7 +4459,7 @@ s32 BattleAudienceSound2(const char* name, s32 index) {
 }
 
 //@@ BattleAudienceSoundGetInfo2
-void BattleAudienceSoundGetInfo2(s32 index, Vec* pos) {
+static void BattleAudienceSoundGetInfo2(s32 index, Vec* pos) {
     BattleAudienceMember* member = BattleAudienceGetPtr(index);
 
     pos->x = member->position.x;
@@ -4466,7 +4468,7 @@ void BattleAudienceSoundGetInfo2(s32 index, Vec* pos) {
 }
 
 //@@ BattleAudienceSoundMain
-void BattleAudienceSoundMain(void) {
+static void BattleAudienceSoundMain(void) {
     AudSound* sound;
     s32 i;
 
@@ -4505,7 +4507,7 @@ void BattleAudienceSoundMain(void) {
 }
 
 //@@ BattleAudienceNoiseMain
-void BattleAudienceNoiseMain(void) {
+static void BattleAudienceNoiseMain(void) {
     BattleWork* wp = _battleWorkPointer;
     BattleAudience* audience = BattleAudienceBaseGetPtr();
     AudSound* sound = AudSoundGetPtr(2);
@@ -4557,7 +4559,7 @@ void BattleAudience_Case_ActionCommandGood(BattleWeapon* weapon) {
     s32 i;
     s32 count = 0;
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     audience->numStylishCommandsThisAttack = 1;
 #endif
     for (i = 0; i < 200; i++) {
@@ -4570,7 +4572,7 @@ void BattleAudience_Case_ActionCommandGood(BattleWeapon* weapon) {
         BattleAudienceJoy(0);
     }
     audience->flags |= AUDIENCE_FLAG_AC_GOOD;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     audience->flags &= ~AUDIENCE_FLAG_STYLISH_MISSED;
 #endif
 }
@@ -4622,7 +4624,7 @@ void BattleAudience_Case_AcrobatGood(void) {
         BattleAudienceSoundClap(180, 120);
         BattleAudienceJoy(1);
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     audience->flags |= AUDIENCE_FLAG_STYLISH_GOOD;
     audience->flags &= ~AUDIENCE_FLAG_STYLISH_MISSED;
 #else
@@ -4650,14 +4652,14 @@ void BattleAudience_Case_AcrobatBad(void) {
         BattleAudienceJoy(0);
     }
     audience->flags |= AUDIENCE_FLAG_STYLISH_BAD;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     audience->flags |= AUDIENCE_FLAG_STYLISH_MISSED;
 #endif
 }
 
 //@@ BattleAudience_Case_AcrobatNoTry
 void BattleAudience_Case_AcrobatNoTry(void) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     BattleAudienceBaseGetPtr()->flags &= ~AUDIENCE_FLAG_STYLISH_MISSED;
 #else
     BattleAudienceBaseGetPtr();
@@ -4719,11 +4721,11 @@ void BattleAudience_Case_TurnEnd(void) {
         }
         if (wp->turnCount >= turns) {
             BattleAudienceAddTargetNum(-0.049999997f * BattleAudienceBaseGetPtr()->audienceDeltaMultiplier, 0.0f);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             BattleAudienceAddPhaseEvtList(6);
 #endif
         }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         if (wp->turnCount == turns) {
             BattleAudienceAddPhaseEvtList(6);
         }
@@ -4748,7 +4750,7 @@ void BattleAudience_Case_TurnEnd(void) {
 void BattleAudience_Case_Appeal(BattleUnit* unit) {
     BattleAudience* audience = BattleAudienceBaseGetPtr();
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (BattleAudience_GetPPAudienceNum() > 0) {
         if (unit->badgesEquipped.SuperAppeal) {
             audience->starPowerGain += BattleAudience_GetPPAudienceNum() / 4 + 25 + unit->badgesEquipped.SuperAppeal * 25;

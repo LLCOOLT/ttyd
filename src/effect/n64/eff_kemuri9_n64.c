@@ -23,7 +23,7 @@ typedef struct EffKemuri9N64Work {
     s32 timer;     // 0x24
     s32 counter;   // 0x28
     s32 lifetime;  // 0x2C
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     f32 anim; // 0x30, animation frame 0..8
 #else
     s32 texU;     // 0x30, texture strip cell of the current frame (0..15)
@@ -33,7 +33,7 @@ typedef struct EffKemuri9N64Work {
 #endif
 } EffKemuri9N64Work;
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, -8, 0, 0, 0, 0, 0, 0, 255},
     {8, -8, 0, -1024, 0, 0, 0, 0, 255},
@@ -49,8 +49,8 @@ static effN64Vtx size32x32_tex32x32_vtx[] = {
 };
 #endif
 
-void effKemuri9Main(EffectEntry* effect);
-void effKemuri9Disp(CameraId cameraId, EffectEntry* effect);
+static void effKemuri9Main(EffectEntry* effect);
+static void effKemuri9Disp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effKemuri9N64Entry(s32 type, s32 count, s32 life, f32 x, f32 y, f32 z, f32 radiusEnd, f32 angle) {
     EffectEntry* effect;
@@ -68,7 +68,7 @@ EffectEntry* effKemuri9N64Entry(s32 type, s32 count, s32 life, f32 x, f32 y, f32
     work->timer = life;
     work->counter = 0;
     work->lifetime = life;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     work->anim = 0.0f;
 #else
     work->texU = 0;
@@ -79,7 +79,7 @@ EffectEntry* effKemuri9N64Entry(s32 type, s32 count, s32 life, f32 x, f32 y, f32
     work->position.z = z;
     work->radius = 10.0f;
     work->radiusEnd = radiusEnd;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     work->texU = 0;
     work->texV = 0;
     work->frameMax = life;
@@ -98,7 +98,7 @@ EffectEntry* effKemuri9N64Entry(s32 type, s32 count, s32 life, f32 x, f32 y, f32
     return effect;
 }
 
-void effKemuri9Main(EffectEntry* effect) {
+static void effKemuri9Main(EffectEntry* effect) {
     EffKemuri9N64Work* work = effect->userdata;
     s32 i;
     s32 ir;
@@ -109,7 +109,7 @@ void effKemuri9Main(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     work->anim = 8.0f * (f32)work->counter / (f32)work->lifetime;
 #else
     {
@@ -144,10 +144,10 @@ void effKemuri9Main(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effKemuri9Disp, effect);
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo draws the smoke as N64 quads, blending two frames of one texture strip; the later versions use a
 // 16-cell GX texture and draw the quads directly.
-void effKemuri9Disp(CameraId cameraId, EffectEntry* effect) {
+static void effKemuri9Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera = camGetPtr(cameraId);
     EffKemuri9N64Work* work = effect->userdata;
     BOOL last;
@@ -227,7 +227,7 @@ void effKemuri9Disp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 #else
-void effKemuri9Disp(CameraId cameraId, EffectEntry* effect) {
+static void effKemuri9Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera = camGetPtr(cameraId);
     EffKemuri9N64Work* work = effect->userdata;
     s32 i;

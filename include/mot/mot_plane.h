@@ -25,7 +25,7 @@ typedef struct MotPlaneWork {
 
 s32 marioGetPlaneStatus(void);
 #include "version.h"
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 void mario_plane_cancel(void);
 #else
 BOOL mario_plane_cancel(void); // TRUE when the flight was cut short

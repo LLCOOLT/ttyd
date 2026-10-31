@@ -58,7 +58,7 @@ typedef struct LoadWork {
     EventEntry* evt;   // 0x3C
     s32 soundSetting;  // 0x40, sound mode in effect (restored on cancel)
     s32 rumbleSetting; // 0x44, rumble setting in effect (restored on cancel)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     s32 savedWinId; // 0x48, event printWindowId, restored on exit
 #endif
 } LoadWork;
@@ -85,15 +85,15 @@ typedef struct WinDt {
 // SLOTFLAGS(i): the flags word of save slot i.
 #define SLOTFLAGS(i) (cardGetFilePtr()->saves[(i)].data.flags)
 
-#if VERSION == VERSION_DEMO
-BOOL loadMain(SequenceWork* seq);
+#if VERSION <= VERSION_DEMO_US
+static BOOL loadMain(SequenceWork* seq);
 #else
-void loadMain(SequenceWork* seq);
+static void loadMain(SequenceWork* seq);
 #endif
-void loadDraw(CameraId camera, void* param);
-void continueGame(void);
+static void loadDraw(CameraId camera, void* param);
+static void continueGame(void);
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 s32 stone_id[7] = {ICON_197, ICON_198, ICON_19A, ICON_19C, ICON_19D, ICON_199, ICON_19B};
 
 static EVT_BEGIN(evt_shake)
@@ -141,7 +141,7 @@ __declspec(section ".sdata2") const u32 seq_logo_zero_color[2];
 
 static EvtWord evt_shake[12];
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 s32 evt_seq_load_keep_msg_window(EventEntry* evt, BOOL isFirstCall) {
     fadeReset(4);
     wp->savedWinId = evt->printWindowId;
@@ -171,7 +171,7 @@ void seq_loadMain(SequenceWork* seq) {
             break;
         case 1:
             wp->evt = evtEntryType(evt_memcard_check, 0, 0, 0);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             if (wp->flags & 0x80) {
                 wp->flags &= ~0x80;
                 wp->evt->lwData[10] = 1;
@@ -187,7 +187,7 @@ void seq_loadMain(SequenceWork* seq) {
                 } else {
                     wp->evt = NULL;
                     seq->state++;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                     wp->cardCode = cardGetCode();
                     if (OSGetSoundMode() == 0) {
                         SoundSetOutputMode(0);
@@ -243,7 +243,7 @@ static inline BOOL loadStart(void) {
     const char* lang[] = {"jp", "us", "ge", "fr", "sp", "it"};
     if (fileAsyncf(4, NULL, "%s/w/%s/name.tpl", getMarioStDvdRoot(), lang[gp->language]) != NULL) {
         wp->file = fileAllocf(4, "%s/w/%s/name.tpl", getMarioStDvdRoot(), lang[gp->language]);
-#elif VERSION == VERSION_DEMO
+#elif VERSION <= VERSION_DEMO_US
     if (fileAsyncf(4, NULL, "%s/window/jp/name.tpl", getMarioStDvdRoot()) != NULL) {
         wp->file = fileAllocf(4, "%s/window/jp/name.tpl", getMarioStDvdRoot());
 #else
@@ -271,10 +271,10 @@ static inline void loadNewGameSetup(void) {
     swByteSet(GSW_STORY_PROGRESS, STORY_STG0_00_PROLOGUE);
 }
 
-#if VERSION == VERSION_DEMO
-BOOL loadMain(SequenceWork* seq) {
+#if VERSION <= VERSION_DEMO_US
+static BOOL loadMain(SequenceWork* seq) {
 #else
-void loadMain(SequenceWork* seq) {
+static void loadMain(SequenceWork* seq) {
 #endif
     u32 trg;
     u32 dir;
@@ -390,7 +390,7 @@ void loadMain(SequenceWork* seq) {
                         break;
                     case 7:
                         SFX(0x12);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                         psndBGMOff(PSND_FADE_DIP_TO(10));
 #endif
                         wp->state = 0x64;
@@ -441,7 +441,7 @@ void loadMain(SequenceWork* seq) {
             break;
         case 0x16:
             fadeEntry(FADE_CURTAIN_SIDES_A1, 0, (GXColor){0, 0, 0, 255});
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             psndBGMOff_f_d(PSND_FADE_OUT, 3000, 0);
 #else
             psndBGMOff_f_d(PSND_FADE_OUT, 2000, 0);
@@ -495,7 +495,7 @@ void loadMain(SequenceWork* seq) {
                 } else {
                     strcpy((char*)gp->playerName, nameEntGetName());
                     gp->lastSlot = wp->slot;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                     if (code == 0) {
                         gp->saveSlot = wp->slot;
                         wp->evt = evtEntryType(evt_memcard_save, 0, 0, 0);
@@ -526,7 +526,7 @@ void loadMain(SequenceWork* seq) {
             break;
         case 0x23:
             if (!evtCheckID(wp->evt->eventId)) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 loadNewGameSetup();
 #endif
                 seqSetSeq(SEQ_MAP_CHANGE, "aaa_00", "prologue");
@@ -576,7 +576,7 @@ void loadMain(SequenceWork* seq) {
             break;
         case 0x2a:
             if (!evtCheckID(wp->evt->eventId)) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 wp->flags &= ~0x40;
                 wp->slot = 4;
                 wp->state = 1;
@@ -674,7 +674,7 @@ void loadMain(SequenceWork* seq) {
             break;
         case 0x35:
             if (!evtCheckID(wp->evt->eventId)) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 wp->flags &= ~0x40;
                 wp->slot = 5;
                 wp->state = 1;
@@ -692,7 +692,7 @@ void loadMain(SequenceWork* seq) {
             }
             break;
         case 0x64:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             wp->flags |= 1;
             if (dir & DEMO_STICK_UP) {
                 wp->soundCursor--;
@@ -850,7 +850,7 @@ void loadMain(SequenceWork* seq) {
         f32 s = 2.0f * (f32)sin(gp->retraceCount / 8.0f);
         wp->x += __fabsf(s);
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     dispEntry(CAMERA_2D, 1000.0f, 0, loadDraw, NULL);
     return FALSE;
 #else
@@ -884,23 +884,23 @@ static inline void loadDrawBg(u32 id, f32 x0, f32 y0, f32 x1, f32 y1) {
     GXTexCoord2f32(1.0f, 0.0f);
 }
 
-void loadDraw(CameraId camera, void* param) {
+static void loadDraw(CameraId camera, void* param) {
     CameraEntry* cam = camGetPtr(CAMERA_2D);
     GXColor white = {255, 255, 255, 255};
     GXColor gray = {160, 160, 160, 255};
     GXColor dark = {128, 128, 128, 128};
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     f32 vp[6];
     f32 proj[7];
     CameraEntry saved;
 #endif
     char buf[0x20];
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     char buf2[0x100];
 #endif
     Mtx m;
     Mtx s;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     f32 x;
 #endif
     f32 y;
@@ -914,7 +914,7 @@ void loadDraw(CameraId camera, void* param) {
     if (wp->state >= 0x20 && wp->state < 0x28) {
         return;
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     GXGetViewportv(vp);
     GXGetProjectionv(proj);
     GXSetProjection(cam->projection, cam->projType);
@@ -952,7 +952,7 @@ void loadDraw(CameraId camera, void* param) {
         if (i == wp->slot) {
             col = white;
         }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         if (wp->state == 0x29 && (i == wp->copySrc || i == wp->copyDst)) {
 #else
         if (wp->state == 0x33 && (i == wp->copySrc || i == wp->copyDst)) {
@@ -989,7 +989,7 @@ void loadDraw(CameraId camera, void* param) {
     FontDrawStart();
     {
         const char* msg = wp->msg;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         FontDrawString(-FontGetMessageWidth(msg) / 2, 192.0f, msg);
 #else
         FontDrawMessage(-FontGetMessageWidth(msg) / 2, 192, msg);
@@ -1022,7 +1022,7 @@ void loadDraw(CameraId camera, void* param) {
         u16 stars = save->data.pouch.starPowersObtained;
         s32 gsw0 = save->data.global.gsw0;
 #endif
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         // demo: the clamp compares the 64-bit hour count, and name is declared last (register order)
         const char* str;
         u64 hours;
@@ -1049,7 +1049,7 @@ void loadDraw(CameraId camera, void* param) {
             str = msgSearch("msg_mcard_file");
         }
         sprintf(buf, "%s%s", str, winZenkakuStr(i + 1));
-#elif VERSION == VERSION_DEMO
+#elif VERSION <= VERSION_DEMO_US
         sprintf(buf, "データ%d", i + 1);
 #else
     sprintf(buf, "データ%s", winZenkakuStr(i + 1));
@@ -1103,7 +1103,7 @@ void loadDraw(CameraId camera, void* param) {
                 FontDrawString(win1->x - FontGetMessageWidth(name) / 2, 70.0f + win1->y, name);
             }
         } else {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             w = FontGetMessageWidth("\x82\x57\x82\x57");
             sec = OSTicksToSeconds(time);
             hours = (u64)sec / 3600;
@@ -1293,14 +1293,14 @@ void loadDraw(CameraId camera, void* param) {
         winTexSet(0, (Vec){wp->x, wp->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
     }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     GXSetViewport(vp[0], vp[1], vp[2], vp[3], vp[4], vp[5]);
     GXSetProjectionv(proj);
     *camGetCurPtr() = saved;
 #endif
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 s32 stone_id[7] = {ICON_197, ICON_198, ICON_19A, ICON_19C, ICON_19D, ICON_199, ICON_19B};
 
 static EVT_BEGIN(evt_shake)
@@ -1318,7 +1318,7 @@ EVT_BEGIN(evt_continue)
     RETURN
 EVT_END()
 #pragma defer_codegen off
-void continueGame(void) {
+static void continueGame(void) {
     cardCopy2Main(wp->slot);
     gp->saveSlot = wp->slot;
     gp->lastSlot = wp->slot;
@@ -1386,7 +1386,7 @@ void continueGame(void) {
             seqSetSeq(SEQ_MAP_CHANGE, "tou_02", 0);
             break;
         case 10:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             gp->areaFadeInType = FADE_STORY_PEACH_A2;
             gp->areaFadeOutType = FADE_STORY_PEACH_A3;
 #else
@@ -1406,7 +1406,7 @@ void continueGame(void) {
             seqSetSeq(SEQ_MAP_CHANGE, "usu_00", 0);
             break;
         case 13:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             gp->areaFadeInType = FADE_STORY_MARIO_A2;
             gp->areaFadeOutType = FADE_STORY_MARIO_A3;
 #else
@@ -1426,7 +1426,7 @@ void continueGame(void) {
             seqSetSeq(SEQ_MAP_CHANGE, "muj_00", 0);
             break;
         case 16:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             gp->areaFadeInType = FADE_STORY_MARIO_A2;
             gp->areaFadeOutType = FADE_STORY_MARIO_A3;
 #else
@@ -1461,7 +1461,7 @@ void continueGame(void) {
             seqSetSeq(SEQ_MAP_CHANGE, "gor_00", 0);
             break;
         case 22:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             gp->areaFadeInType = FADE_STORY_MARIO_A2;
             gp->areaFadeOutType = FADE_STORY_MARIO_A3;
 #else

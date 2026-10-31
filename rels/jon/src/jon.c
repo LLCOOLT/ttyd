@@ -40,7 +40,6 @@
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "npc_event.h"
 #include "jon.h"
 #include "version.h"
@@ -49,19 +48,19 @@
 #include "driver/casedrv.h"
 #include "driver/mapdrv.h"
 
-void raster_disp(CameraId cameraId, void* param);
+static void raster_disp(CameraId cameraId, void* param);
 
-USER_FUNC(enemy_info);
-USER_FUNC(evt_raster);
+static USER_FUNC(enemy_info);
+static USER_FUNC(evt_raster);
 static USER_FUNC(gonbaba_wait_landon);
-USER_FUNC(iri_12_makkino_set_y);
-USER_FUNC(iri_12_paper_init);
-USER_FUNC(setup_npc_ex_para);
-USER_FUNC(shikakeFlag);
-USER_FUNC(wait_landon);
-USER_FUNC(wanwan_set_home_pos);
-USER_FUNC(yattukeFlag);
-void iri_12_msgcb(s32 type, smartEntry* smart);
+static USER_FUNC(iri_12_makkino_set_y);
+static USER_FUNC(iri_12_paper_init);
+static USER_FUNC(setup_npc_ex_para);
+static USER_FUNC(shikakeFlag);
+static USER_FUNC(wait_landon);
+static USER_FUNC(wanwan_set_home_pos);
+static USER_FUNC(yattukeFlag);
+static void iri_12_msgcb(s32 type, smartEntry* smart);
 
 u8 enemy_100[100];
 NpcSetupInfo npcEnt_kuriboo[2];
@@ -155,9 +154,9 @@ EVT_BEGIN(jon_init_evt)
         SET_VALUE(GSW(GSW_JON_DEEPEST_FLOOR), LW(0))
     END_IF
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_kanban"), 0, PTR(evt_kanban), 0)
-    CALL_CHILD(PTR(idouya_setup))
-    CALL_CHILD(PTR(gyousyou_setup))
-    CALL_CHILD(PTR(enemy_setup))
+    CALL_CHILD(idouya_setup)
+    CALL_CHILD(gyousyou_setup)
+    CALL_CHILD(enemy_setup)
     SET_VALUE(LW(0), GSW(GSW_JON_FLOOR))
     ADD(LW(0), 1)
     SET_VALUE(LW(1), LW(0))
@@ -167,13 +166,13 @@ EVT_BEGIN(jon_init_evt)
     SWITCH(LW(1))
         CASE_EQUAL(0)
         IF_INT_EQUAL(LW(2), 10)
-            CALL_CHILD(PTR(setup_boss))
+            CALL_CHILD(setup_boss)
         ELSE
-            CALL_CHILD(PTR(setup_return))
+            CALL_CHILD(setup_return)
             CALL(evt_mobj_floatswitch_blue, 0, STRING("sw"), -75, 60, 0, PTR(dokan_open2), 0)
         END_IF
         CASE_EQUAL(9)
-        CALL_CHILD(PTR(setup_prev_return))
+        CALL_CHILD(setup_prev_return)
         CALL(evt_npc_check, STRING("敵"), LW(0))
         IF_INT_NOT_EQUAL(LW(0), 1)
             CALL(evt_hit_bind_mapobj, STRING("a_dokan_1"), STRING("dokan_1_s"))
@@ -181,6 +180,7 @@ EVT_BEGIN(jon_init_evt)
             CALL(evt_hit_bind_update, STRING("a_dokan_1"))
             CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("dokan_1_k"), MAPOBJ_FLAG_HIDE)
         END_IF
+#if VERSION >= VERSION_JP
         CALL(evt_npc_check, STRING("移動屋"), LW(0))
         IF_INT_EQUAL(LW(0), 1)
             CALL(evt_hit_bind_mapobj, STRING("a_dokan_1"), STRING("dokan_1_s"))
@@ -188,8 +188,9 @@ EVT_BEGIN(jon_init_evt)
             CALL(evt_hit_bind_update, STRING("a_dokan_1"))
             CALL(evt_mobj_floatswitch_blue, 0, STRING("idou_sw"), 75, 60, 0, PTR(dokan_open), 0)
         END_IF
+#endif
         CASE_DEFAULT
-        CALL_CHILD(PTR(setup_normal))
+        CALL_CHILD(setup_normal)
         CALL(evt_npc_check, STRING("敵"), LW(0))
         IF_INT_NOT_EQUAL(LW(0), 1)
             CALL(evt_hit_bind_mapobj, STRING("a_dokan_1"), STRING("dokan_1_s"))
@@ -197,6 +198,7 @@ EVT_BEGIN(jon_init_evt)
             CALL(evt_hit_bind_update, STRING("a_dokan_1"))
             CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("dokan_1_k"), MAPOBJ_FLAG_HIDE)
         END_IF
+#if VERSION >= VERSION_JP
         CALL(evt_npc_check, STRING("移動屋"), LW(0))
         IF_INT_EQUAL(LW(0), 1)
             CALL(evt_hit_bind_mapobj, STRING("a_dokan_1"), STRING("dokan_1_s"))
@@ -204,8 +206,9 @@ EVT_BEGIN(jon_init_evt)
             CALL(evt_hit_bind_update, STRING("a_dokan_1"))
             CALL(evt_mobj_floatswitch_blue, 0, STRING("idou_sw"), 75, 60, 0, PTR(dokan_open), 0)
         END_IF
+#endif
     END_SWITCH
-    CALL_CHILD(PTR(iri_12_init))
+    CALL_CHILD(iri_12_init)
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("jon_04"))
         IF_INT_EQUAL(GSW(GSW_JON_FLOOR), 49)
@@ -273,7 +276,7 @@ u8 enemy_100[] = {
 
 NpcSetupInfo npcEnt_kuriboo[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         kuriboo_init_event, // initEvent
@@ -286,7 +289,11 @@ NpcSetupInfo npcEnt_kuriboo[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -298,7 +305,7 @@ NpcSetupInfo npcEnt_kuriboo[] = {
 
 NpcSetupInfo npcEnt_patakuri[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         patakuri_init_event, // initEvent
@@ -311,7 +318,11 @@ NpcSetupInfo npcEnt_patakuri[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -323,7 +334,7 @@ NpcSetupInfo npcEnt_patakuri[] = {
 
 NpcSetupInfo npcEnt_hannya[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         hannya_init_event, // initEvent
@@ -336,7 +347,11 @@ NpcSetupInfo npcEnt_hannya[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -348,7 +363,7 @@ NpcSetupInfo npcEnt_hannya[] = {
 
 NpcSetupInfo npcEnt_chorobon[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         chorobon_init_event, // initEvent
@@ -361,7 +376,11 @@ NpcSetupInfo npcEnt_chorobon[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -373,7 +392,7 @@ NpcSetupInfo npcEnt_chorobon[] = {
 
 NpcSetupInfo npcEnt_sinnosuke[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         sinnosuke_init_event, // initEvent
@@ -386,7 +405,11 @@ NpcSetupInfo npcEnt_sinnosuke[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -398,7 +421,7 @@ NpcSetupInfo npcEnt_sinnosuke[] = {
 
 NpcSetupInfo npcEnt_sinemon[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         sinemon_init_event, // initEvent
@@ -411,7 +434,11 @@ NpcSetupInfo npcEnt_sinemon[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -423,7 +450,7 @@ NpcSetupInfo npcEnt_sinemon[] = {
 
 NpcSetupInfo npcEnt_nokonoko[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         nokonoko_init_event, // initEvent
@@ -436,7 +463,11 @@ NpcSetupInfo npcEnt_nokonoko[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -448,7 +479,7 @@ NpcSetupInfo npcEnt_nokonoko[] = {
 
 NpcSetupInfo npcEnt_patapata[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         patapata_init_event, // initEvent
@@ -461,7 +492,11 @@ NpcSetupInfo npcEnt_patapata[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -473,7 +508,7 @@ NpcSetupInfo npcEnt_patapata[] = {
 
 NpcSetupInfo npcEnt_met[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         met_init_event, // initEvent
@@ -486,7 +521,11 @@ NpcSetupInfo npcEnt_met[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -498,7 +537,7 @@ NpcSetupInfo npcEnt_met[] = {
 
 NpcSetupInfo npcEnt_patamet[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         patamet_init_event, // initEvent
@@ -511,7 +550,11 @@ NpcSetupInfo npcEnt_patamet[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -523,7 +566,7 @@ NpcSetupInfo npcEnt_patamet[] = {
 
 NpcSetupInfo npcEnt_sambo[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         sambo_init_event, // initEvent
@@ -536,7 +579,11 @@ NpcSetupInfo npcEnt_sambo[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -548,7 +595,7 @@ NpcSetupInfo npcEnt_sambo[] = {
 
 NpcSetupInfo npcEnt_honenoko[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         honenoko2_init_event, // initEvent
@@ -561,7 +608,11 @@ NpcSetupInfo npcEnt_honenoko[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -573,7 +624,7 @@ NpcSetupInfo npcEnt_honenoko[] = {
 
 NpcSetupInfo npcEnt_karon[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         karon_init_event, // initEvent
@@ -586,7 +637,11 @@ NpcSetupInfo npcEnt_karon[] = {
         karon_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -598,7 +653,7 @@ NpcSetupInfo npcEnt_karon[] = {
 
 NpcSetupInfo npcEnt_dokugassun[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         dokugassun_init_event, // initEvent
@@ -611,7 +666,11 @@ NpcSetupInfo npcEnt_dokugassun[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -623,7 +682,7 @@ NpcSetupInfo npcEnt_dokugassun[] = {
 
 NpcSetupInfo npcEnt_piders[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         piders_init_event, // initEvent
@@ -635,7 +694,11 @@ NpcSetupInfo npcEnt_piders[] = {
         piders_blow_event, // blowEvent
         2, // territoryType
         {0.0f, 140.0f, 0.0f}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -647,7 +710,7 @@ NpcSetupInfo npcEnt_piders[] = {
 
 NpcSetupInfo npcEnt_teresa[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         teresa_init_event, // initEvent
@@ -660,7 +723,11 @@ NpcSetupInfo npcEnt_teresa[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -672,7 +739,7 @@ NpcSetupInfo npcEnt_teresa[] = {
 
 NpcSetupInfo npcEnt_hbom[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         hbom_init_event, // initEvent
@@ -685,7 +752,11 @@ NpcSetupInfo npcEnt_hbom[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -697,7 +768,7 @@ NpcSetupInfo npcEnt_hbom[] = {
 
 NpcSetupInfo npcEnt_bubble[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         bubble_init_event, // initEvent
@@ -710,7 +781,11 @@ NpcSetupInfo npcEnt_bubble[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -722,7 +797,7 @@ NpcSetupInfo npcEnt_bubble[] = {
 
 NpcSetupInfo npcEnt_wanwan[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         wanwan_init_event, // initEvent
@@ -734,7 +809,11 @@ NpcSetupInfo npcEnt_wanwan[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -746,7 +825,7 @@ NpcSetupInfo npcEnt_wanwan[] = {
 
 NpcSetupInfo npcEnt_mahoon[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         mahoon_init_event, // initEvent
@@ -759,7 +838,11 @@ NpcSetupInfo npcEnt_mahoon[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -771,7 +854,7 @@ NpcSetupInfo npcEnt_mahoon[] = {
 
 NpcSetupInfo npcEnt_pakkun[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         pakkun_init_event, // initEvent
@@ -784,7 +867,11 @@ NpcSetupInfo npcEnt_pakkun[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -796,7 +883,7 @@ NpcSetupInfo npcEnt_pakkun[] = {
 
 NpcSetupInfo npcEnt_togenoko[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         togenoko_init_event, // initEvent
@@ -809,7 +896,11 @@ NpcSetupInfo npcEnt_togenoko[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -821,7 +912,7 @@ NpcSetupInfo npcEnt_togenoko[] = {
 
 NpcSetupInfo npcEnt_basabasa2[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         basabasa2_init_event, // initEvent
@@ -834,7 +925,11 @@ NpcSetupInfo npcEnt_basabasa2[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -846,7 +941,7 @@ NpcSetupInfo npcEnt_basabasa2[] = {
 
 NpcSetupInfo npcEnt_togedaruma[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         togedaruma_init_event, // initEvent
@@ -859,7 +954,11 @@ NpcSetupInfo npcEnt_togedaruma[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -871,7 +970,7 @@ NpcSetupInfo npcEnt_togedaruma[] = {
 
 NpcSetupInfo npcEnt_pansy[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, // reactionFlags
         pansy_init_event, // initEvent
@@ -884,7 +983,11 @@ NpcSetupInfo npcEnt_pansy[] = {
         enemy_common_blow_event, // blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -896,14 +999,18 @@ NpcSetupInfo npcEnt_pansy[] = {
 
 NpcSetupInfo npcEnt_zonbaba[] = {
     {
-        /*"敵"*/"\x93\x47", // name
+        "敵", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_ENEMY | NPC_FLAG_ACTIVE, // flags
         0, NULL, NULL, NULL, // reactionFlags..talkEvent
         enemy_common_dead_event, // deadEvent
         NULL, NULL, NULL, NULL, // findEvent..blowEvent
         2, // territoryType
         {0}, // territoryBase
+#if VERSION <= VERSION_DEMO_US
+        {200.0f, 100.0f, 140.0f}, // territoryLoiter
+#else
         {150.0f, 100.0f, 100.0f}, // territoryLoiter
+#endif
         200.0f, // searchRange
         300.0f, // searchAngle
         1000.0f, // homingRange
@@ -1088,12 +1195,16 @@ EVT_BEGIN(enemy_setup)
     IF_STR_EQUAL(LW(1), STRING("パイダース"))
         CALL(evt_npc_setup, PTR(npcEnt_piders))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 140, LW(4))
+#if VERSION >= VERSION_JP
         CALL(evt_npc_set_home_position, STRING("敵"), LW(3), 140, LW(4))
+#endif
     END_IF
     IF_STR_EQUAL(LW(1), STRING("チュランタラー"))
         CALL(evt_npc_setup, PTR(npcEnt_piders))
         CALL(evt_npc_set_position, STRING("敵"), LW(3), 140, LW(4))
+#if VERSION >= VERSION_JP
         CALL(evt_npc_set_home_position, STRING("敵"), LW(3), 140, LW(4))
+#endif
     END_IF
     IF_STR_EQUAL(LW(1), STRING("ボロドー"))
         CALL(evt_npc_setup, PTR(npcEnt_kuriboo))
@@ -1220,9 +1331,12 @@ EVT_BEGIN(enemy_setup)
         CALL(evt_npc_flag_onoff, 1, STRING("敵"), NPC_FLAG_NO_BILLBOARD | NPC_FLAG_ALWAYS_VISIBLE)
         CALL(evt_npc_pera_onoff, STRING("敵"), 0)
         CALL(evt_npc_set_ry, STRING("敵"), 0)
-        SPAWN_EVENT(PTR(zonbaba_first_event))
+        SPAWN_EVENT(zonbaba_first_event)
     END_IF
     CALL(evt_npc_get_position, STRING("敵"), LW(3), LW(4), LW(5))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_npc_set_home_position, STRING("敵"), LW(3), LW(4), LW(5))
+#endif
     CALL(evt_npc_set_battle_info, STRING("敵"), LW(2))
     CALL(setup_npc_ex_para, STRING("敵"))
     CALL(yattukeFlag)
@@ -1236,11 +1350,11 @@ EVT_BEGIN(enemy_setup)
         SET_VALUE(LW(0), GSW(GSW_JON_FLOOR))
         ADD(LW(0), 1)
         IF_INT_NOT_EQUAL(LW(0), 100)
-            SPAWN_EVENT(PTR(dokan_open))
+            SPAWN_EVENT(dokan_open)
         ELSE
             SET_VALUE(GSWF(GSWF_JON_BONETAIL_DEFEATED), 1)
         END_IF
-        SPAWN_EVENT(PTR(iri_12_enemy_dead_event))
+        SPAWN_EVENT(iri_12_enemy_dead_event)
     END_INLINE_EVENT
     RETURN
 EVT_END()
@@ -1260,7 +1374,7 @@ EVT_BEGIN(evt_open_box)
         READ_INT(LW(1))
     END_LOOP
     CALL(evt_mobj_get_position, STRING("box"), LW(10), LW(11), LW(12))
-    CALL(evt_item_entry, STRING("item"), LW(1), LW(10), LW(11), LW(12), 17, -1, 0)
+    CALL(evt_item_entry, STRING("item"), LW(1), LW(10), LW(11), LW(12), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("box"))
     CALL(evt_item_get_item, STRING("item"))
     CALL(evt_mario_key_onoff, 1)
@@ -1332,6 +1446,57 @@ EVT_BEGIN(get_map_name)
     RETURN
 EVT_END()
 
+#if VERSION <= VERSION_DEMO_US
+// The demo's mover takes 10 coins for every trip and picks the destination before checking the coins.
+EVT_BEGIN(talk_idouya)
+    CALL(evt_msg_print, 0, STRING("msg_jon_mover"), 0, 0)
+    CALL(evt_msg_select, 0, STRING("msg_jon_mover_select"))
+    SWITCH(LW(0))
+        CASE_EQUAL(0)
+        ADD(GSW(GSW_JON_FLOOR), 2)
+        CALL_CHILD(get_map_name)
+        SET_VALUE(LW(1), STRING("dokan_2"))
+        SET_VALUE(LW(2), 10)
+        CASE_EQUAL(1)
+        ADD(GSW(GSW_JON_FLOOR), 5)
+        CALL_CHILD(get_map_name)
+        SET_VALUE(LW(1), STRING("dokan_2"))
+        SET_VALUE(LW(2), 10)
+        CASE_EQUAL(2)
+        SET_VALUE(LW(0), STRING("tik_06"))
+        SET_VALUE(LW(1), STRING("dokan_3"))
+        SET_VALUE(LW(2), 10)
+        CASE_EQUAL(3)
+        CALL(evt_msg_continue)
+        RETURN
+    END_SWITCH
+    CALL(evt_pouch_get_coin, LW(3))
+    IF_INT_LESS(LW(3), LW(2))
+        CALL(evt_msg_print_add, 0, STRING("msg_jon_mover_nocoin"))
+        RETURN
+    END_IF
+    CALL(evt_msg_continue)
+    MULTIPLY(LW(2), -1)
+    CALL(evt_pouch_add_coin, LW(2))
+    IF_STR_EQUAL(LW(0), STRING("tik_06"))
+        IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_1), 1)
+            SET_VALUE(GSWF(GSWF_TROUBLE_WORK_2), 1)
+        END_IF
+    END_IF
+    CALL(evt_msg_print, 0, STRING("msg_jon_mover_2"), 0, 0)
+    BEGIN_INLINE_EVENT
+        CALL(evt_raster)
+    END_INLINE_EVENT
+    WAIT_MS(5000)
+    CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_BLACK, 300, FADE_IN_BLACK, 300)
+    CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_BLACK, 300, FADE_IN_BLACK, 300)
+    IF_STR_EQUAL(LW(0), STRING("tik_06"))
+        SET_VALUE(GSW(GSW_JON_FLOOR), 0)
+    END_IF
+    CALL(evt_bero_mapchange, LW(0), LW(1))
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(talk_idouya)
     CALL(evt_msg_print, 0, STRING("msg_jon_mover"), 0, 0)
     CALL(evt_msg_select, 0, STRING("msg_jon_mover_select"))
@@ -1356,11 +1521,11 @@ EVT_BEGIN(talk_idouya)
     SWITCH(LW(0))
         CASE_EQUAL(0)
         ADD(GSW(GSW_JON_FLOOR), 2)
-        CALL_CHILD(PTR(get_map_name))
+        CALL_CHILD(get_map_name)
         SET_VALUE(LW(1), STRING("dokan_2"))
         CASE_EQUAL(1)
         ADD(GSW(GSW_JON_FLOOR), 5)
-        CALL_CHILD(PTR(get_map_name))
+        CALL_CHILD(get_map_name)
         SET_VALUE(LW(1), STRING("dokan_2"))
         CASE_EQUAL(2)
         SET_VALUE(LW(0), STRING("tik_06"))
@@ -1388,10 +1553,11 @@ EVT_BEGIN(talk_idouya)
     CALL(evt_bero_mapchange, LW(0), LW(1))
     RETURN
 EVT_END()
+#endif
 
 NpcSetupInfo npcEnt_idouya[] = {
     {
-        /*"移動屋"*/"\x88\xDA\x93\xAE\x89\xAE", // name
+        "移動屋", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, // reactionFlags..initEvent
         move_event, // regularEvent
@@ -1445,6 +1611,9 @@ EVT_BEGIN(talk_gyousyou)
         GOTO(0)
     END_IF
     IF_INT_GREATER_OR_EQUAL(LW(1), 240)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_msg_print_insert, 0, STRING("100kai_item_04"), 0, STRING("me"), LW(2), LW(3), LW(4))
+#else
         CALL(evt_sub_get_language, LW(0))
 #if VERSION >= VERSION_US
         SWITCH(LW(0))
@@ -1462,7 +1631,11 @@ EVT_BEGIN(talk_gyousyou)
             CALL(evt_msg_print_insert, 0, STRING("100kai_item_04"), 0, STRING("me"), LW(2), LW(3), LW(4))
         END_IF
 #endif
+#endif
     ELSE
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_msg_print_insert, 0, STRING("100kai_item_04"), 0, STRING("me"), LW(2), LW(3))
+#else
         CALL(evt_sub_get_language, LW(0))
 #if VERSION >= VERSION_US
         SWITCH(LW(0))
@@ -1481,6 +1654,7 @@ EVT_BEGIN(talk_gyousyou)
         END_SWITCH
 #else
         END_IF
+#endif
 #endif
     END_IF
     CALL(evt_msg_select, 0, STRING("100kai_item_00"))
@@ -1504,12 +1678,24 @@ EVT_BEGIN(talk_gyousyou)
     CALL(evt_win_coin_wait, LW(12))
     WAIT_MS(200)
     CALL(evt_win_coin_off, LW(12))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_msg_continue)
+#endif
     CALL(evt_pouch_get_coin, LW(0))
     IF_INT_EQUAL(LW(0), 0)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_msg_print, 0, STRING("100kai_item_06"), 0, STRING("me"))
+#else
         CALL(evt_msg_print_add, 0, STRING("100kai_item_06"))
+#endif
         RETURN
     END_IF
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_msg_print, 0, STRING("100kai_item_06"), 0, STRING("me"))
+    CALL(evt_msg_print, 0, STRING("100kai_item_07"), 0, STRING("me"))
+#else
     CALL(evt_msg_print_add, 0, STRING("100kai_item_07"))
+#endif
     CALL(evt_msg_select, 0, STRING("100kai_item_00"))
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_msg_print_add, 0, STRING("100kai_item_08"))
@@ -1522,7 +1708,7 @@ EVT_END()
 
 NpcSetupInfo npcEnt_gyousyou[] = {
     {
-        /*"行商人"*/"\x8D\x73\x8F\xA4\x90\x6C", // name
+        "行商人", // name
         NPC_FLAG_HAS_BATTLE_INFO | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, // reactionFlags..initEvent
         move_event, // regularEvent
@@ -1602,8 +1788,13 @@ EVT_BEGIN(shikake_setup)
 EVT_END()
 
 EVT_BEGIN(dokan_open)
+#if VERSION <= VERSION_DEMO_US
+    WAIT_MS(1000)
+    CALL(evt_mario_key_onoff, 0)
+#else
     CALL(evt_mario_key_onoff, 0)
     WAIT_MS(1000)
+#endif
 #if VERSION >= VERSION_US
     WAIT_MS(1000)
 #else
@@ -1675,7 +1866,7 @@ static EVT_BEGIN(evt_kanban2)
 EVT_END()
 
 EVT_BEGIN(floor_inc)
-    SPAWN_EVENT(PTR(iri_12_dokan_in))
+    SPAWN_EVENT(iri_12_dokan_in)
     ADD(GSW(GSW_JON_FLOOR), 1)
     SET_VALUE(LW(0), 0)
     RETURN
@@ -1726,7 +1917,7 @@ BeroEntry bero_boss[] = {
 EVT_BEGIN(setup_boss)
     SET_VALUE(LW(0), PTR(bero_boss))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     RETURN
 EVT_END()
 
@@ -1828,23 +2019,23 @@ BeroEntry bero_return3[] = {
 EVT_BEGIN(setup_return)
     SET_VALUE(LW(0), PTR(bero_return))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     SET_VALUE(LW(0), GSW(GSW_JON_FLOOR))
     ADD(LW(0), 1)
     SWITCH(LW(0))
         CASE_LESS(50)
         CASE_BETWEEN(50, 70)
         SET_VALUE(LW(0), STRING("dokan_3"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_bero_overwrite, STRING("dokan_3"), PTR(bero_return2))
         SET_VALUE(LW(0), STRING("dokan_3"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
         CASE_GREATER(70)
         SET_VALUE(LW(0), STRING("dokan_3"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_bero_overwrite, STRING("dokan_3"), PTR(bero_return3))
         SET_VALUE(LW(0), STRING("dokan_3"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
     END_SWITCH
     SET_VALUE(LW(0), GSW(GSW_JON_FLOOR))
     ADD(LW(0), 1)
@@ -1976,29 +2167,29 @@ BeroEntry bero_prev_return4[] = {
 EVT_BEGIN(setup_prev_return)
     SET_VALUE(LW(0), PTR(bero_prev_return))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     SET_VALUE(LW(0), GSW(GSW_JON_FLOOR))
     ADD(LW(0), 1)
     SWITCH(LW(0))
         CASE_LESS(49)
         CASE_BETWEEN(49, 69)
         SET_VALUE(LW(0), STRING("dokan_1"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_bero_overwrite, STRING("dokan_1"), PTR(bero_prev_return2))
         SET_VALUE(LW(0), STRING("dokan_1"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
         CASE_BETWEEN(70, 98)
         SET_VALUE(LW(0), STRING("dokan_1"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_bero_overwrite, STRING("dokan_1"), PTR(bero_prev_return3))
         SET_VALUE(LW(0), STRING("dokan_1"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
         CASE_DEFAULT
         SET_VALUE(LW(0), STRING("dokan_1"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_bero_overwrite, STRING("dokan_1"), PTR(bero_prev_return4))
         SET_VALUE(LW(0), STRING("dokan_1"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
     END_SWITCH
     RETURN
 EVT_END()
@@ -2084,23 +2275,23 @@ BeroEntry bero_normal3[] = {
 EVT_BEGIN(setup_normal)
     SET_VALUE(LW(0), PTR(bero_normal))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     SET_VALUE(LW(0), GSW(GSW_JON_FLOOR))
     ADD(LW(0), 1)
     SWITCH(LW(0))
         CASE_LESS(50)
         CASE_BETWEEN(50, 80)
         SET_VALUE(LW(0), STRING("dokan_1"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_bero_overwrite, STRING("dokan_1"), PTR(bero_normal2))
         SET_VALUE(LW(0), STRING("dokan_1"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
         CASE_GREATER(80)
         SET_VALUE(LW(0), STRING("dokan_1"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_bero_overwrite, STRING("dokan_1"), PTR(bero_normal3))
         SET_VALUE(LW(0), STRING("dokan_1"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
     END_SWITCH
     RETURN
 EVT_END()
@@ -2189,7 +2380,7 @@ EVT_BEGIN(iri_12_dokan_in)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 12)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_1), 1)
             IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_2), 0)
-                SPAWN_EVENT(PTR(iri_12_dokan_in_sub))
+                SPAWN_EVENT(iri_12_dokan_in_sub)
             END_IF
         END_IF
     END_IF
@@ -2263,7 +2454,7 @@ EVT_BEGIN(iri_12_makkino_return)
     CALL(evt_npc_move_position, STRING("マッキノ"), 72, 0, 0, 120, 4)
     CALL(evt_msg_print, 0, STRING("irai_12_011"), 0, STRING("マッキノ"))
     CALL(evt_npc_move_position, STRING("マッキノ"), 98, -123, 0, 120, 4)
-    CALL_CHILD(PTR(iri_12_makkino_return_dokan))
+    CALL_CHILD(iri_12_makkino_return_dokan)
     RETURN
 EVT_END()
 
@@ -2274,7 +2465,7 @@ EVT_BEGIN(iri_12_makkino_return_b100)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_npc_move_position, STRING("マッキノ"), -76, -310, 0, 180, 4)
     CALL(evt_npc_move_position, STRING("マッキノ"), 98, -486, 0, 180, 4)
-    CALL_CHILD(PTR(iri_12_makkino_return_dokan))
+    CALL_CHILD(iri_12_makkino_return_dokan)
     RETURN
 EVT_END()
 
@@ -2286,7 +2477,7 @@ EVT_BEGIN(iri_12_makkino_return_zonbaba)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_npc_move_position, STRING("マッキノ"), -76, -310, 0, 180, 4)
     CALL(evt_npc_move_position, STRING("マッキノ"), 98, -486, 0, 180, 4)
-    CALL_CHILD(PTR(iri_12_makkino_return_dokan))
+    CALL_CHILD(iri_12_makkino_return_dokan)
     RETURN
 EVT_END()
 
@@ -2324,7 +2515,7 @@ EVT_BEGIN(iri_12_enemy_dead_event)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_1), 1)
             IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_2), 0)
                 WAIT_MS(800)
-                SPAWN_EVENT(PTR(iri_12_makkino_move_dokan_side))
+                SPAWN_EVENT(iri_12_makkino_move_dokan_side)
             END_IF
         END_IF
     END_IF
@@ -2374,7 +2565,7 @@ static EVT_BEGIN(iri_12_makkino_talk)
             CALL(evt_msg_print, 0, STRING("irai_12_008"), PTR(iri_12_msgcb), STRING("マッキノ"))
             SET_VALUE(GSWF(GSWF_TROUBLE_WORK_1), 1)
             CALL(evt_npc_change_interrupt, STRING("マッキノ"), 6, 0)
-            SPAWN_EVENT(PTR(iri_12_makkino_move_dokan_side))
+            SPAWN_EVENT(iri_12_makkino_move_dokan_side)
         ELSE
             CALL(evt_msg_print, 0, STRING("irai_12_010"), 0, STRING("マッキノ"))
         END_IF
@@ -2399,7 +2590,7 @@ EVT_BEGIN(iri_12_makkino_fall)
     CALL(wait_landon)
     CALL(evt_npc_check, STRING("敵"), LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(iri_12_makkino_move_dokan_side))
+        CALL_CHILD(iri_12_makkino_move_dokan_side)
     ELSE
         CALL(evt_npc_move_position, STRING("マッキノ"), -55, 109, 0, 120, 4)
         CALL(evt_npc_check, STRING("敵"), LW(0))
@@ -2425,7 +2616,7 @@ EVT_BEGIN(iri_12_makkino_fall_return)
     CALL(wait_landon)
     IF_INT_EQUAL(GSW(GSW_JON_FLOOR), 99)
         IF_INT_EQUAL(GSWF(GSWF_JON_BONETAIL_DEFEATED), 1)
-            SPAWN_EVENT(PTR(iri_12_makkino_return_b100))
+            SPAWN_EVENT(iri_12_makkino_return_b100)
             SET_VALUE(GSWF(GSWF_TROUBLE_WORK_2), 1)
         ELSE
             CALL(evt_npc_change_interrupt, STRING("マッキノ"), 1, PTR(iri_12_makkino_buruburu))
@@ -2433,7 +2624,7 @@ EVT_BEGIN(iri_12_makkino_fall_return)
             CALL(evt_mario_key_onoff, 1)
         END_IF
     ELSE
-        CALL_CHILD(PTR(iri_12_makkino_return))
+        CALL_CHILD(iri_12_makkino_return)
         SET_VALUE(GSWF(GSWF_TROUBLE_WORK_2), 1)
         CALL(evt_mario_key_onoff, 1)
     END_IF
@@ -2449,9 +2640,9 @@ EVT_BEGIN(iri_12_init_fall)
     ADD(LW(0), 1)
     MODULO(LW(0), 10)
     IF_INT_EQUAL(LW(0), 0)
-        SPAWN_EVENT(PTR(iri_12_makkino_fall_return))
+        SPAWN_EVENT(iri_12_makkino_fall_return)
     ELSE
-        SPAWN_EVENT(PTR(iri_12_makkino_fall))
+        SPAWN_EVENT(iri_12_makkino_fall)
     END_IF
     RETURN
 EVT_END()
@@ -2470,12 +2661,12 @@ static EVT_BEGIN(iri_12_init)
                 CALL(evt_npc_set_anim, STRING("マッキノ"), STRING("D_2"))
                 CALL(evt_npc_set_balloontype, STRING("マッキノ"), 0)
             ELSE
-                CALL_CHILD(PTR(iri_12_init_fall))
+                CALL_CHILD(iri_12_init_fall)
             END_IF
             CASE_DEFAULT
             IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_1), 1)
                 IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_2), 0)
-                    CALL_CHILD(PTR(iri_12_init_fall))
+                    CALL_CHILD(iri_12_init_fall)
                 END_IF
             END_IF
         END_SWITCH
@@ -2625,17 +2816,23 @@ EVT_BEGIN(zonbaba_first_event)
     CALL(evt_npc_set_anim, STRING("敵"), STRING("GNB_S_1"))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("oFF_jon_06"), MAPOBJ_FLAG_HIDE)
     CALL(evt_seq_wait, 2)
+#if VERSION <= VERSION_DEMO_US
+    WAIT_MS(4000)
+#else
     WAIT_MS(3500)
+#endif
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_SURPRISED2_3"), LW(0), LW(1), LW(2), 0)
     CALL(evt_eff_fukidashi, 0, STRING(""), 0, 0, 0, 0, 0, 0, 0, 0, 96)
     CALL(evt_eff_fukidashi, 3, STRING(""), 0, 0, 0, 0, 0, 0, 0, 0, 96)
     CALL(evt_mario_set_pose, STRING("M_N_5B"))
+#if VERSION >= VERSION_JP
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(3), LW(0))
         ADD(LW(3), -40)
         CALL(evt_party_move_pos, 0, LW(3), LW(2), 250)
     END_INLINE_EVENT
+#endif
     WAIT_MS(2000)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL(evt_mario_set_dir_npc, STRING("敵"))
@@ -2647,8 +2844,8 @@ EVT_BEGIN(zonbaba_first_event)
         CALL(evt_npc_wait_anim, STRING("敵"), FLOAT(1.0f))
         CALL(evt_npc_set_anim, STRING("敵"), STRING("GNB_S_1"))
     END_INLINE_EVENT
-    SPAWN_EVENT(PTR(gonbaba_standup_shake))
-    SPAWN_EVENT(PTR(gonbaba_fog_change))
+    SPAWN_EVENT(gonbaba_standup_shake)
+    SPAWN_EVENT(gonbaba_fog_change)
     CALL(evt_cam3d_evt_set, -755, 24, 376, -84, 114, -22, 4500, 11)
     WAIT_MS(4000)
     LOOP(30)
@@ -2669,7 +2866,7 @@ EVT_BEGIN(zonbaba_first_event)
     CALL(evt_party_set_pos, 0, -25, 10, 150)
     CALL(evt_mario_set_dir, 270, 0, 0)
     CALL(evt_party_set_dir, 0, 90, -1)
-    SPAWN_EVENT(PTR(gonbaba_down_shake))
+    SPAWN_EVENT(gonbaba_down_shake)
     BEGIN_INLINE_EVENT
         WAIT_MS(300)
         CALL(evt_npc_flag_onoff, 1, STRING("敵"), NPC_FLAG_JUMPING | NPC_FLAG_LAND_ON_FLOOR)
@@ -2778,7 +2975,7 @@ EVT_BEGIN(zonbaba_first_event)
                 DELETE_EVENT(LW(0))
                 CALL(evt_npc_change_interrupt, STRING("マッキノ"), 1, 0)
                 CALL(evt_mario_key_onoff, 0)
-                SPAWN_EVENT(PTR(iri_12_makkino_return_zonbaba))
+                SPAWN_EVENT(iri_12_makkino_return_zonbaba)
                 SET_VALUE(GSWF(GSWF_TROUBLE_WORK_2), 1)
             END_IF
         END_IF
@@ -2794,7 +2991,7 @@ static USER_FUNC(gonbaba_wait_landon) {
 
 // Message window callback (msgdrv calls it with the window's smart-heap block): starts
 // iri_12_makkino_okiru (マッキノ wakes up) when the message turns to its second page (type 3 = page advanced).
-void iri_12_msgcb(s32 type, smartEntry* smart) {
+static void iri_12_msgcb(s32 type, smartEntry* smart) {
     MsgWinData* data = smart->address;
 
     if (type == 3 && data->curPage == 1) {
@@ -2802,7 +2999,7 @@ void iri_12_msgcb(s32 type, smartEntry* smart) {
     }
 }
 
-USER_FUNC(wait_landon) {
+static USER_FUNC(wait_landon) {
     // マッキノ
     NpcEntry* npc = npcNameToPtr("マッキノ");
 
@@ -2812,14 +3009,14 @@ USER_FUNC(wait_landon) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(iri_12_makkino_set_y) {
+static USER_FUNC(iri_12_makkino_set_y) {
     f32 y = evtGetFloat(event, event->args[0]);
 
     npcNameToPtr("マッキノ")->position.y = y;
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(iri_12_paper_init) {
+static USER_FUNC(iri_12_paper_init) {
     NpcEntry* npc = npcNameToPtr("マッキノ");
 
     animPosePaperPeraOff(npc->poseId);
@@ -2827,7 +3024,7 @@ USER_FUNC(iri_12_paper_init) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(shikakeFlag) {
+static USER_FUNC(shikakeFlag) {
     s32 type = evtGetValue(event, event->args[0]);
     NpcEntry* npc = npcNameToPtr("敵");
 
@@ -2848,7 +3045,7 @@ USER_FUNC(shikakeFlag) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(wanwan_set_home_pos) {
+static USER_FUNC(wanwan_set_home_pos) {
     EvtWord* args = event->args;
     s32 x = evtGetValue(event, args[0]);
     s32 y = evtGetValue(event, args[1]);
@@ -2860,7 +3057,7 @@ USER_FUNC(wanwan_set_home_pos) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(setup_npc_ex_para) {
+static USER_FUNC(setup_npc_ex_para) {
     const char* name = (const char*)evtGetValue(event, event->args[0]);
     NpcEntry* npc = evtNpcNameToPtr(event, name);
 
@@ -2869,12 +3066,12 @@ USER_FUNC(setup_npc_ex_para) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(yattukeFlag) {
+static USER_FUNC(yattukeFlag) {
     npcNameToPtr("敵")->battleInfo.battleFlags |= NPC_BATTLE_NO_BUMP_ATTACK;
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(enemy_info) {
+static USER_FUNC(enemy_info) {
     EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     s32 no = enemy_100[idx];
@@ -2902,7 +3099,7 @@ USER_FUNC(enemy_info) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_raster) {
+static USER_FUNC(evt_raster) {
     f32* work = event->lwDataF;
 
     if (isFirstCall) {
@@ -2922,7 +3119,7 @@ inline s32 ia8_ofs(s32 x, s32 y) {
     return off;
 }
 
-void raster_disp(CameraId cameraId, void* param) {
+static void raster_disp(CameraId cameraId, void* param) {
     EventEntry* event = param;
     CameraEntry* cam = camGetPtr(cameraId);
     f32 amp = event->lwDataF[0];

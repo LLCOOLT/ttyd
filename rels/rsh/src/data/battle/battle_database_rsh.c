@@ -11,8 +11,8 @@
 #include "driver/npcdrv.h"
 #include "rsh.h"
 
-USER_FUNC(_set_destroy_flag);
-USER_FUNC(_set_offset);
+static USER_FUNC(_set_destroy_flag);
+static USER_FUNC(_set_offset);
 
 BattleStageObjectData rsh_btlobject_data[7];
 BattleStageData rsh_btlstage_data[1];
@@ -83,7 +83,7 @@ NpcBattleSelect btlgrpsel_rsh_btlno_rsh_06_01_off[] = {
 
 NpcSetupBattleInfo btlsetup_rsh_tbl[] = {
     {
-        /*"マップstg_06_0"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x36\x5F\x30", // name
+        "マップstg_06_0", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -93,7 +93,7 @@ NpcSetupBattleInfo btlsetup_rsh_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"rsh_06 もあもあ"*/"\x72\x73\x68\x5F\x30\x36\x20\x82\xE0\x82\xA0\x82\xE0\x82\xA0", // name
+        "rsh_06 もあもあ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -124,7 +124,7 @@ EVT_BEGIN(bgset_rsh_bg_event)
     RETURN
 EVT_END()
 
-USER_FUNC(_set_offset) {
+static USER_FUNC(_set_offset) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     s32 outVar = args[1];
@@ -142,7 +142,7 @@ USER_FUNC(_set_offset) {
     evtSetValue(event, outVar, step);
     return EVT_RETURN_DONE;
 }
-USER_FUNC(_set_destroy_flag) {
+static USER_FUNC(_set_destroy_flag) {
     _battleWorkPointer->stageObjectWork.flags |= 8;
     return EVT_RETURN_DONE;
 }

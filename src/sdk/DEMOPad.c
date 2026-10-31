@@ -8,7 +8,7 @@ u32 DemoNumValidPads;
 PADStatus Pad[PAD_MAX_CONTROLLERS];
 u32 PadChanMask[PAD_MAX_CONTROLLERS] = {PAD_CHAN0_BIT, PAD_CHAN1_BIT, PAD_CHAN2_BIT, PAD_CHAN3_BIT};
 
-void DEMOPadCopy(PADStatus* pad, DEMOPadStatus* dmpad) {
+static void DEMOPadCopy(PADStatus* pad, DEMOPadStatus* dmpad) {
     u16 dirs;
 
     if (pad->err != PAD_ERR_TRANSFER) {

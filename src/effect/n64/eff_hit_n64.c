@@ -54,8 +54,8 @@ static u8 anim_data[13] = {0x40, 0x68, 0x90, 0xA4, 0xB8, 0xC0, 0xD0, 0xD8, 0xE0,
 static u8 radius_data[13] = {10, 20, 28, 35, 42, 48, 53, 57, 60, 62, 63, 64, 65};
 static u8 fire_data[13] = {255, 255, 200, 130, 60};
 
-void effHitMain(EffectEntry* effect);
-void effHitDisp(CameraId cameraId, EffectEntry* effect);
+static void effHitMain(EffectEntry* effect);
+static void effHitDisp(CameraId cameraId, EffectEntry* effect);
 static void main_dl(EffectEntry* effect, Mtx mtx);
 
 EffectEntry* effHitN64Entry(s32 type, s32 size, f32 x, f32 y, f32 z, f32 scale) {
@@ -134,7 +134,7 @@ EffectEntry* effHitN64Entry(s32 type, s32 size, f32 x, f32 y, f32 z, f32 scale) 
     return effect;
 }
 
-void effHitMain(EffectEntry* effect) {
+static void effHitMain(EffectEntry* effect) {
     EffHitN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -175,7 +175,7 @@ void effHitMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effHitDisp, effect);
 }
 
-void effHitDisp(CameraId cameraId, EffectEntry* effect) {
+static void effHitDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffHitN64Work* work;
     GXTexObj texObj;

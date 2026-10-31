@@ -17,8 +17,8 @@ static effN64Vtx size16x16_tex32x32_vtx[] = {
 static u8 scale_data[7] = {0, 30, 80, 120, 112, 104, 100};
 static u8 scale_data2[7] = {94, 92, 100, 105, 107, 105, 100};
 
-void effStoneSmokeMain(EffectEntry* effect);
-void effStoneSmokeDisp(CameraId cameraId, EffectEntry* effect);
+static void effStoneSmokeMain(EffectEntry* effect);
+static void effStoneSmokeDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effStoneSmokeN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -52,7 +52,7 @@ EffectEntry* effStoneSmokeN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, 
     return effect;
 }
 
-void effStoneSmokeMain(EffectEntry* effect) {
+static void effStoneSmokeMain(EffectEntry* effect) {
     EffStoneSmokeN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -87,7 +87,7 @@ void effStoneSmokeMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effStoneSmokeDisp, effect);
 }
 
-void effStoneSmokeDisp(CameraId cameraId, EffectEntry* effect) {
+static void effStoneSmokeDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffStoneSmokeN64Work* work;
     s32 alpha;

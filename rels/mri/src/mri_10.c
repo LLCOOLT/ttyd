@@ -8,7 +8,6 @@
 #include "evt/evt_mario.h"
 #include "evt/evt_mobj.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "mri_puni.h"
 #include "mri.h"
 #include "version.h"
@@ -43,11 +42,7 @@ static EVT_BEGIN(item_evt)
     CALL(evt_puni_puninum_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
     CALL(lect_juyoitem_rel_set, PTR(all_juyoitem_lecture_rel))
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("item00"), ITEM_SUPER_BOOTS, LW(0), LW(1), LW(2), 16, -1, 0)
-#else
-    CALL(evt_item_entry, STRING("item00"), ITEM_SUPER_BOOTS, LW(0), LW(1), LW(2), 17, -1, 0)
-#endif
+    CALL(evt_item_entry, STRING("item00"), ITEM_SUPER_BOOTS, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_important_item, STRING("item00"))
     CALL(evt_item_get_item, STRING("item00"))
@@ -70,12 +65,12 @@ EVT_BEGIN(mri_10_init_evt)
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(9), 0)
-    CALL_CHILD(PTR(mri_puni_init))
+    CALL_CHILD(mri_puni_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    SPAWN_EVENT(PTR(puni_disp_info))
-    SPAWN_EVENT(PTR(mri_countdown))
+    CALL_CHILD(evt_bero_info_run)
+    SPAWN_EVENT(puni_disp_info)
+    SPAWN_EVENT(mri_countdown)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG2_23_TIME_BOMB_ACTIVATED, STORY_STG2_23_01_X_NAUT_BATTLE)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))

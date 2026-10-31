@@ -20,7 +20,7 @@
 // log.recipe are 4 higher there and everything after log.recipe is 8 higher.
 
 // Directory of the window files on the disc (format prefix "%s/" is the DVD root); the demo uses "window".
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #define WIN_DIR "%s/window/"
 #else
 #define WIN_DIR "%s/w/"
@@ -63,7 +63,7 @@ typedef struct WinBadgeEnt {
 
 typedef struct WinMarioState {
     s32 poseId; // 0x188
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     s32 f18C; // 0x18C, not in the demo
 #endif
     s32 f190; // 0x190
@@ -228,7 +228,7 @@ typedef struct WindowWork {
     FileEntry* res;           // 0x28, win.tpl
     FileEntry* mailRes;       // 0x2C, mail tpl
     FileEntry* mapRes;        // 0x30, log map tpl
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     // The demo has no background capture.
     smartEntry* texBuf; // 0x34, background capture texture
     s32 texBufValid;    // 0x38

@@ -28,8 +28,8 @@ static effN64Vtx size32x32_tex32x32_vtx[] = {
     {-16, 16, 0, 0, 1024, 0, 0, 0, 255},
 };
 
-void effExplosionMain(EffectEntry* effect);
-void effExplosionDisp(CameraId cameraId, EffectEntry* effect);
+static void effExplosionMain(EffectEntry* effect);
+static void effExplosionDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effExplosionN64Entry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -59,7 +59,7 @@ EffectEntry* effExplosionN64Entry(s32 type, s32 duration, f32 x, f32 y, f32 z, f
     return effect;
 }
 
-void effExplosionMain(EffectEntry* effect) {
+static void effExplosionMain(EffectEntry* effect) {
     EffExplosionN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -82,7 +82,7 @@ void effExplosionMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effExplosionDisp, effect);
 }
 
-void effExplosionDisp(CameraId cameraId, EffectEntry* effect) {
+static void effExplosionDisp(CameraId cameraId, EffectEntry* effect) {
     s32 last;
     s32 s;
     CameraEntry* camera;

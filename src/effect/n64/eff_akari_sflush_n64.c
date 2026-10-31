@@ -34,8 +34,8 @@ static effN64Vtx size16x16_tex32x32_vtx[] = {
 
 static const GXColor kWhite = {255, 255, 255, 0};
 
-void effAkariSflushMain(EffectEntry* effect);
-void effAkariSflushDisp(CameraId cameraId, EffectEntry* effect);
+static void effAkariSflushMain(EffectEntry* effect);
+static void effAkariSflushDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effAkariSflushN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 size) {
     EffectEntry* effect;
@@ -68,7 +68,7 @@ EffectEntry* effAkariSflushN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z,
     return effect;
 }
 
-void effAkariSflushMain(EffectEntry* effect) {
+static void effAkariSflushMain(EffectEntry* effect) {
     EffAkariSflushN64Work* work = effect->userdata;
     s32 lifetime;
     s32 frame;
@@ -105,7 +105,7 @@ void effAkariSflushMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effAkariSflushDisp, effect);
 }
 
-void effAkariSflushDisp(CameraId cameraId, EffectEntry* effect) {
+static void effAkariSflushDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffAkariSflushN64Work* work;
     s32 i;

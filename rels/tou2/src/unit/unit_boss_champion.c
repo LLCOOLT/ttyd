@@ -17,7 +17,7 @@
 #include "evt/evt_eff.h"
 #include "evt/evt_env.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 #include "evt/evt_msg.h"
@@ -25,7 +25,7 @@
 #include "version.h"
 #include "evt/evt_story.h"
 
-USER_FUNC(check_ceil);
+static USER_FUNC(check_ceil);
 static USER_FUNC(down_ceil);
 
 BattleUnitKind unit_boss_champion;
@@ -56,7 +56,7 @@ extern EvtWord healing_event[];
 extern EvtWord roof_shake_attack_event[];
 static EvtWord wait_event[6];
 
-USER_FUNC(ceil_exist) {
+static USER_FUNC(ceil_exist) {
     EvtWord* args = event->args;
 
     if (_battleWorkPointer->stageObjectWork.flags & STAGE_OBJ_FLAG_IRON_FRAME_GONE) {
@@ -74,7 +74,11 @@ BattleUnitKind unit_boss_champion = {
     0,
     1,
     1,
+#if VERSION <= VERSION_DEMO_US
+    49,
+#else
     34,
+#endif
     0,
     0,
     100,
@@ -141,7 +145,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {60, 60, 70, 70, 60, 70, 100, 40, 0, 60, 100, 60, 100, 60, 60, 0, 0, 100, 70, 100, 100, 0};
+#else
 static StatusVulnerability regist = {60, 50, 60, 100, 60, 100, 100, 40, 0, 85, 100, 85, 100, 90, 60, 0, 0, 100, 70, 100, 100, 0};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
@@ -160,8 +168,8 @@ static PoseTableEntry pose_table[] = {
     {40, "W_1"},
     {56, "X_1"},
     {57, "X_1"},
-    {65, "T_1"},
-    {69, "S_1"},
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 PoseTableEntry pose_table_roof[] = {
@@ -181,8 +189,8 @@ PoseTableEntry pose_table_roof[] = {
     {40, "W_2"},
     {56, "X_2"},
     {57, "X_2"},
-    {65, "T_8"},
-    {69, "S_8"},
+    {BTL_POSE_TALK, "T_8"},
+    {BTL_POSE_STAY_DEFAULT, "S_8"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -194,7 +202,7 @@ static BattleUnitKindPart parts[] = {
     {1, "btl_un_champion", "c_bred_h", 0.0f, 0.0f, 0.0f, 0.0f, 50.0f, 0.0f, 0.0f, 55.0f, 0.0f, 35, 70, 255, &defence, &defence_attr, 0x9, 0, pose_table},
 };
 
-USER_FUNC(init_ceil) {
+static USER_FUNC(init_ceil) {
     u8* ceil = &_battleWorkPointer->stageObjectWork.flags;
     BattleStageObject* body = BattleSearchObjectPtr("if_body");
     BattleStageObject* wire = BattleSearchObjectPtr("if_wire");
@@ -451,7 +459,11 @@ BattleWeapon weapon_champion_roof_shake_last_attack = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
+#if VERSION <= VERSION_DEMO_US
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
+#else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE | SPECIAL_UNGUARDABLE, // special
+#endif
     COUNTER_RESIST_ALL, // counterResistFlags
     TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
@@ -478,7 +490,7 @@ EVT_BEGIN(to_ceiling)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_BLED_GRASP_CAILING1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_roof))
-    CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, 65)
+    CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
     CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 43)
     CALL(btlevtcmd_OnAttribute, BTL_UNIT_SELF, 2)
     CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, 6291456)
@@ -498,7 +510,7 @@ EVT_BEGIN(to_floor)
     CALL(evt_btl_camera_shake_h, 0, 3, 0, 50, 13)
     WAIT_MS(250)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
-    CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, 65)
+    CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
     CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 43)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
     CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 2)
@@ -613,7 +625,7 @@ static EVT_BEGIN(entry_event)
     CALL(evt_btl_camera_set_mode, 0, 0)
     WAIT_MS(200)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
-    CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, 65)
+    CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
     CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 43)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("S_1"))
     RETURN
@@ -622,7 +634,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(2), 0)
@@ -645,7 +657,7 @@ static EVT_BEGIN(damage_event)
         END_IF
         IF_INT_NOT_EQUAL(LW(2), 0)
             CALL(btlevtcmd_StopWaitEvent, BTL_UNIT_SELF)
-            CALL_CHILD(PTR(to_floor))
+            CALL_CHILD(to_floor)
             CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         END_IF
     END_IF
@@ -654,14 +666,14 @@ EVT_END()
 
 static EVT_BEGIN(ceil_fall_ready_event)
     CALL(btlevtcmd_SetEventCeilFall, BTL_UNIT_SELF, 0)
-    CALL_CHILD(PTR(to_floor))
+    CALL_CHILD(to_floor)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(to_floor))
+        CALL_CHILD(to_floor)
     END_IF
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("D_3"))
     WAIT_MS(200)
@@ -685,7 +697,7 @@ static EVT_BEGIN(dead_event)
         CALL(btlevtcmd_StatusWindowOnOff, 1)
     END_IF
     SET_VALUE(LW(10), -2)
-    CALL_CHILD(PTR(subsetevt_dead_core_nospin_norotate))
+    CALL_CHILD(subsetevt_dead_core_nospin_norotate)
     RETURN
 EVT_END()
 
@@ -734,7 +746,7 @@ static EVT_BEGIN(phase_event)
                     CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("T_2"))
                     CALL(btlevtcmd_SetStayPose, BTL_UNIT_SELF, STRING("S_2"))
                     CALL(evt_msg_print, 2, STRING("stg3_tou_436_03"), 0, BTL_UNIT_SELF)
-                    CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, 65)
+                    CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
                     CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 43)
                     CALL(btlevtcmd_StatusWindowOnOff, 1)
                 END_IF
@@ -838,33 +850,33 @@ static EVT_BEGIN(attack_event)
         SWITCH(LW(0))
             CASE_EQUAL(0)
             SET_VALUE(LW(9), PTR(&weapon_champion_drop_kick_attack))
-            CALL_CHILD(PTR(drop_kick_attack_event))
+            CALL_CHILD(drop_kick_attack_event)
             CASE_EQUAL(1)
             SET_VALUE(LW(9), PTR(&weapon_champion_screw_attack))
-            CALL_CHILD(PTR(screw_attack_event))
+            CALL_CHILD(screw_attack_event)
         END_SWITCH
         CASE_EQUAL(1)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 2)
         SET_VALUE(LW(9), PTR(&weapon_champion_flying_chop_attack))
-        CALL_CHILD(PTR(flying_chop_attack_event))
+        CALL_CHILD(flying_chop_attack_event)
         CASE_EQUAL(2)
         CALL(btlevtcmd_DrawLots, LW(0), 3, 10, 15, 20)
         SWITCH(LW(0))
             CASE_EQUAL(0)
             SET_VALUE(LW(9), PTR(&weapon_champion_drop_kick_attack))
-            CALL_CHILD(PTR(drop_kick_attack_event))
+            CALL_CHILD(drop_kick_attack_event)
             CASE_EQUAL(1)
             SET_VALUE(LW(9), PTR(&weapon_champion_screw_attack))
-            CALL_CHILD(PTR(screw_attack_event))
+            CALL_CHILD(screw_attack_event)
             CASE_EQUAL(2)
             SET_VALUE(LW(9), PTR(&weapon_champion_flying_chop_attack))
-            CALL_CHILD(PTR(flying_chop_attack_event))
+            CALL_CHILD(flying_chop_attack_event)
         END_SWITCH
         CASE_EQUAL(3)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 4)
-        CALL_CHILD(PTR(to_ceiling))
+        CALL_CHILD(to_ceiling)
         SET_VALUE(LW(9), PTR(&weapon_champion_roof_shake_attack))
-        CALL_CHILD(PTR(roof_shake_attack_event))
+        CALL_CHILD(roof_shake_attack_event)
         CASE_EQUAL(4)
         CALL(btlevtcmd_CheckAttribute, BTL_UNIT_SELF, 2, LW(0))
         IF_INT_EQUAL(LW(0), 0)
@@ -881,30 +893,30 @@ static EVT_BEGIN(attack_event)
             SWITCH(LW(0))
                 CASE_EQUAL(0)
                 SET_VALUE(LW(9), PTR(&weapon_champion_drop_kick_attack))
-                CALL_CHILD(PTR(drop_kick_attack_event))
+                CALL_CHILD(drop_kick_attack_event)
                 CASE_EQUAL(1)
                 SET_VALUE(LW(9), PTR(&weapon_champion_screw_attack))
-                CALL_CHILD(PTR(screw_attack_event))
+                CALL_CHILD(screw_attack_event)
                 CASE_EQUAL(2)
                 SET_VALUE(LW(9), PTR(&weapon_champion_flying_chop_attack))
-                CALL_CHILD(PTR(flying_chop_attack_event))
+                CALL_CHILD(flying_chop_attack_event)
                 CASE_EQUAL(3)
-                CALL_CHILD(PTR(to_ceiling))
+                CALL_CHILD(to_ceiling)
                 SET_VALUE(LW(9), PTR(&weapon_champion_roof_shake_attack))
-                CALL_CHILD(PTR(roof_shake_attack_event))
+                CALL_CHILD(roof_shake_attack_event)
             END_SWITCH
         ELSE
             CALL(btlevtcmd_DrawLots, LW(0), 3, 10, 20, 20)
             SWITCH(LW(0))
                 CASE_EQUAL(0)
                 SET_VALUE(LW(9), PTR(&weapon_champion_foot_stamp_attack))
-                CALL_CHILD(PTR(foot_stamp_attack_event))
+                CALL_CHILD(foot_stamp_attack_event)
                 CASE_EQUAL(1)
                 SET_VALUE(LW(9), PTR(&weapon_champion_healing))
-                CALL_CHILD(PTR(healing_event))
+                CALL_CHILD(healing_event)
                 CASE_EQUAL(2)
                 SET_VALUE(LW(9), PTR(&weapon_champion_roof_shake_attack))
-                CALL_CHILD(PTR(roof_shake_attack_event))
+                CALL_CHILD(roof_shake_attack_event)
             END_SWITCH
         END_IF
     END_SWITCH
@@ -1201,7 +1213,7 @@ EVT_BEGIN(foot_stamp_attack_event)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), 0, LW(2))
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
-    CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, 65)
+    CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
     CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 43)
     CALL(btlevtcmd_OffAttribute, BTL_UNIT_SELF, 2)
     CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, 6291456)
@@ -1357,11 +1369,12 @@ static USER_FUNC(down_ceil) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(check_ceil) {
+static USER_FUNC(check_ceil) {
     event->lwData[1] = _battleWorkPointer->stageObjectWork.flags & STAGE_OBJ_FLAG_IRON_FRAME_GONE;
     return EVT_RETURN_DONE;
 }
 
+#if VERSION >= VERSION_JP
 USER_FUNC(eff_fall_entry) {
     EvtWord* args = event->args;
     s32 var = args[0];
@@ -1379,7 +1392,9 @@ USER_FUNC(eff_fall_entry) {
     evtSetValue(event, var, (EvtWord)eff);
     return EVT_RETURN_DONE;
 }
+#endif
 
+#if VERSION >= VERSION_JP
 USER_FUNC(eff_fall_hit_wait) {
     EffectEntry* eff = (EffectEntry*)evtGetValue(event, event->args[0]);
 
@@ -1388,8 +1403,10 @@ USER_FUNC(eff_fall_hit_wait) {
     }
     return EVT_RETURN_DONE;
 }
+#endif
 
 EVT_BEGIN(roof_shake_attack_event)
+#if VERSION >= VERSION_JP
     SET_VALUE(LW(15), 0)
     CALL(btlevtcmd_SetPartsWork, BTL_UNIT_SELF, 1, 0, 0)
     CALL(btlevtcmd_SetPartsWork, BTL_UNIT_SELF, 1, 1, 0)
@@ -1402,10 +1419,13 @@ EVT_BEGIN(roof_shake_attack_event)
     CALL(btlevtcmd_SetPartsWork, BTL_UNIT_SELF, 1, 8, 0)
     CALL(btlevtcmd_SetPartsWork, BTL_UNIT_SELF, 1, 9, 0)
     SET_VALUE(LW(13), 0)
+#endif
     LOOP(10)
+#if VERSION >= VERSION_JP
         SET_VALUE(LW(0), 0)
         ADD(LW(0), LW(13))
         CALL(btlevtcmd_SetPartsWork, BTL_UNIT_SELF, 1, LW(0), 0)
+#endif
         CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
         CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(9))
         CALL(btlevtcmd_ChoiceSamplingEnemy, LW(9), LW(3), LW(4))
@@ -1424,11 +1444,47 @@ EVT_BEGIN(roof_shake_attack_event)
         WAIT_FRAMES(16)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_BLED_SHAKE_CAILING1"), EVT_NULLPTR, 0, EVT_NULLPTR)
         CALL(evt_btl_camera_shake_h, 0, 2, 0, 10, 13)
+#if VERSION <= VERSION_DEMO_US
+        CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+#else
         CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+#endif
         ADD(LW(2), 10)
+#if VERSION <= VERSION_DEMO_US
+        SET_VALUE(LW(6), 30)
+        CALL(evt_sub_random, 2, LW(5))
+        SWITCH(LW(5))
+            CASE_EQUAL(0)
+            CALL(evt_eff, 0, STRING("fall"), 4, LW(0), LW(1), LW(2), 20, 20, 0, 1, 60, 0, 0, 0)
+            CASE_EQUAL(1)
+            CALL(evt_eff, 0, STRING("fall"), 5, LW(0), LW(1), LW(2), 20, 20, 0, 1, 60, 0, 0, 0)
+            CASE_EQUAL(2)
+            CALL(evt_eff, 0, STRING("fall"), 8, LW(0), LW(1), LW(2), 20, 20, 0, 1, 60, 0, 0, 0)
+        END_SWITCH
+        WAIT_FRAMES(4)
+#else
         SET_VALUE(LW(8), LW(1))
         CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+#endif
         CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
+#if VERSION <= VERSION_DEMO_US
+        IF_INT_EQUAL(LW(5), 1)
+            BEGIN_INLINE_EVENT
+                WAIT_FRAMES(LW(6))
+                CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
+                CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
+            END_INLINE_EVENT
+        END_IF
+        IF_INT_EQUAL(LW(5), 3)
+            CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        END_IF
+        IF_INT_EQUAL(LW(5), 6)
+            CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        END_IF
+        IF_INT_EQUAL(LW(5), 2)
+            CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        END_IF
+#else
         IF_INT_NOT_EQUAL(LW(5), 1)
             SET_VALUE(LW(8), 0)
         END_IF
@@ -1464,9 +1520,16 @@ EVT_BEGIN(roof_shake_attack_event)
         ADD(LW(0), LW(13))
         CALL(btlevtcmd_SetPartsWork, BTL_UNIT_SELF, 1, LW(0), LW(15))
         WAIT_FRAMES(4)
+#endif
         LABEL(90)
+#if VERSION >= VERSION_JP
         ADD(LW(13), 1)
+#endif
     END_LOOP
+#if VERSION <= VERSION_DEMO_US
+    WAIT_FRAMES(32)
+    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_MARIO, 1, PTR(&weapon_champion_roof_shake_last_attack), 256, LW(5))
+#else
     WAIT_FRAMES(10)
     LABEL(92)
     WAIT_FRAMES(1)
@@ -1490,6 +1553,7 @@ EVT_BEGIN(roof_shake_attack_event)
     ELSE
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_MARIO, 1, PTR(&weapon_champion_roof_shake_last_attack), 256, LW(5))
     END_IF
+#endif
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, BTL_UNIT_PARTNER, 1, PTR(&weapon_champion_roof_shake_last_attack), 256, LW(5))
     CALL(evt_btl_camera_set_mode, 0, 0)
     RETURN

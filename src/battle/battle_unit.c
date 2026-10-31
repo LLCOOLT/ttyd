@@ -1141,7 +1141,7 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
             break;
         case STATUS_CHARGE:
             unit->chargeStrength += strength;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             if (unit->chargeStrength < 0) {
                 unit->chargeStrength = 0;
             } else if (unit->chargeStrength > 99) {
@@ -1176,7 +1176,7 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
             unit->invisibleTurns = turns;
             break;
         case STATUS_PAYBACK:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             unit->paybackTurns = turns;
 #else
             if (turns > 0) {
@@ -1237,7 +1237,7 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
 void BtlUnit_ClearStatus(BattleUnit* unit) {
     memset(&unit->sleepTurns, 0, 0x1Eu);
     BtlUnit_SetStatus(unit, STATUS_CHARGE, 1, -99);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     BattleStatusChangeInfoWorkInit(unit);
 #endif
 }
@@ -1823,7 +1823,7 @@ s32 BtlUnit_GetWeaponCost(BattleUnit* unit, BattleWeapon* weapon) {
             cost = 1;
         }
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (cost >= 1000) {
         cost = 999;
     }

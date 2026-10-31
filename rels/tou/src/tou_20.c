@@ -10,10 +10,11 @@
 #include "evt/evt_mario.h"
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
+#include "party.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "tou.h"
 #include "driver/mapdrv.h"
+#include "mario/mario.h"
 
 static EVT_BEGIN(evt_tou_balloon)
     CALL(evt_mapobj_get_position, STRING("tou_enkei1"), LW(13), LW(14), LW(15))
@@ -70,7 +71,7 @@ static f32 spline_dt[] = {
 };
 
 EVT_BEGIN(evt_anim2)
-    CALL(evt_mario_dispflag_onoff, 1, 1)
+    CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_HIDDEN)
     CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 1)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("Hikousen"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_trans, 1, STRING("Hikousen"), FLOAT(-808.0f), FLOAT(971.0f), FLOAT(4897.0f))
@@ -159,10 +160,10 @@ EVT_BEGIN(tou_20_init_evt)
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("start"))
         CALL(evt_cam3d_evt_set, -3020, 129, -6, -212, 722, 807, 0, 11)
-        SPAWN_EVENT(PTR(evt_anim))
+        SPAWN_EVENT(evt_anim)
     ELSE
         CALL(evt_cam3d_evt_set, -700, 866, 4657, -700, 38, -60, 0, 11)
-        SPAWN_EVENT(PTR(evt_anim2))
+        SPAWN_EVENT(evt_anim2)
     END_IF
     CALL(evt_bg_auto_scroll_onoff, 1)
     BEGIN_INLINE_EVENT

@@ -13,8 +13,8 @@ double sin(float);
 // FAKE: local prototype: cos takes a float (libc: double); this file was compiled with it and the header prototype changes the code.
 double cos(float);
 
-void effSweatMain(EffectEntry* effect);
-void effSweatDisp(CameraId cameraId, EffectEntry* effect);
+static void effSweatMain(EffectEntry* effect);
+static void effSweatDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effSweatN64Entry(s32 type, f32 x, f32 y, f32 z, f32 base, f32 angle, s32 life) {
     EffectEntry* effect;
@@ -85,7 +85,7 @@ EffectEntry* effSweatN64Entry(s32 type, f32 x, f32 y, f32 z, f32 base, f32 angle
     return effect;
 }
 
-void effSweatMain(EffectEntry* effect) {
+static void effSweatMain(EffectEntry* effect) {
     EffSweatN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -138,7 +138,7 @@ void effSweatMain(EffectEntry* effect) {
 
 // Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_loop_invariants off
-void effSweatDisp(CameraId cameraId, EffectEntry* effect) {
+static void effSweatDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffSweatN64Work* work;
     Mtx trans;

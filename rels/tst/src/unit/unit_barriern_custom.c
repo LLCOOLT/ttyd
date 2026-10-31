@@ -12,13 +12,14 @@
 #include "battle/battle_event_cmd.h"
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "manager/evtmgr_cmd.h"
 #include "eff/n64/eff_glass_n64.h"
 #include "evt/evt_eff.h"
 #include "evt/evt_sub.h"
 #include "tst.h"
+#include "version.h"
 #include "unit/unit_barriern.h"
 #include "system.h"
 #include "driver/mapdrv.h"
@@ -177,7 +178,11 @@ static BattleUnitKindPart parts[] = {
     {11, "btl_un_barriern_custom", "c_baria_c", 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 10, 10, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
 };
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 100, 10, 100, 10, 100, 10, 10, 0, 0, 100, 10, 100, 100, 10};
+#else
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 100, 0, 100, 0, 0, 0, 0, 100, 0, 100, 100, 10};
+#endif
 
 static BattleWeapon weapon_wakka_attack = {
     NULL, 0, // name..icon
@@ -205,7 +210,11 @@ static BattleWeapon weapon_wakka_attack = {
     COUNTER_RESIST_ALL, // counterResistFlags
     TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000, // targetWeightFlags
     0, 0, // sleepChance..sleepTime
+#if VERSION <= VERSION_DEMO_US
+    100, // stopChance
+#else
     80, // stopChance
+#endif
     3, // stopTime
     0, 0, 0, 0, 0, 0, 0, 0, // dizzyChance..electricChance
     0, 0, 0, 0, 0, 0, 0, 0, // electricTime..sizeChangeChance
@@ -244,7 +253,11 @@ static BattleWeapon weapon_wawawa_attack = {
     COUNTER_RESIST_ALL, // counterResistFlags
     TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, // sleepChance..sleepTime
+#if VERSION <= VERSION_DEMO_US
+    100, // stopChance
+#else
     80, // stopChance
+#endif
     3, // stopTime
     0, 0, 0, 0, 0, 0, 0, 0, // dizzyChance..electricChance
     0, 0, 0, 0, 0, 0, 0, 0, // electricTime..sizeChangeChance
@@ -285,8 +298,8 @@ static PoseTableEntry pose_table[] = {
     {40, "W_1"},
     {56, "X_1"},
     {57, "X_1"},
-    {65, "T_1"},
-    {69, "S_1"},
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -498,7 +511,7 @@ static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_SetRGB, BTL_UNIT_SELF, 1, 255, 255, 255)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -828,7 +841,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetRGB, BTL_UNIT_SELF, 1, 255, 255, 255)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(wakka_attack_event))
+        CALL_CHILD(wakka_attack_event)
         RETURN
     END_IF
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
@@ -854,16 +867,16 @@ static EVT_BEGIN(attack_event)
         ADD(LW(1), 1)
     END_LOOP
     IF_INT_EQUAL(LW(0), 4)
-        CALL_CHILD(PTR(wawawa_attack_event))
+        CALL_CHILD(wawawa_attack_event)
     ELSE
         SET_VALUE(LW(0), 100)
         ADD(LW(0), 0)
         SUBTRACT(LW(0), 1)
         CALL(evt_sub_random, LW(0), LW(1))
         IF_INT_LESS(LW(1), 100)
-            CALL_CHILD(PTR(wakka_attack_event))
+            CALL_CHILD(wakka_attack_event)
         ELSE
-            CALL_CHILD(PTR(recovery_event))
+            CALL_CHILD(recovery_event)
         END_IF
     END_IF
     RETURN
@@ -1066,7 +1079,7 @@ static EVT_BEGIN(damage_check_event_sub)
         CASE_END
     END_SWITCH
     LABEL(90)
-    CALL_CHILD(PTR(wakka_attack_common_event_no_hit))
+    CALL_CHILD(wakka_attack_common_event_no_hit)
     GOTO(98)
     LABEL(91)
     SET_VALUE(LW(13), 0)
@@ -1084,7 +1097,7 @@ static EVT_BEGIN(damage_check_event_sub)
         ADD(LW(13), 1)
         ADD(LW(14), 1)
     END_LOOP
-    CALL_CHILD(PTR(wakka_attack_common_event_hit))
+    CALL_CHILD(wakka_attack_common_event_hit)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     IF_INT_EQUAL(LW(10), 1)
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
@@ -1368,7 +1381,7 @@ EVT_END()
 static EVT_BEGIN(wawawa_attack_event_sub_no_last)
     SET_VALUE(LW(9), PTR(&weapon_wawawa_attack))
     SET_VALUE(LW(10), 0)
-    CALL_CHILD(PTR(damage_check_event_sub))
+    CALL_CHILD(damage_check_event_sub)
     RETURN
 EVT_END()
 
@@ -1389,7 +1402,7 @@ static EVT_BEGIN(wawawa_attack_event_sub_last)
         ADD(LW(14), 1)
     END_LOOP
     IF_INT_EQUAL(LW(0), 1)
-        CALL_CHILD(PTR(wakka_attack_common_event_hit))
+        CALL_CHILD(wakka_attack_common_event_hit)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_wawawa_attack))
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_wawawa_attack), 256, LW(5))
         CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, LW(15), 0, -1000, 0)
@@ -1399,7 +1412,7 @@ static EVT_BEGIN(wawawa_attack_event_sub_last)
     ELSE
         SET_VALUE(LW(9), PTR(&weapon_wawawa_attack))
         SET_VALUE(LW(10), 1)
-        CALL_CHILD(PTR(damage_check_event_sub))
+        CALL_CHILD(damage_check_event_sub)
     END_IF
     RETURN
 EVT_END()
@@ -1762,7 +1775,9 @@ static USER_FUNC(_check_satellite) {
 
     alive = FALSE;
     if (unit == NULL) {
+#if VERSION >= VERSION_JP
         TST_ASSERTMSG("unit_barriern_main.c", 1927, 0, "起動中の待機イベントの主はすでに存在しない\n");
+#endif
         return EVT_RETURN_DONE;
     }
     for (i = 4; i < 8; i++) {
@@ -1856,7 +1871,9 @@ static USER_FUNC(battleGetBarriernSatelliteInitPos) {
     x = args[3];
     y = args[4];
     z = args[5];
+#if VERSION >= VERSION_JP
     TST_ASSERTMSG("unit_barriern_common_main.c", 44, max<5, "衛星の数が多すぎ\n");
+#endif
     p = VecData;
     for (i = 0; i < max; i++) {
         for (j = 0; j < i; j++) {

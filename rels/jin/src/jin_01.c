@@ -11,7 +11,6 @@
 #include "evt/evt_mobj.h"
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "jin.h"
 #include "data_tables.h"
 #include "evt/evt_story.h"
@@ -110,7 +109,9 @@ EVT_END()
 EVT_BEGIN(evt_kaidan_oku)
     IF_INT_LESS_OR_EQUAL(LSW(1), 1)
         CALL(evt_mario_key_onoff, 0)
+#if VERSION >= VERSION_JP
         CALL(evt_mario_normalize)
+#endif
         CALL(evt_party_stop, 0)
         IF_INT_EQUAL(GSWF(GSWF_JIN_ENDLESS_STAIRS_REACTION_SEEN), 0)
             BEGIN_INLINE_EVENT_GET_ID(LW(3))
@@ -144,7 +145,7 @@ EVT_BEGIN(evt_kaidan_oku)
                 END_LOOP
             END_INLINE_EVENT
         END_IF
-        CALL_CHILD(PTR(cam_shake))
+        CALL_CHILD(cam_shake)
         IF_INT_EQUAL(GSWF(GSWF_JIN_ENDLESS_STAIRS_REACTION_SEEN), 0)
             WAIT_MS(500)
             DELETE_EVENT(LW(3))
@@ -161,7 +162,7 @@ EVT_END()
 static EVT_BEGIN(ki_data_evt_01)
     CALL(evt_item_delete_check, STRING("item_ki01"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_ki01"), ITEM_GOLDEN_LEAF, 798, 188, -40, 14, LSWF(2), 0)
+        CALL(evt_item_entry, STRING("item_ki01"), ITEM_GOLDEN_LEAF, 798, 188, -40, ITEM_ENTRY_FALL_THROWN, LSWF(2), 0)
     END_IF
     RETURN
 EVT_END()
@@ -178,11 +179,11 @@ EVT_BEGIN(jin_01_init_evt)
     CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(evt_usu_kagemario_party_kill)
     CALL(evt_mobj_switch_red, 0, STRING("mobj_switch1"), 485, 30, 10, PTR(evt_kaidan_oku), 0)
     SET_VALUE(LSWF(2), 0)
     SET_VALUE(LW(0), PTR(ki_data))
-    CALL_CHILD(PTR(evt_sub_tree_access_entry))
+    CALL_CHILD(evt_sub_tree_access_entry)
     RETURN
 EVT_END()

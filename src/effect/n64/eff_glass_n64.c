@@ -25,8 +25,8 @@ static effN64Vtx size48x48_tex32x32_vtx[5] = {
     {0, 0, 0, 0, 0, 255, 255, 255, 200},
 };
 
-void effGlassDisp(CameraId cameraId, EffectEntry* effect);
-void effGlassMain(EffectEntry* effect);
+static void effGlassDisp(CameraId cameraId, EffectEntry* effect);
+static void effGlassMain(EffectEntry* effect);
 
 EffectEntry* effGlassN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -84,7 +84,7 @@ EffectEntry* effGlassN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 s
     return effect;
 }
 
-void effGlassMain(EffectEntry* effect) {
+static void effGlassMain(EffectEntry* effect) {
     EffGlassN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -123,7 +123,7 @@ void effGlassMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effGlassDisp, effect);
 }
 
-void effGlassDisp(CameraId cameraId, EffectEntry* effect) {
+static void effGlassDisp(CameraId cameraId, EffectEntry* effect) {
     s32 type;
     EffGlassN64Work* work;
     s32 alpha;

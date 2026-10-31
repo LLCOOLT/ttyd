@@ -12,9 +12,9 @@
 #include "version.h"
 #include "libc_decls.h"
 
-void effItemGetMain(EffectEntry* effect);
-void effItemGetDisp(CameraId cameraId, EffectEntry* effect);
-void effItemUseDisp(CameraId cameraId, EffectEntry* effect);
+static void effItemGetMain(EffectEntry* effect);
+static void effItemGetDisp(CameraId cameraId, EffectEntry* effect);
+static void effItemUseDisp(CameraId cameraId, EffectEntry* effect);
 
 static u8 scale_data[12] = {0x00, 0x12, 0x26, 0x3B, 0x4E, 0x60, 0x6E, 0x78, 0x79, 0x72, 0x69, 0x64};
 GXColor white = {0xE1, 0xE1, 0xE1, 0xFF};
@@ -23,7 +23,7 @@ static GXColor color_tbl[10] = {
     { 0x7E, 0xC2, 0x1E, 0xFF }, { 0x30, 0x9C, 0xBF, 0xFF }, { 0xEB, 0x7D, 0x06, 0xFF }, { 0xE8, 0x5B, 0xD0, 0xFF },
     { 0x51, 0x75, 0x9D, 0xFF }, { 0xC8, 0xB2, 0x25, 0xFF },
 };
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 u8 size_tbl[10] = {0x32, 0x32, 0x32, 0x28, 0x14, 0x14, 0x14, 0x0A, 0x0A, 0x0F};
 #else
 u8 size_tbl[10] = {0x32, 0x32, 0x32, 0x28, 0x0C, 0x0C, 0x0C, 0x0A, 0x0A, 0x0F};
@@ -84,7 +84,7 @@ EffectEntry* effItemGetEntry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effItemGetMain(EffectEntry* effect) {
+static void effItemGetMain(EffectEntry* effect) {
     ItemGetWork* work = effect->userdata;
     Vec tmp;
     Vec position = {0.0f, 0.0f, 0.0f};
@@ -174,7 +174,7 @@ void effItemGetMain(EffectEntry* effect) {
     }
 }
 
-void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
+static void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     ItemGetWork* work = effect->userdata;
     CameraEntry* camera = camGetPtr(cameraId);
     Mtx m19c;
@@ -325,7 +325,7 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-void effItemUseDisp(CameraId cameraId, EffectEntry* effect) {
+static void effItemUseDisp(CameraId cameraId, EffectEntry* effect) {
     ItemGetWork* work = effect->userdata;
     CameraEntry* camera;
     Mtx mc8;

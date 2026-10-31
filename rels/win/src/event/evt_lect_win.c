@@ -34,7 +34,6 @@
 #include "evt/evt_party.h"
 #include "evt/evt_pouch.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "pmario_sound.h"
 #include "statuswindow.h"
 #include "driver/hitdrv.h"
@@ -164,7 +163,7 @@ static void lecture_button_disp(CameraId camera, void* param) {
             }
             pos = disp->pos;
             pos.y += ofs;
-            iconDispGxAlpha(&pos, 0x50, btn->iconId, btn->alpha, 1.0f);
+            iconDispGxAlpha(&pos, ICON_FLAG_NO_MAP_BLEND | ICON_FLAG_2D, btn->iconId, btn->alpha, 1.0f);
         }
     }
 }
@@ -502,7 +501,7 @@ EVT_BEGIN(all_party_lecture)
     CALL(lect_test_systemlevel)
     SWITCH(LW(9))
         CASE_EQUAL(5)
-        CALL_CHILD(PTR(cloud_party_lecture_init))
+        CALL_CHILD(cloud_party_lecture_init)
     END_SWITCH
     LOOP(6)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -517,7 +516,7 @@ EVT_BEGIN(all_party_lecture)
     CALL(evt_mario_dispflag_onoff, 0, 1)
     SWITCH(LW(9))
         CASE_EQUAL(5)
-        CALL_CHILD(PTR(cloud_party_lecture))
+        CALL_CHILD(cloud_party_lecture)
     END_SWITCH
     LOOP(6)
         CALL(evt_mario_dispflag_onoff, 1, 1)

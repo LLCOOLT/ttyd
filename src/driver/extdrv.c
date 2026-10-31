@@ -27,7 +27,7 @@ static inline ExtdrvWork* extGetWork(void) {
     return gp->inBattle ? &work[1] : &work[0];
 }
 
-void extMakeTexture(CameraId camId, void* param);
+static void extMakeTexture(CameraId camId, void* param);
 static s32 compare(const void* a, const void* b);
 
 static f32 sintbl[450] = {
@@ -135,7 +135,7 @@ void extEntry(s32 poseNum, ExtdrvTexInfo* texInfo, void (*initFunc)(void), void 
     }
 }
 
-void extMakeTexture(CameraId camId, void* param) {
+static void extMakeTexture(CameraId camId, void* param) {
     ExtdrvWork* wp = extGetWork();
     ExtdrvTexInfo* info;
     ExtdrvTex* tex;
@@ -432,7 +432,7 @@ static u8 shadow_dl[32] ATTRIBUTE_ALIGN(32) = {
 };
 
 // The retail builds place shadow_vtx in small data; the demo keeps it in .data
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static f32 shadow_vtx[16] = {
 #else
 __declspec(section ".sdata") static f32 shadow_vtx[16] = {

@@ -112,10 +112,3 @@ float dspDLSVolTab[129] = {
 #ifdef __cplusplus
 }
 #endif
-#pragma force_active on
-#ifdef VERSION_G8ME01_DEMO
-__declspec(section ".data") u32 gap_05_803B8E28_data[2] = {0, 0};
-#else
-__declspec(section ".data") u32 gap_05_803B8E28_data[6] = {0, 0, 0, 0, 0, 0};
-#endif
-#pragma force_active reset

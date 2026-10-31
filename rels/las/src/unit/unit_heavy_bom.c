@@ -14,7 +14,7 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
 #include "battle/battle_database_common.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "data_tables.h"
 #include "version.h"
 
@@ -205,7 +205,11 @@ static BattleWeapon weapon_heavy_bomb_guard_2 = {
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, // burnChance..sizeChangeStrength
     100, // atkChangeChance
+#if VERSION <= VERSION_DEMO_US
+    2, // atkChangeTime
+#else
     3, // atkChangeTime
+#endif
     3, // atkChangeStrength
     0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
     0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
@@ -242,7 +246,11 @@ static BattleWeapon weapon_heavy_bomb_guard_3 = {
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
     0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
+#if VERSION <= VERSION_DEMO_US
+    6, // chargeStrength
+#else
     3, // chargeStrength
+#endif
     0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
@@ -254,7 +262,11 @@ static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
 static BattleUnitDefenseAttr defence_attr = {0};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {70, 50, 70, 0, 70, 150, 100, 70, 100, 70, 100, 70, 100, 70, 70, 80, 20, 100, 70, 100, 100, 95};
+#else
 static StatusVulnerability regist = {90, 75, 70, 0, 70, 150, 100, 100, 100, 80, 100, 80, 100, 95, 70, 80, 20, 100, 70, 100, 100, 95};
+#endif
 
 static PoseTableEntry pose_table_3[] = {
     {1, "N_1"},
@@ -271,8 +283,8 @@ static PoseTableEntry pose_table_3[] = {
     {39, "D_1"},
     {56, "X_1"},
     {57, "X_1"},
-    {65, "S_1"},
-    {69, "S_1"},
+    {BTL_POSE_TALK, "S_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static PoseTableEntry pose_table_3_fire[] = {
@@ -290,8 +302,8 @@ static PoseTableEntry pose_table_3_fire[] = {
     {39, "D_1"},
     {56, "X_1"},
     {57, "X_1"},
-    {65, "S_1"},
-    {69, "S_1"},
+    {BTL_POSE_TALK, "S_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static PoseTableEntry pose_table_2[] = {
@@ -309,8 +321,8 @@ static PoseTableEntry pose_table_2[] = {
     {39, "D_2"},
     {56, "X_2"},
     {57, "X_2"},
-    {65, "S_2B"},
-    {69, "S_2B"},
+    {BTL_POSE_TALK, "S_2B"},
+    {BTL_POSE_STAY_DEFAULT, "S_2B"},
 };
 
 static PoseTableEntry pose_table_2_fire[] = {
@@ -328,8 +340,8 @@ static PoseTableEntry pose_table_2_fire[] = {
     {39, "D_2"},
     {56, "X_2"},
     {57, "X_2"},
-    {65, "S_2A"},
-    {69, "S_2A"},
+    {BTL_POSE_TALK, "S_2A"},
+    {BTL_POSE_STAY_DEFAULT, "S_2A"},
 };
 
 static PoseTableEntry pose_table_1[] = {
@@ -347,8 +359,8 @@ static PoseTableEntry pose_table_1[] = {
     {39, "D_3"},
     {56, "X_3"},
     {57, "X_3"},
-    {65, "S_3B"},
-    {69, "S_3B"},
+    {BTL_POSE_TALK, "S_3B"},
+    {BTL_POSE_STAY_DEFAULT, "S_3B"},
 };
 
 static PoseTableEntry pose_table_1_fire[] = {
@@ -366,8 +378,8 @@ static PoseTableEntry pose_table_1_fire[] = {
     {39, "D_3"},
     {56, "X_3"},
     {57, "X_3"},
-    {65, "S_3A"},
-    {69, "S_3A"},
+    {BTL_POSE_TALK, "S_3A"},
+    {BTL_POSE_STAY_DEFAULT, "S_3A"},
 };
 
 static PoseTableEntry pose_table_0_fire[] = {
@@ -385,8 +397,8 @@ static PoseTableEntry pose_table_0_fire[] = {
     {39, "D_4"},
     {56, "X_4"},
     {57, "X_4"},
-    {65, "S_4A"},
-    {69, "S_4A"},
+    {BTL_POSE_TALK, "S_4A"},
+    {BTL_POSE_STAY_DEFAULT, "S_4A"},
 };
 
 static PoseTableEntry pose_table_0[] = {
@@ -404,8 +416,8 @@ static PoseTableEntry pose_table_0[] = {
     {39, "D_4"},
     {56, "X_4"},
     {57, "X_4"},
-    {65, "S_4B"},
-    {69, "S_4B"},
+    {BTL_POSE_TALK, "S_4B"},
+    {BTL_POSE_STAY_DEFAULT, "S_4B"},
 };
 
 static PoseTableEntry pose_table_3_to_2[] = {
@@ -420,8 +432,8 @@ static PoseTableEntry pose_table_3_to_2[] = {
     {39, "B_1"},
     {56, "B_10"},
     {57, "B_10"},
-    {65, "B_1"},
-    {69, "B_1"},
+    {BTL_POSE_TALK, "B_1"},
+    {BTL_POSE_STAY_DEFAULT, "B_1"},
 };
 
 static PoseTableEntry pose_table_2_to_1[] = {
@@ -436,8 +448,8 @@ static PoseTableEntry pose_table_2_to_1[] = {
     {39, "B_2"},
     {56, "B_11"},
     {57, "B_11"},
-    {65, "B_2"},
-    {69, "B_2"},
+    {BTL_POSE_TALK, "B_2"},
+    {BTL_POSE_STAY_DEFAULT, "B_2"},
 };
 
 static PoseTableEntry pose_table_1_to_0[] = {
@@ -452,8 +464,8 @@ static PoseTableEntry pose_table_1_to_0[] = {
     {39, "B_3"},
     {56, "B_12"},
     {57, "B_12"},
-    {65, "B_3"},
-    {69, "B_3"},
+    {BTL_POSE_TALK, "B_3"},
+    {BTL_POSE_STAY_DEFAULT, "B_3"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -493,7 +505,7 @@ static BattleUnitKindPart parts[] = {
     },
     {
         2, // partNum
-        /*"ヘビーボム"*/"\x83\x77\x83\x72\x81\x5B\x83\x7B\x83\x80", // partName
+        "ヘビーボム", // partName
         "c_heavy", // modelName
         {0.0f, 80.0f, 0.0f}, // positionOffset
         {0}, // hitBaseOffset
@@ -563,11 +575,11 @@ static EVT_BEGIN(damage_event)
             CASE_END
         END_SWITCH
     END_IF
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
     LABEL(50)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 29)
-    CALL_CHILD(PTR(dead_event))
+    CALL_CHILD(dead_event)
     RETURN
 EVT_END()
 
@@ -691,7 +703,7 @@ static EVT_BEGIN(dead_event)
     END_SWITCH
     LABEL(10)
     SET_VALUE(LW(10), -2)
-    CALL_CHILD(PTR(subsetevt_dead_core))
+    CALL_CHILD(subsetevt_dead_core)
     RETURN
     LABEL(50)
     CALL(btlevtcmd_AfterReactionEntry, BTL_UNIT_SELF, 52)

@@ -10,8 +10,8 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-void effRadiationMain(EffectEntry* effect);
-void effRadiationDisp(CameraId cameraId, EffectEntry* effect);
+static void effRadiationMain(EffectEntry* effect);
+static void effRadiationDisp(CameraId cameraId, EffectEntry* effect);
 
 effN64Vtx size150x20_tex32x32[] = {
     {0, 10, 0, 0, 0, 255, 255, 255, 255},
@@ -138,7 +138,7 @@ EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     return effect;
 }
 
-void effRadiationMain(EffectEntry* effect) {
+static void effRadiationMain(EffectEntry* effect) {
     s32 base1;
     s32 base2;
     s32 base;
@@ -285,7 +285,7 @@ void effRadiationMain(EffectEntry* effect) {
     }
 }
 
-void effRadiationDisp(CameraId cameraId, EffectEntry* effect) {
+static void effRadiationDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffRadiationN64Work* p;
     GXTexObj texObj;

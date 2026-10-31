@@ -31,7 +31,7 @@ struct EffectEntry {
 typedef struct EffectSet {
     s16 id;           // 0x0
     const char* name; // 0x4
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     const char* jpName;     // 0x8, debug name (Japanese)
     const char** typeNames; // 0xC, NULL-terminated debug names of the effect's types, or NULL
 #endif
@@ -95,7 +95,6 @@ void effDelete(EffectEntry* effect);
 void effSoftDelete(EffectEntry* effect);
 EffectEntry* effNameToPtr(const char* name);
 EffectSet* effGetSet(const char* name);
-void effCalcMayaAnimMatrix(MayaAnim* anim, MayaPoly* poly, f32* mtx, f32* alpha);
 MayaAnim* effMayaAnimAlloc(MayaAnimData* data);
 void effDeleteMayaAnim(MayaAnim* anim);
 void effPlayMayaAnim(MayaAnim* anim);

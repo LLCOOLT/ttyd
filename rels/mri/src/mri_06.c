@@ -18,7 +18,6 @@
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_urouro.h"
-#include "party/party_motion.h"
 #include "mri_puni.h"
 #include "data_tables.h"
 #include "evt/evt_story.h"
@@ -206,7 +205,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"ライバル"*/"\x83\x89\x83\x43\x83\x6F\x83\x8B", // name
+        "ライバル", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         rival_init, // initEvent
@@ -218,7 +217,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"プニ族６"*/"\x83\x76\x83\x6A\x91\xB0\x82\x55", // name
+        "プニ族６", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         puni_6_init, // initEvent
@@ -230,7 +229,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"プニ族７"*/"\x83\x76\x83\x6A\x91\xB0\x82\x56", // name
+        "プニ族７", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         puni_7_init, // initEvent
@@ -242,7 +241,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"プニ族８"*/"\x83\x76\x83\x6A\x91\xB0\x82\x57", // name
+        "プニ族８", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         puni_8_init, // initEvent
@@ -254,7 +253,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"プニ族９"*/"\x83\x76\x83\x6A\x91\xB0\x82\x58", // name
+        "プニ族９", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         puni_9_init, // initEvent
@@ -266,7 +265,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"プニ族１０"*/"\x83\x76\x83\x6A\x91\xB0\x82\x50\x82\x4F", // name
+        "プニ族１０", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         puni_10_init, // initEvent
@@ -278,7 +277,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"プニ族１１"*/"\x83\x76\x83\x6A\x91\xB0\x82\x50\x82\x50", // name
+        "プニ族１１", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         puni_11_init, // initEvent
@@ -295,14 +294,14 @@ static NpcSetupInfo npcEnt[] = {
 static EVT_BEGIN(bero_s_doa_close)
     SET_VALUE(LW(9), 1)
     SET_VALUE(LW(10), STRING("S_doa"))
-    SPAWN_EVENT(PTR(evt_mri_door_close))
+    SPAWN_EVENT(evt_mri_door_close)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(bero_s_doa_open)
     SET_VALUE(LW(9), 1)
     SET_VALUE(LW(10), STRING("S_doa"))
-    SPAWN_EVENT(PTR(evt_mri_door_open))
+    SPAWN_EVENT(evt_mri_door_open)
     RETURN
 EVT_END()
 
@@ -428,7 +427,7 @@ static BeroEntry bero_entry_data[] = {
 static EVT_BEGIN(door_switch_init)
     IF_INT_EQUAL(GSWF(GSWF_MRI15_WEST_DOOR_UNLOCKED), 0)
         SET_VALUE(LW(0), STRING("e_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     ELSE
         CALL(evt_map_playanim, STRING("light"), 2, 0)
     END_IF
@@ -438,7 +437,7 @@ EVT_END()
 EVT_BEGIN(ueki_evt_02)
     CALL(evt_item_delete_check, STRING("item_ueki02"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_ueki02"), ITEM_STAR_PIECE, -95, -310, -52, 0, GSWF(GSWF_MRI06_STAR_PIECE_PLANTER), 0)
+        CALL(evt_item_entry, STRING("item_ueki02"), ITEM_STAR_PIECE, -95, -310, -52, ITEM_ENTRY_STAY, GSWF(GSWF_MRI06_STAR_PIECE_PLANTER), 0)
     END_IF
     RETURN
 EVT_END()
@@ -538,7 +537,7 @@ EVT_BEGIN(apper_toge)
     CALL(evt_npc_set_ry, LW(10), 270)
     CALL(evt_npc_flag_onoff, 1, LW(10), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_bero_exec_wait, 65536)
-    CALL_CHILD(PTR(mri_guide_goryu))
+    CALL_CHILD(mri_guide_goryu)
     CALL(evt_party_stop, 0)
     BEGIN_INLINE_EVENT
         CALL(evt_party_move_pos2, 0, 270, -130, FLOAT(120.0f))
@@ -604,10 +603,10 @@ EVT_BEGIN(mri_06_init_evt)
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(9), 0)
-    CALL_CHILD(PTR(mri_puni_init))
+    CALL_CHILD(mri_puni_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_npc_flag_onoff, 1, STRING("トゲ族"), NPC_FLAG_SHADOW_NO_COLLISION)
     CALL(evt_npc_check, STRING("パイダース2F_2"), LW(0))
@@ -618,10 +617,10 @@ EVT_BEGIN(mri_06_init_evt)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(evt_npc_flag_onoff, 1, STRING("パイダース2F_3"), NPC_FLAG_SHADOW_NO_COLLISION)
     END_IF
-    SPAWN_EVENT(PTR(puni_disp_info))
-    SPAWN_EVENT(PTR(mri_countdown))
+    SPAWN_EVENT(puni_disp_info)
+    SPAWN_EVENT(mri_countdown)
     SET_VALUE(LW(0), PTR(ueki_access_data))
-    CALL_CHILD(PTR(evt_sub_kusa_access_entry))
+    CALL_CHILD(evt_sub_kusa_access_entry)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG2_23_TIME_BOMB_ACTIVATED, STORY_STG2_23_01_X_NAUT_BATTLE)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
@@ -636,12 +635,12 @@ EVT_BEGIN(mri_06_init_evt)
     CALL(evt_map_playanim, STRING("awa_01"), 1, 0)
     CALL(evt_map_playanim, STRING("awa_02"), 1, 0)
     CALL(evt_npc_change_fbat_mode, 1)
-    SPAWN_EVENT(PTR(door_switch_init))
-    SPAWN_EVENT(PTR(puni_lose))
+    SPAWN_EVENT(door_switch_init)
+    SPAWN_EVENT(puni_lose)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_16_PUNI_ELDER_POWERS)
-        SPAWN_EVENT(PTR(apper_toge))
+        SPAWN_EVENT(apper_toge)
     END_IF
-    SPAWN_EVENT(PTR(puni_piders_check))
+    SPAWN_EVENT(puni_piders_check)
     CALL(evt_mobj_badgeblk, STRING("mobj_badge_gat"), -150, 85, -138, ITEM_DAMAGE_DODGE_P, 0, GSWF(GSWF_MRI06_DAMAGE_DODGE_P_BLOCK_HIT), 1)
     CALL(evt_mobj_brick, STRING("mobj_hidden1"), -150, 0, -138, ITEM_COIN, 11, 0, LSWF(1))
     IF_INT_EQUAL(GSWF(GSWF_MRI06_FAKE_WALL_BLOWN), 0)

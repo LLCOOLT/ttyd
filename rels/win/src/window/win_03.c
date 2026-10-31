@@ -12,7 +12,6 @@
 #include "evt/evt_npc.h"
 #include "evt/evt_case.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "evt/evt_cam.h"
 #include "evt/evt_env.h"
 #include "evt/evt_fade.h"
@@ -43,7 +42,7 @@ EVT_BEGIN(clouda_house_out)
     CALL(evt_mario_kill_party, 0)
     CALL(evt_mario_cam_y_off)
     CALL(evt_mario_set_pos, 277, 54, -450)
-    CALL_CHILD(PTR(bero_case_entry))
+    CALL_CHILD(bero_case_entry)
     SET_VALUE(LW(0), 1)
     RETURN
 EVT_END()
@@ -140,7 +139,9 @@ EVT_BEGIN(lookat_house)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_npc_change_fbat_mode, 7)
     CALL(evt_npc_stop_for_event)
+#if VERSION >= VERSION_JP
     CALL(evt_mario_normalize)
+#endif
     CALL(evt_msg_print, 0, STRING("stg2_win_e04_02"), 0, STRING("extparty"))
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_04_PLANE_PANEL)
     CALL(evt_npc_change_fbat_mode, 1)
@@ -149,7 +150,7 @@ EVT_BEGIN(lookat_house)
     RETURN
 EVT_END()
 
-USER_FUNC(camera_action) {
+static USER_FUNC(camera_action) {
     CameraEntry* cam = camGetPtr(CAMERA_3D);
     Vec pos = {290.0f, 150.0f, 491.0f};
     Vec at = {290.0f, 90.0f, -6.0f};
@@ -278,7 +279,7 @@ EVT_END()
 EVT_BEGIN(tree_evt_01)
     CALL(evt_item_delete_check, STRING("item_tree01"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_tree01"), ITEM_STAR_PIECE, -333, 72, -24, 0, GSWF(GSWF_WIN03_STAR_PIECE_TREE), 0)
+        CALL(evt_item_entry, STRING("item_tree01"), ITEM_STAR_PIECE, -333, 72, -24, ITEM_ENTRY_STAY, GSWF(GSWF_WIN03_STAR_PIECE_TREE), 0)
     END_IF
     RETURN
 EVT_END()
@@ -307,8 +308,8 @@ EVT_BEGIN(win_03_init_evt)
     SET_VALUE(LW(0), PTR(tree_access_data))
     CALL_CHILD(evt_sub_tree_access_entry)
     CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 7, 425, 60, 75, 0, 0)
-    CALL(evt_item_entry, STRING("i"), ITEM_VOLT_SHROOM, 475, 0, -60, 16, GSWF(GSWF_WIN03_VOLT_SHROOM_TAKEN), 0)
-    CALL(evt_item_entry, STRING("item_00"), ITEM_STAR_PIECE, -150, 0, -30, 16, GSWF(GSWF_WIN03_STAR_PIECE), 0)
+    CALL(evt_item_entry, STRING("i"), ITEM_VOLT_SHROOM, 475, 0, -60, ITEM_ENTRY_FIXED, GSWF(GSWF_WIN03_VOLT_SHROOM_TAKEN), 0)
+    CALL(evt_item_entry, STRING("item_00"), ITEM_STAR_PIECE, -150, 0, -30, ITEM_ENTRY_FIXED, GSWF(GSWF_WIN03_STAR_PIECE), 0)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_siro_asu"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("A_siro_asu"), 1, 0)
@@ -316,12 +317,16 @@ EVT_BEGIN(win_03_init_evt)
         SPAWN_EVENT(lookat_house)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_03_02_SEALED_ENTRANCE_2)
-        CALL(evt_npc_check_delete, STRING(/*"パックン1"*/"\x83\x70\x83\x62\x83\x4E\x83\x93\x31"))
+        CALL(evt_npc_check_delete, STRING("パックン1"))
         SPAWN_EVENT(cloud_toujou)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_03_03_FLURRIE_INTRO)
-        CALL(evt_npc_check_delete, STRING(/*"パックン1"*/"\x83\x70\x83\x62\x83\x4E\x83\x93\x31"))
+        CALL(evt_npc_check_delete, STRING("パックン1"))
         SPAWN_EVENT(cloud_lostitem)
     END_IF
     RETURN
+#if VERSION <= VERSION_DEMO_US
+EVT_END()
+#else
 EVT_END_PAD4()
+#endif

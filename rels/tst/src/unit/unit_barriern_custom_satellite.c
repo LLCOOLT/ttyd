@@ -10,6 +10,7 @@
 #include "battle/battle_event_cmd.h"
 #include "evt/evt_sub.h"
 #include "tst.h"
+#include "version.h"
 
 static USER_FUNC(battleGetBarriernSatelliteInitPos);
 
@@ -47,8 +48,13 @@ BattleUnitKind unit_barriern_custom_satellite = {
     0.0f,
     0.0f,
     0.0f,
+#if VERSION <= VERSION_DEMO_US
+    0,
+    -16,
+#else
     -3,
     -6,
+#endif
     0.0f,
     0.0f,
     0.0f,
@@ -105,7 +111,11 @@ static BattleUnitKindPart parts[] = {
     {6, "btl_un_barriern_custom_satellite", "c_baria_c", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
 };
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {70, 90, 90, 0, 10, 100, 100, 0, 100, 80, 100, 80, 100, 80, 80, 0, 90, 100, 80, 100, 100, 25};
+#else
 static StatusVulnerability regist = {70, 90, 90, 0, 10, 100, 100, 0, 100, 80, 100, 80, 100, 85, 80, 0, 90, 100, 80, 100, 100, 25};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "N_2"},
@@ -124,7 +134,7 @@ static PoseTableEntry pose_table[] = {
     {40, "W_2"},
     {56, "X_2"},
     {57, "X_2"},
-    {69, "S_2"},
+    {BTL_POSE_STAY_DEFAULT, "S_2"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -145,7 +155,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -223,7 +233,9 @@ static USER_FUNC(battleGetBarriernSatelliteInitPos) {
     x = args[3];
     y = args[4];
     z = args[5];
+#if VERSION >= VERSION_JP
     TST_ASSERTMSG("unit_barriern_common_main.c", 44, max<5, "衛星の数が多すぎ\n");
+#endif
     p = VecData;
     for (i = 0; i < max; i++) {
         for (j = 0; j < i; j++) {

@@ -39,20 +39,3 @@ extern BattleUnitKind unit_gullible_yoshi;
 // event/evt_kagemario.c
 USER_FUNC(evt_kagemario_init);
 USER_FUNC(evt_kagemario_change);
-// jin_00.c
-USER_FUNC(get_npc_color);
-USER_FUNC(senteresa_get_seq);
-USER_FUNC(senteresa_get_random_position);
-USER_FUNC(senteresa_tikaduku_stop);
-USER_FUNC(senteresa_syugo);
-USER_FUNC(senteresa_dispoff);
-USER_FUNC(senteresa_huttobu);
-// jin_07.c
-USER_FUNC(senteresa_get_position);
-USER_FUNC(senteresa_okure_move_init);
-USER_FUNC(senteresa_okure_move);
-// jin_10.c
-USER_FUNC(set_pos);
-// unit/unit_faker_mario.c
-USER_FUNC(_save_param);
-USER_FUNC(_load_param);

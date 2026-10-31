@@ -24,115 +24,8 @@
 #include "mario/mario.h"
 #include "driver/shadowdrv.h"
 
-//.data
-
-/*
-    000b95ec 000020 800bebcc  4 partyGetPtr 	party.o
-    000b95c8 000024 800beba8  4 anotherPartyGetPtr 	party.o
-    000b94a8 000120 800bea88  4 partyPaperOn 	party.o
-    000b942c 00007c 800bea0c  4 partyPaperOff 	party.o
-    000b9404 000028 800be9e4  4 partyPaperLightOff 	party.o
-    UNUSED   000028 ........ partyPaperLightOn party.o
-    UNUSED   000078 ........ setAnimPoseMaterialFlag party.o
-    UNUSED   000040 ........ partyPaperRelease party.o
-    000b92a0 000164 800be880  4 partyChgPoseId 	party.o
-    000b9224 00007c 800be804  4 partyChgPose 	party.o
-    000b91b4 000070 800be794  4 partyChgPaper 	party.o
-    UNUSED   000078 ........ partyChgPaperTime party.o
-    000b917c 000038 800be75c  4 partyCtrlOff 	party.o
-    000b9144 000038 800be724  4 partyCtrlOn 	party.o
-    000b8f2c 000218 800be50c  4 partyRun 	party.o
-    000b8d1c 000210 800be2fc  4 partyStop 	party.o
-    000b8af4 000228 800be0d4  4 partySetForceMove 	party.o
-    UNUSED   00006c ........ partyGetNum party.o
-    UNUSED   00007c ........ getPartyEntryId party.o
-    UNUSED   00005c ........ getExtraPartyEntryId party.o
-    UNUSED   000008 ........ partyCheck party.o
-    UNUSED   000238 ........ partyHello_debug party.o
-    000b88bc 000238 800bde9c  4 partyEntryHello 	party.o
-    000b8704 0001b8 800bdce4  4 partyEntry 	party.o
-    000b84e8 00021c 800bdac8  4 partyEntryPos 	party.o
-    000b82b0 000238 800bd890  4 partyGoodbye 	party.o
-    000b815c 000154 800bd73c  4 partyKill 	party.o
-    000b8060 0000fc 800bd640  4 partyKill2 	party.o
-    UNUSED   000080 ........ partyKill_debug party.o
-    UNUSED   0000b8 ........ partyPoseEntry party.o
-    000b7fc0 0000a0 800bd5a0  4 yoshiSetColor 	party.o
-    000b7f90 000030 800bd570  4 partyGetHeight 	party.o
-    000b7c0c 000384 800bd1ec  4 partyEntryMain 	party.o
-    000b7894 000378 800bce74  4 partyEntry2 	party.o
-    000b739c 0004f8 800bc97c  4 partyEntry2Hello 	party.o
-    000b6e0c 000590 800bc3ec  4 partyEntry2Pos 	party.o
-    000b6de0 00002c 800bc3c0  4 partyInit 	party.o
-    000b6214 000bcc 800bb7f4  4 partyReInit 	party.o
-    000b61b8 00005c 800bb798  4 partyUsePost 	party.o
-    000b5fa0 000218 800bb580  4 partyChgRunMode 	party.o
-    UNUSED   000208 ........ partyChgRunMode2 party.o
-    000b5f0c 000094 800bb4ec  4 partyPrevRunMode 	party.o
-    000b5e28 0000e4 800bb408  4 partyMain 	party.o
-    000b5444 0009e4 800baa24  4 driveParty 	party.o
-    000b51d0 000274 800ba7b0  4 partyDoWork 	party.o
-    UNUSED   0000c4 ........ partyNormalie party.o
-    000b503c 000194 800ba61c  4 partyHello 	party.o
-    UNUSED   000158 ........ partyHelloInit party.o
-    000b4990 0006ac 800b9f70  4 partyHelloMain 	party.o
-    UNUSED   000190 ........ party_force_hello party.o
-    000b48c4 0000cc 800b9ea4  4 partyGoodbyeInit 	party.o
-    000b4014 0008b0 800b95f4  4 partyGoodbyeMain 	party.o
-    UNUSED   000054 ........ party_dokan party.o
-    000b3a6c 0005a8 800b904c  4 partyDokanInit 	party.o
-    000b350c 000560 800b8aec  4 partyDokanMain 	party.o
-    000b34a0 00006c 800b8a80  4 partyDokanEnd 	party.o
-    UNUSED   000014 ........ partyGetRideScale party.o
-    000b3068 000438 800b8648  4 allPartyRidePlane 	party.o
-    000b2c30 000438 800b8210  4 allPartyRideShip 	party.o
-    000b27f8 000438 800b7dd8  4 allPartyRideJabara 	party.o
-    UNUSED   000094 ........ allPartyJabaraEscape party.o
-    UNUSED   000358 ........ allPartyRideShip2 party.o
-    000b25d8 000220 800b7bb8  4 getRidePos 	party.o
-    UNUSED   00018c ........ rideInit party.o
-    000b2174 000464 800b7754  4 allPartyForceRideOn 	party.o
-    UNUSED   000434 ........ allPartyRideOn party.o
-    000b20e0 000094 800b76c0  4 allPartyRideOff 	party.o
-    000b204c 000094 800b762c  4 allPartyRideOff2 	party.o
-    UNUSED   000018 ........ partyRideOff party.o
-    UNUSED   000018 ........ partyRideOff2 party.o
-    000b2010 00003c 800b75f0  4 partyRideChk 	party.o
-    UNUSED   0000f4 ........ allPartyRideChk party.o
-    UNUSED   000048 ........ party_ride party.o
-    UNUSED   00000c ........ partyRideInit party.o
-    000b111c 000ef4 800b66fc  4 partyRideMain 	party.o
-    UNUSED   00003c ........ chkMapAttr party.o
-    000b01c8 000f54 800b57a8  4 partyGetAppearPos 	party.o
-    000afc44 000584 800b5224  4 partyGetAppearPos2 	party.o
-    000af908 00033c 800b4ee8  4 partyGetAppearPos3 	party.o
-    000af3e8 000520 800b49c8  4 partyGetAppearPos4 	party.o
-    UNUSED   000214 ........ partyGetFrontPos party.o
-    000af07c 00036c 800b465c  4 party_force_ride_yoshi 	party.o
-    000aeff4 000088 800b45d4  4 party_ride_yoshi_force_move 	party.o
-    UNUSED   000048 ........ party_ride_yoshi party.o
-    000ae96c 000688 800b3f4c  4 partyRideYoshiMain 	party.o
-    UNUSED   000024 ........ chkWater party.o
-    000ae390 0005dc 800b3970  4 party_damage_return 	party.o
-    000ae360 000030 800b3940  4 partyInitCamId 	party.o
-    UNUSED   000008 ........ partyGetCamId party.o
-    000ae358 000008 800b3938  4 partySetCamId 	party.o
-    UNUSED   0000dc ........ partyGetDispDir party.o
-    000ae018 000340 800b35f8  4 partyMakeDispDir 	party.o
-    000adcf8 000320 800b32d8  4 partyPreDisp 	party.o
-    000ad980 000378 800b2f60  4 partyDisp 	party.o
-    000ad97c 000004 800b2f5c  4 partyKeyOn 	party.o
-    000ad978 000004 800b2f58  4 partyKeyOff 	party.o
-    UNUSED   000008 ........ partySetContNo party.o
-    UNUSED   00000c ........ partyGetContNo party.o
-    UNUSED   000038 ........ partyClearCont party.o
-    000ad870 000108 800b2e50  4 partyUpdateKeyData 	party.o
-    UNUSED   000018 ........ partyShadowOn party.o
-    000ad858 000018 800b2e38  4 partyShadowOff 	party.o
-    UNUSED   00004c ........ partyChkHerohero party.o
-    000ad464 0003f4 800b2a44  4 partySetFamicomMode 	party.o
-    000ad464 00dd4c 800b2a44  1 .text 	party.o
-*/
+// The Japanese demo's map lists 37 functions of party.o that its link stripped as unused, among them
+// partyPaperLightOn, partyChgPaperTime, partyGetNum, party_dokan, partyRideOff and partyChkHerohero.
 
 PartyEntry* partyPtrTbl[2];
 PartyData* party_dp;
@@ -195,7 +88,7 @@ void partyPaperLightOff(PartyEntry* party) {
 }
 
 // a partner is in a pinch at this HP or below
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #define PARTY_PINCH_HP 1
 #else
 #define PARTY_PINCH_HP 5
@@ -473,7 +366,7 @@ s32 partyKill(s32 id) {
     }
     mario = party->playerPtr;
     party_dp = &partyDataTbl[partyGetPtr(mario->currPartySlotId[id])->currentMemberId];
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (party_dp->exit_func) {
 #else
     if (party_dp->exit_func && party->runMode != 11) {
@@ -502,7 +395,7 @@ s32 partyKill2(s32 id) {
     }
     mario = party->playerPtr;
     party_dp = &partyDataTbl[partyGetPtr(mario->currPartySlotId[id])->currentMemberId];
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (party_dp->exit_func) {
 #else
     if (party_dp->exit_func && party->runMode != 11) {
@@ -760,8 +653,8 @@ s32 partyEntry2Pos(s32 memberId, f32 x, f32 y, f32 z) {
 }
 
 void L_partyVivianTailStart(PartyEntry* party);
-void getRidePos(PartyEntry* party, Vec* pos);
-void driveParty(PartyEntry* party);
+static void getRidePos(PartyEntry* party, Vec* pos);
+static void driveParty(PartyEntry* party);
 s32 partyHelloMain(PartyEntry* party);
 BOOL N_marioShipGetDir(void);
 static inline void partyShadowOn(PartyEntry* party) {
@@ -775,7 +668,7 @@ void partyInit(void) {
 }
 
 void chuchu_reinit(PartyEntry* party);
-void partyResetTouchWallCt(void);
+void partyResetGndProbeDy(void);
 
 static inline void partyReInitClear(PartyEntry* party) {
     s32 poseId;
@@ -801,7 +694,7 @@ void partyReInit(void) {
             animPoseSetMaterialFlagOff(poseId, -1);
             animPoseSetMaterialLightFlagOn(poseId, ANIM_MATERIAL_LIGHT_CHARA);
         }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         party->slitOn = 0;
         if (party->paperAnimName) {
             animPoseSetPaperAnimGroup(party->paperAnimGroup, NULL, FALSE);
@@ -832,7 +725,7 @@ void partyReInit(void) {
         dotted = party->flags2 & PARTY_DISP_FLAG_FAMICOM;
         party->flags = PARTY_FLAG_IS_ACTIVE;
         party->flags2 = 0;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         party->slitOn = 0;
 #endif
         party->camId = marioGetCamId();
@@ -842,7 +735,7 @@ void partyReInit(void) {
                 animPoseSetMaterialFlagOff(poseId, -1);
                 animPoseSetMaterialLightFlagOn(poseId, ANIM_MATERIAL_LIGHT_CHARA);
             }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             if (party->paperAnimName) {
                 animPoseSetPaperAnimGroup(party->paperAnimGroup, NULL, FALSE);
                 party->paperAnimName = 0;
@@ -886,8 +779,8 @@ void partyReInit(void) {
         if (party->currentMemberId == PARTY_MEMBER_MS_MOWZ) {
             chuchu_reinit(party);
         }
-#if VERSION != VERSION_DEMO
-        partyResetTouchWallCt();
+#if VERSION >= VERSION_JP
+        partyResetGndProbeDy();
 #endif
     }
 }
@@ -903,7 +796,7 @@ void partyUsePost(PartyEntry* party) {
 
 static inline void partyChgRunM(PartyEntry* party);
 static inline void partyChgRunMo(PartyEntry* party);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 void N__partyChgRunMode(PartyEntry* party, s32 prev, s32 mode) {
     MarioWork* mario;
     PartyFunc func;
@@ -954,11 +847,11 @@ void N__partyChgRunMode(PartyEntry* party, s32 prev, s32 mode) {
 }
 #endif
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 // FAKE: keeps the following function(s) out of line as in the target; removing it changes the code
 #pragma dont_inline on
 #endif
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo only leaves the hello state (4) and runs the post function (3) on a run-mode change
 static inline void partyLeaveRunMode(PartyEntry* party) {
     MarioWork* mario;
@@ -997,16 +890,16 @@ void partyChgRunMode(PartyEntry* party, s32 mode) {
     party->trigFlags |= PARTY_TRIG_FLAG_CHG_RUN_MODE;
 }
 #endif
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 #pragma dont_inline reset
 #endif
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 // FAKE: keeps the following function(s) out of line as in the target; removing it changes the code
 #pragma dont_inline on
 #endif
 void N_partyForceChgRunMode(PartyEntry* party, s32 mode, s32 sub) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     partyLeaveRunMode(party);
     party->trigFlags &= ~PARTY_TRIG_FLAG_CHG_RUN_MODE;
     party->runMode = mode;
@@ -1020,12 +913,12 @@ void N_partyForceChgRunMode(PartyEntry* party, s32 mode, s32 sub) {
 #endif
     party->motionStep = sub;
 }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 #pragma dont_inline reset
 #endif
 
-#if VERSION == VERSION_DEMO
-void partyRestoreRunMode(PartyEntry* party) {
+#if VERSION <= VERSION_DEMO_US
+void partyPrevRunMode(PartyEntry* party) {
     if (party->runMode == party->prevRunMode) {
         return;
     }
@@ -1035,7 +928,7 @@ void partyRestoreRunMode(PartyEntry* party) {
     partyChgMot(party, 0);
 }
 #else
-void partyRestoreRunMode(PartyEntry* party) {
+void partyPrevRunMode(PartyEntry* party) {
     if (party->runMode == party->prevRunMode) {
         return;
     }
@@ -1093,7 +986,7 @@ void partyMain(void) {
     s32 i;
     PartyEntry* party;
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (partyCountActive()) {
 #else
     marioGetPtr();
@@ -1112,16 +1005,16 @@ void partyMain(void) {
 void party_kemuri(PartyEntry* party);
 void party_move_mode_wait(PartyEntry* party);
 void partyForceWalk(PartyEntry* party);
-void partyPreDisp(PartyEntry* party);
+static void partyPreDisp(PartyEntry* party);
 void partyRideMain(PartyEntry* party);
 s32 partyRideYoshiMain(PartyEntry* party);
-void party_damage_return(PartyEntry* party);
+static void party_damage_return(PartyEntry* party);
 s32 partyDokanInit(PartyEntry* party);
 s32 partyDokanMain(PartyEntry* party);
 
 static inline void partyHello_inl(PartyEntry* party);
 
-void driveParty(PartyEntry* party) {
+static void driveParty(PartyEntry* party) {
     MarioWork* mario;
     f32 x, y, z;
 
@@ -1174,7 +1067,7 @@ void driveParty(PartyEntry* party) {
         case 1:
             if ((party->flags & PARTY_FLAG_CTRL_OFF) && !(party->flags & PARTY_FLAG_RUN_OFF))
                 break;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             // demo: the partner just stands and checks walls and floor, and follows Mario once he
             // moves away
             if (party->trigFlags & PARTY_TRIG_FLAG_CHG_RUN_MODE) {
@@ -1240,7 +1133,7 @@ void driveParty(PartyEntry* party) {
                 party->trigFlags &= ~PARTY_TRIG_FLAG_CHG_RUN_MODE;
                 party->motionStep = 0;
                 party->flags &= ~PARTY_FLAG_IS_BEING_USED;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 L_partyForceSlitOff(party);
 #endif
             }
@@ -1318,7 +1211,7 @@ static inline void partyHello_inl(PartyEntry* party) {
 
 BOOL partyDoWork(void) {
     PartyEntry* party = partyGetPtr(marioGetPtr()->currPartySlotId[0]);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (!party) {
         return FALSE;
     }
@@ -1342,7 +1235,7 @@ s32 partyHelloMain(PartyEntry* party) {
     switch (party->motionStep) {
         case 0: {
             f32 x, y, z, h, dy;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             psndSFXOn_3D((const char*)0x920, &party->position);
 #endif
             x = ((MarioWork*)mario)->position.x;
@@ -1407,7 +1300,7 @@ s32 partyHelloMain(PartyEntry* party) {
                 break;
             }
             ((PartyEntry*)party)->moveFrames = 0;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             party->moveDir = ((MarioWork*)mario)->moveDirection;
             party->targetDir = ((MarioWork*)mario)->directionView;
             party->displayDirectionTarget = ((MarioWork*)mario)->displayDirectionTarget;
@@ -1428,7 +1321,7 @@ s32 partyHelloMain(PartyEntry* party) {
             party->flags2 &= ~PARTY_DISP_FLAG_DIR_LOCK;
             ret = 1;
             party->runMode = 1;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             psndSFXOn_3D((const char*)0x20920, (Vec*)(mario + 0x8C));
 #endif
             break;
@@ -1501,7 +1394,7 @@ s32 partyGoodbyeMain(PartyEntry* party) {
             }
             break;
         case 10:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             psndSFXOn_3D((const char*)0x91F, &party->position);
 #else
             psndSFXOn_3D((const char*)0x2091F, &mario->position);
@@ -1771,7 +1664,7 @@ s32 partyDokanInit(PartyEntry* party) {
     party->displayDirection = mario->displayDirection;
     party->moveDir = mario->moveDirection;
     party->position = mario->position;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     L_partyVivianTailStop(party);
 #endif
     return 0;
@@ -1779,6 +1672,7 @@ s32 partyDokanInit(PartyEntry* party) {
 
 #endif
 
+// US and PAL hold the partner behind Mario in the pipe and set the paper flags; JP and the demos scale it back up
 #if VERSION >= VERSION_US
 s32 partyDokanMain(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
@@ -1938,7 +1832,7 @@ s32 partyDokanMain(PartyEntry* party) {
             party->targetDir = mario->directionView;
             party->moveDir = mario->directionView;
             partyPaperOff(party);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             party->flags2 &= ~PARTY_DISP_FLAG_NO_MIRROR;
             party->flags2 &= ~PARTY_DISP_FLAG_DIR_LOCK;
             animPoseSetMaterialLightFlagOn(party->paperAnimGroup, ANIM_MATERIAL_LIGHT_PAPER);
@@ -2000,7 +1894,7 @@ s32 partyDokanMain(PartyEntry* party) {
 
 #endif
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 void partyDokanEnd(s32 id, s32 dir) {
     PartyEntry* party = partyGetPtr(id);
     if (party && party->runMode == 10) {
@@ -2057,9 +1951,10 @@ void allPartyRideShip(void) {
     }
 }
 
-#if VERSION == VERSION_DEMO
-// demo: the bellows (jabara) ride, the retail allPartyRideJabara
-void allPartyRideOn(void) {
+#if VERSION <= VERSION_DEMO_US
+// The demos' bellows (jabara) ride, called as Mario's bellows motion starts. Retail has no bellows ride: its
+// bellows motion calls allPartyRideOn later (not the demos' allPartyRideOn, which their link strips).
+void allPartyRideJabara(void) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     if (party) {
         bomhei_use_cancel();
@@ -2074,7 +1969,7 @@ void allPartyRideOn(void) {
 }
 #endif
 
-void getRidePos(PartyEntry* party, Vec* pos) {
+static void getRidePos(PartyEntry* party, Vec* pos) {
     MarioWork* mario = party->playerPtr;
     PartyEntry* ride;
     f32 angle;
@@ -2109,7 +2004,7 @@ void getRidePos(PartyEntry* party, Vec* pos) {
         pos->x = mario->position.x;
         pos->z = mario->position.z;
         pos->y = 40.0f + mario->position.y;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     } else if (mario->currMotionId == MARIO_MOTION_SHIP) {
         sincosf(&s, &c, toMovedirSimple(N_marioShipGetDir() ? 0.0f : 180.0f));
         pos->x = mario->position.x + 22.0f * s;
@@ -2129,7 +2024,7 @@ void allPartyForceRideOn(void) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     if (party) {
         N_partyForceChgRunMode(party, 11, 11);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         party->flags2 |= PARTY_DISP_FLAG_HIDDEN;
 #endif
         partyShadowOff(party);
@@ -2137,7 +2032,7 @@ void allPartyForceRideOn(void) {
     party = partyGetPtr(marioGetExtraPartyId());
     if (party) {
         N_partyForceChgRunMode(party, 11, 11);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         party->flags2 |= PARTY_DISP_FLAG_HIDDEN;
 #endif
         partyShadowOff(party);
@@ -2145,7 +2040,7 @@ void allPartyForceRideOn(void) {
 }
 #pragma dont_inline reset
 
-void L_allPartyRideOn(void) {
+void allPartyRideOn(void) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     if (party) {
         partyChgRunMode(party, 11);
@@ -2275,7 +2170,7 @@ void partyRideMain(PartyEntry* party) {
             party->velY = 0.0f;
             party->position.y = party->moveTarget.y;
             party->scale = (Vec){0.0f, 0.0f, 0.0f};
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             party->flags2 |= PARTY_DISP_FLAG_HIDDEN;
 #endif
             partyShadowOff(party);
@@ -2291,10 +2186,10 @@ void partyRideMain(PartyEntry* party) {
 
         case 11: {
             partyChgPoseId_inl(party, 1);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             party->flags2 |= PARTY_DISP_FLAG_HIDDEN;
 #endif
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             party->velY = 0.0f;
             party->scale = (Vec){0.0f, 0.0f, 0.0f};
             partyShadowOff(party);
@@ -2349,7 +2244,7 @@ void partyRideMain(PartyEntry* party) {
             f32 z;
             f32 h;
             f32 dy;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             party->flags2 &= ~PARTY_DISP_FLAG_HIDDEN;
 #endif
             x = ((MarioWork*)mario)->position.x;
@@ -2381,7 +2276,7 @@ void partyRideMain(PartyEntry* party) {
             party->velY = dy * h;
             party->accelY = -dy;
             party->flags |= PARTY_FLAG_IS_JUMPING;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             party->flags2 &= ~PARTY_DISP_FLAG_HIDDEN;
 #endif
             partyShadowOn(party);
@@ -2423,7 +2318,7 @@ void partyRideMain(PartyEntry* party) {
                     break;
                 }
                 (((PartyEntry*)party)->moveFrames) = 0;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 party->moveDir = ((MarioWork*)mario)->moveDirection;
                 party->targetDir = ((MarioWork*)mario)->directionView;
                 party->displayDirectionTarget = ((MarioWork*)mario)->displayDirectionTarget;
@@ -2441,7 +2336,7 @@ void partyRideMain(PartyEntry* party) {
                 party->scale.x = 1.0f;
                 party->scale.y = party->scale.x;
                 party->scale.z = party->scale.x;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 party->flags2 &= ~PARTY_DISP_FLAG_HIDDEN;
 #endif
                 partyShadowOn(party);
@@ -2452,14 +2347,14 @@ void partyRideMain(PartyEntry* party) {
 
     party->trailPos = party->position;
 }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 static inline void partyChgRunMo(PartyEntry* party) {
     party->scale = (Vec){1.0f, 1.0f, 1.0f};
     party->dispOfs = (Vec){0.0f, 0.0f, 0.0f};
 }
 #endif
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo keeps the partner appear-position search here; retail moved it to party_move.c.
 #include "driver/hitdrv.h"
 #include "driver/npcdrv.h"
@@ -2962,7 +2857,7 @@ s32 partyRideYoshiMain(PartyEntry* party) {
 BOOL marioWaitDamageReturnFall(void);
 BOOL marioWaitDamageTogeReturnFall(void);
 
-void party_damage_return(PartyEntry* party) {
+static void party_damage_return(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     f32 x, y, z;
     f32 mx, my, mz;
@@ -2986,7 +2881,7 @@ void party_damage_return(PartyEntry* party) {
             }
             party->motionStep = 10;
         case 10:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             partyChgPoseId_inl(party, 9);
 #else
             partyChgPoseId_inl(party, 8);
@@ -3016,7 +2911,7 @@ void party_damage_return(PartyEntry* party) {
             if (y > -100.0f) {
                 party->position.y += 20.0f;
             }
-#elif VERSION != VERSION_DEMO
+#elif VERSION >= VERSION_JP
             marioGetScreenPos(party->position, &x, &y, &z);
             if (y <= -100.0f) {
                 party->position.y += 1.0f;
@@ -3047,7 +2942,7 @@ void party_damage_return(PartyEntry* party) {
             party->motionStep = 22;
             break;
         case 22:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         {
             f32 sx, sy, sz;
             marioGetScreenPos(party->position, &sx, &sy, &sz);
@@ -3072,7 +2967,7 @@ void party_damage_return(PartyEntry* party) {
                 party->flags &= ~(PARTY_FLAG_IS_JUMPING | PARTY_FLAG_IS_FALLING | PARTY_FLAG_IS_STEPPING);
             }
             if (party->hitobjStandOn && !((hitGetAttr(party->hitobjStandOn) >> 9) & 1)) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 partyChgPoseId_inl(party, 9);
 #endif
                 party->motionStep = 23;
@@ -3088,7 +2983,7 @@ void party_damage_return(PartyEntry* party) {
             party->flags2 &= ~PARTY_DISP_FLAG_DIR_LOCK;
             break;
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (vivianGetStatus() != 2) {
         vivianShadow(party);
     }
@@ -3108,9 +3003,9 @@ void partySetCamId(PartyEntry* party, s32 cameraId) {
 void shadowSetCamId(s32 id, s32 camId);
 void shadowFlagOn(s32 id, u32 flag);
 BOOL N_vivianDisplayTailCheck(PartyEntry* party);
-void partyDisp(CameraId cam, void* param);
+static void partyDisp(CameraId cam, void* param);
 
-void partyMakeDispDir(PartyEntry* party) {
+static void partyMakeDispDir(PartyEntry* party) {
     f32 diff;
     f32 tgt;
     f32 cur;
@@ -3196,7 +3091,7 @@ void partyMakeDispDir(PartyEntry* party) {
     }
 }
 
-void partyPreDisp(PartyEntry* party) {
+static void partyPreDisp(PartyEntry* party) {
     Vec screen;
     f32 z;
     f32 size;
@@ -3255,7 +3150,7 @@ void partyPreDisp(PartyEntry* party) {
             }
         }
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (party->currentMemberId == PARTY_MEMBER_VIVIAN && !(party->work.vivian.tailFlags & 1)) {
 #else
     if (N_vivianDisplayTailCheck(party)) {
@@ -3284,7 +3179,7 @@ void partyPreDisp(PartyEntry* party) {
     }
 }
 
-void partyDisp(CameraId cam, void* param) {
+static void partyDisp(CameraId cam, void* param) {
     PartyEntry* party = param;
     Mtx m;
     Mtx t;
@@ -3333,7 +3228,7 @@ void partyDisp(CameraId cam, void* param) {
     PSMTXTrans(t, party->rotOfs.x, party->rotOfsY, party->rotOfsZ);
     PSMTXConcat(t, m, m);
     yoff = 0.0f;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (party->paperAnimName) {
         if (party->currentMemberId == PARTY_MEMBER_YOSHI) {
             yoff = 1.0f;
@@ -3435,7 +3330,7 @@ void partySetFamicomMode(PartyEntry* party, s32 mode) {
         if (party->flags2 & PARTY_DISP_FLAG_FAMICOM) {
             return;
         }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         L_partyForceSlitOff(party);
 #endif
         party->flags2 |= PARTY_DISP_FLAG_FAMICOM;

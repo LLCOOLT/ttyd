@@ -16,7 +16,6 @@
 #include "evt/evt_npc.h"
 #include "evt/evt_sub.h"
 #include "evt/evt_telop.h"
-#include "party/party_motion.h"
 #include "hom.h"
 #include "mario/mario_pouch.h"
 #include "manager/evtmgr_cmd.h"
@@ -42,7 +41,7 @@ typedef void (*EnvGlareFilterS16Fn)(s32, s16, s16, s16, s16);
 static smartEntry* ind_lp;
 
 static USER_FUNC(test_glare);
-USER_FUNC(tokei);
+static USER_FUNC(tokei);
 static void sun_tev(MapTevCallbackInfo* info);
 
 static BeroEntry bero_data[3];
@@ -147,7 +146,7 @@ EVT_BEGIN(evt_carry_up_bridge)
     CALL(evt_msg_select, 0, STRING("stg6_hom_10_yn"))
     IF_INT_EQUAL(LW(0), 0)
         CALL(evt_msg_print_add, 0, STRING("stg6_hom_06"))
-        CALL(evt_item_entry, STRING("a"), ITEM_STATION_KEY_0x18, 0, 0, 0, 17, -1, 0)
+        CALL(evt_item_entry, STRING("a"), ITEM_STATION_KEY_0x18, 0, 0, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
         CALL(evt_item_get_item, STRING("a"))
         CALL(evt_item_get_item_end_wait, STRING("a"))
         CALL(evt_msg_print, 0, STRING("stg6_hom_08"), 0, STRING("me"))
@@ -201,7 +200,7 @@ EVT_END()
 EVT_BEGIN(talk_ekiin1)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_28_STATION_KEY_OBTAINED)
-        CALL_CHILD(PTR(evt_carry_up_bridge))
+        CALL_CHILD(evt_carry_up_bridge)
         CASE_LESS(STORY_STG6_42_DRAWBRIDGE_DOWN)
         CALL(evt_msg_print, 0, STRING("stg6_hom_11"), 0, 0)
         CASE_LESS(STORY_STG6_43_CONDUCTOR_APPEARS)
@@ -234,7 +233,7 @@ EVT_END()
 
 static NpcSetupInfo npc_data[] = {
     {
-        /*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", // name
+        "ポワン探偵", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_powan_toron_konari_papa_gurume, // initEvent
@@ -246,7 +245,7 @@ static NpcSetupInfo npc_data[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"トロン"*/"\x83\x67\x83\x8D\x83\x93", // name
+        "トロン", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_powan_toron_konari_papa_gurume, // initEvent
@@ -258,7 +257,7 @@ static NpcSetupInfo npc_data[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"グルメキノピオ"*/"\x83\x4F\x83\x8B\x83\x81\x83\x4C\x83\x6D\x83\x73\x83\x49", // name
+        "グルメキノピオ", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_powan_toron_konari_papa_gurume, // initEvent
@@ -270,7 +269,7 @@ static NpcSetupInfo npc_data[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ナリキンパパ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x70\x83\x70", // name
+        "ナリキンパパ", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_powan_toron_konari_papa_gurume, // initEvent
@@ -282,7 +281,7 @@ static NpcSetupInfo npc_data[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"コナリキン"*/"\x83\x52\x83\x69\x83\x8A\x83\x4C\x83\x93", // name
+        "コナリキン", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_powan_toron_konari_papa_gurume, // initEvent
@@ -294,7 +293,7 @@ static NpcSetupInfo npc_data[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"駅員1"*/"\x89\x77\x88\xF5\x31", // name
+        "駅員1", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_ekiin1, // initEvent
@@ -306,7 +305,7 @@ static NpcSetupInfo npc_data[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"駅員2"*/"\x89\x77\x88\xF5\x32", // name
+        "駅員2", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_ekiin2, // initEvent
@@ -318,7 +317,7 @@ static NpcSetupInfo npc_data[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", // name
+        "ランペル", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -374,7 +373,11 @@ static s32 key_tbl[] = {
 static EVT_BEGIN(evt_chk)
     CALL(evt_pouch_check_item, ITEM_STATION_KEY_0x18, LW(0))
     IF_INT_GREATER(LW(0), 0)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_win_item_select, PTR(key_tbl), LW(0))
+#else
         CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
+#endif
         IF_INT_EQUAL(LW(0), -1)
             CALL(evt_mobj_exec_cancel, STRING("me"))
         END_IF
@@ -384,7 +387,7 @@ EVT_END()
 
 static EVT_BEGIN(evt_lock)
     SET_VALUE(LW(0), 1)
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_29_STATION_DOOR_UNLOCKED)
     RETURN
 EVT_END()
@@ -446,7 +449,7 @@ static EVT_BEGIN(evt_train)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("group614"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
-    SPAWN_EVENT(PTR(hom_10_evt_resha_start))
+    SPAWN_EVENT(hom_10_evt_resha_start)
     WAIT_MS(4500)
     CALL(evt_cam3d_evt_set, 50, 125, 500, 50, 75, 0, 1500, 12)
     WAIT_MS(1500)
@@ -529,13 +532,13 @@ EVT_BEGIN(evt_train_nidome)
             WAIT_MS(6000)
             CALL(evt_npc_set_ry, STRING("駅員2"), 90)
         END_INLINE_EVENT
-        SPAWN_EVENT(PTR(hom_10_evt_resha_start))
+        SPAWN_EVENT(hom_10_evt_resha_start)
     ELSE
         BEGIN_INLINE_EVENT
             WAIT_MS(6000)
             CALL(evt_npc_set_ry, STRING("駅員2"), 270)
         END_INLINE_EVENT
-        SPAWN_EVENT(PTR(hom_10_evt_resha_start2))
+        SPAWN_EVENT(hom_10_evt_resha_start2)
     END_IF
     WAIT_MS(10000)
     SET_VALUE(GSWF(GSWF_TRAIN_DEPARTED), 1)
@@ -559,14 +562,14 @@ EVT_BEGIN(evt_hom_touchaku)
     CALL(evt_mario_set_pos, 0, -1000, 0)
     CALL(evt_party_set_pos, 0, 0, -1000, 0)
     CALL(evt_cam3d_evt_set, 275, 260, 1400, 275, 210, 0, 0, 11)
-    CALL(evt_npc_set_position, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING(/*"グルメキノピオ"*/"\x83\x4F\x83\x8B\x83\x81\x83\x4C\x83\x6D\x83\x73\x83\x49"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING(/*"ナリキンパパ"*/"\x83\x69\x83\x8A\x83\x4C\x83\x93\x83\x70\x83\x70"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING(/*"コナリキン"*/"\x83\x52\x83\x69\x83\x8A\x83\x4C\x83\x93"), 0, -1000, 0)
-    CALL(evt_npc_set_ry, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"), 90)
-    CALL(evt_npc_set_ry, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), 90)
-    CALL(evt_npc_set_position, STRING(/*"駅員2"*/"\x89\x77\x88\xF5\x32"), -750, 80, 100)
+    CALL(evt_npc_set_position, STRING("ポワン探偵"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("トロン"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("グルメキノピオ"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("ナリキンパパ"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("コナリキン"), 0, -1000, 0)
+    CALL(evt_npc_set_ry, STRING("トロン"), 90)
+    CALL(evt_npc_set_ry, STRING("ポワン探偵"), 90)
+    CALL(evt_npc_set_position, STRING("駅員2"), -750, 80, 100)
     CALL(evt_seq_wait, 2)
     BEGIN_INLINE_EVENT
         WAIT_MS(3000)
@@ -586,11 +589,11 @@ EVT_BEGIN(evt_hom_touchaku)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("train_4"), MAPOBJ_FLAG_HIDE)
     CALL(evt_cam3d_evt_set, -810, 232, 628, -810, 137, 87, 0, 11)
     WAIT_MS(2000)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_set_position, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), -815, 80, 15)
-    CALL(evt_npc_set_position, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"), -800, 80, 20)
-    CALL(evt_set_dir_to_target, STRING(/*"駅員2"*/"\x89\x77\x88\xF5\x32"), STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"))
+    CALL(evt_npc_flag_onoff, 1, STRING("ポワン探偵"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 1, STRING("トロン"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_set_position, STRING("ポワン探偵"), -815, 80, 15)
+    CALL(evt_npc_set_position, STRING("トロン"), -800, 80, 20)
+    CALL(evt_set_dir_to_target, STRING("駅員2"), STRING("ポワン探偵"))
     SET_VALUE(LW(1), 0)
     SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -603,15 +606,15 @@ EVT_BEGIN(evt_hom_touchaku)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(0)
     END_IF
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_status_onoff, 1, STRING(/*"駅員2"*/"\x89\x77\x88\xF5\x32"), 2)
-    CALL(evt_npc_move_position, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"), -800, 100, 0, FLOAT(60.0f), 1)
+    CALL(evt_npc_flag_onoff, 0, STRING("ポワン探偵"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 0, STRING("トロン"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_status_onoff, 1, STRING("駅員2"), 2)
+    CALL(evt_npc_move_position, STRING("トロン"), -800, 100, 0, FLOAT(60.0f), 1)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_move_position, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"), -780, 100, 0, FLOAT(60.0f), 1)
+        CALL(evt_npc_move_position, STRING("トロン"), -780, 100, 0, FLOAT(60.0f), 1)
     END_INLINE_EVENT
-    CALL(evt_npc_move_position, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), -815, 100, 0, FLOAT(60.0f), 1)
-    CALL(evt_set_dir_to_target, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"))
+    CALL(evt_npc_move_position, STRING("ポワン探偵"), -815, 100, 0, FLOAT(60.0f), 1)
+    CALL(evt_set_dir_to_target, STRING("ポワン探偵"), STRING("トロン"))
     SET_VALUE(LW(1), 0)
     SPAWN_EVENT(bero_close_door_play_se)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -625,18 +628,18 @@ EVT_BEGIN(evt_hom_touchaku)
         GOTO(1)
     END_IF
     LOOP(3)
-        CALL(evt_npc_reverse_ry, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"))
+        CALL(evt_npc_reverse_ry, STRING("トロン"))
         WAIT_MS(500)
     END_LOOP
-    CALL(evt_msg_print, 0, STRING("stg6_hom_01_01"), 0, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"))
-    CALL(evt_npc_set_anim, STRING(/*"駅員2"*/"\x89\x77\x88\xF5\x32"), STRING("G_1"))
-    CALL(evt_npc_set_anim, STRING(/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3"), STRING("O_1"))
-    CALL(evt_npc_get_position, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"), LW(0), LW(1), LW(2))
+    CALL(evt_msg_print, 0, STRING("stg6_hom_01_01"), 0, STRING("トロン"))
+    CALL(evt_npc_set_anim, STRING("駅員2"), STRING("G_1"))
+    CALL(evt_npc_set_anim, STRING("ポワン探偵"), STRING("O_1"))
+    CALL(evt_npc_get_position, STRING("トロン"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_LANPEL_CHANGE1"), LW(0), LW(1), LW(2), 0)
     BEGIN_INLINE_EVENT
         WAIT_MS(200)
-        CALL(evt_npc_set_position, STRING(/*"トロン"*/"\x83\x67\x83\x8D\x83\x93"), 0, -1000, 0)
-        CALL(evt_npc_set_position, STRING(/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B"), LW(0), LW(1), LW(2))
+        CALL(evt_npc_set_position, STRING("トロン"), 0, -1000, 0)
+        CALL(evt_npc_set_position, STRING("ランペル"), LW(0), LW(1), LW(2))
     END_INLINE_EVENT
     ADD(LW(2), 20)
     LOOP(3)
@@ -646,17 +649,17 @@ EVT_BEGIN(evt_hom_touchaku)
     WAIT_MS(300)
     CALL(evt_cam3d_evt_set, -780, 194, 481, -780, 125, 87, 500, 11)
     WAIT_MS(500)
-    CALL(evt_msg_print, 0, STRING("stg6_hom_01_02"), 0, STRING(/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B"))
+    CALL(evt_msg_print, 0, STRING("stg6_hom_01_02"), 0, STRING("ランペル"))
     WAIT_MS(300)
     CALL(evt_cam3d_evt_set, -780, 259, 776, -780, 137, 87, 500, 11)
-    CALL(evt_npc_sound_data_set, STRING(/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B"), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR, STRING("SFX_STG6_LANPEL_JUMP1"), EVT_NULLPTR)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B"), NPC_FLAG_INTANGIBLE)
-    CALL(evt_npc_status_onoff, 1, STRING(/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B"), 2)
-    CALL(evt_npc_set_ry, STRING(/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B"), 90)
+    CALL(evt_npc_sound_data_set, STRING("ランペル"), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR, STRING("SFX_STG6_LANPEL_JUMP1"), EVT_NULLPTR)
+    CALL(evt_npc_flag_onoff, 1, STRING("ランペル"), NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_status_onoff, 1, STRING("ランペル"), 2)
+    CALL(evt_npc_set_ry, STRING("ランペル"), 90)
     LOOP(0)
-        CALL(evt_npc_get_position, STRING(/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B"), LW(0), LW(1), LW(2))
+        CALL(evt_npc_get_position, STRING("ランペル"), LW(0), LW(1), LW(2))
         ADD(LW(0), 60)
-        CALL(evt_npc_jump_position_nohit, STRING(/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B"), LW(0), LW(1), LW(2), 400, 40)
+        CALL(evt_npc_jump_position_nohit, STRING("ランペル"), LW(0), LW(1), LW(2), 400, 40)
         IF_INT_GREATER(LW(0), -500)
             BREAK_LOOP
         END_IF
@@ -674,7 +677,7 @@ EVT_BEGIN(evt_hom_touchaku_nidome)
     CALL(evt_party_set_pos, 0, 0, -1000, 0)
     CALL(evt_cam3d_evt_set, 406, 317, 596, -389, 137, -44, 0, 11)
     CALL(evt_seq_wait, 2)
-    CALL_CHILD(PTR(hom_10_evt_resha_stop))
+    CALL_CHILD(hom_10_evt_resha_stop)
     WAIT_MS(2500)
     LOOP(0)
         IF_INT_EQUAL(GW(0), 0)
@@ -695,20 +698,28 @@ EVT_BEGIN(hom_00_init_evt)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("hasi_R"), MAPOBJ_FLAG_BBOX_CULL)
 #endif
     CALL(evt_npc_setup, PTR(npc_data))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
+#endif
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG6_HOM1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_EKI1"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
+#endif
     CALL(evt_mobj_save_blk, STRING("mobj_save"), -175, 140, -170, 0, 0)
     CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 15, -125, 140, -170, 0, 0)
     IF_INT_EQUAL(GSWF(GSWF_TRAIN_RETURN_TRIP), 0)
-        CALL_CHILD(PTR(hom_10_evt_resha_right))
+        CALL_CHILD(hom_10_evt_resha_right)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("train_4"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("train_5"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("train_6"), MAPOBJ_FLAG_HIDE)
     ELSE
-        CALL_CHILD(PTR(hom_10_evt_resha_left))
+        CALL_CHILD(hom_10_evt_resha_left)
     END_IF
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_54_WELCOME_BACK)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_map_playanim, STRING("shadanki"), 2, 0)
+#else
         CALL(evt_bero_get_entername, LW(0))
         CALL(evt_sub_get_system_flag, LW(1))
         IF_STR_NOT_EQUAL(LW(0), STRING("n_bero_1"))
@@ -718,6 +729,7 @@ EVT_BEGIN(hom_00_init_evt)
                 END_IF
             END_IF
         END_IF
+#endif
     END_IF
     CALL(evt_map_set_tevcallback, 2, PTR(sun_tev))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("sun"), MAPOBJ_TEV_CALLBACK(2))
@@ -735,30 +747,30 @@ EVT_BEGIN(hom_00_init_evt)
         END_LOOP
     END_INLINE_EVENT
     IF_INT_EQUAL(GSWF(GSWF_EKI00_BRIDGE_LOWER_SCENE), 1)
-        SPAWN_EVENT(PTR(evt_bridge_down))
+        SPAWN_EVENT(evt_bridge_down)
         RETURN
     END_IF
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_27_RIVERSIDE_STATION)
-        SPAWN_EVENT(PTR(evt_hom_touchaku))
+        SPAWN_EVENT(evt_hom_touchaku)
     END_IF
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("nidome"))
-        SPAWN_EVENT(PTR(evt_hom_touchaku_nidome))
+        SPAWN_EVENT(evt_hom_touchaku_nidome)
     END_IF
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_55_PEACH_GRODUS_AND_X_NAUT)
         SET_VALUE(LW(0), STRING("n_bero_1"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_bero_overwrite, STRING("n_bero_1"), PTR(bero_data_nidome))
         SET_VALUE(LW(0), STRING("n_bero_1"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
     END_IF
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_29_STATION_DOOR_UNLOCKED)
         CALL(evt_mobj_lock, STRING("lock"), ITEM_STATION_KEY_0x18, -260, 90, -190, 0, PTR(evt_chk), PTR(evt_lock), GSWF(GSWF_HOM00_STATION_DOOR_UNLOCKED))
         SET_VALUE(LW(0), 1)
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     END_IF
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_42_DRAWBRIDGE_DOWN)
         CALL(evt_map_playanim, STRING("hasi"), 2, 0)
@@ -768,8 +780,10 @@ EVT_BEGIN(hom_00_init_evt)
         CALL(evt_run_case_evt, CASE_COND_FRONT, 1, STRING("n_bero_1"), 0, PTR(evt_train), 0)
         CALL(evt_map_playanim, STRING("n_1_door_open"), 2, 0)
     END_IF
-    SPAWN_EVENT(PTR(evt_sub_mail_event))
+    SPAWN_EVENT(evt_sub_mail_event)
+#if VERSION >= VERSION_JP
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("train_2"), MAPOBJ_FLAG_BBOX_CULL)
+#endif
     RETURN
 EVT_END()
 
@@ -855,7 +869,7 @@ static USER_FUNC(test_glare) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(tokei) {
+static USER_FUNC(tokei) {
     s32 min;
     OSCalendarTime time;
     u32 sec;

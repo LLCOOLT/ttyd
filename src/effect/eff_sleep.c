@@ -9,11 +9,13 @@
 #include <dolphin/mtx.h>
 #include "version.h"
 #include "libc_decls.h"
+
+static void effSleepMain(EffectEntry* effect);
 // US effect texture ids are 0x1C lower for these entries.
 #define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
 
 // local prototypes
-void effSleepDisp(CameraId camId, EffectEntry* effect);
+static void effSleepDisp(CameraId camId, EffectEntry* effect);
 
 EffectEntry* effSleepEntry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale, f32 rotation) {
     EffectEntry* effect;
@@ -56,7 +58,7 @@ EffectEntry* effSleepEntry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scal
     return effect;
 }
 
-void effSleepMain(EffectEntry* effect) {
+static void effSleepMain(EffectEntry* effect) {
     effSleepData* data = effect->userdata;
     int i;
     Vec position;
@@ -107,7 +109,7 @@ void effSleepMain(EffectEntry* effect) {
 static inline void sleepPos(f32 x, f32 one, f32 y) {
     GXPosition3f32(x, one * y, 0.0f);
 }
-void effSleepDisp(CameraId camId, EffectEntry* effect) {
+static void effSleepDisp(CameraId camId, EffectEntry* effect) {
     s32 off;
     f32 tau;
     f32 x0;

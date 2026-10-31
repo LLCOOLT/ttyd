@@ -16,7 +16,6 @@
 #include "evt/evt_party.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "hom.h"
 #include "data_tables.h"
 #include "map/sharin.h"
@@ -109,7 +108,7 @@ static EVT_BEGIN(evt_sharin)
         IF_INT_EQUAL(LW(0), 0)
             BREAK_LOOP
         END_IF
-        SPAWN_EVENT(PTR(evt_sharin_main))
+        SPAWN_EVENT(evt_sharin_main)
     END_LOOP
     RETURN
 EVT_END()
@@ -179,7 +178,7 @@ static EVT_BEGIN(evt_clank)
         IF_INT_EQUAL(LW(0), 0)
             BREAK_LOOP
         END_IF
-        SPAWN_EVENT(PTR(evt_clank_main))
+        SPAWN_EVENT(evt_clank_main)
     END_LOOP
     RETURN
 EVT_END()
@@ -534,18 +533,18 @@ EVT_END()
 EVT_BEGIN(hom_10_evt_resha_stop)
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("pik_00"))
-        SPAWN_EVENT(PTR(stop_1))
+        SPAWN_EVENT(stop_1)
     END_IF
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("gor_04"))
-        SPAWN_EVENT(PTR(stop_2))
+        SPAWN_EVENT(stop_2)
     END_IF
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("hom_00"))
         IF_INT_EQUAL(GSWF(GSWF_TRAIN_RETURN_TRIP), 0)
-            SPAWN_EVENT(PTR(stop_1))
+            SPAWN_EVENT(stop_1)
         ELSE
-            SPAWN_EVENT(PTR(stop_2))
+            SPAWN_EVENT(stop_2)
         END_IF
     END_IF
     RETURN
@@ -602,8 +601,8 @@ static EVT_BEGIN(hom_10_evt_resha_sub)
     SET_VALUE(GSWF(GSWF_TRAIN_MOVING), 0)
     SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(0.0f))
-    SPAWN_EVENT(PTR(evt_sharin))
-    SPAWN_EVENT(PTR(evt_clank))
+    SPAWN_EVENT(evt_sharin)
+    SPAWN_EVENT(evt_clank)
     SET_VALUE(LF(0), 0)
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_EQUAL(LW(0), STRING("hom_10"))
@@ -619,10 +618,10 @@ static EVT_BEGIN(hom_10_evt_resha_sub)
         SET_VALUE(LF(0), 1)
     END_IF
     IF_INT_EQUAL(LF(0), 1)
-        SPAWN_EVENT(PTR(evt_bg))
+        SPAWN_EVENT(evt_bg)
     END_IF
-    SPAWN_EVENT(PTR(evt_hoshi))
-    SPAWN_EVENT(PTR(evt_ramp))
+    SPAWN_EVENT(evt_hoshi)
+    SPAWN_EVENT(evt_ramp)
     CALL(evt_map_set_tevcallback, 1, PTR(resha_tev))
     SET_INT_READ_ADDR(PTR(&pika_tbl))
     CALL(evt_sub_get_mapname, LW(0))
@@ -642,7 +641,7 @@ static EVT_BEGIN(hom_10_evt_resha_sub)
 EVT_END()
 
 EVT_BEGIN(hom_10_evt_resha_right)
-    CALL_CHILD(PTR(hom_10_evt_resha_sub))
+    CALL_CHILD(hom_10_evt_resha_sub)
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_NOT_EQUAL(LW(0), STRING("rsh_06_a"))
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("train_7"), MAPOBJ_FLAG_HIDE)
@@ -654,7 +653,7 @@ EVT_BEGIN(hom_10_evt_resha_right)
 EVT_END()
 
 EVT_BEGIN(hom_10_evt_resha_left)
-    CALL_CHILD(PTR(hom_10_evt_resha_sub))
+    CALL_CHILD(hom_10_evt_resha_sub)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("train_1"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("train_6"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("renketu_1"), MAPOBJ_FLAG_HIDE)
@@ -672,19 +671,21 @@ EVT_BEGIN(hom_10_init_evt)
     CALL(evt_party_set_pos, 0, 0, -1000, 0)
     CALL(evt_party_set_pos, 1, 0, -1000, 0)
     IF_INT_EQUAL(GSWF(GSWF_TRAIN_RETURN_TRIP), 0)
-        CALL_CHILD(PTR(hom_10_evt_resha_right))
-        CALL_CHILD(PTR(hom_10_evt_resha_start3))
+        CALL_CHILD(hom_10_evt_resha_right)
+        CALL_CHILD(hom_10_evt_resha_start3)
         SET_VALUE(LW(0), 500)
         SET_VALUE(LW(1), -500)
+#if VERSION >= VERSION_JP
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("renketu"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("renketu_1"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("renketu_2"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("renketu_3"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("renketu_4"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("renketu_5"), MAPOBJ_FLAG_HIDE)
+#endif
     ELSE
-        CALL_CHILD(PTR(hom_10_evt_resha_left))
-        CALL_CHILD(PTR(hom_10_evt_resha_start4))
+        CALL_CHILD(hom_10_evt_resha_left)
+        CALL_CHILD(hom_10_evt_resha_start4)
         SET_VALUE(LW(0), 0)
         SET_VALUE(LW(1), 1000)
         CALL(evt_mapobj_trans, 1, STRING("train"), -1500, 0, 0)

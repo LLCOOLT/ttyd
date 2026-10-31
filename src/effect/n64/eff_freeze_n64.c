@@ -44,8 +44,8 @@ static effN64Vtx size32x64_tex32x64_vtx[] = {
     {-16, 64, 3, 0, 8192, 0, 0, 0, 255},
 };
 
-void effFreezeMain(EffectEntry* effect);
-void effFreezeDisp(CameraId cameraId, EffectEntry* effect);
+static void effFreezeMain(EffectEntry* effect);
+static void effFreezeDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effFreezeN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -87,7 +87,7 @@ static inline f32 freezeY(EffFreezeN64Work* a, EffFreezeN64Work* b) {
     return a->scale * (f32)(rand() % 40) + b->position.y;
 }
 
-void effFreezeMain(EffectEntry* effect) {
+static void effFreezeMain(EffectEntry* effect) {
     s32 lifetime;
     EffFreezeN64Work* work = effect->userdata;
     s32 i;
@@ -148,7 +148,7 @@ void effFreezeMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effFreezeDisp, effect);
 }
 
-void effFreezeDisp(CameraId cameraId, EffectEntry* effect) {
+static void effFreezeDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffFreezeN64Work* work;
     s32 alpha;

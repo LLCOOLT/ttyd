@@ -18,8 +18,6 @@ USER_FUNC(unitwin_getpartylank);
 USER_FUNC(unitwin_setpartylank);
 USER_FUNC(unitwin_setmariolevel);
 
-#if VERSION == VERSION_DEMO
-s32 unitwin_party_icon(s32 icon);
-const char* unitwin_party_name(s32 i);
-USER_FUNC(evt_unitwin_select_list);
+#if VERSION <= VERSION_DEMO_US
+USER_FUNC(unitwin_window_select_func);
 #endif

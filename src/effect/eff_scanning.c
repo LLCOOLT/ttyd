@@ -7,8 +7,8 @@
 #include "memory.h"
 #include <dolphin/mtx.h>
 
-void effScanningMain(EffectEntry* effect);
-void effScanningDisp(CameraId camId, void* param);
+static void effScanningMain(EffectEntry* effect);
+static void effScanningDisp(CameraId camId, void* param);
 
 EffectEntry* effScanningEntry(s32 int2, f32 float3, f32 float4, f32 float5) {
     EffectEntry* entry;
@@ -35,7 +35,7 @@ EffectEntry* effScanningEntry(s32 int2, f32 float3, f32 float4, f32 float5) {
     return entry;
 }
 
-void effScanningMain(EffectEntry* effect) {
+static void effScanningMain(EffectEntry* effect) {
     effScanningData* data = effect->userdata;
     Vec position;
     BOOL inBattle;
@@ -71,7 +71,7 @@ void effScanningMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effScanningDisp, effect);
 }
 
-void effScanningDisp(CameraId camId, void* param) {
+static void effScanningDisp(CameraId camId, void* param) {
     effScanningData* data = ((EffectEntry*)param)->userdata;
     Mtx mtx;
     Mtx scale;

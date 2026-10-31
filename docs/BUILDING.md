@@ -1,6 +1,6 @@
 # Building
 
-This page covers everything needed to build the four supported versions and check them against the originals. For a one-version quick start, see the [README](../README.md#quick-build).
+This page covers everything needed to build the five supported versions and check them against the originals. For a one-version quick start, see the [README](../README.md#quick-build).
 
 ## Versions
 
@@ -10,6 +10,7 @@ This page covers everything needed to build the four supported versions and chec
 | `G8ME01` | North America, Rev 0 | the disc image | `MarioSt.dol` + 29 RELs | `30 files OK` |
 | `G8MP01` | Europe, Rev 0 | the disc image | `MarioSt.dol` + 32 RELs (with `tst.rel`) | `33 files OK` |
 | `G8ME01_DEMO` | US demo, June 2004 | `zz_PaperMario2_game.tgc` from the Interactive Multi-Game Demo Disc Version 17 (USA) | `MarioSt.dol` + 6 RELs | `7 files OK` |
+| `G8MJ01_DEMO` | Japanese store demo, 2004 | `PaperMarioRPG.tgc` from Gekkan Nintendo Tentou Demo 2004.7.1 (Japan) | `MarioSt.dol` + 32 RELs (with `tst.rel`) | `33 files OK` |
 
 The expected hashes are in `config/<version>/build.sha1`; the counts above are the number of lines in each of those files. [VERSIONS.md](VERSIONS.md) lists which RELs each version has.
 
@@ -50,6 +51,7 @@ The disc image can be ISO (GCM), RVZ, WIA, WBFS, CISO, NFS, GCZ or TGC. Put one 
 - `orig/G8ME01/`: the North American disc.
 - `orig/G8MP01/`: the European disc. This release is the only one that ships the developer test REL `files/rel/tst.rel`; nothing extra is needed, it is read from the disc.
 - `orig/G8ME01_DEMO/`: the demo is not a disc of its own. It is the file `zz_PaperMario2_game.tgc` inside the Interactive Multi-Game Demo Disc Version 17 (USA). Extract that file from the demo disc (for example in Dolphin: right-click the demo disc, **Properties → Filesystem**, right-click `zz_PaperMario2_game.tgc`, **Extract File**) and copy it into `orig/G8ME01_DEMO/`. Do not put the whole demo disc image there.
+- `orig/G8MJ01_DEMO/`: the same for the Japanese store demo: the file `files/local/tgc/PaperMarioRPG.tgc` inside Gekkan Nintendo Tentou Demo 2004.7.1 (Japan). Extract it the same way and copy it into `orig/G8MJ01_DEMO/`.
 
 On the first build, decomp-toolkit extracts `sys/main.dol` and `files/rel/*.rel` from the image into the same folder. After that the image can be deleted to save space. Instead of an image, you can also provide an already extracted `sys/main.dol` and `files/rel/` directly.
 
@@ -58,7 +60,7 @@ Game files are ignored by git (`orig/*/*` in `.gitignore`); never commit them.
 ## Building
 
 ```sh
-python configure.py --version G8ME01   # or G8MJ01 (the default), G8MP01, G8ME01_DEMO
+python configure.py --version G8ME01   # or G8MJ01 (the default), G8MP01, G8ME01_DEMO, G8MJ01_DEMO
 ninja
 ```
 
@@ -68,7 +70,7 @@ ninja
 ninja build/G8ME01/ok
 ```
 
-Outputs, per version in its own folder (`build/G8MJ01/`, `build/G8ME01/`, `build/G8MP01/`, `build/G8ME01_DEMO/`):
+Outputs, per version in its own folder (`build/G8MJ01/`, `build/G8ME01/`, `build/G8MP01/`, `build/G8ME01_DEMO/`, `build/G8MJ01_DEMO/`):
 
 - `build/<version>/MarioSt.dol`: the main executable (`sys/main.dol` on the disc).
 - `build/<version>/<area>/<area>.rel`: one REL per area (`aaa.rel`, `aji.rel`, ...), the files in `files/rel/` on the disc.
@@ -76,17 +78,19 @@ Outputs, per version in its own folder (`build/G8MJ01/`, `build/G8ME01/`, `build
 
 `python configure.py --map` also writes linker map files.
 
-### Switching versions and building all four
+Each REL is linked into a partially linked module (`build/<version>/<area>/<area>.plf`), and `dtk rel make` turns all of them into RELs at once. One REL needs a step in between: the Japanese demo's `tst.rel` references `tst_nakayama_init_evt`, which that version does not define, and the original linker left the reference as 0 with no relocation, which `dtk rel make` cannot produce from an undefined symbol. For that REL, the linker writes `tst.linked.plf`, and `tools/drop_relocations.py` copies it to `tst.plf` without the relocations against the symbols in `config/G8MJ01_DEMO/unresolved_symbols.txt`. `configure.py` sets this up through `config.rel_dropped_relocations`; no other version or REL uses it.
+
+### Switching versions and building all five
 
 The version folders sit side by side, so switching is just re-running `configure.py`:
 
 ```sh
-for v in G8MJ01 G8ME01 G8MP01 G8ME01_DEMO; do
+for v in G8MJ01 G8ME01 G8MP01 G8ME01_DEMO G8MJ01_DEMO; do
     python configure.py --version $v && ninja || break
 done
 ```
 
-Every change must keep all four builds at their `N files OK` (see [CONTRIBUTING.md](CONTRIBUTING.md#the-four-version-check)). Only the versions whose discs you have can be checked locally.
+Every change must keep all five builds at their `N files OK` (see [CONTRIBUTING.md](CONTRIBUTING.md#the-five-version-check)). Only the versions whose discs you have can be checked locally.
 
 ## Running a build
 
@@ -111,7 +115,7 @@ After a build, `objdiff.json` exists in the project root. Download [objdiff](htt
 
 ## Troubleshooting
 
-- **A file fails the hash check on an unmodified tree.** Check that the disc is the right version and revision (Rev 0 for the three releases) and that `--version` matches the folder you put it in. For the demo, check that `orig/G8ME01_DEMO/` holds `zz_PaperMario2_game.tgc` (or its extracted files), not the whole demo disc.
+- **A file fails the hash check on an unmodified tree.** Check that the disc is the right version and revision (Rev 0 for the three releases) and that `--version` matches the folder you put it in. For the US demo, check that `orig/G8ME01_DEMO/` holds `zz_PaperMario2_game.tgc` (or its extracted files), and for the Japanese demo that `orig/G8MJ01_DEMO/` holds `PaperMarioRPG.tgc`, not the whole demo disc.
 - **Two builds at once.** `build.ninja`, `objdiff.json` and ninja's own log belong to the last `configure.py` run in that checkout. Do not run two `ninja` processes, or `configure.py` while `ninja` runs, in the same checkout; build the versions one after another, or use a separate clone or `git worktree` for each parallel build.
 - **Japanese text in sources.** Sources are UTF-8 and may contain Japanese text (strings, comments). The compilers read Shift-JIS, so the build runs them through sjiswrap, which converts on the fly. Keep files UTF-8; an editor that re-saves a file in another encoding changes the bytes of its strings.
 - **"wine: command not found" or the compilers do not start** (macOS, non-x86 Linux): install Wine as above, or pass a wrapper with `--wrapper`.

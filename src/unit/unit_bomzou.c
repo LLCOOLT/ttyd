@@ -9,7 +9,7 @@
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "version.h"
 
 static BattleUnitDefense defence;
@@ -29,7 +29,7 @@ static EvtWord attack_event[5];
 static EvtWord wait_event[57];
 static EvtWord dead_event[6];
 extern EvtWord end_battle_evt[];
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static EvtWord explosion_event[172];
 #else
 static EvtWord explosion_event[173];
@@ -142,33 +142,21 @@ static PoseTableEntry pose_table_3[] = {
     {28, "B_2"},
     {31, "B_2"},
     {39, "B_2"},
-#if VERSION == VERSION_DEMO
-    {67, "B_2"},
-#else
-    {69, "B_2"},
-#endif
+    {BTL_POSE_STAY_DEFAULT, "B_2"},
 };
 
 static PoseTableEntry pose_table_2[] = {
     {28, "B_3"},
     {31, "B_3"},
     {39, "B_3"},
-#if VERSION == VERSION_DEMO
-    {67, "B_3"},
-#else
-    {69, "B_3"},
-#endif
+    {BTL_POSE_STAY_DEFAULT, "B_3"},
 };
 
 static PoseTableEntry pose_table_1[] = {
     {28, "B_4"},
     {31, "B_4"},
     {39, "B_4"},
-#if VERSION == VERSION_DEMO
-    {67, "B_4"},
-#else
-    {69, "B_4"},
-#endif
+    {BTL_POSE_STAY_DEFAULT, "B_4"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -207,7 +195,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -229,7 +217,7 @@ static EVT_BEGIN(phase_event)
             CALL(btlevtcmd_PhaseEventStartDeclare, BTL_UNIT_SELF)
             CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("B_2"))
             WAIT_FRAMES(36)
-            CALL_CHILD(PTR(explosion_event))
+            CALL_CHILD(explosion_event)
         ELSE
             CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         END_IF
@@ -321,7 +309,7 @@ static EVT_BEGIN(explosion_event)
     LABEL(99)
     CALL(btlevtcmd_KillUnit, BTL_UNIT_SELF, 0)
     RETURN
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 EVT_END()
 #else
 EVT_END_PAD()

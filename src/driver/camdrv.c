@@ -38,10 +38,10 @@ CameraEntry* camEntryPersp(CameraCallback callback, f32 fovY, f32 aspect, f32 ne
                            const char* name);
 CameraEntry* camEntryOrtho(CameraCallback callback, f32 fovY, f32 aspect, f32 top, f32 bottom, f32 left, f32 right,
                            f32 near, f32 far, f32 nearZ, f32 farZ, const char* name);
-void camEvalNearFar(CameraEntry* camera);
-void cam3dMain(CameraEntry* camera);
-void cam3dImgMain(CameraEntry* camera);
-void camEffMain(CameraEntry* camera);
+static void camEvalNearFar(CameraEntry* camera);
+static void cam3dMain(CameraEntry* camera);
+static void cam3dImgMain(CameraEntry* camera);
+static void camEffMain(CameraEntry* camera);
 inline Vec makeVecByValue(f32 x, f32 y, f32 z);
 
 void camInit(void) {
@@ -259,7 +259,7 @@ void camMain(void) {
     }
 }
 
-void camEvalNearFar(CameraEntry* camera) {
+static void camEvalNearFar(CameraEntry* camera) {
     MapWork* map;
     f32 m22;
     f32 m23;
@@ -407,7 +407,7 @@ void camSetCurNo(CameraId cameraId) {
     currentCamNo = cameraId;
 }
 
-void cam3dMain(CameraEntry* camera) {
+static void cam3dMain(CameraEntry* camera) {
     if (camera->flags & CAM_FLAG_CTRL_OFF) {
         return;
     }
@@ -625,11 +625,11 @@ void cam3dMain(CameraEntry* camera) {
     camGetPtr(CAMERA_OFFSCREEN2)->projType = camGetPtr(CAMERA_3D)->projType;
 }
 
-void cam3dImgMain(CameraEntry* camera) {
+static void cam3dImgMain(CameraEntry* camera) {
     MTXPerspective(camera->projection, camera->fovY, camera->aspect, camera->near, camera->far);
 }
 
-void camEffMain(CameraEntry* camera) {
+static void camEffMain(CameraEntry* camera) {
     CameraEntry* camera3D = camGetPtr(CAMERA_3D);
 
     camera->cameraPos = camera3D->cameraPos;
@@ -637,7 +637,7 @@ void camEffMain(CameraEntry* camera) {
     camera->cameraAt = camera3D->cameraAt;
     camera->viewDistance = VECDistance(&camera->cameraPos, &camera->cameraAt);
     camera->viewYaw = angleABf(camera->cameraPos.x, camera->cameraPos.z, camera->cameraAt.x, camera->cameraAt.z);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     MTXPerspective(camera->projection, camera->fovY, camera->aspect, camera->near, camera->far);
 #endif
 }
@@ -687,7 +687,7 @@ void getScreenPoint(Vec* model, Vec* screen) {
     screen->y = 240.0f - screen->y;
 }
 
-void camLetterBoxDraw(CameraId cameraId, void* param) {
+static void camLetterBoxDraw(CameraId cameraId, void* param) {
     CameraEntry* camera = camGetPtr(CAMERA_2D);
     f32 viewport[GX_VIEWPORT_SZ];
     f32 projection[GX_PROJECTION_SZ];
@@ -731,7 +731,7 @@ void camLetterBoxDraw(CameraId cameraId, void* param) {
     }
 }
 
-void camLetterBox(void) {
+static void camLetterBox(void) {
     CameraEntry* camera = camPtrTbl[CAMERA_2D];
     PartyEntry* party = partyGetPtr(0);
     if (!(camera->flags & CAM_FLAG_LETTER_BOX_DISABLE) && !(bero_get_BeroEXEC() & 1)) {

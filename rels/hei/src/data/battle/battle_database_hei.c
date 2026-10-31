@@ -99,7 +99,7 @@ NpcBattleSelect btlgrpsel_hei_btlno_hei_06_02_off[2];
 NpcBattleSelect btlgrpsel_hei_btlno_hei_06_03_off[3];
 NpcBattleSelect btlgrpsel_hei_btlno_hei_07_01_off[2];
 NpcBattleSelect btlgrpsel_hei_btlno_hei_08_01_off[2];
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 NpcBattleSelect R_btlgrpsel_hei_btlno_hei_08_02_off[2];
 #endif
 NpcBattleSelect btlgrpsel_hei_btlno_hei_09_01_off[3];
@@ -108,13 +108,13 @@ NpcBattleSelect btlgrpsel_hei_btlno_hei_10_01_off[2];
 NpcBattleSelect btlgrpsel_hei_btlno_hei_11_01_off[3];
 NpcBattleSelect btlgrpsel_hei_btlno_hei_11_03_off[3];
 NpcBattleSelect btlgrpsel_hei_btlno_hei_12_01_off[2];
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 NpcBattleSelect R_btlgrpsel_hei_btlno_hei_12_02_off[2];
 #endif
 NpcBattleSelect btlgrpsel_hei_btlno_hei_13_02_off[5];
 NpcBattleSelect btlgrpsel_hei_btlno_hei_13_03_off[4];
 NpcBattleSelect btlgrpsel_hei_btlno_hei_13_04_off[4];
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 NpcSetupBattleInfo btlsetup_hei_tbl[26];
 NpcTerritoryInfo btl_hei_setup_no_tbl[26];
 #else
@@ -131,7 +131,7 @@ BattleStageObjectData hei_btlobject_data[] = {
     {"kusa_3", 2, 1, {-165.0f, 0.0f, 49.0f}, 20, 40, {0}},
     {"hana_1", 2, 1, {100.0f, 0.0f, 76.0f}, 30, 30, {0}},
     {"hana_2", 2, 1, {-44.0f, 0.0f, 74.0f}, 0, 60, {0}},
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     {"saku_1", 2, 1, {-11.0f, 0.0f, -24.0f}, 10, 50, {0}},
 #else
     {"saku_1", 2, 1, {-24.0f, 0.0f, -39.0f}, 10, 50, {0}},
@@ -1808,7 +1808,7 @@ NpcBattleSelect btlgrpsel_hei_btlno_hei_08_01_off[] = {
     {0},
 };
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 NpcBattleSelect R_btlgrpsel_hei_btlno_hei_08_02_off[] = {
     {10, &btlgrp_hei_hei_08_01_off_1, &hei_btlstage_data[10]},
     {0},
@@ -1849,7 +1849,7 @@ NpcBattleSelect btlgrpsel_hei_btlno_hei_12_01_off[] = {
     {0},
 };
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 NpcBattleSelect R_btlgrpsel_hei_btlno_hei_12_02_off[] = {
     {10, &btlgrp_hei_hei_12_01_off_1, &hei_btlstage_data[10]},
     {0},
@@ -1880,7 +1880,7 @@ NpcBattleSelect btlgrpsel_hei_btlno_hei_13_04_off[] = {
 
 NpcSetupBattleInfo btlsetup_hei_tbl[] = {
     {
-        /*"マップstg_01_0"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x31\x5F\x30", // name
+        "マップstg_01_0", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1890,7 +1890,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"マップstg_01_1"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x31\x5F\x31", // name
+        "マップstg_01_1", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1900,7 +1900,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"マップstg_01_2"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x31\x5F\x32", // name
+        "マップstg_01_2", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1910,7 +1910,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"マップstg_01_4"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x31\x5F\x34", // name
+        "マップstg_01_4", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1920,7 +1920,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"hei01クリボー"*/"\x68\x65\x69\x30\x31\x83\x4E\x83\x8A\x83\x7B\x81\x5B", // name
+        "hei01クリボー", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1930,7 +1930,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"hei02パタクリ２"*/"\x68\x65\x69\x30\x32\x83\x70\x83\x5E\x83\x4E\x83\x8A\x82\x51", // name
+        "hei02パタクリ２", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1940,7 +1940,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"hei02ノコノコ"*/"\x68\x65\x69\x30\x32\x83\x6D\x83\x52\x83\x6D\x83\x52", // name
+        "hei02ノコノコ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1950,7 +1950,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"hei02トゲクリ"*/"\x68\x65\x69\x30\x32\x83\x67\x83\x51\x83\x4E\x83\x8A", // name
+        "hei02トゲクリ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1960,7 +1960,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"hei03シンノスケ"*/"\x68\x65\x69\x30\x33\x83\x56\x83\x93\x83\x6D\x83\x58\x83\x50", // name
+        "hei03シンノスケ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1971,7 +1971,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_KOBOSS_BATTLE1", // bgmName
     },
     {
-        /*"hei04パタクリ"*/"\x68\x65\x69\x30\x34\x83\x70\x83\x5E\x83\x4E\x83\x8A", // name
+        "hei04パタクリ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1981,7 +1981,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"hei04ノコノコ"*/"\x68\x65\x69\x30\x34\x83\x6D\x83\x52\x83\x6D\x83\x52", // name
+        "hei04ノコノコ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1991,7 +1991,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"hei05トゲダルマー"*/"\x68\x65\x69\x30\x35\x83\x67\x83\x51\x83\x5F\x83\x8B\x83\x7D\x81\x5B", // name
+        "hei05トゲダルマー", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -2002,7 +2002,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_KOBOSS_BATTLE1", // bgmName
     },
     {
-        /*"hei06ノコノコ"*/"\x68\x65\x69\x30\x36\x83\x6D\x83\x52\x83\x6D\x83\x52", // name
+        "hei06ノコノコ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -2012,7 +2012,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"hei06パタクリ２"*/"\x68\x65\x69\x30\x36\x83\x70\x83\x5E\x83\x4E\x83\x8A\x82\x51", // name
+        "hei06パタクリ２", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -2022,7 +2022,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"hei07モノクロシンエモン"*/"\x68\x65\x69\x30\x37\x83\x82\x83\x6D\x83\x4E\x83\x8D\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93", // name
+        "hei07モノクロシンエモン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -2033,7 +2033,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_KOBOSS_BATTLE1", // bgmName
     },
     {
-        /*"hei08チョロボン"*/"\x68\x65\x69\x30\x38\x83\x60\x83\x87\x83\x8D\x83\x7B\x83\x93", // name
+        "hei08チョロボン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -2043,9 +2043,9 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         {{5, 5}, {0}, {0}, {0}, {0}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {0}, {1, 1}, {0}, {0}, {0}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     {
-        /*"hei08チョロボン２"*/"\x68\x65\x69\x30\x38\x83\x60\x83\x87\x83\x8D\x83\x7B\x83\x93\x82\x51", // name
+        "hei08チョロボン２", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -2056,7 +2056,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
     },
 #endif
     {
-        /*"hei09チョロボン1"*/"\x68\x65\x69\x30\x39\x83\x60\x83\x87\x83\x8D\x83\x7B\x83\x93\x31", // name
+        "hei09チョロボン1", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -2066,7 +2066,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"hei09チョロボン3"*/"\x68\x65\x69\x30\x39\x83\x60\x83\x87\x83\x8D\x83\x7B\x83\x93\x33", // name
+        "hei09チョロボン3", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -2076,7 +2076,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"hei10ゴールドチョロボン"*/"\x68\x65\x69\x31\x30\x83\x53\x81\x5B\x83\x8B\x83\x68\x83\x60\x83\x87\x83\x8D\x83\x7B\x83\x93", // name
+        "hei10ゴールドチョロボン", // name
         "hei_10", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -2088,7 +2088,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_KOBOSS_BATTLE1", // bgmName
     },
     {
-        /*"hei11チョロボン1"*/"\x68\x65\x69\x31\x31\x83\x60\x83\x87\x83\x8D\x83\x7B\x83\x93\x31", // name
+        "hei11チョロボン1", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -2098,7 +2098,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"hei11チョロボン3"*/"\x68\x65\x69\x31\x31\x83\x60\x83\x87\x83\x8D\x83\x7B\x83\x93\x33", // name
+        "hei11チョロボン3", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -2108,7 +2108,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"hei12チョロボン"*/"\x68\x65\x69\x31\x32\x83\x60\x83\x87\x83\x8D\x83\x7B\x83\x93", // name
+        "hei12チョロボン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -2118,9 +2118,9 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         {{5, 5}, {0}, {0}, {0}, {0}, {5, 5}, {0}, {0}, {5, 5}, {0}, {5, 5}, {0}, {1, 1}, {0}, {0}, {0}}, // randomRanges
         "BGM_ZAKO_BATTLE1", // bgmName
     },
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     {
-        /*"hei12チョロボン２"*/"\x68\x65\x69\x31\x32\x83\x60\x83\x87\x83\x8D\x83\x7B\x83\x93\x82\x51", // name
+        "hei12チョロボン２", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -2131,7 +2131,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
     },
 #endif
     {
-        /*"hei13クリボー2"*/"\x68\x65\x69\x31\x33\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x32", // name
+        "hei13クリボー2", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -2141,7 +2141,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"hei13トゲクリ"*/"\x68\x65\x69\x31\x33\x83\x67\x83\x51\x83\x4E\x83\x8A", // name
+        "hei13トゲクリ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -2151,7 +2151,7 @@ NpcSetupBattleInfo btlsetup_hei_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"hei13パタクリ"*/"\x68\x65\x69\x31\x33\x83\x70\x83\x5E\x83\x4E\x83\x8A", // name
+        "hei13パタクリ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -2180,10 +2180,10 @@ NpcTerritoryInfo btl_hei_setup_no_tbl[] = {
     {"BTLNO_HEI_06_03", 13},
     {"BTLNO_HEI_07_01", 14},
     {"BTLNO_HEI_08_01", 15},
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     {"BTLNO_HEI_08_02", 16},
 #endif
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     {"BTLNO_HEI_09_01", 16},
     {"BTLNO_HEI_09_03", 17},
     {"BTLNO_HEI_10_01", 18},
@@ -2198,10 +2198,10 @@ NpcTerritoryInfo btl_hei_setup_no_tbl[] = {
     {"BTLNO_HEI_11_03", 21},
     {"BTLNO_HEI_12_01", 22},
 #endif
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     {"BTLNO_HEI_12_02", 23},
 #endif
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     {"BTLNO_HEI_13_02", 22},
     {"BTLNO_HEI_13_03", 23},
     {"BTLNO_HEI_13_04", 24},

@@ -15,8 +15,8 @@
 // US effect texture ids are 0x1C lower for these entries.
 #define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
 
-void effMahorn2Main(EffectEntry* effect);
-void effMahorn2Disp(CameraId cameraId, EffectEntry* effect);
+static void effMahorn2Main(EffectEntry* effect);
+static void effMahorn2Disp(CameraId cameraId, EffectEntry* effect);
 
 #define TWO_PI 6.283184f
 
@@ -49,7 +49,7 @@ EffectEntry* effMahorn2Entry(BOOL unused, f32 posX, f32 posY, f32 posZ, f32 dstX
     data++;
 
     for (i = 1; i < 4; i++, data++) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         memset(data, 0, sizeof(effMahorn2Data));
 #endif
         data->type = 1;
@@ -62,7 +62,7 @@ EffectEntry* effMahorn2Entry(BOOL unused, f32 posX, f32 posY, f32 posZ, f32 dstX
     }
 
     for (i = 4; i < 5; i++, data++) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         memset(data, 0, sizeof(effMahorn2Data));
 #endif
         data->type = 2;
@@ -75,7 +75,7 @@ EffectEntry* effMahorn2Entry(BOOL unused, f32 posX, f32 posY, f32 posZ, f32 dstX
     }
 
     for (i = 5; i < 6; i++, data++) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         memset(data, 0, sizeof(effMahorn2Data));
 #endif
         data->type = 3;
@@ -88,7 +88,7 @@ EffectEntry* effMahorn2Entry(BOOL unused, f32 posX, f32 posY, f32 posZ, f32 dstX
     }
 
     for (i = 6; i < effect->count; i++, data++) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         memset(data, 0, sizeof(effMahorn2Data));
 #endif
         data->type = 4;
@@ -107,7 +107,7 @@ EffectEntry* effMahorn2Entry(BOOL unused, f32 posX, f32 posY, f32 posZ, f32 dstX
     return effect;
 }
 
-void effMahorn2Main(EffectEntry* effect) {
+static void effMahorn2Main(EffectEntry* effect) {
     effMahorn2Data* data = effect->userdata;
     Vec position;
     Vec target;
@@ -179,7 +179,7 @@ void effMahorn2Main(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effMahorn2Disp, effect);
 }
 
-void effMahorn2Disp(CameraId cameraId, EffectEntry* effect) {
+static void effMahorn2Disp(CameraId cameraId, EffectEntry* effect) {
     effMahorn2Data* data = effect->userdata;
     Mtx mtx;
     Mtx rot;
@@ -275,7 +275,7 @@ void effMahorn2Disp(CameraId cameraId, EffectEntry* effect) {
             GXPosition3f32(-w / 2.0f, -h / 2.0f, 0.0f);
             GXTexCoord2f32(0.0f, v);
         } else {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             // The demo counts the three segments with the outer loop counter i, so after a type 3 entry the
             // outer loop goes on at i = 4; the later versions use their own counter.
             for (i = 0; i < 3; i++) {

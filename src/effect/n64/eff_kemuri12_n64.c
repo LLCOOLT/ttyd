@@ -29,8 +29,8 @@ effN64Vtx size32x32_tex32x32_yougan_vtx[] = {
     {-26, 16, -15, 0, 1024, 0, 0, 0, 255},
 };
 
-void effKemuri12Main(EffectEntry* effect);
-void effKemuri12Disp(CameraId cameraId, EffectEntry* effect);
+static void effKemuri12Main(EffectEntry* effect);
+static void effKemuri12Disp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effKemuri12N64Entry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -74,7 +74,7 @@ EffectEntry* effKemuri12N64Entry(s32 type, s32 duration, f32 x, f32 y, f32 z, f3
     return effect;
 }
 
-void effKemuri12Main(EffectEntry* effect) {
+static void effKemuri12Main(EffectEntry* effect) {
     EffKemuri12N64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -96,7 +96,7 @@ void effKemuri12Main(EffectEntry* effect) {
 // Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
 
-void effKemuri12Disp(CameraId cameraId, EffectEntry* effect) {
+static void effKemuri12Disp(CameraId cameraId, EffectEntry* effect) {
     s32 type;
     CameraEntry* camera;
     s32 last;

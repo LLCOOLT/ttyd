@@ -112,7 +112,7 @@ typedef struct MsgWinData {
 
 typedef struct MessageEntry {
     u32 length; // 0x0
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     smartEntry* address; // 0x4, the demo keeps the text in a smart heap block
 #else
     void* address; // 0x4

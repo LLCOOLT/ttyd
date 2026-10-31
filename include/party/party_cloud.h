@@ -35,7 +35,7 @@ f32 cloudGetBreathDir(void);
 struct HitEntry* cloudGetHitBreathout(s32 rayId);
 
 void cloud_exit(PartyEntry* party);
-#if VERSION != VERSION_DEMO // the demo has them as static inline functions in party_cloud.c
+#if VERSION >= VERSION_JP // the demo has them as static inline functions in party_cloud.c
 void cloud_hover_init(PartyEntry* party);
 void cloud_hover_main(PartyEntry* party);
 #endif

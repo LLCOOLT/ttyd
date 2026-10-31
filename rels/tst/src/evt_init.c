@@ -1,5 +1,6 @@
 // The init events of the tst maps, plus a test that draws a polygon with the stick and fills it through the GLU
-// tessellator (glu/). The tst_nakayama map runs the test.
+// tessellator (glu/). The tst_nakayama map runs the test. The Japanese demo has no test (the tess code and the
+// tst_nakayama events came after it), but the GLU units are still linked into its tst.rel.
 #include "evt/evt_cmd.h"
 #include "tst.h"
 #include "evt_init.h"
@@ -32,9 +33,11 @@
 #include "evt/evt_sub.h"
 #include "manager/fontmgr.h"
 #include "npc_event.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "driver/mapdrv.h"
+#include "version.h"
 
+#if VERSION >= VERSION_JP
 // One point of the drawn outline (and of the vertices the tessellator adds where edges cross).
 typedef struct TessVertex {
     f64 x;                // 0x00
@@ -71,9 +74,12 @@ USER_FUNC(tess_test_end);
 extern EvtWord tst_nakayama_tess_evt[];
 
 void tess_test(void);
+#endif
 
 // MWCC emits file-scope variables in reverse order: item_name comes first in .bss.
+#if VERSION >= VERSION_JP
 TessTestWork* tess_test_work;
+#endif
 char item_name[32];
 
 EVT_BEGIN(tst_00_init_evt)
@@ -124,7 +130,7 @@ EvtWord tst_npc_env_evt[] = {
 };
 
 EVT_BEGIN(tst_npc_init_evt)
-    CALL(evt_npc_change_interrupt, STRING("NPC_01"), 1, PTR(npc_loiter_move_event))
+    CALL(evt_npc_change_interrupt, STRING("NPC_01"), 1, PTR(testnpc_move_event))
     CALL(evt_npc_change_interrupt, STRING("NPC_01"), 8, PTR(tst_npc_talk_evt))
     CALL(evt_npc_reaction_flag_onoff, 1, STRING("NPC_01"), 2)
     CALL(evt_npc_flag_onoff, 1, STRING("NPC_01"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
@@ -159,8 +165,8 @@ EVT_END()
 
 EVT_BEGIN(tst_moj_01_init_evt)
     CALL(tst_mobj_koopa_on)
-    CALL(evt_mobj_rideswitch_a, STRING("rso"), 100, 0, -200, 0, LSWF(0))
-    CALL(evt_mobj_rideswitch_b, STRING("rsg"), 200, 0, -200, 0, LSWF(1))
+    CALL(evt_mobj_rideswitch_orange, STRING("rso"), 100, 0, -200, 0, LSWF(0))
+    CALL(evt_mobj_rideswitch_green, STRING("rsg"), 200, 0, -200, 0, LSWF(1))
     CALL(evt_mobj_rideswitch_lightblue, STRING("rsl"), 300, 0, -200, 0, 0, LSWF(2))
     CALL(evt_mobj_timerswitch, 0, STRING("tsb1"), 150, 0, -100, STRING("tsb2"), 250, 0, -100, 600, 0, LSWF(3))
     CALL(evt_mobj_timerswitch, 1, STRING("tsr1"), 350, 0, -100, STRING("tsr2"), 450, 0, -100, 600, 0, LSWF(4))
@@ -208,8 +214,8 @@ EVT_BEGIN(tst_moj_03_init_evt)
     CALL(evt_mobj_arrow, STRING("ar"), 350, 0, 0, 0)
     CALL(evt_mobj_breaking_floor, STRING("bf"), 0, 0, 100, 0, 0, LSWF(7))
     CALL(evt_mobj_kururing_floor, STRING("kf"), 100, 0, 100, STRING("S_yuka01"), 121, LSWF(8))
-    CALL(evt_mobj_trap, STRING("tf"), 200, 0, 100, STRING("S_yuka01"), 121, LSWF(9))
-    CALL(evt_mobj_bombrock, STRING("br"), -100, 0, 0, 0, LSWF(10))
+    CALL(evt_mobj_trap_floor, STRING("tf"), 200, 0, 100, STRING("S_yuka01"), 121, LSWF(9))
+    CALL(evt_mobj_breaking_rock, STRING("br"), -100, 0, 0, 0, LSWF(10))
     CALL(evt_mobj_itembox, STRING("tbr"), -50, 0, 0, 2, 0, 0, LSWF(11))
     CALL(evt_mobj_itembox, STRING("tbb"), -150, 0, 0, 3, 0, 0, LSWF(12))
     CALL(evt_mobj_itembox, STRING("tbg"), -250, 0, 0, 4, 0, 0, LSWF(13))
@@ -279,6 +285,9 @@ EVT_BEGIN(tst_bt00_init_evt)
     RETURN
 EVT_END()
 
+// The Japanese store demo has no tst_nakayama_init_evt, though tst.c still registers it: its tst.rel holds 0 there
+// with no relocation. Keep the event out of that version; tst.c explains how the build reproduces the reference.
+#if VERSION >= VERSION_JP
 EVT_BEGIN(tst_nakayama_init_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_set_pos, 0, 0, 0)
@@ -337,10 +346,12 @@ EVT_BEGIN(tst_nakayama_tess_evt)
     END_LOOP
     RETURN
 EVT_END()
+#endif
 
 // The unit is built with -inline auto,deferred, which emits the functions in reverse order: the last one here comes
 // first in the REL.
 
+#if VERSION >= VERSION_JP
 // Draws the outline: one rainbow line per segment, the buffer use, and the cursor.
 void tess_test_line_disp(CameraId cameraId, void* param) {
     s32 i;
@@ -659,6 +670,7 @@ void tess_test(void) {
     gluTessEndPolygon(tess);
     gluDeleteTess(tess);
 }
+#endif
 
 USER_FUNC(make_item_name) {
     EvtWord* args = event->args;
@@ -704,7 +716,7 @@ EVT_BEGIN(tst_item_00_show_evt)
     SET_VALUE(LW(2), -400)
     LOOP(31)
         CALL(make_item_name, LW(0), LW(1))
-        CALL(evt_item_entry, LW(1), LW(0), LW(2), 0, -100, 16, -1, 0)
+        CALL(evt_item_entry, LW(1), LW(0), LW(2), 0, -100, ITEM_ENTRY_FIXED, -1, 0)
         ADD(LW(2), 25)
         ADD(LW(0), 1)
         IF_INT_GREATER_OR_EQUAL(LW(0), 339)

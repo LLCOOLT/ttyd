@@ -6,7 +6,7 @@
 #include "battle/battle_camera.h"
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 #include "rsh.h"
@@ -60,7 +60,11 @@ BattleUnitKind unit_boss_moamoa_mouth = {
     0.0f,
     0.0f,
     0.0f,
+#if VERSION <= VERSION_DEMO_US
+    250.0f,
+#else
     0.0f,
+#endif
     0.0f,
     100.0f,
     0.0f,
@@ -104,7 +108,7 @@ static PoseTableEntry pose_table[] = {
     {28, "S_2"},
     {31, "D_2_1"},
     {39, "D_2_1"},
-    {69, "S_2"},
+    {BTL_POSE_STAY_DEFAULT, "S_2"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -168,7 +172,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -204,7 +208,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL_CHILD(PTR(evt_attack))
+    CALL_CHILD(evt_attack)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()

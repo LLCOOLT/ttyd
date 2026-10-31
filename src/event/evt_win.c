@@ -1,7 +1,7 @@
 // Script commands for the unit windows (unitwin): the shop, partner and item list windows.
 #include "version.h"
 // Script commands for the unit windows: the shop, partner and item list windows.
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo unit is built without the main precompiled header: only the dtrigf constants lead its data
 #define DTRIGF_WITH_INITIAL_VALUES
 #include <dtrigf.h>
@@ -33,14 +33,14 @@
 #include <dolphin/mtx.h>
 #include <stdio.h>
 #include <string.h>
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #include <stdlib.h>
 #endif
 #include "icon_ids.h"
 #include "mario/mario_party.h"
 #include "driver/itemdrv.h"
 #include "win/win_main.h"
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #include "driver/casedrv.h"
 #include "evt/evt_case.h"
 #endif
@@ -55,8 +55,8 @@ typedef struct UnitWinEntry {
     void* evt;           // 0x8
 } UnitWinEntry;
 
-#if VERSION == VERSION_DEMO
-// demo: no help/name/point windows; the list windows (mode 2..18) are run by evt_unitwin_select_list here
+#if VERSION <= VERSION_DEMO_US
+// demo: no help/name/point windows; the list windows (mode 2..18) are run by unitwin_window_select_func here
 typedef struct UnitWinWork {
     u16 flags;             // 0x0
     u16 pad2;              // 0x2
@@ -88,9 +88,9 @@ static s16* mario_status_point_table[3];
 s32 unitwin_coin_se_wait;
 static UnitWinWork* _wp;
 
-USER_FUNC(evt_unitwin_main_func);
-USER_FUNC(evt_unitwin_select_func);
-void evt_unitwin_disp_func(CameraId cameraId, void* param);
+static USER_FUNC(evt_unitwin_main_func);
+static USER_FUNC(select_func);
+static void evt_unitwin_disp_func(CameraId cameraId, void* param);
 
 static s32 party_id_table[8] = {1, 2, 5, 4, 6, 3, 7, 0};
 static s32 party_icon_table[7] = {ICON_155, ICON_156, ICON_15F, ICON_158, ICON_160, ICON_157, ICON_161};
@@ -106,11 +106,11 @@ static EVT_BEGIN(main_evt)
 EVT_END()
 
         EVT_BEGIN(select_evt)
-    CALL(evt_unitwin_select_func)
+    CALL(select_func)
     RETURN
 EVT_END()
 
-s32 unitwin_party_icon(s32 icon) {
+static s32 iconid_conv(s32 icon) {
     if (icon == ICON_158) {
         switch (pouchGetPartyColor(4)) {
             case 0:
@@ -140,7 +140,7 @@ s32 unitwin_party_icon(s32 icon) {
     return icon;
 }
 
-const char* unitwin_party_name(s32 i) {
+static const char* party_name_table_rtn(s32 i) {
     const char* name;
     switch (i) {
         case 0:
@@ -243,7 +243,7 @@ USER_FUNC(evt_unitwin_selltable_setup) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_unitwin_select_func) {
+static USER_FUNC(select_func) {
     UnitWinWork* wp = (UnitWinWork*)event->lwData[0];
     if (wp->mode == 0) {
         wp->goodsIdx = event->lwData[1];
@@ -293,7 +293,7 @@ USER_FUNC(unitwincoin_wait) {
 }
 
 // list window: arg = window kind; returns lwData[0] = 1 and the picked entry in lwData[1..]
-USER_FUNC(evt_unitwin_select_list) {
+USER_FUNC(unitwin_window_select_func) {
     EvtWord* args = event->args;
     s32 arg = evtGetValue(event, *args++);
     UnitWinWork* wp = _wp;
@@ -651,7 +651,7 @@ USER_FUNC(evt_unitwin_select_list) {
                 event->lwData[0] = 1;
                 event->lwData[1] = party_id_table[i];
                 if (arg == 6) {
-                    name = unitwin_party_name(i);
+                    name = party_name_table_rtn(i);
                     event->lwData[3] = (EvtWord)name;
                 }
                 wp->mode = 0;
@@ -672,7 +672,7 @@ USER_FUNC(evt_unitwin_select_list) {
                 statusWinForceOff();
                 event->lwData[0] = 1;
                 event->lwData[2] = party_id_table[i];
-                name = unitwin_party_name(i);
+                name = party_name_table_rtn(i);
                 event->lwData[4] = (EvtWord)name;
                 wp->mode = 0;
                 return EVT_RETURN_YIELD;
@@ -773,7 +773,7 @@ USER_FUNC(evt_unitwin_select_list) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(evt_unitwin_main_func) {
+static USER_FUNC(evt_unitwin_main_func) {
     UnitWinWork* wp = (UnitWinWork*)event->lwData[0];
     if (wp->flags2 & 1) {
         wp->flags2 |= 2;
@@ -823,9 +823,9 @@ static s16* mario_status_point_table[3];
 s32 unitwin_coin_se_wait;
 static UnitWinWork* _wp;
 
-USER_FUNC(evt_unitwin_main_func);
-USER_FUNC(evt_unitwin_select_func);
-void evt_unitwin_disp_func(CameraId cameraId, void* param);
+static USER_FUNC(evt_unitwin_main_func);
+static USER_FUNC(select_func);
+static void evt_unitwin_disp_func(CameraId cameraId, void* param);
 
 void unitwin_help_main(WinMgrEntry* entry);
 void unitwin_help_disp(WinMgrEntry* entry);
@@ -852,7 +852,7 @@ static EVT_BEGIN(main_evt)
 EVT_END()
 
         EVT_BEGIN(select_evt)
-    CALL(evt_unitwin_select_func)
+    CALL(select_func)
     RETURN
 EVT_END()
 
@@ -1073,7 +1073,7 @@ static inline void unitwinClose(UnitWinWork* wp) {
     }
 }
 
-USER_FUNC(evt_unitwin_select_func) {
+static USER_FUNC(select_func) {
     UnitWinWork* wp = (UnitWinWork*)event->lwData[0];
     s32 found = FALSE;
     MarioWork* mario = marioGetPtr();
@@ -1160,7 +1160,7 @@ USER_FUNC(evt_unitwin_select_func) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(evt_unitwin_main_func) {
+static USER_FUNC(evt_unitwin_main_func) {
     UnitWinWork* wp = (UnitWinWork*)event->lwData[0];
     if (wp->flags2 & 1) {
         wp->flags2 |= 2;
@@ -1176,8 +1176,8 @@ USER_FUNC(evt_unitwin_main_func) {
 }
 #endif
 
-#if VERSION != VERSION_DEMO
-static inline s32 unitwin_party_icon(s32 icon) {
+#if VERSION >= VERSION_JP
+static inline s32 iconid_conv(s32 icon) {
     if (icon == ICON_158) {
         switch (pouchGetPartyColor(4)) {
             case 0:
@@ -1207,7 +1207,7 @@ static inline s32 unitwin_party_icon(s32 icon) {
     return icon;
 }
 
-static inline const char* unitwin_party_name(s32 i) {
+static inline const char* party_name_table_rtn(s32 i) {
     const char* name;
     switch (i) {
         case 0:
@@ -1237,7 +1237,7 @@ static inline const char* unitwin_party_name(s32 i) {
 #endif
 #define ICONGX ((void (*)(Vec*, u16, u16, f32))iconDispGx)
 #define ICONGX2 ((void (*)(Vec*, u16, f32, u16))iconDispGx)
-void evt_unitwin_disp_func(CameraId cameraId, void* param) {
+static void evt_unitwin_disp_func(CameraId cameraId, void* param) {
     PouchData* pouch = pouchGetPtr();
     UnitWinWork* wp = (UnitWinWork*)param;
     s32 mode;
@@ -1327,7 +1327,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
             }
             wp->coinFrame++;
             wp->coinFrame %= 1200;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             if (abs(coin - wp->coin) == 1 || gp->retraceCount % 6 == 0) {
                 psndSFXOn("SFX_COUNT_COIN1");
             }
@@ -1367,7 +1367,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
         }
     }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if ((wp->flags & 0x100) && (lotteryGetPtr()->flags & 2)) {
         Mtx mtx;
         char buf[32];
@@ -1764,10 +1764,10 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
                         flag = 0x20;
                     }
                 }
-                ICONGX2(&(Vec){11.0f, wp->scroll + (56 - row * 24), 0.0f}, flag | ICON_DISP_2D, 0.5f, unitwin_party_icon(party_icon_table[i]));
+                ICONGX2(&(Vec){11.0f, wp->scroll + (56 - row * 24), 0.0f}, flag | ICON_DISP_2D, 0.5f, iconid_conv(party_icon_table[i]));
                 FontDrawStart();
                 FontDrawColor(color);
-                name = unitwin_party_name(i);
+                name = party_name_table_rtn(i);
                 ty = 80 - row * 24;
                 FontDrawString(36.0f, wp->scroll + ty, name);
                 sprintf(buf, "%d", pouch->partyData[party_id_table[i]].techLevel);

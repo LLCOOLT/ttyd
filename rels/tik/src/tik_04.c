@@ -19,12 +19,15 @@
 #include "evt/evt_paper.h"
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "tik.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
 
+#if VERSION <= VERSION_DEMO_US
+static BeroEntry bero_entry_data[8];
+#else
 static BeroEntry bero_entry_data[5];
+#endif
 extern EvtWord puni_soguu_1[];
 extern EvtWord puni_soguu_2[];
 extern EvtWord plane_tobashi_check[];
@@ -65,6 +68,56 @@ static BeroEntry bero_entry_data[] = {
         1, // exitAnimeType
         0, 0, // enterAnimeArg..exitAnimeArg
     },
+#if VERSION <= VERSION_DEMO_US
+    {
+        "n_bero_2", // hitName
+        0, 0, // type..sfxId
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        "tik_03", // nextMapName
+        "s_bero_2", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "n_bero_3", // hitName
+        0, 0, // type..sfxId
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        "tik_03", // nextMapName
+        "s_bero_3", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+    {
+        "n_bero_4", // hitName
+        0, 0, // type..sfxId
+        BERO_DIR_AUTO, // directionId
+        BERO_POS_AUTO, // centerPosition
+        0, 0, // centerPositionY..centerPositionZ
+        -1, // length
+        NULL, // enterEvent
+        -1, // caseType
+        NULL, // exitEvent
+        "tik_03", // nextMapName
+        "s_bero_4", // nextBeroName
+        1, // enterAnimeType
+        1, // exitAnimeType
+        0, 0, // enterAnimeArg..exitAnimeArg
+    },
+#endif
     {
         "n_bero_5", // hitName
         0, 0, // type..sfxId
@@ -225,7 +278,7 @@ EVT_BEGIN(plane_tobashi_check)
     END_IF
     CALL(evt_party_run, 1)
     CALL(evt_mario_key_onoff, 1)
-    SPAWN_EVENT(PTR(plane_tobashi_check))
+    SPAWN_EVENT(plane_tobashi_check)
     RETURN
 EVT_END()
 
@@ -271,7 +324,7 @@ EVT_BEGIN(tik_04_switch_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_cam3d_evt_set, 450, 255, 628, 450, 150, 37, 500, 11)
     WAIT_MS(1500)
-    CALL_CHILD(PTR(kaidan_pera))
+    CALL_CHILD(kaidan_pera)
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_hitobj_onoff, STRING("a_dai_nise"), 1, 0)
@@ -284,8 +337,12 @@ EVT_END()
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("item00"), ITEM_HAPPY_HEART_P, LW(0), LW(1), LW(2), 16, -1, 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_HAPPY_HEART_P, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
+#else
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_BADGE_RETURN | ITEM_FLAG_NO_TOUCH)
+#endif
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_item, STRING("item00"))
     CALL(evt_mario_key_onoff, 1)
@@ -298,17 +355,17 @@ EVT_BEGIN(tik_04_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG0_11_3_GOOMBA_GOONS)
-        SPAWN_EVENT(PTR(puni_soguu_1))
+        SPAWN_EVENT(puni_soguu_1)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_31_FRANKLYS_HOUSE)
-        SPAWN_EVENT(PTR(puni_soguu_2))
+        SPAWN_EVENT(puni_soguu_2)
     END_IF
     CALL(evt_map_entry_airport_harbor, 0, STRING("hikou"), STRING("a_hikou"))
     IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG0_12_02_PAPER_MAGE_1)
         IF_INT_EQUAL(GSWF(GSWF_TIK04_FIRST_FLIGHT_DONE), 0)
-            SPAWN_EVENT(PTR(plane_tobashi_check))
+            SPAWN_EVENT(plane_tobashi_check)
         END_IF
     END_IF
     IF_INT_EQUAL(GSWF(GSWF_TIK04_CLOUD_BLOWN), 0)
@@ -331,15 +388,19 @@ EVT_BEGIN(tik_04_init_evt)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("dai_6"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("a_dai_6"), 1, 1)
     END_IF
-    CALL(evt_item_entry, STRING("blackkey"), ITEM_BLACK_KEY_0x21, 175, 125, -100, 16, GSWF(GSWF_TIK04_BLACK_KEY_TAKEN), 0)
+    CALL(evt_item_entry, STRING("blackkey"), ITEM_BLACK_KEY_0x21, 175, 125, -100, ITEM_ENTRY_FIXED, GSWF(GSWF_TIK04_BLACK_KEY_TAKEN), 0)
     CALL(evt_mobj_jumpstand_blue, 0, STRING("mobj_jump00"), 150, -450, 0, 0, 0, 0)
     CALL(evt_mobj_lv_blk, STRING("block"), -425, 0, 0, 0, GSWF(GSWF_TIK04_BIG_BLOCK_BROKEN), STRING("MOBJ_Lv1BigBigBlock"))
     IF_INT_EQUAL(GSWF(GSWF_TIK04_BIG_BLOCK_BROKEN), 0)
         CALL(evt_mobj_flag_onoff, 1, STRING("block"), MOBJ_FLAG_NO_CULL)
     END_IF
     CALL(evt_mobj_itembox, STRING("mobj_box00"), 310, 0, -25, 0, 0, PTR(mobj_box00), GSWF(GSWF_TIK04_HAPPY_HEART_P_CHEST_OPENED))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_mobj_brick, STRING("mobj_box01"), -345, 60, 130, ITEM_PRETTY_LUCKY, 12, 0, GSWF(GSWF_TIK04_PRETTY_LUCKY_BLOCK_HIT))
+#else
     CALL(evt_mobj_brick, STRING("mobj_box01"), -150, 60, 130, ITEM_PRETTY_LUCKY, 12, 0, GSWF(GSWF_TIK04_PRETTY_LUCKY_BLOCK_HIT))
-    CALL(evt_item_entry, STRING("item_02"), ITEM_STAR_PIECE, -460, 25, -100, 16, GSWF(GSWF_TIK04_STAR_PIECE), 0)
+#endif
+    CALL(evt_item_entry, STRING("item_02"), ITEM_STAR_PIECE, -460, 25, -100, ITEM_ENTRY_FIXED, GSWF(GSWF_TIK04_STAR_PIECE), 0)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG5_43_X_NAUTS_RETREAT)
         CALL(evt_npc_check_delete, STRING("カメック"))
         CALL(evt_npc_check_delete, STRING("トゲノコ"))

@@ -18,8 +18,8 @@ typedef struct EffSnowN64Work {
     s32 timer;     // 0x28
 } EffSnowN64Work;
 
-void effSnowMain(EffectEntry* effect);
-void effSnowDisp(CameraId cameraId, EffectEntry* effect);
+static void effSnowMain(EffectEntry* effect);
+static void effSnowDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effSnowN64Entry(s32 lifetime, f32 x, f32 y, f32 z) {
     static s32 kaiten;
@@ -49,7 +49,7 @@ EffectEntry* effSnowN64Entry(s32 lifetime, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effSnowMain(EffectEntry* effect) {
+static void effSnowMain(EffectEntry* effect) {
     EffSnowN64Work* work = effect->userdata;
     MarioWork* mario;
     Vec position;
@@ -91,7 +91,7 @@ void effSnowMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effSnowDisp, effect);
 }
 
-void effSnowDisp(CameraId cameraId, EffectEntry* effect) {
+static void effSnowDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffSnowN64Work* work;
     Mtx trans;

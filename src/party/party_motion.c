@@ -27,267 +27,36 @@
 #include "party/party_move.h"
 #include "mot/mot_slit.h"
 #include "mario/mario_hit.h"
-// FAKE: party_motion.c calls psndENVOn through this prototype (the types it was compiled with) instead of the one in pmario_sound.h; same registers, behaviour-identical.
-typedef BOOL (*PsndENVOnS32S32Fn)(s32, s32);
 // FAKE: party_motion.c calls partySearchHead through this prototype (the types it was compiled with) instead of the one in party/party_hit.h; same registers, behaviour-identical.
 typedef void* (*PartySearchHeadRetVoidptrFn)(PartyEntry*, Vec*, f32*, f32);
 
 static BOOL partyChkMarioFollowY(MarioWork* mario);
 void partyChgMotSlitFloor(PartyEntry* party);
 
-#if VERSION == VERSION_DEMO
-static s32 upstairs_count; // demo: frames the fly follow found no floor in front (reset when the way is clear)
+#if VERSION <= VERSION_DEMO_US
+static s32 touch_wall_ct; // demo: frames the fly follow found no floor in front (reset when the way is clear)
 #else
-static s32 party_motion_unused_sbss; // nothing reads or writes it
-static f32 touch_wall_ct;
+static f32 gnd_probe_dy; // height above a point at which the ground probes start (60)
 static s32 upstairs_count;
 static f32 upstairs_dy;
 #endif
 
-BOOL party_slit(PartyEntry* party);
-BOOL party_roll(PartyEntry* party);
+static BOOL party_slit(PartyEntry* party);
+static BOOL party_roll(PartyEntry* party);
 void partyFlyAdjustY(PartyEntry* party);
 void partyWalkChkGnd(PartyEntry* party);
 
-// Note: the real evt_snd user functions live in this split (see evt_snd.c).
-// Functions are defined in reverse order (-inline deferred).
-
-USER_FUNC(evt_snd_bgmon) {
-    EvtWord* args = event->args;
-    psndBGMOn(args[0], (char*)args[1]);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_bgmon_f) {
-    EvtWord* args = event->args;
-    s32 flags = args[0];
-    char* name = (char*)args[1];
-    s32 fadetime = evtGetValue(event, args[2]);
-#if VERSION != VERSION_DEMO
-    psndBGMOn_f(flags, name, fadetime, 0);
-#else
-    psndBGMOn_f_d(flags, name, fadetime, 0);
-#endif
-    return EVT_RETURN_DONE;
-}
-
-#if VERSION != VERSION_DEMO
-USER_FUNC(evt_snd_bgmon_f_d) {
-    EvtWord* args = event->args;
-    s32 flags = args[0];
-    char* name = (char*)args[1];
-    s32 fadetime = evtGetValue(event, args[2]);
-    evtGetValue(event, args[3]); // as in the original: the fade-out time is read but unused, fadetime is passed for both
-    psndBGMOn_f_d(flags, name, fadetime, fadetime, 0);
-    return EVT_RETURN_DONE;
-}
-#endif
-
-USER_FUNC(evt_snd_bgmoff) {
-    psndBGMOff(event->args[0]);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_bgmoff_f) {
-    EvtWord* args = event->args;
-    s32 a = args[0];
-    s32 t = evtGetValue(event, args[1]);
-    psndBGMOff_f_d(a, t, 0);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_bgm_freq) {
-    EvtWord* args = event->args;
-    s32 a = args[0];
-    s32 t = evtGetValue(event, args[1]);
-    psndBGM_rate(a, t);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_bgm_scope) {
-    EvtWord* args = event->args;
-    s32 a = args[0];
-    s32 t = evtGetValue(event, args[1]);
-    psndBGMScope(a, t);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_sfxon) {
-    EvtWord* args = event->args;
-    const char* name = (const char*)args[0];
-    s32 out = args[1];
-    if (!out) {
-        psndSFXOn(name);
-    } else {
-        evtSetValue(event, out, psndSFXOn(name));
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_sfxon__) {
-    EvtWord* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    s32 out = args[1];
-    if (!out) {
-        psndSFXOn(name);
-    } else {
-        evtSetValue(event, out, psndSFXOn(name));
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_sfxon_) {
-    EvtWord* args = event->args;
-    const char* name = (const char*)args[0];
-    s32 out = args[1];
-    if (!out) {
-        psndSFXOn_(name);
-    } else {
-        evtSetValue(event, out, psndSFXOn_(name));
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_sfxon_3d) {
-    EvtWord* args = event->args;
-    const char* name = (const char*)args[0];
-    Vec pos;
-    s32 out;
-    pos.x = evtGetFloat(event, args[1]);
-    pos.y = evtGetFloat(event, args[2]);
-    pos.z = evtGetFloat(event, args[3]);
-    out = args[4];
-    if (!out || out == -250000000) {
-        psndSFXOn_3D(name, &pos);
-    } else {
-        evtSetValue(event, out, psndSFXOn_3D(name, &pos));
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_sfxon_3d_ex) {
-    EvtWord* args = event->args;
-    const char* name = (const char*)args[0];
-    Vec pos;
-    u16 a, b, c, d;
-    s32 out;
-    pos.x = evtGetFloat(event, args[1]);
-    pos.y = evtGetFloat(event, args[2]);
-    pos.z = evtGetFloat(event, args[3]);
-    a = evtGetValue(event, args[4]);
-    b = evtGetValue(event, args[5]);
-    c = evtGetValue(event, args[6]);
-    d = evtGetValue(event, args[7]);
-    out = args[8];
-    if (!out) {
-        psndSFXOnEx_3D(name, &pos, a, b, c, d);
-    } else {
-        evtSetValue(event, out, psndSFXOnEx_3D(name, &pos, a, b, c, d));
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_sfxoff) {
-    psndSFXOff(evtGetValue(event, event->args[0]));
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_sfxchk) {
-    EvtWord* args = event->args;
-    evtSetValue(event, args[1], psndSFXChk(evtGetValue(event, args[0])));
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_sfx_pit) {
-    EvtWord* args = event->args;
-    s32 id = evtGetValue(event, args[0]);
-    s32 t = evtGetValue(event, args[1]);
-    psndSFX_pit(id, t);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_sfx_vol) {
-    EvtWord* args = event->args;
-    s32 id = evtGetValue(event, args[0]);
-    s32 t = evtGetValue(event, args[1]);
-    psndSFX_vol(id, t);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_sfx_pos) {
-    EvtWord* args = event->args;
-    Vec pos;
-    s32 id = evtGetValue(event, args[0]);
-    pos.x = evtGetFloat(event, args[1]);
-    pos.y = evtGetFloat(event, args[2]);
-    pos.z = evtGetFloat(event, args[3]);
-    psndSFX_pos(id, &pos);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_sfx_dist) {
-    EvtWord* args = event->args;
-    s32 id = evtGetValue(event, args[0]);
-    psndSFX_dist(id, evtGetValue(event, args[1]));
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_envon) {
-    EvtWord* args = event->args;
-    ((PsndENVOnS32S32Fn)psndENVOn)(args[0], args[1]);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_envon_f) {
-    EvtWord* args = event->args;
-    s32 flags = args[0];
-    const char* name = (const char*)args[1];
-    s32 fadetime = evtGetValue(event, args[2]);
-    psndENVOn_f_d(flags, name, fadetime, 0);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_envoff) {
-    psndENVOff(event->args[0]);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_envoff_f) {
-    EvtWord* args = event->args;
-    s32 a = args[0];
-    s32 t = evtGetValue(event, args[1]);
-    psndENVOff_f_d(a, t, 0);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_env_lpf) {
-    EvtWord* args = event->args;
-    s32 a = args[0];
-    psndENV_LPF(a, evtGetValue(event, args[1]));
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_set_rev_mode) {
-    psndSetReverb(event->args[0]);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_snd_sfx_all_stop) {
-    psndSFXAllOff();
-    return EVT_RETURN_DONE;
-}
-
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 /* The demo's partner motion code: an older arrangement of the retail functions below (other order, fewer
    helpers), kept as its own copy. */
 static inline u32 partyGetFrontAttr(PartyEntry* party, f32 dir);
 static inline u32 partyGetFrontAttrFar(PartyEntry* party);
-s32 getFrontFloor(PartyEntry* party, Vec* out, f32 dir);
+static s32 getFrontFloor(PartyEntry* party, Vec* out, f32 dir);
 
-void party_force_reset_outofscreen(PartyEntry* party);
+static void party_force_reset_outofscreen(PartyEntry* party);
 
 /* The demo keeps the footstep helpers here, not in party_move.c. */
-void partyPlaySfxFootstep(PartyEntry* party, s32 arg) {
+void partyWalkSe(PartyEntry* party, s32 arg) {
     s32 a;
     s32 b;
 
@@ -347,13 +116,13 @@ void partyPlaySfxFootstep(PartyEntry* party, s32 arg) {
     }
 }
 
-void partyChgWalkPose(PartyEntry* party, f32 spd) {
+void partyMoveAnime(PartyEntry* party, f32 spd) {
     if (spd >= 1.25f) {
         partyChgPoseId(party, 3);
-        partyPlaySfxFootstep(party, 1);
+        partyWalkSe(party, 1);
     } else {
         partyChgPoseId(party, 2);
-        partyPlaySfxFootstep(party, 0);
+        partyWalkSe(party, 0);
     }
 }
 
@@ -550,7 +319,7 @@ found:
         partyGetReadId2(id, &t);
         if (!(party->flags & PARTY_FLAG_DISABLE_FLOORS)) {
             party->flags &= ~PARTY_FLAG_IN_SHALLOW_WATER;
-            hit = partySearchGround(party, &py, &d3, 10.0f, 0.0f);
+            hit = _partySearchGround(party, &py, &d3, 10.0f, 0.0f);
             if (hit && (hitGetAttr(hit) & 0x200)) {
                 hit = NULL;
                 if (!party->splashTimer) {
@@ -589,7 +358,7 @@ found:
         }
     }
     if (party->moveSpeed) {
-        partyChgWalkPose(party, party->moveSpeed);
+        partyMoveAnime(party, party->moveSpeed);
     } else if (!(fm->flags & 4)) {
         partyChgMot(party, 0);
     }
@@ -687,7 +456,7 @@ found:
         party->hitobjHead = hit;
     }
     party->flags &= ~PARTY_FLAG_IN_SHALLOW_WATER;
-    hit = partySearchGround(party, &v.y, &d3, 10.0f, 10.0f);
+    hit = _partySearchGround(party, &v.y, &d3, 10.0f, 10.0f);
     if (hit) {
         attr = hitGetAttr(hit);
         if (attr & 0x200) {
@@ -719,7 +488,7 @@ found:
     party_force_reset_outofscreen(party);
 }
 
-s32 getFrontFloor(PartyEntry* party, Vec* out, f32 dir) {
+static s32 getFrontFloor(PartyEntry* party, Vec* out, f32 dir) {
     f32 s2, c2;
     HitCheckQuery q2;
     HitCheckQuery q;
@@ -822,7 +591,7 @@ static inline void partyDownDirY(HitCheckQuery* q) {
     q->targetDir = (Vec){0.0f, -1.0f, 0.0f};
 }
 
-void party_force_reset_outofscreen(PartyEntry* party) {
+static void party_force_reset_outofscreen(PartyEntry* party) {
     MarioWork* m2;
     s32 i;
     s32 margin;
@@ -1043,7 +812,7 @@ void party_motion_jump(PartyEntry* party) {
                 break;
             }
             if (party->velY <= 0.0f) {
-                hit = partySearchGround(party, &gy, &d, __fabsf(party->velY), 0.0f);
+                hit = _partySearchGround(party, &gy, &d, __fabsf(party->velY), 0.0f);
                 if (hit && (hitGetAttr(hit) & 0x200)) {
                     if (!party->splashTimer) {
                         party->trigFlags |= PARTY_TRIG_FLAG_SPLASH;
@@ -1121,7 +890,7 @@ void party_motion_jump2(PartyEntry* party) {
             party->position.x = pos.x;
             party->position.z = pos.z;
             if (party->velY <= 0.0f) {
-                hit = partySearchGround(party, &pos.y, &d, __fabsf(party->velY), 0.0f);
+                hit = _partySearchGround(party, &pos.y, &d, __fabsf(party->velY), 0.0f);
                 if (hit && (hitGetAttr(hit) & 0x200)) {
                     if (!party->splashTimer) {
                         party->trigFlags |= PARTY_TRIG_FLAG_SPLASH;
@@ -1255,7 +1024,7 @@ void party_motion_homing_fly(PartyEntry* party) {
             continue;
         }
         party->flags &= ~PARTY_FLAG_IN_SHALLOW_WATER;
-        hit = partySearchGround(party, &py, &dd, 100.0f, 100.0f);
+        hit = _partySearchGround(party, &py, &dd, 100.0f, 100.0f);
         if (hit && (hitGetAttr(hit) & 0x200)) {
             hit = NULL;
         }
@@ -1277,18 +1046,18 @@ void party_motion_homing_fly(PartyEntry* party) {
         }
     }
     if (party->moveSpeed) {
-        partyChgWalkPose(party, party->moveSpeed);
+        partyMoveAnime(party, party->moveSpeed);
     } else {
         partyChgMot(party, 0);
     }
-    if (upstairs_count > 10) {
+    if (touch_wall_ct > 10) {
         dir = angleABf(party->position.x, party->position.z, mario->position.x, mario->position.z);
     }
     if (near) {
         m2 = party->playerPtr;
         partyGetAppearPos3(party, &ap);
         dir = angleABf(party->position.x, party->position.z, ap.x, ap.z);
-        hit = partySearchGround(party, &ap.y, &dd, 10.0f, 0.0f);
+        hit = _partySearchGround(party, &ap.y, &dd, 10.0f, 0.0f);
         if (hit && (hitGetAttr(hit) & 0x200)) {
             hit = NULL;
         }
@@ -1327,7 +1096,7 @@ void party_motion_homing_fly(PartyEntry* party) {
                 if (py > -2000.0f) {
                     party->position.y += 0.05f * ((py + party->height) - party->position.y);
                 } else {
-                    upstairs_count++;
+                    touch_wall_ct++;
                     if (partyGetTargetDistY(id, party->position.y) >= 1.0f &&
                         __fabsf(mario->position.y - party->position.y) >= 10.0f) {
                         party->position.y = party->position.y + 0.1f * ((10.0f + mario->position.y) - party->position.y);
@@ -1339,7 +1108,7 @@ void party_motion_homing_fly(PartyEntry* party) {
             }
         }
     } else {
-        upstairs_count = 0;
+        touch_wall_ct = 0;
         if (party->moveSpeed) {
             v.x = party->position.x;
             v.z = party->position.z;
@@ -1367,7 +1136,7 @@ s32 party_motion_fall(PartyEntry* party) {
     }
     hit = NULL;
     if (!(party->flags & PARTY_FLAG_FORCE_FALL)) {
-        hit = partySearchGround(party, &gy, &depth, 10.0f, __fabsf(party->velY));
+        hit = _partySearchGround(party, &gy, &depth, 10.0f, __fabsf(party->velY));
     }
     if (hit && (hitGetAttr(hit) & 0x200)) {
         hit = NULL;
@@ -1576,7 +1345,7 @@ void party_motion_behind_mario(PartyEntry* party) {
         }
         party->moveSpeed = spd;
         partyMoveCheckWall(party);
-        partyChgWalkPose(party, party->moveSpeed);
+        partyMoveAnime(party, party->moveSpeed);
         if (party->hitobjFront) {
             x = party->position.x;
             z = party->position.z;
@@ -1632,7 +1401,7 @@ void party_motion_behind_mario(PartyEntry* party) {
                 return;
             }
         }
-        hit = partySearchGround(party, &gy, &dist, 10.0f, 0.0f);
+        hit = _partySearchGround(party, &gy, &dist, 10.0f, 0.0f);
         if (hit && (hitGetAttr(hit) & 0x200)) {
             hit = NULL;
             if (!party->splashTimer) {
@@ -1743,8 +1512,8 @@ void party_motion_behind_mario_continue(PartyEntry* party) {
         }
         party->moveSpeed = spd;
         partyMoveCheckWall(party);
-        partyChgWalkPose(party, party->moveSpeed);
-        hit = partySearchGround(party, &gy, &sp, 10.0f, 0.0f);
+        partyMoveAnime(party, party->moveSpeed);
+        hit = _partySearchGround(party, &gy, &sp, 10.0f, 0.0f);
         if (hit && (hitGetAttr(hit) & 0x200)) {
             hit = NULL;
             if (!party->splashTimer) {
@@ -1879,7 +1648,7 @@ void party_motion_behind_mario_fly(PartyEntry* party) {
         party->position.x = v.x;
         party->position.z = v.z;
         party->position.y += 0.05f * (ty - party->position.y);
-        partyChgWalkPose(party, party->moveSpeed);
+        partyMoveAnime(party, party->moveSpeed);
     } else {
         party->moveFrames = 0;
         partyChgMoveMode(party, 1);
@@ -1899,7 +1668,7 @@ void party_motion_behind_mario_fly(PartyEntry* party) {
         party->flags2 &= ~PARTY_DISP_FLAG_DIR_LOCK;
         party->trigFlags &= ~PARTY_TRIG_FLAG_SMALL_HOSEI;
     }
-    hit = partySearchGround(party, &gy, &depth, 100.0f, 100.0f);
+    hit = _partySearchGround(party, &gy, &depth, 100.0f, 100.0f);
     if (hit) {
         if (hitGetAttr(hit) & 0x200) {
             hit = NULL;
@@ -1977,8 +1746,8 @@ void party_motion_beside_mario(PartyEntry* party) {
         }
         party->moveSpeed = spd;
         partyMoveCheckWall(party);
-        partyChgWalkPose(party, party->moveSpeed);
-        hit = partySearchGround(party, &y, &sp, 10.0f, 0.0f);
+        partyMoveAnime(party, party->moveSpeed);
+        hit = _partySearchGround(party, &y, &sp, 10.0f, 0.0f);
         if (hit && (hitGetAttr(hit) & 0x200)) {
             hit = NULL;
             if (!party->splashTimer) {
@@ -2164,7 +1933,7 @@ static void partyStayFlyY(PartyEntry* party) {
     if (party->flags & PARTY_FLAG_DISABLE_FLOORS) {
         return;
     }
-    if (partySearchGround(party, &gy, &depth, 10.0f, 0.0f)) {
+    if (_partySearchGround(party, &gy, &depth, 10.0f, 0.0f)) {
         party->position.y = 1.0f + gy;
     } else {
         party->position.y += 0.1f * ((10.0f + mario->position.y) - party->position.y);
@@ -2186,7 +1955,7 @@ static void partyStayChkGnd(PartyEntry* party) {
     }
     if (!(party->flags & PARTY_FLAG_DISABLE_FLOORS)) {
         party->flags &= ~PARTY_FLAG_IN_SHALLOW_WATER;
-        hit = partySearchGround(party, &g2.y, &depth2, 10.0f, 0.0f);
+        hit = _partySearchGround(party, &g2.y, &depth2, 10.0f, 0.0f);
         if (hit && (hitGetAttr(hit) & 0x200)) {
             hit = NULL;
             if (!party->splashTimer) {
@@ -2341,7 +2110,7 @@ void partyChgMotSlitFloor(PartyEntry* party) {
     party->flags |= PARTY_FLAG_MOT_SLIT_FLOOR;
 }
 
-BOOL party_slit(PartyEntry* party) {
+static BOOL party_slit(PartyEntry* party) {
     BOOL ret = TRUE;
     MarioWork* mario;
     f32 a;
@@ -2462,7 +2231,7 @@ BOOL party_slit(PartyEntry* party) {
     return ret;
 }
 
-BOOL party_roll(PartyEntry* party) {
+static BOOL party_roll(PartyEntry* party) {
     BOOL ret = TRUE;
     f32 d;
     f32 x;
@@ -2564,8 +2333,8 @@ BOOL party_roll(PartyEntry* party) {
     return ret;
 }
 #else
-void partyResetTouchWallCt(void) {
-    touch_wall_ct = 60.0f;
+void partyResetGndProbeDy(void) {
+    gnd_probe_dy = 60.0f;
 }
 
 void N_partyFollowCloseOn(PartyEntry* party) {
@@ -2577,7 +2346,7 @@ void N_partyFollowCloseOff(PartyEntry* party) {
 }
 
 static inline HitEntry* partyBehindGround(PartyEntry* party) {
-    HitEntry* hit = partySearchGround(party, 10.0f, 0.0f);
+    HitEntry* hit = _partySearchGround(party, 10.0f, 0.0f);
     if (hit && (hitGetAttr(hit) & 0x200)) {
         hit = NULL;
         if (!party->splashTimer) {
@@ -2596,9 +2365,9 @@ static f32 partyGetDirGndY(Vec u, f32 md);
 static u32 partyGetFrontAttrFar(PartyEntry* party);
 static void partyGorFix(PartyEntry* party);
 static void partyPoseA2(PartyEntry* party);
-s32 getFrontFloor(PartyEntry* party, Vec* out, f32 dir);
+static s32 getFrontFloor(PartyEntry* party, Vec* out, f32 dir);
 
-void party_force_reset_outofscreen(PartyEntry* party);
+static void party_force_reset_outofscreen(PartyEntry* party);
 
 void party_motion_stay(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
@@ -2854,7 +2623,7 @@ void partyWalkChkGnd(PartyEntry* party) {
         return;
     }
     party->flags &= ~PARTY_FLAG_IN_SHALLOW_WATER;
-    hit = partySearchGround(party, 15.0f, -15.0f);
+    hit = _partySearchGround(party, 15.0f, -15.0f);
     if (hit) {
         attr = hitGetAttr(hit);
         if (attr & 0x200) {
@@ -2950,7 +2719,7 @@ void partyFlyAdjustY(PartyEntry* party) {
         return;
     }
     partyFlyHeadCheck(party);
-    hit = partySearchGround(party, 10.0f, 0.0f);
+    hit = _partySearchGround(party, 10.0f, 0.0f);
     if (hit) {
         attr = hitGetAttr(hit);
         if (attr & 0x800) {
@@ -3023,7 +2792,7 @@ void partyFlyAdjustY(PartyEntry* party) {
     if (party->flags & PARTY_FLAG_DISABLE_FLOORS) {
         return;
     }
-    hit = partySearchGround(party, 10.0f, 0.0f);
+    hit = _partySearchGround(party, 10.0f, 0.0f);
     if (hit) {
         attr = hitGetAttr(hit);
         if (attr & 0x800) {
@@ -3331,7 +3100,7 @@ found:
         partyGetReadId2(id, &t);
         if (!(party->flags & PARTY_FLAG_DISABLE_FLOORS)) {
             party->flags &= ~PARTY_FLAG_IN_SHALLOW_WATER;
-            hit = partySearchGround(party, 10.0f, 0.0f);
+            hit = _partySearchGround(party, 10.0f, 0.0f);
             if (hit && (hitGetAttr(hit) & 0x200)) {
                 hit = NULL;
                 if (!party->splashTimer) {
@@ -3395,7 +3164,7 @@ found:
         }
     }
     if (party->moveSpeed) {
-        partyChgWalkPose(party, party->moveSpeed);
+        partyMoveAnime(party, party->moveSpeed);
     } else if (!(fm->flags & 4)) {
         partyChgMot(party, 0);
     }
@@ -3496,7 +3265,7 @@ found:
         party->hitobjHead = hit;
     }
     party->flags &= ~PARTY_FLAG_IN_SHALLOW_WATER;
-    hit = partySearchGround(party, 10.0f, 10.0f);
+    hit = _partySearchGround(party, 10.0f, 10.0f);
     v.y = party->groundY;
     if (hit) {
         attr = hitGetAttr(hit);
@@ -3735,7 +3504,7 @@ void party_motion_homing_fly(PartyEntry* party) {
             continue;
         }
         party->flags &= ~PARTY_FLAG_IN_SHALLOW_WATER;
-        hit = partySearchGround(party, 100.0f, 100.0f);
+        hit = _partySearchGround(party, 100.0f, 100.0f);
         if (hit && (hitGetAttr(hit) & 0x200)) {
             hit = NULL;
         }
@@ -3759,7 +3528,7 @@ void party_motion_homing_fly(PartyEntry* party) {
         }
     }
     if (party->moveSpeed) {
-        partyChgWalkPose(party, party->moveSpeed);
+        partyMoveAnime(party, party->moveSpeed);
     } else {
         partyChgMot(party, 0);
     }
@@ -3770,7 +3539,7 @@ void party_motion_homing_fly(PartyEntry* party) {
         m2 = party->playerPtr;
         partyGetAppearPos3(party, &ap);
         dir = angleABf(party->position.x, party->position.z, ap.x, ap.z);
-        hit = partySearchGround(party, 10.0f, 0.0f);
+        hit = _partySearchGround(party, 10.0f, 0.0f);
         ap.y = party->groundY;
         if (hit && (hitGetAttr(hit) & 0x200)) {
             hit = NULL;
@@ -3861,7 +3630,7 @@ void party_motion_homing_fly(PartyEntry* party) {
     }
 #endif
     party->flags &= ~PARTY_FLAG_IN_SHALLOW_WATER;
-    hit = partySearchGround(party, 10.0f, 10.0f);
+    hit = _partySearchGround(party, 10.0f, 10.0f);
     if (hit) {
         attr = hitGetAttr(hit);
         if (attr & 0x800) {
@@ -3944,7 +3713,7 @@ void party_motion_behind_mario(PartyEntry* party) {
     {
         f32 py = ty;
         f32 nz, ny, nx, dd, hz, hy, hx;
-        py += touch_wall_ct;
+        py += gnd_probe_dy;
         dd = 1000.0f;
         hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dd, &nx, &ny, &nz, x, py, z, 0.0f, -1.0f, 0.0f);
         if (!hit) {
@@ -3969,7 +3738,7 @@ void party_motion_behind_mario(PartyEntry* party) {
         distABf(party->position.x, party->position.z, x, z);
         partyForceSetSpd(party, (party->trigFlags & PARTY_TRIG_FLAG_HOME_DIR_SET) ? 3.6f : 2.0f);
         partyMoveCheckWall(party);
-        partyChgWalkPose(party, party->moveSpeed);
+        partyMoveAnime(party, party->moveSpeed);
         if (party->hitobjFront) {
             x = party->position.x;
             z = party->position.z;
@@ -3979,7 +3748,7 @@ void party_motion_behind_mario(PartyEntry* party) {
                 f32 py = ty;
                 f32 GG;
                 f32 nz, ny, nx, dd, hz, hy, hx;
-                py += touch_wall_ct;
+                py += gnd_probe_dy;
                 dd = 1000.0f;
                 hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dd, &nx, &ny, &nz, x, py, z, 0.0f, -1.0f, 0.0f);
                 if (!hit) {
@@ -4006,7 +3775,7 @@ void party_motion_behind_mario(PartyEntry* party) {
                 f32 py = ty;
                 f32 GG;
                 f32 nz, ny, nx, dd, hz, hy, hx;
-                py += touch_wall_ct;
+                py += gnd_probe_dy;
                 dd = 1000.0f;
                 hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dd, &nx, &ny, &nz, x, py, z, 0.0f, -1.0f, 0.0f);
                 if (!hit) {
@@ -4119,7 +3888,7 @@ void party_motion_behind_mario_continue(PartyEntry* party) {
     {
         f32 py = y;
         f32 nz, ny, nx, dist, hz, hy, hx;
-        py += touch_wall_ct;
+        py += gnd_probe_dy;
         dist = 1000.0f;
         hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, py, z, 0.0f, -1.0f, 0.0f);
         if (!hit) {
@@ -4150,7 +3919,7 @@ void party_motion_behind_mario_continue(PartyEntry* party) {
         }
         partyForceSetSpd(party, sp);
         partyMoveCheckWall(party);
-        partyChgWalkPose(party, party->moveSpeed);
+        partyMoveAnime(party, party->moveSpeed);
         hit = partyBehindGround(party);
         party->hitobjStandOn = hit;
         if (!hit) {
@@ -4248,7 +4017,7 @@ void party_motion_behind_mario_fly(PartyEntry* party) {
         party->position.x = pos.x;
         party->position.z = pos.z;
         party->position.y += 0.05f * (party->moveTarget.y - party->position.y);
-        partyChgWalkPose(party, party->moveSpeed);
+        partyMoveAnime(party, party->moveSpeed);
         return;
     }
     party->moveFrames = 0;
@@ -4280,7 +4049,7 @@ void party_motion_behind_mario_fly(PartyEntry* party) {
         party->flags2 &= ~PARTY_DISP_FLAG_DIR_LOCK;
         party->trigFlags &= ~PARTY_TRIG_FLAG_SMALL_HOSEI;
     }
-    hit = partySearchGround(party, 100.0f, 100.0f);
+    hit = _partySearchGround(party, 100.0f, 100.0f);
     if (hit) {
         if (hitGetAttr(hit) & 0x200) {
             hit = NULL;
@@ -4356,8 +4125,8 @@ void party_motion_beside_mario(PartyEntry* party) {
         }
         partyForceSetSpd(party, sp);
         partyMoveCheckWall(party);
-        partyChgWalkPose(party, party->moveSpeed);
-        hit = partySearchGround(party, 10.0f, 0.0f);
+        partyMoveAnime(party, party->moveSpeed);
+        hit = _partySearchGround(party, 10.0f, 0.0f);
         if (hit && (hitGetAttr(hit) & 0x200)) {
             hit = NULL;
             if (!party->splashTimer) {
@@ -4582,7 +4351,7 @@ void party_motion_jump(PartyEntry* party) {
             if (party->velY <= 0.0f) {
                 party->flags &= ~PARTY_FLAG_IS_JUMPING;
                 party->flags |= PARTY_FLAG_IS_FALLING;
-                hit = partySearchGround(party, __fabsf(party->velY), 0.0f);
+                hit = _partySearchGround(party, __fabsf(party->velY), 0.0f);
                 if (hit && (hitGetAttr(hit) & 0x200)) {
                     if (!party->splashTimer) {
                         party->trigFlags |= PARTY_TRIG_FLAG_SPLASH;
@@ -4666,7 +4435,7 @@ void party_motion_jump2(PartyEntry* party) {
             party->position.x = pos.x;
             party->position.z = pos.z;
             if (party->velY <= 0.0f) {
-                hit = partySearchGround(party, __fabsf(party->velY), 0.0f);
+                hit = _partySearchGround(party, __fabsf(party->velY), 0.0f);
                 pos.y = party->groundY;
                 if (hit && (hitGetAttr(hit) & 0x200)) {
                     if (!party->splashTimer) {
@@ -4717,7 +4486,7 @@ s32 party_motion_fall(PartyEntry* party) {
     }
     hit = NULL;
     if (!(party->flags & PARTY_FLAG_FORCE_FALL)) {
-        hit = partySearchGround(party, 10.0f, __fabsf(party->velY));
+        hit = _partySearchGround(party, 10.0f, __fabsf(party->velY));
     }
     if (hit && (hitGetAttr(hit) & 0x200)) {
         hit = NULL;
@@ -5001,7 +4770,7 @@ void partySlitReset(PartyEntry* party) {
 }
 
 #endif
-BOOL party_slit(PartyEntry* party) {
+static BOOL party_slit(PartyEntry* party) {
     BOOL ret = TRUE;
     MarioWork* mario;
     f32 a;
@@ -5144,7 +4913,7 @@ BOOL party_slit(PartyEntry* party) {
     return ret;
 }
 
-BOOL party_roll(PartyEntry* party) {
+static BOOL party_roll(PartyEntry* party) {
     BOOL ret = TRUE;
     f32 d;
     f32 x;
@@ -5274,13 +5043,13 @@ static f32 partyHomingOff(PartyEntry* party) {
     return off;
 }
 
-s32 getFrontFloor(PartyEntry* party, Vec* out, f32 dir) {
+static s32 getFrontFloor(PartyEntry* party, Vec* out, f32 dir) {
     f32 s2, c2;
     HitCheckQuery q2;
     HitCheckQuery q;
     f32 c, s;
     f32 r;
-    f32 wallct;
+    f32 probeDy;
     f32 y;
     f32 rf;
     s32 i;
@@ -5288,7 +5057,7 @@ s32 getFrontFloor(PartyEntry* party, Vec* out, f32 dir) {
 
     r = 2.0f * party->width / 3.0f;
     q.targetDir = (Vec){0.0f, 1.0f, 0.0f};
-    wallct = touch_wall_ct;
+    probeDy = gnd_probe_dy;
     sincosf(&s, &c, dir);
     for (i = 0; i < 3; i++) {
         q.targetPos.x = party->position.x + (f32)i * (s * r);
@@ -5305,7 +5074,7 @@ s32 getFrontFloor(PartyEntry* party, Vec* out, f32 dir) {
     y = -2000.0f;
 found:
     if (y > -2000.0f) {
-        f32 t = party->position.y + wallct;
+        f32 t = party->position.y + probeDy;
         f32 u = y - 2.0f;
         if (t < u) {
             q2.targetPos.y = t;
@@ -5313,7 +5082,7 @@ found:
             q2.targetPos.y = u;
         }
     } else {
-        q2.targetPos.y = party->position.y + wallct;
+        q2.targetPos.y = party->position.y + probeDy;
     }
     r = 0.75f * party->width;
     sincosf(&s2, &c2, dir);
@@ -5348,7 +5117,7 @@ static f32 partyGetDirGndY(Vec u, f32 md) {
     f32 s2, c2;
     f32 gy;
     f32 a;
-    gy = touch_wall_ct;
+    gy = gnd_probe_dy;
     sincosf(&s2, &c2, md);
     q2.targetPos = u;
     q2.targetPos.x = s2 * k + q2.targetPos.x;
@@ -5371,7 +5140,7 @@ static f32 partyGetGndY(f32 x, f32 y, f32 z) {
     f32 r;
     f32 hx, hy, hz, dist, nx, ny, nz;
     HitEntry* hit;
-    y += touch_wall_ct;
+    y += gnd_probe_dy;
     dist = 1000.0f;
     hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y, z, 0.0f, -1.0f, 0.0f);
     if (!hit) {
@@ -5416,7 +5185,7 @@ static inline void partyDownDirY(HitCheckQuery* q) {
     q->targetDir = (Vec){0.0f, -1.0f, 0.0f};
 }
 
-void party_force_reset_outofscreen(PartyEntry* party) {
+static void party_force_reset_outofscreen(PartyEntry* party) {
     MarioWork* m2;
     s32 i;
     s32 margin;

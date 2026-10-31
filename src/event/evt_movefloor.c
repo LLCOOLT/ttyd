@@ -12,7 +12,6 @@
 #include "evt/evt_sub.h"
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "memory.h"
 #include "pmario_sound.h"
 #include <string.h>
@@ -112,7 +111,7 @@ static f32 sintbl[450] = {
         (w)->yoff = 0.0f;                                                                                \
     }
 
-USER_FUNC(evt_moving_floor_alloc) {
+static USER_FUNC(evt_moving_floor_alloc) {
     EvtWord* args = event->args;
     MovingFloor* w = (MovingFloor*)_mapAlloc(sizeof(MovingFloor));
     memset(w, 0, sizeof(MovingFloor));
@@ -194,7 +193,7 @@ USER_FUNC(evt_moving_floor_alloc) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_moving_floor_free) {
+static USER_FUNC(evt_moving_floor_free) {
     EvtWord* args = event->args;
     MovingFloor* w = GETW();
     if (w == NULL) {
@@ -205,7 +204,7 @@ USER_FUNC(evt_moving_floor_free) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_moving_floor_init) {
+static USER_FUNC(evt_moving_floor_init) {
     MovingFloor* w = GETW();
     s32 dir;
     f32 t;
@@ -351,7 +350,7 @@ USER_FUNC(evt_moving_floor_init) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_moving_floor_main) {
+static USER_FUNC(evt_moving_floor_main) {
     EvtWord* args = event->args;
     MovingFloor* w = GETW();
     s32 us = (((u32)event->lifetime - (u32)w->start) * 8) / (OS_TIMER_CLOCK / 125000);
@@ -370,13 +369,13 @@ USER_FUNC(evt_moving_floor_main) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_moving_floor_main2) {
+static USER_FUNC(evt_moving_floor_main2) {
     MovingFloor* w = GETW();
     w->start = event->lifetime;
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(moving_floor_get_end) {
+static USER_FUNC(moving_floor_get_end) {
     EvtWord* args = event->args;
     MovingFloor* w = GETW();
     s32 a = (s32)w->cur;
@@ -389,7 +388,7 @@ USER_FUNC(moving_floor_get_end) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(moving_floor_get_pause) {
+static USER_FUNC(moving_floor_get_pause) {
     EvtWord* args = event->args;
     MovingFloor* w = GETW();
     if (w->flags & 2) {
@@ -400,21 +399,21 @@ USER_FUNC(moving_floor_get_pause) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(moving_floor_get_kind) {
+static USER_FUNC(moving_floor_get_kind) {
     EvtWord* args = event->args;
     MovingFloor* w = GETW();
     evtSetValue(event, args[1], w->kind);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(moving_floor_get_mode) {
+static USER_FUNC(moving_floor_get_mode) {
     EvtWord* args = event->args;
     MovingFloor* w = GETW();
     evtSetValue(event, args[1], w->mode);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(moving_floor_update_turn) {
+static USER_FUNC(moving_floor_update_turn) {
     EvtWord* args = event->args;
     MovingFloor* w = GETW();
     w->angle += w->turn;
@@ -428,7 +427,7 @@ USER_FUNC(moving_floor_update_turn) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(moving_floor_getf_pos) {
+static USER_FUNC(moving_floor_getf_pos) {
     EvtWord* args = event->args;
     MovingFloor* w = GETW();
     w->prevYoff = w->yoff;
@@ -439,7 +438,7 @@ USER_FUNC(moving_floor_getf_pos) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(moving_floor_getf_now_bpoint) {
+static USER_FUNC(moving_floor_getf_now_bpoint) {
     EvtWord* args = event->args;
     MovingFloor* w = GETW();
     evtSetFloat(event, args[1], w->pos3[0] - w->prev[0]);
@@ -448,7 +447,7 @@ USER_FUNC(moving_floor_getf_now_bpoint) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(moving_floor_get_stmsec) {
+static USER_FUNC(moving_floor_get_stmsec) {
     EvtWord* args = event->args;
     MovingFloor* w = GETW();
     if (w->flags & 1) {
@@ -463,7 +462,7 @@ USER_FUNC(moving_floor_get_stmsec) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(moving_floor_getf_xz_scale) {
+static USER_FUNC(moving_floor_getf_xz_scale) {
     EvtWord* args = event->args;
     MovingFloor* w = GETW();
     f32 v = evtGetFloat(event, (s32)(w->pos3[1] + w->yoff));
@@ -471,7 +470,7 @@ USER_FUNC(moving_floor_getf_xz_scale) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(moving_floor_reverse) {
+static USER_FUNC(moving_floor_reverse) {
     MovingFloor* w = GETW();
     f32 e;
     if (w->speed >= 0.0f) {
@@ -484,7 +483,7 @@ USER_FUNC(moving_floor_reverse) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(moving_floor_set_se) {
+static USER_FUNC(moving_floor_set_se) {
     EvtWord* args = event->args;
     MovingFloor* w = GETW();
     char* name = (char*)evtGetValue(event, args[1]);
@@ -510,7 +509,7 @@ USER_FUNC(moving_floor_set_se) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(moving_floor_stop_se) {
+static USER_FUNC(moving_floor_stop_se) {
     MovingFloor* w = GETW();
     if (w->seHalt == 0 && w->seId) {
         psndSFXOff(w->seId);
@@ -519,7 +518,7 @@ USER_FUNC(moving_floor_stop_se) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(moving_floor_halt_se) {
+static USER_FUNC(moving_floor_halt_se) {
     MovingFloor* w = GETW();
     w->seHalt = 1;
     return EVT_RETURN_DONE;

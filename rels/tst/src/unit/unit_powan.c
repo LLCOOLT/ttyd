@@ -123,14 +123,14 @@ static PoseTableEntry pose_table_kinopio[] = {
     {31, "KNP_S_1"},
     {39, "KNP_O_1"},
     {42, "KNP_R_1"},
-    {69, "KNP_S_1"},
+    {BTL_POSE_STAY_DEFAULT, "KNP_S_1"},
 };
 
 static PoseTableEntry pose_table_gazigazi[] = {
     {28, "GAZ_S_1"},
     {31, "GAZ_A_1"},
     {39, "GAZ_A_1"},
-    {69, "GAZ_S_1"},
+    {BTL_POSE_STAY_DEFAULT, "GAZ_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -170,7 +170,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -221,7 +221,7 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
     END_IF
-    CALL(btlevtcmd_SetEventHit, BTL_UNIT_SELF, PTR(hit_event))
+    CALL(btlevtcmd_SetCounterAcCallBack, BTL_UNIT_SELF, PTR(hit_event))
     SET_VALUE(LW(12), PTR(&weapon_powan_attack))
     CALL(btlevtcmd_GetEnemyBelong, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SELF, LW(0), LW(12))
@@ -229,7 +229,7 @@ static EVT_BEGIN(attack_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
@@ -326,7 +326,7 @@ static BattleUnitSetup entry_powan = {
 // Post-battle events: each respawns the unit with the next counter value (unit work 0) and arms the next one.
 static EVT_BEGIN(post_battle_event_2)
     SET_VALUE(LW(5), 2)
-    CALL_CHILD(PTR(respawn_event))
+    CALL_CHILD(respawn_event)
     CALL(powan_set_post_battle_event, PTR(post_battle_event_3))
     CALL(powan_set_post_battle_mode, 1)
     RETURN
@@ -334,7 +334,7 @@ EVT_END()
 
 static EVT_BEGIN(post_battle_event_3)
     SET_VALUE(LW(5), 3)
-    CALL_CHILD(PTR(respawn_event))
+    CALL_CHILD(respawn_event)
     CALL(powan_set_post_battle_event, PTR(post_battle_event_4))
     CALL(powan_set_post_battle_mode, 1)
     RETURN
@@ -342,7 +342,7 @@ EVT_END()
 
 static EVT_BEGIN(post_battle_event_4)
     SET_VALUE(LW(5), 4)
-    CALL_CHILD(PTR(respawn_event))
+    CALL_CHILD(respawn_event)
     CALL(powan_set_post_battle_event, PTR(post_battle_event_5))
     CALL(powan_set_post_battle_mode, 1)
     RETURN
@@ -350,7 +350,7 @@ EVT_END()
 
 static EVT_BEGIN(post_battle_event_5)
     SET_VALUE(LW(5), 5)
-    CALL_CHILD(PTR(respawn_event))
+    CALL_CHILD(respawn_event)
     CALL(powan_set_post_battle_event, 0)
     CALL(powan_set_post_battle_mode, 1)
     RETURN
@@ -473,6 +473,8 @@ static USER_FUNC(powan_rider_follow) {
         z = (*pose->worldPositions)[idx].z;
     }
     BtlUnit_SetPartsPos(part, x, y, z);
+#if VERSION >= VERSION_JP // the demos do not print the position
     sysDebugReport("unit_powan.c", 275, "x:%f y:%f z:%f\n", x, y, z);
+#endif
     return EVT_RETURN_DONE;
 }

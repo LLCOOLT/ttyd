@@ -19,7 +19,6 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "gon.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -138,11 +137,7 @@ static EVT_BEGIN(item_evt)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("gon07treasure"), LW(0), LW(1), LW(2))
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("k_slit"), ITEM_BLACK_KEY_0x22, LW(0), LW(1), LW(2), 15, -1, 0)
-#else
-    CALL(evt_item_entry, STRING("k_slit"), ITEM_BLACK_KEY_0x22, LW(0), LW(1), LW(2), 16, -1, 0)
-#endif
+    CALL(evt_item_entry, STRING("k_slit"), ITEM_BLACK_KEY_0x22, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("k_slit"), ITEM_FLAG_NO_TOUCH)
     CALL(evt_mobj_wait_animation_end, STRING("gon07treasure"))
     CALL(evt_item_get_item, STRING("k_slit"))
@@ -201,7 +196,7 @@ static EVT_BEGIN(item_evt)
             CALL(evt_sub_countdown_get_status, LW(0))
             IF_INT_EQUAL(LW(0), 1)
                 SET_VALUE(LW(0), STRING("w_bero"))
-                CALL_CHILD(PTR(bero_case_switch_off))
+                CALL_CHILD(bero_case_switch_off)
                 CALL(evt_seq_set_seq, SEQ_GAME_OVER, 0, 0)
             END_IF
             WAIT_FRAMES(1)
@@ -257,10 +252,10 @@ static EVT_BEGIN(bomb_wall_evt)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana_before"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ana_after"), MAPOBJ_FLAG_HIDE)
     END_IF
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(evt_hitobj_onoff, STRING("san"), 1, 0)
     SET_VALUE(LW(0), STRING("e_bero"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
 #endif
     CALL(evt_img_release, STRING("img"))
     CALL(evt_mapobj_clear_offscreen, 1, STRING("S_ana"))
@@ -271,10 +266,10 @@ static EVT_BEGIN(bomb_wall_evt)
     WAIT_MS(2000)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(evt_hitobj_onoff, STRING("san"), 1, 0)
     SET_VALUE(LW(0), STRING("e_bero"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
 #endif
     SET_VALUE(GSWF(GSWF_GON07_WALL_BOMBED), 1)
     CALL(evt_mario_key_onoff, 1)
@@ -285,7 +280,7 @@ EVT_END()
 EVT_BEGIN(gon_07_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_GON1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_GON1"))
     CALL(evt_snd_set_rev_mode, 2)
@@ -298,7 +293,7 @@ EVT_BEGIN(gon_07_init_evt)
     IF_INT_EQUAL(GSWF(GSWF_GON07_WALL_BOMBED), 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana_after"), MAPOBJ_FLAG_HIDE)
         SET_VALUE(LW(0), STRING("e_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_run_case_evt, CASE_COND_BOBBERY, 1, STRING("san"), 0, PTR(bomb_wall_evt), 0)
     ELSE
         CALL(evt_hitobj_onoff, STRING("san"), 1, 0)

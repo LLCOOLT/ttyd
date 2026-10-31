@@ -9,7 +9,7 @@
 #include "battle/battle_sub.h"
 #include "system.h"
 
-void _btlSamplingEnemy(BattleWorkWeaponTargets* d) {
+static void _btlSamplingEnemy(BattleWorkWeaponTargets* d) {
     BattleUnitKindPart* kp;
     BattleWorkTarget* tg4;
     s32 k;
@@ -119,7 +119,7 @@ void _btlSamplingEnemy(BattleWorkWeaponTargets* d) {
                         }
                     }
                     if (flags & TARGET_CLASS_NO_MARIO) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                         if (unit->currentKind == UNIT_MARIO) {
 #else
                         if (unit->currentKind == UNIT_MARIO || unit->currentKind == UNIT_SHELL_SHIELD) {
@@ -309,7 +309,7 @@ void _btlSamplingEnemy(BattleWorkWeaponTargets* d) {
                     }
                     if (d->propFlags & TARGET_PROP_HAMMERLIKE) {
                         if (part->attributes & PART_ATTR_HAMMERLIKE_CANNOT_TARGET) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                             {
                                 ok = FALSE;
                                 break;

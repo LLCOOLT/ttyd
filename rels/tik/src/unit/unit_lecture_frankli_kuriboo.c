@@ -22,7 +22,11 @@ static BattleDataEntry data_table[1];
 static BattleUnitKindPart parts[1];
 static EvtWord init_event[53];
 static EvtWord entry_event[29];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord phase_event[148];
+#else
 static EvtWord phase_event[160];
+#endif
 static EvtWord damage_event[10];
 static EvtWord wait_event[6];
 
@@ -117,7 +121,7 @@ static PoseTableEntry pose_table[] = {
     {28, "S_1"},
     {31, "D_2"},
     {39, "D_2"},
-    {69, "S_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -168,11 +172,15 @@ static EVT_BEGIN(phase_event)
             CALL(evt_btl_camera_set_mode, 0, 3)
             CALL(evt_btl_camera_set_moveto, 0, 71, 49, 213, 71, 35, 0, 30, 11)
             WAIT_FRAMES(30)
+#if VERSION >= VERSION_JP
             CALL(evt_msg_toge, 1, 0, 0, 0)
+#endif
             CALL(evt_msg_print, 2, STRING("mac_0_092_02"), 0, BTL_UNIT_SELF)
             CALL(evt_btl_camera_set_moveto, 0, 111, 85, 213, 111, 71, 0, 30, 11)
             WAIT_FRAMES(30)
+#if VERSION >= VERSION_JP
             CALL(evt_msg_toge, 1, 0, 0, 0)
+#endif
             CALL(evt_msg_print, 2, STRING("mac_0_092_03"), 0, BTL_UNIT_SELF)
             CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, -1)
             CALL(evt_btl_camera_set_mode, 0, 0)
@@ -198,7 +206,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 

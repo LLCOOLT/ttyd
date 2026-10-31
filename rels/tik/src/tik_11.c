@@ -19,11 +19,11 @@
 #include "evt/evt_msg.h"
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
+#include "party.h"
 #include "evt/evt_sub.h"
 #include "evt/evt_win.h"
 #include "evt/evt_window.h"
 #include "manager/winmgr.h"
-#include "party/party_motion.h"
 #include "pmario_sound.h"
 #include "tik.h"
 #include "version.h"
@@ -31,6 +31,7 @@
 #include "driver/casedrv.h"
 #include "driver/mapdrv.h"
 #include "evt/evt_pouch.h"
+#include "mario/mario.h"
 
 static s32 xlw[16];
 
@@ -52,7 +53,9 @@ static USER_FUNC(wariai_enzan_0f);
 static USER_FUNC(wariai_enzan_0);
 static USER_FUNC(wariai_enzan_1);
 
+#if VERSION >= VERSION_JP
 extern EvtWord powerdownya_face_left[];
+#endif
 extern EvtWord powerdownya_mario_level_rtn[];
 extern EvtWord powerdownya_party_lank_rtn[];
 extern EvtWord powerdownya_table_talk[];
@@ -223,6 +226,7 @@ static USER_FUNC(bgm_start_wait) {
     return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 
+#if VERSION >= VERSION_JP
 EVT_BEGIN(powerdownya_face_left)
     LOOP(0)
         CALL(evt_party_set_dir_pos, 0, -9, 0)
@@ -231,11 +235,16 @@ EVT_BEGIN(powerdownya_face_left)
     END_LOOP
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(powerdownya_mario_level_rtn)
     CALL(evt_pouch_get_coin, LW(0))
     IF_INT_LESS(LW(0), 39)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_msg_print, 0, STRING("powerdown_04"), 0, STRING("me"))
+#else
         CALL(evt_msg_print_add, 0, STRING("powerdown_04"))
+#endif
         RETURN
     END_IF
     CALL(evt_msg_continue)
@@ -279,7 +288,9 @@ EVT_BEGIN(powerdownya_mario_level_rtn)
     WAIT_MS(500)
     CALL(evt_win_coin_off, LW(12))
     CALL(enzan_lw_save)
+#if VERSION >= VERSION_JP
     SPAWN_EVENT_GET_ID(PTR(powerdownya_face_left), GW(1))
+#endif
     CALL(evt_snd_bgmoff_f, PSND_FADE_HOLD, 2000)
     CALL(evt_msg_print_add, 0, STRING("powerdown_11"))
     CALL(bgScrollControll, 0)
@@ -417,8 +428,10 @@ EVT_BEGIN(powerdownya_mario_level_rtn)
     CALL(evt_mario_set_pose, STRING("M_V_2"))
     WAIT_MS(1500)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
-    CALL(evt_mario_dispflag_onoff, 0, 4)
+    CALL(evt_mario_dispflag_onoff, 0, MARIO_DISP_FLAG_FRONT_POSE)
+#if VERSION >= VERSION_JP
     DELETE_EVENT(GW(1))
+#endif
     CALL(enzan_lw_load)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
@@ -437,11 +450,13 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
         CALL(evt_msg_print_add, 0, STRING("powerdown_04"))
         RETURN
     END_IF
+#if VERSION >= VERSION_JP
     CALL(evt_win_party_lankdown_chk, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(evt_msg_print_add, 0, STRING("powerdown_07"))
         RETURN
     END_IF
+#endif
     CALL(evt_msg_continue)
     CALL(evt_win_coin_on, 0, LW(12))
     LOOP(0)
@@ -505,13 +520,17 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
         END_IF
     END_LOOP
     WAIT_MS(500)
+#if VERSION >= VERSION_JP
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
     CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_POWERDOWN1"))
     CALL(bgm_start_wait)
+#endif
     CALL(evt_eff64, STRING("aaax"), STRING("lensflare_n64"), 0, -9, 49, 0, FLOAT(1.0f), -1, 0, 0, 0, 0, 0, 0)
     WAIT_MS(500)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("down_pira"), MAPOBJ_FLAG_HIDE)
+#if VERSION >= VERSION_JP
     SPAWN_EVENT_GET_ID(PTR(powerdownya_face_left), GW(1))
+#endif
     CALL(evt_msg_print, 0, STRING("powerdown_12"), 0, STRING("me"))
     BEGIN_INLINE_EVENT
         CALL(evt_sub_intpl_msec_init, 0, 255, 0, 1200)
@@ -568,23 +587,25 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_get_party, LW(0))
         SWITCH(LW(0))
-            CASE_EQUAL(1)
+            CASE_EQUAL(PARTY_MEMBER_GOOMBELLA)
             CALL(evt_party_set_pose, 0, STRING("PKR_I_1"))
-            CASE_EQUAL(2)
+            CASE_EQUAL(PARTY_MEMBER_KOOPS)
             CALL(evt_party_set_pose, 0, STRING("PNK_I_1"))
-            CASE_EQUAL(3)
+            CASE_EQUAL(PARTY_MEMBER_BOBBERY)
             CALL(evt_party_set_pose, 0, STRING("I_1"))
-            CASE_EQUAL(4)
+            CASE_EQUAL(PARTY_MEMBER_YOSHI)
             CALL(evt_party_set_pose, 0, STRING("PYS_I_1"))
-            CASE_EQUAL(5)
+            CASE_EQUAL(PARTY_MEMBER_FLURRIE)
             CALL(evt_party_set_pose, 0, STRING("PWD_I_1"))
-            CASE_EQUAL(6)
+            CASE_EQUAL(PARTY_MEMBER_VIVIAN)
             CALL(evt_party_set_pose, 0, STRING("PTR_I_1"))
-            CASE_EQUAL(7)
+            CASE_EQUAL(PARTY_MEMBER_MS_MOWZ)
             CALL(evt_party_set_pose, 0, STRING("PCH_I_1"))
         END_SWITCH
         WAIT_MS(500)
+#if VERSION >= VERSION_JP
         DELETE_EVENT(GW(1))
+#endif
         CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_DIR_LOCK, 1)
         CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
         CALL(effect_stardust, 4, LW(3), LW(4), LW(5), FLOAT(50.0f), FLOAT(50.0f), 14, 60)
@@ -606,23 +627,25 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
         CALL(evt_mario_goodbye_party, 0)
         CALL(evt_mario_hello_party, 0, LW(1))
         WAIT_MS(500)
+#if VERSION >= VERSION_JP
         CALL(evt_party_stop, 0)
         SPAWN_EVENT_GET_ID(PTR(powerdownya_face_left), GW(1))
+#endif
         CALL(evt_mario_get_party, LW(1))
         SWITCH(LW(1))
-            CASE_EQUAL(1)
+            CASE_EQUAL(PARTY_MEMBER_GOOMBELLA)
             CALL(evt_party_set_pose, 0, STRING("PKR_C_1"))
-            CASE_EQUAL(2)
+            CASE_EQUAL(PARTY_MEMBER_KOOPS)
             CALL(evt_party_set_pose, 0, STRING("PNK_C_1"))
-            CASE_EQUAL(3)
+            CASE_EQUAL(PARTY_MEMBER_BOBBERY)
             CALL(evt_party_set_pose, 0, STRING("C_1"))
-            CASE_EQUAL(4)
+            CASE_EQUAL(PARTY_MEMBER_YOSHI)
             CALL(evt_party_set_pose, 0, STRING("PYS_C_1"))
-            CASE_EQUAL(5)
+            CASE_EQUAL(PARTY_MEMBER_FLURRIE)
             CALL(evt_party_set_pose, 0, STRING("PWD_C_1"))
-            CASE_EQUAL(6)
+            CASE_EQUAL(PARTY_MEMBER_VIVIAN)
             CALL(evt_party_set_pose, 0, STRING("PTR_C_1"))
-            CASE_EQUAL(7)
+            CASE_EQUAL(PARTY_MEMBER_MS_MOWZ)
             CALL(evt_party_set_pose, 0, STRING("PCH_C_1"))
         END_SWITCH
         CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
@@ -641,19 +664,19 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
     CALL(evt_eff_softdelete, STRING("cccx"))
     CALL(evt_mario_get_party, LW(0))
     SWITCH(LW(0))
-        CASE_EQUAL(1)
+        CASE_EQUAL(PARTY_MEMBER_GOOMBELLA)
         CALL(evt_party_set_pose, 0, STRING("PKR_I_1"))
-        CASE_EQUAL(2)
+        CASE_EQUAL(PARTY_MEMBER_KOOPS)
         CALL(evt_party_set_pose, 0, STRING("PNK_I_1"))
-        CASE_EQUAL(3)
+        CASE_EQUAL(PARTY_MEMBER_BOBBERY)
         CALL(evt_party_set_pose, 0, STRING("I_1"))
-        CASE_EQUAL(4)
+        CASE_EQUAL(PARTY_MEMBER_YOSHI)
         CALL(evt_party_set_pose, 0, STRING("PYS_I_1"))
-        CASE_EQUAL(5)
+        CASE_EQUAL(PARTY_MEMBER_FLURRIE)
         CALL(evt_party_set_pose, 0, STRING("PWD_I_1"))
-        CASE_EQUAL(6)
+        CASE_EQUAL(PARTY_MEMBER_VIVIAN)
         CALL(evt_party_set_pose, 0, STRING("PTR_I_1"))
-        CASE_EQUAL(7)
+        CASE_EQUAL(PARTY_MEMBER_MS_MOWZ)
         CALL(evt_party_set_pose, 0, STRING("PCH_I_1"))
     END_SWITCH
     CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
@@ -703,28 +726,32 @@ EVT_BEGIN(powerdownya_party_lank_rtn)
     END_LOOP
     CALL(evt_mario_get_party, LW(0))
     SWITCH(LW(0))
-        CASE_EQUAL(1)
+        CASE_EQUAL(PARTY_MEMBER_GOOMBELLA)
         CALL(evt_party_set_pose, 0, STRING("PKR_Y_1"))
-        CASE_EQUAL(2)
+        CASE_EQUAL(PARTY_MEMBER_KOOPS)
         CALL(evt_party_set_pose, 0, STRING("PNK_Y_1"))
-        CASE_EQUAL(3)
+        CASE_EQUAL(PARTY_MEMBER_BOBBERY)
         CALL(evt_party_set_pose, 0, STRING("Y_1"))
-        CASE_EQUAL(4)
+        CASE_EQUAL(PARTY_MEMBER_YOSHI)
         CALL(evt_party_set_pose, 0, STRING("PYS_Y_1"))
-        CASE_EQUAL(5)
+        CASE_EQUAL(PARTY_MEMBER_FLURRIE)
         CALL(evt_party_set_pose, 0, STRING("PWD_Y_1"))
-        CASE_EQUAL(6)
+        CASE_EQUAL(PARTY_MEMBER_VIVIAN)
         CALL(evt_party_set_pose, 0, STRING("PTR_Y_1"))
-        CASE_EQUAL(7)
+        CASE_EQUAL(PARTY_MEMBER_MS_MOWZ)
         CALL(evt_party_set_pose, 0, STRING("PCH_Y_1"))
     END_SWITCH
     WAIT_MS(1500)
     CALL(evt_party_set_breed_pose, 0, 1)
-    CALL(evt_mario_dispflag_onoff, 0, 4)
+    CALL(evt_mario_dispflag_onoff, 0, MARIO_DISP_FLAG_FRONT_POSE)
+#if VERSION >= VERSION_JP
     DELETE_EVENT(GW(1))
+#endif
     CALL(enzan_lw_load)
+#if VERSION >= VERSION_JP
     CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
+#endif
     CALL(unitwin_getpartylank, LW(1), LW(0))
     ADD(LW(0), 1)
     CALL(unitwin_setpartylank, LW(1), LW(0))
@@ -769,9 +796,9 @@ EVT_BEGIN(powerdownya_table_talk)
         GOTO(0)
     END_IF
     IF_INT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(powerdownya_mario_level_rtn))
+        CALL_CHILD(powerdownya_mario_level_rtn)
     ELSE
-        CALL_CHILD(PTR(powerdownya_party_lank_rtn))
+        CALL_CHILD(powerdownya_party_lank_rtn)
     END_IF
     LABEL(0)
     CALL(evt_party_run, 0)
@@ -791,7 +818,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"パワーダウン屋"*/"\x83\x70\x83\x8F\x81\x5B\x83\x5F\x83\x45\x83\x93\x89\xAE", // name
+        "パワーダウン屋", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         powerdownya_init, // initEvent
@@ -831,7 +858,7 @@ EVT_BEGIN(tik_11_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     SET_VALUE(GSWF(GSWF_TIK11_CHET_RIPPO_GREETED), 0)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_map_playanim, STRING("anm_kem"), 1, 0)

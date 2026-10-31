@@ -6,7 +6,6 @@
 #include "stdio.h"
 #include "evt/evt_bero.h"
 #include "evt/evt_mobj.h"
-#include "party/party_motion.h"
 #include "evt/evt_snd.h"
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_eff.h"
@@ -18,7 +17,9 @@
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
 
+#if VERSION >= VERSION_JP
 static char name[8];
+#endif
 
 static USER_FUNC(make_name);
 
@@ -101,7 +102,11 @@ static EVT_BEGIN(rousoku_init)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_get_position, LW(1), LW(2), LW(3), LW(4))
         SUBTRACT_FLOAT(LW(3), FLOAT(7.0f))
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_eff, STRING(""), STRING("fire"), 3, LW(2), LW(3), LW(4), FLOAT(0.5f), 1000, 0, 0, 0, 0, 0, 0)
+#else
         CALL(evt_eff, 0, STRING("fire"), 3, LW(2), LW(3), LW(4), FLOAT(0.5f), 1000, 0, 0, 0, 0, 0, 0)
+#endif
         ADD(LW(0), 1)
     END_LOOP
     RETURN
@@ -110,7 +115,7 @@ EVT_END()
 static EVT_BEGIN(mobj_box01)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box01"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("item01"), ITEM_ULTRA_SHROOM, LW(0), LW(1), LW(2), 16, -1, 0)
+    CALL(evt_item_entry, STRING("item01"), ITEM_ULTRA_SHROOM, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("item01"), ITEM_FLAG_NO_TOUCH)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box01"))
     CALL(evt_item_get_item, STRING("item01"))
@@ -121,7 +126,7 @@ EVT_END()
 static EVT_BEGIN(mobj_box02)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box02"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("item02"), ITEM_JAMMIN_JELLY, LW(0), LW(1), LW(2), 16, -1, 0)
+    CALL(evt_item_entry, STRING("item02"), ITEM_JAMMIN_JELLY, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("item02"), ITEM_FLAG_NO_TOUCH)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box02"))
     CALL(evt_item_get_item, STRING("item02"))
@@ -132,27 +137,49 @@ EVT_END()
 EVT_BEGIN(las_30_init_evt)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER2"))
+#if VERSION >= VERSION_JP
         CALL(evt_snd_envoff, PSND_FADE_OUT)
+#endif
     ELSE
         CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+#if VERSION >= VERSION_JP
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
+#endif
     END_IF
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
+#else
     CALL(evt_snd_set_rev_mode, 2)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(evt_bero_info_run)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), 1150, 60, -125, 0, 0)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_mobj_recovery_blk, STRING("r_blk"), 1, -1050, 860, -75, 0, 0)
+#else
     CALL(evt_mobj_recovery_blk, STRING("r_blk"), 10, -1050, 860, -75, 0, 0)
+#endif
     CALL(evt_mobj_itembox, STRING("mobj_box01"), -1150, 800, -75, 0, 0, PTR(mobj_box01), GSWF(GSWF_LAS30_ITEMBOX_01))
     CALL(evt_mobj_itembox, STRING("mobj_box02"), 1050, 0, -125, 0, 0, PTR(mobj_box02), GSWF(GSWF_LAS30_ITEMBOX_02))
     CALL_CHILD(rousoku_init)
     RETURN
+#if VERSION <= VERSION_DEMO_US
+EVT_END()
+#else
 EVT_END_PAD()
+#endif
 
 static USER_FUNC(make_name) {
     EvtWord* args = event->args;
+#if VERSION <= VERSION_DEMO_US
+    // The demo builds the name in a stack buffer, which is gone by the time the script uses the name.
+    char name[8];
+#endif
+    s32 number;
 
-    sprintf(name, "hi%d", evtGetValue(event, args[0]));
+    number = evtGetValue(event, args[0]);
+    sprintf(name, "hi%d", number);
     evtSetValue(event, args[1], (EvtWord)name);
     return EVT_RETURN_DONE;
 }

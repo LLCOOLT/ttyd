@@ -14,13 +14,12 @@
 #include "evt/evt_npc.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "aji.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
 
-USER_FUNC(camAtY);
-USER_FUNC(slit_chk);
+static USER_FUNC(camAtY);
+static USER_FUNC(slit_chk);
 
 extern EvtWord evt_slit0[];
 extern EvtWord evt_slit1[];
@@ -165,19 +164,21 @@ EVT_END()
 EVT_BEGIN(aji_08_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI2"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 1)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     SPAWN_EVENT_GET_ID(PTR(heya_tenura_onoff), LW(0))
-    SPAWN_EVENT(PTR(evt_emergency))
+    SPAWN_EVENT(evt_emergency)
     BEGIN_INLINE_EVENT
         CALL(slit_chk)
     END_INLINE_EVENT
     CALL(evt_map_playanim, STRING("bari"), 1, 0)
     CALL(evt_map_playanim, STRING("awa1"), 1, 0)
     CALL(evt_map_playanim, STRING("awa2"), 1, 0)
-    CALL(evt_item_entry, STRING("item00"), ITEM_STAR_PIECE, -975, 170, 75, 16, GSWF(GSWF_AJI08_STAR_PIECE), 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_STAR_PIECE, -975, 170, 75, ITEM_ENTRY_FIXED, GSWF(GSWF_AJI08_STAR_PIECE), 0)
     BEGIN_INLINE_EVENT
         LOOP(0)
             CALL(evt_mapobj_get_position, STRING("S_ita"), LW(0), LW(1), LW(2))
@@ -210,13 +211,13 @@ EVT_BEGIN(aji_08_init_evt)
     RETURN
 EVT_END()
 
-USER_FUNC(camAtY) {
+static USER_FUNC(camAtY) {
     EvtWord* args = event->args;
 
     evtSetValue(event, args[0], camGetPtr(CAMERA_3D)->cameraAt.y);
     return EVT_RETURN_DONE;
 }
-USER_FUNC(slit_chk) {
+static USER_FUNC(slit_chk) {
     MarioWork* mario = marioGetPtr();
 
     if (mario->flags & MARIO_FLAG_PAPER_MODE) {

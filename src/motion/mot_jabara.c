@@ -192,7 +192,7 @@ static inline void jabaraFreeWork(void) {
     }
 }
 
-void swingMain(void);
+static void swingMain(void);
 void jabaraSwingStart(s32 s);
 void jabaraSwingWalk(void);
 
@@ -230,8 +230,8 @@ void mot_jabara(void) {
     mario->hitobjHead = 0;
     switch (mario->currSubMotionId) {
         case 0:
-#if VERSION == VERSION_DEMO
-            allPartyRideOn();
+#if VERSION <= VERSION_DEMO_US
+            allPartyRideJabara();
 #endif
             mario->dispFlags |= MARIO_DISP_FLAG_DIR_LOCK;
             mario->hammerChargeTimer = 1;
@@ -243,7 +243,7 @@ void mot_jabara(void) {
             marioChgPose("M_J_1A");
             marioPaperOn("p_jyabara");
             marioChgPaper("PM_J_1B");
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             mario->multiTimer = 8;
             mario->lastGroundPos = mario->position;
             psndSFXOn_3D(SFX_NAME_WORD(0x182), &mario->position);
@@ -263,7 +263,7 @@ void mot_jabara(void) {
                 mario->currSubMotionId = 0x64;
                 break;
             }
-            L_allPartyRideOn();
+            allPartyRideOn();
             psndSFXOn_3D(SFX_NAME_WORD(0x182), &mario->position);
             jabaraSetSpd(0.2f, 0.005f, 1.5f);
             mario->multiTimer = 8;
@@ -278,7 +278,7 @@ void mot_jabara(void) {
             }
         case 12:
             hitY = marioChkOverheadJabara(&overheadHit, &overheadDist);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             if (mario->hitobjHead != NULL) {
                 mario->position.y = hitY;
             }
@@ -307,7 +307,7 @@ void mot_jabara(void) {
                 jabaraSetSpd(0.3f, 0.005f, 1.6f);
             }
             marioChkGnd();
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             if (mario->currMotionId != MARIO_MOTION_JABARA) {
                 mario->currSubMotionId = 0x64;
                 return;
@@ -388,7 +388,7 @@ void mot_jabara(void) {
                 break;
             }
             if ((f32)hitY < mario->lastGroundPos.y) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 allPartyRideOff();
 #endif
                 marioPaperOff();
@@ -398,7 +398,7 @@ void mot_jabara(void) {
                 }
                 camFollowYOn();
                 marioGetPtr();
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 allPartyRideOff();
 #endif
                 jabaraResetPose();
@@ -448,14 +448,14 @@ void mot_jabara(void) {
                 mario->position.y += spd;
                 break;
             }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             allPartyRideOff();
 #endif
             marioPaperOff();
             jabaraLand(hitY, land);
             camFollowYOn();
             marioGetPtr();
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             allPartyRideOff();
 #endif
             jabaraResetPose();
@@ -466,7 +466,7 @@ void mot_jabara(void) {
     }
     switch (mario->currSubMotionId) {
         case 0x28:
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             if (strcmp(gp->currentMapName, "eki_02") == 0 && mario->position.x >= -450.0f && mario->position.x <= -190.0f) {
                 mario->flags |= MARIO_FLAG_WALLS_DISABLED;
             }
@@ -553,7 +553,7 @@ void mot_jabara(void) {
                 HitEntry* land = marioChkLandon2(&hitY, f28, mario->dispOfs.y);
                 if (land == NULL) {
                     mario->position.y += f28;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                     if ((f32)mario->screenY > 480.0f) {
                         camFollowYOn();
                     }
@@ -562,7 +562,7 @@ void mot_jabara(void) {
                         mario->mot.jabara.animFrame = 0;
                     }
                     if (mario->buttonTrg & PAD_BUTTON_B) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                         allPartyRideOff();
                         if (mario->dispFlags & MARIO_DISP_FLAG_PAPER_ON) {
                             marioPaperOff();
@@ -601,19 +601,19 @@ void mot_jabara(void) {
     }
     switch (mario->currSubMotionId) {
         case 0x3c:
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             allPartyRideOff();
 #endif
             mario->currSubMotionId = 0x3d;
             mario->hitobjJumpFrom = mario->hitobjStandOn;
             mario->hitobjStandOn = 0;
             mario->baseSpeed = 0.0f;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             mario->flags &= ~MARIO_FLAG_WALLS_DISABLED;
 #endif
             jabaraResetPose();
             jabaraFreeWork();
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             allPartyRideOff();
 #endif
             marioPaperOff();
@@ -662,7 +662,7 @@ void mot_jabara(void) {
                     mario->rot.x = 0.0f;
                     mario->currSubMotionId = 0x5a;
                 } else if (mario->buttonTrg & PAD_BUTTON_B) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                     allPartyRideOff();
                     mario->flags |= MARIO_FLAG_STOP_AIR_MOVEMENT;
                     marioGetPtr();
@@ -779,7 +779,7 @@ BOOL jabaraNoHitChk(void) {
 void mot_jabara_post(void) {
     MarioWork* mario = marioGetPtr();
     MarioWork* m2;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     allPartyRideOff();
 #else
     mario->flags &= ~MARIO_FLAG_WALLS_DISABLED;
@@ -790,7 +790,7 @@ void mot_jabara_post(void) {
     if ((u32)mario->dispFlags & MARIO_DISP_FLAG_PAPER_ON) {
         marioPaperOff();
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     allPartyRideOff();
 #endif
     jabaraResetPose();
@@ -842,7 +842,7 @@ void jabaraSwingWalk(void) {
     marioGetPtr()->motJabara->swingRotStep = 0.18f;
 }
 
-void swingMain(void) {
+static void swingMain(void) {
     MarioWork* mario = marioGetPtr();
     if (marioGetPtr()->motStruct) {
         if ((s32)mario->currSubMotionId < 0x5a && (mario->buttonTrg & (PAD_BUTTON_A | PAD_BUTTON_B)) && !(marioGetPtr()->motJabara->flags & 1)) {

@@ -108,7 +108,7 @@ s32* acrobat_tbl[2] = {acrobat_jp, acrobat_us};
 
 // forward declarations
 static void rendermodeFunc(s32 wXluStage);
-void effNiceMain(EffectEntry* effect);
+static void effNiceMain(EffectEntry* effect);
 
 BOOL effNiceAsync(s32 group) {
     int i;
@@ -203,10 +203,10 @@ EffectEntry* effNiceEntry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effNiceDisp(CameraId cameraId, void* param);
-void acrobatMain(EffectEntry* effect);
+static void effNiceDisp(CameraId cameraId, void* param);
+static void acrobatMain(EffectEntry* effect);
 
-void effNiceMain(EffectEntry* effect) {
+static void effNiceMain(EffectEntry* effect) {
     NiceEffectWork* wp = effect->userdata;
     Vec pos;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -335,7 +335,7 @@ void effNiceMain(EffectEntry* effect) {
     }
 }
 
-void effNiceDisp(CameraId cameraId, void* param) {
+static void effNiceDisp(CameraId cameraId, void* param) {
     EffectEntry* effect = param;
     NiceEffectWork* wp = effect->userdata;
     Mtx trans, rot, scale, mtx;
@@ -362,9 +362,9 @@ void effNiceDisp(CameraId cameraId, void* param) {
     animPoseDrawMtx(wp->poseId, mtx, 3, 0.0f, 1.0f);
 }
 
-void effAcrobatDisp(CameraId cameraId, void* param);
+static void effAcrobatDisp(CameraId cameraId, void* param);
 
-void acrobatMain(EffectEntry* effect) {
+static void acrobatMain(EffectEntry* effect) {
     NiceEffectWork* wp = effect->userdata;
     int i;
     int done = 0;
@@ -465,7 +465,7 @@ void acrobatMain(EffectEntry* effect) {
     }
 }
 
-void effAcrobatDisp(CameraId cameraId, void* param) {
+static void effAcrobatDisp(CameraId cameraId, void* param) {
     EffectEntry* effect = param;
     NiceEffectWork* wp = effect->userdata;
     CameraEntry* camera = camGetPtr(cameraId);
@@ -506,6 +506,7 @@ void effAcrobatDisp(CameraId cameraId, void* param) {
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    // US and PAL skip a letter whose texture id is -1 and compute the quad corners inside the loop
 #if VERSION >= VERSION_US
     size = 20.0f;
     size = -size;

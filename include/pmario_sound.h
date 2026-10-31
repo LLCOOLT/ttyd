@@ -200,7 +200,7 @@ typedef struct PaperSoundWork {
     s8 sfxVolume;                   // 0x59, SFX master volume, ramps toward 100 (120 when flag 0x20)
     s8 envVolume;                   // 0x5A, ENV master volume, ramps toward 100 (80 when flag 0x20)
     u8 sfxActiveCount[0x5C - 0x5B]; // 0x5B, active PaperSoundEffect slots counted by psndSFXMain
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     s8 sfxCooldown;         // 0x5C, frames before certain repeating SFX may restart (set to 6)
     u8 pad_5D[0x60 - 0x5D]; // 0x5D
 #endif
@@ -216,7 +216,7 @@ BOOL psndPushGroup(void);
 
 BOOL psndBGMOn(u32 r3, char* bgm_name);
 BOOL psndBGMOn_f(u32 flags, char* bgm_name, u32 fadetime, s32 unused);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 BOOL psndBGMOn_f_d(u32 flags, char* bgm_name, u32 fadetime, s32 unused); // the demo always fades the old BGM out over 750 ms
 #else
 BOOL psndBGMOn_f_d(u32 flags, char* bgm_name, u32 fadetime, u32 fadeout, s32 unused);

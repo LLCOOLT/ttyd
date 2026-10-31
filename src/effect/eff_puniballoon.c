@@ -10,8 +10,8 @@
 #include <dolphin/mtx.h>
 #include "libc_decls.h"
 
-void effPuniBalloonMain(EffectEntry* effect);
-void effPuniBalloonDisp(CameraId cameraId, EffectEntry* effect);
+static void effPuniBalloonMain(EffectEntry* effect);
+static void effPuniBalloonDisp(CameraId cameraId, EffectEntry* effect);
 static void balloon_1(CameraId cameraId, EffectEntry* effect);
 static void balloon_0(CameraId cameraId, EffectEntry* effect);
 
@@ -59,7 +59,7 @@ EffectEntry* effPuniBalloonEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     return effect;
 }
 
-void effPuniBalloonMain(EffectEntry* effect) {
+static void effPuniBalloonMain(EffectEntry* effect) {
     PuniBalloonWork* work = effect->userdata;
     Vec pos;
     Vec tmp;
@@ -105,7 +105,7 @@ void effPuniBalloonMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&pos), 2, (DispCallback)effPuniBalloonDisp, effect);
 }
 
-void effPuniBalloonDisp(CameraId cameraId, EffectEntry* effect) {
+static void effPuniBalloonDisp(CameraId cameraId, EffectEntry* effect) {
     PuniBalloonWork* work = effect->userdata;
     if (work->type == 0) {
         balloon_0(cameraId, effect);

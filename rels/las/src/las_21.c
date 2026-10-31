@@ -16,13 +16,12 @@
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "las.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
 #include "driver/camdrv.h"
 
-USER_FUNC(set_mobj_y_position);
+static USER_FUNC(set_mobj_y_position);
 
 static BeroEntry bero_entry_data[5];
 static BeroEntry w_bero_mapchg[1];
@@ -216,7 +215,7 @@ EVT_BEGIN(floatblk_evt)
         SET_FLOAT_VALUE(LW(9), FLOAT(-0.049804688f))
         SET_VALUE(LF(1), 1)
     END_IF
-    SPAWN_EVENT(PTR(floatblk_shake))
+    SPAWN_EVENT(floatblk_shake)
     WAIT_MS(500)
     CALL(evt_mobj_get_position, LW(15), LW(0), LW(1), LW(2))
     CALL(evt_mobj_get_kindname, LW(15), LW(3))
@@ -320,16 +319,18 @@ EVT_BEGIN(floatblk_evt)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(evt_snd_sfxoff, LW(8))
-    SPAWN_EVENT(PTR(floatblk_stop_se))
+    SPAWN_EVENT(floatblk_stop_se)
     IF_INT_EQUAL(LF(1), 1)
-        SPAWN_EVENT(PTR(floatblk_shake))
+        SPAWN_EVENT(floatblk_shake)
         WAIT_MS(1000)
     END_IF
     RETURN
 EVT_END()
 
 EVT_BEGIN(floatblk21_1_evt)
+#if VERSION >= VERSION_JP
     SET_TYPE(239)
+#endif
     IF_INT_EQUAL(LSWF(8), 0)
         SET_VALUE(LW(0), STRING("21blk1"))
         SET_VALUE(LW(1), STRING("MOBJ_21blk1"))
@@ -345,7 +346,7 @@ EVT_BEGIN(floatblk21_1_evt)
         SET_VALUE(LW(4), -130)
         SET_VALUE(LSWF(8), 0)
     END_IF
-    CALL_CHILD(PTR(floatblk_evt))
+    CALL_CHILD(floatblk_evt)
     CALL(evt_mobj_get_y_position, STRING("21blk1"), LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), -130)
         SET_VALUE(LSWF(8), 0)
@@ -356,7 +357,9 @@ EVT_BEGIN(floatblk21_1_evt)
 EVT_END()
 
 EVT_BEGIN(floatblk21_2_evt)
+#if VERSION >= VERSION_JP
     SET_TYPE(239)
+#endif
     IF_INT_EQUAL(LSWF(9), 0)
         SET_VALUE(LW(0), STRING("21blk2"))
         SET_VALUE(LW(1), STRING("MOBJ_21blk2"))
@@ -372,7 +375,7 @@ EVT_BEGIN(floatblk21_2_evt)
         SET_VALUE(LW(4), -130)
         SET_VALUE(LSWF(9), 0)
     END_IF
-    CALL_CHILD(PTR(floatblk_evt))
+    CALL_CHILD(floatblk_evt)
     CALL(evt_mobj_get_y_position, STRING("21blk2"), LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), -130)
         SET_VALUE(LSWF(9), 0)
@@ -389,10 +392,12 @@ EVT_BEGIN(las_21_init_evt)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST3"))
     END_IF
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 2)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG8_06_MOVING_PLANETS)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_under"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_under"), 1, 0)
@@ -401,12 +406,12 @@ EVT_BEGIN(las_21_init_evt)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_yuka"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_be"), 1, 0)
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_bero_overwrite, STRING("w_bero"), PTR(w_bero_mapchg))
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
         CALL(evt_npc_check_delete, STRING("ワンワン１"))
-        SPAWN_EVENT(PTR(hikari_evt))
+        SPAWN_EVENT(hikari_evt)
     END_IF
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_06_MOVING_PLANETS)
         IF_INT_EQUAL(GSWF(GSWF_LAS19_SWITCH1_ON), 0)
@@ -449,7 +454,7 @@ static USER_FUNC(set_party_y_pos) {
     party->position.y = evtGetFloat(event, args[0]);
     return EVT_RETURN_DONE;
 }
-USER_FUNC(set_mobj_y_position) {
+static USER_FUNC(set_mobj_y_position) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);

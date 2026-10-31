@@ -39,7 +39,6 @@
 #include "evt/evt_sub.h"
 #include "evt/evt_urouro.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "muj.h"
 #include "data_tables.h"
 #include "driver/envdrv.h"
@@ -55,9 +54,9 @@ static s32* itemsel_table_ram;
 static USER_FUNC(anim_tevcallback);
 static USER_FUNC(anim_tevcallback_mobj);
 static USER_FUNC(delete_itemsel_table);
-USER_FUNC(evt_mario_get_reqdir);
+static USER_FUNC(evt_mario_get_reqdir);
 static USER_FUNC(make_itemsel_table);
-USER_FUNC(muj_get_door_check);
+static USER_FUNC(muj_get_door_check);
 static USER_FUNC(starstone_entry);
 static USER_FUNC(starstone_set_pos);
 static USER_FUNC(starstone_set_ry);
@@ -261,7 +260,7 @@ static EVT_BEGIN(marco_talk)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG5_13_BOBBERY_AND_THE_BRIDGE, STORY_STG5_17_WINE_OBTAINED)
         IF_INT_EQUAL(GSWF(GSWF_MUJ01_TIMID_SAILOR_PERSUADED), 0)
-            CALL_CHILD(PTR(settoku_event_main))
+            CALL_CHILD(settoku_event_main)
         END_IF
     END_SWITCH
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -308,7 +307,11 @@ static EVT_BEGIN(marco_talk)
             CALL(delete_itemsel_table)
             RETURN
         END_IF
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_win_item_select, LW(10), LW(0))
+#else
         CALL(evt_win_item_select, 0, LW(10), LW(0), 0)
+#endif
         CALL(delete_itemsel_table)
         IF_INT_EQUAL(LW(0), -1)
             RETURN
@@ -323,7 +326,7 @@ static EVT_BEGIN(marco_talk)
         ELSE
             ADD(LW(3), 20)
         END_IF
-        CALL(evt_item_entry, STRING("watasu"), LW(0), LW(3), LW(4), LW(5), 16, -1, 0)
+        CALL(evt_item_entry, STRING("watasu"), LW(0), LW(3), LW(4), LW(5), ITEM_ENTRY_FIXED, -1, 0)
         CALL(evt_item_flag_on, STRING("watasu"), ITEM_FLAG_NO_TOUCH)
         WAIT_MS(500)
         CALL(evt_npc_set_anim, STRING("me"), STRING("I_1"))
@@ -365,7 +368,7 @@ static EVT_BEGIN(marco_talk)
         WAIT_MS(500)
         CALL(evt_npc_set_anim, STRING("me"), STRING("I_2"))
         WAIT_MS(500)
-        CALL(evt_item_entry, STRING("itemwine"), ITEM_CHUCKOLA_COLA, 0, -1000, 0, 16, -1, 0)
+        CALL(evt_item_entry, STRING("itemwine"), ITEM_CHUCKOLA_COLA, 0, -1000, 0, ITEM_ENTRY_FIXED, -1, 0)
         CALL(evt_item_flag_on, STRING("itemwine"), ITEM_FLAG_NO_TOUCH)
         CALL(evt_item_get_item, STRING("itemwine"))
         CALL(evt_msg_print, 0, STRING("stg5_muj_31_03"), 0, STRING("me"))
@@ -383,26 +386,36 @@ static EVT_BEGIN(marco_talk)
             WAIT_FRAMES(1)
         END_LOOP
         CALL(evt_cam3d_evt_set, -60, 95, 491, -60, 35, 146, 500, 11)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_party_stop, 0)
+#else
         CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_INTANGIBLE)
         CALL(evt_mario_mov_pos2, -34, 162, FLOAT(120.0f))
         CALL(evt_mario_set_dir, 270, 200, 0)
         CALL(evt_npc_set_ry_lr, STRING("me"), 1)
         CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_INTANGIBLE)
+#endif
         CALL(evt_mario_get_party, LW(0))
         SET_VALUE(LF(10), 0)
         IF_INT_NOT_EQUAL(LW(0), 3)
             SET_VALUE(LF(10), 1)
             CALL(evt_mario_hello_exparty_pos, 15, -25, 0, 210)
         END_IF
+#if VERSION >= VERSION_JP
         CALL(evt_party_stop, 0)
         CALL(evt_party_stop, 1)
+#endif
         SET_VALUE(GF(0), 1)
         BEGIN_INLINE_EVENT
+#if VERSION >= VERSION_JP
             IF_INT_EQUAL(LW(0), 3)
+#endif
                 CALL(evt_party_move_pos2, 0, 0, 170, FLOAT(120.0f))
+#if VERSION >= VERSION_JP
             ELSE
                 CALL(evt_party_move_pos2, 0, 20, 170, FLOAT(120.0f))
             END_IF
+#endif
             CALL(evt_party_set_dir, 0, 270, -1)
             SET_VALUE(GF(0), 0)
         END_INLINE_EVENT
@@ -431,16 +444,18 @@ static EVT_BEGIN(marco_talk)
         ELSE
             CALL(evt_msg_print, 0, STRING("stg5_muj_83"), 0, STRING("extparty"))
         END_IF
+#if VERSION >= VERSION_JP
         CALL(evt_party_run, 1)
+#endif
         CALL(evt_msg_print, 0, STRING("stg5_muj_84"), 0, STRING("me"))
         LOOP(3)
             SET_VALUE(LW(0), 0)
             SET_VALUE(LW(1), 180)
-            CALL_CHILD(PTR(marco_kyorokyoro))
+            CALL_CHILD(marco_kyorokyoro)
             WAIT_MS(160)
             SET_VALUE(LW(0), 180)
             SET_VALUE(LW(1), 0)
-            CALL_CHILD(PTR(marco_kyorokyoro))
+            CALL_CHILD(marco_kyorokyoro)
             WAIT_MS(160)
         END_LOOP
         WAIT_MS(1000)
@@ -489,11 +504,11 @@ static EVT_BEGIN(marco_talk)
         LOOP(3)
             SET_VALUE(LW(0), 0)
             SET_VALUE(LW(1), 180)
-            CALL_CHILD(PTR(marco_kyorokyoro))
+            CALL_CHILD(marco_kyorokyoro)
             WAIT_MS(160)
             SET_VALUE(LW(0), 180)
             SET_VALUE(LW(1), 0)
-            CALL_CHILD(PTR(marco_kyorokyoro))
+            CALL_CHILD(marco_kyorokyoro)
             WAIT_MS(160)
         END_LOOP
         WAIT_MS(1000)
@@ -788,7 +803,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", // name
+        "ガラの悪い水夫", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         garawaru_init, // initEvent
@@ -800,7 +815,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", // name
+        "マルコ", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         marco_init, // initEvent
@@ -812,7 +827,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76", // name
+        "めがね水夫", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         megane_init, // initEvent
@@ -824,7 +839,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76", // name
+        "オドオド水夫", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         odoodo_init, // initEvent
@@ -836,7 +851,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"店員"*/"\x93\x58\x88\xF5", // name
+        "店員", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         npc_init_evt, // initEvent
@@ -846,7 +861,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5", // name
+        "宿店員", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         npc_init_evt, // initEvent
@@ -856,7 +871,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"水夫A"*/"\x90\x85\x95\x76\x41", // name
+        "水夫A", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         suifu_a_init, // initEvent
@@ -868,7 +883,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA", // name
+        "水夫ボム兵", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         suifu_bomb_init, // initEvent
@@ -880,7 +895,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"水夫D"*/"\x90\x85\x95\x76\x44", // name
+        "水夫D", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         suifu_d_init, // initEvent
@@ -892,7 +907,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ボロ水夫A"*/"\x83\x7B\x83\x8D\x90\x85\x95\x76\x41", // name
+        "ボロ水夫A", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         borosuifu_a_init, // initEvent
@@ -904,7 +919,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ボロ水夫B"*/"\x83\x7B\x83\x8D\x90\x85\x95\x76\x42", // name
+        "ボロ水夫B", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         borosuifu_b_init, // initEvent
@@ -916,7 +931,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"モニー"*/"\x83\x82\x83\x6A\x81\x5B", // name
+        "モニー", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         mony_init, // initEvent
@@ -928,7 +943,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ピートン"*/"\x83\x73\x81\x5B\x83\x67\x83\x93", // name
+        "ピートン", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         peton_init, // initEvent
@@ -940,7 +955,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41", // name
+        "エルモスA", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         npc_init_evt, // initEvent
@@ -950,7 +965,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"エルモスB"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x42", // name
+        "エルモスB", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         npc_init_evt, // initEvent
@@ -960,7 +975,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"エルモスC"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x43", // name
+        "エルモスC", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         npc_init_evt, // initEvent
@@ -1060,9 +1075,9 @@ EVT_BEGIN(muj_00_door_open)
     END_IF
     CALL(door_dark_flag, LW(0), 1)
     IF_BITS_CLEAR(LW(15), 2)
-        SPAWN_EVENT(PTR(door_dark))
+        SPAWN_EVENT(door_dark)
     END_IF
-    SPAWN_EVENT(PTR(door_open_se))
+    SPAWN_EVENT(door_open_se)
     CALL(evt_door_param, LW(0), 6, LW(7), LW(8), LW(9))
     IF_INT_NOT_EQUAL(LW(7), 0)
         BEGIN_INLINE_EVENT
@@ -1083,6 +1098,10 @@ EVT_BEGIN(muj_00_door_open)
     WAIT_MS(500)
     CALL(evt_door_param, LW(0), 10, LW(1), LW(2), LW(3))
     CALL(evt_mario_party_door_move, LW(1), LW(3), FLOAT(135.0f))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_party_move_behind_mario, 0)
+    CALL(evt_party_move_behind_mario, 1)
+#endif
     CALL(evt_cam3d_evt_xyz_off, 0, 11)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_cam_letter_box_disable, 0)
@@ -1098,12 +1117,12 @@ EVT_BEGIN(muj_00_door_close)
     IF_INT_EQUAL(LW(1), 0)
         RETURN
     END_IF
-    CALL_CHILD(PTR(evt_door_close))
+    CALL_CHILD(evt_door_close)
     RETURN
 EVT_END()
 
 static const char* mise_npc[] = {
-    /*"店員"*/"\x93\x58\x88\xF5",
+    "店員",
     NULL,
 };
 
@@ -1111,7 +1130,7 @@ EVT_BEGIN(mise_data_open)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_mise_kan"), MAPOBJ_FLAG_NO_BLEND2)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_mise_hasi04"), MAPOBJ_FLAG_NO_BLEND2)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_mise_hasi05"), MAPOBJ_FLAG_NO_BLEND2)
-    SPAWN_EVENT(PTR(custom_door_dark2))
+    SPAWN_EVENT(custom_door_dark2)
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_env_lpf, 0, 800)
@@ -1120,7 +1139,7 @@ EVT_END()
 
 EVT_BEGIN(mise_data_close)
     BEGIN_INLINE_EVENT
-        CALL_CHILD(PTR(custom_door_light2))
+        CALL_CHILD(custom_door_light2)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_mise_kan"), MAPOBJ_FLAG_NO_BLEND2)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_mise_hasi04"), MAPOBJ_FLAG_NO_BLEND2)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_mise_hasi05"), MAPOBJ_FLAG_NO_BLEND2)
@@ -1147,14 +1166,14 @@ static DoorParam mise_data = {
 };
 
 static const char* yado_npc[] = {
-    /*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5",
+    "宿店員",
     NULL,
 };
 
 EVT_BEGIN(mise_open_event)
-    SPAWN_EVENT(PTR(door_dark))
+    SPAWN_EVENT(door_dark)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_yado"), MAPOBJ_FLAG_NO_BLEND)
-    SPAWN_EVENT(PTR(custom_door_dark2))
+    SPAWN_EVENT(custom_door_dark2)
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_env_lpf, 0, 800)
@@ -1162,8 +1181,8 @@ EVT_BEGIN(mise_open_event)
 EVT_END()
 
 EVT_BEGIN(mise_close_event)
-    SPAWN_EVENT(PTR(door_light))
-    SPAWN_EVENT(PTR(custom_door_light2))
+    SPAWN_EVENT(door_light)
+    SPAWN_EVENT(custom_door_light2)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_yado"), MAPOBJ_FLAG_NO_BLEND)
     WAIT_MS(1000)
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
@@ -1247,7 +1266,7 @@ static ShopDb trade_list[] = {
 };
 
 static ShopperData35 shopper_data = {
-    /*"店員"*/"\x93\x58\x88\xF5", // name
+    "店員", // name
     NULL, NULL, // fook_evt..buy_evt
     {"shop_00", "shop_01", "shop_02", "shop_03", "shop_04", "shop_05", "shop_06", "shop_07", "shop_08", "shop_09", "shop_10", "shop_11", "shop_12", "shop_13", "shop_14", "shop_15", "shop_16", "shop_17", "shop_18", "shop_19", "shop_20", "shop_21", "shop_22", "shop_23", "shop_24", "shop_25", "shop_26", "shop_27", "shop_28", "shop_29", "shop_30", "shop_31", "shop_32", "shop_33", "shop_34"}, // msgs
 };
@@ -1256,12 +1275,16 @@ static KinopioData kino_dt = {
     0, // breakfastItem
     {0}, // breakfastPos
     10, // ryoukin
+#if VERSION <= VERSION_DEMO_US
+    {399.0f, 16.0f, -185.0f}, // bed
+#else
     {403.0f, 17.0f, -182.0f}, // bed
+#endif
     {355.0f, 0.0f, -155.0f}, // bedside
     {213.0f, 122.0f, -97.0f, 341.0f, 45.0f, -178.0f}, // cam
     -30.0f, // bedDeg
     {352.0f, 0.0f, -135.0f}, // npcTalk
-    /*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5", // npcName
+    "宿店員", // npcName
     {"yado_00", "yado_01", "yado_02", "yado_03", "yado_04", "yado_05", "yado_06", "yado_07", "yado_08", "yado_09", "yado_10", "yado_11", "yado_12", "yado_13"}, // msg
     NULL, NULL, // toBedEvt..fromBedEvt
 };
@@ -1360,7 +1383,7 @@ EVT_BEGIN(nakamaware_event)
     IF_INT_EQUAL(GSWF(GSWF_MUJ01_SKIP_TO_SHOW_OF_HANDS), 1)
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_cam3d_evt_set, -85, 134, 714, -85, 38, 172, 500, 11)
-        SPAWN_EVENT(PTR(kyoshu_event))
+        SPAWN_EVENT(kyoshu_event)
         RETURN
     END_IF
     CALL(evt_npc_set_position, STRING("水夫ボム兵"), -33, 0, 74)
@@ -1520,7 +1543,7 @@ EVT_BEGIN(nakamaware_event)
     CALL(evt_npc_get_position, STRING("エルモスA"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_ELMOS_MOVE1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_npc_glide_position, STRING("エルモスA"), -128, 10, 229, 0, FLOAT(120.0f), 0, 11, 0)
-    CALL(evt_npc_release_fieldnpc, 1)
+    CALL(evt_npc_release_filednpc, 1)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     WAIT_MS(100)
     CALL(evt_npc_set_battle_info, STRING("エルモスA"), 6)
@@ -1538,7 +1561,7 @@ EVT_BEGIN(nakamaware_event)
     CALL(evt_npc_set_position, STRING("エルモスC"), 0, -1000, 0)
     CALL(evt_npc_flag_onoff, 1, STRING("ガラの悪い水夫"), NPC_FLAG_MOVE_ANIM)
     CALL(evt_npc_flag_onoff, 1, STRING("マルコ"), NPC_FLAG_MOVE_ANIM)
-    SPAWN_EVENT(PTR(kyoshu_event))
+    SPAWN_EVENT(kyoshu_event)
     RETURN
 EVT_END()
 
@@ -1629,14 +1652,14 @@ static USER_FUNC(delete_itemsel_table) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_mario_get_reqdir) {
+static USER_FUNC(evt_mario_get_reqdir) {
     EvtWord* args = event->args;
 
     evtSetFloat(event, args[0], marioGetPtr()->displayDirectionTarget);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(muj_get_door_check) {
+static USER_FUNC(muj_get_door_check) {
     EvtWord* args = event->args;
     DoorParam* door = (DoorParam*)evtGetValue(event, args[0]);
     f32 range = evtGetFloat(event, args[1]);
@@ -1760,7 +1783,7 @@ static EVT_BEGIN(sekai_yami_evt)
     CALL(yami_view, -800)
     CALL(sekai_yami_omise)
     CALL(evt_cam3d_evt_set, 0, 120, 795, 0, 70, 348, 0, 11)
-    SPAWN_EVENT(PTR(sekai_yami_shake))
+    SPAWN_EVENT(sekai_yami_shake)
     CALL(evt_seq_wait, 2)
     CALL(evt_snd_sfxon, STRING("SFX_STG8_QUAKE1"), LW(0))
     BEGIN_INLINE_EVENT
@@ -1802,8 +1825,11 @@ static EVT_BEGIN(sekai_yami_evt)
 #if VERSION >= VERSION_US
         WAIT_MS(100)
         LOOP(1)
-#else
+#elif VERSION >= VERSION_JP
         WAIT_MS(500)
+        LOOP(2)
+#else
+        WAIT_MS(1000)
         LOOP(2)
 #endif
             CALL(evt_snd_sfxon, STRING("SFX_STG8_LIGHT1"), 0)
@@ -1819,8 +1845,10 @@ static EVT_BEGIN(sekai_yami_evt)
     END_INLINE_EVENT
 #if VERSION >= VERSION_US
     WAIT_MS(1200)
-#else
+#elif VERSION >= VERSION_JP
     WAIT_MS(1000)
+#else
+    WAIT_MS(3000)
 #endif
     CALL(evt_snd_sfxoff, LW(0))
     CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_BLACK, 300, FADE_IN_BLACK, 300)
@@ -1996,7 +2024,7 @@ static EVT_BEGIN(epilogue_evt)
     CALL(evt_cam3d_evt_set, -20, 143, 791, -20, 39, 200, 0, 11)
     CALL(evt_seq_wait, 2)
     CALL(evt_npc_flag_onoff, 0, STRING("ガラの悪い水夫"), NPC_FLAG_INSTANT_TURN)
-    SPAWN_EVENT(PTR(epilogue_evt_sub))
+    SPAWN_EVENT(epilogue_evt_sub)
     CALL(evt_fade_end_wait)
     WAIT_MS(1000)
     CALL(evt_msg_print, 0, STRING("ep_42"), 0, 0)
@@ -2043,9 +2071,9 @@ EVT_BEGIN(muj_01_init_evt)
     CALL(evt_bero_get_info)
     CALL_CHILD(evt_bero_info_run)
     CALL(evt_npc_setup, PTR(npcEnt))
-    CALL(evt_npc_set_tribe, STRING(/*"モニー"*/"\x83\x82\x83\x6A\x81\x5B"), STRING(/*"モニー（指輪）"*/"\x83\x82\x83\x6A\x81\x5B\x81\x69\x8E\x77\x97\xD6\x81\x6A"))
-    CALL(evt_npc_set_tribe, STRING(/*"ピートン"*/"\x83\x73\x81\x5B\x83\x67\x83\x93"), STRING(/*"ピートン（指輪）"*/"\x83\x73\x81\x5B\x83\x67\x83\x93\x81\x69\x8E\x77\x97\xD6\x81\x6A"))
-    CALL(evt_npc_sound_data_set, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), STRING("SFX_STG5_MARCO_MOVE1L"), STRING("SFX_STG5_MARCO_MOVE1R"), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
+    CALL(evt_npc_set_tribe, STRING("モニー"), STRING("モニー（指輪）"))
+    CALL(evt_npc_set_tribe, STRING("ピートン"), STRING("ピートン（指輪）"))
+    CALL(evt_npc_sound_data_set, STRING("マルコ"), STRING("SFX_STG5_MARCO_MOVE1L"), STRING("SFX_STG5_MARCO_MOVE1R"), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_00_START)
         IF_INT_EQUAL(LF(0), 0)
             CALL_CHILD(musume_a_entry)
@@ -2057,8 +2085,8 @@ EVT_BEGIN(muj_01_init_evt)
     CALL(evt_map_playanim, STRING("fuku_hata"), 1, 0)
     SPAWN_EVENT(yakan_anime)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), 100, 60, -25, 0, 0)
-    CALL(evt_item_entry, STRING("item_00"), ITEM_STAR_PIECE, 475, 0, 100, 16, GSWF(GSWF_MUJ01_STAR_PIECE_1), 0)
-    CALL(evt_item_entry, STRING("item_01"), ITEM_STAR_PIECE, -200, -16, 485, 16, GSWF(GSWF_MUJ01_STAR_PIECE_2), 0)
+    CALL(evt_item_entry, STRING("item_00"), ITEM_STAR_PIECE, 475, 0, 100, ITEM_ENTRY_FIXED, GSWF(GSWF_MUJ01_STAR_PIECE_1), 0)
+    CALL(evt_item_entry, STRING("item_01"), ITEM_STAR_PIECE, -200, -16, 485, ITEM_ENTRY_FIXED, GSWF(GSWF_MUJ01_STAR_PIECE_2), 0)
     SET_VALUE(LW(0), PTR(&mise_data))
     SPAWN_EVENT(evt_door_entry_custom00)
     SET_VALUE(LW(0), PTR(&yado_data))

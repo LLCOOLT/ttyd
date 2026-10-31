@@ -11,7 +11,6 @@
 #include "evt/evt_npc.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "mri_puni.h"
 #include "mri.h"
 #include "data_tables.h"
@@ -29,14 +28,14 @@ static KusaAccess ueki_access_data[7];
 static EVT_BEGIN(bero_s_doa_close)
     SET_VALUE(LW(9), 0)
     SET_VALUE(LW(10), STRING("S_doa"))
-    SPAWN_EVENT(PTR(evt_mri_door_close))
+    SPAWN_EVENT(evt_mri_door_close)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(bero_s_doa_open)
     SET_VALUE(LW(9), 0)
     SET_VALUE(LW(10), STRING("S_doa"))
-    SPAWN_EVENT(PTR(evt_mri_door_open))
+    SPAWN_EVENT(evt_mri_door_open)
     RETURN
 EVT_END()
 
@@ -90,7 +89,7 @@ static BeroEntry bero_entry_data[] = {
 static EVT_BEGIN(door_switch_init)
     IF_INT_EQUAL(GSWF(GSWF_MRI15_WEST_DOOR_UNLOCKED), 0)
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     ELSE
         CALL(evt_map_playanim, STRING("light"), 2, 0)
     END_IF
@@ -105,12 +104,12 @@ static EVT_BEGIN(door_switch)
     IF_INT_EQUAL(GSWF(GSWF_MRI15_WEST_DOOR_UNLOCKED), 0)
         SET_VALUE(GSWF(GSWF_MRI15_WEST_DOOR_UNLOCKED), 1)
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
         CALL(evt_map_playanim, STRING("light"), 0, 0)
     ELSE
         SET_VALUE(GSWF(GSWF_MRI15_WEST_DOOR_UNLOCKED), 0)
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_map_playanim, STRING("light"), 0, 0)
         CALL(evt_map_pauseanim, 0, STRING("light"))
     END_IF
@@ -123,7 +122,7 @@ EVT_BEGIN(dai3_escape)
         WAIT_MS(300)
         SET_VALUE(LW(9), 0)
         SET_VALUE(LW(10), STRING("S_doa"))
-        SPAWN_EVENT(PTR(evt_mri_door_close))
+        SPAWN_EVENT(evt_mri_door_close)
     END_INLINE_EVENT
     CALL(evt_npc_move_position, STRING("第三勢力幹部"), -193, 29, 0, FLOAT(180.0f), 0)
     CALL(evt_npc_set_position, STRING("第三勢力幹部"), 0, -1000, 0)
@@ -203,7 +202,7 @@ EVT_END()
 EVT_BEGIN(ueki_evt_01)
     CALL(evt_item_delete_check, STRING("item_ueki01"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_ueki01"), ITEM_STAR_PIECE, -37, 0, 96, 0, GSWF(GSWF_MRI15_STAR_PIECE_PLANTER), 0)
+        CALL(evt_item_entry, STRING("item_ueki01"), ITEM_STAR_PIECE, -37, 0, 96, ITEM_ENTRY_STAY, GSWF(GSWF_MRI15_STAR_PIECE_PLANTER), 0)
     END_IF
     RETURN
 EVT_END()
@@ -226,14 +225,14 @@ EVT_BEGIN(mri_15_init_evt)
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(9), 0)
-    CALL_CHILD(PTR(mri_puni_init))
+    CALL_CHILD(mri_puni_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    SPAWN_EVENT(PTR(puni_disp_info))
-    SPAWN_EVENT(PTR(mri_countdown))
+    CALL_CHILD(evt_bero_info_run)
+    SPAWN_EVENT(puni_disp_info)
+    SPAWN_EVENT(mri_countdown)
     SET_VALUE(LW(0), PTR(ueki_access_data))
-    CALL_CHILD(PTR(evt_sub_kusa_access_entry))
+    CALL_CHILD(evt_sub_kusa_access_entry)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG2_23_TIME_BOMB_ACTIVATED, STORY_STG2_23_01_X_NAUT_BATTLE)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
@@ -253,17 +252,17 @@ EVT_BEGIN(mri_15_init_evt)
     SET_VALUE(LW(1), 0)
     SET_VALUE(LW(2), -75)
     SET_FLOAT_VALUE(LW(3), FLOAT(1.0f))
-    SPAWN_EVENT(PTR(mri_waterfall_effect))
+    SPAWN_EVENT(mri_waterfall_effect)
     SET_VALUE(LW(0), 60)
     SET_VALUE(LW(1), 0)
     SET_VALUE(LW(2), -40)
     SET_FLOAT_VALUE(LW(3), FLOAT(1.0f))
-    SPAWN_EVENT(PTR(mri_waterfall_effect))
+    SPAWN_EVENT(mri_waterfall_effect)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_23_TIME_BOMB_ACTIVATED)
-        CALL_CHILD(PTR(dai3_battle_init))
-        SPAWN_EVENT(PTR(dai3_battle))
+        CALL_CHILD(dai3_battle_init)
+        SPAWN_EVENT(dai3_battle)
     END_IF
-    SPAWN_EVENT(PTR(door_switch_init))
+    SPAWN_EVENT(door_switch_init)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui"), 0, PTR(door_switch), 0)
     RETURN
 EVT_END()

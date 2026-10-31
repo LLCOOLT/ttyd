@@ -98,14 +98,14 @@ static PoseTableEntry pose_table[] = {
     {31, "CAT_S_1"},
     {39, "CAT_K_1"},
     {40, "CAT_W_1"},
-    {69, "CAT_S_1"},
+    {BTL_POSE_STAY_DEFAULT, "CAT_S_1"},
 };
 
 static PoseTableEntry pose_table_2[] = {
     {28, "BRT_O_1"},
     {31, "BRT_O_1"},
     {39, "BRT_O_1"},
-    {69, "BRT_O_1"},
+    {BTL_POSE_STAY_DEFAULT, "BRT_O_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -114,7 +114,7 @@ static BattleDataEntry data_table[] = {
 
 static BattleUnitKindPart parts[] = {
     {1, "bll_un_ufo", "ufo", 0.0f, 0.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 65.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
-    {2, /*"おとしもの"*/"\x82\xA8\x82\xC6\x82\xB5\x82\xE0\x82\xCC", "coin", 0.0f, -15.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x410000, 0, pose_table_2},
+    {2, "おとしもの", "coin", 0.0f, -15.0f, 0.0f, 15.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x410000, 0, pose_table_2},
 };
 
 static EVT_BEGIN(init_event)
@@ -122,12 +122,12 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    SPAWN_EVENT(PTR(main_event))
+    SPAWN_EVENT(main_event)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(main_event)
-    CALL(_ufo_main)
+    CALL(btlevtcmd_UFOAction)
     RETURN
 EVT_END()
 
@@ -138,16 +138,16 @@ static EVT_BEGIN(damage_event)
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(14), 39)
         SET_VALUE(LW(15), LW(14))
-        CALL(_ufo_damage_start)
-        CALL_CHILD(PTR(subsetevt_damage))
+        CALL(btlevtcmd_UFODamageOn)
+        CALL_CHILD(subsetevt_damage)
         SET_VALUE(LW(14), 40)
         CALL(btlevtcmd_CheckDamageCode, LW(10), 256, LW(0))
         CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(10), LW(14))
-        CALL(_ufo_damage_end)
+        CALL(btlevtcmd_UFOEscapeOn)
     ELSE
         SET_VALUE(LW(14), 39)
         SET_VALUE(LW(15), LW(14))
-        CALL_CHILD(PTR(subsetevt_damage))
+        CALL_CHILD(subsetevt_damage)
         SET_VALUE(LW(14), 40)
     END_IF
     RETURN

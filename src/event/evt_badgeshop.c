@@ -2,7 +2,7 @@
 #include "version.h"
 // Script commands and stock tables for the badge shops (Lovely Howz of Badges, Dazzle,
 // Charlieton, the Pianta Parlor prize counter): bargain and restock generation.
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo unit is built without the main precompiled header: only the dtrigf constants lead its data
 #define DTRIGF_WITH_INITIAL_VALUES
 #include <dtrigf.h>
@@ -98,9 +98,9 @@ s32 badge_bteresa_table_card_platinum[] = { //Pianta Parlor Platinum Card
     ITEM_QUAKE_HAMMER, ITEM_MONEY_MONEY, ITEM_ULTRA_SHROOM, ITEM_JAMMIN_JELLY, ITEM_NULL
 };
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // demo only: not referenced in the demo dol (four rows of four decreasing values, then 0)
-s32 badge_bteresa_value_table[] = {
+s32 badge_bteresa_table_nedan[] = {
     400, 200, 100, 50,
     800, 600, 400, 200,
     1600, 900, 500, 300,
@@ -116,7 +116,7 @@ BadgeShopWork badgeshopwork;
 BadgeShopWork* bdsw;
 
 // local prototypes
-s32 bottakuruComp(const void* sortA, const void* sortB);
+static s32 bottakuruComp(const void* sortA, const void* sortB);
 
 s32 getBadgeBottakuru100TableMaxCount(void) {
     return (sizeof(badge_bottakuru100_table) / sizeof(s32)) - 1;
@@ -163,7 +163,7 @@ void badgeShop_init(void) {
     }
 }
 
-s32 bottakuruComp(const void* sortA, const void* sortB) {
+static s32 bottakuruComp(const void* sortA, const void* sortB) {
     s32 a, b;
 
     a = ((const s32*)sortA)[1];
@@ -583,7 +583,7 @@ USER_FUNC(evt_badgeShop_bottakuru_dec) {
 }
 
 #pragma opt_common_subs reset
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo counts the thrown badges through an inline copy of badgeShop_ThrowCheck
 static inline s32 badgeShop_ThrowCount(s32 itemId) {
     int i;
@@ -605,7 +605,7 @@ USER_FUNC(evt_badgeShop_throw_get_kind_cnt) {
     long i;
 
     for (count = 0, i = 0; i < 99; i++) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         // the demo leaves out the badges already picked for the bargain list
         if ((badge = badgeShop_get(bdsw->bargain_table, (s16)(i + BADGE_MIN))) - badgeShop_ThrowCount(i + BADGE_MIN) > 0) {
 #else
@@ -649,7 +649,7 @@ USER_FUNC(evt_badgeShop_bottakuru_get_kind_cnt) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 USER_FUNC(U_evt_badgeShop_get_special_zaiko) {
     EvtWord* args = event->args;
     s16 badge;
@@ -683,9 +683,9 @@ USER_FUNC(evt_badgeShop_bteresa_get_kind_cnt) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // demo only: TRUE once word 6 of the block in LW(0) reaches the bargain count (no caller in the demo dol)
-USER_FUNC(evt_badgeShop_bargain_index_check) {
+USER_FUNC(evt_badgeShop_getBargainKind) {
     evtSetValue(event, event->args[0], !(((s32*)event->lwData[0])[6] < bdsw->bargainNum));
     return EVT_RETURN_DONE;
 }
@@ -703,7 +703,7 @@ s32 badgeShop_ThrowCheck(s32 itemId) {
     return count;
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 s32 U_badgeShop_SpecialCheck(void) {
     s32 count;
     int i;

@@ -27,10 +27,10 @@ BattleUnitSetup entryunit_mario = {&unitdata_Mario, 0, {0}, BATTLE_PHASE_PLAYER,
 BattleUnitSetup entryunit_system = {&unit_system, 0, {0}, BATTLE_PHASE_PLAYER};
 
 // forward declarations
-BOOL BattleMain(void);
-void _EquipItem(BattleUnit* unit, EquipFlags flags, ItemType type);
-void BattlePartyInfoWorkInit(BattleWork* wp);
-void BattleCheckUnitBroken(BattleWork* wp);
+static BOOL BattleMain(void);
+static void _EquipItem(BattleUnit* unit, EquipFlags flags, ItemType type);
+static void BattlePartyInfoWorkInit(BattleWork* wp);
+static void BattleCheckUnitBroken(BattleWork* wp);
 
 void battleMain(void) {
     BattleWork* wp = _battleWorkPointer;
@@ -47,7 +47,7 @@ BOOL battleSeqEndCheck() {
 void BattleInit(FieldBattleInfo* info) {
     BattleWork* wp;
 
-#if VERSION == VERSION_DEMO || VERSION >= VERSION_US
+#if VERSION != VERSION_JP
     wp = _battleWorkPointer = (BattleWork*)BattleAlloc(sizeof(BattleWork));
 #else
     wp = _battleWorkPointer = (BattleWork*)_mapAlloc(sizeof(BattleWork));
@@ -98,7 +98,7 @@ void BattleInit(FieldBattleInfo* info) {
     BattleBreakSlot_Init();
 }
 
-BOOL BattleMain(void) {
+static BOOL BattleMain(void) {
     BattleWork* wp = _battleWorkPointer;
 
     BattleCheckUnitBroken(wp);
@@ -148,7 +148,7 @@ void BattleEnd(void) {
     if (subMenu) {
         BattleFree(subMenu);
     }
-#if VERSION == VERSION_DEMO || VERSION >= VERSION_US
+#if VERSION != VERSION_JP
     BattleFree(wp);
 #else
     _mapFree(wp);
@@ -201,18 +201,18 @@ BOOL Btl_UnitSetup(BattleWork* wp) {
     }
 
     enemyData = groupSetup->enemyData;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     heldItem = ITEM_NULL;
 #endif
     for (i = 0; i < groupSetup->numEnemies; enemyData++, i++) {
         enemy = BtlUnit_Entry(enemyData);
         enemy->groupSetupId = i;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         enemy->heldItem = heldItem;
 #else
         enemy->heldItem = ITEM_NULL;
 #endif
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         // The demo's enemies carry no held or stolen items.
         heldItem = setup->stolenItems[enemy->groupSetupId];
         if (heldItem) {
@@ -554,7 +554,7 @@ void BtlUnit_EquipItem(BattleUnit* unit, s32 flags, ItemType type) {
     }
 }
 
-void _EquipItem(BattleUnit* unit, EquipFlags flags, ItemType type) {
+static void _EquipItem(BattleUnit* unit, EquipFlags flags, ItemType type) {
     if (type == ITEM_NULL) {
         return;
     }
@@ -776,7 +776,7 @@ void _EquipItem(BattleUnit* unit, EquipFlags flags, ItemType type) {
     }
 }
 
-void BattlePartyInfoWorkInit(BattleWork* wp) {
+static void BattlePartyInfoWorkInit(BattleWork* wp) {
     BattleWorkPartyInfo* partyInfo;
     int i;
 
@@ -819,7 +819,7 @@ f32 BattleGetFloorHeight(BattleWork* wp, f32 x, f32 y, f32 z) {
     return stage->audienceSizeY;
 }
 
-void BattleCheckUnitBroken(BattleWork* wp) {
+static void BattleCheckUnitBroken(BattleWork* wp) {
     s32 i;
 
     for (i = 0; i < BATTLE_UNIT_MAX; i++) {

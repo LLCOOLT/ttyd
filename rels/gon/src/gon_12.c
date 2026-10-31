@@ -20,7 +20,6 @@
 #include "evt/evt_party.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "gon.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -110,13 +109,13 @@ static EVT_BEGIN(chuchurina_sogu)
     CALL(evt_bero_mario_go_init)
     CALL(evt_seq_wait, 2)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_play_enter_anime))
+    SPAWN_EVENT(bero_play_enter_anime)
     CALL(evt_bero_mario_go_wait)
     BEGIN_INLINE_EVENT
         CALL(evt_party_move_pos2, 0, 160, 15, FLOAT(150.0f))
     END_INLINE_EVENT
     CALL(evt_mario_mov_pos2, 130, 0, FLOAT(150.0f))
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
 #endif
     CALL(evt_party_stop, 0)
@@ -223,11 +222,11 @@ static EVT_BEGIN(chuchurina_sogu)
     CALL(evt_msg_continue)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_GON1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_GON1"))
-    SPAWN_EVENT(PTR(bero_case_entry))
+    SPAWN_EVENT(bero_case_entry)
     CALL(evt_cam3d_evt_off, 500, 4)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_party_run, 0)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(evt_mario_get_party, LW(0))
     IF_INT_EQUAL(LW(0), 2)
         SET_VALUE(GSWF(GSWF_GON12_MOWZ_MET_WITH_KOOPS), 1)
@@ -242,7 +241,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"チュチュリーナ"*/"\x83\x60\x83\x85\x83\x60\x83\x85\x83\x8A\x81\x5B\x83\x69", // name
+        "チュチュリーナ", // name
         0, 0, // flags..reactionFlags
         npc_init_evt, // initEvent
         NULL, // regularEvent
@@ -258,11 +257,7 @@ static NpcSetupInfo npcEnt[] = {
 static EVT_BEGIN(item_get00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("item00"), ITEM_CASTLE_KEY_0x0F, LW(0), LW(1), LW(2), 15, -1, 0)
-#else
-    CALL(evt_item_entry, STRING("item00"), ITEM_CASTLE_KEY_0x0F, LW(0), LW(1), LW(2), 16, -1, 0)
-#endif
+    CALL(evt_item_entry, STRING("item00"), ITEM_CASTLE_KEY_0x0F, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_item, STRING("item00"))
@@ -274,11 +269,7 @@ EVT_END()
 EVT_BEGIN(item_get01)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box01"), LW(0), LW(1), LW(2))
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("item01"), ITEM_MUSHROOM, LW(0), LW(1), LW(2), 15, -1, 0)
-#else
-    CALL(evt_item_entry, STRING("item01"), ITEM_MUSHROOM, LW(0), LW(1), LW(2), 16, -1, 0)
-#endif
+    CALL(evt_item_entry, STRING("item01"), ITEM_MUSHROOM, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("item01"), ITEM_FLAG_NO_TOUCH)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box01"))
     CALL(evt_item_get_item, STRING("item01"))
@@ -289,11 +280,7 @@ EVT_END()
 EVT_BEGIN(item_get02)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box02"), LW(0), LW(1), LW(2))
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("item02"), ITEM_HONEY_SYRUP, LW(0), LW(1), LW(2), 15, -1, 0)
-#else
-    CALL(evt_item_entry, STRING("item02"), ITEM_HONEY_SYRUP, LW(0), LW(1), LW(2), 16, -1, 0)
-#endif
+    CALL(evt_item_entry, STRING("item02"), ITEM_HONEY_SYRUP, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("item02"), ITEM_FLAG_NO_TOUCH)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box02"))
     CALL(evt_item_get_item, STRING("item02"))
@@ -305,19 +292,19 @@ EVT_BEGIN(gon_12_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_15_MS_MOWZ)
-        CALL_CHILD(PTR(evt_bero_info_run))
+        CALL_CHILD(evt_bero_info_run)
     END_IF
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_GON1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_GON1"))
     CALL(evt_snd_set_rev_mode, 2)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_npc_change_fbat_mode, 1)
-    SPAWN_EVENT(PTR(chuchurina_sogu))
+    SPAWN_EVENT(chuchurina_sogu)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_15_01_KEY_3)
         SET_VALUE(GSWF(GSWF_GON12_CASTLE_KEY_CHEST_OPENED), 1)
     END_IF
     CALL(evt_mobj_itembox, STRING("mobj_box00"), -117, 0, -75, 0, 0, PTR(item_get00), GSWF(GSWF_GON12_CASTLE_KEY_CHEST_OPENED))
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(evt_mobj_itembox, STRING("mobj_box01"), -56, 0, -75, 0, 0, PTR(item_get01), GSWF(GSWF_GON12_MUSHROOM_CHEST_OPENED))
 #else
     CALL(evt_mobj_itembox, STRING("mobj_box01"), -56, 0, -25, 0, 0, PTR(item_get01), GSWF(GSWF_GON12_MUSHROOM_CHEST_OPENED))

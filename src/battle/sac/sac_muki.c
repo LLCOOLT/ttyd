@@ -23,7 +23,7 @@
 #include "battle/battle_event_cmd.h"
 #include "battle/battle_camera.h"
 #include "battle/sac/sac_common.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "pmario_sound.h"
 #include "battle/battle_sub.h"
@@ -38,7 +38,7 @@ static USER_FUNC(star_stone_appear);
 static USER_FUNC(wait_game_end);
 static USER_FUNC(start_game);
 static USER_FUNC(set_weapon);
-USER_FUNC(main_muki);
+static USER_FUNC(main_muki);
 
 typedef struct MukiObj { // 0x38
     s32 kind;            // 0x
@@ -105,15 +105,15 @@ static void disp_2D(CameraId cam, void* param);
 static MukiWork* get_ptr(void);
 static void main_star(void);
 static void main_base(void);
-void main_icon(s32 idx);
-void main_point(s32 idx);
-void main_cursor(void);
+static void main_icon(s32 idx);
+static void main_point(s32 idx);
+static void main_cursor(void);
 
 static BattleWeapon weapon;
 extern EvtWord nice_event_pow[];
 
 // the demo defines the event first
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(nice_event_pow)
     CALL(btlevtcmd_ACSuccessEffect, LW(0), -100, 175, 0)
     RETURN
@@ -158,14 +158,14 @@ static BattleWeapon weapon = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 EVT_BEGIN(nice_event_pow)
     CALL(btlevtcmd_ACSuccessEffect, LW(0), -100, 175, 0)
     RETURN
 EVT_END()
 #endif
 
-USER_FUNC(main_muki) {
+static USER_FUNC(main_muki) {
     MukiWork* w = get_ptr();
     EvtWord* args = event->args;
     s32 i;
@@ -351,7 +351,7 @@ static void main_base(void) {
         BattleAudienceSoundHandBeat();  \
     }
 
-void main_cursor(void) {
+static void main_cursor(void) {
     MukiWork* w = get_ptr();
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
     BattleUnitPart* part = BtlUnit_GetPartsPtr(mario, BtlUnit_GetBodyPartsId(mario));
@@ -384,7 +384,7 @@ void main_cursor(void) {
                 ob = w->o3d[w->idx].link;
                 if (ob) {
                     ob->kind = 5;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                     effHitEntry(0, 0x20, ob->pos.x, ob->pos.y, ob->pos.z, 1.0f);
 #else
                     effHitEntry(0, 5, ob->pos.x, ob->pos.y, ob->pos.z, 1.0f);
@@ -510,7 +510,7 @@ void main_cursor(void) {
     }
 }
 
-void main_point(s32 idx) {
+static void main_point(s32 idx) {
     MukiWork* w = get_ptr();
     Muki3D* o = &w->o3d[idx];
     s32 i;
@@ -582,7 +582,7 @@ void main_point(s32 idx) {
     }
 }
 
-void main_icon(s32 idx) {
+static void main_icon(s32 idx) {
     MukiWork* w = get_ptr();
     MukiObj* o = &w->obj[idx];
 
@@ -718,7 +718,7 @@ static void main_star(void) {
     }
 }
 
-USER_FUNC(end_muki) {
+static USER_FUNC(end_muki) {
     MukiWork* w = get_ptr();
     s32 i;
 

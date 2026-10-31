@@ -12,7 +12,6 @@
 #include "evt/evt_offscreen.h"
 #include "evt/evt_paper.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "moo.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -27,7 +26,7 @@ EVT_BEGIN(n_bero_in)
     CALL(evt_mario_cam_y_off)
     CALL(evt_hit_get_position, STRING("n_bero"), LW(0), LW(1), LW(2))
     CALL(evt_mario_set_pos, LW(0), LW(1), LW(2))
-    CALL_CHILD(PTR(bero_case_entry))
+    CALL_CHILD(bero_case_entry)
     SET_VALUE(LW(0), 1)
     RETURN
 EVT_END()
@@ -213,7 +212,7 @@ static EVT_BEGIN(rock_evt0)
 #endif
     SET_VALUE(LW(10), STRING("S_iwa_01"))
     SET_VALUE(LW(11), STRING("A_iwa_01"))
-    CALL_CHILD(PTR(rock_main))
+    CALL_CHILD(rock_main)
 #if VERSION <= VERSION_JP
     SET_VALUE(GSWF(GSWF_MOO02_ROCK_A_BOMBED), 1)
     CALL(evt_mario_key_onoff, 1)
@@ -230,7 +229,7 @@ static EVT_BEGIN(rock_evt1)
 #endif
     SET_VALUE(LW(10), STRING("S_iwa_07"))
     SET_VALUE(LW(11), STRING("A_iwa_07"))
-    CALL_CHILD(PTR(rock_main))
+    CALL_CHILD(rock_main)
 #if VERSION <= VERSION_JP
     SET_VALUE(GSWF(GSWF_MOO02_ROCK_B_BOMBED), 1)
     CALL(evt_mario_key_onoff, 1)
@@ -242,14 +241,14 @@ EVT_END()
 EVT_BEGIN(moo_02_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_MON1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_MOO2"))
     CALL(evt_map_playanim, STRING("hosi_01"), 1, 0)
     CALL(evt_map_playanim, STRING("hosi_02"), 1, 0)
     CALL(evt_map_playanim, STRING("hosi_03"), 1, 0)
     CALL(evt_map_playanim, STRING("light"), 1, 0)
-    CALL(evt_item_entry, STRING("item00"), ITEM_STAR_PIECE, -55, 0, -135, 16, GSWF(GSWF_MOO02_STAR_PIECE), 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_STAR_PIECE, -55, 0, -135, ITEM_ENTRY_FIXED, GSWF(GSWF_MOO02_STAR_PIECE), 0)
     CALL(evt_paper_entry, STRING("OFF_d_bom_ver2"))
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_07_A_PIPE_APPEARS)
         CALL(evt_run_case_evt, CASE_COND_BOBBERY, 1, STRING("A_iwa_04"), 0, PTR(dokan_evt), 0)
@@ -269,6 +268,6 @@ EVT_BEGIN(moo_02_init_evt)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_iwa_07"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_iwa_07"), 1, 0)
     END_IF
-    CALL(evt_item_entry, STRING("item_01"), ITEM_POWER_PUNCH, 330, 0, 403, 16, GSWF(GSWF_MOO02_POWER_PUNCH), 0)
+    CALL(evt_item_entry, STRING("item_01"), ITEM_POWER_PUNCH, 330, 0, 403, ITEM_ENTRY_FIXED, GSWF(GSWF_MOO02_POWER_PUNCH), 0)
     RETURN
 EVT_END()

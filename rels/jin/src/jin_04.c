@@ -22,14 +22,14 @@
 #include "evt/evt_party.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
+#include "party.h"
 #include "evt/evt_story.h"
 #include "evt/evt_pouch.h"
 #include "driver/casedrv.h"
 #include <dolphin/pad.h>
 
 static USER_FUNC(getYoshiColor);
-USER_FUNC(vivian_away);
+static USER_FUNC(vivian_away);
 
 static BeroEntry bero_entry_data[2];
 extern EvtWord ranperu_toujou[];
@@ -159,11 +159,11 @@ EVT_BEGIN(ranperu_toujou)
     CALL(evt_npc_set_battle_info, STRING("ランペル"), 5)
     CALL(evt_npc_battle_start, STRING("ランペル"))
     CALL(evt_npc_wait_battle_end)
-    CALL_CHILD(PTR(irekawatta_mario_init))
+    CALL_CHILD(irekawatta_mario_init)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG4_10_DOOPLISS_BATTLE)
     SET_VALUE(LW(0), 0)
-    SPAWN_EVENT(PTR(irekawatta_mario))
+    SPAWN_EVENT(irekawatta_mario)
     CALL(evt_exit_case_evt)
     RETURN
 EVT_END()
@@ -195,7 +195,7 @@ EVT_BEGIN(irekawatta_mario)
     IF_INT_EQUAL(LW(0), 1)
         GOTO(100)
     END_IF
-    CALL_CHILD(PTR(irekawatta_mario_init))
+    CALL_CHILD(irekawatta_mario_init)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     WAIT_MS(100)
     CALL(evt_mario_set_pose, STRING("M_D_1"))
@@ -219,7 +219,7 @@ EVT_BEGIN(irekawatta_mario)
     CALL(evt_mario_set_pose, STRING("M_D_2"))
     WAIT_MS(800)
     CALL(evt_cam3d_evt_set, -8, 800, 422, -8, 730, 28, 2000, 11)
-    CALL(evt_item_entry, STRING("rubystar"), ITEM_RUBY_STAR, 0, -1000, 0, 17, -1, 0)
+    CALL(evt_item_entry, STRING("rubystar"), ITEM_RUBY_STAR, 0, -1000, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_npc_sound_data_set, STRING("ランペル"), 0, 0, 0, 0, 0)
     CALL(evt_npc_set_position, STRING("ランペル"), 85, 470, 51)
     BEGIN_INLINE_EVENT
@@ -235,20 +235,25 @@ EVT_BEGIN(irekawatta_mario)
         END_LOOP
     END_INLINE_EVENT
     CALL(evt_npc_jump_position_nohit, STRING("ランペル"), 35, 470, 51, 600, FLOAT(30.0f))
-    SPAWN_EVENT(PTR(starstone_jump_se))
+    SPAWN_EVENT(starstone_jump_se)
     CALL(evt_npc_jump_position_nohit, STRING("ランペル"), 10, 470, 51, 300, FLOAT(15.0f))
-    SPAWN_EVENT(PTR(starstone_jump_se))
+    SPAWN_EVENT(starstone_jump_se)
     CALL(evt_npc_jump_position_nohit, STRING("ランペル"), -2, 470, 51, 150, FLOAT(7.5f))
-    SPAWN_EVENT(PTR(starstone_jump_se))
+    SPAWN_EVENT(starstone_jump_se)
     CALL(evt_npc_jump_position_nohit, STRING("ランペル"), -8, 470, 51, 79, FLOAT(3.25f))
-    SPAWN_EVENT(PTR(starstone_jump_se))
+    SPAWN_EVENT(starstone_jump_se)
     CALL(evt_npc_set_position, STRING("ランペル"), -8, 470, 51)
     WAIT_MS(300)
     WAIT_MS(500)
     SET_VALUE(LW(0), -1)
     SET_VALUE(LW(1), STRING("rubystar"))
+#if VERSION <= VERSION_DEMO_US
+    CALL_CHILD(evt_sub_starstone)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
-    CALL_CHILD(PTR(evt_sub_starstone))
+#else
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
+    CALL_CHILD(evt_sub_starstone)
+#endif
     WAIT_MS(500)
     GOTO(101)
     LABEL(100)
@@ -323,7 +328,9 @@ EVT_BEGIN(irekawatta_mario)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_JIN1"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_JIN1"))
+#endif
     CALL(evt_cam3d_evt_off, 1000, 11)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG4_10_02_TRADING_PLACES)
     SET_VALUE(GSWF(GSWF_STG4_MARIO_IS_SHADOW), 1)
@@ -442,9 +449,9 @@ EVT_BEGIN(ranperu_lastbattle)
     CALL(evt_npc_set_battle_info, STRING("にせマリオ"), 6)
     CALL(evt_npc_battle_start, STRING("にせマリオ"))
     CALL(evt_npc_wait_battle_end)
-    CALL_CHILD(PTR(hontonosugata_mario_init))
+    CALL_CHILD(hontonosugata_mario_init)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG4_15_DOOPLISS_BATTLE_2)
-    SPAWN_EVENT(PTR(hontonosugata_mario))
+    SPAWN_EVENT(hontonosugata_mario)
     CALL(evt_exit_case_evt)
     RETURN
 EVT_END()
@@ -479,8 +486,8 @@ EVT_BEGIN(hontonosugata_mario_init)
 EVT_END()
 
 EVT_BEGIN(hontonosugata_mario)
-    CALL_CHILD(PTR(hontonosugata_mario_init))
-    CALL(evt_item_entry, STRING("rubystar"), ITEM_RUBY_STAR, 0, -1000, 0, 17, -1, 0)
+    CALL_CHILD(hontonosugata_mario_init)
+    CALL(evt_item_entry, STRING("rubystar"), ITEM_RUBY_STAR, 0, -1000, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_npc_entry, STRING("ダミー"), STRING("c_mario"))
     CALL(evt_npc_flag_onoff, 1, STRING("ダミー"), NPC_FLAG_HIDDEN)
     CALL(evt_npc_get_position, STRING("にせマリオ"), LW(0), LW(1), LW(2))
@@ -499,15 +506,15 @@ EVT_BEGIN(hontonosugata_mario)
         SUBTRACT(LW(0), 25)
         ADD(LW(2), 20)
         CALL(evt_npc_jump_position_nohit, STRING("ダミー"), LW(0), 670, LW(2), 300, FLOAT(15.0f))
-        SPAWN_EVENT(PTR(starstone_jump_se))
+        SPAWN_EVENT(starstone_jump_se)
         SUBTRACT(LW(0), 12)
         ADD(LW(2), 10)
         CALL(evt_npc_jump_position_nohit, STRING("ダミー"), LW(0), 670, LW(2), 150, FLOAT(7.5f))
-        SPAWN_EVENT(PTR(starstone_jump_se))
+        SPAWN_EVENT(starstone_jump_se)
         SUBTRACT(LW(0), 6)
         ADD(LW(2), 5)
         CALL(evt_npc_jump_position_nohit, STRING("ダミー"), LW(0), 670, LW(2), 75, FLOAT(3.25f))
-        SPAWN_EVENT(PTR(starstone_jump_se))
+        SPAWN_EVENT(starstone_jump_se)
         SET_VALUE(GF(0), 1)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
@@ -720,8 +727,10 @@ EVT_BEGIN(hontonosugata_mario)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG4_15_03_THE_RUBY_STAR)
     SET_VALUE(LW(0), 4)
     SET_VALUE(LW(1), STRING("rubystar"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
-    CALL_CHILD(PTR(evt_sub_starstone))
+#endif
+    CALL_CHILD(evt_sub_starstone)
     RETURN
 EVT_END()
 
@@ -749,7 +758,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", // name
+        "ランペル", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         ranperu_init, // initEvent
@@ -759,7 +768,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"にせマリオ"*/"\x82\xC9\x82\xB9\x83\x7D\x83\x8A\x83\x49", // name
+        "にせマリオ", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         nisemario_init, // initEvent
@@ -769,7 +778,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"クリスチーヌ"*/"\x83\x4E\x83\x8A\x83\x58\x83\x60\x81\x5B\x83\x6B", // name
+        "クリスチーヌ", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -778,7 +787,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ノコタロウ"*/"\x83\x6D\x83\x52\x83\x5E\x83\x8D\x83\x45", // name
+        "ノコタロウ", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -787,7 +796,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"クラウダ"*/"\x83\x4E\x83\x89\x83\x45\x83\x5F", // name
+        "クラウダ", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -796,7 +805,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ヨッシー"*/"\x83\x88\x83\x62\x83\x56\x81\x5B", // name
+        "ヨッシー", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -818,8 +827,11 @@ EVT_BEGIN(jin_04_jumpstand)
         END_SWITCH
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_mario_dispflag_onoff, 1, 4)
+        // The demo always makes the partner jump along; the releases only when L_evt_party_dokan returns 1.
+#if VERSION >= VERSION_JP
         CALL(L_evt_party_dokan, 0, LW(0))
         IF_INT_EQUAL(LW(0), 1)
+#endif
             BEGIN_INLINE_EVENT_GET_ID(LW(10))
                 CALL(evt_party_stop, 0)
                 WAIT_MS(300)
@@ -829,7 +841,9 @@ EVT_BEGIN(jin_04_jumpstand)
                 CALL(evt_party_jump_pos, 0, -100, 670, 50, 1000, 0, -1000)
                 CALL(evt_party_run, 0)
             END_INLINE_EVENT
+#if VERSION >= VERSION_JP
         END_IF
+#endif
         CALL(evt_mario_jump_pos, -75, 670, 50, 1000, 0, -1000)
         LOOP(0)
             IS_EVENT_RUNNING(LW(10), LW(11))
@@ -843,8 +857,10 @@ EVT_BEGIN(jin_04_jumpstand)
     ELSE
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_mario_dispflag_onoff, 1, 4)
+#if VERSION >= VERSION_JP
         CALL(L_evt_party_dokan, 0, LW(0))
         IF_INT_EQUAL(LW(0), 1)
+#endif
             BEGIN_INLINE_EVENT_GET_ID(LW(10))
                 CALL(evt_party_stop, 0)
                 WAIT_MS(300)
@@ -854,7 +870,9 @@ EVT_BEGIN(jin_04_jumpstand)
                 CALL(evt_party_jump_pos, 0, -60, 450, 130, 500, 0, -1000)
                 CALL(evt_party_run, 0)
             END_INLINE_EVENT
+#if VERSION >= VERSION_JP
         END_IF
+#endif
         CALL(evt_hitobj_onoff, STRING("MOBJ_mobj_jump"), 0, 0)
         CALL(evt_mario_jump_pos, -30, 450, 110, 500, 0, -1000)
         CALL(evt_hitobj_onoff, STRING("MOBJ_mobj_jump"), 0, 1)
@@ -868,17 +886,27 @@ EVT_BEGIN(jin_04_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG4_10_DOOPLISS_BATTLE)
         CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_JIN1"))
+        CALL(evt_snd_set_rev_mode, 2)
+#else
         CALL(evt_snd_envoff, PSND_FADE_OUT)
+#endif
         CASE_DEFAULT
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_JIN1"))
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_JIN1"))
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_snd_set_rev_mode, 2)
+#endif
     END_SWITCH
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 2)
+#endif
     CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(evt_usu_kagemario_party_kill)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 10, -100, 60, 150, 0, 0)
     CALL(evt_mobj_jumpstand_red, 0, STRING("mobj_jump"), -75, 450, 100, PTR(jin_04_jumpstand), 0)
@@ -886,17 +914,17 @@ EVT_BEGIN(jin_04_init_evt)
         CASE_LESS(STORY_STG4_10_DOOPLISS_BATTLE)
         CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_yuka"), 0, PTR(ranperu_toujou), 0)
         CASE_EQUAL(STORY_STG4_14_NAME_GUESSING)
-        CALL_CHILD(PTR(yoshi_color))
+        CALL_CHILD(yoshi_color)
         CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("a_yuka"), 0, PTR(ranperu_lastbattle), 0)
         CASE_EQUAL(STORY_STG4_10_DOOPLISS_BATTLE)
-        CALL_CHILD(PTR(yoshi_color))
+        CALL_CHILD(yoshi_color)
         SET_VALUE(LW(0), 1)
-        SPAWN_EVENT(PTR(irekawatta_mario))
+        SPAWN_EVENT(irekawatta_mario)
         CASE_EQUAL(STORY_STG4_15_DOOPLISS_BATTLE_2)
         CALL(evt_mario_key_onoff, 0)
         BEGIN_INLINE_EVENT
             CALL(evt_seq_wait, 2)
-            SPAWN_EVENT(PTR(hontonosugata_mario))
+            SPAWN_EVENT(hontonosugata_mario)
         END_INLINE_EVENT
     END_SWITCH
     RETURN
@@ -907,7 +935,7 @@ static USER_FUNC(getYoshiColor) {
     evtSetValue(event, args[0], pouchGetPartyColor(4));
     return EVT_RETURN_DONE;
 }
-USER_FUNC(vivian_away) {
+static USER_FUNC(vivian_away) {
     pouchGetPtr()->partyData[6].flags |= 2;
     return EVT_RETURN_DONE;
 }

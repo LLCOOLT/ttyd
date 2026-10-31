@@ -46,7 +46,7 @@ void batSpotEnd(void);
 
 static u8 inta_tex[32] ATTRIBUTE_ALIGN(32) = {0xFF, 0xFF, 0xFF, 0xFF, 0, 0, 0, 0, 0xFF, 0xFF, 0xFF, 0xFF, 0, 0, 0, 0, 0xFF, 0xFF, 0xFF, 0xFF, 0, 0, 0, 0, 0xFF, 0xFF, 0xFF, 0xFF, 0, 0, 0, 0};
 
-USER_FUNC(screen_evt_func);
+static USER_FUNC(screen_evt_func);
 
 EVT_BEGIN(screen_evt)
     BEGIN_INLINE_EVENT
@@ -56,18 +56,18 @@ EVT_BEGIN(screen_evt)
 EVT_END()
 
 // forward declarations
-void batSpotDisp(CameraId camId, void* param);
-BattleSpotEntry* batSpotEntry(void);
-void BattleStageDispDark(CameraId camId, void* param);
-void BattleStageDispLight(CameraId camId, void* param);
-void DarkByPoint(u8 alpha, f32 x, f32 y, f32 z);
-void DarkBySquare(f32 x0, f32 y0, f32 x1, f32 y1, f32 z, u8 alpha);
-void BattleStageSetDark(StageDark* d, u8 v, s32 time, u8 mode);
-void BattleStageSetDarkBase(StageDark* d, u8 v, s32 time, u8 mode);
-void batSpotInit(void);
+static void batSpotDisp(CameraId camId, void* param);
+static BattleSpotEntry* batSpotEntry(void);
+static void BattleStageDispDark(CameraId camId, void* param);
+static void BattleStageDispLight(CameraId camId, void* param);
+static void DarkByPoint(u8 alpha, f32 x, f32 y, f32 z);
+static void DarkBySquare(f32 x0, f32 y0, f32 x1, f32 y1, f32 z, u8 alpha);
+static void BattleStageSetDark(StageDark* d, u8 v, s32 time, u8 mode);
+static void BattleStageSetDarkBase(StageDark* d, u8 v, s32 time, u8 mode);
+static void batSpotInit(void);
 f32 getSpline(f32* a, f32* b, f32* c, f32* d, s32* t, s32 n, s32 x);
-void batSpotMain();
-void drawCone(CameraId camId, BattleSpotEntry* e);
+static void batSpotMain();
+static void drawCone(CameraId camId, BattleSpotEntry* e);
 
 BattleStage* BattleStageGetPtr(void) {
     return &_battleWorkPointer->stage;
@@ -224,7 +224,7 @@ void BattleStageDisp(void) {
 
 // inlining off for DarkByPoint, as in the original (the object differs without it)
 #pragma dont_inline on
-void DarkByPoint(u8 alpha, f32 x, f32 y, f32 z) {
+static void DarkByPoint(u8 alpha, f32 x, f32 y, f32 z) {
     GXPosition3f32(x, y, z);
     GXColor4u8(0, 0, 0, alpha);
 }
@@ -232,7 +232,7 @@ void DarkByPoint(u8 alpha, f32 x, f32 y, f32 z) {
 
 // inlining off for DarkBySquare, as in the original (the object differs without it)
 #pragma dont_inline on
-void DarkBySquare(f32 x0, f32 y0, f32 x1, f32 y1, f32 z, u8 alpha) {
+static void DarkBySquare(f32 x0, f32 y0, f32 x1, f32 y1, f32 z, u8 alpha) {
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     DarkByPoint(alpha, x0, y0, z);
     DarkByPoint(alpha, x1, y0, z);
@@ -241,7 +241,7 @@ void DarkBySquare(f32 x0, f32 y0, f32 x1, f32 y1, f32 z, u8 alpha) {
 }
 #pragma dont_inline reset
 
-void BattleStageDispDark(CameraId camId, void* param) {
+static void BattleStageDispDark(CameraId camId, void* param) {
     BattleStage* s = STG;
     CameraEntry* cam = camGetPtr(CAMERA_3D);
     StageDark* aud;
@@ -280,7 +280,7 @@ void BattleStageDispDark(CameraId camId, void* param) {
 #pragma push
 // propagation optimisation off for BattleStageDispLight, BattleStageOnLightInCommand, BattleStageOffLightInCommand and 7 more: the original register allocation and scheduling need it
 #pragma opt_propagation off
-void BattleStageDispLight(CameraId camId, void* param) {
+static void BattleStageDispLight(CameraId camId, void* param) {
     s32 i, j;
     f32 width;
     BattleStage* s = &_battleWorkPointer->stage;
@@ -535,7 +535,7 @@ void BattleStageLightSetUpVec(s32 idx, f32 x, f32 y, f32 z, s32 time, u8 mode) {
 
 // inlining off for BattleStageSetDark, as in the original (the object differs without it)
 #pragma dont_inline on
-void BattleStageSetDark(StageDark* d, u8 v, s32 time, u8 mode) {
+static void BattleStageSetDark(StageDark* d, u8 v, s32 time, u8 mode) {
     d->start = d->cur;
     d->target = v;
     d->time = time;
@@ -549,7 +549,7 @@ void BattleStageSetDark(StageDark* d, u8 v, s32 time, u8 mode) {
 
 // inlining off for BattleStageSetDarkBase, as in the original (the object differs without it)
 #pragma dont_inline on
-void BattleStageSetDarkBase(StageDark* d, u8 v, s32 time, u8 mode) {
+static void BattleStageSetDarkBase(StageDark* d, u8 v, s32 time, u8 mode) {
     d->baseStart = d->base;
     d->baseTarget = v;
     d->baseTime = time;
@@ -608,7 +608,7 @@ BattleSpotWork* BatSpotGetPtr(void) {
 
 // inlining off for batSpotInit, as in the original (the object differs without it)
 #pragma dont_inline on
-void batSpotInit(void) {
+static void batSpotInit(void) {
     int i;
     BattleSpotEntry* entry;
 
@@ -628,7 +628,7 @@ void batSpotInit(void) {
 
 // inlining off for batSpotMain, as in the original (the object differs without it)
 #pragma dont_inline on
-void batSpotMain() {
+static void batSpotMain() {
     s32 count = wp->count;
 
     while (count-- > 0) {}
@@ -647,7 +647,7 @@ void batSpotEnd(void) {
 #pragma dont_inline reset
 #endif
 
-void batSpotDisp(CameraId camId, void* param) {
+static void batSpotDisp(CameraId camId, void* param) {
     int i;
     BattleSpotEntry* e;
 
@@ -697,7 +697,7 @@ void batSpotDisp(CameraId camId, void* param) {
 
 // inlining off for drawCone, as in the original (the object differs without it)
 #pragma dont_inline on
-void drawCone(CameraId camId, BattleSpotEntry* e) {
+static void drawCone(CameraId camId, BattleSpotEntry* e) {
     Mtx trans, scale, m, rx, ry, rz;
     CameraEntry* cam;
     s32 i;
@@ -735,7 +735,7 @@ void drawCone(CameraId camId, BattleSpotEntry* e) {
 
 // inlining off for batSpotEntry, as in the original (the object differs without it)
 #pragma dont_inline on
-BattleSpotEntry* batSpotEntry(void) {
+static BattleSpotEntry* batSpotEntry(void) {
     int i;
     BattleSpotEntry* entry = wp->entries;
 
@@ -772,7 +772,7 @@ static void screen_capture(CameraId camId, void* param) {
     screen_wp->captured = 1;
 }
 
-USER_FUNC(screen_evt_func) {
+static USER_FUNC(screen_evt_func) {
     dispEntry(CAMERA_2D, 1000.0f, 0, screen_capture, NULL);
     return 0;
 }

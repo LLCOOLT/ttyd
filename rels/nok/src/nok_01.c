@@ -34,7 +34,6 @@
 #include "evt/evt_snd.h"
 #include "evt/evt_urouro.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "nok.h"
 #include "driver/envdrv.h"
 #include "version.h"
@@ -65,7 +64,7 @@ static HouseParam ie_data;
 static HitDamageReturn hitDmgRetPoints[13];
 static KusaAccess kusa_data[4];
 
-void iri_08_msg(s32 type, void** work) {
+static void iri_08_msg(s32 type, void** work) {
     u16* msg = *work;
 
     if (type == 3 && msg[4] == 9) {
@@ -216,7 +215,7 @@ EVT_BEGIN(monban_talk)
         CASE_LESS(STORY_STG1_02_TALKING_WITH_KROOP)
         CALL(evt_msg_print, 0, STRING("stg1_nok_26"), 0, 0)
         CASE_LESS(STORY_STG1_03_PETALBURG_GATEKEEPER)
-        CALL_CHILD(PTR(open_gate))
+        CALL_CHILD(open_gate)
         CASE_LESS(STORY_STG1_06_01_GOLD_FUZZY)
         CALL(evt_msg_print, 0, STRING("stg1_nok_31_01_00"), 0, 0)
         CASE_LESS(STORY_STG1_17_FATHER_AND_SON_REUNITED)
@@ -232,7 +231,7 @@ EVT_BEGIN(monban_talk)
 EVT_END()
 
 static EVT_BEGIN(nokotarou_init)
-    CALL_CHILD(PTR(npc_init_evt))
+    CALL_CHILD(npc_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_06_01_GOLD_FUZZY)
         CALL(evt_npc_set_position, STRING("me"), -35, 65, -425)
@@ -258,7 +257,7 @@ static EVT_BEGIN(nokotarou_talk)
 EVT_END()
 
 EVT_BEGIN(nokopapa_init)
-    CALL_CHILD(PTR(npc_init_evt))
+    CALL_CHILD(npc_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_GREATER(STORY_STG1_16_HOOKTAIL)
         CALL(evt_npc_set_position, STRING("me"), 92, 50, -308)
@@ -409,11 +408,7 @@ EVT_BEGIN(boss_noko_talk)
         END_IF
         IF_INT_LESS(LW(0), LW(1))
             CALL(evt_msg_continue)
-#if VERSION == VERSION_DEMO
-            CALL(evt_item_entry, STRING("item_irai"), ITEM_TURTLEY_LEAF, 0, -1000, 0, 16, -1, 0)
-#else
-            CALL(evt_item_entry, STRING("item_irai"), ITEM_TURTLEY_LEAF, 0, -1000, 0, 17, -1, 0)
-#endif
+            CALL(evt_item_entry, STRING("item_irai"), ITEM_TURTLEY_LEAF, 0, -1000, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
             CALL(evt_item_get_item, STRING("item_irai"))
             SET_VALUE(GSWF(GSWF_NOK01_TURTLEY_LEAF_TAKEN), 1)
         ELSE
@@ -423,11 +418,7 @@ EVT_BEGIN(boss_noko_talk)
             CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
             CALL(evt_npc_move_position, STRING("me"), -317, -350, 0, 40, 0)
             WAIT_MS(300)
-#if VERSION == VERSION_DEMO
-            CALL(evt_item_entry, STRING("iri_08"), ITEM_TURTLEY_LEAF, -317, 128, -374, 15, GSWF(GSWF_NOK01_TURTLEY_LEAF_TAKEN), 0)
-#else
-            CALL(evt_item_entry, STRING("iri_08"), ITEM_TURTLEY_LEAF, -317, 128, -374, 16, GSWF(GSWF_NOK01_TURTLEY_LEAF_TAKEN), 0)
-#endif
+            CALL(evt_item_entry, STRING("iri_08"), ITEM_TURTLEY_LEAF, -317, 128, -374, ITEM_ENTRY_FIXED, GSWF(GSWF_NOK01_TURTLEY_LEAF_TAKEN), 0)
             WAIT_MS(300)
             CALL(evt_npc_move_position, STRING("me"), LW(0), LW(2), 0, 40, 0)
             CALL(evt_set_dir_to_target, STRING("me"), STRING("mario"))
@@ -448,7 +439,7 @@ EVT_BEGIN(boss_noko_talk)
             ELSE
                 IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_2), 0)
                     CALL(evt_msg_print, 0, STRING("irai_17_00"), 0, 0)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                     CALL(evt_win_item_select, PTR(iri_17_item_tbl), LW(0))
 #else
                     CALL(evt_win_item_select, 0, PTR(iri_17_item_tbl), LW(0), 0)
@@ -456,11 +447,7 @@ EVT_BEGIN(boss_noko_talk)
                     IF_INT_NOT_EQUAL(LW(0), -1)
                         CALL(evt_pouch_remove_item, ITEM_ROUTING_SLIP, LW(0))
                         CALL(evt_msg_print, 0, STRING("irai_17_01"), 0, 0)
-#if VERSION == VERSION_DEMO
-                        CALL(evt_item_entry, STRING("kairanban"), ITEM_ROUTING_SLIP, 0, -1000, 0, 16, -1, 0)
-#else
-                        CALL(evt_item_entry, STRING("kairanban"), ITEM_ROUTING_SLIP, 0, -1000, 0, 17, -1, 0)
-#endif
+                        CALL(evt_item_entry, STRING("kairanban"), ITEM_ROUTING_SLIP, 0, -1000, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
                         CALL(evt_item_get_item, STRING("kairanban"))
                         CALL(evt_item_get_item_end_wait, STRING("kairanban"))
                         SET_VALUE(GSWF(GSWF_TROUBLE_WORK_2), 1)
@@ -475,7 +462,7 @@ EVT_BEGIN(boss_noko_talk)
     END_IF
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG1_02_TALKING_WITH_KROOP)
-        CALL_CHILD(PTR(boss_noko_open_gate))
+        CALL_CHILD(boss_noko_open_gate)
         CASE_LESS(STORY_STG1_08_OPENING_THE_PATH)
         IF_INT_EQUAL(GSWF(GSWF_HEI_SUN_STONE_TAKEN), 1)
             IF_INT_EQUAL(GSWF(GSWF_HEI_MOON_STONE_TAKEN), 1)
@@ -488,7 +475,7 @@ EVT_BEGIN(boss_noko_talk)
         CALL(evt_msg_print, 0, STRING("stg1_nok_56_01"), 0, 0)
         CASE_LESS(STORY_STG1_31_FRANKLYS_HOUSE)
         CALL(evt_msg_print, 0, STRING("stg1_nok_57"), 0, 0)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         CASE_EQUAL(STORY_STG7_02_MAYOR_BOB)
         SET_VALUE(GSWF(GSWF_STG7_WHITE_PETALBURG_HINT), 1)
         CALL(evt_msg_print, 0, STRING("stg1_nok_57_1_00"), 0, 0)
@@ -681,7 +668,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"ノコノコG"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52\x47", // name
+        "ノコノコG", // name
         0, 0, // flags..reactionFlags
         npc_init_evt, // initEvent
         nokonoko_G_regl, // regularEvent
@@ -692,7 +679,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ノコノコH"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52\x48", // name
+        "ノコノコH", // name
         0, 0, // flags..reactionFlags
         npc_init_evt, // initEvent
         nokonoko_H_regl, // regularEvent
@@ -703,7 +690,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ノコノコI"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52\x49", // name
+        "ノコノコI", // name
         0, 0, // flags..reactionFlags
         npc_init_evt, // initEvent
         nokonoko_I_regl, // regularEvent
@@ -714,7 +701,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ノコノコK"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52\x4B", // name
+        "ノコノコK", // name
         0, 0, // flags..reactionFlags
         npc_init_evt, // initEvent
         NULL, // regularEvent
@@ -725,7 +712,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"村長"*/"\x91\xBA\x92\xB7", // name
+        "村長", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         npc_init_evt, // initEvent
@@ -737,7 +724,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"門番ノコノコ"*/"\x96\xE5\x94\xD4\x83\x6D\x83\x52\x83\x6D\x83\x52", // name
+        "門番ノコノコ", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         monban_init, // initEvent
@@ -749,7 +736,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ノコタロウ"*/"\x83\x6D\x83\x52\x83\x5E\x83\x8D\x83\x45", // name
+        "ノコタロウ", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         nokotarou_init, // initEvent
@@ -761,7 +748,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ノコタロウ父"*/"\x83\x6D\x83\x52\x83\x5E\x83\x8D\x83\x45\x95\x83", // name
+        "ノコタロウ父", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         nokopapa_init, // initEvent
@@ -773,7 +760,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ノコリン"*/"\x83\x6D\x83\x52\x83\x8A\x83\x93", // name
+        "ノコリン", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         nokorin_init, // initEvent
@@ -841,7 +828,7 @@ static BeroEntry bero_entry_data[] = {
 };
 
 const char* son_npc[] = {
-    /*"村長"*/"\x91\xBA\x92\xB7",
+    "村長",
     NULL,
 };
 
@@ -873,7 +860,7 @@ HouseParam son_data = {
 };
 
 const char* taro_npc[] = {
-    /*"ノコタロウ"*/"\x83\x6D\x83\x52\x83\x5E\x83\x8D\x83\x45",
+    "ノコタロウ",
     NULL,
 };
 
@@ -910,7 +897,7 @@ HouseParam taro_data = {
 };
 
 static const char* ie_npc[] = {
-    /*"ノコノコK"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52\x4B",
+    "ノコノコK",
     NULL,
 };
 
@@ -1020,7 +1007,7 @@ EVT_BEGIN(nokotarou_tabidachi)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_20_KOOPS_LEAVES)
     RESUME_TYPES_OTHER(4)
     CALL(evt_cam3d_evt_off, 500, 11)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
 #endif
     CALL(evt_mario_key_onoff, 1)
@@ -1048,7 +1035,7 @@ EVT_BEGIN(nokotarou_tabidachi_init)
     CALL(evt_npc_set_position, STRING("村長"), 90, 0, -50)
     CALL(evt_npc_set_ry, STRING("村長"), 270)
     CALL(evt_mario_kill_party, 0)
-    SPAWN_EVENT(PTR(nokotarou_tabidachi))
+    SPAWN_EVENT(nokotarou_tabidachi)
     RETURN
 EVT_END()
 
@@ -1121,15 +1108,15 @@ static EVT_BEGIN(sekai_yami_evt)
     CALL(anim_tevcallback, STRING("ノコリン"), 1)
     SET_VALUE(GW(0), -600)
     SET_VALUE(LW(0), STRING("ノコノコG"))
-    SPAWN_EVENT(PTR(sekai_yami_npc))
+    SPAWN_EVENT(sekai_yami_npc)
     SET_VALUE(LW(0), STRING("ノコノコH"))
-    SPAWN_EVENT(PTR(sekai_yami_npc))
+    SPAWN_EVENT(sekai_yami_npc)
     SET_VALUE(LW(0), STRING("ノコノコI"))
-    SPAWN_EVENT(PTR(sekai_yami_npc))
+    SPAWN_EVENT(sekai_yami_npc)
     SET_VALUE(LW(0), STRING("村長"))
     SPAWN_EVENT_GET_ID(PTR(sekai_yami_npc), GW(1))
     SET_VALUE(LW(0), STRING("ノコリン"))
-    SPAWN_EVENT(PTR(sekai_yami_npc))
+    SPAWN_EVENT(sekai_yami_npc)
     CALL(evt_snd_sfxon, STRING("SFX_STG8_WORLD_DARK1"), 0)
     CALL(evt_sub_intpl_msec_init, 11, -600, 600, 5000)
     LOOP(0)
@@ -1417,7 +1404,7 @@ static EVT_BEGIN(epilogue_evt)
     CALL(evt_cam3d_evt_set, 0, 133, 517, 0, 50, -77, 0, 11)
     CALL(evt_seq_wait, 2)
     CALL(evt_npc_flag_onoff, 0, STRING("ノコタロウ"), NPC_FLAG_INSTANT_TURN)
-    SPAWN_EVENT(PTR(epilogue_evt_sub))
+    SPAWN_EVENT(epilogue_evt_sub)
     CALL(evt_fade_end_wait)
     WAIT_MS(2000)
     CALL(evt_msg_print, 0, STRING("ep_38"), 0, 0)
@@ -1440,10 +1427,10 @@ static EVT_BEGIN(evt_kusa_4)
     END_IF
     CALL(evt_item_delete_check, STRING("item_kusa_4"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-#if VERSION == VERSION_DEMO
-        CALL(evt_item_entry, STRING("item_kusa_4"), ITEM_TURTLEY_LEAF, -407, 70, -148, 4, LSWF(4), 0)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_item_entry, STRING("item_kusa_4"), ITEM_TURTLEY_LEAF, -407, 70, -148, ITEM_ENTRY_LAUNCH, LSWF(4), 0)
 #else
-        CALL(evt_item_entry, STRING("item_kusa_4"), ITEM_TURTLEY_LEAF, -407, 70, -160, 4, LSWF(4), 0)
+        CALL(evt_item_entry, STRING("item_kusa_4"), ITEM_TURTLEY_LEAF, -407, 70, -160, ITEM_ENTRY_LAUNCH, LSWF(4), 0)
 #endif
     END_IF
     RETURN
@@ -1455,10 +1442,10 @@ static EVT_BEGIN(evt_kusa_5)
     END_IF
     CALL(evt_item_delete_check, STRING("item_kusa_5"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-#if VERSION == VERSION_DEMO
-        CALL(evt_item_entry, STRING("item_kusa_5"), ITEM_TURTLEY_LEAF, -452, 70, -148, 4, LSWF(4), 0)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_item_entry, STRING("item_kusa_5"), ITEM_TURTLEY_LEAF, -452, 70, -148, ITEM_ENTRY_LAUNCH, LSWF(4), 0)
 #else
-        CALL(evt_item_entry, STRING("item_kusa_5"), ITEM_TURTLEY_LEAF, -452, 70, -160, 4, LSWF(4), 0)
+        CALL(evt_item_entry, STRING("item_kusa_5"), ITEM_TURTLEY_LEAF, -452, 70, -160, ITEM_ENTRY_LAUNCH, LSWF(4), 0)
 #endif
     END_IF
     RETURN
@@ -1470,10 +1457,10 @@ static EVT_BEGIN(evt_kusa_6)
     END_IF
     CALL(evt_item_delete_check, STRING("item_kusa_6"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-#if VERSION == VERSION_DEMO
-        CALL(evt_item_entry, STRING("item_kusa_6"), ITEM_TURTLEY_LEAF, -362, 70, -148, 4, LSWF(4), 0)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_item_entry, STRING("item_kusa_6"), ITEM_TURTLEY_LEAF, -362, 70, -148, ITEM_ENTRY_LAUNCH, LSWF(4), 0)
 #else
-        CALL(evt_item_entry, STRING("item_kusa_6"), ITEM_TURTLEY_LEAF, -362, 70, -160, 4, LSWF(4), 0)
+        CALL(evt_item_entry, STRING("item_kusa_6"), ITEM_TURTLEY_LEAF, -362, 70, -160, ITEM_ENTRY_LAUNCH, LSWF(4), 0)
 #endif
     END_IF
     RETURN
@@ -1489,8 +1476,8 @@ static KusaAccess kusa_data[] = {
 EVT_BEGIN(nok_01_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    SPAWN_EVENT(PTR(evt_switch_init))
+    CALL_CHILD(evt_bero_info_run)
+    SPAWN_EVENT(evt_switch_init)
     SET_VALUE(LF(0), 0)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
         CALL(evt_bero_get_entername, LW(0))
@@ -1518,24 +1505,24 @@ EVT_BEGIN(nok_01_init_evt)
     CALL(evt_npc_setup, PTR(npcEnt))
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_00_PETAL_MEADOWS)
         IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_17_FATHER_AND_SON_REUNITED)
-            CALL_CHILD(PTR(odoriko_1_init))
-            CALL_CHILD(PTR(odoriko_2_init))
-            CALL_CHILD(PTR(odoriko_3_init))
+            CALL_CHILD(odoriko_1_init)
+            CALL_CHILD(odoriko_2_init)
+            CALL_CHILD(odoriko_3_init)
         END_IF
     END_IF
     CALL(evt_map_playanim, STRING("S_kawa"), 1, 0)
     SET_VALUE(LW(0), PTR(&son_data))
-    CALL_CHILD(PTR(evt_door_setup))
+    CALL_CHILD(evt_door_setup)
     SET_VALUE(LW(0), PTR(&taro_data))
-    CALL_CHILD(PTR(evt_door_setup))
+    CALL_CHILD(evt_door_setup)
     SET_VALUE(LW(0), PTR(&ie_data))
-    CALL_CHILD(PTR(evt_door_setup))
+    CALL_CHILD(evt_door_setup)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_03_PETALBURG_GATEKEEPER)
         CALL(evt_map_playanim, STRING("S_mon"), 2, 0)
         CALL(evt_hitobj_onoff, STRING("A_mon"), 1, 0)
     END_IF
     SET_VALUE(LW(0), PTR(kusa_data))
-    CALL_CHILD(PTR(evt_sub_kusa_access_entry))
+    CALL_CHILD(evt_sub_kusa_access_entry)
     SET_VALUE(LSWF(4), 0)
     CALL(evt_sub_random, 2, LSW(1))
     CALL(evt_sub_get_system_flag, LW(0))
@@ -1543,17 +1530,9 @@ EVT_BEGIN(nok_01_init_evt)
         SET_VALUE(LSWF(4), 1)
     END_IF
     CALL(evt_mobj_kururing_floor, STRING("kururin2"), 400, 0, 140, STRING("S_guround"), 125, GSWF(GSWF_NOK01_STAR_PIECE_PANEL))
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("item_00"), ITEM_MEGA_RUSH_P, -180, 70, -425, 15, GSWF(GSWF_NOK01_MEGA_RUSH_P_TAKEN), 0)
-#else
-    CALL(evt_item_entry, STRING("item_00"), ITEM_MEGA_RUSH_P, -180, 70, -425, 16, GSWF(GSWF_NOK01_MEGA_RUSH_P_TAKEN), 0)
-#endif
+    CALL(evt_item_entry, STRING("item_00"), ITEM_MEGA_RUSH_P, -180, 70, -425, ITEM_ENTRY_FIXED, GSWF(GSWF_NOK01_MEGA_RUSH_P_TAKEN), 0)
     IF_INT_EQUAL(GSWF(GSWF_TROUBLE_08_SOLVED), 1)
-#if VERSION == VERSION_DEMO
-        CALL(evt_item_entry, STRING("iri_08"), ITEM_TURTLEY_LEAF, -317, 128, -374, 15, GSWF(GSWF_NOK01_TURTLEY_LEAF_TAKEN), 0)
-#else
-        CALL(evt_item_entry, STRING("iri_08"), ITEM_TURTLEY_LEAF, -317, 128, -374, 16, GSWF(GSWF_NOK01_TURTLEY_LEAF_TAKEN), 0)
-#endif
+        CALL(evt_item_entry, STRING("iri_08"), ITEM_TURTLEY_LEAF, -317, 128, -374, ITEM_ENTRY_FIXED, GSWF(GSWF_NOK01_TURTLEY_LEAF_TAKEN), 0)
     END_IF
     IF_INT_EQUAL(LF(0), 0)
         LOOP(2)
@@ -1574,28 +1553,28 @@ EVT_BEGIN(nok_01_init_evt)
         END_LOOP
     END_IF
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
-    CALL_CHILD(PTR(evt_gazigazi_entry))
+    CALL_CHILD(evt_gazigazi_entry)
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("nokotarou"))
         CALL(evt_pouch_mario_recovery)
         CALL(evt_pouch_all_party_recovery)
-        CALL_CHILD(PTR(nokotarou_tabidachi_init))
+        CALL_CHILD(nokotarou_tabidachi_init)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
         CALL(evt_bero_get_entername, LW(0))
         IF_STR_EQUAL(LW(0), STRING("sekai_yami1"))
-            SPAWN_EVENT(PTR(sekai_yami_evt))
+            SPAWN_EVENT(sekai_yami_evt)
         END_IF
         IF_STR_EQUAL(LW(0), STRING("minnnanokoe"))
-            SPAWN_EVENT(PTR(minnnanokoe_evt))
+            SPAWN_EVENT(minnnanokoe_evt)
         END_IF
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_END_AFTER_THE_BATTLE)
         CALL(evt_mario_kill_party, 0)
-        CALL_CHILD(PTR(epilogue_npc_entry))
-        SPAWN_EVENT(PTR(epilogue_evt))
+        CALL_CHILD(epilogue_npc_entry)
+        SPAWN_EVENT(epilogue_evt)
     END_IF
-    SPAWN_EVENT(PTR(evt_sub_mail_event))
+    SPAWN_EVENT(evt_sub_mail_event)
     CALL(evt_sub_get_system_flag, LW(0))
     IF_BITS_SET(LW(0), GLOBAL_FLAG_KIOSK)
         CALL(evt_npc_change_interrupt, STRING("門番ノコノコ"), 6, PTR(e3_talk))

@@ -29,11 +29,11 @@ static inline f32 nokonokoSin(f32 x) {
 #include "mario/mariost.h"
 #include "version.h"
 #define val (val)
-HitEntry* ccwall(PartyEntry* party, s32 mode);
-void lookupSafetyPosSub(Vec pos, f32 height, f32 angle, Vec* out);
-void lookupSafetyPos3(Vec pos, f32 height, Vec* out);
-void lookupSafetyPos2(Vec pos, f32 height, Vec* out);
-u32 lookupSafetyPos(Vec pos, f32 height, Vec* out);
+static HitEntry* ccwall(PartyEntry* party, s32 mode);
+static void lookupSafetyPosSub(Vec pos, f32 height, f32 angle, Vec* out);
+static void lookupSafetyPos3(Vec pos, f32 height, Vec* out);
+static void lookupSafetyPos2(Vec pos, f32 height, Vec* out);
+static u32 lookupSafetyPos(Vec pos, f32 height, Vec* out);
 
 s32 nokonokoGetStatus(PartyEntry* party) {
     u32 m;
@@ -103,7 +103,7 @@ void nokonoko_move(PartyEntry* party) {
         // FAKE: the call passes a second argument partyWalkInit does not take (no effect); the cast keeps it.
         ((void (*)(PartyEntry*, s32))partyWalkInit)(party, 1);
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     partyUpdMoveSpd(party);
 #endif
     partyRecordFootmark(party);
@@ -267,7 +267,7 @@ void nokonoko_use(PartyEntry* party) {
 
     switch (party->useMotionId) {
         case 0:
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             if (mario->currMotionId == MARIO_MOTION_DAMAGE_TOGE || mario->currMotionId == MARIO_MOTION_DAMAGE) {
                 party->useMotionId = 70;
                 break;
@@ -298,7 +298,7 @@ void nokonoko_use(PartyEntry* party) {
             mario->baseSpeed = 0.0f;
             break;
         case 1:
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             if (mario->currMotionId == MARIO_MOTION_DAMAGE_TOGE || mario->currMotionId == MARIO_MOTION_DAMAGE) {
                 party->useMotionId = 70;
                 break;
@@ -318,7 +318,7 @@ void nokonoko_use(PartyEntry* party) {
             party->useMotionId = 2;
             partyChgPose(party, "PNK_A_1");
         case 2:
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             if (mario->currMotionId == MARIO_MOTION_DAMAGE_TOGE || mario->currMotionId == MARIO_MOTION_DAMAGE) {
                 party->useMotionId = 70;
                 break;
@@ -412,7 +412,7 @@ void nokonoko_use(PartyEntry* party) {
             }
             NOKO_ITEM(party, party->useMotionId = 50; psndSFXOn_3D((const char*)0x92c, &party->position); noko_star(party, 1); noko_se_off(); break;)
             if (!(party->flags & PARTY_FLAG_IS_EVT_USE)) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 if (mario->currMotionId == MARIO_MOTION_SHIP || mario->currMotionId == MARIO_MOTION_JABARA || mario->currMotionId == MARIO_MOTION_PLANE || mario->currMotionId == MARIO_MOTION_ROLL ||
                     (mario->flags & MARIO_FLAG_FORCED_MOVEMENT) || !marioChkKey()) {
 #else
@@ -471,7 +471,7 @@ void nokonoko_use(PartyEntry* party) {
 #if VERSION >= VERSION_US
                 partyChkWallAround(party, &party->position, spd, dir, party->width, party->height);
 #else
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 marioChkWallAround(&party->position, spd, dir, party->width, party->height);
 #else
                 marioChkWallAround(&party->position, 1, spd, dir, party->width, party->height);
@@ -849,7 +849,7 @@ void nokotaro_hold_cancel(PartyEntry* party) {
     party->useMotionId = 20;
 }
 
-HitEntry* ccwall(PartyEntry* party, s32 mode) {
+static HitEntry* ccwall(PartyEntry* party, s32 mode) {
     f32 s;
     f32 c;
     f32 dist;
@@ -950,7 +950,7 @@ HitEntry* ccwall(PartyEntry* party, s32 mode) {
         sincosf(&s2, &c2, 180.0f + party->targetDir);
         party->position.x = hx + 0.5f * (s2 * party->width);
         party->position.z = hz + 0.5f * (c2 * party->width);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         party->position.z -= w * (f32)cos(3.1415927f * (party->targetDir - 90.0f) / 180.0f);
         party->position.x -= w * (f32)sin(3.1415927f * (party->targetDir - 90.0f) / 180.0f);
 #endif
@@ -979,7 +979,7 @@ HitEntry* ccwall(PartyEntry* party, s32 mode) {
         sincosf(&s3, &c3, 180.0f + party->targetDir);
         party->position.x = hx + 0.5f * (s3 * party->width);
         party->position.z = hz + 0.5f * (c3 * party->width);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         party->position.z -= w * (f32)cos(3.1415927f * (90.0f + party->targetDir) / 180.0f);
         party->position.x -= w * (f32)sin(3.1415927f * (90.0f + party->targetDir) / 180.0f);
 #endif
@@ -1005,7 +1005,7 @@ void nokoStrippedPool(f32* p) {
     p[3] = 11.0f;
     p[4] = 6.0f;
 }
-u32 lookupSafetyPos(Vec pos, f32 height, Vec* out) {
+static u32 lookupSafetyPos(Vec pos, f32 height, Vec* out) {
     Vec p[4];
     f32 dist;
     f32 hx;
@@ -1133,7 +1133,7 @@ u32 lookupSafetyPos(Vec pos, f32 height, Vec* out) {
     return flags;
 }
 
-void lookupSafetyPos2(Vec pos, f32 height, Vec* out) {
+static void lookupSafetyPos2(Vec pos, f32 height, Vec* out) {
     f32 rad;
     f32 dx;
     f32 dz;
@@ -1209,7 +1209,7 @@ void lookupSafetyPos2(Vec pos, f32 height, Vec* out) {
     *out = pos;
 }
 
-void lookupSafetyPos3(Vec pos, f32 height, Vec* out) {
+static void lookupSafetyPos3(Vec pos, f32 height, Vec* out) {
     f32 y;
     f32 rad;
     f32 dx;
@@ -1260,7 +1260,7 @@ void lookupSafetyPos3(Vec pos, f32 height, Vec* out) {
     *out = pos;
 }
 
-void lookupSafetyPosSub(Vec pos, f32 height, f32 angle, Vec* out) {
+static void lookupSafetyPosSub(Vec pos, f32 height, f32 angle, Vec* out) {
     f32 rad;
     f32 x;
     f32 y;

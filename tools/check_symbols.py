@@ -3,7 +3,7 @@
 
 For each module (the main executable and each REL) and each source file of config/<version>/splits.txt,
 the functions of that file are listed in address order for every version that has it and lined up
-against the JP list (the demo against JP as well, US and PAL against each other and JP). Functions
+against the JP list (the two demos against JP and each other, US and PAL against each other and JP). Functions
 that line up between two matching neighbours, in a run of the same length, are taken to be the same
 function; if their names differ (and neither name appears elsewhere in the other version's file, which
 would mean a function that moved), that is reported. Runs that do not line up (functions added or removed
@@ -21,9 +21,11 @@ import sys
 from typing import Dict, List, Optional, Tuple
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."))
-VERSIONS = ["G8MJ01", "G8ME01", "G8MP01", "G8ME01_DEMO"]
-# Pairs to compare: every version against JP, and PAL against US (PAL is built from the US code).
-PAIRS = [("G8MJ01", "G8ME01"), ("G8MJ01", "G8MP01"), ("G8MJ01", "G8ME01_DEMO"), ("G8ME01", "G8MP01")]
+VERSIONS = ["G8MJ01", "G8ME01", "G8MP01", "G8ME01_DEMO", "G8MJ01_DEMO"]
+# Pairs to compare: every version against JP, PAL against US (PAL is built from the US code), and the two demos
+# against each other (the Japanese and the US demo are builds of the same code).
+PAIRS = [("G8MJ01", "G8ME01"), ("G8MJ01", "G8MP01"), ("G8MJ01", "G8ME01_DEMO"), ("G8MJ01", "G8MJ01_DEMO"),
+         ("G8ME01", "G8MP01"), ("G8ME01_DEMO", "G8MJ01_DEMO")]
 
 SYMBOL = re.compile(r"^(\S+)\s*=\s*(\.\w+):0x([0-9A-Fa-f]+);\s*//(.*)$")
 SPLIT_FILE = re.compile(r"^(\S.*):\s*$")

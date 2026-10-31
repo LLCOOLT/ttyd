@@ -4,6 +4,6 @@
 #include <dolphin/types.h>
 #include "evt/evt_cmd.h"
 
-USER_FUNC(_ufo_main);
-USER_FUNC(_ufo_damage_start);
-USER_FUNC(_ufo_damage_end);
+USER_FUNC(btlevtcmd_UFOAction);
+USER_FUNC(btlevtcmd_UFODamageOn);
+USER_FUNC(btlevtcmd_UFOEscapeOn);

@@ -9,7 +9,7 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "unit/party/unit_party_vivian.h"
 #include "battle/battle_database_common.h"
 #include "unit/unit_boss_majolyne.h"
@@ -111,7 +111,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {80, 80, 80, 100, 80, 100, 100, 40, 100, 70, 100, 70, 100, 70, 70, 0, 0, 100, 70, 100, 100, 0};
+#else
 static StatusVulnerability regist = {80, 80, 80, 100, 80, 100, 100, 60, 100, 80, 100, 80, 100, 95, 70, 0, 0, 100, 70, 100, 100, 0};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "MRR_N_1"},
@@ -130,8 +134,8 @@ static PoseTableEntry pose_table[] = {
     {40, "MRR_W_1"},
     {56, "MRR_S_1"},
     {57, "MRR_S_1"},
-    {65, "MRR_T_1"},
-    {69, "MRR_S_1"},
+    {BTL_POSE_TALK, "MRR_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "MRR_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -281,7 +285,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 0)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
-    SPAWN_EVENT(PTR(majo3_shadow_tail_event))
+    SPAWN_EVENT(majo3_shadow_tail_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -293,7 +297,7 @@ static EVT_BEGIN(damage_event)
     END_IF
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -331,7 +335,7 @@ static EVT_BEGIN(dead_event)
             CASE_EQUAL(0)
             CASE_DEFAULT
             CALL(btlevtcmd_StatusWindowOnOff, 0)
-            CALL_CHILD(PTR(btl_marilyn_zoom))
+            CALL_CHILD(btl_marilyn_zoom)
             CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("MRR_D_1"))
             CALL(btlevtcmd_SetStayPose, BTL_UNIT_SELF, STRING("MRR_D_1"))
             CALL(evt_msg_print, 2, STRING("btl_majo3_12"), 0, BTL_UNIT_SELF)
@@ -339,7 +343,7 @@ static EVT_BEGIN(dead_event)
         END_SWITCH
     END_SWITCH
     CALL(btlevtcmd_StatusWindowOnOff, 0)
-    CALL_CHILD(PTR(btl_marilyn_zoom))
+    CALL_CHILD(btl_marilyn_zoom)
     CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("MRR_D_1"))
     CALL(btlevtcmd_SetStayPose, BTL_UNIT_SELF, STRING("MRR_D_1"))
     CALL(evt_msg_print, 2, STRING("btl_majo3_09"), 0, BTL_UNIT_SELF)
@@ -350,21 +354,21 @@ static EVT_BEGIN(dead_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("MRR_D_3"))
     SET_VALUE(GW(12), 2)
     SET_VALUE(LW(10), -2)
-    CALL_CHILD(PTR(subsetevt_dead_core_nospin_norotate))
+    CALL_CHILD(subsetevt_dead_core_nospin_norotate)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(majo_unison_phase_event))
+        CALL_CHILD(majo_unison_phase_event)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(3))
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(4))
         IF_INT_NOT_EQUAL(LW(3), LW(4))
             CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, LW(4))
             CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
             WAIT_MS(200)
-            CALL_CHILD(PTR(marilyn_down))
+            CALL_CHILD(marilyn_down)
             WAIT_MS(500)
             SWITCH(LW(4))
                 CASE_EQUAL(0)
@@ -379,7 +383,7 @@ static EVT_BEGIN(unison_phase_event)
             END_SWITCH
             SET_VALUE(LW(1), 0)
             CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-            CALL_CHILD(PTR(marilyn_up))
+            CALL_CHILD(marilyn_up)
             CALL(btlevtcmd_SortPhaseMoveTable)
             CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         END_IF
@@ -409,18 +413,18 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 1)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, 0)
         SET_VALUE(LW(9), PTR(&weapon_marilyn_kagenuke_attack1))
-        CALL_CHILD(PTR(kagenuke_attack_event))
+        CALL_CHILD(kagenuke_attack_event)
         CASE_EQUAL(1)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 4)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, 1)
         SET_VALUE(LW(9), PTR(&weapon_marilyn_charge1))
-        CALL_CHILD(PTR(charge_attack_event))
+        CALL_CHILD(charge_attack_event)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 1)
         CASE_EQUAL(2)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 8, 4)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, 0)
         SET_VALUE(LW(9), PTR(&weapon_marilyn_thunder_attack1))
-        CALL_CHILD(PTR(thunder_attack_event))
+        CALL_CHILD(thunder_attack_event)
         CASE_EQUAL(4)
         SET_VALUE(LW(1), 0)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 7, LW(0))
@@ -437,17 +441,17 @@ static EVT_BEGIN(attack_event)
             CASE_EQUAL(0)
             CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, 0)
             SET_VALUE(LW(9), PTR(&weapon_marilyn_kagenuke_attack1))
-            CALL_CHILD(PTR(kagenuke_attack_event))
+            CALL_CHILD(kagenuke_attack_event)
             CASE_EQUAL(1)
             CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, 0)
             SET_VALUE(LW(9), PTR(&weapon_marilyn_thunder_attack1))
-            CALL_CHILD(PTR(thunder_attack_event))
+            CALL_CHILD(thunder_attack_event)
             CASE_EQUAL(2)
             CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 9, LW(0))
             ADD(LW(0), 1)
             CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 9, LW(0))
             SET_VALUE(LW(9), PTR(&weapon_marilyn_charge1))
-            CALL_CHILD(PTR(charge_attack_event))
+            CALL_CHILD(charge_attack_event)
         END_SWITCH
     END_SWITCH
     LABEL(90)

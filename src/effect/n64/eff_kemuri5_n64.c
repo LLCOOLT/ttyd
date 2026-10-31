@@ -38,14 +38,14 @@ static effN64Vtx kmr_a_1_v[] = {
     {7, -8, 0, 512, 512, 255, 255, 255, 255},
 };
 
-void effKemuri5Main(EffectEntry* effect);
+static void effKemuri5Main(EffectEntry* effect);
 static inline GXColor mkc(u8 a) {
     GXColor c = {0x70, 0x60, 0x18, 0};
     c.a = a;
     return c;
 }
 
-void effKemuri5Disp(CameraId cameraId, EffectEntry* effect);
+static void effKemuri5Disp(CameraId cameraId, EffectEntry* effect);
 
 // Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
@@ -92,7 +92,7 @@ EffectEntry* effKemuri5N64Entry(f32 x, f32 y, f32 z, f32 angle) {
     return effect;
 }
 
-void effKemuri5Main(EffectEntry* effect) {
+static void effKemuri5Main(EffectEntry* effect) {
     EffKemuri5N64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -145,7 +145,7 @@ void effKemuri5Main(EffectEntry* effect) {
 
 #pragma opt_propagation reset
 
-void effKemuri5Disp(CameraId cameraId, EffectEntry* effect) {
+static void effKemuri5Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera = camGetPtr(cameraId);
     EffKemuri5N64Work* work = effect->userdata;
     s32 i;

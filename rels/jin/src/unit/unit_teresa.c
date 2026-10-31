@@ -113,7 +113,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {50, 50, 90, 0, 50, 100, 100, 50, 100, 60, 100, 60, 100, 60, 60, 50, 95, 100, 10, 100, 100, 10};
+#else
 static StatusVulnerability regist = {50, 50, 105, 0, 50, 100, 100, 50, 100, 90, 100, 90, 100, 95, 60, 50, 90, 100, 10, 100, 100, 10};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_teresa", "c_teresa", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
@@ -279,8 +283,8 @@ static PoseTableEntry pose_table[] = {
     {42, "R_1"},
     {56, "X_1"},
     {57, "X_1"},
-    {65, "T_1"},
-    {69, "S_1"},
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -304,14 +308,14 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(normal_attack_event))
+        CALL_CHILD(normal_attack_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
@@ -348,25 +352,25 @@ static EVT_BEGIN(attack_event)
     SET_VALUE(LW(0), 25)
     IF_INT_LESS(LW(1), LW(0))
         IF_INT_EQUAL(LW(13), 1)
-            CALL_CHILD(PTR(trans_myself_event))
+            CALL_CHILD(trans_myself_event)
             GOTO(99)
         END_IF
     END_IF
     ADD(LW(0), 25)
     IF_INT_LESS(LW(1), LW(0))
         IF_INT_EQUAL(LW(14), 1)
-            CALL_CHILD(PTR(trans_event))
+            CALL_CHILD(trans_event)
             GOTO(99)
         END_IF
     END_IF
     ADD(LW(0), 15)
     IF_INT_LESS(LW(1), LW(0))
         IF_INT_EQUAL(LW(15), 1)
-            CALL_CHILD(PTR(move_event))
+            CALL_CHILD(move_event)
             GOTO(99)
         END_IF
     END_IF
-    CALL_CHILD(PTR(normal_attack_event))
+    CALL_CHILD(normal_attack_event)
     GOTO(99)
     LABEL(99)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -611,7 +615,7 @@ static EVT_BEGIN(move_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
@@ -628,7 +632,7 @@ static EVT_BEGIN(move_event)
     IF_INT_EQUAL(LW(5), 1)
         CALL(btlevtcmd_GetUnitWork, LW(3), 0, LW(6))
         IF_INT_EQUAL(LW(6), 0)
-            SPAWN_EVENT(PTR(move_event_sub))
+            SPAWN_EVENT(move_event_sub)
             ADD(LW(12), 20)
 #if VERSION == VERSION_EU
             ADD(LW(15), 1)

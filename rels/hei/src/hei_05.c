@@ -11,7 +11,6 @@
 #include "evt/evt_map.h"
 #include "evt/evt_mario.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "hei.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
@@ -58,20 +57,20 @@ static BeroEntry bero_entry_data[] = {
 static EVT_BEGIN(dead_evt1)
     SET_VALUE(GSWF(GSWF_HEI05_PILLAR_ENEMY_A_DEFEATED), 1)
     SET_VALUE(GSWF(GSWF_HEI05_PILLAR_ENEMY_B_DEFEATED), 1)
-    CALL_CHILD(PTR(enemy_common_dead_event))
+    CALL_CHILD(enemy_common_dead_event)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(dead_evt2)
     SET_VALUE(GSWF(GSWF_HEI05_PILLAR_ENEMY_B_DEFEATED), 1)
     SET_VALUE(GSWF(GSWF_HEI05_PILLAR_ENEMY_A_DEFEATED), 1)
-    CALL_CHILD(PTR(enemy_common_dead_event))
+    CALL_CHILD(enemy_common_dead_event)
     RETURN
 EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"シンエモン1"*/"\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93\x31", // name
+        "シンエモン1", // name
         0, 0, // flags..reactionFlags
         kuriboo_init_event, // initEvent
         kuriboo_move_event, // regularEvent
@@ -90,7 +89,7 @@ static NpcSetupInfo npcEnt[] = {
         11, // battleInfoId
     },
     {
-        /*"シンエモン2"*/"\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93\x32", // name
+        "シンエモン2", // name
         0, 0, // flags..reactionFlags
         kuriboo_init_event, // initEvent
         kuriboo_move_event, // regularEvent
@@ -193,12 +192,12 @@ static EVT_BEGIN(hashira_evt)
         // BUG: tests hei_03's pillar-enemy flags, not this map's GSWF_HEI05_PILLAR_ENEMY_A/B_DEFEATED (original game)
         IF_INT_EQUAL(GSWF(GSWF_HEI03_PILLAR_ENEMY_B_DEFEATED), 0)
             SET_VALUE(LW(0), LW(1))
-            SPAWN_EVENT(PTR(hashira_evt_sub))
+            SPAWN_EVENT(hashira_evt_sub)
         END_IF
     ELSE
         IF_INT_EQUAL(GSWF(GSWF_HEI03_PILLAR_ENEMY_A_DEFEATED), 0)
             SET_VALUE(LW(0), LW(1))
-            SPAWN_EVENT(PTR(hashira_evt_sub))
+            SPAWN_EVENT(hashira_evt_sub)
         END_IF
     END_IF
     LABEL(0)
@@ -227,7 +226,7 @@ EVT_END()
 EVT_BEGIN(hei_05_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_HEI1"))
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(20))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_HEI4"))
@@ -266,7 +265,7 @@ EVT_BEGIN(hei_05_init_evt)
                 WAIT_FRAMES(1)
                 GOTO(0)
             END_IF
-            CALL_CHILD(PTR(door_open))
+            CALL_CHILD(door_open)
         END_INLINE_EVENT
     ELSE
         CALL(evt_hitobj_onoff, STRING("a_mon"), 0, 0)

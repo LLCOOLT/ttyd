@@ -10,7 +10,7 @@
 #include "manager/evtmgr_cmd.h"
 #include "version.h"
 
-USER_FUNC(_rumble_switch);
+static USER_FUNC(_rumble_switch);
 
 static BattleUnitKindPart parts[1];
 static StatusVulnerability regist;
@@ -73,11 +73,7 @@ static PoseTableEntry pose_table[] = {
     {28, "M_S_1"},
     {31, "M_S_1"},
     {39, "M_O_1"},
-#if VERSION == VERSION_DEMO
-    {67, "M_S_1"},
-#else
-    {69, "M_S_1"},
-#endif
+    {BTL_POSE_STAY_DEFAULT, "M_S_1"},
 };
 
 static BattleUnitKindPart parts[] = {
@@ -139,14 +135,14 @@ EVT_END()
 
 static s32 _data[] = {
     -5, 0, 15, 0, -15, 0, 14, 0, -13, 0, 12, 0, -11, 0, 10, 0, -9, 0,
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     8, 0, -7, 0, 6, 0, -6, 0, 5, 0, -4, 0, 2, 0, -2, 0,
 #else
     8, 0, -7, 0, 6, 0, -6, 0, 5, 0, -4, 0, 2, 0, -2, 0, 0,
 #endif
 };
 
-USER_FUNC(_rumble_switch) {
+static USER_FUNC(_rumble_switch) {
     BattleUnit* unit;
     BattleStageObject* object;
     s32 id;

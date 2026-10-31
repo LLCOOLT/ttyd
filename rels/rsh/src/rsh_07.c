@@ -11,7 +11,6 @@
 #include "evt/evt_mobj.h"
 #include "evt/evt_msg.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "evt/evt_sub.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
@@ -96,17 +95,21 @@ static EVT_BEGIN(init_unten)
 EVT_END()
 
 static EVT_BEGIN(talk_unten)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_08"), 0, 0)
+#else
     IF_INT_EQUAL(GSWF(GSWF_TRAIN_AT_ROGUEPORT), 0)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_c_08"), 0, 0)
     ELSE
         CALL(evt_msg_print, 0, STRING("stg6_rsh_c_08_1"), 0, 0)
     END_IF
+#endif
     RETURN
 EVT_END()
 
 static NpcSetupInfo npc_data[] = {
     {
-        /*"運転手"*/"\x89\x5E\x93\x5D\x8E\xE8", // name
+        "運転手", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_JUMPING | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR, // flags
         0, // reactionFlags
         init_unten, // initEvent
@@ -160,7 +163,7 @@ EVT_BEGIN(rsh_07_init_evt)
         END_IF
     END_IF
     CALL(evt_npc_setup, PTR(npc_data))
-    CALL_CHILD(PTR(evt_access_entry))
+    CALL_CHILD(evt_access_entry)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), 210, 60, -145, 0, 0)
     IF_INT_EQUAL(GSWF(GSWF_TRAIN_ARRIVED_POSHLEY), 1)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG6_PIK1"))
@@ -169,7 +172,11 @@ EVT_BEGIN(rsh_07_init_evt)
     ELSE
         IF_INT_EQUAL(GSWF(GSWF_TRAIN_ARRIVED_ROGUEPORT), 1)
             CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_GOR1"))
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_GOR5"))
+#else
             CALL(evt_snd_envoff, PSND_FADE_OUT)
+#endif
             CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
         ELSE
             CALL(evt_sub_get_mapname, LW(0))
@@ -191,16 +198,16 @@ EVT_END()
 EVT_BEGIN(rsh_07_a_init_evt)
     SET_VALUE(LW(0), PTR(bero_data_a))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(rsh_07_init_evt))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(rsh_07_init_evt)
     RETURN
 EVT_END()
 
 EVT_BEGIN(rsh_07_b_init_evt)
     SET_VALUE(LW(0), PTR(bero_data_b))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(rsh_07_init_evt))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(rsh_07_init_evt)
     RETURN
 EVT_END()
 
@@ -215,9 +222,9 @@ static const char* window_tbl[] = {
 EVT_BEGIN(rsh_07_c_init_evt)
     SET_VALUE(LW(0), PTR(bero_data_c))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(rsh_07_init_evt))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(rsh_07_init_evt)
     SET_VALUE(LW(0), PTR(&window_tbl))
-    CALL_CHILD(PTR(evt_rsh_window))
+    CALL_CHILD(evt_rsh_window)
     RETURN
 EVT_END()

@@ -46,10 +46,10 @@
 #include "evt/evt_msg.h"
 #include "evt/evt_npc.h"
 #include "evt/evt_party.h"
+#include "party.h"
 #include "evt/evt_pouch.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "tou.h"
 #include "map/tou_ranking.h"
 #include "mario/mario_party.h"
@@ -132,22 +132,24 @@ typedef struct StarStoneWork {
 } StarStoneWork; /* mirrors EffStarStoneWork: type + flags, then scale + f18 */
 static s32 champion_belt_onoff;
 
-USER_FUNC(chk);
+static USER_FUNC(chk);
 static USER_FUNC(evt_rankingReInit);
 static USER_FUNC(evt_tou_get_fighter_rank);
 static USER_FUNC(evt_tou_get_next_match);
 static USER_FUNC(evt_tou_get_rule_info);
 static USER_FUNC(evt_tou_print_ranking);
 static USER_FUNC(getYoshiColor);
-USER_FUNC(make_monitor);
-USER_FUNC(onoff);
+static USER_FUNC(make_monitor);
+static USER_FUNC(onoff);
+#if VERSION >= VERSION_JP
 USER_FUNC(tou_mario_keyoff_check);
 USER_FUNC(tou_mario_free_wait);
+#endif
 #if VERSION >= VERSION_US
 USER_FUNC(tou_mario_talk_end_wait);
 #endif
 static USER_FUNC(tou_champion_belt_onoff);
-void monitor_tev(MapTevCallbackInfo* info);
+static void monitor_tev(MapTevCallbackInfo* info);
 static USER_FUNC(evt_tou_set_rule_result);
 static USER_FUNC(evt_tou_set_ranking_win_lose);
 static USER_FUNC(evt_tou_get_fighter_battle_msg);
@@ -234,7 +236,11 @@ static void rankingInit(void) {
             }
             evtSetValue(NULL, GSWF(GSWF_TOU_SWOOPS_ADDED), 1);
         }
+#if VERSION <= VERSION_DEMO_US
+        if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) >= STORY_STG3_20_06_RAWK_HAWKS_WARNING) {
+#else
         if (evtGetValue(NULL, GSWF(GSWF_TOU_MAIL4_RECEIVED))) {
+#endif
             rank_wp->entries[11].flags |= 2;
             rank_wp->entries[22].flags &= ~2;
             if (!evtGetValue(NULL, GSWF(GSWF_TOU_SPINIA_ADDED))) {
@@ -270,6 +276,7 @@ static USER_FUNC(evt_rankingReInit) {
     return EVT_RETURN_DONE;
 }
 
+#if VERSION >= VERSION_JP
 USER_FUNC(evt_rankingReset) {
     s32 i;
 
@@ -288,6 +295,7 @@ USER_FUNC(evt_rankingReset) {
     rankingInit();
     return EVT_RETURN_DONE;
 }
+#endif
 
 static void insert(s32* list, s32 num, s32 from, s32 to) {
     s32 i;
@@ -434,7 +442,11 @@ static USER_FUNC(evt_tou_get_next_match) {
     if (rank > 0) {
         if (flag) {
             evtSetValue(event, args[0], list[rank - 1]);
+#if VERSION <= VERSION_DEMO_US
+        } else if (rank != n - 1) {
+#else
         } else if (rank + 1 < n) {
+#endif
             evtSetValue(event, args[0], list[rank + 1]);
         } else {
             evtSetValue(event, args[0], list[rank - 1]);
@@ -519,7 +531,17 @@ static USER_FUNC(evt_tou_get_rule_info) {
     s32 rank;
 
     if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG3_34_RETURN_TO_ROGUEPORT) {
+#if VERSION <= VERSION_DEMO_US
+        // the demo also counts the fighters taken out of the ranking
+        for (i = 0; i < rank_wp->count; i++) {
+            if (rank_wp->entries[i].flags & 4) {
+                break;
+            }
+        }
+        rank = i;
+#else
         GET_RANK(rank, i);
+#endif
         if (rank > 10) {
             num = 10;
             dt = ruleDt_2bu;
@@ -563,7 +585,17 @@ USER_FUNC(evt_tou_get_rule_msg2) {
     s32 rank;
 
     if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG3_34_RETURN_TO_ROGUEPORT) {
+#if VERSION <= VERSION_DEMO_US
+        // the demo also counts the fighters taken out of the ranking
+        for (i = 0; i < rank_wp->count; i++) {
+            if (rank_wp->entries[i].flags & 4) {
+                break;
+            }
+        }
+        rank = i;
+#else
         GET_RANK(rank, i);
+#endif
         if (rank > 10) {
             num = 10;
             dt = ruleDt_2bu;
@@ -754,8 +786,8 @@ static RankData* rank_wp = &rank_work;
 static RankDispWork* dwp = &disp_work;
 
 static const char* suuji[] = {
-    /*"０"*/"\x82\x4F", /*"１"*/"\x82\x50", /*"２"*/"\x82\x51", /*"３"*/"\x82\x52", /*"４"*/"\x82\x53", /*"５"*/"\x82\x54", /*"６"*/"\x82\x55", /*"７"*/"\x82\x56",
-    /*"８"*/"\x82\x57", /*"９"*/"\x82\x58",
+    "０", "１", "２", "３", "４", "５", "６", "７",
+    "８", "９",
 };
 
 static void disp_proc(CameraId cameraId, void* param) {
@@ -890,31 +922,31 @@ static void disp_proc(CameraId cameraId, void* param) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = 15.0f + x;
         pos.y = yy - 24.0f;
-        iconDispGx(&pos, 0x10, ICON_123, 0.8f);
+        iconDispGx(&pos, ICON_FLAG_2D, ICON_123, 0.8f);
     }
     GXSetScissor(0, 0, 0x260, 0x1E0);
     if (dwp->page > 0) {
         {
             Vec pos = {0.0f, 125.0f, 0.0f};
             pos.x = x + winW;
-            iconDispGx(&pos, 0x10, ICON_205, -1.0f);
+            iconDispGx(&pos, ICON_FLAG_2D, ICON_205, -1.0f);
         }
         {
             Vec pos = {0.0f, 75.0f, 0.0f};
             pos.x = x + winW;
-            iconDispGx(&pos, 0x10, ICON_07E, 0.6f);
+            iconDispGx(&pos, ICON_FLAG_2D, ICON_07E, 0.6f);
         }
     }
     if (dwp->page < 1) {
         {
             Vec pos = {0.0f, -140.0f, 0.0f};
             pos.x = x + winW;
-            iconDispGx(&pos, 0x10, ICON_205, 1.0f);
+            iconDispGx(&pos, ICON_FLAG_2D, ICON_205, 1.0f);
         }
         {
             Vec pos = {0.0f, -125.0f, 0.0f};
             pos.x = x + winW;
-            iconDispGx(&pos, 0x10, ICON_080, 0.6f);
+            iconDispGx(&pos, ICON_FLAG_2D, ICON_080, 0.6f);
         }
     }
 }
@@ -996,7 +1028,9 @@ EVT_BEGIN(evt_close)
         SET_VALUE(LW(4), LW(9))
         CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, LW(2), 0, PTR(evt_open), 0)
     ELSE
+#if VERSION >= VERSION_JP
         CALL(evt_mario_key_onoff, 0)
+#endif
         CALL(evt_del_case_evt, 0, LW(11))
         SET_VALUE(LW(5), LW(0))
         SET_VALUE(LW(6), LW(1))
@@ -1015,7 +1049,9 @@ EVT_BEGIN(evt_close)
             CALL(evt_hit_bind_update, LW(6))
             WAIT_FRAMES(1)
         END_LOOP
+#if VERSION >= VERSION_JP
         CALL(evt_mario_key_onoff, 1)
+#endif
         SET_VALUE(LW(0), LW(5))
         SET_VALUE(LW(1), LW(6))
         SET_VALUE(LW(2), LW(7))
@@ -1176,7 +1212,7 @@ USER_FUNC(tou_mario_keyoff_check) {
 }
 #endif
 
-void gans_tex(CameraId cameraId, void* param) {
+static void gans_tex(CameraId cameraId, void* param) {
     GansWork* wp = param;
     CameraEntry saved;
     Mtx44 projMtx;
@@ -1282,25 +1318,25 @@ EVT_END()
 
 EVT_BEGIN(dummy_party_msg_pkr)
     CALL(evt_msg_print, 0, STRING("stg3_tou_303_kur"), 0, STRING("me"))
-    CALL_CHILD(PTR(talk_gardman_doku))
+    CALL_CHILD(talk_gardman_doku)
     RETURN
 EVT_END()
 
 EVT_BEGIN(dummy_party_msg_pnk)
     CALL(evt_msg_print, 0, STRING("stg3_tou_303_nok"), 0, STRING("me"))
-    CALL_CHILD(PTR(talk_gardman_doku))
+    CALL_CHILD(talk_gardman_doku)
     RETURN
 EVT_END()
 
 EVT_BEGIN(dummy_party_msg_yos)
     CALL(evt_msg_print, 0, STRING("stg3_tou_303_yos"), 0, STRING("me"))
-    CALL_CHILD(PTR(talk_gardman_doku))
+    CALL_CHILD(talk_gardman_doku)
     RETURN
 EVT_END()
 
 EVT_BEGIN(dummy_party_msg_win)
     CALL(evt_msg_print, 0, STRING("stg3_tou_303_win"), 0, STRING("me"))
-    CALL_CHILD(PTR(talk_gardman_doku))
+    CALL_CHILD(talk_gardman_doku)
     RETURN
 EVT_END()
 
@@ -1308,15 +1344,15 @@ EVT_BEGIN(party_npc_replace)
     CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_mario_get_party, LW(3))
     SWITCH(LW(3))
-        CASE_EQUAL(1)
+        CASE_EQUAL(PARTY_MEMBER_GOOMBELLA)
         CALL(evt_npc_entry, STRING("dummy_party"), STRING("c_pkr"))
         CALL(evt_npc_set_anim, STRING("dummy_party"), STRING("PKR_D_3"))
         CALL(evt_npc_change_interrupt, STRING("dummy_party"), 6, PTR(dummy_party_msg_pkr))
-        CASE_EQUAL(2)
+        CASE_EQUAL(PARTY_MEMBER_KOOPS)
         CALL(evt_npc_entry, STRING("dummy_party"), STRING("c_pnk"))
         CALL(evt_npc_set_anim, STRING("dummy_party"), STRING("PNK_D_3"))
         CALL(evt_npc_change_interrupt, STRING("dummy_party"), 6, PTR(dummy_party_msg_pnk))
-        CASE_EQUAL(4)
+        CASE_EQUAL(PARTY_MEMBER_YOSHI)
         CALL(getYoshiColor, LW(5))
         SWITCH(LW(5))
             CASE_EQUAL(0)
@@ -1444,29 +1480,29 @@ EVT_BEGIN(evt_tamago_byebye)
             ADD(LW(3), 200)
             CALL(evt_sub_random, 20, LW(4))
             ADD(LW(4), 20)
-            SPAWN_EVENT(PTR(evt_tamago_scale))
+            SPAWN_EVENT(evt_tamago_scale)
             CALL(evt_npc_jump_position_nohit, STRING("たまご"), LW(0), LW(1), LW(2), LW(3), LW(4))
         END_LOOP
         IF_INT_GREATER(LW(0), 0)
             SET_VALUE(LW(3), 400)
-            SPAWN_EVENT(PTR(evt_tamago_scale))
+            SPAWN_EVENT(evt_tamago_scale)
             CALL(evt_npc_jump_position_nohit, STRING("たまご"), 45, 20, 8, 400, 50)
             SET_VALUE(LW(3), 400)
-            SPAWN_EVENT(PTR(evt_tamago_scale))
+            SPAWN_EVENT(evt_tamago_scale)
             CALL(evt_npc_jump_position_nohit, STRING("たまご"), 10, 20, 15, 400, 50)
             SET_VALUE(LW(3), 400)
-            SPAWN_EVENT(PTR(evt_tamago_scale))
+            SPAWN_EVENT(evt_tamago_scale)
             CALL(evt_npc_jump_position_nohit, STRING("たまご"), -30, 20, 30, 400, 50)
         ELSE
             SET_VALUE(LW(3), 400)
-            SPAWN_EVENT(PTR(evt_tamago_scale))
+            SPAWN_EVENT(evt_tamago_scale)
             CALL(evt_npc_jump_position_nohit, STRING("たまご"), -80, 20, 15, 400, 50)
             SET_VALUE(LW(3), 400)
-            SPAWN_EVENT(PTR(evt_tamago_scale))
+            SPAWN_EVENT(evt_tamago_scale)
             CALL(evt_npc_jump_position_nohit, STRING("たまご"), -30, 20, 30, 400, 50)
         END_IF
         SET_VALUE(LW(3), 400)
-        SPAWN_EVENT(PTR(evt_tamago_scale2))
+        SPAWN_EVENT(evt_tamago_scale2)
     END_INLINE_EVENT
     RETURN
 EVT_END()
@@ -1481,7 +1517,7 @@ EVT_BEGIN(talk_gardman)
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_20_MAJORS_10TH)
             CALL(chk, LW(0))
             IF_INT_EQUAL(LW(0), 0)
-                CALL_CHILD(PTR(evt_tamago_byebye))
+                CALL_CHILD(evt_tamago_byebye)
             END_IF
         END_IF
     END_IF
@@ -1502,7 +1538,7 @@ EVT_BEGIN(talk_gardman)
     WAIT_FRAMES(1)
     CALL(evt_npc_move_position, STRING("ガードマン"), 0, -130, 0, FLOAT(80.0f), 1)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -1557,7 +1593,32 @@ static EVT_BEGIN(evt_gardman)
     IF_STR_EQUAL(LW(0), STRING("tou_07"))
         SET_VALUE(LF(2), 1)
     END_IF
+#if VERSION <= VERSION_DEMO_US
+    SET_VALUE(LW(0), 0)
+    LOOP(0)
+        ADD(LW(0), 1)
+        WAIT_FRAMES(1)
+        CALL(evt_mario_wait_movable)
+        IF_INT_GREATER(LW(0), 240)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    LOOP(0)
+        CALL(evt_mario_get_motion, LW(0))
+        IF_INT_EQUAL(LW(0), 0)
+            BREAK_LOOP
+        END_IF
+        IF_INT_EQUAL(LW(0), 1)
+            BREAK_LOOP
+        END_IF
+        IF_INT_EQUAL(LW(0), 2)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+#else
     CALL(tou_mario_free_wait)
+#endif
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_wait_landon)
 #if VERSION >= VERSION_US
@@ -1580,7 +1641,7 @@ static EVT_BEGIN(evt_gardman)
             RETURN
         END_IF
         CALL(evt_mario_normalize)
-        CALL(evt_mario_dispflag_onoff, 1, 2)
+        CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_POSE_LOCK)
 #if VERSION >= VERSION_US
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_SURPRISED1"), LW(0), LW(1), LW(2), 0)
@@ -1592,11 +1653,11 @@ static EVT_BEGIN(evt_gardman)
         CALL(evt_npc_flag_onoff, 0, STRING("ガードマン"), NPC_FLAG_INTANGIBLE)
         WAIT_MS(500)
         CALL(evt_mario_set_pose, STRING("M_S_1"))
-        CALL(evt_mario_dispflag_onoff, 0, 2)
+        CALL(evt_mario_dispflag_onoff, 0, MARIO_DISP_FLAG_POSE_LOCK)
         CALL(evt_mario_set_dir_npc, STRING("ガードマン"))
     END_INLINE_EVENT
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, -180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -1621,7 +1682,7 @@ static EVT_BEGIN(evt_gardman)
     CALL(evt_npc_set_position, STRING("ガードマン"), 0, 0, -170)
     CALL(evt_npc_move_position, STRING("ガードマン"), 0, -90, 0, FLOAT(80.0f), 1)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_close_door_play_se))
+    SPAWN_EVENT(bero_close_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, -180, 0, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -1655,15 +1716,17 @@ static EVT_BEGIN(evt_gardman)
     CALL(evt_npc_status_onoff, 1, STRING("ガードマン"), 2)
     CALL(evt_npc_flag_onoff, 0, STRING("ガードマン"), NPC_FLAG_INSTANT_TURN)
     SET_VALUE(LW(0), 0)
-    CALL_CHILD(PTR(bero_case_switch_off))
+    CALL_CHILD(bero_case_switch_off)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
+#if VERSION >= VERSION_JP
 EVT_BEGIN(evt_gardman_spawn)
-    CALL_CHILD(PTR(evt_gardman))
+    CALL_CHILD(evt_gardman)
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(evt_tou_match_make_default_sub)
     SET_VALUE(LF(0), 0)
@@ -1705,7 +1768,7 @@ EVT_BEGIN(evt_tou_match_make_default_sub)
         CALL(evt_mario_mov_pos2, -90, -96, FLOAT(80.0f))
         CALL(evt_mario_mov_pos2, -87, -99, FLOAT(80.0f))
     END_IF
-    CALL_CHILD(PTR(evt_tou_monitor_on))
+    CALL_CHILD(evt_tou_monitor_on)
     WAIT_MS(800)
     CALL(evt_party_run, 0)
     IF_INT_EQUAL(LF(0), 1)
@@ -1837,25 +1900,31 @@ EVT_BEGIN(evt_tou_match_make_default_sub)
     SET_VALUE(GSW(GSW_TOU_MATCH_RULE_PARAM1), LW(14))
     SET_VALUE(GSW(GSW_TOU_MATCH_RULE_PARAM2), LW(15))
     CALL(evt_msg_print_add, 0, LW(10))
-    CALL_CHILD(PTR(evt_tou_monitor_off))
+    CALL_CHILD(evt_tou_monitor_off)
     WAIT_MS(500)
     SET_VALUE(LW(0), 0)
-    CALL_CHILD(PTR(bero_case_switch_off))
+    CALL_CHILD(bero_case_switch_off)
+#if VERSION <= VERSION_DEMO_US
+    IF_INT_EQUAL(LF(2), 1)
+        SET_VALUE(LW(0), 1)
+        CALL_CHILD(bero_case_switch_off)
+    END_IF
+#endif
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_tou_get_ranking, LW(0))
     IF_INT_EQUAL(LW(0), 3)
         IF_INT_EQUAL(GSWF(GSWF_TOU_POISON_CAKE_EVENT), 0)
             SET_VALUE(GSWF(GSWF_TOU_POISON_CAKE_EVENT), 1)
-            CALL_CHILD(PTR(evt_doku_cake))
+            CALL_CHILD(evt_doku_cake)
         END_IF
     END_IF
-    SPAWN_EVENT(PTR(evt_gardman))
+    SPAWN_EVENT(evt_gardman)
     SET_VALUE(GSWF(GSWF_TOU_MATCH_RESERVED), 1)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_34_RETURN_TO_ROGUEPORT)
         IF_INT_EQUAL(GSW(GSW_TOU_OPPONENT_ID), 18)
             IF_INT_EQUAL(GSWF(GSWF_TOU_KING_K_MATCH_SCENE), 0)
                 SET_VALUE(GSWF(GSWF_TOU_KING_K_MATCH_SCENE), 1)
-                CALL_CHILD(PTR(evt_michel_1))
+                CALL_CHILD(evt_michel_1)
             END_IF
         END_IF
     END_IF
@@ -1863,10 +1932,12 @@ EVT_BEGIN(evt_tou_match_make_default_sub)
 EVT_END()
 
 EVT_BEGIN(evt_tou_match_make_default)
+#if VERSION >= VERSION_JP
     CALL(tou_mario_keyoff_check, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         RETURN
     END_IF
+#endif
     CALL(evt_hit_get_position, STRING("M_make"), LW(10), LW(11), LW(12))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_TOUROKU_COM1"), LW(10), LW(11), LW(12), 0)
     SET_VALUE(LF(0), 0)
@@ -1925,7 +1996,11 @@ EVT_BEGIN(evt_tou_match_make_default)
             SET_VALUE(LF(10), 1)
             CASE_BETWEEN(STORY_STG3_20_13_MAJORS_1ST_PL, STORY_STG3_20_15_UNLOCKING_THE_DOOR)
             SET_VALUE(LF(10), 1)
+#if VERSION <= VERSION_DEMO_US
+            CASE_EQUAL(STORY_STG3_31_GRUBBAS_PLANS)
+#else
             CASE_BETWEEN(STORY_STG3_30_NEW_CHAMPION, STORY_STG3_31_GRUBBAS_PLANS)
+#endif
             SET_VALUE(LF(10), 1)
             CASE_GREATER_OR_EQUAL(STORY_STG3_34_RETURN_TO_ROGUEPORT)
             IF_INT_EQUAL(LF(0), 1)
@@ -1964,7 +2039,7 @@ EVT_BEGIN(evt_tou_match_make_default)
             CALL(evt_msg_print_add_insert, 0, LW(12), LW(0), LW(2))
         ELSE
             CALL(evt_msg_continue)
-            CALL_CHILD(PTR(evt_tou_match_make_default_sub))
+            CALL_CHILD(evt_tou_match_make_default_sub)
         END_IF
         CASE_EQUAL(1)
         CALL(evt_msg_continue)
@@ -1986,6 +2061,7 @@ EVT_END()
 EVT_BEGIN(evt_eat_doku_cake)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
+#if VERSION >= VERSION_JP
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
     CALL(evt_sub_get_dist, LW(0), LW(2), LW(3), LW(5), LW(10))
@@ -1993,6 +2069,7 @@ EVT_BEGIN(evt_eat_doku_cake)
         CALL(evt_party_set_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_party_set_dir_pos, 0, 20, -20)
     END_IF
+#endif
     WAIT_MS(200)
     CALL(evt_msg_print_party, STRING("stg3_tou_296_doku"))
     CALL(evt_msg_print, 0, STRING("stg3_tou_297_doku"), 0, 0)
@@ -2004,14 +2081,24 @@ EVT_BEGIN(evt_eat_doku_cake)
         CALL(evt_party_run, 0)
         RETURN
     END_IF
+#if VERSION >= VERSION_JP
     CALL(evt_party_flg_onoff, 0, 16777216, 1)
+#endif
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     BEGIN_INLINE_EVENT
         SUBTRACT(LW(2), 30)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_mario_mov_pos2, LW(0), LW(2), FLOAT(50.0f))
+#else
         CALL(evt_mario_mov_pos2, LW(0), LW(2), FLOAT(80.0f))
+#endif
         CALL(evt_mario_adjust_dir)
     END_INLINE_EVENT
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_party_move_pos2, 0, LW(0), LW(2), FLOAT(50.0f))
+#else
     CALL(evt_party_move_pos2, 0, LW(0), LW(2), FLOAT(80.0f))
+#endif
     CALL(evt_msg_print_party, STRING("stg3_tou_299_doku"))
     CALL(evt_item_delete, STRING("doku_cake"))
     CALL(evt_party_set_breed_pose, 0, 7)
@@ -2037,23 +2124,25 @@ EVT_BEGIN(evt_eat_doku_cake)
         CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
         CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     END_INLINE_EVENT
-    CALL_CHILD(PTR(party_npc_replace))
+    CALL_CHILD(party_npc_replace)
     WAIT_MS(300)
     CALL(evt_mario_get_party, LW(3))
     SWITCH(LW(3))
-        CASE_EQUAL(1)
+        CASE_EQUAL(PARTY_MEMBER_GOOMBELLA)
         CALL(evt_msg_print, 0, STRING("stg3_tou_301_kur"), 0, STRING("dummy_party"))
-        CASE_EQUAL(2)
+        CASE_EQUAL(PARTY_MEMBER_KOOPS)
         CALL(evt_msg_print, 0, STRING("stg3_tou_301_nok"), 0, STRING("dummy_party"))
-        CASE_EQUAL(5)
+        CASE_EQUAL(PARTY_MEMBER_FLURRIE)
         CALL(evt_msg_print, 0, STRING("stg3_tou_301_win"), 0, STRING("dummy_party"))
-        CASE_EQUAL(4)
+        CASE_EQUAL(PARTY_MEMBER_YOSHI)
         CALL(evt_msg_print, 0, STRING("stg3_tou_301_yos"), 0, STRING("dummy_party"))
     END_SWITCH
     WAIT_MS(300)
     SET_VALUE(GSWF(GSWF_TOU_POISON_CAKE_ON_TABLE), 0)
     SET_VALUE(GSWF(GSWF_TOU_PARTNER_POISONED), 1)
+#if VERSION >= VERSION_JP
     CALL(evt_party_flg_onoff, 0, 16777216, 0)
+#endif
     CALL(evt_party_stop, 0)
     CALL(evt_mario_kill_party, 0)
     CALL(evt_pouch_party_left, 1)
@@ -2073,7 +2162,7 @@ EVT_BEGIN(evt_doku_cake)
     CALL(evt_npc_set_position, STRING("キノシコワ"), 0, 0, -180)
     CALL(evt_npc_set_ry, STRING("キノシコワ"), 270)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, -180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -2087,7 +2176,7 @@ EVT_BEGIN(evt_doku_cake)
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
         SET_VALUE(LW(1), 0)
-        SPAWN_EVENT(PTR(bero_close_door_play_se))
+        SPAWN_EVENT(bero_close_door_play_se)
         CALL(evt_sub_intpl_msec_init, 11, -180, 0, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
@@ -2109,13 +2198,15 @@ EVT_BEGIN(evt_doku_cake)
     CALL(evt_msg_print, 0, STRING("stg3_tou_295_doku"), 0, STRING("キノシコワ"))
     CALL(evt_npc_set_ry, STRING("キノシコワ"), 90)
     WAIT_MS(300)
-    CALL(evt_item_entry, STRING("doku_cake"), ITEM_POISONED_CAKE, 20, 25, -25, 17, -1, 0)
+    CALL(evt_item_entry, STRING("doku_cake"), ITEM_POISONED_CAKE, 20, 25, -25, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
+#if VERSION >= VERSION_JP
     CALL(evt_item_status_on, STRING("doku_cake"), ITEM_STATUS_NO_KOOPS)
+#endif
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_cake"), 0, PTR(evt_eat_doku_cake), 0)
     WAIT_MS(500)
     CALL(evt_npc_move_position, STRING("キノシコワ"), 0, -130, 0, FLOAT(80.0f), 1)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -2129,7 +2220,7 @@ EVT_BEGIN(evt_doku_cake)
     CALL(evt_npc_move_position, STRING("キノシコワ"), 0, -200, 0, FLOAT(80.0f), 1)
     CALL(evt_npc_set_position, STRING("キノシコワ"), 0, -1000, 0)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_close_door_play_se))
+    SPAWN_EVENT(bero_close_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -2170,7 +2261,7 @@ EVT_BEGIN(evt_michel_3_sub)
     SET_VALUE(LW(3), LW(0))
     CALL(evt_npc_move_position, LW(3), 0, -130, 0, FLOAT(80.0f), 1)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -2187,7 +2278,7 @@ EVT_BEGIN(evt_michel_3_sub)
     END_INLINE_EVENT
     WAIT_MS(800)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_close_door_play_se))
+    SPAWN_EVENT(bero_close_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -2213,7 +2304,7 @@ EVT_BEGIN(evt_michel_3)
     CALL(evt_cam3d_evt_set, 0, 112, 287, 0, 60, -8, 1000, 11)
     WAIT_MS(1000)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -2236,7 +2327,7 @@ EVT_BEGIN(evt_michel_3)
     CALL(evt_npc_move_position, STRING("キノシコワ"), 25, -75, 0, FLOAT(80.0f), 1)
     CALL(evt_set_dir_to_target, STRING("キノシコワ"), STRING("ブロッツ"))
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_close_door_play_se))
+    SPAWN_EVENT(bero_close_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -2253,14 +2344,14 @@ EVT_BEGIN(evt_michel_3)
     WAIT_MS(600)
     CALL(evt_npc_set_anim, STRING("キノシコワ"), STRING("S_1"))
     SET_VALUE(LW(0), STRING("キノシコワ"))
-    CALL_CHILD(PTR(evt_michel_3_sub))
+    CALL_CHILD(evt_michel_3_sub)
     CALL(evt_npc_move_position, STRING("マイケル"), 25, -75, 0, FLOAT(80.0f), 1)
     CALL(evt_msg_print, 0, STRING("stg3_tou_93_21"), 0, STRING("マイケル"))
     CALL(evt_msg_print, 0, STRING("stg3_tou_93_22"), 0, STRING("ブロッツ"))
     CALL(evt_msg_print, 0, STRING("stg3_tou_93_23"), 0, STRING("マイケル"))
     CALL(evt_msg_print, 0, STRING("stg3_tou_93_23_01"), 0, STRING("ブロッツ"))
     SET_VALUE(LW(0), STRING("ブロッツ"))
-    CALL_CHILD(PTR(evt_michel_3_sub))
+    CALL_CHILD(evt_michel_3_sub)
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_npc_move_position, STRING("マイケル"), 90, -90, 0, FLOAT(60.0f), 1)
     CALL(evt_npc_set_ry, STRING("マイケル"), 270)
@@ -2361,7 +2452,7 @@ EVT_BEGIN(evt_michel_7)
     RETURN
 EVT_END()
 
-USER_FUNC(make_monitor) {
+static USER_FUNC(make_monitor) {
     NpcEntry* npc = npcNameToPtr_NoAssert(evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG3_34_RETURN_TO_ROGUEPORT ? "ガンス" : "キノシコワ");
     GansWork* wp;
 
@@ -2394,7 +2485,7 @@ USER_FUNC(make_monitor) {
     return EVT_RETURN_BLOCK;
 }
 
-void monitor_tev(MapTevCallbackInfo* info) {
+static void monitor_tev(MapTevCallbackInfo* info) {
     if (gans_wp->ready) {
         GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, 60, GX_FALSE, GX_PTIDENTITY);
         GXLoadTexObj(smartTexObj(&gans_wp->tex, &gans_wp->buf->address), GX_TEXMAP1);
@@ -2419,7 +2510,7 @@ void monitor_tev(MapTevCallbackInfo* info) {
     }
 }
 
-USER_FUNC(onoff) {
+static USER_FUNC(onoff) {
     gans_wp->onoff = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
 }
@@ -2430,12 +2521,13 @@ static USER_FUNC(getYoshiColor) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(chk) {
+static USER_FUNC(chk) {
     EvtWord* args = event->args;
     evtSetValue(event, args[0], partyChkJoin(4) != 0);
     return EVT_RETURN_DONE;
 }
 
+#if VERSION >= VERSION_JP
 USER_FUNC(tou_mario_free_wait) {
     MarioWork* mario = marioGetPtr();
 
@@ -2451,12 +2543,13 @@ USER_FUNC(tou_mario_free_wait) {
     }
     return EVT_RETURN_BLOCK;
 }
+#endif
 
 #if VERSION >= VERSION_US
 USER_FUNC(tou_mario_talk_end_wait) {
     return marioGetPtr()->currMotionId != MARIO_MOTION_TALK ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
-#else
+#elif VERSION >= VERSION_JP
 USER_FUNC(tou_mario_keyoff_check) {
     EvtWord* args = event->args;
 
@@ -2469,7 +2562,7 @@ USER_FUNC(tou_mario_keyoff_check) {
 }
 #endif
 
-USER_FUNC(octo_stop) {
+static USER_FUNC(octo_stop) {
     NpcEntry* npc = npcNameToPtr_NoAssert("オクトール");
 
     if (npc != NULL) {
@@ -2481,7 +2574,7 @@ USER_FUNC(octo_stop) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(octo_start) {
+static USER_FUNC(octo_start) {
     NpcEntry* npc = npcNameToPtr_NoAssert("オクトール");
 
     if (npc != NULL) {
@@ -2490,7 +2583,7 @@ USER_FUNC(octo_start) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(fight_money) {
+static USER_FUNC(fight_money) {
     EvtWord* args = event->args;
     s32 rank = evtGetValue(event, args[0]);
     s32 win = evtGetValue(event, args[1]);
@@ -2579,10 +2672,14 @@ EVT_BEGIN(evt_michel_8)
     CALL(evt_msg_print, 0, STRING("stg3_tou_93_30"), 0, STRING("オクトール"))
     CALL(evt_cam3d_evt_set, 0, 112, 287, 0, 60, -8, 1000, 11)
     WAIT_MS(1000)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_npc_set_position, STRING("ポグ"), 0, 0, -200)
+#else
     CALL(evt_npc_set_position, STRING("ポグ"), -1, 0, -200)
+#endif
     CALL(evt_npc_set_position, STRING("キノシコワ"), 0, 0, -180)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, -180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -2595,19 +2692,29 @@ EVT_BEGIN(evt_michel_8)
     END_LOOP
     BEGIN_INLINE_EVENT
         WAIT_MS(400)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_npc_move_position, STRING("ポグ"), 0, -85, 0, FLOAT(80.0f), 1)
+#else
         CALL(evt_npc_move_position, STRING("ポグ"), 0, -80, 0, FLOAT(80.0f), 1)
+#endif
         CALL(evt_set_dir_to_target, STRING("ポグ"), STRING("キノシコワ"))
     END_INLINE_EVENT
     CALL(evt_npc_move_position, STRING("キノシコワ"), 0, -120, 0, FLOAT(80.0f), 1)
     CALL(evt_npc_move_position, STRING("キノシコワ"), 40, -100, 0, FLOAT(80.0f), 1)
     CALL(evt_set_dir_to_target, STRING("キノシコワ"), STRING("ポグ"))
+#if VERSION >= VERSION_JP
     WAIT_MS(500)
+#endif
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_close_door_play_se))
+    SPAWN_EVENT(bero_close_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, -180, 0, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
+#if VERSION <= VERSION_DEMO_US
+        MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
+#else
         MULTIPLY_FLOAT(LW(0), FLOAT(0.4716797f))
+#endif
         CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
@@ -2627,17 +2734,19 @@ EVT_BEGIN(evt_michel_8)
         CALL(evt_mario_set_dir, 90, 300, 0)
     END_INLINE_EVENT
     CALL(evt_npc_move_position, STRING("ポグ"), -70, -95, 0, FLOAT(80.0f), 1)
+#if VERSION >= VERSION_JP
     CALL(evt_npc_move_position, STRING("ポグ"), -70, -120, 0, FLOAT(80.0f), 1)
     WAIT_MS(1000)
+#endif
     CALL(evt_msg_print, 0, STRING("stg3_tou_93_34"), 0, STRING("キノシコワ"))
     CALL(evt_npc_get_position, STRING("ポグ"), LW(0), LW(1), LW(2))
     CALL(evt_npc_jump_position_nohit, STRING("ポグ"), LW(0), LW(1), LW(2), 500, 30)
-    CALL_CHILD(PTR(evt_tou_monitor_on))
+    CALL_CHILD(evt_tou_monitor_on)
     WAIT_MS(800)
     CALL(evt_mapobj_get_position, STRING("gamen"), LW(0), LW(1), LW(2))
     CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
     CALL(evt_msg_print, 0, STRING("stg3_tou_93_35"), 0, STRING("ガンス"))
-    CALL_CHILD(PTR(evt_tou_monitor_off))
+    CALL_CHILD(evt_tou_monitor_off)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("stg3_tou_93_36"), 0, STRING("キノシコワ"))
     CALL(evt_npc_get_position, STRING("ポグ"), LW(0), LW(1), LW(2))
@@ -2652,30 +2761,45 @@ EVT_BEGIN(evt_michel_8)
     CALL(evt_npc_set_anim, STRING("キノシコワ"), STRING("M_1"))
     WAIT_MS(600)
     CALL(evt_npc_set_anim, STRING("キノシコワ"), STRING("S_1"))
+#if VERSION >= VERSION_JP
     CALL(evt_npc_move_position, STRING("ポグ"), -70, -95, 0, FLOAT(80.0f), 1)
+#endif
     CALL(evt_msg_print, 0, STRING("stg3_tou_93_38"), 0, STRING("ポグ"))
     WAIT_MS(2000)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, -180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
+#if VERSION <= VERSION_DEMO_US
+        MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
+#else
         MULTIPLY_FLOAT(LW(0), FLOAT(0.4716797f))
+#endif
         CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
         WAIT_FRAMES(1)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
     END_LOOP
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_npc_set_position, STRING("ガードマン"), 0, 0, -170)
+    CALL(evt_npc_move_position, STRING("ガードマン"), 0, -120, 0, FLOAT(80.0f), 1)
+#else
     CALL(evt_npc_set_position, STRING("ガードマン"), -1, 0, -170)
     CALL(evt_npc_move_position, STRING("ガードマン"), 0, -100, 0, FLOAT(80.0f), 1)
+#endif
     CALL(evt_set_dir_to_target, STRING("ガードマン"), STRING("mario"))
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_close_door_play_se))
+    SPAWN_EVENT(bero_close_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, -180, 0, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
+#if VERSION <= VERSION_DEMO_US
+        MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
+#else
         MULTIPLY_FLOAT(LW(0), FLOAT(0.4716797f))
+#endif
         CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
         WAIT_FRAMES(1)
         IF_INT_EQUAL(LW(1), 0)
@@ -2686,17 +2810,26 @@ EVT_BEGIN(evt_michel_8)
     WAIT_MS(300)
     CALL(evt_msg_print, 0, STRING("stg3_tou_93_39"), 0, STRING("キノシコワ"))
     WAIT_MS(300)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_npc_move_position, STRING("キノシコワ"), 30, -100, 0, FLOAT(80.0f), 1)
+    CALL(evt_set_dir_to_target, STRING("キノシコワ"), STRING("ポグ"))
+#else
     BEGIN_INLINE_EVENT
         CALL(evt_npc_move_position, STRING("キノシコワ"), 30, -100, 0, FLOAT(80.0f), 1)
         CALL(evt_set_dir_to_target, STRING("キノシコワ"), STRING("ポグ"))
     END_INLINE_EVENT
+#endif
     CALL(evt_npc_move_position, STRING("ガードマン"), 0, -130, 0, FLOAT(80.0f), 1)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
+#if VERSION <= VERSION_DEMO_US
+        MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
+#else
         MULTIPLY_FLOAT(LW(0), FLOAT(0.4716797f))
+#endif
         CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
         WAIT_FRAMES(1)
         IF_INT_EQUAL(LW(1), 0)
@@ -2704,6 +2837,9 @@ EVT_BEGIN(evt_michel_8)
         END_IF
     END_LOOP
     BEGIN_INLINE_EVENT
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_npc_move_position, STRING("ガードマン"), 0, -120, 0, FLOAT(80.0f), 1)
+#endif
         CALL(evt_npc_move_position, STRING("ガードマン"), 0, -200, 0, FLOAT(80.0f), 1)
         CALL(evt_npc_set_position, STRING("ガードマン"), 0, -1000, 0)
     END_INLINE_EVENT
@@ -2721,7 +2857,7 @@ EVT_BEGIN(evt_michel_8)
     END_INLINE_EVENT
     WAIT_MS(2000)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_close_door_play_se))
+    SPAWN_EVENT(bero_close_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -2855,6 +2991,7 @@ EVT_END()
 EVT_BEGIN(evt_eat_cake)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
+#if VERSION >= VERSION_JP
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
     CALL(evt_sub_get_dist, LW(0), LW(2), LW(3), LW(5), LW(10))
@@ -2862,20 +2999,31 @@ EVT_BEGIN(evt_eat_cake)
         CALL(evt_party_set_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_party_set_dir_pos, 0, 20, -20)
     END_IF
+#endif
     WAIT_MS(200)
     CALL(evt_msg_print_party, STRING("stg3_tou_296"))
     CALL(evt_msg_print, 0, STRING("stg3_tou_297"), 0, 0)
     CALL(evt_msg_select, 0, STRING("stg3_tou_297_yn"))
     CALL(evt_msg_continue)
     IF_INT_EQUAL(LW(0), 0)
+#if VERSION >= VERSION_JP
         CALL(evt_party_flg_onoff, 0, 16777216, 1)
+#endif
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         BEGIN_INLINE_EVENT
             SUBTRACT(LW(2), 30)
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_mario_mov_pos2, LW(0), LW(2), FLOAT(50.0f))
+#else
             CALL(evt_mario_mov_pos2, LW(0), LW(2), FLOAT(80.0f))
+#endif
             CALL(evt_mario_adjust_dir)
         END_INLINE_EVENT
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_party_move_pos2, 0, LW(0), LW(2), FLOAT(50.0f))
+#else
         CALL(evt_party_move_pos2, 0, LW(0), LW(2), FLOAT(80.0f))
+#endif
         CALL(evt_msg_print_party, STRING("stg3_tou_299"))
         CALL(evt_msg_print, 0, STRING("stg3_tou_297_1"), 0, 0)
         CALL(evt_item_delete, STRING("cake"))
@@ -2892,7 +3040,9 @@ EVT_BEGIN(evt_eat_cake)
         CALL(evt_pouch_mario_recovery)
         CALL(evt_pouch_all_party_recovery)
         SET_VALUE(GSWF(GSWF_TOU_CAKE_WAITING), 0)
+#if VERSION >= VERSION_JP
         CALL(evt_party_flg_onoff, 0, 16777216, 0)
+#endif
         CALL(evt_exit_case_evt)
     ELSE
         CALL(evt_msg_print_party, STRING("stg3_tou_298"))
@@ -2907,8 +3057,10 @@ EVT_BEGIN(evt_cake_init)
     IF_INT_EQUAL(LW(0), 6)
         IF_INT_EQUAL(GSWF(GSWF_TOU_CAKE_EVENT_DONE), 0)
             IF_INT_EQUAL(GSWF(GSWF_TOU_CAKE_WAITING), 0)
-                CALL(evt_item_entry, STRING("cake"), ITEM_CAKE, 20, 25, -25, 17, -1, 0)
+                CALL(evt_item_entry, STRING("cake"), ITEM_CAKE, 20, 25, -25, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
+#if VERSION >= VERSION_JP
                 CALL(evt_item_status_on, STRING("cake"), ITEM_STATUS_NO_KOOPS)
+#endif
             END_IF
         END_IF
     END_IF
@@ -3106,7 +3258,7 @@ EVT_BEGIN(evt_tamago_hello2)
         ADD(LW(3), 200)
         CALL(evt_sub_random, 20, LW(4))
         ADD(LW(4), 20)
-        SPAWN_EVENT(PTR(evt_tamago_scale))
+        SPAWN_EVENT(evt_tamago_scale)
         CALL(evt_npc_jump_position_nohit, STRING("たまご"), LW(0), LW(1), LW(2), LW(3), LW(4))
     END_LOOP
     CALL(evt_npc_get_position, STRING("たまご"), LW(0), LW(1), LW(2))
@@ -3165,7 +3317,7 @@ EVT_BEGIN(evt_tou_match_after_default)
             IF_INT_EQUAL(LF(0), 0)
                 CALL(chk, LW(0))
                 IF_INT_EQUAL(LW(0), 0)
-                    CALL_CHILD(PTR(evt_tamago_hello))
+                    CALL_CHILD(evt_tamago_hello)
                 END_IF
             END_IF
         END_IF
@@ -3244,7 +3396,7 @@ EVT_BEGIN(evt_tou_match_after_default)
             CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
             ADD(LW(0), 20)
             ADD(LW(1), 20)
-            CALL(evt_item_entry, STRING("fmoney"), ITEM_COIN, LW(0), LW(1), LW(2), 17, -1, 0)
+            CALL(evt_item_entry, STRING("fmoney"), ITEM_COIN, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
             CALL(evt_mario_set_pose, STRING("M_C_3"))
             WAIT_MS(1000)
             CALL(evt_item_delete, STRING("fmoney"))
@@ -3261,7 +3413,7 @@ EVT_BEGIN(evt_tou_match_after_default)
 #else
             CALL(evt_msg_print_insert, 0, STRING("stg3_tou_114_01"), 0, STRING("キノシコワ"), LW(10))
 #endif
-            CALL_CHILD(PTR(evt_tou_ranking_msg))
+            CALL_CHILD(evt_tou_ranking_msg)
             CALL(evt_pouch_add_coin, LW(10))
             WAIT_MS(300)
             CALL(evt_msg_print, 0, STRING("stg3_tou_114_02"), 0, STRING("キノシコワ"))
@@ -3278,7 +3430,7 @@ EVT_BEGIN(evt_tou_match_after_default)
             CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
             ADD(LW(0), 20)
             ADD(LW(1), 20)
-            CALL(evt_item_entry, STRING("fmoney"), ITEM_COIN, LW(0), LW(1), LW(2), 17, -1, 0)
+            CALL(evt_item_entry, STRING("fmoney"), ITEM_COIN, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
             CALL(evt_mario_set_pose, STRING("M_C_3"))
             WAIT_MS(1000)
             CALL(evt_item_delete, STRING("fmoney"))
@@ -3295,7 +3447,7 @@ EVT_BEGIN(evt_tou_match_after_default)
 #else
             CALL(evt_msg_print_insert, 0, STRING("stg3_tou_179_01"), 0, STRING("キノシコワ"), LW(10))
 #endif
-            CALL_CHILD(PTR(evt_tou_ranking_msg))
+            CALL_CHILD(evt_tou_ranking_msg)
             CALL(evt_pouch_add_coin, LW(10))
             WAIT_MS(300)
             CALL(evt_msg_print, 0, STRING("stg3_tou_179_02"), 0, STRING("キノシコワ"))
@@ -3315,7 +3467,7 @@ EVT_BEGIN(evt_tou_match_after_default)
             CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
             ADD(LW(0), 20)
             ADD(LW(1), 20)
-            CALL(evt_item_entry, STRING("fmoney"), ITEM_COIN, LW(0), LW(1), LW(2), 17, -1, 0)
+            CALL(evt_item_entry, STRING("fmoney"), ITEM_COIN, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
             CALL(evt_mario_set_pose, STRING("M_C_3"))
             WAIT_MS(1000)
             CALL(evt_item_delete, STRING("fmoney"))
@@ -3332,7 +3484,7 @@ EVT_BEGIN(evt_tou_match_after_default)
 #else
             CALL(evt_msg_print_insert, 0, STRING("stg3_tou_365_01"), 0, STRING("キノシコワ"), LW(10))
 #endif
-            CALL_CHILD(PTR(evt_tou_ranking_msg))
+            CALL_CHILD(evt_tou_ranking_msg)
             CALL(evt_pouch_add_coin, LW(10))
             WAIT_MS(300)
             CALL(evt_msg_print, 0, STRING("stg3_tou_365_02"), 0, STRING("キノシコワ"))
@@ -3350,7 +3502,7 @@ EVT_BEGIN(evt_tou_match_after_default)
             CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
             ADD(LW(0), 20)
             ADD(LW(1), 20)
-            CALL(evt_item_entry, STRING("fmoney"), ITEM_COIN, LW(0), LW(1), LW(2), 17, -1, 0)
+            CALL(evt_item_entry, STRING("fmoney"), ITEM_COIN, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
             CALL(evt_mario_set_pose, STRING("M_C_3"))
             WAIT_MS(1000)
             CALL(evt_item_delete, STRING("fmoney"))
@@ -3367,7 +3519,7 @@ EVT_BEGIN(evt_tou_match_after_default)
 #else
             CALL(evt_msg_print_insert, 0, STRING("stg3_tou_365_03_01"), 0, STRING("キノシコワ"), LW(10))
 #endif
-            CALL_CHILD(PTR(evt_tou_ranking_msg))
+            CALL_CHILD(evt_tou_ranking_msg)
             CALL(evt_pouch_add_coin, LW(10))
             WAIT_MS(300)
             CALL(evt_msg_print, 0, STRING("stg3_tou_365_03_02"), 0, STRING("キノシコワ"))
@@ -3384,7 +3536,7 @@ EVT_BEGIN(evt_tou_match_after_default)
             CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
             ADD(LW(0), 20)
             ADD(LW(1), 20)
-            CALL(evt_item_entry, STRING("fmoney"), ITEM_COIN, LW(0), LW(1), LW(2), 17, -1, 0)
+            CALL(evt_item_entry, STRING("fmoney"), ITEM_COIN, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
             CALL(evt_mario_set_pose, STRING("M_C_3"))
             WAIT_MS(1000)
             CALL(evt_item_delete, STRING("fmoney"))
@@ -3401,7 +3553,7 @@ EVT_BEGIN(evt_tou_match_after_default)
 #else
             CALL(evt_msg_print_insert, 0, STRING("stg3_tou_180_01"), 0, STRING("キノシコワ"), LW(10))
 #endif
-            CALL_CHILD(PTR(evt_tou_ranking_msg))
+            CALL_CHILD(evt_tou_ranking_msg)
             CALL(evt_pouch_add_coin, LW(10))
             WAIT_MS(300)
             CALL(evt_msg_print, 0, STRING("stg3_tou_180_02"), 0, STRING("キノシコワ"))
@@ -3420,7 +3572,7 @@ EVT_BEGIN(evt_tou_match_after_default)
             CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
             SUBTRACT(LW(0), 20)
             ADD(LW(1), 20)
-            CALL(evt_item_entry, STRING("fmoney"), ITEM_COIN, LW(0), LW(1), LW(2), 17, -1, 0)
+            CALL(evt_item_entry, STRING("fmoney"), ITEM_COIN, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
             CALL(evt_mario_set_pose, STRING("M_C_3"))
             WAIT_MS(1000)
             CALL(evt_item_delete, STRING("fmoney"))
@@ -3437,7 +3589,7 @@ EVT_BEGIN(evt_tou_match_after_default)
 #else
             CALL(evt_msg_print_insert, 0, STRING("stg3_tou_365_04_01"), 0, STRING("キノシコワ"), LW(10))
 #endif
-            CALL_CHILD(PTR(evt_tou_ranking_msg))
+            CALL_CHILD(evt_tou_ranking_msg)
             CALL(evt_pouch_add_coin, LW(10))
             WAIT_MS(300)
             CALL(evt_msg_print, 0, STRING("stg3_tou_365_04_02"), 0, STRING("キノシコワ"))
@@ -3454,7 +3606,7 @@ EVT_BEGIN(evt_tou_match_after_default)
             CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
             SUBTRACT(LW(0), 20)
             ADD(LW(1), 20)
-            CALL(evt_item_entry, STRING("fmoney"), ITEM_COIN, LW(0), LW(1), LW(2), 17, -1, 0)
+            CALL(evt_item_entry, STRING("fmoney"), ITEM_COIN, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
             CALL(evt_mario_set_pose, STRING("M_C_3"))
             WAIT_MS(1000)
             CALL(evt_item_delete, STRING("fmoney"))
@@ -3471,7 +3623,7 @@ EVT_BEGIN(evt_tou_match_after_default)
 #else
             CALL(evt_msg_print_insert, 0, STRING("stg3_tou_181_01"), 0, STRING("キノシコワ"), LW(10))
 #endif
-            CALL_CHILD(PTR(evt_tou_ranking_msg))
+            CALL_CHILD(evt_tou_ranking_msg)
             CALL(evt_pouch_add_coin, LW(10))
             WAIT_MS(300)
             CALL(evt_msg_print, 0, STRING("stg3_tou_181_02"), 0, STRING("キノシコワ"))
@@ -3484,7 +3636,7 @@ EVT_BEGIN(evt_tou_match_after_default)
     CALL(evt_npc_status_onoff, 1, STRING("キノシコワ"), 2)
     CALL(evt_npc_move_position, STRING("キノシコワ"), 0, -130, 0, FLOAT(80.0f), 1)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -3509,7 +3661,7 @@ EVT_BEGIN(evt_tou_match_after_default)
     END_INLINE_EVENT
     WAIT_MS(800)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_close_door_play_se))
+    SPAWN_EVENT(bero_close_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -3598,9 +3750,9 @@ EVT_BEGIN(evt_tou_match_after_default)
         CALL(chk, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_12_MINI_YOSHI_EGG)
-                CALL_CHILD(PTR(evt_tou_chibi_yoshi))
+                CALL_CHILD(evt_tou_chibi_yoshi)
             ELSE
-                CALL_CHILD(PTR(evt_michel_9))
+                CALL_CHILD(evt_michel_9)
             END_IF
             SET_VALUE(LF(0), 1)
         END_IF
@@ -3609,11 +3761,11 @@ EVT_BEGIN(evt_tou_match_after_default)
         IF_INT_EQUAL(LF(0), 0)
             CALL(chk, LW(0))
             IF_INT_EQUAL(LW(0), 0)
-                CALL_CHILD(PTR(evt_tamago_hello2))
+                CALL_CHILD(evt_tamago_hello2)
             END_IF
         END_IF
     END_IF
-    CALL_CHILD(PTR(evt_cake_init))
+    CALL_CHILD(evt_cake_init)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
     CALL(evt_tou_get_ranking, LW(0))
@@ -3621,32 +3773,32 @@ EVT_BEGIN(evt_tou_match_after_default)
         CASE_EQUAL(18)
         IF_INT_EQUAL(GSWF(GSWF_TOU_RANK18_SCENE), 0)
             SET_VALUE(GSWF(GSWF_TOU_RANK18_SCENE), 1)
-            CALL_CHILD(PTR(evt_michel_2))
+            CALL_CHILD(evt_michel_2)
         END_IF
         CASE_EQUAL(17)
         IF_INT_EQUAL(GSWF(GSWF_TOU_RANK17_SCENE), 0)
             SET_VALUE(GSWF(GSWF_TOU_RANK17_SCENE), 1)
-            CALL_CHILD(PTR(evt_michel_3))
+            CALL_CHILD(evt_michel_3)
         END_IF
         CASE_EQUAL(16)
         IF_INT_EQUAL(GSWF(GSWF_TOU_RANK16_SCENE), 0)
             SET_VALUE(GSWF(GSWF_TOU_RANK16_SCENE), 1)
-            CALL_CHILD(PTR(evt_michel_4))
+            CALL_CHILD(evt_michel_4)
         END_IF
         CASE_EQUAL(15)
         IF_INT_EQUAL(GSWF(GSWF_TOU_RANK15_SCENE), 0)
             SET_VALUE(GSWF(GSWF_TOU_RANK15_SCENE), 1)
-            CALL_CHILD(PTR(evt_michel_5))
+            CALL_CHILD(evt_michel_5)
         END_IF
         CASE_EQUAL(14)
         IF_INT_EQUAL(GSWF(GSWF_TOU_RANK14_SCENE), 0)
             SET_VALUE(GSWF(GSWF_TOU_RANK14_SCENE), 1)
-            CALL_CHILD(PTR(evt_michel_6))
+            CALL_CHILD(evt_michel_6)
         END_IF
         CASE_EQUAL(13)
         IF_INT_EQUAL(GSWF(GSWF_TOU_RANK13_SCENE), 0)
             SET_VALUE(GSWF(GSWF_TOU_RANK13_SCENE), 1)
-            CALL_CHILD(PTR(evt_michel_7))
+            CALL_CHILD(evt_michel_7)
         END_IF
         CASE_EQUAL(12)
         IF_INT_EQUAL(GSWF(GSWF_TOU_RANK12_KING_K_GONE), 0)
@@ -3657,7 +3809,7 @@ EVT_BEGIN(evt_tou_match_after_default)
         CASE_EQUAL(11)
         IF_INT_EQUAL(GSWF(GSWF_TOU_RANK11_SWOOPS_JOINS), 0)
             SET_VALUE(GSWF(GSWF_TOU_RANK11_SWOOPS_JOINS), 1)
-            CALL_CHILD(PTR(evt_michel_8))
+            CALL_CHILD(evt_michel_8)
             CALL(evt_rankingReInit)
         END_IF
         CASE_EQUAL(10)
@@ -3665,42 +3817,44 @@ EVT_BEGIN(evt_tou_match_after_default)
         CASE_EQUAL(8)
         IF_INT_EQUAL(GSWF(GSWF_TOU_MAIL1_RECEIVED), 0)
             SET_VALUE(GSWF(GSWF_TOU_MAIL1_RECEIVED), 1)
-            CALL_CHILD(PTR(evt_mail_1))
+            CALL_CHILD(evt_mail_1)
         END_IF
         CASE_EQUAL(7)
         IF_INT_EQUAL(GSWF(GSWF_TOU_MAIL2_RECEIVED), 0)
             SET_VALUE(GSWF(GSWF_TOU_MAIL2_RECEIVED), 1)
-            CALL_CHILD(PTR(evt_mail_2))
+            CALL_CHILD(evt_mail_2)
         END_IF
         CASE_EQUAL(6)
         IF_INT_EQUAL(GSWF(GSWF_TOU_CAKE_EVENT_DONE), 0)
             SET_VALUE(GSWF(GSWF_TOU_CAKE_EVENT_DONE), 1)
-            CALL_CHILD(PTR(evt_cake))
+            CALL_CHILD(evt_cake)
         END_IF
         CASE_EQUAL(5)
         IF_INT_EQUAL(GSWF(GSWF_TOU_BOWSER_RAID_DONE), 0)
             SET_VALUE(GSWF(GSWF_TOU_BOWSER_RAID_DONE), 1)
-            CALL_CHILD(PTR(evt_koopa_after))
+            CALL_CHILD(evt_koopa_after)
         END_IF
         IF_INT_EQUAL(GSWF(GSWF_TOU_CAKE_WAITING), 1)
-            CALL_CHILD(PTR(evt_tou_08_cake))
+            CALL_CHILD(evt_tou_08_cake)
         END_IF
         CASE_EQUAL(4)
         IF_INT_EQUAL(GSWF(GSWF_TOU_MAIL3_RECEIVED), 0)
             SET_VALUE(GSWF(GSWF_TOU_MAIL3_RECEIVED), 1)
-            CALL_CHILD(PTR(evt_mail_3))
+            CALL_CHILD(evt_mail_3)
         END_IF
         CASE_EQUAL(3)
         IF_INT_EQUAL(GSWF(GSWF_TOU_MAIL4_RECEIVED), 0)
             SET_VALUE(GSWF(GSWF_TOU_MAIL4_RECEIVED), 1)
-            CALL_CHILD(PTR(evt_mail_4))
+            CALL_CHILD(evt_mail_4)
+#if VERSION >= VERSION_JP
             CALL(evt_rankingReInit)
+#endif
         END_IF
         CASE_EQUAL(2)
         CASE_EQUAL(1)
         IF_INT_EQUAL(GSWF(GSWF_TOU_RANK1_SCENE), 0)
             SET_VALUE(GSWF(GSWF_TOU_RANK1_SCENE), 1)
-            CALL_CHILD(PTR(evt_mail_5))
+            CALL_CHILD(evt_mail_5)
         END_IF
     END_SWITCH
     CALL(octo_start)

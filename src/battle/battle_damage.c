@@ -32,13 +32,13 @@ typedef void (*BtlUnit_GetStatusS8Fn)(BattleUnit*, s8, s8*, s8*);
 // FAKE: battle_damage.c calls BtlUnit_SetStatus through this prototype (the types it was compiled with) instead of the one in battle/battle_unit.h; same registers, behaviour-identical.
 typedef BOOL (*BtlUnit_SetStatusS8Fn)(BattleUnit*, s8, s8, s8);
 
-void _getSickStatusParam(BattleUnit* unit, BattleWeapon* weapon, u32 type, s8* outTime, s8* outStrength);
-s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u32 special, s32 type, s32 rate, s32 levelDiff, s8 time, s8 strength);
-u32 BattleCheckPikkyoro(BattleWeapon* weapon, u32* flags);
-s32 BattleCalculateDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, u32* result, u32 flags);
-s32 BattleCalculateFpDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, u32* resultFlags, u32 flags);
-s32 _checkDamageCode_EmergencyRevival(BattleUnit* unit, u32* flags);
-void __declare(s32 unitIdx, s32 partIdx, s32* outUnit, s32* outPart);
+static void _getSickStatusParam(BattleUnit* unit, BattleWeapon* weapon, u32 type, s8* outTime, s8* outStrength);
+static s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u32 special, s32 type, s32 rate, s32 levelDiff, s8 time, s8 strength);
+static u32 BattleCheckPikkyoro(BattleWeapon* weapon, u32* flags);
+static s32 BattleCalculateDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, u32* result, u32 flags);
+static s32 BattleCalculateFpDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, u32* resultFlags, u32 flags);
+static s32 _checkDamageCode_EmergencyRevival(BattleUnit* unit, u32* flags);
+static void __declare(s32 unitIdx, s32 partIdx, s32* outUnit, s32* outPart);
 
 void BtlActRec_AddCount(u8* count);
 // FAKE: local prototype: BtlActRec_AddPoint takes the points as u8 (battle_actrecord.h: s32); this file was compiled with it and the header prototype changes the code.
@@ -146,7 +146,7 @@ void BattleDamageDirect(s32 unitId, BattleUnit* target, BattleUnitPart* part, s3
     }
 
     if (!(result & DAMAGE_FLAG_HEAL) && damage > 0) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         s32 i = target->badgesEquipped.PityFlower;
         for (; i > 0; i--) {
             irand(100);
@@ -172,7 +172,7 @@ void BattleDamageDirect(s32 unitId, BattleUnit* target, BattleUnitPart* part, s3
     if (pattern != 0x13 && pattern != 0x1b) {
         if (result & DAMAGE_FLAG_ATTACK_FX_R) {
             psndSFXOn_3D("SFX_MARIO_HAMMER_PIKKYO_R1", &pos);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         } else if (result & DAMAGE_FLAG_ATTACK_FX_Y) {
             psndSFXOn_3D("SFX_MARIO_HAMMER_PIKKYO_B1", &pos);
         } else if (result & DAMAGE_FLAG_ATTACK_FX_B) {
@@ -323,7 +323,7 @@ void BattleDamageDirect(s32 unitId, BattleUnit* target, BattleUnitPart* part, s3
     BattleRunHitEvent(target, result);
 }
 
-u32 BattleCheckPikkyoro(BattleWeapon* weapon, u32* flags) {
+static u32 BattleCheckPikkyoro(BattleWeapon* weapon, u32* flags) {
     BattleWork* wp = _battleWorkPointer;
     s32 table[5] = {0};
     s32 count = 0;
@@ -397,7 +397,7 @@ u32 BattleCheckPikkyoro(BattleWeapon* weapon, u32* flags) {
     return result;
 }
 
-s32 BattleCalculateDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, u32* result, u32 flags) {
+static s32 BattleCalculateDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, u32* result, u32 flags) {
     u32 defaultResult;
     BattleWork* wp = _battleWorkPointer;
     s32 damage;
@@ -451,7 +451,7 @@ s32 BattleCalculateDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPa
         if (attacker->currentHp <= attacker->kindParams->perilHP && attacker->badgesEquipped.MegaRush) {
             damage += attacker->badgesEquipped.MegaRush * 5;
         }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         else
 #endif
             if (attacker->currentHp <= attacker->kindParams->dangerHP && attacker->badgesEquipped.PowerRush) {
@@ -535,7 +535,7 @@ skip:
         if (target->badgesEquipped.DamageDodge && (flags & DAMAGE_FLAG_GUARDED)) {
             defense += target->badgesEquipped.DamageDodge;
         }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         if (element == 1 && target->badgesEquipped.IcePower) {
             defense += target->badgesEquipped.IcePower;
         }
@@ -581,7 +581,7 @@ skip:
     if (flags & DAMAGE_FLAG_GUARDED) {
         damage--;
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (element == 1 && target->badgesEquipped.IcePower) {
         damage -= target->badgesEquipped.IcePower;
     }
@@ -591,7 +591,7 @@ skip:
         damage *= target->badgesEquipped.DoublePain + 1;
     }
     if (target->badgesEquipped.LastStand && target->currentHp <= target->kindParams->dangerHP) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         n = target->badgesEquipped.LastStand;
 #else
         n = target->badgesEquipped.LastStand + 1;
@@ -632,7 +632,7 @@ skip:
     return damage;
 }
 
-s32 BattleCalculateFpDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, u32* resultFlags, u32 flags) {
+static s32 BattleCalculateFpDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, u32* resultFlags, u32 flags) {
     BattleWork* wp = _battleWorkPointer;
     s32 damage = 0;
     s32 reduce = 0;
@@ -668,7 +668,7 @@ s32 BattleCalculateFpDamage(BattleUnit* attacker, BattleUnit* target, BattleUnit
     return damage;
 }
 
-s32 _getSickStatusRate(BattleWeapon* weapon, s32 type) {
+static s32 _getSickStatusRate(BattleWeapon* weapon, s32 type) {
     BattleWeapon* w = weapon;
     switch (type) {
         case 1:
@@ -737,7 +737,7 @@ s32 _getSickStatusRate(BattleWeapon* weapon, s32 type) {
             return w->hpRegenTime > 0 ? 100 : 0;
         case 24:
             return w->fpRegenTime > 0 ? 100 : 0;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         case 16:
             return w->chargeStrength > 0 ? 100 : 0;
         case 21:
@@ -756,7 +756,7 @@ s32 _getSickStatusRate(BattleWeapon* weapon, s32 type) {
     return 0;
 }
 
-void _getSickStatusParam(BattleUnit* unit, BattleWeapon* weapon, u32 type, s8* outTime, s8* outStrength) {
+static void _getSickStatusParam(BattleUnit* unit, BattleWeapon* weapon, u32 type, s8* outTime, s8* outStrength) {
     BattleWeapon* w = weapon;
     s32 time;
     s32 strength;
@@ -945,7 +945,7 @@ void _getSickStatusParam(BattleUnit* unit, BattleWeapon* weapon, u32 type, s8* o
                 strength += (n - 1) * 2;
             }
         }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         if (strength >= 10) {
             strength = 9;
         }
@@ -955,7 +955,7 @@ void _getSickStatusParam(BattleUnit* unit, BattleWeapon* weapon, u32 type, s8* o
     *outStrength = strength;
 }
 
-u8 _getRegistStatus(BattleUnit* unit, s32 type) {
+static u8 _getRegistStatus(BattleUnit* unit, s32 type) {
     BattleVulnerableStatus* v = unit->vulnStatus;
     switch (type) {
         case 1:
@@ -1018,7 +1018,7 @@ EffectEntry* effUpdownEntry(s32 type, s32 strength, s32 time, f32 x, f32 y, f32 
     ((EffStampN64Work*)(e)->userdata)->g2 = (g1); \
     ((EffStampN64Work*)(e)->userdata)->b2 = (b1)
 
-s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u32 special, s32 type, s32 rate, s32 levelDiff, s8 time, s8 strength) {
+static s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u32 special, s32 type, s32 rate, s32 levelDiff, s8 time, s8 strength) {
     s32 ok;
     s32 announce;
     s32 chance;
@@ -1030,7 +1030,7 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
     s8 curTurns;
     s8 curStrength;
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     BtlUnit_GetStatus(unit, STATUS_CHARGE, NULL, &prevStrength);
 #else
     ok = 0;
@@ -1083,7 +1083,7 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
     if (part->attributes & PART_ATTR_IMMUNE_TO_STATUS) {
         return 0;
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (BtlUnit_CheckStatus(unit, STATUS_ALLERGIC) && !ok) {
         return 0;
     }
@@ -1105,7 +1105,7 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
             case 0x19:
             case 0x1a:
             case 0x1b:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 return 0;
 #else
                 if (!ok) {
@@ -1193,7 +1193,7 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
         } else {
             y += BtlUnit_GetHeight(unit) / 2;
         }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         switch (type) {
             case 1:
                 effStampN64Entry(0, x, y, 10.0f + z);
@@ -1539,7 +1539,7 @@ s32 BattleSetStatusDamageFromWeapon(BattleUnit* attacker, BattleUnit* target, Ba
                     }
                     break;
             }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             BattleSetStatusDamage(&result, target, part, weapon->special, i, (s8)rate, levelDiff, time, strength);
 #else
             if (BattleSetStatusDamage(&result, target, part, weapon->special, i, (s8)rate, levelDiff, time, strength) && i == 18) {
@@ -1619,7 +1619,7 @@ s32 BattlePreCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPar
     return 1;
 }
 
-s32 _checkDamageCode_EmergencyRevival(BattleUnit* unit, u32* flags) {
+static s32 _checkDamageCode_EmergencyRevival(BattleUnit* unit, u32* flags) {
     s32 kind = unit->currentKind;
     if (kind == 0xDE) {
         if ((s32)pouchCheckItem(ITEM_LIFE_SHROOM) > 0) {
@@ -1939,7 +1939,7 @@ void BattleAttackDeclare(s32* unitIdx, s32* partIdx) {
     }
 }
 
-void __declare(s32 unitIdx, s32 partIdx, s32* outUnit, s32* outPart) {
+static void __declare(s32 unitIdx, s32 partIdx, s32* outUnit, s32* outPart) {
     s32 i;
     BattleUnit* unit;
     BattleUnitPart* part;

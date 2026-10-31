@@ -7,7 +7,6 @@
 #include "evt/evt_map.h"
 #include "evt/evt_mobj.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "jin.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
@@ -198,18 +197,18 @@ EVT_BEGIN(jin_03_init_evt)
     CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(evt_usu_kagemario_party_kill)
     IF_INT_EQUAL(LSW(1), 0)
-        SPAWN_EVENT(PTR(jin_03_kaidan_temae_kesu))
-        SPAWN_EVENT(PTR(jin_03_kaidan_oku_kesu))
+        SPAWN_EVENT(jin_03_kaidan_temae_kesu)
+        SPAWN_EVENT(jin_03_kaidan_oku_kesu)
     ELSE
         IF_INT_EQUAL(LSW(1), 1)
-            SPAWN_EVENT(PTR(jin_03_kaidan_naka_kesu))
-            SPAWN_EVENT(PTR(jin_03_kaidan_oku_kesu))
+            SPAWN_EVENT(jin_03_kaidan_naka_kesu)
+            SPAWN_EVENT(jin_03_kaidan_oku_kesu)
         ELSE
-            SPAWN_EVENT(PTR(jin_03_kaidan_temae_kesu))
-            SPAWN_EVENT(PTR(jin_03_kaidan_naka_kesu))
+            SPAWN_EVENT(jin_03_kaidan_temae_kesu)
+            SPAWN_EVENT(jin_03_kaidan_naka_kesu)
         END_IF
     END_IF
     CALL(evt_mobj_kururing_floor, STRING("kururin1"), 125, 0, 0, STRING("S_yuka"), 125, GSWF(GSWF_JIN03_STAR_PIECE_PANEL))

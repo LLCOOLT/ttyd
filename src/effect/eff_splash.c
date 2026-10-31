@@ -16,9 +16,9 @@
 #include "eff/eff_kemu_test.h"
 #include "libc_decls.h"
 
-void effSplashMain(EffectEntry* effect);
-void effSplashDisp(CameraId cameraId, EffectEntry* effect);
-void effSplashGetCol(CameraId cameraId, EffectEntry* effect);
+static void effSplashMain(EffectEntry* effect);
+static void effSplashDisp(CameraId cameraId, EffectEntry* effect);
+static void effSplashGetCol(CameraId cameraId, EffectEntry* effect);
 
 typedef struct EffSplashWork {
     s32 type;      // 0x0
@@ -201,7 +201,7 @@ EffectEntry* effSplashEntry(s32 type, f32 x, f32 y, f32 z, f32 size) {
     return effect;
 }
 
-void effSplashMain(EffectEntry* effect) {
+static void effSplashMain(EffectEntry* effect) {
     EffSplashWork* work = effect->userdata;
     Vec position;
     Vec v = {0.0f, 0.0f, 0.0f};
@@ -300,14 +300,14 @@ void effSplashMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 1, (DispCallback)effSplashDisp, effect);
 }
 
-void effSplashGetCol(CameraId cameraId, EffectEntry* effect) {
+static void effSplashGetCol(CameraId cameraId, EffectEntry* effect) {
     EffSplashWork* work = effect->userdata;
     CameraEntry* cam;
     f32 proj[7];
     f32 vp[6];
     f32 sx, sy, sz;
     u8 argb[4];
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     GXColor c;
 #endif
 
@@ -325,7 +325,7 @@ void effSplashGetCol(CameraId cameraId, EffectEntry* effect) {
         work->color.a = 255;
     }
     work->hasColor = 1;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // The demo picks the water colour per map here; retail asks eff_funemizu.
     if (strcmp(gp->currentMapName, "muj_02") == 0) {
         work->color.r = 0x20;
@@ -352,7 +352,7 @@ void effSplashGetCol(CameraId cameraId, EffectEntry* effect) {
 #endif
 }
 
-void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
+static void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
     EffSplashWork* work = effect->userdata;
     Mtx trans;
     Mtx scale;
@@ -376,7 +376,7 @@ void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
     u32 k2;
     u8* sz;
     u8** dl;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     s32 kb;
 #endif
 
@@ -514,12 +514,12 @@ void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
                     ang = 6.2831855f * (f32)k / 8.0f;
                     cs = (f32)cos(ang);
                     sn = (f32)sin(ang);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                     kb = k & 1;
 #endif
                     GXPosition3f32(a * sn, 0.0f, a * cs);
                     GXColor4u8((u8)(255.0f * r0), (u8)(255.0f * g0), (u8)(255.0f * b0), 255);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                     GXTexCoord2f32((f32)(k & 1), 0.1f);
 #else
                     GXTexCoord2f32((f32)kb, 0.1f);
@@ -528,7 +528,7 @@ void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
                     sn = (f32)sin(ang);
                     GXPosition3f32(b * sn, c, b * cs);
                     GXColor4u8((u8)(255.0f * r1), (u8)(255.0f * g1), (u8)(255.0f * b1), 255);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                     GXTexCoord2f32((f32)(k & 1), 2.1f);
 #else
                     GXTexCoord2f32((f32)kb, 2.1f);

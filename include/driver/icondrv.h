@@ -38,7 +38,7 @@ typedef struct IconBinary {
 #define ICON_FLAG_PENDING_BIN 0x2000 // made before icon.bin had loaded; iconMain finishes the set-up
 
 // IconEntry flags that the demo numbers differently
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #define ICON_FLAG_2D 0x4
 #define ICON_FLAG_FLIP_X 0x8
 #define ICON_FLAG_FLIP_Y 0x10
@@ -93,7 +93,7 @@ void iconDelete(const char* name);
 void iconChange(const char* name, u16 iconId);
 // iconDispGx flag bits: drawn with the 2D camera, mirrored in x. The demo's 2D bit is 4, with the flips after it
 // (x 8, y 0x10); retail moved the flips to 4 and 8 and the 2D bit to 0x10.
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #define ICON_DISP_2D 4
 #define ICON_DISP_FLIP_X 8
 #else

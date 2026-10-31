@@ -20,7 +20,7 @@ typedef struct effKemuri1Data {
 } effKemuri1Data;
 
 // local prototypes
-void effKemuri1Main(EffectEntry* effect);
+static void effKemuri1Main(EffectEntry* effect);
 
 typedef struct effKemuri1EWork {
     u16 type;
@@ -213,7 +213,7 @@ EffectEntry* effKemuri1N64Entry(s32 type, f32 x, f32 y, f32 z, f32 a5) {
 }
 
 #include "driver/dispdrv.h"
-void effKemuri1Disp(CameraId cameraId, EffectEntry* effect);
+static void effKemuri1Disp(CameraId cameraId, EffectEntry* effect);
 
 typedef struct effKemuri1MWork {
     u16 type;
@@ -228,7 +228,7 @@ typedef struct effKemuri1MWork {
     s32 duration;                                         // 0x4C
 } effKemuri1MWork;
 
-void effKemuri1Main(EffectEntry* effect) {
+static void effKemuri1Main(EffectEntry* effect) {
     effKemuri1MWork* work = effect->userdata;
     Vec pos2;
     Vec pos = {0.0f, 0.0f, 0.0f};
@@ -305,7 +305,7 @@ typedef struct effKemuri1Work {
     u8 pad_4C[4];
 } effKemuri1Work;
 
-void effKemuri1Disp(CameraId cameraId, EffectEntry* effect) {
+static void effKemuri1Disp(CameraId cameraId, EffectEntry* effect) {
     Mtx mtx, scale, rot, view;
     GXTexObj tex;
     effKemuri1Work* work;

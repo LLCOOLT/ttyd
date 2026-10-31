@@ -17,7 +17,7 @@
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_eff.h"
@@ -268,7 +268,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {90, 90, 80, 100, 90, 100, 100, 70, 100, 90, 100, 90, 100, 90, 90, 95, 80, 100, 90, 100, 100, 95};
+#else
 static StatusVulnerability regist = {100, 90, 70, 100, 100, 100, 100, 70, 100, 95, 100, 95, 100, 100, 90, 95, 80, 100, 90, 100, 100, 95};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
@@ -287,10 +291,15 @@ static PoseTableEntry pose_table[] = {
     {42, "R_1"},
     {41, "R_1"},
     {40, "W_1"},
+#if VERSION <= VERSION_DEMO_US
+    {56, "I_1"},
+    {57, "I_1"},
+#else
     {56, "X_1"},
     {57, "X_1"},
-    {65, "T_1"},
-    {69, "S_1"},
+#endif
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static PoseTableEntry pose_table_item_have[] = {
@@ -298,8 +307,13 @@ static PoseTableEntry pose_table_item_have[] = {
     {2, "Y_1"},
     {9, "Y_1"},
     {5, "K_1"},
+#if VERSION <= VERSION_DEMO_US
+    {4, "I_1"},
+    {3, "I_1"},
+#else
     {4, "X_1"},
     {3, "X_1"},
+#endif
     {28, "S_2"},
     {29, "Q_1"},
     {30, "Q_1"},
@@ -310,21 +324,19 @@ static PoseTableEntry pose_table_item_have[] = {
     {42, "R_2"},
     {41, "R_2"},
     {40, "W_2"},
-    {65, "S_2"},
-    {69, "S_2"},
+    {BTL_POSE_TALK, "S_2"},
+    {BTL_POSE_STAY_DEFAULT, "S_2"},
 };
 
 #if VERSION >= VERSION_US
 extern EvtWord _borodo_emergency_revival_event[];
-static BattleDataEntry data_table[] = {
-    {51, _borodo_emergency_revival_event},
-    {0, NULL},
-};
-#else
-static BattleDataEntry data_table[] = {
-    {0, NULL},
-};
 #endif
+static BattleDataEntry data_table[] = {
+#if VERSION >= VERSION_US
+    {51, _borodo_emergency_revival_event},
+#endif
+    {0, NULL},
+};
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_borodo", "c_borodo", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
@@ -350,7 +362,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -361,7 +373,7 @@ EVT_END()
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_CheckUnitFlag, BTL_UNIT_SELF, 1073741824, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(escape_event))
+        CALL_CHILD(escape_event)
         RETURN
     END_IF
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
@@ -372,16 +384,16 @@ static EVT_BEGIN(attack_event)
     END_IF
     CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(_borodo_normal_attack))
+        CALL_CHILD(_borodo_normal_attack)
         RETURN
     END_IF
     SET_VALUE(LW(1), 225)
     SUBTRACT(LW(1), 1)
     CALL(evt_sub_random, LW(1), LW(0))
     IF_INT_LESS(LW(0), 25)
-        CALL_CHILD(PTR(_borodo_normal_attack))
+        CALL_CHILD(_borodo_normal_attack)
     ELSE
-        CALL_CHILD(PTR(_borodo_steal_attack))
+        CALL_CHILD(_borodo_steal_attack)
     END_IF
     RETURN
 EVT_END()

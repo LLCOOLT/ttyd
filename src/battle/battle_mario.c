@@ -19,7 +19,7 @@
 #include "evt/evt_audience.h"
 #include "evt/evt_eff.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "driver/npcdrv.h"
 #include "battle/battle_message.h"
 #include "evt/evt_story.h"
@@ -37,6 +37,7 @@ static USER_FUNC(_get_mario_hammer_lv);
 #include "mario/mario_pouch.h"
 #include "system.h"
 #include "pmario_sound.h"
+#include "icon_ids.h"
 
 EffectEntry* effFireEntry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 duration);
 
@@ -44,20 +45,20 @@ EffectEntry* effFireEntry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 duration
 #include "battle/battle_database_common.h"
 static USER_FUNC(_get_mario_hammer_lv);
 
-USER_FUNC(_battle_majinai_effect);
-USER_FUNC(_majinai_powerup_check);
-USER_FUNC(_paper_light_off);
-USER_FUNC(_fire_wave);
-USER_FUNC(_mario_fire_ball_controll);
-USER_FUNC(_kaiten_hammer_acrobat_rotate);
-USER_FUNC(_hammer_star_effect);
+static USER_FUNC(_battle_majinai_effect);
+static USER_FUNC(_majinai_powerup_check);
+static USER_FUNC(_paper_light_off);
+static USER_FUNC(_fire_wave);
+static USER_FUNC(_mario_fire_ball_controll);
+static USER_FUNC(_kaiten_hammer_acrobat_rotate);
+static USER_FUNC(_hammer_star_effect);
 USER_FUNC(mario_get_renzoku_count_max);
-USER_FUNC(_record_renzoku_count);
-USER_FUNC(_tatsumaki_effect);
-USER_FUNC(_wait_jyabara_hit_iron_frame);
-USER_FUNC(_bgset_iron_frame_check);
-USER_FUNC(_jump_star_effect);
-USER_FUNC(_whirlwind_effect);
+static USER_FUNC(_record_renzoku_count);
+static USER_FUNC(_tatsumaki_effect);
+static USER_FUNC(_wait_jyabara_hit_iron_frame);
+static USER_FUNC(_bgset_iron_frame_check);
+static USER_FUNC(_jump_star_effect);
+static USER_FUNC(_whirlwind_effect);
 
 BattleWeapon marioDefaultWeapon_Jump;
 BattleWeapon marioWeapon_KururinJump;
@@ -147,10 +148,9 @@ extern EvtWord _MajinaiPoseReset[];
 extern EvtWord marioAttackEvent_MajinaiDefenceUp[];
 extern EvtWord marioAttackEvent_MajinaiExpUp[];
 
-#if VERSION >= VERSION_US
 BattleWeapon marioDefaultWeapon_Jump = {
     "btl_wn_mario_normal_jump", // name
-    167, // icon
+    ICON_09F, // icon
     {0}, // pad_06
     0, // itemId
     "msg_normal_jump", // description
@@ -182,89 +182,16 @@ BattleWeapon marioDefaultWeapon_Jump = {
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
     marioAttackEvent_NormalJump, // attackEvtScript
-    {0, 0, 0, 100, 0, 4, 2, 1, 1, 0, 0, 0}, // stageEffectRates
-};
-#else
-BattleWeapon marioDefaultWeapon_Jump = {
-    "btl_wn_mario_normal_jump", // name
-    159, // icon
-    {0}, // pad_06
-    0, // itemId
-    "msg_normal_jump", // description
-    100, // baseAccuracy
-    0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    1, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerFromMarioJumpLv, // hpDamageFn
-    {1, 1, 2, 2, 3, 3, 0, 0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_ac_jump", // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_FLIPS_SHELLED | SPECIAL_GROUNDS_WINGED | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
-    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_NormalJump, // attackEvtScript
+#if VERSION <= VERSION_JP
     {0, 0, 0, 100, 0, 2, 2, 1, 1, 0, 0, 0}, // stageEffectRates
-};
-#endif
-
-#if VERSION >= VERSION_US
-BattleWeapon marioWeapon_KururinJump = {
-    "btl_wn_mario_kururin_jump", // name
-    169, // icon
-    {0}, // pad_06
-    0, // itemId
-    "msg_kururin_jump", // description
-    100, // baseAccuracy
-    2, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerFromMarioJumpLv, // hpDamageFn
-    {1, 1, 2, 2, 3, 3, 0, 0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_ac_k_jump", // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_FLIPS_SHELLED | SPECIAL_GROUNDS_WINGED | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
-    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_KururinJump, // attackEvtScript
-    {0, 0, 0, 100, 0, 4, 5, 1, 1, 0, 0, 0}, // stageEffectRates
-};
 #else
+    {0, 0, 0, 100, 0, 4, 2, 1, 1, 0, 0, 0}, // stageEffectRates
+#endif
+};
+
 BattleWeapon marioWeapon_KururinJump = {
     "btl_wn_mario_kururin_jump", // name
-    161, // icon
+    ICON_0A1, // icon
     {0}, // pad_06
     0, // itemId
     "msg_kururin_jump", // description
@@ -297,14 +224,16 @@ BattleWeapon marioWeapon_KururinJump = {
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
     marioAttackEvent_KururinJump, // attackEvtScript
+#if VERSION <= VERSION_JP
     {0, 0, 0, 100, 0, 2, 5, 1, 1, 0, 0, 0}, // stageEffectRates
-};
+#else
+    {0, 0, 0, 100, 0, 4, 5, 1, 1, 0, 0, 0}, // stageEffectRates
 #endif
+};
 
-#if VERSION >= VERSION_US
 BattleWeapon marioWeapon_KururinJump2 = {
     "btl_wn_mario_kururin_jump", // name
-    169, // icon
+    ICON_0A1, // icon
     {0}, // pad_06
     0, // itemId
     "msg_kururin_jump", // description
@@ -316,71 +245,40 @@ BattleWeapon marioWeapon_KururinJump2 = {
     100, // bingoSlotChance
     50, // reserved_1B
     weaponGetPowerFromMarioJumpLv, // hpDamageFn
+#if VERSION <= VERSION_JP
+    {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
+#else
     {1, 2, 3, 4, 5, 6, 0, 0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_ac_k_jump", // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_FLIPS_SHELLED | SPECIAL_GROUNDS_WINGED | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
-    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_KururinJump, // attackEvtScript
-    {0, 5, 5, 100, 0, 20, 10, 5, 5, 5, 0, 0}, // stageEffectRates
-};
-#else
-BattleWeapon marioWeapon_KururinJump2 = {
-    "btl_wn_mario_kururin_jump", // name
-    161, // icon
-    {0}, // pad_06
-    0, // itemId
-    "msg_kururin_jump", // description
-    100, // baseAccuracy
-    0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerFromMarioJumpLv, // hpDamageFn
-    {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_ac_k_jump", // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_FLIPS_SHELLED | SPECIAL_GROUNDS_WINGED | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
-    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_KururinJump, // attackEvtScript
-    {0, 5, 5, 100, 0, 10, 10, 5, 5, 5, 0, 0}, // stageEffectRates
-};
 #endif
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
+    TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
+    0, 0, // element..damagePattern
+    3, // acLevel
+    2, // reserved_6F
+    "msg_ac_k_jump", // acHelpMsg
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_FLIPS_SHELLED | SPECIAL_GROUNDS_WINGED | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
+    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
+    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
+    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
+    {0}, // pad_AE
+    marioAttackEvent_KururinJump, // attackEvtScript
+#if VERSION <= VERSION_JP
+    {0, 5, 5, 100, 0, 10, 10, 5, 5, 5, 0, 0}, // stageEffectRates
+#else
+    {0, 5, 5, 100, 0, 20, 10, 5, 5, 5, 0, 0}, // stageEffectRates
+#endif
+};
 
-#if VERSION >= VERSION_US
 BattleWeapon marioWeapon_JyabaraJump = {
     "btl_wn_mario_jyabara_jump", // name
-    168, // icon
+    ICON_0A0, // icon
     {0}, // pad_06
     0, // itemId
     "msg_jyabara_jump", // description
@@ -388,12 +286,20 @@ BattleWeapon marioWeapon_JyabaraJump = {
     4, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
     1.0f, // reserved_14
+#if VERSION <= VERSION_JP
+    2, // stylishCommandMultiplier
+#else
     1, // stylishCommandMultiplier
+#endif
     5, // reserved_19
     100, // bingoSlotChance
     50, // reserved_1B
     weaponGetPowerFromMarioJumpLv, // hpDamageFn
+#if VERSION <= VERSION_JP
+    {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
+#else
     {1, 2, 2, 4, 5, 6, 0, 0}, // hpDamageWork
+#endif
     NULL, // fpDamageFn
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
@@ -413,90 +319,16 @@ BattleWeapon marioWeapon_JyabaraJump = {
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
     marioAttackEvent_JyabaraJump, // attackEvtScript
-    {0, 5, 5, 100, 0, 20, 10, 5, 5, 5, 0, 0}, // stageEffectRates
-};
-#else
-BattleWeapon marioWeapon_JyabaraJump = {
-    "btl_wn_mario_jyabara_jump", // name
-    160, // icon
-    {0}, // pad_06
-    0, // itemId
-    "msg_jyabara_jump", // description
-    100, // baseAccuracy
-    4, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    2, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerFromMarioJumpLv, // hpDamageFn
-    {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_ac_j_jump", // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_FLIPS_SHELLED | SPECIAL_GROUNDS_WINGED | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
-    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_JyabaraJump, // attackEvtScript
+#if VERSION <= VERSION_JP
     {0, 5, 5, 100, 0, 10, 10, 5, 5, 5, 0, 0}, // stageEffectRates
-};
-#endif
-
-#if VERSION >= VERSION_US
-BattleWeapon marioWeapon_JyabaraJumpFailed = {
-    "btl_wn_mario_jyabara_jump", // name
-    168, // icon
-    {0}, // pad_06
-    0, // itemId
-    "msg_jyabara_jump", // description
-    100, // baseAccuracy
-    4, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    1, // bingoSlotChance
-    50, // reserved_1B
-    NULL, // hpDamageFn
-    {0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    NULL, // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_FLIPS_SHELLED | SPECIAL_GROUNDS_WINGED | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
-    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_JyabaraJump, // attackEvtScript
-    {0, 50, 50, 100, 0, 0, 0, 50, 0, 0, 0, 0}, // stageEffectRates
-};
 #else
+    {0, 5, 5, 100, 0, 20, 10, 5, 5, 5, 0, 0}, // stageEffectRates
+#endif
+};
+
 BattleWeapon marioWeapon_JyabaraJumpFailed = {
     "btl_wn_mario_jyabara_jump", // name
-    160, // icon
+    ICON_0A0, // icon
     {0}, // pad_06
     0, // itemId
     "msg_jyabara_jump", // description
@@ -504,7 +336,11 @@ BattleWeapon marioWeapon_JyabaraJumpFailed = {
     4, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
     1.0f, // reserved_14
+#if VERSION <= VERSION_JP
     2, // stylishCommandMultiplier
+#else
+    1, // stylishCommandMultiplier
+#endif
     5, // reserved_19
     1, // bingoSlotChance
     50, // reserved_1B
@@ -531,7 +367,6 @@ BattleWeapon marioWeapon_JyabaraJumpFailed = {
     marioAttackEvent_JyabaraJump, // attackEvtScript
     {0, 50, 50, 100, 0, 0, 0, 50, 0, 0, 0, 0}, // stageEffectRates
 };
-#endif
 
 BattleWeapon marioDefaultWeapon_FirstAttackKaitenHammer = {
     NULL, 0, // name..icon
@@ -581,7 +416,7 @@ BattleWeapon marioDefaultWeapon_FirstAttackUltraHammer = {
     1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerFromMarioHammerLv, // hpDamageFn
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     {1, 2, 2, 4, 4, 8, 0, 0}, // hpDamageWork
 #else
     {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
@@ -609,10 +444,9 @@ BattleWeapon marioDefaultWeapon_FirstAttackUltraHammer = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
-#if VERSION >= VERSION_US
 BattleWeapon marioDefaultWeapon_Hammer = {
     "btl_wn_mario_normal_hammer", // name
-    164, // icon
+    ICON_09C, // icon
     {0}, // pad_06
     0, // itemId
     "msg_normal_hammer", // description
@@ -644,90 +478,16 @@ BattleWeapon marioDefaultWeapon_Hammer = {
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
     marioAttackEvent_NormalHammer, // attackEvtScript
-    {0, 3, 3, 100, 3, 6, 2, 3, 3, 0, 0, 0}, // stageEffectRates
-};
-#else
-BattleWeapon marioDefaultWeapon_Hammer = {
-    "btl_wn_mario_normal_hammer", // name
-    156, // icon
-    {0}, // pad_06
-    0, // itemId
-    "msg_normal_hammer", // description
-    100, // baseAccuracy
-    0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    1, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerFromMarioHammerLv, // hpDamageFn
-    {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_ac_hammer", // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE | SPECIAL_ATTACK_FX | SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ELECTRIC | COUNTER_RESIST_TOP_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_FIERY | COUNTER_RESIST_ICY | COUNTER_RESIST_POISON | COUNTER_RESIST_EXPLOSIVE | COUNTER_RESIST_VOLATILE_EXPLOSIVE | COUNTER_RESIST_PAYBACK | COUNTER_RESIST_HOLD_FAST, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
-    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_NormalHammer, // attackEvtScript
+#if VERSION <= VERSION_JP
     {0, 3, 3, 100, 3, 3, 2, 3, 3, 0, 0, 0}, // stageEffectRates
-};
-#endif
-
-#if VERSION >= VERSION_US
-BattleWeapon marioWeapon_KaitenHammer = {
-    "btl_wn_mario_kaiten_hammer", // name
-    165, // icon
-    {0}, // pad_06
-    0, // itemId
-    "msg_kaiten_hammer", // description
-    100, // baseAccuracy
-    2, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerFromMarioHammerLv, // hpDamageFn
-    {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
-    14, // damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_ac_kaiten_hammer", // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE | SPECIAL_ATTACK_FX | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ELECTRIC | COUNTER_RESIST_TOP_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_FIERY | COUNTER_RESIST_ICY | COUNTER_RESIST_POISON | COUNTER_RESIST_EXPLOSIVE | COUNTER_RESIST_VOLATILE_EXPLOSIVE | COUNTER_RESIST_PAYBACK | COUNTER_RESIST_HOLD_FAST, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
-    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_KaitenHammer, // attackEvtScript
-    {0, 0, 0, 100, 0, 6, 5, 0, 0, 0, 0, 0}, // stageEffectRates
-};
 #else
+    {0, 3, 3, 100, 3, 6, 2, 3, 3, 0, 0, 0}, // stageEffectRates
+#endif
+};
+
 BattleWeapon marioWeapon_KaitenHammer = {
     "btl_wn_mario_kaiten_hammer", // name
-    157, // icon
+    ICON_09D, // icon
     {0}, // pad_06
     0, // itemId
     "msg_kaiten_hammer", // description
@@ -761,9 +521,12 @@ BattleWeapon marioWeapon_KaitenHammer = {
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
     marioAttackEvent_KaitenHammer, // attackEvtScript
+#if VERSION <= VERSION_JP
     {0, 0, 0, 100, 0, 3, 5, 0, 0, 0, 0, 0}, // stageEffectRates
-};
+#else
+    {0, 0, 0, 100, 0, 6, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 #endif
+};
 
 BattleWeapon marioWeapon_KaitenHammerInvolved = {
     NULL, 0, // name..icon
@@ -775,7 +538,7 @@ BattleWeapon marioWeapon_KaitenHammerInvolved = {
     {1, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
 #else
@@ -800,10 +563,9 @@ BattleWeapon marioWeapon_KaitenHammerInvolved = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
-#if VERSION >= VERSION_US
 BattleWeapon marioWeapon_UltraHammer = {
     "btl_wn_mario_ultra_hammer", // name
-    166, // icon
+    ICON_09E, // icon
     {0}, // pad_06
     0, // itemId
     "msg_ultra_hammer", // description
@@ -811,46 +573,11 @@ BattleWeapon marioWeapon_UltraHammer = {
     4, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerFromMarioHammerLv, // hpDamageFn
-    {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
-    16, // damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_ac_ultra_hammer", // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ELECTRIC | COUNTER_RESIST_TOP_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_FIERY | COUNTER_RESIST_ICY | COUNTER_RESIST_POISON | COUNTER_RESIST_EXPLOSIVE | COUNTER_RESIST_VOLATILE_EXPLOSIVE | COUNTER_RESIST_PAYBACK | COUNTER_RESIST_HOLD_FAST, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
-    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_KaitenHammer, // attackEvtScript
-    {0, 0, 0, 100, 0, 6, 5, 0, 0, 0, 0, 0}, // stageEffectRates
-};
-#else
-BattleWeapon marioWeapon_UltraHammer = {
-    "btl_wn_mario_ultra_hammer", // name
-    158, // icon
-    {0}, // pad_06
-    0, // itemId
-    "msg_ultra_hammer", // description
-    100, // baseAccuracy
-    4, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
+#if VERSION <= VERSION_JP
     2, // stylishCommandMultiplier
+#else
+    1, // stylishCommandMultiplier
+#endif
     5, // reserved_19
     100, // bingoSlotChance
     50, // reserved_1B
@@ -876,9 +603,12 @@ BattleWeapon marioWeapon_UltraHammer = {
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
     marioAttackEvent_KaitenHammer, // attackEvtScript
+#if VERSION <= VERSION_JP
     {0, 0, 0, 100, 0, 3, 5, 0, 0, 0, 0, 0}, // stageEffectRates
-};
+#else
+    {0, 0, 0, 100, 0, 6, 5, 0, 0, 0, 0, 0}, // stageEffectRates
 #endif
+};
 
 BattleWeapon marioWeapon_UltraHammerInvolved = {
     NULL, 0, // name..icon
@@ -890,7 +620,7 @@ BattleWeapon marioWeapon_UltraHammerInvolved = {
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
     NULL, // fpDamageFn
     {0}, // fpDamageWork
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
 #else
@@ -915,55 +645,20 @@ BattleWeapon marioWeapon_UltraHammerInvolved = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
-#if VERSION >= VERSION_US
 BattleWeapon marioWeapon_UltraHammerFinish = {
     "btl_wn_mario_ultra_hammer", // name
-    166, // icon
+    ICON_09E, // icon
     {0}, // pad_06
     0, // itemId
     "msg_ultra_hammer", // description
     100, // baseAccuracy
     0, 0, 0, // baseFpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    NULL, // hpDamageFn
-    {0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, // element
-    19, // damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    NULL, // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ALWAYS_HITS | SPECIAL_SHATTERS_FREEZE | SPECIAL_ATTACK_FX | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ALL, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
-    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_KaitenHammer, // attackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 5, 0, 0}, // stageEffectRates
-};
-#else
-BattleWeapon marioWeapon_UltraHammerFinish = {
-    "btl_wn_mario_ultra_hammer", // name
-    158, // icon
-    {0}, // pad_06
-    0, // itemId
-    "msg_ultra_hammer", // description
-    100, // baseAccuracy
-    0, 0, 0, // baseFpCost..superguardsAllowed
-    1.0f, // reserved_14
+#if VERSION <= VERSION_JP
     2, // stylishCommandMultiplier
+#else
+    1, // stylishCommandMultiplier
+#endif
     5, // reserved_19
     100, // bingoSlotChance
     50, // reserved_1B
@@ -991,9 +686,7 @@ BattleWeapon marioWeapon_UltraHammerFinish = {
     marioAttackEvent_KaitenHammer, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 5, 0, 0}, // stageEffectRates
 };
-#endif
 
-#if VERSION >= VERSION_US
 BattleWeapon badgeWeapon_TugitugiJump = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1028,46 +721,12 @@ BattleWeapon badgeWeapon_TugitugiJump = {
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
     marioAttackEvent_TugiTugiJump, // attackEvtScript
-    {0, 0, 0, 100, 0, 10, 5, 2, 2, 0, 0, 0}, // stageEffectRates
-};
-#else
-BattleWeapon badgeWeapon_TugitugiJump = {
-    NULL, 0, // name..icon
-    {0}, // pad_06
-    241, // itemId
-    NULL, // description
-    100, // baseAccuracy
-    2, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerOverlapJump1, // hpDamageFn
-    {0, 0, 1, 1, 2, 2, 241, 1}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
-    TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_ac_jump", // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_FLIPS_SHELLED | SPECIAL_GROUNDS_WINGED | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
-    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_TugiTugiJump, // attackEvtScript
+#if VERSION <= VERSION_JP
     {0, 0, 0, 100, 0, 5, 5, 2, 2, 0, 0, 0}, // stageEffectRates
-};
+#else
+    {0, 0, 0, 100, 0, 10, 5, 2, 2, 0, 0, 0}, // stageEffectRates
 #endif
+};
 
 BattleWeapon badgeWeapon_GatsunJump = {
     NULL, 0, // name..icon
@@ -1143,7 +802,6 @@ BattleWeapon badgeWeapon_DokanJump = {
     {0, 25, 25, 100, 25, 5, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 
-#if VERSION >= VERSION_US
 BattleWeapon badgeWeapon_RenzokuJump = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1178,85 +836,13 @@ BattleWeapon badgeWeapon_RenzokuJump = {
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
     marioAttackEvent_RenzokuJump, // attackEvtScript
-    {0, 0, 0, 100, 0, 10, 5, 2, 2, 0, 0, 0}, // stageEffectRates
-};
-#else
-BattleWeapon badgeWeapon_RenzokuJump = {
-    NULL, 0, // name..icon
-    {0}, // pad_06
-    242, // itemId
-    NULL, // description
-    100, // baseAccuracy
-    3, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerOverlapJump1, // hpDamageFn
-    {0, 0, 1, 1, 2, 2, 242, 1}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_ac_jump", // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_DIMINISHING_BY_HIT | SPECIAL_ATTACK_FX | SPECIAL_FLIPS_SHELLED | SPECIAL_GROUNDS_WINGED | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
-    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_RenzokuJump, // attackEvtScript
+#if VERSION <= VERSION_JP
     {0, 0, 0, 100, 0, 5, 5, 2, 2, 0, 0, 0}, // stageEffectRates
-};
-#endif
-
-#if VERSION >= VERSION_US
-BattleWeapon badgeWeapon_TatsumakiJump = {
-    NULL, 0, // name..icon
-    {0}, // pad_06
-    243, // itemId
-    NULL, // description
-    100, // baseAccuracy
-    3, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerOverlapJump1, // hpDamageFn
-    {0, 1, 1, 3, 2, 5, 243, 1}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_ac_tatsumaki_jump", // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_FLIPS_SHELLED | SPECIAL_GROUNDS_WINGED | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
-    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_TatsumakiJump, // attackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
-};
 #else
+    {0, 0, 0, 100, 0, 10, 5, 2, 2, 0, 0, 0}, // stageEffectRates
+#endif
+};
+
 BattleWeapon badgeWeapon_TatsumakiJump = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1266,7 +852,11 @@ BattleWeapon badgeWeapon_TatsumakiJump = {
     3, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
     1.0f, // reserved_14
+#if VERSION <= VERSION_JP
     3, // stylishCommandMultiplier
+#else
+    1, // stylishCommandMultiplier
+#endif
     5, // reserved_19
     100, // bingoSlotChance
     50, // reserved_1B
@@ -1293,7 +883,6 @@ BattleWeapon badgeWeapon_TatsumakiJump = {
     marioAttackEvent_TatsumakiJump, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
-#endif
 
 BattleWeapon badgeWeapon_TatsumakiJumpInvolved = {
     NULL, 0, // name..icon
@@ -1324,7 +913,6 @@ BattleWeapon badgeWeapon_TatsumakiJumpInvolved = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
-#if VERSION >= VERSION_US
 BattleWeapon badgeWeapon_MiniminiFumi = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1354,50 +942,10 @@ BattleWeapon badgeWeapon_MiniminiFumi = {
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, // burnTime..freezeTime
+#if VERSION >= VERSION_JP
     100, // sizeChangeChance
-    3, // sizeChangeTime
-    -2, // sizeChangeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeChance..allergicTime
-    0, 0, 0, 0, 0, 0, 0, 0, // ohkoChance..galeForceChance
-    0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_MiniminiFumi, // attackEvtScript
-    {0, 0, 0, 100, 0, 6, 5, 1, 1, 0, 0, 0}, // stageEffectRates
-};
 #else
-BattleWeapon badgeWeapon_MiniminiFumi = {
-    NULL, 0, // name..icon
-    {0}, // pad_06
-    244, // itemId
-    NULL, // description
-    100, // baseAccuracy
-    2, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerFromMarioJumpLv, // hpDamageFn
-    {1, 1, 2, 2, 3, 3, 0, 0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_ac_jump", // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_FLIPS_SHELLED | SPECIAL_GROUNDS_WINGED | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, // burnTime..freezeTime
-#if VERSION == VERSION_DEMO
     95, // sizeChangeChance
-#else
-    100, // sizeChangeChance
 #endif
     3, // sizeChangeTime
     -2, // sizeChangeStrength
@@ -1406,50 +954,13 @@ BattleWeapon badgeWeapon_MiniminiFumi = {
     0, 0, 0, 0, 0, 0, 0, 0, // paybackTime..fpRegenStrength
     {0}, // pad_AE
     marioAttackEvent_MiniminiFumi, // attackEvtScript
+#if VERSION <= VERSION_JP
     {0, 0, 0, 100, 0, 3, 5, 1, 1, 0, 0, 0}, // stageEffectRates
-};
-#endif
-
-#if VERSION >= VERSION_US
-BattleWeapon badgeWeapon_NemuraseFumi = {
-    NULL, 0, // name..icon
-    {0}, // pad_06
-    245, // itemId
-    NULL, // description
-    100, // baseAccuracy
-    2, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerFromMarioJumpLv, // hpDamageFn
-    {1, 1, 2, 2, 3, 3, 0, 0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_ac_jump", // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_FLIPS_SHELLED | SPECIAL_GROUNDS_WINGED | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    100, // sleepChance
-    5, // sleepTime
-    0, 0, 0, 0, 0, 0, 0, 0, // stopChance..confuseChance
-    0, 0, 0, 0, 0, 0, 0, 0, // confuseTime..freezeChance
-    0, 0, 0, 0, 0, 0, 0, 0, // freezeTime..defChangeChance
-    0, 0, 0, 0, 0, 0, 0, 0, // defChangeTime..fastTime
-    0, 0, 0, 0, 0, 0, 0, 0, // slowChance..invisibleTime
-    0, 0, 0, 0, // hpRegenTime..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_NemuraseFumi, // attackEvtScript
-    {0, 0, 0, 100, 0, 6, 5, 1, 1, 0, 0, 0}, // stageEffectRates
-};
 #else
+    {0, 0, 0, 100, 0, 6, 5, 1, 1, 0, 0, 0}, // stageEffectRates
+#endif
+};
+
 BattleWeapon badgeWeapon_NemuraseFumi = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1476,10 +987,10 @@ BattleWeapon badgeWeapon_NemuraseFumi = {
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_FLIPS_SHELLED | SPECIAL_GROUNDS_WINGED | SPECIAL_UNGUARDABLE, // special
     COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
     TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-#if VERSION == VERSION_DEMO
+#if VERSION >= VERSION_JP
+    100, // sleepChance
+#else
     95, // sleepChance
-#else
-    100, // sleepChance
 #endif
     5, // sleepTime
     0, 0, 0, 0, 0, 0, 0, 0, // stopChance..confuseChance
@@ -1490,52 +1001,13 @@ BattleWeapon badgeWeapon_NemuraseFumi = {
     0, 0, 0, 0, // hpRegenTime..fpRegenStrength
     {0}, // pad_AE
     marioAttackEvent_NemuraseFumi, // attackEvtScript
+#if VERSION <= VERSION_JP
     {0, 0, 0, 100, 0, 3, 5, 1, 1, 0, 0, 0}, // stageEffectRates
-};
-#endif
-
-#if VERSION >= VERSION_US
-BattleWeapon badgeWeapon_FunyafunyaJump = {
-    NULL, 0, // name..icon
-    {0}, // pad_06
-    246, // itemId
-    NULL, // description
-    100, // baseAccuracy
-    2, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerFromMarioJumpLv, // hpDamageFn
-    {1, 1, 2, 2, 3, 3, 0, 0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_NO_CEILING | TARGET_PROP_JUMPLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_ac_jump", // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_FLIPS_SHELLED | SPECIAL_GROUNDS_WINGED | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
-    0, // atkChangeStrength
-    100, // defChangeChance
-    3, // defChangeTime
-    -3, // defChangeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
-    0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
-    0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_FunyafunyaJump, // attackEvtScript
+#else
     {0, 0, 0, 100, 0, 6, 5, 1, 1, 0, 0, 0}, // stageEffectRates
+#endif
 };
-#else
+
 BattleWeapon badgeWeapon_FunyafunyaJump = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1566,10 +1038,10 @@ BattleWeapon badgeWeapon_FunyafunyaJump = {
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
     0, // atkChangeStrength
-#if VERSION == VERSION_DEMO
-    95, // defChangeChance
-#else
+#if VERSION >= VERSION_JP
     100, // defChangeChance
+#else
+    95, // defChangeChance
 #endif
     3, // defChangeTime
     -3, // defChangeStrength
@@ -1578,9 +1050,12 @@ BattleWeapon badgeWeapon_FunyafunyaJump = {
     0, 0, // fpRegenTime..fpRegenStrength
     {0}, // pad_AE
     marioAttackEvent_FunyafunyaJump, // attackEvtScript
+#if VERSION <= VERSION_JP
     {0, 0, 0, 100, 0, 3, 5, 1, 1, 0, 0, 0}, // stageEffectRates
-};
+#else
+    {0, 0, 0, 100, 0, 6, 5, 1, 1, 0, 0, 0}, // stageEffectRates
 #endif
+};
 
 BattleWeapon badgeWeapon_GatsunHammer = {
     NULL, 0, // name..icon
@@ -1656,7 +1131,6 @@ BattleWeapon badgeWeapon_DokanHammer = {
     {0, 25, 25, 100, 25, 5, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 };
 
-#if VERSION >= VERSION_US
 BattleWeapon badgeWeapon_JishinHammer = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1666,44 +1140,11 @@ BattleWeapon badgeWeapon_JishinHammer = {
     3, // baseFpCost
     0, 0, // baseSpCost..superguardsAllowed
     1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerOverlapHammer1, // hpDamageFn
-    {0xFFFFFFFF, 0, 0xFFFFFFFF, 0, 0xFFFFFFFF, 0, 248, 2}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
-    TARGET_PROP_NO_FLOATING_2 | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_ac_hammer", // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE | SPECIAL_ATTACK_FX | SPECIAL_FLIPS_SHELLED | SPECIAL_FLIPS_BOMB_FLIPPABLE | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ALL, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
-    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_JishinHammer, // attackEvtScript
-    {0, 50, 50, 100, 50, 25, 25, 5, 25, 5, 0, 0}, // stageEffectRates
-};
-#else
-BattleWeapon badgeWeapon_JishinHammer = {
-    NULL, 0, // name..icon
-    {0}, // pad_06
-    248, // itemId
-    NULL, // description
-    100, // baseAccuracy
-    3, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
+#if VERSION <= VERSION_JP
     2, // stylishCommandMultiplier
+#else
+    1, // stylishCommandMultiplier
+#endif
     5, // reserved_19
     100, // bingoSlotChance
     50, // reserved_1B
@@ -1730,7 +1171,6 @@ BattleWeapon badgeWeapon_JishinHammer = {
     marioAttackEvent_JishinHammer, // attackEvtScript
     {0, 50, 50, 100, 50, 25, 25, 5, 25, 5, 0, 0}, // stageEffectRates
 };
-#endif
 
 BattleWeapon badgeWeapon_UltraJishinHammer = {
     NULL, 0, // name..icon
@@ -1806,7 +1246,6 @@ BattleWeapon badgeWeapon_HammerNageru = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
-#if VERSION >= VERSION_US
 BattleWeapon badgeWeapon_TsuranukiNaguri = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -1841,98 +1280,23 @@ BattleWeapon badgeWeapon_TsuranukiNaguri = {
     0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
     {0}, // pad_AE
     marioAttackEvent_TsuranukiHammer, // attackEvtScript
-    {0, 25, 25, 100, 0, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
-};
-#else
-BattleWeapon badgeWeapon_TsuranukiNaguri = {
-    NULL, 0, // name..icon
-    {0}, // pad_06
-    250, // itemId
-    NULL, // description
-    100, // baseAccuracy
-    2, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerFromMarioHammerLv, // hpDamageFn
-    {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_ac_hammer", // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE | SPECIAL_ATTACK_FX | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ELECTRIC | COUNTER_RESIST_TOP_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_FIERY | COUNTER_RESIST_ICY | COUNTER_RESIST_POISON | COUNTER_RESIST_EXPLOSIVE | COUNTER_RESIST_VOLATILE_EXPLOSIVE | COUNTER_RESIST_PAYBACK | COUNTER_RESIST_HOLD_FAST, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..chargeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
-    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_TsuranukiHammer, // attackEvtScript
+#if VERSION <= VERSION_JP
     {0, 25, 25, 100, 0, 5, 5, 5, 5, 5, 0, 0}, // stageEffectRates
-};
+#else
+    {0, 25, 25, 100, 0, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 #endif
+};
 
-#if VERSION >= VERSION_US
 BattleWeapon badgeWeapon_ConfuseHammer = {
     NULL, 0, // name..icon
     {0}, // pad_06
     251, // itemId
     NULL, // description
     100, // baseAccuracy
+#if VERSION >= VERSION_JP
     2, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerFromMarioHammerLv, // hpDamageFn
-    {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_ac_hammer", // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE | SPECIAL_ATTACK_FX | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ELECTRIC | COUNTER_RESIST_TOP_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_FIERY | COUNTER_RESIST_ICY | COUNTER_RESIST_POISON | COUNTER_RESIST_EXPLOSIVE | COUNTER_RESIST_VOLATILE_EXPLOSIVE | COUNTER_RESIST_PAYBACK | COUNTER_RESIST_HOLD_FAST, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, // poisonStrength
-    100, // confuseChance
-    3, // confuseTime
-    0, 0, 0, 0, 0, 0, 0, 0, // electricChance..freezeTime
-    0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeChance..defChangeTime
-    0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
-    0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
-    0, 0, 0, // hpRegenStrength..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_NormalHammer, // attackEvtScript
-    {0, 5, 5, 100, 0, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
-};
 #else
-BattleWeapon badgeWeapon_ConfuseHammer = {
-    NULL, 0, // name..icon
-    {0}, // pad_06
-    251, // itemId
-    NULL, // description
-    100, // baseAccuracy
-#if VERSION == VERSION_DEMO
     3, // baseFpCost
-#else
-    2, // baseFpCost
 #endif
     0, 0, // baseSpCost..superguardsAllowed
     1.0f, // reserved_14
@@ -1955,10 +1319,10 @@ BattleWeapon badgeWeapon_ConfuseHammer = {
     TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, // poisonStrength
-#if VERSION == VERSION_DEMO
+#if VERSION >= VERSION_JP
+    100, // confuseChance
+#else
     90, // confuseChance
-#else
-    100, // confuseChance
 #endif
     3, // confuseTime
     0, 0, 0, 0, 0, 0, 0, 0, // electricChance..freezeTime
@@ -1968,240 +1332,133 @@ BattleWeapon badgeWeapon_ConfuseHammer = {
     0, 0, 0, // hpRegenStrength..fpRegenStrength
     {0}, // pad_AE
     marioAttackEvent_NormalHammer, // attackEvtScript
+#if VERSION <= VERSION_JP
     {0, 5, 5, 100, 0, 5, 5, 5, 5, 5, 0, 0}, // stageEffectRates
-};
-#endif
-
-#if VERSION >= VERSION_US
-BattleWeapon badgeWeapon_FireNaguri = {
-    NULL, 0, // name..icon
-    {0}, // pad_06
-    252, // itemId
-    NULL, // description
-    100, // baseAccuracy
-    5, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerOverlapHammer1, // hpDamageFn
-    {0xFFFFFFFF, 3, 0, 3, 1, 3, 252, 2}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MULTIPLE, // targetClassFlags
-    TARGET_PROP_HAMMERLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    1, // element
-    0, // damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_ac_fire_naguri", // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_DIMINISHING_BY_TARGET | SPECIAL_PIERCES_DEFENSE | SPECIAL_ATTACK_FX | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ALL, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, // poisonStrength..dodgyTime
-    100, // burnChance
-    3, // burnTime
-    0, 0, 0, 0, 0, 0, 0, 0, // freezeChance..atkChangeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
-    0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
-    0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_FireNaguri, // attackEvtScript
-    {0, 0, 0, 100, 0, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
-};
 #else
-BattleWeapon badgeWeapon_FireNaguri = {
-    NULL, 0, // name..icon
-    {0}, // pad_06
-    252, // itemId
-    NULL, // description
-    100, // baseAccuracy
-#if VERSION == VERSION_DEMO
-    6, // baseFpCost
-#else
-    5, // baseFpCost
-#endif
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    2, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerOverlapHammer1, // hpDamageFn
-#if VERSION == VERSION_DEMO
-    {0xFFFFFFFF, 0, 0, 2, 1, 4, 252, 2}, // hpDamageWork
-#else
-    {0xFFFFFFFF, 3, 0, 3, 1, 3, 252, 2}, // hpDamageWork
-#endif
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MULTIPLE, // targetClassFlags
-    TARGET_PROP_HAMMERLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    1, // element
-    0, // damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_ac_fire_naguri", // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_DIMINISHING_BY_TARGET | SPECIAL_PIERCES_DEFENSE | SPECIAL_ATTACK_FX | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ALL, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, // poisonStrength..dodgyTime
-#if VERSION == VERSION_DEMO
-    95, // burnChance
-#else
-    100, // burnChance
-#endif
-    3, // burnTime
-    0, 0, 0, 0, 0, 0, 0, 0, // freezeChance..atkChangeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
-    0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
-    0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_FireNaguri, // attackEvtScript
-    {0, 0, 0, 100, 0, 5, 5, 5, 5, 5, 0, 0}, // stageEffectRates
-};
-#endif
-
-#if VERSION >= VERSION_US
-BattleWeapon badgeWeapon_FireNaguriFailed = {
-    NULL, 0, // name..icon
-    {0}, // pad_06
-    252, // itemId
-    NULL, // description
-    100, // baseAccuracy
-    5, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    1, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerFromMarioHammerLv, // hpDamageFn
-    {1, 5, 2, 5, 3, 5, 0, 0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
-    TARGET_PROP_HAMMERLIKE | TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    1, // element
-    0, // damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    NULL, // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ALL, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, // poisonStrength..dodgyTime
-    100, // burnChance
-    3, // burnTime
-    0, 0, 0, 0, 0, 0, 0, 0, // freezeChance..atkChangeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
-    0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
-    0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_FireNaguri, // attackEvtScript
-    {0, 0, 0, 100, 0, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
-};
-#else
-BattleWeapon badgeWeapon_FireNaguriFailed = {
-    NULL, 0, // name..icon
-    {0}, // pad_06
-    252, // itemId
-    NULL, // description
-    100, // baseAccuracy
-#if VERSION == VERSION_DEMO
-    6, // baseFpCost
-#else
-    5, // baseFpCost
-#endif
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    2, // stylishCommandMultiplier
-    5, // reserved_19
-    1, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerFromMarioHammerLv, // hpDamageFn
-#if VERSION == VERSION_DEMO
-    {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
-#else
-    {1, 5, 2, 5, 3, 5, 0, 0}, // hpDamageWork
-#endif
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
-    TARGET_PROP_HAMMERLIKE | TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    1, // element
-    0, // damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    NULL, // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ALL, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, // poisonStrength..dodgyTime
-#if VERSION == VERSION_DEMO
-    95, // burnChance
-#else
-    100, // burnChance
-#endif
-    3, // burnTime
-    0, 0, 0, 0, 0, 0, 0, 0, // freezeChance..atkChangeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
-    0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
-    0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_FireNaguri, // attackEvtScript
-    {0, 0, 0, 100, 0, 5, 5, 5, 5, 5, 0, 0}, // stageEffectRates
-};
-#endif
-
-#if VERSION >= VERSION_US
-BattleWeapon badgeWeapon_IceNaguri = {
-    NULL, 0, // name..icon
-    {0}, // pad_06
-    253, // itemId
-    NULL, // description
-    100, // baseAccuracy
-    3, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPowerFromMarioHammerLv, // hpDamageFn
-    {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_HAMMERLIKE | TARGET_PROP_FRONTMOST | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    2, // element
-    0, // damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_ac_hammer", // acHelpMsg
-    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ELECTRIC | COUNTER_RESIST_TOP_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_FIERY | COUNTER_RESIST_ICY | COUNTER_RESIST_POISON | COUNTER_RESIST_EXPLOSIVE | COUNTER_RESIST_VOLATILE_EXPLOSIVE | COUNTER_RESIST_PAYBACK | COUNTER_RESIST_HOLD_FAST, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, // burnTime
-    100, // freezeChance
-    2, // freezeTime
-    0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeChance..defChangeTime
-    0, 0, 0, 0, 0, 0, 0, 0, // defChangeStrength..slowChance
-    0, 0, 0, 0, 0, 0, 0, 0, // slowTime..hpRegenTime
-    0, 0, 0, // hpRegenStrength..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_IceNaguri, // attackEvtScript
     {0, 5, 5, 100, 0, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
+#endif
 };
+
+BattleWeapon badgeWeapon_FireNaguri = {
+    NULL, 0, // name..icon
+    {0}, // pad_06
+    252, // itemId
+    NULL, // description
+    100, // baseAccuracy
+#if VERSION >= VERSION_JP
+    5, // baseFpCost
 #else
+    6, // baseFpCost
+#endif
+    0, 0, // baseSpCost..superguardsAllowed
+    1.0f, // reserved_14
+#if VERSION <= VERSION_JP
+    2, // stylishCommandMultiplier
+#else
+    1, // stylishCommandMultiplier
+#endif
+    5, // reserved_19
+    100, // bingoSlotChance
+    50, // reserved_1B
+    weaponGetPowerOverlapHammer1, // hpDamageFn
+#if VERSION >= VERSION_JP
+    {0xFFFFFFFF, 3, 0, 3, 1, 3, 252, 2}, // hpDamageWork
+#else
+    {0xFFFFFFFF, 0, 0, 2, 1, 4, 252, 2}, // hpDamageWork
+#endif
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_HAMMERLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
+    1, // element
+    0, // damagePattern
+    3, // acLevel
+    2, // reserved_6F
+    "msg_ac_fire_naguri", // acHelpMsg
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_DIMINISHING_BY_TARGET | SPECIAL_PIERCES_DEFENSE | SPECIAL_ATTACK_FX | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, // poisonStrength..dodgyTime
+#if VERSION >= VERSION_JP
+    100, // burnChance
+#else
+    95, // burnChance
+#endif
+    3, // burnTime
+    0, 0, 0, 0, 0, 0, 0, 0, // freezeChance..atkChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
+    0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
+    0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
+    {0}, // pad_AE
+    marioAttackEvent_FireNaguri, // attackEvtScript
+#if VERSION <= VERSION_JP
+    {0, 0, 0, 100, 0, 5, 5, 5, 5, 5, 0, 0}, // stageEffectRates
+#else
+    {0, 0, 0, 100, 0, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
+#endif
+};
+
+BattleWeapon badgeWeapon_FireNaguriFailed = {
+    NULL, 0, // name..icon
+    {0}, // pad_06
+    252, // itemId
+    NULL, // description
+    100, // baseAccuracy
+#if VERSION >= VERSION_JP
+    5, // baseFpCost
+#else
+    6, // baseFpCost
+#endif
+    0, 0, // baseSpCost..superguardsAllowed
+    1.0f, // reserved_14
+#if VERSION <= VERSION_JP
+    2, // stylishCommandMultiplier
+#else
+    1, // stylishCommandMultiplier
+#endif
+    5, // reserved_19
+    1, // bingoSlotChance
+    50, // reserved_1B
+    weaponGetPowerFromMarioHammerLv, // hpDamageFn
+#if VERSION >= VERSION_JP
+    {1, 5, 2, 5, 3, 5, 0, 0}, // hpDamageWork
+#else
+    {1, 2, 2, 4, 3, 6, 0, 0}, // hpDamageWork
+#endif
+    NULL, // fpDamageFn
+    {0}, // fpDamageWork
+    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OPPOSING_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
+    TARGET_PROP_HAMMERLIKE | TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
+    1, // element
+    0, // damagePattern
+    3, // acLevel
+    2, // reserved_6F
+    NULL, // acHelpMsg
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_UNGUARDABLE, // special
+    COUNTER_RESIST_ALL, // counterResistFlags
+    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
+    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
+    0, 0, 0, 0, 0, 0, 0, // poisonStrength..dodgyTime
+#if VERSION >= VERSION_JP
+    100, // burnChance
+#else
+    95, // burnChance
+#endif
+    3, // burnTime
+    0, 0, 0, 0, 0, 0, 0, 0, // freezeChance..atkChangeStrength
+    0, 0, 0, 0, 0, 0, 0, 0, // defChangeChance..fastChance
+    0, 0, 0, 0, 0, 0, 0, 0, // fastTime..invisibleChance
+    0, 0, 0, 0, 0, // invisibleTime..fpRegenStrength
+    {0}, // pad_AE
+    marioAttackEvent_FireNaguri, // attackEvtScript
+#if VERSION <= VERSION_JP
+    {0, 0, 0, 100, 0, 5, 5, 5, 5, 5, 0, 0}, // stageEffectRates
+#else
+    {0, 0, 0, 100, 0, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
+#endif
+};
+
 BattleWeapon badgeWeapon_IceNaguri = {
     NULL, 0, // name..icon
     {0}, // pad_06
@@ -2232,10 +1489,10 @@ BattleWeapon badgeWeapon_IceNaguri = {
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, // burnTime
-#if VERSION == VERSION_DEMO
-    90, // freezeChance
-#else
+#if VERSION >= VERSION_JP
     100, // freezeChance
+#else
+    90, // freezeChance
 #endif
     2, // freezeTime
     0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeChance..defChangeTime
@@ -2244,61 +1501,24 @@ BattleWeapon badgeWeapon_IceNaguri = {
     0, 0, 0, // hpRegenStrength..fpRegenStrength
     {0}, // pad_AE
     marioAttackEvent_IceNaguri, // attackEvtScript
+#if VERSION <= VERSION_JP
     {0, 5, 5, 100, 0, 5, 5, 5, 5, 5, 0, 0}, // stageEffectRates
-};
+#else
+    {0, 5, 5, 100, 0, 10, 5, 5, 5, 5, 0, 0}, // stageEffectRates
 #endif
-
-#if VERSION >= VERSION_US
-BattleWeapon badgeWeapon_Charge = {
-    "btl_wn_mario_normal_charge", // name
-    167, // icon
-    {0}, // pad_06
-    256, // itemId
-    "btl_hlp_cmd_operation_charge", // description
-    100, // baseAccuracy
-    1, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    1, // reserved_19
-    1, // bingoSlotChance
-    1, // reserved_1B
-    NULL, // hpDamageFn
-    {0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    NULL, // acHelpMsg
-    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ALL, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
-    0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..ohkoChance
-    2, // chargeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
-    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_NormalCharge, // attackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
-#else
+
 BattleWeapon badgeWeapon_Charge = {
     "btl_wn_mario_normal_charge", // name
-    159, // icon
+    ICON_09F, // icon
     {0}, // pad_06
     256, // itemId
     "btl_hlp_cmd_operation_charge", // description
     100, // baseAccuracy
-#if VERSION == VERSION_DEMO
-    0, // baseFpCost
-#else
+#if VERSION >= VERSION_JP
     1, // baseFpCost
+#else
+    0, // baseFpCost
 #endif
     0, 0, // baseSpCost..superguardsAllowed
     1.0f, // reserved_14
@@ -2330,59 +1550,18 @@ BattleWeapon badgeWeapon_Charge = {
     marioAttackEvent_NormalCharge, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
-#endif
 
-#if VERSION >= VERSION_US
 BattleWeapon badgeWeapon_ChargeP = {
     "btl_wn_mario_normal_charge", // name
-    167, // icon
+    ICON_09F, // icon
     {0}, // pad_06
     257, // itemId
     "btl_hlp_cmd_operation_charge", // description
     100, // baseAccuracy
+#if VERSION >= VERSION_JP
     1, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    1, // reserved_19
-    1, // bingoSlotChance
-    1, // reserved_1B
-    NULL, // hpDamageFn
-    {0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    NULL, // acHelpMsg
-    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ALL, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
-    0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..ohkoChance
-    2, // chargeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
-    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_NormalChargeP, // attackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
-};
 #else
-BattleWeapon badgeWeapon_ChargeP = {
-    "btl_wn_mario_normal_charge", // name
-    159, // icon
-    {0}, // pad_06
-    257, // itemId
-    "btl_hlp_cmd_operation_charge", // description
-    100, // baseAccuracy
-#if VERSION == VERSION_DEMO
     0, // baseFpCost
-#else
-    1, // baseFpCost
 #endif
     0, 0, // baseSpCost..superguardsAllowed
     1.0f, // reserved_14
@@ -2414,12 +1593,10 @@ BattleWeapon badgeWeapon_ChargeP = {
     marioAttackEvent_NormalChargeP, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
-#endif
 
-#if VERSION >= VERSION_US
 BattleWeapon badgeWeapon_SuperCharge = {
     "btl_wn_mario_super_charge", // name
-    167, // icon
+    ICON_09F, // icon
     {0}, // pad_06
     337, // itemId
     "btl_hlp_cmd_operation_super_charge", // description
@@ -2455,51 +1632,10 @@ BattleWeapon badgeWeapon_SuperCharge = {
     marioAttackEvent_SuperCharge, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
-#else
-BattleWeapon badgeWeapon_SuperCharge = {
-    "btl_wn_mario_super_charge", // name
-    159, // icon
-    {0}, // pad_06
-    337, // itemId
-    "btl_hlp_cmd_operation_super_charge", // description
-    100, // baseAccuracy
-    2, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    1, // reserved_19
-    1, // bingoSlotChance
-    1, // reserved_1B
-    NULL, // hpDamageFn
-    {0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    NULL, // acHelpMsg
-    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ALL, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
-    0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..ohkoChance
-    2, // chargeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
-    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_SuperCharge, // attackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
-};
-#endif
 
-#if VERSION >= VERSION_US
 BattleWeapon badgeWeapon_SuperChargeP = {
     "btl_wn_mario_super_charge", // name
-    167, // icon
+    ICON_09F, // icon
     {0}, // pad_06
     338, // itemId
     "btl_hlp_cmd_operation_super_charge", // description
@@ -2535,46 +1671,6 @@ BattleWeapon badgeWeapon_SuperChargeP = {
     marioAttackEvent_SuperChargeP, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
-#else
-BattleWeapon badgeWeapon_SuperChargeP = {
-    "btl_wn_mario_super_charge", // name
-    159, // icon
-    {0}, // pad_06
-    338, // itemId
-    "btl_hlp_cmd_operation_super_charge", // description
-    100, // baseAccuracy
-    2, // baseFpCost
-    0, 0, // baseSpCost..superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    1, // reserved_19
-    1, // bingoSlotChance
-    1, // reserved_1B
-    NULL, // hpDamageFn
-    {0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_ONLY_SELF | TARGET_CLASS_SINGLE, // targetClassFlags
-    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    NULL, // acHelpMsg
-    SPECIAL_ALWAYS_HITS | SPECIAL_IGNORE_STATUS_VULNERABILITY | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ALL, // counterResistFlags
-    TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
-    0, 0, 0, 0, 0, 0, 0, 0, // burnTime..atkChangeTime
-    0, 0, 0, 0, 0, 0, 0, // atkChangeStrength..ohkoChance
-    2, // chargeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // fastChance..holdFastTime
-    0, 0, 0, 0, 0, 0, // invisibleChance..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_SuperChargeP, // attackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
-};
-#endif
 
 BattleWeapon badgeWeapon_2KaiItem = {
     "btl_wn_2kai_item", // name
@@ -2615,7 +1711,7 @@ BattleWeapon badgeWeapon_3KaiItem = {
     329, // itemId
     NULL, // description
     100, // baseAccuracy
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     10, // baseFpCost
 #else
     8, // baseFpCost
@@ -2714,10 +1810,9 @@ BattleWeapon badgeWeapon_DefenceCommandP = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
-#if VERSION >= VERSION_US
 BattleWeapon marioWeapon_BakuGame = {
     "btl_wn_sac_bakugame", // name
-    416, // icon
+    ICON_198, // icon
     {0}, // pad_06
     0, // itemId
     "msg_bakugame", // description
@@ -2743,53 +1838,12 @@ BattleWeapon marioWeapon_BakuGame = {
     SPECIAL_ALWAYS_HITS | SPECIAL_SHATTERS_FREEZE | SPECIAL_UNGUARDABLE, // special
     COUNTER_RESIST_ALL, // counterResistFlags
     0, 0, 0, // targetWeightFlags..sleepTime
+#if VERSION >= VERSION_JP
     100, // stopChance
     1, // stopTime
-    0, 0, 0, 0, 0, 0, 0, 0, // dizzyChance..electricChance
-    0, 0, 0, 0, 0, 0, 0, 0, // electricTime..sizeChangeChance
-    0, 0, 0, 0, 0, 0, 0, 0, // sizeChangeTime..defChangeStrength
-    0, 0, 0, 0, 0, 0, 0, 0, // allergicChance..slowTime
-    0, 0, 0, 0, 0, 0, 0, 0, // frightChance..hpRegenStrength
-    0, 0, // fpRegenTime..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_BakuGame, // attackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
-};
 #else
-BattleWeapon marioWeapon_BakuGame = {
-    "btl_wn_sac_bakugame", // name
-    408, // icon
-    {0}, // pad_06
-    0, // itemId
-    "msg_bakugame", // description
-    100, // baseAccuracy
-    0, // baseFpCost
-    2, // baseSpCost
-    0, // superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    NULL, // hpDamageFn
-    {0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
-    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_sac_3", // acHelpMsg
-    SPECIAL_ALWAYS_HITS | SPECIAL_SHATTERS_FREEZE | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ALL, // counterResistFlags
-    0, 0, 0, // targetWeightFlags..sleepTime
-#if VERSION == VERSION_DEMO
     0, // stopChance
     0, // stopTime
-#else
-    100, // stopChance
-    1, // stopTime
 #endif
     0, 0, 0, 0, 0, 0, 0, 0, // dizzyChance..electricChance
     0, 0, 0, 0, 0, 0, 0, 0, // electricTime..sizeChangeChance
@@ -2801,12 +1855,10 @@ BattleWeapon marioWeapon_BakuGame = {
     marioAttackEvent_BakuGame, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
-#endif
 
-#if VERSION >= VERSION_US
 BattleWeapon marioWeapon_Scissor = {
     "btl_wn_sac_scissor", // name
-    420, // icon
+    ICON_19C, // icon
     {0}, // pad_06
     0, // itemId
     "msg_scissor", // description
@@ -2841,50 +1893,10 @@ BattleWeapon marioWeapon_Scissor = {
     marioAttackEvent_Scissor, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
-#else
-BattleWeapon marioWeapon_Scissor = {
-    "btl_wn_sac_scissor", // name
-    412, // icon
-    {0}, // pad_06
-    0, // itemId
-    "msg_scissor", // description
-    100, // baseAccuracy
-    0, // baseFpCost
-    4, // baseSpCost
-    0, // superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPower_Scissor, // hpDamageFn
-    {0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
-    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_sac_5", // acHelpMsg
-    SPECIAL_ALWAYS_HITS | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ALL, // counterResistFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
-    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
-    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
-    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_Scissor, // attackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
-};
-#endif
 
-#if VERSION >= VERSION_US
 BattleWeapon marioWeapon_ZubaStar = {
     "btl_wn_sac_zubastar", // name
-    419, // icon
+    ICON_19B, // icon
     {0}, // pad_06
     0, // itemId
     "msg_zubastar", // description
@@ -2919,50 +1931,10 @@ BattleWeapon marioWeapon_ZubaStar = {
     marioAttackEvent_ZubaStar, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
-#else
-BattleWeapon marioWeapon_ZubaStar = {
-    "btl_wn_sac_zubastar", // name
-    411, // icon
-    {0}, // pad_06
-    0, // itemId
-    "msg_zubastar", // description
-    100, // baseAccuracy
-    0, // baseFpCost
-    6, // baseSpCost
-    0, // superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPower_ZubaStar, // hpDamageFn
-    {0, 3, 6, 9, 12, 15, 0, 0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
-    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_sac_8", // acHelpMsg
-    SPECIAL_ALWAYS_HITS | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ALL, // counterResistFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
-    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
-    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
-    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_ZubaStar, // attackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
-};
-#endif
 
-#if VERSION >= VERSION_US
 BattleWeapon marioWeapon_Genki0 = {
     "btl_wn_sac_genki0", // name
-    313, // icon
+    ICON_131, // icon
     {0}, // pad_06
     0, // itemId
     "msg_genkigenki", // description
@@ -2997,50 +1969,10 @@ BattleWeapon marioWeapon_Genki0 = {
     marioAttackEvent_Genki0, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
-#else
-BattleWeapon marioWeapon_Genki0 = {
-    "btl_wn_sac_genki0", // name
-    305, // icon
-    {0}, // pad_06
-    0, // itemId
-    "msg_genkigenki", // description
-    100, // baseAccuracy
-    0, // baseFpCost
-    1, // baseSpCost
-    0, // superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    NULL, // hpDamageFn
-    {0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_ENEMY | TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
-    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_sac_1", // acHelpMsg
-    SPECIAL_ALWAYS_HITS | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ALL, // counterResistFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
-    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
-    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
-    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_Genki0, // attackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
-};
-#endif
 
-#if VERSION >= VERSION_US
 BattleWeapon marioWeapon_Genki1 = {
     "btl_wn_sac_genki1", // name
-    421, // icon
+    ICON_19D, // icon
     {0}, // pad_06
     0, // itemId
     "msg_super_genki", // description
@@ -3075,50 +2007,10 @@ BattleWeapon marioWeapon_Genki1 = {
     marioAttackEvent_Genki1, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
-#else
-BattleWeapon marioWeapon_Genki1 = {
-    "btl_wn_sac_genki1", // name
-    413, // icon
-    {0}, // pad_06
-    0, // itemId
-    "msg_super_genki", // description
-    100, // baseAccuracy
-    0, // baseFpCost
-    5, // baseSpCost
-    0, // superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    NULL, // hpDamageFn
-    {0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_ENEMY | TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
-    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_sac_6", // acHelpMsg
-    SPECIAL_ALWAYS_HITS | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ALL, // counterResistFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
-    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
-    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
-    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_Genki1, // attackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
-};
-#endif
 
-#if VERSION >= VERSION_US
 BattleWeapon marioWeapon_Deka = {
     "btl_wn_sac_dekkaku_dokkan", // name
-    415, // icon
+    ICON_197, // icon
     {0}, // pad_06
     0, // itemId
     "msg_dekkaku_dokkan", // description
@@ -3153,50 +2045,10 @@ BattleWeapon marioWeapon_Deka = {
     marioAttackEvent_Deka, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
-#else
-BattleWeapon marioWeapon_Deka = {
-    "btl_wn_sac_dekkaku_dokkan", // name
-    407, // icon
-    {0}, // pad_06
-    0, // itemId
-    "msg_dekkaku_dokkan", // description
-    100, // baseAccuracy
-    0, // baseFpCost
-    2, // baseSpCost
-    0, // superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    weaponGetPower_Deka, // hpDamageFn
-    {0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
-    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_sac_2", // acHelpMsg
-    SPECIAL_ALWAYS_HITS | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ALL, // counterResistFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
-    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
-    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
-    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_Deka, // attackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
-};
-#endif
 
-#if VERSION >= VERSION_US
 BattleWeapon marioWeapon_Muki = {
     "btl_wn_sac_mukimuki_body", // name
-    418, // icon
+    ICON_19A, // icon
     {0}, // pad_06
     0, // itemId
     "msg_mukimuki_body", // description
@@ -3231,50 +2083,10 @@ BattleWeapon marioWeapon_Muki = {
     marioAttackEvent_Muki, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
-#else
-BattleWeapon marioWeapon_Muki = {
-    "btl_wn_sac_mukimuki_body", // name
-    410, // icon
-    {0}, // pad_06
-    0, // itemId
-    "msg_mukimuki_body", // description
-    100, // baseAccuracy
-    0, // baseFpCost
-    3, // baseSpCost
-    0, // superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    NULL, // hpDamageFn
-    {0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_ENEMY | TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
-    TARGET_PROP_START_OWN_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_sac_4", // acHelpMsg
-    SPECIAL_ALWAYS_HITS | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ALL, // counterResistFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
-    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
-    0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
-    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
-    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_Muki, // attackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
-};
-#endif
 
-#if VERSION >= VERSION_US
 BattleWeapon marioWeapon_Suki = {
     "btl_wn_sac_sukkari_sukkiri", // name
-    417, // icon
+    ICON_199, // icon
     {0}, // pad_06
     0, // itemId
     "msg_sukkari_sukkiri", // description
@@ -3303,49 +2115,10 @@ BattleWeapon marioWeapon_Suki = {
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
     0, 0, 0, 0, 0, 0, 0, // atkChangeTime..allergicTime
+#if VERSION >= VERSION_JP
     100, // ohkoChance
-    0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
-    0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
-    {0}, // pad_AE
-    marioAttackEvent_Suki, // attackEvtScript
-    {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
-};
 #else
-BattleWeapon marioWeapon_Suki = {
-    "btl_wn_sac_sukkari_sukkiri", // name
-    409, // icon
-    {0}, // pad_06
-    0, // itemId
-    "msg_sukkari_sukkiri", // description
-    100, // baseAccuracy
-    0, // baseFpCost
-    2, // baseSpCost
-    0, // superguardsAllowed
-    1.0f, // reserved_14
-    1, // stylishCommandMultiplier
-    5, // reserved_19
-    100, // bingoSlotChance
-    50, // reserved_1B
-    NULL, // hpDamageFn
-    {0}, // hpDamageWork
-    NULL, // fpDamageFn
-    {0}, // fpDamageWork
-    TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
-    TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
-    0, 0, // element..damagePattern
-    3, // acLevel
-    2, // reserved_6F
-    "msg_sac_7", // acHelpMsg
-    SPECIAL_ALWAYS_HITS | SPECIAL_UNGUARDABLE, // special
-    COUNTER_RESIST_ALL, // counterResistFlags
-    0, 0, 0, 0, 0, 0, 0, 0, // targetWeightFlags..poisonChance
-    0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
-    0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
-    0, 0, 0, 0, 0, 0, 0, // atkChangeTime..allergicTime
-#if VERSION == VERSION_DEMO
     0, // ohkoChance
-#else
-    100, // ohkoChance
 #endif
     0, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
     0, 0, 0, 0, 0, 0, 0, // holdFastTime..fpRegenStrength
@@ -3353,7 +2126,6 @@ BattleWeapon marioWeapon_Suki = {
     marioAttackEvent_Suki, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
-#endif
 
 BattleWeapon* superActionTable[] = {
     &marioWeapon_Genki0, &marioWeapon_Deka, &marioWeapon_BakuGame, &marioWeapon_Muki, &marioWeapon_Scissor, &marioWeapon_Genki1,
@@ -3361,7 +2133,6 @@ BattleWeapon* superActionTable[] = {
     NULL, NULL, NULL, NULL, NULL, NULL,
 };
 
-#if VERSION >= VERSION_US
 static EVT_BEGIN(marioAttackEvent_NormalJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
@@ -3483,15 +2254,24 @@ static EVT_BEGIN(marioAttackEvent_NormalJump)
             SUBTRACT(LW(0), 3)
             SET_VALUE(LW(1), LW(0))
             SET_VALUE(LW(2), LW(0))
+#if VERSION <= VERSION_JP
+            SUBTRACT(LW(1), 3)
+            ADD(LW(2), 3)
+#else
             SUBTRACT(LW(1), 7)
             ADD(LW(2), 5)
+#endif
             SET_VALUE(LW(0), LW(6))
             SUBTRACT(LW(0), 4)
             CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, LW(1), LW(2), LW(0), 0)
             CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
             SWITCH(LW(6))
                 CASE_GREATER_OR_EQUAL(2)
+#if VERSION <= VERSION_JP
+                CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_4"))
+#else
                 CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_5"))
+#endif
                 CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, -60, -25, 0)
                 CALL(btlevtcmd_snd_voice, BTL_UNIT_SELF, 1)
                 CASE_DEFAULT
@@ -3579,12 +2359,19 @@ static EVT_BEGIN(marioAttackEvent_NormalJump)
     LABEL(90)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(btlevtcmd_StopAC)
+#if VERSION <= VERSION_JP
+    CALL(evt_audience_ap_recovery)
+    CALL(btlevtcmd_InviteApInfoReport)
+#endif
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
     CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 60)
+#if VERSION <= VERSION_JP
+    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
+#else
     SET_VALUE(LW(6), 32)
     BEGIN_SIBLING_EVENT
         WAIT_FRAMES(3)
@@ -3612,272 +2399,26 @@ static EVT_BEGIN(marioAttackEvent_NormalJump)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
     CALL(evt_audience_ap_recovery)
     CALL(btlevtcmd_InviteApInfoReport)
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
-    LABEL(95)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_W_1"))
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    LABEL(99)
-    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
-    CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
-#else
-static EVT_BEGIN(marioAttackEvent_NormalJump)
-    CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
-    IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
-        IF_INT_EQUAL(LW(3), -1)
-            GOTO(99)
-        END_IF
-        SET_VALUE(LW(12), PTR(&marioDefaultWeapon_Jump))
-        CALL(btlevtcmd_ACHelpSet, PTR(&marioDefaultWeapon_Jump))
-        CALL(evt_btl_camera_set_mode, 0, 10)
-        CALL(evt_btl_camera_set_homing_unitparts, 0, LW(3), LW(4), BTL_UNIT_SELF, 1)
-        CALL(evt_btl_camera_set_zoom, 0, 250)
-        CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
-    ELSE
-        CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-        IF_INT_EQUAL(LW(3), -1)
-            GOTO(99)
-        END_IF
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(12))
-        CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
-        CALL(btlevtcmd_WaitGuardMove)
-        CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(12))
-        CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
-        CALL_CHILD(marioAttackEvent_MajinaiPowerUpCheck)
-        CALL(evt_btl_camera_set_mode, 0, 11)
-        CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
-        CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-        CALL(evt_btl_camera_set_zoom, 0, 250)
-    END_IF
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
-    IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetWeaponActionLv, LW(12), LW(0))
-        CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 1, 1, 0)
-    END_IF
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
-    IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 250)
-        CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        WAIT_MS(1000)
-        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
-        CALL(btlevtcmd_GetTakeoffPosition, BTL_UNIT_SELF, LW(3), LW(4), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(6))
-        CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(6))
-        CALL(btlevtcmd_GetMoveFrame, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, LW(7))
-        IF_INT_GREATER(LW(7), 22)
-            SUBTRACT(LW(7), 22)
-        ELSE
-            SUBTRACT(LW(7), 22)
-            MULTIPLY(LW(7), -1)
-        END_IF
-        BEGIN_SIBLING_EVENT
-            WAIT_FRAMES(LW(7))
-            CALL(btlevtcmd_GetWeaponActionLv, LW(12), LW(5))
-            CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(5))
-            CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 1, 1, 0)
-        END_SIBLING_EVENT
-        CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    ELSE
-        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
-        CALL(btlevtcmd_GetTakeoffPosition, BTL_UNIT_SELF, LW(3), LW(4), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(6))
-        CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(6))
-        BEGIN_SIBLING_EVENT
-            SWITCH(LW(12))
-                CASE_EQUAL(PTR(&badgeWeapon_MiniminiFumi))
-                SET_VALUE(LW(13), 4)
-                CASE_EQUAL(PTR(&badgeWeapon_NemuraseFumi))
-                SET_VALUE(LW(13), 3)
-                CASE_EQUAL(PTR(&badgeWeapon_FunyafunyaJump))
-                SET_VALUE(LW(13), 1)
-            END_SWITCH
-            SWITCH(LW(12))
-                CASE_OR_EQUAL(PTR(&badgeWeapon_MiniminiFumi))
-                CASE_OR_EQUAL(PTR(&badgeWeapon_NemuraseFumi))
-                CASE_OR_EQUAL(PTR(&badgeWeapon_FunyafunyaJump))
-                CALL(_jump_star_effect, BTL_UNIT_SELF, LW(13))
-                CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-                CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_MARIO_HAMMER_SHINE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-                CASE_END
-            END_SWITCH
-        END_SIBLING_EVENT
-        CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    END_IF
-    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_StartAC, 1)
-    SET_VALUE(LW(10), 0)
-    LABEL(10)
-    IF_INT_GREATER_OR_EQUAL(LW(10), 1)
-        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 1048832, LW(5))
-    ELSE
-        CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
-    END_IF
-    SWITCH(LW(5))
-        CASE_OR_EQUAL(2)
-        CASE_OR_EQUAL(3)
-        CASE_OR_EQUAL(4)
-        CASE_OR_EQUAL(6)
-        CASE_END
-        CASE_EQUAL(1)
-        CASE_DEFAULT
-        WAIT_MS(1000)
-    END_SWITCH
-    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-    ADD(LW(2), 5)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-    IF_INT_GREATER_OR_EQUAL(LW(10), 1)
-        SET_VALUE(LW(6), 36)
-        CALL(btlevtcmd_MarioJumpParam, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(6))
-        BEGIN_SIBLING_EVENT
-            WAIT_FRAMES(3)
-            SET_VALUE(LW(0), LW(6))
-            DIVIDE(LW(0), 2)
-            SUBTRACT(LW(0), 3)
-            SET_VALUE(LW(1), LW(0))
-            SET_VALUE(LW(2), LW(0))
-            SUBTRACT(LW(1), 3)
-            ADD(LW(2), 3)
-            SET_VALUE(LW(0), LW(6))
-            SUBTRACT(LW(0), 4)
-            CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, LW(1), LW(2), LW(0), 0)
-            CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
-            SWITCH(LW(6))
-                CASE_GREATER_OR_EQUAL(2)
-                CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_4"))
-                CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, -60, -25, 0)
-                CALL(btlevtcmd_snd_voice, BTL_UNIT_SELF, 1)
-                CASE_DEFAULT
-                CALL(evt_audience_acrobat_notry)
-            END_SWITCH
-        END_SIBLING_EVENT
-        CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(6), 3, -1)
-    ELSE
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_BATTLE_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        SET_VALUE(LW(6), 36)
-        CALL(btlevtcmd_MarioJumpParam, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(6))
-        CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(6), 0, -1)
-    END_IF
-    IF_INT_NOT_EQUAL(LW(5), 1)
-        IF_INT_EQUAL(LW(5), 3)
-            CALL(btlevtcmd_StartAvoid, LW(3), 38)
-        END_IF
-        IF_INT_EQUAL(LW(5), 6)
-            CALL(btlevtcmd_StartAvoid, LW(3), 39)
-        END_IF
-        IF_INT_EQUAL(LW(5), 2)
-            CALL(btlevtcmd_StartAvoid, LW(3), 40)
-        END_IF
-        CALL(btlevtcmd_StopAC)
-        CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_LAND_DAMAGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_D_2"))
-        WAIT_FRAMES(40)
-        GOTO(95)
-    END_IF
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1D"))
-    CALL(btlevtcmd_ac_timing_flag_onoff, 1, 1)
-    CALL(btlevtcmd_ac_timing_get_success_frame, LW(0))
-    DIVIDE(LW(0), 2)
-    WAIT_FRAMES(LW(0))
-    CALL(btlevtcmd_ac_timing_flag_onoff, 0, 1)
-    CALL(btlevtcmd_ResultAC)
-    CALL(btlevtcmd_GetResultAC, LW(6))
-    IF_BITS_CLEAR(LW(6), 2)
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
-        IF_INT_EQUAL(LW(10), 0)
-            CALL(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
-        END_IF
-        CALL(evt_btl_camera_set_mode, 0, 0)
-        CALL(btlevtcmd_StopAC)
-        CALL(evt_audience_ap_recovery)
-        CALL(btlevtcmd_InviteApInfoReport)
-        CALL(btlevtcmd_WeaponAftereffect, LW(12))
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 27)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
-        GOTO(95)
-    END_IF
-    CALL(btlevtcmd_snd_voice, BTL_UNIT_SELF, 2)
-    CALL(btlevtcmd_GetResultCountAC, LW(6))
-    IF_INT_LESS_OR_EQUAL(LW(6), 1)
-        BEGIN_INLINE_EVENT
-            CALL(evt_btl_camera_set_moveSpeedLv, 0, 0)
-            CALL(evt_btl_camera_set_zoom, 0, 200)
-            WAIT_FRAMES(10)
-            CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-            CALL(evt_btl_camera_set_zoom, 0, 250)
-        END_INLINE_EVENT
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 131072, LW(5))
-        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
-        CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
-        WAIT_FRAMES(2)
-        ADD(LW(10), 1)
-        GOTO(10)
-    ELSE
-        CALL(evt_btl_camera_set_mode, 0, 0)
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 131328, LW(5))
-        WAIT_FRAMES(2)
-    END_IF
-    LABEL(90)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_StopAC)
-    CALL(evt_audience_ap_recovery)
-    CALL(btlevtcmd_InviteApInfoReport)
-    CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 60)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
-    LABEL(95)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_W_1"))
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    LABEL(99)
-    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
-    CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
 #endif
+    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
+    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
+    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
+    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
+    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
+    LABEL(95)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_W_1"))
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    LABEL(99)
+    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
+    CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(marioAttackEvent_KururinJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.39941406f))
@@ -4183,7 +2724,6 @@ static EVT_BEGIN(marioAttackEvent_KururinJump)
     RETURN
 EVT_END()
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(marioAttackEvent_JyabaraJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -4456,437 +2996,11 @@ EVT_BEGIN(marioAttackEvent_JyabaraJump)
     CALL(btlevtcmd_ac_timing_flag_onoff, 1, 1)
     CALL(btlevtcmd_ac_timing_get_success_frame, LW(0))
     DIVIDE(LW(0), 2)
-    ADD(LW(0), 4)
-    WAIT_FRAMES(LW(0))
-    CALL(btlevtcmd_ac_timing_flag_onoff, 0, 1)
-    CALL(btlevtcmd_ResultAC)
-    CALL(btlevtcmd_GetResultAC, LW(6))
-    IF_BITS_CLEAR(LW(6), 2)
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
-        CALL(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
-        CALL(btlevtcmd_GetDamage, LW(3), LW(0))
-        IF_INT_GREATER_OR_EQUAL(LW(0), 10)
-            SET_VALUE(LW(0), 9)
-        END_IF
-        CALL(evt_btl_camera_shake_h, 0, LW(0), 0, 10, 13)
-        CALL(btlevtcmd_WeaponAftereffect, LW(12))
-        CALL(btlevtcmd_StopAC)
-        CALL(evt_audience_ap_recovery)
-        CALL(btlevtcmd_InviteApInfoReport)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 27)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
-        GOTO(95)
-    ELSE
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 131072, LW(5))
-    END_IF
-    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
-    CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-    BEGIN_SIBLING_EVENT_GET_ID(LW(14))
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5f))
-        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-        ADD(LW(2), 5)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_BATTLE_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        SET_VALUE(LW(6), 36)
-        CALL(btlevtcmd_MarioJumpParam, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(6))
-        CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(6), 0, -1)
-    END_SIBLING_EVENT
-    WAIT_FRAMES(15)
-    DELETE_EVENT(LW(14))
-    CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(15))
-    MULTIPLY(LW(15), -30)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_1A"))
-    CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 12, 0)
-    CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-    WAIT_FRAMES(15)
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_POWER1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_JUMP_JABARA5"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    LOOP(12)
-        CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, LW(15))
-        WAIT_FRAMES(1)
-    END_LOOP
-    CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-    CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 0, 0)
-    WAIT_FRAMES(15)
-    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 4, 0, 0, 0, -1)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_1B"))
-    WAIT_FRAMES(2)
-    CALL(btlevtcmd_ac_timing_flag_onoff, 1, 1)
-    CALL(btlevtcmd_ac_timing_get_success_frame, LW(0))
-    DIVIDE(LW(0), 2)
-    ADD(LW(0), 1)
-    WAIT_FRAMES(LW(0))
-    CALL(btlevtcmd_ac_timing_flag_onoff, 0, 1)
-    CALL(btlevtcmd_ResultAC)
-    CALL(btlevtcmd_GetResultAC, LW(6))
-    IF_BITS_SET(LW(6), 2)
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 131328, LW(5))
-        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetResultPrizeLv, LW(3), 1, LW(6))
-        CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
-    ELSE
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
-        CALL(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
-        CALL(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
-        CALL(btlevtcmd_GetDamage, LW(3), LW(0))
-#if VERSION != VERSION_EU
-        IF_INT_GREATER_OR_EQUAL(LW(0), 10)
-            SET_VALUE(LW(0), 9)
-        END_IF
-#endif
-        CALL(evt_btl_camera_shake_h, 0, LW(0), 0, 10, 13)
-        CALL(btlevtcmd_WeaponAftereffect, LW(12))
-        CALL(btlevtcmd_StopAC)
-        CALL(evt_audience_ap_recovery)
-        CALL(btlevtcmd_InviteApInfoReport)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 27)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
-        GOTO(95)
-    END_IF
-    LABEL(90)
-    CALL(btlevtcmd_GetDamage, LW(3), LW(0))
-    IF_INT_GREATER_OR_EQUAL(LW(0), 10)
-        SET_VALUE(LW(0), 9)
-    END_IF
-    CALL(evt_btl_camera_shake_h, 0, LW(0), 0, 10, 13)
-    CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL(btlevtcmd_StopAC)
-    CALL(evt_audience_ap_recovery)
-    CALL(btlevtcmd_InviteApInfoReport)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 60)
-    BEGIN_SIBLING_EVENT
-        WAIT_FRAMES(1)
-        CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 8, 17, 29, 0)
-        CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
-        SWITCH(LW(6))
-            CASE_GREATER_OR_EQUAL(2)
-            CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_5"))
-            CALL(btlevtcmd_snd_voice, BTL_UNIT_SELF, 1)
-            CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
-            CASE_DEFAULT
-            CALL(evt_audience_acrobat_notry)
-        END_SWITCH
-    END_SIBLING_EVENT
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
-    LABEL(95)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_W_1"))
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    LABEL(99)
-    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
-    CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
-#else
-EVT_BEGIN(marioAttackEvent_JyabaraJump)
-    CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-    IF_INT_EQUAL(LW(3), -1)
-        GOTO(99)
-    END_IF
-    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
-    CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(12))
-    CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(12))
-    CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
-    CALL_CHILD(marioAttackEvent_MajinaiPowerUpCheck)
-    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
-    CALL(btlevtcmd_GetWeaponActionLv, LW(12), LW(0))
-    CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 1, 1, 0)
-    WAIT_FRAMES(21)
-    CALL(btlevtcmd_StartAC, 1)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5f))
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_S_1"))
-    WAIT_FRAMES(1)
-    CALL(btlevtcmd_AnimeChangePaperGroup, BTL_UNIT_SELF, 1, STRING("p_jyabara"), 1)
-    CALL(btlevtcmd_AnimeChangePaperAnime, BTL_UNIT_SELF, 1, STRING("PM_J_1E"))
-    WAIT_FRAMES(16)
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_POWER2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_JUMP_JABARA1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_AnimeChangePaperGroup, BTL_UNIT_SELF, 1, STRING("p_jyabara"), 0)
-    CALL(btlevtcmd_AnimeChangePaperAnime, BTL_UNIT_SELF, 1, STRING("PM_J_1A"))
-    WAIT_FRAMES(8)
-    CALL(btlevtcmd_AnimeChangePaperAnime, BTL_UNIT_SELF, 1, STRING("PM_J_1B"))
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_JUMP_JABARA2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_AnimeChangePaperAnime, BTL_UNIT_SELF, 1, STRING("PM_J_2A"))
-    WAIT_FRAMES(8)
-    CALL(btlevtcmd_AnimeChangePaperAnime, BTL_UNIT_SELF, 1, STRING("PM_J_2B"))
-    WAIT_FRAMES(10)
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_JUMP_JABARA3"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_AnimeChangePaperAnime, BTL_UNIT_SELF, 1, STRING("PM_J_3A"))
-    WAIT_FRAMES(10)
-    CALL(btlevtcmd_AnimeChangePaperAnime, BTL_UNIT_SELF, 1, STRING("PM_J_3B"))
-    WAIT_FRAMES(20)
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_JUMP_JABARA4"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_AC3_5"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(_bgset_iron_frame_check, LW(0))
-    IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-        CALL(btlevtcmd_AnimeChangePaperAnime, BTL_UNIT_SELF, 1, STRING("PM_J_1C"))
-        BEGIN_INLINE_EVENT_GET_ID(LW(14))
-            LOOP(50)
-                CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 48, 0)
-                WAIT_FRAMES(1)
-            END_LOOP
-            CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-        END_INLINE_EVENT
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        ADD(LW(2), 5)
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.2998047f))
-        CALL(btlevtcmd_SetMoveSoundDataWork, BTL_UNIT_SELF, STRING("SFX_BTL_JUMP_CONTINUE1"), 0, 0, -1, -1, 0, 0)
-        BEGIN_INLINE_EVENT_GET_ID(LW(15))
-            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_BATTLE_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-            CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 90, -2)
-        END_INLINE_EVENT
-        CALL(_wait_jyabara_hit_iron_frame, BTL_UNIT_SELF)
-        DELETE_EVENT(LW(14))
-        DELETE_EVENT(LW(15))
-        CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-        CALL(btlevtcmd_WeaponAftereffect, PTR(&marioWeapon_JyabaraJumpFailed))
-        CALL(btlevtcmd_StopAC)
-        CALL(evt_btl_camera_shake_h, 0, 2, 0, 10, 13)
-        BEGIN_SIBLING_EVENT
-            SET_FLOAT_VALUE(LW(0), FLOAT(1.0f))
-            LOOP(5)
-                WAIT_FRAMES(1)
-                SUBTRACT_FLOAT(LW(0), FLOAT(0.19921875f))
-                CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), LW(0), FLOAT(1.0f))
-            END_LOOP
-        END_SIBLING_EVENT
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), 130, LW(2), 5, 0, 0, 0, -1)
-        WAIT_FRAMES(16)
-        CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
-        CALL(btlevtcmd_AnimeChangePaperAnime, BTL_UNIT_SELF, 1, STRING("PM_J_1H"))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
-        CALL(btlevtcmd_TransStageFloorPosition, LW(5), LW(6), LW(7))
-        BEGIN_SIBLING_EVENT
-            SET_VALUE(LW(5), LW(6))
-            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(9), EVT_NULLPTR)
-            SUBTRACT(LW(9), LW(5))
-            DIVIDE(LW(9), 4)
-            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(6), EVT_NULLPTR)
-            SUBTRACT(LW(6), LW(9))
-            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(7), LW(1))
-            CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(7), LW(1))
-            ADD(LW(7), LW(9))
-            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(8), LW(1))
-            CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(8), LW(1))
-            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(0), EVT_NULLPTR)
-            CALL(evt_sub_intpl_init, 0, LW(0), LW(6), 32)
-            LOOP(32)
-                CALL(evt_sub_intpl_get_value)
-                CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(0), EVT_NULLPTR)
-                WAIT_FRAMES(1)
-            END_LOOP
-            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(0), EVT_NULLPTR)
-            CALL(evt_sub_intpl_init, 0, LW(0), LW(7), 64)
-            LOOP(64)
-                CALL(evt_sub_intpl_get_value)
-                CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(0), EVT_NULLPTR)
-                WAIT_FRAMES(1)
-            END_LOOP
-            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(0), EVT_NULLPTR)
-            CALL(evt_sub_intpl_init, 0, LW(0), LW(8), 32)
-            LOOP(32)
-                CALL(evt_sub_intpl_get_value)
-                CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(0), EVT_NULLPTR)
-                WAIT_FRAMES(1)
-            END_LOOP
-        END_SIBLING_EVENT
-        BEGIN_SIBLING_EVENT
-            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), EVT_NULLPTR, EVT_NULLPTR)
-            CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(7))
-            MULTIPLY(LW(7), -30)
-            SET_VALUE(LW(1), LW(0))
-            ADD(LW(1), LW(7))
-            CALL(evt_sub_intpl_init, 11, LW(0), LW(1), 26)
-            LOOP(26)
-                CALL(evt_sub_intpl_get_value)
-                CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), EVT_NULLPTR, EVT_NULLPTR)
-                WAIT_FRAMES(1)
-            END_LOOP
-            WAIT_FRAMES(6)
-            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), EVT_NULLPTR, EVT_NULLPTR)
-            CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(7))
-            MULTIPLY(LW(7), 60)
-            SET_VALUE(LW(1), LW(0))
-            ADD(LW(1), LW(7))
-            CALL(evt_sub_intpl_init, 11, LW(0), LW(1), 58)
-            LOOP(58)
-                CALL(evt_sub_intpl_get_value)
-                CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), EVT_NULLPTR, EVT_NULLPTR)
-                WAIT_FRAMES(1)
-            END_LOOP
-            WAIT_FRAMES(6)
-            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), EVT_NULLPTR, EVT_NULLPTR)
-            CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(7))
-            MULTIPLY(LW(7), -30)
-            SET_VALUE(LW(1), LW(0))
-            ADD(LW(1), LW(7))
-            CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(1), EVT_NULLPTR, EVT_NULLPTR)
-            CALL(evt_sub_intpl_init, 11, LW(0), LW(1), 32)
-            LOOP(32)
-                CALL(evt_sub_intpl_get_value)
-                CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), EVT_NULLPTR, EVT_NULLPTR)
-                WAIT_FRAMES(1)
-            END_LOOP
-        END_SIBLING_EVENT
-        WAIT_FRAMES(130)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_I_S"))
-        CALL(btlevtcmd_AnimeChangePaperAnime, BTL_UNIT_SELF, 1, STRING("PM_J_1E"))
-        BEGIN_SIBLING_EVENT_GET_ID(LW(15))
-            CALL(evt_sub_intpl_init_float, 5, FLOAT(0.0f), FLOAT(1.1992188f), 10)
-            LOOP(10)
-                CALL(evt_sub_intpl_get_float, LW(5), EVT_NULLPTR)
-                CALL(btlevtcmd_GetScale, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-                CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, LW(0), LW(5), LW(2))
-                WAIT_FRAMES(1)
-            END_LOOP
-            CALL(evt_sub_intpl_init_float, 7, FLOAT(1.1992188f), FLOAT(1.0f), 30)
-            LOOP(30)
-                CALL(evt_sub_intpl_get_float, LW(5), EVT_NULLPTR)
-                CALL(btlevtcmd_GetScale, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-                CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, LW(0), LW(5), LW(2))
-                WAIT_FRAMES(1)
-            END_LOOP
-        END_SIBLING_EVENT
-        CALL(btlevtcmd_WaitEventEnd, LW(15))
-        WAIT_FRAMES(20)
-        CALL(evt_audience_ap_recovery)
-        CALL(btlevtcmd_InviteApInfoReport)
-        GOTO(95)
-    END_IF
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-    CALL(btlevtcmd_AnimeChangePaperAnime, BTL_UNIT_SELF, 1, STRING("PM_J_1C"))
-    BEGIN_SIBLING_EVENT
-        LOOP(50)
-            CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 48, 0)
-            WAIT_FRAMES(1)
-        END_LOOP
-        CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_1A"))
-        CALL(btlevtcmd_SetPartsBlur, BTL_UNIT_SELF, 1, 255, 255, 255, 80, 255, 255, 255, 0, 0)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_BLUR)
-    END_SIBLING_EVENT
-    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-    ADD(LW(2), 5)
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.2998047f))
-    CALL(btlevtcmd_SetMoveSoundDataWork, BTL_UNIT_SELF, STRING("SFX_BTL_JUMP_CONTINUE1"), 0, 0, -1, -1, 0, 0)
-    CALL(evt_sub_random, 20, LW(5))
-    SUBTRACT(LW(5), 10)
-    MULTIPLY(LW(5), 6)
-    ADD(LW(5), 180)
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.14941406f))
-    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-    ADD(LW(2), 5)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(5), -2)
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
-    IF_INT_NOT_EQUAL(LW(5), 1)
-        IF_INT_EQUAL(LW(5), 3)
-            CALL(btlevtcmd_StartAvoid, LW(3), 38)
-        END_IF
-        IF_INT_EQUAL(LW(5), 6)
-            CALL(btlevtcmd_StartAvoid, LW(3), 39)
-        END_IF
-        IF_INT_EQUAL(LW(5), 2)
-            CALL(btlevtcmd_StartAvoid, LW(3), 40)
-        END_IF
-        CALL(btlevtcmd_StopAC)
-        CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_B_2"))
-        CALL(btlevtcmd_AnimeChangePaperGroup, BTL_UNIT_SELF, 1, 0, 0)
-        CALL(btlevtcmd_SetPartsBlur, BTL_UNIT_SELF, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-        BEGIN_INLINE_EVENT
-            WAIT_FRAMES(10)
-            CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_BLUR)
-        END_INLINE_EVENT
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 35)
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5f))
-        CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 12, 0)
-        BEGIN_SIBLING_EVENT
-            CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(0))
-            MULTIPLY(LW(0), -24)
-            LOOP(20)
-                CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, LW(0))
-                WAIT_FRAMES(1)
-            END_LOOP
-        END_SIBLING_EVENT
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
-        CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 20)
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5f))
-        BEGIN_SIBLING_EVENT
-            CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(0))
-            MULTIPLY(LW(0), -20)
-            LOOP(12)
-                CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, LW(0))
-                WAIT_FRAMES(1)
-            END_LOOP
-        END_SIBLING_EVENT
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_Z_11"))
-        CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 10)
-        CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, 0, 4, 0, -1)
-        WAIT_FRAMES(30)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_U_3"))
-        WAIT_FRAMES(12)
-        GOTO(95)
-    END_IF
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1D"))
-    WAIT_FRAMES(2)
-    CALL(btlevtcmd_AnimeChangePaperGroup, BTL_UNIT_SELF, 1, 0, 0)
-    CALL(btlevtcmd_SetPartsBlur, BTL_UNIT_SELF, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    BEGIN_INLINE_EVENT
-        WAIT_FRAMES(10)
-        CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_BLUR)
-    END_INLINE_EVENT
-    CALL(btlevtcmd_ac_timing_flag_onoff, 1, 1)
-    CALL(btlevtcmd_ac_timing_get_success_frame, LW(0))
-    DIVIDE(LW(0), 2)
+#if VERSION <= VERSION_JP
     ADD(LW(0), 2)
+#else
+    ADD(LW(0), 4)
+#endif
     WAIT_FRAMES(LW(0))
     CALL(btlevtcmd_ac_timing_flag_onoff, 0, 1)
     CALL(btlevtcmd_ResultAC)
@@ -4895,6 +3009,11 @@ EVT_BEGIN(marioAttackEvent_JyabaraJump)
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
         CALL(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
         CALL(btlevtcmd_GetDamage, LW(3), LW(0))
+#if VERSION >= VERSION_US
+        IF_INT_GREATER_OR_EQUAL(LW(0), 10)
+            SET_VALUE(LW(0), 9)
+        END_IF
+#endif
         CALL(evt_btl_camera_shake_h, 0, LW(0), 0, 10, 13)
         CALL(btlevtcmd_WeaponAftereffect, LW(12))
         CALL(btlevtcmd_StopAC)
@@ -4968,6 +3087,11 @@ EVT_BEGIN(marioAttackEvent_JyabaraJump)
         CALL(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
         CALL(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
         CALL(btlevtcmd_GetDamage, LW(3), LW(0))
+#if VERSION == VERSION_US
+        IF_INT_GREATER_OR_EQUAL(LW(0), 10)
+            SET_VALUE(LW(0), 9)
+        END_IF
+#endif
         CALL(evt_btl_camera_shake_h, 0, LW(0), 0, 10, 13)
         CALL(btlevtcmd_WeaponAftereffect, LW(12))
         CALL(btlevtcmd_StopAC)
@@ -4988,6 +3112,11 @@ EVT_BEGIN(marioAttackEvent_JyabaraJump)
     END_IF
     LABEL(90)
     CALL(btlevtcmd_GetDamage, LW(3), LW(0))
+#if VERSION >= VERSION_US
+    IF_INT_GREATER_OR_EQUAL(LW(0), 10)
+        SET_VALUE(LW(0), 9)
+    END_IF
+#endif
     CALL(evt_btl_camera_shake_h, 0, LW(0), 0, 10, 13)
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
     CALL(btlevtcmd_StopAC)
@@ -5000,11 +3129,19 @@ EVT_BEGIN(marioAttackEvent_JyabaraJump)
     CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 60)
     BEGIN_SIBLING_EVENT
         WAIT_FRAMES(1)
+#if VERSION <= VERSION_JP
         CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 11, 15, 29, 0)
+#else
+        CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 8, 17, 29, 0)
+#endif
         CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
         SWITCH(LW(6))
             CASE_GREATER_OR_EQUAL(2)
+#if VERSION <= VERSION_JP
             CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_4"))
+#else
+            CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_5"))
+#endif
             CALL(btlevtcmd_snd_voice, BTL_UNIT_SELF, 1)
             CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
             CASE_DEFAULT
@@ -5032,9 +3169,7 @@ EVT_BEGIN(marioAttackEvent_JyabaraJump)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
-#endif
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(marioAttackEvent_GatsuDokaJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -5133,9 +3268,11 @@ EVT_BEGIN(marioAttackEvent_GatsuDokaJump)
         CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
         CALL(btlevtcmd_AudienceDeclareACResult, LW(0), -1)
         CALL(btlevtcmd_GetDamage, LW(3), LW(0))
+#if VERSION >= VERSION_US
         IF_INT_GREATER_OR_EQUAL(LW(0), 10)
             SET_VALUE(LW(0), 9)
         END_IF
+#endif
         CALL(evt_btl_camera_shake_h, 0, LW(0), 0, 10, 13)
         CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
         CALL(btlevtcmd_WeaponAftereffect, LW(0))
@@ -5165,216 +3302,56 @@ EVT_BEGIN(marioAttackEvent_GatsuDokaJump)
     WAIT_FRAMES(2)
     LABEL(90)
     CALL(btlevtcmd_GetDamage, LW(3), LW(0))
+#if VERSION >= VERSION_US
     IF_INT_GREATER_OR_EQUAL(LW(0), 10)
         SET_VALUE(LW(0), 9)
     END_IF
-    CALL(evt_btl_camera_shake_h, 0, LW(0), 0, 10, 13)
-    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_WeaponAftereffect, LW(0))
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_StopAC)
-    CALL(evt_audience_ap_recovery)
-    CALL(btlevtcmd_InviteApInfoReport)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 60)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
-    LABEL(95)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_W_1"))
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    LABEL(99)
-    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
-    CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
-#else
-EVT_BEGIN(marioAttackEvent_GatsuDokaJump)
-    CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-    IF_INT_EQUAL(LW(3), -1)
-        GOTO(99)
-    END_IF
-    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
-    CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
-    CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
-    CALL_CHILD(marioAttackEvent_MajinaiPowerUpCheck)
-    CALL(evt_btl_camera_set_mode, 0, 11)
-    CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(evt_btl_camera_set_zoom, 0, 250)
-    CALL(btlevtcmd_CommandGetWeaponActionLv, LW(0))
-    CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 1, 1, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
-    CALL(btlevtcmd_GetTakeoffPosition, BTL_UNIT_SELF, LW(3), LW(4), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_StartAC, 1)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_I_Y"))
-    WAIT_FRAMES(10)
-    CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
-    SWITCH(LW(5))
-        CASE_OR_EQUAL(2)
-        CASE_OR_EQUAL(3)
-        CASE_OR_EQUAL(6)
-        CASE_OR_EQUAL(4)
-        CASE_END
-        CASE_EQUAL(1)
-        CASE_DEFAULT
-        WAIT_MS(1000)
-    END_SWITCH
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-    ADD(LW(2), 5)
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_BATTLE_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    SET_VALUE(LW(6), 36)
-    CALL(btlevtcmd_MarioJumpParam, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(6))
-    BEGIN_SIBLING_EVENT
-        SET_VALUE(LW(0), LW(6))
-        SET_VALUE(LW(1), LW(6))
-        DIVIDE(LW(0), 2)
-        SUBTRACT(LW(1), 1)
-        CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 5, LW(0), LW(1), 0)
-        CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
-        SWITCH(LW(6))
-            CASE_GREATER_OR_EQUAL(2)
-            CALL(btlevtcmd_snd_voice, BTL_UNIT_SELF, 1)
-            CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
-            CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 14, 0)
-            LOOP(15)
-                CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, -24)
-                WAIT_FRAMES(1)
-            END_LOOP
-            CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-            CASE_DEFAULT
-            CALL(evt_audience_acrobat_notry)
-        END_SWITCH
-    END_SIBLING_EVENT
-    CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(6), 0, -1)
-    IF_INT_NOT_EQUAL(LW(5), 1)
-        IF_INT_EQUAL(LW(5), 3)
-            CALL(btlevtcmd_StartAvoid, LW(3), 38)
-        END_IF
-        IF_INT_EQUAL(LW(5), 6)
-            CALL(btlevtcmd_StartAvoid, LW(3), 39)
-        END_IF
-        IF_INT_EQUAL(LW(5), 2)
-            CALL(btlevtcmd_StartAvoid, LW(3), 40)
-        END_IF
-        CALL(btlevtcmd_StopAC)
-        CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_LAND_DAMAGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_D_2"))
-        WAIT_FRAMES(40)
-        GOTO(95)
-    END_IF
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1D"))
-    CALL(btlevtcmd_ac_timing_flag_onoff, 1, 1)
-    CALL(btlevtcmd_ac_timing_get_success_frame, LW(0))
-    DIVIDE(LW(0), 2)
-    WAIT_FRAMES(LW(0))
-    CALL(btlevtcmd_ac_timing_flag_onoff, 0, 1)
-    CALL(btlevtcmd_ResultAC)
-    CALL(btlevtcmd_GetResultAC, LW(6))
-    IF_BITS_CLEAR(LW(6), 2)
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_AudienceDeclareACResult, LW(0), -1)
-        CALL(btlevtcmd_GetDamage, LW(3), LW(0))
-        CALL(evt_btl_camera_shake_h, 0, LW(0), 0, 10, 13)
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_WeaponAftereffect, LW(0))
-        CALL(evt_btl_camera_set_mode, 0, 0)
-        CALL(btlevtcmd_StopAC)
-        CALL(evt_audience_ap_recovery)
-        CALL(btlevtcmd_InviteApInfoReport)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 27)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
-        GOTO(95)
-    END_IF
-    CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 131328, LW(5))
-    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
-    CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_AudienceDeclareACResult, LW(0), LW(6))
-    WAIT_FRAMES(2)
-    LABEL(90)
-    CALL(btlevtcmd_GetDamage, LW(3), LW(0))
-    CALL(evt_btl_camera_shake_h, 0, LW(0), 0, 10, 13)
-    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_WeaponAftereffect, LW(0))
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_StopAC)
-    CALL(evt_audience_ap_recovery)
-    CALL(btlevtcmd_InviteApInfoReport)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 60)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
-    LABEL(95)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_W_1"))
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    LABEL(99)
-    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
-    CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
 #endif
+    CALL(evt_btl_camera_shake_h, 0, LW(0), 0, 10, 13)
+    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_WeaponAftereffect, LW(0))
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(btlevtcmd_StopAC)
+    CALL(evt_audience_ap_recovery)
+    CALL(btlevtcmd_InviteApInfoReport)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
+    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
+    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 60)
+    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
+    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
+    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
+    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
+    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
+    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
+    LABEL(95)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_W_1"))
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    LABEL(99)
+    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
+    CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
+    RETURN
+EVT_END()
 
 EVT_BEGIN(marioAttackEvent_GatsunJump)
     SET_VALUE(LW(12), PTR(&badgeWeapon_GatsunJump))
-    CALL_CHILD(PTR(marioAttackEvent_GatsuDokaJump))
+    CALL_CHILD(marioAttackEvent_GatsuDokaJump)
     RETURN
 EVT_END()
 
 EVT_BEGIN(marioAttackEvent_DokanJump)
     SET_VALUE(LW(12), PTR(&badgeWeapon_DokanJump))
-    CALL_CHILD(PTR(marioAttackEvent_GatsuDokaJump))
+    CALL_CHILD(marioAttackEvent_GatsuDokaJump)
     RETURN
 EVT_END()
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(marioAttackEvent_TatsumakiJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -5629,7 +3606,9 @@ EVT_BEGIN(marioAttackEvent_TatsumakiJump)
                 IF_INT_LESS(LW(1), 90)
                     IF_INT_GREATER_OR_EQUAL(LW(0), 90)
                         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_N_7"))
+#if VERSION >= VERSION_JP
                         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_MARIO_FALL_CRUSH1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+#endif
                     END_IF
                 END_IF
                 SET_VALUE(LW(1), LW(0))
@@ -5693,7 +3672,11 @@ EVT_BEGIN(marioAttackEvent_TatsumakiJump)
                 GOTO(59)
             END_IF
             IF_INT_EQUAL(LW(3), LW(6))
+#if VERSION >= VERSION_JP
                 GOTO(58)
+#else
+                GOTO(59)
+#endif
             END_IF
             CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SYSTEM, LW(3), LW(4), PTR(&badgeWeapon_TatsumakiJumpInvolved), 256, LW(5))
             SWITCH(LW(5))
@@ -5709,517 +3692,12 @@ EVT_BEGIN(marioAttackEvent_TatsumakiJump)
                 IF_BITS_SET(LW(0), 2)
                     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SYSTEM, LW(3), LW(4), PTR(&badgeWeapon_TatsumakiJumpInvolved), 131328, LW(5))
                     CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+#if VERSION >= VERSION_JP
                     CALL(btlevtcmd_GetResultPrizeLv, LW(3), 1, LW(7))
                     CALL(btlevtcmd_ACSuccessEffect, LW(7), LW(0), LW(1), LW(2))
-                ELSE
-                    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SYSTEM, LW(3), LW(4), PTR(&badgeWeapon_TatsumakiJumpInvolved), 256, LW(5))
-                END_IF
-                CASE_DEFAULT
-            END_SWITCH
-            LABEL(58)
-            CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
-            GOTO(50)
-            LABEL(59)
-            CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-            CALL(btlevtcmd_GetResultPrizeLv, LW(3), 1, LW(6))
-            CALL(btlevtcmd_AudienceDeclareACResult, LW(0), LW(6))
-        END_SIBLING_EVENT
-        WAIT_FRAMES(60)
-        BEGIN_INLINE_EVENT_GET_ID(LW(13))
-            LOOP(30)
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(0))
-                SUBTRACT(LW(0), 1)
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, LW(0))
-                WAIT_FRAMES(1)
-            END_IF
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 0)
-            CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-            LOOP(6)
-                WAIT_FRAMES(1)
-                CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 45, 0)
-            END_LOOP
-            LOOP(6)
-                WAIT_FRAMES(1)
-                CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 15, 0)
-            END_LOOP
-            CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-        END_INLINE_EVENT
-        CALL(btlevtcmd_WaitEventEnd, LW(13))
-        DELETE_EVENT(LW(12))
-        CALL(evt_snd_sfxoff, LW(11))
-        WAIT_FRAMES(30)
-        BEGIN_SIBLING_EVENT
-            CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 7, 21, 21, 0)
-            CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
-            IF_INT_GREATER_OR_EQUAL(LW(6), 2)
-                CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_B_1"))
-            END_IF
-        END_SIBLING_EVENT
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.14941406f))
-        CALL(btlevtcmd_FallPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 16)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1D"))
-        WAIT_FRAMES(6)
-        CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
-        IF_INT_GREATER_OR_EQUAL(LW(6), 2)
-            GOTO(80)
-        END_IF
-    END_IF
-    CALL(evt_audience_ap_recovery)
-    CALL(btlevtcmd_InviteApInfoReport)
-    GOTO(95)
-    LABEL(80)
-    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(0), 1, 0, 0, 0)
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetMoveFrame, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, LW(7))
-    SET_VALUE(LW(8), LW(7))
-    ADD(LW(8), 12)
-    BEGIN_SIBLING_EVENT
-        WAIT_FRAMES(1)
-        CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, LW(7), LW(8), LW(8), 0)
-    END_SIBLING_EVENT
-    ADD(LW(8), 1)
-    CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(15))
-    MULTIPLY(LW(15), 30)
-    CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 14, 0)
-    BEGIN_SIBLING_EVENT
-        SET_VALUE(LW(10), 0)
-        LOOP(LW(8))
-            CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, LW(15))
-            IF_INT_EQUAL(LW(10), 0)
-                CALL(btlevtcmd_snd_voice, BTL_UNIT_SELF, 1)
-            END_IF
-            ADD(LW(10), 1)
-            IF_INT_GREATER_OR_EQUAL(LW(10), 12)
-                SET_VALUE(LW(10), 0)
-            END_IF
-            WAIT_FRAMES(1)
-        END_LOOP
-    END_SIBLING_EVENT
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8), -1, 0)
-    CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
-    MULTIPLY(LW(5), 36)
-    BEGIN_INLINE_EVENT_GET_ID(LW(14))
-        CALL(btlevtcmd_GetRotate, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        MODULO(LW(2), 360)
-        DIVIDE(LW(2), 10)
-        ADD(LW(2), LW(5))
-        LOOP(10)
-        END_LOOP
-        CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-    END_INLINE_EVENT
-    CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
-    SWITCH(LW(6))
-        CASE_GREATER_OR_EQUAL(2)
-        CALL(btlevtcmd_WaitEventEnd, LW(14))
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(0), 1, 0, 0, 0)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_3B"))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        ADD(LW(1), 50)
-        CALL(evt_eff, STRING("_BTLEF"), STRING("confetti"), 3, LW(0), LW(1), LW(2), 90, 0, 0, 0, 0, 0, 0, 0)
-        CALL(btlevtcmd_snd_voice, BTL_UNIT_SELF, 1)
-        CALL(evt_snd_sfxon, STRING("SFX_BTL_ACROBAT_FINISH1"), 0)
-        WAIT_FRAMES(90)
-        CASE_LESS_OR_EQUAL(-1)
-        DELETE_EVENT(LW(14))
-        CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(0), 0, 0, 0, 0)
-        CALL(evt_snd_sfxon, STRING("SFX_BTL_ACROBAT_MISS1"), 0)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_I_S"))
-        WAIT_MS(1500)
-        CASE_DEFAULT
-        CALL(btlevtcmd_WaitEventEnd, LW(14))
-        CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-        CALL(evt_audience_acrobat_notry)
-    END_SWITCH
-    CALL(evt_audience_ap_recovery)
-    CALL(btlevtcmd_InviteApInfoReport)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    GOTO(99)
-    LABEL(90)
-    CALL(btlevtcmd_StopAC)
-    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_WeaponAftereffect, LW(0))
-    CALL(evt_audience_ap_recovery)
-    CALL(btlevtcmd_InviteApInfoReport)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 27)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
-    LABEL(95)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_W_1"))
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    LABEL(99)
-    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
-    CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
 #else
-EVT_BEGIN(marioAttackEvent_TatsumakiJump)
-    CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-    IF_INT_EQUAL(LW(3), -1)
-        GOTO(99)
-    END_IF
-    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
-    CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
-    CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
-    CALL_CHILD(marioAttackEvent_MajinaiPowerUpCheck)
-    CALL(evt_btl_camera_set_mode, 0, 11)
-    CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(evt_btl_camera_set_zoom, 0, 250)
-    CALL(btlevtcmd_CommandGetWeaponActionLv, LW(0))
-    CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 1, 1, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
-    CALL(btlevtcmd_GetTakeoffPosition, BTL_UNIT_SELF, LW(3), LW(4), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetMoveFrame, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, LW(7))
-    SUBTRACT(LW(7), 21)
-    IF_INT_LESS(LW(7), 0)
-        MULTIPLY(LW(7), -1)
-        WAIT_FRAMES(LW(7))
-    END_IF
-    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_StartAC, 1)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_I_Y"))
-    WAIT_FRAMES(10)
-    CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
-    SWITCH(LW(5))
-        CASE_OR_EQUAL(2)
-        CASE_OR_EQUAL(3)
-        CASE_OR_EQUAL(6)
-        CASE_OR_EQUAL(4)
-        CASE_END
-        CASE_EQUAL(1)
-        CASE_DEFAULT
-        WAIT_MS(1000)
-    END_SWITCH
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-    ADD(LW(2), 5)
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_BATTLE_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    SET_VALUE(LW(6), 36)
-    CALL(btlevtcmd_MarioJumpParam, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(6))
-    CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(6), 0, -1)
-    IF_INT_NOT_EQUAL(LW(5), 1)
-        IF_INT_EQUAL(LW(5), 3)
-            CALL(btlevtcmd_StartAvoid, LW(3), 38)
-        END_IF
-        IF_INT_EQUAL(LW(5), 6)
-            CALL(btlevtcmd_StartAvoid, LW(3), 39)
-        END_IF
-        IF_INT_EQUAL(LW(5), 2)
-            CALL(btlevtcmd_StartAvoid, LW(3), 40)
-        END_IF
-        CALL(btlevtcmd_StopAC)
-        CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_LAND_DAMAGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_D_2"))
-        WAIT_FRAMES(40)
-        GOTO(95)
-    END_IF
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1D"))
-    CALL(btlevtcmd_ac_timing_flag_onoff, 1, 1)
-    CALL(btlevtcmd_ac_timing_get_success_frame, LW(0))
-    DIVIDE(LW(0), 2)
-    WAIT_FRAMES(LW(0))
-    CALL(btlevtcmd_ac_timing_flag_onoff, 0, 1)
-    CALL(btlevtcmd_ResultAC)
-    CALL(btlevtcmd_GetResultAC, LW(6))
-    IF_BITS_CLEAR(LW(6), 2)
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_AudienceDeclareACResult, LW(0), -1)
-        GOTO(90)
-    END_IF
-    BEGIN_INLINE_EVENT
-        CALL(evt_btl_camera_set_moveSpeedLv, 0, 0)
-        CALL(evt_btl_camera_set_zoom, 0, 200)
-        WAIT_FRAMES(10)
-        CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
-        CALL(evt_btl_camera_set_zoom, 0, 250)
-    END_INLINE_EVENT
-    CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 131328, LW(5))
-    CALL(btlevtcmd_GetFriendBelong, LW(3), LW(15))
-    CALL(btlevtcmd_GetResultAC, LW(0))
-    IF_BITS_SET(LW(0), 2)
-        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
-        CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-    END_IF
-    WAIT_FRAMES(2)
-    CALL(btlevtcmd_StopAC)
-    BEGIN_INLINE_EVENT_GET_ID(LW(13))
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.14941406f))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 80, 3, -1)
-    END_INLINE_EVENT
-    BEGIN_SIBLING_EVENT
-        LOOP(24)
-            CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 15, 0)
-            WAIT_FRAMES(1)
-        END_LOOP
-    END_SIBLING_EVENT
-    WAIT_FRAMES(27)
-    DELETE_EVENT(LW(13))
-    CALL(btlevtcmd_CommandGetWeaponActionLv, LW(0))
-    CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_AcGetDifficulty, LW(0))
-    SUBTRACT(LW(0), 3)
-    SWITCH(LW(0))
-        CASE_LESS_OR_EQUAL(-3)
-        CALL(btlevtcmd_ftof, 600, LW(0))
-        CASE_EQUAL(-2)
-        CALL(btlevtcmd_ftof, 480, LW(0))
-        CASE_EQUAL(-1)
-        CALL(btlevtcmd_ftof, 420, LW(0))
-        CASE_EQUAL(0)
-        CALL(btlevtcmd_ftof, 360, LW(0))
-        CASE_EQUAL(1)
-        CALL(btlevtcmd_ftof, 300, LW(0))
-        CASE_EQUAL(2)
-        CALL(btlevtcmd_ftof, 200, LW(0))
-        CASE_DEFAULT
-        CALL(btlevtcmd_ftof, 100, LW(0))
-    END_SWITCH
-    CALL(btlevtcmd_AcSetParamAll, LW(0), 1, 3, -4, 3, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
-    CALL(btlevtcmd_AcSetFlag, 0)
-    CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 10, 1, 0)
-    WAIT_FRAMES(1)
-    CALL(btlevtcmd_StartAC, 1)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_MARIO, 5, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_MARIO, 6, 0)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_MARIO, 7, 0)
-    BEGIN_INLINE_EVENT_GET_ID(LW(13))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 1)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 30)
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, 0)
-        SET_VALUE(LW(0), 15)
-        LABEL(60)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
-        IF_INT_EQUAL(LW(1), 0)
-            GOTO(61)
-        END_IF
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(10))
-        ADD(LW(0), 1)
-        IF_INT_GREATER(LW(0), LW(10))
-            SET_VALUE(LW(0), LW(10))
-        END_IF
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, LW(0))
-        CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, LW(0), 0)
-        WAIT_FRAMES(1)
-        GOTO(60)
-        LABEL(61)
-    END_INLINE_EVENT
-    BEGIN_SIBLING_EVENT_GET_ID(LW(14))
-        SET_VALUE(LW(0), 0)
-        LOOP(1000)
-            WAIT_FRAMES(1)
-            CALL(btlevtcmd_AcGetOutputParam, 0, LW(1))
-            IF_INT_NOT_EQUAL(LW(1), LW(0))
-                SET_VALUE(LW(0), LW(1))
-                SWITCH(LW(0))
-                    CASE_EQUAL(0)
-                    CASE_EQUAL(1)
-                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_MARIO, 5, 1023)
-                    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_MARIO, 6, LW(10))
-                    SUBTRACT(LW(10), 1023)
-                    MULTIPLY(LW(10), -1)
-                    DIVIDE(LW(10), 10)
-                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_MARIO, 7, LW(10))
-                    CASE_EQUAL(2)
-                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 45)
-                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_MARIO, 5, 2046)
-                    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_MARIO, 6, LW(10))
-                    SUBTRACT(LW(10), 2046)
-                    MULTIPLY(LW(10), -1)
-                    DIVIDE(LW(10), 10)
-                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_MARIO, 7, LW(10))
-                    CASE_EQUAL(3)
-                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_MARIO, 5, 3069)
-                    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_MARIO, 6, LW(10))
-                    SUBTRACT(LW(10), 3069)
-                    MULTIPLY(LW(10), -1)
-                    DIVIDE(LW(10), 10)
-                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_MARIO, 7, LW(10))
-                    CASE_DEFAULT
-                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 60)
-                END_SWITCH
-            END_IF
-        END_LOOP
-    END_SIBLING_EVENT
-    CALL(evt_snd_sfxon, STRING("SFX_BTL_JUMP_TATUMAKI1"), LW(11))
-    BEGIN_SIBLING_EVENT_GET_ID(LW(12))
-        SET_VALUE(LW(5), 5)
-        LOOP(LW(5))
-            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-            CALL(evt_snd_sfx_pos, LW(11), LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_MARIO, 5, LW(1))
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_MARIO, 6, LW(0))
-            IF_INT_NOT_EQUAL(LW(0), LW(1))
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_MARIO, 7, LW(2))
-                ADD(LW(0), LW(2))
-                IF_INT_GREATER_OR_EQUAL(LW(2), 0)
-                    IF_INT_GREATER_OR_EQUAL(LW(0), LW(1))
-                        SET_VALUE(LW(0), LW(1))
-                    END_IF
-                ELSE
-                    IF_INT_LESS_OR_EQUAL(LW(0), LW(1))
-                        SET_VALUE(LW(0), LW(1))
-                    END_IF
-                END_IF
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_MARIO, 6, LW(0))
-                CALL(evt_snd_sfx_pit, LW(11), LW(0))
-            END_IF
-            WAIT_FRAMES(1)
-            SET_VALUE(LW(5), 5)
-        END_LOOP
-    END_SIBLING_EVENT
-    CALL(btlevtcmd_ResultAC)
-    WAIT_FRAMES(1)
-    CALL(btlevtcmd_GetResultAC, LW(6))
-    IF_BITS_CLEAR(LW(6), 2)
-        DELETE_EVENT(LW(14))
-        BEGIN_SIBLING_EVENT
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_MARIO, 5, -2728)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_MARIO, 6, LW(10))
-            SUBTRACT(LW(10), -2728)
-            MULTIPLY(LW(10), -1)
-            DIVIDE(LW(10), 40)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_MARIO, 7, LW(10))
-        END_SIBLING_EVENT
-        BEGIN_SIBLING_EVENT
-            CALL(btlevtcmd_GetRotate, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-            LOOP(40)
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(0))
-                IF_INT_GREATER(LW(0), 10)
-                    SUBTRACT(LW(0), 1)
-                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, LW(0))
-                END_IF
-                CALL(btlevtcmd_GetRotate, BTL_UNIT_SELF, EVT_NULLPTR, LW(0), EVT_NULLPTR)
-                IF_INT_LESS(LW(1), 90)
-                    IF_INT_GREATER_OR_EQUAL(LW(0), 90)
-                        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_N_7"))
-#if VERSION != VERSION_DEMO
-                        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_MARIO_FALL_CRUSH1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-#endif
-                    END_IF
-                END_IF
-                SET_VALUE(LW(1), LW(0))
-                WAIT_FRAMES(1)
-            END_LOOP
-        END_SIBLING_EVENT
-        WAIT_FRAMES(40)
-        DELETE_EVENT(LW(13))
-        DELETE_EVENT(LW(12))
-        CALL(evt_snd_sfxoff, LW(11))
-        BEGIN_SIBLING_EVENT_GET_ID(LW(13))
-            LOOP(60)
-                CALL(btlevtcmd_GetRotate, BTL_UNIT_SELF, EVT_NULLPTR, LW(0), EVT_NULLPTR)
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(1))
-                ADD(LW(0), LW(1))
-                IF_INT_GREATER_OR_EQUAL(LW(0), 360)
-                    CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-                    BREAK_LOOP
-                END_IF
-                CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, LW(0), 0)
-                WAIT_FRAMES(1)
-            END_LOOP
-        END_SIBLING_EVENT
-        CALL(btlevtcmd_WaitEventEnd, LW(13))
-        CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-        WAIT_FRAMES(60)
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 40, FLOAT(0.0f), FLOAT(0.099609375f))
-        CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
-        BEGIN_SIBLING_EVENT
-            WAIT_FRAMES(12)
-            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_LAND_DAMAGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-            CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_D_2"))
-        END_SIBLING_EVENT
-        CALL(btlevtcmd_FallPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 16)
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_AudienceDeclareACResult, LW(0), -1)
-        WAIT_FRAMES(32)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_U_3"))
-        WAIT_FRAMES(12)
-        CALL(evt_audience_ap_recovery)
-        CALL(btlevtcmd_InviteApInfoReport)
-        GOTO(95)
-    ELSE
-        DELETE_EVENT(LW(14))
-        CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 45)
-        LABEL(62)
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 4, LW(0))
-        IF_INT_LESS(LW(0), 44)
-            WAIT_FRAMES(1)
-            GOTO(62)
-        END_IF
-        BEGIN_SIBLING_EVENT
-            SET_VALUE(LW(6), LW(3))
-            CALL(_tatsumaki_effect, BTL_UNIT_SELF)
-            SET_VALUE(LW(0), LW(15))
-            CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SYSTEM, LW(0), PTR(&badgeWeapon_TatsumakiJumpInvolved))
-            CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-            LABEL(50)
-            IF_INT_EQUAL(LW(3), -1)
-                GOTO(59)
-            END_IF
-            IF_INT_EQUAL(LW(3), LW(6))
-#if VERSION == VERSION_DEMO
-                GOTO(59)
-#else
-                GOTO(58)
-#endif
-            END_IF
-            CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SYSTEM, LW(3), LW(4), PTR(&badgeWeapon_TatsumakiJumpInvolved), 256, LW(5))
-            SWITCH(LW(5))
-                CASE_EQUAL(2)
-                CALL(btlevtcmd_StartAvoid, LW(3), 40)
-                CASE_EQUAL(3)
-                CALL(btlevtcmd_StartAvoid, LW(3), 38)
-                CASE_EQUAL(6)
-                CALL(btlevtcmd_StartAvoid, LW(3), 39)
-                CASE_EQUAL(4)
-                CASE_EQUAL(1)
-                CALL(btlevtcmd_GetResultAC, LW(0))
-                IF_BITS_SET(LW(0), 2)
-                    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SYSTEM, LW(3), LW(4), PTR(&badgeWeapon_TatsumakiJumpInvolved), 131328, LW(5))
-                    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-#if VERSION == VERSION_DEMO
                     CALL(btlevtcmd_GetResultPrizeLv, LW(3), 1, LW(6))
                     CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-#else
-                    CALL(btlevtcmd_GetResultPrizeLv, LW(3), 1, LW(7))
-                    CALL(btlevtcmd_ACSuccessEffect, LW(7), LW(0), LW(1), LW(2))
 #endif
                 ELSE
                     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SYSTEM, LW(3), LW(4), PTR(&badgeWeapon_TatsumakiJumpInvolved), 256, LW(5))
@@ -6280,6 +3758,10 @@ EVT_BEGIN(marioAttackEvent_TatsumakiJump)
     CALL(btlevtcmd_InviteApInfoReport)
     GOTO(95)
     LABEL(80)
+#if VERSION >= VERSION_US
+    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
+    CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(0), 1, 0, 0, 0)
+#endif
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetMoveFrame, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, LW(7))
@@ -6381,24 +3863,22 @@ EVT_BEGIN(marioAttackEvent_TatsumakiJump)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
-#endif
 
 EVT_BEGIN(marioAttackEvent_MiniminiFumi)
-    CALL_CHILD(PTR(marioAttackEvent_NormalJump))
+    CALL_CHILD(marioAttackEvent_NormalJump)
     RETURN
 EVT_END()
 
 EVT_BEGIN(marioAttackEvent_NemuraseFumi)
-    CALL_CHILD(PTR(marioAttackEvent_NormalJump))
+    CALL_CHILD(marioAttackEvent_NormalJump)
     RETURN
 EVT_END()
 
 EVT_BEGIN(marioAttackEvent_FunyafunyaJump)
-    CALL_CHILD(PTR(marioAttackEvent_NormalJump))
+    CALL_CHILD(marioAttackEvent_NormalJump)
     RETURN
 EVT_END()
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(marioAttackEvent_RenzokuJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -6473,244 +3953,11 @@ EVT_BEGIN(marioAttackEvent_RenzokuJump)
         CALL(btlevtcmd_SetMoveSoundDataWork, BTL_UNIT_SELF, LW(6), 0, 0, -1, -1, 0, 0)
         BEGIN_SIBLING_EVENT
             WAIT_FRAMES(3)
-            CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 10, 17, 30, 0)
-            CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
-            SWITCH(LW(6))
-                CASE_GREATER_OR_EQUAL(2)
-                CALL(evt_sub_random, 2, LW(0))
-                SWITCH(LW(0))
-                    CASE_EQUAL(0)
-                    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_4"))
-                    CASE_EQUAL(1)
-                    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_5"))
-                    CASE_DEFAULT
-                    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_6"))
-                END_SWITCH
-                CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-                CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(0), 1, -60, -30, 0)
-                CALL(btlevtcmd_snd_voice, BTL_UNIT_SELF, 1)
-                CASE_DEFAULT
-                CALL(evt_audience_acrobat_notry)
-            END_SWITCH
-        END_SIBLING_EVENT
-        CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8), 3, -2)
-    ELSE
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_BATTLE_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CALL(btlevtcmd_SetMoveSoundDataWork, BTL_UNIT_SELF, STRING("SFX_BTL_JUMP_CONTINUE1"), 0, 0, -1, -1, 0, 0)
-        SET_VALUE(LW(8), 36)
-        CALL(btlevtcmd_MarioJumpParam, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8))
-        CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8), 0, -2)
-    END_IF
-    IF_INT_NOT_EQUAL(LW(5), 1)
-        IF_INT_EQUAL(LW(5), 3)
-            CALL(btlevtcmd_StartAvoid, LW(3), 38)
-        END_IF
-        IF_INT_EQUAL(LW(5), 6)
-            CALL(btlevtcmd_StartAvoid, LW(3), 39)
-        END_IF
-        IF_INT_EQUAL(LW(5), 2)
-            CALL(btlevtcmd_StartAvoid, LW(3), 40)
-        END_IF
-        CALL(btlevtcmd_StopAC)
-        CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_LAND_DAMAGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_D_2"))
-        WAIT_FRAMES(40)
-        GOTO(95)
-    END_IF
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1D"))
-    CALL(btlevtcmd_ac_timing_flag_onoff, 1, 1)
-    CALL(btlevtcmd_ac_timing_get_success_frame, LW(0))
-    DIVIDE(LW(0), 2)
-    WAIT_FRAMES(LW(0))
-    CALL(btlevtcmd_ac_timing_flag_onoff, 0, 1)
-    CALL(btlevtcmd_ResultAC)
-    CALL(btlevtcmd_GetResultAC, LW(6))
-    IF_BITS_CLEAR(LW(6), 2)
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-        IF_INT_EQUAL(LW(10), 0)
-            CALL(btlevtcmd_AudienceDeclareACResult, LW(0), -1)
-        ELSE
-            SET_VALUE(LW(6), LW(10))
-            SUBTRACT(LW(6), 1)
-            CALL(btlevtcmd_GetResultPrizeLv, LW(3), LW(6), LW(6))
-            CALL(btlevtcmd_AudienceDeclareACResult, LW(0), LW(6))
-        END_IF
-        CALL(btlevtcmd_StopAC)
-        CALL(evt_btl_camera_set_mode, 0, 0)
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_WeaponAftereffect, LW(0))
-        CALL(evt_audience_ap_recovery)
-        CALL(btlevtcmd_InviteApInfoReport)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 27)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
-        GOTO(95)
-    END_IF
-    BEGIN_INLINE_EVENT
-        CALL(evt_btl_camera_set_moveSpeedLv, 0, 0)
-        CALL(evt_btl_camera_set_zoom, 0, 200)
-        WAIT_FRAMES(10)
-        CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
-        CALL(evt_btl_camera_set_zoom, 0, 250)
-    END_INLINE_EVENT
-    CALL(btlevtcmd_snd_voice, BTL_UNIT_SELF, 2)
-    CALL(btlevtcmd_GetResultCountAC, LW(6))
-    CALL(_record_renzoku_count, LW(6))
-    CALL(btlevtcmd_GetResultCountAC, LW(6))
-    CALL(mario_get_renzoku_count_max, LW(3), LW(6), LW(7))
-    IF_INT_LESS(LW(6), LW(7))
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 131072, LW(5))
-    ELSE
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 131328, LW(5))
-    END_IF
-    ADD(LW(10), 1)
-    SET_VALUE(LW(1), GSW(GSW_POWER_BOUNCE_RECORD_LO))
-    SET_VALUE(LW(2), GSW(GSW_POWER_BOUNCE_RECORD_HI))
-    MULTIPLY(LW(2), 256)
-    ADD(LW(1), LW(2))
-    IF_INT_GREATER(LW(10), LW(1))
-        SET_VALUE(LW(0), LW(10))
-        IF_INT_GREATER(LW(0), 9999)
-            SET_VALUE(LW(0), 9999)
-        END_IF
-        SET_VALUE(LW(1), LW(0))
-        MODULO(LW(1), 256)
-        SET_VALUE(LW(2), LW(0))
-        DIVIDE(LW(2), 256)
-        SET_VALUE(GSW(GSW_POWER_BOUNCE_RECORD_LO), LW(1))
-        SET_VALUE(GSW(GSW_POWER_BOUNCE_RECORD_HI), LW(2))
-    END_IF
-    SET_VALUE(LW(0), LW(10))
-    SUBTRACT(LW(0), 1)
-    CALL(btlevtcmd_GetResultPrizeLv, LW(3), LW(0), LW(6))
-    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_AudienceDeclareACResult, LW(0), LW(6))
-    CALL(btlevtcmd_GetResultCountAC, LW(6))
-    IF_INT_LESS(LW(6), LW(7))
-        WAIT_FRAMES(2)
-        CALL(btlevtcmd_StartAC, 0)
-        GOTO(10)
-    END_IF
-    LABEL(90)
-    CALL(btlevtcmd_StopAC)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_WeaponAftereffect, LW(0))
-    CALL(evt_audience_ap_recovery)
-    CALL(btlevtcmd_InviteApInfoReport)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 60)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
-    LABEL(95)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_W_1"))
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    LABEL(99)
-    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
-    CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
-#else
-EVT_BEGIN(marioAttackEvent_RenzokuJump)
-    CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-    IF_INT_EQUAL(LW(3), -1)
-        GOTO(99)
-    END_IF
-    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
-    CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
-    CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
-    CALL_CHILD(marioAttackEvent_MajinaiPowerUpCheck)
-    CALL(evt_btl_camera_set_mode, 0, 11)
-    CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(evt_btl_camera_set_zoom, 0, 250)
-    CALL(btlevtcmd_CommandGetWeaponActionLv, LW(0))
-    CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 1, 1, 0)
-    CALL(btlevtcmd_ac_timing_flag_onoff, 1, 2)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
-    CALL(btlevtcmd_GetTakeoffPosition, BTL_UNIT_SELF, LW(3), LW(4), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_StartAC, 1)
-    SET_VALUE(LW(10), 0)
-    LABEL(10)
-    IF_INT_GREATER_OR_EQUAL(LW(10), 1)
-        CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 1048832, LW(5))
-    ELSE
-        CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
-    END_IF
-    SWITCH(LW(5))
-        CASE_OR_EQUAL(2)
-        CASE_OR_EQUAL(3)
-        CASE_OR_EQUAL(6)
-        CASE_OR_EQUAL(4)
-        CASE_END
-        CASE_EQUAL(1)
-        CASE_DEFAULT
-        WAIT_MS(1000)
-    END_SWITCH
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-    ADD(LW(2), 5)
-    IF_INT_GREATER_OR_EQUAL(LW(10), 1)
-        SET_VALUE(LW(8), 36)
-        CALL(btlevtcmd_MarioJumpParam, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8))
-        SWITCH(LW(10))
-            CASE_EQUAL(1)
-            SET_VALUE(LW(6), STRING("SFX_BTL_JUMP_CONTINUE2"))
-            CASE_EQUAL(2)
-            SET_VALUE(LW(6), STRING("SFX_BTL_JUMP_CONTINUE3"))
-            CASE_EQUAL(3)
-            SET_VALUE(LW(6), STRING("SFX_BTL_JUMP_CONTINUE4"))
-            CASE_EQUAL(4)
-            SET_VALUE(LW(6), STRING("SFX_BTL_JUMP_CONTINUE5"))
-            CASE_EQUAL(5)
-            SET_VALUE(LW(6), STRING("SFX_BTL_JUMP_CONTINUE6"))
-            CASE_EQUAL(6)
-            SET_VALUE(LW(6), STRING("SFX_BTL_JUMP_CONTINUE7"))
-            CASE_EQUAL(7)
-            SET_VALUE(LW(6), STRING("SFX_BTL_JUMP_CONTINUE8"))
-            CASE_EQUAL(8)
-            SET_VALUE(LW(6), STRING("SFX_BTL_JUMP_CONTINUE9"))
-            CASE_DEFAULT
-            SET_VALUE(LW(6), STRING("SFX_BTL_JUMP_CONTINUE10"))
-        END_SWITCH
-        CALL(btlevtcmd_SetMoveSoundDataWork, BTL_UNIT_SELF, LW(6), 0, 0, -1, -1, 0, 0)
-        BEGIN_SIBLING_EVENT
-            WAIT_FRAMES(3)
+#if VERSION <= VERSION_JP
             CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 11, 15, 30, 0)
+#else
+            CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 10, 17, 30, 0)
+#endif
             CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
             SWITCH(LW(6))
                 CASE_GREATER_OR_EQUAL(2)
@@ -6872,9 +4119,7 @@ EVT_BEGIN(marioAttackEvent_RenzokuJump)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
-#endif
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(marioAttackEvent_TugiTugiJump)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
@@ -6923,221 +4168,11 @@ EVT_BEGIN(marioAttackEvent_TugiTugiJump)
         CALL(btlevtcmd_MarioJumpParam, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8))
         BEGIN_SIBLING_EVENT
             WAIT_FRAMES(3)
-            CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 10, 19, 30, 0)
-            CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
-            SWITCH(LW(6))
-                CASE_GREATER_OR_EQUAL(2)
-                CALL(evt_sub_random, 2, LW(0))
-                SWITCH(LW(0))
-                    CASE_EQUAL(0)
-                    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_4"))
-                    CASE_EQUAL(1)
-                    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_5"))
-                    CASE_DEFAULT
-                    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_6"))
-                END_SWITCH
-                CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-                CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(0), 1, -60, -30, 0)
-                CASE_DEFAULT
-                CALL(evt_audience_acrobat_notry)
-            END_SWITCH
-        END_SIBLING_EVENT
-        CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8), 3, -2)
-        CASE_DEFAULT
-        SET_VALUE(LW(8), 36)
-        CALL(btlevtcmd_MarioJumpParam, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8))
-        BEGIN_SIBLING_EVENT
-            WAIT_FRAMES(3)
-            CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 10, 19, 30, 0)
-            CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
-            SWITCH(LW(6))
-                CASE_GREATER_OR_EQUAL(2)
-                CALL(evt_sub_random, 2, LW(0))
-                SWITCH(LW(0))
-                    CASE_EQUAL(0)
-                    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_4"))
-                    CASE_EQUAL(1)
-                    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_5"))
-                    CASE_DEFAULT
-                    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_6"))
-                END_SWITCH
-                CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-                CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(0), 1, -60, -30, 0)
-                CASE_DEFAULT
-                CALL(evt_audience_acrobat_notry)
-            END_SWITCH
-        END_SIBLING_EVENT
-        CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8), 4, -2)
-    END_SWITCH
-    IF_INT_NOT_EQUAL(LW(5), 1)
-        IF_INT_EQUAL(LW(5), 3)
-            CALL(btlevtcmd_StartAvoid, LW(3), 38)
-        END_IF
-        IF_INT_EQUAL(LW(5), 6)
-            CALL(btlevtcmd_StartAvoid, LW(3), 39)
-        END_IF
-        IF_INT_EQUAL(LW(5), 2)
-            CALL(btlevtcmd_StartAvoid, LW(3), 40)
-        END_IF
-        CALL(btlevtcmd_StopAC)
-        CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_LAND_DAMAGE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_D_2"))
-        WAIT_FRAMES(40)
-        GOTO(95)
-    END_IF
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1D"))
-    CALL(btlevtcmd_ac_timing_flag_onoff, 1, 1)
-    CALL(btlevtcmd_ac_timing_get_success_frame, LW(0))
-    DIVIDE(LW(0), 2)
-    WAIT_FRAMES(LW(0))
-    CALL(btlevtcmd_ac_timing_flag_onoff, 0, 1)
-    CALL(btlevtcmd_ResultAC)
-    CALL(btlevtcmd_GetResultAC, LW(6))
-    IF_BITS_CLEAR(LW(6), 2)
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-        IF_INT_EQUAL(LW(10), 0)
-            CALL(btlevtcmd_AudienceDeclareACResult, LW(0), -1)
-        ELSE
-            SET_VALUE(LW(6), LW(10))
-            SUBTRACT(LW(6), 1)
-            CALL(btlevtcmd_GetResultPrizeLv, LW(3), LW(6), LW(6))
-            CALL(btlevtcmd_AudienceDeclareACResult, LW(0), LW(6))
-        END_IF
-        CALL(evt_btl_camera_set_mode, 0, 0)
-        CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-        CALL(btlevtcmd_StopAC)
-        CALL(evt_audience_ap_recovery)
-        CALL(btlevtcmd_InviteApInfoReport)
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_WeaponAftereffect, LW(0))
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 27)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
-        GOTO(95)
-    END_IF
-    CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 131328, LW(5))
-    CALL(btlevtcmd_GetResultAC, LW(0))
-    IF_BITS_SET(LW(0), 2)
-        CALL(btlevtcmd_snd_voice, BTL_UNIT_SELF, 2)
-        CALL(btlevtcmd_GetResultPrizeLv, LW(3), LW(10), LW(6))
-        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-    END_IF
-    CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
-    IF_INT_NOT_EQUAL(LW(3), -1)
-        BEGIN_INLINE_EVENT
-            CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
-            CALL(evt_btl_camera_set_zoomSpeedLv, 0, 0)
-            CALL(evt_btl_camera_set_zoom, 0, 200)
-            WAIT_FRAMES(10)
-            CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
-            CALL(evt_btl_camera_set_zoom, 0, 250)
-        END_INLINE_EVENT
-        WAIT_FRAMES(2)
-        ADD(LW(10), 1)
-        BEGIN_INLINE_EVENT
-            WAIT_FRAMES(10)
-            CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
-            CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-        END_INLINE_EVENT
-        GOTO(10)
-    END_IF
-    CALL(btlevtcmd_GetResultPrizeLv, LW(3), LW(10), LW(6))
-    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_AudienceDeclareACResult, LW(0), LW(6))
-    LABEL(90)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(btlevtcmd_StopAC)
-    CALL(evt_audience_ap_recovery)
-    CALL(btlevtcmd_InviteApInfoReport)
-    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_WeaponAftereffect, LW(0))
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 60)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
-    LABEL(95)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_W_1"))
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    LABEL(99)
-    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
-    CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
+#if VERSION <= VERSION_JP
+            CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 13, 17, 30, 0)
 #else
-EVT_BEGIN(marioAttackEvent_TugiTugiJump)
-    CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
-    CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
-    CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-    CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
-    CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
-    CALL_CHILD(marioAttackEvent_MajinaiPowerUpCheck)
-    CALL(evt_btl_camera_set_mode, 0, 11)
-    CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(evt_btl_camera_set_zoom, 0, 250)
-    CALL(btlevtcmd_CommandGetWeaponActionLv, LW(0))
-    CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 1, 1, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
-    CALL(btlevtcmd_GetTakeoffPosition, BTL_UNIT_SELF, LW(3), LW(4), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_StartAC, 1)
-    SET_VALUE(LW(10), 0)
-    LABEL(10)
-    CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
-    SWITCH(LW(5))
-        CASE_OR_EQUAL(2)
-        CASE_OR_EQUAL(3)
-        CASE_OR_EQUAL(6)
-        CASE_OR_EQUAL(4)
-        CASE_END
-        CASE_EQUAL(1)
-        CASE_DEFAULT
-        WAIT_MS(1000)
-    END_SWITCH
-    CALL(btlevtcmd_SetMoveSoundDataWork, BTL_UNIT_SELF, STRING("SFX_BTL_JUMP_TUGITUGI1"), 0, 0, -1, -1, 0, 0)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_J_1B"))
-    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-    ADD(LW(2), 5)
-    SWITCH(LW(10))
-        CASE_EQUAL(0)
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_BATTLE_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        SET_VALUE(LW(8), 36)
-        CALL(btlevtcmd_MarioJumpParam, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8))
-        CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8), 0, -2)
-        CASE_EQUAL(1)
-        SET_VALUE(LW(8), 36)
-        CALL(btlevtcmd_MarioJumpParam, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8))
-        BEGIN_SIBLING_EVENT
-            WAIT_FRAMES(3)
-            CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 13, 17, 30, 0)
+            CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 10, 19, 30, 0)
+#endif
             CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
             SWITCH(LW(6))
                 CASE_GREATER_OR_EQUAL(2)
@@ -7162,7 +4197,11 @@ EVT_BEGIN(marioAttackEvent_TugiTugiJump)
         CALL(btlevtcmd_MarioJumpParam, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8))
         BEGIN_SIBLING_EVENT
             WAIT_FRAMES(3)
+#if VERSION <= VERSION_JP
             CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 13, 17, 30, 0)
+#else
+            CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 10, 19, 30, 0)
+#endif
             CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
             SWITCH(LW(6))
                 CASE_GREATER_OR_EQUAL(2)
@@ -7177,10 +4216,12 @@ EVT_BEGIN(marioAttackEvent_TugiTugiJump)
                 END_SWITCH
                 CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
                 CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(0), 1, -60, -30, 0)
+#if VERSION <= VERSION_JP
                 CASE_LESS_OR_EQUAL(-1)
                 CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_N_7"))
                 CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
                 CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(0), 0, 0, 0, 0)
+#endif
                 CASE_DEFAULT
                 CALL(evt_audience_acrobat_notry)
             END_SWITCH
@@ -7306,33 +4347,31 @@ EVT_BEGIN(marioAttackEvent_TugiTugiJump)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
-#endif
 
 static EVT_BEGIN(marioAttackEvent_NormalHammer)
     SET_VALUE(LW(14), 0)
-    CALL_CHILD(PTR(marioAttackEvent_NormalHammer_Core))
+    CALL_CHILD(marioAttackEvent_NormalHammer_Core)
     RETURN
 EVT_END()
 
 EVT_BEGIN(marioAttackEvent_GatsunHammer)
     SET_VALUE(LW(14), 1)
-    CALL_CHILD(PTR(marioAttackEvent_NormalHammer_Core))
+    CALL_CHILD(marioAttackEvent_NormalHammer_Core)
     RETURN
 EVT_END()
 
 EVT_BEGIN(marioAttackEvent_IceNaguri)
     SET_VALUE(LW(14), 0)
-    CALL_CHILD(PTR(marioAttackEvent_NormalHammer_Core))
+    CALL_CHILD(marioAttackEvent_NormalHammer_Core)
     RETURN
 EVT_END()
 
 EVT_BEGIN(marioAttackEvent_TsuranukiHammer)
     SET_VALUE(LW(14), 1)
-    CALL_CHILD(PTR(marioAttackEvent_NormalHammer_Core))
+    CALL_CHILD(marioAttackEvent_NormalHammer_Core)
     RETURN
 EVT_END()
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(marioAttackEvent_NormalHammer_Core)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -7567,401 +4606,21 @@ EVT_BEGIN(marioAttackEvent_NormalHammer_Core)
     LABEL(90)
     CALL(btlevtcmd_StopAC)
     CALL(btlevtcmd_GetDamage, LW(3), LW(0))
+#if VERSION >= VERSION_US
     IF_INT_GREATER_OR_EQUAL(LW(0), 10)
         SET_VALUE(LW(0), 9)
     END_IF
+#endif
     CALL(evt_btl_camera_shake_h, 0, LW(0), 0, 10, 13)
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 0, 12, 60, 0)
-    CALL(btlevtcmd_ACRGetResult, LW(15), LW(13))
-    IF_INT_EQUAL(LW(15), 1)
-        GOTO(91)
-    END_IF
-    IF_INT_LESS_OR_EQUAL(LW(15), -1)
-        GOTO(91)
-    END_IF
-    GOTO(92)
-    LABEL(91)
-    CALL(evt_audience_acrobat_notry)
-    SET_VALUE(LW(0), 60)
-    SUBTRACT(LW(0), LW(13))
-    IF_INT_GREATER_OR_EQUAL(LW(0), 1)
-        WAIT_FRAMES(LW(0))
-    END_IF
-    IF_INT_EQUAL(LW(12), PTR(&badgeWeapon_TsuranukiNaguri))
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_H_16"))
-    ELSE
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_S_1"))
-    END_IF
-    WAIT_FRAMES(10)
-    GOTO(95)
-    LABEL(92)
-    IF_INT_NOT_EQUAL(LW(15), 0)
-        CALL(evt_btl_camera_set_mode, 0, 0)
-        CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-        CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
-        BEGIN_SIBLING_EVENT
-            CALL(btlevtcmd_snd_voice, BTL_UNIT_SELF, 1)
-            CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 20, 0)
-            LOOP(30)
-                CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, 12)
-                WAIT_FRAMES(1)
-            END_LOOP
-        END_SIBLING_EVENT
-        BEGIN_SIBLING_EVENT
-            WAIT_FRAMES(8)
-            CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 12, 25, 25, 0)
-        END_SIBLING_EVENT
-        BEGIN_SIBLING_EVENT
-            WAIT_FRAMES(4)
-            CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_Z_1"))
-        END_SIBLING_EVENT
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_3A"))
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.2998047f))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 35)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
-        WAIT_FRAMES(4)
-        CALL(btlevtcmd_ACRGetResult, LW(0), LW(1))
-        IF_INT_EQUAL(LW(14), 0)
-            IF_INT_EQUAL(LW(0), 2)
-                CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_3B"))
-                CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-                ADD(LW(1), 50)
-                CALL(evt_eff, STRING("_BTLEF"), STRING("confetti"), 3, LW(0), LW(1), LW(2), 90, 0, 0, 0, 0, 0, 0, 0)
-                CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
-                WAIT_FRAMES(90)
-                GOTO(95)
-            ELSE
-                CALL(evt_audience_acrobat_notry)
-                GOTO(95)
-            END_IF
-        ELSE
-            SWITCH(LW(0))
-                CASE_EQUAL(2)
-                CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
-                CASE_EQUAL(1)
-                CALL(evt_audience_acrobat_notry)
-                GOTO(95)
-            END_SWITCH
-        END_IF
-        BEGIN_SIBLING_EVENT
-            CALL(btlevtcmd_snd_voice, BTL_UNIT_SELF, 1)
-            CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 20, 0)
-            LOOP(40)
-                CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, 18)
-                WAIT_FRAMES(1)
-            END_LOOP
-        END_SIBLING_EVENT
-        BEGIN_SIBLING_EVENT
-            WAIT_FRAMES(18)
-            CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 12, 25, 25, 0)
-        END_SIBLING_EVENT
-        BEGIN_SIBLING_EVENT
-            WAIT_FRAMES(18)
-            CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_Z_1"))
-        END_SIBLING_EVENT
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_3A"))
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.2998047f))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 40)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 40, -1)
-        WAIT_FRAMES(4)
-        CALL(btlevtcmd_ACRGetResult, LW(0), LW(1))
-        IF_INT_NOT_EQUAL(LW(0), 2)
-            GOTO(95)
-        END_IF
-        CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
-        CALL(btlevtcmd_snd_voice, BTL_UNIT_SELF, 1)
-        CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 20, 0)
-        BEGIN_SIBLING_EVENT
-            LOOP(60)
-                CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 12, 12)
-                WAIT_FRAMES(1)
-            END_LOOP
-            CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-        END_SIBLING_EVENT
-        BEGIN_SIBLING_EVENT
-            WAIT_FRAMES(35)
-            CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 15, 28, 28, 0)
-        END_SIBLING_EVENT
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_C_3"))
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.19921875f))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 50)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, -1)
-        WAIT_FRAMES(4)
-        CALL(btlevtcmd_ACRGetResult, LW(0), LW(1))
-        IF_INT_NOT_EQUAL(LW(0), 2)
-            GOTO(95)
-        END_IF
-        CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_3B"))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        ADD(LW(1), 50)
-        CALL(evt_eff, STRING("_BTLEF"), STRING("confetti"), 3, LW(0), LW(1), LW(2), 90, 0, 0, 0, 0, 0, 0, 0)
-        CALL(btlevtcmd_snd_voice, BTL_UNIT_SELF, 1)
-        CALL(evt_snd_sfxon, STRING("SFX_BTL_ACROBAT_FINISH1"), 0)
-        WAIT_FRAMES(90)
-    END_IF
-    LABEL(95)
-    CALL(evt_audience_ap_recovery)
-    CALL(btlevtcmd_InviteApInfoReport)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_W_1"))
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    LABEL(99)
-    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
-    CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
-#else
-EVT_BEGIN(marioAttackEvent_NormalHammer_Core)
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
-    IF_INT_NOT_EQUAL(LW(0), 0)
-        SET_VALUE(LW(12), PTR(&marioDefaultWeapon_Hammer))
-        CALL(btlevtcmd_GetFirstAttackTarget, LW(3), LW(4))
-        IF_INT_EQUAL(LW(3), -1)
-            GOTO(99)
-        END_IF
-        CALL(evt_btl_camera_set_mode, 0, 7)
-        CALL(evt_btl_camera_set_homing_unit, 0, LW(3), BTL_UNIT_NONE)
-        CALL(evt_btl_camera_set_zoom, 0, 300)
-        CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
-        CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 250)
-        CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        WAIT_FRAMES(30)
-    ELSE
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(12))
-        CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-        IF_INT_EQUAL(LW(3), -1)
-            GOTO(99)
-        END_IF
-        CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
-        CALL(btlevtcmd_WaitGuardMove)
-        CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(12))
-        CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
-        CALL_CHILD(marioAttackEvent_MajinaiPowerUpCheck)
-        CALL(evt_btl_camera_set_mode, 0, 11)
-        CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
-        CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-        CALL(evt_btl_camera_set_zoom, 0, 300)
-    END_IF
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
-    IF_INT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetWeaponActionLv, LW(12), LW(0))
-        CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(0))
-        SWITCH(LW(12))
-            CASE_EQUAL(PTR(&marioDefaultWeapon_Hammer))
-            CALL(btlevtcmd_AcSetParamAll, 4, 25, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
-            CASE_EQUAL(PTR(&badgeWeapon_ConfuseHammer))
-            CALL(btlevtcmd_AcSetParamAll, 4, 30, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
-            CASE_EQUAL(PTR(&badgeWeapon_TsuranukiNaguri))
-            CALL(btlevtcmd_AcSetParamAll, 4, 30, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
-            CASE_DEFAULT
-            CALL(btlevtcmd_AcSetParamAll, 4, 40, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
-        END_SWITCH
-        CALL(btlevtcmd_AcSetFlag, 0)
-        CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 3, 1, 0)
-    END_IF
-    CALL(btlevtcmd_check_battleflag, LW(0), 2)
-    IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 250)
-        CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        WAIT_MS(1000)
-        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
-        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-        CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 35)
-        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(5.0f))
-        ADD(LW(2), 5)
-        CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
-        CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-        CALL(btlevtcmd_GetMoveFrame, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, LW(7))
-        IF_INT_GREATER(LW(7), 22)
-            SUBTRACT(LW(7), 22)
-        ELSE
-            SUBTRACT(LW(7), 22)
-            MULTIPLY(LW(7), -1)
-        END_IF
-        BEGIN_SIBLING_EVENT
-            WAIT_FRAMES(LW(7))
-            CALL(btlevtcmd_GetWeaponActionLv, LW(12), LW(0))
-            CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(0))
-            SWITCH(LW(12))
-                CASE_EQUAL(PTR(&marioDefaultWeapon_Hammer))
-                CALL(btlevtcmd_AcSetParamAll, 4, 25, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
-                CASE_EQUAL(PTR(&badgeWeapon_ConfuseHammer))
-                CALL(btlevtcmd_AcSetParamAll, 4, 30, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
-                CASE_EQUAL(PTR(&badgeWeapon_TsuranukiNaguri))
-                CALL(btlevtcmd_AcSetParamAll, 4, 30, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
-                CASE_DEFAULT
-                CALL(btlevtcmd_AcSetParamAll, 4, 40, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
-            END_SWITCH
-            CALL(btlevtcmd_AcSetFlag, 0)
-            CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 3, 1, 0)
-        END_SIBLING_EVENT
-        CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    ELSE
-        CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
-        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-        CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 35)
-        CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
-        ADD(LW(2), 5)
-        CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
-        CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-        CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    END_IF
-    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(6))
-    IF_INT_EQUAL(LW(6), 5)
-        CALL(btlevtcmd_StopAC)
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
-        RETURN
-    END_IF
-    IF_INT_EQUAL(LW(12), PTR(&badgeWeapon_TsuranukiNaguri))
-        CALL(_get_mario_hammer_lv, LW(0))
-        SWITCH(LW(0))
-            CASE_EQUAL(2)
-            SET_VALUE(LW(0), STRING("M_H_5A"))
-            SET_VALUE(LW(1), STRING("M_H_5B"))
-            SET_VALUE(LW(2), STRING("M_H_14"))
-            CASE_EQUAL(3)
-            SET_VALUE(LW(0), STRING("M_H_9A"))
-            SET_VALUE(LW(1), STRING("M_H_9B"))
-            SET_VALUE(LW(2), STRING("M_H_15"))
-            CASE_DEFAULT
-            SET_VALUE(LW(0), STRING("M_H_1A"))
-            SET_VALUE(LW(1), STRING("M_H_1B"))
-            SET_VALUE(LW(2), STRING("M_H_13"))
-        END_SWITCH
-    ELSE
-        CALL(_get_mario_hammer_lv, LW(0))
-        SWITCH(LW(0))
-            CASE_EQUAL(2)
-            SET_VALUE(LW(0), STRING("M_H_5A"))
-            SET_VALUE(LW(1), STRING("M_H_5B"))
-            SET_VALUE(LW(2), STRING("M_H_5C"))
-            CASE_EQUAL(3)
-            SET_VALUE(LW(0), STRING("M_H_9A"))
-            SET_VALUE(LW(1), STRING("M_H_9B"))
-            SET_VALUE(LW(2), STRING("M_H_9C"))
-            CASE_DEFAULT
-            SET_VALUE(LW(0), STRING("M_H_1A"))
-            SET_VALUE(LW(1), STRING("M_H_1B"))
-            SET_VALUE(LW(2), STRING("M_H_1C"))
-        END_SWITCH
-    END_IF
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(evt_btl_camera_set_zoom, 0, 350)
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_POWER2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(0))
-    CALL(_get_mario_hammer_lv, LW(0))
-    SWITCH(LW(0))
-        CASE_EQUAL(2)
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_MARIO_HAMMER_HOLD2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CASE_EQUAL(1)
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_MARIO_HAMMER_HOLD1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CASE_DEFAULT
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_MARIO_HAMMER_HOLD3"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    END_SWITCH
-    BEGIN_SIBLING_EVENT
-        SWITCH(LW(12))
-            CASE_EQUAL(PTR(&badgeWeapon_ConfuseHammer))
-            SET_VALUE(LW(13), 0)
-            CASE_EQUAL(PTR(&badgeWeapon_TsuranukiNaguri))
-            SET_VALUE(LW(13), 2)
-        END_SWITCH
-        SWITCH(LW(12))
-            CASE_OR_EQUAL(PTR(&badgeWeapon_ConfuseHammer))
-            CASE_OR_EQUAL(PTR(&badgeWeapon_TsuranukiNaguri))
-            CALL(btlevtcmd_ftomsec, 9, LW(0))
-            WAIT_MS(LW(0))
-            CALL(_hammer_star_effect, BTL_UNIT_SELF, LW(13))
-            CASE_END
-        END_SWITCH
-        SWITCH(LW(12))
-            CASE_OR_EQUAL(PTR(&badgeWeapon_ConfuseHammer))
-            CASE_OR_EQUAL(PTR(&badgeWeapon_TsuranukiNaguri))
-            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_MARIO_HAMMER_SHINE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-            CASE_END
-        END_SWITCH
-    END_SIBLING_EVENT
-    CALL(btlevtcmd_ftomsec, 30, LW(0))
-    WAIT_MS(LW(0))
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(1))
-    CALL(btlevtcmd_StartAC, 0)
-    CALL(btlevtcmd_ResultAC)
-    CALL(_get_mario_hammer_lv, LW(0))
-    SWITCH(LW(0))
-        CASE_EQUAL(2)
-        CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING2"), 0)
-        CASE_EQUAL(1)
-        CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING1"), 0)
-        CASE_DEFAULT
-        CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING3"), 0)
-    END_SWITCH
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(2))
-    WAIT_FRAMES(7)
-    IF_INT_EQUAL(LW(12), PTR(&badgeWeapon_TsuranukiNaguri))
-        CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_TURANUKI1"), 0)
-    ELSE
-        CALL(_get_mario_hammer_lv, LW(0))
-        SWITCH(LW(0))
-            CASE_EQUAL(2)
-            CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_HIT_GROUND3"), 0)
-            CASE_EQUAL(1)
-            CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_HIT_GROUND2"), 0)
-            CASE_DEFAULT
-            CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_HIT_GROUND1"), 0)
-        END_SWITCH
-    END_IF
-    IF_INT_NOT_EQUAL(LW(6), 1)
-        IF_INT_EQUAL(LW(6), 3)
-            CALL(btlevtcmd_StartAvoid, LW(3), 38)
-        END_IF
-        IF_INT_EQUAL(LW(6), 6)
-            CALL(btlevtcmd_StartAvoid, LW(3), 39)
-        END_IF
-        IF_INT_EQUAL(LW(6), 2)
-            CALL(btlevtcmd_StartAvoid, LW(3), 40)
-        END_IF
-        GOTO(90)
-    END_IF
-    CALL(btlevtcmd_GetResultAC, LW(6))
-    IF_BITS_CLEAR(LW(6), 2)
-        CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 256, LW(5))
-        CALL(btlevtcmd_AudienceDeclareACResult, LW(12), -1)
-        GOTO(90)
-    END_IF
-    CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(12), 131328, LW(5))
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 0)
-    CALL(evt_btl_camera_set_zoom, 0, 250)
-    CALL(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
-    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_AudienceDeclareACResult, LW(12), LW(6))
-    LABEL(90)
-    CALL(btlevtcmd_StopAC)
-    CALL(btlevtcmd_GetDamage, LW(3), LW(0))
-    CALL(evt_btl_camera_shake_h, 0, LW(0), 0, 10, 13)
-    CALL(btlevtcmd_WeaponAftereffect, LW(12))
+#if VERSION <= VERSION_JP
     CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 0, 15, 60, 0)
+#else
+    CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 0, 12, 60, 0)
+#endif
     CALL(btlevtcmd_ACRGetResult, LW(15), LW(13))
     IF_INT_EQUAL(LW(15), 1)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         GOTO(91)
     END_IF
     IF_INT_LESS_OR_EQUAL(LW(15), -1)
@@ -7983,10 +4642,10 @@ EVT_BEGIN(marioAttackEvent_NormalHammer_Core)
         END_IF
         WAIT_FRAMES(10)
         GOTO(95)
-#if VERSION == VERSION_DEMO
-    END_IF
-#else
+#if VERSION >= VERSION_JP
     LABEL(92)
+#else
+    END_IF
 #endif
     IF_INT_NOT_EQUAL(LW(15), 0)
         CALL(evt_btl_camera_set_mode, 0, 0)
@@ -8113,7 +4772,6 @@ EVT_BEGIN(marioAttackEvent_NormalHammer_Core)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
-#endif
 
 static EVT_BEGIN(marioAttackEvent_KaitenHammer)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
@@ -8461,12 +5119,11 @@ EVT_BEGIN(marioAttackEvent_FirstAttackKaitenHammer)
     ELSE
         SET_VALUE(LW(12), PTR(&marioDefaultWeapon_FirstAttackUltraHammer))
     END_IF
-    CALL_CHILD(PTR(marioAttackEvent_KaitenHammer))
+    CALL_CHILD(marioAttackEvent_KaitenHammer)
     RETURN
     RETURN
 EVT_END()
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(marioAttackEvent_JishinHammer)
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
@@ -8584,13 +5241,25 @@ EVT_BEGIN(marioAttackEvent_JishinHammer)
     SWITCH(LW(0))
         CASE_EQUAL(2)
         CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING2"), 0)
+#if VERSION >= VERSION_JP
         SET_VALUE(LW(2), STRING("M_H_14"))
+#else
+        SET_VALUE(LW(2), STRING("M_H_13"))
+#endif
         CASE_EQUAL(1)
         CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING1"), 0)
+#if VERSION >= VERSION_JP
         SET_VALUE(LW(2), STRING("M_H_13"))
+#else
+        SET_VALUE(LW(2), STRING("M_H_15"))
+#endif
         CASE_DEFAULT
         CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING3"), 0)
+#if VERSION >= VERSION_JP
         SET_VALUE(LW(2), STRING("M_H_15"))
+#else
+        SET_VALUE(LW(2), STRING("M_H_14"))
+#endif
     END_SWITCH
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(2))
     CALL(evt_snd_sfxon, STRING("SFX_MARIO_ATTACK_ULTRAQUAKE1"), 0)
@@ -8693,8 +5362,10 @@ EVT_BEGIN(marioAttackEvent_JishinHammer)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_snd_voice, BTL_UNIT_SELF, 1)
+#if VERSION >= VERSION_US
         CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(12))
         CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, -30, 20, 0)
+#endif
         CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 20, 0)
         LOOP(60)
             CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, 12)
@@ -8738,289 +5409,6 @@ EVT_BEGIN(marioAttackEvent_JishinHammer)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
-#else
-EVT_BEGIN(marioAttackEvent_JishinHammer)
-    CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
-    CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
-    CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
-    CALL_CHILD(marioAttackEvent_MajinaiPowerUpCheck)
-    CALL(btlevtcmd_CommandGetWeaponActionLv, LW(0))
-    CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_AcSetParamAll, 4, 25, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
-    CALL(btlevtcmd_AcSetFlag, 0)
-    CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 3, 1, 0)
-    CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_SELF)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -60, LW(1), LW(2), 0, -1, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 4)
-    CALL(evt_btl_camera_set_zoom, 0, 450)
-    CALL(_get_mario_hammer_lv, LW(0))
-    SWITCH(LW(0))
-        CASE_EQUAL(2)
-        SET_VALUE(LW(0), STRING("M_H_5A"))
-        SET_VALUE(LW(1), STRING("M_H_5B"))
-        SET_VALUE(LW(2), STRING("M_H_14"))
-        CASE_EQUAL(3)
-        SET_VALUE(LW(0), STRING("M_H_9A"))
-        SET_VALUE(LW(1), STRING("M_H_9B"))
-        SET_VALUE(LW(2), STRING("M_H_15"))
-        CASE_DEFAULT
-        SET_VALUE(LW(0), STRING("M_H_1A"))
-        SET_VALUE(LW(1), STRING("M_H_1B"))
-        SET_VALUE(LW(2), STRING("M_H_13"))
-    END_SWITCH
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_POWER2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(0))
-    CALL(_get_mario_hammer_lv, LW(0))
-    SWITCH(LW(0))
-        CASE_EQUAL(2)
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_MARIO_HAMMER_HOLD2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CASE_EQUAL(1)
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_MARIO_HAMMER_HOLD1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CASE_DEFAULT
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_MARIO_HAMMER_HOLD3"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    END_SWITCH
-    WAIT_FRAMES(30)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(1))
-    CALL(btlevtcmd_StartAC, 1)
-    WAIT_FRAMES(75)
-    BEGIN_SIBLING_EVENT_GET_ID(LW(13))
-        SET_VALUE(LW(5), 5)
-        LOOP(LW(5))
-            CALL(btlevtcmd_AcGetOutputParam, 1, LW(6))
-            IF_INT_GREATER_OR_EQUAL(LW(6), 3)
-                BREAK_LOOP
-            END_IF
-            WAIT_FRAMES(1)
-            SET_VALUE(LW(5), 5)
-        END_LOOP
-        WAIT_FRAMES(25)
-    END_SIBLING_EVENT
-    BEGIN_SIBLING_EVENT_GET_ID(LW(14))
-        SET_VALUE(LW(5), 5)
-        LOOP(LW(5))
-            CALL(btlevtcmd_AcGetOutputParam, 1, LW(6))
-            IF_INT_GREATER_OR_EQUAL(LW(6), 3)
-                BREAK_LOOP
-            END_IF
-            WAIT_FRAMES(1)
-            SET_VALUE(LW(5), 5)
-        END_LOOP
-        WAIT_FRAMES(5)
-        CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
-        MULTIPLY(LW(5), 45)
-        CALL(evt_sub_intpl_init, 11, 0, LW(5), 10)
-        LOOP(10)
-            CALL(evt_sub_intpl_get_value)
-            CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, LW(0))
-            WAIT_FRAMES(1)
-        END_LOOP
-        WAIT_FRAMES(8)
-        CALL(evt_sub_intpl_init, 12, LW(5), 0, 15)
-        LOOP(15)
-            CALL(evt_sub_intpl_get_value)
-            CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, LW(0))
-            WAIT_FRAMES(1)
-        END_LOOP
-    END_SIBLING_EVENT
-    BEGIN_SIBLING_EVENT_GET_ID(LW(15))
-        SET_VALUE(LW(5), 5)
-        LOOP(LW(5))
-            CALL(btlevtcmd_AcGetOutputParam, 1, LW(6))
-            IF_INT_GREATER_OR_EQUAL(LW(6), 3)
-                BREAK_LOOP
-            END_IF
-            WAIT_FRAMES(1)
-            SET_VALUE(LW(5), 5)
-        END_LOOP
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(6), LW(7), LW(8))
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.2998047f))
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(6), LW(7), LW(8), 40, -1)
-    END_SIBLING_EVENT
-    CALL(btlevtcmd_ResultAC)
-    CALL(btlevtcmd_GetResultAC, LW(8))
-    CALL(btlevtcmd_AcGetOutputParam, 1, LW(0))
-    IF_INT_GREATER_OR_EQUAL(LW(0), 3)
-        GOTO(10)
-    END_IF
-    DELETE_EVENT(LW(13))
-    DELETE_EVENT(LW(14))
-    DELETE_EVENT(LW(15))
-    CALL(_get_mario_hammer_lv, LW(0))
-    SWITCH(LW(0))
-        CASE_EQUAL(2)
-        CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING2"), 0)
-#if VERSION == VERSION_DEMO
-        SET_VALUE(LW(2), STRING("M_H_13"))
-#else
-        SET_VALUE(LW(2), STRING("M_H_14"))
-#endif
-        CASE_EQUAL(1)
-        CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING1"), 0)
-#if VERSION == VERSION_DEMO
-        SET_VALUE(LW(2), STRING("M_H_15"))
-#else
-        SET_VALUE(LW(2), STRING("M_H_13"))
-#endif
-        CASE_DEFAULT
-        CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING3"), 0)
-#if VERSION == VERSION_DEMO
-        SET_VALUE(LW(2), STRING("M_H_14"))
-#else
-        SET_VALUE(LW(2), STRING("M_H_15"))
-#endif
-    END_SWITCH
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(2))
-    CALL(evt_snd_sfxon, STRING("SFX_MARIO_ATTACK_ULTRAQUAKE1"), 0)
-    WAIT_FRAMES(10)
-    GOTO(40)
-    LABEL(10)
-    CALL(btlevtcmd_WaitEventEnd, LW(13))
-    CALL(_get_mario_hammer_lv, LW(0))
-    SWITCH(LW(0))
-        CASE_EQUAL(2)
-        CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING2"), 0)
-        CASE_EQUAL(1)
-        CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING1"), 0)
-        CASE_DEFAULT
-        CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING3"), 0)
-    END_SWITCH
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(2))
-    CALL(evt_snd_sfxon, STRING("SFX_MARIO_ATTACK_ULTRAQUAKE1"), 0)
-    CALL(btlevtcmd_WaitEventEnd, LW(14))
-    CALL(btlevtcmd_WaitEventEnd, LW(15))
-    LABEL(40)
-    CALL(evt_btl_camera_set_mode, 0, 1)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 0)
-    CALL(evt_btl_camera_set_zoom, 0, 0)
-    CALL(evt_btl_camera_off_posoffset_manual, 0)
-    CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_ULTRAQUAKE1"), 0)
-    CALL(evt_btl_camera_shake_h, 0, 8, 0, 42, 13)
-    CALL(evt_audience_reflesh_natural_all, 100)
-    CALL(btlevtcmd_GetResultAC, LW(7))
-    IF_BITS_SET(LW(7), 2)
-        CALL(btlevtcmd_GetResultPrizeLv, BTL_UNIT_SYSTEM, 0, LW(6))
-        CALL(btlevtcmd_ACSuccessEffect, LW(6), 0, 50, 0)
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_AudienceDeclareACResult, LW(0), LW(6))
-    ELSE
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_AudienceDeclareACResult, LW(0), -1)
-    END_IF
-    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-    IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_StopAC)
-        GOTO(90)
-    END_IF
-    GOTO(51)
-    LABEL(50)
-    CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
-    IF_INT_EQUAL(LW(3), -1)
-        CALL(btlevtcmd_StopAC)
-        GOTO(90)
-    END_IF
-    LABEL(51)
-    CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(6))
-    IF_INT_EQUAL(LW(6), 1)
-        CALL(btlevtcmd_DamageDirect, LW(3), LW(4), 0, 0, 2, 0)
-        BEGIN_INLINE_EVENT
-            WAIT_FRAMES(42)
-            IF_BITS_SET(LW(7), 2)
-                CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 131328, LW(5))
-            ELSE
-                CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
-            END_IF
-        END_INLINE_EVENT
-    ELSE
-        IF_INT_EQUAL(LW(6), 3)
-            CALL(btlevtcmd_StartAvoid, LW(3), 38)
-        END_IF
-        IF_INT_EQUAL(LW(6), 6)
-            CALL(btlevtcmd_StartAvoid, LW(3), 39)
-        END_IF
-        IF_INT_EQUAL(LW(6), 2)
-            CALL(btlevtcmd_StartAvoid, LW(3), 40)
-        END_IF
-    END_IF
-    GOTO(50)
-    LABEL(90)
-    WAIT_FRAMES(12)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    WAIT_FRAMES(30)
-    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_WeaponAftereffect, LW(0))
-    WAIT_FRAMES(60)
-    BEGIN_SIBLING_EVENT_GET_ID(LW(15))
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_H_16"))
-        WAIT_FRAMES(18)
-    END_SIBLING_EVENT
-    CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 0, 17, 17, 0)
-    CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
-    SWITCH(LW(6))
-        CASE_GREATER_OR_EQUAL(2)
-        CASE_DEFAULT
-        CALL(evt_audience_acrobat_notry)
-        CALL(btlevtcmd_WaitEventEnd, LW(15))
-        CALL(evt_audience_ap_recovery)
-        CALL(btlevtcmd_InviteApInfoReport)
-        GOTO(95)
-    END_SWITCH
-    CALL(btlevtcmd_AnimeWaitPlayComplete, BTL_UNIT_SELF, 1)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_snd_voice, BTL_UNIT_SELF, 1)
-        CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 20, 0)
-        LOOP(60)
-            CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, 12)
-            WAIT_FRAMES(1)
-        END_LOOP
-    END_SIBLING_EVENT
-    BEGIN_SIBLING_EVENT
-        WAIT_FRAMES(8)
-        CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 42, 55, 55, 0)
-    END_SIBLING_EVENT
-    BEGIN_SIBLING_EVENT
-        WAIT_FRAMES(4)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_Z_1"))
-    END_SIBLING_EVENT
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_3A"))
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.19921875f))
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 60, -1)
-    WAIT_FRAMES(4)
-    CALL(btlevtcmd_ACRGetResult, LW(0), LW(1))
-    IF_INT_EQUAL(LW(0), 2)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_3B"))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        ADD(LW(1), 50)
-        CALL(evt_eff, STRING("_BTLEF"), STRING("confetti"), 3, LW(0), LW(1), LW(2), 90, 0, 0, 0, 0, 0, 0, 0)
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(12))
-        CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
-        WAIT_MS(1500)
-    END_IF
-    CALL(evt_audience_ap_recovery)
-    CALL(btlevtcmd_InviteApInfoReport)
-    LABEL(95)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_W_1"))
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    LABEL(99)
-    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
-    CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
-#endif
 
 EVT_BEGIN(marioAttackEvent_UltraJishinHammer)
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
@@ -9254,7 +5642,6 @@ EVT_BEGIN(marioAttackEvent_HammerRotate)
     RETURN
 EVT_END()
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(marioAttackEvent_HammerNageru)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     IF_INT_EQUAL(LW(3), -1)
@@ -9333,186 +5720,59 @@ EVT_BEGIN(marioAttackEvent_HammerNageru)
     END_SWITCH
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_snd_voice, BTL_UNIT_SELF, 1)
+#if VERSION >= VERSION_US
         CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(12))
         CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, -40, 30, 0)
-        CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 20, 0)
-        LOOP(30)
-            CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, -24)
-            WAIT_FRAMES(1)
-        END_LOOP
-    END_SIBLING_EVENT
-    BEGIN_SIBLING_EVENT
-        WAIT_FRAMES(8)
-        CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 12, 25, 25, 0)
-    END_SIBLING_EVENT
-    BEGIN_SIBLING_EVENT
-        WAIT_FRAMES(4)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_Z_1"))
-    END_SIBLING_EVENT
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_3A"))
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.19921875f))
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
-    WAIT_FRAMES(4)
-    CALL(btlevtcmd_ACRGetResult, LW(0), LW(1))
-    IF_INT_EQUAL(LW(0), 2)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_3B"))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        ADD(LW(1), 50)
-        CALL(evt_eff, STRING("_BTLEF"), STRING("confetti"), 3, LW(0), LW(1), LW(2), 90, 0, 0, 0, 0, 0, 0, 0)
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(12))
-        CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
-        WAIT_MS(1500)
-    END_IF
-    LABEL(94)
-    CALL(btlevtcmd_WaitEventEnd, LW(15))
-    CALL(evt_audience_ap_recovery)
-    CALL(btlevtcmd_InviteApInfoReport)
-    LABEL(95)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 5)
-    CALL(evt_btl_camera_off_posoffset_manual, 0)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_W_1"))
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    LABEL(99)
-    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
-    CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
-#else
-EVT_BEGIN(marioAttackEvent_HammerNageru)
-    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-    IF_INT_EQUAL(LW(3), -1)
-        GOTO(99)
-    END_IF
-    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
-    CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(12))
-    CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
-    CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
-    CALL_CHILD(marioAttackEvent_MajinaiPowerUpCheck)
-    CALL(btlevtcmd_CommandGetWeaponActionLv, LW(0))
-    CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_AcSetParamAll, 5, 40, 0, 0, 0, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
-    CALL(btlevtcmd_AcSetFlag, 0)
-    CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 3, 1, 0)
-    CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_SELF)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(6))
-    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 4)
-    CALL(evt_btl_camera_set_zoom, 0, 450)
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_POWER2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(_get_mario_hammer_lv, LW(0))
-    SWITCH(LW(0))
-        CASE_EQUAL(2)
-        SET_VALUE(LW(0), STRING("M_H_5A"))
-        SET_VALUE(LW(1), STRING("M_H_5B"))
-        SET_VALUE(LW(2), STRING("M_H_7"))
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("M_H_8"))
-        CASE_EQUAL(3)
-        SET_VALUE(LW(0), STRING("M_H_9A"))
-        SET_VALUE(LW(1), STRING("M_H_9B"))
-        SET_VALUE(LW(2), STRING("M_H_11"))
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("M_H_12"))
-        CASE_DEFAULT
-        SET_VALUE(LW(0), STRING("M_H_1A"))
-        SET_VALUE(LW(1), STRING("M_H_1B"))
-        SET_VALUE(LW(2), STRING("M_H_3"))
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("M_H_4"))
-    END_SWITCH
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(0))
-    CALL(_get_mario_hammer_lv, LW(0))
-    SWITCH(LW(0))
-        CASE_EQUAL(2)
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_MARIO_HAMMER_HOLD2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CASE_EQUAL(1)
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_MARIO_HAMMER_HOLD1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CASE_DEFAULT
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_MARIO_HAMMER_HOLD3"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    END_SWITCH
-    WAIT_FRAMES(30)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(1))
-    CALL(btlevtcmd_StartAC, 1)
-    CALL(btlevtcmd_ResultAC)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(evt_btl_camera_off_posoffset_manual, 0)
-    CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_NAGERU1"), 0)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(2))
-    WAIT_FRAMES(3)
-    SPAWN_EVENT_GET_ID(PTR(marioAttackEvent_HammerNageru_object), LW(15))
-    CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 0, 15, 15, 0)
-    CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
-    SWITCH(LW(6))
-        CASE_GREATER_OR_EQUAL(2)
-        CASE_DEFAULT
-        CALL(evt_audience_acrobat_notry)
-        WAIT_MS(1000)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_S_1"))
-        WAIT_MS(667)
-        GOTO(94)
-    END_SWITCH
-    BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_snd_voice, BTL_UNIT_SELF, 1)
-        CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 20, 0)
-        LOOP(30)
-            CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, -24)
-            WAIT_FRAMES(1)
-        END_LOOP
-    END_SIBLING_EVENT
-    BEGIN_SIBLING_EVENT
-        WAIT_FRAMES(8)
-        CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 12, 25, 25, 0)
-    END_SIBLING_EVENT
-    BEGIN_SIBLING_EVENT
-        WAIT_FRAMES(4)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_Z_1"))
-    END_SIBLING_EVENT
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_3A"))
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.19921875f))
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
-    WAIT_FRAMES(4)
-    CALL(btlevtcmd_ACRGetResult, LW(0), LW(1))
-    IF_INT_EQUAL(LW(0), 2)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_3B"))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        ADD(LW(1), 50)
-        CALL(evt_eff, STRING("_BTLEF"), STRING("confetti"), 3, LW(0), LW(1), LW(2), 90, 0, 0, 0, 0, 0, 0, 0)
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(12))
-        CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
-        WAIT_MS(1500)
-    END_IF
-    LABEL(94)
-    CALL(btlevtcmd_WaitEventEnd, LW(15))
-    CALL(evt_audience_ap_recovery)
-    CALL(btlevtcmd_InviteApInfoReport)
-    LABEL(95)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 5)
-    CALL(evt_btl_camera_off_posoffset_manual, 0)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_W_1"))
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    LABEL(99)
-    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
-    CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
 #endif
+        CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 20, 0)
+        LOOP(30)
+            CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, -24)
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        WAIT_FRAMES(8)
+        CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 12, 25, 25, 0)
+    END_SIBLING_EVENT
+    BEGIN_SIBLING_EVENT
+        WAIT_FRAMES(4)
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_Z_1"))
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_3A"))
+    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.19921875f))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
+    WAIT_FRAMES(4)
+    CALL(btlevtcmd_ACRGetResult, LW(0), LW(1))
+    IF_INT_EQUAL(LW(0), 2)
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_A_3B"))
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        ADD(LW(1), 50)
+        CALL(evt_eff, STRING("_BTLEF"), STRING("confetti"), 3, LW(0), LW(1), LW(2), 90, 0, 0, 0, 0, 0, 0, 0)
+        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(12))
+        CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
+        WAIT_MS(1500)
+    END_IF
+    LABEL(94)
+    CALL(btlevtcmd_WaitEventEnd, LW(15))
+    CALL(evt_audience_ap_recovery)
+    CALL(btlevtcmd_InviteApInfoReport)
+    LABEL(95)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 5)
+    CALL(evt_btl_camera_off_posoffset_manual, 0)
+    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_W_1"))
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    LABEL(99)
+    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
+    CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
+    RETURN
+EVT_END()
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(marioAttackEvent_HammerNageru_object)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     ADD(LW(1), 25)
@@ -9567,86 +5827,23 @@ EVT_BEGIN(marioAttackEvent_HammerNageru_object)
         CALL(btlevtcmd_AudienceDeclareACResult, LW(0), -1)
     END_IF
     CALL(btlevtcmd_GetDamage, LW(3), LW(0))
+#if VERSION >= VERSION_US
     IF_INT_GREATER_OR_EQUAL(LW(0), 10)
         SET_VALUE(LW(0), 9)
     END_IF
-    CALL(evt_btl_camera_shake_h, 0, LW(0), 0, 10, 13)
-    DELETE_EVENT(LW(13))
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
-    WAIT_FRAMES(20)
-    LABEL(90)
-    CALL(btlevtcmd_StopAC)
-    RETURN
-EVT_END()
-#else
-EVT_BEGIN(marioAttackEvent_HammerNageru_object)
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    ADD(LW(1), 25)
-    CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 3, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
-    SET_VALUE(LW(0), -25)
-    CALL(btlevtcmd_SetPartsRotate, BTL_UNIT_SELF, 3, 0, 0, 0)
-    SPAWN_EVENT_GET_ID(PTR(marioAttackEvent_HammerRotate), LW(13))
-    CALL(btlevtcmd_JumpPartsSetting, BTL_UNIT_SELF, 3, 0, FLOAT(6.0f), FLOAT(0.34960938f))
-    CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, 3, LW(0), LW(1), LW(2), 0, -1)
-    IF_INT_NOT_EQUAL(LW(6), 1)
-        IF_INT_EQUAL(LW(6), 3)
-            CALL(btlevtcmd_StartAvoid, LW(3), 38)
-        END_IF
-        IF_INT_EQUAL(LW(6), 6)
-            CALL(btlevtcmd_StartAvoid, LW(3), 39)
-        END_IF
-        IF_INT_EQUAL(LW(6), 2)
-            CALL(btlevtcmd_StartAvoid, LW(3), 40)
-        END_IF
-        CALL(btlevtcmd_JumpPartsContinue, BTL_UNIT_SELF, 3)
-        CALL(btlevtcmd_WeaponAftereffect, LW(12))
-        CALL(btlevtcmd_GetPartsPos, BTL_UNIT_SELF, 3, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), -30)
-        CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, 3, LW(0), LW(1), LW(2), 20, -1)
-        CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), -15)
-        CALL(btlevtcmd_JumpPartsPosition, BTL_UNIT_SELF, 3, LW(0), LW(1), LW(2), 12, -1)
-        DELETE_EVENT(LW(13))
-        WAIT_FRAMES(30)
-        CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
-        GOTO(90)
-    END_IF
-    BEGIN_INLINE_EVENT
-        CALL(evt_btl_camera_set_mode, 0, 1)
-        CALL(evt_btl_camera_set_moveSpeedLv, 0, 4)
-        CALL(evt_btl_camera_set_zoom, 0, 0)
-        CALL(evt_btl_camera_off_posoffset_manual, 0)
-    END_INLINE_EVENT
-    CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL(btlevtcmd_GetResultAC, LW(0))
-    IF_BITS_SET(LW(0), 2)
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 131328, LW(5))
-        CALL(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
-        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_AudienceDeclareACResult, LW(0), LW(6))
-    ELSE
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_AudienceDeclareACResult, LW(0), -1)
-    END_IF
-    CALL(btlevtcmd_GetDamage, LW(3), LW(0))
-    CALL(evt_btl_camera_shake_h, 0, LW(0), 0, 10, 13)
-    DELETE_EVENT(LW(13))
-    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
-    WAIT_FRAMES(20)
-    LABEL(90)
-    CALL(btlevtcmd_StopAC)
-    RETURN
-EVT_END()
 #endif
+    CALL(evt_btl_camera_shake_h, 0, LW(0), 0, 10, 13)
+    DELETE_EVENT(LW(13))
+    CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, PART_ATTR_HIDDEN)
+    WAIT_FRAMES(20)
+    LABEL(90)
+    CALL(btlevtcmd_StopAC)
+    RETURN
+EVT_END()
 
 static const char battle_mario_nullstr[4] = "";
 extern const f32 battle_mario_one;
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(marioAttackEvent_FireNaguri)
     CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
     CALL(btlevtcmd_WaitGuardMove)
@@ -9847,208 +6044,6 @@ EVT_BEGIN(marioAttackEvent_FireNaguri)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
-#else
-EVT_BEGIN(marioAttackEvent_FireNaguri)
-    CALL(btlevtcmd_AttackDeclareAll, BTL_UNIT_SELF)
-    CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
-    CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
-    CALL_CHILD(marioAttackEvent_MajinaiPowerUpCheck)
-    CALL(btlevtcmd_CommandGetWeaponActionLv, LW(0))
-    CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_AcSetParamAll, 0, 83, 63, 83, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
-    CALL(btlevtcmd_AcSetFlag, 16)
-    CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 11, 1, 0)
-    WAIT_FRAMES(2)
-    CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_SELF)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(evt_btl_camera_set_posoffset, 0, 40, 0, 0)
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 25)
-    CALL(btlevtcmd_GetStageSize, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-    CALL(btlevtcmd_SetPartsPos, BTL_UNIT_SELF, 3, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("M_H_8"))
-    CALL(btlevtcmd_SetPartsWork, BTL_UNIT_SELF, 3, 0, 1)
-    BEGIN_SIBLING_EVENT
-        CALL(_mario_fire_ball_controll, BTL_UNIT_SELF, 3)
-    END_SIBLING_EVENT
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-    ADD(LW(1), 140)
-    BEGIN_SIBLING_EVENT_GET_ID(LW(15))
-        CALL(btlevtcmd_DivePartsPosition, BTL_UNIT_SELF, 3, LW(0), LW(1), LW(2), 60, 0, 5, 0, -1)
-    END_SIBLING_EVENT
-    LABEL(10)
-    CALL(btlevtcmd_PadCheckNow, 0, BTL_PAD_STICK_LEFT, LW(0))
-    IF_INT_EQUAL(LW(0), 0)
-        WAIT_FRAMES(1)
-        GOTO(10)
-    END_IF
-    IS_EVENT_RUNNING(LW(15), LW(0))
-    IF_INT_NOT_EQUAL(LW(0), 0)
-        DELETE_EVENT(LW(15))
-    END_IF
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_POWER2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(_get_mario_hammer_lv, LW(0))
-    SWITCH(LW(0))
-        CASE_EQUAL(2)
-        SET_VALUE(LW(0), STRING("M_H_18A"))
-        SET_VALUE(LW(1), STRING("M_H_18B"))
-        SET_VALUE(LW(2), STRING("M_H_18C"))
-        CASE_EQUAL(3)
-        SET_VALUE(LW(0), STRING("M_H_19A"))
-        SET_VALUE(LW(1), STRING("M_H_19B"))
-        SET_VALUE(LW(2), STRING("M_H_19C"))
-        CASE_DEFAULT
-        SET_VALUE(LW(0), STRING("M_H_17A"))
-        SET_VALUE(LW(1), STRING("M_H_17B"))
-        SET_VALUE(LW(2), STRING("M_H_17C"))
-    END_SWITCH
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(0))
-    CALL(_get_mario_hammer_lv, LW(0))
-    SWITCH(LW(0))
-        CASE_EQUAL(2)
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_MARIO_HAMMER_HOLD2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CASE_EQUAL(1)
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_MARIO_HAMMER_HOLD1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CASE_DEFAULT
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_MARIO_HAMMER_HOLD3"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    END_SWITCH
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_MARIO_HAMMER_FIRE1"), EVT_NULLPTR, 0, LW(15))
-    BEGIN_INLINE_EVENT_GET_ID(LW(14))
-        CALL(btlevtcmd_GetPartsPos, BTL_UNIT_SELF, 3, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_JumpPartsSetting, BTL_UNIT_SELF, 3, 0, FLOAT(4.0f), FLOAT(0.19921875f))
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_MARIO_HAMMER_FIRE3"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CALL(btlevtcmd_FallPartsPosition, BTL_UNIT_SELF, 3, LW(0), LW(1), LW(2), 75)
-    END_INLINE_EVENT
-    CALL(btlevtcmd_StartAC, 1)
-    WAIT_FRAMES(20)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(1))
-    CALL(btlevtcmd_ResultAC)
-    CALL(btlevtcmd_GetResultAC, LW(0))
-    IF_BITS_CLEAR(LW(0), 2)
-        CALL(btlevtcmd_AcGetOutputParam, 0, LW(0))
-        BEGIN_SIBLING_EVENT
-            CALL(_get_mario_hammer_lv, LW(0))
-            SWITCH(LW(0))
-                CASE_EQUAL(2)
-                CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING2"), 0)
-                CASE_EQUAL(1)
-                CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING1"), 0)
-                CASE_DEFAULT
-                CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING3"), 0)
-            END_SWITCH
-            CALL(evt_snd_sfxoff, LW(15))
-            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_MARIO_HAMMER_FIRE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-            CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(2))
-            WAIT_FRAMES(7)
-            WAIT_FRAMES(60)
-            CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_S_1"))
-        END_SIBLING_EVENT
-        CALL(btlevtcmd_WaitEventEnd, LW(14))
-        CALL(btlevtcmd_SetPartsWork, BTL_UNIT_SELF, 3, 0, 0)
-        CALL(evt_audience_ap_recovery)
-        CALL(btlevtcmd_InviteApInfoReport)
-        CALL(btlevtcmd_GetPartsPos, BTL_UNIT_SELF, 3, LW(0), LW(1), LW(2))
-        CALL(evt_eff64, PTR((char*)battle_mario_nullstr), STRING("fire_spark_n64"), 0, LW(0), LW(1), LW(2), 30, 40, FLOAT(1.0f), 12, 100, FLOAT(1.0f), FLOAT(1.0f), 0)
-        ADD(LW(1), 5)
-        CALL(evt_eff, PTR((char*)battle_mario_nullstr), STRING("kemuri_test"), 11, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
-        CALL(evt_btl_camera_set_mode, 0, 1)
-        CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-        CALL(evt_btl_camera_set_zoom, 0, 0)
-        CALL(evt_btl_camera_off_posoffset_manual, 0)
-        CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(6))
-        CALL(btlevtcmd_GetEnemyBelong, LW(6), LW(0))
-        CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SYSTEM, LW(0), PTR(&badgeWeapon_FireNaguriFailed))
-        CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-        LABEL(15)
-        IF_INT_EQUAL(LW(3), -1)
-            GOTO(17)
-        END_IF
-        IF_INT_EQUAL(LW(3), LW(6))
-            GOTO(16)
-        END_IF
-        LABEL(16)
-        CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
-        GOTO(15)
-        LABEL(17)
-        CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(6))
-        CALL(btlevtcmd_GetEnemyBelong, LW(6), LW(0))
-        CALL(btlevtcmd_SamplingEnemy, BTL_UNIT_SYSTEM, LW(0), PTR(&badgeWeapon_FireNaguriFailed))
-        CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-        LABEL(20)
-        IF_INT_EQUAL(LW(3), -1)
-            GOTO(22)
-        END_IF
-        IF_INT_NOT_EQUAL(LW(3), LW(6))
-            GOTO(21)
-        END_IF
-        CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
-        LABEL(21)
-        CALL(btlevtcmd_GetSelectNextEnemy, LW(3), LW(4))
-        GOTO(20)
-        LABEL(22)
-        WAIT_FRAMES(30)
-        GOTO(99)
-    END_IF
-    CALL(_get_mario_hammer_lv, LW(0))
-    SWITCH(LW(0))
-        CASE_EQUAL(2)
-        CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING2"), 0)
-        CASE_EQUAL(1)
-        CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING1"), 0)
-        CASE_DEFAULT
-        CALL(evt_snd_sfxon, STRING("SFX_MARIO_HAMMER_SWING3"), 0)
-    END_SWITCH
-    CALL(evt_snd_sfxoff, LW(15))
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_MARIO_HAMMER_FIRE2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, LW(2))
-    WAIT_FRAMES(7)
-    DELETE_EVENT(LW(14))
-    CALL(evt_btl_camera_set_mode, 0, 1)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(evt_btl_camera_set_zoom, 0, 0)
-    CALL(evt_btl_camera_off_posoffset_manual, 0)
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_MARIO_HAMMER_FIRE4"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    SPAWN_EVENT_GET_ID(PTR(marioAttackEvent_FireNaguri_object), LW(15))
-    CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 0, 15, 15, 0)
-    CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
-    SWITCH(LW(6))
-        CASE_GREATER_OR_EQUAL(2)
-        LOOP(20)
-            CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 36, 0)
-            WAIT_FRAMES(1)
-        END_LOOP
-        CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-        CALL(btlevtcmd_snd_voice, BTL_UNIT_SELF, 1)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_V_2"))
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(12))
-        CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
-        WAIT_MS(500)
-        CASE_DEFAULT
-        CALL(evt_audience_acrobat_notry)
-        WAIT_FRAMES(60)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_S_1"))
-    END_SWITCH
-    CALL(btlevtcmd_WaitEventEnd, LW(15))
-    CALL(evt_audience_ap_recovery)
-    CALL(btlevtcmd_InviteApInfoReport)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_W_1"))
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    LABEL(99)
-    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
-    CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
-#endif
 
 EVT_BEGIN(marioAttackEvent_FireNaguri_object)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -10200,13 +6195,13 @@ EVT_END()
 
 EVT_BEGIN(marioAttackEvent_NormalCharge)
     SET_VALUE(LW(12), PTR(&badgeWeapon_Charge))
-    CALL_CHILD(PTR(_NormalCharge_core))
+    CALL_CHILD(_NormalCharge_core)
     RETURN
 EVT_END()
 
 EVT_BEGIN(marioAttackEvent_NormalChargeP)
     SET_VALUE(LW(12), PTR(&badgeWeapon_ChargeP))
-    CALL_CHILD(PTR(_NormalCharge_core))
+    CALL_CHILD(_NormalCharge_core)
     RETURN
 EVT_END()
 
@@ -10241,23 +6236,22 @@ EVT_END()
 
 EVT_BEGIN(marioAttackEvent_SuperCharge)
     SET_VALUE(LW(12), PTR(&badgeWeapon_SuperCharge))
-    CALL_CHILD(PTR(_SuperCharge_core))
+    CALL_CHILD(_SuperCharge_core)
     RETURN
 EVT_END()
 
 EVT_BEGIN(marioAttackEvent_SuperChargeP)
     SET_VALUE(LW(12), PTR(&badgeWeapon_SuperChargeP))
-    CALL_CHILD(PTR(_SuperCharge_core))
+    CALL_CHILD(_SuperCharge_core)
     RETURN
 EVT_END()
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static const Vec majinai_effect_pos = {0.0f, 0.0f, 0.0f};
 #else
 static const Vec majinai_effect_pos = {0.0f, 10.0f, 0.0f};
 #endif
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(marioAttackEvent_MajinaiPowerUpCheck)
     CALL(_majinai_powerup_check, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -10266,30 +6260,21 @@ EVT_BEGIN(marioAttackEvent_MajinaiPowerUpCheck)
     SET_VALUE(LW(0), 0)
     SET_VALUE(LW(1), 0)
     SET_VALUE(LW(2), 0)
+#if VERSION <= VERSION_JP
     SPAWN_EVENT(evt_majinai_effect_se_btl)
-    CALL(_battle_majinai_effect, -3)
-    CALL_CHILD(PTR(marioAttackEvent_MajinaiJump))
-    CALL(btlevtcmd_AnnounceMessage, 2, 0, 0, STRING("btl_msg_mj_power_up"), 180)
-    WAIT_FRAMES(60)
-    RETURN
-EVT_END()
 #else
-EVT_BEGIN(marioAttackEvent_MajinaiPowerUpCheck)
-    CALL(_majinai_powerup_check, LW(0))
-    IF_INT_EQUAL(LW(0), 0)
-        RETURN
-    END_IF
-    SET_VALUE(LW(0), 0)
-    SET_VALUE(LW(1), 0)
-    SET_VALUE(LW(2), 0)
-    SPAWN_EVENT(PTR(evt_majinai_effect_se_btl))
+    SPAWN_EVENT(evt_majinai_effect_se_btl)
+#endif
     CALL(_battle_majinai_effect, -3)
-    CALL_CHILD(PTR(marioAttackEvent_MajinaiJump))
+    CALL_CHILD(marioAttackEvent_MajinaiJump)
+#if VERSION <= VERSION_JP
     CALL(btlevtcmd_AnnounceMessage, 0, 0, 0, STRING("btl_msg_mj_power_up"), 60)
+#else
+    CALL(btlevtcmd_AnnounceMessage, 2, 0, 0, STRING("btl_msg_mj_power_up"), 180)
+#endif
     WAIT_FRAMES(60)
     RETURN
 EVT_END()
-#endif
 
 EVT_BEGIN(marioAttackEvent_MajinaiJump)
     CALL(btlevtcmd_CheckActStatus, BTL_UNIT_SELF, LW(0))
@@ -10314,59 +6299,46 @@ EVT_BEGIN(_MajinaiPoseReset)
     RETURN
 EVT_END()
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(marioAttackEvent_MajinaiDefenceUp)
     SET_VALUE(LW(0), 0)
     SET_VALUE(LW(1), 0)
     SET_VALUE(LW(2), 0)
+#if VERSION <= VERSION_JP
     SPAWN_EVENT(evt_majinai_effect_se_btl)
-    CALL(_battle_majinai_effect, -3)
-    CALL_CHILD(PTR(marioAttackEvent_MajinaiJump))
-    CALL(btlevtcmd_AnnounceMessage, 2, 0, 0, STRING("btl_msg_mj_defence_up"), 180)
-    WAIT_FRAMES(60)
-    CALL_CHILD(PTR(_MajinaiPoseReset))
-    RETURN
-EVT_END()
 #else
-EVT_BEGIN(marioAttackEvent_MajinaiDefenceUp)
-    SET_VALUE(LW(0), 0)
-    SET_VALUE(LW(1), 0)
-    SET_VALUE(LW(2), 0)
-    SPAWN_EVENT(PTR(evt_majinai_effect_se_btl))
+    SPAWN_EVENT(evt_majinai_effect_se_btl)
+#endif
     CALL(_battle_majinai_effect, -3)
-    CALL_CHILD(PTR(marioAttackEvent_MajinaiJump))
+    CALL_CHILD(marioAttackEvent_MajinaiJump)
+#if VERSION <= VERSION_JP
     CALL(btlevtcmd_AnnounceMessage, 0, 0, 0, STRING("btl_msg_mj_defence_up"), 60)
-    WAIT_FRAMES(60)
-    CALL_CHILD(PTR(_MajinaiPoseReset))
-    RETURN
-EVT_END()
-#endif
-
-#if VERSION >= VERSION_US
-EVT_BEGIN(marioAttackEvent_MajinaiExpUp)
-    SET_VALUE(LW(0), 0)
-    SET_VALUE(LW(1), 0)
-    SET_VALUE(LW(2), 0)
-    SPAWN_EVENT(evt_majinai_effect_se_btl)
-    CALL(_battle_majinai_effect, -3)
-    CALL_CHILD(PTR(marioAttackEvent_MajinaiJump))
-    CALL(btlevtcmd_AnnounceMessage, 2, 0, 0, STRING("btl_msg_mj_exp_up"), 180)
-    WAIT_FRAMES(60)
-    RETURN
-EVT_END()
 #else
+    CALL(btlevtcmd_AnnounceMessage, 2, 0, 0, STRING("btl_msg_mj_defence_up"), 180)
+#endif
+    WAIT_FRAMES(60)
+    CALL_CHILD(_MajinaiPoseReset)
+    RETURN
+EVT_END()
+
 EVT_BEGIN(marioAttackEvent_MajinaiExpUp)
     SET_VALUE(LW(0), 0)
     SET_VALUE(LW(1), 0)
     SET_VALUE(LW(2), 0)
-    SPAWN_EVENT(PTR(evt_majinai_effect_se_btl))
+#if VERSION <= VERSION_JP
+    SPAWN_EVENT(evt_majinai_effect_se_btl)
+#else
+    SPAWN_EVENT(evt_majinai_effect_se_btl)
+#endif
     CALL(_battle_majinai_effect, -3)
-    CALL_CHILD(PTR(marioAttackEvent_MajinaiJump))
+    CALL_CHILD(marioAttackEvent_MajinaiJump)
+#if VERSION <= VERSION_JP
     CALL(btlevtcmd_AnnounceMessage, 0, 0, 0, STRING("btl_msg_mj_exp_up"), 60)
+#else
+    CALL(btlevtcmd_AnnounceMessage, 2, 0, 0, STRING("btl_msg_mj_exp_up"), 180)
+#endif
     WAIT_FRAMES(60)
     RETURN
 EVT_END()
-#endif
 
 static USER_FUNC(_get_mario_hammer_lv) {
     s32 ret = *event->args;
@@ -10374,7 +6346,7 @@ static USER_FUNC(_get_mario_hammer_lv) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_whirlwind_effect) {
+static USER_FUNC(_whirlwind_effect) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -10392,7 +6364,7 @@ USER_FUNC(_whirlwind_effect) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_jump_star_effect) {
+static USER_FUNC(_jump_star_effect) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -10433,7 +6405,7 @@ USER_FUNC(_jump_star_effect) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_bgset_iron_frame_check) {
+static USER_FUNC(_bgset_iron_frame_check) {
     s32 ret = *event->args;
     if (_battleWorkPointer->stageObjectWork.flags & STAGE_OBJ_FLAG_IRON_FRAME_GONE) {
         evtSetValue(event, ret, 0);
@@ -10443,7 +6415,7 @@ USER_FUNC(_bgset_iron_frame_check) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_wait_jyabara_hit_iron_frame) {
+static USER_FUNC(_wait_jyabara_hit_iron_frame) {
     BattleUnit* unit;
     f32 pos[3];
     s32 id = evtGetValue(event, *event->args);
@@ -10456,7 +6428,7 @@ USER_FUNC(_wait_jyabara_hit_iron_frame) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_tatsumaki_effect) {
+static USER_FUNC(_tatsumaki_effect) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* ud = event->userWork;
     BattleUnit* unit;
@@ -10508,7 +6480,7 @@ USER_FUNC(_tatsumaki_effect) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(_record_renzoku_count) {
+static USER_FUNC(_record_renzoku_count) {
     s32 n = evtGetValue(event, *event->args);
     BattleActRecord* rec = &_battleWorkPointer->actRecord;
     PouchData* pouch = pouchGetPtr();
@@ -10554,7 +6526,7 @@ USER_FUNC(mario_get_renzoku_count_max) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_hammer_star_effect) {
+static USER_FUNC(_hammer_star_effect) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -10587,7 +6559,7 @@ USER_FUNC(_hammer_star_effect) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_kaiten_hammer_acrobat_rotate) {
+static USER_FUNC(_kaiten_hammer_acrobat_rotate) {
     BattleUnit* unit;
     BattleUnitPart* part;
     EvtWord* args = event->args;
@@ -10630,7 +6602,7 @@ USER_FUNC(_kaiten_hammer_acrobat_rotate) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_mario_fire_ball_controll) {
+static USER_FUNC(_mario_fire_ball_controll) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -10653,7 +6625,7 @@ USER_FUNC(_mario_fire_ball_controll) {
     }
     return EVT_RETURN_BLOCK;
 }
-USER_FUNC(_fire_wave) {
+static USER_FUNC(_fire_wave) {
     EvtWord* args = event->args;
     f32 x = evtGetValue(event, args[0]);
     f32 y = evtGetValue(event, args[1]);
@@ -10665,7 +6637,7 @@ USER_FUNC(_fire_wave) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_majinai_powerup_check) {
+static USER_FUNC(_majinai_powerup_check) {
     BattleWork* wp = _battleWorkPointer;
     s32 ret = *event->args;
     if (pouchGetPtr()->merleeNextCurseType != 1) {
@@ -10679,7 +6651,7 @@ USER_FUNC(_majinai_powerup_check) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_battle_majinai_effect) {
+static USER_FUNC(_battle_majinai_effect) {
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
     if (isFirstCall) {
         Vec v = majinai_effect_pos;
@@ -10692,7 +6664,7 @@ USER_FUNC(_battle_majinai_effect) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_paper_light_off) {
+static USER_FUNC(_paper_light_off) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 part;

@@ -14,7 +14,7 @@ typedef struct eff_n64_work {
 typedef struct eff_set {
     s16 id;     // 0x0
     char* name; // 0x4
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     const char* description; // 0x8
     const char** users;      // 0xC, who uses the effect
 #endif

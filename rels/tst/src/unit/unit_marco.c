@@ -92,8 +92,8 @@ static PoseTableEntry pose_table[] = {
     {39, "EM_D_1"},
     {42, "EM_R_1"},
     {40, "EM_W_1"},
-    {65, "EM_T_1"},
-    {69, "EM_S_1"},
+    {BTL_POSE_TALK, "EM_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "EM_S_1"},
 };
 
 static BattleDataEntry data_table[] = {

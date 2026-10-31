@@ -11,8 +11,8 @@
 #include "system.h"
 #include <dolphin/os.h>
 
-USER_FUNC(evt_gazigazi_move_position);
-USER_FUNC(camdir);
+static USER_FUNC(evt_gazigazi_move_position);
+static USER_FUNC(camdir);
 
 #define GAZIGAZI "\x83\x4B\x83\x57\x83\x4B\x83\x57" // "ガジガジ"
 
@@ -64,7 +64,7 @@ EVT_BEGIN(evt_gazigazi_appear)
     RETURN
 EVT_END()
 
-USER_FUNC(camdir) {
+static USER_FUNC(camdir) {
     f32 yaw;
     s32 dir;
     CameraEntry* camera;
@@ -88,7 +88,7 @@ USER_FUNC(camdir) {
 }
 
 // const char* name, s32 x0, s32 y0, s32 z0, s32 x1, s32 y1, s32 z1, s32 msec, s32 mode
-USER_FUNC(evt_gazigazi_move_position) {
+static USER_FUNC(evt_gazigazi_move_position) {
     EvtWord* args = event->args;
     const char* name;
     f32 y0, x0, z0, x1, y1, z1;

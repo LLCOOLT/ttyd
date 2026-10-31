@@ -8,7 +8,6 @@
 #include "evt/evt_mobj.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "las.h"
 #include "evt/evt_story.h"
 
@@ -166,10 +165,12 @@ static BeroEntry bero_entry_data[] = {
 EVT_BEGIN(las_07_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 2)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     BEGIN_INLINE_EVENT
         CALL(evt_seq_wait, 2)
         CALL(evt_cam_road_reset)

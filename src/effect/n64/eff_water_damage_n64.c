@@ -49,7 +49,7 @@ effN64Vtx size8x8_tex16x16_2_vtx[] = {
     {-3, 5, 0, 0, 512, 0, 0, 0, 255},
 };
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 u32 water_damage_tex[32] __attribute__((aligned(32))) = {
     0x78A31427, 0x572B0B52, 0x5167133A, 0x7FDF7F2F, 0x653E32A7, 0xF5FFFF8B, 0x32670486, 0x8BFFD55E,
     0x60830B26, 0xF8E8FA55, 0x602011C5, 0x2E020278, 0x59A40486, 0xF7155555, 0x90200486, 0xBC555555,
@@ -58,9 +58,9 @@ u32 water_damage_tex[32] __attribute__((aligned(32))) = {
 };
 #endif
 
-void effWaterDamageMain(EffectEntry* effect);
-void effWaterDamageDisp(CameraId cameraId, EffectEntry* effect);
-void effWaterDamageDisp2(CameraId cameraId, EffectEntry* effect);
+static void effWaterDamageMain(EffectEntry* effect);
+static void effWaterDamageDisp(CameraId cameraId, EffectEntry* effect);
+static void effWaterDamageDisp2(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effWaterDamageN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     s32 variant;
@@ -185,7 +185,7 @@ EffectEntry* effWaterDamageN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z,
     return effect;
 }
 
-void effWaterDamageMain(EffectEntry* effect) {
+static void effWaterDamageMain(EffectEntry* effect) {
     EffWaterDamageN64Work* work = effect->userdata;
     Vec calcPos;
     Vec pos = {0.0f, 0.0f, 0.0f};
@@ -239,7 +239,7 @@ void effWaterDamageMain(EffectEntry* effect) {
     }
 }
 
-void effWaterDamageDisp(CameraId cameraId, EffectEntry* effect) {
+static void effWaterDamageDisp(CameraId cameraId, EffectEntry* effect) {
     EffWaterDamageN64Work* work;
     CameraEntry* cam;
     Mtx trans;
@@ -247,14 +247,14 @@ void effWaterDamageDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx rot;
     Mtx mtx;
     GXTexObj texObj;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     void* buffer;
 #endif
     s32 i;
     s32 alpha;
     s32 ix;
     s32 iy;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     s32 dx, dy;
 #endif
 
@@ -299,7 +299,7 @@ void effWaterDamageDisp(CameraId cameraId, EffectEntry* effect) {
     GXLoadTexObj(&texObj, GX_TEXMAP0);
     GXSetCullMode(GX_CULL_NONE);
     work++;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // the second map is a copy of the screen, shifted by each drop's position
     buffer = smartAlloc(GXGetTexBufferSize(304, 240, GX_TF_RGB565, GX_FALSE, 0), 4)->address;
     GXSetTexCopySrc(0, 0, 608, 480);
@@ -313,7 +313,7 @@ void effWaterDamageDisp(CameraId cameraId, EffectEntry* effect) {
     GXInitTexObjLOD(&texObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&texObj, GX_TEXMAP1);
     for (i = 1; i < effect->count; i++, work++) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         dx = (s32)work->position.x + ix;
         dy = (s32)work->position.y + iy;
         dx = dx < 0 ? -(dx & 0x7F) : (dx & 0x7F);
@@ -350,7 +350,7 @@ void effWaterDamageDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-void effWaterDamageDisp2(CameraId cameraId, EffectEntry* effect) {
+static void effWaterDamageDisp2(CameraId cameraId, EffectEntry* effect) {
     EffWaterDamageN64Work* work;
     CameraEntry* cam;
     Mtx trans;

@@ -785,8 +785,8 @@ L_8025F0D8:
     blr
 }
 
-#if defined(VERSION_G8MP01) || defined(VERSION_G8ME01_DEMO)
-/* PAL and demo only: setjmp and longjmp of the Metrowerks runtime, in assembly as in the original source. They
+#if defined(VERSION_G8MP01) || defined(VERSION_G8ME01_DEMO) || defined(VERSION_G8MJ01_DEMO)
+/* PAL and demos only: setjmp and longjmp of the Metrowerks runtime, in assembly as in the original source. They
  * save and restore the return address, the condition register, r1, r2, r13-r31, f14-f31 (each with its
  * paired-single half) and the FPSCR. */
 asm int __setjmp(register void* env) {

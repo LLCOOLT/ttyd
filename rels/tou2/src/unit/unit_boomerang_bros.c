@@ -6,7 +6,7 @@
 #include "battle/battle_event_cmd.h"
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 #include "evt/evt_sub.h"
@@ -97,7 +97,11 @@ static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {80, 80, 70, 100, 80, 100, 100, 70, 100, 80, 100, 80, 100, 80, 80, 40, 60, 100, 80, 100, 100, 95};
+#else
 static StatusVulnerability regist = {80, 80, 70, 100, 80, 100, 100, 70, 100, 80, 100, 80, 100, 95, 80, 70, 60, 100, 80, 100, 100, 95};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "BRO_N_1"},
@@ -116,8 +120,8 @@ static PoseTableEntry pose_table[] = {
     {40, "BRO_W_1"},
     {56, "BRO_X_1"},
     {57, "BRO_X_1"},
-    {65, "BRO_T_1"},
-    {69, "BRO_S_1"},
+    {BTL_POSE_TALK, "BRO_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "BRO_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -215,7 +219,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -223,7 +227,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 7, 0)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(normal_attack_event))
+        CALL_CHILD(normal_attack_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
@@ -239,11 +243,11 @@ static EVT_BEGIN(attack_event)
         SUBTRACT(LW(0), 1)
         CALL(evt_sub_random, LW(0), LW(1))
         IF_INT_LESS(LW(1), 30)
-            CALL_CHILD(PTR(renzoku_attack_event))
+            CALL_CHILD(renzoku_attack_event)
             GOTO(99)
         END_IF
     END_IF
-    CALL_CHILD(PTR(normal_attack_event))
+    CALL_CHILD(normal_attack_event)
     GOTO(99)
     LABEL(99)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -295,7 +299,7 @@ EVT_END()
 
 static EVT_BEGIN(damage_check_no_last)
     SET_VALUE(LW(7), 0)
-    CALL_CHILD(PTR(damage_check_sub))
+    CALL_CHILD(damage_check_sub)
     RETURN
 EVT_END()
 
@@ -309,7 +313,7 @@ static EVT_BEGIN(damage_check_last)
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(6), 256, LW(5))
     ELSE
         SET_VALUE(LW(7), 1)
-        CALL_CHILD(PTR(damage_check_sub))
+        CALL_CHILD(damage_check_sub)
     END_IF
     RETURN
 EVT_END()
@@ -439,14 +443,14 @@ static EVT_BEGIN(normal_attack_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
     CALL(btlevtcmd_GetEnemyBelong, LW(3), LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(normal_attack_event_confuse))
+        CALL_CHILD(normal_attack_event_confuse)
         GOTO(99)
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -476,7 +480,7 @@ static EVT_BEGIN(normal_attack_event)
     SET_VALUE(LW(15), 2)
     SET_VALUE(LW(14), 1)
     SET_VALUE(LW(6), PTR(&weapon_boomerang_bros_attack))
-    SPAWN_EVENT(PTR(boomerang_move_event))
+    SPAWN_EVENT(boomerang_move_event)
     LOOP(0)
         WAIT_FRAMES(1)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
@@ -497,14 +501,14 @@ static EVT_BEGIN(renzoku_attack_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
     CALL(btlevtcmd_GetEnemyBelong, LW(3), LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(normal_attack_event_confuse))
+        CALL_CHILD(normal_attack_event_confuse)
         GOTO(99)
     END_IF
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -534,13 +538,13 @@ static EVT_BEGIN(renzoku_attack_event)
     WAIT_FRAMES(27)
     SET_VALUE(LW(15), 2)
     SET_VALUE(LW(14), 0)
-    SPAWN_EVENT(PTR(boomerang_move_event))
+    SPAWN_EVENT(boomerang_move_event)
     WAIT_MS(750)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("BRO_A_2A"))
     WAIT_FRAMES(27)
     SET_VALUE(LW(15), 4)
     SET_VALUE(LW(14), 1)
-    SPAWN_EVENT(PTR(boomerang_move_event))
+    SPAWN_EVENT(boomerang_move_event)
     LOOP(0)
         WAIT_FRAMES(1)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))

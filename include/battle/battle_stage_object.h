@@ -94,8 +94,6 @@ BattleStageObject* BattleSearchObjectPtr(const char* name);
 
 void BattleStageObjectMain(void);
 
-USER_FUNC(_set_mobj_shake_init);
-
 void BattleStageObjectInit(void);
 
 extern EvtWord _close_wall_event[];

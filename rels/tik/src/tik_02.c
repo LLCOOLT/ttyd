@@ -30,7 +30,6 @@
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "tik.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -52,7 +51,11 @@ static NpcSetupInfo npcEnt[2];
 extern EvtWord ukishima_move[];
 char geso_checkpose[];
 extern EvtWord geso_battle[];
+#if VERSION <= VERSION_DEMO_US
+static HitDamageReturn hitDmgRetPoints[6];
+#else
 static HitDamageReturn hitDmgRetPoints[7];
+#endif
 
 static USER_FUNC(tik_npc_buruburu) {
     EvtWord* args = event->args;
@@ -334,7 +337,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"ゲッソーのゲソ"*/"\x83\x51\x83\x62\x83\x5C\x81\x5B\x82\xCC\x83\x51\x83\x5C", // name
+        "ゲッソーのゲソ", // name
         0, // flags
         3, // reactionFlags
         geso_init, // initEvent
@@ -662,7 +665,7 @@ EVT_BEGIN(geso_battle)
         CALL(evt_hit_bind_update, STRING("a_dokan_1"))
     END_INLINE_EVENT
     CALL(evt_snd_sfxon, STRING("SFX_STG0_ROAD_APPEAR1"), 0)
-    CALL_CHILD(PTR(ukishima_apper))
+    CALL_CHILD(ukishima_apper)
     WAIT_MS(500)
     SET_VALUE(LW(4), STRING("ugo_yuka_1"))
     SET_VALUE(LW(5), STRING("a_ugo_yuka_1"))
@@ -675,7 +678,7 @@ EVT_BEGIN(geso_battle)
 #endif
     SET_VALUE(LW(8), 1000)
     SET_VALUE(LW(9), 2000)
-    SPAWN_EVENT(PTR(ukishima_move))
+    SPAWN_EVENT(ukishima_move)
     SET_VALUE(LW(4), STRING("ugo_yuka_2"))
     SET_VALUE(LW(5), STRING("a_ugo_yuka_2"))
 #if VERSION >= VERSION_US
@@ -687,7 +690,7 @@ EVT_BEGIN(geso_battle)
 #endif
     SET_VALUE(LW(8), 1000)
     SET_VALUE(LW(9), 2000)
-    SPAWN_EVENT(PTR(ukishima_move))
+    SPAWN_EVENT(ukishima_move)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG0_19_BLOOPER_BATTLE)
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_party_run, 0)
@@ -703,7 +706,7 @@ static EVT_BEGIN(wall_bomb)
         CALL(evt_snd_sfxon_3d, STRING("SFX_OFF_WALL_BREAK1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
     SET_VALUE(LW(0), STRING("w_bwro_2"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     CALL(evt_hitobj_attr_onoff, 1, 1, STRING("w_bwro_2"), 4)
     SET_VALUE(GSWF(GSWF_TIK01_WALL2_BOMBED), 1)
     CALL(evt_img_entry, STRING("capture_img"))
@@ -744,14 +747,16 @@ static HitDamageReturn hitDmgRetPoints[] = {
     {"mod_3", {0.0f, -1000.0f, 0.0f}},
     {"mod_4", {0.0f, -1000.0f, 0.0f}},
     {"mod_5", {0.0f, -1000.0f, 0.0f}},
+#if VERSION >= VERSION_JP
     {"dokan_1", {0.0f, -1000.0f, 0.0f}},
+#endif
     {0},
 };
 
 EVT_BEGIN(tik_02_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK4"))
@@ -759,13 +764,13 @@ EVT_BEGIN(tik_02_init_evt)
     CALL(evt_map_playanim, STRING("anm_nami_1"), 1, 0)
     CALL(evt_map_playanim, STRING("anm_nami_2"), 1, 0)
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
-    CALL_CHILD(PTR(evt_gazigazi_entry))
+    CALL_CHILD(evt_gazigazi_entry)
     CALL(evt_paper_entry, STRING("OFF_d_bom_ver2"))
     IF_INT_EQUAL(GSWF(GSWF_TIK01_WALL2_BOMBED), 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("bom_kabe_4"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_attr_onoff, 1, 0, STRING("w_bwro_2"), 4)
         SET_VALUE(LW(0), STRING("w_bwro_2"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_run_case_evt, CASE_COND_BOBBERY, 1, STRING("w_bwro_2"), 0, PTR(wall_bomb), 0)
     ELSE
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("bom_kabe_3"), MAPOBJ_FLAG_HIDE)
@@ -793,7 +798,7 @@ EVT_BEGIN(tik_02_init_evt)
 #endif
         SET_VALUE(LW(8), 1000)
         SET_VALUE(LW(9), 2000)
-        SPAWN_EVENT(PTR(ukishima_move))
+        SPAWN_EVENT(ukishima_move)
         SET_VALUE(LW(4), STRING("ugo_yuka_2"))
         SET_VALUE(LW(5), STRING("a_ugo_yuka_2"))
 #if VERSION >= VERSION_US
@@ -805,17 +810,17 @@ EVT_BEGIN(tik_02_init_evt)
 #endif
         SET_VALUE(LW(8), 1000)
         SET_VALUE(LW(9), 2000)
-        SPAWN_EVENT(PTR(ukishima_move))
+        SPAWN_EVENT(ukishima_move)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG0_17_BADGE_TUTORIAL)
-        SPAWN_EVENT(PTR(geso_battle))
+        SPAWN_EVENT(geso_battle)
     END_IF
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_00_PETAL_MEADOWS)
         SET_VALUE(LW(0), STRING("dokan"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_bero_overwrite, STRING("dokan"), PTR(bero_entry_data2))
         SET_VALUE(LW(0), STRING("dokan"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
     END_IF
     CALL(evt_map_entry_airport_harbor, 1, STRING("S_Ship_Change_01"), STRING("ue_1"))
     CALL(evt_map_entry_airport_harbor, 1, STRING("S_Ship_Change_02"), STRING("ue_2"))

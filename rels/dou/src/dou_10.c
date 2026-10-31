@@ -21,7 +21,6 @@
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
 #include "mot/mot_ship.h"
-#include "party/party_motion.h"
 #include "dou.h"
 #include "evt/evt_story.h"
 
@@ -35,18 +34,18 @@ typedef struct EntryMgr {
     EntryMgrEntry* entries;
 } EntryMgr;
 
-USER_FUNC(dou_namiatari_check);
-USER_FUNC(evt_sub_entrymgr_check);
-USER_FUNC(evt_sub_entrymgr_delete);
-USER_FUNC(evt_sub_entrymgr_entry);
-USER_FUNC(evt_sub_entrymgr_getreg);
-USER_FUNC(evt_sub_entrymgr_init);
-USER_FUNC(evt_sub_entrymgr_setreg);
-USER_FUNC(nami_running_func);
-USER_FUNC(nami_running_init_func);
-USER_FUNC(namiyoke_fail_stop);
-USER_FUNC(namiyoke_se_check);
-USER_FUNC(namiyoke_set_mapobj);
+static USER_FUNC(dou_namiatari_check);
+static USER_FUNC(evt_sub_entrymgr_check);
+static USER_FUNC(evt_sub_entrymgr_delete);
+static USER_FUNC(evt_sub_entrymgr_entry);
+static USER_FUNC(evt_sub_entrymgr_getreg);
+static USER_FUNC(evt_sub_entrymgr_init);
+static USER_FUNC(evt_sub_entrymgr_setreg);
+static USER_FUNC(nami_running_func);
+static USER_FUNC(nami_running_init_func);
+static USER_FUNC(namiyoke_fail_stop);
+static USER_FUNC(namiyoke_se_check);
+static USER_FUNC(namiyoke_set_mapobj);
 
 static BeroEntry bero_entry_data[5];
 const char* namiyoke_mapobj[15];
@@ -299,7 +298,7 @@ EVT_BEGIN(namiyoke_fail)
         WAIT_MS(400)
         CALL(evt_eff64, STRING(""), STRING("ripple_n64"), 0, LW(0), 5, LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
     END_INLINE_EVENT
-    CALL_CHILD(PTR(namiyoke_fail_recover))
+    CALL_CHILD(namiyoke_fail_recover)
     CALL(evt_cam_road_reset)
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_mario_cont_onoff, 1)
@@ -314,7 +313,7 @@ EVT_BEGIN(namiyoke_atari_check)
     LOOP(0)
         IF_INT_EQUAL(GW(0), 1)
             DEBUG_PUT_MSG(STRING("マリオと波の接触"))
-            CALL_CHILD(PTR(namiyoke_fail))
+            CALL_CHILD(namiyoke_fail)
             SET_VALUE(GW(0), 0)
         END_IF
         WAIT_FRAMES(1)
@@ -338,19 +337,19 @@ EVT_BEGIN(namiyoke_main)
             CASE_EQUAL(0)
             SET_VALUE(LW(13), -125)
             IF_INT_GREATER_OR_EQUAL(LW(10), 6)
-                SPAWN_EVENT(PTR(nami_running))
+                SPAWN_EVENT(nami_running)
             END_IF
             CASE_EQUAL(1)
             SET_VALUE(LW(13), -50)
             IF_INT_GREATER_OR_EQUAL(LW(10), 6)
-                SPAWN_EVENT(PTR(nami_running))
+                SPAWN_EVENT(nami_running)
             END_IF
             CASE_EQUAL(2)
             SET_VALUE(LW(13), 25)
-            SPAWN_EVENT(PTR(nami_running))
+            SPAWN_EVENT(nami_running)
             CASE_EQUAL(3)
             SET_VALUE(LW(13), 100)
-            SPAWN_EVENT(PTR(nami_running))
+            SPAWN_EVENT(nami_running)
         END_SWITCH
         IF_INT_EQUAL(LW(10), 9)
             BREAK_LOOP
@@ -374,7 +373,7 @@ EVT_BEGIN(namiyoke_main)
             CASE_EQUAL(3)
             SET_VALUE(LW(13), 100)
         END_SWITCH
-        SPAWN_EVENT(PTR(nami_running))
+        SPAWN_EVENT(nami_running)
         CALL(evt_sub_random, 500, LW(0))
         ADD(LW(0), 1500)
         WAIT_MS(LW(0))
@@ -452,15 +451,15 @@ EVT_BEGIN(namiyoke_check)
         SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_29_WAVE_DODGING)
     END_IF
     CALL(evt_sub_entrymgr_init, LW(9), 15)
-    SPAWN_EVENT(PTR(namiyoke_init))
-    SPAWN_EVENT(PTR(namiyoke_main))
-    SPAWN_EVENT(PTR(namiyoke_se))
+    SPAWN_EVENT(namiyoke_init)
+    SPAWN_EVENT(namiyoke_main)
+    SPAWN_EVENT(namiyoke_se)
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("w_bero_1"))
-        SPAWN_EVENT(PTR(namiyoke_atari_check))
+        SPAWN_EVENT(namiyoke_atari_check)
     END_IF
     IF_STR_EQUAL(LW(0), STRING("e_bero"))
-        SPAWN_EVENT(PTR(namiyoke_atari_check))
+        SPAWN_EVENT(namiyoke_atari_check)
     END_IF
     RETURN
 EVT_END()
@@ -508,7 +507,7 @@ EVT_END()
 static EVT_BEGIN(yari_trap)
     CALL(evt_hit_bind_mapobj, STRING("A_yari"), STRING("S_yari"))
     SET_VALUE(GW(15), 0)
-    SPAWN_EVENT(PTR(yari_trap_sub))
+    SPAWN_EVENT(yari_trap_sub)
     RETURN
 EVT_END()
 
@@ -550,15 +549,15 @@ EVT_BEGIN(dou_10_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     WAIT_FRAMES(1)
     CALL(evt_map_playanim, STRING("nami"), 1, 0)
     CALL(evt_map_playanim, STRING("moku"), 1, 0)
     CALL(evt_map_playanim, STRING("fune_02"), 1, 0)
-    SPAWN_EVENT(PTR(yari_trap))
+    SPAWN_EVENT(yari_trap)
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
-    CALL_CHILD(PTR(evt_gazigazi_entry))
-    SPAWN_EVENT(PTR(namiyoke_check))
+    CALL_CHILD(evt_gazigazi_entry)
+    SPAWN_EVENT(namiyoke_check)
     SET_VALUE(LW(0), STRING("s10_fune_01"))
     SET_VALUE(LW(1), 0)
     SPAWN_EVENT_GET_ID(PTR(dou_puka_event_main0), LW(10))
@@ -566,7 +565,7 @@ EVT_BEGIN(dou_10_init_evt)
     RETURN
 EVT_END()
 
-USER_FUNC(namiyoke_se_check) {
+static USER_FUNC(namiyoke_se_check) {
     EvtWord* args = event->args;
     MarioWork* mario = marioGetPtr();
     f32 x = evtGetFloat(event, args[0]);
@@ -586,12 +585,12 @@ USER_FUNC(namiyoke_se_check) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(namiyoke_fail_stop) {
+static USER_FUNC(namiyoke_fail_stop) {
     marioShipForceStop();
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(dou_namiatari_check) {
+static USER_FUNC(dou_namiatari_check) {
     EvtWord* args = event->args;
     MarioWork* mario = marioGetPtr();
     f32 x = evtGetFloat(event, args[0]);
@@ -626,7 +625,7 @@ USER_FUNC(dou_namiatari_check) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(nami_running_func) {
+static USER_FUNC(nami_running_func) {
     f32* lwf = event->lwDataF;
     EvtWord* args = event->args;
     f32 s;
@@ -674,7 +673,7 @@ USER_FUNC(nami_running_func) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(nami_running_init_func) {
+static USER_FUNC(nami_running_init_func) {
     f32* lwf = event->lwDataF;
 
     lwf[6] = event->lwData[11];
@@ -683,7 +682,7 @@ USER_FUNC(nami_running_init_func) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(namiyoke_set_mapobj) {
+static USER_FUNC(namiyoke_set_mapobj) {
     EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
@@ -694,7 +693,7 @@ USER_FUNC(namiyoke_set_mapobj) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_sub_entrymgr_getreg) {
+static USER_FUNC(evt_sub_entrymgr_getreg) {
     EvtWord* args = event->args;
     EntryMgr* mgr = (EntryMgr*)evtGetValue(event, args[0]);
     EntryMgrEntry* e = mgr->entries;
@@ -712,7 +711,7 @@ USER_FUNC(evt_sub_entrymgr_getreg) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_sub_entrymgr_setreg) {
+static USER_FUNC(evt_sub_entrymgr_setreg) {
     EvtWord* args = event->args;
     EntryMgr* mgr = (EntryMgr*)evtGetValue(event, args[0]);
     EntryMgrEntry* e = mgr->entries;
@@ -730,7 +729,7 @@ USER_FUNC(evt_sub_entrymgr_setreg) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_sub_entrymgr_check) {
+static USER_FUNC(evt_sub_entrymgr_check) {
     EvtWord* args = event->args;
     EntryMgr* mgr = (EntryMgr*)evtGetValue(event, args[0]);
     EntryMgrEntry* e = mgr->entries;
@@ -751,7 +750,7 @@ USER_FUNC(evt_sub_entrymgr_check) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_sub_entrymgr_delete) {
+static USER_FUNC(evt_sub_entrymgr_delete) {
     EvtWord* args = event->args;
     EntryMgr* mgr = (EntryMgr*)evtGetValue(event, args[0]);
     EntryMgrEntry* e = mgr->entries;
@@ -771,7 +770,7 @@ USER_FUNC(evt_sub_entrymgr_delete) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_sub_entrymgr_entry) {
+static USER_FUNC(evt_sub_entrymgr_entry) {
     EvtWord* args = event->args;
     EntryMgr* mgr = (EntryMgr*)evtGetValue(event, args[0]);
     EntryMgrEntry* e = mgr->entries;
@@ -791,7 +790,7 @@ USER_FUNC(evt_sub_entrymgr_entry) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_sub_entrymgr_init) {
+static USER_FUNC(evt_sub_entrymgr_init) {
     EvtWord* args = event->args;
     EntryMgr* mgr = _mapAlloc(sizeof(EntryMgr));
 

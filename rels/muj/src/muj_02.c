@@ -28,7 +28,6 @@
 #include "evt/evt_pouch.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "version.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
@@ -38,10 +37,10 @@
 #include "driver/hitdrv.h"
 #endif
 
-void printCount(CameraId camera, void* param);
+static void printCount(CameraId camera, void* param);
 
-USER_FUNC(countDisp);
-void printCount(CameraId camera, void* param);
+static USER_FUNC(countDisp);
+static void printCount(CameraId camera, void* param);
 
 static BeroEntry bero_entry_data[4];
 extern EvtWord mony_peton_setup[];
@@ -170,7 +169,7 @@ EVT_BEGIN(lost_wedding_ring)
     DELETE_EVENT(LW(0))
     CALL(evt_npc_get_reglid, STRING("ピートン"), LW(0))
     DELETE_EVENT(LW(0))
-    CALL_CHILD(PTR(mony_peton_setup))
+    CALL_CHILD(mony_peton_setup)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_HAND_UP1_4"), LW(0), LW(1), LW(2), 0)
@@ -268,7 +267,11 @@ EVT_BEGIN(wedding_ring_consign)
     SET_VALUE(LW(0), 0)
     CALL(evt_pouch_check_item, ITEM_WEDDING_RING, LW(10))
     IF_INT_NOT_EQUAL(LW(10), 0)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_win_item_select, PTR(itemsel_table00), LW(10))
+#else
         CALL(evt_win_item_select, 0, PTR(itemsel_table00), LW(10), 0)
+#endif
         IF_INT_NOT_EQUAL(LW(10), -1)
             CALL(evt_pouch_remove_item, ITEM_WEDDING_RING, LW(10))
             SET_VALUE(LW(0), 1)
@@ -285,7 +288,7 @@ EVT_BEGIN(find_wedding_ring)
     DELETE_EVENT(LW(0))
     CALL(evt_npc_get_reglid, STRING("ピートン"), LW(0))
     DELETE_EVENT(LW(0))
-    CALL_CHILD(PTR(mony_peton_setup))
+    CALL_CHILD(mony_peton_setup)
     CALL(evt_set_dir_to_target, STRING("モニー"), STRING("ピートン"))
     CALL(evt_set_dir_to_target, STRING("ピートン"), STRING("モニー"))
     WAIT_MS(500)
@@ -381,7 +384,7 @@ EVT_BEGIN(mony_regl)
     SET_VALUE(LW(0), 500)
     SET_VALUE(LW(1), 0)
     SET_VALUE(LW(2), -40)
-    CALL_CHILD(PTR(mony_peton_regl))
+    CALL_CHILD(mony_peton_regl)
     RETURN
 EVT_END()
 
@@ -390,16 +393,16 @@ static EVT_BEGIN(mony_talk)
         CASE_EQUAL(STORY_STG5_63_KEELHAUL_ANYTIME)
         CALL(evt_msg_print, 0, STRING("stg5_muj_169"), 0, STRING("me"))
         SET_VALUE(LW(10), 0)
-        CALL_CHILD(PTR(lost_wedding_ring))
+        CALL_CHILD(lost_wedding_ring)
         SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_64_LOST_WEDDING_RING)
         CASE_EQUAL(STORY_STG5_64_LOST_WEDDING_RING)
-        CALL_CHILD(PTR(wedding_ring_consign))
+        CALL_CHILD(wedding_ring_consign)
         IF_INT_EQUAL(LW(0), 0)
             CALL(evt_msg_print, 0, STRING("stg5_muj_192"), 0, STRING("me"))
         ELSE
             CALL(evt_msg_print, 0, STRING("stg5_muj_194"), 0, STRING("me"))
             SET_VALUE(LW(10), 0)
-            CALL_CHILD(PTR(find_wedding_ring))
+            CALL_CHILD(find_wedding_ring)
             SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_64_01_WEDDING_RING_DELIVERY)
         END_IF
     END_SWITCH
@@ -419,7 +422,7 @@ EVT_BEGIN(peton_regl)
     SET_VALUE(LW(0), 400)
     SET_VALUE(LW(1), 0)
     SET_VALUE(LW(2), -40)
-    CALL_CHILD(PTR(mony_peton_regl))
+    CALL_CHILD(mony_peton_regl)
     RETURN
 EVT_END()
 
@@ -428,16 +431,16 @@ static EVT_BEGIN(peton_talk)
         CASE_EQUAL(STORY_STG5_63_KEELHAUL_ANYTIME)
         CALL(evt_msg_print, 0, STRING("stg5_muj_170"), 0, STRING("me"))
         SET_VALUE(LW(10), 1)
-        CALL_CHILD(PTR(lost_wedding_ring))
+        CALL_CHILD(lost_wedding_ring)
         SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_64_LOST_WEDDING_RING)
         CASE_EQUAL(STORY_STG5_64_LOST_WEDDING_RING)
-        CALL_CHILD(PTR(wedding_ring_consign))
+        CALL_CHILD(wedding_ring_consign)
         IF_INT_EQUAL(LW(0), 0)
             CALL(evt_msg_print, 0, STRING("stg5_muj_193"), 0, STRING("me"))
         ELSE
             CALL(evt_msg_print, 0, STRING("stg5_muj_195"), 0, STRING("me"))
             SET_VALUE(LW(10), 1)
-            CALL_CHILD(PTR(find_wedding_ring))
+            CALL_CHILD(find_wedding_ring)
             SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_64_01_WEDDING_RING_DELIVERY)
         END_IF
     END_SWITCH
@@ -446,7 +449,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"モニー"*/"\x83\x82\x83\x6A\x81\x5B", // name
+        "モニー", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         mony_init, // initEvent
@@ -458,7 +461,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ピートン"*/"\x83\x73\x81\x5B\x83\x67\x83\x93", // name
+        "ピートン", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         peton_init, // initEvent
@@ -488,7 +491,7 @@ EVT_END()
 EVT_BEGIN(evt_treeb_01)
     CALL(evt_item_delete_check, STRING("item_treeb_01"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_treeb_01"), ITEM_KEEL_MANGO, -350, 90, -70, 14, GSWF(GSWF_MUJ02_KEEL_MANGO_TAKEN), 0)
+        CALL(evt_item_entry, STRING("item_treeb_01"), ITEM_KEEL_MANGO, -350, 90, -70, ITEM_ENTRY_FALL_THROWN, GSWF(GSWF_MUJ02_KEEL_MANGO_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -496,7 +499,7 @@ EVT_END()
 static EVT_BEGIN(evt_kusa_2)
     CALL(evt_item_delete_check, STRING("item_kusa_2"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_kusa_2"), ITEM_COIN, 323, 0, 50, 4, GSWF(GSWF_MUJ02_BUSH_COIN_TAKEN), 0)
+        CALL(evt_item_entry, STRING("item_kusa_2"), ITEM_COIN, 323, 0, 50, ITEM_ENTRY_LAUNCH, GSWF(GSWF_MUJ02_BUSH_COIN_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -504,7 +507,7 @@ EVT_END()
 static EVT_BEGIN(evt_kusa_6)
     CALL(evt_item_delete_check, STRING("item_kusa_6"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_kusa_6"), ITEM_STAR_PIECE, -500, 0, 110, 4, GSWF(GSWF_MUJ02_STAR_PIECE_BUSH), 0)
+        CALL(evt_item_entry, STRING("item_kusa_6"), ITEM_STAR_PIECE, -500, 0, 110, ITEM_ENTRY_LAUNCH, GSWF(GSWF_MUJ02_STAR_PIECE_BUSH), 0)
     END_IF
     RETURN
 EVT_END()
@@ -555,10 +558,10 @@ EVT_BEGIN(muj_02_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_MUJ1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_MUJ4"))
     SET_VALUE(GSWF(GSWF_MUJ02_KEEL_MANGO_TAKEN), 0)
-    CALL_CHILD(PTR(evt_switch_init))
+    CALL_CHILD(evt_switch_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_npc_set_tribe, STRING("ピートン"), STRING("ピートン（指輪）"))
 #if VERSION >= VERSION_US
@@ -573,7 +576,7 @@ EVT_BEGIN(muj_02_init_evt)
     END_IF
     CALL(evt_map_playanim, STRING("mizu"), 1, 0)
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
-    CALL_CHILD(PTR(evt_gazigazi_entry))
+    CALL_CHILD(evt_gazigazi_entry)
     CALL(evt_eff64, STRING("sunlight"), STRING("sunlight_n64"), 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_mobj_badgeblk, STRING("mobj_badge_gat"), -200, 60, -90, ITEM_HEAD_RATTLE, 0, GSWF(GSWF_MUJ02_HEAD_RATTLE_BLOCK_HIT), 1)
     CALL(evt_mobj_badgeblk, STRING("mobj_hatena"), -135, 0, 135, ITEM_COURAGE_SHELL, 0, GSWF(GSWF_MUJ02_COURAGE_SHELL_BLOCK_HIT), 0)
@@ -587,16 +590,16 @@ EVT_BEGIN(muj_02_init_evt)
         SET_VALUE(GSWF(GSWF_MUJ02_KEEL_MANGO_TAKEN), 1)
     END_IF
 #endif
-    CALL_CHILD(PTR(evt_sub_tree_access_entry))
+    CALL_CHILD(evt_sub_tree_access_entry)
     SET_VALUE(LW(0), PTR(kusa_tbl))
-    CALL_CHILD(PTR(evt_sub_kusa_access_entry))
+    CALL_CHILD(evt_sub_kusa_access_entry)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S"), MAPOBJ_FLAG_BBOX_CULL)
     RETURN
 EVT_END()
 
 // (body lives in countDisp.c to keep the original definition order)
 // printCount comes first so the deferred compile emits both functions in the original order
-void printCount(CameraId camera, void* param) {
+static void printCount(CameraId camera, void* param) {
 #if VERSION >= VERSION_US
     char buf[32];
 #else
@@ -654,7 +657,7 @@ void printCount(CameraId camera, void* param) {
 #endif
 }
 
-USER_FUNC(countDisp) {
+static USER_FUNC(countDisp) {
     dispEntry(CAMERA_2D, 399.0f, 0, printCount, NULL);
     return EVT_RETURN_BLOCK;
 }

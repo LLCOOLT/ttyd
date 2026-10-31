@@ -51,8 +51,8 @@ static effN64Vtx size10x10_tex32x32_vtx[] = {
     {-5, 5, 0, 0, 4096, 0, 0, 0, 255},
 };
 
-void effLensflareMain(EffectEntry* effect);
-void effLensflareDisp(CameraId cameraId, EffectEntry* effect);
+static void effLensflareMain(EffectEntry* effect);
+static void effLensflareDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effLensflareN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -88,7 +88,7 @@ EffectEntry* effLensflareN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f
     return effect;
 }
 
-void effLensflareMain(EffectEntry* effect) {
+static void effLensflareMain(EffectEntry* effect) {
     EffLensflareN64Elem* e = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -130,7 +130,7 @@ void effLensflareMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effLensflareDisp, effect);
 }
 
-void effLensflareDisp(CameraId cameraId, EffectEntry* effect) {
+static void effLensflareDisp(CameraId cameraId, EffectEntry* effect) {
     s32 ang1;
     s32 odd;
     s32 ang2;

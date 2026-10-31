@@ -428,7 +428,7 @@ typedef enum BattlePoseType {
     BTL_POSE_ITEM_USE = 52, // holding up an item
     BTL_POSE_DANGER = 56,   // low HP (status flag 0x10000000)
     BTL_POSE_PERIL = 57,    // very low HP (status flag 0x20000000)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     BTL_POSE_ESCAPE_FAIL = 58, // failed Run Away: tumble
 #else
     BTL_POSE_KISSED_CHRISTINE = 58, // target of Goombella's kiss move

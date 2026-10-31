@@ -23,13 +23,13 @@
 #include "evt/evt_party.h"
 #include "evt/evt_pouch.h"
 #include "evt/evt_snd.h"
+#include "party.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "system.h"
 #include "dou.h"
 #include "evt/evt_story.h"
 
-USER_FUNC(evt_box_pukapuka);
+static USER_FUNC(evt_box_pukapuka);
 
 static BeroEntry bero_entry_data[2];
 extern EvtWord box_trans[];
@@ -45,7 +45,7 @@ static HitDamageReturn hitDmgRetPoints[4];
 extern EvtWord kuribo_talk[];
 static NpcSetupInfo npcEnt[2];
 
-USER_FUNC(evt_mario_check_menu) {
+static USER_FUNC(evt_mario_check_menu) {
     EvtWord* args = event->args;
 
     evtSetValue(event, args[0], marioCheckMenuDisable());
@@ -107,8 +107,8 @@ EVT_BEGIN(box_event)
     SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(0.0f))
     SET_FLOAT_VALUE(GW(2), FLOAT(0.0f))
-    SPAWN_EVENT(PTR(box_trans))
-    SPAWN_EVENT(PTR(box_pukapuka))
+    SPAWN_EVENT(box_trans)
+    SPAWN_EVENT(box_pukapuka)
     CALL(evt_hit_bind_mapobj, STRING("a04_m_hako_03"), STRING("s04_m_hako_a"))
     LOOP(0)
         CALL(evt_sub_intpl_msec_init, 1, 0, 3, 500)
@@ -353,7 +353,7 @@ EVT_BEGIN(lift_main_00)
             SET_VALUE(LW(0), 0)
             SET_FLOAT_VALUE(LW(3), LW(4))
         END_IF
-        CALL_CHILD(PTR(lift_event_00))
+        CALL_CHILD(lift_event_00)
         WAIT_MS(4000)
         IF_INT_EQUAL(LF(10), 0)
             SET_VALUE(LW(0), 1)
@@ -362,7 +362,7 @@ EVT_BEGIN(lift_main_00)
             SET_VALUE(LW(0), 1)
             SET_FLOAT_VALUE(LW(3), LW(4))
         END_IF
-        CALL_CHILD(PTR(lift_event_00))
+        CALL_CHILD(lift_event_00)
         SET_VALUE(GF(10), 1)
     END_LOOP
     RETURN
@@ -379,7 +379,7 @@ EVT_BEGIN(lift_main_01)
             SET_VALUE(LW(0), 0)
             SET_FLOAT_VALUE(LW(3), LW(4))
         END_IF
-        CALL_CHILD(PTR(lift_event_01))
+        CALL_CHILD(lift_event_01)
         WAIT_MS(4000)
         IF_INT_EQUAL(LF(10), 0)
             SET_VALUE(LW(0), 1)
@@ -388,7 +388,7 @@ EVT_BEGIN(lift_main_01)
             SET_VALUE(LW(0), 1)
             SET_FLOAT_VALUE(LW(3), LW(4))
         END_IF
-        CALL_CHILD(PTR(lift_event_01))
+        CALL_CHILD(lift_event_01)
         SET_VALUE(GF(10), 1)
     END_LOOP
     RETURN
@@ -398,8 +398,8 @@ EVT_BEGIN(lift_event_init)
     CALL(evt_hit_bind_mapobj, STRING("a04_m_hako_01"), STRING("s04_m_ita_b"))
     CALL(evt_hit_bind_mapobj, STRING("a04_m_hako_02"), STRING("s04_m_hako_b"))
     SET_VALUE(GF(10), 1)
-    SPAWN_EVENT(PTR(lift_main_00))
-    SPAWN_EVENT(PTR(lift_main_01))
+    SPAWN_EVENT(lift_main_00)
+    SPAWN_EVENT(lift_main_01)
     RETURN
 EVT_END()
 
@@ -479,7 +479,7 @@ EVT_BEGIN(kuribo_talk)
                 ADD(LW(0), 10)
                 ADD(LW(1), 15)
                 ADD(LW(2), 5)
-                CALL(evt_item_entry, STRING("ff"), ITEM_COUPLES_CAKE, LW(0), LW(1), LW(2), 17, GSWF(GSWF_DOU04_TROUBLE21_COUPLES_CAKE_TAKEN), 0)
+                CALL(evt_item_entry, STRING("ff"), ITEM_COUPLES_CAKE, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, GSWF(GSWF_DOU04_TROUBLE21_COUPLES_CAKE_TAKEN), 0)
                 WAIT_MS(800)
                 CALL(evt_msg_print, 0, STRING("irai_21_006"), 0, STRING("party"))
                 WAIT_MS(500)
@@ -639,7 +639,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"クリチェロ"*/"\x83\x4E\x83\x8A\x83\x60\x83\x46\x83\x8D", // name
+        "クリチェロ", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         kuribo_init, // initEvent
@@ -659,26 +659,26 @@ EVT_BEGIN(dou_04_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     WAIT_FRAMES(1)
     CALL(evt_npc_setup, PTR(npcEnt))
-    SPAWN_EVENT(PTR(box_event))
+    SPAWN_EVENT(box_event)
     CALL(evt_mobj_switch_red, 0, STRING("mobj00"), 25, 32, 125, PTR(lift_event), 0)
-    SPAWN_EVENT(PTR(lift_event_init))
+    SPAWN_EVENT(lift_event_init)
     CALL(evt_map_playanim, STRING("nami"), 1, 0)
     CALL(evt_map_playanim, STRING("moku"), 1, 0)
-    CALL(evt_item_entry, STRING("kagitsume"), ITEM_GROTTO_KEY, 122, 110, -118, 0, GSWF(GSWF_DOU04_GROTTO_KEY_TAKEN), 0)
-    CALL(evt_item_entry, STRING("starpice"), ITEM_STAR_PIECE, -230, 200, 110, 0, GSWF(GSWF_DOU04_STAR_PIECE), 0)
+    CALL(evt_item_entry, STRING("kagitsume"), ITEM_GROTTO_KEY, 122, 110, -118, ITEM_ENTRY_STAY, GSWF(GSWF_DOU04_GROTTO_KEY_TAKEN), 0)
+    CALL(evt_item_entry, STRING("starpice"), ITEM_STAR_PIECE, -230, 200, 110, ITEM_ENTRY_STAY, GSWF(GSWF_DOU04_STAR_PIECE), 0)
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
-    CALL_CHILD(PTR(evt_gazigazi_entry))
+    CALL_CHILD(evt_gazigazi_entry)
     CALL(evt_mobj_powerupblk, STRING("pblk00"), -230, 290, -105, 0, GSWF(GSWF_DOU04_SHINE_SPRITE), 0)
     IF_INT_EQUAL(GSWF(GSWF_TROUBLE_21_SOLVED), 1)
-        CALL(evt_item_entry, STRING("iri_21"), ITEM_COUPLES_CAKE, -165, 10, 106, 16, GSWF(GSWF_DOU04_TROUBLE21_COUPLES_CAKE_TAKEN), 0)
+        CALL(evt_item_entry, STRING("iri_21"), ITEM_COUPLES_CAKE, -165, 10, 106, ITEM_ENTRY_FIXED, GSWF(GSWF_DOU04_TROUBLE21_COUPLES_CAKE_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
 
-USER_FUNC(evt_box_pukapuka) {
+static USER_FUNC(evt_box_pukapuka) {
     EvtWord* args = event->args;
     f32 y;
 
@@ -694,7 +694,7 @@ USER_FUNC(evt_box_pukapuka) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(evt_mapgrp_translate2) {
+static USER_FUNC(evt_mapgrp_translate2) {
     EvtWord* args = event->args;
     MarioWork* mario = marioGetPtr();
     const char* name = (const char*)evtGetValue(event, args[0]);

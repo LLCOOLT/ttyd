@@ -117,7 +117,7 @@ static struct {
             },
             0};
 
-static s32 jetw_ry_tbl[] = {0, 40, 55, 190, 20, 130, 270, 300};
+static s32 dat_ry[] = {0, 40, 55, 190, 20, 130, 270, 300};
 
 static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, -8, 0, 0, 0, 255, 255, 255, 255},
@@ -133,8 +133,8 @@ effN64Vtx size6x22_tex32x32_vtx[] = {
     {-3, 22, 0, 0, 1024, 255, 255, 255, 255},
 };
 
-void effOpukuJetwMain(EffectEntry* effect);
-void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect);
+static void effOpukuJetwMain(EffectEntry* effect);
+static void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effOpukuJetwN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -171,7 +171,7 @@ EffectEntry* effOpukuJetwN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f
     return effect;
 }
 
-void effOpukuJetwMain(EffectEntry* effect) {
+static void effOpukuJetwMain(EffectEntry* effect) {
     EffOpukuJetwN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -198,7 +198,7 @@ void effOpukuJetwMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effOpukuJetwDisp, effect);
 }
 
-void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
+static void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx mtx;
     Mtx scale;
     Mtx rot;
@@ -273,7 +273,7 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
                     PSMTXTrans(mtx, (f32)ptr[idx].x, 10.0f + (f32)ptr[idx].y, 0.0f);
                     PSMTXScale(scale, 0.01f * (f32)tbl[idx].sx, 0.01f * (f32)tbl[idx].sy, 1.0f);
                     PSMTXConcat(mtx, scale, mtx);
-                    PSMTXRotRad(rot, 'z', 0.017453292f * ((f32)ptr[idx].rot + (f32)jetw_ry_tbl[(j + i) & 7]));
+                    PSMTXRotRad(rot, 'z', 0.017453292f * ((f32)ptr[idx].rot + (f32)dat_ry[(j + i) & 7]));
                     PSMTXConcat(mtx, rot, mtx);
                     PSMTXConcat(mtx2, mtx, mtx);
                     GXLoadPosMtxImm(mtx, GX_PNMTX0);

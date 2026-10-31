@@ -33,8 +33,8 @@ typedef struct EffStarPowerN64Work {
     f32 prevScale; // 0x54
 } EffStarPowerN64Work;
 
-void effStarPowerMain(EffectEntry* effect);
-void effStarPowerDisp(CameraId cameraId, EffectEntry* effect);
+static void effStarPowerMain(EffectEntry* effect);
+static void effStarPowerDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effStarPowerN64Entry(s32 id, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -73,7 +73,7 @@ EffectEntry* effStarPowerN64Entry(s32 id, s32 lifetime, f32 x, f32 y, f32 z, f32
     return effect;
 }
 
-void effStarPowerMain(EffectEntry* effect) {
+static void effStarPowerMain(EffectEntry* effect) {
     EffStarPowerN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -197,7 +197,7 @@ effN64Vtx testsrc_akari_v[] = {
     {-107, -35, 0, 620, 770, 0, 0, 0, 255},
 };
 
-void effStarPowerDisp(CameraId cameraId, EffectEntry* effect) {
+static void effStarPowerDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     s32 half;
     EffStarPowerN64Work* work;

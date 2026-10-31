@@ -8,7 +8,6 @@
 #include "evt/evt_map.h"
 #include "evt/evt_npc.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "hei.h"
 #include "data_tables.h"
 #include "version.h"
@@ -60,11 +59,7 @@ static BeroEntry bero_entry_data[] = {
 static EVT_BEGIN(evt_ki_3)
     CALL(evt_item_delete_check, STRING("item_ki_3"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-#if VERSION == VERSION_DEMO
-        CALL(evt_item_entry, STRING("item_ki_3"), ITEM_COIN, 17, 90, -122, 13, GSWF(GSWF_HEI04_TREE_COIN_TAKEN), 0)
-#else
-        CALL(evt_item_entry, STRING("item_ki_3"), ITEM_COIN, 17, 90, -122, 14, GSWF(GSWF_HEI04_TREE_COIN_TAKEN), 0)
-#endif
+        CALL(evt_item_entry, STRING("item_ki_3"), ITEM_COIN, 17, 90, -122, ITEM_ENTRY_FALL_THROWN, GSWF(GSWF_HEI04_TREE_COIN_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -79,7 +74,7 @@ static TreeAccess ki_data[] = {
 EVT_BEGIN(evt_kusa_11)
     CALL(evt_item_delete_check, STRING("item_kusa_11"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_kusa_11"), ITEM_COIN, 364, 75, -95, 4, GSWF(GSWF_HEI04_BUSH_COIN_TAKEN), 0)
+        CALL(evt_item_entry, STRING("item_kusa_11"), ITEM_COIN, 364, 75, -95, ITEM_ENTRY_LAUNCH, GSWF(GSWF_HEI04_BUSH_COIN_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -87,7 +82,7 @@ EVT_END()
 EVT_BEGIN(evt_kusa_12)
     CALL(evt_item_delete_check, STRING("item_kusa_12"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_kusa_12"), ITEM_POW_BLOCK, 320, 75, -55, 4, GSWF(GSWF_HEI04_BUSH_POW_BLOCK_TAKEN), 0)
+        CALL(evt_item_entry, STRING("item_kusa_12"), ITEM_POW_BLOCK, 320, 75, -55, ITEM_ENTRY_LAUNCH, GSWF(GSWF_HEI04_BUSH_POW_BLOCK_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -110,15 +105,15 @@ static KusaAccess kusa_data[] = {
 EVT_BEGIN(hei_04_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_HEI1"))
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_HEI1"))
     CALL(evt_npc_change_fbat_mode, 1)
     SET_VALUE(LW(0), PTR(ki_data))
-    CALL_CHILD(PTR(evt_sub_tree_access_entry))
+    CALL_CHILD(evt_sub_tree_access_entry)
     SET_VALUE(LW(0), PTR(kusa_data))
-    CALL_CHILD(PTR(evt_sub_kusa_access_entry))
+    CALL_CHILD(evt_sub_kusa_access_entry)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("group1"), MAPOBJ_FLAG_BBOX_CULL)
     RETURN
 EVT_END()

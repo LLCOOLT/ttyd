@@ -46,8 +46,8 @@ static effN64Vtx size16x16_tex16x16_vtx[] = {
     {-8, 8, 0, 0, 2048, 0, 0, 0, 255},
 };
 
-void effPikkyoloMain(EffectEntry* effect);
-void effPikkyoloDisp(CameraId cameraId, EffectEntry* effect);
+static void effPikkyoloMain(EffectEntry* effect);
+static void effPikkyoloDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effPikkyoloN64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -100,7 +100,7 @@ EffectEntry* effPikkyoloN64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 sc
     return effect;
 }
 
-void effPikkyoloMain(EffectEntry* effect) {
+static void effPikkyoloMain(EffectEntry* effect) {
     EffPikkyoloN64Work* work = effect->userdata;
     s32 i;
     Vec position;
@@ -139,7 +139,7 @@ void effPikkyoloMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effPikkyoloDisp, effect);
 }
 
-void effPikkyoloDisp(CameraId cameraId, EffectEntry* effect) {
+static void effPikkyoloDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffPikkyoloN64Work* work;
     s32 i;

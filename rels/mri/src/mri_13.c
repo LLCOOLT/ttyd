@@ -22,14 +22,13 @@
 #include "evt/evt_npc.h"
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "version.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
 #include "driver/mapdrv.h"
 #include "driver/camdrv.h"
 
-USER_FUNC(yuka_fall_check);
+static USER_FUNC(yuka_fall_check);
 
 BeroEntry bero_dai3_kanbu[1];
 static BeroEntry bero_entry_data[3];
@@ -116,7 +115,7 @@ static EVT_BEGIN(punipuni_mario_halt)
 EVT_END()
 
 static EVT_BEGIN(punipuni_ball00_init)
-    CALL_CHILD(PTR(mri_punipuni_setup))
+    CALL_CHILD(mri_punipuni_setup)
     IF_INT_EQUAL(GSWF(GSWF_MRI13_ORB_ON_PEDESTAL), 1)
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG2_21_06_WATER_SWITCH)
             CALL(evt_item_set_position, LW(10), -55, 30, 0)
@@ -138,7 +137,7 @@ EVT_END()
 static EVT_BEGIN(punipuni_ball00)
     CALL(evt_mario_key_onoff, 0)
     IF_INT_EQUAL(GSWF(GSWF_MRI13_ORB_ON_PEDESTAL), 0)
-        CALL_CHILD(PTR(mri_punipuni_itemselect))
+        CALL_CHILD(mri_punipuni_itemselect)
         IF_INT_EQUAL(LW(1), 0)
             GOTO(100)
         END_IF
@@ -150,12 +149,12 @@ static EVT_BEGIN(punipuni_ball00)
         END_IF
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_sui_hikari"), MAPOBJ_FLAG_HIDE)
         SET_VALUE(GF(0), 1)
-        CALL_CHILD(PTR(mri_punipuni_itemset))
+        CALL_CHILD(mri_punipuni_itemset)
         SET_VALUE(GF(0), 0)
     ELSE
         SET_VALUE(GSWF(GSWF_MRI13_ORB_ON_PEDESTAL), 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_sui_hikari"), MAPOBJ_FLAG_HIDE)
-        CALL_CHILD(PTR(mri_punipuni_itemremove))
+        CALL_CHILD(mri_punipuni_itemremove)
     END_IF
     LABEL(100)
     CALL(evt_mario_key_onoff, 1)
@@ -210,7 +209,7 @@ EVT_BEGIN(yuka_slot)
     RETURN
 EVT_END()
 
-USER_FUNC(yuka_fall_check) {
+static USER_FUNC(yuka_fall_check) {
     s32 i;
 
     for (i = 1; i < 103; i++) {
@@ -246,7 +245,7 @@ static USER_FUNC(evt_puni_force_pose) {
 }
 
 EVT_BEGIN(yuka_shake)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     LOOP(0)
         CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 1500)
 #else
@@ -258,7 +257,7 @@ EVT_BEGIN(yuka_shake)
 EVT_END()
 
 EVT_BEGIN(yuka_shake2)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 500)
     CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0087890625f), FLOAT(0.0f), 1000)
     CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.0078125f), FLOAT(0.0f), 1000)
@@ -393,7 +392,7 @@ EVT_BEGIN(yuka_event)
     CALL(evt_snd_sfxoff, GW(4))
     DELETE_EVENT(LW(10))
     CALL(evt_snd_sfxon, STRING("SFX_STG2_QUAKE1"), GW(3))
-    SPAWN_EVENT(PTR(yuka_shake2))
+    SPAWN_EVENT(yuka_shake2)
     CALL(evt_hit_bind_mapobj, STRING("A_sui_l1"), STRING("S_sui_l"))
     CALL(evt_hit_bind_mapobj, STRING("A_dai"), STRING("S_dai"))
     CALL(evt_hit_bind_mapobj, STRING("A_dai_02"), STRING("S_dai"))
@@ -453,12 +452,12 @@ EVT_BEGIN(yuka_event)
     CALL(evt_hitobj_onoff, STRING("A_sui_l1"), 1, 0)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
-    SPAWN_EVENT(PTR(yuka_check))
+    SPAWN_EVENT(yuka_check)
     CALL(evt_target_flag_onoff, 0, 0, 1)
     CALL(evt_target_set_position, 0, -55, -309, 50)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_21_06_WATER_SWITCH)
     CALL(evt_puni_set_hamari, -180, -310, 60, 2, -2, -306, -312)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(evt_puni_winddisable_onoff, 0)
 #endif
     CALL(evt_mario_key_onoff, 1)
@@ -468,7 +467,7 @@ EVT_END()
 static EVT_BEGIN(evt_f1_ueki_01)
     CALL(evt_item_delete_check, STRING("item_ueki_01"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_ueki_01"), ITEM_MUSHROOM, -190, -309, 115, 4, GSWF(GSWF_MRI13_PLANTER_MUSHROOM_TAKEN), 0)
+        CALL(evt_item_entry, STRING("item_ueki_01"), ITEM_MUSHROOM, -190, -309, 115, ITEM_ENTRY_LAUNCH, GSWF(GSWF_MRI13_PLANTER_MUSHROOM_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -491,14 +490,14 @@ EVT_BEGIN(mri_13_init_evt)
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(9), 0)
-    CALL_CHILD(PTR(mri_puni_init))
+    CALL_CHILD(mri_puni_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    SPAWN_EVENT(PTR(puni_disp_info))
-    SPAWN_EVENT(PTR(mri_countdown))
+    CALL_CHILD(evt_bero_info_run)
+    SPAWN_EVENT(puni_disp_info)
+    SPAWN_EVENT(mri_countdown)
     SET_VALUE(LW(0), PTR(ueki_access_data))
-    CALL_CHILD(PTR(evt_sub_kusa_access_entry))
+    CALL_CHILD(evt_sub_kusa_access_entry)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG2_23_TIME_BOMB_ACTIVATED, STORY_STG2_23_01_X_NAUT_BATTLE)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
@@ -519,27 +518,27 @@ EVT_BEGIN(mri_13_init_evt)
         CALL(evt_hitobj_onoff, STRING("A_f2_rak"), 1, 0)
         SPAWN_EVENT_GET_ID(PTR(yuka_slot), GW(1))
         SPAWN_EVENT_GET_ID(PTR(yuka_check), GW(2))
-        SPAWN_EVENT(PTR(yuka_event))
+        SPAWN_EVENT(yuka_event)
         CALL(evt_puni_set_hamari, -250, 0, 60, 2, -2, -306, -312)
     ELSE
-        SPAWN_EVENT(PTR(yuka_init))
-        SPAWN_EVENT(PTR(yuka_check))
+        SPAWN_EVENT(yuka_init)
+        SPAWN_EVENT(yuka_check)
         CALL(evt_puni_set_hamari, -180, -310, 60, 2, -2, -306, -312)
     END_IF
     SET_VALUE(LW(0), STRING("S_sui_l"))
     SET_RAW_VALUE(LW(1), GW(0))
     SET_VALUE(LW(2), 100)
-    SPAWN_EVENT(PTR(mri_hikari_color))
+    SPAWN_EVENT(mri_hikari_color)
     SET_VALUE(LW(10), STRING("punipuni"))
     SET_VALUE(LW(11), 0)
-    SPAWN_EVENT(PTR(punipuni_ball00_init))
+    SPAWN_EVENT(punipuni_ball00_init)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_dai"), 0, PTR(punipuni_ball00), 0)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG2_22_LORD_CRUMP_APPEARS)
         SET_VALUE(LW(0), STRING("e_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_bero_overwrite, STRING("e_bero"), PTR(bero_dai3_kanbu))
         SET_VALUE(LW(0), STRING("e_bero"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
     END_IF
     RETURN
 EVT_END()

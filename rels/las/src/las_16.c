@@ -15,7 +15,6 @@
 #include "evt/evt_offscreen.h"
 #include "evt/evt_paper.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "las.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
@@ -60,7 +59,7 @@ static BeroEntry bero_entry_data[] = {
 static EVT_BEGIN(box_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("key"), ITEM_PALACE_KEY_0x2B, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("key"), ITEM_PALACE_KEY_0x2B, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("box"))
     CALL(evt_item_get_item, STRING("key"))
     CALL(evt_mario_key_onoff, 1)
@@ -137,10 +136,12 @@ EVT_END()
 EVT_BEGIN(las_16_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST2"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 2)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     IF_INT_EQUAL(GSWF(GSWF_LAS16_WALL_BOMBED), 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_ana_after"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_ana_after"), 1, 0)

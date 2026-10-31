@@ -10,7 +10,7 @@
 #include "evt/evt_msg.h"
 #include "evt/evt_npc.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "tik.h"
 #include "evt/evt_story.h"
 #include "driver/camdrv.h"
@@ -138,7 +138,7 @@ EVT_BEGIN(iri_12_kino_makkino_talk)
     CALL(evt_npc_move_position, STRING("キーノ"), LW(0), LW(2), 0, 60, 0)
     CALL(evt_mario_set_dir_npc, STRING("キーノ"))
     WAIT_MS(500)
-    CALL(evt_item_entry, STRING("tf"), ITEM_SILVER_CARD, 0, -1000, 0, 17, -1, 0)
+    CALL(evt_item_entry, STRING("tf"), ITEM_SILVER_CARD, 0, -1000, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_item_get_item, STRING("tf"))
     CALL(evt_item_get_item_end_wait, STRING("tf"))
     WAIT_MS(300)
@@ -182,7 +182,7 @@ EVT_BEGIN(iri_12_kino_talk)
             END_IF
         ELSE
             SET_VALUE(LW(0), 0)
-            CALL_CHILD(PTR(iri_12_kino_makkino_talk))
+            CALL_CHILD(iri_12_kino_makkino_talk)
         END_IF
     END_IF
     RETURN
@@ -190,7 +190,7 @@ EVT_END()
 
 static EVT_BEGIN(iri_12_makkino_talk)
     SET_VALUE(LW(0), 1)
-    CALL_CHILD(PTR(iri_12_kino_makkino_talk))
+    CALL_CHILD(iri_12_kino_makkino_talk)
     RETURN
 EVT_END()
 
@@ -247,15 +247,19 @@ static EVT_BEGIN(evt_kanban2)
 EVT_END()
 
 EVT_BEGIN(tik_06_init_evt)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_TIK1"))
+#else
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
+#endif
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_TIK1"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(iri_12_init))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(iri_12_init)
     CALL(evt_mobj_signboard, STRING("board"), -50, 0, 50, PTR(evt_kanban), LSWF(0))
     CALL(evt_mobj_signboard, STRING("board2"), 50, 0, -250, PTR(evt_kanban2), LSWF(0))
-    CALL(evt_item_entry, STRING("item_00"), ITEM_STAR_PIECE, 290, 0, -50, 16, GSWF(GSWF_TIK06_STAR_PIECE), 0)
+    CALL(evt_item_entry, STRING("item_00"), ITEM_STAR_PIECE, 290, 0, -50, ITEM_ENTRY_FIXED, GSWF(GSWF_TIK06_STAR_PIECE), 0)
     RETURN
 EVT_END()

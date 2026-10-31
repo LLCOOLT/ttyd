@@ -14,8 +14,8 @@
 
 static u8 anime_data[12] = {0x00, 0xFF, 0xD0, 0x1A, 0x78, 0x4D, 0xD0, 0xFE, 0xF0, 0xFE, 0x4C, 0x6E};
 
-void effMagic1Main(EffectEntry* effect);
-void effMagic1Disp(CameraId cameraId, EffectEntry* effect);
+static void effMagic1Main(EffectEntry* effect);
+static void effMagic1Disp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effMagic1N64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32 tz) {
     EffectEntry* effect;
@@ -61,7 +61,7 @@ EffectEntry* effMagic1N64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 tx, 
     return effect;
 }
 
-void effMagic1Main(EffectEntry* effect) {
+static void effMagic1Main(EffectEntry* effect) {
     EffMagic1N64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -71,7 +71,7 @@ void effMagic1Main(EffectEntry* effect) {
     tmp.y = work->offset.y;
     tmp.z = work->offset.z;
     position = tmp;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if ((u32)marioStGetSystemLevel() != 0) {
         dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effMagic1Disp, effect);
         return;
@@ -223,7 +223,7 @@ static void main_dl(EffectEntry* effect, Mtx base) {
     }
 }
 
-void effMagic1Disp(CameraId cameraId, EffectEntry* effect) {
+static void effMagic1Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffMagic1N64Work* w;
     f32 yaw;

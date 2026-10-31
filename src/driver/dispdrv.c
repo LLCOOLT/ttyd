@@ -15,7 +15,7 @@
 f32 offset_tbl[] = {
     400000.0f, 400000.0f, 600000.0f, 100000.0f, 100000.0f,
     300000.0f, 900000.0f, 1100000.0f, 1000000.0f, 500000.0f,
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     700000.0f //700K new in retail
 #endif
 };
@@ -27,7 +27,7 @@ DispEntry** pSortWork;
 DispEntry* pDispWork;
 
 // local prototypes
-s32 _sort(const void* sortA, const void* sortB);
+static s32 _sort(const void* sortA, const void* sortB);
 
 void dispInit(void) {
     pDispWork = __memAlloc(HEAP_DEFAULT, sizeof(DispEntry) * DISP_MAX_ENTRIES);
@@ -54,7 +54,7 @@ void dispEntry(CameraId camId, f32 order, s32 renderMode, DispCallback callback,
     switch (renderMode) {
         case 2:
         case 5:
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         case 9:
         case 10:
 #endif
@@ -69,7 +69,7 @@ void dispEntry(CameraId camId, f32 order, s32 renderMode, DispCallback callback,
     entry_n++;
 }
 
-s32 _sort(const void* sortA, const void* sortB) {
+static s32 _sort(const void* sortA, const void* sortB) {
     f32 orderB;
     f32 orderA;
 
@@ -138,7 +138,7 @@ void dispDraw(CameraId camId) {
                     break;
                 case 2:
                 case 5:
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 case 9:
                 case 10:
 #endif
@@ -175,9 +175,3 @@ f32 dispCalcZ(Vec* input) {
 DispEntry* dispGetCurWork(void) {
     return currentWorkPtr;
 }
-#if VERSION != VERSION_DEMO
-// FAKE: unnamed .sdata padding in the retail DOL (no symbol); force_active keeps the unreferenced words in the link
-#pragma force_active on
-u32 dispdrv_sdata_pad[7] = {0, 0, 0, 0, 0, 0, 0};
-#pragma force_active reset
-#endif

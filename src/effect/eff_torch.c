@@ -6,6 +6,9 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
+static void effTorchDisp(CameraId cameraId, EffectEntry* effect);
+static void effTorchMain(EffectEntry* effect);
+
 typedef struct EffTorchWork {
     s32 type;     // 0x0
     Vec position; // 0x4
@@ -168,13 +171,13 @@ EffectEntry* effTorchEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     return effect;
 }
 
-void effTorchMain(EffectEntry* effect) {
+static void effTorchMain(EffectEntry* effect) {
     EffTorchWork* work = effect->userdata;
 
     dispEntry(CAMERA_3D, dispCalcZ(&work->position), 2, (DispCallback)effTorchDisp, effect);
 }
 
-void effTorchDisp(CameraId cameraId, EffectEntry* effect) {
+static void effTorchDisp(CameraId cameraId, EffectEntry* effect) {
     EffTorchWork* work = effect->userdata;
     CameraEntry* camera;
     s32 i;

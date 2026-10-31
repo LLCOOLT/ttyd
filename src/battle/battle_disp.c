@@ -37,7 +37,7 @@ typedef BOOL (*BtlUnit_CheckStatusS8Fn)(BattleUnit*, s8);
 //.sdata
 s32 _status_pose_table[] = {
     STATUS_INSTANT_KILL,
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     STATUS_SLEEP,
     STATUS_STOP,
     STATUS_FREEZE,
@@ -54,17 +54,17 @@ s32 _status_pose_table[] = {
 
 // local prototypes
 const char* searchPoseTbl(PoseTableEntry* table, s32 poseId);
-void btlDispGXInit2DSub(void);
-void btlDispTexPlaneInit(void);
-void btlDispTexPlainGX(u32 id, GXColor color0, GXColor color1, GXColor color2, GXColor color3);
+static void btlDispGXInit2DSub(void);
+static void btlDispTexPlaneInit(void);
+static void btlDispTexPlainGX(u32 id, GXColor color0, GXColor color1, GXColor color2, GXColor color3);
 void btlDispGetTexSize(u32 id, u16* width, u16* height);
-void _partsBlurControl(BattleUnitPart* part, s32 flags, Mtx orientation, GXColor color, f32 rotation);
-void btlUnitItemDisp(CameraId camId, BattleUnit* unit);
-void _pose_def(BattleUnitPart* part);
-void _pose_one_pattern(BattleUnitPart* part);
-void _pose_two_pattern(BattleUnitPart* part);
-void _btlDispTex4(u32 id, Vec pos, Vec scale, Vec rot, Vec pos2, Vec scale2, GXColor color);
-void _btlStockExpDisp(CameraId camId, void* param);
+static void _partsBlurControl(BattleUnitPart* part, s32 flags, Mtx orientation, GXColor color, f32 rotation);
+static void btlUnitItemDisp(CameraId camId, BattleUnit* unit);
+static void _pose_def(BattleUnitPart* part);
+static void _pose_one_pattern(BattleUnitPart* part);
+static void _pose_two_pattern(BattleUnitPart* part);
+static void _btlDispTex4(u32 id, Vec pos, Vec scale, Vec rot, Vec pos2, Vec scale2, GXColor color);
+static void _btlStockExpDisp(CameraId camId, void* param);
 
 const char* searchPoseTbl(PoseTableEntry* table, s32 poseId) {
     int i;
@@ -79,7 +79,7 @@ const char* searchPoseTbl(PoseTableEntry* table, s32 poseId) {
     return NULL;
 }
 
-void btlDispGXInit2DSub(void) {
+static void btlDispGXInit2DSub(void) {
     GXSetCullMode(GX_CULL_NONE);
     GXSetZCompLoc(GX_TRUE);
     GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
@@ -141,14 +141,14 @@ void PSMTXIdentity(Mtx m);
 void PSMTXRotRad(Mtx m, char axis, f32 rad);
 void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
 void PSMTXTrans(Mtx m, f32 xT, f32 yT, f32 zT);
-void BattleStockExpDisp(void);
+static void BattleStockExpDisp(void);
 void btlDispAnimeSpeed(BattleUnitPart* part, f32 speed);
-void btlUnitPartsBlurControl(BattleUnitPart* part, s32 unused, Mtx orientation, GXColor color, f32 rotation);
-void floatOffsetControl(BattleUnitPart* part);
+static void btlUnitPartsBlurControl(BattleUnitPart* part, s32 unused, Mtx orientation, GXColor color, f32 rotation);
+static void floatOffsetControl(BattleUnitPart* part);
 f32 getFloatDispOffset(BattleUnitPart* part);
 f32 getGravityDispOffset(BattleUnitPart* part);
-void gravityOffsetControl(BattleUnitPart* part);
-void statusPoseControl(BattleUnitPart* part);
+static void gravityOffsetControl(BattleUnitPart* part);
+static void statusPoseControl(BattleUnitPart* part);
 void btlDispGXPoint2DRasta(f32 x, f32 y, u8 r, u8 g, u8 b, u8 a) {
     GXPosition3f32(x, y, 0.0f);
     GXColor4u8(r, g, b, a);
@@ -175,7 +175,7 @@ void btlDispGXQuads2D(f32 x0, f32 y0, f32 x1, f32 y1, u8 r, u8 g, u8 b, u8 a) {
     btlDispGXPoint2D(x1, y1, r, g, b, a, 1.0f, 1.0f);
     btlDispGXPoint2D(x0, y1, r, g, b, a, 0.0f, 1.0f);
 }
-void btlDispTexPlaneInit(void) {
+static void btlDispTexPlaneInit(void) {
     GXSetCullMode(GX_CULL_NONE);
     GXClearVtxDesc();
     GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
@@ -190,7 +190,7 @@ void btlDispTexPlaneInit(void) {
     GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
 }
 
-void btlDispTexPlainGX(u32 id, GXColor color0, GXColor color1, GXColor color2, GXColor color3) {
+static void btlDispTexPlainGX(u32 id, GXColor color0, GXColor color1, GXColor color2, GXColor color3) {
     GXTexObj texobj;
     f32 x, y;
 
@@ -309,17 +309,17 @@ BattlePoseType _GetStatusPoseType(BattleUnit* unit) {
 }
 
 typedef void (*PartsDispCb)(BattleUnitPart*, s32);
-void BattleStockExpDisp(void);
+static void BattleStockExpDisp(void);
 void btlDispAnimeSpeed(BattleUnitPart* part, f32 speed);
-void gravityOffsetControl(BattleUnitPart* part);
-void floatOffsetControl(BattleUnitPart* part);
-void statusPoseControl(BattleUnitPart* part);
+static void gravityOffsetControl(BattleUnitPart* part);
+static void floatOffsetControl(BattleUnitPart* part);
+static void statusPoseControl(BattleUnitPart* part);
 f32 getGravityDispOffset(BattleUnitPart* part);
 f32 getFloatDispOffset(BattleUnitPart* part);
-void btlUnitPartsBlurDisp(CameraId camId, BattleUnitPart* part);
-void btlUnitItemDisp2(CameraId camId, BattleUnit* unit);
-void btlUnitStolenItemDisp(CameraId camId, void* param);
-void btlUnitPartsBlurControl(BattleUnitPart* part, s32 unused, Mtx orientation, GXColor color, f32 rotation);
+static void btlUnitPartsBlurDisp(CameraId camId, BattleUnitPart* part);
+static void btlUnitItemDisp2(CameraId camId, BattleUnit* unit);
+static void btlUnitStolenItemDisp(CameraId camId, void* param);
+static void btlUnitPartsBlurControl(BattleUnitPart* part, s32 unused, Mtx orientation, GXColor color, f32 rotation);
 
 void btlDispMain(void) {
     BattleUnit* unit;
@@ -363,12 +363,12 @@ void btlDispMain(void) {
                     goto next;
                 BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
                 BtlUnit_GetPos(target, &tpos.x, &tpos.y, &tpos.z);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 tpos.z += 5.0f;
 #else
                 tpos.z += 7.0f;
 #endif
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 // retail puts the shell on the floor; the demo keeps it at the target's height
                 h = BattleGetFloorHeight(wp, tpos.x, tpos.y, tpos.z);
 #endif
@@ -386,7 +386,7 @@ void btlDispMain(void) {
                         break;
                     case 3:
                         if (__fabs(pos.x - tpos.x) < 1.0) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                             BtlUnit_SetPos(unit, tpos.x, tpos.y, tpos.z);
 #else
                             BtlUnit_SetPos(unit, tpos.x, h, tpos.z);
@@ -394,14 +394,14 @@ void btlDispMain(void) {
                             unit->work[2] = 1;
                         } else if (tpos.x > pos.x) {
                             pos.x += 1.0f;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                             BtlUnit_SetPos(unit, pos.x, tpos.y, tpos.z);
 #else
                             BtlUnit_SetPos(unit, pos.x, h, tpos.z);
 #endif
                         } else {
                             pos.x -= 1.0f;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                             BtlUnit_SetPos(unit, pos.x, tpos.y, tpos.z);
 #else
                             BtlUnit_SetPos(unit, pos.x, h, tpos.z);
@@ -409,7 +409,7 @@ void btlDispMain(void) {
                         }
                         break;
                     default:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                         BtlUnit_SetPos(unit, tpos.x, tpos.y, tpos.z);
 #else
                         BtlUnit_SetPos(unit, tpos.x, h, tpos.z);
@@ -905,7 +905,7 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* param) {
 #pragma push
 // dead assignments optimisation off for btlUnitItemDisp, btlUnitItemDisp2, btlUnitStolenItemDisp and 15 more: the original register allocation and scheduling need it
 #pragma opt_dead_assignments off
-void btlUnitItemDisp(CameraId camId, BattleUnit* unit) {
+static void btlUnitItemDisp(CameraId camId, BattleUnit* unit) {
     BattleWork* wp = _battleWorkPointer;
     s32 item;
     f32 height;
@@ -930,7 +930,7 @@ void btlUnitItemDisp(CameraId camId, BattleUnit* unit) {
 }
 #pragma pop
 
-void btlUnitItemDisp2(CameraId camId, BattleUnit* unit) {
+static void btlUnitItemDisp2(CameraId camId, BattleUnit* unit) {
     BattleWork* wp = _battleWorkPointer;
     s32 kind = unit->currentKind;
 
@@ -950,7 +950,7 @@ disp:
     }
 }
 
-void btlUnitStolenItemDisp(CameraId camId, void* param) {
+static void btlUnitStolenItemDisp(CameraId camId, void* param) {
     BattleUnit* unit = param;
     Vec pos;
     s32 item = unit->heldItem;
@@ -960,7 +960,7 @@ void btlUnitStolenItemDisp(CameraId camId, void* param) {
     ((IconDispGxArgOrderFn)iconDispGx)(1.0f, &pos, 0, itemDataTable[item].icon_id);
 }
 
-void btlUnitPartsBlurControl(BattleUnitPart* part, s32 unused, Mtx orientation, GXColor color, f32 rotation) {
+static void btlUnitPartsBlurControl(BattleUnitPart* part, s32 unused, Mtx orientation, GXColor color, f32 rotation) {
 
     if (part->attributes & PART_ATTR_BLUR) {
         _partsBlurControl(part, 1, orientation, color, rotation);
@@ -969,7 +969,7 @@ void btlUnitPartsBlurControl(BattleUnitPart* part, s32 unused, Mtx orientation, 
     }
 }
 
-void _partsBlurControl(BattleUnitPart* part, s32 flags, Mtx orientation, GXColor color, f32 rotation) {
+static void _partsBlurControl(BattleUnitPart* part, s32 flags, Mtx orientation, GXColor color, f32 rotation) {
     BattleWorkUnitPartBlur* blur;
     int i;
 
@@ -988,7 +988,7 @@ void _partsBlurControl(BattleUnitPart* part, s32 flags, Mtx orientation, GXColor
     }
 }
 
-void btlUnitPartsBlurDisp(CameraId camId, BattleUnitPart* part) {
+static void btlUnitPartsBlurDisp(CameraId camId, BattleUnitPart* part) {
     BattleWorkUnitPartBlur* blur;
     BattleWorkUnitPartBlurEntry* entry;
     GXColor color;
@@ -1062,7 +1062,7 @@ void btlDispPoseAnime(BattleUnitPart* part) {
     part->animFlags &= ~PART_ANIM_PERA;
 }
 
-void gravityOffsetControl(BattleUnitPart* part) {
+static void gravityOffsetControl(BattleUnitPart* part) {
     BOOL active = TRUE;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit = part->owner;
@@ -1091,7 +1091,7 @@ f32 getGravityDispOffset(BattleUnitPart* part) {
     return 4.0f * sinfd((PART_GRAVITY(part) * 3 + 270) % 360) + 4.0f;
 }
 
-void floatOffsetControl(BattleUnitPart* part) {
+static void floatOffsetControl(BattleUnitPart* part) {
     BOOL active = TRUE;
     BattleUnit* unit = part->owner;
 
@@ -1121,7 +1121,7 @@ f32 getFloatDispOffset(BattleUnitPart* part) {
     return 2.0f * sinfd((PART_FLOAT(part) * 4 + 270) % 360) + 2.0f;
 }
 
-void statusPoseControl(BattleUnitPart* part) {
+static void statusPoseControl(BattleUnitPart* part) {
     switch (PART_POSETYPE(part)) {
         case 0:
             break;
@@ -1141,7 +1141,7 @@ void statusPoseControl(BattleUnitPart* part) {
     }
 }
 
-void _pose_def(BattleUnitPart* part) {
+static void _pose_def(BattleUnitPart* part) {
     switch (PART_POSESTATE(part)) {
         case 0:
             PART_POSESTATE(part) = 1;
@@ -1153,7 +1153,7 @@ void _pose_def(BattleUnitPart* part) {
     }
 }
 
-void _pose_one_pattern(BattleUnitPart* part) {
+static void _pose_one_pattern(BattleUnitPart* part) {
     switch (PART_POSESTATE(part)) {
         case 0:
             PART_POSESTATE(part) = 1;
@@ -1175,7 +1175,7 @@ void _pose_one_pattern(BattleUnitPart* part) {
     }
 }
 
-void _pose_two_pattern(BattleUnitPart* part) {
+static void _pose_two_pattern(BattleUnitPart* part) {
     switch (PART_POSESTATE(part)) {
         case 0:
             PART_POSESTATE(part) = 1;
@@ -1311,7 +1311,7 @@ void btlDispTex4(u32 id, Vec pos, Vec scale, Vec rot, GXColor color) {
     _btlDispTex4(id, pos, scale, rot, off, (Vec){1.0f, -1.0f, 1.0f}, color);
 }
 
-void _btlDispTex4(u32 id, Vec pos, Vec scale, Vec rot, Vec pos2, Vec scale2, GXColor color) {
+static void _btlDispTex4(u32 id, Vec pos, Vec scale, Vec rot, Vec pos2, Vec scale2, GXColor color) {
     Mtx mtx, trans, scl, rotX, rotY, rotZ, trans2, scl2;
 
     PSMTXIdentity(mtx);
@@ -1332,7 +1332,7 @@ void _btlDispTex4(u32 id, Vec pos, Vec scale, Vec rot, Vec pos2, Vec scale2, GXC
     btlDispTexPlane2(mtx, id, color, 0);
 }
 
-void BattleStockExpDisp(void) {
+static void BattleStockExpDisp(void) {
     BattleWork* wp = _battleWorkPointer;
 
     if (wp->stockExp > wp->stockExpDisp) {
@@ -1346,7 +1346,7 @@ void BattleStockExpDisp(void) {
     }
 }
 
-void _btlStockExpDisp(CameraId camId, void* param) {
+static void _btlStockExpDisp(CameraId camId, void* param) {
     static f32 y;
     static f32 x;
     s32 exp;

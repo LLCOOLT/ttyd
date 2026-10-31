@@ -132,7 +132,11 @@ static BattleUnitDefense defence = {{3, 3, 3, 3, 3}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {10, 50, 50, 100, 40, 100, 100, 40, 100, 40, 100, 40, 100, 40, 40, 30, 75, 100, 40, 100, 100, 40};
+#else
 static StatusVulnerability regist = {10, 50, 90, 100, 40, 100, 100, 50, 100, 85, 100, 85, 100, 90, 40, 30, 85, 100, 40, 100, 100, 40};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_mahorn", "c_maho", 0.0f, 0.0f, 0.0f, 0.0f, 30.0f, 0.0f, 0.0f, 40.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
@@ -164,7 +168,11 @@ static BattleWeapon weapon_mahorn_attack_magic = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
+#if VERSION <= VERSION_DEMO_US
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
+#else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_PIERCES_DEFENSE | SPECIAL_SHATTERS_FREEZE, // special
+#endif
     COUNTER_RESIST_ALL, // counterResistFlags
     TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
@@ -318,7 +326,11 @@ BattleWeapon weapon_mahorn_confuse_magic = {
     3, // acLevel
     2, // reserved_6F
     NULL, // acHelpMsg
+#if VERSION <= VERSION_DEMO_US
+    SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE | SPECIAL_IGNORE_STATUS_VULNERABILITY, // special
+#else
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
+#endif
     COUNTER_RESIST_ALL, // counterResistFlags
     TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
@@ -373,7 +385,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(LW(9), PTR(&weapon_mahorn_attack_magic))
-        CALL_CHILD(PTR(attack_magic_event))
+        CALL_CHILD(attack_magic_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
@@ -395,37 +407,37 @@ static EVT_BEGIN(attack_event)
     SET_VALUE(LW(0), 50)
     IF_INT_LESS(LW(1), LW(0))
         SET_VALUE(LW(9), PTR(&weapon_mahorn_attack_magic))
-        CALL_CHILD(PTR(attack_magic_event))
+        CALL_CHILD(attack_magic_event)
         GOTO(99)
     END_IF
     ADD(LW(0), 30)
     IF_INT_LESS(LW(1), LW(0))
         SET_VALUE(LW(9), PTR(&weapon_mahorn_all_attack_magic))
-        CALL_CHILD(PTR(all_attack_magic_event))
+        CALL_CHILD(all_attack_magic_event)
         GOTO(99)
     END_IF
     ADD(LW(0), 10)
     IF_INT_LESS(LW(1), LW(0))
         SET_VALUE(LW(9), PTR(&weapon_mahorn_dekadeka_magic))
-        CALL_CHILD(PTR(dekadeka_magic_event))
+        CALL_CHILD(dekadeka_magic_event)
         GOTO(99)
     END_IF
     ADD(LW(0), 10)
     IF_INT_LESS(LW(1), LW(0))
         SET_VALUE(LW(9), PTR(&weapon_mahorn_katikati_magic))
-        CALL_CHILD(PTR(katikati_magic_event))
+        CALL_CHILD(katikati_magic_event)
         GOTO(99)
     END_IF
     ADD(LW(0), 10)
     IF_INT_LESS(LW(1), LW(0))
         SET_VALUE(LW(9), PTR(&weapon_mahorn_confuse_magic))
-        CALL_CHILD(PTR(confuse_magic_event))
+        CALL_CHILD(confuse_magic_event)
         GOTO(99)
     END_IF
     ADD(LW(0), 10)
     IF_INT_LESS(LW(1), LW(0))
         SET_VALUE(LW(9), PTR(&weapon_mahorn_recover_magic))
-        CALL_CHILD(PTR(recover_magic_event))
+        CALL_CHILD(recover_magic_event)
         GOTO(99)
     END_IF
     GOTO(10)
@@ -450,8 +462,8 @@ static PoseTableEntry pose_table[] = {
     {42, "MAH_R_1"},
     {56, "MAH_X_1"},
     {57, "MAH_X_1"},
-    {65, "MAH_T_1"},
-    {69, "MAH_S_1"},
+    {BTL_POSE_TALK, "MAH_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "MAH_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -480,7 +492,7 @@ static EVT_BEGIN(init_event)
     CALL(set_hand_dest, BTL_UNIT_SELF, 3, FLOAT(25.0f), FLOAT(30.0f), FLOAT(10.0f))
     CALL(set_hand_dest, BTL_UNIT_SELF, 4, FLOAT(-25.0f), FLOAT(10.0f), FLOAT(-10.0f))
     CALL(set_hand_dest, BTL_UNIT_SELF, 5, FLOAT(25.0f), FLOAT(10.0f), FLOAT(10.0f))
-    SPAWN_EVENT(PTR(hand_ctrl_event))
+    SPAWN_EVENT(hand_ctrl_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, 0)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 6, 0)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -563,7 +575,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -1024,12 +1036,12 @@ static EVT_BEGIN(attack_magic_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
-    CALL_CHILD(PTR(attack_enemy_common_event))
+    CALL_CHILD(attack_enemy_common_event)
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     RETURN
@@ -1042,12 +1054,12 @@ static EVT_BEGIN(confuse_magic_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
-    CALL_CHILD(PTR(attack_enemy_common_event))
+    CALL_CHILD(attack_enemy_common_event)
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     RETURN
@@ -1060,12 +1072,12 @@ static EVT_BEGIN(all_attack_magic_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
     END_IF
-    CALL_CHILD(PTR(attack_enemy_all_common_event))
+    CALL_CHILD(attack_enemy_all_common_event)
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     RETURN
@@ -1118,7 +1130,7 @@ static EVT_BEGIN(dekadeka_magic_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
@@ -1127,7 +1139,7 @@ static EVT_BEGIN(dekadeka_magic_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
-    CALL_CHILD(PTR(support_friend_common_event))
+    CALL_CHILD(support_friend_common_event)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     WAIT_FRAMES(10)
@@ -1145,7 +1157,7 @@ static EVT_BEGIN(katikati_magic_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
@@ -1154,7 +1166,7 @@ static EVT_BEGIN(katikati_magic_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
-    CALL_CHILD(PTR(support_friend_common_event))
+    CALL_CHILD(support_friend_common_event)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     WAIT_FRAMES(10)
@@ -1172,7 +1184,7 @@ static EVT_BEGIN(trans_magic_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
@@ -1181,7 +1193,7 @@ static EVT_BEGIN(trans_magic_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
-    CALL_CHILD(PTR(support_friend_common_event))
+    CALL_CHILD(support_friend_common_event)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     WAIT_FRAMES(10)
@@ -1199,7 +1211,7 @@ static EVT_BEGIN(yokeyoke_magic_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
@@ -1208,7 +1220,7 @@ static EVT_BEGIN(yokeyoke_magic_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
-    CALL_CHILD(PTR(support_friend_common_event))
+    CALL_CHILD(support_friend_common_event)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     WAIT_FRAMES(10)
@@ -1226,7 +1238,7 @@ static EVT_BEGIN(recover_magic_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
@@ -1235,7 +1247,7 @@ static EVT_BEGIN(recover_magic_event)
     CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
-    CALL_CHILD(PTR(support_friend_common_event))
+    CALL_CHILD(support_friend_common_event)
     CALL(btlevtcmd_RecoverHp, LW(3), LW(4), 6)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
     ADD(LW(1), 30)

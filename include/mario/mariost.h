@@ -129,6 +129,5 @@ u32 marioStGetSystemLevel(void);
 extern GXRenderModeObj GXNtsc480IntDfMarioSt;
 extern GXRenderModeObj GXNtsc480ProgMarioSt;
 extern s32 _mariostSystemLevel;
-extern OSTime none_key;
 extern GXRenderModeObj sRMObjHReso;
 extern GXRenderModeObj sRMObjHReso_prog;

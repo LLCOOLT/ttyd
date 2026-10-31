@@ -17,12 +17,11 @@
 
 #define CHECK_ITEM(id) pouchCheckItem(id)
 
-PouchData* mpp_gap;
 static PouchData* mpp;
-s32 comp_aiueo(const void* a, const void* b);
-s32 comp_kind(const void* a, const void* b);
+static s32 comp_aiueo(const void* a, const void* b);
+static s32 comp_kind(const void* a, const void* b);
 
-#if VERSION == VERSION_DEMO
+#if VERSION == VERSION_DEMO_US
 s16 _party_max_hp_table[9][4] = {
 #else
 s16 _party_max_hp_table[8][4] = {
@@ -35,12 +34,12 @@ s16 _party_max_hp_table[8][4] = {
     {15, 25, 35, 200},
     {15, 20, 30, 200},
     {15, 20, 25, 200},
-#if VERSION == VERSION_DEMO
+#if VERSION == VERSION_DEMO_US
     {0, 0, 0, 0},
 #endif
 };
-s32 comp_aiueo_r(const void* a, const void* b);
-s32 comp_kind_r(const void* a, const void* b);
+static s32 comp_aiueo_r(const void* a, const void* b);
+static s32 comp_kind_r(const void* a, const void* b);
 
 PouchData* pouchGetPtr(void) {
     return mpp;
@@ -223,7 +222,7 @@ BOOL pouchGetItem(ItemType type) {
         return 1;
     }
     if (type == ITEM_PIANTA_TOKEN) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         if (yuwp->tokens < 0x7FFFFFFF) // the demo has no 99999 cap
 #else
         if (yuwp->tokens < 99999)
@@ -411,7 +410,7 @@ BOOL pouchRemoveItem(ItemType type) {
     return 0;
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo's pouchRemoveItemIndex shifts the second table wrongly: it clears the slot it has just filled
 // instead of the one it moved from (the demo's own bug; the later versions call pouchShift).
 static inline void pouchShiftDemo(s16* table1, s16* table2, int i, s32 maximum) {
@@ -465,7 +464,7 @@ BOOL pouchRemoveItemIndex(ItemType type, s32 index) {
     }
     for (i = index; i < maximum; p++, i++) {
         if (type == *p) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             pouchShiftDemo(table1, table2, i, maximum);
 #else
             pouchShift(table1, table2, i, maximum);
@@ -480,7 +479,7 @@ BOOL pouchRemoveItemIndex(ItemType type, s32 index) {
 char* strupr(char* str);
 #endif
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 void pouchHiraToKata(const char* src, char* dst) {
     u16 c;
     s32 len = strlen(src) / 2;
@@ -641,9 +640,9 @@ static inline void pouchAiueoConv(const char* src, char* dst) {
 #endif
 #endif
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo compares the item names as they are, without the kana conversion.
-s32 comp_aiueo(const void* a, const void* b) {
+static s32 comp_aiueo(const void* a, const void* b) {
     s16 ia = *(s16*)a;
     s16 ib = *(s16*)b;
     s32 r = strcmp(msgSearch(itemDataTable[ia].name), msgSearch(itemDataTable[ib].name));
@@ -652,7 +651,7 @@ s32 comp_aiueo(const void* a, const void* b) {
     return -(r < 0);
 }
 #else
-s32 comp_aiueo(const void* a, const void* b) {
+static s32 comp_aiueo(const void* a, const void* b) {
     char bufA[0x80];
     char bufB[0x80];
     s16 ia = *(s16*)a;
@@ -664,7 +663,7 @@ s32 comp_aiueo(const void* a, const void* b) {
 }
 #endif
 
-s32 comp_kind(const void* a, const void* b) {
+static s32 comp_kind(const void* a, const void* b) {
     s16 x = itemDataTable[*(const s16*)a].type_sort_order;
     s16 y = itemDataTable[*(const s16*)b].type_sort_order;
     if (x > y)
@@ -672,8 +671,8 @@ s32 comp_kind(const void* a, const void* b) {
     return -(x < y);
 }
 
-#if VERSION == VERSION_DEMO
-s32 comp_aiueo_r(const void* a, const void* b) {
+#if VERSION <= VERSION_DEMO_US
+static s32 comp_aiueo_r(const void* a, const void* b) {
     s16 ia = *(s16*)a;
     s16 ib = *(s16*)b;
     s32 r = strcmp(msgSearch(itemDataTable[ia].name), msgSearch(itemDataTable[ib].name));
@@ -682,7 +681,7 @@ s32 comp_aiueo_r(const void* a, const void* b) {
     return -(r > 0);
 }
 #else
-s32 comp_aiueo_r(const void* a, const void* b) {
+static s32 comp_aiueo_r(const void* a, const void* b) {
     char bufA[0x80];
     char bufB[0x80];
     s16 ia = *(s16*)a;
@@ -694,7 +693,7 @@ s32 comp_aiueo_r(const void* a, const void* b) {
 }
 #endif
 
-s32 comp_kind_r(const void* a, const void* b) {
+static s32 comp_kind_r(const void* a, const void* b) {
     s16 x = itemDataTable[*(const s16*)a].type_sort_order;
     s16 y = itemDataTable[*(const s16*)b].type_sort_order;
     if (x < y)
@@ -939,7 +938,7 @@ void pouchSortItem(s32 mode) {
                     } else if (mode == 12) {
                         if (a->type_sort_order < b->type_sort_order)
                             swap = TRUE;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                         // The demo sorts by BP cost alone, with no tie-break on the sort order.
                     } else if (mode == 6) {
                         if (ca > cb)
@@ -970,7 +969,7 @@ void pouchSortItem(s32 mode) {
                         equipped[j] = t2;
                     }
                 }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 // The demo copies the lists back after every pass of the outer loop.
                 memcpy(pp[0]->badges, badges, sizeof(badges));
                 memcpy(pp[0]->equippedBadges, equipped, sizeof(equipped));
@@ -1162,7 +1161,7 @@ s32 pouchGetPartyAttackLv(PartyId partyId) {
     return party->attackLevel;
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo stores into the first empty slot and removes by id alone, without shifting the list.
 BOOL pouchAddKeepItem(s16 id) {
     s32 i;
@@ -1330,7 +1329,7 @@ BOOL pouchEquipBadgeID(s32 badgeId) {
     return FALSE;
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 BOOL N_pouchUnEquipBadgeID(s32 badgeId) {
     int i;
 
@@ -1348,7 +1347,7 @@ BOOL N_pouchUnEquipBadgeID(s32 badgeId) {
 #endif
 
 s32 pouchArriveBadge(s32 id) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // The demo stocks an arriving badge in the bargain table.
     return badgeShop_add(bdsw->bargain_table, (s16)id, 1);
 #else

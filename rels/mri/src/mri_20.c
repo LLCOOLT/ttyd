@@ -7,7 +7,6 @@
 #include "evt/evt_map.h"
 #include "evt/evt_npc.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "mri_puni.h"
 #include "mri.h"
 #include "data_tables.h"
@@ -110,7 +109,7 @@ static BeroEntry bero_entry_data[] = {
 static EVT_BEGIN(evt_ueki_08)
     CALL(evt_item_delete_check, STRING("item_ueki_08"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_ueki_08"), ITEM_POWER_PUNCH, 250, -320, 130, 4, GSWF(GSWF_MRI20_PLANTER_POWER_PUNCH_TAKEN), 0)
+        CALL(evt_item_entry, STRING("item_ueki_08"), ITEM_POWER_PUNCH, 250, -320, 130, ITEM_ENTRY_LAUNCH, GSWF(GSWF_MRI20_PLANTER_POWER_PUNCH_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -133,12 +132,12 @@ EVT_BEGIN(mri_20_init_evt)
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(9), 0)
-    CALL_CHILD(PTR(mri_puni_init))
+    CALL_CHILD(mri_puni_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    SPAWN_EVENT(PTR(puni_disp_info))
-    SPAWN_EVENT(PTR(mri_countdown))
+    CALL_CHILD(evt_bero_info_run)
+    SPAWN_EVENT(puni_disp_info)
+    SPAWN_EVENT(mri_countdown)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG2_23_TIME_BOMB_ACTIVATED, STORY_STG2_23_01_X_NAUT_BATTLE)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
@@ -152,17 +151,17 @@ EVT_BEGIN(mri_20_init_evt)
         CALL(evt_npc_check_delete, STRING("バリアーン"))
     END_IF
     SET_VALUE(LW(0), PTR(ueki_access_data))
-    CALL_CHILD(PTR(evt_sub_kusa_access_entry))
+    CALL_CHILD(evt_sub_kusa_access_entry)
     CALL(evt_map_playanim, STRING("mizu_01"), 1, 0)
     CALL(evt_map_playanim, STRING("mizu_02"), 1, 0)
     CALL(evt_map_playanim, STRING("awa_01"), 1, 0)
     CALL(evt_map_playanim, STRING("awa_02"), 1, 0)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_12_RIVAL_ARRIVAL)
         SET_VALUE(LW(0), STRING("dokan1"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_bero_overwrite, STRING("dokan1"), PTR(bero_black_shadow))
         SET_VALUE(LW(0), STRING("dokan1"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
     END_IF
     RETURN
 EVT_END()

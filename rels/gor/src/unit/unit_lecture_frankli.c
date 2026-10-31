@@ -8,7 +8,7 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_audience.h"
 #include "evt/evt_msg.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 #include "evt/evt_sub.h"
@@ -108,7 +108,7 @@ static PoseTableEntry pose_table[] = {
     {28, "S_1"},
     {31, "D_2"},
     {39, "D_2"},
-    {69, "S_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 BattleWeapon _lec_weapon_jump = {
@@ -194,9 +194,15 @@ BattleWeapon _lec_weapon_hammer = {
 };
 
 static BattleDataEntry data_table[] = {
+#if VERSION <= VERSION_DEMO_US
+    {67, &_lec_weapon_jump},
+    {68, &_lec_weapon_hammer},
+    {69, lecture_end_event},
+#else
     {68, &_lec_weapon_jump},
     {69, &_lec_weapon_hammer},
     {70, lecture_end_event},
+#endif
     {0, NULL},
 };
 
@@ -220,7 +226,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -502,14 +508,18 @@ EVT_BEGIN(lecAttackEvent_Jump)
             CALL(btlevtcmd_SetTalkPose, BTL_UNIT_LECTURE, STRING("T_1"))
             CALL(btlevtcmd_SetStayPose, BTL_UNIT_LECTURE, STRING("S_1"))
             CALL(evt_msg_print, 2, STRING("mac_0_b_t2_002"), 0, BTL_UNIT_LECTURE)
+#if VERSION >= VERSION_JP
             WAIT_FRAMES(1)
+#endif
             LABEL(11)
             CALL(btlevtcmd_PadCheckTrigger, 0, 256, LW(0))
             IF_INT_EQUAL(LW(0), 0)
                 WAIT_FRAMES(1)
                 GOTO(11)
             END_IF
+#if VERSION >= VERSION_JP
             WAIT_MS(150)
+#endif
             CALL(evt_msg_continue)
         END_IF
     ELSE
@@ -724,9 +734,11 @@ EVT_BEGIN(lecAttackEvent_Hammer)
             LOOP(LW(5))
                 CALL(btlevtcmd_PadCheckNow, 0, 262144, LW(0))
                 IF_INT_EQUAL(LW(0), 0)
+#if VERSION >= VERSION_JP
                     IS_EVENT_RUNNING(LW(15), LW(0))
                     IF_INT_EQUAL(LW(0), 0)
                     ELSE
+#endif
                         SUSPEND_EVENT(LW(15))
                         CALL(btlevtcmd_AcSetParam, 2, 1)
                         CALL(btlevtcmd_SetTalkPose, BTL_UNIT_LECTURE, STRING("T_1"))
@@ -738,11 +750,15 @@ EVT_BEGIN(lecAttackEvent_Hammer)
                             WAIT_FRAMES(1)
                             GOTO(6)
                         END_IF
+#if VERSION >= VERSION_JP
                         WAIT_MS(200)
+#endif
                         CALL(evt_msg_continue)
                         CALL(btlevtcmd_AcSetParam, 2, 0)
                         RESUME_EVENT(LW(15))
+#if VERSION >= VERSION_JP
                     END_IF
+#endif
                 END_IF
                 WAIT_FRAMES(1)
                 SET_VALUE(LW(5), 5)
@@ -765,7 +781,9 @@ EVT_BEGIN(lecAttackEvent_Hammer)
             GOTO(10)
         END_IF
         CALL(btlevtcmd_ResultAC)
+#if VERSION >= VERSION_JP
         WAIT_MS(200)
+#endif
         CALL(evt_msg_continue)
     ELSE
         CALL(btlevtcmd_ResultAC)

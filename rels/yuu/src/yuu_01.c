@@ -32,7 +32,6 @@
 #include "mario/mario_motion.h"
 #include "mot/mot_ship.h"
 #include "party.h"
-#include "party/party_motion.h"
 #include "yuu.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
@@ -72,11 +71,13 @@ static inline f32 randRange(f32 d) {
 
 static USER_FUNC(fall_rtn);
 static USER_FUNC(re_fall_rtn);
+#if VERSION >= VERSION_JP
 USER_FUNC(yuu_01_cam_shift_reset);
-USER_FUNC(yuuminigame2_get_name);
-USER_FUNC(yuuminigame2_opening_chk);
-USER_FUNC(yuuminigame2_opening_on_off);
-USER_FUNC(yuuminigame2_set_phase);
+#endif
+static USER_FUNC(yuuminigame2_get_name);
+static USER_FUNC(yuuminigame2_opening_chk);
+static USER_FUNC(yuuminigame2_opening_on_off);
+static USER_FUNC(yuuminigame2_set_phase);
 
 const char* s_nametbl[21];
 const char* a2_nametbl[21];
@@ -153,14 +154,18 @@ EVT_BEGIN(yuu_01_kaijo_init)
 EVT_END()
 
 EVT_BEGIN(yuu_01_kaijo_init2)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_mario_set_pos, -670, 0, 200)
+#else
     CALL(evt_mario_set_pos, -800, 0, 200)
+#endif
     CALL(evt_mario_set_dir, 90, 0, 0)
     RETURN
 EVT_END()
 
 EVT_BEGIN(minigame02_main)
     CALL(evt_mario_key_onoff, 0)
-    CALL_CHILD(PTR(yuu_01_kaijo_init))
+    CALL_CHILD(yuu_01_kaijo_init)
     CALL(evt_yuuminigame_alloc, LW(0), 1)
     CALL(yuuminigame_set_dataadr, 0, LW(0))
     CALL(evt_mario_kill_party, 0)
@@ -176,10 +181,18 @@ EVT_BEGIN(minigame02_start_cam)
     CALL(evt_cam3d_evt_set, FLOAT(-560.0f), FLOAT(565.0f), FLOAT(1185.0f), FLOAT(-560.0f), FLOAT(75.0f), FLOAT(155.0f), 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_seq_wait, 2)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_cam3d_evt_set, FLOAT(550.0f), FLOAT(565.0f), FLOAT(1185.0f), FLOAT(550.0f), FLOAT(75.0f), FLOAT(155.0f), 3000, 0)
+#else
     CALL(evt_cam3d_evt_set, FLOAT(550.0f), FLOAT(565.0f), FLOAT(1185.0f), FLOAT(550.0f), FLOAT(75.0f), FLOAT(155.0f), 4000, 0)
+#endif
     WAIT_MS(500)
     CALL(evt_yuutitle_alloc, 0, 0, STRING("menu_title_minigame2"))
+#if VERSION <= VERSION_DEMO_US
+    WAIT_MS(2000)
+#else
     WAIT_MS(3000)
+#endif
     CALL(evt_yuutitle_free)
     WAIT_MS(500)
     RETURN
@@ -191,7 +204,7 @@ EVT_BEGIN(minigame02_start_cam_cancel)
     CALL(evt_cam3d_evt_off, 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_mario_wait_move_end)
-    CALL_CHILD(PTR(yuu_01_kaijo_init2))
+    CALL_CHILD(yuu_01_kaijo_init2)
     RETURN
 EVT_END()
 
@@ -209,33 +222,43 @@ EVT_BEGIN(minigame02_start)
                 IF_BITS_SET(LW(9), 768)
                     DELETE_EVENT(LW(8))
                     CALL(evt_seq_wait, 2)
-                    CALL_CHILD(PTR(minigame02_start_cam_cancel))
+                    CALL_CHILD(minigame02_start_cam_cancel)
                     BREAK_LOOP
                 END_IF
             END_IF
             WAIT_FRAMES(1)
         END_LOOP
         CALL(yuuminigame2_opening_on_off, LW(0), 0)
-        CALL_CHILD(PTR(yuu_01_kaijo_init2))
+        CALL_CHILD(yuu_01_kaijo_init2)
         CALL(evt_cam3d_evt_off, 0, 11)
         WAIT_FRAMES(1)
     END_IF
+#if VERSION >= VERSION_JP
     CALL(evt_hitobj_onoff, STRING("taisaku"), 0, 0)
     CALL(evt_mario_mov_pos2, -660, 200, 120)
     CALL(evt_hitobj_onoff, STRING("taisaku"), 0, 1)
+#endif
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_MINIGAME1"))
     CALL(eff_call_minigame, 0, 0, 0, 500)
     WAIT_MS(3000)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_mario_key_onoff, 1)
+#else
     CALL(evt_cam_letter_box_onoff, 0, 0)
     CALL(evt_cam_letter_box_disable, 1)
+#endif
     CALL(evt_yuucounter_alloc, 0, 70, 1, 120)
+#if VERSION >= VERSION_JP
     CALL(evt_mario_key_onoff, 1)
+#endif
     RETURN
 EVT_END()
 
 EVT_BEGIN(minigame02_end)
+#if VERSION >= VERSION_JP
     CALL(evt_cam_letter_box_onoff, 1, 0)
     CALL(evt_cam_letter_box_disable, 0)
+#endif
     CALL(evt_snd_sfxon, STRING("SFX_EVT_GAME_AUDIENCE2"), 0)
     IF_INT_LESS(LW(0), 0)
         CALL(eff_call_minigame, 2, 0, 0, 500)
@@ -283,8 +306,10 @@ EVT_BEGIN(minigame02_end)
     CALL(evt_snd_sfxoff, GW(11))
     CALL(evt_fade_out, 1000)
     CALL(re_fall_rtn)
-    CALL_CHILD(PTR(yuu_01_kaijo_init2))
+    CALL_CHILD(yuu_01_kaijo_init2)
+#if VERSION >= VERSION_JP
     CALL(yuu_01_cam_shift_reset)
+#endif
     WAIT_MS(500)
     CALL(evt_snd_sfxon, STRING("SFX_EVT_GAME_AUDIENCE1"), GW(10))
     CALL(evt_snd_sfxon, STRING("SFX_EVT_GAME_BOAT_WATER1"), GW(11))
@@ -292,7 +317,6 @@ EVT_BEGIN(minigame02_end)
     RETURN
 EVT_END()
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(yuu_01_init_evt)
     CALL(evt_map_playanim, STRING("den1"), 1, 0)
     CALL(evt_map_playanim, STRING("den2"), 1, 0)
@@ -305,8 +329,13 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(1), LW(1))
     SET_VALUE(LW(2), -140)
     SET_VALUE(LW(3), 140)
+#if VERSION <= VERSION_DEMO_US
+    SET_VALUE(LW(4), 3500)
+    SET_VALUE(LW(5), 200)
+#else
     SET_VALUE(LW(4), 1500)
     SET_VALUE(LW(5), 100)
+#endif
     SET_VALUE(LW(6), 2)
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(8), 0)
@@ -319,6 +348,17 @@ EVT_BEGIN(yuu_01_init_evt)
     CALL(yuuminigame2_get_name, 2, LW(0), LW(1), LW(11))
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
+#if VERSION <= VERSION_DEMO_US
+    SET_VALUE(LW(2), 0)
+    SET_VALUE(LW(3), 20)
+    SET_VALUE(LW(4), 800)
+    SET_VALUE(LW(5), 0)
+    SET_VALUE(LW(6), 4)
+    SET_VALUE(LW(7), 0)
+    SET_VALUE(LW(8), -30)
+    SET_VALUE(LW(9), 50)
+    SET_VALUE(LW(10), 3200)
+#else
     SET_VALUE(LW(2), -220)
     SET_VALUE(LW(3), 50)
     SET_VALUE(LW(4), 3500)
@@ -328,6 +368,7 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(9), 0)
     SET_VALUE(LW(10), 0)
+#endif
     SET_VALUE(LW(11), LW(11))
     SET_VALUE(LW(12), 2)
     SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
@@ -335,15 +376,26 @@ EVT_BEGIN(yuu_01_init_evt)
     CALL(yuuminigame2_get_name, 3, LW(0), LW(1), LW(11))
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
+#if VERSION <= VERSION_DEMO_US
+    SET_VALUE(LW(2), 0)
+    SET_VALUE(LW(3), -20)
+#else
     SET_VALUE(LW(2), 20)
     SET_VALUE(LW(3), -60)
+#endif
     SET_VALUE(LW(4), 800)
     SET_VALUE(LW(5), 0)
     SET_VALUE(LW(6), 4)
     SET_VALUE(LW(7), 0)
+#if VERSION <= VERSION_DEMO_US
+    SET_VALUE(LW(8), 40)
+    SET_VALUE(LW(9), -40)
+    SET_VALUE(LW(10), 3200)
+#else
     SET_VALUE(LW(8), 115)
     SET_VALUE(LW(9), -40)
     SET_VALUE(LW(10), 1600)
+#endif
     SET_VALUE(LW(11), LW(11))
     SET_VALUE(LW(12), 2)
     SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
@@ -351,11 +403,19 @@ EVT_BEGIN(yuu_01_init_evt)
     CALL(yuuminigame2_get_name, 4, LW(0), LW(1), LW(11))
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
+#if VERSION <= VERSION_DEMO_US
+    SET_VALUE(LW(2), 0)
+    SET_VALUE(LW(3), 0)
+    SET_VALUE(LW(4), 0)
+    SET_VALUE(LW(5), 0)
+    SET_VALUE(LW(6), 5)
+#else
     SET_VALUE(LW(2), -50)
     SET_VALUE(LW(3), 0)
     SET_VALUE(LW(4), 800)
     SET_VALUE(LW(5), 100)
     SET_VALUE(LW(6), 2)
+#endif
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(9), 0)
@@ -369,7 +429,11 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(1), LW(1))
     SET_VALUE(LW(2), -75)
     SET_VALUE(LW(3), 75)
+#if VERSION <= VERSION_DEMO_US
+    SET_VALUE(LW(4), 2000)
+#else
     SET_VALUE(LW(4), 1500)
+#endif
     SET_VALUE(LW(5), 400)
     SET_VALUE(LW(6), 2)
     SET_VALUE(LW(7), 0)
@@ -385,7 +449,11 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(1), LW(1))
     SET_VALUE(LW(2), 75)
     SET_VALUE(LW(3), -75)
+#if VERSION <= VERSION_DEMO_US
+    SET_VALUE(LW(4), 2000)
+#else
     SET_VALUE(LW(4), 1500)
+#endif
     SET_VALUE(LW(5), 400)
     SET_VALUE(LW(6), 2)
     SET_VALUE(LW(7), 0)
@@ -400,8 +468,13 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
     SET_VALUE(LW(2), 75)
+#if VERSION <= VERSION_DEMO_US
+    SET_VALUE(LW(3), -75)
+    SET_VALUE(LW(4), 3000)
+#else
     SET_VALUE(LW(3), 0)
     SET_VALUE(LW(4), 1500)
+#endif
     SET_VALUE(LW(5), 500)
     SET_VALUE(LW(6), 2)
     SET_VALUE(LW(7), 0)
@@ -416,9 +489,15 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
     SET_VALUE(LW(2), -75)
+#if VERSION <= VERSION_DEMO_US
+    SET_VALUE(LW(3), 75)
+    SET_VALUE(LW(4), 3000)
+    SET_VALUE(LW(5), 500)
+#else
     SET_VALUE(LW(3), 40)
     SET_VALUE(LW(4), 1500)
     SET_VALUE(LW(5), 100)
+#endif
     SET_VALUE(LW(6), 2)
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(8), 0)
@@ -559,11 +638,19 @@ EVT_BEGIN(yuu_01_init_evt)
     CALL(yuuminigame2_get_name, 17, LW(0), LW(1), LW(11))
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
+#if VERSION <= VERSION_DEMO_US
+    SET_VALUE(LW(2), 0)
+    SET_VALUE(LW(3), 0)
+    SET_VALUE(LW(4), 0)
+    SET_VALUE(LW(5), 0)
+    SET_VALUE(LW(6), 5)
+#else
     SET_VALUE(LW(2), -40)
     SET_VALUE(LW(3), 100)
     SET_VALUE(LW(4), 3000)
     SET_VALUE(LW(5), 300)
     SET_VALUE(LW(6), 2)
+#endif
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(9), 0)
@@ -576,10 +663,17 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
     SET_VALUE(LW(2), 0)
+#if VERSION <= VERSION_DEMO_US
+    SET_VALUE(LW(3), 0)
+    SET_VALUE(LW(4), 0)
+    SET_VALUE(LW(5), 0)
+    SET_VALUE(LW(6), 5)
+#else
     SET_VALUE(LW(3), 240)
     SET_VALUE(LW(4), 4000)
     SET_VALUE(LW(5), 500)
     SET_VALUE(LW(6), 2)
+#endif
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(9), 0)
@@ -591,11 +685,19 @@ EVT_BEGIN(yuu_01_init_evt)
     CALL(yuuminigame2_get_name, 19, LW(0), LW(1), LW(11))
     SET_VALUE(LW(0), LW(0))
     SET_VALUE(LW(1), LW(1))
+#if VERSION <= VERSION_DEMO_US
+    SET_VALUE(LW(2), 0)
+    SET_VALUE(LW(3), 0)
+    SET_VALUE(LW(4), 0)
+    SET_VALUE(LW(5), 0)
+    SET_VALUE(LW(6), 5)
+#else
     SET_VALUE(LW(2), -60)
     SET_VALUE(LW(3), 0)
     SET_VALUE(LW(4), 1000)
     SET_VALUE(LW(5), 100)
     SET_VALUE(LW(6), 2)
+#endif
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(9), 0)
@@ -620,8 +722,9 @@ EVT_BEGIN(yuu_01_init_evt)
     SET_VALUE(LW(12), 1)
     SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
     CALL(yuuminigame_set_dataadr, 20, LW(15))
-    SPAWN_EVENT(PTR(minigame02_main))
+    SPAWN_EVENT(minigame02_main)
     CALL_CHILD(evt_yuunpc_minigame2)
+#if VERSION >= VERSION_US
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("J_mon"), MAPOBJ_FLAG_DISABLE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("E_mon"), MAPOBJ_FLAG_DISABLE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("D_mon"), MAPOBJ_FLAG_DISABLE)
@@ -643,341 +746,9 @@ EVT_BEGIN(yuu_01_init_evt)
         CASE_EQUAL(5)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("I_mon"), MAPOBJ_FLAG_DISABLE)
     END_SWITCH
-    RETURN
-EVT_END()
-#else
-EVT_BEGIN(yuu_01_init_evt)
-    CALL(evt_map_playanim, STRING("den1"), 1, 0)
-    CALL(evt_map_playanim, STRING("den2"), 1, 0)
-    CALL(evt_map_playanim, STRING("kumo"), 1, 0)
-    CALL(evt_map_playanim, STRING("wakka"), 1, 0)
-    CALL(evt_map_playanim, STRING("mizu"), 1, 0)
-    CALL(evt_map_playanim, STRING("nagare"), 1, 0)
-    CALL(yuuminigame2_get_name, 1, LW(0), LW(1), LW(11))
-    SET_VALUE(LW(0), LW(0))
-    SET_VALUE(LW(1), LW(1))
-    SET_VALUE(LW(2), -140)
-    SET_VALUE(LW(3), 140)
-    SET_VALUE(LW(4), 1500)
-    SET_VALUE(LW(5), 100)
-    SET_VALUE(LW(6), 2)
-    SET_VALUE(LW(7), 0)
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), LW(11))
-    SET_VALUE(LW(12), 2)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-    CALL(yuuminigame_set_dataadr, 1, LW(15))
-    CALL(yuuminigame2_get_name, 2, LW(0), LW(1), LW(11))
-    SET_VALUE(LW(0), LW(0))
-    SET_VALUE(LW(1), LW(1))
-    SET_VALUE(LW(2), -220)
-    SET_VALUE(LW(3), 50)
-    SET_VALUE(LW(4), 3500)
-    SET_VALUE(LW(5), 200)
-    SET_VALUE(LW(6), 2)
-    SET_VALUE(LW(7), 0)
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), LW(11))
-    SET_VALUE(LW(12), 2)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-    CALL(yuuminigame_set_dataadr, 2, LW(15))
-    CALL(yuuminigame2_get_name, 3, LW(0), LW(1), LW(11))
-    SET_VALUE(LW(0), LW(0))
-    SET_VALUE(LW(1), LW(1))
-    SET_VALUE(LW(2), 20)
-    SET_VALUE(LW(3), -60)
-    SET_VALUE(LW(4), 800)
-    SET_VALUE(LW(5), 0)
-    SET_VALUE(LW(6), 4)
-    SET_VALUE(LW(7), 0)
-    SET_VALUE(LW(8), 115)
-    SET_VALUE(LW(9), -40)
-    SET_VALUE(LW(10), 1600)
-    SET_VALUE(LW(11), LW(11))
-    SET_VALUE(LW(12), 2)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-    CALL(yuuminigame_set_dataadr, 3, LW(15))
-    CALL(yuuminigame2_get_name, 4, LW(0), LW(1), LW(11))
-    SET_VALUE(LW(0), LW(0))
-    SET_VALUE(LW(1), LW(1))
-    SET_VALUE(LW(2), -50)
-    SET_VALUE(LW(3), 0)
-    SET_VALUE(LW(4), 800)
-    SET_VALUE(LW(5), 100)
-    SET_VALUE(LW(6), 2)
-    SET_VALUE(LW(7), 0)
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), LW(11))
-    SET_VALUE(LW(12), 2)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-    CALL(yuuminigame_set_dataadr, 4, LW(15))
-    CALL(yuuminigame2_get_name, 5, LW(0), LW(1), LW(11))
-    SET_VALUE(LW(0), LW(0))
-    SET_VALUE(LW(1), LW(1))
-    SET_VALUE(LW(2), -75)
-    SET_VALUE(LW(3), 75)
-    SET_VALUE(LW(4), 1500)
-    SET_VALUE(LW(5), 400)
-    SET_VALUE(LW(6), 2)
-    SET_VALUE(LW(7), 0)
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), LW(11))
-    SET_VALUE(LW(12), 2)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-    CALL(yuuminigame_set_dataadr, 5, LW(15))
-    CALL(yuuminigame2_get_name, 6, LW(0), LW(1), LW(11))
-    SET_VALUE(LW(0), LW(0))
-    SET_VALUE(LW(1), LW(1))
-    SET_VALUE(LW(2), 75)
-    SET_VALUE(LW(3), -75)
-    SET_VALUE(LW(4), 1500)
-    SET_VALUE(LW(5), 400)
-    SET_VALUE(LW(6), 2)
-    SET_VALUE(LW(7), 0)
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), LW(11))
-    SET_VALUE(LW(12), 2)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-    CALL(yuuminigame_set_dataadr, 6, LW(15))
-    CALL(yuuminigame2_get_name, 7, LW(0), LW(1), LW(11))
-    SET_VALUE(LW(0), LW(0))
-    SET_VALUE(LW(1), LW(1))
-    SET_VALUE(LW(2), 75)
-    SET_VALUE(LW(3), 0)
-    SET_VALUE(LW(4), 1500)
-    SET_VALUE(LW(5), 500)
-    SET_VALUE(LW(6), 2)
-    SET_VALUE(LW(7), 0)
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), LW(11))
-    SET_VALUE(LW(12), 2)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-    CALL(yuuminigame_set_dataadr, 7, LW(15))
-    CALL(yuuminigame2_get_name, 8, LW(0), LW(1), LW(11))
-    SET_VALUE(LW(0), LW(0))
-    SET_VALUE(LW(1), LW(1))
-    SET_VALUE(LW(2), -75)
-    SET_VALUE(LW(3), 40)
-    SET_VALUE(LW(4), 1500)
-    SET_VALUE(LW(5), 100)
-    SET_VALUE(LW(6), 2)
-    SET_VALUE(LW(7), 0)
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), LW(11))
-    SET_VALUE(LW(12), 2)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-    CALL(yuuminigame_set_dataadr, 8, LW(15))
-    CALL(yuuminigame2_get_name, 9, LW(0), LW(1), LW(11))
-    SET_VALUE(LW(0), LW(0))
-    SET_VALUE(LW(1), LW(1))
-    SET_VALUE(LW(2), 120)
-    SET_VALUE(LW(3), -40)
-    SET_VALUE(LW(4), 2800)
-    SET_VALUE(LW(5), 0)
-    SET_VALUE(LW(6), 2)
-    SET_VALUE(LW(7), 0)
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), LW(11))
-    SET_VALUE(LW(12), 2)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-    CALL(yuuminigame_set_dataadr, 9, LW(15))
-    CALL(yuuminigame2_get_name, 10, LW(0), LW(1), LW(11))
-    SET_VALUE(LW(0), LW(0))
-    SET_VALUE(LW(1), LW(1))
-    SET_VALUE(LW(2), -40)
-    SET_VALUE(LW(3), 60)
-    SET_VALUE(LW(4), 2800)
-    SET_VALUE(LW(5), 0)
-    SET_VALUE(LW(6), 0)
-    SET_VALUE(LW(7), 0)
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), LW(11))
-    SET_VALUE(LW(12), 2)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-    CALL(yuuminigame_set_dataadr, 10, LW(15))
-    CALL(yuuminigame2_get_name, 11, LW(0), LW(1), LW(11))
-    SET_VALUE(LW(0), LW(0))
-    SET_VALUE(LW(1), LW(1))
-    SET_VALUE(LW(2), 40)
-    SET_VALUE(LW(3), -50)
-    SET_VALUE(LW(4), 2800)
-    SET_VALUE(LW(5), 0)
-    SET_VALUE(LW(6), 0)
-    SET_VALUE(LW(7), 0)
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), LW(11))
-    SET_VALUE(LW(12), 2)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-    CALL(yuuminigame_set_dataadr, 11, LW(15))
-    CALL(yuuminigame2_get_name, 12, LW(0), LW(1), LW(11))
-    SET_VALUE(LW(0), LW(0))
-    SET_VALUE(LW(1), LW(1))
-    SET_VALUE(LW(2), -40)
-    SET_VALUE(LW(3), 40)
-    SET_VALUE(LW(4), 2800)
-    SET_VALUE(LW(5), 0)
-    SET_VALUE(LW(6), 2)
-    SET_VALUE(LW(7), 0)
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), LW(11))
-    SET_VALUE(LW(12), 2)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-    CALL(yuuminigame_set_dataadr, 12, LW(15))
-    CALL(yuuminigame2_get_name, 13, LW(0), LW(1), LW(11))
-    SET_VALUE(LW(0), LW(0))
-    SET_VALUE(LW(1), LW(1))
-    SET_VALUE(LW(2), -20)
-    SET_VALUE(LW(3), 75)
-    SET_VALUE(LW(4), 3600)
-    SET_VALUE(LW(5), 400)
-    SET_VALUE(LW(6), 2)
-    SET_VALUE(LW(7), 0)
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), LW(11))
-    SET_VALUE(LW(12), 1)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-    CALL(yuuminigame_set_dataadr, 13, LW(15))
-    CALL(yuuminigame2_get_name, 14, LW(0), LW(1), LW(11))
-    SET_VALUE(LW(0), LW(0))
-    SET_VALUE(LW(1), LW(1))
-    SET_VALUE(LW(2), -75)
-    SET_VALUE(LW(3), 75)
-    SET_VALUE(LW(4), 4000)
-    SET_VALUE(LW(5), 800)
-    SET_VALUE(LW(6), 2)
-    SET_VALUE(LW(7), 0)
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), LW(11))
-    SET_VALUE(LW(12), 1)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-    CALL(yuuminigame_set_dataadr, 14, LW(15))
-    CALL(yuuminigame2_get_name, 15, LW(0), LW(1), LW(11))
-    SET_VALUE(LW(0), LW(0))
-    SET_VALUE(LW(1), LW(1))
-    SET_VALUE(LW(2), -70)
-    SET_VALUE(LW(3), 75)
-    SET_VALUE(LW(4), 4000)
-    SET_VALUE(LW(5), 600)
-    SET_VALUE(LW(6), 2)
-    SET_VALUE(LW(7), 0)
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), LW(11))
-    SET_VALUE(LW(12), 1)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-    CALL(yuuminigame_set_dataadr, 15, LW(15))
-    CALL(yuuminigame2_get_name, 16, LW(0), LW(1), LW(11))
-    SET_VALUE(LW(0), LW(0))
-    SET_VALUE(LW(1), LW(1))
-    SET_VALUE(LW(2), 75)
-    SET_VALUE(LW(3), -75)
-    SET_VALUE(LW(4), 4000)
-    SET_VALUE(LW(5), 600)
-    SET_VALUE(LW(6), 2)
-    SET_VALUE(LW(7), 0)
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), LW(11))
-    SET_VALUE(LW(12), 1)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-    CALL(yuuminigame_set_dataadr, 16, LW(15))
-    CALL(yuuminigame2_get_name, 17, LW(0), LW(1), LW(11))
-    SET_VALUE(LW(0), LW(0))
-    SET_VALUE(LW(1), LW(1))
-    SET_VALUE(LW(2), -40)
-    SET_VALUE(LW(3), 100)
-    SET_VALUE(LW(4), 3000)
-    SET_VALUE(LW(5), 300)
-    SET_VALUE(LW(6), 2)
-    SET_VALUE(LW(7), 0)
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), LW(11))
-    SET_VALUE(LW(12), 1)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-    CALL(yuuminigame_set_dataadr, 17, LW(15))
-    CALL(yuuminigame2_get_name, 18, LW(0), LW(1), LW(11))
-    SET_VALUE(LW(0), LW(0))
-    SET_VALUE(LW(1), LW(1))
-    SET_VALUE(LW(2), 0)
-    SET_VALUE(LW(3), 240)
-    SET_VALUE(LW(4), 4000)
-    SET_VALUE(LW(5), 500)
-    SET_VALUE(LW(6), 2)
-    SET_VALUE(LW(7), 0)
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), LW(11))
-    SET_VALUE(LW(12), 1)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-    CALL(yuuminigame_set_dataadr, 18, LW(15))
-    CALL(yuuminigame2_get_name, 19, LW(0), LW(1), LW(11))
-    SET_VALUE(LW(0), LW(0))
-    SET_VALUE(LW(1), LW(1))
-    SET_VALUE(LW(2), -60)
-    SET_VALUE(LW(3), 0)
-    SET_VALUE(LW(4), 1000)
-    SET_VALUE(LW(5), 100)
-    SET_VALUE(LW(6), 2)
-    SET_VALUE(LW(7), 0)
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), LW(11))
-    SET_VALUE(LW(12), 1)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-    CALL(yuuminigame_set_dataadr, 19, LW(15))
-    CALL(yuuminigame2_get_name, 20, LW(0), LW(1), LW(11))
-    SET_VALUE(LW(0), LW(0))
-    SET_VALUE(LW(1), LW(1))
-    SET_VALUE(LW(2), -25)
-    SET_VALUE(LW(3), 75)
-    SET_VALUE(LW(4), 3000)
-    SET_VALUE(LW(5), 0)
-    SET_VALUE(LW(6), 0)
-    SET_VALUE(LW(7), 0)
-    SET_VALUE(LW(8), 0)
-    SET_VALUE(LW(9), 0)
-    SET_VALUE(LW(10), 0)
-    SET_VALUE(LW(11), LW(11))
-    SET_VALUE(LW(12), 1)
-    SPAWN_EVENT_GET_ID(PTR(moving_floor), LW(15))
-    CALL(yuuminigame_set_dataadr, 20, LW(15))
-    SPAWN_EVENT(PTR(minigame02_main))
-    CALL_CHILD(PTR(evt_yuunpc_minigame2))
-    RETURN
-EVT_END()
 #endif
+    RETURN
+EVT_END()
 
 BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp, FuneWork* data) {
     MarioWork* mario = marioGetPtr();
@@ -1025,7 +796,11 @@ BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
                     data->dir.y = 0.0f;
                     data->dist = PSVECMag(&data->dir);
                     PSVECNormalize(&data->dir, &data->dir);
+#if VERSION <= VERSION_DEMO_US
+                    data->timer = 240;
+#else
                     data->timer = 120;
+#endif
                     data->y = mario->position.y;
                     mario->dispFlags |= MARIO_DISP_FLAG_DIR_LOCK;
                     psndSFXOn_3D((const char*)0x8DB, &mario->position);
@@ -1086,16 +861,28 @@ BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
                     PSMTXMultVec(mtx, &data->dir, &data->dir);
                     data->dir.y = 0.0f;
                     PSVECNormalize(&data->dir, &data->dir);
+#if VERSION <= VERSION_DEMO_US
+                    PSVECScale(&data->dir, &ofs, data->timer >= 60 ? data->dist * ((data->timer - 60) / 180.0f) : 0.0f);
+#else
                     PSVECScale(&data->dir, &ofs, data->timer >= 30 ? data->dist * ((data->timer - 30) / 90.0f) : 0.0f);
+#endif
                     mapObjGetPos(s_nametbl[data->index], &pos);
                     PSVECAdd(&ofs, &pos, &ofs);
                     mario->position.x = ofs.x;
                     mario->position.z = ofs.z;
+#if VERSION <= VERSION_DEMO_US
+                    mario->position.y = data->y - 30.0f * ((240 - data->timer) / 240.0f);
+#else
                     mario->position.y = data->y - 30.0f * ((120 - data->timer) / 120.0f);
+#endif
                     if (data->timer <= 0) {
                         data->state++;
                         angle = 0.0f;
+#if VERSION <= VERSION_DEMO_US
+                        data->timer = 60;
+#else
                         data->timer = 30;
+#endif
                         mario->dispFlags &= ~MARIO_DISP_FLAG_DIR_LOCK;
                         data->x = mario->position.x;
                     }
@@ -1103,17 +890,29 @@ BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
                 case 1:
                     data->timer--;
                     angle = 0.0f;
+#if VERSION <= VERSION_DEMO_US
+                    mario->position.x = data->x + -100.0f * ((60 - data->timer) / 60.0f);
+#else
                     mario->position.x = data->x + -100.0f * ((30 - data->timer) / 30.0f);
+#endif
                     mario->position.y = data->y - 30.0f;
                     if (data->timer <= 0) {
                         data->state++;
+#if VERSION <= VERSION_DEMO_US
+                        data->timer = 60;
+#else
                         data->timer = 30;
+#endif
                     }
                     break;
                 case 2:
                     data->timer--;
                     angle = 0.0f;
+#if VERSION <= VERSION_DEMO_US
+                    mario->position.y = data->y - 30.0f * (data->timer / 60.0f);
+#else
                     mario->position.y = data->y - 30.0f * (data->timer / 30.0f);
+#endif
                     if (data->timer <= 0) {
                         data->index = 0x15;
                         marioKeyOn();
@@ -1160,11 +959,19 @@ void yuuminigame_main_2fune(EventEntry* event, BOOL isFirstCall) {
         case 4:
             wp->subEvent = evtEntry(minigame02_end, 0, 0);
             wp->subEvent->lwData[0] = data->coins;
+#if VERSION <= VERSION_DEMO_US
+            if (data->result == 0) {
+                data->result += 2;
+            } else if (data->result < 0) {
+                data->result = 1;
+            }
+#else
             if (data->result + 5 <= 0) {
                 data->result = 1;
             } else {
                 data->result += 0x105;
             }
+#endif
             wp->subEvent->lwData[1] = data->result;
             wp->subEvent->lwData[2] = data->monteCount;
             data->phase++;
@@ -1181,7 +988,7 @@ void yuuminigame_init_2fune(EventEntry* event, BOOL isFirstCall) {
     marioChgShipMotion();
 }
 
-USER_FUNC(yuuminigame2_opening_chk) {
+static USER_FUNC(yuuminigame2_opening_chk) {
     EvtWord* args = event->args;
     MiniGameWork* wp = (MiniGameWork*)evtGetValue(event, args[0]);
 
@@ -1193,7 +1000,7 @@ USER_FUNC(yuuminigame2_opening_chk) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(yuuminigame2_opening_on_off) {
+static USER_FUNC(yuuminigame2_opening_on_off) {
     EvtWord* args = event->args;
     FuneWork* data = ((MiniGameWork*)evtGetValue(event, args[0]))->data;
 
@@ -1205,7 +1012,7 @@ USER_FUNC(yuuminigame2_opening_on_off) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(yuuminigame2_get_name) {
+static USER_FUNC(yuuminigame2_get_name) {
     EvtWord* args = event->args;
     s32 i = evtGetValue(event, args[0]);
 
@@ -1215,7 +1022,7 @@ USER_FUNC(yuuminigame2_get_name) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(yuuminigame2_set_phase) {
+static USER_FUNC(yuuminigame2_set_phase) {
     EvtWord* args = event->args;
     FuneWork* data = ((MiniGameWork*)evtGetValue(event, args[0]))->data;
 
@@ -1348,7 +1155,9 @@ static BOOL get_monte_check(Vec* a, Vec* b) {
     return FALSE;
 }
 
+#if VERSION >= VERSION_JP
 USER_FUNC(yuu_01_cam_shift_reset) {
     camShiftReset();
     return EVT_RETURN_DONE;
 }
+#endif

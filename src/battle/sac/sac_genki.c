@@ -24,7 +24,7 @@
 #include "battle/battle_camera.h"
 #include "battle/sac/sac_common.h"
 #include "evt/evt_eff.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/sac/sac_genki.h"
 #include "battle/battle_sub.h"
 #include "eff/eff_hit.h"
@@ -35,6 +35,8 @@
 #include "libc_decls.h"
 #include "statuswindow.h"
 #include "battle/battle_disp.h"
+
+static void weapon_entry(void);
 // FAKE: sac_genki.c calls weapon_entry through this prototype (the types it was compiled with) instead of the one in battle/sac/sac_genki.h; same registers, behaviour-identical.
 typedef void (*Weapon_entryLocalFn)(void);
 // FAKE: sac_genki.c calls iconDispGxCol through this prototype (the types it was compiled with) instead of the one in driver/icondrv.h; same registers, behaviour-identical.
@@ -119,29 +121,29 @@ typedef struct GenkiWork {
     GenkiStar star[7];      // 0x510
 } GenkiWork;
 
-USER_FUNC(recover_cmd_disable);
-USER_FUNC(star_appear);
-USER_FUNC(status_on);
-USER_FUNC(get_score);
-USER_FUNC(object_get_num);
-USER_FUNC(object_entry);
+static USER_FUNC(recover_cmd_disable);
+static USER_FUNC(star_appear);
+static USER_FUNC(status_on);
+static USER_FUNC(get_score);
+static USER_FUNC(object_get_num);
+static USER_FUNC(object_entry);
 static USER_FUNC(star_stone_appear);
 static USER_FUNC(wait_game_end);
 static USER_FUNC(start_game);
-void main_star1(void);
-void main_star0(s32 idx);
+static void main_star1(void);
+static void main_star0(s32 idx);
 static void main_star(void);
-void main_object(s32 idx);
-void main_weapon(s32 idx);
-void main_target(void);
-void main_mario(void);
+static void main_object(s32 idx);
+static void main_weapon(s32 idx);
+static void main_target(void);
+static void main_mario(void);
 static void main_base(void);
 static void disp_3D_alpha(CameraId cam, void* param);
 static void disp_3D(CameraId cam, void* param);
 static void disp_2D(CameraId cam, void* param);
 static GenkiWork* get_ptr(void);
 
-USER_FUNC(main_genki) {
+static USER_FUNC(main_genki) {
     GenkiWork* w = get_ptr();
     s32 i;
     s32 j;
@@ -328,7 +330,7 @@ static void main_base(void) {
     }
 }
 
-void main_mario(void) {
+static void main_mario(void) {
     GenkiWork* w = get_ptr();
     s32 stick = keyGetStickX(0);
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
@@ -396,7 +398,7 @@ void main_mario(void) {
 
 // inlining off for main_target, as in the original (the object differs without it)
 #pragma dont_inline on
-void main_target(void) {
+static void main_target(void) {
     GenkiWork* w = get_ptr();
     switch (w->targetState) {
         case 0:
@@ -436,7 +438,7 @@ void main_target(void) {
 }
 #pragma dont_inline reset
 
-void main_weapon(s32 idx) {
+static void main_weapon(s32 idx) {
     GenkiWork* w = get_ptr();
     GenkiWeapon* wp = &w->weapon[idx];
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
@@ -527,7 +529,7 @@ void main_weapon(s32 idx) {
             wp->state = 3;
             o->state = 3;
             effStardustN64Entry(5, o->pos.x, o->pos.y, o->pos.z, 10.0f);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             effHitEntry(0, 10, o->pos.x, o->pos.y, o->pos.z, 1.0f);
 #else
             effHitEntry(0, 5, o->pos.x, o->pos.y, o->pos.z, 1.0f);
@@ -641,7 +643,7 @@ void main_weapon(s32 idx) {
     }
 }
 
-void main_object(s32 idx) {
+static void main_object(s32 idx) {
     GenkiWork* w = get_ptr();
     GenkiObject* o = &w->object[idx];
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
@@ -738,7 +740,7 @@ static void main_star(void) {
 }
 #pragma dont_inline reset
 
-void main_star0(s32 idx) {
+static void main_star0(s32 idx) {
     GenkiWork* w = get_ptr();
     GenkiStar* s = &w->star[idx];
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
@@ -839,7 +841,7 @@ void main_star0(s32 idx) {
     }
 }
 
-void main_star1(void) {
+static void main_star1(void) {
     GenkiWork* w = get_ptr();
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
     EffStarStoneWork* star;
@@ -932,7 +934,7 @@ void main_star1(void) {
     }
 }
 
-USER_FUNC(end_genki) {
+static USER_FUNC(end_genki) {
     GenkiWork* w = get_ptr();
     GenkiStar* s;
     GenkiWeapon* wp;
@@ -1173,7 +1175,6 @@ static void disp_3D_alpha(CameraId cam, void* param) {
 static USER_FUNC(start_game);
 
 static GenkiWork* get_ptr(void);
-#if VERSION >= VERSION_US
 EVT_BEGIN(genki_evt_common)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_PARTNER, LW(13))
     CALL(btlevtcmd_GetBodyId, LW(13), LW(14))
@@ -1224,103 +1225,11 @@ EVT_BEGIN(genki_evt_common)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
     CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
-    CALL(status_on)
-    CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
-    CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
-    CALL(evt_btl_camera_set_zoomSpeedLv, 0, 2)
-    SET_VALUE(LW(15), LW(10))
-    ADD(LW(15), LW(11))
-    ADD(LW(15), LW(12))
-    IF_INT_GREATER_OR_EQUAL(LW(15), 1)
-        CALL(sac_wao)
-    END_IF
-    IF_INT_NOT_EQUAL(LW(13), -1)
-        CALL(evt_snd_sfxon, STRING("SFX_HP_RECOVER_SHINE2"), 0)
-        SET_VALUE(LW(9), -2)
-        CALL_CHILD(status_recover_evt)
-        CALL(btlevtcmd_RecoverHp, BTL_UNIT_SELF, 1, LW(10))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(evt_eff, STRING(""), STRING("stardust"), 2, LW(0), LW(1), LW(2), 50, 50, 50, 100, 0, 0, 0, 0)
-        SET_VALUE(LW(9), LW(13))
-        CALL_CHILD(status_recover_evt)
-        CALL(btlevtcmd_StartWaitEvent, LW(13))
-        CALL(btlevtcmd_RecoverHp, LW(13), LW(14), LW(11))
-        CALL(btlevtcmd_GetPos, LW(13), LW(0), LW(1), LW(2))
-        CALL(evt_eff, STRING(""), STRING("stardust"), 2, LW(0), LW(1), LW(2), 50, 50, 50, 100, 0, 0, 0, 0)
-        CALL(btlevtcmd_RecoverFp, BTL_UNIT_SELF, 1, LW(12))
-    ELSE
-        CALL(evt_snd_sfxon, STRING("SFX_HP_RECOVER_SHINE2"), 0)
-        SET_VALUE(LW(9), -2)
-        CALL_CHILD(status_recover_evt)
-        CALL(btlevtcmd_RecoverHp, BTL_UNIT_SELF, 1, LW(10))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(evt_eff, STRING(""), STRING("stardust"), 2, LW(0), LW(1), LW(2), 50, 50, 50, 100, 0, 0, 0, 0)
-        CALL(btlevtcmd_RecoverFp, BTL_UNIT_SELF, 1, LW(12))
-    END_IF
-    WAIT_MS(1000)
-    CALL(sac_enemy_slide_return)
-    WAIT_MS(1000)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    WAIT_MS(1000)
-    CALL(end_genki)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
-#else
-EVT_BEGIN(genki_evt_common)
-    CALL(btlevtcmd_GetUnitId, BTL_UNIT_PARTNER, LW(13))
-    CALL(btlevtcmd_GetBodyId, LW(13), LW(14))
-    CALL(btlevtcmd_CheckStatus, LW(13), 27, LW(0))
-    IF_INT_NOT_EQUAL(LW(0), 0)
-        SET_VALUE(LW(13), -1)
-    END_IF
-    CALL(btlevtcmd_reset_move_color_lv_all)
-    CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
-    BEGIN_SIBLING_EVENT
-        CALL(main_genki, LW(13), LW(15))
-    END_SIBLING_EVENT
-    CALL_CHILD(sac_start_camera_evt)
-    WAIT_MS(500)
-    CALL(sac_enemy_slide_go)
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_SAC_START1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL_CHILD(sac_mario_item_on_evt)
-    WAIT_MS(500)
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_SAC_START2"), EVT_NULLPTR, 0, LW(11))
-    IF_INT_EQUAL(LW(15), 0)
-        CALL(star_appear)
-    ELSE
-        CALL(star_stone_appear)
-    END_IF
-    BEGIN_SIBLING_EVENT
-        CALL_CHILD(sac_start_stardust)
-    END_SIBLING_EVENT
-    WAIT_FRAMES(100)
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_SAC_HEART_SHOOT1"), EVT_NULLPTR, 0, LW(10))
-    CALL(evt_snd_sfxoff, LW(11))
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    WAIT_FRAMES(40)
-    CALL_CHILD(sac_mario_item_on_end_evt)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, -75, LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_I_Y"))
-    WAIT_FRAMES(40)
-    CALL(evt_snd_sfxoff, LW(10))
-    CALL(sac_ac_help_on)
-    CALL(start_game)
-    CALL(wait_game_end)
-    CALL(sac_ac_help_off)
-    CALL(get_score, LW(10), LW(11), LW(12))
-    WAIT_FRAMES(70)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+#if VERSION <= VERSION_JP
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+#else
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
+#endif
     CALL(status_on)
     CALL(evt_btl_camera_set_mode, 0, 7)
     CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_NONE)
@@ -1365,7 +1274,6 @@ EVT_BEGIN(genki_evt_common)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
-#endif
 
 // After genki_evt_common, where the demo's .data places them (retail keeps them in .sdata).
 EVT_BEGIN(marioAttackEvent_Genki0)
@@ -1436,7 +1344,7 @@ static GenkiWork* get_ptr(void) {
 }
 #pragma dont_inline reset
 
-void weapon_entry(void) {
+static void weapon_entry(void) {
     GenkiWork* w = get_ptr();
     s32 cnt = 0;
     s32 idx[7];
@@ -1462,7 +1370,7 @@ void weapon_entry(void) {
 
 // Starts the first idle object. main_genki calls it directly, not from a script, so it is called through a
 // cast; it returns nothing (r3 still holds the work pointer), which main_genki ignores.
-USER_FUNC(object_entry) {
+static USER_FUNC(object_entry) {
     GenkiWork* w = get_ptr();
     s32 i;
     for (i = 0; i < 10; i++) {
@@ -1475,7 +1383,7 @@ USER_FUNC(object_entry) {
 }
 
 // Counts the objects in state 2 (called directly by main_genki through a cast).
-USER_FUNC(object_get_num) {
+static USER_FUNC(object_get_num) {
     GenkiWork* w = get_ptr();
     s32 i;
     s32 n;
@@ -1497,7 +1405,7 @@ static USER_FUNC(wait_game_end) {
     return get_ptr()->state == 3 ? 2 : 0;
 }
 
-USER_FUNC(get_score) {
+static USER_FUNC(get_score) {
     GenkiWork* w = get_ptr();
     EvtWord* args = event->args;
     evtSetValue(event, args[0], w->score0);
@@ -1506,12 +1414,12 @@ USER_FUNC(get_score) {
     return 2;
 }
 
-USER_FUNC(status_on) {
+static USER_FUNC(status_on) {
     statusWinOpen();
     return 2;
 }
 
-USER_FUNC(star_appear) {
+static USER_FUNC(star_appear) {
     GenkiWork* w = get_ptr();
     s32 i;
     for (i = 0; i < 7; i++) {
@@ -1529,7 +1437,7 @@ static USER_FUNC(star_stone_appear) {
     return 2;
 }
 
-USER_FUNC(recover_cmd_disable) {
+static USER_FUNC(recover_cmd_disable) {
     BattleWork* w = _battleWorkPointer;
     w->commandDisabled[0] = 0;
     w->commandDisabled[1] = 0;

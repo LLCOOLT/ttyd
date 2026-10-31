@@ -74,8 +74,8 @@ struct {
     s32 n;
 } vtx_data[3] = {{vtx, 95}, {vtx2, 66}, {vtx3, 56}};
 
-void effFireworksMain(EffectEntry* effect);
-void effFireworksDisp(CameraId cameraId, EffectEntry* effect);
+static void effFireworksMain(EffectEntry* effect);
+static void effFireworksDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effFireworksN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 vx, f32 vy, f32 vz, f32 w) {
     EffectEntry* effect;
@@ -138,7 +138,7 @@ EffectEntry* effFireworksN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f
     return effect;
 }
 
-void effFireworksMain(EffectEntry* effect) {
+static void effFireworksMain(EffectEntry* effect) {
     EffFireworksN64Work* work = effect->userdata;
     Vec position2;
     Vec position = {0.0f, 0.0f, 0.0f};
@@ -202,7 +202,7 @@ void effFireworksMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position2), 2, (DispCallback)effFireworksDisp, effect);
 }
 
-void effFireworksDisp(CameraId cameraId, EffectEntry* effect) {
+static void effFireworksDisp(CameraId cameraId, EffectEntry* effect) {
     static s32 salpha;
     static s32 sflag;
     CameraEntry* camera;

@@ -23,7 +23,7 @@ typedef struct EffWangFlushN64Work {
     s32 frame;      // 0x30
 } EffWangFlushN64Work;
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo defines the colours first
 static u8 color_rotation_data[] = {
     0xFF, 0xFF, 0x52, 0xFF, 0xFF, 0x52, 0xB5, 0x94,
@@ -39,7 +39,7 @@ static effN64Vtx size16x16_tex64x64_vtx[] = {
     {-8, 8, 0, 0, 3072, 0, 0, 0, 255},
 };
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 static u8 color_rotation_data[] = {
     0xFF, 0xFF, 0x52, 0xFF, 0xFF, 0x52, 0xB5, 0x94,
     0x00, 0xB5, 0x94, 0x00, 0xFF, 0xFF, 0xD6, 0xFF,
@@ -47,8 +47,8 @@ static u8 color_rotation_data[] = {
 };
 #endif
 
-void effWangFlushMain(EffectEntry* effect);
-void effWangFlushDisp(CameraId cameraId, EffectEntry* effect);
+static void effWangFlushMain(EffectEntry* effect);
+static void effWangFlushDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effWangFlushN64Entry(s32 type, f32 x, f32 y, f32 z, s32 timer) {
     EffectEntry* effect;
@@ -80,7 +80,7 @@ EffectEntry* effWangFlushN64Entry(s32 type, f32 x, f32 y, f32 z, s32 timer) {
     return effect;
 }
 
-void effWangFlushMain(EffectEntry* effect) {
+static void effWangFlushMain(EffectEntry* effect) {
     s32 timer;
     s32 frame;
     f32 sv;
@@ -116,7 +116,7 @@ void effWangFlushMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effWangFlushDisp, effect);
 }
 
-void effWangFlushDisp(CameraId cameraId, EffectEntry* effect) {
+static void effWangFlushDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffWangFlushN64Work* work;
     s32 idx;

@@ -100,7 +100,7 @@ s32 _check_aud_item_type(EventEntry* event, BOOL isFirstCall) {
     return 2;
 }
 
-s32 _delete_present_item(EventEntry* event, BOOL isFirstCall) {
+static s32 _delete_present_item(EventEntry* event, BOOL isFirstCall) {
     s32 out = event->args[0];
     s32 item = BattleAudience_GetPresentItemNo();
 
@@ -111,7 +111,7 @@ s32 _delete_present_item(EventEntry* event, BOOL isFirstCall) {
     return 2;
 }
 
-s32 _get_present_item(EventEntry* event, BOOL isFirstCall) {
+static s32 _get_present_item(EventEntry* event, BOOL isFirstCall) {
     BattleWork* wp = _battleWorkPointer;
     s32 item = BattleAudience_GetPresentItemNo();
     s32 id = BattleAudience_GetPresentTargetUnitId();
@@ -125,14 +125,14 @@ s32 _get_present_item(EventEntry* event, BOOL isFirstCall) {
     return 2;
 }
 
-s32 _get_present_target_id(EventEntry* event, BOOL isFirstCall) {
+static s32 _get_present_target_id(EventEntry* event, BOOL isFirstCall) {
     s32 out = event->args[0];
 
     evtSetValue(event, out, BattleAudience_GetPresentTargetUnitId());
     return 2;
 }
 
-void _get_item_announce_disp(s32 cameraId, void* param) {
+static void _get_item_announce_disp(s32 cameraId, void* param) {
     u16 lines;
     const char* itemName;
     char buf[128];
@@ -165,7 +165,7 @@ void _get_item_announce_disp(s32 cameraId, void* param) {
     FontDrawMessage(x - width / 2, (s32)y - 29, buf);
 }
 
-s32 _get_item_announce(EventEntry* event, BOOL isFirstCall) {
+static s32 _get_item_announce(EventEntry* event, BOOL isFirstCall) {
     BattleWork* wp = _battleWorkPointer;
     s32 item = BattleAudience_GetPresentItemNo();
 
@@ -177,12 +177,12 @@ s32 _get_item_announce(EventEntry* event, BOOL isFirstCall) {
         f32 z;
 
         BtlUnit_GetPos(unit, &x, &y, &z);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         y = y + (f32)(BtlUnit_GetHeight(unit) + 10);
-        event->userdatap[1] = itemEntry(x, y, z, NULL, item, 0x10, -1, 0);
+        event->userdatap[1] = itemEntry(x, y, z, NULL, item, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0);
 #else
         y = y + (unit->sizeMultiplier * (f32)BtlUnit_GetHeight(unit) + 8.0f);
-        event->userdatap[1] = itemEntry(x, y, z, NULL, item, 0x11, -1, 0);
+        event->userdatap[1] = itemEntry(x, y, z, NULL, item, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0);
 #endif
         event->userdata[2] = 90;
     } else {
@@ -198,7 +198,7 @@ s32 _get_item_announce(EventEntry* event, BOOL isFirstCall) {
     return 0;
 }
 
-s32 _damage(EventEntry* event, BOOL isFirstCall) {
+static s32 _damage(EventEntry* event, BOOL isFirstCall) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
     s32 id = BattleAudience_GetPresentTargetUnitId();
@@ -224,9 +224,6 @@ EvtWord* btlataudGetMoveEventPtr(void) {
     }
 }
 
-#if VERSION <= VERSION_JP
-__declspec(section ".data") static s32 btlataudevtDummyPad[1] = {0};
-#endif
 EVT_BEGIN(btlataudevtDummy)
     CALL(_get_attack_aud_no, LW(3), LW(0), LW(1), LW(2))
     CALL(_attack_aud, LW(3), 0)

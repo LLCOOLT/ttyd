@@ -92,8 +92,8 @@ static PoseTableEntry pose_table[] = {
     {40, "KUR_W_1"},
     {56, "KUR_I_1"},
     {57, "KUR_I_1"},
-    {65, "KUR_T_1"},
-    {69, "KUR_S_1"},
+    {BTL_POSE_TALK, "KUR_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "KUR_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -105,7 +105,11 @@ static BattleUnitDefense defence = {0};
 
 static BattleUnitDefenseAttr defence_attr = {0};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {100, 120, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120, 120, 100, 100, 100, 100, 150};
+#else
 static StatusVulnerability regist = {100, 110, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 110, 100, 100, 100, 100, 100, 150};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {
@@ -177,7 +181,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -277,7 +281,7 @@ static EVT_BEGIN(attack_event)
     LABEL(90)
     CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-    SET_VALUE(LW(15), 69)
+    SET_VALUE(LW(15), BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, LW(15))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_MoveDirectionAdd, BTL_UNIT_SELF, LW(0), 30)
@@ -294,7 +298,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_kuriboo_attack))
     CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_kuriboo_attack), 256, LW(5))
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-    SET_VALUE(LW(15), 69)
+    SET_VALUE(LW(15), BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, LW(15))
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(1), 0)

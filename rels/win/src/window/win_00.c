@@ -23,13 +23,12 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_urouro.h"
-#include "party/party_motion.h"
 #include "win.h"
 #include "data_tables.h"
 #include "evt/evt_story.h"
 
-USER_FUNC(item_check_necklace_exist);
-USER_FUNC(win_item_move_3d_position);
+static USER_FUNC(item_check_necklace_exist);
+static USER_FUNC(win_item_move_3d_position);
 
 static NpcSetupInfo npcEnt[5];
 static BeroEntry bero_entry_data[3];
@@ -129,7 +128,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"ビビアン"*/"\x83\x72\x83\x72\x83\x41\x83\x93", // name
+        "ビビアン", // name
         NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         vivian_init, // initEvent
@@ -141,7 +140,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"マリリン"*/"\x83\x7D\x83\x8A\x83\x8A\x83\x93", // name
+        "マリリン", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         maririn_init, // initEvent
@@ -153,7 +152,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"マジョリン"*/"\x83\x7D\x83\x57\x83\x87\x83\x8A\x83\x93", // name
+        "マジョリン", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         majorin_init, // initEvent
@@ -165,7 +164,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ファビオ"*/"\x83\x74\x83\x40\x83\x72\x83\x49", // name
+        "ファビオ", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         fabio_init, // initEvent
@@ -226,8 +225,13 @@ EVT_BEGIN(witchtrio_momeru)
     CALL(evt_npc_flag_onoff, 1, STRING("マリリン"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_npc_flag_onoff, 1, STRING("マジョリン"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_bero_exec_wait, 65536)
+#if VERSION <= VERSION_DEMO_US
     CALL(evt_mario_normalize)
+#endif
+    CALL(evt_bero_exec_wait, 65536)
+#if VERSION >= VERSION_JP
+    CALL(evt_mario_normalize)
+#endif
     CALL(evt_npc_change_fbat_mode, 7)
     CALL(evt_npc_stop_for_event)
     SET_VALUE(GF(0), 1)
@@ -281,7 +285,7 @@ EVT_BEGIN(witchtrio_momeru)
     ADD(LW(0), 17)
     ADD(LW(1), 11)
     ADD(LW(2), 5)
-    CALL(evt_item_entry, STRING("necklace"), ITEM_NECKLACE, LW(0), LW(1), LW(2), 16, -1, 0)
+    CALL(evt_item_entry, STRING("necklace"), ITEM_NECKLACE, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("necklace"), ITEM_FLAG_NO_TOUCH)
     WAIT_MS(300)
     CALL(evt_npc_set_autotalkpose, STRING("ビビアン"), STRING("PTR_S_5"), STRING("PTR_T_6"))
@@ -475,7 +479,7 @@ EVT_BEGIN(witchtrio_picture)
     CALL(evt_cam3d_evt_set, -495, 90, 237, -495, 30, -108, 500, 11)
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("stg2_win_e06_02"), 0, STRING("マリリン"))
-    CALL(evt_item_entry, STRING("picture"), ITEM_MARIO_POSTER, 0, -1000, 0, 16, -1, 0)
+    CALL(evt_item_entry, STRING("picture"), ITEM_MARIO_POSTER, 0, -1000, 0, ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("picture"), ITEM_FLAG_NO_TOUCH)
     SPAWN_EVENT_GET_ID(PTR(majorin_have_picture), LW(10))
     CALL(evt_npc_set_anim, STRING("マジョリン"), STRING("MJR_I_1"))
@@ -684,7 +688,7 @@ EVT_BEGIN(mario_vs_witchtrio)
     CALL(evt_mario_cont_onoff, 1)
     CALL(evt_mario_key_onoff, 1)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_07_MARIO_VS_SHADOW_SIRENS)
-    SPAWN_EVENT(PTR(witchtrio_lose))
+    SPAWN_EVENT(witchtrio_lose)
     RETURN
 EVT_END()
 
@@ -770,7 +774,7 @@ EVT_BEGIN(witchtrio_lose)
     CALL(evt_npc_set_autotalkpose, STRING("ビビアン"), STRING("PTR_S_4"), STRING("PTR_T_4"))
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_WITCH1"))
     CALL(evt_cam3d_evt_set, -375, 144, 533, -375, 40, -58, 0, 11)
-    CALL(evt_item_entry, STRING("necklace"), ITEM_NECKLACE, 0, -1000, 0, 16, GSWF(GSWF_WIN00_NECKLACE_TAKEN), PTR(get_necklace))
+    CALL(evt_item_entry, STRING("necklace"), ITEM_NECKLACE, 0, -1000, 0, ITEM_ENTRY_FIXED, GSWF(GSWF_WIN00_NECKLACE_TAKEN), PTR(get_necklace))
     CALL(evt_item_flag_on, STRING("necklace"), ITEM_FLAG_NO_TOUCH)
     CALL(evt_npc_get_position, STRING("マリリン"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_GURUGURU_MARK1"), LW(0), LW(1), LW(2), 0)
@@ -819,7 +823,7 @@ EVT_BEGIN(witchtrio_lose)
         CALL(evt_eff_softdelete, STRING("effmaririn"))
         CALL(evt_npc_get_position, STRING("マリリン"), LW(0), LW(1), LW(2))
         CALL(evt_npc_jump_position_nohit, STRING("マリリン"), LW(0), LW(1), LW(2), 225, 30)
-        SPAWN_EVENT(PTR(witchtrio_mess_mari))
+        SPAWN_EVENT(witchtrio_mess_mari)
         CALL(evt_npc_set_ry, STRING("マリリン"), 270)
         CALL(evt_npc_get_position, STRING("マリリン"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_SISTERS_ESCAPE1"), LW(0), LW(1), LW(2), 0)
@@ -833,7 +837,7 @@ EVT_BEGIN(witchtrio_lose)
         CALL(evt_eff_softdelete, STRING("effvivian"))
         CALL(evt_npc_get_position, STRING("ビビアン"), LW(0), LW(1), LW(2))
         CALL(evt_npc_jump_position_nohit, STRING("ビビアン"), LW(0), LW(1), LW(2), 225, 30)
-        SPAWN_EVENT(PTR(witchtrio_mess_vivi))
+        SPAWN_EVENT(witchtrio_mess_vivi)
         WAIT_MS(500)
         CALL(evt_npc_set_ry, STRING("ビビアン"), 270)
         CALL(evt_npc_get_position, STRING("ビビアン"), LW(0), LW(1), LW(2))
@@ -873,7 +877,7 @@ EVT_END()
 static EVT_BEGIN(ki_data_evt_01)
     CALL(evt_item_delete_check, STRING("item_ki01"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_ki01"), ITEM_SLEEPY_SHEEP, -694, 111, -130, 14, GSWF(GSWF_WIN00_TREE_SLEEPY_SHEEP_TAKEN), 0)
+        CALL(evt_item_entry, STRING("item_ki01"), ITEM_SLEEPY_SHEEP, -694, 111, -130, ITEM_ENTRY_FALL_THROWN, GSWF(GSWF_WIN00_TREE_SLEEPY_SHEEP_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -934,10 +938,10 @@ EVT_BEGIN(iri_28_enemy_all_dead)
 EVT_END()
 
 EVT_BEGIN(iri_28_enemy_dead)
-    CALL_CHILD(PTR(enemy_common_dead_event))
+    CALL_CHILD(enemy_common_dead_event)
     ADD(GSW(GSW_TROUBLE_WORK_FIRST), 1)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_WORK_FIRST), 3)
-        SPAWN_EVENT(PTR(iri_28_enemy_all_dead))
+        SPAWN_EVENT(iri_28_enemy_all_dead)
     END_IF
     RETURN
 EVT_END()
@@ -945,21 +949,45 @@ EVT_END()
 EVT_BEGIN(iri_28_init)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 28)
         SET_VALUE(GSW(GSW_TROUBLE_WORK_FIRST), 0)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_npc_check, STRING("ドクガッスン１"), LW(0))
+#else
         CALL(evt_npc_check, STRING("パックン１"), LW(0))
+#endif
         IF_INT_EQUAL(LW(0), 1)
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_npc_change_interrupt, STRING("ドクガッスン１"), 8, PTR(iri_28_enemy_dead))
+#else
             CALL(evt_npc_change_interrupt, STRING("パックン１"), 8, PTR(iri_28_enemy_dead))
+#endif
         ELSE
             ADD(GSW(GSW_TROUBLE_WORK_FIRST), 1)
         END_IF
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_npc_check, STRING("モノクロシンエモン"), LW(0))
+#else
         CALL(evt_npc_check, STRING("シンエモン"), LW(0))
+#endif
         IF_INT_EQUAL(LW(0), 1)
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_npc_change_interrupt, STRING("モノクロシンエモン"), 8, PTR(iri_28_enemy_dead))
+#else
             CALL(evt_npc_change_interrupt, STRING("シンエモン"), 8, PTR(iri_28_enemy_dead))
+#endif
         ELSE
             ADD(GSW(GSW_TROUBLE_WORK_FIRST), 1)
         END_IF
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_npc_check, STRING("ドクガッスン３"), LW(0))
+#else
         CALL(evt_npc_check, STRING("パックン２"), LW(0))
+#endif
         IF_INT_EQUAL(LW(0), 1)
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_npc_change_interrupt, STRING("ドクガッスン３"), 8, PTR(iri_28_enemy_dead))
+#else
             CALL(evt_npc_change_interrupt, STRING("パックン２"), 8, PTR(iri_28_enemy_dead))
+#endif
         ELSE
             ADD(GSW(GSW_TROUBLE_WORK_FIRST), 1)
         END_IF
@@ -970,42 +998,47 @@ EVT_END()
 EVT_BEGIN(win_00_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG2_WIN1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_WIN1"))
     CALL(evt_npc_setup, PTR(npcEnt))
     IF_INT_EQUAL(GSWF(GSWF_WIN00_NECKLACE_TAKEN), 1)
         IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_AFTER_THE_BOSS_BATTLE)
-            CALL_CHILD(PTR(kizayarou_init))
+            CALL_CHILD(kizayarou_init)
         END_IF
     END_IF
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_npc_check_delete, STRING("ドクガッスン１_2"))
+    CALL(evt_npc_check_delete, STRING("モノクロシンエモン_2"))
+    CALL(evt_npc_check_delete, STRING("ドクガッスン３_2"))
+#endif
     SET_VALUE(LW(0), PTR(tree_access_data))
-    CALL_CHILD(PTR(evt_sub_tree_access_entry))
+    CALL_CHILD(evt_sub_tree_access_entry)
     IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_00_BOGGLY_WOODS)
-        SPAWN_EVENT(PTR(witchtrio_momeru))
+        SPAWN_EVENT(witchtrio_momeru)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_05_02_FLURRIE_REQUEST)
-        SPAWN_EVENT(PTR(witchtrio_picture))
+        SPAWN_EVENT(witchtrio_picture)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_06_THE_SKETCH)
-        SPAWN_EVENT(PTR(mario_vs_witchtrio))
+        SPAWN_EVENT(mario_vs_witchtrio)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_07_MARIO_VS_SHADOW_SIRENS)
-        SPAWN_EVENT(PTR(witchtrio_lose))
+        SPAWN_EVENT(witchtrio_lose)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_08_SHADOW_SIRENS_LOSE)
-        CALL(evt_item_entry, STRING("necklace"), ITEM_NECKLACE, -361, 0, -22, 16, GSWF(GSWF_WIN00_NECKLACE_TAKEN), PTR(get_necklace))
+        CALL(evt_item_entry, STRING("necklace"), ITEM_NECKLACE, -361, 0, -22, ITEM_ENTRY_FIXED, GSWF(GSWF_WIN00_NECKLACE_TAKEN), PTR(get_necklace))
     END_IF
-    CALL(evt_item_entry, STRING("i"), ITEM_HONEY_SYRUP, 385, 0, -115, 0, GSWF(GSWF_WIN00_HONEY_SYRUP_TAKEN), 0)
-    CALL_CHILD(PTR(iri_28_init))
+    CALL(evt_item_entry, STRING("i"), ITEM_HONEY_SYRUP, 385, 0, -115, ITEM_ENTRY_STAY, GSWF(GSWF_WIN00_HONEY_SYRUP_TAKEN), 0)
+    CALL_CHILD(iri_28_init)
     RETURN
 EVT_END()
 
-USER_FUNC(mariowalk_wait) {
+static USER_FUNC(mariowalk_wait) {
     return !(marioGetPtr()->flags & MARIO_FLAG_FORCED_MOVEMENT);
 }
 
-USER_FUNC(win_item_move_3d_position) {
+static USER_FUNC(win_item_move_3d_position) {
     EvtWord* args = event->args;
     char* name = (char*)evtGetValue(event, args[0]);
     f32 x = evtGetValue(event, args[1]);
@@ -1041,7 +1074,7 @@ USER_FUNC(win_item_move_3d_position) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(item_check_necklace_exist) {
+static USER_FUNC(item_check_necklace_exist) {
     ItemEntry* item = itemNameToPtr("necklace");
 
     if (item != NULL && itemFlag(item, ITEM_FLAG_USED)) {

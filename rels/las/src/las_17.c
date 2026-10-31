@@ -13,7 +13,6 @@
 #include "evt/evt_msg.h"
 #include "evt/evt_npc.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "npc_event.h"
 #include "las.h"
 #include "evt/evt_story.h"
@@ -58,7 +57,7 @@ static BeroEntry bero_entry_data[] = {
 static EVT_BEGIN(box_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("key"), ITEM_PALACE_KEY_0x2C, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("key"), ITEM_PALACE_KEY_0x2C, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("box"))
     CALL(evt_item_get_item, STRING("key"))
     CALL(evt_mario_key_onoff, 1)
@@ -74,14 +73,14 @@ static EVT_BEGIN(switch_evt)
     CALL(evt_mobj_flag_onoff, 0, STRING("box"), MOBJ_FLAG_INVISIBLE | MOBJ_FLAG_FALL)
     CALL(evt_mobj_hit_onoff, STRING("box"), 1)
     SET_VALUE(LW(0), STRING("box"))
-    CALL_CHILD(PTR(box_syutugen))
+    CALL_CHILD(box_syutugen)
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(enemy1_dead_evt)
-    CALL_CHILD(PTR(enemy_common_dead_event))
+    CALL_CHILD(enemy_common_dead_event)
     IF_INT_EQUAL(GSW(GSW_LAS17_ENEMY_ORDER), 0)
         SET_VALUE(GSW(GSW_LAS17_ENEMY_ORDER), 1)
     END_IF
@@ -89,7 +88,7 @@ EVT_BEGIN(enemy1_dead_evt)
 EVT_END()
 
 EVT_BEGIN(enemy2_dead_evt)
-    CALL_CHILD(PTR(enemy_common_dead_event))
+    CALL_CHILD(enemy_common_dead_event)
     IF_INT_EQUAL(GSW(GSW_LAS17_ENEMY_ORDER), 1)
         SET_VALUE(GSW(GSW_LAS17_ENEMY_ORDER), 2)
     END_IF
@@ -97,7 +96,7 @@ EVT_BEGIN(enemy2_dead_evt)
 EVT_END()
 
 EVT_BEGIN(enemy3_dead_evt)
-    CALL_CHILD(PTR(enemy_common_dead_event))
+    CALL_CHILD(enemy_common_dead_event)
     IF_INT_EQUAL(GSW(GSW_LAS17_ENEMY_ORDER), 2)
         SET_VALUE(GSW(GSW_LAS17_ENEMY_ORDER), 3)
     END_IF
@@ -105,7 +104,7 @@ EVT_BEGIN(enemy3_dead_evt)
 EVT_END()
 
 EVT_BEGIN(enemy4_dead_evt)
-    CALL_CHILD(PTR(enemy_common_dead_event))
+    CALL_CHILD(enemy_common_dead_event)
     IF_INT_EQUAL(GSW(GSW_LAS17_ENEMY_ORDER), 3)
         SET_VALUE(GSW(GSW_LAS17_ENEMY_ORDER), 4)
         SET_VALUE(GSWF(GSWF_LAS17_ENEMIES_BEATEN_IN_ORDER), 1)
@@ -121,7 +120,11 @@ EVT_BEGIN(enemy4_dead_evt)
         CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
         WAIT_MS(500)
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_SWITCH_BIKKURI_APPEAR1"), -225, 60, 0, 0)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_eff, STRING(""), STRING("kemuri_test"), 7, -205, 60, 20, 1, 0, 0, 0, 0, 0, 0, 0)
+#else
         CALL(evt_eff, 0, STRING("kemuri_test"), 7, -205, 60, 20, 1, 0, 0, 0, 0, 0, 0, 0)
+#endif
         WAIT_MS(100)
         CALL(evt_mobj_floatswitch_blue, 0, STRING("switch"), -225, 60, 0, PTR(switch_evt), GSWF(GSWF_LAS17_SWITCH_PRESSED))
         WAIT_MS(500)
@@ -148,10 +151,12 @@ EVT_END()
 EVT_BEGIN(las_17_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST2"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 2)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     IF_INT_LESS(GSW(GSW_LAS17_ENEMY_ORDER), 4)
         SET_VALUE(GSW(GSW_LAS17_ENEMY_ORDER), 0)
     END_IF

@@ -15,7 +15,7 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "driver/extdrv.h"
 #include "manager/evtmgr_cmd.h"
@@ -42,7 +42,11 @@ BattleWeapon weapon_gundan_zako_group3_attack;
 static EvtWord init_event[21];
 static EvtWord damage_event[129];
 static EvtWord dead_event[136];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord attack_event[260];
+#else
 static EvtWord attack_event[287];
+#endif
 static EvtWord hit_check_event[119];
 static EvtWord wait_event[6];
 
@@ -164,7 +168,7 @@ static PoseTableEntry pose_table[] = {
     {28, "Z_1"},
     {31, "Z_1"},
     {39, "Z_1"},
-    {69, "Z_1"},
+    {BTL_POSE_STAY_DEFAULT, "Z_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -262,7 +266,7 @@ static EVT_BEGIN(damage_event)
     IF_INT_NOT_EQUAL(LW(15), 0)
         CALL(zakogun_damage_pose)
     END_IF
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     CALL(zakogun_damage_pose_cancel)
     RETURN
 EVT_END()
@@ -322,9 +326,12 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_WaitGuardMove)
     CALL(btlevtcmd_PayWeaponCost, BTL_UNIT_SELF, LW(9))
     CALL(zakogun_get_kanbu_id_evtcmd, LW(5))
+    // The releases bring the leader along only while it can act; the demo always does.
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_CheckActStatus, LW(5), LW(12))
     IF_INT_NOT_EQUAL(LW(12), 0)
         CALL(zakogun_get_kanbu_id_evtcmd, LW(5))
+#endif
         BEGIN_SIBLING_EVENT_GET_ID(LW(15))
             WAIT_FRAMES(10)
             CALL(btlevtcmd_AnimeChangePose, LW(5), 1, STRING("W_1"))
@@ -333,13 +340,17 @@ static EVT_BEGIN(attack_event)
             CALL(btlevtcmd_MovePosition, LW(5), LW(0), LW(1), LW(2), 60, -1, 0)
             CALL(btlevtcmd_AnimeChangePose, LW(5), 1, STRING("S_1"))
         END_SIBLING_EVENT
+#if VERSION >= VERSION_JP
     END_IF
+#endif
     BEGIN_SIBLING_EVENT
         WAIT_FRAMES(32)
         CALL(evt_snd_sfxon, STRING("SFX_BOSS_TEAM_3RD_ADHERE1"), 0)
     END_SIBLING_EVENT
     CALL(zakogun_attack3_1)
+#if VERSION >= VERSION_JP
     IF_INT_NOT_EQUAL(LW(12), 0)
+#endif
         DELETE_EVENT(LW(15))
         CALL(btlevtcmd_AnimeChangePose, LW(5), 1, STRING("A_1A"))
         CALL(btlevtcmd_snd_se, LW(5), STRING("SFX_BOSS_KANBU_JUMP1"), EVT_NULLPTR, 0, LW(13))
@@ -347,10 +358,14 @@ static EVT_BEGIN(attack_event)
         CALL(btlevtcmd_JumpPosition, LW(5), 0, 100, 0, 0, -1)
         CALL(btlevtcmd_AnimeChangePose, LW(5), 1, STRING("S_1"))
         CALL(evt_snd_sfxoff, LW(13))
+#if VERSION >= VERSION_JP
     END_IF
+#endif
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     CALL(zakogun_set_target_id, LW(3))
+#if VERSION >= VERSION_JP
     IF_INT_NOT_EQUAL(LW(12), 0)
+#endif
         BEGIN_SIBLING_EVENT_GET_ID(LW(14))
             CALL(zakogun_get_kanbu_id_evtcmd, LW(5))
             CALL(btlevtcmd_AnimeChangePose, LW(5), 1, STRING("R_2"))
@@ -359,17 +374,23 @@ static EVT_BEGIN(attack_event)
                 WAIT_FRAMES(1)
             END_LOOP
         END_SIBLING_EVENT
+#if VERSION >= VERSION_JP
     END_IF
+#endif
     BEGIN_SIBLING_EVENT
         CALL_CHILD(hit_check_event)
     END_SIBLING_EVENT
     CALL(evt_snd_sfxon, STRING("SFX_BOSS_TEAM_3RD_ROUND1"), LW(13))
     CALL(zakogun_attack3_2, LW(13))
+#if VERSION >= VERSION_JP
     IF_INT_NOT_EQUAL(LW(12), 0)
+#endif
         DELETE_EVENT(LW(14))
         DELETE_EVENT(LW(15))
+#if VERSION >= VERSION_JP
     END_IF
     IF_INT_NOT_EQUAL(LW(12), 0)
+#endif
         BEGIN_INLINE_EVENT
             CALL(zakogun_get_kanbu_id_evtcmd, LW(5))
             CALL(btlevtcmd_AnimeChangePose, LW(5), 1, STRING("A_1A"))
@@ -385,7 +406,9 @@ static EVT_BEGIN(attack_event)
             CALL(btlevtcmd_AnimeChangePose, LW(5), 1, STRING("S_1"))
             CALL(btlevtcmd_ResetFaceDirection, LW(5))
         END_INLINE_EVENT
+#if VERSION >= VERSION_JP
     END_IF
+#endif
     CALL(evt_snd_sfxon, STRING("SFX_BOSS_TEAM_3RD_ADHERE2"), 0)
     CALL(zakogun_attack3_3)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)

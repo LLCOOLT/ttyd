@@ -96,7 +96,7 @@ BattleUnitKind unit_hatty = {
     data_table,
 };
 
-// Spawned by init_event like the UFO's _ufo_main, but left as a stub: it looks the unit up and blocks.
+// Spawned by init_event like the UFO's btlevtcmd_UFOAction, but left as a stub: it looks the unit up and blocks.
 USER_FUNC(hatty_main) {
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -117,7 +117,7 @@ static PoseTableEntry pose_table[] = {
     {28, "PTK_S_1"},
     {31, "PTK_S_1"},
     {39, "PTK_D_1"},
-    {69, "PTK_S_1"},
+    {BTL_POSE_STAY_DEFAULT, "PTK_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -210,7 +210,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
-    SPAWN_EVENT(PTR(main_event))
+    SPAWN_EVENT(main_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -218,7 +218,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
     OPCODE_END_SCRIPT,
     RETURN
@@ -269,7 +269,7 @@ static EVT_BEGIN(attack_event)
                 ADD(LW(2), LW(13))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(12), 0)
-                    CALL_CHILD(PTR(kohatty_spawn_event))
+                    CALL_CHILD(kohatty_spawn_event)
                     GOTO(99)
                 END_IF
             END_IF
@@ -337,7 +337,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_FaceDirectionSub, LW(3), LW(0), 50)
     SUBTRACT(LW(1), 10)
     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, 0, 1, 0, -1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     WAIT_MS(500)
     GOTO(98)
     LABEL(91)

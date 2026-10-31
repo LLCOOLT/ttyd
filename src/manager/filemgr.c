@@ -14,14 +14,14 @@
 #include "addr_word.h"
 
 //.bss
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 FileManagerWork fileWork; // .bss in the demo (-sdata 8), after _filename: .bss is laid out in reverse order
 #endif
 
 char _filename[0x400]; // for fileAllocf/fileAsyncf vsprintf
 
 //.sbss
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 FileManagerWork fileWork;
 #endif
 
@@ -29,10 +29,10 @@ FileManagerWork fileWork;
 FileManagerWork* afp = &fileWork;
 
 // local prototypes
-void fileGarbageDataAdrClear(FileEntry* entry);
-void fileGarbageDataAdrSet(void* data, s32 type);
-FileEntry* _fileAlloc(const char* filename, s32 type, void (*callback)(FileEntry*));
-void dvdReadDoneCallBack(s32 error, DVDFileInfo* info);
+static void fileGarbageDataAdrClear(FileEntry* entry);
+static void fileGarbageDataAdrSet(void* data, s32 type);
+static FileEntry* _fileAlloc(const char* filename, s32 type, void (*callback)(FileEntry*));
+static void dvdReadDoneCallBack(s32 error, DVDFileInfo* info);
 
 void fileInit(void) {
     FileEntry* ptr;
@@ -77,7 +77,7 @@ typedef struct FileReloc9 {
 #define POSE(d) ((AnimationPoseData*)(d))
 #define ANIM(d) ((AnimData*)(d))
 
-void fileGarbageDataAdrClear(FileEntry* entry) {
+static void fileGarbageDataAdrClear(FileEntry* entry) {
     u16 i;
     u32 off;
     TEXPalette* tpl;
@@ -271,7 +271,7 @@ void fileGarbageDataAdrClear(FileEntry* entry) {
     }
 }
 
-void fileGarbageDataAdrSet(void* data, s32 type) {
+static void fileGarbageDataAdrSet(void* data, s32 type) {
     u16 i;
     u32 off;
     u32 off2;
@@ -570,7 +570,7 @@ FileEntry* fileAlloc(const char* filename, s32 type) {
     return _fileAlloc(filename, type, NULL);
 }
 
-FileEntry* _fileAlloc(const char* filename, s32 type, void (*callback)(FileEntry*)) {
+static FileEntry* _fileAlloc(const char* filename, s32 type, void (*callback)(FileEntry*)) {
     void* handle;
     FileEntry* search;
     smartEntry* smart;
@@ -702,7 +702,7 @@ void fileFree(FileEntry* handle) {
     }
 }
 
-void dvdReadDoneCallBack(s32 error, DVDFileInfo* info) {
+static void dvdReadDoneCallBack(s32 error, DVDFileInfo* info) {
     DVDEntry* entry;
     FileEntry* f;
 

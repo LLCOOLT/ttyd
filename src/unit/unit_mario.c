@@ -14,7 +14,6 @@
 #include "battle/battle_camera.h"
 #include "battle/battle_event_subset.h"
 #include "evt/evt_eff.h"
-#include "party/party_motion.h"
 #include "evt/evt_map.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
@@ -23,14 +22,14 @@
 #include "version.h"
 #include "evt/evt_story.h"
 
-USER_FUNC(_get_local_frame);
+static USER_FUNC(_get_local_frame);
 static USER_FUNC(_mario_makkuro_set);
-USER_FUNC(_mario_super_emblem_anim_set);
+static USER_FUNC(_mario_super_emblem_anim_set);
 static USER_FUNC(_get_mario_hammer_lv);
 static void callback(MapTevCallbackInfo* info);
-s32 mario_pinch_pose_sound_callback(BattleUnit* unit);
+static s32 mario_pinch_pose_sound_callback(BattleUnit* unit);
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 PoseTableEntry pose_table_mario_stay[32];
 #else
 PoseTableEntry pose_table_mario_stay[34];
@@ -85,41 +84,26 @@ PoseTableEntry pose_table_mario_stay[] = {
     {52, "M_I_1"},
     {57, "M_S_3"},
     {56, "M_S_3"},
-#if VERSION == VERSION_DEMO
-    {60, "M_V_2"},
-    {61, "M_V_2"},
-    {58, "M_D_2"},
-    {59, "M_V_1"},
-    {65, "M_C_3"},
-    {64, "M_N_8"},
-    {62, "M_I_O"},
-    {49, "M_J_1B"},
-    {45, "M_B_2"},
-    {67, "M_S_1"},
-#else
-    {62, "M_V_2"},
-    {63, "M_V_2"},
-    {58, "M_A_3B"},
-    {59, "M_A_3B"},
-    {60, "M_D_2"},
-    {61, "M_V_1"},
-    {67, "M_C_3"},
-    {66, "M_N_8"},
-    {64, "M_I_O"},
-    {49, "M_J_1B"},
-    {45, "M_B_2"},
-    {69, "M_S_1"},
+    {BTL_POSE_HAPPY_HEART, "M_V_2"},
+    {BTL_POSE_HAPPY_FLOWER, "M_V_2"},
+#if VERSION >= VERSION_JP
+    {BTL_POSE_KISSED_CHRISTINE, "M_A_3B"},
+    {BTL_POSE_KISSED_CHUCHURINA, "M_A_3B"},
 #endif
+    {BTL_POSE_ESCAPE_FAIL, "M_D_2"},
+    {BTL_POSE_ESCAPE_FAIL_END, "M_V_1"},
+    {BTL_POSE_COMMAND_WAIT, "M_C_3"},
+    {BTL_POSE_APPEAL, "M_N_8"},
+    {BTL_POSE_ZERO_GRAVITY, "M_I_O"},
+    {49, "M_J_1B"},
+    {45, "M_B_2"},
+    {BTL_POSE_STAY_DEFAULT, "M_S_1"},
 };
 
 PoseTableEntry pose_table_object[] = {
     {28, "KRN_H_1"},
     {39, "KRN_H_1"},
-#if VERSION == VERSION_DEMO
-    {67, "KRN_H_1"},
-#else
-    {69, "KRN_H_1"},
-#endif
+    {BTL_POSE_STAY_DEFAULT, "KRN_H_1"},
 };
 
 BattleDataEntry data_table_mario[] = {
@@ -293,7 +277,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -306,7 +290,7 @@ static EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
-USER_FUNC(_get_local_frame) {
+static USER_FUNC(_get_local_frame) {
     EvtWord* args = event->args;
     s32 index = args[0];
     BattleUnitPart* part;
@@ -318,7 +302,7 @@ USER_FUNC(_get_local_frame) {
     return EVT_RETURN_DONE;
 }
 
-s32 mario_pinch_pose_sound_callback(BattleUnit* unit) {
+static s32 mario_pinch_pose_sound_callback(BattleUnit* unit) {
     s32 ret;
 
     if (unit->work[8] & 1) {
@@ -366,7 +350,7 @@ static USER_FUNC(_mario_makkuro_set) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_mario_super_emblem_anim_set) {
+static USER_FUNC(_mario_super_emblem_anim_set) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
     BattleUnitPart* part;
@@ -494,11 +478,7 @@ EVT_BEGIN(mario_emergency_revival_event)
 EVT_END()
 
 EVT_BEGIN(mario_appeal_event)
-#if VERSION == VERSION_DEMO
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 64)
-#else
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 66)
-#endif
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_APPEAL)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_MARIO_APPEAL1"), LW(0), LW(1), LW(2), 0)
     WAIT_FRAMES(60)
@@ -517,9 +497,9 @@ EVT_END()
 static EVT_BEGIN(attack_audience_event)
     CALL(evt_sub_random, 1, LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(btlataudevtMarioJump))
+        CALL_CHILD(btlataudevtMarioJump)
     ELSE
-        CALL_CHILD(PTR(btlataudevtMarioHammer))
+        CALL_CHILD(btlataudevtMarioHammer)
     END_IF
     RETURN
 EVT_END()
@@ -610,7 +590,7 @@ EVT_BEGIN(btlataudevtMarioHammer)
         CASE_EQUAL(2)
         SET_VALUE(LW(0), STRING("M_H_5A"))
         SET_VALUE(LW(1), STRING("M_H_5B"))
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         SET_VALUE(LW(2), STRING("M_H_15"))
 #else
         SET_VALUE(LW(2), STRING("M_H_14"))
@@ -618,7 +598,7 @@ EVT_BEGIN(btlataudevtMarioHammer)
         CASE_EQUAL(3)
         SET_VALUE(LW(0), STRING("M_H_9A"))
         SET_VALUE(LW(1), STRING("M_H_9B"))
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         SET_VALUE(LW(2), STRING("M_H_14"))
 #else
         SET_VALUE(LW(2), STRING("M_H_15"))
@@ -669,7 +649,7 @@ EVT_BEGIN(btlataudevtMarioHammer)
         CALL(evt_btl_camera_set_mode, 0, 0)
         WAIT_MS(1000)
     END_SIBLING_EVENT
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     WAIT_MS(30)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))

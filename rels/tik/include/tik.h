@@ -48,9 +48,9 @@ extern BattleUnitKind unit_togenoko;
 
 extern EvtWord evt_uranai_cap[];
 
-extern s32 R_defence_turn[];
-extern s32 R_defence_attr_turn[];
-extern s32 R_regist_turn[];
+extern s32 gesso_defence_turn[];
+extern s32 gesso_defence_attr_turn[];
+extern s32 gesso_regist_turn[];
 extern PoseTableEntry gesso_pose_table_turn[];
 extern BattleUnitKind unit_boss_gesso;
 extern BattleUnitKind unit_boss_gesso_left_arm;

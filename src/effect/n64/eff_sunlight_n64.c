@@ -22,8 +22,8 @@ typedef struct EffSunlightN64Work {
     s32 alphaMax;  // 0x3C
 } EffSunlightN64Work;
 
-void effSunlightMain(EffectEntry* effect);
-void effSunlightDisp(CameraId cameraId, EffectEntry* effect);
+static void effSunlightMain(EffectEntry* effect);
+static void effSunlightDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effSunlightN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 w) {
     EffectEntry* effect;
@@ -64,7 +64,7 @@ EffectEntry* effSunlightN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f3
     return effect;
 }
 
-void effSunlightMain(EffectEntry* effect) {
+static void effSunlightMain(EffectEntry* effect) {
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
     EffSunlightN64Work* work;
@@ -130,7 +130,7 @@ void effSunlightMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), VERSION_PICK(2, 10), (DispCallback)effSunlightDisp, effect);
 }
 
-void effSunlightDisp(CameraId cameraId, EffectEntry* effect) {
+static void effSunlightDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera = camGetPtr(cameraId);
     EffSunlightN64Work* work = effect->userdata;
     s32 alpha = work->alpha;

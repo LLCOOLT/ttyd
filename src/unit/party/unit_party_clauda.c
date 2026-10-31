@@ -19,21 +19,20 @@
 #include "evt/evt_audience.h"
 #include "evt/evt_eff.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "evt/evt_snd.h"
 
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 #include "version.h"
 
-USER_FUNC(_clauda_make_extra_work_area);
-USER_FUNC(_make_kumoguard_weapon);
-USER_FUNC(_get_clauda_kiss_hit_position);
-USER_FUNC(_make_kiss_weapon);
-USER_FUNC(_make_breath_weapon);
+static USER_FUNC(_clauda_make_extra_work_area);
+static USER_FUNC(_make_kumoguard_weapon);
+static USER_FUNC(_get_clauda_kiss_hit_position);
+static USER_FUNC(_make_kiss_weapon);
+static USER_FUNC(_make_breath_weapon);
 static USER_FUNC(_clauda_breath_effect_fire);
 static USER_FUNC(_clauda_breath_effect_ready);
-USER_FUNC(_check_blow_rate);
+static USER_FUNC(_check_blow_rate);
 static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 
 BattleWeapon partyWeapon_ClaudaNormalAttack;
@@ -248,7 +247,6 @@ static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 
 PoseTableEntry pose_table_clauda_stay[] = {
-#if VERSION == VERSION_DEMO
     {9, "PWD_D_5"},
     {2, "PWD_D_5"},
     {3, "PWD_X_1"},
@@ -264,43 +262,16 @@ PoseTableEntry pose_table_clauda_stay[] = {
     {42, "PWD_R_1"},
     {57, "PWD_D_2"},
     {56, "PWD_D_2"},
-    {58, "PWD_D_3"},
-    {59, "PWD_D_2"},
-    {63, "PWD_T_1"},
+    {BTL_POSE_ESCAPE_FAIL, "PWD_D_3"},
+    {BTL_POSE_ESCAPE_FAIL_END, "PWD_D_2"},
+    {BTL_POSE_TALK, "PWD_T_1"},
     {52, "PWD_I_1"},
-    {65, "PWD_C_1"},
-    {64, "PWD_O_1"},
-    {62, "PWD_X_1"},
+    {BTL_POSE_COMMAND_WAIT, "PWD_C_1"},
+    {BTL_POSE_APPEAL, "PWD_O_1"},
+    {BTL_POSE_ZERO_GRAVITY, "PWD_X_1"},
     {49, "PWD_A4_3"},
     {45, "PWD_G_1"},
-    {67, "PWD_S_1"},
-#else
-    {9, "PWD_D_5"},
-    {2, "PWD_D_5"},
-    {3, "PWD_X_1"},
-    {4, "PWD_D_2"},
-    {5, "PWD_X_1"},
-    {1, "PWD_N_1"},
-    {27, "PWD_D_3"},
-    {28, "PWD_S_1"},
-    {37, "PWD_G_2"},
-    {31, "PWD_G_1"},
-    {39, "PWD_D_1"},
-    {40, "PWD_W_1"},
-    {42, "PWD_R_1"},
-    {57, "PWD_D_2"},
-    {56, "PWD_D_2"},
-    {60, "PWD_D_3"},
-    {61, "PWD_D_2"},
-    {65, "PWD_T_1"},
-    {52, "PWD_I_1"},
-    {67, "PWD_C_1"},
-    {66, "PWD_O_1"},
-    {64, "PWD_X_1"},
-    {49, "PWD_A4_3"},
-    {45, "PWD_G_1"},
-    {69, "PWD_S_1"},
-#endif
+    {BTL_POSE_STAY_DEFAULT, "PWD_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -418,7 +389,7 @@ static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -645,7 +616,7 @@ EVT_BEGIN(partyClaudaAttack_BreathAttack)
     CALL(btlevtcmd_AcGetDifficulty, LW(1))
     SUBTRACT(LW(1), 3)
     SWITCH(LW(1))
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         CASE_LESS_OR_EQUAL(-3)
         SET_VALUE(LW(0), 420)
         CASE_EQUAL(-2)
@@ -830,7 +801,6 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
         CALL(btlevtcmd_AcGetDifficulty, LW(0))
         SUBTRACT(LW(0), 3)
         SWITCH(LW(0))
-#if VERSION == VERSION_DEMO
             CASE_LESS_OR_EQUAL(-3)
             SET_VALUE(LW(0), 120)
             SET_VALUE(LW(1), 0)
@@ -844,6 +814,7 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
             SET_VALUE(LW(0), 70)
             SET_VALUE(LW(1), 2)
             CASE_EQUAL(1)
+#if VERSION <= VERSION_DEMO_US
             SET_VALUE(LW(0), 65)
             SET_VALUE(LW(1), 3)
             CASE_EQUAL(2)
@@ -853,19 +824,6 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
             SET_VALUE(LW(0), 50)
             SET_VALUE(LW(1), 4)
 #else
-            CASE_LESS_OR_EQUAL(-3)
-            SET_VALUE(LW(0), 120)
-            SET_VALUE(LW(1), 0)
-            CASE_EQUAL(-2)
-            SET_VALUE(LW(0), 100)
-            SET_VALUE(LW(1), 0)
-            CASE_EQUAL(-1)
-            SET_VALUE(LW(0), 80)
-            SET_VALUE(LW(1), 1)
-            CASE_EQUAL(0)
-            SET_VALUE(LW(0), 70)
-            SET_VALUE(LW(1), 2)
-            CASE_EQUAL(1)
             SET_VALUE(LW(0), 66)
             SET_VALUE(LW(1), 2)
             CASE_EQUAL(2)
@@ -876,7 +834,7 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
             SET_VALUE(LW(1), 2)
 #endif
         END_SWITCH
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         CALL(btlevtcmd_AcSetParamAll, 0, LW(0), LW(1), 6, 3, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
         CALL(btlevtcmd_AcSetGaugeParam, 51, 68, 85, 100)
 #else
@@ -887,7 +845,7 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
         CALL(btlevtcmd_AcGetDifficulty, LW(0))
         SUBTRACT(LW(0), 3)
         SWITCH(LW(0))
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             CASE_LESS_OR_EQUAL(-3)
             SET_VALUE(LW(0), 80)
             SET_VALUE(LW(1), 0)
@@ -933,7 +891,7 @@ EVT_BEGIN(partyClaudaAttack_PredationAttack)
             SET_VALUE(LW(1), 2)
 #endif
         END_SWITCH
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         CALL(btlevtcmd_AcSetParamAll, 0, LW(0), LW(1), 4, 2, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
         CALL(btlevtcmd_AcSetGaugeParam, 25, 50, 75, 100)
 #else
@@ -1194,11 +1152,7 @@ EVT_END()
 
 EVT_BEGIN(clauda_appeal_event)
     CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
-#if VERSION == VERSION_DEMO
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 64)
-#else
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 66)
-#endif
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_APPEAL)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_MARIO_APPEAL1"), LW(0), LW(1), LW(2), 0)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -1224,9 +1178,9 @@ static EVT_BEGIN(attack_audience_event)
     CALL(_check_aud_item_type, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(1)
-        CALL_CHILD(PTR(attack_bad_audience_event))
+        CALL_CHILD(attack_bad_audience_event)
         CASE_DEFAULT
-        CALL_CHILD(PTR(attack_good_audience_event))
+        CALL_CHILD(attack_good_audience_event)
     END_SWITCH
     RETURN
 EVT_END()
@@ -1367,7 +1321,7 @@ EVT_BEGIN(attack_good_audience_event)
     RETURN
 EVT_END()
 
-USER_FUNC(_clauda_make_extra_work_area) {
+static USER_FUNC(_clauda_make_extra_work_area) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
     s32 id;
@@ -1420,7 +1374,7 @@ static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     }
 }
 
-USER_FUNC(_check_blow_rate) {
+static USER_FUNC(_check_blow_rate) {
     EvtWord* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     s32 id, out;
@@ -1490,7 +1444,7 @@ static USER_FUNC(_clauda_breath_effect_fire) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_make_breath_weapon) {
+static USER_FUNC(_make_breath_weapon) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -1511,7 +1465,7 @@ USER_FUNC(_make_breath_weapon) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_make_kiss_weapon) {
+static USER_FUNC(_make_kiss_weapon) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -1531,7 +1485,7 @@ USER_FUNC(_make_kiss_weapon) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_get_clauda_kiss_hit_position) {
+static USER_FUNC(_get_clauda_kiss_hit_position) {
     EvtWord* args = event->args;
     Vec pos, tmp;
     s32 dir;
@@ -1569,7 +1523,7 @@ USER_FUNC(_get_clauda_kiss_hit_position) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_make_kumoguard_weapon) {
+static USER_FUNC(_make_kumoguard_weapon) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
     BattleUnit* unit;

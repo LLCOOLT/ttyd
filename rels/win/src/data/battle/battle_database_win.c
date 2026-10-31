@@ -1136,7 +1136,7 @@ NpcBattleSelect btlgrpsel_win_btlno_win_03_01_off[] = {
 
 NpcSetupBattleInfo btlsetup_win_tbl[] = {
     {
-        /*"マップstg_02_0"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x32\x5F\x30", // name
+        "マップstg_02_0", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1146,7 +1146,7 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"win_00ドクガッスン１"*/"\x77\x69\x6E\x5F\x30\x30\x83\x68\x83\x4E\x83\x4B\x83\x62\x83\x58\x83\x93\x82\x50", // name
+        "win_00ドクガッスン１", // name
         NULL, 0, // mapName..fixedItem
         GSWF(GSWF_WIN04_FLURRIE_JOINED), // swFlag
         btlgrpsel_win_btlno_win_00_01_on, // altSelect
@@ -1156,7 +1156,7 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"win_00モノクロシンエモン"*/"\x77\x69\x6E\x5F\x30\x30\x83\x82\x83\x6D\x83\x4E\x83\x8D\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93", // name
+        "win_00モノクロシンエモン", // name
         NULL, 0, // mapName..fixedItem
         GSWF(GSWF_WIN04_FLURRIE_JOINED), // swFlag
         btlgrpsel_win_btlno_win_00_02_on, // altSelect
@@ -1166,7 +1166,7 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"win_00ドクガッスン３"*/"\x77\x69\x6E\x5F\x30\x30\x83\x68\x83\x4E\x83\x4B\x83\x62\x83\x58\x83\x93\x82\x52", // name
+        "win_00ドクガッスン３", // name
         NULL, 0, // mapName..fixedItem
         GSWF(GSWF_WIN04_FLURRIE_JOINED), // swFlag
         btlgrpsel_win_btlno_win_00_03_on, // altSelect
@@ -1176,7 +1176,7 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"win00ビビアン３姉妹"*/"\x77\x69\x6E\x30\x30\x83\x72\x83\x72\x83\x41\x83\x93\x82\x52\x8E\x6F\x96\x85", // name
+        "win00ビビアン３姉妹", // name
         "win_00", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1188,7 +1188,7 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
         "BGM_BOSS_STG3_3WOMEN1", // bgmName
     },
     {
-        /*"win_02シンエモン１"*/"\x77\x69\x6E\x5F\x30\x32\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93\x82\x50", // name
+        "win_02シンエモン１", // name
         NULL, 0, // mapName..fixedItem
         GSWF(GSWF_WIN02_ALT_BATTLES), // swFlag; BUG: nothing sets this flag, so altSelect is never used (original game)
         btlgrpsel_win_btlno_win_02_01_on, // altSelect
@@ -1198,7 +1198,7 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"win_02パックンフラワー"*/"\x77\x69\x6E\x5F\x30\x32\x83\x70\x83\x62\x83\x4E\x83\x93\x83\x74\x83\x89\x83\x8F\x81\x5B", // name
+        "win_02パックンフラワー", // name
         NULL, 0, // mapName..fixedItem
         GSWF(GSWF_WIN02_ALT_BATTLES), // swFlag; BUG: nothing sets this flag, so altSelect is never used (original game)
         btlgrpsel_win_btlno_win_02_02_on, // altSelect
@@ -1208,7 +1208,7 @@ NpcSetupBattleInfo btlsetup_win_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"win_03パックン１"*/"\x77\x69\x6E\x5F\x30\x33\x83\x70\x83\x62\x83\x4E\x83\x93\x82\x50", // name
+        "win_03パックン１", // name
         NULL, 0, // mapName..fixedItem
         GSWF(GSWF_WIN04_FLURRIE_REQUEST_HEARD), // swFlag
         btlgrpsel_win_btlno_win_03_01_on, // altSelect

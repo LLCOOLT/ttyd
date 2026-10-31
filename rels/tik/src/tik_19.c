@@ -20,9 +20,9 @@
 #include "evt/evt_pouch.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "pmario_sound.h"
 #include "evt/evt_story.h"
+#include "mario/mario.h"
 
 static USER_FUNC(bgm_start_wait);
 static void majin_callback(s32 type);
@@ -140,7 +140,11 @@ static EVT_BEGIN(evt_majin)
             ADD(LW(1), 30)
             CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
             CALL(evt_msg_print, 0, STRING("mac_majin_10"), PTR(majin_callback), 0)
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_win_item_select, PTR(key_tbl), LW(0))
+#else
             CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
+#endif
             IF_INT_EQUAL(LW(0), -1)
                 CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
                 ADD(LW(1), 30)
@@ -186,6 +190,9 @@ EVT_END()
 
 static EVT_BEGIN(evt_majin2)
     CALL(evt_mario_key_onoff, 0)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_mario_normalize)
+#endif
     CALL(evt_mobj_wait_animation_end, STRING("box"))
     CALL(evt_pouch_add_item, ITEM_PLANE_CURSE, LW(0))
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
@@ -214,19 +221,19 @@ static EVT_BEGIN(evt_majin2)
     CALL(lect_cam_save)
     CALL(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
     WAIT_FRAMES(1)
-    CALL_CHILD(PTR(plane_majin_lecture_init))
-    CALL_CHILD(PTR(plane_majin_lecture))
+    CALL_CHILD(plane_majin_lecture_init)
+    CALL_CHILD(plane_majin_lecture)
     LOOP(6)
-        CALL(evt_mario_dispflag_onoff, 1, 1)
+        CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_HIDDEN)
         WAIT_MS(100)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_PERAMAJIN_BLINKING1"), LW(0), LW(1), LW(2), 0)
-        CALL(evt_mario_dispflag_onoff, 0, 1)
+        CALL(evt_mario_dispflag_onoff, 0, MARIO_DISP_FLAG_HIDDEN)
         WAIT_MS(100)
     END_LOOP
-    CALL(evt_mario_dispflag_onoff, 1, 1)
+    CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_HIDDEN)
     CALL(evt_mario_set_pos, LW(10), LW(11), LW(12))
-    CALL(evt_mario_dispflag_onoff, 0, 1)
+    CALL(evt_mario_dispflag_onoff, 0, MARIO_DISP_FLAG_HIDDEN)
     CALL(evt_mario_init_camid)
     CALL(lect_cam_load, 0)
     CALL(evt_cam3d_evt_off, 500, 11)
@@ -262,7 +269,7 @@ EVT_BEGIN(tik_19_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_map_entry_airport_harbor, 0, STRING("hikou"), STRING("a_hikou_ue"))
     CALL(evt_paper_entry, STRING("OFF_d_kusya"))
     CALL(evt_mobj_itembox, STRING("box"), 0, 10, -50, 3, PTR(evt_majin), PTR(evt_majin2), GSWF(GSWF_TIK19_BLACK_CHEST_OPENED))

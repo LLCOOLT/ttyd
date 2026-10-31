@@ -24,7 +24,7 @@ USER_FUNC(evt_pouch_set_supercoin);
 USER_FUNC(evt_pouch_get_starpiece);
 USER_FUNC(evt_pouch_add_starpiece);
 USER_FUNC(evt_pouch_get_starstone);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 USER_FUNC(L_evt_pouch_get_hp);
 USER_FUNC(L_evt_pouch_set_hp);
 #endif

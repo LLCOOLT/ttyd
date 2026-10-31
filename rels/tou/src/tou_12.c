@@ -13,7 +13,6 @@
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "tou.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
@@ -92,7 +91,11 @@ static EVT_BEGIN(evt_block_broken)
     CALL(evt_party_move_pos2, 0, 95, 10, FLOAT(80.0f))
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
     CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SURPRISED2"))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_party_set_dir, 0, 270, 200)
+#else
     CALL(evt_party_set_dir, 0, 90, 200)
+#endif
     WAIT_MS(300)
     CALL(evt_msg_print_party, STRING("stg3_tou_307_10"))
     CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
@@ -101,7 +104,7 @@ static EVT_BEGIN(evt_block_broken)
     CALL(evt_msg_print, 0, STRING("stg3_tou_307_11"), 0, STRING("ブロッツダミー"))
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_party_run, 0)
-    SPAWN_EVENT(PTR(evt_kinoshikowa))
+    SPAWN_EVENT(evt_kinoshikowa)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_20_16_FLATTENED)
     RETURN
 EVT_END()
@@ -184,7 +187,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"マイケル"*/"\x83\x7D\x83\x43\x83\x50\x83\x8B", // name
+        "マイケル", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_NO_TURN_TO_MARIO | NPC_FLAG_INTANGIBLE, // flags
         0, // reactionFlags
         init_michel, // initEvent
@@ -194,7 +197,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ブロッツ"*/"\x83\x75\x83\x8D\x83\x62\x83\x63", // name
+        "ブロッツ", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_NO_TURN_TO_MARIO | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE, // flags
         0, // reactionFlags
         init_brots, // initEvent
@@ -204,7 +207,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"マイケルダミー"*/"\x83\x7D\x83\x43\x83\x50\x83\x8B\x83\x5F\x83\x7E\x81\x5B", // name
+        "マイケルダミー", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_NO_TURN_TO_MARIO | NPC_FLAG_HIDDEN, // flags
         0, // reactionFlags
         init_michel_dummy, // initEvent
@@ -216,7 +219,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ブロッツダミー"*/"\x83\x75\x83\x8D\x83\x62\x83\x63\x83\x5F\x83\x7E\x81\x5B", // name
+        "ブロッツダミー", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_NO_TURN_TO_MARIO | NPC_FLAG_HIDDEN, // flags
         0, // reactionFlags
         init_brots_dummy, // initEvent
@@ -228,7 +231,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F", // name
+        "キノシコワ", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_kinoshikowa, // initEvent
@@ -250,11 +253,19 @@ EVT_BEGIN(tou_12_init_evt)
         SWITCH(GSW(GSW_STORY_PROGRESS))
             CASE_BETWEEN(STORY_STG3_00_WELCOME_TO_GLITZVILLE, STORY_STG3_12_MINI_YOSHI_EGG)
             CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
+#else
             CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))
+#endif
             CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
             CASE_GREATER_OR_EQUAL(STORY_STG3_33_PEACH_THE_SECRET_WEAPON)
             CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
+#else
             CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))
+#endif
             CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
             CASE_DEFAULT
             CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU1"))
@@ -263,9 +274,9 @@ EVT_BEGIN(tou_12_init_evt)
     END_IF
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_npc_setup, PTR(npcEnt))
-    CALL(evt_item_entry, STRING("item01"), ITEM_STAR_PIECE, 190, 0, 30, 16, GSWF(GSWF_TOU12_STAR_PIECE), 0)
+    CALL(evt_item_entry, STRING("item01"), ITEM_STAR_PIECE, 190, 0, 30, ITEM_ENTRY_FIXED, GSWF(GSWF_TOU12_STAR_PIECE), 0)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_20_16_FLATTENED)
         CALL(evt_mobj_lv_blk, STRING("aa"), 125, 0, 0, PTR(evt_block_broken), GSWF(GSWF_TOU12_BIG_BLOCK_BROKEN), STRING("MOBJ_Lv1BigBigBlock"))
         CALL(evt_mobj_flag_onoff, 0, STRING("aa"), MOBJ_FLAG_FALL)

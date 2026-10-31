@@ -11,7 +11,6 @@
 #include "evt/evt_mobj.h"
 #include "evt/evt_msg.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "las.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
@@ -55,7 +54,7 @@ static BeroEntry bero_entry_data[] = {
 static EVT_BEGIN(box_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("key"), ITEM_PALACE_KEY_0x26, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("key"), ITEM_PALACE_KEY_0x26, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("box"))
     CALL(evt_item_get_item, STRING("key"))
     CALL(evt_mario_key_onoff, 1)
@@ -71,7 +70,7 @@ static EVT_BEGIN(switch_evt)
     CALL(evt_mobj_flag_onoff, 0, STRING("box"), MOBJ_FLAG_INVISIBLE | MOBJ_FLAG_FALL)
     CALL(evt_mobj_hit_onoff, STRING("box"), 1)
     SET_VALUE(LW(0), STRING("box"))
-    CALL_CHILD(PTR(box_syutugen))
+    CALL_CHILD(box_syutugen)
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
     CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SUCCESS1"))
     WAIT_MS(2000)
@@ -101,10 +100,12 @@ EVT_END()
 EVT_BEGIN(las_11_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST2"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 2)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_mobj_lv_blk, STRING("stone1"), 150, 50, 0, PTR(block_break), GSWF(GSWF_LAS_TOWER_BIG_BLOCK_A), STRING("MOBJ_Lv2BigBlock"))
     CALL(evt_mobj_lv_blk, STRING("stone2"), -150, 0, 75, PTR(block_break), GSWF(GSWF_LAS_TOWER_BIG_BLOCK_B), STRING("MOBJ_Lv2BigBlock"))
     CALL(evt_mobj_lv_blk, STRING("metal1"), 150, 0, 75, 0, GSWF(GSWF_LAS_TOWER_BIG_BLOCK_C), STRING("MOBJ_Lv3BigBlock"))

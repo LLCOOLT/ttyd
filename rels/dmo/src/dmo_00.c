@@ -38,7 +38,6 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_urouro.h"
-#include "party/party_motion.h"
 #include "dmo.h"
 #include "statuswindow.h"
 #include "eff/n64/eff_crystal_n64.h"
@@ -67,11 +66,11 @@ static DemoWork work;
 char buf[0x200]; // the text window's message tags (make_msg)
 static DemoWork* wp;
 
-void demo_cap(void);
-void demo_desk(CameraId cameraId, void* param);
-void demo_img(CameraId cameraId, void* param);
-void demo_book(CameraId cameraId, void* param);
-void demo_window(CameraId cameraId, void* param);
+static void demo_cap(void);
+static void demo_desk(CameraId cameraId, void* param);
+static void demo_img(CameraId cameraId, void* param);
+static void demo_book(CameraId cameraId, void* param);
+static void demo_window(CameraId cameraId, void* param);
 static USER_FUNC(next);
 
 extern EvtWord buttonCheck[];
@@ -80,7 +79,7 @@ extern EvtWord roten_move[];
 extern EvtWord kuribo_move[];
 extern EvtWord chusan_move[];
 
-USER_FUNC(demo_init) {
+static USER_FUNC(demo_init) {
     if (isFirstCall) {
         memset(wp, 0, sizeof(DemoWork));
         wp->bookRot = 0.0f;
@@ -95,8 +94,19 @@ USER_FUNC(demo_init) {
     }
     if (fileAsyncf(4, NULL, "%s/demo.tpl", getMarioStDvdRoot()) != NULL) {
         wp->tpl = fileAllocf(4, "%s/demo.tpl", getMarioStDvdRoot());
+#if VERSION <= VERSION_DEMO_US
+        // the map fades in from black after the logo sequence and from white after the title screen
+        if (seqGetPrevSeq() == SEQ_LOGO) {
+            gp->areaFadeOutType = FADE_IN_BLACK;
+            gp->areaFadeOutDuration = 500;
+        } else {
+            gp->areaFadeOutType = FADE_IN_WHITE;
+            gp->areaFadeOutDuration = 500;
+        }
+#else
         gp->areaFadeOutType = FADE_IN_BLACK;
         gp->areaFadeOutDuration = 500;
+#endif
         return EVT_RETURN_DONE;
     }
     return EVT_RETURN_BLOCK;
@@ -117,7 +127,7 @@ void demo_exit(void) {
     statusWinDispOn();
 }
 
-void demo_cap(void) {
+static void demo_cap(void) {
     if (wp->page == 4) {
         if (wp->captured == 0) {
             GXSetTexCopySrc(0, 0, 608, 480);
@@ -134,7 +144,7 @@ void demo_cap(void) {
     }
 }
 
-void demo_desk(CameraId cameraId, void* param) {
+static void demo_desk(CameraId cameraId, void* param) {
     CameraEntry* cam = camGetPtr(CAMERA_2D);
     GXTexObj obj;
     Mtx mtx;
@@ -185,7 +195,7 @@ void demo_desk(CameraId cameraId, void* param) {
     GXEnd();
 }
 
-void demo_img(CameraId cameraId, void* param) {
+static void demo_img(CameraId cameraId, void* param) {
     CameraEntry* cam = camGetPtr(CAMERA_2D);
     CameraEntry* cam2;
     Mtx mtx;
@@ -262,7 +272,7 @@ void demo_img(CameraId cameraId, void* param) {
     }
 }
 
-void demo_book(CameraId cameraId, void* param) {
+static void demo_book(CameraId cameraId, void* param) {
     CameraEntry* cam = camGetPtr(CAMERA_2D);
     GXTexObj obj;
     Mtx mtx;
@@ -384,7 +394,7 @@ void demo_book(CameraId cameraId, void* param) {
     GXEnd();
 }
 
-void demo_window(CameraId cameraId, void* param) {
+static void demo_window(CameraId cameraId, void* param) {
     CameraEntry* cam = camGetPtr(cameraId);
     GXTexObj obj;
     Mtx mtx;
@@ -445,7 +455,7 @@ void demo_window(CameraId cameraId, void* param) {
     GXEnd();
 }
 
-USER_FUNC(demo_draw) {
+static USER_FUNC(demo_draw) {
     dispEntry(CAMERA_3D, 9.0f, 7, demo_desk, NULL);
     dispEntry(CAMERA_3D, 8.0f, 7, demo_book, NULL);
     if (wp->fade != 0.0f) {
@@ -455,14 +465,14 @@ USER_FUNC(demo_draw) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(demo_winonoff) {
+static USER_FUNC(demo_winonoff) {
     EvtWord* args = event->args;
 
     wp->winOn = evtGetValue(event, args[0]);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(demo_scale) {
+static USER_FUNC(demo_scale) {
     OSTime now = event->lifetime;
     f32 t;
 
@@ -479,7 +489,7 @@ USER_FUNC(demo_scale) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(book_r) {
+static USER_FUNC(book_r) {
     EvtWord* args = event->args;
 
     wp->bookRot = evtGetFloat(event, args[0]);
@@ -491,7 +501,7 @@ static USER_FUNC(next) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(adjust) {
+static USER_FUNC(adjust) {
     EvtWord* args = event->args;
     Mtx trans;
     Mtx scale;
@@ -512,25 +522,29 @@ USER_FUNC(adjust) {
 }
 
 // Moves the two crystal effects to the CAMERA_3D_EFFECTA camera.
-USER_FUNC(eff_cam) {
+static USER_FUNC(eff_cam) {
     ((EffCrystalN64Work*)effNameToPtr("eff0")->userdata)->camera = CAMERA_3D_EFFECTA;
     ((EffCrystalN64Work*)effNameToPtr("eff1")->userdata)->camera = CAMERA_3D_EFFECTA;
     return EVT_RETURN_DONE;
 }
 
 // The same for the radiation effect.
-USER_FUNC(eff_cam1) {
+static USER_FUNC(eff_cam1) {
     ((EffRadiationN64Work*)effNameToPtr("eff2")->userdata)->camera = CAMERA_3D_EFFECTA;
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(make_msg) {
+static USER_FUNC(make_msg) {
     EvtWord* args = event->args;
     u16 lines;
     u16 width;
 
     width = FontGetMessageWidthLine(msgSearch((const char*)evtGetValue(event, args[0])), &lines);
+#if VERSION <= VERSION_DEMO_US
+    sprintf(buf, "<clear><wpos %d %d %d %d><once_stop>", -width / 2 - 62, lines * 28 / 2 - 90, 400, 200);
+#else
     sprintf(buf, "<clear><wpos %d %d %d %d><once_stop>", -width / 2 - 62, lines * 28 / 2 - 84, 400, 200);
+#endif
     return EVT_RETURN_DONE;
 }
 
@@ -554,7 +568,11 @@ EVT_BEGIN(demo_evt)
     CALL(evt_seq_wait, 2)
     SET_VALUE(GF(10), 0)
     SPAWN_EVENT_GET_ID(PTR(buttonCheck), GW(10))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_DEMO1"))
+#else
     CALL(evt_snd_bgmon, PSND_FADE_OUT | PSND_CH(1), STRING("BGM_DEMO1"))
+#endif
     CALL(evt_snd_bgm_scope, 0, 1)
     BEGIN_INLINE_EVENT_GET_ID(LW(9))
         WAIT_MS(4000)
@@ -611,6 +629,12 @@ EVT_BEGIN(demo_evt)
     CALL(evt_msg_print, 1, PTR(buf), 0, 0)
     CALL(evt_msg_print_add, 0, STRING("op_book_08"))
     CALL(demo_winonoff, 0)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_img_entry, STRING("img4"))
+    CALL(evt_img_entry, STRING("img3"))
+    CALL(evt_img_entry, STRING("img2"))
+    CALL(evt_img_entry, STRING("img1"))
+#else
     CALL(evt_img_entry, STRING("img1"))
     CALL(evt_img_entry, STRING("img2"))
     CALL(evt_img_entry, STRING("img3"))
@@ -619,6 +643,7 @@ EVT_BEGIN(demo_evt)
     CALL(N_evt_img_set_z, STRING("img2"), FLOAT(3.0f))
     CALL(N_evt_img_set_z, STRING("img3"), FLOAT(2.0f))
     CALL(N_evt_img_set_z, STRING("img4"), FLOAT(1.0f))
+#endif
     CALL(evt_img_set_paper, STRING("img1"), STRING("OFF_d_meku_right"))
     CALL(evt_img_clear_virtual_point, STRING("img1"))
     CALL(evt_img_alloc_capture, STRING("img1"), 0, 0, 1, 124, 0, 386, 480)
@@ -736,8 +761,14 @@ EVT_BEGIN(demo_evt)
     CALL(evt_npc_flag_onoff, 0, STRING("ロテン１"), NPC_FLAG_HIDDEN)
     CALL(evt_npc_flag_onoff, 0, STRING("クリボー１"), NPC_FLAG_HIDDEN)
     CALL(evt_npc_flag_onoff, 0, STRING("チューさん１"), NPC_FLAG_HIDDEN)
+#if VERSION >= VERSION_JP
     CALL(evt_mobj_flag_onoff, 0, STRING("hako"), MOBJ_FLAG_INVISIBLE)
+#endif
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 6000)
+#else
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT | PSND_CH(1), 6000)
+#endif
     CALL(evt_sub_intpl_msec_init, 0, 0, 1000, 3000)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -754,7 +785,11 @@ EVT_BEGIN(demo_evt)
     CALL(evt_paper_delete, STRING("OFF_d_meku_right"))
     LABEL(100)
     WAIT_MS(1000)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_DEMO2"))
+#else
     CALL(evt_snd_bgmon, PSND_FADE_OUT | PSND_CH(1), STRING("BGM_DEMO2"))
+#endif
     CALL(evt_npc_move_position, STRING("peach"), 0, 450, 0, FLOAT(60.0f), 1)
     WAIT_MS(1000)
     CALL(evt_msg_print, 0, STRING("op_00"), 0, 0)
@@ -1016,8 +1051,10 @@ EVT_BEGIN(dmo_00_init_evt)
     CALL(evt_npc_set_position, STRING("hako"), -125, 0, 450)
     CALL(evt_npc_flag_onoff, 1, STRING("hako"), NPC_FLAG_NO_WALL_HIT)
     CALL(evt_npc_pera_onoff, STRING("hako"), 0)
+#if VERSION >= VERSION_JP
     CALL(evt_mobj_itembox, STRING("hako"), 340, 110, -20, 1, 0, 0, 0)
     CALL(evt_mobj_flag_onoff, 1, STRING("hako"), MOBJ_FLAG_INVISIBLE)
+#endif
     CALL(evt_npc_entry, STRING("ロテン１"), STRING("c_roten"))
     CALL(evt_npc_set_tribe, STRING("ロテン１"), STRING("ロテン"))
     CALL(evt_npc_flag_onoff, 1, STRING("ロテン１"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
@@ -1052,8 +1089,8 @@ EVT_BEGIN(dmo_00_init_evt)
         SET_TYPE(0)
         CALL(demo_draw)
     END_INLINE_EVENT
-    SPAWN_EVENT(PTR(demo_evt))
-    SPAWN_EVENT(PTR(koushukei_dai))
+    SPAWN_EVENT(demo_evt)
+    SPAWN_EVENT(koushukei_dai)
     BEGIN_INLINE_EVENT
         CALL(evt_sub_animgroup_async, STRING("OFF_d_maku_center"))
     END_INLINE_EVENT
@@ -1064,5 +1101,5 @@ EVT_BEGIN(dmo_00_init_evt)
 #if VERSION >= VERSION_US
 EVT_END()
 #else
-EVT_END_PAD() // JP: one zero word after the script
+EVT_END_PAD() // JP and the demo: one zero word after the script
 #endif

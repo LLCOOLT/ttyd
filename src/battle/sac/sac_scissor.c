@@ -23,7 +23,7 @@
 #include "evt/evt_img.h"
 #include "evt/evt_offscreen.h"
 #include "evt/evt_paper.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_sub.h"
 #include "battle/battle_disp.h"
 #include "battle/sac/sac_scissor.h"
@@ -35,7 +35,7 @@ double __fabs(double);
 static inline double my_fabsf(float x) {
     return __fabs(x);
 }
-void scissor_disp_control(CameraId camera, void* param);
+static void scissor_disp_control(CameraId camera, void* param);
 
 typedef struct ScissorTri {
     f32 x[3]; // 0x0
@@ -92,27 +92,27 @@ typedef struct Pt {
     f32 x, y;
 } Pt;
 ScissorWork* GetScissorPtr(void);
-void scissor_disp_region(CameraId camera, void* param);
-void scissor_capture(CameraId camera, void* param);
-void tess(Pt* buf, s32 count);
+static void scissor_disp_region(CameraId camera, void* param);
+static void scissor_capture(CameraId camera, void* param);
+static void tess(Pt* buf, s32 count);
 void DCFlushRange(void*, u32);
-void star_disp2D_sub(s32 idx, s32 alpha);
-s32 scissor_damage_sub2(Vec pt);
-void scissor_damage_sub(BattleUnit* unit, s32* out);
-s32 scissor_intersection(f32, f32, f32, f32, f32, f32, f32, f32, f32*, f32*);
+static void star_disp2D_sub(s32 idx, s32 alpha);
+static s32 scissor_damage_sub2(Vec pt);
+static void scissor_damage_sub(BattleUnit* unit, s32* out);
+static s32 scissor_intersection(f32, f32, f32, f32, f32, f32, f32, f32, f32*, f32*);
 
 static s32 star_stone_appear();
-s32 wait_star_standby();
-s32 scissor_end();
-s32 scissor_init();
-s32 scissor_offscreen();
-s32 scissor_ofscreen_ok();
-s32 scissor_damage();
-s32 scissor_control();
-s32 scissor_timer_main();
-s32 scissor_timer_get();
-s32 star_control();
-s32 scissor_tess();
+static s32 wait_star_standby();
+static s32 scissor_end();
+static s32 scissor_init();
+static s32 scissor_offscreen();
+static s32 scissor_ofscreen_ok();
+static s32 scissor_damage();
+static s32 scissor_control();
+static s32 scissor_timer_main();
+static s32 scissor_timer_get();
+static s32 star_control();
+static s32 scissor_tess();
 
 BattleWeapon weapon_scissor;
 BattleWeapon weapon_scissor_finish;
@@ -198,7 +198,7 @@ ScissorWork* GetScissorPtr(void) {
 }
 #pragma dont_inline reset
 
-s32 scissor_intersection(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy) {
+static s32 scissor_intersection(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy) {
     f32 a1, a2, d;
     f32 dx1, dy1, dx2, dy2;
     f32 minx, miny, maxx, maxy;
@@ -379,7 +379,7 @@ s32 scissor_intersection(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4,
 
 // inlining off for scissor_intersection2, as in the original (the object differs without it)
 #pragma dont_inline on
-s32 scissor_intersection2(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy) {
+static s32 scissor_intersection2(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy) {
     if (x1 == x3 && y1 == y3) {
         return 0;
     }
@@ -398,7 +398,7 @@ s32 scissor_intersection2(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4
 #pragma dont_inline reset
 // inlining off for scissor_intersection3, as in the original (the object differs without it)
 #pragma dont_inline on
-s32 scissor_intersection3(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy) {
+static s32 scissor_intersection3(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy) {
     f32 dx = x2 - x1;
     f32 slope;
     if (dx != 0.0f) {
@@ -429,7 +429,7 @@ s32 scissor_intersection3(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4
 
 // inlining off for scissor_intersection4, as in the original (the object differs without it)
 #pragma dont_inline on
-s32 scissor_intersection4(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy) {
+static s32 scissor_intersection4(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy) {
     if (x1 == x3 && y1 == y3) {
         *ox = x1;
         *oy = y1;
@@ -454,7 +454,7 @@ s32 scissor_intersection4(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4
 }
 
 #pragma dont_inline reset
-s32 scissor_cross(Pt* a, Pt* b, Pt* pts, s32 n) {
+static s32 scissor_cross(Pt* a, Pt* b, Pt* pts, s32 n) {
     f32 xs[512];
     f32 ys[512];
     Pt* cur;
@@ -551,7 +551,7 @@ s32 scissor_cross(Pt* a, Pt* b, Pt* pts, s32 n) {
     return 0;
 }
 
-s32 scissor_tess(void) {
+static s32 scissor_tess(void) {
     ScissorWork* w = GetScissorPtr();
     void* p = BattleAlloc(w->stars.count * 8);
     memcpy(p, w->strokePts, w->stars.count * 8);
@@ -561,8 +561,8 @@ s32 scissor_tess(void) {
     return 2;
 }
 
-s32 scissor_cross(Pt* a, Pt* b, Pt* pts, s32 n);
-void tess(Pt* pts, s32 n) {
+static s32 scissor_cross(Pt* a, Pt* b, Pt* pts, s32 n);
+static void tess(Pt* pts, s32 n) {
     ScissorWork* w = GetScissorPtr();
     s32 i, j, k;
     s32 n1, n2;
@@ -626,9 +626,9 @@ s32 weaponGetPower_Scissor(BattleUnit* attacker, BattleWeapon* weapon, BattleUni
     return 0;
 }
 
-void star_disp2D(CameraId camera, void* param);
+static void star_disp2D(CameraId camera, void* param);
 
-s32 star_control(EventEntry* evt, BOOL first) {
+static s32 star_control(EventEntry* evt, BOOL first) {
     ScissorWork* w = GetScissorPtr();
     struct ScissorStars* t = &w->stars;
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
@@ -731,7 +731,7 @@ s32 star_control(EventEntry* evt, BOOL first) {
     return 0;
 }
 
-void star_disp2D(CameraId camera, void* param) {
+static void star_disp2D(CameraId camera, void* param) {
     ScissorWork* w = GetScissorPtr();
     if (w->phase >= 2 && w->phase <= 6) {
         star_disp2D_sub(0, 255);
@@ -744,7 +744,7 @@ void star_disp2D(CameraId camera, void* param) {
 
 // inlining off for star_disp2D_sub, as in the original (the object differs without it)
 #pragma dont_inline on
-void star_disp2D_sub(s32 idx, s32 alpha) {
+static void star_disp2D_sub(s32 idx, s32 alpha) {
     ScissorWork* w = GetScissorPtr();
     Mtx rotMtx;
     Mtx transMtx;
@@ -786,7 +786,7 @@ void star_disp2D_sub(s32 idx, s32 alpha) {
 }
 #pragma dont_inline reset
 
-s32 scissor_timer_get(EventEntry* evt) {
+static s32 scissor_timer_get(EventEntry* evt) {
     ScissorWork* w = GetScissorPtr();
     EvtWord* args = evt->args;
     if (w->timer <= 59) {
@@ -796,7 +796,7 @@ s32 scissor_timer_get(EventEntry* evt) {
     return 2;
 }
 
-s32 scissor_timer_main(void) {
+static s32 scissor_timer_main(void) {
     ScissorWork* w = GetScissorPtr();
     switch (w->state) {
         case 0:
@@ -840,10 +840,10 @@ s32 scissor_timer_main(void) {
     return 0;
 }
 
-void scissor_disp_control(CameraId camera, void* param);
-void scissor_disp_region(CameraId camera, void* param);
+static void scissor_disp_control(CameraId camera, void* param);
+static void scissor_disp_region(CameraId camera, void* param);
 
-s32 scissor_control(EventEntry* evt, BOOL first) {
+static s32 scissor_control(EventEntry* evt, BOOL first) {
     ScissorWork* w = GetScissorPtr();
     Pt* buf = (Pt*)w->strokePts;
     Pt* p;
@@ -931,7 +931,7 @@ s32 scissor_control(EventEntry* evt, BOOL first) {
 #include "battle/battle_database_common.h"
 #include "version.h"
 
-s32 scissor_damage(EventEntry* evt, BOOL first) {
+static s32 scissor_damage(EventEntry* evt, BOOL first) {
     BattleWork* wp;
     BattleUnit* mario;
     BattleUnit* unit;
@@ -954,7 +954,7 @@ s32 scissor_damage(EventEntry* evt, BOOL first) {
             BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit));
             s32 res;
             if (BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL) != 1 && !(part->attributes & PART_ATTR_EVASIVE) && !(part->attributes & PART_ATTR_IMMUNE_TO_DAMAGE_OR_STATUS) &&
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 !(part->attributes & PART_ATTR_NOT_TARGETABLE) && *(s8*)part->defenseAttr != 4) {
 #else
                 !(part->attributes & PART_ATTR_NOT_TARGETABLE) && *(s8*)part->defenseAttr != 4 && *(s8*)part->defenseAttr != 2) {
@@ -1014,7 +1014,7 @@ s32 scissor_damage(EventEntry* evt, BOOL first) {
     return 2;
 }
 
-void scissor_damage_sub(BattleUnit* unit, s32* out) {
+static void scissor_damage_sub(BattleUnit* unit, s32* out) {
     Vec pos;
     Vec p;
     s32 i, j;
@@ -1060,7 +1060,7 @@ void scissor_damage_sub(BattleUnit* unit, s32* out) {
 
 // inlining off for scissor_damage_sub2, as in the original (the object differs without it)
 #pragma dont_inline on
-s32 scissor_damage_sub2(Vec pt) {
+static s32 scissor_damage_sub2(Vec pt) {
     ScissorWork* w = GetScissorPtr();
     s32 n = w->triCount;
     f32 y0, x0;
@@ -1085,7 +1085,7 @@ s32 scissor_damage_sub2(Vec pt) {
 }
 
 #pragma dont_inline reset
-s32 scissor_ofscreen_ok(EventEntry* evt) {
+static s32 scissor_ofscreen_ok(EventEntry* evt) {
     EvtWord* args = evt->args;
     ScissorWork* w = GetScissorPtr();
     if (w->flags & 1) {
@@ -1096,7 +1096,7 @@ s32 scissor_ofscreen_ok(EventEntry* evt) {
     return 2;
 }
 
-void scissor_capture(CameraId camera, void* param) {
+static void scissor_capture(CameraId camera, void* param) {
     ScissorWork* w = GetScissorPtr();
     GXSetTexCopySrc(0, 0, 0x260, 0x1E0);
     GXSetTexCopyDst(0x260, 0x1E0, 4, 0);
@@ -1104,11 +1104,11 @@ void scissor_capture(CameraId camera, void* param) {
     GXPixModeSync();
 }
 
-void scissor_disp_control(CameraId camera, void* param) {
+static void scissor_disp_control(CameraId camera, void* param) {
     ScissorWork* w = GetScissorPtr();
     f32* pts = (f32*)w->strokePts;
     s32 i;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     BattleWork* wp;
     BattleUnit* unit;
     Vec pos;
@@ -1152,7 +1152,7 @@ void scissor_disp_control(CameraId camera, void* param) {
         GXPosition3f32(pts[i * 2], pts[i * 2 + 1], 0.0f);
         GXPosition3f32(pts[i * 2 + 2], pts[i * 2 + 3], 0.0f);
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // The demo outlines each enemy's cut box in red (scissor_damage's box).
     wp = _battleWorkPointer;
     GXSetChanMatColor(4, (GXColor){0xFF, 0x00, 0x00, 0xFF});
@@ -1226,13 +1226,13 @@ void scissor_disp_control(CameraId camera, void* param) {
 #endif
 }
 
-s32 scissor_offscreen(void) {
+static s32 scissor_offscreen(void) {
     GetScissorPtr();
     dispEntry(CAMERA_OFFSCREEN2, 0.0f, 1, scissor_disp_region, NULL);
     return 2;
 }
 
-void scissor_disp_region(CameraId camera, void* param) {
+static void scissor_disp_region(CameraId camera, void* param) {
     ScissorWork* w = GetScissorPtr();
     GXTexObj texObj;
     Mtx mtx;
@@ -1283,7 +1283,7 @@ void scissor_disp_region(CameraId camera, void* param) {
     offscreenAddBoundingBox(offscreenNameToId("ofs"), left, top, right, bottom);
 }
 
-s32 scissor_init(void) {
+static s32 scissor_init(void) {
     ScissorWork* w = GetScissorPtr();
     memset(w, 0, 0x174);
     w->timer = 0x3BF;
@@ -1296,7 +1296,7 @@ s32 scissor_init(void) {
     return 2;
 }
 
-s32 scissor_end(void) {
+static s32 scissor_end(void) {
     ScissorWork* w = GetScissorPtr();
     effDelete(((EffStarStoneWork*)w->eff->userdata)->dust);
     effDelete(w->eff);
@@ -1315,7 +1315,7 @@ static s32 star_stone_appear(void) {
     return 2;
 }
 
-s32 wait_star_standby(void) {
+static s32 wait_star_standby(void) {
     return GetScissorPtr()->phase == 5 ? 2 : 0;
 }
 
@@ -1345,7 +1345,7 @@ EVT_BEGIN(marioAttackEvent_Scissor)
     BEGIN_SIBLING_EVENT
         WAIT_FRAMES(30)
         CALL(evt_btl_camera_set_mode, 0, 3)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         CALL(evt_btl_camera_set_moveto, 0, 75, 120, 600, 75, 70, 0, 30, 0)
 #else
         CALL(evt_btl_camera_set_moveto, 0, 75, 105, 600, 75, 55, 0, 30, 0)

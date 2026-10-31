@@ -17,9 +17,9 @@
 #include "driver/shadowdrv.h"
 #include "eff/n64/eff_stardust_n64.h"
 
-void effStarStoneDisp_2(CameraId cameraId, EffectEntry* effect);
-void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect);
-void effStarStoneMain(EffectEntry* effect);
+static void effStarStoneDisp_2(CameraId cameraId, EffectEntry* effect);
+static void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect);
+static void effStarStoneMain(EffectEntry* effect);
 
 // Model data in the exporter's layout: indexed vertex arrays (positions, normals, colours, texture coordinates),
 // display lists of GX commands (each padded to 32 bytes with GX_NOP) and, per list table, the list sizes in
@@ -290,7 +290,7 @@ EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     return effect;
 }
 
-void effStarStoneMain(EffectEntry* effect) {
+static void effStarStoneMain(EffectEntry* effect) {
     EffStarStoneWork* w = effect->userdata;
     Vec pos;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -425,7 +425,7 @@ void effStarStoneMain(EffectEntry* effect) {
             ((EffSnowDustN64Work*)w->dust->userdata)->position.z = 0.0f;
         }
         if (w->state < 3 && cam == 4) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             shadowEntry(w->position.x, w->position.y, w->position.z, 8.0f * w->scale);
 #else
             U_shadowSetMode(shadowEntry(w->position.x, w->position.y, w->position.z, 8.0f * w->scale), w->a);
@@ -476,8 +476,8 @@ static inline void starStoneSetBlend(void) {
 // Each loop walks a display-list table and its size table (32-byte units). The loops are written the way the
 // compiler saw them: some share the function's loop variables, others have their own block, and the demo orders
 // the loop variables differently; each form gives the original register allocation.
-void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
-#if VERSION == VERSION_DEMO
+static void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
+#if VERSION <= VERSION_DEMO_US
     u32 i;
     u8* size;
     u8** list;
@@ -524,7 +524,7 @@ void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
     GXSetCullMode(GX_CULL_BACK);
     if (type == 0) {
         starStoneSetVtx(diamond_1_vertex_tbl, diamond_1_normal_tbl, TRUE, diamond_1_color0_tbl, diamond_1_texcoord0_tbl, 13);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         for (i = 0, size = diamond_1_dl_0_size_tbl, list = diamond_1_dl_0_tbl; i < sizeof(diamond_1_dl_0_tbl) / sizeof(diamond_1_dl_0_tbl[0]); i++, size++, list++) {
             GXCallDisplayList(*list, *size << 5);
         }
@@ -534,7 +534,7 @@ void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
         }
 #endif
         starStoneSetVtx(diamond_1_vertex_tbl, diamond_1_normal_tbl, FALSE, NULL, diamond_1_texcoord0_tbl, 13);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         {
             u8* sz;
             u8** dl;
@@ -551,7 +551,7 @@ void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
 #endif
     } else {
         starStoneSetVtx(diamond_7_vertex_tbl, diamond_7_normal_tbl, TRUE, diamond_7_color0_tbl, diamond_7_texcoord0_tbl, 13);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         {
             u8* sz;
             u8** dl;
@@ -567,7 +567,7 @@ void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
         }
 #endif
         starStoneSetVtx(diamond_7_vertex_tbl, diamond_7_normal_tbl, TRUE, diamond_7_color0_tbl, diamond_7_texcoord0_tbl, 13);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         {
             u8* sz;
             u8** dl;
@@ -618,7 +618,7 @@ void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
     starStoneSetBlend();
     if (type == 0) {
         starStoneSetVtx(diamond_1_vertex_tbl, diamond_1_normal_tbl, TRUE, diamond_1_color0_tbl, diamond_1_texcoord0_tbl, 13);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         {
             u8* sz;
             u8** dl;
@@ -684,7 +684,7 @@ static inline void starStoneCallHalfLists(EffStarStoneWork* w, u8** tbl, u8* sz,
 }
 
 // Draws the stones that split in two (types 1-5): an untextured shell for each half, then each half textured.
-void effStarStoneDisp_2(CameraId cameraId, EffectEntry* effect) {
+static void effStarStoneDisp_2(CameraId cameraId, EffectEntry* effect) {
     Mtx m;
     Mtx s;
     Mtx r;

@@ -33,7 +33,6 @@
 #include "evt/evt_party.h"
 #include "evt/evt_pouch.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "pmario_sound.h"
 #include "statuswindow.h"
 #include "driver/hitdrv.h"
@@ -197,11 +196,7 @@ static void lecture_button_disp(CameraId camera, void* param) {
             }
             pos = disp->pos;
             pos.y += ofs;
-#if VERSION == VERSION_DEMO
-            iconDispGxAlpha(&pos, 0x84, btn->iconId, btn->alpha, 1.0f);
-#else
-            iconDispGxAlpha(&pos, 0x50, btn->iconId, btn->alpha, 1.0f);
-#endif
+            iconDispGxAlpha(&pos, ICON_FLAG_NO_MAP_BLEND | ICON_FLAG_2D, btn->iconId, btn->alpha, 1.0f);
         }
     }
 }
@@ -425,7 +420,7 @@ EVT_BEGIN(nokotaro_party_lecture)
     CALL(evt_msg_print, 0, STRING("lecture_friends_04_0_1"), 0, 0)
     CALL(evt_msg_print, 0, STRING("lecture_friends_04_1"), 0, 0)
     CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(100.0f), FLOAT(630.0f), FLOAT(45.0f), FLOAT(39.0f), FLOAT(-100.0f), 1000, 0)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     WAIT_MS(1000)
 #else
     WAIT_MS(1500)
@@ -435,7 +430,7 @@ EVT_BEGIN(nokotaro_party_lecture)
         CALL(evt_party_nokotaro_kick, 0)
         WAIT_MS(500)
     END_LOOP
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(x_flag_set, 0, 1)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -458,13 +453,13 @@ EVT_BEGIN(nokotaro_party_lecture)
         SET_VALUE(LW(1), STRING("TESTMOBJ"))
         CALL(evt_mario_get_pos, 0, LW(2), LW(3), LW(4))
         ADD(LW(2), -70)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         ADD(LW(3), 100)
 #endif
         SET_VALUE(GSWF(GSWF_HEI_KOOPS_LECTURE_SWITCH), 0)
         CALL(evt_mobj_switch_blue, 0, LW(1), LW(2), LW(3), LW(4), 0, GSWF(GSWF_HEI_KOOPS_LECTURE_SWITCH))
         CALL(evt_mobj_set_camid, LW(1), 7)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         CALL(evt_snd_sfxon, STRING("SFX_EVT_LECTURE_BLOCK_FALL1"), LW(7))
         BEGIN_INLINE_EVENT
             LOOP(0)
@@ -499,7 +494,7 @@ EVT_BEGIN(nokotaro_party_lecture)
             CASE_EQUAL(2)
             CALL(evt_msg_print_add, 0, STRING("lecture_friends_05_1"))
             CASE_EQUAL(1)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             CALL(evt_mario_mov_pos2, 367, 74, FLOAT(135.0f))
 #else
             CALL(evt_mario_mov_pos2, 367, -38, FLOAT(135.0f))
@@ -624,7 +619,7 @@ EVT_BEGIN(all_party_lecture)
     CALL(lect_test_systemlevel)
     SWITCH(LW(9))
         CASE_EQUAL(2)
-        CALL_CHILD(PTR(nokotaro_party_lecture_init))
+        CALL_CHILD(nokotaro_party_lecture_init)
     END_SWITCH
     LOOP(6)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -639,7 +634,7 @@ EVT_BEGIN(all_party_lecture)
     CALL(evt_mario_dispflag_onoff, 0, 1)
     SWITCH(LW(9))
         CASE_EQUAL(2)
-        CALL_CHILD(PTR(nokotaro_party_lecture))
+        CALL_CHILD(nokotaro_party_lecture)
     END_SWITCH
     LOOP(6)
         CALL(evt_mario_dispflag_onoff, 1, 1)

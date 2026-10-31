@@ -113,13 +113,8 @@ typedef struct NanNPCWork {
 extern NanNPCWork* nanNPCWork;
 void nanNPCOption(void);
 void evt_nannpc_set_animtbl_sub(NanNPC* npc, s16* tbl);
-void nannpc_ext_disp(CameraId camera, void* param);
-void nannpc_ext_shadow_disp(CameraId camera, void* param);
-void nannpc_ext_init(void);
 void nannpc_ext_main_sub(void);
 void nannpc_ext_main_sub_fast(void);
-void nannpc_ext_main(void);
-void nannpc_ext_dispent(void);
 
 USER_FUNC(evt_nannpc_entry);
 USER_FUNC(evt_nannpc_init);

@@ -27,7 +27,6 @@
 #include "evt/evt_sub.h"
 #include "mot/mot_damage.h"
 #include "mario/mario_motion.h"
-#include "party/party_motion.h"
 #include "driver/shadowdrv.h"
 #include "pmario_sound.h"
 #include <math.h>
@@ -70,12 +69,12 @@ typedef struct FirebarWork {
     FirebarBall* balls;
     FirebarSetup* setup;
 } FirebarWork;
-void firebar_disp(CameraId camera, void* param);
+static void firebar_disp(CameraId camera, void* param);
 
-USER_FUNC(coin_entry);
-USER_FUNC(firebar_disp_evt);
-USER_FUNC(firebar_entry);
-void firebar_cb(FirebarWork* wp, s32 type);
+static USER_FUNC(coin_entry);
+static USER_FUNC(firebar_disp_evt);
+static USER_FUNC(firebar_entry);
+static void firebar_cb(FirebarWork* wp, s32 type);
 
 static BeroEntry bero_entry_data[3];
 FirebarSetup firebardesc[7];
@@ -536,18 +535,22 @@ static void _firebar_trans(FirebarWork* wp) {
     }
 }
 
-USER_FUNC(firebar_entry) {
+static USER_FUNC(firebar_entry) {
     FirebarSetup* setup = (FirebarSetup*)evtGetValue(event, event->args[0]);
     FirebarWork* wp;
     FirebarBall* ball;
     MarioWork* mario;
+#if VERSION >= VERSION_JP
     FirebarBall* balls;
     f32 x;
     f32 y;
     f32 z;
+#endif
     s32 i;
+#if VERSION >= VERSION_JP
     s32 j;
     s32 n;
+#endif
 
     if (isFirstCall) {
         wp = _mapAlloc(sizeof(FirebarWork));
@@ -601,6 +604,7 @@ USER_FUNC(firebar_entry) {
             psndSFXOff(wp->sfxId);
             wp->sfxId = -1;
         }
+#if VERSION >= VERSION_JP
         balls = wp->balls;
         for (j = 0; j < 3; j++) {
             n = (wp->count + 1) * j / 3;
@@ -609,6 +613,7 @@ USER_FUNC(firebar_entry) {
             z = balls[n].pos.z + (rand() % 5 + 3);
             effKemuTestEntry(0, x, y, z, 1.0f);
         }
+#endif
         ball = wp->balls;
         for (i = 0; i < wp->count; i++, ball++) {
             animPoseRelease(ball->pose);
@@ -649,7 +654,7 @@ USER_FUNC(firebar_entry) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(firebar_disp_evt) {
+static USER_FUNC(firebar_disp_evt) {
     FirebarWork* wp;
     FirebarBall* ball;
     f32 a;
@@ -671,7 +676,7 @@ USER_FUNC(firebar_disp_evt) {
     return EVT_RETURN_DONE;
 }
 
-void firebar_disp(CameraId camera, void* param) {
+static void firebar_disp(CameraId camera, void* param) {
     FirebarWork* wp = param;
     FirebarBall* ball = wp->balls;
     Mtx mtx;
@@ -685,13 +690,13 @@ void firebar_disp(CameraId camera, void* param) {
     }
 }
 
-USER_FUNC(coin_entry) {
+static USER_FUNC(coin_entry) {
     EvtWord* args = event->args;
     s32 x = evtGetValue(event, args[0]);
     s32 y = evtGetValue(event, args[1]);
     s32 z = evtGetValue(event, args[2]);
     s32 w = evtGetValue(event, args[3]);
-    ItemEntry* item = itemEntry(x, y, z, NULL, ITEM_COIN, 3, -1, NULL);
+    ItemEntry* item = itemEntry(x, y, z, NULL, ITEM_COIN, ITEM_ENTRY_BOUNCE_5S, -1, NULL);
 
     itemStatusOn(item, ITEM_STATUS_CUSTOM_LAUNCH);
     item->bounceFactor = 0.8f;
@@ -703,7 +708,7 @@ USER_FUNC(coin_entry) {
     return EVT_RETURN_DONE;
 }
 
-void firebar_cb(FirebarWork* wp, s32 type) {
+static void firebar_cb(FirebarWork* wp, s32 type) {
     MarioWork* mario = marioGetPtr();
     EventEntry* evt;
 
@@ -734,13 +739,15 @@ static HitDamageReturn dmgRetPoint[] = {
 EVT_BEGIN(las_04_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS2"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 2)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_hit_damage_return_set, PTR(dmgRetPoint))
-    CALL_CHILD(PTR(evt_gazigazi_entry))
-    SPAWN_EVENT(PTR(firebar_evt))
+    CALL_CHILD(evt_gazigazi_entry)
+    SPAWN_EVENT(firebar_evt)
     CALL(evt_map_playanim, STRING("mizu"), 1, 0)
     CALL(evt_map_playanim, STRING("hamon"), 1, 0)
     CALL(evt_mobj_brick, STRING("mobj_01"), 0, 150, 0, ITEM_BOOS_SHEET, 11, 0, GSWF(GSWF_LAS04_BOOS_SHEET_BRICK))

@@ -32,14 +32,19 @@ typedef struct YuuCounterWork {
 } YuuCounterWork;
 static void* yuunpc_wp;
 static YuuCounterWork* _wp;
+#if VERSION >= VERSION_JP
 void evtYuuSetWindowEvt(EvtWord* evt);
-void evt_yuucounter_disp_func(CameraId camera, void* param);
+#endif
+static void evt_yuucounter_disp_func(CameraId camera, void* param);
 static const GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
 static const GXColor bgColor = {0xFF, 0xFF, 0xFF, 0x99};
 
 static EvtWord main_evt[4];
+
+#if VERSION >= VERSION_JP
 extern EvtWord yuucounter_window_disp_evt[];
 extern EvtWord yuucounter_window_null_evt[];
+#endif
 
 u32 yuucounter_flag(u32 mask) {
     if (_wp == NULL) {
@@ -117,15 +122,17 @@ USER_FUNC(evt_yuucounter_alloc) {
     }
     wp->event = evtEntry(main_evt, 0, 0);
     wp->event->lwData[0] = (EvtWord)wp;
+#if VERSION >= VERSION_JP
     if (wp->type == 1) {
         evtYuuSetWindowEvt(yuucounter_window_disp_evt);
     } else {
         evtYuuSetWindowEvt(yuucounter_window_null_evt);
     }
+#endif
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_yuucounter_main_func) {
+static USER_FUNC(evt_yuucounter_main_func) {
     YuuCounterWork* wp = (YuuCounterWork*)event->lwData[0];
 
     if (wp->flags & 1) {
@@ -136,7 +143,7 @@ USER_FUNC(evt_yuucounter_main_func) {
     return EVT_RETURN_BLOCK;
 }
 
-void evt_yuucounter_disp_func(CameraId camera, void* param) {
+static void evt_yuucounter_disp_func(CameraId camera, void* param) {
     YuuCounterWork* wp = param;
     GXColor color = white;
     GXColor numColor;
@@ -178,10 +185,12 @@ void evt_yuucounter_disp_func(CameraId camera, void* param) {
         case 1:
             if (!(wp->dispFlags & 2)) {
                 if (wp->data >= 0) {
+#if VERSION >= VERSION_JP
                     if (wp->dispFlags & 4) {
                         wp->dispFlags &= ~4;
                         wp->lastTime = gp->renderTime;
                     }
+#endif
                     wp->elapsed += (s32)gp->renderTime - (s32)wp->lastTime;
                     wp->lastTime = gp->renderTime;
                     wp->data = wp->limit - OSTicksToMilliseconds(wp->elapsed);
@@ -217,7 +226,7 @@ void evt_yuucounter_disp_func(CameraId camera, void* param) {
     PSMTXTrans(base, wp->x, wp->y, 0.0f);
     PSMTXScale(scaleMtx, scale, 1.0f, 1.0f);
     PSMTXConcat(base, scaleMtx, mtx);
-    iconDispGxCol(mtx, 0x10, ICON_1F6, bgColor);
+    iconDispGxCol(mtx, ICON_FLAG_2D, ICON_1F6, bgColor);
 
     switch (wp->type) {
         case 0: {
@@ -235,7 +244,7 @@ void evt_yuucounter_disp_func(CameraId camera, void* param) {
                 if (!skip) {
                     PSMTXTrans(mtx, xOfs + (f32)(j * 30), 8.0f, 0.0f);
                     PSMTXConcat(base, mtx, mtx);
-                    iconDispGxCol(mtx, 0x10, digit + ICON_1F7, numColor);
+                    iconDispGxCol(mtx, ICON_FLAG_2D, digit + ICON_1F7, numColor);
                 }
             }
             break;
@@ -248,13 +257,13 @@ void evt_yuucounter_disp_func(CameraId camera, void* param) {
             for (i = 0; i < 3; i++) {
                 PSMTXTrans(mtx, xOfs + (f32)(i * 30) - (f32)((i == 0) * 16), 8.0f, 0.0f);
                 PSMTXConcat(base, mtx, mtx);
-                iconDispGxCol(mtx, 0x10, digits[i] + ICON_1F7, numColor);
+                iconDispGxCol(mtx, ICON_FLAG_2D, digits[i] + ICON_1F7, numColor);
             }
             PSMTXTrans(mtx, 8.0f + xOfs, 12.0f, 0.0f);
             PSMTXScale(scaleMtx, 2.0f, 2.0f, 2.0f);
             PSMTXConcat(mtx, scaleMtx, mtx);
             PSMTXConcat(base, mtx, mtx);
-            iconDispGxCol(mtx, 0x10, iconId, iconColor);
+            iconDispGxCol(mtx, ICON_FLAG_2D, iconId, iconColor);
             break;
         case 2:
             skip2 = TRUE;
@@ -273,7 +282,7 @@ void evt_yuucounter_disp_func(CameraId camera, void* param) {
                 if (!skip2) {
                     PSMTXTrans(mtx, xOfs + (f32)(k * 30), 8.0f, 0.0f);
                     PSMTXConcat(base, mtx, mtx);
-                    iconDispGxCol(mtx, 0x10, digit + ICON_1F7, numColor);
+                    iconDispGxCol(mtx, ICON_FLAG_2D, digit + ICON_1F7, numColor);
                 }
             }
             break;
@@ -282,7 +291,7 @@ void evt_yuucounter_disp_func(CameraId camera, void* param) {
     if (iconId != -1) {
         PSMTXTrans(mtx, 90.0f + xOfs - 12.0f, 10.0f, 0.0f);
         PSMTXConcat(base, mtx, mtx);
-        iconDispGxCol(mtx, 0x10, iconId, iconColor);
+        iconDispGxCol(mtx, ICON_FLAG_2D, iconId, iconColor);
     }
 
     switch (wp->type) {
@@ -295,7 +304,7 @@ void evt_yuucounter_disp_func(CameraId camera, void* param) {
                 PSMTXScale(scaleMtx, 0.5f, 0.5f, 0.5f);
                 PSMTXConcat(mtx, scaleMtx, mtx);
                 PSMTXConcat(base, mtx, mtx);
-                iconDispGxCol(mtx, 0x10, digits[i] + ICON_1F7, numColor);
+                iconDispGxCol(mtx, ICON_FLAG_2D, digits[i] + ICON_1F7, numColor);
             }
             break;
         case 2:
@@ -303,6 +312,7 @@ void evt_yuucounter_disp_func(CameraId camera, void* param) {
     }
 }
 
+#if VERSION >= VERSION_JP
 USER_FUNC(yuucounter_disp_flag_onoff) {
     EvtWord* args = event->args;
     BOOL on = evtGetValue(event, args[0]);
@@ -316,12 +326,14 @@ USER_FUNC(yuucounter_disp_flag_onoff) {
     }
     return EVT_RETURN_DONE;
 }
+#endif
 
 static EVT_BEGIN(main_evt)
     CALL(evt_yuucounter_main_func)
     RETURN
 EVT_END()
 
+#if VERSION >= VERSION_JP
 EVT_BEGIN(yuucounter_window_disp_evt)
     CALL(yuucounter_disp_flag_onoff, 1, 4)
     RETURN
@@ -330,3 +342,4 @@ EVT_END()
 EVT_BEGIN(yuucounter_window_null_evt)
     RETURN
 EVT_END()
+#endif

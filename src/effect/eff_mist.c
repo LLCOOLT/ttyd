@@ -25,8 +25,8 @@ typedef struct EffMistWork {
     u8 pad;
 } EffMistWork;
 
-void effMistMain(EffectEntry* effect);
-void effMistDisp(CameraId cameraId, EffectEntry* effect);
+static void effMistMain(EffectEntry* effect);
+static void effMistDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effMistEntry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 yaw) {
     EffectEntry* effect;
@@ -122,7 +122,7 @@ EffectEntry* effMistEntry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 yaw) {
     return effect;
 }
 
-void effMistMain(EffectEntry* effect) {
+static void effMistMain(EffectEntry* effect) {
     EffMistWork* work = effect->userdata;
     Vec position;
     Vec v = {0.0f, 0.0f, 0.0f};
@@ -192,7 +192,7 @@ void effMistMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effMistDisp, effect);
 }
 
-void effMistDisp(CameraId cameraId, EffectEntry* effect) {
+static void effMistDisp(CameraId cameraId, EffectEntry* effect) {
     EffMistWork* work = effect->userdata;
     Mtx trans;
     Mtx rot;

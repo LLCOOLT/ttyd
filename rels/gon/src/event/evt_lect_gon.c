@@ -51,7 +51,7 @@ static inline void effitemget_cam_move(CameraEntry* camera, Vec ofs) {
 }
 static Vec daiv;
 void marioRollTryCancel(void);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 void marioRollCancel(void);
 #endif
 BOOL marioRollKeyDisable(void);
@@ -193,11 +193,7 @@ static void lecture_button_disp(CameraId camera, void* param) {
             }
             pos = disp->pos;
             pos.y += ofs;
-#if VERSION == VERSION_DEMO
-            iconDispGxAlpha(&pos, 0x84, btn->iconId, btn->alpha, 1.0f);
-#else
-            iconDispGxAlpha(&pos, 0x50, btn->iconId, btn->alpha, 1.0f);
-#endif
+            iconDispGxAlpha(&pos, ICON_FLAG_NO_MAP_BLEND | ICON_FLAG_2D, btn->iconId, btn->alpha, 1.0f);
         }
     }
 }
@@ -516,7 +512,7 @@ static USER_FUNC(evt_nomal_cange) {
     MarioWork* mario = marioGetPtr();
 
     if (isFirstCall) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         marioRollCancel();
 #else
         marioRollTryCancel();
@@ -576,7 +572,7 @@ EVT_BEGIN(slit_majin_lecture)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("stg1_gon_12_13"), 0, STRING("ペラ魔人"))
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("stg1_gon_12_14"), 0, STRING("ペラ魔人"))
 #else
@@ -639,7 +635,7 @@ EVT_BEGIN(slit_majin_lecture)
                     END_IF
                 END_IF
             END_LOOP
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             CALL(evt_msg_continue)
 #endif
             CALL(evt_mario_key_onoff, 0)
@@ -669,25 +665,25 @@ EVT_BEGIN(slit_majin_lecture)
             IF_INT_EQUAL(LW(11), 1)
                 BREAK_LOOP
             ELSE
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 CALL(evt_msg_continue)
 #endif
                 CALL(evt_msg_toge, 1, 0, 0, 0)
                 CALL(evt_msg_print, 0, STRING("stg1_gon_12_15_1"), 0, STRING("ペラ魔人"))
             END_IF
         END_LOOP
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         CALL(evt_msg_print_add, 0, STRING("stg1_gon_12_15"))
 #else
         CALL(evt_msg_toge, 1, 0, 0, 0)
         CALL(evt_msg_print, 0, STRING("stg1_gon_12_15"), 0, STRING("ペラ魔人"))
 #endif
         CALL(evt_msg_select, 0, STRING("stg1_gon_12_15_yn"))
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         CALL(evt_msg_continue)
 #endif
         IF_INT_EQUAL(LW(0), 0)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             CALL(evt_msg_toge, 1, 0, 0, 0)
             CALL(evt_msg_print, 0, STRING("stg1_gon_12_16"), 0, STRING("ペラ魔人"))
 #else
@@ -697,7 +693,7 @@ EVT_BEGIN(slit_majin_lecture)
             BREAK_LOOP
         END_IF
     END_LOOP
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("stg1_gon_12_17"), 0, STRING("ペラ魔人"))
 #else

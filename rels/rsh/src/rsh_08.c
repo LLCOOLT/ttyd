@@ -5,7 +5,6 @@
 #include "evt/evt_bero.h"
 #include "evt/evt_map.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "rsh.h"
 #include "evt/evt_story.h"
 
@@ -87,7 +86,11 @@ EVT_BEGIN(rsh_08_a_init_evt)
     ELSE
         IF_INT_EQUAL(GSWF(GSWF_TRAIN_ARRIVED_ROGUEPORT), 1)
             CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_GOR1"))
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_GOR5"))
+#else
             CALL(evt_snd_envoff, PSND_FADE_OUT)
+#endif
             CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
         ELSE
             CALL(evt_snd_bgmoff, PSND_FADE_OUT)
@@ -105,7 +108,7 @@ EVT_BEGIN(rsh_08_a_init_evt)
         SET_VALUE(LW(0), PTR(bero_data_c_nidome))
     END_IF
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_map_playanim, STRING("yure"), 1, 0)
     RETURN
 EVT_END()

@@ -30,37 +30,37 @@ typedef struct WinSortData {
     void (*func)(WindowWork* wp);
 } WinSortData;
 
-void winMailDisp(WindowWork* wp);
-void winMsgDisp(WindowWork* wp, f32 x, f32 y);
-void winSortGX(WindowWork* wp);
+static void winMailDisp(WindowWork* wp);
+static void winMsgDisp(WindowWork* wp, f32 x, f32 y);
+static void winSortGX(WindowWork* wp);
 
-void sort_1_1_func(WindowWork* wp);
-void sort_1_2_func(WindowWork* wp);
-void sort_2_1_func(WindowWork* wp);
-void sort_2_2_func(WindowWork* wp);
-void sort_3_1_func(WindowWork* wp);
-void sort_3_2_func(WindowWork* wp);
-void sort_3_3_func(WindowWork* wp);
-void sort_4_1_func(WindowWork* wp);
-void sort_4_2_func(WindowWork* wp);
-void sort_4_3_func(WindowWork* wp);
-void sort_5_1_func(WindowWork* wp);
-void sort_5_2_func(WindowWork* wp);
-void sort_5_3_func(WindowWork* wp);
-void sort_6_1_func(WindowWork* wp);
-void sort_6_2_func(WindowWork* wp);
-void sort_7_1_func(WindowWork* wp);
-void sort_7_2_func(WindowWork* wp);
-void sort_7_3_func(WindowWork* wp);
-void sort_8_1_func(WindowWork* wp);
-void sort_8_2_func(WindowWork* wp);
+static void sort_1_1_func(WindowWork* wp);
+static void sort_1_2_func(WindowWork* wp);
+static void sort_2_1_func(WindowWork* wp);
+static void sort_2_2_func(WindowWork* wp);
+static void sort_3_1_func(WindowWork* wp);
+static void sort_3_2_func(WindowWork* wp);
+static void sort_3_3_func(WindowWork* wp);
+static void sort_4_1_func(WindowWork* wp);
+static void sort_4_2_func(WindowWork* wp);
+static void sort_4_3_func(WindowWork* wp);
+static void sort_5_1_func(WindowWork* wp);
+static void sort_5_2_func(WindowWork* wp);
+static void sort_5_3_func(WindowWork* wp);
+static void sort_6_1_func(WindowWork* wp);
+static void sort_6_2_func(WindowWork* wp);
+static void sort_7_1_func(WindowWork* wp);
+static void sort_7_2_func(WindowWork* wp);
+static void sort_7_3_func(WindowWork* wp);
+static void sort_8_1_func(WindowWork* wp);
+static void sort_8_2_func(WindowWork* wp);
 
 #include "driver/dispdrv.h"
 #include "driver/swdrv.h"
 #include "mario/mario_party.h"
 #include "memory.h"
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 void winRootBgDrawDisp(CameraId camId, void* param);
 void winRootBgCaptureDisp(CameraId camId, void* param);
 #endif
@@ -75,9 +75,9 @@ void winRootBgCaptureDisp(CameraId camId, void* param);
         w->tabNum++;                    \
     }
 
-void winBgMain(WindowWork* wp);
-void winMsgMain(WindowWork* wp);
-void winSortMain(WindowWork* wp);
+static void winBgMain(WindowWork* wp);
+static void winMsgMain(WindowWork* wp);
+static void winSortMain(WindowWork* wp);
 
 static inline void winRootTabMain(WindowWork* w) {
     s32 i;
@@ -144,7 +144,7 @@ s32 winRootMain(WindowWork* w) {
                 WIN_ROOT_ADD_TAB(3);
             }
             WIN_ROOT_ADD_TAB(4);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             {
                 s32 j;
                 for (j = 0; j < w->tabNum; j++) {
@@ -214,7 +214,7 @@ s32 winRootMain(WindowWork* w) {
                 w->active = 12;
                 w->tabSel = 0;
             }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             w->texBuf = smartAlloc(GXGetTexBufferSize(gp->fbWidth, gp->efbHeight, GX_TF_RGB565, GX_FALSE, 0), 1);
             w->texBufValid = 0;
             dispEntry(CAMERA_2D, 1000.0f, 0, winRootBgCaptureDisp, w);
@@ -342,14 +342,14 @@ s32 winRootMain(WindowWork* w) {
                 w->menu[i].state = 10;
             }
             w->msgState = 10;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             N_mapDispOn();
             camDispOn(CAMERA_3D);
 #endif
             w->active++;
             break;
         default:
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             if (w->texBuf) {
                 smartFree(w->texBuf);
                 w->texBuf = NULL;
@@ -403,13 +403,13 @@ s32 winRootMain(WindowWork* w) {
     w->helpX += __fabs(2.0f * (f32)sin(gp->retraceCount / 8.0f));
     w->sortPosX += (w->sortTgtX - w->sortPosX) / FPS_EASE(4.0f);
     w->sortPosY += (w->sortTgtY - w->sortPosY) / FPS_EASE(4.0f);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     dispEntry(CAMERA_2D, 1000.0f, 0, winRootBgDrawDisp, w);
 #endif
     return 0;
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // FAKE: stand-in for a function the linker stripped; codegen runs bottom-up, so
 // its 185.0f and 180.0f land in .sdata2 ahead of winRootMain's 1000.0f, as in the demo.
 void winRootStrippedPool(f32* f) {
@@ -464,7 +464,7 @@ void winRootDisp(s32 camId, WindowWork* wp) {
         winMailDisp(wp);
         winMsgDisp(wp, wp->msgOfsX, wp->msgOfsY);
         winSortGX(wp);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         if (!(wp->flags & 0x8000))
 #endif
         {
@@ -490,7 +490,7 @@ static inline void winTabDisp(WindowWork* wp) {
     }
 }
 
-void winBgMain(WindowWork* wp) {
+static void winBgMain(WindowWork* wp) {
 
     s32 i;
 
@@ -664,7 +664,7 @@ void winBgGX(WindowWork* wp, s32 type, f32 x, f32 y) {
     GXTexCoord2f32(1.0f, 0.0f);
 }
 
-void winMsgMain(WindowWork* wp) {
+static void winMsgMain(WindowWork* wp) {
     switch (wp->msgState) {
         case 0:
             wp->msgOfsX = -800.0f;
@@ -727,7 +727,7 @@ void winMsgMain(WindowWork* wp) {
 
 #if VERSION >= VERSION_US
 #endif
-void winMsgDisp(WindowWork* wp, f32 x, f32 y) {
+static void winMsgDisp(WindowWork* wp, f32 x, f32 y) {
     GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     GXColor black = {0x00, 0x00, 0x00, 0xFF};
     GXColor waku = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -1112,7 +1112,7 @@ void winBookGX(WindowWork* w, s32 a, f32 x, f32 y) {
                         luigi_book_list[w->item.bookIdx][w->item.bookPage * 2]);
         winFontSetLabel((Vec){220.0f + lx, y - 14.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, (GXColor){0x00, 0x00, 0x00, 0xFF},
                         luigi_book_list[w->item.bookIdx][w->item.bookPage * 2 + 1]);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         pose = L_msgGetWork()->poseId;
         anim = animPoseGetAnimDataPtr(pose);
         if (w->item.bookPage < w->item.bookPages - 1) {
@@ -1536,7 +1536,7 @@ WinSortData sort_6[] = {
 };
 // The demo still gives every listed enemy its own number; retail later merged
 // variants that share an entry.
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 u8 enemy_monoshiri_sort_table[] = {
     0x00, 0x01, 0x02, 0x03, 0x2F, 0x30, 0x94, 0x2A, 0x62, 0x95, 0x96, 0x12, 0x24, 0x97, 0x0A, 0x0B,
     0x32, 0x14, 0x4D, 0x54, 0x33, 0x98, 0x15, 0x63, 0x43, 0x38, 0x4F, 0x3E, 0x6B, 0x6E, 0x6F, 0x79,
@@ -1574,7 +1574,7 @@ u8 enemy_monoshiri_sort_table[] = {
 };
 #endif
 
-void sort_1_1_func(WindowWork* wp) {
+static void sort_1_1_func(WindowWork* wp) {
     s32 sel = wp->item.cursor[0];
     s32 mode;
 
@@ -1591,7 +1591,7 @@ void sort_1_1_func(WindowWork* wp) {
     wp->item.page[0] = wp->item.cursor[0] / 10;
 }
 
-void sort_1_2_func(WindowWork* wp) {
+static void sort_1_2_func(WindowWork* wp) {
     s32 sel = wp->item.cursor[0];
 
     pouchGetHaveItemCnt();
@@ -1603,7 +1603,7 @@ void sort_1_2_func(WindowWork* wp) {
     wp->item.page[0] = wp->item.cursor[0] / 10;
 }
 
-void sort_2_1_func(WindowWork* wp) {
+static void sort_2_1_func(WindowWork* wp) {
     pouchSortItem(!wp->sortRev ? 2 : 9);
     wp->sortRev = 1 - wp->sortRev;
     winMakeSkipList(wp);
@@ -1611,7 +1611,7 @@ void sort_2_1_func(WindowWork* wp) {
     wp->item.page[1] = wp->item.cursor[1] / 10;
 }
 
-void sort_2_2_func(WindowWork* wp) {
+static void sort_2_2_func(WindowWork* wp) {
     pouchSortItem(!wp->sortRev ? 3 : 10);
     wp->sortRev = 1 - wp->sortRev;
     winMakeSkipList(wp);
@@ -1619,7 +1619,7 @@ void sort_2_2_func(WindowWork* wp) {
     wp->item.page[1] = wp->item.cursor[1] / 10;
 }
 
-void sort_3_1_func(WindowWork* wp) {
+static void sort_3_1_func(WindowWork* wp) {
     s32 sel = wp->badge.sel[0];
 
     pouchGetHaveBadgeCnt();
@@ -1631,7 +1631,7 @@ void sort_3_1_func(WindowWork* wp) {
     wp->badge.page[0] = wp->badge.sel[0] / 8;
 }
 
-void sort_3_2_func(WindowWork* wp) {
+static void sort_3_2_func(WindowWork* wp) {
     s32 sel = wp->badge.sel[0];
 
     pouchGetHaveBadgeCnt();
@@ -1643,12 +1643,12 @@ void sort_3_2_func(WindowWork* wp) {
     wp->badge.page[0] = wp->badge.sel[0] / 8;
 }
 
-void sort_3_3_func(WindowWork* wp) {
+static void sort_3_3_func(WindowWork* wp) {
     s32 sel = wp->badge.sel[0];
 
     pouchGetHaveBadgeCnt();
     pouchHaveBadge(sel);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     pouchSortItem(!wp->sortRev ? 4 : 11);
 #else
     pouchSortItem(!wp->sortRev ? 6 : 13);
@@ -1660,9 +1660,9 @@ void sort_3_3_func(WindowWork* wp) {
     wp->badge.page[0] = wp->badge.sel[0] / 8;
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo sorts the equipped list through the pouch, like the owned list.
-void sort_4_1_func(WindowWork* wp) {
+static void sort_4_1_func(WindowWork* wp) {
     pouchSortItem(!wp->sortRev ? 4 : 11);
     wp->sortRev = 1 - wp->sortRev;
     winMakeEquipList(wp);
@@ -1670,7 +1670,7 @@ void sort_4_1_func(WindowWork* wp) {
     wp->badge.page[1] = wp->badge.sel[1] / 8;
 }
 
-void sort_4_2_func(WindowWork* wp) {
+static void sort_4_2_func(WindowWork* wp) {
     pouchSortItem(!wp->sortRev ? 5 : 12);
     wp->sortRev = 1 - wp->sortRev;
     winMakeEquipList(wp);
@@ -1678,7 +1678,7 @@ void sort_4_2_func(WindowWork* wp) {
     wp->badge.page[1] = wp->badge.sel[1] / 8;
 }
 
-void sort_4_3_func(WindowWork* wp) {
+static void sort_4_3_func(WindowWork* wp) {
     pouchSortItem(!wp->sortRev ? 4 : 11);
     pouchSortItem(!wp->sortRev ? 6 : 13);
     wp->sortRev = 1 - wp->sortRev;
@@ -1741,7 +1741,7 @@ s32 N_compare_func4_2_r(const void* a, const void* b) {
     return 0;
 }
 
-void sort_4_1_func(WindowWork* wp) {
+static void sort_4_1_func(WindowWork* wp) {
     if (!wp->sortRev) {
         qqsort(wp->badge.list, wp->badge.count, sizeof(WinBadgeEnt), N_compare_func4_1);
     } else {
@@ -1752,7 +1752,7 @@ void sort_4_1_func(WindowWork* wp) {
     wp->badge.page[1] = wp->badge.sel[1] / 8;
 }
 
-void sort_4_2_func(WindowWork* wp) {
+static void sort_4_2_func(WindowWork* wp) {
     if (!wp->sortRev) {
         qqsort(wp->badge.list, wp->badge.count, sizeof(WinBadgeEnt), N_compare_func4_2);
     } else {
@@ -1763,7 +1763,7 @@ void sort_4_2_func(WindowWork* wp) {
     wp->badge.page[1] = wp->badge.sel[1] / 8;
 }
 
-void sort_4_3_func(WindowWork* wp) {
+static void sort_4_3_func(WindowWork* wp) {
     ItemData* db;
     ItemData* da;
     WinBadgeEnt tmp;
@@ -1820,8 +1820,8 @@ void sort_4_3_func(WindowWork* wp) {
 }
 #endif
 
-#if VERSION == VERSION_DEMO
-s32 compare_func5_1(const void* a, const void* b) {
+#if VERSION <= VERSION_DEMO_US
+static s32 compare_func5_1(const void* a, const void* b) {
     const s16* ea = a;
     const s16* eb = b;
     s16 ia = *ea + BADGE_MIN;
@@ -1836,7 +1836,7 @@ s32 compare_func5_1(const void* a, const void* b) {
     return 0;
 }
 
-s32 compare_func5_1_r(const void* a, const void* b) {
+static s32 compare_func5_1_r(const void* a, const void* b) {
     const s16* ea = a;
     const s16* eb = b;
     s16 ia = *ea + BADGE_MIN;
@@ -1851,7 +1851,7 @@ s32 compare_func5_1_r(const void* a, const void* b) {
     return 0;
 }
 #else
-s32 compare_func5_1(const void* a, const void* b) {
+static s32 compare_func5_1(const void* a, const void* b) {
     const s16* ea = a;
     const s16* eb = b;
     char buf1[128];
@@ -1864,7 +1864,7 @@ s32 compare_func5_1(const void* a, const void* b) {
     return strcmp(buf1, buf2);
 }
 
-s32 compare_func5_1_r(const void* a, const void* b) {
+static s32 compare_func5_1_r(const void* a, const void* b) {
     const s16* ea = a;
     const s16* eb = b;
     char buf1[128];
@@ -1892,7 +1892,7 @@ s32 compare_func5_2(const void* a, const void* b) {
     return 0;
 }
 
-s32 compare_func5_2_r(const void* a, const void* b) {
+static s32 compare_func5_2_r(const void* a, const void* b) {
     const s16* ea = a;
     const s16* eb = b;
     s16 ia = itemDataTable[(s16)(*ea + BADGE_MIN)].type_sort_order;
@@ -1906,7 +1906,7 @@ s32 compare_func5_2_r(const void* a, const void* b) {
     return 0;
 }
 
-void sort_5_1_func(WindowWork* wp) {
+static void sort_5_1_func(WindowWork* wp) {
     if (!wp->sortRev) {
         qqsort(wp->log.badgeIds, wp->log.badge.num, sizeof(s16), compare_func5_1);
     } else {
@@ -1917,7 +1917,7 @@ void sort_5_1_func(WindowWork* wp) {
     wp->log.badge.idx = wp->log.badge.cursor / 28;
 }
 
-void sort_5_2_func(WindowWork* wp) {
+static void sort_5_2_func(WindowWork* wp) {
     if (!wp->sortRev) {
         qqsort(wp->log.badgeIds, wp->log.badge.num, sizeof(s16), compare_func5_2);
     } else {
@@ -1928,9 +1928,9 @@ void sort_5_2_func(WindowWork* wp) {
     wp->log.badge.idx = wp->log.badge.cursor / 28;
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo sorts by name first, then bubbles by BP cost only.
-void sort_5_3_func(WindowWork* wp) {
+static void sort_5_3_func(WindowWork* wp) {
     if (!wp->sortRev) {
         s16 a;
         s16 b;
@@ -1969,7 +1969,7 @@ void sort_5_3_func(WindowWork* wp) {
     wp->log.badge.idx = wp->log.badge.cursor / 28;
 }
 #else
-void sort_5_3_func(WindowWork* wp) {
+static void sort_5_3_func(WindowWork* wp) {
 
     if (!wp->sortRev) {
         ItemData* db;
@@ -2036,8 +2036,8 @@ void sort_5_3_func(WindowWork* wp) {
 }
 #endif
 
-#if VERSION == VERSION_DEMO
-s32 compare_func6_1(const void* a, const void* b) {
+#if VERSION <= VERSION_DEMO_US
+static s32 compare_func6_1(const void* a, const void* b) {
     const s16* ea = a;
     const s16* eb = b;
     s16 ia = *ea + WIN_RECIPE_MIN;
@@ -2052,7 +2052,7 @@ s32 compare_func6_1(const void* a, const void* b) {
     return 0;
 }
 
-s32 compare_func6_1_r(const void* a, const void* b) {
+static s32 compare_func6_1_r(const void* a, const void* b) {
     const s16* ea = a;
     const s16* eb = b;
     s16 ia = *ea + WIN_RECIPE_MIN;
@@ -2067,7 +2067,7 @@ s32 compare_func6_1_r(const void* a, const void* b) {
     return 0;
 }
 #else
-s32 compare_func6_1(const void* a, const void* b) {
+static s32 compare_func6_1(const void* a, const void* b) {
     const s16* ea = a;
     const s16* eb = b;
     char buf1[128];
@@ -2080,7 +2080,7 @@ s32 compare_func6_1(const void* a, const void* b) {
     return strcmp(buf1, buf2);
 }
 
-s32 compare_func6_1_r(const void* a, const void* b) {
+static s32 compare_func6_1_r(const void* a, const void* b) {
     const s16* ea = a;
     const s16* eb = b;
     char buf1[128];
@@ -2108,7 +2108,7 @@ s32 compare_func6_2(const void* a, const void* b) {
     return 0;
 }
 
-s32 compare_func6_2_r(const void* a, const void* b) {
+static s32 compare_func6_2_r(const void* a, const void* b) {
     const s16* ea = a;
     const s16* eb = b;
     s16 ia = itemDataTable[(s16)(*ea + WIN_RECIPE_MIN)].type_sort_order;
@@ -2122,7 +2122,7 @@ s32 compare_func6_2_r(const void* a, const void* b) {
     return 0;
 }
 
-void sort_6_1_func(WindowWork* wp) {
+static void sort_6_1_func(WindowWork* wp) {
     if (!wp->sortRev) {
         qqsort(wp->log.recipeIds, wp->log.recipe.num, sizeof(s16), compare_func6_1);
     } else {
@@ -2133,7 +2133,7 @@ void sort_6_1_func(WindowWork* wp) {
     wp->log.recipe.idx = wp->log.recipe.cursor / 28;
 }
 
-void sort_6_2_func(WindowWork* wp) {
+static void sort_6_2_func(WindowWork* wp) {
     if (!wp->sortRev) {
         qqsort(wp->log.recipeIds, wp->log.recipe.num, sizeof(s16), compare_func6_2);
     } else {
@@ -2144,7 +2144,7 @@ void sort_6_2_func(WindowWork* wp) {
     wp->log.recipe.idx = wp->log.recipe.cursor / 28;
 }
 
-s32 compare_func1(const void* a, const void* b) {
+static s32 compare_func1(const void* a, const void* b) {
     const u8* ea = a;
     const u8* eb = b;
     if (*ea > *eb) {
@@ -2155,7 +2155,7 @@ s32 compare_func1(const void* a, const void* b) {
     return 0;
 }
 
-s32 compare_func1_r(const void* a, const void* b) {
+static s32 compare_func1_r(const void* a, const void* b) {
     const u8* ea = a;
     const u8* eb = b;
     if (*ea < *eb) {
@@ -2166,7 +2166,7 @@ s32 compare_func1_r(const void* a, const void* b) {
     return 0;
 }
 
-void sort_7_1_func(WindowWork* wp) {
+static void sort_7_1_func(WindowWork* wp) {
     if (!wp->sortRev) {
         qqsort(wp->log.enemy, wp->log.enemyNum, sizeof(WinSortEnt), compare_func1);
     } else {
@@ -2192,7 +2192,7 @@ static inline u32 getMonosiriPlace(const char* place) {
         "mri",
         "tou",
         "usu",
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         "gra",
         "jin",
         "muj",
@@ -2250,7 +2250,7 @@ WinSortData sort_8[] = {
 };
 WinSortData* sort_data[] = {sort_1, sort_2, sort_3, sort_4, sort_5, sort_6, sort_7, sort_8};
 
-s32 compare_func2(const void* a, const void* b) {
+static s32 compare_func2(const void* a, const void* b) {
     const WinSortEnt* ea = a;
     const WinSortEnt* eb = b;
     TattleEntry* ta = battleGetUnitMonosiriPtr(ea->id);
@@ -2266,7 +2266,7 @@ s32 compare_func2(const void* a, const void* b) {
     return 0;
 }
 
-s32 compare_func2_r(const void* a, const void* b) {
+static s32 compare_func2_r(const void* a, const void* b) {
     const WinSortEnt* ea = a;
     const WinSortEnt* eb = b;
     TattleEntry* ta = battleGetUnitMonosiriPtr(ea->id);
@@ -2282,7 +2282,7 @@ s32 compare_func2_r(const void* a, const void* b) {
     return 0;
 }
 
-void sort_7_2_func(WindowWork* wp) {
+static void sort_7_2_func(WindowWork* wp) {
     if (!wp->sortRev) {
         qqsort(wp->log.enemy, wp->log.enemyNum, sizeof(WinSortEnt), compare_func1);
         qqsort(wp->log.enemy, wp->log.enemyNum, sizeof(WinSortEnt), compare_func2);
@@ -2295,8 +2295,8 @@ void sort_7_2_func(WindowWork* wp) {
     wp->log.enemyPage = wp->log.enemySel / 16;
 }
 
-#if VERSION == VERSION_DEMO
-s32 compare_func3(const void* a, const void* b) {
+#if VERSION <= VERSION_DEMO_US
+static s32 compare_func3(const void* a, const void* b) {
     const WinSortEnt* ea = a;
     const WinSortEnt* eb = b;
     TattleEntry* ta = battleGetUnitMonosiriPtr(ea->id);
@@ -2307,7 +2307,7 @@ s32 compare_func3(const void* a, const void* b) {
     return strcmp(sa, sb);
 }
 
-s32 compare_func3_r(const void* a, const void* b) {
+static s32 compare_func3_r(const void* a, const void* b) {
     const WinSortEnt* ea = a;
     const WinSortEnt* eb = b;
     TattleEntry* ta = battleGetUnitMonosiriPtr(ea->id);
@@ -2318,7 +2318,7 @@ s32 compare_func3_r(const void* a, const void* b) {
     return strcmp(sb, sa);
 }
 #else
-s32 compare_func3(const void* a, const void* b) {
+static s32 compare_func3(const void* a, const void* b) {
     const WinSortEnt* ea = a;
     const WinSortEnt* eb = b;
     char buf1[128];
@@ -2345,7 +2345,7 @@ s32 compare_func3(const void* a, const void* b) {
     return strcmp(buf1, buf2);
 }
 
-s32 compare_func3_r(const void* a, const void* b) {
+static s32 compare_func3_r(const void* a, const void* b) {
     const WinSortEnt* ea = a;
     const WinSortEnt* eb = b;
     char buf1[128];
@@ -2373,7 +2373,7 @@ s32 compare_func3_r(const void* a, const void* b) {
 }
 #endif
 
-void sort_7_3_func(WindowWork* wp) {
+static void sort_7_3_func(WindowWork* wp) {
     if (!wp->sortRev) {
         qqsort(wp->log.enemy, wp->log.enemyNum, sizeof(WinSortEnt), compare_func1);
         qqsort(wp->log.enemy, wp->log.enemyNum, sizeof(WinSortEnt), compare_func3);
@@ -2386,7 +2386,7 @@ void sort_7_3_func(WindowWork* wp) {
     wp->log.enemyPage = wp->log.enemySel / 16;
 }
 
-s32 compare_func4(const void* a, const void* b) {
+static s32 compare_func4(const void* a, const void* b) {
     const WinSortEnt* ea = a;
     const WinSortEnt* eb = b;
     MailData* ma = mailGetPtr(ea->id);
@@ -2397,7 +2397,7 @@ s32 compare_func4(const void* a, const void* b) {
     return strcmp(sa, sb);
 }
 
-s32 compare_func4_r(const void* a, const void* b) {
+static s32 compare_func4_r(const void* a, const void* b) {
     const WinSortEnt* ea = a;
     const WinSortEnt* eb = b;
     MailData* ma = mailGetPtr(ea->id);
@@ -2408,7 +2408,7 @@ s32 compare_func4_r(const void* a, const void* b) {
     return strcmp(sb, sa);
 }
 
-void sort_8_1_func(WindowWork* wp) {
+static void sort_8_1_func(WindowWork* wp) {
     if (!wp->sortRev) {
         qqsort(wp->item.mail, wp->item.mailNum, sizeof(WinSortEnt), compare_func4);
     } else {
@@ -2419,7 +2419,7 @@ void sort_8_1_func(WindowWork* wp) {
     wp->item.mailPage = wp->item.mailSel / 5;
 }
 
-s32 compare_func5(const void* a, const void* b) {
+static s32 compare_func5(const void* a, const void* b) {
     const u8* ea = a;
     const u8* eb = b;
     if (*ea > *eb) {
@@ -2430,7 +2430,7 @@ s32 compare_func5(const void* a, const void* b) {
     return 0;
 }
 
-s32 compare_func5_r(const void* a, const void* b) {
+static s32 compare_func5_r(const void* a, const void* b) {
     const u8* ea = a;
     const u8* eb = b;
     if (*ea < *eb) {
@@ -2441,7 +2441,7 @@ s32 compare_func5_r(const void* a, const void* b) {
     return 0;
 }
 
-void sort_8_2_func(WindowWork* wp) {
+static void sort_8_2_func(WindowWork* wp) {
     if (!wp->sortRev) {
         qqsort(wp->item.mail, wp->item.mailNum, sizeof(WinSortEnt), compare_func5);
     } else {
@@ -2452,7 +2452,7 @@ void sort_8_2_func(WindowWork* wp) {
     wp->item.mailPage = wp->item.mailSel / 5;
 }
 
-void winSortMain(WindowWork* wp) {
+static void winSortMain(WindowWork* wp) {
     u32 trg = wp->buttonTrg;
     u32 rep = wp->dirRep;
     const char* msg;
@@ -2536,7 +2536,7 @@ static inline void winSortTex(WindowWork* wp, s32 id, f32 x, f32 y, f32 w, f32 h
     GXTexCoord2f32(1.0f, 0.0f);
 }
 
-void winSortGX(WindowWork* wp) {
+static void winSortGX(WindowWork* wp) {
     f32 x = wp->sortPosX;
     f32 y = wp->sortPosY;
     s32 i;
@@ -2725,7 +2725,7 @@ void winZClear(void) {
 
 #if VERSION >= VERSION_US
 #endif
-void winMailDisp(WindowWork* wp) {
+static void winMailDisp(WindowWork* wp) {
     s32 i;
     s32 id;
     s32 kind;
@@ -2794,7 +2794,7 @@ void winMailDisp(WindowWork* wp) {
 #else
             winFontSetLabel((Vec){120.0f + wp->item.mailX, 8.0f + (wp->item.mailY - 56.0f), 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, mail->name);
 #endif
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             GXSetScissor((u32)(32.0f + (304.0f + wp->item.mailX)), (u32)(72.0f + (240.0f - wp->item.mailY)), 0x158, 0xAE);
 #else
             GXSetScissor((u32)(32.0f + (304.0f + wp->item.mailX)), (u32)(72.0f + (240.0f - wp->item.mailY)), 0x158, 0xB1);
@@ -2809,14 +2809,14 @@ void winMailDisp(WindowWork* wp) {
 #endif
             if (mail->flags & 0x1000) {
                 winTexInit((TEXPalette*)*wp->mailRes->data);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 winTexSet(mail->icon, (Vec){210.0f + wp->item.mailX, (wp->item.mailY - (f32)((wp->item.mailLines - 3) * 21)) + (f32)(wp->item.mailLine * 21), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 #else
                 winTexSet(mail->icon, (Vec){210.0f + wp->item.mailX, 7.0f + ((wp->item.mailY - (f32)((wp->item.mailLines - 1) * 21)) + (f32)(wp->item.mailLine * 21)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 #endif
             }
             GXSetScissor(0, 0, 0x260, 0x1E0);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             if (wp->item.mailLines > 8)
 #endif
             {
@@ -2825,7 +2825,7 @@ void winMailDisp(WindowWork* wp) {
                     if ((gp->retraceCount & 0x1F) < 0x14) {
                         winIconSet(ICON_1B6, (Vec){360.0f + wp->item.mailX, (20.0f + (wp->item.mailY - 230.0f)) - 24.0f, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
                     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 } else if (wp->item.mailLine + 8 == wp->item.mailLines) {
 #else
                 } else if (wp->item.mailLine + 6 == wp->item.mailLines) {
@@ -2846,7 +2846,7 @@ void winMailDisp(WindowWork* wp) {
 }
 
 // The demo has no captured-frame menu background.
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 void winRootBgCaptureDisp(CameraId camId, void* param) {
     WindowWork* bg = param;
 

@@ -845,7 +845,7 @@ NpcBattleSelect btlgrpsel_eki_btlno_eki_04_05_off[] = {
 
 NpcSetupBattleInfo btlsetup_eki_tbl[] = {
     {
-        /*"マップstg_06_1"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x36\x5F\x31", // name
+        "マップstg_06_1", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -855,7 +855,7 @@ NpcSetupBattleInfo btlsetup_eki_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"マップstg_06_2"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x36\x5F\x32", // name
+        "マップstg_06_2", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -865,7 +865,7 @@ NpcSetupBattleInfo btlsetup_eki_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"マップstg_06_3"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x36\x5F\x33", // name
+        "マップstg_06_3", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -875,7 +875,7 @@ NpcSetupBattleInfo btlsetup_eki_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"eki_06 クリボー３"*/"\x65\x6B\x69\x5F\x30\x36\x20\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x52", // name
+        "eki_06 クリボー３", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -885,7 +885,7 @@ NpcSetupBattleInfo btlsetup_eki_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"eki_06 クリボー３"*/"\x65\x6B\x69\x5F\x30\x36\x20\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x52", // name
+        "eki_06 クリボー３", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -895,7 +895,7 @@ NpcSetupBattleInfo btlsetup_eki_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"eki_02クロクモーン"*/"\x65\x6B\x69\x5F\x30\x32\x83\x4E\x83\x8D\x83\x4E\x83\x82\x81\x5B\x83\x93", // name
+        "eki_02クロクモーン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -905,7 +905,7 @@ NpcSetupBattleInfo btlsetup_eki_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"eki_02クロクモーン"*/"\x65\x6B\x69\x5F\x30\x32\x83\x4E\x83\x8D\x83\x4E\x83\x82\x81\x5B\x83\x93", // name
+        "eki_02クロクモーン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -915,7 +915,7 @@ NpcSetupBattleInfo btlsetup_eki_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"eki_02パタトゲメット"*/"\x65\x6B\x69\x5F\x30\x32\x83\x70\x83\x5E\x83\x67\x83\x51\x83\x81\x83\x62\x83\x67", // name
+        "eki_02パタトゲメット", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -925,7 +925,7 @@ NpcSetupBattleInfo btlsetup_eki_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"eki_03サンボ"*/"\x65\x6B\x69\x5F\x30\x33\x83\x54\x83\x93\x83\x7B", // name
+        "eki_03サンボ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -935,7 +935,7 @@ NpcSetupBattleInfo btlsetup_eki_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"eki_03サンボ"*/"\x65\x6B\x69\x5F\x30\x33\x83\x54\x83\x93\x83\x7B", // name
+        "eki_03サンボ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -945,7 +945,7 @@ NpcSetupBattleInfo btlsetup_eki_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"eki_03サンボ"*/"\x65\x6B\x69\x5F\x30\x33\x83\x54\x83\x93\x83\x7B", // name
+        "eki_03サンボ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -955,7 +955,7 @@ NpcSetupBattleInfo btlsetup_eki_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"eki_03クロクモーン"*/"\x65\x6B\x69\x5F\x30\x33\x83\x4E\x83\x8D\x83\x4E\x83\x82\x81\x5B\x83\x93", // name
+        "eki_03クロクモーン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -965,7 +965,7 @@ NpcSetupBattleInfo btlsetup_eki_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"eki_03クロクモーン"*/"\x65\x6B\x69\x5F\x30\x33\x83\x4E\x83\x8D\x83\x4E\x83\x82\x81\x5B\x83\x93", // name
+        "eki_03クロクモーン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -975,7 +975,7 @@ NpcSetupBattleInfo btlsetup_eki_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"eki_04パタトゲメット"*/"\x65\x6B\x69\x5F\x30\x34\x83\x70\x83\x5E\x83\x67\x83\x51\x83\x81\x83\x62\x83\x67", // name
+        "eki_04パタトゲメット", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -985,7 +985,7 @@ NpcSetupBattleInfo btlsetup_eki_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"eki_04パタトゲメット"*/"\x65\x6B\x69\x5F\x30\x34\x83\x70\x83\x5E\x83\x67\x83\x51\x83\x81\x83\x62\x83\x67", // name
+        "eki_04パタトゲメット", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -995,7 +995,7 @@ NpcSetupBattleInfo btlsetup_eki_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"eki_04パタトゲメット"*/"\x65\x6B\x69\x5F\x30\x34\x83\x70\x83\x5E\x83\x67\x83\x51\x83\x81\x83\x62\x83\x67", // name
+        "eki_04パタトゲメット", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1005,7 +1005,7 @@ NpcSetupBattleInfo btlsetup_eki_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"eki_04サンボマミー"*/"\x65\x6B\x69\x5F\x30\x34\x83\x54\x83\x93\x83\x7B\x83\x7D\x83\x7E\x81\x5B", // name
+        "eki_04サンボマミー", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1015,7 +1015,7 @@ NpcSetupBattleInfo btlsetup_eki_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"eki_04サンボマミー"*/"\x65\x6B\x69\x5F\x30\x34\x83\x54\x83\x93\x83\x7B\x83\x7D\x83\x7E\x81\x5B", // name
+        "eki_04サンボマミー", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1025,7 +1025,7 @@ NpcSetupBattleInfo btlsetup_eki_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"eki_04サンボマミー"*/"\x65\x6B\x69\x5F\x30\x34\x83\x54\x83\x93\x83\x7B\x83\x7D\x83\x7E\x81\x5B", // name
+        "eki_04サンボマミー", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect

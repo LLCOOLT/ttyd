@@ -11,7 +11,6 @@
 #include "evt/evt_mario.h"
 #include "evt/evt_mobj.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "win.h"
 #include "data_tables.h"
 #include "evt/evt_story.h"
@@ -92,9 +91,15 @@ static BeroEntry bero_entry_data[] = {
 EVT_BEGIN(evt_hikou_nobiru_init)
     CALL(evt_hit_bind_mapobj, STRING("a_dai"), STRING("hikou"))
     CALL(evt_hit_bind_mapobj, STRING("a_hi"), STRING("hikou"))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_hit_bind_mapobj, STRING("A_dokan1"), STRING("S_dokan_ha"))
+#else
     CALL(evt_hit_bind_mapobj, STRING("A_dokan1"), STRING("S_dokan2"))
+#endif
     CALL(evt_hit_bind_mapobj, STRING("A_hi_kabe"), STRING("S_nob_tree"))
+#if VERSION >= VERSION_JP
     CALL(evt_hit_bind_mapobj, STRING("A_dokan_nobi"), STRING("S_dokan2"))
+#endif
     SET_VALUE(LW(0), 175)
     CALL(evt_mapobj_trans, 1, STRING("S_dokan_ha"), 0, LW(0), 0)
     SET_FLOAT_VALUE(LW(2), LW(0))
@@ -110,7 +115,9 @@ EVT_BEGIN(evt_hikou_nobiru_init)
     CALL(evt_hit_bind_update, STRING("a_dai"))
     CALL(evt_hit_bind_update, STRING("a_hi"))
     CALL(evt_hit_bind_update, STRING("A_dokan1"))
+#if VERSION >= VERSION_JP
     CALL(evt_hit_bind_update, STRING("A_dokan_nobi"))
+#endif
     CALL(evt_hit_bind_update, STRING("A_hi_kabe"))
     RETURN
 EVT_END()
@@ -127,9 +134,15 @@ EVT_BEGIN(evt_hikou_nobiru)
     CALL(evt_cam3d_evt_set, -307, 393, 533, -307, 297, -7, 3000, 0)
     CALL(evt_hit_bind_mapobj, STRING("a_dai"), STRING("hikou"))
     CALL(evt_hit_bind_mapobj, STRING("a_hi"), STRING("hikou"))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_hit_bind_mapobj, STRING("A_dokan1"), STRING("S_dokan_ha"))
+#else
     CALL(evt_hit_bind_mapobj, STRING("A_dokan1"), STRING("S_dokan2"))
+#endif
     CALL(evt_hit_bind_mapobj, STRING("A_hi_kabe"), STRING("S_nob_tree"))
+#if VERSION >= VERSION_JP
     CALL(evt_hit_bind_mapobj, STRING("A_dokan_nobi"), STRING("S_dokan2"))
+#endif
     CALL(evt_hit_get_position, STRING("A_dokan1"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_STEP_EXTEND1"), LW(0), LW(1), LW(2), LW(9))
     BEGIN_INLINE_EVENT
@@ -142,7 +155,9 @@ EVT_BEGIN(evt_hikou_nobiru)
             DIVIDE_FLOAT(LW(2), 90)
             CALL(evt_mapobj_scale, 1, STRING("S_dokan2"), 1, LW(2), 1)
             CALL(evt_hit_bind_update, STRING("A_dokan1"))
+#if VERSION >= VERSION_JP
             CALL(evt_hit_bind_update, STRING("A_dokan_nobi"))
+#endif
             CALL(evt_hit_bind_update, STRING("A_hi_kabe"))
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
@@ -184,18 +199,18 @@ static TreeAccess tree_access_data[] = {
 EVT_BEGIN(win_02_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG2_WIN1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_WIN1"))
     SET_VALUE(LW(0), PTR(tree_access_data))
-    CALL_CHILD(PTR(evt_sub_tree_access_entry))
+    CALL_CHILD(evt_sub_tree_access_entry)
     CALL(evt_map_entry_airport_harbor, 0, STRING("hikou"), STRING("a_hi"))
     CALL(evt_mobj_powerupblk, STRING("pblk00"), -470, 300, 50, 0, GSWF(GSWF_WIN02_SHINE_SPRITE), 0)
     CALL(evt_mobj_brick, STRING("mobj_box01"), 67, 110, -130, ITEM_P_DOWN_D_UP_P, 12, 0, GSWF(GSWF_WIN02_HIDDEN_PDOWN_DUP_P_BLOCK_HIT))
     CALL(evt_mobj_badgeblk, STRING("mobj_badge_gat"), 600, 185, -75, ITEM_QUAKE_HAMMER, 0, GSWF(GSWF_WIN02_QUAKE_HAMMER_BLOCK_HIT), 1)
-    CALL(evt_item_entry, STRING("item_00"), ITEM_STAR_PIECE, -472, 50, -134, 16, GSWF(GSWF_WIN02_STAR_PIECE), 0)
+    CALL(evt_item_entry, STRING("item_00"), ITEM_STAR_PIECE, -472, 50, -134, ITEM_ENTRY_FIXED, GSWF(GSWF_WIN02_STAR_PIECE), 0)
     IF_INT_EQUAL(GSWF(GSWF_WIN02_BLUE_SWITCH_PRESSED), 1)
-        SPAWN_EVENT(PTR(evt_hikou_nobiru_init))
+        SPAWN_EVENT(evt_hikou_nobiru_init)
     END_IF
     CALL(evt_mobj_switch_blue, 0, STRING("mobj_hashi0"), -415, 50, -125, PTR(evt_hikou_nobiru), GSWF(GSWF_WIN02_BLUE_SWITCH_PRESSED))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_hikou"), MAPOBJ_FLAG_BBOX_CULL)

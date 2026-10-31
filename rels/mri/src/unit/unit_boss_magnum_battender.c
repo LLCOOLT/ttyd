@@ -19,7 +19,7 @@
 #include "battle/battle_camera.h"
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 #include "unit/unit_boss_magnum_battender.h"
@@ -56,7 +56,7 @@ static BattleUnitSetup entry_rocket_punch;
 static EvtWord init_event[92];
 static EvtWord waku_event[23];
 static EvtWord damage_event[111];
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static EvtWord dead_event[216];
 #else
 static EvtWord dead_event[234];
@@ -106,7 +106,7 @@ BattleUnitKind unit_boss_magnum_battender = {
     0.0f,
     0,
     0,
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     0.0f,
     0.0f,
 #else
@@ -158,7 +158,7 @@ static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static StatusVulnerability regist = {0, 50, 50, 0, 50, 0, 100, 30, 0, 0, 100, 0, 100, 50, 50, 0, 0, 100, 40, 0, 0, 0};
 #else
 static StatusVulnerability regist = {0, 50, 50, 0, 50, 0, 100, 30, 0, 0, 100, 0, 100, 90, 50, 0, 0, 100, 40, 0, 0, 0};
@@ -169,7 +169,7 @@ static PoseTableEntry pose_table[] = {
     {2, "MGN_2D_1"},
     {9, "MGN_2D_1"},
     {5, "MGN_X_1"},
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     {4, "MGN_S_1"},
     {3, "MGN_S_1"},
 #else
@@ -185,13 +185,8 @@ static PoseTableEntry pose_table[] = {
     {41, "MGN_W_2"},
     {56, "MGN_S_1"},
     {57, "MGN_S_1"},
-#if VERSION == VERSION_DEMO
-    {63, "MGN_T_1"},
-    {67, "MGN_S_1"},
-#else
-    {65, "MGN_T_1"},
-    {69, "MGN_S_1"},
-#endif
+    {BTL_POSE_TALK, "MGN_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "MGN_S_1"},
 };
 
 static PoseTableEntry pose_table_no_arm[] = {
@@ -199,7 +194,7 @@ static PoseTableEntry pose_table_no_arm[] = {
     {2, "MGN_2D_2"},
     {9, "MGN_2D_2"},
     {5, "MGN_X_2"},
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     {4, "MGN_S_2"},
     {3, "MGN_S_2"},
 #else
@@ -214,13 +209,8 @@ static PoseTableEntry pose_table_no_arm[] = {
     {40, "MGN_W_3"},
     {56, "MGN_S_2"},
     {57, "MGN_S_2"},
-#if VERSION == VERSION_DEMO
-    {63, "MGN_T_2"},
-    {67, "MGN_S_2"},
-#else
-    {65, "MGN_T_2"},
-    {69, "MGN_S_2"},
-#endif
+    {BTL_POSE_TALK, "MGN_T_2"},
+    {BTL_POSE_STAY_DEFAULT, "MGN_S_2"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -388,7 +378,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 3, STRING("MGN_L_1"))
-    SPAWN_EVENT(PTR(waku_event))
+    SPAWN_EVENT(waku_event)
     CALL(arm_init)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
@@ -423,7 +413,7 @@ static EVT_BEGIN(damage_event)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
     END_IF
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     CALL(btlevtcmd_OffPartsAttribute, BTL_UNIT_SELF, 3, 16777216)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 6, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -438,13 +428,8 @@ static EVT_BEGIN(damage_event)
             SUBTRACT(LW(0), 20)
             CALL(evt_btl_camera_set_moveto, 1, LW(0), 160, 600, LW(0), 110, -100, 20, 11)
             WAIT_FRAMES(20)
-#if VERSION == VERSION_DEMO
-            CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, 63)
-            CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 67)
-#else
-            CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, 65)
-            CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 69)
-#endif
+            CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
+            CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, BTL_POSE_STAY_DEFAULT)
             CALL(evt_msg_print, 2, STRING("stg2_mri_e24_15"), 0, BTL_UNIT_SELF)
             CALL(evt_btl_camera_set_prilimit, 0)
             CALL(evt_btl_camera_set_mode, 0, 0)
@@ -509,7 +494,7 @@ static EVT_BEGIN(dead_event)
     WAIT_MS(500)
     CALL(arm_check, 0, LW(0))
     IF_INT_NOT_EQUAL(LW(0), -1)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         CALL(btlevtcmd_CheckDamageCode, LW(0), 512, LW(1))
         IF_INT_EQUAL(LW(1), 0)
 #endif
@@ -521,12 +506,12 @@ static EVT_BEGIN(dead_event)
                 CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, 33554432)
             END_INLINE_EVENT
         END_IF
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     END_IF
 #endif
     CALL(arm_check, 1, LW(0))
     IF_INT_NOT_EQUAL(LW(0), -1)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         CALL(btlevtcmd_CheckDamageCode, LW(0), 512, LW(1))
         IF_INT_EQUAL(LW(1), 0)
 #endif
@@ -537,7 +522,7 @@ static EVT_BEGIN(dead_event)
                 CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, 16777216)
                 CALL(btlevtcmd_OnPartsAttribute, LW(10), 1, 33554432)
             END_INLINE_EVENT
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         END_IF
 #endif
     END_IF
@@ -595,7 +580,7 @@ static EVT_BEGIN(attack_event)
                 CALL(btlevtcmd_AddUnitWork, BTL_UNIT_SELF, 1, -1)
                 CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
                 IF_INT_LESS_OR_EQUAL(LW(0), 0)
-                    CALL_CHILD(PTR(arm_return_event))
+                    CALL_CHILD(arm_return_event)
                 END_IF
             END_IF
         END_IF
@@ -610,17 +595,17 @@ static EVT_BEGIN(attack_event)
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 5, LW(0))
         IF_INT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(stamp_attack_event))
+            CALL_CHILD(stamp_attack_event)
             GOTO(99)
         END_IF
         CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
         IF_INT_GREATER(LW(0), 20)
-            CALL_CHILD(PTR(stamp_attack_event))
+            CALL_CHILD(stamp_attack_event)
             GOTO(99)
         ELSE
             CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
             IF_INT_EQUAL(LW(0), 0)
-                CALL_CHILD(PTR(arm_bunri_event))
+                CALL_CHILD(arm_bunri_event)
                 GOTO(99)
             END_IF
             SET_VALUE(LW(0), 0)
@@ -630,15 +615,15 @@ static EVT_BEGIN(attack_event)
             CALL(evt_sub_random, LW(0), LW(1))
             SET_VALUE(LW(0), 60)
             IF_INT_LESS(LW(1), LW(0))
-                CALL_CHILD(PTR(stamp_attack_event))
+                CALL_CHILD(stamp_attack_event)
                 GOTO(99)
             ELSE
-                CALL_CHILD(PTR(arm_bunri_event))
+                CALL_CHILD(arm_bunri_event)
                 GOTO(99)
             END_IF
         END_IF
     ELSE
-        CALL_CHILD(PTR(shake_attack_event))
+        CALL_CHILD(shake_attack_event)
         GOTO(99)
     END_IF
     LABEL(99)
@@ -808,11 +793,7 @@ static EVT_BEGIN(shake_attack_event)
         CALL(evt_btl_camera_shake_h, 0, 6, 0, 60, 0)
     END_SIBLING_EVENT
     WAIT_FRAMES(120)
-#if VERSION == VERSION_DEMO
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 67)
-#else
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
-#endif
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
     SET_VALUE(LW(6), 0)
     LABEL(10)
@@ -905,26 +886,14 @@ static EVT_BEGIN(arm_bunri_event)
     CALL(btlevtcmd_SetUnitWork, LW(3), 0, 0)
     CALL(btlevtcmd_SetUnitWork, LW(3), 1, 1)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, LW(3))
-#if VERSION == VERSION_DEMO
-    CALL(btlevtcmd_AnimeChangePoseType, LW(3), 1, 67)
-#else
-    CALL(btlevtcmd_AnimeChangePoseType, LW(3), 1, 69)
-#endif
+    CALL(btlevtcmd_AnimeChangePoseType, LW(3), 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_SpawnUnit, LW(4), PTR(&entry_rocket_punch), 0)
     CALL(btlevtcmd_SetUnitWork, LW(4), 0, 1)
     CALL(btlevtcmd_SetUnitWork, LW(4), 1, 1)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, LW(4))
-#if VERSION == VERSION_DEMO
-    CALL(btlevtcmd_AnimeChangePoseType, LW(4), 1, 67)
-#else
-    CALL(btlevtcmd_AnimeChangePoseType, LW(4), 1, 69)
-#endif
+    CALL(btlevtcmd_AnimeChangePoseType, LW(4), 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table_no_arm))
-#if VERSION == VERSION_DEMO
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 67)
-#else
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
-#endif
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     WAIT_MS(1500)
     RETURN
 EVT_END()
@@ -936,19 +905,11 @@ static EVT_BEGIN(arm_return_event)
     CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_rocket_punch), 0)
     CALL(btlevtcmd_SetUnitWork, LW(3), 0, 2)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, LW(3))
-#if VERSION == VERSION_DEMO
-    CALL(btlevtcmd_AnimeChangePoseType, LW(3), 1, 67)
-#else
-    CALL(btlevtcmd_AnimeChangePoseType, LW(3), 1, 69)
-#endif
+    CALL(btlevtcmd_AnimeChangePoseType, LW(3), 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_SpawnUnit, LW(4), PTR(&entry_rocket_punch), 0)
     CALL(btlevtcmd_SetUnitWork, LW(4), 0, 3)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, LW(4))
-#if VERSION == VERSION_DEMO
-    CALL(btlevtcmd_AnimeChangePoseType, LW(4), 1, 67)
-#else
-    CALL(btlevtcmd_AnimeChangePoseType, LW(4), 1, 69)
-#endif
+    CALL(btlevtcmd_AnimeChangePoseType, LW(4), 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_MBTN_PUNCH_FLY1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     BEGIN_SIBLING_EVENT
         CALL(btlevtcmd_SetPos, LW(3), 300, 40, -100)
@@ -967,11 +928,7 @@ static EVT_BEGIN(arm_return_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("MGN_A1_8"))
     WAIT_MS(600)
     CALL(btlevtcmd_AnimeSetPoseTable, BTL_UNIT_SELF, 1, PTR(pose_table))
-#if VERSION == VERSION_DEMO
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 67)
-#else
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
-#endif
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     WAIT_MS(500)
     RETURN
 EVT_END()
@@ -1051,7 +1008,7 @@ static BattleUnitDefense defence_r = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr_r = {{0, 0, 0, 0, 0}};
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static StatusVulnerability regist_r = {0, 80, 80, 80, 80, 80, 100, 80, 0, 0, 100, 0, 100, 80, 80, 0, 110, 100, 80, 0, 0, 0};
 #else
 static StatusVulnerability regist_r = {0, 80, 80, 100, 80, 100, 100, 80, 0, 0, 100, 0, 100, 95, 80, 0, 100, 100, 80, 0, 0, 0};
@@ -1071,11 +1028,7 @@ static PoseTableEntry pose_table_r[] = {
     {39, "MGN_A1_9"},
     {56, "MGN_A1_9"},
     {57, "MGN_A1_9"},
-#if VERSION == VERSION_DEMO
-    {67, "MGN_A1_9"},
-#else
-    {69, "MGN_A1_9"},
-#endif
+    {BTL_POSE_STAY_DEFAULT, "MGN_A1_9"},
 };
 
 static BattleDataEntry data_table_r[] = {
@@ -1109,7 +1062,7 @@ static BattleWeapon weapon_batten_rocket_attack = {
     2, // reserved_6F
     NULL, // acHelpMsg
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_SHATTERS_FREEZE, // special
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     COUNTER_RESIST_TOP_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_FIERY | COUNTER_RESIST_ICY | COUNTER_RESIST_POISON | COUNTER_RESIST_EXPLOSIVE | COUNTER_RESIST_VOLATILE_EXPLOSIVE | COUNTER_RESIST_PAYBACK | COUNTER_RESIST_HOLD_FAST, // counterResistFlags
 #else
     COUNTER_RESIST_ALL, // counterResistFlags
@@ -1175,7 +1128,7 @@ static EVT_BEGIN(arm_event)
     WAIT_FRAMES(1)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), -1)
-        CALL_CHILD(PTR(arm_event_end))
+        CALL_CHILD(arm_event_end)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
@@ -1216,12 +1169,12 @@ EVT_END()
 static EVT_BEGIN(damage_event_r)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 512, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 2048, LW(0))
         IF_INT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(arm_event_end))
+            CALL_CHILD(arm_event_end)
         END_IF
     END_IF
     RETURN

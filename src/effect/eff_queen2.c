@@ -10,6 +10,9 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
+static void effQueen2Disp(CameraId cameraId, EffectEntry* effect);
+static void effQueen2Main(EffectEntry* effect);
+
 typedef struct EffQueen2Work {
     s32 type;            // 0x0
     Vec position;        // 0x4
@@ -53,7 +56,7 @@ EffectEntry* effQueen2Entry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effQueen2Main(EffectEntry* effect) {
+static void effQueen2Main(EffectEntry* effect) {
     EffQueen2Work* work = effect->userdata;
     Vec position;
 
@@ -124,7 +127,7 @@ void effQueen2Main(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effQueen2Disp, effect);
 }
 
-void effQueen2Disp(CameraId cameraId, EffectEntry* effect) {
+static void effQueen2Disp(CameraId cameraId, EffectEntry* effect) {
     EffQueen2Work* work = effect->userdata;
     CameraEntry* camera;
     Mtx trans;

@@ -38,8 +38,8 @@ static effN64Vtx size12x12_tex64x64_vtx[] = {
     {-6, 6, 0, 0, 4096, 0x30, 0x6C, 0x25, 0xFF},
 };
 
-void effFallLeafMain(EffectEntry* effect);
-void effFallLeafDisp(CameraId cameraId, EffectEntry* effect);
+static void effFallLeafMain(EffectEntry* effect);
+static void effFallLeafDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effFallLeafN64Entry(s32 type, f32 x, f32 y, f32 z, s32 lifetime) {
     EffectEntry* effect;
@@ -90,7 +90,7 @@ EffectEntry* effFallLeafN64Entry(s32 type, f32 x, f32 y, f32 z, s32 lifetime) {
     return effect;
 }
 
-void effFallLeafMain(EffectEntry* effect) {
+static void effFallLeafMain(EffectEntry* effect) {
     EffFallLeafN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -152,7 +152,7 @@ void effFallLeafMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effFallLeafDisp, effect);
 }
 
-void effFallLeafDisp(CameraId cameraId, EffectEntry* effect) {
+static void effFallLeafDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffFallLeafN64Work* work;
     s32 type;

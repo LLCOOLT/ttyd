@@ -11,7 +11,9 @@
 #include <string.h>
 #include "libc_decls.h"
 
-void effKemuriDisp(CameraId camId, void* param);
+static void effKemuriMain(EffectEntry* effect);
+
+static void effKemuriDisp(CameraId camId, void* param);
 static void effKemuri2Main(EffectEntry* entry);
 static void effKemuri2Disp(CameraId camId, void* param);
 
@@ -143,7 +145,7 @@ EffectEntry* effKemuri2Entry(s32 type, f32 x, f32 y, f32 z, f32 dx, f32 dz) {
 }
 #pragma opt_propagation reset
 
-void effKemuriMain(EffectEntry* effect) {
+static void effKemuriMain(EffectEntry* effect) {
     effKemuriData* data = effect->userdata;
     Vec pos2;
     Vec pos = {0.0f, 0.0f, 0.0f};
@@ -234,7 +236,7 @@ static void effKemuri2Main(EffectEntry* entry) {
 }
 #pragma opt_propagation reset
 
-void effKemuriDisp(CameraId camId, void* param) {
+static void effKemuriDisp(CameraId camId, void* param) {
     Mtx t, s, r, m, m2;
     GXTexObj tex;
     s32 i, j, off;

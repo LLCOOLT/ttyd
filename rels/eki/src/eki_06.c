@@ -17,18 +17,17 @@
 #include "evt/evt_mobj.h"
 #include "evt/evt_npc.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "eki.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
 
 static s32 lock;
 
-USER_FUNC(sw_entry);
-s32 sw_main(MapObjectEntry* mobj);
-void sw_reset(void);
-s32 sw_cnt(MapObjectEntry* mobj);
-void sw_cntup(MapObjectEntry* mobj);
+static USER_FUNC(sw_entry);
+static s32 sw_main(MapObjectEntry* mobj);
+static void sw_reset(void);
+static s32 sw_cnt(MapObjectEntry* mobj);
+static void sw_cntup(MapObjectEntry* mobj);
 
 static BeroEntry bero_data[3];
 extern EvtWord evt_box_open[];
@@ -195,7 +194,7 @@ EVT_BEGIN(evt_sw_complete)
     RETURN
 EVT_END()
 
-void sw_cntup(MapObjectEntry* mobj) {
+static void sw_cntup(MapObjectEntry* mobj) {
     if (strcmp(mobj->name, "MOBJ_eki_06_su1") == 0) {
         evtSetValue(NULL, GW(0), evtGetValue(NULL, GW(0)) + 1);
     } else if (strcmp(mobj->name, "MOBJ_eki_06_su2") == 0) {
@@ -205,7 +204,7 @@ void sw_cntup(MapObjectEntry* mobj) {
     }
 }
 
-s32 sw_cnt(MapObjectEntry* mobj) {
+static s32 sw_cnt(MapObjectEntry* mobj) {
     if (strcmp(mobj->name, "MOBJ_eki_06_su1") == 0) {
         return evtGetValue(NULL, GW(0));
     }
@@ -218,7 +217,7 @@ s32 sw_cnt(MapObjectEntry* mobj) {
     return 0;
 }
 
-void sw_reset(void) {
+static void sw_reset(void) {
     MapObjectEntry* mobj;
 
     mobj = mobjNameToPtr("MOBJ_eki_06_su1");
@@ -249,7 +248,7 @@ void sw_reset(void) {
     }
 }
 
-s32 sw_main(MapObjectEntry* mobj) {
+static s32 sw_main(MapObjectEntry* mobj) {
     switch (mobj->state) {
         case 2:
             break;
@@ -334,7 +333,7 @@ s32 sw_main(MapObjectEntry* mobj) {
     return 0;
 }
 
-USER_FUNC(sw_entry) {
+static USER_FUNC(sw_entry) {
     EvtWord* args = event->args;
     const char* name;
     f32 x, y, z;
@@ -368,11 +367,11 @@ USER_FUNC(sw_entry) {
 EVT_BEGIN(eki_06_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_EKI2"))
     CALL(evt_npc_change_fbat_mode, 1)
-    SPAWN_EVENT(PTR(evt_box_open))
+    SPAWN_EVENT(evt_box_open)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_34_3_BLUE_BLOCKS)
         CALL(evt_hitobj_onoff, STRING("a_ori"), 1, 0)

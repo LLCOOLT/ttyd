@@ -11,6 +11,9 @@
 #include "libc_decls.h"
 #include "version.h"
 
+static void effPeachFukidashiDisp(CameraId cameraId, EffectEntry* effect);
+static void effPeachFukidashiMain(EffectEntry* effect);
+
 #define fabsf(x) __fabsf(x)
 
 typedef struct EffPeachFukidashiWork {
@@ -69,7 +72,7 @@ EffectEntry* effPeachFukidashiEntry(s32 type, NpcEntry* npc, s32 duration, f32 x
     return effect;
 }
 
-void effPeachFukidashiMain(EffectEntry* effect) {
+static void effPeachFukidashiMain(EffectEntry* effect) {
     EffPeachFukidashiWork* work = effect->userdata;
 
     if (work->timer < 1000) {
@@ -82,7 +85,7 @@ void effPeachFukidashiMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, 0.0f, 2, (DispCallback)effPeachFukidashiDisp, effect);
 }
 
-void effPeachFukidashiDisp(CameraId cameraId, EffectEntry* effect) {
+static void effPeachFukidashiDisp(CameraId cameraId, EffectEntry* effect) {
     EffPeachFukidashiWork* work = effect->userdata;
     Mtx mtx;
     Mtx scale;

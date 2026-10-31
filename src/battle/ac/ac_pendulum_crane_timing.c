@@ -41,7 +41,7 @@ typedef struct PendulumWork {
     s32 flag;    // 0x3C
     s32 rate;    // 0x40
     s32 sfxId;   // 0x44
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     s32 zone; // 0x48
 #endif
     s32 endTimer; // 0x4C (0x48 in the demo)
@@ -60,8 +60,8 @@ typedef struct PendulumWork {
 #pragma dont_inline on
 u16 _hp_tbl[] = {20, 2, 35, 4, 45, 6, 55, 8, 65, 6, 80, 4, 100, 2};
 
-s32 _get_angle_hp(s32 hp);
-s32 _get_angle_rate(f32 angle);
+static s32 _get_angle_hp(s32 hp);
+static s32 _get_angle_rate(f32 angle);
 
 s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
     PendulumWork* cw;
@@ -75,7 +75,7 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
     u8* stick;
     f32 accel;
     f32 mag;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     s32 zone;
 #endif
     s32 rate;
@@ -101,7 +101,7 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
             cw->cur = PC_PARAMS(work)->period;
             cw->vel = 0;
             cw->force = 3.0f;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             cw->zone = -1;
 #endif
             cw->button = 0x100;
@@ -167,7 +167,7 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
             work->actionCommands.outputParams[1] = _get_angle_hp(rate);
             cw->rate = rate;
             rate = _get_angle_rate(cw->angle);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             // The demo ticks only at the exact ends of the gauge.
             if (rate == 0 || rate == 100) {
                 psndSFXOn("SFX_AC_GAUGE_MOVE1");
@@ -301,7 +301,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     }
 }
 
-s32 _get_angle_rate(f32 angle) {
+static s32 _get_angle_rate(f32 angle) {
     s32 r;
     f32 a;
     angle = compAngle(0.0f, angle);
@@ -318,7 +318,7 @@ s32 _get_angle_rate(f32 angle) {
     return r;
 }
 
-s32 _get_angle_hp(s32 hp) {
+static s32 _get_angle_hp(s32 hp) {
     u16* p = _hp_tbl;
     while (hp > p[0]) {
         p += 2;

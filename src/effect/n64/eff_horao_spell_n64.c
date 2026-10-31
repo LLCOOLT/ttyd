@@ -67,8 +67,8 @@ effN64Vtx horao_spell_vtx[] = {
     {0, 8, 0, 7680, 1024, 0, 0, 0, 0},
 };
 
-void effHoraoSpellMain(EffectEntry* effect);
-void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect);
+static void effHoraoSpellMain(EffectEntry* effect);
+static void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effHoraoSpellN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -103,7 +103,7 @@ EffectEntry* effHoraoSpellN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, 
     return effect;
 }
 
-void effHoraoSpellMain(EffectEntry* effect) {
+static void effHoraoSpellMain(EffectEntry* effect) {
     EffHoraoSpellN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -137,7 +137,7 @@ void effHoraoSpellMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effHoraoSpellDisp, effect);
 }
 
-void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
+static void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
     GXTexObj texObj;
     Mtx mtx;
     Mtx scale;

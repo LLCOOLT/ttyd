@@ -35,11 +35,11 @@ USER_FUNC(chorogun_counterd);
 USER_FUNC(chorogun_dive_target);
 USER_FUNC(chorogun_escape);
 USER_FUNC(chorogun_get_alive_num);
-USER_FUNC(chorogun_set_target_id);
-void chorogun_ext_disp(CameraId camera, void* param);
-void chorogun_ext_main(void);
-void chorogun_ext_init(void);
-BattleUnit* chorogun_get_ptr(void);
+static USER_FUNC(chorogun_set_target_id);
+static void chorogun_ext_disp(CameraId camera, void* param);
+static void chorogun_ext_main(void);
+static void chorogun_ext_init(void);
+static BattleUnit* chorogun_get_ptr(void);
 
 BattleUnitKind unit_chorobon_gundan;
 static BattleUnitDefense defence;
@@ -50,7 +50,7 @@ static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
 BattleWeapon weapon_chorobon_gundan_attack;
 static EvtWord init_event[26];
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static EvtWord damage_event[80];
 #else
 static EvtWord damage_event[59];
@@ -59,7 +59,7 @@ static EvtWord attack_event[217];
 static EvtWord wait_event[6];
 ExtTexInfo chorogun_ext_entry_data[21];
 
-BattleUnit* chorogun_get_ptr(void) {
+static BattleUnit* chorogun_get_ptr(void) {
     s32 i;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -131,7 +131,7 @@ BattleUnitKind unit_chorobon_gundan = {
     "SFX_BTL_DAMAGE_FIRE1",
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     0x2240000,
 #else
     0x240000,
@@ -164,11 +164,7 @@ static PoseTableEntry pose_table[] = {
     {50, "CBN_A_1"},
     {42, "CBN_R_1"},
     {40, "CBN_W_1"},
-#if VERSION == VERSION_DEMO
-    {67, "CBN_S_1"},
-#else
-    {69, "CBN_S_1"},
-#endif
+    {BTL_POSE_STAY_DEFAULT, "CBN_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -216,7 +212,7 @@ BattleWeapon weapon_chorobon_gundan_attack = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 EVT_BEGIN(chorogun_dead_reward)
     CALL(btlevtcmd_snd_se, LW(10), STRING("SFX_BTL_ENEMY_DIE1_2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
@@ -267,7 +263,7 @@ static EVT_BEGIN(damage_event)
     IF_INT_EQUAL(LW(0), 0)
         GOTO(99)
     END_IF
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_btl_camera_set_mode, 0, 0)
@@ -278,7 +274,7 @@ static EVT_BEGIN(damage_event)
 #endif
     CALL(chorogun_get_alive_num, LW(0))
     IF_INT_LESS_OR_EQUAL(LW(0), 500)
-        CALL_CHILD(PTR(escape_chorogun_event))
+        CALL_CHILD(escape_chorogun_event)
         GOTO(99)
     END_IF
     LABEL(99)
@@ -406,7 +402,7 @@ EVT_BEGIN(chorogun_entry)
     RETURN
 EVT_END()
 
-void chorogun_ext_init(void) {
+static void chorogun_ext_init(void) {
     s32 i;
     s32 a, b;
     f32 tx, ty, tz;
@@ -447,7 +443,7 @@ void chorogun_ext_init(void) {
     }
 }
 
-void chorogun_ext_main(void) {
+static void chorogun_ext_main(void) {
     BattleWork* wp;
     BattleUnit* unit;
     s32 i;
@@ -675,7 +671,7 @@ void chorogun_ext_main(void) {
     dispEntry(CAMERA_3D, 0.0f, 1, chorogun_ext_disp, NULL);
 }
 
-void chorogun_ext_disp(CameraId camera, void* param) {
+static void chorogun_ext_disp(CameraId camera, void* param) {
     extLoadRenderMode();
     extLoadVertex();
     extLoadTexture();
@@ -698,7 +694,7 @@ USER_FUNC(chorogun_get_alive_num) {
     return 2;
 }
 
-USER_FUNC(chorogun_set_target_id) {
+static USER_FUNC(chorogun_set_target_id) {
     chorogun_targetId = evtGetValue(event, event->args[0]);
     return 2;
 }

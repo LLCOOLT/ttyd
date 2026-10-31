@@ -6,10 +6,10 @@
 #pragma optimize_for_size on
 // inlining off for BtlActRec_AddCount, BtlActRec_AddPoint, BtlActRec_JudgeTurnRuleKeep and 5 more, as in the original (the object differs without it)
 #pragma dont_inline on
-s32 _check_turn_count_0_end(s32 n);
-s32 _check_turn_count_0_turn(s32 n);
-s32 _check_use(s32 n);
-s32 _check_no_use(s32 n);
+static s32 _check_turn_count_0_end(s32 n);
+static s32 _check_turn_count_0_turn(s32 n);
+static s32 _check_use(s32 n);
+static s32 _check_no_use(s32 n);
 
 void BtlActRec_AddCount(u8* count) {
     if (*count < 100) {
@@ -309,7 +309,7 @@ void BtlActRec_JudgeRuleKeep(void) {
     }
 }
 
-s32 _check_use(s32 n) {
+static s32 _check_use(s32 n) {
     FieldBattleInfo* rec = _battleWorkPointer->fbatInfo;
     if (n >= rec->ruleParam) {
         return 6;
@@ -317,7 +317,7 @@ s32 _check_use(s32 n) {
     return (n >= rec->ruleParam2) + 1;
 }
 
-s32 _check_no_use(s32 n) {
+static s32 _check_no_use(s32 n) {
     FieldBattleInfo* rec = _battleWorkPointer->fbatInfo;
     if (n >= rec->ruleParam2) {
         return 1;
@@ -325,7 +325,7 @@ s32 _check_no_use(s32 n) {
     return n >= rec->ruleParam ? 2 : 6;
 }
 
-s32 _check_turn_count_0_turn(s32 n) {
+static s32 _check_turn_count_0_turn(s32 n) {
     BattleWork* wp = _battleWorkPointer;
     FieldBattleInfo* rec = wp->fbatInfo;
     BattleActRecord* ar = &wp->actRecord;
@@ -346,7 +346,7 @@ s32 _check_turn_count_0_turn(s32 n) {
     return rec->ruleKeepResult;
 }
 
-s32 _check_turn_count_0_end(s32 n) {
+static s32 _check_turn_count_0_end(s32 n) {
     BattleWork* wp = _battleWorkPointer;
     FieldBattleInfo* rec = wp->fbatInfo;
     BattleActRecord* ar = &wp->actRecord;

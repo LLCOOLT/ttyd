@@ -95,13 +95,8 @@ static PoseTableEntry pose_table[] = {
     {39, "KNF_D_1"},
     {42, "KNF_R_1"},
     {40, "KNF_W_1"},
-#if VERSION == VERSION_DEMO
-    {63, "KNF_T_1"},
-    {67, "KNF_S_1"},
-#else
-    {65, "KNF_T_1"},
-    {69, "KNF_S_1"},
-#endif
+    {BTL_POSE_TALK, "KNF_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "KNF_S_1"},
 };
 
 static BattleDataEntry data_table[] = {

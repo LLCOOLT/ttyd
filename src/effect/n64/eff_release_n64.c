@@ -36,8 +36,8 @@ typedef struct AnimeEntry {
     u16 value;
 } AnimeEntry;
 
-void effReleaseMain(EffectEntry* effect);
-void effReleaseDisp(CameraId cameraId, EffectEntry* effect);
+static void effReleaseMain(EffectEntry* effect);
+static void effReleaseDisp(CameraId cameraId, EffectEntry* effect);
 
 static AnimeEntry anime_data[30] = {
     {0x0064, 0x00FF},
@@ -225,7 +225,7 @@ EffectEntry* effReleaseN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32
     return effect;
 }
 
-void effReleaseMain(EffectEntry* effect) {
+static void effReleaseMain(EffectEntry* effect) {
     EffReleaseN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -395,7 +395,7 @@ void effReleaseMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effReleaseDisp, effect);
 }
 
-void effReleaseDisp(CameraId cameraId, EffectEntry* effect) {
+static void effReleaseDisp(CameraId cameraId, EffectEntry* effect) {
     GXColor c0;
     GXColor c1;
     CameraEntry* camera;

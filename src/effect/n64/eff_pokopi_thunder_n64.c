@@ -41,8 +41,8 @@ u8 yuragi_data2[11][24] = {
 
 static u8 (*yuragi_data_table[2])[24] = {yuragi_data, yuragi_data2};
 
-void effPokopiThunderMain(EffectEntry* effect);
-void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect);
+static void effPokopiThunderMain(EffectEntry* effect);
+static void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effPokopiThunderN64Entry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 x2, f32 y2, f32 z2, f32 scale) {
     EffectEntry* effect;
@@ -110,7 +110,7 @@ inline float inline_fn(s32 i, float step) {
     return ((f32)i) * step;
 }
 
-void effPokopiThunderMain(EffectEntry* effect) {
+static void effPokopiThunderMain(EffectEntry* effect) {
     EffPokopiThunderN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -149,7 +149,7 @@ inline float pt_dy(EffPokopiThunderN64Work* a, EffPokopiThunderN64Work* b) {
     return a->end.y - b->start.y;
 }
 
-void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
+static void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     s32 alpha;
     f32 scale;

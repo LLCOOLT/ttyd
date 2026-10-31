@@ -33,6 +33,7 @@ VERSIONS = [
     "G8ME01",  # 1
     "G8MP01",  # 2
     "G8ME01_DEMO",  # 3: the June 2004 prerelease from the Interactive Multi-Game Demo Disc Version 17 (disc ID G8MJ01)
+    "G8MJ01_DEMO",  # 4: the Japanese store demo from Gekkan Nintendo Tentou Demo 2004.7.1 (disc ID G8MJ01)
 ]
 
 parser = argparse.ArgumentParser()
@@ -228,19 +229,24 @@ cflags_base = [
     f"-DVERSION_{config.version}",
     "-DSDK_REVISION=1",
 ]
-# The game code tests the version through include/version.h (VERSION_DEMO < VERSION_JP < VERSION_US < VERSION_EU;
-# tools/check_versions.py keeps the per-version macros below out of it). The library code under libs/ tests those: the
-# European release is built from the US code, so G8MP01 defines VERSION_G8ME01 as well, and VERSION_G8MP01 marks
-# what differs in PAL.
+# The game code tests the version through include/version.h (VERSION_DEMO_JP < VERSION_DEMO_US < VERSION_JP <
+# VERSION_US < VERSION_EU; tools/check_versions.py keeps the per-version macros below out of it). The library code
+# under libs/ tests those: the European release is built from the US code, so G8MP01 defines VERSION_G8ME01 as well,
+# and VERSION_G8MP01 marks what differs in PAL.
 if config.version == "G8MP01":
     cflags_base.append("-DVERSION_G8ME01")
-# The demo (build MarioSt_MN7_NOA_20040619a) is English, but its code is the JP code before localization: of the
-# main.dol functions where JP and US differ, 373 match JP and none match US. So it takes the JP code paths (no
-# VERSION_G8ME01), and VERSION_G8ME01_DEMO marks what differs in the demo.
+# The US demo (build MarioSt_MN7_NOA_20040619a) is English, but its code is the JP code before localization: of
+# the main.dol functions where JP and US differ, 373 match JP and none match US. So it takes the JP code paths (no
+# VERSION_G8ME01).
 
-# Small-data thresholds of the game code. The demo puts no variable over 8 bytes in .sdata/.sbss (PadChanMask[4]
+# The Japanese store demo is the US demo's code before its English localisation: 6,890 of its 6,905 main.dol
+# functions have the same code as the US demo's (relocations masked). The library code marks what the two demos
+# share with VERSION_G8ME01_DEMO || VERSION_G8MJ01_DEMO.
+DEMO_VERSIONS = ("G8ME01_DEMO", "G8MJ01_DEMO")
+
+# Small-data thresholds of the game code. The demos put no variable over 8 bytes in .sdata/.sbss (PadChanMask[4]
 # of sdk/DEMOPad.c is in .data) and no constant over 4 bytes in .sdata2 (the 6-byte string "title" is in .rodata).
-if config.version == "G8ME01_DEMO":
+if config.version in DEMO_VERSIONS:
     cflags_sdata = ["-sdata 8", "-sdata2 4"]
 else:
     cflags_sdata = ["-sdata 48", "-sdata2 6"]
@@ -370,7 +376,7 @@ Equivalent = (
     config.non_matching
 )  # Object should be linked when configured with --non-matching
 
-# Every object below matches in every version that has it. One list serves all four versions: a version builds
+# Every object below matches in every version that has it. One list serves all five versions: a version builds
 # and links only the units its config/<version>/splits.txt names (dtk's build config), so an object that a
 # version does not contain is simply not built for it; which versions contain a unit is recorded in the
 # splits, not here.
@@ -512,7 +518,6 @@ config.libs = [
             Object(Matching, "driver/msgdrv.c"),
             Object(Matching, "driver/swdrv.c"),
             Object(Matching, "driver/itemdrv.c"),
-            Object(Matching, "driver/itemdrv_pad.c"),
             Object(Matching, "driver/extdrv.c"),
             Object(Matching, "driver/envdrv.c"),
         ],
@@ -1575,6 +1580,7 @@ config.libs = [
         [
             Object(Matching, "end.c"),
             Object(Matching, "end_00.c", extra_cflags=["-inline auto,deferred"]),
+            Object(Matching, "end_module.c", extra_cflags=["-inline auto,deferred"]),
         ]
     ),
     Rel(
@@ -2270,16 +2276,20 @@ config.libs = [
 
 # main.dol game units built with msl_main.pch: the units that keep the dtrigf mask block and the sqrtf users
 MAIN_PCH = {"battle/ac/ac_air_gauge.c", "battle/battle_audience.c", "battle/battle_break_slot.c", "battle/battle_event_cmd.c", "battle/battle_seq.c", "battle/battle_seq_end.c", "battle/battle_stage_object.c", "battle/battle_status_icon.c", "cam_road.c", "driver/envdrv.c", "driver/itemdrv.c", "driver/mapdrv.c", "driver/mobjdrv.c", "driver/npcdrv.c", "driver/shadowdrv.c", "effect/eff_fall.c", "effect/eff_fukidashi.c", "effect/eff_funemizu.c", "effect/eff_ibuki.c", "effect/eff_nozle.c", "effect/eff_particle.c", "effect/eff_starstone.c", "effect/eff_toiki.c", "effect/eff_ultra_hammer.c", "effect/n64/eff_akari_charge_n64.c", "effect/n64/eff_blow_n64.c", "effect/n64/eff_booboo_n64.c", "effect/n64/eff_broken_barrier_n64.c", "effect/n64/eff_butterfly_n64.c", "effect/n64/eff_cloud_n64.c", "effect/n64/eff_fireflower_n64.c", "effect/n64/eff_flame_n64.c", "effect/n64/eff_hokori_n64.c", "effect/n64/eff_kemuri10_n64.c", "effect/n64/eff_kumokumo_chip_n64.c", "effect/n64/eff_kumokumo_n64.c", "effect/n64/eff_magic3_n64.c", "effect/n64/eff_opuku_jetw_n64.c", "effect/n64/eff_pokopi_pcharge_n64.c", "effect/n64/eff_pokopi_thunder_n64.c", "effect/n64/eff_pturn_n64.c", "effect/n64/eff_recover_heart_n64.c", "effect/n64/eff_release_n64.c", "effect/n64/eff_small_star_n64.c", "effect/n64/eff_snow_dust_n64.c", "effect/n64/eff_sstar_n64.c", "effect/n64/eff_water_damage_n64.c", "event/evt_cam.c", "event/evt_mobj.c", "event/evt_npc.c", "event/evt_snd.c", "himo.c", "koopa_hit.c", "mario/mario.c", "mario/mario_hit.c", "motion/mot_roll.c", "nameent.c", "party/party_hit.c", "party/party_motion.c", "party/party_move.c", "pmario_sound.c", "sequence/seq_gameover.c", "sequence/seq_load.c", "sequence/seq_title.c", "system.c", "unit/party/unit_party_christine.c", "unit/party/unit_party_chuchurina.c", "unit/party/unit_party_clauda.c", "unit/party/unit_party_nokotarou.c", "unit/party/unit_party_sanders.c", "unit/party/unit_party_vivian.c", "unit/party/unit_party_yoshi.c"}
-# The demo keeps the dtrigf constants in a different set of units (msl_main.pch).
+# The demos keep the dtrigf constants in a different set of units (msl_main.pch).
 MAIN_PCH_DEMO_ADD = {"effect/n64/eff_akari_pose_n64.c", "effect/n64/eff_timestamp_n64.c", "effect/n64/eff_snowman_n64.c", "effect/n64/eff_horao_spell_n64.c", "effect/n64/eff_dogabon_attack_n64.c", "effect/n64/eff_confetti_n64.c", "effect/eff_kiss.c", "effect/eff_levelup.c", "effect/eff_minigame.c", "effect/eff_spark.c", "effect/eff_stageclear.c", "statuswindow.c", "motion/mot_hammer.c", "battle/battle_seq_command.c", "motion/mot_damage.c", "motion/mot_plane.c", "party/party_bomhei.c", "window/win_mario.c", "effect/eff_splash.c"}
-# These demo units use the math header without the dtrigf constants.
-MATH_PCH_DEMO = {"party/party_hit.c", "party/party_move.c", "party/party_motion.c", "effect/n64/eff_akari_charge_n64.c", "effect/n64/eff_kemuri10_n64.c", "effect/n64/eff_small_star_n64.c", "nameent.c", "system.c", "mario/mario.c", "mario/mario_hit.c", "driver/npcdrv.c", "driver/itemdrv.c"}
-if config.version == "G8ME01_DEMO":
+# These units use the math header without the dtrigf constants in the demos.
+MATH_PCH_DEMO = {"party/party_hit.c", "party/party_move.c", "party/party_motion.c", "event/evt_snd.c", "effect/n64/eff_akari_charge_n64.c", "effect/n64/eff_kemuri10_n64.c", "effect/n64/eff_small_star_n64.c", "nameent.c", "system.c", "mario/mario.c", "mario/mario_hit.c", "driver/npcdrv.c", "driver/itemdrv.c"}
+if config.version in DEMO_VERSIONS:
     MAIN_PCH = (MAIN_PCH - MATH_PCH_DEMO) | MAIN_PCH_DEMO_ADD | {"battle/battle_seq_command.c", "motion/mot_damage.c", "motion/mot_plane.c", "event/evt_shop.c", "driver/camdrv.c"}
-    # the demo shadowdrv has neither the dtrigf block nor the sqrtf statics
+    # the demos' shadowdrv has neither the dtrigf block nor the sqrtf statics
     MAIN_PCH -= {"driver/shadowdrv.c"}
 else:
     MATH_PCH_DEMO = set()
+# The Japanese store demo's tst.rel references tst_nakayama_init_evt, which that version does not define; the
+# original linker left it as 0 with no relocation, so the build drops that relocation before `dtk rel make`.
+if config.version == "G8MJ01_DEMO":
+    config.rel_dropped_relocations = {"tst": Path("config/G8MJ01_DEMO/unresolved_symbols.txt")}
 for lib in config.libs:
     for obj in lib.get("objects", []):
         if obj.name in MAIN_PCH:

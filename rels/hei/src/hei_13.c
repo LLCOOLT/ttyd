@@ -10,7 +10,6 @@
 #include "evt/evt_mobj.h"
 #include "evt/evt_npc.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "hei.h"
 #include "data_tables.h"
 #include "version.h"
@@ -103,13 +102,13 @@ EVT_BEGIN(evt_anm_kan)
         IF_INT_EQUAL(GSW(GSW_HEI13_CAN_HITS), 10)
             SET_VALUE(GF(0), 1)
             WAIT_MS(200)
-            CALL(evt_item_entry, STRING("item_tukushi"), ITEM_HORSETAIL, 565, 15, -65, 5, -1, 0)
+            CALL(evt_item_entry, STRING("item_tukushi"), ITEM_HORSETAIL, 565, 15, -65, ITEM_ENTRY_LAUNCH_5S, -1, 0)
         ELSE
             ADD(GSW(GSW_HEI13_CAN_HITS), 1)
             IF_INT_EQUAL(GSW(GSW_HEI13_CAN_HITS), 10)
                 SET_VALUE(GF(0), 1)
                 WAIT_MS(200)
-                CALL(evt_item_entry, STRING("item_tukushi"), ITEM_HORSETAIL, 565, 15, -65, 5, -1, 0)
+                CALL(evt_item_entry, STRING("item_tukushi"), ITEM_HORSETAIL, 565, 15, -65, ITEM_ENTRY_LAUNCH_5S, -1, 0)
             END_IF
         END_IF
     END_INLINE_EVENT
@@ -121,7 +120,7 @@ EVT_END()
 EVT_BEGIN(hei_13_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     SET_VALUE(GF(0), 0)
     SET_VALUE(GSW(GSW_HEI13_CAN_HITS), 0)
     CALL(evt_npc_change_fbat_mode, 1)
@@ -133,15 +132,15 @@ EVT_BEGIN(hei_13_init_evt)
     END_IF
     CALL(evt_sub_get_system_flag, LW(0))
     IF_BITS_CLEAR(LW(0), GLOBAL_FLAG_KIOSK)
-#if VERSION == VERSION_DEMO
-        CALL(evt_item_entry, STRING("i"), ITEM_HAPPY_HEART, 325, 200, -100, 0, GSWF(GSWF_HEI13_HAPPY_HEART_TAKEN), 0)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_item_entry, STRING("i"), ITEM_HAPPY_HEART, 325, 200, -100, ITEM_ENTRY_STAY, GSWF(GSWF_HEI13_HAPPY_HEART_TAKEN), 0)
 #else
-        CALL(evt_item_entry, STRING("i"), ITEM_HAPPY_HEART, 325, 200, -100, 16, GSWF(GSWF_HEI13_HAPPY_HEART_TAKEN), 0)
+        CALL(evt_item_entry, STRING("i"), ITEM_HAPPY_HEART, 325, 200, -100, ITEM_ENTRY_FIXED, GSWF(GSWF_HEI13_HAPPY_HEART_TAKEN), 0)
 #endif
     END_IF
     CALL(evt_mobj_brick, STRING("10m"), 325, 60, -100, 0, 3, 0, GSWF(GSWF_HEI13_COIN_BRICK_EMPTIED))
     SET_VALUE(LW(0), PTR(ki_data))
-    CALL_CHILD(PTR(evt_sub_tree_access_entry))
+    CALL_CHILD(evt_sub_tree_access_entry)
     CALL(evt_map_playanim, STRING("anm_mugi"), 1, 0)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_HEI1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_HEI1"))

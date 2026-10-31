@@ -39,9 +39,9 @@ typedef struct EffSnowfallWork {
     EffSnowfallParticle p[1]; // 0x34
 } EffSnowfallWork;
 
-void effSnowfallMain(EffectEntry* effect);
-void effSnowfallDisp(CameraId cameraId, EffectEntry* effect);
-void cam_clip_chk(EffSnowfallParticle* p, s32 w, s32 h, s32 life);
+static void effSnowfallMain(EffectEntry* effect);
+static void effSnowfallDisp(CameraId cameraId, EffectEntry* effect);
+static void cam_clip_chk(EffSnowfallParticle* p, s32 w, s32 h, s32 life);
 
 static effN64Vtx eff_snowfall_v[] = {
     {-78, 3, -38, 0, 2048, 0xFF, 0xFF, 0xFF, 0xFF},
@@ -77,7 +77,7 @@ static effN64Vtx eff_snowfall_v[] = {
     {37, -44, -57, 2048, 0, 0xFF, 0xFF, 0xFF, 0xFF},
     {27, -44, -57, 0, 0, 0xFF, 0xFF, 0xFF, 0xFF},};
 
-void cam_clip_chk(EffSnowfallParticle* p, s32 w, s32 h, s32 life) {
+static void cam_clip_chk(EffSnowfallParticle* p, s32 w, s32 h, s32 life) {
     CameraEntry* cam = camGetPtr(CAMERA_3D);
     f32 cx, cy, cz, py, pz;
     s32 d;
@@ -160,7 +160,7 @@ EffectEntry* effSnowfallN64Entry(s32 arg, s32 count) {
 }
 
 #define W ((EffSnowfallWork*)p)
-void effSnowfallMain(EffectEntry* effect) {
+static void effSnowfallMain(EffectEntry* effect) {
     s32 i, life, count, h;
     f32 hf;
     Vec position;
@@ -208,7 +208,7 @@ void effSnowfallMain(EffectEntry* effect) {
     } else {
         dispEntry(CAMERA_3D_EFFECTB, dispCalcZ(&position), 10, (DispCallback)effSnowfallDisp, effect);
     }
-#elif VERSION == VERSION_DEMO
+#elif VERSION <= VERSION_DEMO_US
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effSnowfallDisp, effect);
 #else
     dispEntry(CAMERA_3D, dispCalcZ(&position), 10, (DispCallback)effSnowfallDisp, effect);
@@ -217,7 +217,7 @@ void effSnowfallMain(EffectEntry* effect) {
 
 #undef W
 #define W ((EffSnowfallWork*)p)
-void effSnowfallDisp(CameraId cameraId, EffectEntry* effect) {
+static void effSnowfallDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* cam;
     EffSnowfallParticle* p;
     Mtx trans;

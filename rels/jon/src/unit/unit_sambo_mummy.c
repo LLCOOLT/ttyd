@@ -9,7 +9,7 @@
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 #include "evt/evt_eff.h"
@@ -119,7 +119,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {70, 60, 60, 100, 70, 100, 100, 30, 100, 70, 100, 70, 100, 70, 70, 80, 70, 100, 70, 100, 100, 95};
+#else
 static StatusVulnerability regist = {75, 60, 60, 100, 70, 100, 100, 40, 100, 85, 100, 85, 100, 90, 70, 80, 70, 100, 70, 100, 100, 95};
+#endif
 
 static BattleWeapon weapon_sambo_mummy_head_attack_4 = {
     NULL, 0, // name..icon
@@ -134,7 +138,11 @@ static BattleWeapon weapon_sambo_mummy_head_attack_4 = {
     1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
+#if VERSION <= VERSION_DEMO_US
+    {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+#else
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+#endif
     NULL, // fpDamageFn
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
@@ -173,7 +181,11 @@ static BattleWeapon weapon_sambo_mummy_head_attack_3 = {
     1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
+#if VERSION <= VERSION_DEMO_US
+    {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+#else
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+#endif
     NULL, // fpDamageFn
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
@@ -212,7 +224,11 @@ static BattleWeapon weapon_sambo_mummy_head_attack_2 = {
     1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
+#if VERSION <= VERSION_DEMO_US
+    {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+#else
     {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+#endif
     NULL, // fpDamageFn
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
@@ -290,7 +306,11 @@ static BattleWeapon weapon_sambo_mummy_spike_attack_4 = {
     1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
+#if VERSION <= VERSION_DEMO_US
+    {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+#else
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+#endif
     NULL, // fpDamageFn
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
@@ -326,7 +346,11 @@ static BattleWeapon weapon_sambo_mummy_spike_attack_3 = {
     1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
+#if VERSION <= VERSION_DEMO_US
+    {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+#else
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+#endif
     NULL, // fpDamageFn
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
@@ -362,7 +386,11 @@ static BattleWeapon weapon_sambo_mummy_spike_attack_2 = {
     1, // bingoSlotChance
     1, // reserved_1B
     weaponGetPowerDefault, // hpDamageFn
+#if VERSION <= VERSION_DEMO_US
+    {3, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+#else
     {4, 0, 0, 0, 0, 0, 0, 0}, // hpDamageWork
+#endif
     NULL, // fpDamageFn
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_NO_SELF | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_SINGLE, // targetClassFlags
@@ -402,8 +430,8 @@ static PoseTableEntry pose_table_body4[] = {
     {40, "SNB_W_1"},
     {56, "SNB_X_1"},
     {57, "SNB_X_1"},
-    {65, "SNB_T_1"},
-    {69, "SNB_S_1"},
+    {BTL_POSE_TALK, "SNB_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "SNB_S_1"},
 };
 
 static PoseTableEntry pose_table_body3[] = {
@@ -425,8 +453,8 @@ static PoseTableEntry pose_table_body3[] = {
     {40, "SNB_W_2"},
     {56, "SNB_X_2"},
     {57, "SNB_X_2"},
-    {65, "SNB_T_2"},
-    {69, "SNB_S_2"},
+    {BTL_POSE_TALK, "SNB_T_2"},
+    {BTL_POSE_STAY_DEFAULT, "SNB_S_2"},
 };
 
 static PoseTableEntry pose_table_body2[] = {
@@ -448,8 +476,8 @@ static PoseTableEntry pose_table_body2[] = {
     {40, "SNB_W_3"},
     {56, "SNB_X_3"},
     {57, "SNB_X_3"},
-    {65, "SNB_T_3"},
-    {69, "SNB_S_3"},
+    {BTL_POSE_TALK, "SNB_T_3"},
+    {BTL_POSE_STAY_DEFAULT, "SNB_S_3"},
 };
 
 static PoseTableEntry pose_table_body1[] = {
@@ -471,14 +499,14 @@ static PoseTableEntry pose_table_body1[] = {
     {40, "SNB_W_4"},
     {56, "SNB_X_4"},
     {57, "SNB_X_4"},
-    {65, "SNB_T_4"},
-    {69, "SNB_S_4"},
+    {BTL_POSE_TALK, "SNB_T_4"},
+    {BTL_POSE_STAY_DEFAULT, "SNB_S_4"},
 };
 
 static PoseTableEntry pose_table_parts[] = {
     {28, "SNB_B_1"},
     {39, "SNB_B_1"},
-    {69, "SNB_B_1"},
+    {BTL_POSE_STAY_DEFAULT, "SNB_B_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -506,9 +534,9 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 4)
-    CALL_CHILD(PTR(_body_param_set))
+    CALL_CHILD(_body_param_set)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 5, 69)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 5, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_SetRunSound, BTL_UNIT_SELF, STRING("SFX_ENM_SAMBO_MOVE1"), STRING("SFX_ENM_SAMBO_MOVE1"), 0, 6, 6)
     CALL(btlevtcmd_SetWalkSound, BTL_UNIT_SELF, STRING("SFX_ENM_SAMBO_MOVE1"), STRING("SFX_ENM_SAMBO_MOVE1"), 0, 6, 6)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -542,7 +570,7 @@ static EVT_BEGIN(damage_event)
         CASE_DEFAULT
         SET_VALUE(LW(11), 1)
     END_SWITCH
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -558,14 +586,14 @@ static EVT_BEGIN(damage_event_bodylost)
                 WAIT_FRAMES(30)
             END_IF
         ELSE
-            CALL_CHILD(PTR(subsetevt_nodamage_motion))
+            CALL_CHILD(subsetevt_nodamage_motion)
         END_IF
     ELSE
         SET_VALUE(LW(12), LW(11))
         CALL(btlevtcmd_GetUnitWork, LW(10), 0, LW(0))
         SUBTRACT(LW(0), 1)
         CALL(btlevtcmd_SetUnitWork, LW(10), 0, LW(0))
-        CALL_CHILD(PTR(_body_param_set))
+        CALL_CHILD(_body_param_set)
         SWITCH(LW(0))
             CASE_EQUAL(1)
             SET_VALUE(LW(11), 4)
@@ -597,7 +625,7 @@ static EVT_BEGIN(damage_event_bodylost)
         CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
         BEGIN_SIBLING_EVENT
             WAIT_FRAMES(4)
-            CALL_CHILD(PTR(subset_dmg_sambo_fall))
+            CALL_CHILD(subset_dmg_sambo_fall)
         END_SIBLING_EVENT
         CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
         CALL(btlevtcmd_SetPartsPos, LW(10), 5, LW(0), LW(1), LW(2))
@@ -774,7 +802,7 @@ static EVT_BEGIN(damage_swallow_body)
                 WAIT_FRAMES(30)
             END_IF
         ELSE
-            CALL_CHILD(PTR(subsetevt_nodamage_motion))
+            CALL_CHILD(subsetevt_nodamage_motion)
         END_IF
     ELSE
         WAIT_FRAMES(3)
@@ -782,7 +810,7 @@ static EVT_BEGIN(damage_swallow_body)
         CALL(btlevtcmd_GetUnitWork, LW(10), 0, LW(0))
         SUBTRACT(LW(0), 1)
         CALL(btlevtcmd_SetUnitWork, LW(10), 0, LW(0))
-        CALL_CHILD(PTR(_body_param_set))
+        CALL_CHILD(_body_param_set)
         SWITCH(LW(0))
             CASE_EQUAL(1)
             SET_VALUE(LW(11), 4)
@@ -815,7 +843,7 @@ static EVT_BEGIN(damage_swallow_body)
             CALL(btlevtcmd_OffPartsAttribute, LW(10), LW(11), 16842752)
             CALL(btlevtcmd_AnimeChangePoseType, LW(10), LW(11), LW(14))
             WAIT_FRAMES(1)
-            CALL_CHILD(PTR(subset_dmg_sambo_fall))
+            CALL_CHILD(subset_dmg_sambo_fall)
         END_SIBLING_EVENT
         CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
         CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
@@ -861,7 +889,7 @@ static EVT_BEGIN(attack_event)
                 CALL(btlevtcmd_CheckSpace, LW(3), LW(6), LW(7), LW(8), 40, 0, 0, 0)
                 IF_INT_EQUAL(LW(3), -1)
                     IF_INT_GREATER(LW(6), 0)
-                        CALL_CHILD(PTR(call_friend_event))
+                        CALL_CHILD(call_friend_event)
                         GOTO(99)
                     END_IF
                 END_IF
@@ -886,14 +914,14 @@ static EVT_BEGIN(attack_event)
                 CALL(btlevtcmd_ChoiceSamplingEnemy, PTR(&weapon_sambo_mummy_head_attack_2), LW(3), LW(4))
             END_SWITCH
             IF_INT_NOT_EQUAL(LW(3), -1)
-                CALL_CHILD(PTR(attack_head_2_event))
+                CALL_CHILD(attack_head_2_event)
                 RETURN
             END_IF
         END_IF
-        CALL_CHILD(PTR(attack_spike_event))
+        CALL_CHILD(attack_spike_event)
         RETURN
     END_IF
-    CALL_CHILD(PTR(attack_head_1_event))
+    CALL_CHILD(attack_head_1_event)
     LABEL(99)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)

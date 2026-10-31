@@ -75,8 +75,13 @@ BattleUnitKind unit_super_killer_cannon = {
     0.0f,
     0.0f,
     0.0f,
+#if VERSION <= VERSION_DEMO_US
+    0.0f,
+    0.0f,
+#else
     20.0f,
     10.0f,
+#endif
     26.0f,
     0.0f,
     0.0f,
@@ -113,7 +118,11 @@ static BattleUnitDefense defence = {{4, 4, 4, 4, 4}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {0, 0, 0, 0, 0, 150, 100, 40, 100, 40, 100, 40, 100, 40, 40, 0, 5, 100, 40, 100, 100, 90};
+#else
 static StatusVulnerability regist = {0, 0, 0, 0, 0, 150, 100, 90, 100, 80, 100, 80, 100, 95, 40, 0, 5, 100, 40, 100, 100, 90};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_super_killer_cannon", "c_killtai_g", 0.0f, 0.0f, 0.0f, 0.0f, 30.0f, 0.0f, 0.0f, 35.0f, 0.0f, 35, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
@@ -147,8 +156,8 @@ static PoseTableEntry pose_table[] = {
     {56, "KTA_X_1"},
     {57, "KTA_X_1"},
     {50, "KTA_A_1"},
-    {65, "KTA_T_1"},
-    {69, "KTA_S_1"},
+    {BTL_POSE_TALK, "KTA_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "KTA_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -175,7 +184,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -210,7 +219,7 @@ static EVT_BEGIN(attack_event)
                 ADD(LW(2), LW(13))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(12), 0)
-                    CALL_CHILD(PTR(friend_event))
+                    CALL_CHILD(friend_event)
                     GOTO(99)
                 END_IF
             END_IF
@@ -239,7 +248,7 @@ static EVT_BEGIN(attack_event)
                 ADD(LW(2), LW(13))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(12), 1)
-                    CALL_CHILD(PTR(friend_event))
+                    CALL_CHILD(friend_event)
                     GOTO(99)
                 END_IF
             END_IF
@@ -268,7 +277,7 @@ static EVT_BEGIN(attack_event)
                 ADD(LW(2), LW(13))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(12), 0)
-                    CALL_CHILD(PTR(friend_event))
+                    CALL_CHILD(friend_event)
                 END_IF
             END_IF
             ADD(LW(15), 1)
@@ -300,7 +309,7 @@ static EVT_BEGIN(attack_event)
                 ADD(LW(2), LW(13))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(12), 0)
-                    CALL_CHILD(PTR(friend_event_sky))
+                    CALL_CHILD(friend_event_sky)
                     CALL(btlevtcmd_GetPartsRotate, BTL_UNIT_SELF, 2, LW(5), LW(6), LW(11))
                     LOOP(0)
                         IF_INT_GREATER_OR_EQUAL(LW(11), 0)
@@ -345,7 +354,7 @@ static EVT_BEGIN(attack_event)
                 ADD(LW(2), LW(13))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(12), 1)
-                    CALL_CHILD(PTR(friend_event_sky))
+                    CALL_CHILD(friend_event_sky)
                     CALL(btlevtcmd_GetPartsRotate, BTL_UNIT_SELF, 2, LW(5), LW(6), LW(11))
                     LOOP(0)
                         IF_INT_GREATER_OR_EQUAL(LW(11), 0)
@@ -390,7 +399,7 @@ static EVT_BEGIN(attack_event)
                 ADD(LW(2), LW(13))
                 IF_INT_EQUAL(LW(3), -1)
                     SET_VALUE(LW(12), 0)
-                    CALL_CHILD(PTR(friend_event_sky))
+                    CALL_CHILD(friend_event_sky)
                 END_IF
             END_IF
             ADD(LW(15), 1)

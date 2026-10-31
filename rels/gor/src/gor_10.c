@@ -24,7 +24,8 @@
 #include "evt/evt_party.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
+#include "party.h"
 #include "gor.h"
 #include "pmario_sound.h"
 #include "evt/evt_story.h"
@@ -103,6 +104,8 @@ typedef struct TegamiWork {
     s32 alpha;
     FileEntry* tpl;
 } TegamiWork;
+// cam_yure's state. The demo map has both as its static locals (view_dy$598, view_trg$599); as locals they would
+// be emitted before wp in .bss, so they stay at file scope.
 static f32 view_dy;
 static s32 view_trg;
 static TegamiWork* wp;
@@ -114,7 +117,7 @@ static void draw(CameraId camera, void* param) {
     winTexSet(4, (Vec){0.0f, -74.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, wp->alpha});
 }
 
-USER_FUNC(tegami) {
+static USER_FUNC(tegami) {
     if (isFirstCall) {
         wp = _mapAlloc(sizeof(TegamiWork));
         memset(wp, 0, sizeof(TegamiWork));
@@ -223,6 +226,10 @@ EVT_BEGIN(tegami_init_evt)
     CALL(evt_party_stop, 0)
     CALL(evt_mario_dispflag_onoff, 1, 1)
     CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 1)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_map_playanim, STRING("anm_umi"), 1, 0)
+    CALL(evt_map_playanim, STRING("anm_nami"), 1, 0)
+#endif
     BEGIN_INLINE_EVENT
         CALL(tegami)
     END_INLINE_EVENT
@@ -240,7 +247,7 @@ EVT_BEGIN(tegami_init_evt)
     RETURN
 EVT_END()
 
-void mabutaDisp(CameraId camera, void* param) {
+static void mabutaDisp(CameraId camera, void* param) {
     f32 h = evtGetFloat(NULL, GW(1));
     CameraEntry* cam = camGetPtr(camera);
 
@@ -270,12 +277,12 @@ void mabutaDisp(CameraId camera, void* param) {
     GXEnd();
 }
 
-USER_FUNC(mabuta) {
+static USER_FUNC(mabuta) {
     dispEntry(CAMERA_2D, 1100.0f, 0, mabutaDisp, NULL);
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(cam_yure) {
+static USER_FUNC(cam_yure) {
     CameraEntry* cam = camGetPtr(CAMERA_3D);
     f32 s;
 
@@ -397,6 +404,10 @@ EVT_BEGIN(mezame_init_evt)
     CALL(evt_party_stop, 0)
     CALL(evt_mario_dispflag_onoff, 1, 1)
     CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 1)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_map_playanim, STRING("anm_umi"), 1, 0)
+    CALL(evt_map_playanim, STRING("anm_nami"), 1, 0)
+#endif
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("marukongou"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("densha"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("pukupuku"), MAPOBJ_FLAG_HIDE)
@@ -411,21 +422,23 @@ EVT_BEGIN(mezame_init_evt)
     BEGIN_INLINE_EVENT
         CALL(cam_yure)
     END_INLINE_EVENT
-    SPAWN_EVENT(PTR(evt_mezame))
+    SPAWN_EVENT(evt_mezame)
     RETURN
 EVT_END()
 
 EVT_BEGIN(gor_10_init_evt)
+#if VERSION >= VERSION_JP
     CALL(evt_map_playanim, STRING("anm_umi"), 1, 0)
     CALL(evt_map_playanim, STRING("anm_nami"), 1, 0)
     CALL(evt_sub_get_system_flag, LW(0))
     IF_BITS_SET(LW(0), GLOBAL_FLAG_SKIP_MAP_EVENTS)
         RETURN
     END_IF
+#endif
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG0_02_MARIOS_HOUSE)
-        CALL_CHILD(PTR(tegami_init_evt))
+        CALL_CHILD(tegami_init_evt)
     ELSE
-        CALL_CHILD(PTR(mezame_init_evt))
+        CALL_CHILD(mezame_init_evt)
     END_IF
     RETURN
 EVT_END()

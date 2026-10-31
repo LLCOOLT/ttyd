@@ -107,7 +107,7 @@ static inline void __DEMOInitRenderMode(GXRenderModeObj* mode) {
                 rmode = &GXMpal480IntDf;
                 break;
             default:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 OSPanic(demo_file, 0x203, demo_msg);
 #else
                 OSPanic(demo_file, 0x206, demo_msg);
@@ -128,7 +128,7 @@ void DEMOInit(GXRenderModeObj* mode) {
     __DEMOInitMem();
     memInit();
     VIConfigure(rmode);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     DefaultFifo = __memAlloc(HEAP_DEFAULT, 0x60000);
     DefaultFifoObj = GXInit(DefaultFifo, 0x60000);
 #else

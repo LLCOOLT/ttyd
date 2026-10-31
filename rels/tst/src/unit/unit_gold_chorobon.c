@@ -14,6 +14,7 @@
 #include "battle/battle_sub.h"
 #include "evt/evt_msg.h"
 #include "tst.h"
+#include "version.h"
 
 USER_FUNC(get_gold_chorobon_id);
 
@@ -30,7 +31,11 @@ extern EvtWord gold_chorobon_rabbit_move[];
 BattleUnitSetup entry_chorogun;
 extern EvtWord call_chorogun_event[];
 static EvtWord init_event[43];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord damage_event[104];
+#else
 static EvtWord damage_event[131];
+#endif
 static EvtWord counter_damage_event[30];
 static EvtWord return_event[24];
 static EvtWord attack_event[500];
@@ -125,8 +130,8 @@ static PoseTableEntry pose_table[] = {
     {40, "CBN_W_1"},
     {56, "CBN_X_1"},
     {57, "CBN_X_1"},
-    {65, "CBN_T_1"},
-    {69, "CBN_S_1"},
+    {BTL_POSE_TALK, "CBN_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "CBN_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -273,6 +278,7 @@ EVT_END()
 EVT_BEGIN(escape_chorogun_event)
     WAIT_MS(2000)
     CALL(get_gold_chorobon_id, LW(4))
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(0))
     IF_INT_EQUAL(LW(0), -1)
         RETURN
@@ -283,11 +289,15 @@ EVT_BEGIN(escape_chorogun_event)
     END_IF
     CALL(btlevtcmd_SetUnitWork, LW(4), 1, 1)
     CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(10))
-    CALL_CHILD(PTR(chorogun_dead_reward))
+    CALL_CHILD(chorogun_dead_reward)
+#endif
     CALL(chorogun_escape_all)
     WAIT_MS(1000)
     CALL(btlevtcmd_GetUnitWork, LW(4), 2, LW(3))
     CALL(btlevtcmd_KillUnit, LW(3), 0)
+#if VERSION <= VERSION_DEMO_US
+    CALL(btlevtcmd_SetUnitWork, LW(4), 1, 1)
+#endif
     RETURN
 EVT_END()
 
@@ -297,7 +307,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventDamage, BTL_UNIT_SELF, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(btldefaultevt_Confuse))
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    CALL_CHILD(PTR(chorogun_entry))
+    CALL_CHILD(chorogun_entry)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
     CALL(btlevtcmd_AnimeSetPoseSoundTable, BTL_UNIT_SELF, 1, PTR(pose_sound_timing_table))
@@ -308,9 +318,11 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
     CALL(btlevtcmd_GetUnitId, LW(0), LW(1))
     IF_INT_NOT_EQUAL(LW(1), -1)
+#endif
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 512, LW(0))
@@ -319,29 +331,37 @@ static EVT_BEGIN(damage_event)
                 IF_INT_EQUAL(LW(0), 0)
                     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
                     IF_INT_NOT_EQUAL(LW(0), 0)
+#if VERSION >= VERSION_JP
                         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
                         CALL(btlevtcmd_WaitAttackEnd)
                         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(10))
-                        CALL_CHILD(PTR(chorogun_dead_reward))
+                        CALL_CHILD(chorogun_dead_reward)
                         SET_VALUE(LW(10), -2)
+#endif
                         CALL(chorogun_escape_all)
                         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(3))
                         CALL(btlevtcmd_KillUnit, LW(3), 0)
+#if VERSION <= VERSION_DEMO_US
+                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 1)
+#else
                     END_IF
+#endif
                 END_IF
             END_IF
         END_IF
     END_IF
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
         IF_INT_LESS_OR_EQUAL(LW(0), 7)
             IF_INT_GREATER_OR_EQUAL(LW(0), 1)
+#if VERSION >= VERSION_JP
                 CALL(btlevtcmd_WaitAttackEnd)
+#endif
                 CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entry_chorogun), 0)
                 CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(3))
-                CALL_CHILD(PTR(call_chorogun_event))
+                CALL_CHILD(call_chorogun_event)
                 CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
                 GOTO(99)
             END_IF
@@ -356,10 +376,10 @@ static EVT_BEGIN(counter_damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_GetDamageCode, LW(10), LW(0))
-    CALL_CHILD(PTR(subsetevt_counter_damage))
+    CALL_CHILD(subsetevt_counter_damage)
     CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
-        CALL_CHILD(PTR(return_event))
+        CALL_CHILD(return_event)
     END_IF
     RETURN
 EVT_END()
@@ -369,7 +389,7 @@ static EVT_BEGIN(return_event)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(4.0f), FLOAT(0.5996094f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
     SET_VALUE(LW(8), 40)
-    CALL_CHILD(PTR(gold_chorobon_rabbit_move))
+    CALL_CHILD(gold_chorobon_rabbit_move)
     RETURN
 EVT_END()
 
@@ -386,7 +406,7 @@ static EVT_BEGIN(attack_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
@@ -405,7 +425,7 @@ static EVT_BEGIN(attack_event)
     SET_VALUE(LW(6), 0)
     CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(5), 50)
     SET_VALUE(LW(8), 50)
-    CALL_CHILD(PTR(gold_chorobon_rabbit_move))
+    CALL_CHILD(gold_chorobon_rabbit_move)
     WAIT_FRAMES(20)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_set_zoom, 0, 200)
@@ -508,7 +528,7 @@ static EVT_BEGIN(attack_event)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
     CALL(evt_btl_camera_nomove_y_onoff, 0, 0)
-    CALL_CHILD(PTR(return_event))
+    CALL_CHILD(return_event)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     LABEL(99)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)

@@ -52,7 +52,6 @@
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "party/party_nokonoko.h"
 #include "eki.h"
 #include "evt/evt_story.h"
@@ -219,7 +218,7 @@ static s32 evt_moamoa_end_wait(EventEntry* event, BOOL isFirstCall);
 static s32 evt_moamoa_ry_reset(EventEntry* event, BOOL isFirstCall);
 static s32 evt_moamoa_exit(EventEntry* event, BOOL isFirstCall);
 
-s32 img_set_color(EventEntry* event, BOOL isFirstCall);
+static s32 img_set_color(EventEntry* event, BOOL isFirstCall);
 
 static MoamoaData ext_moamoa_data[47];
 static BeroEntry bero_data[3];
@@ -683,9 +682,13 @@ static s32 moamoa_hit_check(ExtdrvPose* pose, Moamoa* moa) {
         return 0;
     }
     if (distABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], mario->position.x, mario->position.z) < (mario->wPlayerCollisionBox.x + 20.0f) / 2 && mario->position.y > 10.0f + (*pose->mtx)[1][3] && (mario->flags & 0x20000) && !(mario->flags & 0x10000) && wp->bounceCount < 2) {
+#if VERSION <= VERSION_DEMO_US
+        marioChgMot(5);
+#else
         if (mario->currMotionId != MARIO_MOTION_ROLL && mario->currMotionId != MARIO_MOTION_YOSHI) {
             marioChgMot(5);
         }
+#endif
         wp->bounceCount++;
         return 1;
     }
@@ -846,7 +849,11 @@ static void ext_moamoa_main(void) {
     for (i = 0; i < wp->count; i++, pose++, moa++) {
         wp->angle = angleABf(mario->position.x, mario->position.z, (*pose->mtx)[0][3], (*pose->mtx)[2][3]);
         wp->dist = distABf(mario->position.x, mario->position.z, (*pose->mtx)[0][3], (*pose->mtx)[2][3]);
+#if VERSION <= VERSION_DEMO_US
+        if ((((wp->flags & MOAMOA_WORK_ACTIVE) && (!(wp->flags & MOAMOA_WORK_NO_HIT))) && (!hit)) && (!(moa->flags & (MOAMOA_FLAG_DAMAGED | MOAMOA_FLAG_ESCAPING | MOAMOA_FLAG_OFF_FLOOR | MOAMOA_FLAG_FUSING)))) {
+#else
         if ((((((wp->flags & MOAMOA_WORK_ACTIVE) && (!(wp->flags & MOAMOA_WORK_NO_HIT))) && (!marioKeyOffChk())) && (!marioCtrlOffChk())) && (!hit)) && (!(moa->flags & (MOAMOA_FLAG_DAMAGED | MOAMOA_FLAG_ESCAPING | MOAMOA_FLAG_OFF_FLOOR | MOAMOA_FLAG_FUSING)))) {
+#endif
             ret = moamoa_hit_check(pose, moa);
             if (ret == 1) {
                 moa->flags |= MOAMOA_FLAG_DAMAGED;
@@ -1285,11 +1292,15 @@ static void ext_moamoa_main(void) {
     }
 
     moamoa_pose_main();
+#if VERSION <= VERSION_DEMO_US
+    {
+#else
     if (wp->flags & MOAMOA_WORK_PARTNER_IN_USE) {
         mario->floorMove.x = 0.0f;
         mario->floorMove.y = 0.0f;
         mario->floorMove.z = 0.0f;
     } else {
+#endif
         pv = (Vec){mario->floorMove.x, mario->floorMove.y, mario->floorMove.z};
         if (PSVECMag(&pv) > 2.0f) {
             PSVECNormalize(&pv, &pv);
@@ -1314,29 +1325,29 @@ static void ext_moamoa_dispent(void) {
 
 static EVT_BEGIN(e_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
-    CALL(evt_mapobj_rotate, 0, STRING(((char*)"e_door")), 0, LW(0), 0)
+    CALL(evt_mapobj_rotate, 0, STRING("e_door"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(e_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
-    CALL(evt_mapobj_rotate, 0, STRING(((char*)"e_door")), 0, LW(0), 0)
+    CALL(evt_mapobj_rotate, 0, STRING("e_door"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(s_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.38867188f))
-    CALL(evt_mapobj_rotate, 1, STRING(((char*)"s_door_a")), 0, LW(0), 0)
+    CALL(evt_mapobj_rotate, 1, STRING("s_door_a"), 0, LW(0), 0)
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
-    CALL(evt_mapobj_rotate, 1, STRING(((char*)"s_door_b")), 0, LW(0), 0)
+    CALL(evt_mapobj_rotate, 1, STRING("s_door_b"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(s_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.38867188f))
-    CALL(evt_mapobj_rotate, 1, STRING(((char*)"s_door_a")), 0, LW(0), 0)
+    CALL(evt_mapobj_rotate, 1, STRING("s_door_a"), 0, LW(0), 0)
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
-    CALL(evt_mapobj_rotate, 1, STRING(((char*)"s_door_b")), 0, LW(0), 0)
+    CALL(evt_mapobj_rotate, 1, STRING("s_door_b"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
@@ -1382,34 +1393,41 @@ static BeroEntry bero_data[] = {
 
 EVT_BEGIN(evt_bridge)
     CALL(evt_mario_key_onoff, 0)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_mario_normalize)
+#else
     WAIT_MS(500)
+#endif
     SET_VALUE(GSWF(GSWF_EKI00_BRIDGE_LOWER_SCENE), 1)
-    CALL(evt_bero_mapchange, STRING(((char*)"hom_00")), STRING(((char*)"n_bero_2")))
+    CALL(evt_bero_mapchange, STRING("hom_00"), STRING("n_bero_2"))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_mario_key_onoff, 1)
+#endif
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_bridge2)
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"s_eki_07")), MAPOBJ_FLAG_HIDE)
-    CALL(evt_hitobj_onoff, STRING(((char*)"a_eki_07")), 1, 1)
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"s_eki_00")), MAPOBJ_FLAG_HIDE)
-    CALL(evt_hitobj_onoff, STRING(((char*)"a_eki_00")), 1, 0)
-    CALL(evt_map_playanim, STRING(((char*)"anm_ori")), 2, 0)
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"kaidann")), MAPOBJ_FLAG_HIDE)
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"ori")), MAPOBJ_FLAG_HIDE)
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"n_kaidan")), MAPOBJ_FLAG_HIDE)
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"n_ori")), MAPOBJ_FLAG_HIDE)
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"n_kabe")), MAPOBJ_FLAG_HIDE)
-    CALL(evt_map_playanim, STRING(((char*)"anm_ere_1")), 2, 0)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("s_eki_07"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_hitobj_onoff, STRING("a_eki_07"), 1, 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("s_eki_00"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_hitobj_onoff, STRING("a_eki_00"), 1, 0)
+    CALL(evt_map_playanim, STRING("anm_ori"), 2, 0)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("kaidann"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("ori"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_kaidan"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_ori"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_kabe"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_map_playanim, STRING("anm_ere_1"), 2, 0)
     CALL(evt_mario_set_pos, -210, 60, 0)
     CALL(evt_party_set_pos, 0, -230, 60, 0)
-    CALL(evt_item_delete_check, STRING(((char*)"item")), LW(0))
+    CALL(evt_item_delete_check, STRING("item"), LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(evt_item_get_position, STRING(((char*)"item")), LW(0), LW(1), LW(2))
+        CALL(evt_item_get_position, STRING("item"), LW(0), LW(1), LW(2))
         SUBTRACT(LW(1), 2000)
-        CALL(evt_item_set_position, STRING(((char*)"item")), LW(0), LW(1), LW(2))
+        CALL(evt_item_set_position, STRING("item"), LW(0), LW(1), LW(2))
     END_IF
     CALL(evt_party_cont_onoff, 0, 1)
-    CALL(evt_mapobj_rotate, 1, STRING(((char*)"s_lever")), 0, 0, -80)
+    CALL(evt_mapobj_rotate, 1, STRING("s_lever"), 0, 0, -80)
     SET_VALUE(GF(0), 1)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_42_DRAWBRIDGE_DOWN)
     SET_VALUE(GSWF(GSWF_EKI00_BRIDGE_LOWER_SCENE), 0)
@@ -1419,13 +1437,13 @@ EVT_END()
 static EVT_BEGIN(evt_origami)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
-    CALL(evt_mapobj_get_position, STRING(((char*)"s_lever")), LW(0), LW(1), LW(2))
-    CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_SWITCH_MOVE1")), LW(0), LW(1), LW(2), 0)
+    CALL(evt_mapobj_get_position, STRING("s_lever"), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_SWITCH_MOVE1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_sub_intpl_msec_init, 11, 0, -800, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
         DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
-        CALL(evt_mapobj_rotate, 1, STRING(((char*)"s_lever")), 0, 0, LW(0))
+        CALL(evt_mapobj_rotate, 1, STRING("s_lever"), 0, 0, LW(0))
         WAIT_FRAMES(1)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
@@ -1438,25 +1456,29 @@ static EVT_BEGIN(evt_origami)
     SUBTRACT(LW(2), 1)
     CALL(evt_mario_mov_pos, LW(0), LW(2), 30)
     WAIT_MS(500)
-    CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ORIGAMI_APPEAR1")), -220, 60, 0, 0)
-    CALL(evt_map_playanim, STRING(((char*)"anm_ori")), 0, 0)
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"kaidann")), MAPOBJ_FLAG_HIDE)
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"ori")), MAPOBJ_FLAG_HIDE)
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"n_kaidan")), MAPOBJ_FLAG_HIDE)
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"n_ori")), MAPOBJ_FLAG_HIDE)
-    CALL(evt_hitobj_onoff, STRING(((char*)"kaidann_A")), 1, 1)
-    CALL(evt_map_checkanim, STRING(((char*)"anm_ori")), LW(0), LW(1))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ORIGAMI_APPEAR1"), -220, 60, 0, 0)
+    CALL(evt_map_playanim, STRING("anm_ori"), 0, 0)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("kaidann"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("ori"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_kaidan"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_ori"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_hitobj_onoff, STRING("kaidann_A"), 1, 1)
+    CALL(evt_map_checkanim, STRING("anm_ori"), LW(0), LW(1))
+#if VERSION <= VERSION_DEMO_US
+    WAIT_MS(LW(1))
+#else
     WAIT_MS(1600)
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"n_kabe")), MAPOBJ_FLAG_HIDE)
+#endif
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_kabe"), MAPOBJ_FLAG_HIDE)
     WAIT_MS(1000)
-    CALL(evt_mobj_switch_blue, 0, STRING(((char*)"bridge_sw")), -220, 60, 0, PTR(evt_bridge), GSWF(GSWF_EKI00_BRIDGE_SWITCH_PRESSED))
-    CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_OBJ_SWITCH_APPEAR1")), -220, 60, 0, 0)
-    CALL(evt_mobj_set_scale, STRING(((char*)"bridge_sw")), FLOAT(0.099609375f), FLOAT(0.099609375f), FLOAT(0.099609375f))
+    CALL(evt_mobj_switch_blue, 0, STRING("bridge_sw"), -220, 60, 0, PTR(evt_bridge), GSWF(GSWF_EKI00_BRIDGE_SWITCH_PRESSED))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_OBJ_SWITCH_APPEAR1"), -220, 60, 0, 0)
+    CALL(evt_mobj_set_scale, STRING("bridge_sw"), FLOAT(0.099609375f), FLOAT(0.099609375f), FLOAT(0.099609375f))
     CALL(evt_sub_intpl_msec_init, 8, 100, 1000, 1000)
     LABEL(0)
     CALL(evt_sub_intpl_msec_get_value)
     DIVIDE_FLOAT(LW(0), FLOAT(1000.0f))
-    CALL(evt_mobj_set_scale, STRING(((char*)"bridge_sw")), LW(0), LW(0), LW(0))
+    CALL(evt_mobj_set_scale, STRING("bridge_sw"), LW(0), LW(0), LW(0))
     WAIT_FRAMES(1)
     IF_INT_EQUAL(LW(1), 1)
         GOTO(0)
@@ -1470,10 +1492,10 @@ static EVT_BEGIN(evt_origami)
 EVT_END()
 
 static EVT_BEGIN(evt_moamoa_init)
-    CALL(evt_npc_entry, STRING(((char*)"moa_a")), STRING(((char*)"c_n_moa_a")))
-    CALL(evt_npc_set_position, STRING(((char*)"moa_a")), 0, -1000, 0)
-    CALL(evt_npc_entry, STRING(((char*)"moa_b")), STRING(((char*)"c_n_moa_b")))
-    CALL(evt_npc_set_position, STRING(((char*)"moa_b")), 0, -1000, 0)
+    CALL(evt_npc_entry, STRING("moa_a"), STRING("c_n_moa_a"))
+    CALL(evt_npc_set_position, STRING("moa_a"), 0, -1000, 0)
+    CALL(evt_npc_entry, STRING("moa_b"), STRING("c_n_moa_b"))
+    CALL(evt_npc_set_position, STRING("moa_b"), 0, -1000, 0)
     CALL(evt_ext_entry, 150, PTR(ext_moamoa_data), PTR(ext_moamoa_init), PTR(ext_moamoa_main), PTR(ext_moamoa_dispent))
     RETURN
 EVT_END()
@@ -1494,51 +1516,51 @@ static EVT_BEGIN(evt_meet_moamoa)
     CALL(evt_mario_get_party, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(1)
-        CALL(evt_msg_print, 0, STRING(((char*)"stg6_eki_02_0")), 0, STRING(((char*)"party")))
+        CALL(evt_msg_print, 0, STRING("stg6_eki_02_0"), 0, STRING("party"))
         CASE_EQUAL(2)
-        CALL(evt_msg_print, 0, STRING(((char*)"stg6_eki_02_1")), 0, STRING(((char*)"party")))
+        CALL(evt_msg_print, 0, STRING("stg6_eki_02_1"), 0, STRING("party"))
         CASE_EQUAL(4)
-        CALL(evt_msg_print, 0, STRING(((char*)"stg6_eki_02_2")), 0, STRING(((char*)"party")))
+        CALL(evt_msg_print, 0, STRING("stg6_eki_02_2"), 0, STRING("party"))
         CASE_EQUAL(5)
-        CALL(evt_msg_print, 0, STRING(((char*)"stg6_eki_02_3")), 0, STRING(((char*)"party")))
+        CALL(evt_msg_print, 0, STRING("stg6_eki_02_3"), 0, STRING("party"))
         CASE_EQUAL(6)
-        CALL(evt_msg_print, 0, STRING(((char*)"stg6_eki_02_4")), 0, STRING(((char*)"party")))
+        CALL(evt_msg_print, 0, STRING("stg6_eki_02_4"), 0, STRING("party"))
         CASE_EQUAL(3)
-        CALL(evt_msg_print, 0, STRING(((char*)"stg6_eki_02_5")), 0, STRING(((char*)"party")))
+        CALL(evt_msg_print, 0, STRING("stg6_eki_02_5"), 0, STRING("party"))
         CASE_EQUAL(7)
-        CALL(evt_msg_print, 0, STRING(((char*)"stg6_eki_02_6")), 0, STRING(((char*)"party")))
+        CALL(evt_msg_print, 0, STRING("stg6_eki_02_6"), 0, STRING("party"))
     END_SWITCH
     BEGIN_INLINE_EVENT
         CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
-        CALL(evt_snd_bgmon, PSND_CH(1), STRING(((char*)"BGM_FF_ENV_SURPRISED1")))
+        CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SURPRISED1"))
         WAIT_MS(2000)
         CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
         CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     END_INLINE_EVENT
     CALL(evt_cam3d_evt_set, 32, 151, 528, 32, 56, -12, 500, 11)
     WAIT_MS(2000)
-    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING(((char*)"BGM_EVT_DANGER4")))
+    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
     BEGIN_INLINE_EVENT
         CALL(evt_mario_dispflag_onoff, 1, 2)
         WAIT_MS(1000)
-        CALL(evt_mario_set_pose, STRING(((char*)"M_N_2")))
+        CALL(evt_mario_set_pose, STRING("M_N_2"))
     END_INLINE_EVENT
     CALL(evt_mario_get_party, LW(0))
     SWITCH(LW(0))
         CASE_EQUAL(1)
-        CALL(evt_msg_print, 0, STRING(((char*)"stg6_eki_03_0")), 0, STRING(((char*)"party")))
+        CALL(evt_msg_print, 0, STRING("stg6_eki_03_0"), 0, STRING("party"))
         CASE_EQUAL(2)
-        CALL(evt_msg_print, 0, STRING(((char*)"stg6_eki_03_1")), 0, STRING(((char*)"party")))
+        CALL(evt_msg_print, 0, STRING("stg6_eki_03_1"), 0, STRING("party"))
         CASE_EQUAL(4)
-        CALL(evt_msg_print, 0, STRING(((char*)"stg6_eki_03_2")), 0, STRING(((char*)"party")))
+        CALL(evt_msg_print, 0, STRING("stg6_eki_03_2"), 0, STRING("party"))
         CASE_EQUAL(5)
-        CALL(evt_msg_print, 0, STRING(((char*)"stg6_eki_03_3")), 0, STRING(((char*)"party")))
+        CALL(evt_msg_print, 0, STRING("stg6_eki_03_3"), 0, STRING("party"))
         CASE_EQUAL(6)
-        CALL(evt_msg_print, 0, STRING(((char*)"stg6_eki_03_4")), 0, STRING(((char*)"party")))
+        CALL(evt_msg_print, 0, STRING("stg6_eki_03_4"), 0, STRING("party"))
         CASE_EQUAL(3)
-        CALL(evt_msg_print, 0, STRING(((char*)"stg6_eki_03_5")), 0, STRING(((char*)"party")))
+        CALL(evt_msg_print, 0, STRING("stg6_eki_03_5"), 0, STRING("party"))
         CASE_EQUAL(7)
-        CALL(evt_msg_print, 0, STRING(((char*)"stg6_eki_03_6")), 0, STRING(((char*)"party")))
+        CALL(evt_msg_print, 0, STRING("stg6_eki_03_6"), 0, STRING("party"))
     END_SWITCH
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
@@ -1559,13 +1581,13 @@ static EVT_BEGIN(evt_moamoa_escape)
     WAIT_MS(3000)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
-    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING(((char*)"a_lever")), 0, PTR(evt_origami), GW(10))
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_lever"), 0, PTR(evt_origami), GW(10))
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_40_SWATTING_SMORGS)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
-s32 img_set_color(EventEntry* event, BOOL isFirstCall) {
+static s32 img_set_color(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     u8 r = evtGetValue(event, args[1]);
@@ -1580,46 +1602,46 @@ s32 img_set_color(EventEntry* event, BOOL isFirstCall) {
 
 EVT_BEGIN(evt_elv_rumble)
     IF_INT_EQUAL(GF(0), 0)
-        CALL(evt_map_checkanim, STRING(((char*)"anm_ere_1")), LW(0), LW(1))
+        CALL(evt_map_checkanim, STRING("anm_ere_1"), LW(0), LW(1))
     ELSE
-        CALL(evt_map_checkanim, STRING(((char*)"anm_ere_2")), LW(0), LW(1))
+        CALL(evt_map_checkanim, STRING("anm_ere_2"), LW(0), LW(1))
     END_IF
     SUBTRACT(LW(1), 500)
     CALL(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
-    CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_SHAKE1")), LW(3), LW(4), LW(5), 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_SHAKE1"), LW(3), LW(4), LW(5), 0)
     CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.0048828125f), 250)
     WAIT_MS(LW(1))
     CALL(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
-    CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_SHAKE1")), LW(3), LW(4), LW(5), 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_SHAKE1"), LW(3), LW(4), LW(5), 0)
     CALL(evt_cam_shake, 4, FLOAT(0.0f), FLOAT(0.0048828125f), 250)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(evt_elv_init)
-    CALL(evt_paper_entry, STRING(((char*)"OFF_hei_07")))
-    CALL(evt_img_entry, STRING(((char*)"capture_img")))
-    CALL(evt_img_set_paper, STRING(((char*)"capture_img")), STRING(((char*)"OFF_hei_07")))
-    CALL(evt_offscreen_entry, STRING(((char*)"offscreen")))
-    CALL(evt_img_set_paper_anim, STRING(((char*)"capture_img")), STRING(((char*)"Z_1")))
-    CALL(evt_img_alloc_capture, STRING(((char*)"capture_img")), 0, STRING(((char*)"offscreen")), 0, 0, 0, 608, 480)
-    CALL(evt_img_alloc_capture, STRING(((char*)"capture_img")), 2, STRING(((char*)"offscreen")), 0, 0, 0, 608, 480)
-    CALL(evt_img_clear_virtual_point, STRING(((char*)"capture_img")))
-    CALL(evt_img_onoff, STRING(((char*)"capture_img")), 0)
+    CALL(evt_paper_entry, STRING("OFF_hei_07"))
+    CALL(evt_img_entry, STRING("capture_img"))
+    CALL(evt_img_set_paper, STRING("capture_img"), STRING("OFF_hei_07"))
+    CALL(evt_offscreen_entry, STRING("offscreen"))
+    CALL(evt_img_set_paper_anim, STRING("capture_img"), STRING("Z_1"))
+    CALL(evt_img_alloc_capture, STRING("capture_img"), 0, STRING("offscreen"), 0, 0, 0, 608, 480)
+    CALL(evt_img_alloc_capture, STRING("capture_img"), 2, STRING("offscreen"), 0, 0, 0, 608, 480)
+    CALL(evt_img_clear_virtual_point, STRING("capture_img"))
+    CALL(evt_img_onoff, STRING("capture_img"), 0)
     SET_VALUE(GF(0), 0)
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_elv_down)
     BEGIN_INLINE_EVENT
-        CALL(evt_mapobj_get_position, STRING(((char*)"d_1")), LW(0), LW(1), LW(2))
-        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_OPEN1")), LW(0), LW(1), LW(2), 0)
+        CALL(evt_mapobj_get_position, STRING("d_1"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_OPEN1"), LW(0), LW(1), LW(2), 0)
         WAIT_MS(1000)
-        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_OPEN1")), LW(0), LW(1), LW(2), 0)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_OPEN1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
-    CALL(evt_map_playanim, STRING(((char*)"anm_ere_door_1")), 0, 0)
+    CALL(evt_map_playanim, STRING("anm_ere_door_1"), 0, 0)
     WAIT_FRAMES(20)
     CALL(evt_mario_mov_pos2, 190, -65, FLOAT(60.0f))
-    CALL(evt_map_checkanim, STRING(((char*)"anm_ere_door_1")), LW(0), LW(1))
+    CALL(evt_map_checkanim, STRING("anm_ere_door_1"), LW(0), LW(1))
     ADD(LW(1), 1)
     WAIT_MS(LW(1))
     BEGIN_INLINE_EVENT
@@ -1631,104 +1653,115 @@ EVT_BEGIN(evt_elv_down)
     END_INLINE_EVENT
     CALL(evt_mario_mov_pos2, 190, -160, FLOAT(60.0f))
     CALL(evt_mario_set_dir, 270, 200, 0)
-    CALL(evt_mapobj_set_offscreen, 1, STRING(((char*)"s_eki_00")), STRING(((char*)"offscreen")))
-    CALL(evt_mapobj_clear_offscreen, 1, STRING(((char*)"s_eki_07")))
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"s_eki_00")), MAPOBJ_FLAG_HIDE)
-    CALL(evt_img_onoff, STRING(((char*)"capture_img")), 1)
+    CALL(evt_mapobj_set_offscreen, 1, STRING("s_eki_00"), STRING("offscreen"))
+    CALL(evt_mapobj_clear_offscreen, 1, STRING("s_eki_07"))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("s_eki_00"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_img_onoff, STRING("capture_img"), 1)
     BEGIN_INLINE_EVENT
-        CALL(evt_mapobj_get_position, STRING(((char*)"d_1")), LW(0), LW(1), LW(2))
-        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_CLOSE1")), LW(0), LW(1), LW(2), 0)
+        CALL(evt_mapobj_get_position, STRING("d_1"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_CLOSE1"), LW(0), LW(1), LW(2), 0)
         WAIT_MS(1000)
-        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_CLOSE1")), LW(0), LW(1), LW(2), 0)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_CLOSE1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
-    CALL(evt_map_playanim, STRING(((char*)"anm_ere_door_2")), 0, 0)
-    CALL(evt_map_checkanim, STRING(((char*)"anm_ere_door_2")), LW(0), LW(2))
+    CALL(evt_map_playanim, STRING("anm_ere_door_2"), 0, 0)
+    CALL(evt_map_checkanim, STRING("anm_ere_door_2"), LW(0), LW(2))
     CALL(evt_sub_intpl_msec_init, 11, 255, 0, LW(2))
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL(img_set_color, STRING(((char*)"capture_img")), 255, 255, 255, LW(0))
+        CALL(img_set_color, STRING("capture_img"), 255, 255, 255, LW(0))
         WAIT_FRAMES(1)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
     END_LOOP
-    CALL(evt_img_onoff, STRING(((char*)"capture_img")), 0)
+    CALL(evt_img_onoff, STRING("capture_img"), 0)
     BEGIN_INLINE_EVENT
         WAIT_MS(200)
-        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_MOVE1")), LW(0), LW(1), LW(2), LW(10))
-        CALL(evt_map_checkanim, STRING(((char*)"anm_ere_1")), LW(0), LW(1))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_MOVE1"), LW(0), LW(1), LW(2), LW(10))
+        CALL(evt_map_checkanim, STRING("anm_ere_1"), LW(0), LW(1))
         WAIT_MS(LW(1))
         CALL(evt_snd_sfxoff, LW(10))
     END_INLINE_EVENT
-    CALL(evt_map_playanim, STRING(((char*)"anm_ere_1")), 0, 0)
-    SPAWN_EVENT(PTR(evt_elv_rumble))
-    CALL(evt_map_checkanim, STRING(((char*)"anm_ere_1")), LW(0), LW(1))
+    CALL(evt_map_playanim, STRING("anm_ere_1"), 0, 0)
+    SPAWN_EVENT(evt_elv_rumble)
+    CALL(evt_map_checkanim, STRING("anm_ere_1"), LW(0), LW(1))
     WAIT_MS(LW(1))
-    CALL(evt_mapobj_get_position, STRING(((char*)"d_1")), LW(0), LW(1), LW(2))
-    CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_BELL1")), LW(0), LW(1), LW(2), 0)
+    CALL(evt_mapobj_get_position, STRING("d_1"), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_BELL1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(400)
-    CALL(evt_mapobj_clear_offscreen, 1, STRING(((char*)"s_eki_00")))
-    CALL(evt_mapobj_set_offscreen, 1, STRING(((char*)"s_eki_07")), STRING(((char*)"offscreen")))
-    CALL(evt_img_onoff, STRING(((char*)"capture_img")), 1)
+    CALL(evt_mapobj_clear_offscreen, 1, STRING("s_eki_00"))
+    CALL(evt_mapobj_set_offscreen, 1, STRING("s_eki_07"), STRING("offscreen"))
+    CALL(evt_img_onoff, STRING("capture_img"), 1)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_40_SWATTING_SMORGS)
         CALL(evt_moamoa_flag_onoff, 0, 1)
         CALL(evt_moamoa_flag_onoff, 1, 2)
     END_IF
     BEGIN_INLINE_EVENT
-        CALL(evt_mapobj_get_position, STRING(((char*)"d_1")), LW(0), LW(1), LW(2))
-        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_OPEN1")), LW(0), LW(1), LW(2), 0)
+        CALL(evt_mapobj_get_position, STRING("d_1"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_OPEN1"), LW(0), LW(1), LW(2), 0)
         WAIT_MS(1000)
-        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_OPEN1")), LW(0), LW(1), LW(2), 0)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_OPEN1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
-    CALL(evt_map_playanim, STRING(((char*)"anm_ere_door_1")), 0, 0)
-    CALL(evt_map_checkanim, STRING(((char*)"anm_ere_door_1")), LW(0), LW(2))
+    CALL(evt_map_playanim, STRING("anm_ere_door_1"), 0, 0)
+    CALL(evt_map_checkanim, STRING("anm_ere_door_1"), LW(0), LW(2))
     CALL(evt_sub_intpl_msec_init, 11, 0, 255, LW(2))
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL(img_set_color, STRING(((char*)"capture_img")), 255, 255, 255, LW(0))
+        CALL(img_set_color, STRING("capture_img"), 255, 255, 255, LW(0))
         WAIT_FRAMES(1)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
     END_LOOP
-    CALL(evt_img_onoff, STRING(((char*)"capture_img")), 0)
+    CALL(evt_img_onoff, STRING("capture_img"), 0)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_40_SWATTING_SMORGS)
         CALL(evt_moamoa_flag_onoff, 1, 1)
         CALL(evt_moamoa_flag_onoff, 0, 2)
     END_IF
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"s_eki_07")), MAPOBJ_FLAG_HIDE)
-    CALL(evt_hitobj_onoff, STRING(((char*)"a_eki_07")), 1, 1)
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"s_eki_00")), MAPOBJ_FLAG_HIDE)
-    CALL(evt_hitobj_onoff, STRING(((char*)"a_eki_00")), 1, 0)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("s_eki_07"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_hitobj_onoff, STRING("a_eki_07"), 1, 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("s_eki_00"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_hitobj_onoff, STRING("a_eki_00"), 1, 0)
+#if VERSION <= VERSION_DEMO_US
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_41_ORIGAMI_STAIRS)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_lever"), 0, PTR(evt_origami), GW(10))
+    ELSE
+        CALL(evt_mapobj_rotate, 1, STRING("s_lever"), 0, 0, -80)
+    END_IF
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_40_SWATTING_SMORGS)
+        CALL(evt_del_case_evt, 0, GW(10))
+    END_IF
+#else
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_40_SWATTING_SMORGS)
         CASE_EQUAL(STORY_STG6_40_SWATTING_SMORGS)
-        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING(((char*)"a_lever")), 0, PTR(evt_origami), GW(10))
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_lever"), 0, PTR(evt_origami), GW(10))
         CASE_DEFAULT
-        CALL(evt_mapobj_rotate, 1, STRING(((char*)"s_lever")), 0, 0, -80)
+        CALL(evt_mapobj_rotate, 1, STRING("s_lever"), 0, 0, -80)
     END_SWITCH
+#endif
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_41_ORIGAMI_STAIRS)
-        CALL(evt_mobj_switch_blue, 0, STRING(((char*)"bridge_sw")), -220, 60, 0, PTR(evt_bridge), GSWF(GSWF_EKI00_BRIDGE_SWITCH_PRESSED))
+        CALL(evt_mobj_switch_blue, 0, STRING("bridge_sw"), -220, 60, 0, PTR(evt_bridge), GSWF(GSWF_EKI00_BRIDGE_SWITCH_PRESSED))
     END_IF
-    CALL(evt_item_delete_check, STRING(((char*)"item")), LW(0))
+    CALL(evt_item_delete_check, STRING("item"), LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(evt_item_get_position, STRING(((char*)"item")), LW(0), LW(1), LW(2))
+        CALL(evt_item_get_position, STRING("item"), LW(0), LW(1), LW(2))
         SUBTRACT(LW(1), 2000)
-        CALL(evt_item_set_position, STRING(((char*)"item")), LW(0), LW(1), LW(2))
+        CALL(evt_item_set_position, STRING("item"), LW(0), LW(1), LW(2))
     END_IF
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_41_ORIGAMI_STAIRS)
-        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"kaidann")), MAPOBJ_FLAG_HIDE)
-        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"ori")), MAPOBJ_FLAG_HIDE)
-        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"n_kaidan")), MAPOBJ_FLAG_HIDE)
-        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"n_ori")), MAPOBJ_FLAG_HIDE)
-        CALL(evt_hitobj_onoff, STRING(((char*)"kaidann_A")), 1, 0)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("kaidann"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("ori"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("n_kaidan"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("n_ori"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_hitobj_onoff, STRING("kaidann_A"), 1, 0)
     ELSE
-        CALL(evt_map_playanim, STRING(((char*)"anm_ori")), 2, 0)
-        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"kaidann")), MAPOBJ_FLAG_HIDE)
-        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"ori")), MAPOBJ_FLAG_HIDE)
-        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"n_kaidan")), MAPOBJ_FLAG_HIDE)
-        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"n_ori")), MAPOBJ_FLAG_HIDE)
-        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"n_kabe")), MAPOBJ_FLAG_HIDE)
+        CALL(evt_map_playanim, STRING("anm_ori"), 2, 0)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("kaidann"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("ori"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_kaidan"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_ori"), MAPOBJ_FLAG_HIDE)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("n_kabe"), MAPOBJ_FLAG_HIDE)
     END_IF
     BEGIN_INLINE_EVENT
         CALL(evt_party_stop, 0)
@@ -1742,20 +1775,20 @@ EVT_BEGIN(evt_elv_down)
     WAIT_MS(500)
     CALL(evt_mario_mov_pos2, 190, -65, FLOAT(60.0f))
     BEGIN_INLINE_EVENT
-        CALL(evt_mapobj_get_position, STRING(((char*)"d_1")), LW(0), LW(1), LW(2))
-        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_CLOSE1")), LW(0), LW(1), LW(2), 0)
+        CALL(evt_mapobj_get_position, STRING("d_1"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_CLOSE1"), LW(0), LW(1), LW(2), 0)
         WAIT_MS(1000)
-        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_CLOSE1")), LW(0), LW(1), LW(2), 0)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_CLOSE1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
-    CALL(evt_map_playanim, STRING(((char*)"anm_ere_door_2")), 0, 0)
+    CALL(evt_map_playanim, STRING("anm_ere_door_2"), 0, 0)
     WAIT_MS(500)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_39_SMORG_1ST_ENCOUNTER)
-        CALL_CHILD(PTR(evt_meet_moamoa))
+        CALL_CHILD(evt_meet_moamoa)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_39_SMORG_1ST_ENCOUNTER)
-        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING(((char*)"BGM_EVT_DANGER4")))
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
     END_IF
-    CALL(evt_map_checkanim, STRING(((char*)"anm_ere_door_2")), LW(0), LW(1))
+    CALL(evt_map_checkanim, STRING("anm_ere_door_2"), LW(0), LW(1))
     WAIT_MS(LW(1))
     RETURN
 EVT_END()
@@ -1763,111 +1796,113 @@ EVT_END()
 EVT_BEGIN(evt_elv_up)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     BEGIN_INLINE_EVENT
-        CALL(evt_mapobj_get_position, STRING(((char*)"d_1")), LW(0), LW(1), LW(2))
-        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_OPEN1")), LW(0), LW(1), LW(2), 0)
+        CALL(evt_mapobj_get_position, STRING("d_1"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_OPEN1"), LW(0), LW(1), LW(2), 0)
         WAIT_MS(1000)
-        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_OPEN1")), LW(0), LW(1), LW(2), 0)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_OPEN1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
-    CALL(evt_map_playanim, STRING(((char*)"anm_ere_door_1")), 0, 0)
+    CALL(evt_map_playanim, STRING("anm_ere_door_1"), 0, 0)
     WAIT_FRAMES(20)
     CALL(evt_mario_mov_pos2, 190, -65, FLOAT(60.0f))
-    CALL(evt_map_checkanim, STRING(((char*)"anm_ere_door_1")), LW(0), LW(1))
+    CALL(evt_map_checkanim, STRING("anm_ere_door_1"), LW(0), LW(1))
     ADD(LW(1), 1)
     WAIT_MS(LW(1))
     BEGIN_INLINE_EVENT
-        CALL(evt_hitobj_onoff, STRING(((char*)"ere__A")), 0, 0)
+        CALL(evt_hitobj_onoff, STRING("ere__A"), 0, 0)
         CALL(evt_party_move_pos, 0, 190, -65, 500)
         CALL(evt_party_stop, 0)
         CALL(evt_party_move_pos, 0, 160, -160, 500)
         CALL(evt_party_stop, 0)
         CALL(evt_party_set_dir, 0, 90, 0)
-        CALL(evt_hitobj_onoff, STRING(((char*)"ere__A")), 0, 1)
+        CALL(evt_hitobj_onoff, STRING("ere__A"), 0, 1)
     END_INLINE_EVENT
     CALL(evt_mario_mov_pos, 190, -160, 500)
     CALL(evt_mario_set_dir, 270, 0, 0)
     WAIT_MS(500)
-    CALL(evt_mapobj_clear_offscreen, 1, STRING(((char*)"s_eki_00")))
-    CALL(evt_mapobj_set_offscreen, 1, STRING(((char*)"s_eki_07")), STRING(((char*)"offscreen")))
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"s_eki_07")), MAPOBJ_FLAG_HIDE)
-    CALL(evt_img_onoff, STRING(((char*)"capture_img")), 1)
+    CALL(evt_mapobj_clear_offscreen, 1, STRING("s_eki_00"))
+    CALL(evt_mapobj_set_offscreen, 1, STRING("s_eki_07"), STRING("offscreen"))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("s_eki_07"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_img_onoff, STRING("capture_img"), 1)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_40_SWATTING_SMORGS)
         CALL(evt_moamoa_flag_onoff, 0, 1)
         CALL(evt_moamoa_flag_onoff, 1, 2)
     END_IF
     BEGIN_INLINE_EVENT
-        CALL(evt_mapobj_get_position, STRING(((char*)"d_1")), LW(0), LW(1), LW(2))
-        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_CLOSE1")), LW(0), LW(1), LW(2), 0)
+        CALL(evt_mapobj_get_position, STRING("d_1"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_CLOSE1"), LW(0), LW(1), LW(2), 0)
         WAIT_MS(1000)
-        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_CLOSE1")), LW(0), LW(1), LW(2), 0)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_CLOSE1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
-    CALL(evt_map_playanim, STRING(((char*)"anm_ere_door_2")), 0, 0)
-    CALL(evt_map_checkanim, STRING(((char*)"anm_ere_door_2")), LW(0), LW(2))
+    CALL(evt_map_playanim, STRING("anm_ere_door_2"), 0, 0)
+    CALL(evt_map_checkanim, STRING("anm_ere_door_2"), LW(0), LW(2))
     CALL(evt_sub_intpl_msec_init, 11, 255, 0, LW(2))
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL(img_set_color, STRING(((char*)"capture_img")), 255, 255, 255, LW(0))
+        CALL(img_set_color, STRING("capture_img"), 255, 255, 255, LW(0))
         WAIT_FRAMES(1)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
     END_LOOP
-    CALL(evt_img_onoff, STRING(((char*)"capture_img")), 0)
+    CALL(evt_img_onoff, STRING("capture_img"), 0)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_40_SWATTING_SMORGS)
         CALL(evt_moamoa_flag_onoff, 0, 2)
     END_IF
     BEGIN_INLINE_EVENT
         WAIT_MS(200)
-        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_MOVE1")), LW(0), LW(1), LW(2), LW(10))
-        CALL(evt_map_checkanim, STRING(((char*)"anm_ere_2")), LW(0), LW(1))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_MOVE1"), LW(0), LW(1), LW(2), LW(10))
+        CALL(evt_map_checkanim, STRING("anm_ere_2"), LW(0), LW(1))
         WAIT_MS(LW(1))
         CALL(evt_snd_sfxoff, LW(10))
     END_INLINE_EVENT
-    CALL(evt_map_playanim, STRING(((char*)"anm_ere_2")), 0, 0)
-    SPAWN_EVENT(PTR(evt_elv_rumble))
-    CALL(evt_map_checkanim, STRING(((char*)"anm_ere_2")), LW(0), LW(1))
+    CALL(evt_map_playanim, STRING("anm_ere_2"), 0, 0)
+    SPAWN_EVENT(evt_elv_rumble)
+    CALL(evt_map_checkanim, STRING("anm_ere_2"), LW(0), LW(1))
     WAIT_MS(LW(1))
-    CALL(evt_mapobj_get_position, STRING(((char*)"d_1")), LW(0), LW(1), LW(2))
-    CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_BELL1")), LW(0), LW(1), LW(2), 0)
+    CALL(evt_mapobj_get_position, STRING("d_1"), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_BELL1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(400)
-    CALL(evt_mapobj_set_offscreen, 1, STRING(((char*)"s_eki_00")), STRING(((char*)"offscreen")))
-    CALL(evt_mapobj_clear_offscreen, 1, STRING(((char*)"s_eki_07")))
-    CALL(evt_img_onoff, STRING(((char*)"capture_img")), 1)
+    CALL(evt_mapobj_set_offscreen, 1, STRING("s_eki_00"), STRING("offscreen"))
+    CALL(evt_mapobj_clear_offscreen, 1, STRING("s_eki_07"))
+    CALL(evt_img_onoff, STRING("capture_img"), 1)
     BEGIN_INLINE_EVENT
-        CALL(evt_mapobj_get_position, STRING(((char*)"d_1")), LW(0), LW(1), LW(2))
-        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_OPEN1")), LW(0), LW(1), LW(2), 0)
+        CALL(evt_mapobj_get_position, STRING("d_1"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_OPEN1"), LW(0), LW(1), LW(2), 0)
         WAIT_MS(1000)
-        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_OPEN1")), LW(0), LW(1), LW(2), 0)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_OPEN1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
-    CALL(evt_map_playanim, STRING(((char*)"anm_ere_door_1")), 0, 0)
-    CALL(evt_map_checkanim, STRING(((char*)"anm_ere_door_1")), LW(0), LW(2))
+    CALL(evt_map_playanim, STRING("anm_ere_door_1"), 0, 0)
+    CALL(evt_map_checkanim, STRING("anm_ere_door_1"), LW(0), LW(2))
     CALL(evt_sub_intpl_msec_init, 11, 0, 255, LW(2))
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL(img_set_color, STRING(((char*)"capture_img")), 255, 255, 255, LW(0))
+        CALL(img_set_color, STRING("capture_img"), 255, 255, 255, LW(0))
         WAIT_FRAMES(1)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
     END_LOOP
-    CALL(evt_img_onoff, STRING(((char*)"capture_img")), 0)
+    CALL(evt_img_onoff, STRING("capture_img"), 0)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_41_ORIGAMI_STAIRS)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_41_ORIGAMI_STAIRS)
-        CALL(evt_mobj_delete, STRING(((char*)"bridge_sw")))
+        CALL(evt_mobj_delete, STRING("bridge_sw"))
     END_IF
-    CALL(evt_item_delete_check, STRING(((char*)"item")), LW(0))
+    CALL(evt_item_delete_check, STRING("item"), LW(0))
     IF_INT_EQUAL(LW(0), 0)
-        CALL(evt_item_get_position, STRING(((char*)"item")), LW(0), LW(1), LW(2))
+        CALL(evt_item_get_position, STRING("item"), LW(0), LW(1), LW(2))
         ADD(LW(1), 2000)
-        CALL(evt_item_set_position, STRING(((char*)"item")), LW(0), LW(1), LW(2))
+        CALL(evt_item_set_position, STRING("item"), LW(0), LW(1), LW(2))
     END_IF
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"s_eki_07")), MAPOBJ_FLAG_HIDE)
-    CALL(evt_hitobj_onoff, STRING(((char*)"a_eki_07")), 1, 0)
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING(((char*)"s_eki_00")), MAPOBJ_FLAG_HIDE)
-    CALL(evt_hitobj_onoff, STRING(((char*)"a_eki_00")), 1, 1)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("s_eki_07"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_hitobj_onoff, STRING("a_eki_07"), 1, 0)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("s_eki_00"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_hitobj_onoff, STRING("a_eki_00"), 1, 1)
+#if VERSION >= VERSION_JP
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_40_SWATTING_SMORGS)
         CALL(evt_del_case_evt, 0, GW(10))
     END_IF
+#endif
     BEGIN_INLINE_EVENT
         CALL(evt_party_jump_pos, 0, 190, 0, -65, 500, 0, -1000)
         CALL(evt_party_stop, 0)
@@ -1877,13 +1912,13 @@ EVT_BEGIN(evt_elv_up)
     WAIT_FRAMES(30)
     CALL(evt_mario_mov_pos, 190, -65, 500)
     BEGIN_INLINE_EVENT
-        CALL(evt_mapobj_get_position, STRING(((char*)"d_1")), LW(0), LW(1), LW(2))
-        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_CLOSE1")), LW(0), LW(1), LW(2), 0)
+        CALL(evt_mapobj_get_position, STRING("d_1"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_CLOSE1"), LW(0), LW(1), LW(2), 0)
         WAIT_MS(1000)
-        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_ELEVATOR_CLOSE1")), LW(0), LW(1), LW(2), 0)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_ELEVATOR_CLOSE1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
-    CALL(evt_map_playanim, STRING(((char*)"anm_ere_door_2")), 0, 0)
-    CALL(evt_map_checkanim, STRING(((char*)"anm_ere_door_2")), LW(0), LW(1))
+    CALL(evt_map_playanim, STRING("anm_ere_door_2"), 0, 0)
+    CALL(evt_map_checkanim, STRING("anm_ere_door_2"), LW(0), LW(1))
     WAIT_MS(LW(1))
     RETURN
 EVT_END()
@@ -1895,21 +1930,25 @@ static s32 item_tbl[] = {
 EVT_BEGIN(evt_elv)
     CALL(evt_mario_key_onoff, 0)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_38_RIDE_THE_ELEVATOR)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_win_item_select, PTR(item_tbl), LW(1))
+#else
         CALL(evt_win_item_select, 0, PTR(item_tbl), LW(1), 0)
+#endif
         IF_INT_EQUAL(LW(1), -1)
             CALL(evt_mario_key_onoff, 1)
             RETURN
         END_IF
         CALL(evt_pouch_remove_item, ITEM_ELEVATOR_KEY_0x1A, LW(0))
         SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_38_RIDE_THE_ELEVATOR)
-        CALL(evt_snd_sfxon, STRING(((char*)"SFX_STG6_ELEVATOR_KEY1")), 0)
-        CALL(evt_msg_print, 0, STRING(((char*)"stg6_eki_07")), 0, 0)
+        CALL(evt_snd_sfxon, STRING("SFX_STG6_ELEVATOR_KEY1"), 0)
+        CALL(evt_msg_print, 0, STRING("stg6_eki_07"), 0, 0)
     END_IF
     IF_INT_EQUAL(GF(0), 0)
-        CALL_CHILD(PTR(evt_elv_down))
+        CALL_CHILD(evt_elv_down)
         SET_VALUE(GF(0), 1)
     ELSE
-        CALL_CHILD(PTR(evt_elv_up))
+        CALL_CHILD(evt_elv_up)
         SET_VALUE(GF(0), 0)
     END_IF
     CALL(evt_party_run, 0)
@@ -1919,27 +1958,27 @@ EVT_END()
 
 EVT_BEGIN(evt_elv_nomsg)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_msg_print, 0, STRING(((char*)"stg6_eki_06")), 0, 0)
+    CALL(evt_msg_print, 0, STRING("stg6_eki_06"), 0, 0)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(evt_head)
-    CALL(evt_item_delete, STRING(((char*)"item")))
-    CALL(evt_item_entry, STRING(((char*)"item")), ITEM_CLOSE_CALL_P, -260, 160, -60, 4, GSWF(GSWF_EKI00_CLOSE_CALL_P), 0)
-    CALL(evt_item_set_move_dir_speed, STRING(((char*)"item")), FLOAT(135.0f), FLOAT(90.0f))
-    CALL(evt_item_set_gravity, STRING(((char*)"item")), FLOAT(1.0f))
-    CALL(evt_item_set_bound_rate, STRING(((char*)"item")), FLOAT(0.5996094f))
-    CALL(evt_item_set_jump_power, STRING(((char*)"item")), FLOAT(500.0f))
-    CALL(evt_item_status_on, STRING(((char*)"item")), ITEM_STATUS_CUSTOM_LAUNCH)
-    CALL(evt_item_flag_on, STRING(((char*)"item")), ITEM_FLAG_NO_CEILING)
+    CALL(evt_item_delete, STRING("item"))
+    CALL(evt_item_entry, STRING("item"), ITEM_CLOSE_CALL_P, -260, 160, -60, ITEM_ENTRY_LAUNCH, GSWF(GSWF_EKI00_CLOSE_CALL_P), 0)
+    CALL(evt_item_set_move_dir_speed, STRING("item"), FLOAT(135.0f), FLOAT(90.0f))
+    CALL(evt_item_set_gravity, STRING("item"), FLOAT(1.0f))
+    CALL(evt_item_set_bound_rate, STRING("item"), FLOAT(0.5996094f))
+    CALL(evt_item_set_jump_power, STRING("item"), FLOAT(500.0f))
+    CALL(evt_item_status_on, STRING("item"), ITEM_STATUS_CUSTOM_LAUNCH)
+    CALL(evt_item_flag_on, STRING("item"), ITEM_FLAG_NO_CEILING)
     CALL(evt_exit_case_evt)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(evt_kanban)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_msg_print, 0, STRING(((char*)"stg6_eki_00_01")), 0, 0)
+    CALL(evt_msg_print, 0, STRING("stg6_eki_00_01"), 0, 0)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -1948,31 +1987,31 @@ EVT_BEGIN(eki_00_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
     IF_INT_EQUAL(GSWF(GSWF_EKI00_BRIDGE_LOWER_SCENE), 0)
-        CALL_CHILD(PTR(evt_bero_info_run))
+        CALL_CHILD(evt_bero_info_run)
     ELSE
-        CALL_CHILD(PTR(bero_case_entry))
+        CALL_CHILD(bero_case_entry)
     END_IF
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING(((char*)"s_eki_07")), MAPOBJ_FLAG_HIDE)
-    CALL(evt_hitobj_onoff, STRING(((char*)"a_eki_07")), 1, 0)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("s_eki_07"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_hitobj_onoff, STRING("a_eki_07"), 1, 0)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_37_ELEVATOR_KEY)
-        CALL_CHILD(PTR(evt_elv_init))
-        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING(((char*)"a_suitti")), 0, PTR(evt_elv), 0)
+        CALL_CHILD(evt_elv_init)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_suitti"), 0, PTR(evt_elv), 0)
     ELSE
-        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING(((char*)"a_suitti")), 0, PTR(evt_elv_nomsg), 0)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_suitti"), 0, PTR(evt_elv_nomsg), 0)
     END_IF
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_40_SWATTING_SMORGS)
-        CALL_CHILD(PTR(evt_moamoa_init))
+        CALL_CHILD(evt_moamoa_init)
     END_IF
-    CALL(evt_item_entry, STRING(((char*)"item")), ITEM_CLOSE_CALL_P, -260, 130, -60, 17, GSWF(GSWF_EKI00_CLOSE_CALL_P), 0)
+    CALL(evt_item_entry, STRING("item"), ITEM_CLOSE_CALL_P, -260, 130, -60, ITEM_ENTRY_FIXED_NO_TOUCH, GSWF(GSWF_EKI00_CLOSE_CALL_P), 0)
     IF_INT_EQUAL(GSWF(GSWF_EKI00_CLOSE_CALL_P), 0)
-        CALL(evt_run_case_evt, CASE_COND_HEAD, 1, STRING(((char*)"a_dai_sita")), 0, PTR(evt_head), 0)
+        CALL(evt_run_case_evt, CASE_COND_HEAD, 1, STRING("a_dai_sita"), 0, PTR(evt_head), 0)
     END_IF
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
-    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING(((char*)"ENV_STG6_EKI2")))
+    CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_EKI2"))
     IF_INT_EQUAL(GSWF(GSWF_EKI00_BRIDGE_LOWER_SCENE), 1)
-        SPAWN_EVENT(PTR(evt_bridge2))
+        SPAWN_EVENT(evt_bridge2)
     END_IF
-    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING(((char*)"a_kan")), 0, PTR(evt_kanban), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_kan"), 0, PTR(evt_kanban), 0)
     RETURN
 EVT_END()
 

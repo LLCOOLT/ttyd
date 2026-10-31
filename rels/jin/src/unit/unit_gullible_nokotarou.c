@@ -6,7 +6,7 @@
 #include "battle/battle_camera.h"
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_msg.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "unit/party/unit_party_nokotarou.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
@@ -23,7 +23,11 @@ static BattleUnitKindPart parts_nokotarou[1];
 static EvtWord dmg_turn_event[64];
 static EvtWord init_event_nokotarou[62];
 static EvtWord damage_event_nokotarou[24];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord dead_event_nokotarou[156];
+#else
 static EvtWord dead_event_nokotarou[177];
+#endif
 static EvtWord _koura_rotate_stop[13];
 static EvtWord attack_event_nokotarou[33];
 static EvtWord attack_event_nokotarou_koura[393];
@@ -176,7 +180,11 @@ static BattleUnitDefenseAttr defence_attr_nokotarou = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefense defence_turn_nokotarou = {0};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist_nokotarou = {60, 80, 70, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 70, 70, 0, 0, 100, 70, 100, 100, 0};
+#else
 static StatusVulnerability regist_nokotarou = {60, 80, 70, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 90, 70, 0, 0, 100, 70, 100, 100, 0};
+#endif
 
 static BattleDataEntry data_table_nokotarou[] = {
     {49, dead_event_nokotarou},
@@ -246,10 +254,10 @@ static EVT_BEGIN(damage_event_nokotarou)
     IF_INT_NOT_EQUAL(LW(0), 0)
         SET_VALUE(GW(20), 1)
     END_IF
-    CALL_CHILD(PTR(_koura_rotate_stop))
+    CALL_CHILD(_koura_rotate_stop)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -279,7 +287,9 @@ static EVT_BEGIN(dead_event_nokotarou)
         WAIT_FRAMES(37)
         CALL(evt_msg_print, 2, STRING("stg4_jin_26_03_nok"), 0, BTL_UNIT_SELF)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PNK_D_3"))
+#if VERSION >= VERSION_JP
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_DIE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+#endif
         WAIT_MS(500)
         CALL(evt_btl_camera_set_mode, 0, 3)
         CALL(evt_btl_camera_set_moveto, 0, 90, 58, 228, 90, 38, -20, 30, 11)
@@ -288,7 +298,9 @@ static EVT_BEGIN(dead_event_nokotarou)
         WAIT_MS(200)
         CASE_EQUAL(1)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PNK_D_3"))
+#if VERSION >= VERSION_JP
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_DIE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+#endif
         LOOP(0)
             IF_INT_EQUAL(GW(19), 2)
                 BREAK_LOOP
@@ -297,7 +309,9 @@ static EVT_BEGIN(dead_event_nokotarou)
         END_LOOP
         CASE_EQUAL(2)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PNK_D_3"))
+#if VERSION >= VERSION_JP
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_DIE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+#endif
     END_SWITCH
     CALL(btlevtcmd_KillUnit, BTL_UNIT_SELF, 1)
     SET_VALUE(GW(20), 2)
@@ -396,15 +410,15 @@ EVT_END()
 static EVT_BEGIN(attack_event_nokotarou)
     CALL(btlevtcmd_GetOverTurnCount, BTL_UNIT_SELF, LW(0))
     IF_INT_GREATER_OR_EQUAL(LW(0), 1)
-        CALL_CHILD(PTR(wakeup_event))
+        CALL_CHILD(wakeup_event)
         RETURN
     END_IF
     CALL(btlevtcmd_DrawLots, LW(0), 2, 80, 20)
     SWITCH(LW(0))
         CASE_EQUAL(0)
-        CALL_CHILD(PTR(attack_event_nokotarou_koura))
+        CALL_CHILD(attack_event_nokotarou_koura)
         CASE_EQUAL(1)
-        CALL_CHILD(PTR(attack_event_nokotarou_shubibin))
+        CALL_CHILD(attack_event_nokotarou_shubibin)
     END_SWITCH
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -468,7 +482,11 @@ static EVT_BEGIN(attack_event_nokotarou_koura)
         IF_INT_EQUAL(LW(6), 2)
             CALL(btlevtcmd_StartAvoid, LW(3), 40)
         END_IF
+#if VERSION <= VERSION_DEMO_US
+        CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), 40)
+#else
         CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 40)
+#endif
         CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
         CALL_CHILD(_koura_rotate_stop)
         CALL_CHILD(_restore_koura_pose)

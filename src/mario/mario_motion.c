@@ -45,18 +45,20 @@ typedef struct MarioMotTblEntry {
     void (*post)(void);
 } MarioMotTblEntry;
 
-void mot_talk(void);
-void mot_getItem(void);
-void mot_kaze(void);
+static void mot_talk(void);
+static void mot_getItem(void);
+static void mot_kaze(void);
+#if VERSION <= VERSION_DEMO_US
+static void mot_cloud(void);
+static void mot_cloud_post(void);
+#else
 void mot_cloud(void);
-#if VERSION == VERSION_DEMO
-void mot_cloud_post(void);
 #endif
-void mot_bottomless(void);
-void mot_forceReset(void);
-void mot_shadow(void);
-void mot_partyUse(void);
-void mot_dummy(void);
+static void mot_bottomless(void);
+static void mot_forceReset(void);
+static void mot_shadow(void);
+static void mot_partyUse(void);
+static void mot_dummy(void);
 
 #define PCHK(x) pouchCheckItem(x)
 
@@ -92,7 +94,7 @@ MarioMotTblEntry marioMotTbl[] = {
     {mot_plane, NULL, mot_plane_post},
     {mot_ship, NULL, mot_ship_post},
     {mot_yoshi, NULL, mot_yoshi_post},
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     {mot_cloud, NULL, mot_cloud_post},
 #else
     {mot_cloud, NULL, cloudResetAt},
@@ -125,7 +127,7 @@ void marioChgMoveMotion(void) {
         mario_plane_cancel();
         return;
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (mario->currMotionId == MARIO_MOTION_ROLL) {
         allPartyForceRideOn();
         return;
@@ -186,7 +188,7 @@ void marioChgRollMotion(void) {
 
 void marioChgJumpStandMotion(f32 v) {
     MarioWork* mario = marioGetPtr();
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // The demo does not follow the camera up, and in status 0x10 only stores the height.
     if (marioChkSts(0x10)) {
         mario->mot.jump.standHeight = v;
@@ -345,7 +347,7 @@ void marioChgMotSub(MarioMotion id, s32 callPost) {
             marioMotTbl[mario->prevMotionId].post();
         }
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     else if (mario->prevMotionId == MARIO_MOTION_JABARA) {
         if (marioMotTbl[mario->prevMotionId].post) {
             marioMotTbl[mario->prevMotionId].post();
@@ -612,7 +614,7 @@ void marioFall(void) {
 #else
             if (marioPriCheckJabara() && a != -1 && rub >= 0) {
 #endif
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 camFollowYOn();
 #endif
                 marioChgMot(MARIO_MOTION_JABARA);
@@ -709,7 +711,7 @@ void marioLandOn(void) {
             return;
         }
         if (mario->flags & MARIO_FLAG_PAPER_MODE) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             marioChgMotSub(MARIO_MOTION_STAY, FALSE); // the demo has no slit re-entry
 #else
             marioSlitReenter();
@@ -735,7 +737,7 @@ void marioLandOn(void) {
             quake_kpaLandOn();
             return;
         }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         marioChgMot(MARIO_MOTION_WALK); // the demo does not stay in the slit after landing
         return;
 #else
@@ -778,7 +780,7 @@ void marioLandOn(void) {
         return;
     }
     if (flags & 0x100000) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         marioChgMotSub(MARIO_MOTION_STAY, FALSE);
 #else
         marioSlitReenter();
@@ -790,7 +792,7 @@ void marioLandOn(void) {
     }
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // FAKE: unreferenced stand-in (deadstripped by the linker) that only creates the demo's three stray
 // .rodata doubles 0.5, 3.0 and 0.0 between the mot_talk and earlier pools; the original function that used
 // them is not in the demo DOL. A file-scope const array or <math.h> constants place them at the start of
@@ -803,7 +805,7 @@ static f32 marioDemoHalf(f32 x) {
 }
 #endif
 
-void mot_talk(void) {
+static void mot_talk(void) {
     MarioWork* mario = marioGetPtr();
     NpcEntry* npc;
     f32 camYaw;
@@ -875,7 +877,7 @@ void mot_talk(void) {
     }
 }
 
-void mot_getItem(void) {
+static void mot_getItem(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->trigFlags & MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION) {
         mario->trigFlags &= ~MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION;
@@ -941,7 +943,7 @@ BOOL marioChkTransform(void) {
     if (!(mario->buttonTrg & PAD_BUTTON_Y)) {
         return FALSE;
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (!(mario->trigFlags & MARIO_TRIG_FLAG_SHIP_PLANE_EVT_ON) && mario->partyUseDelay) {
         return FALSE;
     }
@@ -987,8 +989,8 @@ BOOL marioChkItemMotion(void) {
     return TRUE;
 }
 
-s32 L_marioChkRub(void) {
-#if VERSION == VERSION_DEMO
+s32 marioChkRub(void) {
+#if VERSION <= VERSION_DEMO_US
     MarioWork* mario = marioGetPtr();
 #endif
     return 0;
@@ -1030,7 +1032,7 @@ s32 marioRollChgChk(void) {
 
 void marioChgMotJump2(void) {
     MarioWork* mario = marioGetPtr();
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (kpaGetBodyStatus() != 2) {
 #else
     if (kpaGetBodyStatus() != 2 && mario->currMotionId != MARIO_MOTION_ROLL) {
@@ -1039,10 +1041,10 @@ void marioChgMotJump2(void) {
     }
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // In the demo the Flurrie motion lives here: party_cloud.c has no mot_cloud yet, and the motion's post
 // function resets the camera target.
-void mot_cloud(void) {
+static void mot_cloud(void) {
     MarioWork* mario = marioGetPtr();
 
     if (mario->trigFlags & MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION) {
@@ -1054,7 +1056,7 @@ void mot_cloud(void) {
     }
 }
 
-void mot_cloud_post(void) {
+static void mot_cloud_post(void) {
     cloudResetAt();
 }
 #endif
@@ -1067,7 +1069,7 @@ static inline BOOL marioChkBackAngle(f32 a) {
     return ret;
 }
 
-void mot_kaze(void) {
+static void mot_kaze(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->trigFlags & MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION) {
         mario->trigFlags &= ~MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION;
@@ -1106,7 +1108,7 @@ void mot_kaze(void) {
     }
 }
 
-void mot_shadow(void) {
+static void mot_shadow(void) {
     MarioWork* mario = marioGetPtr();
     if (mario->trigFlags & MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION) {
         mario->trigFlags &= ~MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION;
@@ -1131,15 +1133,15 @@ void mot_shadow(void) {
     }
 }
 
-void mot_partyUse(void) {
+static void mot_partyUse(void) {
     marioGetPtr();
 }
 
-void mot_dummy(void) {
+static void mot_dummy(void) {
     marioGetPtr();
 }
 
-void mot_bottomless(void) {
+static void mot_bottomless(void) {
     MarioWork* mario = marioGetPtr();
     Vec pos;
     f32 y;
@@ -1246,7 +1248,7 @@ void mot_bottomless(void) {
     }
 }
 
-void mot_forceReset(void) {
+static void mot_forceReset(void) {
     MarioWork* mario = marioGetPtr();
     PartyEntry* party;
     if (mario->trigFlags & MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION) {

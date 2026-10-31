@@ -98,7 +98,7 @@ static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 
 static BattleUnitDefense defence_turn = {0};
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static StatusVulnerability regist = {50, 90, 50, 100, 50, 100, 0, 70, 100, 70, 100, 70, 100, 80, 80, 50, 30, 100, 80, 100, 100, 95};
 #else
 static StatusVulnerability regist = {50, 100, 50, 100, 50, 100, 0, 70, 100, 70, 100, 70, 100, 100, 70, 50, 40, 100, 70, 100, 100, 95};
@@ -161,13 +161,8 @@ static PoseTableEntry pose_table[] = {
     {42, "SIS_R_1"},
     {56, "SIS_I_1"},
     {57, "SIS_I_1"},
-#if VERSION == VERSION_DEMO
-    {63, "SIS_T_1"},
-    {67, "SIS_S_1"},
-#else
-    {65, "SIS_T_1"},
-    {69, "SIS_S_1"},
-#endif
+    {BTL_POSE_TALK, "SIS_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "SIS_S_1"},
 };
 
 static PoseTableEntry pose_table_turn[] = {
@@ -184,13 +179,8 @@ static PoseTableEntry pose_table_turn[] = {
     {39, "SIS_D_2"},
     {56, "SIS_K_2"},
     {57, "SIS_K_2"},
-#if VERSION == VERSION_DEMO
-    {63, "SIS_D_2"},
-    {67, "SIS_D_2"},
-#else
-    {65, "SIS_D_2"},
-    {69, "SIS_D_2"},
-#endif
+    {BTL_POSE_TALK, "SIS_D_2"},
+    {BTL_POSE_STAY_DEFAULT, "SIS_D_2"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -225,7 +215,7 @@ static EVT_BEGIN(damage_event)
     END_IF
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 

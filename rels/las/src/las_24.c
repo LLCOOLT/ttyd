@@ -12,7 +12,6 @@
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "las.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -256,14 +255,14 @@ static EVT_BEGIN(dai_evt)
 #if VERSION >= VERSION_US
     CALL(las_24_adjust_for_framerate, LW(2), LW(2))
 #endif
-    CALL_CHILD(PTR(move_dai))
+    CALL_CHILD(move_dai)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(box_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("key"), ITEM_PALACE_KEY_0x30, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("key"), ITEM_PALACE_KEY_0x30, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("box"))
     CALL(evt_item_get_item, STRING("key"))
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_13_KEY)
@@ -274,14 +273,16 @@ EVT_END()
 EVT_BEGIN(las_24_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST3"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS7"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 2)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("S_hgm_05a"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("S_hgm_19a"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("S_hgm_24a"), MAPOBJ_FLAG_BBOX_CULL)
-    SPAWN_EVENT(PTR(haguruma_evt))
+    SPAWN_EVENT(haguruma_evt)
     CALL(evt_map_playanim, STRING("kusari"), 1, 0)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG8_12_LARGE_STONE_BLOCK)
         IF_INT_EQUAL(GSWF(GSWF_LAS24_BLOCK_UNCOVERED), 0)

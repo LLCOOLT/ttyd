@@ -52,19 +52,19 @@ extern s32 marioWeapon_KururinJump[];
 extern s32 marioDefaultWeapon_Hammer[];
 
 // local prototypes
-USER_FUNC(_set_haikei_entry_scale);
-void _mapobj_data_touch_scale(s32 layer);
-void battleMakePhaseEvtTable(BattleWork* wp);
-void btlseqPhaseFirstProcess(BattleWork* wp);
-void btlseqTurnFirstProcess(BattleWork* wp);
-void btlseqAct(BattleWork* wp);
-BOOL BattlePhaseEndCheck(void);
-void btlseqMove(BattleWork* wp);
-void btlseqPhase(BattleWork* wp);
-void _rule_disp(CameraId cameraId, void* param);
-USER_FUNC(_set_effect_luck);
+static USER_FUNC(_set_haikei_entry_scale);
+static void _mapobj_data_touch_scale(s32 layer);
+static void battleMakePhaseEvtTable(BattleWork* wp);
+static void btlseqPhaseFirstProcess(BattleWork* wp);
+static void btlseqTurnFirstProcess(BattleWork* wp);
+static void btlseqAct(BattleWork* wp);
+static BOOL BattlePhaseEndCheck(void);
+static void btlseqMove(BattleWork* wp);
+static void btlseqPhase(BattleWork* wp);
+static void _rule_disp(CameraId cameraId, void* param);
+static USER_FUNC(_set_effect_luck);
 
-s32 _set_haikei_entry_scale(EventEntry* event, BOOL isFirstCall);
+static s32 _set_haikei_entry_scale(EventEntry* event, BOOL isFirstCall);
 EVT_BEGIN(nanika_luck_event)
     BEGIN_SIBLING_EVENT_GET_ID(PTR(0xfe363c8f))
         WAIT_FRAMES(60)
@@ -74,11 +74,11 @@ EVT_BEGIN(nanika_luck_event)
     RETURN
 EVT_END()
 
-BattleWeapon* _GetFirstAttackWeapon(s32 type);
-void BattleCheckAllPinchStatus(BattleWork* wp, BOOL a2);
-void btlseqInit(BattleWork* wp);
-void btlseqFirstAct(BattleWork* wp);
-void btlseqTurn(BattleWork* wp);
+static BattleWeapon* _GetFirstAttackWeapon(s32 type);
+static void BattleCheckAllPinchStatus(BattleWork* wp, BOOL a2);
+static void btlseqInit(BattleWork* wp);
+static void btlseqFirstAct(BattleWork* wp);
+static void btlseqTurn(BattleWork* wp);
 
 // static data from an inlined header function (see unit_party_sanders.c)
 
@@ -187,7 +187,7 @@ void BattleSequenceManager(void) { // 1:1
     }
 }
 
-void BattleCheckAllPinchStatus(BattleWork* wp, BOOL a2) { // 1:1, needs stmw forced
+static void BattleCheckAllPinchStatus(BattleWork* wp, BOOL a2) { // 1:1, needs stmw forced
     BattleUnit* unit;
     BOOL v6;
     int i;
@@ -263,7 +263,7 @@ void BattleCheckAllPinchStatus(BattleWork* wp, BOOL a2) { // 1:1, needs stmw for
     }
 }
 
-void btlseqInit(BattleWork* wp) { // 1:1, needs stmw
+static void btlseqInit(BattleWork* wp) { // 1:1, needs stmw
     MarioWork* mario;
     PartyEntry* party;
 
@@ -310,7 +310,7 @@ void btlseqInit(BattleWork* wp) { // 1:1, needs stmw
     }
 }
 
-BattleWeapon* _GetFirstAttackWeapon(s32 type) {
+static BattleWeapon* _GetFirstAttackWeapon(s32 type) {
     switch (type) {
         case 1:
             return (BattleWeapon*)marioDefaultWeapon_Jump;
@@ -334,7 +334,7 @@ BattleWeapon* _GetFirstAttackWeapon(s32 type) {
     }
 }
 
-void btlseqFirstAct(BattleWork* wp) {
+static void btlseqFirstAct(BattleWork* wp) {
     s32 type;
     int i;
     BattleUnit* unit;
@@ -611,7 +611,7 @@ void btlseqFirstAct(BattleWork* wp) {
 
 //==== written below (reverse order) ====
 
-USER_FUNC(_set_effect_luck) {
+static USER_FUNC(_set_effect_luck) {
     BattleWork* wp = _battleWorkPointer;
     f32* pz;
     f32* py;
@@ -760,7 +760,7 @@ USER_FUNC(_set_effect_luck) {
     TURN_SKIP(wp);                        \
     break
 
-void btlseqTurn(BattleWork* wp) {
+static void btlseqTurn(BattleWork* wp) {
     Vec pos;
     f32 hpX;
     f32 hpY;
@@ -907,7 +907,7 @@ void btlseqTurn(BattleWork* wp) {
             if (!BattleWaitAllActiveEvtEnd(wp)) {
                 break;
             }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             BattleIncSeq(wp, SEQ_TURN);
 #else
             if (BattleCheckConcluded(wp)) {
@@ -1495,7 +1495,7 @@ void btlseqTurn(BattleWork* wp) {
                     ret = BtlUnit_CheckRecoveryStatus(unit, STATUS_SLOW);
                     sfx |= ret;
                     if (ret) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                         BtlUnit_ResetMoveStatus(unit);
 #endif
                         evt = evtEntry(subsetevt_status_recovery, 10, 0);
@@ -1658,7 +1658,7 @@ void btlseqTurn(BattleWork* wp) {
                     if (!BattleWaitAllActiveEvtEnd(wp)) {
                         break;
                     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                     BattleIncSeq(wp, SEQ_TURN);
 #else
                     if (BattleCheckConcluded(wp)) {
@@ -1766,7 +1766,7 @@ void btlseqTurn(BattleWork* wp) {
                             unit->currentHp = unit->maxHp;
                         }
                         BtlUnit_GetPartsWorldPos(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit)), &heartX, &heartY, &heartZ);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                         heartY += BtlUnit_GetHeight(unit);
 #else
                         heartY += unit->sizeMultiplier * BtlUnit_GetHeight(unit);
@@ -1812,7 +1812,7 @@ void btlseqTurn(BattleWork* wp) {
                     if (n > 0) {
                         BtlUnit_RecoverFp(unit, n);
                         BtlUnit_GetPartsWorldPos(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit)), &flowerX, &flowerY, &flowerZ);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                         flowerY += BtlUnit_GetHeight(unit);
 #else
                         flowerY += unit->sizeMultiplier * BtlUnit_GetHeight(unit);
@@ -1923,7 +1923,7 @@ void btlseqTurn(BattleWork* wp) {
     }
 }
 
-void _rule_disp(CameraId cameraId, void* param) {
+static void _rule_disp(CameraId cameraId, void* param) {
     FieldBattleInfo* info = _battleWorkPointer->fbatInfo;
     char buf[256];
     f32 x;
@@ -1950,7 +1950,7 @@ void _rule_disp(CameraId cameraId, void* param) {
     FontDrawMessage(x - (u16)width / 2, (s32)y - 29, buf);
 }
 
-void btlseqPhase(BattleWork* wp) {
+static void btlseqPhase(BattleWork* wp) {
     switch (BattleGetSeq(wp, SEQ_PHASE)) {
         case BATTLE_PHASE_INIT:
             BattleIncSeq(wp, SEQ_PHASE);
@@ -1970,7 +1970,7 @@ void btlseqPhase(BattleWork* wp) {
     }
 }
 
-void btlseqMove(BattleWork* wp) {
+static void btlseqMove(BattleWork* wp) {
     int j;
     BattleUnit* unit;
     PouchData* pouch;
@@ -2069,7 +2069,7 @@ void btlseqMove(BattleWork* wp) {
                 for (i = 0; i < BATTLE_UNIT_MAX; i++) {
                     unit = BattleGetUnitPtr(wp, i);
                     if (unit) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                         unit->tokenFlags &= TOKEN_FLAG_PERSISTENT;
 #else
                         unit->tokenFlags &= (TOKEN_FLAG_RALLY_WINK | TOKEN_FLAG_PERSISTENT);
@@ -2089,7 +2089,7 @@ void btlseqMove(BattleWork* wp) {
                     id = wp->movePriorityQueue[i];
                     if (id != -1) {
                         unit = BattleGetUnitPtr(wp, id);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                         if (unit) {
 #else
                         if (unit && unit->movesRemaining > 0) {
@@ -2198,7 +2198,7 @@ void btlseqMove(BattleWork* wp) {
     } while (loop);
 }
 
-BOOL BattlePhaseEndCheck(void) {
+static BOOL BattlePhaseEndCheck(void) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
     int i;
@@ -2206,7 +2206,7 @@ BOOL BattlePhaseEndCheck(void) {
     for (i = 0; i < BATTLE_UNIT_MAX; i++) {
         if (wp->movePriorityQueue[i] != -1) {
             unit = BattleGetUnitPtr(wp, wp->movePriorityQueue[i]);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             if (unit && unit->moveState != 10 && !BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) {
 #else
             if (unit && unit->moveState != 10 && unit->movesRemaining > 0 &&
@@ -2222,7 +2222,7 @@ BOOL BattlePhaseEndCheck(void) {
     return FALSE;
 }
 
-void btlseqAct(BattleWork* wp) {
+static void btlseqAct(BattleWork* wp) {
     BattleUnit* unit;
     EventEntry* evt;
     BOOL decrement;
@@ -2401,7 +2401,7 @@ void btlseqAct(BattleWork* wp) {
                         }
                         if (unit->movesRemaining <= 0) {
                             unit->moveState = 10;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                             unit->activeTurns = 0;
 #else
                             if (!(unit->tokenFlags & TOKEN_FLAG_RALLY_WINK)) {
@@ -2477,7 +2477,7 @@ void btlseqAct(BattleWork* wp) {
     }
 }
 
-void btlseqTurnFirstProcess(BattleWork* wp) {
+static void btlseqTurnFirstProcess(BattleWork* wp) {
     BattleUnitKind* kind;
     int i;
     BattleUnit* unit;
@@ -2505,7 +2505,7 @@ void btlseqTurnFirstProcess(BattleWork* wp) {
     BattleFogEndCheck();
 }
 
-void btlseqPhaseFirstProcess(BattleWork* wp) {
+static void btlseqPhaseFirstProcess(BattleWork* wp) {
     BattleUnit* unit;
     BattleUnitPart* part;
     s32 count;
@@ -2521,7 +2521,7 @@ void btlseqPhaseFirstProcess(BattleWork* wp) {
         unit = BattleGetUnitPtr(wp, i);
         if (unit) {
             unit->moveColorLv = 0xFF;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             if (unit->moveState == 10) {
 #else
             if (unit->moveState == 10 && !BtlUnit_CheckStatus(unit, STATUS_SLOW)) {
@@ -2590,7 +2590,7 @@ void battleSortPhaseMoveTable(BattleWork* wp, s32 count) {
     }
 }
 
-void battleMakePhaseEvtTable(BattleWork* wp) {
+static void battleMakePhaseEvtTable(BattleWork* wp) {
     BattlePhaseEvtEntry* table;
     int i;
     BattleUnit* unit;
@@ -2784,7 +2784,7 @@ BOOL BattleCheckConcluded(BattleWork* wp) {
     return (wp->flags & (BATTLE_FLAG_ESCAPED | BATTLE_FLAG_INTERRUPTED)) != 0;
 }
 
-void _mapobj_data_touch_scale(s32 layer) {
+static void _mapobj_data_touch_scale(s32 layer) {
     BattleWork* wp = _battleWorkPointer;
     BattleStageObject* obj;
     int i;
@@ -2799,7 +2799,7 @@ void _mapobj_data_touch_scale(s32 layer) {
 
 // inlining off for the code below, as in the original (the object differs without it)
 #pragma dont_inline on
-USER_FUNC(_set_haikei_entry_scale) {
+static USER_FUNC(_set_haikei_entry_scale) {
     BattleWork* wp = _battleWorkPointer;
     BOOL busy = FALSE;
     f32 sx, sy;

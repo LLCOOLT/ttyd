@@ -29,8 +29,8 @@ static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, 8, 0, 0, 32, 0, 0, 0, 255},
 };
 
-void effRotHammerSuccessMain(EffectEntry* effect);
-void effRotHammerSuccessDisp(CameraId cameraId, EffectEntry* effect);
+static void effRotHammerSuccessMain(EffectEntry* effect);
+static void effRotHammerSuccessDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effRotHammerSuccessN64Entry(s32 type, f32 x, f32 y, f32 z, s32 count, s32 lifetime) {
     EffectEntry* effect;
@@ -67,7 +67,7 @@ EffectEntry* effRotHammerSuccessN64Entry(s32 type, f32 x, f32 y, f32 z, s32 coun
     return effect;
 }
 
-void effRotHammerSuccessMain(EffectEntry* effect) {
+static void effRotHammerSuccessMain(EffectEntry* effect) {
     EffRotHammerSuccessWork* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -111,7 +111,7 @@ void effRotHammerSuccessMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effRotHammerSuccessDisp, effect);
 }
 
-void effRotHammerSuccessDisp(CameraId cameraId, EffectEntry* effect) {
+static void effRotHammerSuccessDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffRotHammerSuccessWork* work;
     s32 i;

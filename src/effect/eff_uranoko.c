@@ -6,6 +6,9 @@
 #include "memory.h"
 #include <dolphin/mtx.h>
 
+static void effUranokoDisp(CameraId cameraId, EffectEntry* effect);
+static void effUranokoMain(EffectEntry* effect);
+
 EffectEntry* effUranokoEntry(s32 type, s32 duration, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
     EffUranokoWork* work;
@@ -34,7 +37,7 @@ EffectEntry* effUranokoEntry(s32 type, s32 duration, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effUranokoMain(EffectEntry* effect) {
+static void effUranokoMain(EffectEntry* effect) {
     EffUranokoWork* work = effect->userdata;
     Vec position;
     BOOL inBattle;
@@ -73,7 +76,7 @@ void effUranokoMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effUranokoDisp, effect);
 }
 
-void effUranokoDisp(CameraId cameraId, EffectEntry* effect) {
+static void effUranokoDisp(CameraId cameraId, EffectEntry* effect) {
     EffUranokoWork* work = effect->userdata;
     Mtx mtx;
     Mtx scale;

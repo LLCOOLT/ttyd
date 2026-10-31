@@ -17,7 +17,7 @@ PoseTableEntry pose_table_crack_lv1[5];
 PoseTableEntry pose_table_crack_lv2[5];
 static BattleUnitKindPart parts[2];
 static EvtWord init_event[46];
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static EvtWord phase_event[22];
 #else
 static EvtWord phase_event[38];
@@ -108,39 +108,24 @@ static PoseTableEntry pose_table[] = {
     {28, "PKO_S_1"},
     {31, "PKO_S_1"},
     {39, "PKO_D_1"},
-#if VERSION == VERSION_DEMO
-    {66, "PKO_Z_1"},
-    {67, "PKO_S_1"},
-#else
-    {68, "PKO_Z_1"},
-    {69, "PKO_S_1"},
-#endif
+    {BTL_POSE_SHELL_SHIELD, "PKO_Z_1"},
+    {BTL_POSE_STAY_DEFAULT, "PKO_S_1"},
 };
 
 PoseTableEntry pose_table_crack_lv1[] = {
     {28, "PKO_S_2"},
     {31, "PKO_S_2"},
     {39, "PKO_D_2"},
-#if VERSION == VERSION_DEMO
-    {66, "PKO_Z_2"},
-    {67, "PKO_S_2"},
-#else
-    {68, "PKO_Z_2"},
-    {69, "PKO_S_2"},
-#endif
+    {BTL_POSE_SHELL_SHIELD, "PKO_Z_2"},
+    {BTL_POSE_STAY_DEFAULT, "PKO_S_2"},
 };
 
 PoseTableEntry pose_table_crack_lv2[] = {
     {28, "PKO_S_3"},
     {31, "PKO_S_3"},
     {39, "PKO_D_3"},
-#if VERSION == VERSION_DEMO
-    {66, "PKO_Z_3"},
-    {67, "PKO_S_3"},
-#else
-    {68, "PKO_Z_3"},
-    {69, "PKO_S_3"},
-#endif
+    {BTL_POSE_SHELL_SHIELD, "PKO_Z_3"},
+    {BTL_POSE_STAY_DEFAULT, "PKO_S_3"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -175,30 +160,30 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
-#if VERSION == VERSION_DEMO
-        CALL_CHILD(PTR(koura_open))
+#if VERSION <= VERSION_DEMO_US
+        CALL_CHILD(koura_open)
 #else
         CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
         IF_INT_GREATER(LW(0), 0)
-            CALL_CHILD(PTR(koura_open))
+            CALL_CHILD(koura_open)
         END_IF
 #endif
     END_IF
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
-#if VERSION == VERSION_DEMO
-        CALL_CHILD(PTR(koura_close))
+#if VERSION <= VERSION_DEMO_US
+        CALL_CHILD(koura_close)
 #else
         CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
         IF_INT_GREATER(LW(0), 0)
-            CALL_CHILD(PTR(koura_close))
+            CALL_CHILD(koura_close)
         END_IF
 #endif
     END_IF
@@ -223,11 +208,7 @@ EVT_BEGIN(koura_open)
     CALL(btlevtcmd_OffAttribute, LW(3), UNIT_ATTR_NOT_SAMPLED_AS_TARGET)
     CALL(btlevtcmd_OnPartsAttribute, BTL_UNIT_SELF, 1, PART_ATTR_NOT_TARGETABLE)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 1)
-#if VERSION == VERSION_DEMO
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 66)
-#else
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 68)
-#endif
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_SHELL_SHIELD)
     RETURN
 EVT_END()
 
@@ -284,7 +265,7 @@ EVT_BEGIN(damage_core)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
     END_SWITCH
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 39)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     WAIT_FRAMES(30)
 #else
     WAIT_MS(500)

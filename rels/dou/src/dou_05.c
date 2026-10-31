@@ -25,7 +25,6 @@
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "dou.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -71,7 +70,7 @@ static USER_FUNC(alpha_set_func) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(cam_displacement) {
+static USER_FUNC(cam_displacement) {
     CamRoadWork* work = camRoadGetWorkPtr();
 
     work->f_19c[10] = 1.7f;
@@ -155,7 +154,11 @@ static s32 key_tbl[] = {
 static EVT_BEGIN(evt_chk)
     CALL(evt_pouch_check_item, ITEM_GROTTO_KEY, LW(0))
     IF_INT_GREATER(LW(0), 0)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_win_item_select, PTR(key_tbl), LW(0))
+#else
         CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
+#endif
         IF_INT_EQUAL(LW(0), -1)
             CALL(evt_mobj_exec_cancel, STRING("me"))
         END_IF
@@ -165,18 +168,22 @@ EVT_END()
 
 static EVT_BEGIN(evt_unlock)
     SET_VALUE(LW(0), STRING("e_bero"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     RETURN
 EVT_END()
 
 EVT_BEGIN(bigdoor_event_init)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG5_20_THE_BLUE_BLOCK)
+#if VERSION >= VERSION_JP
         DEBUG_PUT_MSG(STRING("dou_05：扉が開く前の処理"))
+#endif
         SET_VALUE(LW(0), STRING("w_bero_3"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_mapobj_trans, 0, STRING("tetu"), 1, 0, 0)
     ELSE
+#if VERSION >= VERSION_JP
         DEBUG_PUT_MSG(STRING("dou_05：扉が開く後の処理"))
+#endif
         CALL(evt_hitobj_attr_onoff, 1, 1, STRING("w_bero_3"), 4)
         CALL(evt_mapobj_trans, 0, STRING("tetu"), 1, 100, 0)
     END_IF
@@ -185,10 +192,12 @@ EVT_END()
 
 EVT_BEGIN(bigdoor_event)
     CALL(evt_mario_key_onoff, 0)
+#if VERSION >= VERSION_JP
     BEGIN_INLINE_EVENT
         CALL(evt_mario_wait_landon)
         CALL(evt_mario_set_mov_spd, FLOAT(0.0f))
     END_INLINE_EVENT
+#endif
     CALL(evt_cam3d_evt_set, 150, 432, 40, 0, 337, -480, 500, 11)
     WAIT_MS(1000)
     BEGIN_INLINE_EVENT
@@ -223,7 +232,7 @@ EVT_BEGIN(bigdoor_event)
     CALL(evt_snd_sfxon, STRING("SFX_STG5_ELMOS_VOICE1"), 0)
     CALL(evt_msg_print, 0, STRING("stg5_dou_10"), 0, 0)
     SET_VALUE(LW(0), STRING("w_bero_3"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     CALL(evt_hitobj_attr_onoff, 1, 1, STRING("w_bero_3"), 4)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_20_THE_BLUE_BLOCK)
     CALL(evt_cam3d_evt_off, 500, 11)
@@ -243,11 +252,17 @@ static HitDamageReturn hitDmgRetPoints[] = {
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
 #if VERSION >= VERSION_US
-    CALL(evt_item_entry, STRING("item00"), ITEM_DEFEND_PLUS_P, 0, -1000, 0, 16, -1, 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_DEFEND_PLUS_P, 0, -1000, 0, ITEM_ENTRY_FIXED, -1, 0)
+#elif VERSION >= VERSION_JP
+    CALL(evt_item_entry, STRING("item00"), ITEM_DAMAGE_DODGE_P, 0, -1000, 0, ITEM_ENTRY_FIXED, -1, 0)
 #else
-    CALL(evt_item_entry, STRING("item00"), ITEM_DAMAGE_DODGE_P, 0, -1000, 0, 16, -1, 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_DAMAGE_DODGE_P, 0, -1000, 0, ITEM_ENTRY_FIXED, -1, 0)
 #endif
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
+#else
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_BADGE_RETURN | ITEM_FLAG_NO_TOUCH)
+#endif
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_item, STRING("item00"))
     CALL(evt_mario_key_onoff, 1)
@@ -276,7 +291,7 @@ EVT_BEGIN(waterfall_init)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_mizu_ata"), MAPOBJ_TEV_CALLBACK(1))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_mizu_ata"), MAPOBJ_FLAG_DISPLAY_LIST)
     SET_VALUE(GW(0), 0)
-    SPAWN_EVENT(PTR(waterfall_main))
+    SPAWN_EVENT(waterfall_main)
     RETURN
 EVT_END()
 
@@ -301,7 +316,7 @@ EVT_BEGIN(dou_05_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     WAIT_FRAMES(1)
     CALL(evt_map_playanim, STRING("nami"), 1, 0)
     CALL(evt_map_playanim, STRING("tubo"), 1, 0)
@@ -309,20 +324,20 @@ EVT_BEGIN(dou_05_init_evt)
     CALL(evt_mobj_lock, STRING("mobj_lock00"), ITEM_GROTTO_KEY, 190, 10, 0, 270, PTR(evt_chk), PTR(evt_unlock), GSWF(GSWF_DOU05_DOOR_UNLOCKED))
     IF_INT_EQUAL(GSWF(GSWF_DOU05_DOOR_UNLOCKED), 1)
         SET_VALUE(LW(0), STRING("e_bero"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
     ELSE
         SET_VALUE(LW(0), STRING("e_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     END_IF
     CALL(evt_mobj_switch_blue, 0, STRING("mobj00"), -60, 330, -565, PTR(bigdoor_event), GSWF(GSWF_DOU05_BIG_DOOR_SWITCH_PRESSED))
-    SPAWN_EVENT(PTR(bigdoor_event_init))
+    SPAWN_EVENT(bigdoor_event_init)
     CALL(evt_mobj_itembox, STRING("mobj_box00"), 500, 275, -800, 0, 0, PTR(mobj_box00), GSWF(GSWF_DOU05_CHEST_OPENED))
     CALL(evt_mobj_powerupblk, STRING("pblk1"), -65, 280, -175, 0, GSWF(GSWF_DOU05_SHINE_SPRITE), 0)
     CALL(evt_mobj_brick, STRING("mobj_hidden1"), -35, 255, -175, ITEM_COIN, 11, 0, GSWF(GSWF_DOU05_HIDDEN_COIN_BLOCK_HIT))
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
-    CALL_CHILD(PTR(evt_gazigazi_entry))
+    CALL_CHILD(evt_gazigazi_entry)
     CALL(evt_map_entry_airport_harbor, 1, STRING("S_Ship_Change"), STRING("Ship_Change"))
-    CALL_CHILD(PTR(waterfall_init))
+    CALL_CHILD(waterfall_init)
     CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("mizu_atari"), 0, PTR(ride_waterfall), 0)
     CALL(evt_run_case_evt, CASE_COND_NOT_STAND_ON, 1, STRING("mizu_atari"), 0, PTR(nonride_waterfall), 0)
     CALL(cam_displacement)

@@ -23,7 +23,6 @@
 #include "evt/evt_msg.h"
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "mri_puni.h"
 #include "data_tables.h"
 #include "version.h"
@@ -33,8 +32,8 @@
 
 EffectEntry* marioeff;
 
-USER_FUNC(evt_pcharge_pos);
-USER_FUNC(mario_shabon_eff);
+static USER_FUNC(evt_pcharge_pos);
+static USER_FUNC(mario_shabon_eff);
 
 extern EvtWord puni_4_init[];
 extern EvtWord puni_4_talk[];
@@ -101,7 +100,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"プニ族４"*/"\x83\x76\x83\x6A\x91\xB0\x82\x53", // name
+        "プニ族４", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         puni_4_init, // initEvent
@@ -113,7 +112,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"プニ族５"*/"\x83\x76\x83\x6A\x91\xB0\x82\x54", // name
+        "プニ族５", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         puni_5_init, // initEvent
@@ -130,14 +129,14 @@ static NpcSetupInfo npcEnt[] = {
 static EVT_BEGIN(bero_s_doa_close)
     SET_VALUE(LW(9), 0)
     SET_VALUE(LW(10), STRING("S_doa"))
-    SPAWN_EVENT(PTR(evt_mri_door_close))
+    SPAWN_EVENT(evt_mri_door_close)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(bero_s_doa_open)
     SET_VALUE(LW(9), 0)
     SET_VALUE(LW(10), STRING("S_doa"))
-    SPAWN_EVENT(PTR(evt_mri_door_open))
+    SPAWN_EVENT(evt_mri_door_open)
     RETURN
 EVT_END()
 
@@ -232,7 +231,7 @@ static BeroEntry bero_entry_data[] = {
 static EVT_BEGIN(door_switch_init)
     IF_INT_EQUAL(GSWF(GSWF_MRI05_WEST_DOOR_UNLOCKED), 0)
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     ELSE
         CALL(evt_map_playanim, STRING("doalight"), 2, 0)
     END_IF
@@ -247,12 +246,12 @@ static EVT_BEGIN(door_switch)
     IF_INT_EQUAL(GSWF(GSWF_MRI05_WEST_DOOR_UNLOCKED), 0)
         SET_VALUE(GSWF(GSWF_MRI05_WEST_DOOR_UNLOCKED), 1)
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
         CALL(evt_map_playanim, STRING("doalight"), 0, 0)
     ELSE
         SET_VALUE(GSWF(GSWF_MRI05_WEST_DOOR_UNLOCKED), 0)
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_map_playanim, STRING("doalight"), 0, 0)
         CALL(evt_map_pauseanim, 0, STRING("doalight"))
     END_IF
@@ -262,7 +261,7 @@ EVT_END()
 static EVT_BEGIN(evt_ueki_04)
     CALL(evt_item_delete_check, STRING("item_ueki_04"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_ueki_04"), ITEM_THUNDER_RAGE, 225, -309, -40, 4, GSWF(GSWF_MRI05_PLANTER_THUNDER_RAGE_TAKEN), 0)
+        CALL(evt_item_entry, STRING("item_ueki_04"), ITEM_THUNDER_RAGE, 225, -309, -40, ITEM_ENTRY_LAUNCH, GSWF(GSWF_MRI05_PLANTER_THUNDER_RAGE_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -277,7 +276,7 @@ static KusaAccess ueki_access_data[] = {
 };
 
 static EVT_BEGIN(punipuni_ball00_init)
-    CALL_CHILD(PTR(mri_punipuni_setup))
+    CALL_CHILD(mri_punipuni_setup)
     IF_INT_EQUAL(GSWF(GSWF_MRI05_ORB_A_ON_PEDESTAL), 1)
         CALL(evt_item_set_position, LW(10), -150, -109, -37)
         CALL(evt_target_flag_onoff, LW(11), 0, 3)
@@ -293,18 +292,18 @@ EVT_END()
 static EVT_BEGIN(punipuni_ball00)
     CALL(evt_mario_key_onoff, 0)
     IF_INT_EQUAL(GSWF(GSWF_MRI05_ORB_A_ON_PEDESTAL), 0)
-        CALL_CHILD(PTR(mri_punipuni_itemselect))
+        CALL_CHILD(mri_punipuni_itemselect)
         IF_INT_EQUAL(LW(1), 0)
             GOTO(100)
         END_IF
         SET_VALUE(GSWF(GSWF_MRI05_ORB_A_ON_PEDESTAL), 1)
         CALL(evt_item_set_position, LW(10), -150, -109, -37)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_sui_hikari_01"), MAPOBJ_FLAG_HIDE)
-        CALL_CHILD(PTR(mri_punipuni_itemset))
+        CALL_CHILD(mri_punipuni_itemset)
     ELSE
         SET_VALUE(GSWF(GSWF_MRI05_ORB_A_ON_PEDESTAL), 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_sui_hikari_01"), MAPOBJ_FLAG_HIDE)
-        CALL_CHILD(PTR(mri_punipuni_itemremove))
+        CALL_CHILD(mri_punipuni_itemremove)
     END_IF
     LABEL(100)
     CALL(evt_mario_key_onoff, 1)
@@ -312,7 +311,7 @@ static EVT_BEGIN(punipuni_ball00)
 EVT_END()
 
 EVT_BEGIN(punipuni_ball01_init)
-    CALL_CHILD(PTR(mri_punipuni_setup))
+    CALL_CHILD(mri_punipuni_setup)
     IF_INT_EQUAL(GSWF(GSWF_MRI05_ORB_B_ON_PEDESTAL), 1)
         CALL(evt_item_set_position, LW(10), 150, -109, -37)
         CALL(evt_target_flag_onoff, LW(11), 0, 3)
@@ -325,7 +324,7 @@ EVT_BEGIN(punipuni_ball01_init)
     RETURN
 EVT_END()
 
-USER_FUNC(mario_shabon_eff) {
+static USER_FUNC(mario_shabon_eff) {
     EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
@@ -355,18 +354,18 @@ static USER_FUNC(mario_shabon_effdel) {
 EVT_BEGIN(punipuni_ball01)
     CALL(evt_mario_key_onoff, 0)
     IF_INT_EQUAL(GSWF(GSWF_MRI05_ORB_B_ON_PEDESTAL), 0)
-        CALL_CHILD(PTR(mri_punipuni_itemselect))
+        CALL_CHILD(mri_punipuni_itemselect)
         IF_INT_EQUAL(LW(1), 0)
             GOTO(100)
         END_IF
         SET_VALUE(GSWF(GSWF_MRI05_ORB_B_ON_PEDESTAL), 1)
         CALL(evt_item_set_position, LW(10), 150, -109, -37)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_sui_hikari_02"), MAPOBJ_FLAG_HIDE)
-        CALL_CHILD(PTR(mri_punipuni_itemset))
+        CALL_CHILD(mri_punipuni_itemset)
     ELSE
         SET_VALUE(GSWF(GSWF_MRI05_ORB_B_ON_PEDESTAL), 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_sui_hikari_02"), MAPOBJ_FLAG_HIDE)
-        CALL_CHILD(PTR(mri_punipuni_itemremove))
+        CALL_CHILD(mri_punipuni_itemremove)
     END_IF
     LABEL(100)
     CALL(evt_mario_key_onoff, 1)
@@ -455,7 +454,7 @@ EVT_BEGIN(mario_shabon_check)
     ADD(LW(2), 2)
     CALL(mario_shabon_eff, 1, LW(0), LW(1), LW(2))
     DELETE_EVENT(LW(9))
-    SPAWN_EVENT(PTR(mario_shabon_break_sound))
+    SPAWN_EVENT(mario_shabon_break_sound)
     CALL(evt_mario_set_pose, STRING("M_F_1"))
     WAIT_MS(500)
     CALL(evt_sub_intpl_msec_init, 1, LW(6), LW(4), 300)
@@ -475,11 +474,11 @@ EVT_BEGIN(mario_shabon_check)
     CALL(evt_mario_cont_onoff, 1)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_cam_letter_box_disable, 0)
-    SPAWN_EVENT(PTR(mario_shabon_check))
+    SPAWN_EVENT(mario_shabon_check)
     RETURN
 EVT_END()
 
-USER_FUNC(evt_pcharge_pos) {
+static USER_FUNC(evt_pcharge_pos) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
@@ -602,19 +601,19 @@ EVT_BEGIN(mri_05_init_evt)
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(9), 0)
-    CALL_CHILD(PTR(mri_puni_init))
+    CALL_CHILD(mri_puni_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_npc_setup, PTR(npcEnt))
-    SPAWN_EVENT(PTR(puni_disp_info))
-    SPAWN_EVENT(PTR(mri_countdown))
+    SPAWN_EVENT(puni_disp_info)
+    SPAWN_EVENT(mri_countdown)
     IF_INT_GREATER(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_01_PEACH_CRUMP_AND_X_NAUTS)
         CALL(evt_npc_check_delete, STRING("軍団ザコ"))
     END_IF
     CALL(evt_npc_change_fbat_mode, 1)
     SET_VALUE(LW(0), PTR(ueki_access_data))
-    CALL_CHILD(PTR(evt_sub_kusa_access_entry))
+    CALL_CHILD(evt_sub_kusa_access_entry)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG2_23_TIME_BOMB_ACTIVATED, STORY_STG2_23_01_X_NAUT_BATTLE)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
@@ -630,18 +629,18 @@ EVT_BEGIN(mri_05_init_evt)
     CALL(evt_map_playanim, STRING("syabon_01"), 1, 0)
     CALL(evt_map_playanim, STRING("syabon_02"), 1, 0)
     CALL(evt_map_playanim, STRING("sui_hikari"), 1, 0)
-    SPAWN_EVENT(PTR(evt_shabon_s))
+    SPAWN_EVENT(evt_shabon_s)
     SET_VALUE(LW(10), STRING("punipuni00"))
     SET_VALUE(LW(11), 0)
-    SPAWN_EVENT(PTR(punipuni_ball00_init))
+    SPAWN_EVENT(punipuni_ball00_init)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_dai_01_mae"), 0, PTR(punipuni_ball00), 0)
     SET_VALUE(LW(10), STRING("punipuni01"))
     SET_VALUE(LW(11), 1)
-    SPAWN_EVENT(PTR(punipuni_ball01_init))
+    SPAWN_EVENT(punipuni_ball01_init)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_dai_mae"), 0, PTR(punipuni_ball01), 0)
-    SPAWN_EVENT(PTR(door_switch_init))
+    SPAWN_EVENT(door_switch_init)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui"), 0, PTR(door_switch), 0)
     CALL(evt_mobj_powerupblk, STRING("pblk00"), 250, -250, 100, 0, GSWF(GSWF_MRI05_SHINE_SPRITE), 0)
-    SPAWN_EVENT(PTR(mario_shabon_check))
+    SPAWN_EVENT(mario_shabon_check)
     RETURN
 EVT_END()

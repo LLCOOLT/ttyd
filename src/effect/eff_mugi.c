@@ -39,14 +39,14 @@ typedef struct effMugiKemuriData {
     s32 poseId;      // 0x60
 } effMugiKemuriData;
 
-void effMugiKemuriMain(EffectEntry* effect);
-void effMugiKemuriDisp(CameraId camId, void* param);
+static void effMugiKemuriMain(EffectEntry* effect);
+static void effMugiKemuriDisp(CameraId camId, void* param);
 
 inline f32 inline_fn(effMugiKemuriData* data) {
     return 6.2831855f * reviseAngle(data->rot.y);
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo has one more entry function here. Nothing calls it, so the linker drops it, but its type
 // string stays at the end of the unit's .rodata.
 EffectEntry* effMugiEntry(void) {
@@ -99,8 +99,8 @@ EffectEntry* effMugiKemuriEntry(f32 x, f32 y, f32 z, f32 angle) {
     return effect;
 }
 
-void effMugiKemuri2Main(EffectEntry* effect);
-void effMugiKemuri2Disp(CameraId camId, void* param);
+static void effMugiKemuri2Main(EffectEntry* effect);
+static void effMugiKemuri2Disp(CameraId camId, void* param);
 
 EffectEntry* effMugiKemuri2Entry(s32 type, f32 x, f32 y, f32 z, f32 angle, f32 dir) {
     EffectEntry* effect;
@@ -151,7 +151,7 @@ EffectEntry* effMugiKemuri2Entry(s32 type, f32 x, f32 y, f32 z, f32 angle, f32 d
     return effect;
 }
 
-void effMugiKemuriMain(EffectEntry* effect) {
+static void effMugiKemuriMain(EffectEntry* effect) {
     s32 i;
     effMugiKemuriData* data;
     effMugiKemuriData* p;
@@ -228,7 +228,7 @@ void effMugiKemuriMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&pos2), 2, effMugiKemuriDisp, effect);
 }
 
-void effMugiKemuri2Main(EffectEntry* effect) {
+static void effMugiKemuri2Main(EffectEntry* effect) {
     s32 i;
     effMugiKemuriData* data;
     effMugiKemuriData* p;
@@ -320,7 +320,7 @@ void effMugiKemuri2Main(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&pos2), 2, effMugiKemuri2Disp, effect);
 }
 
-void effMugiKemuriDisp(CameraId camId, void* param) {
+static void effMugiKemuriDisp(CameraId camId, void* param) {
     EffectEntry* effect = param;
     effMugiKemuriData* data;
     s32 i;
@@ -350,7 +350,7 @@ void effMugiKemuriDisp(CameraId camId, void* param) {
     }
 }
 
-void effMugiKemuri2Disp(CameraId camId, void* param) {
+static void effMugiKemuri2Disp(CameraId camId, void* param) {
     EffectEntry* effect = param;
     effMugiKemuriData* data;
     s32 i;

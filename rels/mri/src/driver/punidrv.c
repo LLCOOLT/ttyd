@@ -11,6 +11,8 @@
 #include "system.h"
 #include "driver/animdrv.h"
 #include "libc_decls.h"
+
+static void puniMakeTexture(CameraId camId, void* param);
 // FAKE: punidrv.c calls animPoseDisp_MakeExtTexture through this prototype (the types it was compiled with) instead of the one in driver/animdrv.h; same registers, behaviour-identical.
 typedef void (*AnimPoseDisp_MakeExtTextureLocalFn)(const char*, const char*, f32, f32, GXTexObj*, void***, s32*, s32*, s32*, s32*);
 
@@ -142,7 +144,7 @@ void puniEntry(s32 poseNum, PunidrvTexInfo* texInfo, void (*initFunc)(void), voi
     }
 }
 
-void puniMakeTexture(CameraId camId, void* param) {
+static void puniMakeTexture(CameraId camId, void* param) {
     PunidrvWork* wp = work;
     PunidrvTexInfo* info = param;
     PunidrvTex* tex = wp->texs;

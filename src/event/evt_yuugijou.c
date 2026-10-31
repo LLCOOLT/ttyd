@@ -22,43 +22,34 @@ extern USER_FUNC(evt_msg_print);
 extern USER_FUNC(evt_msg_select);
 extern USER_FUNC(evt_msg_continue);
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 USER_FUNC(yuuminigame_get_window_evt);
 #endif
-USER_FUNC(yuuminigame_end);
-USER_FUNC(yuuminigame_window_end);
+static USER_FUNC(yuuminigame_end);
+static USER_FUNC(yuuminigame_window_end);
 
 //.bss
 PiantaParlorWork yuugijouwork;
 
 //.sbss
 PiantaParlorWork* yuwp;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 s32 yuu_window_evt; // the demo has no per-game window script
 #endif
 
-#if VERSION == VERSION_DEMO
 EVT_BEGIN(minigame_end)
     SET_VALUE(GW(0), 2)
     SET_VALUE(GSWF(GSWF_YUU_MINIGAME_QUIT), 1)
     CALL(evt_mario_set_prev_party_pos, 0, 0, -1000, 0)
     CALL(evt_mario_set_prev_party_pos, 1, 0, -1000, 0)
-    CALL(evt_bero_mapchange, STRING("gor_03"), STRING("A_dokan_02"))
-    RETURN
-EVT_END()
-#else
-EVT_BEGIN(minigame_end)
-    SET_VALUE(GW(0), 2)
-    SET_VALUE(GSWF(GSWF_YUU_MINIGAME_QUIT), 1)
-    CALL(evt_mario_set_prev_party_pos, 0, 0, -1000, 0)
-    CALL(evt_mario_set_prev_party_pos, 1, 0, -1000, 0)
+#if VERSION >= VERSION_JP
     CALL(evt_mario_set_enable_key, 0)
+#endif
     CALL(evt_bero_mapchange, STRING("gor_03"), STRING("A_dokan_02"))
     RETURN
 EVT_END()
-#endif
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(window_open)
     CALL(evt_msg_print, 0, STRING("sysyuu_all_01"), 0, 0)
     CALL(evt_msg_select, 0, STRING("sysyuu_all_02"))
@@ -98,13 +89,13 @@ static inline s32 MAX0(s32 x) {
 }
 
 void yuugijou_init(void) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     s32 t;
 #endif
     yuwp = &yuugijouwork;
     memset(yuwp, 0, sizeof(PiantaParlorWork));
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // the demo has its own default records, with the per-rank values written out
     yuwp->recordOn[0][0] = 1;
     yuwp->recordOn[0][1] = 1;
@@ -451,11 +442,11 @@ void monteCountDisp(void) {
                 yuwp->dispTick = 0;
                 if (monte_snd_flag == 0 && y != 0) {
                     psndSFXOn(SFX_NAME_WORD(0x8CA));
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                     monte_snd_flag = 8;
 #endif
                 }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 monte_snd_flag = 0; // the demo plays the count sound every step
 #endif
                 if (y != 0) {
@@ -471,7 +462,7 @@ void monteCountDisp(void) {
                     yuwp->dispTokens += y;
                 }
             }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             monte_snd_flag = 0;
 #else
             if (monte_snd_flag != 0)
@@ -484,7 +475,7 @@ void monteCountDisp(void) {
 USER_FUNC(yuugijou_add_montemedal) {
     EvtWord* args = event->args;
     s32 a = evtGetValue(event, args[0]);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     yuwp->tokens += evtGetValue(event, args[1]); // no 99999 cap in the demo
 #else
     s32 sum = yuwp->tokens + evtGetValue(event, args[1]);
@@ -578,17 +569,17 @@ USER_FUNC(yuugijou_set_yupflag) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(yuuminigame_window_end) {
+static USER_FUNC(yuuminigame_window_end) {
     yuwp->flags |= 8;
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(yuuminigame_end) {
+static USER_FUNC(yuuminigame_end) {
     evtEntryType(minigame_end, 0, 0, 0xEF);
     return EVT_RETURN_DONE;
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 USER_FUNC(yuuminigame_get_window_evt) {
     evtSetValue(event, event->args[0], yuu_window_evt);
     return EVT_RETURN_DONE;

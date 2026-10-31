@@ -162,13 +162,13 @@ MayaPoly recovery_effAnimRST[] = {
 MayaPolyList recovery_effAnimRSTDt = {1, recovery_effAnimRST};
 MayaAnimData recovery_effAnimDt = {{0}, 79.0f, &recovery_effAnimRSTDt};
 
-void effRecoveryMain(EffectEntry* effect);
-void effRecoveryMain2(EffectEntry* effect);
+static void effRecoveryMain(EffectEntry* effect);
+static void effRecoveryMain2(EffectEntry* effect);
 
-void effRecoveryDisp(CameraId cameraId, EffectEntry* effect);
-void effRecoveryDisp2(CameraId cameraId, EffectEntry* effect);
-void effRecoveryDisp3(CameraId cameraId, EffectEntry* effect);
-void effRecoveryDisp4(CameraId cameraId, EffectEntry* effect);
+static void effRecoveryDisp(CameraId cameraId, EffectEntry* effect);
+static void effRecoveryDisp2(CameraId cameraId, EffectEntry* effect);
+static void effRecoveryDisp3(CameraId cameraId, EffectEntry* effect);
+static void effRecoveryDisp4(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effRecoveryEntry(s32 type, s32 amount, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
@@ -217,7 +217,7 @@ EffectEntry* effRecoveryEntry(s32 type, s32 amount, f32 x, f32 y, f32 z) {
     work->timer = 0;
     work->tick = gp->retraceCount;
     work->alpha = 255;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     work->baseY = -30.0f;
 #endif
     {
@@ -307,7 +307,7 @@ EffectEntry* effRecoveryEntry(s32 type, s32 amount, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effRecoveryMain(EffectEntry* effect) {
+static void effRecoveryMain(EffectEntry* effect) {
     RecoveryWork* work = effect->userdata;
     RecoveryWork* p;
     s32 i;
@@ -317,7 +317,7 @@ void effRecoveryMain(EffectEntry* effect) {
     s32 type = work->type;
     u32 n = 0;
     f32 x, y, z;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     f32 baseY = work->baseY;
 #endif
     f32 a, d;
@@ -402,7 +402,7 @@ void effRecoveryMain(EffectEntry* effect) {
                     if (p->timer < 16) {
                         p->timer++;
                         p->position.x = intplGetValue(1, p->position.x, 0.0f, p->timer, 16);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                         p->position.y = intplGetValue(1, p->position.y, -30.0f, p->timer, 16);
 #else
                         p->position.y = intplGetValue(1, p->position.y, baseY, p->timer, 16);
@@ -423,7 +423,7 @@ void effRecoveryMain(EffectEntry* effect) {
                 work = effect->userdata;
                 if (type != 7 && type != 8) {
                     Vec sfxPos;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                     s32 count = amount * 10;
                     if (count > 100) {
                         count = 100;
@@ -497,7 +497,7 @@ void effRecoveryMain(EffectEntry* effect) {
     }
 }
 
-void effRecoveryMain2(EffectEntry* effect) {
+static void effRecoveryMain2(EffectEntry* effect) {
     RecoveryWork* work = effect->userdata;
     Vec calc;
     Vec pos = {0.0f, 0.0f, 0.0f};
@@ -550,7 +550,7 @@ void effRecoveryMain2(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&calc), 2, (DispCallback)effRecoveryDisp4, effect);
 }
 
-void effRecoveryDisp(CameraId cameraId, EffectEntry* effect) {
+static void effRecoveryDisp(CameraId cameraId, EffectEntry* effect) {
     RecoveryWork* work = effect->userdata;
     RecoveryWork* p;
     CameraEntry* cam;
@@ -654,7 +654,7 @@ void effRecoveryDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-void effRecoveryDisp2(CameraId cameraId, EffectEntry* effect) {
+static void effRecoveryDisp2(CameraId cameraId, EffectEntry* effect) {
     RecoveryWork* work = effect->userdata;
     CameraEntry* cam;
     s32 type;
@@ -701,7 +701,7 @@ void effRecoveryDisp2(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-void effRecoveryDisp3(CameraId cameraId, EffectEntry* effect) {
+static void effRecoveryDisp3(CameraId cameraId, EffectEntry* effect) {
     RecoveryWork* work = effect->userdata;
     CameraEntry* cam;
     s32 type;
@@ -794,7 +794,7 @@ void effRecoveryDisp3(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-void effRecoveryDisp4(CameraId cameraId, EffectEntry* effect) {
+static void effRecoveryDisp4(CameraId cameraId, EffectEntry* effect) {
     RecoveryWork* work = effect->userdata;
     CameraEntry* cam;
     s32 i;

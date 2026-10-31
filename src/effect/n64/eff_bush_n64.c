@@ -35,8 +35,8 @@ static effN64Vtx size12x12_tex64x64_vtx[] = {
     {-6, 6, 0, 0, 4096, 0x30, 0x6C, 0x25, 0xFF},
 };
 
-void effBushMain(EffectEntry* effect);
-void effBushDisp(CameraId cameraId, EffectEntry* effect);
+static void effBushMain(EffectEntry* effect);
+static void effBushDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effBushN64Entry(s32 type, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
@@ -70,7 +70,7 @@ EffectEntry* effBushN64Entry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effBushMain(EffectEntry* effect) {
+static void effBushMain(EffectEntry* effect) {
     EffBushN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -136,7 +136,7 @@ void effBushMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effBushDisp, effect);
 }
 
-void effBushDisp(CameraId cameraId, EffectEntry* effect) {
+static void effBushDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffBushN64Work* work;
     s32 i;

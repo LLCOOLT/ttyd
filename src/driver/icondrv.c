@@ -112,10 +112,10 @@ static inline IconBinData* iconGetBinData(u16 iconId) {
 #endif
 
 // local prototypes
-void _callback_tpl(s32 error, DVDFileInfo* info);
-void _callback_bin(s32 error, DVDFileInfo* info);
-void iconDisp(CameraId camId, void* param);
-void iconGX(Mtx mtx, IconEntry* entry);
+static void _callback_tpl(s32 error, DVDFileInfo* info);
+static void _callback_bin(s32 error, DVDFileInfo* info);
+static void iconDisp(CameraId camId, void* param);
+static void iconGX(Mtx mtx, IconEntry* entry);
 
 // the field or the battle icon work (inlined everywhere; no symbol of its own)
 static inline IconWork* iconGetWork(void) {
@@ -148,14 +148,14 @@ inline IconEntry* iconGetEntry(const char* name) {
     return NULL;
 }
 
-void _callback_tpl(s32 error, DVDFileInfo* info) {
+static void _callback_tpl(s32 error, DVDFileInfo* info) {
     DVDEntry* entry = info->cb.userData;
     UnpackTexPalette(icon_tpl);
     DVDMgrClose(entry);
     icon_tpl_ok = TRUE;
 }
 
-void _callback_bin(s32 error, DVDFileInfo* info) {
+static void _callback_bin(s32 error, DVDFileInfo* info) {
     DVDMgrClose(info->cb.userData);
     icon_bin_ok = TRUE;
 }
@@ -305,7 +305,7 @@ void iconEntry(const char* name, u16 iconId) {
     }
     entry->uflags |= ICON_FLAG_USED;
     if (mapGetWork()->entries[0].flags & 2) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         entry->uflags |= ICON_FLAG_NO_MAP_BLEND;
 #else
         if (!strncmp(gp->currentMapName, "aji", 3) && evtGetValue(0, GSW(GSW_STORY_PROGRESS)) == STORY_STG7_25_THE_LAST_MAIL) {
@@ -383,7 +383,7 @@ void iconChange(const char* name, u16 iconId) {
     entry->uflags |= ICON_FLAG_USED;
 }
 
-void iconDisp(CameraId camId, void* param) {
+static void iconDisp(CameraId camId, void* param) {
     IconEntry* entry = param; // cast to correct type
     CameraEntry* camera;
     Mtx trans, scale, rot, mtx;
@@ -563,7 +563,7 @@ void iconGetWidthHight(u16* width, u16* height, s16 iconId) {
     }
 }
 
-void iconGX(Mtx mtx, IconEntry* entry) {
+static void iconGX(Mtx mtx, IconEntry* entry) {
     static char dummy[] ATTRIBUTE_ALIGN(32) = "";
     f32 x, y, w, hn;
     f32 h;
@@ -639,7 +639,7 @@ void iconGX(Mtx mtx, IconEntry* entry) {
         GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
         GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_C0, GX_CC_CPREV, GX_CC_ZERO);
         GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_A0, GX_CA_APREV, GX_CA_ZERO);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         if (!(entry->uflags & ICON_FLAG_2D) && !(entry->uflags & ICON_FLAG_NO_MAP_BLEND) &&
             (mapGetWork()->entries[0].flags & 2)) {
 #else

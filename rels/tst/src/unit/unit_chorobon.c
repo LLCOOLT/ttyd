@@ -10,6 +10,7 @@
 #include "battle/battle_database_common.h"
 #include "data_tables.h"
 #include "battle/battle_sub.h"
+#include "version.h"
 
 BattleUnitKind unit_chorobon;
 static BattleUnitDefense defence;
@@ -98,7 +99,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {100, 100, 90, 100, 90, 100, 100, 75, 100, 80, 100, 80, 100, 75, 75, 95, 95, 100, 75, 100, 100, 100};
+#else
 static StatusVulnerability regist = {95, 95, 90, 100, 95, 100, 100, 80, 100, 90, 100, 90, 100, 95, 70, 95, 90, 100, 90, 100, 100, 100};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_chorobon", "c_chorobon", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
@@ -148,7 +153,7 @@ static EVT_BEGIN(attack_event)
         RETURN
     END_IF
     SET_VALUE(LW(9), PTR(&weapon_chorobon_drain_attack))
-    CALL_CHILD(PTR(drain_attack_event))
+    CALL_CHILD(drain_attack_event)
     RETURN
 EVT_END()
 
@@ -157,7 +162,11 @@ static BattleWeapon weapon_chorobon_drain_attack_biribiri_counterd = {
     {0}, // pad_06
     0, NULL, // itemId..description
     100, // baseAccuracy
+#if VERSION <= VERSION_DEMO_US
+    0, 0, 0, // baseFpCost..superguardsAllowed
+#else
     0, 0, 2, // baseFpCost..superguardsAllowed
+#endif
     1.0f, // reserved_14
     1, // stylishCommandMultiplier
     1, // reserved_19
@@ -202,8 +211,8 @@ static PoseTableEntry pose_table[] = {
     {40, "CBN_W_1"},
     {56, "CBN_X_1"},
     {57, "CBN_X_1"},
-    {65, "CBN_T_1"},
-    {69, "CBN_S_1"},
+    {BTL_POSE_TALK, "CBN_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "CBN_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -286,7 +295,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -295,7 +304,7 @@ static EVT_BEGIN(counter_damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
     CALL(btlevtcmd_GetDamageCode, LW(10), LW(0))
-    CALL_CHILD(PTR(subsetevt_counter_damage))
+    CALL_CHILD(subsetevt_counter_damage)
     CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 512, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CheckDamageCode, BTL_UNIT_SELF, 2048, LW(0))
@@ -303,7 +312,7 @@ static EVT_BEGIN(counter_damage_event)
             RETURN
         END_IF
     END_IF
-    CALL_CHILD(PTR(return_event))
+    CALL_CHILD(return_event)
     RETURN
 EVT_END()
 
@@ -312,7 +321,7 @@ static EVT_BEGIN(return_event)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 0, FLOAT(4.0f), FLOAT(0.5996094f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
     SET_VALUE(LW(8), 40)
-    CALL_CHILD(PTR(rabbit_move))
+    CALL_CHILD(rabbit_move)
     RETURN
 EVT_END()
 

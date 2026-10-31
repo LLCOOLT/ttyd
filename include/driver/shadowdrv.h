@@ -44,7 +44,7 @@ typedef struct ShadowEntry {
     f32 volume;      // 0x1C
     f32 decay;       // 0x20
     f32 decay2;      // 0x24
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     Mtx mtx; // 0x28, the demo has no per-shadow alpha
 #else
     u8 alpha;     // 0x28

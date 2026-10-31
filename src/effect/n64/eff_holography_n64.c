@@ -1344,8 +1344,8 @@ effN64Vtx ach_01_v[55][22] = {
     },
 };
 
-void effHolographyMain(EffectEntry* effect);
-void effHolographyDisp(CameraId cameraId, EffectEntry* effect);
+static void effHolographyMain(EffectEntry* effect);
+static void effHolographyDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effHolographyN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -1376,7 +1376,7 @@ EffectEntry* effHolographyN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, 
     return effect;
 }
 
-void effHolographyMain(EffectEntry* effect) {
+static void effHolographyMain(EffectEntry* effect) {
     EffHolographyN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -1410,7 +1410,7 @@ void effHolographyMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effHolographyDisp, effect);
 }
 
-void effHolographyDisp(CameraId cameraId, EffectEntry* effect) {
+static void effHolographyDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffHolographyN64Work* work;
     s32 frame;

@@ -24,7 +24,7 @@ static inline void marioPartyKillSlot1(void) {
     }
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 s32 marioUseParty(void) {
     MarioWork* mario = marioGetPtr();
     PartyEntry* party;
@@ -174,7 +174,7 @@ void marioPartyKill(void) {
     marioPartyKillSlot1();
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo has one function for the partner button: the request flag is trigFlags 0x100000, and the wait for
 // partyDoWork runs here (retail splits it out into marioUsePartyMain).
 s32 marioUseParty(void) {

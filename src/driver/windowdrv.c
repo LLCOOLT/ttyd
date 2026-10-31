@@ -31,7 +31,7 @@ static const GXColor fog_color = {0xFF, 0xFF, 0xFF, 0xFF};
 
 // local prototypes
 void windowTexSetup_callback(s32 error, DVDFileInfo* info);
-void _windowDispGX_Message(s32 type, s32 tailMode, u8 alpha, BOOL dark, f32 x, f32 y, f32 width, f32 height, f32 tailX, f32 tailY);
+static void _windowDispGX_Message(s32 type, s32 tailMode, u8 alpha, BOOL dark, f32 x, f32 y, f32 width, f32 height, f32 tailX, f32 tailY);
 static inline void fogOff(void) {
     GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, fog_color);
 }
@@ -54,13 +54,13 @@ void windowInit(void) {
     w[5].userdata = NULL;
     w[6].flags = 0;
     w[6].userdata = NULL;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     winTpl = NULL;
     tpl_loaded = FALSE;
 #endif
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 void windowLoadTpl(const char* name);
 
 // the demo loads msgWindow.tpl synchronously
@@ -670,7 +670,7 @@ void windowDispGX_System(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width
     GXTexCoord2f32(0.0f, 1.0f);
 }
 
-void _windowDispGX_Message(s32 type, s32 tailMode, u8 alpha, BOOL dark, f32 x, f32 y, f32 width, f32 height, f32 tailX, f32 tailY) {
+static void _windowDispGX_Message(s32 type, s32 tailMode, u8 alpha, BOOL dark, f32 x, f32 y, f32 width, f32 height, f32 tailX, f32 tailY) {
     CameraEntry* camera;
     Mtx trans, scale;
     Mtx norm_mtx1, norm_mtx2, norm_mtx3, norm_mtx4;
@@ -1082,7 +1082,7 @@ void _windowDispGX_Message(s32 type, s32 tailMode, u8 alpha, BOOL dark, f32 x, f
 end:;
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 TEXPalette* winTpl;
 #else
 BOOL tpl_loaded; // set once the frame textures (winTpl) have loaded
@@ -1091,7 +1091,7 @@ TEXPalette* winTpl;
 
 // whether the window frame textures can be drawn (the demo loads them synchronously and has no load flag)
 static inline BOOL windowTplReady(void) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     return TRUE;
 #else
     return tpl_loaded;

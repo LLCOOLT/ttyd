@@ -26,9 +26,9 @@ typedef struct EffGarekiN64Work {
     f32 rotVelY;  // 0x3C
 } EffGarekiN64Work;
 
-void gareki_dl(s32 type);
-void effGarekiMain(EffectEntry* effect);
-void effGarekiDisp(CameraId cameraId, EffectEntry* effect);
+static void gareki_dl(s32 type);
+static void effGarekiMain(EffectEntry* effect);
+static void effGarekiDisp(CameraId cameraId, EffectEntry* effect);
 
 static f32 vx_data[] = {-1.0f, -0.5f, 0.5f, 1.0f, -1.0f, -0.5f, 0.5f, 1.0f};
 
@@ -141,7 +141,7 @@ EffectEntry* effGarekiN64Entry(s32 type, f32 x, f32 y, f32 z, f32 groundY) {
     return effect;
 }
 
-void effGarekiMain(EffectEntry* effect) {
+static void effGarekiMain(EffectEntry* effect) {
     EffGarekiN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -183,7 +183,7 @@ void effGarekiMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effGarekiDisp, effect);
 }
 
-void effGarekiDisp(CameraId cameraId, EffectEntry* effect) {
+static void effGarekiDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffGarekiN64Work* work;
     s32 i;
@@ -259,7 +259,7 @@ void effGarekiDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-void gareki_dl(s32 type) {
+static void gareki_dl(s32 type) {
     GXSetCullMode(GX_CULL_NONE);
     effSetVtxDescN64(stg__s_v);
     switch (type) {

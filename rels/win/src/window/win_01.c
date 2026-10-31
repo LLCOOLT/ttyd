@@ -14,7 +14,7 @@
 #include "evt/evt_npc.h"
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
+#include "party.h"
 #include "win.h"
 #include "data_tables.h"
 #include "evt/evt_story.h"
@@ -43,7 +43,7 @@ EVT_END()
 
 EVT_BEGIN(evt_dokan1)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_03_04_SHES_LOST_HER_PRECIOUS)
-        SPAWN_EVENT(PTR(evt_dokan1_message))
+        SPAWN_EVENT(evt_dokan1_message)
     END_IF
     SET_VALUE(LW(0), 0)
     RETURN
@@ -264,14 +264,24 @@ static EVT_BEGIN(peach_mail)
     DELETE_EVENT(LW(10))
     WAIT_FRAMES(1)
     CALL(evt_sub_rumble_onoff, 1, 0)
+#if VERSION >= VERSION_JP
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     SET_VALUE(LW(3), LW(2))
     ADD(LW(3), 267)
     SET_VALUE(LW(4), LW(2))
+#endif
     IF_INT_EQUAL(LF(0), 0)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_cam3d_evt_set, -184, 86, 262, -184, 38, -5, 1000, 11)
+#else
         CALL(evt_cam3d_evt_set, -184, 86, LW(3), -184, 38, LW(4), 1000, 11)
+#endif
     ELSE
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_cam3d_evt_set, 184, 86, 262, 184, 38, -5, 1000, 11)
+#else
         CALL(evt_cam3d_evt_set, 184, 86, LW(3), 184, 38, LW(4), 1000, 11)
+#endif
     END_IF
     WAIT_MS(1000)
     CALL(evt_mario_set_pose, STRING("M_N_9"))
@@ -303,7 +313,7 @@ EVT_END()
 EVT_BEGIN(ki_data_evt_03)
     CALL(evt_item_delete_check, STRING("item_ki03"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_ki03"), ITEM_COIN, 312, 106, -122, 14, GSWF(GSWF_WIN01_TREE_COIN_TAKEN), 0)
+        CALL(evt_item_entry, STRING("item_ki03"), ITEM_COIN, 312, 106, -122, ITEM_ENTRY_FALL_THROWN, GSWF(GSWF_WIN01_TREE_COIN_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -319,18 +329,18 @@ static TreeAccess tree_access_data[] = {
 EVT_BEGIN(win_01_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG2_WIN1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_WIN1"))
     SET_VALUE(LW(0), PTR(tree_access_data))
-    CALL_CHILD(PTR(evt_sub_tree_access_entry))
+    CALL_CHILD(evt_sub_tree_access_entry)
     IF_INT_LESS_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_01_A_SIREN_ARGUMENT)
-        SPAWN_EVENT(PTR(guide_bigtree))
+        SPAWN_EVENT(guide_bigtree)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_26_PRAISE_FROM_THE_PUNI)
-        SPAWN_EVENT(PTR(peach_mail))
+        SPAWN_EVENT(peach_mail)
     END_IF
-    SPAWN_EVENT(PTR(evt_sub_mail_event))
-    CALL(evt_item_entry, STRING("item_00"), ITEM_INN_COUPON, 165, 0, -58, 16, GSWF(GSWF_WIN01_INN_COUPON_TAKEN), 0)
+    SPAWN_EVENT(evt_sub_mail_event)
+    CALL(evt_item_entry, STRING("item_00"), ITEM_INN_COUPON, 165, 0, -58, ITEM_ENTRY_FIXED, GSWF(GSWF_WIN01_INN_COUPON_TAKEN), 0)
     RETURN
 EVT_END()

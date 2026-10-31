@@ -8,7 +8,7 @@
 #include "pmario_sound.h"
 
 //.sbss
-static OSTime lastKeyTime;
+static OSTime none_key;
 
 //.sdata
 EVT_BEGIN(maku_spread)
@@ -18,7 +18,7 @@ EVT_BEGIN(maku_spread)
 EVT_END()
 
 void seq_gameInit(SequenceWork* wp) {
-    lastKeyTime = OSGetTime();
+    none_key = OSGetTime();
     gp->systemLevelFlags &= ~0x10;
 }
 

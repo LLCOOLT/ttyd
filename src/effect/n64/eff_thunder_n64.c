@@ -32,8 +32,8 @@ typedef struct EffThunderN64Work {
     EffectEntry* charge; // 0x48
 } EffThunderN64Work;
 
-void effThunderMain(EffectEntry* effect);
-void effThunderDisp(CameraId cameraId, EffectEntry* effect);
+static void effThunderMain(EffectEntry* effect);
+static void effThunderDisp(CameraId cameraId, EffectEntry* effect);
 
 effN64Vtx Ncube_inazuma_v[] = {
     {-85, -102, 0, 3887, 2048, 255, 255, 255, 255},
@@ -644,7 +644,7 @@ EffectEntry* effThunderN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a, f32 b) {
     return effect;
 }
 
-void effThunderMain(EffectEntry* effect) {
+static void effThunderMain(EffectEntry* effect) {
     EffThunderN64Work* work;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -732,7 +732,7 @@ void effThunderMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effThunderDisp, effect);
 }
 
-void effThunderDisp(CameraId cameraId, EffectEntry* effect) {
+static void effThunderDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffThunderN64Work* work;
     s32 type;

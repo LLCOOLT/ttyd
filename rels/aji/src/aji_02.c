@@ -22,13 +22,12 @@
 #include "evt/evt_mario.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
 
-USER_FUNC(all_flag_off);
-USER_FUNC(hikaru_off_func);
-USER_FUNC(hikaru_on_func);
+static USER_FUNC(all_flag_off);
+static USER_FUNC(hikaru_off_func);
+static USER_FUNC(hikaru_on_func);
 static USER_FUNC(ride_chk);
 static USER_FUNC(thunder_main);
 static USER_FUNC(loop_onoff);
@@ -47,7 +46,11 @@ static HitDamageReturn dmgReturnPt[2];
 static EvtWord hikaru_yuka_init[83];
 
 static EVT_BEGIN(w_door_close)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("S_door1_1"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("S_door1_2"), 0, 0, LW(0))
@@ -55,7 +58,11 @@ static EVT_BEGIN(w_door_close)
 EVT_END()
 
 static EVT_BEGIN(w_door_open)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("S_door1_1"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("S_door1_2"), 0, 0, LW(0))
@@ -116,13 +123,13 @@ static EVT_BEGIN(hikaru_off)
 EVT_END()
 
 EVT_BEGIN(hikaru_yuka)
-    CALL_CHILD(PTR(hikaru_on))
+    CALL_CHILD(hikaru_on)
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_set, 80, 172, 562, 80, 50, -10, 1000, 11)
     WAIT_MS(2000)
     CALL(evt_cam3d_evt_off, 800, 11)
     WAIT_MS(800)
-    CALL_CHILD(PTR(hikaru_off))
+    CALL_CHILD(hikaru_off)
     WAIT_MS(500)
     RETURN
 EVT_END()
@@ -130,7 +137,7 @@ EVT_END()
 static EVT_BEGIN(evt_box)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("dummy"), ITEM_ELEVATOR_KEY_0x1B, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("dummy"), ITEM_ELEVATOR_KEY_0x1B, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("box"))
     CALL(evt_item_get_item, STRING("dummy"))
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG7_09_ELEVATOR_KEY_A_LIT_FLOOR)
@@ -197,7 +204,7 @@ static EVT_BEGIN(peach_evt_stg1)
     CALL(evt_mario_dispflag_onoff, 1, 1)
     CALL(evt_mario_set_pos, -140, 10, 0)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("no1"), MAPOBJ_FLAG_HIDE)
-    CALL_CHILD(PTR(hikaru_off))
+    CALL_CHILD(hikaru_off)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("yukayu1"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("yukayu2"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("ato"), MAPOBJ_FLAG_HIDE)
@@ -210,7 +217,9 @@ EVT_END()
 
 EVT_BEGIN(aji_02_init_evt)
     CALL(evt_bero_get_entername, LW(0))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 1)
+#endif
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_00_START)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN1"))
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI1"))
@@ -226,26 +235,26 @@ EVT_BEGIN(aji_02_init_evt)
         WAIT_FRAMES(1)
         CALL(evt_cam3d_evt_set, -78, 172, 560, -78, 50, -9, 0, 11)
         WAIT_FRAMES(1)
-        SPAWN_EVENT(PTR(peach_evt_stg1))
+        SPAWN_EVENT(peach_evt_stg1)
         RETURN
     END_IF
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_cam_road_reset)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("no1"), MAPOBJ_FLAG_HIDE)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_09_ELEVATOR_KEY_A_LIT_FLOOR)
-        SPAWN_EVENT(PTR(hikaru_yuka_init))
+        SPAWN_EVENT(hikaru_yuka_init)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("ato"), MAPOBJ_FLAG_HIDE)
         WAIT_FRAMES(1)
     ELSE
-        CALL_CHILD(PTR(hikaru_off))
+        CALL_CHILD(hikaru_off)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("yukayu1"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("yukayu2"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("ato"), MAPOBJ_FLAG_HIDE)
     END_IF
     CALL(evt_mobj_badgeblk, STRING("mobj00"), -125, 60, -125, ITEM_SUPER_SHROOM, 0, GSWF(GSWF_AJI02_SUPER_SHROOM_BLOCK_HIT), 0)
-    SPAWN_EVENT(PTR(evt_emergency))
+    SPAWN_EVENT(evt_emergency)
     RETURN
 EVT_END()
 
@@ -253,14 +262,19 @@ static USER_FUNC(ride_chk) {
     static s32 onoff[30];
     char hitName[64];
     char name[64];
+#if VERSION >= VERSION_JP
     MarioWork* mario = marioGetPtr();
     PartyEntry* party = partyGetPtr(0);
+#endif
     s32 i;
+#if VERSION >= VERSION_JP
     HitEntry* hit;
+#endif
 
     if (isFirstCall) {
         memset(onoff, 0, sizeof(onoff));
     }
+#if VERSION >= VERSION_JP
     if (party != NULL && party->currentMemberId == PARTY_MEMBER_YOSHI && (party->flags & PARTY_FLAG_IS_BEING_USED)) {
         hit = mario->hitobjStandOn;
         if (hit == NULL) {
@@ -269,11 +283,22 @@ static USER_FUNC(ride_chk) {
     } else {
         hit = (HitEntry*)mario->hitobjUnder;
     }
+#endif
     // panels stay lit for 30 frames after being touched
     for (i = 0; i < 30; i++) {
+#if VERSION <= VERSION_DEMO_US
+        MarioWork* mario = marioGetPtr();
+
+        if (mario->hitobjUnder != NULL) {
+#else
         if (hit != NULL) {
+#endif
             sprintf(hitName, "A_hikaru_%02d", i + 1);
+#if VERSION <= VERSION_DEMO_US
+            if (strcmp(mario->hitobjUnder->joint->name, hitName) == 0) {
+#else
             if (strcmp(hit->joint->name, hitName) == 0) {
+#endif
                 onoff[i] = 30;
             }
         }
@@ -364,7 +389,7 @@ static USER_FUNC(loop_onoff) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(all_flag_off) {
+static USER_FUNC(all_flag_off) {
     char name[64];
     s32 i;
 
@@ -379,7 +404,7 @@ USER_FUNC(all_flag_off) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(hikaru_on_func) {
+static USER_FUNC(hikaru_on_func) {
     char name[64];
     s32 idx = evtGetValue(event, GW(10));
     // root_data holds {panel list, panel count} for each route
@@ -415,7 +440,7 @@ USER_FUNC(hikaru_on_func) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(hikaru_off_func) {
+static USER_FUNC(hikaru_off_func) {
     char name[64];
     s32 i;
 

@@ -5,9 +5,9 @@
 #include "evt/evt_bero.h"
 #include "evt/evt_map.h"
 #include "evt/evt_mario.h"
+#include "evt/evt_mobj.h"
 #include "evt/evt_msg.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "muj.h"
 #include "evt/evt_story.h"
 
@@ -103,9 +103,14 @@ EVT_BEGIN(muj_11_init_evt)
     END_IF
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_31_FOUR_EYES)
-        SPAWN_EVENT(PTR(warning_event))
+        SPAWN_EVENT(warning_event)
     END_IF
+#if VERSION <= VERSION_DEMO_US
+    // the demo has a heart block and a save block in this room
+    CALL(evt_mobj_recovery_blk, STRING("r_blk"), 12, 0, 60, -20, 0, 0)
+    CALL(evt_mobj_save_blk, STRING("s_blk"), 50, 60, -20, 0, 0)
+#endif
     RETURN
 EVT_END()

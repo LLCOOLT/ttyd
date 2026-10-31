@@ -7,7 +7,7 @@
 #include "evt/evt_map.h"
 #include "evt/evt_mario.h"
 #include "evt/evt_mobj.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "eki.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
@@ -89,13 +89,13 @@ EVT_END()
 EVT_BEGIN(eki_04_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_cam_road_reset)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_EKI2"))
     CALL(evt_mobj_jumpstand_red, 0, STRING("mobj_jump"), 360, -900, 70, PTR(evt_jump), 0)
-    CALL(evt_item_entry, STRING("item01"), ITEM_DRIED_SHROOM, -250, -815, 70, 16, GSWF(GSWF_EKI04_DRIED_SHROOM), 0)
-    CALL(evt_item_entry, STRING("item02"), ITEM_P_UP_D_DOWN, -250, 230, 40, 16, GSWF(GSWF_EKI04_P_UP_D_DOWN), 0)
+    CALL(evt_item_entry, STRING("item01"), ITEM_DRIED_SHROOM, -250, -815, 70, ITEM_ENTRY_FIXED, GSWF(GSWF_EKI04_DRIED_SHROOM), 0)
+    CALL(evt_item_entry, STRING("item02"), ITEM_P_UP_D_DOWN, -250, 230, 40, ITEM_ENTRY_FIXED, GSWF(GSWF_EKI04_P_UP_D_DOWN), 0)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("futi_"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("hasira"), MAPOBJ_FLAG_BBOX_CULL)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_33_BLOW_THE_POSTER)

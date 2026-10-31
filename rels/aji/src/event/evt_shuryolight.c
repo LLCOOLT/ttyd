@@ -151,7 +151,10 @@ static void shuryolight_callback(void* param, s32 group) {
         }
     }
     if (i != 5) {
+        // The Japanese demo draws the light without advancing its animation first.
+#if VERSION >= VERSION_JP
         animPoseMain(lights[i].npc->poseId);
+#endif
         animPoseDrawShape(lights[i].npc->poseId, lights[i].shape);
     }
 }

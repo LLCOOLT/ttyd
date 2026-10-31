@@ -43,8 +43,8 @@ typedef struct EffOpukuWgunN64Work {
     u8 alphas[12];   // 0x1D8
 } EffOpukuWgunN64Work;
 
-void effOpukuWgunMain(EffectEntry* effect);
-void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect);
+static void effOpukuWgunMain(EffectEntry* effect);
+static void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect);
 
 void DCFlushRange(void* addr, u32 nBytes);
 void GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts);
@@ -130,7 +130,7 @@ EffectEntry* effOpukuWgunN64Entry(s32 type, s32 lifetime, f32 x1, f32 y1, f32 z1
     return effect;
 }
 
-void effOpukuWgunMain(EffectEntry* effect) {
+static void effOpukuWgunMain(EffectEntry* effect) {
     EffOpukuWgunN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -191,7 +191,7 @@ void effOpukuWgunMain(EffectEntry* effect) {
 }
 
 static u8 a_data[12] = {255, 255, 255, 255, 255, 255, 255, 255, 255, 200, 128, 32};
-void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
+static void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffOpukuWgunN64Work* work;
     Mtx scale;

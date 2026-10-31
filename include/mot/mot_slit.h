@@ -20,7 +20,7 @@ BOOL U_marioSlitContinueChk(void);
 void marioClearSlitFloor(void);
 BOOL marioGetSlitFloorPos(Vec* out);
 BOOL marioChkSlitThrouhEnd(void);
-void marioSlitResume(void);
+void motSlitContinue2(void);
 void motSlitCancel(void);
 void motSlitCancel2(void);
 void motSlitCancel3(void);

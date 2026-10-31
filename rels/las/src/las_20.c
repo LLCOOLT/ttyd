@@ -13,12 +13,11 @@
 #include "evt/evt_mobj.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
 #include "driver/camdrv.h"
 
-USER_FUNC(get_hosi_name);
+static USER_FUNC(get_hosi_name);
 
 static BeroEntry bero_entry_data[4];
 static const char* haguruma_hontai[14];
@@ -214,7 +213,7 @@ static EVT_BEGIN(dai_evt)
     SET_VALUE(LW(0), STRING("S_move_dai"))
     SET_VALUE(LW(1), STRING("A_move_dai"))
     SET_VALUE(LW(2), 2700)
-    CALL_CHILD(PTR(move_dai))
+    CALL_CHILD(move_dai)
     RETURN
 EVT_END()
 
@@ -336,7 +335,11 @@ EVT_BEGIN(hosi_onoff)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(1), MAPOBJ_FLAG_HIDE)
         SET_INT_INDEXED(LW(2), 1)
         CALL(evt_mapobj_get_position, LW(0), LW(3), LW(4), LW(5))
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_eff64, STRING(""), STRING("stardust_n64"), 2, LW(3), LW(4), LW(5), 30, 0, 0, 0, 0, 0, 0, 0)
+#else
         CALL(evt_eff64, 0, STRING("stardust_n64"), 2, LW(3), LW(4), LW(5), 30, 0, 0, 0, 0, 0, 0, 0)
+#endif
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG8_STAR_LIGHTUP1"), LW(3), LW(4), LW(5), 0)
     ELSE
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(0), MAPOBJ_FLAG_HIDE)
@@ -350,8 +353,8 @@ EVT_BEGIN(hosi_02_sw_evt)
     SET_VALUE(LW(0), STRING("S_hosi_02a"))
     SET_VALUE(LW(1), STRING("S_hosi_02b"))
     SET_RAW_VALUE(LW(2), LSWF(1))
-    CALL_CHILD(PTR(hosi_onoff))
-    CALL_CHILD(PTR(hosi_sw_check))
+    CALL_CHILD(hosi_onoff)
+    CALL_CHILD(hosi_sw_check)
     RETURN
 EVT_END()
 
@@ -359,8 +362,8 @@ EVT_BEGIN(hosi_03_sw_evt)
     SET_VALUE(LW(0), STRING("S_hosi_03a"))
     SET_VALUE(LW(1), STRING("S_hosi_03b"))
     SET_RAW_VALUE(LW(2), LSWF(2))
-    CALL_CHILD(PTR(hosi_onoff))
-    CALL_CHILD(PTR(hosi_sw_check))
+    CALL_CHILD(hosi_onoff)
+    CALL_CHILD(hosi_sw_check)
     RETURN
 EVT_END()
 
@@ -368,8 +371,8 @@ EVT_BEGIN(hosi_04_sw_evt)
     SET_VALUE(LW(0), STRING("S_hosi_04a"))
     SET_VALUE(LW(1), STRING("S_hosi_04b"))
     SET_RAW_VALUE(LW(2), LSWF(3))
-    CALL_CHILD(PTR(hosi_onoff))
-    CALL_CHILD(PTR(hosi_sw_check))
+    CALL_CHILD(hosi_onoff)
+    CALL_CHILD(hosi_sw_check)
     RETURN
 EVT_END()
 
@@ -377,8 +380,8 @@ EVT_BEGIN(hosi_05_sw_evt)
     SET_VALUE(LW(0), STRING("S_hosi_05a"))
     SET_VALUE(LW(1), STRING("S_hosi_05b"))
     SET_RAW_VALUE(LW(2), LSWF(4))
-    CALL_CHILD(PTR(hosi_onoff))
-    CALL_CHILD(PTR(hosi_sw_check))
+    CALL_CHILD(hosi_onoff)
+    CALL_CHILD(hosi_sw_check)
     RETURN
 EVT_END()
 
@@ -386,8 +389,8 @@ EVT_BEGIN(hosi_06_sw_evt)
     SET_VALUE(LW(0), STRING("S_hosi_06a"))
     SET_VALUE(LW(1), STRING("S_hosi_06b"))
     SET_RAW_VALUE(LW(2), LSWF(5))
-    CALL_CHILD(PTR(hosi_onoff))
-    CALL_CHILD(PTR(hosi_sw_check))
+    CALL_CHILD(hosi_onoff)
+    CALL_CHILD(hosi_sw_check)
     RETURN
 EVT_END()
 
@@ -395,8 +398,8 @@ EVT_BEGIN(hosi_07_sw_evt)
     SET_VALUE(LW(0), STRING("S_hosi_07a"))
     SET_VALUE(LW(1), STRING("S_hosi_07b"))
     SET_RAW_VALUE(LW(2), LSWF(6))
-    CALL_CHILD(PTR(hosi_onoff))
-    CALL_CHILD(PTR(hosi_sw_check))
+    CALL_CHILD(hosi_onoff)
+    CALL_CHILD(hosi_sw_check)
     RETURN
 EVT_END()
 
@@ -404,8 +407,8 @@ EVT_BEGIN(hosi_08_sw_evt)
     SET_VALUE(LW(0), STRING("S_hosi_08a"))
     SET_VALUE(LW(1), STRING("S_hosi_08b"))
     SET_RAW_VALUE(LW(2), LSWF(7))
-    CALL_CHILD(PTR(hosi_onoff))
-    CALL_CHILD(PTR(hosi_sw_check))
+    CALL_CHILD(hosi_onoff)
+    CALL_CHILD(hosi_sw_check)
     RETURN
 EVT_END()
 
@@ -447,28 +450,30 @@ EVT_END()
 EVT_BEGIN(las_20_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST3"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS5"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 2)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("S_hgm_01a"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("S_hgm_08a"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("S_hgm_09a"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("S_hgm_12a"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 0, STRING("S_hgm_19a"), MAPOBJ_FLAG_BBOX_CULL)
-    SPAWN_EVENT(PTR(haguruma_evt))
+    SPAWN_EVENT(haguruma_evt)
     CALL(evt_map_playanim, STRING("kusari"), 1, 0)
     CALL(evt_hit_bind_mapobj, STRING("A_move_dai"), STRING("S_move_dai"))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_move_dai"), MAPOBJ_FLAG_HIDE)
     CALL(evt_hitobj_onoff, STRING("A_move_dai"), 0, 0)
     CALL(evt_mobj_switch_red, 0, STRING("dai_switch"), -250, -290, 100, PTR(dai_evt), 0)
-    SPAWN_EVENT(PTR(hosi_init))
+    SPAWN_EVENT(hosi_init)
     CALL(evt_mobj_badgeblk, STRING("mobj_item00"), 295, -440, -15, ITEM_REPEL_CAPE, 0, GSWF(GSWF_LAS20_REPEL_CAPE_BLOCK_HIT), 0)
     CALL(evt_mobj_badgeblk, STRING("mobj_item01"), 640, -320, -135, ITEM_LIFE_SHROOM, 0, GSWF(GSWF_LAS20_LIFE_SHROOM_BLOCK_HIT), 0)
     RETURN
 EVT_END()
 
-USER_FUNC(get_hosi_name) {
+static USER_FUNC(get_hosi_name) {
     EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     evtSetValue(event, args[1], (EvtWord)hosi_name[idx * 2]);

@@ -18,13 +18,13 @@
 
 void GXGetProjectionv(f32* ptr);
 void GXGetViewportv(f32* vp);
-void nameBG(void);
-void nameKirinukiGX(f32 x, f32 y, f32 w, f32 h);
+static void nameBG(void);
+static void nameKirinukiGX(f32 x, f32 y, f32 w, f32 h);
 void nameWinGX(f32 x, f32 y, f32 w, f32 h, TEXPalette* tpl, s32 type);
 #include <string.h>
 
-s32 nameMain(void);
-void nameEntDisp(CameraId cameraId, void* param);
+static s32 nameMain(void);
+static void nameEntDisp(CameraId cameraId, void* param);
 
 //.data
 
@@ -126,7 +126,7 @@ const char* latin_tbl[] = {
 #endif
 
 // The demo still loads the name entry textures from the old window folder.
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #define NAME_TPL_JP "%s/window/jp/name.tpl"
 #else
 #define NAME_TPL_JP "%s/w/jp/name.tpl"
@@ -300,9 +300,9 @@ void nameEntMain(void) {
     }
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo has no cursor travel check, no all-blank name check and no default partner name.
-s32 nameMain(void) {
+static s32 nameMain(void) {
     s32 off;
     s32 idx;
 
@@ -463,7 +463,7 @@ s32 nameMain(void) {
     return 0;
 }
 #else
-s32 nameMain(void) {
+static s32 nameMain(void) {
     s32 len;
     s32 j;
     s32 off;
@@ -848,7 +848,7 @@ s32 nameMain(void) {
 
 #endif
 
-void nameEntDisp(CameraId cameraId, void* param) {
+static void nameEntDisp(CameraId cameraId, void* param) {
     GXColor white2;
     GXColor white;
     GXColor unused = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -889,7 +889,7 @@ void nameEntDisp(CameraId cameraId, void* param) {
     for (j = 0; j < 9; j++) {
         for (n = 0; n < NAMEENT_COLS; n++) {
             if (wp->charTable[j * NAMEENT_COLS + n]) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 FontDrawString((f32)(n * 24 - 190 + (n / 5) * 30), (f32)(112 - j * 28), wp->charTable[j * NAMEENT_COLS + n]);
 #else
                 FontDrawString((f32)(n * 24 - 190 + (n / 5) * 30 + (24 - FontGetMessageWidth(wp->charTable[j * NAMEENT_COLS + n])) / 2), (f32)(112 - j * 28), wp->charTable[j * NAMEENT_COLS + n]);
@@ -963,7 +963,7 @@ void nameEntDisp(CameraId cameraId, void* param) {
     GXSetViewport(vp[0], vp[1], vp[2], vp[3], vp[4], vp[5]);
 }
 
-void nameBG(void) {
+static void nameBG(void) {
     Mtx m1, m2, m3;
     GXTexObj obj1, obj2, obj3;
     f32 sy;
@@ -1076,7 +1076,7 @@ static inline void nameTexQuad(s32 id, f32 x, f32 y, f32 w, f32 h) {
     GXTexCoord2f32(1.0f, 0.0f);
 }
 
-void nameKirinukiGX(f32 x, f32 y, f32 w, f32 h) {
+static void nameKirinukiGX(f32 x, f32 y, f32 w, f32 h) {
     GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
     GXSetZCompLoc(GX_FALSE);
     GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);

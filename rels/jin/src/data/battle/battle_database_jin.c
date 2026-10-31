@@ -1259,7 +1259,7 @@ NpcBattleSelect btlgrpsel_jin_btlno_jin_10_06_off[] = {
 
 NpcSetupBattleInfo btlsetup_jin_tbl[] = {
     {
-        /*"マップstg_04_2"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x34\x5F\x32", // name
+        "マップstg_04_2", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1269,7 +1269,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"マップstg_04_3"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x34\x5F\x33", // name
+        "マップstg_04_3", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1279,7 +1279,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"マップstg_04_4"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x34\x5F\x34", // name
+        "マップstg_04_4", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1289,7 +1289,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"マップstg_04_5"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x34\x5F\x35", // name
+        "マップstg_04_5", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1299,7 +1299,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"マップstg_04_6"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x34\x5F\x36", // name
+        "マップstg_04_6", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1309,7 +1309,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"JIN_04ランペルその１"*/"\x4A\x49\x4E\x5F\x30\x34\x83\x89\x83\x93\x83\x79\x83\x8B\x82\xBB\x82\xCC\x82\x50", // name
+        "JIN_04ランペルその１", // name
         "jin_04", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1321,7 +1321,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_BOSS_STG4_RUNPELL1", // bgmName
     },
     {
-        /*"JIN_04ランペルその２"*/"\x4A\x49\x4E\x5F\x30\x34\x83\x89\x83\x93\x83\x79\x83\x8B\x82\xBB\x82\xCC\x82\x51", // name
+        "JIN_04ランペルその２", // name
         "jin_04", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1333,7 +1333,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_BOSS_STG4_FAKEMARIO1", // bgmName
     },
     {
-        /*"JIN_00アトミックテレサ"*/"\x4A\x49\x4E\x5F\x30\x30\x83\x41\x83\x67\x83\x7E\x83\x62\x83\x4E\x83\x65\x83\x8C\x83\x54", // name
+        "JIN_00アトミックテレサ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1344,7 +1344,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_CHUBOSS_BATTLE1", // bgmName
     },
     {
-        /*"JIN_00テレサ"*/"\x4A\x49\x4E\x5F\x30\x30\x83\x65\x83\x8C\x83\x54", // name
+        "JIN_00テレサ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1354,7 +1354,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"JIN_00テレサ"*/"\x4A\x49\x4E\x5F\x30\x30\x83\x65\x83\x8C\x83\x54", // name
+        "JIN_00テレサ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1364,7 +1364,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"JIN_00テレサ"*/"\x4A\x49\x4E\x5F\x30\x30\x83\x65\x83\x8C\x83\x54", // name
+        "JIN_00テレサ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1374,7 +1374,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"JIN_00テレサ"*/"\x4A\x49\x4E\x5F\x30\x30\x83\x65\x83\x8C\x83\x54", // name
+        "JIN_00テレサ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1384,7 +1384,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"JIN_00テレサ"*/"\x4A\x49\x4E\x5F\x30\x30\x83\x65\x83\x8C\x83\x54", // name
+        "JIN_00テレサ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1394,7 +1394,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"JIN_00テレサ"*/"\x4A\x49\x4E\x5F\x30\x30\x83\x65\x83\x8C\x83\x54", // name
+        "JIN_00テレサ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1404,7 +1404,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"JIN_01バサバサ"*/"\x4A\x49\x4E\x5F\x30\x31\x83\x6F\x83\x54\x83\x6F\x83\x54", // name
+        "JIN_01バサバサ", // name
         "jin_04", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1415,7 +1415,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"JIN_01バサバサ"*/"\x4A\x49\x4E\x5F\x30\x31\x83\x6F\x83\x54\x83\x6F\x83\x54", // name
+        "JIN_01バサバサ", // name
         "jin_04", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1426,7 +1426,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"JIN_02バサバサ"*/"\x4A\x49\x4E\x5F\x30\x32\x83\x6F\x83\x54\x83\x6F\x83\x54", // name
+        "JIN_02バサバサ", // name
         "jin_04", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1437,7 +1437,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"JIN_02バサバサ"*/"\x4A\x49\x4E\x5F\x30\x32\x83\x6F\x83\x54\x83\x6F\x83\x54", // name
+        "JIN_02バサバサ", // name
         "jin_04", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1448,7 +1448,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"JIN_09メット"*/"\x4A\x49\x4E\x5F\x30\x39\x83\x81\x83\x62\x83\x67", // name
+        "JIN_09メット", // name
         "jin_04", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1459,7 +1459,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"JIN_10メット"*/"\x4A\x49\x4E\x5F\x31\x30\x83\x81\x83\x62\x83\x67", // name
+        "JIN_10メット", // name
         "jin_04", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1470,7 +1470,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"JIN_10トゲメット"*/"\x4A\x49\x4E\x5F\x31\x30\x83\x67\x83\x51\x83\x81\x83\x62\x83\x67", // name
+        "JIN_10トゲメット", // name
         "jin_04", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1481,7 +1481,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"JIN_10メット"*/"\x4A\x49\x4E\x5F\x31\x30\x83\x81\x83\x62\x83\x67", // name
+        "JIN_10メット", // name
         "jin_04", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1492,7 +1492,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"JIN_10メット"*/"\x4A\x49\x4E\x5F\x31\x30\x83\x81\x83\x62\x83\x67", // name
+        "JIN_10メット", // name
         "jin_04", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1503,7 +1503,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"JIN_10トゲメット"*/"\x4A\x49\x4E\x5F\x31\x30\x83\x67\x83\x51\x83\x81\x83\x62\x83\x67", // name
+        "JIN_10トゲメット", // name
         "jin_04", // mapName
         0, // fixedItem
         -1, // swFlag
@@ -1514,7 +1514,7 @@ NpcSetupBattleInfo btlsetup_jin_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"JIN_10メット"*/"\x4A\x49\x4E\x5F\x31\x30\x83\x81\x83\x62\x83\x67", // name
+        "JIN_10メット", // name
         "jin_04", // mapName
         0, // fixedItem
         -1, // swFlag

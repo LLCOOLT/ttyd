@@ -140,7 +140,7 @@ s32 ARCConvertPathToEntrynum(ARCHandle* handle, const char* pathPtr) {
     }
 }
 
-u32 myStrncpy(char* dest, char* src, u32 maxlen) {
+static u32 myStrncpy(char* dest, char* src, u32 maxlen) {
     u32 i = maxlen;
     while ((i > 0) && (*src != 0)) {
         *dest++ = *src++;
@@ -168,7 +168,7 @@ static u32 entryToPath(ARCHandle* handle, u32 entry, char* path, u32 maxlen) {
     return loc;
 }
 
-BOOL ARCConvertEntrynumToPath(ARCHandle* handle, s32 entrynum, char* path, u32 maxlen) {
+static BOOL ARCConvertEntrynumToPath(ARCHandle* handle, s32 entrynum, char* path, u32 maxlen) {
     u32 loc;
     FSTEntry* FstStart = (FSTEntry*)handle->FSTStart;
 

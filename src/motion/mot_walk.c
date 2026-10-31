@@ -184,7 +184,7 @@ void mot_walk(void) {
         } else if (!marioBgmodeChk()) {
             marioChgPose("M_W_1");
         }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         mario->currSubMotionId = 0;
 #else
         if (!(mario->dispFlags & (MARIO_DISP_FLAG_HIDDEN << 24))) {
@@ -193,7 +193,7 @@ void mot_walk(void) {
 #endif
         mario->multiTimer = 0;
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (strcmp(mario->animName, "M_I_Y") == 0 || mario->wMotionTimer > 0xA) {
 #else
     if (!(mario->flags & MARIO_FLAG_IS_CARRYING_BOBBERY) &&
@@ -309,7 +309,7 @@ void mot_dash(void) {
             mario->baseSpeed = marioGetDashSpd();
         }
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (strcmp(mario->animName, "M_I_Y") == 0 || mario->wMotionTimer > 0xA) {
 #else
     if (!(mario->flags & MARIO_FLAG_IS_CARRYING_BOBBERY) &&

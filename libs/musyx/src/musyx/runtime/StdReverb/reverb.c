@@ -6,9 +6,6 @@
 
 #include "musyx/sal.h"
 
-// TTYD symbols.txt names this static U_HandleReverb (avoids clashing with creverb.c's HandleReverb)
-#define HandleReverb U_HandleReverb
-
 extern double pow(double x, double y);
 
 static inline void DLsetdelay(_SND_REVHI_DELAYLINE* delayline, s32 len) {

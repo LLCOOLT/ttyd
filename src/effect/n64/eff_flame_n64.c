@@ -40,8 +40,8 @@ typedef struct EffFlameN64Work {
     effN64Vtx vtx[8]; // 0x70
 } EffFlameN64Work;
 
-void effFlameMain(EffectEntry* effect);
-void effFlameDisp(CameraId cameraId, EffectEntry* effect);
+static void effFlameMain(EffectEntry* effect);
+static void effFlameDisp(CameraId cameraId, EffectEntry* effect);
 
 static inline void xf(Mtx m, effN64Vtx* dst, effN64Vtx* src) {
     Vec v;
@@ -201,7 +201,7 @@ EffectEntry* effFlameN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     return effect;
 }
 
-void effFlameMain(EffectEntry* effect) {
+static void effFlameMain(EffectEntry* effect) {
     EffFlameN64Work* work;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -285,7 +285,7 @@ void effFlameMain(EffectEntry* effect) {
     }
 }
 
-void effFlameDisp(CameraId cameraId, EffectEntry* effect) {
+static void effFlameDisp(CameraId cameraId, EffectEntry* effect) {
     s32 alpha;
     s32 type;
     EffFlameN64Work* work[1];

@@ -42,7 +42,6 @@
 #include "evt/evt_sub.h"
 #include "evt/evt_window.h"
 #include "mario/mario_motion.h"
-#include "party/party_motion.h"
 #include "pmario_sound.h"
 #include "statuswindow.h"
 #include "driver/hitdrv.h"
@@ -203,7 +202,7 @@ static void lecture_button_disp(CameraId camera, void* param) {
             }
             pos = disp->pos;
             pos.y += ofs;
-            iconDispGxAlpha(&pos, 0x50, btn->iconId, btn->alpha, 1.0f);
+            iconDispGxAlpha(&pos, ICON_FLAG_NO_MAP_BLEND | ICON_FLAG_2D, btn->iconId, btn->alpha, 1.0f);
         }
     }
 }
@@ -436,6 +435,9 @@ EVT_BEGIN(yoshi_party_lecture)
         LOOP(0)
             IF_INT_LESS_OR_EQUAL(LW(3), 0)
                 CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+#if VERSION <= VERSION_DEMO_US
+                CALL(evt_snd_sfxon_3d, STRING("SFX_PARTY_YOSH_MOVE1"), LW(0), LW(1), LW(2), 0)
+#endif
                 SET_VALUE(LW(3), 10)
             ELSE
                 SUBTRACT(LW(3), 1)
@@ -460,6 +462,9 @@ EVT_BEGIN(yoshi_party_lecture)
         LOOP(0)
             IF_INT_LESS_OR_EQUAL(LW(3), 0)
                 CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+#if VERSION <= VERSION_DEMO_US
+                CALL(evt_snd_sfxon_3d, STRING("SFX_PARTY_YOSH_MOVE1"), LW(0), LW(1), LW(2), 0)
+#endif
                 SET_VALUE(LW(3), 10)
             ELSE
                 SUBTRACT(LW(3), 1)
@@ -557,7 +562,7 @@ EVT_BEGIN(all_party_lecture)
         CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
         CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     END_IF
-    CALL(evt_mario_dispflag_onoff, 1, 1)
+    CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_HIDDEN)
     CALL(evt_mario_set_camid, 7)
     CALL(effitemget_open, STRING("sub_bg"))
     CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
@@ -593,39 +598,39 @@ EVT_BEGIN(all_party_lecture)
     CALL(lect_test_systemlevel)
     SWITCH(LW(9))
         CASE_EQUAL(4)
-        CALL_CHILD(PTR(yoshi_party_lecture_init))
+        CALL_CHILD(yoshi_party_lecture_init)
     END_SWITCH
     LOOP(6)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_LECTUREN_BLINKING1"), LW(0), LW(1), LW(2), 0)
-        CALL(evt_mario_dispflag_onoff, 0, 1)
+        CALL(evt_mario_dispflag_onoff, 0, MARIO_DISP_FLAG_HIDDEN)
         WAIT_MS(100)
-        CALL(evt_mario_dispflag_onoff, 1, 1)
+        CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_HIDDEN)
         WAIT_MS(100)
     END_LOOP
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_LECTUREN_BLINKING1"), LW(0), LW(1), LW(2), 0)
-    CALL(evt_mario_dispflag_onoff, 0, 1)
+    CALL(evt_mario_dispflag_onoff, 0, MARIO_DISP_FLAG_HIDDEN)
     SWITCH(LW(9))
         CASE_EQUAL(4)
-        CALL_CHILD(PTR(yoshi_party_lecture))
+        CALL_CHILD(yoshi_party_lecture)
     END_SWITCH
     LOOP(6)
-        CALL(evt_mario_dispflag_onoff, 1, 1)
+        CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_HIDDEN)
         CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 1)
         WAIT_MS(100)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_LECTUREN_BLINKING1"), LW(0), LW(1), LW(2), 0)
-        CALL(evt_mario_dispflag_onoff, 0, 1)
+        CALL(evt_mario_dispflag_onoff, 0, MARIO_DISP_FLAG_HIDDEN)
         CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 0)
         WAIT_MS(100)
     END_LOOP
-    CALL(evt_mario_dispflag_onoff, 1, 1)
+    CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_HIDDEN)
     CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 1)
     CALL(evt_mario_init_camid)
     CALL(evt_party_init_camid, 0)
     CALL(lect_cam_load, 0)
-    CALL(evt_mario_dispflag_onoff, 0, 1)
+    CALL(evt_mario_dispflag_onoff, 0, MARIO_DISP_FLAG_HIDDEN)
     CALL(evt_party_dispflg_onoff, 0, PARTY_DISP_FLAG_HIDDEN, 0)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
@@ -924,7 +929,7 @@ EVT_BEGIN(all_juyoitem_lecture_rel)
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_OFF_PARTY_LECTURE1_1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_npc_stop_for_event)
-    CALL(evt_npc_start_for_one_event, STRING(/*"キノピコ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x52"))
+    CALL(evt_npc_start_for_one_event, STRING("キノピコ"))
     CALL(evt_party_stop, 0)
     WAIT_MS(1000)
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
@@ -955,7 +960,7 @@ EVT_BEGIN(all_juyoitem_lecture_rel)
     CALL(evt_mario_set_pos, LW(0), LW(1), LW(2))
     CALL(evt_mario_cont_onoff, 1)
     CALL(lect_test_systemlevel)
-    CALL(evt_npc_sound_data_set, STRING(/*"キノピコ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x52"), STRING("SFX_FLD_NPC_KINOPIO_MOVE1L"), STRING("SFX_FLD_NPC_KINOPIO_MOVE1R"), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
+    CALL(evt_npc_sound_data_set, STRING("キノピコ"), STRING("SFX_FLD_NPC_KINOPIO_MOVE1L"), STRING("SFX_FLD_NPC_KINOPIO_MOVE1R"), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
     SWITCH(LW(10))
         CASE_EQUAL(10)
         CALL_CHILD(hammer_lv2_juyoitem_lecture_init)
@@ -965,19 +970,19 @@ EVT_BEGIN(all_juyoitem_lecture_rel)
         CALL_CHILD(hammer_lv2_juyoitem_lecture)
     END_SWITCH
     LOOP(6)
-        CALL(evt_mario_dispflag_onoff, 1, 1)
+        CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_HIDDEN)
         WAIT_MS(100)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_LECTUREN_BLINKING1"), LW(0), LW(1), LW(2), 0)
-        CALL(evt_mario_dispflag_onoff, 0, 1)
+        CALL(evt_mario_dispflag_onoff, 0, MARIO_DISP_FLAG_HIDDEN)
         WAIT_MS(100)
     END_LOOP
-    CALL(evt_mario_dispflag_onoff, 1, 1)
+    CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_HIDDEN)
     CALL(evt_mario_init_camid)
     CALL(lect_cam_load, 0)
     CALL(evt_cam3d_evt_off, 0, 11)
     CALL(evt_cam_road_reset)
-    CALL(evt_mario_dispflag_onoff, 0, 1)
+    CALL(evt_mario_dispflag_onoff, 0, MARIO_DISP_FLAG_HIDDEN)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
     CALL(evt_snd_envoff, PSND_FADE_OUT | PSND_CH(1))
@@ -1103,14 +1108,14 @@ static USER_FUNC(juyoitem_end) {
 
     effSoftDelete((EffectEntry*)event->lwData[9]);
     marioSetCamId(4);
-    iconFlagOff(item->name, 0x200);
+    iconFlagOff(item->name, ICON_FLAG_EFFECT_B);
     return EVT_RETURN_DONE;
 }
 
 static USER_FUNC(juyoitem_gogo) {
     ItemEntry* item = (ItemEntry*)event->lwData[8];
 
-    iconFlagOff(item->name, 0x200);
+    iconFlagOff(item->name, ICON_FLAG_EFFECT_B);
     itemSetPosition(item, 0.0f, -1000.0f, 0.0f);
     marioChgStayMotion();
     marioStSystemLevel(0);

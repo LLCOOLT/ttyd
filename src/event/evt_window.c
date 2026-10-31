@@ -42,10 +42,9 @@ typedef struct OneMsgWin {
 #define EW_ICON_OFS 0
 #endif
 // icon draw flags (the demo passes 4)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 s32 coinwin_se_wait;
 #endif
-s32 evt_window_unused_sbss; // nothing reads or writes it
 static void coin_disp(WinMgrEntry* entry);
 static void oneMessageDisp(WinMgrEntry* entry);
 
@@ -56,7 +55,8 @@ WinMgrDesc coin_desc = {
     2, 0, 8, -250, -75, 150, 45, {0xF0, 0xF0, 0xF0, 0xFF}, NULL, coin_disp
 };
 
-#if VERSION == VERSION_DEMO
+// The release versions take a flag first and, when it is set, also return the select window's cursor
+#if VERSION <= VERSION_DEMO_US
 USER_FUNC(evt_win_item_select) {
     EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
@@ -324,7 +324,7 @@ static void coin_disp(WinMgrEntry* entry) {
         }
         w->timer++;
         w->timer = w->timer % 1200;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         if (__abs(target - w->coins) == 1 || gp->retraceCount % 6 == 0) {
             psndSFXOn("SFX_COUNT_COIN1");
         }
@@ -335,7 +335,7 @@ static void coin_disp(WinMgrEntry* entry) {
         }
 #endif
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (coinwin_se_wait > 0) {
         coinwin_se_wait--;
     }

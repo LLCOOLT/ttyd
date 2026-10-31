@@ -10,7 +10,7 @@
 #include "evt/evt_bero.h"
 #include "evt/evt_item.h"
 #include "evt/evt_map.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "eki.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -52,7 +52,7 @@ static BeroEntry bero_data[] = {
     {0},
 };
 
-USER_FUNC(hit_move) {
+static USER_FUNC(hit_move) {
     MarioWork* mario = marioGetPtr();
     HitEntry* hit = mario->hitobjStandOn;
     Mtx rot;
@@ -104,7 +104,7 @@ EVT_END()
 EVT_BEGIN(eki_02_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_EKI3"))
 #if VERSION >= VERSION_US
@@ -115,11 +115,11 @@ EVT_BEGIN(eki_02_init_evt)
     CALL(evt_map_playanim, STRING("anm_sikake_2"), 1, 0)
 #endif
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_31_KEY)
-        CALL(evt_item_entry, STRING("key"), ITEM_STATION_KEY_0x19, 525, 220, 29, 16, -1, PTR(evt_key))
+        CALL(evt_item_entry, STRING("key"), ITEM_STATION_KEY_0x19, 525, 220, 29, ITEM_ENTRY_FIXED, -1, PTR(evt_key))
     END_IF
     BEGIN_INLINE_EVENT
         CALL(hit_move)
     END_INLINE_EVENT
-    CALL(evt_item_entry, STRING("item"), ITEM_STAR_PIECE, 540, 140, -40, 16, GSWF(GSWF_EKI02_STAR_PIECE), 0)
+    CALL(evt_item_entry, STRING("item"), ITEM_STAR_PIECE, 540, 140, -40, ITEM_ENTRY_FIXED, GSWF(GSWF_EKI02_STAR_PIECE), 0)
     RETURN
 EVT_END()

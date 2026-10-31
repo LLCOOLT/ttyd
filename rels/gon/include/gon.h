@@ -31,8 +31,3 @@ extern BattleUnitKind unit_nokonoko;
 extern BattleUnitKind unit_patakuri;
 extern BattleUnitKind unit_patapata;
 extern BattleUnitKind unit_togekuri;
-
-// User functions defined in the area's files (global symbols in the original REL).
-// gon_11.c
-USER_FUNC(evt_iri_16_cloud_init);
-USER_FUNC(evt_iri_16_cloud_ent);

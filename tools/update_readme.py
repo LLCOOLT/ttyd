@@ -109,7 +109,7 @@ def main():
     us = ""
     # Other versions, each once it has been built (L 2026-10-26: PAL and the demo get tables too)
     for ver, label in (("G8ME01", "US (G8ME01)"), ("G8MP01", "Europe (G8MP01)"),
-                       ("G8ME01_DEMO", "Demo (G8ME01_DEMO)")):
+                       ("G8ME01_DEMO", "US demo (G8ME01_DEMO)"), ("G8MJ01_DEMO", "Japanese demo (G8MJ01_DEMO)")):
         vr_path = os.path.join(ROOT, "build", ver, "report.json")
         if not os.path.exists(vr_path):
             continue

@@ -14,13 +14,12 @@
 #include "evt/evt_mobj.h"
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "jin.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
 
 static USER_FUNC(get_pos);
-USER_FUNC(get_width);
+static USER_FUNC(get_width);
 
 static BeroEntry bero_entry_data[3];
 extern EvtWord unpush_evt[];
@@ -86,7 +85,7 @@ static BeroEntry bero_entry_data[] = {
     {0},
 };
 
-USER_FUNC(set_pos) {
+static USER_FUNC(set_pos) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
@@ -117,7 +116,9 @@ static EVT_BEGIN(push_evt)
     ADD_FLOAT(GW(10), LW(10))
     IF_FLOAT_GREATER_OR_EQUAL(GW(10), FLOAT(265.0f))
         SET_FLOAT_VALUE(GW(10), FLOAT(265.0f))
+#if VERSION >= VERSION_JP
         SET_FLOAT_VALUE(LW(10), FLOAT(0.0f))
+#endif
         IF_INT_EQUAL(GF(0), 1)
             CALL(evt_snd_sfxoff, GW(3))
             SET_VALUE(GF(0), 0)
@@ -125,7 +126,9 @@ static EVT_BEGIN(push_evt)
     END_IF
     IF_FLOAT_LESS_OR_EQUAL(GW(10), FLOAT(0.0f))
         SET_FLOAT_VALUE(GW(10), FLOAT(0.0f))
+#if VERSION >= VERSION_JP
         SET_FLOAT_VALUE(LW(10), FLOAT(0.0f))
+#endif
         IF_INT_EQUAL(GF(0), 1)
             CALL(evt_snd_sfxoff, GW(3))
             SET_VALUE(GF(0), 0)
@@ -261,19 +264,19 @@ EVT_BEGIN(jin_10_init_evt)
     CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(evt_usu_kagemario_party_kill)
     CALL(evt_mobj_badgeblk, STRING("m"), 60, 60, -25, ITEM_TORNADO_JUMP, 0, GSWF(GSWF_JIN10_TORNADO_JUMP_BLOCK_HIT), 1)
     SET_FLOAT_VALUE(GW(10), FLOAT(0.0f))
     SET_FLOAT_VALUE(GW(11), FLOAT(0.0f))
     CALL(evt_hit_bind_mapobj, STRING("a_saku"), STRING("saku"))
     CALL(evt_run_case_evt, CASE_COND_PUSH, 1, STRING("a_saku"), 0, PTR(push_evt), 0)
-    SPAWN_EVENT(PTR(unpush_evt))
-    SPAWN_EVENT(PTR(vivi_chk))
+    SPAWN_EVENT(unpush_evt)
+    SPAWN_EVENT(vivi_chk)
     RETURN
 EVT_END()
 
-USER_FUNC(get_width) {
+static USER_FUNC(get_width) {
     EvtWord* args = event->args;
     PartyEntry* party = partyGetPtr(evtGetValue(event, args[0]));
 

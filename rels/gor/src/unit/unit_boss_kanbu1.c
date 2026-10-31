@@ -17,8 +17,8 @@
 #include "battle/battle_sub.h"
 #include "gor.h"
 
-USER_FUNC(_mario_ac_failed_check);
-USER_FUNC(_mario_ac_success_check);
+static USER_FUNC(_mario_ac_failed_check);
+static USER_FUNC(_mario_ac_success_check);
 
 BattleUnitKind unit_boss_kanbu1;
 static BattleUnitDefense defence;
@@ -275,7 +275,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -287,7 +287,7 @@ static EVT_BEGIN(attack_event)
         RETURN
     END_IF
     SET_VALUE(LW(9), PTR(&weapon_kanbu1_attack))
-    CALL_CHILD(PTR(normal_attack_event))
+    CALL_CHILD(normal_attack_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -382,7 +382,7 @@ static PoseTableEntry pose_table[] = {
     {4, "X_1"},
     {3, "X_1"},
     {28, "S_1"},
-    {65, "T_1"},
+    {BTL_POSE_TALK, "T_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "S_1"},
@@ -391,8 +391,8 @@ static PoseTableEntry pose_table[] = {
     {40, "W_1"},
     {56, "X_1"},
     {57, "X_1"},
-    {65, "T_1"},
-    {69, "S_1"},
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static PoseTableEntry pose_table_guard[] = {
@@ -403,7 +403,7 @@ static PoseTableEntry pose_table_guard[] = {
     {4, "X_1"},
     {3, "X_1"},
     {28, "G_2"},
-    {65, "T_1"},
+    {BTL_POSE_TALK, "T_1"},
     {29, "Q_1"},
     {30, "Q_1"},
     {31, "G_2"},
@@ -412,8 +412,8 @@ static PoseTableEntry pose_table_guard[] = {
     {40, "W_1"},
     {56, "X_1"},
     {57, "X_1"},
-    {65, "T_1"},
-    {69, "G_2"},
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "G_2"},
 };
 
 static EVT_BEGIN(normal_attack_event)
@@ -513,11 +513,11 @@ static EVT_BEGIN(normal_attack_event)
         RETURN
 EVT_END()
 
-USER_FUNC(_mario_ac_success_check) {
+static USER_FUNC(_mario_ac_success_check) {
     evtSetValue(event, event->args[0], _battleWorkPointer->marioAcSuccess);
     return EVT_RETURN_DONE;
 }
-USER_FUNC(_mario_ac_failed_check) {
+static USER_FUNC(_mario_ac_failed_check) {
     evtSetValue(event, event->args[0], _battleWorkPointer->marioAcFailed);
     return EVT_RETURN_DONE;
 }

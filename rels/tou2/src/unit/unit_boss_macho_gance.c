@@ -12,7 +12,6 @@
 #include "evt/evt_cam.h"
 #include "evt/evt_eff.h"
 #include "evt/evt_msg.h"
-#include "party/party_motion.h"
 #include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
@@ -36,7 +35,11 @@ BattleUnitKind unit_boss_macho_gance;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
+#if VERSION <= VERSION_DEMO_US
+static BattleDataEntry data_table[2];
+#else
 static BattleDataEntry data_table[15];
+#endif
 static BattleUnitKindPart parts[1];
 BattleWeapon weapon_gance_macho_speed;
 BattleWeapon weapon_gance_build_up;
@@ -51,7 +54,9 @@ static EvtWord entry_event[62];
 static EvtWord damage_event[97];
 static EvtWord phase_event[482];
 static EvtWord dead_event[64];
+#if VERSION >= VERSION_JP
 extern EvtWord macho_gance_damage_event[];
+#endif
 static EvtWord attack_event[151];
 extern EvtWord gance_macho_speed_attack_event[];
 extern EvtWord gance_build_up_attack_event[];
@@ -70,7 +75,11 @@ BattleUnitKind unit_boss_macho_gance = {
     0,
     1,
     1,
+#if VERSION <= VERSION_DEMO_US
+    70,
+#else
     71,
+#endif
     0,
     0,
     100,
@@ -133,7 +142,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {50, 40, 50, 60, 50, 60, 100, 40, 0, 60, 100, 60, 100, 60, 60, 0, 0, 100, 60, 100, 100, 0};
+#else
 static StatusVulnerability regist = {50, 40, 50, 100, 50, 100, 100, 30, 0, 75, 100, 75, 100, 90, 60, 0, 0, 100, 60, 100, 100, 0};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
@@ -152,8 +165,8 @@ static PoseTableEntry pose_table[] = {
     {40, "W_1"},
     {56, "X_1"},
     {57, "X_1"},
-    {65, "T_1"},
-    {69, "S_1"},
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static PoseTableEntry pose_table_furafura[] = {
@@ -173,12 +186,13 @@ static PoseTableEntry pose_table_furafura[] = {
     {40, "W_1"},
     {56, "X_1"},
     {57, "X_1"},
-    {65, "T_1"},
-    {69, "X_1"},
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "X_1"},
 };
 
 static BattleDataEntry data_table[] = {
     {49, dead_event},
+#if VERSION >= VERSION_JP
     {36, macho_gance_damage_event},
     {24, macho_gance_damage_event},
     {25, macho_gance_damage_event},
@@ -192,6 +206,7 @@ static BattleDataEntry data_table[] = {
     {33, macho_gance_damage_event},
     {34, macho_gance_damage_event},
     {35, macho_gance_damage_event},
+#endif
     {0, NULL},
 };
 
@@ -594,7 +609,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
         SWITCH(LW(0))
@@ -721,7 +736,11 @@ static EVT_BEGIN(phase_event)
             LOOP(LW(5))
                 CALL(wariai_enzan_1f, LW(5), 36, FLOAT(0.0f), FLOAT(180.0f), LW(6))
                 CALL(wariai_enzan_1f, LW(5), 36, FLOAT(1.0f), FLOAT(1.1494141f), LW(7))
+#if VERSION <= VERSION_DEMO_US
+                CALL(btlevtcmd_SetBaseScale, BTL_UNIT_SELF, LW(7), LW(7), LW(7))
+#else
                 CALL(btlevtcmd_SetBaseScale, BTL_UNIT_SELF, LW(7), LW(7), 1)
+#endif
                 ADD(LW(6), LW(1))
                 CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, LW(6), 0)
                 WAIT_FRAMES(1)
@@ -735,7 +754,11 @@ static EVT_BEGIN(phase_event)
             LOOP(LW(5))
                 CALL(wariai_enzan_1f, LW(5), 36, FLOAT(0.0f), FLOAT(-180.0f), LW(6))
                 CALL(wariai_enzan_1f, LW(5), 36, FLOAT(1.1494141f), FLOAT(1.2998047f), LW(7))
+#if VERSION <= VERSION_DEMO_US
+                CALL(btlevtcmd_SetBaseScale, BTL_UNIT_SELF, LW(7), LW(7), LW(7))
+#else
                 CALL(btlevtcmd_SetBaseScale, BTL_UNIT_SELF, LW(7), LW(7), 1)
+#endif
                 ADD(LW(6), LW(1))
                 CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, LW(6), 0)
                 WAIT_FRAMES(1)
@@ -772,7 +795,7 @@ static EVT_BEGIN(phase_event)
                 END_SIBLING_EVENT
                 WAIT_MS(200)
             END_LOOP
-            CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
+            CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
             WAIT_MS(400)
             CALL(btlevtcmd_StatusWindowOnOff, 1)
             CALL(evt_btl_camera_set_mode, 0, 0)
@@ -790,7 +813,7 @@ static EVT_BEGIN(phase_event)
             CALL(btlevtcmd_StatusWindowOnOff, 0)
             SET_VALUE(LW(0), 1)
             CALL_CHILD(macho_gance_zoom)
-            CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, 65)
+            CALL(btlevtcmd_SetTalkPoseType, BTL_UNIT_SELF, BTL_POSE_TALK)
             CALL(btlevtcmd_SetStayPoseType, BTL_UNIT_SELF, 43)
             CALL(evt_msg_print, 2, STRING("stg3_tou_471_19"), 0, BTL_UNIT_SELF)
             WAIT_MS(300)
@@ -825,6 +848,7 @@ static EVT_BEGIN(dead_event)
     RETURN
 EVT_END()
 
+#if VERSION >= VERSION_JP
 EVT_BEGIN(macho_gance_damage_event)
     CALL(btlevtcmd_ResetFaceDirection, LW(10))
     CALL(btlevtcmd_OnUnitFlag, LW(10), 1)
@@ -898,6 +922,7 @@ EVT_BEGIN(macho_gance_damage_event)
     CALL(evt_btl_camera_set_mode, 0, 0)
     RETURN
 EVT_END()
+#endif
 
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(1))
@@ -906,7 +931,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_CheckStatus, BTL_UNIT_SELF, 19, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         SET_VALUE(LW(9), PTR(&weapon_gance_macho_speed))
-        CALL_CHILD(PTR(gance_macho_speed_attack_event))
+        CALL_CHILD(gance_macho_speed_attack_event)
     ELSE
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(2))
         IF_INT_LESS(LW(2), 2)
@@ -915,17 +940,17 @@ static EVT_BEGIN(attack_event)
                 SWITCH(LW(0))
                     CASE_EQUAL(0)
                     SET_VALUE(LW(9), PTR(&weapon_gance_build_up))
-                    CALL_CHILD(PTR(gance_build_up_attack_event))
+                    CALL_CHILD(gance_build_up_attack_event)
                     CASE_EQUAL(1)
                     SET_VALUE(LW(9), PTR(&weapon_gance_body))
-                    CALL_CHILD(PTR(gance_body_attack_event))
+                    CALL_CHILD(gance_body_attack_event)
                     CASE_EQUAL(2)
                     SET_VALUE(LW(9), PTR(&weapon_gance_footwork))
-                    CALL_CHILD(PTR(gance_footwork_attack_event))
+                    CALL_CHILD(gance_footwork_attack_event)
                 END_SWITCH
             ELSE
                 SET_VALUE(LW(9), PTR(&weapon_gance_attack))
-                CALL_CHILD(PTR(gance_attack_attack_event))
+                CALL_CHILD(gance_attack_attack_event)
             END_IF
         ELSE
             IF_INT_LESS_OR_EQUAL(LW(1), 1)
@@ -933,26 +958,26 @@ static EVT_BEGIN(attack_event)
                 SWITCH(LW(0))
                     CASE_EQUAL(0)
                     SET_VALUE(LW(9), PTR(&weapon_gance_build_up))
-                    CALL_CHILD(PTR(gance_build_up_attack_event))
+                    CALL_CHILD(gance_build_up_attack_event)
                     CASE_EQUAL(1)
                     SET_VALUE(LW(9), PTR(&weapon_gance_body))
-                    CALL_CHILD(PTR(gance_body_attack_event))
+                    CALL_CHILD(gance_body_attack_event)
                     CASE_EQUAL(2)
                     SET_VALUE(LW(9), PTR(&weapon_gance_footwork))
-                    CALL_CHILD(PTR(gance_footwork_attack_event))
+                    CALL_CHILD(gance_footwork_attack_event)
                     CASE_EQUAL(3)
                     SET_VALUE(LW(9), PTR(&weapon_gance_posing))
-                    CALL_CHILD(PTR(gance_posing_attack_event))
+                    CALL_CHILD(gance_posing_attack_event)
                 END_SWITCH
             ELSE
                 CALL(btlevtcmd_DrawLots, LW(0), 2, 10, 10)
                 SWITCH(LW(0))
                     CASE_EQUAL(0)
                     SET_VALUE(LW(9), PTR(&weapon_gance_rariat_attack))
-                    CALL_CHILD(PTR(gance_rariat_attack_attack_event))
+                    CALL_CHILD(gance_rariat_attack_attack_event)
                     CASE_EQUAL(1)
                     SET_VALUE(LW(9), PTR(&weapon_gance_body_attack))
-                    CALL_CHILD(PTR(gance_body_attack_attack_event))
+                    CALL_CHILD(gance_body_attack_attack_event)
                 END_SWITCH
             END_IF
         END_IF
@@ -1183,7 +1208,7 @@ EVT_BEGIN(gance_attack_attack_event)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 18, -1)
     CALL(btlevtcmd_MoveDirectionAdd, BTL_UNIT_SELF, LW(0), 18)
     CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 9, -1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     WAIT_MS(300)
     GOTO(98)
     LABEL(91)
@@ -1207,7 +1232,7 @@ EVT_BEGIN(gance_attack_attack_event)
     CALL(x_flag_wait, 0, 0)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     WAIT_MS(500)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
     CALL(x_flag_set, 0, 1)
@@ -1373,7 +1398,7 @@ EVT_BEGIN(gance_rariat_attack_attack_event)
     CALL(x_flag_wait, 0, 0)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     WAIT_MS(500)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
     CALL(x_flag_set, 0, 1)
@@ -1405,7 +1430,7 @@ EVT_BEGIN(gance_body_attack_attack_event)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("M_1"))
     WAIT_MS(1000)
     CALL(evt_eff_delete, STRING("hikari"))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_GANSU_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetRotate, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     SET_VALUE(LW(5), 12)
@@ -1511,7 +1536,7 @@ EVT_BEGIN(gance_body_attack_attack_event)
     CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
     CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 69)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_STAY_DEFAULT)
     WAIT_MS(500)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
     CALL(x_flag_set, 0, 1)
@@ -1587,7 +1612,7 @@ static USER_FUNC(wariai_enzan_0) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(wariai_enzan_1f_intpl_w) {
+static USER_FUNC(wariai_enzan_1f_intpl_w) {
     EvtWord* args = event->args;
     f32 a = evtGetFloat(event, args[0]) - 1.0f;
     f32 b = evtGetFloat(event, args[1]);

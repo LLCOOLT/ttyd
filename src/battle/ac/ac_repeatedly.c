@@ -57,7 +57,7 @@ void battleAcDelete_Repeatedly(BattleWork* work);
 
 #define PadNow(m) (BattlePadCheckNow(m))
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static s32 _power_table[] = {80, 60, 50, 40, 28, 16, 8};
 #else
 static s32 _power_table[] = {55, 50, 45, 40, 35, 30, 25};

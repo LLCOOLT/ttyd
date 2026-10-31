@@ -18,7 +18,6 @@
 #include "evt/evt_mobj.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "version.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
@@ -195,13 +194,13 @@ EVT_END()
 
 EVT_BEGIN(water_shikake)
     CALL(evt_mario_key_onoff, 0)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     BEGIN_INLINE_EVENT
         CALL(evt_mario_wait_landon)
         CALL(evt_mario_set_mov_spd, FLOAT(0.0f))
     END_INLINE_EVENT
 #endif
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(evt_mario_normalize)
 #endif
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(40))
@@ -252,7 +251,7 @@ EVT_BEGIN(water_shikake)
     CALL(evt_map_checkanim, STRING("mizu_guru"), LW(0), LW(1))
     WAIT_MS(LW(1))
     DELETE_EVENT(LW(10))
-    CALL_CHILD(PTR(cam_shake2))
+    CALL_CHILD(cam_shake2)
     BEGIN_INLINE_EVENT
         CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
         CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_FF_ENV_SUCCESS1"))
@@ -354,11 +353,10 @@ static HitDamageReturn hitDmgRetPoints[] = {
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("item00"), ITEM_SHRINK_STOMP, LW(0), LW(1), LW(2), 15, -1, 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_SHRINK_STOMP, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
+#if VERSION <= VERSION_DEMO_US
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
 #else
-    CALL(evt_item_entry, STRING("item00"), ITEM_SHRINK_STOMP, LW(0), LW(1), LW(2), 16, -1, 0)
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_BADGE_RETURN | ITEM_FLAG_NO_TOUCH)
 #endif
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
@@ -375,12 +373,12 @@ EVT_BEGIN(mri_16_init_evt)
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(9), 0)
-    CALL_CHILD(PTR(mri_puni_init))
+    CALL_CHILD(mri_puni_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    SPAWN_EVENT(PTR(puni_disp_info))
-    SPAWN_EVENT(PTR(mri_countdown))
+    CALL_CHILD(evt_bero_info_run)
+    SPAWN_EVENT(puni_disp_info)
+    SPAWN_EVENT(mri_countdown)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG2_23_TIME_BOMB_ACTIVATED, STORY_STG2_23_01_X_NAUT_BATTLE)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
@@ -400,7 +398,7 @@ EVT_BEGIN(mri_16_init_evt)
     CALL(evt_hit_bind_mapobj, STRING("A_sikake"), STRING("S_sikake"))
     CALL(ss_set, 0)
     CALL(evt_mobj_rideswitch_lightblue, STRING("mobj01"), 125, 80, -120, PTR(bar_shikake), PTR(bar_shikake_up), GSWF(GSWF_MRI16_BAR_SWITCH_PRESSED))
-    SPAWN_EVENT(PTR(switch_up_down))
+    SPAWN_EVENT(switch_up_down)
     IF_INT_EQUAL(GSWF(GSWF_MRI16_WATER_SWITCH_PRESSED), 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_mizu_now"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_mizu_after"), MAPOBJ_FLAG_HIDE)
@@ -428,8 +426,8 @@ EVT_BEGIN(mri_16_init_evt)
         CALL(evt_puni_set_ymode, 5)
     END_IF
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
-    CALL_CHILD(PTR(evt_gazigazi_entry))
-    CALL(evt_item_entry, STRING("item_00"), ITEM_DIZZY_DIAL, -115, 0, -25, 0, GSWF(GSWF_MRI16_DIZZY_DIAL_TAKEN), 0)
+    CALL_CHILD(evt_gazigazi_entry)
+    CALL(evt_item_entry, STRING("item_00"), ITEM_DIZZY_DIAL, -115, 0, -25, ITEM_ENTRY_STAY, GSWF(GSWF_MRI16_DIZZY_DIAL_TAKEN), 0)
     CALL(evt_mobj_itembox, STRING("mobj_box00"), -125, 0, 125, 0, 0, PTR(mobj_box00), GSWF(GSWF_MRI16_SHRINK_STOMP_CHEST_OPENED))
     CALL(evt_mobj_powerupblk, STRING("pblk1"), 65, -260, -70, 0, GSWF(GSWF_MRI16_SHINE_SPRITE), 0)
     RETURN

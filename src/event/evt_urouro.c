@@ -68,7 +68,7 @@ USER_FUNC(urouro_main_func) {
     f32 step;
     f32 lim;
     f32 temp;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     s32 sfxFlag;
 #endif
 
@@ -121,7 +121,7 @@ USER_FUNC(urouro_main_func) {
                 npc->moveOffset.x = step * (f32)sin(npc->moveDir * 6.2831855f / 360.0f);
                 temp = (f32)cos(npc->moveDir * 6.2831855f / 360.0f);
                 npc->moveOffset.z = step * -temp;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 sfxFlag = 0;
                 if (psndGetFlag() & PSND_FLAG_MUTE_DOOR_SFX) {
                     if (!(animPoseGetMaterialFlag(npc->poseId) & 0x1800)) {

@@ -20,7 +20,7 @@
 static BackgroundWork work[2];
 
 // local prototypes
-void bgDisp(CameraId camId, void* param);
+static void bgDisp(CameraId camId, void* param);
 
 // the field or the battle background work (inlined everywhere; no symbol of its own)
 static inline BackgroundWork* bgGetWork(void) {
@@ -147,7 +147,7 @@ void bgMain(void) {
     }
 }
 
-void bgDisp(CameraId camId, void* param) {
+static void bgDisp(CameraId camId, void* param) {
     BackgroundWork* bgwork = bgGetWork();
     CameraEntry* camera = camGetPtr(camId);
     GXColor blend;

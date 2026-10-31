@@ -84,7 +84,7 @@ void battleAcDisp_TimingA(CameraId cameraId, void* param) {
         case 99:
             disp->iconX = intplGetValue(4, -300.0f, 30.0f, 20 - disp->slideTimer, 20);
         case 100:
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             disp->iconX = 30.0f;
 #endif
             actionCommandDisp(disp->iconX, disp->iconY);

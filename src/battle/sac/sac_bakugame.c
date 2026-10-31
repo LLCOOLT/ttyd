@@ -26,7 +26,7 @@
 #include "battle/battle_event_cmd.h"
 #include "battle/battle_camera.h"
 #include "battle/sac/sac_common.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/sac/sac_bakugame.h"
 #include "battle/battle_database_common.h"
 #include "pmario_sound.h"
@@ -121,18 +121,18 @@ typedef struct BakuWork {
 BakuWork* GetBakuGamePtr(void);
 static USER_FUNC(star_stone_appear);
 static USER_FUNC(main_star);
-void bakuGameDecideButton(s32 first);
-BOOL bakuGamePartyExist(BattleUnit* unit);
-BOOL bakuGameAudienceCanThrowPos(s32 idx);
-void bakuGameMarioSurpriseReset(BattleUnit* mario, BattleUnit* party);
-void bakuGameEnemySurpriseReset(void);
-void bakuGameAudienceSurpriseReset(void);
-void bakuGameMarioSurprise(BattleUnit* mario, BattleUnit* party);
-void bakuGameEnemySurprise(void);
-void bakuGameAudienceSurprise(void);
-void bakuGameDisp2D(CameraId cam, void* param);
-void bakuGameDisp3D(CameraId cam, void* param);
-void bakuGameDispStar(CameraId cam, void* param);
+static void bakuGameDecideButton(s32 first);
+static BOOL bakuGamePartyExist(BattleUnit* unit);
+static BOOL bakuGameAudienceCanThrowPos(s32 idx);
+static void bakuGameMarioSurpriseReset(BattleUnit* mario, BattleUnit* party);
+static void bakuGameEnemySurpriseReset(void);
+static void bakuGameAudienceSurpriseReset(void);
+static void bakuGameMarioSurprise(BattleUnit* mario, BattleUnit* party);
+static void bakuGameEnemySurprise(void);
+static void bakuGameAudienceSurprise(void);
+static void bakuGameDisp2D(CameraId cam, void* param);
+static void bakuGameDisp3D(CameraId cam, void* param);
+static void bakuGameDispStar(CameraId cam, void* param);
 
 static BattleWeapon weapon = {
     "btl_wn_sac_bakugame", // name
@@ -162,7 +162,7 @@ static BattleWeapon weapon = {
     SPECIAL_ALWAYS_HITS | SPECIAL_SHATTERS_FREEZE | SPECIAL_UNGUARDABLE, // special
     COUNTER_RESIST_ALL, // counterResistFlags
     0, 0, 0, // targetWeightFlags..sleepTime
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     0, // stopChance
     0, // stopTime
 #else
@@ -254,19 +254,19 @@ static USER_FUNC(main_star) {
     return 0;
 }
 
-USER_FUNC(init_bakugame) {
+static USER_FUNC(init_bakugame) {
     memset(GetBakuGamePtr(), 0, 0x2B8);
     return 2;
 }
 
-USER_FUNC(end_bakugame) {
+static USER_FUNC(end_bakugame) {
     BakuWork* w = GetBakuGamePtr();
     effDelete(((EffStarStoneWork*)w->eff->userdata)->dust);
     effDelete(w->eff);
     return 2;
 }
 
-s32 bakuGameDecideWeapon(EventEntry* event, BOOL isFirstCall) {
+static s32 bakuGameDecideWeapon(EventEntry* event, BOOL isFirstCall) {
     EvtWord* args = event->args;
     s32 v;
     BakuWork* w;
@@ -517,7 +517,7 @@ state_end:
             w->hstate = 2;
             w->hflag = -1;
             w->texIdx = 0x5A;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             w->hpos = (Vec){300.0f, 0.0f, 100.0f};
             w->hfrom = w->hpos;
             w->hto = (Vec){125.0f, 0.0f, -30.0f};
@@ -688,7 +688,7 @@ state_end:
             w->s80 = 0;
             w->c0 = 70.0f;
         case 11:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             if (w->cc == 2 && !(w->flags & 2)) {
                 w->c0 = 70.0f;
             } else if (w->s80 < 14) {
@@ -813,7 +813,7 @@ state_end:
                             if (u != NULL && !(u->attributeFlags & UNIT_ATTR_INACTIVE) && !BtlUnit_CheckStatus(u, STATUS_INSTANT_KILL) &&
                                 u->alliance == 1 && BtlUnit_CanActStatus(u)) {
                                 if (w->s80 == 0) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                                     BtlUnit_SetBodyAnimType(u, 0x3F);
 #else
                                     BtlUnit_SetBodyAnimType(u, 0x41);
@@ -926,7 +926,7 @@ state_end:
                 case 1:
                     w->to = (Vec){125.0f, 0.0f, -30.0f};
                     if (w->flags & 1) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                         w->to = w->hpos;
                         w->to.y = 30.0f + w->hpos.y;
 #else
@@ -1172,7 +1172,7 @@ USER_FUNC(bakuGameHeihoReturn) {
     return 0;
 }
 
-void bakuGameDecideButton(s32 first) {
+static void bakuGameDecideButton(s32 first) {
     BakuWork* w = GetBakuGamePtr();
     Vec pos[3] = {
         {-125.0f, 50.0f, 0.0f},
@@ -1200,7 +1200,7 @@ void bakuGameDecideButton(s32 first) {
     }
 }
 
-BOOL bakuGamePartyExist(BattleUnit* unit) {
+static BOOL bakuGamePartyExist(BattleUnit* unit) {
     if (unit == NULL) {
         return FALSE;
     }
@@ -1210,7 +1210,7 @@ BOOL bakuGamePartyExist(BattleUnit* unit) {
     return BtlUnit_CanActStatus(unit) != 0;
 }
 
-BOOL bakuGameAudienceCanThrowPos(s32 idx) {
+static BOOL bakuGameAudienceCanThrowPos(s32 idx) {
     s32 i;
     for (i = 0; i < 3; i++) {
         if (idx >= i * 20 + 8 && idx <= i * 20 + 11) {
@@ -1220,14 +1220,14 @@ BOOL bakuGameAudienceCanThrowPos(s32 idx) {
     return FALSE;
 }
 
-void bakuGameMarioSurpriseReset(BattleUnit* mario, BattleUnit* party) {
+static void bakuGameMarioSurpriseReset(BattleUnit* mario, BattleUnit* party) {
     btlDispPoseAnime(BtlUnit_GetPartsPtr(mario, BtlUnit_GetBodyPartsId(mario)));
     if (bakuGamePartyExist(party)) {
         btlDispPoseAnime(BtlUnit_GetPartsPtr(party, BtlUnit_GetBodyPartsId(party)));
     }
 }
 
-void bakuGameEnemySurpriseReset(void) {
+static void bakuGameEnemySurpriseReset(void) {
     s32 i;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* u;
@@ -1240,7 +1240,7 @@ void bakuGameEnemySurpriseReset(void) {
     }
 }
 
-void bakuGameAudienceSurpriseReset(void) {
+static void bakuGameAudienceSurpriseReset(void) {
     s32 i;
     BattleAudienceMember* m;
 
@@ -1255,7 +1255,7 @@ void bakuGameAudienceSurpriseReset(void) {
     }
 }
 
-void bakuGameMarioSurprise(BattleUnit* mario, BattleUnit* party) {
+static void bakuGameMarioSurprise(BattleUnit* mario, BattleUnit* party) {
     BtlUnit_SetBodyAnim(mario, "M_N_7");
     if (bakuGamePartyExist(party)) {
         switch (party->initialKind) {
@@ -1284,7 +1284,7 @@ void bakuGameMarioSurprise(BattleUnit* mario, BattleUnit* party) {
     }
 }
 
-void bakuGameEnemySurprise(void) {
+static void bakuGameEnemySurprise(void) {
     s32 i;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* u;
@@ -1297,7 +1297,7 @@ void bakuGameEnemySurprise(void) {
     }
 }
 
-void bakuGameAudienceSurprise(void) {
+static void bakuGameAudienceSurprise(void) {
     s32 i;
     BattleAudienceMember* m;
 
@@ -1320,7 +1320,7 @@ void bakuGameAudienceSurprise(void) {
     }
 }
 
-void bakuGameDisp2D(CameraId cam, void* param) {
+static void bakuGameDisp2D(CameraId cam, void* param) {
     BakuWork* w = GetBakuGamePtr();
     BattleACDispParams* disp = &_battleWorkPointer->actionCommands.disp;
     BakuBtn* b;
@@ -1368,7 +1368,7 @@ void bakuGameDisp2D(CameraId cam, void* param) {
 }
 
 #pragma dont_inline reset
-void bakuGameDisp3D(CameraId cam, void* param) {
+static void bakuGameDisp3D(CameraId cam, void* param) {
     BakuWork* w = GetBakuGamePtr();
     CameraEntry* camera = camGetPtr(CAMERA_3D);
     Mtx scl;
@@ -1439,7 +1439,7 @@ void bakuGameDisp3D(CameraId cam, void* param) {
     }
 }
 
-void bakuGameDispStar(CameraId cam, void* param) {
+static void bakuGameDispStar(CameraId cam, void* param) {
 }
 
 EVT_BEGIN(marioAttackEvent_BakuGame)

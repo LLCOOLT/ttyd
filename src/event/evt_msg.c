@@ -22,7 +22,7 @@ void evt_msg_init(void) {
     // stubbed in retail
 }
 
-s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, const char* msg, s32 callback, EvtWord name);
+static s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, const char* msg, s32 callback, EvtWord name);
 
 #include "evt/evt_npc.h"
 #include "driver/camdrv.h"
@@ -36,7 +36,7 @@ s32 BattleTransID(EventEntry* event, s32 type);
 // the message window's MsgWinData lives in its userdata block
 #define MSGW(w) ((MsgWinData*)(w)->userdata->address)
 
-s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, const char* msg, s32 callback, EvtWord name) {
+static s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, const char* msg, s32 callback, EvtWord name) {
     NpcEntry* npc = NULL;
     WindowEntry* win;
     const char* m;

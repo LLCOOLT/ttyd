@@ -24,7 +24,6 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "kpa_act.h"
-#include "party/party_motion.h"
 #include "version.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
@@ -35,12 +34,12 @@
 #include "kpa.h"
 #endif
 
-USER_FUNC(get_togenoko_pos);
+static USER_FUNC(get_togenoko_pos);
 static USER_FUNC(make_name);
-void kpa_stg1_008_cb(s32 type, smartEntry* smart);
-void kpa_stg1_014_2_cb(s32 type, smartEntry* smart);
-void kpa_stg1_036_cb(s32 type, smartEntry* smart);
-void kpa_stg1_034_cb(s32 type, smartEntry* smart);
+static void kpa_stg1_008_cb(s32 type, smartEntry* smart);
+static void kpa_stg1_014_2_cb(s32 type, smartEntry* smart);
+static void kpa_stg1_036_cb(s32 type, smartEntry* smart);
+static void kpa_stg1_034_cb(s32 type, smartEntry* smart);
 
 static NpcSetupInfo npcEnt[13];
 
@@ -237,7 +236,7 @@ EVT_BEGIN(kpa_01_touzyo_evt)
     CALL(evt_eff_fukidashi, 1, STRING(""), STRING("トゲノコＡ"), 0, 0, 0, 0, 0, 0, 0, 60)
     CALL(evt_eff_fukidashi, 1, STRING(""), STRING("トゲノコＢ"), 0, 0, 0, 0, 0, 0, 0, 60)
     WAIT_MS(1000)
-    CALL_CHILD(PTR(kpa_01_door_open))
+    CALL_CHILD(kpa_01_door_open)
     CALL(evt_cam3d_evt_set, -470, 60, 269, -683, 65, 24, 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_cam3d_evt_set, -430, 60, 234, -644, 65, -11, 2800, 11)
@@ -246,13 +245,13 @@ EVT_BEGIN(kpa_01_touzyo_evt)
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_KOOPA_LAUGH2_2"), LW(0), LW(1), LW(2), 0)
     CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("KPA_S_1"), STRING("KPA_T_1"))
     CALL(evt_msg_print, 0, STRING("kpa_stg1_000"), 0, STRING("mario"))
-    CALL_CHILD(PTR(kpa_01_door_close))
+    CALL_CHILD(kpa_01_door_close)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
     WAIT_MS(100)
     CALL(evt_msg_print, 0, STRING("kpa_stg1_001"), 0, STRING("トゲノコＡ"))
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_19_01_BOWSER_CASTLE)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
 #endif
     CALL(evt_mario_key_onoff, 1)
@@ -285,7 +284,7 @@ EVT_BEGIN(kpa_01_syuppatu_evt)
     CALL(evt_npc_move_position, STRING("ババ"), -650, 0, 0, FLOAT(60.0f), 0)
     WAIT_FRAMES(1)
     CALL(evt_msg_print, 0, STRING("kpa_stg1_021"), 0, STRING("ババ"))
-    SPAWN_EVENT(PTR(kpa_01_door_close))
+    SPAWN_EVENT(kpa_01_door_close)
     CALL(evt_npc_move_position, STRING("ババ"), -480, 0, 0, FLOAT(90.0f), 0)
     CALL(evt_mario_set_pos, 625, 30, 0)
     CALL(evt_mario_set_dir, 270, 0, 0)
@@ -727,7 +726,7 @@ EVT_BEGIN(kpa_01_syuppatu_evt)
             GOTO(10)
         END_IF
     END_INLINE_EVENT
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     BEGIN_INLINE_EVENT
         CALL(evt_npc_kamek_kemuri2, STRING("ババ"), 1500, 1)
     END_INLINE_EVENT
@@ -773,7 +772,7 @@ EVT_BEGIN(kpa_01_pos_check)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
-    CALL_CHILD(PTR(kpa_01_syuppatu_evt))
+    CALL_CHILD(kpa_01_syuppatu_evt)
     RETURN
 EVT_END()
 
@@ -824,14 +823,14 @@ EVT_BEGIN(togenoko_B_talk_evt)
 EVT_END()
 
 EVT_BEGIN(togenoko_C_init_evt)
-    CALL_CHILD(PTR(npc_init_evt))
+    CALL_CHILD(npc_init_evt)
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_JUMPING | NPC_FLAG_LAND_ON_FLOOR)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
 EVT_BEGIN(hammer_AB_init_evt)
-    CALL_CHILD(PTR(npc_init_evt))
+    CALL_CHILD(npc_init_evt)
     IF_INT_EQUAL(GSWF(GSWF_KPA01_HAMMER_BROS_TALKED), 0)
         CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_TURN_TO_MARIO)
     END_IF
@@ -888,7 +887,7 @@ EVT_BEGIN(hammer_D_talk_evt)
 EVT_END()
 
 EVT_BEGIN(hammer_E_init_evt)
-    CALL_CHILD(PTR(npc_init_evt))
+    CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
@@ -899,27 +898,27 @@ EVT_BEGIN(hammer_E_talk_evt)
 EVT_END()
 
 EVT_BEGIN(baba_init_evt)
-    CALL_CHILD(PTR(npc_init_evt))
+    CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     CALL(evt_npc_set_tribe, STRING("me"), STRING("カメックババ（地上）"))
     RETURN
 EVT_END()
 
 EVT_BEGIN(kamek_init_evt)
-    CALL_CHILD(PTR(npc_init_evt))
+    CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
 EVT_BEGIN(hkoopa_init_evt)
-    CALL_CHILD(PTR(npc_init_evt))
+    CALL_CHILD(npc_init_evt)
     CALL(evt_npc_status_onoff, 1, STRING("me"), 2)
     RETURN
 EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"トゲノコＡ"*/"\x83\x67\x83\x51\x83\x6D\x83\x52\x82\x60", // name
+        "トゲノコＡ", // name
         0, 0, // flags..reactionFlags
         npc_init_evt, // initEvent
         NULL, // regularEvent
@@ -930,7 +929,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"トゲノコＢ"*/"\x83\x67\x83\x51\x83\x6D\x83\x52\x82\x61", // name
+        "トゲノコＢ", // name
         0, 0, // flags..reactionFlags
         npc_init_evt, // initEvent
         NULL, // regularEvent
@@ -941,7 +940,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"トゲノコＣ"*/"\x83\x67\x83\x51\x83\x6D\x83\x52\x82\x62", // name
+        "トゲノコＣ", // name
         0, 0, // flags..reactionFlags
         npc_init_evt, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -950,7 +949,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"トゲノコＤ"*/"\x83\x67\x83\x51\x83\x6D\x83\x52\x82\x63", // name
+        "トゲノコＤ", // name
         0, 0, // flags..reactionFlags
         npc_init_evt, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -959,7 +958,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ハンマーＡ"*/"\x83\x6E\x83\x93\x83\x7D\x81\x5B\x82\x60", // name
+        "ハンマーＡ", // name
         0, 0, // flags..reactionFlags
         hammer_AB_init_evt, // initEvent
         NULL, // regularEvent
@@ -970,7 +969,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ハンマーＢ"*/"\x83\x6E\x83\x93\x83\x7D\x81\x5B\x82\x61", // name
+        "ハンマーＢ", // name
         0, 0, // flags..reactionFlags
         hammer_AB_init_evt, // initEvent
         NULL, // regularEvent
@@ -981,7 +980,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ハンマーＣ"*/"\x83\x6E\x83\x93\x83\x7D\x81\x5B\x82\x62", // name
+        "ハンマーＣ", // name
         0, 0, // flags..reactionFlags
         npc_init_evt, // initEvent
         NULL, // regularEvent
@@ -992,7 +991,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ハンマーＤ"*/"\x83\x6E\x83\x93\x83\x7D\x81\x5B\x82\x63", // name
+        "ハンマーＤ", // name
         0, 0, // flags..reactionFlags
         npc_init_evt, // initEvent
         NULL, // regularEvent
@@ -1003,7 +1002,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ハンマーＥ"*/"\x83\x6E\x83\x93\x83\x7D\x81\x5B\x82\x64", // name
+        "ハンマーＥ", // name
         0, 0, // flags..reactionFlags
         hammer_E_init_evt, // initEvent
         NULL, // regularEvent
@@ -1014,7 +1013,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ババ"*/"\x83\x6F\x83\x6F", // name
+        "ババ", // name
         0, 0, // flags..reactionFlags
         baba_init_evt, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -1023,7 +1022,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"カメック"*/"\x83\x4A\x83\x81\x83\x62\x83\x4E", // name
+        "カメック", // name
         0, 0, // flags..reactionFlags
         kamek_init_evt, // initEvent
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, // regularEvent..territoryType
@@ -1032,7 +1031,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"飛クッパ"*/"\x94\xF2\x83\x4E\x83\x62\x83\x70", // name
+        "飛クッパ", // name
         NPC_FLAG_INTANGIBLE, // flags
         0, // reactionFlags
         hkoopa_init_evt, // initEvent
@@ -1086,7 +1085,7 @@ EVT_BEGIN(kpa_01_init_evt)
         END_IF
     END_SWITCH
     RETURN
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 EVT_END()
 #else
 EVT_END_PAD()
@@ -1101,7 +1100,7 @@ static USER_FUNC(make_name) {
     return EVT_RETURN_DONE;
 }
 
-void kpa_stg1_008_cb(s32 type, smartEntry* smart) {
+static void kpa_stg1_008_cb(s32 type, smartEntry* smart) {
     MsgWinData* info = smart->address;
 
     switch (type) {
@@ -1113,7 +1112,7 @@ void kpa_stg1_008_cb(s32 type, smartEntry* smart) {
     }
 }
 
-void kpa_stg1_014_2_cb(s32 type, smartEntry* smart) {
+static void kpa_stg1_014_2_cb(s32 type, smartEntry* smart) {
     MsgWinData* info = smart->address;
 
     switch (type) {
@@ -1125,7 +1124,7 @@ void kpa_stg1_014_2_cb(s32 type, smartEntry* smart) {
     }
 }
 
-void kpa_stg1_036_cb(s32 type, smartEntry* smart) {
+static void kpa_stg1_036_cb(s32 type, smartEntry* smart) {
     MsgWinData* info = smart->address;
 
     switch (type) {
@@ -1137,7 +1136,7 @@ void kpa_stg1_036_cb(s32 type, smartEntry* smart) {
     }
 }
 
-void kpa_stg1_034_cb(s32 type, smartEntry* smart) {
+static void kpa_stg1_034_cb(s32 type, smartEntry* smart) {
     MsgWinData* info = smart->address;
 
     switch (type) {
@@ -1149,7 +1148,7 @@ void kpa_stg1_034_cb(s32 type, smartEntry* smart) {
     }
 }
 
-USER_FUNC(get_togenoko_pos) {
+static USER_FUNC(get_togenoko_pos) {
     EvtWord* args = event->args;
     f32 cx = evtGetFloat(event, args[0]);
     f32 cz = evtGetFloat(event, args[1]);

@@ -7,6 +7,9 @@
 #include "memory.h"
 #include <dolphin/mtx.h>
 
+static void effSyuryouDisp(CameraId cameraId, EffectEntry* effect);
+static void effSyuryouMain(EffectEntry* effect);
+
 EffectEntry* effSyuryouEntry(s32 type, s32 duration, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
     EffSyuryouWork* work;
@@ -38,7 +41,7 @@ EffectEntry* effSyuryouEntry(s32 type, s32 duration, f32 x, f32 y, f32 z) {
 #pragma push
 // dead assignments optimisation off for effSyuryouMain, effSyuryouDisp: the original register allocation and scheduling need it
 #pragma opt_dead_assignments off
-void effSyuryouMain(EffectEntry* effect) {
+static void effSyuryouMain(EffectEntry* effect) {
     EffSyuryouWork* work = effect->userdata;
     Vec position;
     BOOL inBattle;
@@ -99,7 +102,7 @@ void effSyuryouMain(EffectEntry* effect) {
 }
 #pragma pop
 
-void effSyuryouDisp(CameraId cameraId, EffectEntry* effect) {
+static void effSyuryouDisp(CameraId cameraId, EffectEntry* effect) {
     EffSyuryouWork* work = effect->userdata;
     Mtx mtx;
     Mtx scale;

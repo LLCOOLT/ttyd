@@ -31,10 +31,10 @@ typedef struct EffChargeWork {
     s32 b1;       // 0x44
 } EffChargeWork;
 
-void effChargeDisp(CameraId cameraId, EffectEntry* effect);
-void effChargeMain(EffectEntry* effect);
+static void effChargeDisp(CameraId cameraId, EffectEntry* effect);
+static void effChargeMain(EffectEntry* effect);
 
-void effChargeDisp(CameraId cameraId, EffectEntry* effect) {
+static void effChargeDisp(CameraId cameraId, EffectEntry* effect) {
     EffChargeWork* work = effect->userdata;
     s32 i;
     s32 s0 = work->r0, s1 = work->g0, s2 = work->b0;
@@ -114,7 +114,7 @@ void effChargeDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-void effChargeMain(EffectEntry* effect) {
+static void effChargeMain(EffectEntry* effect) {
     s32 frame;
     s32 odd;
     EffChargeWork* work = effect->userdata;

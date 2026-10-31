@@ -53,8 +53,8 @@ static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, 8, 0, 0, 1024, 0, 0, 0, 255},
 };
 
-void effAkariPoseMain(EffectEntry* effect);
-void effAkariPoseDisp(CameraId cameraId, EffectEntry* effect);
+static void effAkariPoseMain(EffectEntry* effect);
+static void effAkariPoseDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effAkariPoseN64Entry(s32 type, s32 count, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     f32 half;
@@ -90,7 +90,7 @@ EffectEntry* effAkariPoseN64Entry(s32 type, s32 count, s32 lifetime, f32 x, f32 
     return effect;
 }
 
-void effAkariPoseMain(EffectEntry* effect) {
+static void effAkariPoseMain(EffectEntry* effect) {
     EffAkariPoseN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -175,7 +175,7 @@ void effAkariPoseMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effAkariPoseDisp, effect);
 }
 
-void effAkariPoseDisp(CameraId cameraId, EffectEntry* effect) {
+static void effAkariPoseDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* cam;
     EffAkariPoseN64Work* work;
     s32 alpha;

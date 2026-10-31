@@ -23,8 +23,8 @@ typedef struct EffConfettiN64Work {
     s32 camId;    // 0x34
 } EffConfettiN64Work;
 
-void effConfettiMain(EffectEntry* effect);
-void effConfettiDisp(CameraId cameraId, EffectEntry* effect);
+static void effConfettiMain(EffectEntry* effect);
+static void effConfettiDisp(CameraId cameraId, EffectEntry* effect);
 
 u8 color_table[] = {
     0xE8, 0xA0, 0xA8, 0xA8, 0x50, 0x58, 0xA0, 0xA8, 0xE8, 0x48, 0x48, 0xE8,
@@ -172,7 +172,7 @@ EffectEntry* effConfettiN64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 sc
     return effect;
 }
 
-void effConfettiMain(EffectEntry* effect) {
+static void effConfettiMain(EffectEntry* effect) {
     s32 mod;
     EffConfettiN64Work* w;
     s32 i;
@@ -261,7 +261,7 @@ void effConfettiMain(EffectEntry* effect) {
     }
 }
 
-void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
+static void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
     s32 anm;
     s32 type;
     EffConfettiN64Work* w;

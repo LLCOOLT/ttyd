@@ -22,9 +22,17 @@ static BattleDataEntry data_table_yoshi[2];
 static BattleUnitKindPart parts_yoshi[1];
 static EvtWord init_event_yoshi[24];
 extern EvtWord damage_event_yoshi[];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord dead_event_yoshi[156];
+#else
 static EvtWord dead_event_yoshi[177];
+#endif
 static EvtWord attack_event_yoshi[748];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord wait_event_yoshi[6];
+#else
 static EvtWord wait_event_yoshi[7];
+#endif
 
 BattleUnitKind unit_gullible_yoshi = {
     82,
@@ -132,7 +140,11 @@ static BattleUnitDefense defence_yoshi = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr_yoshi = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist_yoshi = {60, 80, 70, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 70, 70, 0, 0, 100, 70, 100, 100, 0};
+#else
 static StatusVulnerability regist_yoshi = {60, 80, 70, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 90, 70, 0, 0, 100, 70, 100, 100, 0};
+#endif
 
 static BattleDataEntry data_table_yoshi[] = {
     {49, dead_event_yoshi},
@@ -160,7 +172,7 @@ EVT_BEGIN(damage_event_yoshi)
     END_IF
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -190,7 +202,9 @@ static EVT_BEGIN(dead_event_yoshi)
         WAIT_FRAMES(37)
         CALL(evt_msg_print, 2, STRING("stg4_jin_26_03_yos"), 0, BTL_UNIT_SELF)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PYS_D_3"))
+#if VERSION >= VERSION_JP
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_DIE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+#endif
         WAIT_MS(500)
         CALL(evt_btl_camera_set_mode, 0, 3)
         CALL(evt_btl_camera_set_moveto, 0, 90, 58, 228, 90, 38, -20, 30, 11)
@@ -199,7 +213,9 @@ static EVT_BEGIN(dead_event_yoshi)
         WAIT_MS(200)
         CASE_EQUAL(1)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PYS_D_3"))
+#if VERSION >= VERSION_JP
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_DIE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+#endif
         LOOP(0)
             IF_INT_EQUAL(GW(19), 2)
                 BREAK_LOOP
@@ -208,7 +224,9 @@ static EVT_BEGIN(dead_event_yoshi)
         END_LOOP
         CASE_EQUAL(2)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PYS_D_3"))
+#if VERSION >= VERSION_JP
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_DIE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+#endif
     END_SWITCH
     CALL(btlevtcmd_KillUnit, BTL_UNIT_SELF, 1)
     SET_VALUE(GW(20), 2)
@@ -414,4 +432,8 @@ EVT_END()
 static EVT_BEGIN(wait_event_yoshi)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
+#if VERSION <= VERSION_DEMO_US
+EVT_END()
+#else
 EVT_END_PAD()
+#endif

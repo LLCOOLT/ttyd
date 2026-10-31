@@ -8,6 +8,9 @@
 #include "libc_decls.h"
 #include "eff/eff_mist.h"
 
+static void effToikiDisp(CameraId cameraId, EffectEntry* effect);
+static void effToikiMain(EffectEntry* effect);
+
 typedef struct EffToikiWork {
     s32 type;      // 0x0
     Vec position;  // 0x4
@@ -162,7 +165,7 @@ EffectEntry* effToikiEntry(s32 type, s32 duration, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effToikiMain(EffectEntry* effect) {
+static void effToikiMain(EffectEntry* effect) {
     EffToikiWork* work = effect->userdata;
     Vec position;
     Vec mist;
@@ -215,9 +218,10 @@ void effToikiMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effToikiDisp, effect);
 }
 
-void effToikiDisp(CameraId cameraId, EffectEntry* effect) {
+static u8 color_tbl[3][4] = {{0x03, 0x02, 0x21, 0xFF}, {0xD8, 0x0F, 0x51, 0xFF}, {0x0B, 0x1B, 0x00, 0xFF}};
+
+static void effToikiDisp(CameraId cameraId, EffectEntry* effect) {
     EffToikiWork* work = effect->userdata;
-    static u8 color_tbl[3][4] = {{0x03, 0x02, 0x21, 0xFF}, {0xD8, 0x0F, 0x51, 0xFF}, {0x0B, 0x1B, 0x00, 0xFF}};
     GXTexObj texObj;
     Mtx mtx;
     Mtx rot;

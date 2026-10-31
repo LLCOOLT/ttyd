@@ -10,7 +10,6 @@
 #include "evt/evt_mobj.h"
 #include "evt/evt_paper.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "gon.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -41,11 +40,7 @@ static BeroEntry bero_entry_data[] = {
 EVT_BEGIN(item_get03)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box04"), LW(0), LW(1), LW(2))
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("item00"), ITEM_UP_ARROW, LW(0), LW(1), LW(2), 15, -1, 0)
-#else
-    CALL(evt_item_entry, STRING("item00"), ITEM_UP_ARROW, LW(0), LW(1), LW(2), 16, -1, 0)
-#endif
+    CALL(evt_item_entry, STRING("item00"), ITEM_UP_ARROW, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box04"))
     CALL(evt_item_get_item, STRING("item00"))
@@ -83,7 +78,7 @@ EVT_BEGIN(gon_13_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_mobj_floatswitch_blue, 0, STRING("mobj_switch00"), 50, 60, 40, PTR(switch_evt), GSWF(GSWF_GON13_SWITCH_PRESSED))
     CALL(evt_mobj_itembox, STRING("mobj_box04"), 0, 0, -50, 0, 0, PTR(item_get03), GSWF(GSWF_GON13_UP_ARROW_CHEST_OPENED))
     IF_INT_EQUAL(GSWF(GSWF_GON13_SWITCH_PRESSED), 0)

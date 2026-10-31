@@ -36,8 +36,8 @@ typedef struct EffBrokenBarrierN64Work {
     f32 rotVelB;   // 0x68
 } EffBrokenBarrierN64Work;
 
-void effBrokenBarrierMain(EffectEntry* effect);
-void effBrokenBarrierDisp(CameraId cameraId, EffectEntry* effect);
+static void effBrokenBarrierMain(EffectEntry* effect);
+static void effBrokenBarrierDisp(CameraId cameraId, EffectEntry* effect);
 static void main_dl(EffectEntry* effect, Mtx viewMtx);
 
 static f32 scale_data[] = {0.2f, 0.4f, 0.8f, 1.3f, 1.5f, 1.3f, 0.9f, 0.6f, 0.4f, 0.3f,
@@ -125,7 +125,7 @@ EffectEntry* effBrokenBarrierN64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f
     return effect;
 }
 
-void effBrokenBarrierMain(EffectEntry* effect) {
+static void effBrokenBarrierMain(EffectEntry* effect) {
     s32 w;
     s32 h;
     EffBrokenBarrierN64Work* work = effect->userdata;
@@ -252,7 +252,7 @@ void effBrokenBarrierMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effBrokenBarrierDisp, effect);
 }
 
-void effBrokenBarrierDisp(CameraId cameraId, EffectEntry* effect) {
+static void effBrokenBarrierDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx trans;
     Mtx scaleMtx;
     Mtx rotMtx;

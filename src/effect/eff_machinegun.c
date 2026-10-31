@@ -6,6 +6,9 @@
 #include <dolphin/mtx.h>
 #include "version.h"
 #include "libc_decls.h"
+
+static void effMachinegunDisp(CameraId cameraId, EffectEntry* effect);
+static void effMachinegunMain(EffectEntry* effect);
 // US effect texture ids are 0x1C lower for these entries.
 #define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
 
@@ -39,7 +42,7 @@ EffectEntry* effMachinegunEntry(s32 type, f32 x, f32 y, f32 z, f32 angle, f32 sp
     return effect;
 }
 
-void effMachinegunMain(EffectEntry* effect) {
+static void effMachinegunMain(EffectEntry* effect) {
     EffMachinegunWork* work = effect->userdata;
     Vec position;
 
@@ -55,7 +58,7 @@ void effMachinegunMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effMachinegunDisp, effect);
 }
 
-void effMachinegunDisp(CameraId cameraId, EffectEntry* effect) {
+static void effMachinegunDisp(CameraId cameraId, EffectEntry* effect) {
     EffMachinegunWork* work = effect->userdata;
     CameraEntry* camera;
     GXTexObj texObj;

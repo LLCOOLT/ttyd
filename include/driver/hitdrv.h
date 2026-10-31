@@ -58,7 +58,7 @@ struct HitEntry {
     struct HitEntry* parent;  // 0xD4
     struct HitEntry* child;   // 0xD8
     struct HitEntry* sibling; // 0xDC
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     struct HitEntry* nextActive; // 0xE0, next entry in the hitActiveListTop list (not in the demo)
 #endif
 };

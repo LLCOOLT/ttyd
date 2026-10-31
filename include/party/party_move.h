@@ -27,8 +27,6 @@ void party_move_mode_beside_mario(PartyEntry* party);
 void party_move_mode_stay(PartyEntry* party);
 void party_move_mode_walk(PartyEntry* party);
 
-void walkMain(PartyEntry* party);
-
 struct HitEntry;
 
 s32 partyGetFootmarkReadId(s32 id);

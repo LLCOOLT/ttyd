@@ -48,39 +48,41 @@ typedef f32 (*IntplSubArgOrderFn)(s32 mode, f32 start, f32 end, s32 cur, s32 ste
 #include "battle/battle_detect.h"
 #include "eff/eff_fall.h"
 
+static USER_FUNC(_set_mobj_shake_init);
+
 // local prototypes
-void BattleObjectConfig(void);
-void _mobj_shake_main(BattleStageObject* obj);
-void _Nozzle_Change_Check(u8 index, u8* rate);
-void _disp_escape_wall_message(CameraId camera, void* param);
-void _nozzle_type_init(void);
-f32 _get_nozzle_dir(s32 index);
-s32 _get_nozzle_attack_index(u8 index);
-void _rate_mix(s8* dstChance, s8* dstTime, s8* srcChance, s8* srcTime);
-void _rate_mix_3(s8* dstChance, s8* dstTime, s8* dstStrength, s8* srcChance, s8* srcTime, s8* srcStrength);
-void _combine_nozzle_weapon(BOOL copy, BattleWeapon* dst, BattleWeapon* src);
-USER_FUNC(_object_fall_attack);
-USER_FUNC(_object_fall_wait);
-USER_FUNC(_nozzle_work_get_weapon_address);
-USER_FUNC(_nozzle_work_attack_set);
-USER_FUNC(_nozzle_work_effect);
-USER_FUNC(_nozzle_work_wait);
-USER_FUNC(_fall_frame_delete);
-USER_FUNC(_fall_frame);
-USER_FUNC(_fall_frame_wait_unit_ready);
-USER_FUNC(_fall_frame_wait);
+static void BattleObjectConfig(void);
+static void _mobj_shake_main(BattleStageObject* obj);
+static void _Nozzle_Change_Check(u8 index, u8* rate);
+static void _disp_escape_wall_message(CameraId camera, void* param);
+static void _nozzle_type_init(void);
+static f32 _get_nozzle_dir(s32 index);
+static s32 _get_nozzle_attack_index(u8 index);
+static void _rate_mix(s8* dstChance, s8* dstTime, s8* srcChance, s8* srcTime);
+static void _rate_mix_3(s8* dstChance, s8* dstTime, s8* dstStrength, s8* srcChance, s8* srcTime, s8* srcStrength);
+static void _combine_nozzle_weapon(BOOL copy, BattleWeapon* dst, BattleWeapon* src);
+static USER_FUNC(_object_fall_attack);
+static USER_FUNC(_object_fall_wait);
+static USER_FUNC(_nozzle_work_get_weapon_address);
+static USER_FUNC(_nozzle_work_attack_set);
+static USER_FUNC(_nozzle_work_effect);
+static USER_FUNC(_nozzle_work_wait);
+static USER_FUNC(_fall_frame_delete);
+static USER_FUNC(_fall_frame);
+static USER_FUNC(_fall_frame_wait_unit_ready);
+static USER_FUNC(_fall_frame_wait);
 #if VERSION <= VERSION_JP
-USER_FUNC(_announce_wall_message);
+static USER_FUNC(_announce_wall_message);
 #endif
-USER_FUNC(_nozzle_turn);
-USER_FUNC(_set_mobj_shake);
-USER_FUNC(_bgset_audience_bgset_access);
-USER_FUNC(_bgset_audience_bgset_access);
-USER_FUNC(_bgset_kemuri_effect);
-USER_FUNC(_get_bgset_attack_data);
-USER_FUNC(_mobj_destroy);
-USER_FUNC(_mobj_set_alpha);
-USER_FUNC(_set_mobj_rotate_x);
+static USER_FUNC(_nozzle_turn);
+static USER_FUNC(_set_mobj_shake);
+static USER_FUNC(_bgset_audience_bgset_access);
+static USER_FUNC(_bgset_audience_bgset_access);
+static USER_FUNC(_bgset_kemuri_effect);
+static USER_FUNC(_get_bgset_attack_data);
+static USER_FUNC(_mobj_destroy);
+static USER_FUNC(_mobj_set_alpha);
+static USER_FUNC(_set_mobj_rotate_x);
 
 extern BattleWeaponData _nozzle_at_base_mario;
 extern BattleWeaponData _nozzle_at_base_monster;
@@ -451,7 +453,7 @@ void BattleStageObjectMain(void) {
     BattleObjectConfig();
 }
 
-void BattleObjectConfig(void) {
+static void BattleObjectConfig(void) {
     // stubbed in retail
 }
 
@@ -1325,7 +1327,7 @@ BattleStageFallObjectData battle_stage_fall_object_data[] = {
                 0, 0, 100, 0, 100, 0, 0, 0, // poisonTime..dodgyTime
                 100, 0, 100, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
                 0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 -99, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
 #else
                 -99, 0, 0, 0, 0, 0, 0, -99, // chargeStrength..paybackTime
@@ -1653,7 +1655,7 @@ BattleStageFallObjectData battle_stage_fall_object_data[] = {
                 0, 0, 100, 0, 100, 0, 0, 0, // poisonTime..dodgyTime
                 100, 0, 100, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
                 0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 -99, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
 #else
                 -99, 0, 0, 0, 0, 0, 0, -99, // chargeStrength..paybackTime
@@ -1981,7 +1983,7 @@ BattleStageFallObjectData battle_stage_fall_object_data[] = {
                 0, 0, 100, 0, 100, 0, 0, 0, // poisonTime..dodgyTime
                 100, 0, 100, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
                 0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 -99, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
 #else
                 -99, 0, 0, 0, 0, 0, 0, -99, // chargeStrength..paybackTime
@@ -2309,7 +2311,7 @@ BattleStageFallObjectData battle_stage_fall_object_data[] = {
                 0, 0, 100, 0, 100, 0, 0, 0, // poisonTime..dodgyTime
                 100, 0, 100, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
                 0, 0, 0, 0, 0, 0, 0, 0, // atkChangeTime..ohkoChance
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 -99, 0, 0, 0, 0, 0, 0, 0, // chargeStrength..paybackTime
 #else
                 -99, 0, 0, 0, 0, 0, 0, -99, // chargeStrength..paybackTime
@@ -2438,19 +2440,19 @@ BattleUnitSetup _entry_switch_data = {&unit_object_switch, 2, {0}, BATTLE_PHASE_
 
 EVT_BEGIN(_object_turn_event_A1)
     SET_VALUE(LW(9), 0)
-    CALL_CHILD(PTR(_object_turn_event_core))
+    CALL_CHILD(_object_turn_event_core)
     RETURN
 EVT_END()
 
 EVT_BEGIN(_object_turn_event_A2)
     SET_VALUE(LW(9), 1)
-    CALL_CHILD(PTR(_object_turn_event_core))
+    CALL_CHILD(_object_turn_event_core)
     RETURN
 EVT_END()
 
 EVT_BEGIN(_object_turn_event_B)
     SET_VALUE(LW(9), 2)
-    CALL_CHILD(PTR(_object_turn_event_core))
+    CALL_CHILD(_object_turn_event_core)
     RETURN
 EVT_END()
 
@@ -2563,13 +2565,13 @@ EVT_END()
 #if VERSION <= VERSION_JP
 EVT_BEGIN(_nozzle_work_event_0)
     SET_VALUE(LW(10), 0)
-    CALL_CHILD(PTR(_nozzle_work_event_core))
+    CALL_CHILD(_nozzle_work_event_core)
     RETURN
 EVT_END()
 
 EVT_BEGIN(_nozzle_work_event_1)
     SET_VALUE(LW(10), 1)
-    CALL_CHILD(PTR(_nozzle_work_event_core))
+    CALL_CHILD(_nozzle_work_event_core)
     RETURN
 EVT_END()
 #endif
@@ -2655,7 +2657,7 @@ EVT_BEGIN(_object_fall_event)
     RETURN
 EVT_END()
 
-USER_FUNC(_set_mobj_rotate_x) {
+static USER_FUNC(_set_mobj_rotate_x) {
     const char* fall1;
     const char* fall3;
     BattleWork* wp;
@@ -2748,18 +2750,18 @@ EVT_END()
 
 EVT_BEGIN(_nozzle_work_event_0)
     SET_VALUE(LW(10), 0)
-    CALL_CHILD(PTR(_nozzle_work_event_core))
+    CALL_CHILD(_nozzle_work_event_core)
     RETURN
 EVT_END()
 
 EVT_BEGIN(_nozzle_work_event_1)
     SET_VALUE(LW(10), 1)
-    CALL_CHILD(PTR(_nozzle_work_event_core))
+    CALL_CHILD(_nozzle_work_event_core)
     RETURN
 EVT_END()
 #endif
 
-USER_FUNC(_mobj_set_alpha) {
+static USER_FUNC(_mobj_set_alpha) {
     EvtWord* args = event->args;
     s32 layer = evtGetValue(event, args[0]);
     u8 alpha = evtGetValue(event, args[1]);
@@ -2789,7 +2791,7 @@ USER_FUNC(_mobj_set_alpha) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_mobj_destroy) {
+static USER_FUNC(_mobj_destroy) {
     BattleWork* wp = _battleWorkPointer;
     BattleStageObject* obj;
     BattleUnit* unit;
@@ -2824,7 +2826,7 @@ USER_FUNC(_mobj_destroy) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_get_bgset_attack_data) {
+static USER_FUNC(_get_bgset_attack_data) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
@@ -2850,7 +2852,7 @@ USER_FUNC(_get_bgset_attack_data) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_bgset_kemuri_effect) {
+static USER_FUNC(_bgset_kemuri_effect) {
     s32 layer;
     const char* sfxA1;
     const char* sfxA2;
@@ -2896,12 +2898,12 @@ USER_FUNC(_bgset_kemuri_effect) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_bgset_audience_bgset_access) {
+static USER_FUNC(_bgset_audience_bgset_access) {
     BattleAudience_Case_HaikeiSet();
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_set_mobj_shake_init) {
+static USER_FUNC(_set_mobj_shake_init) {
     BattleWork* wp = _battleWorkPointer;
     s32 layer;
     int i;
@@ -2926,7 +2928,7 @@ USER_FUNC(_set_mobj_shake_init) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_set_mobj_shake) {
+static USER_FUNC(_set_mobj_shake) {
     BattleWork* wp = _battleWorkPointer;
     BattleStageObject* obj;
     BattleStageObjectWork* sw = STAGE_WORK(wp);
@@ -2957,7 +2959,7 @@ USER_FUNC(_set_mobj_shake) {
     return EVT_RETURN_BLOCK;
 }
 
-void _mobj_shake_main(BattleStageObject* obj) {
+static void _mobj_shake_main(BattleStageObject* obj) {
     obj->shakePeriodPosition++;
     if (obj->shakePeriodPosition >= obj->shakePeriodLength) {
         obj->shakePeriodPosition = 0;
@@ -2978,7 +2980,7 @@ void BattleStage_NozzleDirChangeCheck(void) {
     }
 }
 
-void _Nozzle_Change_Check(u8 index, u8* rate) {
+static void _Nozzle_Change_Check(u8 index, u8* rate) {
     BattleStageObjectWork* sw = STAGE_WORK(_battleWorkPointer);
     u8* cur = &sw->nozzleDir[index];
     EventEntry* evt;
@@ -3012,7 +3014,7 @@ void _Nozzle_Change_Check(u8 index, u8* rate) {
     }
 }
 
-USER_FUNC(_nozzle_turn) {
+static USER_FUNC(_nozzle_turn) {
     BattleStageObjectWork* sw = STAGE_WORK(_battleWorkPointer);
     s32 index = event->unitId;
     const char* name;
@@ -3109,7 +3111,7 @@ void BattleStage_WallCloseCheck(void) {
 }
 
 #if VERSION <= VERSION_JP
-USER_FUNC(_announce_wall_message) {
+static USER_FUNC(_announce_wall_message) {
     if (isFirstCall) {
         event->userdata[0] = 60;
     }
@@ -3121,7 +3123,7 @@ USER_FUNC(_announce_wall_message) {
     return EVT_RETURN_BLOCK;
 }
 
-void _disp_escape_wall_message(CameraId camera, void* param) {
+static void _disp_escape_wall_message(CameraId camera, void* param) {
     const char* msg = msgSearch("btl_msg_escape_wall_close2");
     s32 width = FontGetMessageWidth(msg);
     f32 x;
@@ -3145,7 +3147,7 @@ void BattleStage_IronFrameFallCheck(void) {
     }
 }
 
-USER_FUNC(_fall_frame_wait) {
+static USER_FUNC(_fall_frame_wait) {
     BattleWork* wp = _battleWorkPointer;
     BattleStageObjectWork* sw = STAGE_WORK(wp);
 
@@ -3161,7 +3163,7 @@ USER_FUNC(_fall_frame_wait) {
     return EVT_RETURN_YIELD;
 }
 
-USER_FUNC(_fall_frame_wait_unit_ready) {
+static USER_FUNC(_fall_frame_wait_unit_ready) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
     EventEntry* evt;
@@ -3170,7 +3172,7 @@ USER_FUNC(_fall_frame_wait_unit_ready) {
     if (isFirstCall) {
         for (i = 0; i < BATTLE_UNIT_MAX; i++) {
             unit = BattleGetUnitPtr(wp, i);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             if (unit && !(unit->flags & UNIT_FLAG_DELETE_PENDING) && unit->ceilFallEventCode) {
 #else
             if (unit && !(unit->flags & UNIT_FLAG_DELETE_PENDING) && !BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL) && unit->ceilFallEventCode) {
@@ -3197,7 +3199,7 @@ USER_FUNC(_fall_frame_wait_unit_ready) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_fall_frame) {
+static USER_FUNC(_fall_frame) {
     BattleWork* wp;
     s32 arg = event->args[0];
     BattleStageObject* body;
@@ -3219,7 +3221,7 @@ USER_FUNC(_fall_frame) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_fall_frame_delete) {
+static USER_FUNC(_fall_frame_delete) {
     BattleWork* wp = _battleWorkPointer;
     BattleStageObjectWork* sw = STAGE_WORK(wp);
 
@@ -3258,7 +3260,7 @@ void BattleStage_NozzleWorkCheck(s32 type) {
     }
 }
 
-void _nozzle_type_init(void) {
+static void _nozzle_type_init(void) {
     BattleWork* wp = _battleWorkPointer;
     BattleStageObjectWork* sw = STAGE_WORK(wp);
     BattleStageNozzleData* data = sw->nozzleData;
@@ -3281,7 +3283,7 @@ void _nozzle_type_init(void) {
     }
 }
 
-USER_FUNC(_nozzle_work_wait) {
+static USER_FUNC(_nozzle_work_wait) {
     BattleWork* wp = _battleWorkPointer;
     BattleStageObjectWork* sw = STAGE_WORK(wp);
     int i;
@@ -3300,7 +3302,7 @@ USER_FUNC(_nozzle_work_wait) {
     return EVT_RETURN_DONE;
 }
 
-f32 _get_nozzle_dir(s32 index) {
+static f32 _get_nozzle_dir(s32 index) {
     switch (STAGE_WORK(_battleWorkPointer)->nozzleDir[index]) {
         case 1:
             return -45.0f;
@@ -3312,7 +3314,7 @@ f32 _get_nozzle_dir(s32 index) {
     }
 }
 
-USER_FUNC(_nozzle_work_effect) {
+static USER_FUNC(_nozzle_work_effect) {
     BattleWork* wp = _battleWorkPointer;
     BattleStageObjectWork* sw = STAGE_WORK(wp);
     EvtWord* args = event->args;
@@ -3492,7 +3494,7 @@ BOOL BattleFogForceStop(void) {
     return TRUE;
 }
 
-USER_FUNC(_nozzle_work_attack_set) {
+static USER_FUNC(_nozzle_work_attack_set) {
     BattleWork* wp = _battleWorkPointer;
     BattleStageObjectWork* sw = STAGE_WORK(wp);
     s32 index;
@@ -3516,7 +3518,7 @@ USER_FUNC(_nozzle_work_attack_set) {
     return EVT_RETURN_DONE;
 }
 
-s32 _get_nozzle_attack_index(u8 index) {
+static s32 _get_nozzle_attack_index(u8 index) {
     BattleStageObjectWork* sw = STAGE_WORK(_battleWorkPointer);
 
     switch (index) {
@@ -3551,7 +3553,7 @@ s32 _get_nozzle_attack_index(u8 index) {
     return -1;
 }
 
-void _rate_mix(s8* dstChance, s8* dstTime, s8* srcChance, s8* srcTime) {
+static void _rate_mix(s8* dstChance, s8* dstTime, s8* srcChance, s8* srcTime) {
     if (*srcChance <= 0) {
         return;
     }
@@ -3561,7 +3563,7 @@ void _rate_mix(s8* dstChance, s8* dstTime, s8* srcChance, s8* srcTime) {
     *dstTime += *srcTime;
 }
 
-void _rate_mix_3(s8* dstChance, s8* dstTime, s8* dstStrength, s8* srcChance, s8* srcTime, s8* srcStrength) {
+static void _rate_mix_3(s8* dstChance, s8* dstTime, s8* dstStrength, s8* srcChance, s8* srcTime, s8* srcStrength) {
     if (*srcChance <= 0) {
         return;
     }
@@ -3576,7 +3578,7 @@ void _rate_mix_3(s8* dstChance, s8* dstTime, s8* dstStrength, s8* srcChance, s8*
     }
 }
 
-void _combine_nozzle_weapon(BOOL copy, BattleWeapon* dst, BattleWeapon* src) {
+static void _combine_nozzle_weapon(BOOL copy, BattleWeapon* dst, BattleWeapon* src) {
     s8* d;
     s8* s;
     int i;
@@ -3617,7 +3619,7 @@ void _combine_nozzle_weapon(BOOL copy, BattleWeapon* dst, BattleWeapon* src) {
     d[0x2D] += s[0x2D];
 }
 
-USER_FUNC(_nozzle_work_get_weapon_address) {
+static USER_FUNC(_nozzle_work_get_weapon_address) {
     BattleWork* wp = _battleWorkPointer;
     BattleStageObjectWork* sw = STAGE_WORK(wp);
     EvtWord* args = event->args;
@@ -3640,7 +3642,7 @@ s32 BattleStage_ObjectFallCheck(void) {
     return evt->eventId;
 }
 
-USER_FUNC(_object_fall_wait) {
+static USER_FUNC(_object_fall_wait) {
     BattleWork* wp = _battleWorkPointer;
     BattleStageObjectWork* sw = STAGE_WORK(wp);
 
@@ -3690,54 +3692,54 @@ typedef struct FallObjectWork {
     s8 prevTypes[3];            // 0x1
     FallObjectEntry entries[1]; // 0x4
 } FallObjectWork;
-s32 _object_fall_attack(EventEntry* event, BOOL isFirstCall);
-void _combine_nozzle_weapon(BOOL copy, BattleWeapon* dst, BattleWeapon* src);
-void _rate_mix_3(s8* dstChance, s8* dstTime, s8* dstStrength, s8* srcChance, s8* srcTime, s8* srcStrength);
-void _rate_mix(s8* dstChance, s8* dstTime, s8* srcChance, s8* srcTime);
-s32 _get_nozzle_attack_index(u8 index);
+static s32 _object_fall_attack(EventEntry* event, BOOL isFirstCall);
+static void _combine_nozzle_weapon(BOOL copy, BattleWeapon* dst, BattleWeapon* src);
+static void _rate_mix_3(s8* dstChance, s8* dstTime, s8* dstStrength, s8* srcChance, s8* srcTime, s8* srcStrength);
+static void _rate_mix(s8* dstChance, s8* dstTime, s8* srcChance, s8* srcTime);
+static s32 _get_nozzle_attack_index(u8 index);
 BOOL BattleFogForceStop(void);
-f32 _get_nozzle_dir(s32 index);
-void _nozzle_type_init(void);
+static f32 _get_nozzle_dir(s32 index);
+static void _nozzle_type_init(void);
 void BattleStage_NozzleWorkCheck(s32 type);
 void BattleStage_IronFrameFallCheck(void);
-void _disp_escape_wall_message(CameraId camera, void* param);
+static void _disp_escape_wall_message(CameraId camera, void* param);
 void BattleStage_WallCloseCheck(void);
-void _Nozzle_Change_Check(u8 index, u8* rate);
+static void _Nozzle_Change_Check(u8 index, u8* rate);
 void BattleStage_NozzleDirChangeCheck(void);
-void _mobj_shake_main(BattleStageObject* obj);
+static void _mobj_shake_main(BattleStageObject* obj);
 void BattleStage_DestroyB(void);
 void BattleStage_DestroyA2(void);
 void BattleStage_DestroyA1(void);
-void BattleObjectConfig(void);
+static void BattleObjectConfig(void);
 void BattleStageObjectMain(void);
 void BattleStageObjectInit(void);
 BattleStageObject* BattleSearchObjectPtr(const char* name);
 BattleStageObject* BattleGetObjectPtr(s32 id);
-USER_FUNC(_object_fall_wait);
-USER_FUNC(_nozzle_work_get_weapon_address);
-USER_FUNC(_nozzle_work_attack_set);
-USER_FUNC(_nozzle_work_effect);
-USER_FUNC(_nozzle_work_wait);
-USER_FUNC(_fall_frame_delete);
-USER_FUNC(_fall_frame);
-USER_FUNC(_fall_frame_wait_unit_ready);
-USER_FUNC(_fall_frame_wait);
+static USER_FUNC(_object_fall_wait);
+static USER_FUNC(_nozzle_work_get_weapon_address);
+static USER_FUNC(_nozzle_work_attack_set);
+static USER_FUNC(_nozzle_work_effect);
+static USER_FUNC(_nozzle_work_wait);
+static USER_FUNC(_fall_frame_delete);
+static USER_FUNC(_fall_frame);
+static USER_FUNC(_fall_frame_wait_unit_ready);
+static USER_FUNC(_fall_frame_wait);
 #if VERSION >= VERSION_US
 USER_FUNC(btlevtcmd_AnnounceMessage);
 #else
-USER_FUNC(_announce_wall_message);
+static USER_FUNC(_announce_wall_message);
 #endif
-USER_FUNC(_nozzle_turn);
-USER_FUNC(_set_mobj_shake);
-USER_FUNC(_set_mobj_shake_init);
-USER_FUNC(_bgset_audience_bgset_access);
-USER_FUNC(_bgset_kemuri_effect);
-USER_FUNC(_get_bgset_attack_data);
-USER_FUNC(_mobj_destroy);
-USER_FUNC(_mobj_set_alpha);
-USER_FUNC(_set_mobj_rotate_x);
+static USER_FUNC(_nozzle_turn);
+static USER_FUNC(_set_mobj_shake);
+static USER_FUNC(_set_mobj_shake_init);
+static USER_FUNC(_bgset_audience_bgset_access);
+static USER_FUNC(_bgset_kemuri_effect);
+static USER_FUNC(_get_bgset_attack_data);
+static USER_FUNC(_mobj_destroy);
+static USER_FUNC(_mobj_set_alpha);
+static USER_FUNC(_set_mobj_rotate_x);
 
-s32 _object_fall_attack(EventEntry* event, BOOL isFirstCall) {
+static s32 _object_fall_attack(EventEntry* event, BOOL isFirstCall) {
     BattleWork* wp = _battleWorkPointer;
     BattleStageFallObjectData* fd = wp->stageObjectWork.fallObjectData;
     const char* sfxNormal;
@@ -3760,7 +3762,7 @@ s32 _object_fall_attack(EventEntry* event, BOOL isFirstCall) {
     s32 k;
     const char* sfxTub2;
     FallObjectEntry* o2;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     const char* sfxRest;
 #endif
     s32 i;
@@ -3893,7 +3895,7 @@ s32 _object_fall_attack(EventEntry* event, BOOL isFirstCall) {
     }
     sfxTub2 = (0, "SFX_BTL_STAGE_DAMAGE_TUB1"); // FAKE: comma expr makes the literal an early @ temp (same pointer)
     sfxNormal = "SFX_BTL_STAGE_DAMAGE_NORMAL1";
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     sfxRest = "SFX_REST_CONDITION1";
 #endif
     w = event->userdatap[0];
@@ -3974,7 +3976,7 @@ s32 _object_fall_attack(EventEntry* event, BOOL isFirstCall) {
                     break;
 
                 case 4:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                     e3->effect = effFallEntry(2, pos.x, pos.y, pos.z, width, hit.y - pos.y, dir, 1, 90);
 #else
                     e3->effect = effFallEntry(2, pos.x, pos.y, 5.0f + pos.z, width, hit.y - pos.y, dir, 1, 90);
@@ -3991,13 +3993,13 @@ s32 _object_fall_attack(EventEntry* event, BOOL isFirstCall) {
 
                 case 6:
                     if (BtlUnit_GetBelong(unit) == 0) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                         e3->effect = effFallEntry(6, -300.0f, pos.y, pos.z, 0.0f, 0.0f, dir, 1, 180);
 #else
                         e3->effect = effFallEntry(6, -300.0f, pos.y, 15.0f + pos.z, 0.0f, 0.0f, dir, 1, 180);
 #endif
                     } else {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                         e3->effect = effFallEntry(6, 300.0f, pos.y, pos.z, 0.0f, 0.0f, dir, 1, 180);
 #else
                         e3->effect = effFallEntry(6, 300.0f, pos.y, 15.0f + pos.z, 0.0f, 0.0f, dir, 1, 180);
@@ -4006,7 +4008,7 @@ s32 _object_fall_attack(EventEntry* event, BOOL isFirstCall) {
                     break;
 
                 case 7:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                     e3->effect = effFallEntry(7, pos.x, pos.y, pos.z, width, hit.y - pos.y, dir, 1, 180);
 #else
                     e3->effect = effFallEntry(7, pos.x, pos.y, 5.0f + pos.z, width, hit.y - pos.y, dir, 1, 180);
@@ -4077,7 +4079,7 @@ s32 _object_fall_attack(EventEntry* event, BOOL isFirstCall) {
                                     break;
 
                                 case 5:
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                                     psndSFXOn_3D(sfxRest, &sfxPos);
 #endif
                                     break;

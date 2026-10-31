@@ -46,7 +46,7 @@ EffectEntry* effIrekaeruEntry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effIrekaeruMain(EffectEntry* effect) {
+static void effIrekaeruMain(EffectEntry* effect) {
     EffIrekaeruWork* work = effect->userdata;
     Vec position;
     BOOL inBattle;
@@ -107,7 +107,7 @@ void effIrekaeruMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effIrekaeruDisp, effect);
 }
 
-void effIrekaeruDisp(CameraId cameraId, EffectEntry* effect) {
+static void effIrekaeruDisp(CameraId cameraId, EffectEntry* effect) {
     EffIrekaeruWork* work = effect->userdata;
     Mtx mtx;
     Mtx scale;

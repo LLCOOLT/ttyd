@@ -13,6 +13,9 @@
 #include <dolphin/mtx.h>
 #include "version.h"
 
+static void effMajinaiDisp(CameraId cameraId, EffectEntry* effect);
+static void effMajinaiMain(EffectEntry* effect);
+
 EffectEntry* effMajinaiEntry(s32 type, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
     EffMajinaiWork* work;
@@ -37,7 +40,7 @@ EffectEntry* effMajinaiEntry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effMajinaiMain(EffectEntry* effect) {
+static void effMajinaiMain(EffectEntry* effect) {
     EffMajinaiWork* work = effect->userdata;
     Vec position;
     BOOL inBattle;
@@ -96,7 +99,7 @@ void effMajinaiMain(EffectEntry* effect) {
                 animPoseSetMaterialFlagOn(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit))->poseId, ANIM_MATERIAL_FLAG_NO_BLEND);
             }
             if (animPoseGetLoopTimes(work->poseId) >= 0.93f) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 effStardustEntry(0, 16, 60, work->position.x, 55.0f + work->position.y, work->position.z, 45.0f, 45.0f);
 #else
                 effStardustEntry(0, 16, 60, work->position.x, 55.0f * work->scale + work->position.y,
@@ -150,7 +153,7 @@ void effMajinaiMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effMajinaiDisp, effect);
 }
 
-void effMajinaiDisp(CameraId cameraId, EffectEntry* effect) {
+static void effMajinaiDisp(CameraId cameraId, EffectEntry* effect) {
     EffMajinaiWork* work = effect->userdata;
     Mtx mtx;
     Mtx scale;

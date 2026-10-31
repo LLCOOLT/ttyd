@@ -10,8 +10,8 @@
 typedef struct UfoWork {
     s32 targetUnitId; // 0x0, unit the UFO hovers over (-1 none)
     s32 targetPartId; // 0x4
-    s32 state;        // 0x8, _ufo_main state (1 fly in .. 11 delete)
-    s32 swayFrame;    // 0xC, hover bob counter (_ufo_sway)
+    s32 state;        // 0x8, btlevtcmd_UFOAction state (1 fly in .. 11 delete)
+    s32 swayFrame;    // 0xC, hover bob counter (_SetUfoPos_Float)
     s32 timer;        // 0x10, frames to wait after the drop
     s32 dropState;    // 0x14, dropped item: 0 none, 1 start, 2 falling, 3/4 blinking, 5 gone
     s32 reserved_18;  // 0x18, never accessed
@@ -24,9 +24,9 @@ typedef struct UfoWork {
 } UfoWork;
 
 // The functions are in reverse order of the binary: the compiler emits them last to first.
-void _ufo_drop_main(EventEntry* event);
+static void _UFOItemAction(EventEntry* event);
 
-void _ufo_sway(BattleUnit* unit, BOOL advance) {
+static void _SetUfoPos_Float(BattleUnit* unit, BOOL advance) {
     UfoWork* work;
     f32 x, y, z;
 
@@ -39,7 +39,7 @@ void _ufo_sway(BattleUnit* unit, BOOL advance) {
     BtlUnit_SetPos(unit, x, y, z);
 }
 
-USER_FUNC(_ufo_main) {
+USER_FUNC(btlevtcmd_UFOAction) {
     BattleWorkWeaponTargets targets;
     s32 targetId;
     s32 partId;
@@ -99,7 +99,7 @@ USER_FUNC(_ufo_main) {
                     BtlUnit_SetHomePos(unit, x1, y1, z1);
                     work->state = 2;
                 }
-                _ufo_sway(unit, TRUE);
+                _SetUfoPos_Float(unit, TRUE);
                 break;
             case 2:
                 BattleSamplingEnemy(&targets, NULL, id, BtlUnit_GetEnemyBelong(unit), 0x1103100, 0,
@@ -111,7 +111,7 @@ USER_FUNC(_ufo_main) {
                 }
                 work->targetUnitId = targetId;
                 work->targetPartId = partId;
-                _ufo_sway(unit, !again);
+                _SetUfoPos_Float(unit, !again);
                 work->state = 3;
                 break;
             case 3:
@@ -133,7 +133,7 @@ USER_FUNC(_ufo_main) {
                 if (hx3 == tx3) {
                     work->state = 4;
                 }
-                _ufo_sway(unit, TRUE);
+                _SetUfoPos_Float(unit, TRUE);
                 break;
             case 4:
                 target = BattleGetUnitPtr(wp, targetId);
@@ -156,14 +156,14 @@ USER_FUNC(_ufo_main) {
                 work->timer = 60;
                 BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit))->attributes |= PART_ATTR_NOT_TARGETABLE;
                 work->state = 5;
-                _ufo_sway(unit, TRUE);
+                _SetUfoPos_Float(unit, TRUE);
                 break;
             case 5:
                 work->timer--;
                 if (work->timer <= 0) {
                     work->state = 6;
                 }
-                _ufo_sway(unit, TRUE);
+                _SetUfoPos_Float(unit, TRUE);
                 break;
             case 6:
                 work->state = 7;
@@ -188,7 +188,7 @@ USER_FUNC(_ufo_main) {
                 if (x7 >= 240.0f) {
                     BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit))->attributes |= PART_ATTR_NOT_TARGETABLE;
                 }
-                _ufo_sway(unit, TRUE);
+                _SetUfoPos_Float(unit, TRUE);
                 break;
             case 8:
                 work->state = 9;
@@ -205,11 +205,11 @@ USER_FUNC(_ufo_main) {
                 return EVT_RETURN_DONE;
         }
     } while (again);
-    _ufo_drop_main(event);
+    _UFOItemAction(event);
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(_ufo_damage_start) {
+USER_FUNC(btlevtcmd_UFODamageOn) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
     UfoWork* work;
@@ -228,7 +228,7 @@ USER_FUNC(_ufo_damage_start) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_ufo_damage_end) {
+USER_FUNC(btlevtcmd_UFOEscapeOn) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
     UfoWork* work;
@@ -247,7 +247,7 @@ USER_FUNC(_ufo_damage_end) {
     return EVT_RETURN_DONE;
 }
 
-void _ufo_drop_main(EventEntry* event) {
+static void _UFOItemAction(EventEntry* event) {
     f32 ux, uy, uz;
     f32 tx, ty, tz;
     f32 px, py, pz;

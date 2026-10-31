@@ -261,26 +261,26 @@ u8 anime_data_walk[] = {1, 1, 2, 2, 1, 1, 0, 0};
     DLS(p, 31)
 // clang-format on
 
-void boo_polygon_0(void) {
+static void boo_polygon_0(void) {
     BOO_ARRAYS()
     DL4(boo_dl_0_0, boo_dl_0_1, boo_dl_0_2, boo_dl_0_3)
     DLS_ALL(boo_dl_0_)
 }
 
-void boo_polygon_1(void) {
+static void boo_polygon_1(void) {
     BOO_ARRAYS()
     DL4(boo_dl_1_0, boo_dl_1_1, boo_dl_1_2, boo_dl_1_3)
     DLS_ALL(boo_dl_1_)
 }
 
-void boo_polygon_2(void) {
+static void boo_polygon_2(void) {
     BOO_ARRAYS()
     DL4(boo_dl_2_0, boo_dl_2_1, boo_dl_2_2, boo_dl_2_3)
     DLS_ALL(boo_dl_2_)
 }
 
-void effBoobooMain(EffectEntry* effect);
-void effBoobooDisp(CameraId cameraId, EffectEntry* effect);
+static void effBoobooMain(EffectEntry* effect);
+static void effBoobooDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effBoobooN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -309,7 +309,7 @@ EffectEntry* effBoobooN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 scal
     return effect;
 }
 
-void effBoobooMain(EffectEntry* effect) {
+static void effBoobooMain(EffectEntry* effect) {
     EffBoobooN64Work* work = effect->userdata;
     s32 i;
     s32 done;
@@ -392,7 +392,7 @@ void effBoobooMain(EffectEntry* effect) {
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, cin_d);                        \
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
 
-BOOL texture_dl(EffectEntry* effect, s32 idx, u32 type) {
+static BOOL texture_dl(EffectEntry* effect, s32 idx, u32 type) {
     EffBoobooN64Work* work = effect->userdata;
     GXTexObj texObj;
     GXColor blend;
@@ -455,7 +455,7 @@ BOOL texture_dl(EffectEntry* effect, s32 idx, u32 type) {
     return FALSE;
 }
 
-void effBoobooDisp(CameraId cameraId, EffectEntry* effect) {
+static void effBoobooDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx mtx;
     Mtx scl;
     Mtx rot;

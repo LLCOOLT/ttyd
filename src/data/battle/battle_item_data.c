@@ -26,24 +26,22 @@
 #include "evt/evt_env.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "statuswindow.h"
 
 #include "battle/battle_detect.h"
 EffectEntry* effNanigaEntry(s32 type, s32* table, s32 item, f32 x, f32 y, f32 z);
-void _nancy_disp(CameraId cameraId, void* param);
-void _disp_item_icon(CameraId cameraId, void* param);
-extern s32 R_mystery_item_table[];
+static void _nancy_disp(CameraId cameraId, void* param);
+static void _disp_item_icon(CameraId cameraId, void* param);
 
-USER_FUNC(_cam_rot);
-USER_FUNC(_get_throw_first_pos);
-USER_FUNC(_nancy_mirage);
-USER_FUNC(_naniga_okorukana_check);
-USER_FUNC(_throw_item_icon);
-USER_FUNC(_hpfp_change_declare_2);
-USER_FUNC(_hpfp_change_declare_1);
-USER_FUNC(_rank_up);
-USER_FUNC(_sampling_random_target);
+static USER_FUNC(_cam_rot);
+static USER_FUNC(_get_throw_first_pos);
+static USER_FUNC(_nancy_mirage);
+static USER_FUNC(_naniga_okorukana_check);
+static USER_FUNC(_throw_item_icon);
+static USER_FUNC(_hpfp_change_declare_2);
+static USER_FUNC(_hpfp_change_declare_1);
+static USER_FUNC(_rank_up);
+static USER_FUNC(_sampling_random_target);
 
 extern EvtWord _return_home_event[];
 extern EvtWord ItemEvent_Automatic_Target[];
@@ -118,7 +116,7 @@ extern EvtWord ItemEvent_Attiike_Shisshi[];
 BattleWeapon ItemWeaponData_Attiike_Shisshi;
 extern EvtWord ItemEvent_Naniga_Okorukana[];
 BattleWeapon ItemWeaponData_Naniga_Okorukana;
-s32 R_mystery_item_table[14];
+static s32 _item_table[14];
 BattleWeapon ItemWeaponData_Shikaeshino_Kona;
 BattleWeapon ItemWeaponData_Kameno_Noroi;
 extern EvtWord ItemEvent_RecoveryAndStatus[];
@@ -223,11 +221,11 @@ EVT_BEGIN(ItemEvent_Recovery_Core_Effect)
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Recovery_Core)
-    CALL_CHILD(PTR(ItemEvent_Recovery_Core_Effect))
+    CALL_CHILD(ItemEvent_Recovery_Core_Effect)
     CALL(evt_btl_camera_set_mode, 0, 0)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     WAIT_FRAMES(60)
-    CALL_CHILD(PTR(_return_home_event))
+    CALL_CHILD(_return_home_event)
     CALL(btlevtcmd_StartWaitEvent, LW(10))
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -266,7 +264,7 @@ EVT_BEGIN(ItemEvent_Recovery)
     IF_INT_EQUAL(LW(9), 0)
         CALL(btlevtcmd_GetConsumeItem, LW(9))
     END_IF
-    CALL_CHILD(PTR(ItemEvent_Recovery_Core))
+    CALL_CHILD(ItemEvent_Recovery_Core)
     RETURN
 EVT_END()
 
@@ -319,7 +317,7 @@ EVT_BEGIN(ItemEvent_GetTarget)
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Support_Sub_Effect)
-    CALL_CHILD(PTR(ItemEvent_GetTarget))
+    CALL_CHILD(ItemEvent_GetTarget)
     LABEL(10)
     IF_INT_EQUAL(LW(10), -1)
         GOTO(90)
@@ -348,21 +346,21 @@ EVT_END()
 
 EVT_BEGIN(ItemEvent_Support_NoEffect)
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
+    CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
     WAIT_FRAMES(30)
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_Effect))
+    CALL_CHILD(ItemEvent_Support_Sub_Effect)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
-    CALL_CHILD(PTR(_return_home_event))
+    CALL_CHILD(_return_home_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Support_RefreshEffect)
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
+    CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
     WAIT_FRAMES(30)
-    CALL_CHILD(PTR(ItemEvent_GetTarget))
+    CALL_CHILD(ItemEvent_GetTarget)
     LABEL(10)
     IF_INT_EQUAL(LW(10), -1)
         GOTO(90)
@@ -390,7 +388,7 @@ EVT_BEGIN(ItemEvent_Support_RefreshEffect)
     LABEL(90)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
-    CALL_CHILD(PTR(_return_home_event))
+    CALL_CHILD(_return_home_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -950,7 +948,7 @@ EVT_BEGIN(ItemEvent_Fire_Flower_Core)
     LABEL(90)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
-    CALL_CHILD(PTR(_return_home_event))
+    CALL_CHILD(_return_home_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -962,9 +960,9 @@ EVT_BEGIN(ItemEvent_Fire_Flower)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Fire_Flower))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
+    CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
     WAIT_FRAMES(30)
-    CALL_CHILD(PTR(ItemEvent_Fire_Flower_Core))
+    CALL_CHILD(ItemEvent_Fire_Flower_Core)
     RETURN
 EVT_END()
 
@@ -1067,7 +1065,7 @@ EVT_BEGIN(ItemEvent_Kaminari_Core)
     LABEL(90)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(30)
-    CALL_CHILD(PTR(_return_home_event))
+    CALL_CHILD(_return_home_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -1092,13 +1090,13 @@ EVT_BEGIN(ItemEvent_Kaminari)
     CALL(btlevtcmd_CommandFlyItem, BTL_UNIT_SELF, 40)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_ConsumeItem, BTL_UNIT_SELF)
-    CALL_CHILD(PTR(ItemEvent_Kaminari_Core))
+    CALL_CHILD(ItemEvent_Kaminari_Core)
     RETURN
 EVT_END()
 
 EVT_BEGIN(ItemEvent_Kaminari_Dokkan)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Kaminari_Dokkan))
-    CALL_CHILD(PTR(ItemEvent_Kaminari))
+    CALL_CHILD(ItemEvent_Kaminari)
     RETURN
 EVT_END()
 
@@ -1141,7 +1139,7 @@ BattleWeapon ItemWeaponData_Kaminari_Dokkan = {
 
 EVT_BEGIN(ItemEvent_Kaminari_Gorogoro)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Kaminari_Gorogoro))
-    CALL_CHILD(PTR(ItemEvent_Kaminari))
+    CALL_CHILD(ItemEvent_Kaminari)
     RETURN
 EVT_END()
 
@@ -1328,8 +1326,8 @@ EVT_BEGIN(ItemEvent_Kirakira_Otoshi)
     CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
     CALL(evt_btl_camera_set_zoom, 0, 200)
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
-    CALL_CHILD(PTR(ItemEvent_Kirakira_Otoshi_Core))
+    CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
+    CALL_CHILD(ItemEvent_Kirakira_Otoshi_Core)
     RETURN
 EVT_END()
 
@@ -1453,7 +1451,7 @@ EVT_BEGIN(ItemEvent_Koorino_Ibuki)
     LABEL(90)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
-    CALL_CHILD(PTR(_return_home_event))
+    CALL_CHILD(_return_home_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -1487,7 +1485,7 @@ BattleWeapon ItemWeaponData_Koorino_Ibuki = {
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
     0, // burnTime
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     100, // freezeChance
 #else
     95, // freezeChance
@@ -1588,7 +1586,7 @@ EVT_BEGIN(ItemEvent_Yurayura_Jishin)
     LABEL(90)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
-    CALL_CHILD(PTR(_return_home_event))
+    CALL_CHILD(_return_home_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -1698,7 +1696,7 @@ EVT_BEGIN(ItemEvent_Teresano_Fuku)
     LABEL(90)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
-    CALL_CHILD(PTR(_return_home_event))
+    CALL_CHILD(_return_home_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -1742,10 +1740,10 @@ BattleWeapon ItemWeaponData_Teresano_Fuku = {
 };
 
 EVT_BEGIN(ItemEvent_Biribiri_Kinoko_Core)
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_Effect))
+    CALL_CHILD(ItemEvent_Support_Sub_Effect)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
-    CALL_CHILD(PTR(_return_home_event))
+    CALL_CHILD(_return_home_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -1753,9 +1751,9 @@ EVT_END()
 EVT_BEGIN(ItemEvent_Biribiri_Kinoko)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Biribiri_Kinoko))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
+    CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
     WAIT_FRAMES(30)
-    CALL_CHILD(PTR(ItemEvent_Biribiri_Kinoko_Core))
+    CALL_CHILD(ItemEvent_Biribiri_Kinoko_Core)
     RETURN
 EVT_END()
 
@@ -1799,10 +1797,10 @@ BattleWeapon ItemWeaponData_Biribiri_Kinoko = {
 };
 
 EVT_BEGIN(ItemEvent_Teki_Yokeeru_Core)
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_Effect))
+    CALL_CHILD(ItemEvent_Support_Sub_Effect)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
-    CALL_CHILD(PTR(_return_home_event))
+    CALL_CHILD(_return_home_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -1810,9 +1808,9 @@ EVT_END()
 EVT_BEGIN(ItemEvent_Teki_Yokeeru)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Teki_Yokeeru))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
+    CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
     WAIT_FRAMES(30)
-    CALL_CHILD(PTR(ItemEvent_Teki_Yokeeru_Core))
+    CALL_CHILD(ItemEvent_Teki_Yokeeru_Core)
     RETURN
 EVT_END()
 
@@ -1856,7 +1854,7 @@ BattleWeapon ItemWeaponData_Teki_Yokeeru = {
 
 EVT_BEGIN(ItemEvent_Madowaseno_Kona)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Madowaseno_Kona))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    CALL_CHILD(ItemEvent_Support_NoEffect)
     RETURN
 EVT_END()
 
@@ -1899,13 +1897,16 @@ BattleWeapon ItemWeaponData_Madowaseno_Kona = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(ItemEvent_Nemure_Yoikoyo)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Nemure_Yoikoyo))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
+    CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
     WAIT_FRAMES(30)
     CALL(evt_btl_camera_shake_h, 0, 1, 0, 10000, 0)
+#if VERSION <= VERSION_JP
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(evt_eff, 0, STRING("sheep"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+#else
     CALL(btlevtcmd_check_battleflag, LW(0), 256)
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -1915,34 +1916,16 @@ EVT_BEGIN(ItemEvent_Nemure_Yoikoyo)
         ADD(LW(2), 15)
         CALL(evt_eff, 0, STRING("sheep"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
     END_IF
-    WAIT_FRAMES(300)
-    CALL(evt_btl_camera_noshake, 0)
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_Effect))
-    CALL(evt_audience_ap_recovery)
-    WAIT_FRAMES(150)
-    CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
-#else
-EVT_BEGIN(ItemEvent_Nemure_Yoikoyo)
-    SET_VALUE(LW(12), PTR(&ItemWeaponData_Nemure_Yoikoyo))
-    CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
-    WAIT_FRAMES(30)
-    CALL(evt_btl_camera_shake_h, 0, 1, 0, 10000, 0)
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(evt_eff, 0, STRING("sheep"), 0, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
-    WAIT_FRAMES(300)
-    CALL(evt_btl_camera_noshake, 0)
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_Effect))
-    CALL(evt_audience_ap_recovery)
-    WAIT_FRAMES(150)
-    CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
 #endif
+    WAIT_FRAMES(300)
+    CALL(evt_btl_camera_noshake, 0)
+    CALL_CHILD(ItemEvent_Support_Sub_Effect)
+    CALL(evt_audience_ap_recovery)
+    WAIT_FRAMES(150)
+    CALL_CHILD(_return_home_event)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
+    RETURN
+EVT_END()
 
 BattleWeapon ItemWeaponData_Nemure_Yoikoyo = {
     NULL, 0, // name..icon
@@ -1969,7 +1952,7 @@ BattleWeapon ItemWeaponData_Nemure_Yoikoyo = {
     SPECIAL_USABLE_IF_CONFUSED | SPECIAL_UNGUARDABLE, // special
     COUNTER_RESIST_ALL, // counterResistFlags
     TARGET_WEIGHT_RANDOM, // targetWeightFlags
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     100, // sleepChance
 #else
     95, // sleepChance
@@ -1993,7 +1976,7 @@ EVT_BEGIN(ItemEvent_Stop_Watch_Core)
     CALL(evt_snd_sfxon, STRING("SFX_ITEM_STOP_WATCH1"), 0)
     CALL(btlevtcmd_check_battleflag, LW(0), 256)
     IF_INT_EQUAL(LW(0), 0)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         CALL(evt_eff64, 0, STRING("timestamp_n64"), 0, 0, 0, 0, FLOAT(1.0f), 200, 0, 0, 0, 0, 0, 0)
 #else
         CALL(evt_eff64, 0, STRING("timestamp_n64"), 0, 0, 0, 103, FLOAT(1.0f), 200, 0, 0, 0, 0, 0, 0)
@@ -2026,7 +2009,7 @@ EVT_BEGIN(ItemEvent_Stop_Watch_Core)
     GOTO(10)
     LABEL(90)
     CALL(evt_audience_ap_recovery)
-    CALL_CHILD(PTR(_return_home_event))
+    CALL_CHILD(_return_home_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -2052,7 +2035,7 @@ EVT_BEGIN(ItemEvent_Stop_Watch)
     CALL(btlevtcmd_CommandFlyItem, BTL_UNIT_SELF, 40)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, LW(9), BTL_POSE_STAY_DEFAULT)
     CALL(btlevtcmd_ConsumeItem, BTL_UNIT_SELF)
-    CALL_CHILD(PTR(ItemEvent_Stop_Watch_Core))
+    CALL_CHILD(ItemEvent_Stop_Watch_Core)
     RETURN
 EVT_END()
 
@@ -2082,7 +2065,7 @@ BattleWeapon ItemWeaponData_Stop_Watch = {
     COUNTER_RESIST_ALL, // counterResistFlags
     TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, // sleepChance..sleepTime
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     100, // stopChance
 #else
     95, // stopChance
@@ -2102,17 +2085,17 @@ BattleWeapon ItemWeaponData_Stop_Watch = {
 EVT_BEGIN(ItemEvent_Guruguru_Memawashi)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Guruguru_Memawashi))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
+    CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
     WAIT_FRAMES(30)
     CALL(evt_snd_sfxon, STRING("SFX_ITEM_GURUGURU1"), 0)
     BEGIN_SIBLING_EVENT
         CALL(evt_env_blur_on, 0, 2000)
     END_SIBLING_EVENT
     CALL(_cam_rot)
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_Effect))
+    CALL_CHILD(ItemEvent_Support_Sub_Effect)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
-    CALL_CHILD(PTR(_return_home_event))
+    CALL_CHILD(_return_home_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -2157,7 +2140,7 @@ BattleWeapon ItemWeaponData_Guruguru_Memawashi = {
 
 EVT_BEGIN(ItemEvent_Dekadeka_Drink)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Dekadeka_Drink))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    CALL_CHILD(ItemEvent_Support_NoEffect)
     RETURN
 EVT_END()
 
@@ -2202,7 +2185,7 @@ BattleWeapon ItemWeaponData_Dekadeka_Drink = {
 
 EVT_BEGIN(ItemEvent_Katikati_Koura)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Katikati_Koura))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    CALL_CHILD(ItemEvent_Support_NoEffect)
     RETURN
 EVT_END()
 
@@ -2324,7 +2307,7 @@ EVT_BEGIN(ItemEvent_Suitooru)
     LABEL(90)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(60)
-    CALL_CHILD(PTR(_return_home_event))
+    CALL_CHILD(_return_home_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -2472,7 +2455,7 @@ BattleWeapon ItemWeaponData_Teki_Kyouka = {
 
 EVT_BEGIN(ItemEvent_Minimini_Kun)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Minimini_Kun))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    CALL_CHILD(ItemEvent_Support_NoEffect)
     RETURN
 EVT_END()
 
@@ -2517,7 +2500,7 @@ BattleWeapon ItemWeaponData_Minimini_Kun = {
 
 EVT_BEGIN(ItemEvent_Funyafunya_Kun)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Funyafunya_Kun))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    CALL_CHILD(ItemEvent_Support_NoEffect)
     RETURN
 EVT_END()
 
@@ -2563,7 +2546,7 @@ BattleWeapon ItemWeaponData_Funyafunya_Kun = {
 
 EVT_BEGIN(ItemEvent_Sukkiri_Drink)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Sukkiri_Drink))
-    CALL_CHILD(PTR(ItemEvent_Support_RefreshEffect))
+    CALL_CHILD(ItemEvent_Support_RefreshEffect)
     RETURN
 EVT_END()
 
@@ -2621,10 +2604,10 @@ BattleWeapon ItemWeaponData_Sukkiri_Drink = {
 };
 
 EVT_BEGIN(ItemEvent_Jiwajiwa_Kinoko_Core)
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_Effect))
+    CALL_CHILD(ItemEvent_Support_Sub_Effect)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
-    CALL_CHILD(PTR(_return_home_event))
+    CALL_CHILD(_return_home_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -2632,9 +2615,9 @@ EVT_END()
 EVT_BEGIN(ItemEvent_Jiwajiwa_Kinoko)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Jiwajiwa_Kinoko))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
+    CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
     WAIT_FRAMES(30)
-    CALL_CHILD(PTR(ItemEvent_Jiwajiwa_Kinoko_Core))
+    CALL_CHILD(ItemEvent_Jiwajiwa_Kinoko_Core)
     RETURN
 EVT_END()
 
@@ -2678,10 +2661,10 @@ BattleWeapon ItemWeaponData_Jiwajiwa_Kinoko = {
 };
 
 EVT_BEGIN(ItemEvent_Jiwajiwa_Syrup_Core)
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_Effect))
+    CALL_CHILD(ItemEvent_Support_Sub_Effect)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(150)
-    CALL_CHILD(PTR(_return_home_event))
+    CALL_CHILD(_return_home_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -2689,9 +2672,9 @@ EVT_END()
 EVT_BEGIN(ItemEvent_Jiwajiwa_Syrup)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Jiwajiwa_Syrup))
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
+    CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
     WAIT_FRAMES(30)
-    CALL_CHILD(PTR(ItemEvent_Jiwajiwa_Syrup_Core))
+    CALL_CHILD(ItemEvent_Jiwajiwa_Syrup_Core)
     RETURN
 EVT_END()
 
@@ -2830,7 +2813,7 @@ EVT_BEGIN(ItemEvent_Attiike_Shisshi)
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_ITEM_HORROR2"), EVT_NULLPTR, 0, EVT_NULLPTR)
     END_SIBLING_EVENT
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(evt_eff64, STRING(""), STRING("holography_n64"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 120, 0, 0, 0, 0, 0, 0)
     WAIT_FRAMES(120)
     CALL_CHILD(ItemEvent_Support_Sub_Effect)
@@ -2910,85 +2893,85 @@ BattleWeapon ItemWeaponData_Attiike_Shisshi = {
 
 EVT_BEGIN(ItemEvent_Naniga_Okorukana)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Naniga_Okorukana))
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
+    CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
     WAIT_FRAMES(30)
     CALL(_naniga_okorukana_check, BTL_UNIT_SELF, LW(13))
     SWITCH(LW(13))
         CASE_EQUAL(148)
         SET_VALUE(LW(12), PTR(&ItemWeaponData_Kinoko))
         SET_VALUE(LW(8), LW(12))
-        CALL_CHILD(PTR(ItemEvent_Automatic_Target))
+        CALL_CHILD(ItemEvent_Automatic_Target)
         SET_VALUE(LW(9), 148)
-        CALL_CHILD(PTR(ItemEvent_Recovery_Core))
+        CALL_CHILD(ItemEvent_Recovery_Core)
         CASE_EQUAL(150)
         SET_VALUE(LW(12), PTR(&ItemWeaponData_Ultra_Kinoko))
         SET_VALUE(LW(8), LW(12))
-        CALL_CHILD(PTR(ItemEvent_Automatic_Target))
+        CALL_CHILD(ItemEvent_Automatic_Target)
         SET_VALUE(LW(9), 150)
-        CALL_CHILD(PTR(ItemEvent_Recovery_Core))
+        CALL_CHILD(ItemEvent_Recovery_Core)
         CASE_EQUAL(152)
         SET_VALUE(LW(12), PTR(&ItemWeaponData_Sinabita_Kinoko))
         SET_VALUE(LW(8), LW(12))
-        CALL_CHILD(PTR(ItemEvent_Automatic_Target))
+        CALL_CHILD(ItemEvent_Automatic_Target)
         SET_VALUE(LW(9), 152)
-        CALL_CHILD(PTR(ItemEvent_Recovery_Core))
+        CALL_CHILD(ItemEvent_Recovery_Core)
         CASE_EQUAL(154)
         SET_VALUE(LW(12), PTR(&ItemWeaponData_Honey_Syrup))
         SET_VALUE(LW(8), LW(12))
-        CALL_CHILD(PTR(ItemEvent_Automatic_Target))
+        CALL_CHILD(ItemEvent_Automatic_Target)
         SET_VALUE(LW(9), 154)
-        CALL_CHILD(PTR(ItemEvent_Recovery_Core))
+        CALL_CHILD(ItemEvent_Recovery_Core)
         CASE_EQUAL(156)
         SET_VALUE(LW(12), PTR(&ItemWeaponData_Royal_Jelly))
         SET_VALUE(LW(8), LW(12))
-        CALL_CHILD(PTR(ItemEvent_Automatic_Target))
+        CALL_CHILD(ItemEvent_Automatic_Target)
         SET_VALUE(LW(9), 156)
-        CALL_CHILD(PTR(ItemEvent_Recovery_Core))
+        CALL_CHILD(ItemEvent_Recovery_Core)
         CASE_EQUAL(135)
         SET_VALUE(LW(12), PTR(&ItemWeaponData_Biribiri_Kinoko))
         SET_VALUE(LW(8), LW(12))
-        CALL_CHILD(PTR(ItemEvent_Automatic_Target))
-        CALL_CHILD(PTR(ItemEvent_Biribiri_Kinoko_Core))
+        CALL_CHILD(ItemEvent_Automatic_Target)
+        CALL_CHILD(ItemEvent_Biribiri_Kinoko_Core)
         CASE_EQUAL(136)
         SET_VALUE(LW(12), PTR(&ItemWeaponData_Teki_Yokeeru))
         SET_VALUE(LW(8), LW(12))
-        CALL_CHILD(PTR(ItemEvent_Automatic_Target))
-        CALL_CHILD(PTR(ItemEvent_Teki_Yokeeru_Core))
+        CALL_CHILD(ItemEvent_Automatic_Target)
+        CALL_CHILD(ItemEvent_Teki_Yokeeru_Core)
         CASE_EQUAL(157)
         SET_VALUE(LW(12), PTR(&ItemWeaponData_Jiwajiwa_Kinoko))
         SET_VALUE(LW(8), LW(12))
-        CALL_CHILD(PTR(ItemEvent_Automatic_Target))
-        CALL_CHILD(PTR(ItemEvent_Jiwajiwa_Kinoko_Core))
+        CALL_CHILD(ItemEvent_Automatic_Target)
+        CALL_CHILD(ItemEvent_Jiwajiwa_Kinoko_Core)
         CASE_EQUAL(158)
         SET_VALUE(LW(12), PTR(&ItemWeaponData_Jiwajiwa_Syrup))
         SET_VALUE(LW(8), LW(12))
-        CALL_CHILD(PTR(ItemEvent_Automatic_Target))
-        CALL_CHILD(PTR(ItemEvent_Jiwajiwa_Syrup_Core))
+        CALL_CHILD(ItemEvent_Automatic_Target)
+        CALL_CHILD(ItemEvent_Jiwajiwa_Syrup_Core)
         CASE_EQUAL(128)
         SET_VALUE(LW(12), PTR(&ItemWeaponData_Kaminari_Gorogoro))
         SET_VALUE(LW(8), LW(12))
-        CALL_CHILD(PTR(ItemEvent_Automatic_Target))
-        CALL_CHILD(PTR(ItemEvent_Kaminari_Core))
+        CALL_CHILD(ItemEvent_Automatic_Target)
+        CALL_CHILD(ItemEvent_Kaminari_Core)
         CASE_EQUAL(129)
         SET_VALUE(LW(12), PTR(&ItemWeaponData_Kaminari_Dokkan))
         SET_VALUE(LW(8), LW(12))
-        CALL_CHILD(PTR(ItemEvent_Automatic_Target))
-        CALL_CHILD(PTR(ItemEvent_Kaminari_Core))
+        CALL_CHILD(ItemEvent_Automatic_Target)
+        CALL_CHILD(ItemEvent_Kaminari_Core)
         CASE_EQUAL(132)
         SET_VALUE(LW(12), PTR(&ItemWeaponData_Fire_Flower))
         SET_VALUE(LW(8), LW(12))
-        CALL_CHILD(PTR(ItemEvent_Automatic_Target))
-        CALL_CHILD(PTR(ItemEvent_Fire_Flower_Core))
+        CALL_CHILD(ItemEvent_Automatic_Target)
+        CALL_CHILD(ItemEvent_Fire_Flower_Core)
         CASE_EQUAL(130)
         SET_VALUE(LW(12), PTR(&ItemWeaponData_Kirakira_Otoshi))
         SET_VALUE(LW(8), LW(12))
-        CALL_CHILD(PTR(ItemEvent_Automatic_Target))
-        CALL_CHILD(PTR(ItemEvent_Kirakira_Otoshi_Core))
+        CALL_CHILD(ItemEvent_Automatic_Target)
+        CALL_CHILD(ItemEvent_Kirakira_Otoshi_Core)
         CASE_EQUAL(140)
         SET_VALUE(LW(12), PTR(&ItemWeaponData_Stop_Watch))
         SET_VALUE(LW(8), LW(12))
-        CALL_CHILD(PTR(ItemEvent_Automatic_Target))
-        CALL_CHILD(PTR(ItemEvent_Stop_Watch_Core))
+        CALL_CHILD(ItemEvent_Automatic_Target)
+        CALL_CHILD(ItemEvent_Stop_Watch_Core)
         CASE_DEFAULT
         CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
         RETURN
@@ -3033,14 +3016,17 @@ BattleWeapon ItemWeaponData_Naniga_Okorukana = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
-s32 R_mystery_item_table[] = {
+// The items Naniga Okorukana (the mystery item) can turn into. The demo map has the table as a static local of
+// _naniga_okorukana_check (_item_table$597); there it would land at the end of .data instead of here, so it
+// stays at file scope.
+static s32 _item_table[] = {
     148, 154, 156, 135, 136, 157, 158, 150,
     152, 129, 132, 130, 140, 0,
 };
 
 EVT_BEGIN(ItemEvent_Shikaeshino_Kona)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Shikaeshino_Kona))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    CALL_CHILD(ItemEvent_Support_NoEffect)
     RETURN
 EVT_END()
 
@@ -3083,7 +3069,7 @@ BattleWeapon ItemWeaponData_Shikaeshino_Kona = {
 
 EVT_BEGIN(ItemEvent_Kameno_Noroi)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_Kameno_Noroi))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    CALL_CHILD(ItemEvent_Support_NoEffect)
     RETURN
 EVT_END()
 
@@ -3159,7 +3145,7 @@ EVT_BEGIN(ItemEvent_RecoveryAndStatus)
     IF_INT_EQUAL(LW(9), 0)
         CALL(btlevtcmd_GetConsumeItem, LW(9))
     END_IF
-    CALL_CHILD(PTR(ItemEvent_Recovery_Core_Effect))
+    CALL_CHILD(ItemEvent_Recovery_Core_Effect)
     SWITCH(LW(9))
         CASE_EQUAL(216)
         CALL(evt_sub_random, 100, LW(0))
@@ -3201,7 +3187,7 @@ EVT_BEGIN(ItemEvent_RecoveryAndStatus)
         CASE_EQUAL(1)
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(10), LW(11), LW(12), 256, LW(5))
     END_SWITCH
-    CALL_CHILD(PTR(_return_home_event))
+    CALL_CHILD(_return_home_event)
     CALL(btlevtcmd_StartWaitEvent, LW(10))
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
@@ -3971,7 +3957,7 @@ BattleWeapon ItemWeaponData_FutarideForever = {
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // demo only: Fire Candy (item 228) still had battle data
 BattleWeapon ItemWeaponData_FireCandy = {
     NULL, 0, // name..icon
@@ -4128,7 +4114,7 @@ EVT_BEGIN(ItemEvent_ThrowAttack)
     LABEL(90)
     CALL(evt_audience_ap_recovery)
     WAIT_FRAMES(30)
-    CALL_CHILD(PTR(_return_home_event))
+    CALL_CHILD(_return_home_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -4282,14 +4268,14 @@ BattleWeapon ItemWeaponData_BomberEgg = {
 
 EVT_BEGIN(ItemEvent_Poison_Kinoko)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_PoisonKinoko))
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
+    CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
     CALL(evt_sub_random, 100, LW(0))
     IF_INT_LESS(LW(0), 80)
-        CALL_CHILD(PTR(ItemEvent_Support_Sub_Effect))
+        CALL_CHILD(ItemEvent_Support_Sub_Effect)
     ELSE
-        CALL_CHILD(PTR(ItemEvent_GetTarget))
+        CALL_CHILD(ItemEvent_GetTarget)
         CALL(evt_btl_camera_set_homing_unit, 0, LW(10), BTL_UNIT_NONE)
         CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
         CALL(evt_btl_camera_set_zoom, 0, 200)
@@ -4304,7 +4290,7 @@ EVT_BEGIN(ItemEvent_Poison_Kinoko)
     // the original script has one END_IF too many; the interpreter ignores it
     END_IF
     CALL(evt_audience_ap_recovery)
-    CALL_CHILD(PTR(_return_home_event))
+    CALL_CHILD(_return_home_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -4362,7 +4348,7 @@ typedef struct ThrowWork {
     u8 reserved_34[0x7C - 0x34]; // 0x34, never accessed (keeps the 0x7C-byte BattleAlloc)
 } ThrowWork;
 
-USER_FUNC(_sampling_random_target) {
+static USER_FUNC(_sampling_random_target) {
     BattleWorkWeaponTargets targets;
     BattleWork* wp;
     BattleWeapon* weapon;
@@ -4394,7 +4380,7 @@ USER_FUNC(_sampling_random_target) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_cam_rot) {
+static USER_FUNC(_cam_rot) {
     f32 rot;
 
     if (isFirstCall) {
@@ -4411,7 +4397,7 @@ USER_FUNC(_cam_rot) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(_rank_up) {
+static USER_FUNC(_rank_up) {
     s32 id = evtGetValue(event, event->args[0]);
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, BattleTransID(event, id));
 
@@ -4424,7 +4410,7 @@ USER_FUNC(_rank_up) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_hpfp_change_declare_1) {
+static USER_FUNC(_hpfp_change_declare_1) {
     BattleWork* wp = _battleWorkPointer;
     s32 id = evtGetValue(event, event->args[0]);
     BattleUnit* unit = BattleGetUnitPtr(wp, BattleTransID(event, id));
@@ -4439,20 +4425,20 @@ USER_FUNC(_hpfp_change_declare_1) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_hpfp_change_declare_2) {
+static USER_FUNC(_hpfp_change_declare_2) {
     BattleWork* wp = _battleWorkPointer;
     s32 id = evtGetValue(event, event->args[0]);
     BattleUnit* unit = BattleGetUnitPtr(wp, BattleTransID(event, id));
 
     if (unit) {
         if (unit->currentKind == UNIT_MARIO) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             N_statusClearBlink();
 #endif
             statusMarioHPBlink(120);
             statusFPBlink(120);
         } else if (unit->currentKind >= TYPE_PARTNER_MIN && unit->currentKind < TYPE_PARTNER_MAX) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             N_statusClearBlink();
 #endif
             statusPartyHPBlink(120);
@@ -4462,7 +4448,7 @@ USER_FUNC(_hpfp_change_declare_2) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_naniga_okorukana_check) {
+static USER_FUNC(_naniga_okorukana_check) {
     Vec pos;
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
@@ -4484,13 +4470,13 @@ USER_FUNC(_naniga_okorukana_check) {
         }
     }
     if (isFirstCall) {
-        for (i = 0; R_mystery_item_table[i] != 0; i++) {
+        for (i = 0; _item_table[i] != 0; i++) {
         }
-        item = R_mystery_item_table[irand(i)];
-        event->userdata[0] = (EvtWord)effNanigaEntry(0, R_mystery_item_table, item, pos.x, pos.y, pos.z);
+        item = _item_table[irand(i)];
+        event->userdata[0] = (EvtWord)effNanigaEntry(0, _item_table, item, pos.x, pos.y, pos.z);
         effSetName((EffectEntry*)event->userdata[0], "effNaniga");
         evtSetValue(event, out, item);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         if (unit->currentKind == UNIT_MARIO) {
             a = &wp->actRecord.marioAttackItems;
             b = &wp->actRecord.marioSupportItems;
@@ -4514,7 +4500,7 @@ USER_FUNC(_naniga_okorukana_check) {
         }
 #endif
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 end:
 #endif
     if (effNameToPtr("effNaniga")) {
@@ -4523,7 +4509,7 @@ end:
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_get_throw_first_pos) {
+static USER_FUNC(_get_throw_first_pos) {
     BattleUnit* unit;
     Vec pos;
     BattleWork* wp = _battleWorkPointer;
@@ -4549,7 +4535,7 @@ USER_FUNC(_get_throw_first_pos) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_throw_item_icon) {
+static USER_FUNC(_throw_item_icon) {
     EvtWord* args = event->args;
     ThrowWork* wk;
     s32 item = evtGetValue(event, args[0]);
@@ -4601,12 +4587,12 @@ USER_FUNC(_throw_item_icon) {
     return EVT_RETURN_BLOCK;
 }
 
-void _disp_item_icon(CameraId cameraId, void* param) {
+static void _disp_item_icon(CameraId cameraId, void* param) {
     EventEntry* event = param;
     iconDispGx(&((ThrowWork*)event->userdatap[0])->pos, 0, itemDataTable[event->userdata[1]].icon_id, 1.0f);
 }
 
-USER_FUNC(_nancy_mirage) {
+static USER_FUNC(_nancy_mirage) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
@@ -4636,7 +4622,7 @@ USER_FUNC(_nancy_mirage) {
     return EVT_RETURN_BLOCK;
 }
 
-void _nancy_disp(CameraId cameraId, void* param) {
+static void _nancy_disp(CameraId cameraId, void* param) {
     EventEntry* event = param;
     Mtx mtx;
     Mtx scale;
@@ -4665,7 +4651,7 @@ void _nancy_disp(CameraId cameraId, void* param) {
     animPoseDrawMtx(event->userdata[1], mtx, 3, 0.0f, 2.0f);
 }
 
-USER_FUNC(_full_ap_recover) {
+static USER_FUNC(_full_ap_recover) {
     BattleWork* wp = _battleWorkPointer;
     s32 id = evtGetValue(event, event->args[0]);
     BattleUnit* unit = BattleGetUnitPtr(wp, BattleTransID(event, id));
@@ -4678,10 +4664,10 @@ USER_FUNC(_full_ap_recover) {
 
 EVT_BEGIN(ItemEvent_LastDinner)
     SET_VALUE(LW(12), PTR(&ItemWeaponData_PoisonKinoko))
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
+    CALL_CHILD(ItemEvent_Support_Sub_UseDeclere)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL_CHILD(PTR(ItemEvent_GetTarget))
+    CALL_CHILD(ItemEvent_GetTarget)
     CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetHeight, LW(10), LW(5))
     CALL(btlevtcmd_GetStatusMg, LW(10), LW(6))
@@ -4699,7 +4685,8 @@ EVT_BEGIN(ItemEvent_LastDinner)
     CALL(btlevtcmd_SetFp, LW(10), 0)
     CALL(_full_ap_recover, LW(10))
     CALL(btlevtcmd_StatusWindowOnOff, 2)
-#if VERSION == VERSION_DEMO
+    // Two copies: the demos play the cooking sound once before the hits; the releases play it after each hit.
+#if VERSION <= VERSION_DEMO_US
     CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_COOK_LAST3"), LW(0), LW(1), LW(2), 0)
     CALL(evt_eff, 0, STRING("indirect"), 0, LW(0), LW(1), LW(2), 60, 0, 0, 0, 0, 0, 0, 0)
     CALL(evt_eff, 0, STRING("hit"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
@@ -4725,7 +4712,7 @@ EVT_BEGIN(ItemEvent_LastDinner)
 #endif
     WAIT_MS(1750)
     CALL(evt_audience_ap_recovery)
-    CALL_CHILD(PTR(_return_home_event))
+    CALL_CHILD(_return_home_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()

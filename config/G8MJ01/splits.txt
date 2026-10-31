@@ -338,15 +338,12 @@ driver/arcdrv.c:
 	.bss        start:0x803D8470 end:0x803D8510
 
 sequence/seq_gameover.c:
-	.text       start:0x80077A5C end:0x80077EC4
+	.text       start:0x80077A5C end:0x80077F88
 	.rodata     start:0x802C4948 end:0x802C4970
 	.data       start:0x8030AD90 end:0x8030B348
 	.sdata      start:0x80410370 end:0x80410378
 	.sbss       start:0x804187A0 end:0x804187A8
 	.sdata2     start:0x8041A350 end:0x8041A3C8
-
-event/evt_snd.c:
-	.text       start:0x80077EC4 end:0x80077F88
 
 event/evt_bero.c:
 	.text       start:0x80077F88 end:0x8007A244
@@ -489,14 +486,11 @@ event/evt_item.c:
 
 driver/itemdrv.c:
 	.text       start:0x800A8864 end:0x800ACF78
-	.rodata     start:0x802CABE0 end:0x802CAE68
+	.rodata     start:0x802CABE0 end:0x802CAE80
 	.data       start:0x80312378 end:0x803124B8
 	.bss        start:0x803D8710 end:0x803D8748
 	.sbss       start:0x80418890 end:0x80418898
 	.sdata2     start:0x8041AF90 end:0x8041B018
-
-driver/itemdrv_pad.c:
-	.rodata     start:0x802CAE68 end:0x802CAE80
 
 manager/cardmgr.c:
 	.text       start:0x800ACF78 end:0x800B1694
@@ -988,7 +982,7 @@ manager/dvdmgr.c:
 unit/unit_mario.c:
 	.text       start:0x8013FEE0 end:0x801403D4
 	.rodata     start:0x802F3780 end:0x802F3A90
-	.data       start:0x8036FF38 end:0x80371354
+	.data       start:0x8036FF38 end:0x80371358
 	.sdata      start:0x80411CE0 end:0x80411DB8
 	.sdata2     start:0x8041CC08 end:0x8041CCA8
 
@@ -1005,7 +999,7 @@ effect/eff_breath_fire.c:
 battle/battle_attack_audience.c:
 	.text       start:0x80140B9C end:0x801412AC
 	.rodata     start:0x802F3A90 end:0x802F3AC8
-	.data       start:0x80371354 end:0x80371490
+	.data       start:0x80371358 end:0x80371490
 	.sdata2     start:0x8041CCC0 end:0x8041CCE8
 
 battle/battle_stage_object.c:
@@ -1021,10 +1015,13 @@ motion/mot_dokan.c:
 	.sdata2     start:0x8041CD80 end:0x8041CDC0
 
 party/party_motion.c:
-	.text       start:0x80145DC4 end:0x8014CD30
+	.text       start:0x80145DC4 end:0x8014C488
 	.rodata     start:0x802F3E40 end:0x802F3FE8
 	.sbss       start:0x804189E8 end:0x804189F8
 	.sdata2     start:0x8041CDC0 end:0x8041CED8
+
+event/evt_snd.c:
+	.text       start:0x8014C488 end:0x8014CD30
 
 manager/arammgr.c:
 	.text       start:0x8014CD30 end:0x8014D338

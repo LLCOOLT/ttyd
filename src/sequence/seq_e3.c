@@ -20,7 +20,6 @@
 #include "system.h"
 #include <string.h>
 #include "libc_decls.h"
-#include "libc_decls.h"
 #include "mario/mario_motion.h"
 #include "statuswindow.h"
 #include "win/win_main.h"
@@ -29,7 +28,7 @@
 #include "driver/windowdrv.h"
 #include "mario/mario_party.h"
 #include "evt/evt_story.h"
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #include "evt/evt_cmd.h"
 #include "evt/evt_sub.h"
 #include "manager/evtmgr.h"
@@ -42,6 +41,9 @@ typedef struct seq_e3_entry {
     f32 x;  // 0x4
     f32 y;  // 0x8
 } seq_e3_entry;
+
+// mariost.c's time of the last pad input (not in mariost.h: seq_game.c has a static of the same name)
+extern OSTime none_key;
 
 //.bss
 static seq_e3_work work;
@@ -62,7 +64,7 @@ seq_e3_entry e3_tbl[3] = {
     { 96, 0.0f, -100.0f },
 };
 #endif
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo's title screen shows four characters: {anim group, walk, stay, action} for each.
 char* anim_tbl[4 * 4] = {
     "b_mario", "M_W_1", "M_S_1", "M_N_8",
@@ -91,9 +93,9 @@ const char e3_anim_str10[] = "PWD_A_7";
 #endif
 
 // Forward Declarations
-void e3Disp(CameraId cameraId, void* param);
-void e3DispOffscreen(CameraId cameraId, void* param);
-#if VERSION == VERSION_DEMO
+static void e3Disp(CameraId cameraId, void* param);
+static void e3DispOffscreen(CameraId cameraId, void* param);
+#if VERSION == VERSION_DEMO_US
 static void e3DispShadow(f32 x, f32 y, f32 z);
 static f32 e3BlinkTime(void);
 #else
@@ -103,7 +105,7 @@ static
     void pressStartGX(s32 alpha, f32 x, f32 y);
 #endif
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // Sets every character to the given column of anim_tbl.
 USER_FUNC(e3PoseSetAnim) {
     s32 col = evtGetValue(event, event->args[0]);
@@ -160,12 +162,12 @@ EVT_BEGIN(e3_pose_evt)
 EVT_END()
 #endif
 
-void alarm_handler(OSAlarm* alarm, OSContext* context) {
+static void alarm_handler(OSAlarm* alarm, OSContext* context) {
     gp->flags |= GLOBAL_FLAG_KIOSK_TIMEOUT;
 }
 
 void seq_e3Init(SequenceWork* seq) {
-#if VERSION == VERSION_DEMO
+#if VERSION == VERSION_DEMO_US
     s32 type = gp->inBattle != 0;
     s32 i;
 
@@ -184,8 +186,8 @@ void seq_e3Init(SequenceWork* seq) {
     wp->nextScreen = 0;
     wp->scenario = 0;
     wp->poseRotY = 270.0f;
-#if VERSION == VERSION_DEMO
-    // The demo starts the timeout when a scenario is picked.
+#if VERSION == VERSION_DEMO_US
+    // The US demo starts the timeout when a scenario is picked.
     OSCancelAlarm(&wp->alarm);
     wp->initTime = 0;
 #else
@@ -210,7 +212,7 @@ void seq_e3Init(SequenceWork* seq) {
 }
 
 void seq_e3Exit(SequenceWork* seq) {
-#if VERSION == VERSION_DEMO
+#if VERSION == VERSION_DEMO_US
     s32 i;
 
     for (i = 0; i < 4; i++) {
@@ -468,7 +470,7 @@ void seq_e3Main(SequenceWork* seq) {
             pouchReviseMarioParam();
             pouchRevisePartyParam();
             statusWinForceUpdate();
-#if VERSION == VERSION_DEMO
+#if VERSION == VERSION_DEMO_US
             OSCreateAlarm(&wp->alarm);
             OSSetAlarm(&wp->alarm, (OSTime)OS_TIMER_CLOCK * 600, alarm_handler);
             wp->initTime = OSGetTime();
@@ -495,7 +497,7 @@ typedef enum E3Texture {
     E3_TEX_CURSOR0 = 5,
     E3_TEX_CURSOR1 = 6,
     E3_TEX_BOX = 7,
-#elif VERSION == VERSION_DEMO
+#elif VERSION == VERSION_DEMO_US
     E3_TEX_BOX = 1,
     E3_TEX_TILE = 4,
     E3_TEX_CURSOR0 = 5,
@@ -508,9 +510,9 @@ typedef enum E3Texture {
 #endif
 } E3Texture;
 
-void e3Disp(CameraId cameraId, void* param) {
+static void e3Disp(CameraId cameraId, void* param) {
     CameraEntry* camera = camGetPtr(CAMERA_2D);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     Mtx poseMtx;
     Mtx poseScale;
 #endif
@@ -549,7 +551,7 @@ void e3Disp(CameraId cameraId, void* param) {
                   camera->viewport[4], camera->viewport[5]);
 
     if (active == 0) {
-#if VERSION == VERSION_DEMO
+#if VERSION == VERSION_DEMO_US
         // Title screen: background tiles, the four characters and the title textures
         mode = (s32)((f32)sin(e3BlinkTime()) * 459.0f);
         if (mode < 0) {
@@ -615,8 +617,8 @@ void e3Disp(CameraId cameraId, void* param) {
 #endif
     } else {
         // Tiled background fill (40 x 32 quads)
-#if VERSION == VERSION_DEMO
-        // Same fill as below; the demo compiles it with the counters held in these variables.
+#if VERSION == VERSION_DEMO_US
+        // Same fill as below; the US demo compiles it with the counters held in these variables.
         winTexInit(*wp->handle->data);
         for (col = 0, py = -304; col < 40; col++, py += 16) {
             for (px = 0, row = 0; px < 32; px++, row += 16) {
@@ -708,14 +710,16 @@ void e3Disp(CameraId cameraId, void* param) {
                   viewportBackup[5]);
 }
 
-#if VERSION != VERSION_DEMO
-// JP and US both pool 30.0f via this dead-stripped stand-in
-f32 forceSdata(void) {
+#if VERSION != VERSION_DEMO_US
+// FAKE: stand-in for a function the linker stripped; it only creates the 30.0f constant in its place in .sdata2
+// (every build except the US demo has it there) and is dead-stripped at link. The one stripped function the
+// Japanese demo's map lists in this unit is `e3GetTime` (0x10 bytes); its code is in no build.
+f32 e3StrippedPool(void) {
     return 30.0f;
 }
 #endif
 
-void e3DispOffscreen(CameraId cameraId, void* param) {
+static void e3DispOffscreen(CameraId cameraId, void* param) {
     u16 left, top, right, bottom;
 
     wp->curScreen = wp->nextScreen;
@@ -727,7 +731,7 @@ void e3DispOffscreen(CameraId cameraId, void* param) {
     offscreenAddBoundingBox(offscreenNameToId("fOff_peron"), left, top, right, bottom);
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION == VERSION_DEMO_US
 static f32 e3BlinkTime(void) {
     return (f32)gp->retraceCount / 15.0f;
 }

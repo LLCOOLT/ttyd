@@ -20,7 +20,7 @@ static inline OffscreenWork* offscreenGetWorkGp(void) {
 }
 
 // local prototypes
-void offscreenDisp(CameraId camId, void* param);
+static void offscreenDisp(CameraId camId, void* param);
 
 void offscreenInit(void) {
     OffscreenWork* wp;
@@ -72,7 +72,7 @@ s32 offscreenEntry(const char* name) {
     return i;
 }
 
-void offscreenDisp(CameraId camId, void* param) {
+static void offscreenDisp(CameraId camId, void* param) {
     OffscreenWork* wp = offscreenGetWorkGp();
     int i, count;
     OffscreenEntry* entry;

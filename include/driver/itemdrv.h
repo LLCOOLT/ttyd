@@ -48,9 +48,36 @@ enum ItemStatusFlags {
     ITEM_STATUS_SAVED_BADGE_RETURN = 0x4000000, // ITEM_FLAG_BADGE_RETURN saved over the get sequence
 };
 
+// itemEntry's type argument (ItemEntry.type, also evt_item_entry's): the start mode, the despawn timer and a few
+// flags (the switch at the end of itemEntry). Timers count down once the item is out and blink for the last 3 s;
+// the _DROP types hold the timer until the item lands (ITEM_STATUS_TIMER_HOLD). Retail added
+// ITEM_ENTRY_DROP_8S_BADGE_RETURN, so in the demo the types after it are one lower; the enum carries the shift.
+enum ItemEntryType {
+    ITEM_ENTRY_STAY,              // rests where it is put (falls if there is no floor under it)
+    ITEM_ENTRY_STAY_NO_TOUCH,     // as STAY, with ITEM_FLAG_NO_TOUCH
+    ITEM_ENTRY_BOUNCE,            // hops out to one side; collectable at once
+    ITEM_ENTRY_BOUNCE_5S,         // as BOUNCE, gone after 5 s
+    ITEM_ENTRY_LAUNCH,            // hops out to one side; collectable once it starts to fall (ITEM_STATUS_LAUNCH)
+    ITEM_ENTRY_LAUNCH_5S,         // as LAUNCH, gone after 5 s
+    ITEM_ENTRY_LAUNCH_5S_SCATTER, // as LAUNCH_5S, directions spread in 132 degree steps (ITEM_STATUS_SCATTER)
+    ITEM_ENTRY_DROP_5S,           // as LAUNCH, gone 5 s after it lands
+    ITEM_ENTRY_DROP_8S,           // as LAUNCH, gone 8 s after it lands
+#if VERSION >= VERSION_JP
+    ITEM_ENTRY_DROP_8S_BADGE_RETURN, // as DROP_8S, with ITEM_FLAG_BADGE_RETURN
+#endif
+    ITEM_ENTRY_DROP_8S_REPLACEABLE,  // as DROP_8S, with ITEM_FLAG_REPLACEABLE
+    ITEM_ENTRY_DROP_20S,             // as LAUNCH, gone 20 s after it lands
+    ITEM_ENTRY_DROP_20S_REPLACEABLE, // as DROP_20S, with ITEM_FLAG_REPLACEABLE
+    ITEM_ENTRY_FALL,                 // drops straight down from where it is put
+    ITEM_ENTRY_FALL_THROWN,          // as FALL, not collectable until the first bounce (ITEM_STATUS_THROWN)
+    ITEM_ENTRY_POP_VANISH,           // pops straight up and vanishes in stardust as it starts to fall (block coins)
+    ITEM_ENTRY_FIXED,                // stays where it is put, without gravity
+    ITEM_ENTRY_FIXED_NO_TOUCH,       // as FIXED, with ITEM_FLAG_NO_TOUCH
+};
+
 typedef struct ItemEntry {
     u16 flags;              // 0x0, ItemFlags
-    u16 type;               // 0x2, entry type (itemEntry arg)
+    u16 type;               // 0x2, ItemEntryType
     s32 itemId;             // 0x4
     s32 collectFlag;        // 0x8, GSWF/LSWF flag set when collected, -1 for none
     char name[0x10];        // 0xC
@@ -101,7 +128,7 @@ void itemPickUp(ItemEntry* entry);
 
 void itemDelete(const char* name);
 // The position comes first: every call site in the original binary evaluates x, y, z before the other
-// arguments. type picks the start mode and despawn timer (the switch at the end of itemdrv.c itemEntry);
+// arguments. type is an ItemEntryType (start mode and despawn timer);
 // collectFlag is a GSWF/LSWF set on pickup, or -1; pickupEvt runs on pickup (NULL for none).
 // Returns NULL when collectFlag is already set or no slot is free.
 ItemEntry* itemEntry(f32 x, f32 y, f32 z, const char* name, s32 itemId, u16 type, s32 collectFlag, EvtWord* pickupEvt);

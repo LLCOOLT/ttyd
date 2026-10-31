@@ -6,7 +6,6 @@
 #include "evt/evt_item.h"
 #include "evt/evt_map.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "las.h"
 #include "evt/evt_story.h"
 
@@ -87,11 +86,13 @@ static BeroEntry bero_entry_data[] = {
 EVT_BEGIN(las_01_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS2"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 2)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_map_playanim, STRING("hamon"), 1, 0)
-    CALL(evt_item_entry, STRING("item_01"), ITEM_STOPWATCH, -710, 448, -175, 16, GSWF(GSWF_LAS01_STOPWATCH_ITEM_01), 0)
+    CALL(evt_item_entry, STRING("item_01"), ITEM_STOPWATCH, -710, 448, -175, ITEM_ENTRY_FIXED, GSWF(GSWF_LAS01_STOPWATCH_ITEM_01), 0)
     RETURN
 EVT_END()

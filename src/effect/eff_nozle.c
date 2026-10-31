@@ -29,8 +29,8 @@ typedef struct EffNozleWork {
     f32 rotY;     // 0x40
 } EffNozleWork;
 
-void effNozleMain(EffectEntry* effect);
-void effNozleDisp(CameraId cameraId, EffectEntry* effect);
+static void effNozleMain(EffectEntry* effect);
+static void effNozleDisp(CameraId cameraId, EffectEntry* effect);
 
 // Model data in the exporter's layout: indexed vertex arrays (positions, normals, colours, texture coordinates),
 // display lists of GX commands (each padded to 32 bytes with GX_NOP) and, per list table, the list sizes in
@@ -107,7 +107,7 @@ static s16 nozle_1_texcoord1_tbl[] __attribute__((aligned(32))) = {
     16384, -5461, 16384, -8192, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
 };
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static s8 nozle_1_normal_tbl[] __attribute__((aligned(32))) = {0, 0, 64};
 #else
 static s8 nozle_1_normal_tbl[] __attribute__((aligned(32))) = {
@@ -341,7 +341,7 @@ static s16 nozle_4_texcoord1_tbl[] __attribute__((aligned(32))) = {
     8192, 12288, 8192, 16384, 8192, 20480, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
 };
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static s8 nozle_4_normal_tbl[] __attribute__((aligned(32))) = {0, 0, 64, 0};
 #else
 static s8 nozle_4_normal_tbl[] __attribute__((aligned(32))) = {
@@ -364,7 +364,7 @@ static u32 nozle_4_dl_0_7[] __attribute__((aligned(32))) = {0x98000619, 0x000119
 static void* nozle_4_dl_0_tbl[] = {nozle_4_dl_0_0, nozle_4_dl_0_1, nozle_4_dl_0_2, nozle_4_dl_0_3, nozle_4_dl_0_4, nozle_4_dl_0_5, nozle_4_dl_0_6, nozle_4_dl_0_7};
 static u8 nozle_4_dl_0_size_tbl[] = {0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02, 0x02};
 static u8 scale_dt[][2] = {{0, 0}, {11, 13}, {22, 27}, {34, 41}, {46, 55}, {57, 69}, {68, 82}, {79, 94}, {87, 105}, {94, 113}, {100, 120}, {102, 123}, {103, 124}, {101, 123}, {98, 120}, {95, 116}, {90, 111}, {86, 107}, {83, 103}, {81, 101}, {80, 100}, {0, 0}
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // the demo keeps a fade-out half after the grow-in half
     , {80, 100}, {79, 99}, {77, 97}, {75, 94}, {73, 91}, {70, 87}, {66, 83}, {62, 78}, {58, 73}, {54, 67}, {49, 61}, {44, 55}, {39, 49}, {34, 42}, {29, 36}, {24, 29}, {19, 23}, {14, 17}, {9, 11}, {5, 6}, {0, 0}, {0, 0}
 #endif
@@ -428,7 +428,7 @@ EffectEntry* effNozleEntry(s32 type, f32 x, f32 y, f32 z, f32 rx, f32 ry, s32 li
     return effect;
 }
 
-void effNozleMain(EffectEntry* effect) {
+static void effNozleMain(EffectEntry* effect) {
     EffNozleWork* work = effect->userdata;
     EffNozleWork* p;
     Vec position;
@@ -488,7 +488,7 @@ void effNozleMain(EffectEntry* effect) {
     work->timer++;
     if (work->life < 0) {
         effDelete(effect);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     } else if (type == 3) {
         dispEntry(CAMERA_3D, dispCalcZ(&position), 8, (DispCallback)effNozleDisp, effect);
 #endif
@@ -522,7 +522,7 @@ void effNozleMain(EffectEntry* effect) {
         }                                                     \
     }
 
-void effNozleDisp(CameraId cameraId, EffectEntry* effect) {
+static void effNozleDisp(CameraId cameraId, EffectEntry* effect) {
     void** dl5;
     u8* sz5;
     u8* sz3;
@@ -546,7 +546,7 @@ void effNozleDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* cam;
     cam = camGetPtr(cameraId);
     alpha = work->alpha;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     GXSetBlendMode(1, 4, 5, 0);
     GXSetZCompLoc(1);
     GXSetAlphaCompare(7, 0, 0, 7, 0);

@@ -39,7 +39,7 @@ typedef struct KemuTestWork {
 } KemuTestWork;
 
 static void effKemuTestMain(EffectEntry* effect);
-void effKemuTestDisp(CameraId cameraId, void* param);
+static void effKemuTestDisp(CameraId cameraId, void* param);
 
 // functions are emitted in source order, as in the original
 #pragma defer_codegen off
@@ -62,7 +62,7 @@ static const KemuF3 kemu_h = {{0.0f, 1.0f, 2.0f}};
 static const Vec kemu_pos = {0.0f, 0.0f, 0.0f};
 static const Vec kemu_tmp = {0.0f, 0.0f, 0.0f};
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // In the demo the burst tables are file-scope statics, first in .data.
 static f32 bom_dir[10] = {10.0f, 40.0f, 80.0f, 170.0f, 140.0f, 100.0f, 25.0f, 155.0f, 60.0f, 120.0f};
 static f32 bom_spd[10] = {2.2f, 2.7f, 3.0f, 2.2f, 2.7f, 3.0f, 1.9f, 1.9f, 1.5f, 1.5f};
@@ -82,7 +82,7 @@ void effKemuTestDrawCam(EffectEntry* effect, s32 camera) {
 
 // Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_loop_invariants off
-void effKemuTestDisp(CameraId cameraId, void* param) {
+static void effKemuTestDisp(CameraId cameraId, void* param) {
     EffectEntry* effect = param;
     Mtx trans;
     Mtx scl;
@@ -371,7 +371,7 @@ static void effKemuTestMain(EffectEntry* effect) {
 }
 
 EffectEntry* effKemuTestEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     static f32 bom_dir[10] = {10.0f, 40.0f, 80.0f, 170.0f, 140.0f, 100.0f, 25.0f, 155.0f, 60.0f, 120.0f};
     static f32 bom_spd[10] = {2.2f, 2.7f, 3.0f, 2.2f, 2.7f, 3.0f, 1.9f, 1.9f, 1.5f, 1.5f};
 #endif
@@ -766,8 +766,3 @@ EffectEntry* effKemuTestEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     }
     return effect;
 }
-
-static __declspec(section ".rodata") const u32 eff_kemutest_rodata_pad[1] = {0};
-#if VERSION == VERSION_JP
-__declspec(section ".data") u8 eff_kemutest_data_pad[28] = {0};
-#endif

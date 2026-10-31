@@ -13,15 +13,14 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "las.h"
 #include "evt/evt_story.h"
 
 u16 toge_flag;
 
-USER_FUNC(get_toge_name);
-USER_FUNC(toge_check_flag);
-USER_FUNC(toge_flag_onoff);
+static USER_FUNC(get_toge_name);
+static USER_FUNC(toge_check_flag);
+static USER_FUNC(toge_flag_onoff);
 
 static BeroEntry bero_entry_data[3];
 static HitDamageReturn dmgRetPoint[3];
@@ -165,7 +164,7 @@ EVT_END()
 
 EVT_BEGIN(toge_evt)
     CALL(evt_hit_damage_return_set, PTR(dmgRetPoint))
-    CALL_CHILD(PTR(evt_gazigazi_entry))
+    CALL_CHILD(evt_gazigazi_entry)
     SET_INT_READ_ADDR(PTR(&toge_data))
     LOOP(9)
         READ_INT2(LW(0), LW(1))
@@ -184,7 +183,7 @@ EVT_BEGIN(toge_evt)
                 CALL(evt_sub_area_check, 1, LW(6), LW(8), 90, LW(1), LW(3), LW(9))
                 IF_INT_EQUAL(LW(9), 1)
                     SET_VALUE(LW(0), LW(4))
-                    SPAWN_EVENT(PTR(toge_evt_sub))
+                    SPAWN_EVENT(toge_evt_sub)
                 END_IF
                 ADD(LW(4), 1)
                 IF_INT_GREATER_OR_EQUAL(LW(4), 9)
@@ -200,30 +199,32 @@ EVT_END()
 EVT_BEGIN(las_03_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 2)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_mobj_badgeblk, STRING("mobj_badge_gat"), -350, 0, -100, ITEM_ALL_OR_NOTHING, 0, GSWF(GSWF_LAS03_ALL_OR_NOTHING_BLOCK_HIT), 1)
-    SPAWN_EVENT(PTR(toge_evt))
+    SPAWN_EVENT(toge_evt)
     RETURN
 EVT_END()
 
-USER_FUNC(get_toge_name) {
+static USER_FUNC(get_toge_name) {
     EvtWord* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     evtSetValue(event, args[1], (EvtWord)toge_data[idx * 2]);
     evtSetValue(event, args[2], (EvtWord)toge_data[idx * 2 + 1]);
     return EVT_RETURN_DONE;
 }
-USER_FUNC(toge_check_flag) {
+static USER_FUNC(toge_check_flag) {
     EvtWord* args = event->args;
     s32 bit = evtGetValue(event, args[0]);
 
     evtSetValue(event, args[1], toge_flag & (1 << bit));
     return EVT_RETURN_DONE;
 }
-USER_FUNC(toge_flag_onoff) {
+static USER_FUNC(toge_flag_onoff) {
     EvtWord* args = event->args;
     s32 bit = evtGetValue(event, args[0]);
     s32 on = evtGetValue(event, args[1]);

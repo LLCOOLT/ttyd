@@ -42,7 +42,7 @@ static CardWork* wp;
 
 // Set once a card has been opened; memcard_open then reads its serial number.
 // The demo keeps it in bit 0x4000 (retail moved it to make room for the insert watch).
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #define CARD_FLAG_SERIAL 0x4000
 #else
 #define CARD_FLAG_SERIAL 0x2000
@@ -60,7 +60,7 @@ static inline void make_header(void);
 #endif
 static inline void make_data(void);
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static void memcard_probe(void); // the demo calls it, the later versions inline it
 #else
 static inline void memcard_probe(void);
@@ -76,23 +76,23 @@ static inline void memcard_read(void* addr, s32 length, s32 offset);
 static inline void memcard_set_stat(void);
 static inline void memcard_get_stat(void);
 static inline void memcard_get_serial(void);
-void memcard_open(void);
+static void memcard_open(void);
 static inline void memcard_close(void);
 
-void mountDetachCallback(s32 chan, s32 result);
-void mountAttachCallback(s32 chan, s32 result);
-void checkCallback(s32 chan, s32 result);
-void formatCallback(s32 chan, s32 result);
-void createCallback(s32 chan, s32 result);
-void writeCallback(s32 chan, s32 result);
-void readCallback(s32 chan, s32 result);
-void statusCallback(s32 chan, s32 result);
+static void mountDetachCallback(s32 chan, s32 result);
+static void mountAttachCallback(s32 chan, s32 result);
+static void checkCallback(s32 chan, s32 result);
+static void formatCallback(s32 chan, s32 result);
+static void createCallback(s32 chan, s32 result);
+static void writeCallback(s32 chan, s32 result);
+static void readCallback(s32 chan, s32 result);
+static void statusCallback(s32 chan, s32 result);
 
-void write_main(void);
-void write_header_main(void);
-void read_main(void);
-void read_all_main(void);
-void create_main(void);
+static void write_main(void);
+static void write_header_main(void);
+static void read_main(void);
+static void read_all_main(void);
+static void create_main(void);
 static inline void format_main(void);
 static inline void delete_main(void);
 
@@ -128,7 +128,7 @@ void cardBufReset(void) {
     wp->op = 0;
     wp->result = CARD_RESULT_NOCARD;
     wp->flags = 0;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (flags & 0x8000) {
         wp->flags |= 0x8000;
     }
@@ -159,7 +159,7 @@ void cardInit(void) {
     CARDInit();
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 void cardInsertWatchStart(void) {
     wp->prevInserted = wp->chan;
     wp->busyFrames = 10;
@@ -180,7 +180,7 @@ BOOL cardInsertChanged(void) {
 #endif
 
 BOOL cardIsExec(void) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (wp == NULL) {
         return FALSE;
     }
@@ -199,7 +199,7 @@ s32 cardGetCode(void) {
 }
 
 void cardMain(void) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     s32 inserted;
 
     if (wp->flags & 0x8000) {
@@ -330,7 +330,7 @@ void cardCopy2Main(s32 slot) {
 #if VERSION == VERSION_EU
     s32 framerate;
 #endif
-#elif VERSION == VERSION_DEMO
+#elif VERSION <= VERSION_DEMO_US
     CardSaveSlot* save;
     void* backup1;
     void* backup2;
@@ -369,13 +369,13 @@ void cardCopy2Main(s32 slot) {
     memcpy(yuwp, &save->data.parlor, sizeof(PiantaParlorWork));
     memcpy(&_jdt.readFlags, &save->data.informant, sizeof(InformantUnknown));
     gp->resetType = 0;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     gp->resetButtonDown = 0;
 #endif
 #if VERSION >= VERSION_US
     gp->softResetWait = 0;
 #endif
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     gp->dvdError = 0;
 #endif
     gp->retraceTime = OSGetTime();
@@ -473,7 +473,7 @@ void cardWrite(s32 slot) {
         gp->resetButtonDown = 0;
         gp->softResetWait = 0;
 #endif
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         gp->dvdError = 0;
 #endif
         memcpy(&save->data.global, gp, sizeof(GlobalWork));
@@ -488,7 +488,7 @@ void cardWrite(s32 slot) {
     }
 }
 
-void write_main(void) {
+static void write_main(void) {
     if (wp->result) {
         wp->op = 8;
         wp->flags |= 0x200;
@@ -589,7 +589,7 @@ void cardWriteHeader(void) {
     }
 }
 
-void write_header_main(void) {
+static void write_header_main(void) {
     if (wp->result) {
         wp->op = 8;
         wp->flags |= 0x200;
@@ -634,7 +634,7 @@ void write_header_main(void) {
     }
 }
 
-void read_main(void) {
+static void read_main(void) {
     s32 saveType; // invalid = -1, main = 0, backup = 1
 
     if (wp->result) {
@@ -732,7 +732,7 @@ void cardReadAll(void) {
     }
 }
 
-void read_all_main(void) {
+static void read_all_main(void) {
     s32 saveType; // invalid = -1, main = 0, backup = 1
 
     if (wp->result) {
@@ -839,7 +839,7 @@ void cardCreate(void) {
     }
 }
 
-void create_main(void) {
+static void create_main(void) {
     if (wp->result) {
         wp->op = 8;
         wp->flags |= 0x200;
@@ -1188,7 +1188,7 @@ static void memcard_probe(void) {
     s32 sectorSize;
     s32 result;
     // the declaration order sets the registers: the demo's out-of-line copy and the inlined copies need opposite orders
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     s32 resultB;
     s32 timeout;
     s32 i;
@@ -1214,7 +1214,7 @@ static void memcard_probe(void) {
     if (result == CARD_RESULT_READY) {
         wp->result = CARD_RESULT_READY;
         wp->chan = 0;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     } else if (resultB == CARD_RESULT_READY) {
         wp->result = CARD_RESULT_READY;
         wp->chan = 1;
@@ -1222,7 +1222,7 @@ static void memcard_probe(void) {
     } else if (result == CARD_RESULT_WRONGDEVICE) {
         wp->result = CARD_RESULT_WRONGDEVICE;
         wp->chan = 0;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     } else if (resultB == CARD_RESULT_WRONGDEVICE) {
         wp->result = CARD_RESULT_WRONGDEVICE;
         wp->chan = 1;
@@ -1234,11 +1234,11 @@ static void memcard_probe(void) {
     wp->flags &= ~1;
 }
 
-void mountDetachCallback(s32 chan, s32 result) {
+static void mountDetachCallback(s32 chan, s32 result) {
     ; // stubbed in retail
 }
 
-void mountAttachCallback(s32 chan, s32 result) {
+static void mountAttachCallback(s32 chan, s32 result) {
     wp->result = result;
     if (result == CARD_RESULT_BROKEN || result == CARD_RESULT_ENCODING) {
         wp->result = CARD_RESULT_READY;
@@ -1268,7 +1268,7 @@ static inline void memcard_unmount(void) {
     wp->flags &= ~1;
 }
 
-void checkCallback(s32 chan, s32 result) {
+static void checkCallback(s32 chan, s32 result) {
     wp->result = result;
     wp->flags &= ~1;
 }
@@ -1278,7 +1278,7 @@ static inline void memcard_check(void) {
     CARDCheckAsync(wp->chan, checkCallback);
 }
 
-void formatCallback(s32 chan, s32 result) {
+static void formatCallback(s32 chan, s32 result) {
     wp->result = result;
     wp->flags &= ~1;
 }
@@ -1309,7 +1309,7 @@ static inline void memcard_delete(void) {
     wp->flags &= ~1;
 }
 
-void createCallback(s32 chan, s32 result) {
+static void createCallback(s32 chan, s32 result) {
     wp->result = result;
     wp->flags &= ~1;
 }
@@ -1319,7 +1319,7 @@ static inline void memcard_create(void) {
     CARDCreateAsync(wp->chan, card_file_name, sizeof(CardData) + (sizeof(CardSaveSlot) * 4), &wp->info, createCallback);
 }
 
-void writeCallback(s32 chan, s32 result) {
+static void writeCallback(s32 chan, s32 result) {
     wp->result = result;
     wp->flags &= ~1;
 }
@@ -1329,7 +1329,7 @@ static inline void memcard_write(void* addr, s32 length, s32 offset) {
     CARDWriteAsync(&wp->info, addr, length, offset, writeCallback);
 }
 
-void readCallback(s32 chan, s32 result) {
+static void readCallback(s32 chan, s32 result) {
     wp->result = result;
     wp->flags &= ~1;
 }
@@ -1339,7 +1339,7 @@ static inline void memcard_read(void* addr, s32 length, s32 offset) {
     CARDReadAsync(&wp->info, addr, length, offset, readCallback);
 }
 
-void statusCallback(s32 chan, s32 result) {
+static void statusCallback(s32 chan, s32 result) {
     wp->result = result;
     wp->flags &= ~1;
 }
@@ -1384,7 +1384,7 @@ static inline void memcard_get_serial(void) {
     wp->flags &= ~1;
 }
 
-void memcard_open(void) {
+static void memcard_open(void) {
     CARDStat stat;
     u64 serialNo;
     s32 byteNotUsed;

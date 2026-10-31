@@ -8,8 +8,8 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
-void effBreathFireMain(EffectEntry* effect);
-void effBreathFireDisp(CameraId cameraId, EffectEntry* effect);
+static void effBreathFireMain(EffectEntry* effect);
+static void effBreathFireDisp(CameraId cameraId, EffectEntry* effect);
 
 static effN64Vtx stg_fire_breath_v[] = {
     {100, -100, 0, 3072, 0, 0, 0, 0, 255},
@@ -79,7 +79,7 @@ EffectEntry* effBreathFireN64Entry(s32 type, s32 count, s32 seed, s32 lifetime, 
     return effect;
 }
 
-void effBreathFireMain(EffectEntry* effect) {
+static void effBreathFireMain(EffectEntry* effect) {
     s32 remaining;
     EffBreathFireN64Work* work;
     Vec position;
@@ -140,7 +140,7 @@ void effBreathFireMain(EffectEntry* effect) {
     }
 }
 
-void effBreathFireDisp(CameraId cameraId, EffectEntry* effect) {
+static void effBreathFireDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffBreathFireN64Work* work;
     GXTexObj texObj;

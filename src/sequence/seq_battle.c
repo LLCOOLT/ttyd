@@ -34,8 +34,14 @@
 #include <dolphin/mtx.h>
 #include "evt/evt_story.h"
 
+static void battle_exit(void);
+#if VERSION <= VERSION_DEMO_US
+static void battle_init(void);
+#else
+static BOOL battle_init(void);
+#endif
+
 s32 debug_battle_flag;
-s32 seq_battle_unused_sbss; // nothing reads or writes it
 
 static inline BOOL loadTpl(const char* path) {
     return fileAsyncf(4, NULL, "%s/%s", getMarioStDvdRoot(), path) != NULL;
@@ -51,12 +57,12 @@ static const char bti04[7];
 void seq_battleInit(SequenceWork* work) {
     FieldBattleData* fbat;
     NpcEntry* npc;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     MapData* map;
 #endif
 
     debug_battle_flag = gp->debugBattle;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // the demo starts reading the battle map now
     fbatGetPointer();
     switch (pouchGetPtr()->rank) {
@@ -88,7 +94,7 @@ void seq_battleInit(SequenceWork* work) {
     padRumbleOff(0);
     evtStopAll(4);
     psndSetFlag(PSND_FLAG_MUTE_SFX);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     switch (fbatGetPointer()->hitKind) {
         case 0x1000000:
         case 0x800000:
@@ -107,7 +113,7 @@ void seq_battleExit(SequenceWork* work) {
 }
 
 void seq_battleMain(SequenceWork* work) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     FieldBattleData* fbat;
     BattleStageData* stage;
     PouchData* pouch;
@@ -133,7 +139,7 @@ void seq_battleMain(SequenceWork* work) {
                 work->state++;
             }
             break;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         // the demo loads the battle map in battle_init
         case 2:
             battle_init();
@@ -232,7 +238,7 @@ void seq_battleMain(SequenceWork* work) {
             psndSetPosDirListener(&pos, camGetPtr(CAMERA_3D)->viewYaw);
             break;
         }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         case 4:
 #else
         case 6:
@@ -262,15 +268,15 @@ void seq_battleMain(SequenceWork* work) {
     }
 }
 
-#if VERSION == VERSION_DEMO
-void battle_init(void) {
+#if VERSION <= VERSION_DEMO_US
+static void battle_init(void) {
 #else
-BOOL battle_init(void) {
+static BOOL battle_init(void) {
 #endif
     FieldBattleData* fbat;
     NpcEntry* npc;
     PouchData* pouch;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     MapData* map;
     MapData* map2;
     BattleStageData* stage;
@@ -280,11 +286,11 @@ BOOL battle_init(void) {
 
     fbat = fbatGetPointer();
     npc = fbat->target;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     stage = npc->battleInfo.stageData;
 #endif
     pouch = pouchGetPtr();
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // the demo takes Mario's control and loads the battle map here (later versions: seq_battleMain states 2 and 3)
     if (debug_battle_flag == 0) {
         marioCtrlOff();
@@ -330,10 +336,10 @@ BOOL battle_init(void) {
 #endif
     _battleWorkPointer = NULL;
     animPoseBattleInit();
-    npcReleaseFieldNpc();
+    npcReleaseFiledNpc();
     gp->inBattle = 1;
     evtmgrReInit();
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (map && map->eventAddr) {
         evtEntry(map->eventAddr, 0, 0);
     }
@@ -394,12 +400,12 @@ BOOL battle_init(void) {
     info->ruleParam = npc->battleInfo.battleRule[1];
     info->ruleParam2 = npc->battleInfo.battleRule[2];
     BattleInit(info);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     return FALSE;
 #endif
 }
 
-void battle_exit(void) {
+static void battle_exit(void) {
     LightEntry* light;
     Mtx mtx;
 
@@ -424,7 +430,7 @@ void battle_exit(void) {
     effAutoRelease(TRUE);
     animPoseAutoRelease(TRUE);
     evtmgrReInit();
-    npcRecoveryFieldNpc();
+    npcRecoveryFiledNpc();
     gp->inBattle = 0;
 #if VERSION <= VERSION_JP
     memClear(4);
@@ -435,7 +441,7 @@ void battle_exit(void) {
         partyCtrlOn();
         marioGetPtr()->flags |= 1;
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     psndClearFlag(PSND_FLAG_SFX_WITH_BGM);
 #else
     L_psndBGM_stop();
@@ -448,7 +454,7 @@ void battle_exit(void) {
     }
     PSMTXScale(mtx, 3.0f, 3.0f, 3.0f);
     PSMTXMultVec(mtx, &light->position, &light->position);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if ((evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG2_23_TIME_BOMB_ACTIVATED || evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) >= STORY_STG2_24_BOSS_BATTLE) && evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) != STORY_STG8_END_AFTER_THE_BATTLE && seqGetNextSeq() != SEQ_GAME_OVER) {
 #else
     if (evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) >= STORY_STG2_23_TIME_BOMB_ACTIVATED && evtGetValue(NULL, GSW(GSW_STORY_PROGRESS)) < STORY_STG2_24_BOSS_BATTLE) {
@@ -461,7 +467,7 @@ void battle_exit(void) {
 }
 
 // the demo defines the names in another order (their order in .rodata)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static const char bti01[] = "bti_01";
 static const char bti02[] = "bti_02";
 static const char bti03[] = "bti_03";

@@ -19,7 +19,6 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "moo.h"
 #include "math.h"
 #include "evt/evt_story.h"
@@ -64,7 +63,7 @@ static EVT_BEGIN(mario_fly)
     CALL(evt_snd_sfxon, STRING("SFX_STG7_MARIO_FLY1"), LW(10))
     CALL(evt_mario_dispflag_onoff, 1, 2)
     CALL(evt_mario_set_pose, STRING("M_N_7"))
-    CALL_CHILD(PTR(party_damage_pose))
+    CALL_CHILD(party_damage_pose)
     WAIT_FRAMES(1)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
@@ -178,7 +177,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"幹部"*/"\x8A\xB2\x95\x94", // name
+        "幹部", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -217,7 +216,7 @@ EVT_BEGIN(moo_04_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG7_06_TO_THE_MOON)
         CALL(evt_cam3d_evt_set, 0, 134, 533, 0, 38, -8, 0, 11)
-        SPAWN_EVENT(PTR(mario_fly))
+        SPAWN_EVENT(mario_fly)
         WAIT_FRAMES(1)
         CASE_LESS(STORY_STG7_20_LORD_CRUMP_DEFEATED)
         CALL(evt_cam3d_evt_set, 20, 200, 533, 20, 104, -8, 0, 11)
@@ -226,10 +225,10 @@ EVT_BEGIN(moo_04_init_evt)
         CALL(evt_mario_set_pos, 0, -1000, 0)
         CALL(evt_party_set_pos, 0, 0, -1000, 0)
         WAIT_FRAMES(1)
-        SPAWN_EVENT(PTR(kanbu_fly))
+        SPAWN_EVENT(kanbu_fly)
         CASE_EQUAL(STORY_STG8_END_AFTER_THE_BATTLE)
         CALL(evt_mario_kill_party, 0)
-        SPAWN_EVENT(PTR(epilogue_evt))
+        SPAWN_EVENT(epilogue_evt)
         CASE_DEFAULT
         CALL(evt_cam3d_evt_set, 75, 160, 533, 75, 65, -8, 0, 11)
         BEGIN_INLINE_EVENT

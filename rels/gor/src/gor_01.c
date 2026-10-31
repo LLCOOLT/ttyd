@@ -12,6 +12,8 @@
 #include "evt/evt_npc.h"
 #include "mario/mario.h"
 #include "system.h"
+#include "manager/filemgr.h"
+#include "parse.h"
 #include "data/item_data.h"
 #include "dolphin/gx.h"
 #include "string.h"
@@ -56,7 +58,6 @@
 #include "evt/evt_win.h"
 #include "evt/evt_window.h"
 #include "kpa_act.h"
-#include "party/party_motion.h"
 #include "pmario_sound.h"
 #include "statuswindow.h"
 #include "evt/evt_johoya.h"
@@ -72,7 +73,11 @@
 typedef struct ShopSel {
     u8 head[8];
     s32* items;
+#if VERSION <= VERSION_DEMO_US
+    u8 listState[0x18 - 0xC];
+#else
     u8 listState[0x24 - 0xC];
+#endif
     s32 sel;
 } ShopSel; /* head: u16 flags first (cleared by disp_off); listState: never accessed */
 s32* iri_09_item_tbl;
@@ -80,24 +85,24 @@ static s32 item_tbl[21];
 
 static USER_FUNC(anim_tevcallback);
 static USER_FUNC(anim_tevcallback_mobj);
-USER_FUNC(chk_cook_msg);
-USER_FUNC(chk_special_cook);
-USER_FUNC(cooking_flag);
+static USER_FUNC(chk_cook_msg);
+static USER_FUNC(chk_special_cook);
+static USER_FUNC(cooking_flag);
 static USER_FUNC(delete_npc_regl_evt);
 static USER_FUNC(disp_off);
 static USER_FUNC(evt_StatusClose);
 static USER_FUNC(evt_StatusOpen);
 static USER_FUNC(evt_osreport);
 static USER_FUNC(get_value);
-USER_FUNC(iri_09_item_tbl_alloc);
-USER_FUNC(iri_09_item_tbl_free);
-USER_FUNC(iri_09_item_tbl_make);
+static USER_FUNC(iri_09_item_tbl_alloc);
+static USER_FUNC(iri_09_item_tbl_free);
+static USER_FUNC(iri_09_item_tbl_make);
 static USER_FUNC(mario_keyoff_wait);
 static USER_FUNC(set_fook_evt);
 static USER_FUNC(starstone_entry);
 static USER_FUNC(starstone_set_pos);
 static USER_FUNC(starstone_set_ry);
-USER_FUNC(wait_mahojin);
+static USER_FUNC(wait_mahojin);
 static USER_FUNC(yami_view);
 
 s32 item_tbl_nancy[2];
@@ -136,32 +141,38 @@ extern EvtWord christine_nakama_after[];
 extern EvtWord iri_09_tentyo_talk[];
 s32 iri_16_item_tbl[2];
 extern EvtWord iri_16_tyutyu_talk[];
+#if VERSION >= VERSION_JP
 SimpleRecipe R_simple_recipe_table[26];
 CookRecipe R_cookbook_recipe_table[VERSION_PICK(289, 292)];
-s32 R_mystery_cook_list[20];
+#endif
+s32 naniga_okorukana_list[20];
 s32 special_cook_list[16];
 s32 iri_18_item_tbl[2];
 extern EvtWord cooking_evt[];
 
+#if VERSION >= VERSION_JP
 USER_FUNC(badgeshop_special_cnt) {
     EvtWord* args = event->args;
 
     evtSetValue(event, args[0], U_badgeShop_SpecialCheck());
     return EVT_RETURN_DONE;
 }
+#endif
 
-USER_FUNC(nancy_block_init_func) {
+static USER_FUNC(nancy_block_init_func) {
     NpcEntry* npc = evtNpcNameToPtr(event, "ナンシー");
     f32 z;
 
     z = npc->position.z;
     event->lwDataF[10] = z;
     event->lwDataF[11] = z;
+#if VERSION >= VERSION_JP
     npc->flags |= NPC_FLAG_RESUME_ON_LEAVE;
+#endif
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(nancy_block_func) {
+static USER_FUNC(nancy_block_func) {
     MarioWork* mario = marioGetPtr();
     NpcEntry* npc = evtNpcNameToPtr(event, "ナンシー");
     f32 z;
@@ -199,7 +210,7 @@ USER_FUNC(nancy_block_func) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(chusan1_alwaysencont) {
+static USER_FUNC(chusan1_alwaysencont) {
     EvtWord* args = event->args;
     NpcWork* wp = npcGetWorkPtr();
 
@@ -251,6 +262,50 @@ static USER_FUNC(mario_keyoff_wait) {
     }
 }
 
+#if VERSION <= VERSION_DEMO_US
+// The demo's badge shop: each step is a new message from the clerk, and the coin window opens with each menu
+static EVT_BEGIN(sell_evt)
+    CALL(evt_pouch_get_havebadgecnt, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print, 0, STRING("badgeshop_06"), 0, STRING("バッジ店員"))
+        RETURN
+    END_IF
+    LABEL(0)
+    CALL(evt_win_coin_on, 0, LW(12))
+    CALL(evt_win_other_select, 12)
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print, 0, STRING("badgeshop_22"), 0, STRING("バッジ店員"))
+        CALL(evt_win_coin_off, LW(12))
+        RETURN
+    END_IF
+    CALL(evt_msg_print_insert, 0, STRING("badgeshop_08"), 0, STRING("バッジ店員"), LW(2), LW(3))
+    CALL(evt_msg_select, 0, STRING("badgeshop_24"))
+    CALL(evt_msg_continue)
+    IF_INT_EQUAL(LW(0), 1)
+        GOTO(0)
+    END_IF
+    CALL(evt_pouch_remove_item, LW(1), LW(0))
+    CALL(evt_badgeShop_throw_inc, LW(1))
+    CALL(evt_pouch_add_coin, LW(3))
+    CALL(evt_win_coin_wait, LW(12))
+    WAIT_MS(500)
+    CALL(evt_win_coin_off, LW(12))
+    CALL(evt_pouch_get_havebadgecnt, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print, 0, STRING("badgeshop_11"), 0, STRING("バッジ店員"))
+        RETURN
+    END_IF
+    CALL(evt_msg_print, 0, STRING("badgeshop_10"), 0, STRING("バッジ店員"))
+    CALL(evt_msg_select, 0, STRING("badgeshop_24"))
+    CALL(evt_msg_continue)
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_msg_print, 0, STRING("badgeshop_22"), 0, STRING("バッジ店員"))
+        RETURN
+    END_IF
+    GOTO(0)
+    RETURN
+EVT_END()
+#else
 static EVT_BEGIN(sell_evt)
     CALL(evt_pouch_get_havebadgecnt, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -312,6 +367,7 @@ static EVT_BEGIN(sell_evt)
     GOTO(0)
     RETURN
 EVT_END()
+#endif
 
 #if VERSION >= VERSION_US
 EVT_BEGIN(zaiko_buy_evt)
@@ -382,7 +438,7 @@ EVT_BEGIN(zaiko_buy_evt)
     GOTO(0)
     RETURN
 EVT_END()
-#else
+#elif VERSION >= VERSION_JP
 EVT_BEGIN(zaiko_buy_evt)
     CALL(evt_badgeShop_throw_get_kind_cnt, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -448,8 +504,80 @@ EVT_BEGIN(zaiko_buy_evt)
     GOTO(0)
     RETURN
 EVT_END()
+#else
+EVT_BEGIN(zaiko_buy_evt)
+    CALL(evt_badgeShop_throw_get_kind_cnt, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print, 0, STRING("badgeshop_37"), 0, STRING("バッジ店員"))
+        RETURN
+    END_IF
+    LABEL(0)
+    CALL(evt_win_coin_on, 0, LW(12))
+    CALL(evt_win_other_select, 11)
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print, 0, STRING("badgeshop_22"), 0, STRING("バッジ店員"))
+        CALL(evt_win_coin_off, LW(12))
+        RETURN
+    END_IF
+    CALL(evt_msg_print_insert, 0, STRING("badgeshop_00"), 0, STRING("バッジ店員"), LW(2), LW(3), LW(4))
+    CALL(evt_msg_select, 0, STRING("badgeshop_24"))
+    CALL(evt_msg_continue)
+    IF_INT_EQUAL(LW(0), 1)
+        GOTO(0)
+    END_IF
+    CALL(evt_pouch_get_coin, LW(0))
+    IF_INT_LESS(LW(0), LW(3))
+        CALL(evt_msg_print, 0, STRING("badgeshop_01"), 0, STRING("バッジ店員"))
+        CALL(evt_win_coin_off, LW(12))
+        RETURN
+    END_IF
+    CALL(evt_pouch_add_item, LW(1), LW(0))
+    IF_INT_EQUAL(LW(0), -1)
+        CALL(evt_msg_print, 0, STRING("badgeshop_02"), 0, STRING("バッジ店員"))
+        CALL(evt_win_coin_off, LW(12))
+        RETURN
+    END_IF
+    CALL(evt_badgeShop_throw_dec, LW(1))
+    MULTIPLY(LW(3), -1)
+    CALL(evt_pouch_add_coin, LW(3))
+    CALL(evt_win_coin_wait, LW(12))
+    WAIT_MS(500)
+    CALL(evt_win_coin_off, LW(12))
+    CALL(evt_badgeShop_throw_get_kind_cnt, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print, 0, STRING("badgeshop_11"), 0, STRING("バッジ店員"))
+        RETURN
+    END_IF
+    CALL(evt_msg_print, 0, STRING("badgeshop_38"), 0, STRING("バッジ店員"))
+    CALL(evt_msg_select, 0, STRING("badgeshop_24"))
+    CALL(evt_msg_continue)
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_msg_print, 0, STRING("badgeshop_22"), 0, STRING("バッジ店員"))
+        RETURN
+    END_IF
+    GOTO(0)
+    RETURN
+EVT_END()
 #endif
 
+#if VERSION <= VERSION_DEMO_US
+static EVT_BEGIN(buy_evt)
+    CALL(evt_msg_print, 0, STRING("badgeshop_36"), 0, STRING("バッジ店員"))
+    CALL(evt_msg_select, 0, STRING("badgeshop_35"))
+    SWITCH(LW(0))
+        CASE_EQUAL(0)
+        CALL(evt_msg_continue)
+        CALL(evt_msg_print, 0, STRING("badgeshop_05"), 0, STRING("バッジ店員"))
+        CASE_EQUAL(1)
+        CALL(evt_msg_continue)
+        CALL_CHILD(zaiko_buy_evt)
+        CASE_EQUAL(2)
+        CALL(evt_msg_continue)
+        CALL(evt_msg_print, 0, STRING("badgeshop_22"), 0, STRING("バッジ店員"))
+    END_SWITCH
+    RETURN
+EVT_END()
+#else
 static EVT_BEGIN(buy_evt)
     CALL(evt_msg_print_add, 0, STRING("badgeshop_36"))
     CALL(evt_msg_select, 0, STRING("badgeshop_35"))
@@ -467,13 +595,47 @@ static EVT_BEGIN(buy_evt)
             CALL(evt_msg_print_add, 0, STRING("badgeshop_05"))
         END_IF
         CASE_EQUAL(1)
-        CALL_CHILD(PTR(zaiko_buy_evt))
+        CALL_CHILD(zaiko_buy_evt)
         CASE_EQUAL(2)
         CALL(evt_msg_print_add, 0, STRING("badgeshop_22"))
     END_SWITCH
     RETURN
 EVT_END()
+#endif
 
+#if VERSION <= VERSION_DEMO_US
+// The clerk greets Mario on his first visit (GSWF_GOR01_BADGE_SHOP_FIRST_TALK) instead of opening the menu
+static EVT_BEGIN(first_shopping_evt)
+    CALL(evt_msg_print, 0, STRING("badgeshop_30"), 0, STRING("バッジ店員"))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(badgeshopper_talk_evt)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(unitwin_get_work_ptr, LW(10))
+    IF_INT_EQUAL(GSWF(GSWF_GOR01_BADGE_SHOP_FIRST_TALK), 0)
+        CALL_CHILD(first_shopping_evt)
+        SET_VALUE(GSWF(GSWF_GOR01_BADGE_SHOP_FIRST_TALK), 1)
+        CALL(evt_mario_key_onoff, 1)
+        RETURN
+    END_IF
+    CALL(evt_msg_print, 0, STRING("badgeshop_04"), 0, STRING("バッジ店員"))
+    CALL(evt_msg_select, 0, STRING("badgeshop_23"))
+    SWITCH(LW(0))
+        CASE_EQUAL(0)
+        CALL(evt_msg_continue)
+        CALL_CHILD(buy_evt)
+        CASE_EQUAL(1)
+        CALL(evt_msg_continue)
+        CALL_CHILD(sell_evt)
+        CASE_EQUAL(2)
+        CALL(evt_msg_continue)
+        CALL(evt_msg_print, 0, STRING("badgeshop_22"), 0, STRING("バッジ店員"))
+    END_SWITCH
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+#else
 EVT_BEGIN(badgeshopper_talk_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(unitwin_get_work_ptr, LW(10))
@@ -481,15 +643,16 @@ EVT_BEGIN(badgeshopper_talk_evt)
     CALL(evt_msg_select, 0, STRING("badgeshop_23"))
     SWITCH(LW(0))
         CASE_EQUAL(0)
-        CALL_CHILD(PTR(buy_evt))
+        CALL_CHILD(buy_evt)
         CASE_EQUAL(1)
-        CALL_CHILD(PTR(sell_evt))
+        CALL_CHILD(sell_evt)
         CASE_EQUAL(2)
         CALL(evt_msg_print_add, 0, STRING("badgeshop_22"))
     END_SWITCH
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
+#endif
 
 EVT_BEGIN(badgemaster_init)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 16)
@@ -558,217 +721,16 @@ EVT_BEGIN(kinoji_talk)
     RETURN
 EVT_END()
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(nancy_init_check)
     CALL(evt_npc_change_interrupt, STRING("me"), 6, 0)
     LOOP(0)
         CALL(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
         SET_VALUE(LW(3), 0)
-        IF_INT_GREATER(LW(10), -580)
-            IF_INT_LESS(LW(10), -400)
-                IF_INT_GREATER(LW(11), -10)
-                    IF_INT_LESS(LW(11), 5)
-                        IF_INT_GREATER(LW(12), 0)
-                            IF_INT_LESS(LW(12), 180)
-                                SET_VALUE(LW(3), 1)
-                            END_IF
-                        END_IF
-                    END_IF
-                END_IF
-            END_IF
-        END_IF
-        WAIT_FRAMES(1)
-        IF_INT_EQUAL(LW(3), 1)
-            BREAK_LOOP
-        END_IF
-    END_LOOP
-    CALL(evt_mario_key_onoff, 0)
-    CALL(evt_mario_normalize)
-    CALL(evt_npc_get_reglid, STRING("ナンシー"), LW(0))
-    DELETE_EVENT(LW(0))
-    BEGIN_INLINE_EVENT
-        WAIT_MS(100)
-        CALL(evt_mario_set_dir_npc, STRING("ナンシー"))
-    END_INLINE_EVENT
-    BEGIN_INLINE_EVENT
-        WAIT_MS(100)
-        CALL(evt_party_wait_landon, 0)
-        CALL(evt_party_stop, 0)
-        CALL(evt_party_set_dir_npc, 0, STRING("ナンシー"))
-    END_INLINE_EVENT
-    BEGIN_INLINE_EVENT
-        WAIT_MS(100)
-        CALL(evt_party_wait_landon, 1)
-        CALL(evt_party_stop, 1)
-        CALL(evt_party_set_dir_npc, 1, STRING("ナンシー"))
-    END_INLINE_EVENT
-    CALL(evt_msg_print, 0, STRING("gor_01_000"), 0, STRING("me"))
-    CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
-    SET_VALUE(LW(1), LW(2))
-    ADD(LW(1), 335)
-    ADD(LW(2), -8)
-    IF_INT_LESS_OR_EQUAL(LW(0), -520)
-        SET_VALUE(LW(0), -520)
-    END_IF
-    CALL(evt_cam3d_evt_set, LW(0), 99, LW(1), LW(0), 39, LW(2), 500, 11)
-    WAIT_MS(800)
-    SET_VALUE(LW(3), 90)
-    CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
-    IF_INT_GREATER(LW(0), LW(10))
-        ADD(LW(3), 180)
-    END_IF
-    CALL(evt_npc_set_ry, STRING("me"), LW(3))
-    CALL(evt_msg_print, 0, STRING("gor_01_001"), 0, STRING("me"))
-    CALL(evt_npc_reverse_ry, STRING("me"))
-    WAIT_MS(700)
-    CALL(evt_npc_reverse_ry, STRING("me"))
-    WAIT_MS(800)
-    CALL(evt_msg_print, 0, STRING("gor_01_002"), 0, STRING("me"))
-    CALL(evt_npc_reverse_ry, STRING("me"))
-    WAIT_MS(700)
-    CALL(evt_npc_reverse_ry, STRING("me"))
-    WAIT_MS(700)
-    CALL(evt_npc_reverse_ry, STRING("me"))
-    WAIT_MS(700)
-    CALL(evt_npc_reverse_ry, STRING("me"))
-    WAIT_MS(800)
-    CALL(evt_msg_print, 0, STRING("gor_01_003"), 0, STRING("me"))
-    WAIT_MS(300)
-    CALL(evt_npc_restart_regular_event, STRING("me"))
-    CALL(evt_cam3d_evt_off, 800, 11)
-    WAIT_MS(800)
-    CALL(evt_mario_key_onoff, 1)
-    CALL(evt_party_run, 0)
-    CALL(evt_party_run, 1)
-    SET_VALUE(GF(0), 1)
-    BEGIN_INLINE_EVENT
-        WAIT_MS(1000)
-        SET_VALUE(GF(0), 0)
-    END_INLINE_EVENT
-    BEGIN_INLINE_EVENT
-        LOOP(0)
-            CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-            IF_INT_GREATER_OR_EQUAL(LW(0), -400)
-                BREAK_LOOP
-            END_IF
-            IF_INT_LESS_OR_EQUAL(LW(0), -550)
-                BREAK_LOOP
-            END_IF
-            WAIT_FRAMES(1)
-        END_LOOP
-        SET_VALUE(GF(0), 0)
-    END_INLINE_EVENT
-    WAIT_WHILE(GF(0))
-    LOOP(0)
-        CALL(evt_mario_get_state, LW(0))
-        IF_INT_EQUAL(LW(0), 1)
-            BREAK_LOOP
-        END_IF
-        WAIT_FRAMES(1)
-    END_LOOP
-    WAIT_MS(60)
-    CALL(evt_mario_key_onoff, 0)
-    CALL(evt_mario_normalize)
-    CALL(evt_mario_wait_landon)
-    CALL(evt_mario_get_party, LW(0))
-    IF_INT_EQUAL(LW(0), 5)
-        LOOP(0)
-            CALL(evt_mario_party_use_check, LW(0))
-            IF_INT_EQUAL(LW(0), 0)
-                BREAK_LOOP
-            END_IF
-            WAIT_FRAMES(1)
-        END_LOOP
-        CALL(evt_mario_set_pose, STRING("M_S_1"))
-    END_IF
-    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-    CALL(evt_snd_sfxon_3d, STRING("SFX_STG0_LENS_BREAK1"), LW(0), LW(1), LW(2), 0)
-    CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
-    CALL(evt_msg_print, 0, STRING("gor_01_004"), 0, 0)
-    CALL(evt_npc_get_reglid, STRING("me"), LW(0))
-    DELETE_EVENT(LW(0))
-    CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
-    SET_VALUE(LW(1), LW(2))
-    ADD(LW(1), 250)
-    ADD(LW(2), 30)
-    IF_INT_LESS_OR_EQUAL(LW(0), -500)
-        SET_VALUE(LW(0), -500)
-    END_IF
-    CALL(evt_cam3d_evt_set, LW(0), 80, LW(1), LW(0), 40, LW(2), 500, 11)
-    WAIT_MS(400)
-    CALL(evt_set_dir_to_target, STRING("me"), STRING("mario"))
-    CALL(evt_msg_print, 0, STRING("gor_01_005"), 0, STRING("me"))
-    CALL(evt_mario_set_dir_npc, STRING("me"))
-    CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
-    CALL(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
-    IF_INT_LESS(LW(0), LW(10))
-        IF_INT_LESS(LW(10), -550)
-            GOTO(100)
-        END_IF
-        SUBTRACT(LW(10), 30)
-        CALL(evt_npc_set_ry, STRING("me"), 90)
-    ELSE
-        LABEL(100)
-        ADD(LW(10), 30)
-        CALL(evt_npc_set_ry, STRING("me"), 270)
-    END_IF
-    WAIT_FRAMES(1)
-    CALL(evt_cam3d_evt_off, 500, 11)
-    CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
-    CALL(evt_npc_move_position, STRING("me"), LW(10), LW(12), 0, FLOAT(180.0f), 0)
-    CALL(evt_mario_set_dir_npc, STRING("me"))
-    CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
-    CALL(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
-    IF_INT_LESS(LW(0), LW(10))
-        CALL(evt_npc_set_ry, STRING("me"), 90)
-    ELSE
-        CALL(evt_npc_set_ry, STRING("me"), 270)
-    END_IF
-    WAIT_MS(300)
-    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-    CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_NO1"), LW(0), LW(1), LW(2), 0)
-    CALL(evt_mario_set_pose, STRING("M_N_B"))
-    WAIT_MS(800)
-    CALL(evt_mario_set_pose, STRING("M_S_1"))
-    WAIT_MS(200)
-    CALL(evt_msg_print, 0, STRING("gor_01_006"), 0, STRING("me"))
-    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-    CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_NO1"), LW(0), LW(1), LW(2), 0)
-    CALL(evt_mario_set_pose, STRING("M_N_C"))
-    WAIT_MS(400)
-    CALL(evt_mario_set_pose, STRING("M_S_1"))
-    WAIT_MS(400)
-    CALL(evt_npc_set_ry, STRING("me"), 270)
-    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-    SET_VALUE(GF(0), 0)
-    IF_INT_LESS_OR_EQUAL(LW(0), -540)
-        SET_VALUE(GF(0), 1)
-        BEGIN_INLINE_EVENT
-            CALL(evt_mario_mov_pos2, -530, LW(2), FLOAT(180.0f))
-            SET_VALUE(GF(0), 0)
-            CALL(evt_mario_set_dir, 270, 200, 0)
-        END_INLINE_EVENT
-    END_IF
-    CALL(evt_npc_move_position, STRING("me"), -573, 56, 0, FLOAT(180.0f), 0)
-    WAIT_WHILE(GF(0))
-    CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
-    CALL(evt_npc_set_ry, STRING("me"), 90)
-    WAIT_MS(300)
-    CALL(evt_msg_print, 0, STRING("gor_01_007"), 0, STRING("me"))
-    CALL(evt_npc_restart_regular_event, STRING("me"))
-    CALL(evt_npc_change_interrupt, STRING("me"), 6, PTR(nancy_talk))
-    CALL(evt_cam3d_evt_off, 0, 11)
-    CALL(evt_mario_key_onoff, 1)
-    SET_VALUE(GSWF(GSWF_GOR01_ZESS_BLOCKS_GATE), 1)
-    RETURN
-EVT_END()
+#if VERSION <= VERSION_DEMO_US
+        IF_INT_GREATER(LW(10), -575)
 #else
-EVT_BEGIN(nancy_init_check)
-    CALL(evt_npc_change_interrupt, STRING("me"), 6, 0)
-    LOOP(0)
-        CALL(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
-        SET_VALUE(LW(3), 0)
         IF_INT_GREATER(LW(10), -580)
+#endif
             IF_INT_LESS(LW(10), -400)
                 IF_INT_GREATER(LW(11), -10)
                     IF_INT_LESS(LW(11), 5)
@@ -842,6 +804,10 @@ EVT_BEGIN(nancy_init_check)
     CALL(evt_cam3d_evt_off, 800, 11)
     WAIT_MS(800)
     CALL(evt_mario_key_onoff, 1)
+#if VERSION >= VERSION_US
+    CALL(evt_party_run, 0)
+    CALL(evt_party_run, 1)
+#endif
     SET_VALUE(GF(0), 1)
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
@@ -872,6 +838,7 @@ EVT_BEGIN(nancy_init_check)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_normalize)
     CALL(evt_mario_wait_landon)
+#if VERSION >= VERSION_JP
     CALL(evt_mario_get_party, LW(0))
     IF_INT_EQUAL(LW(0), 5)
         LOOP(0)
@@ -883,6 +850,7 @@ EVT_BEGIN(nancy_init_check)
         END_LOOP
         CALL(evt_mario_set_pose, STRING("M_S_1"))
     END_IF
+#endif
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG0_LENS_BREAK1"), LW(0), LW(1), LW(2), 0)
     CALL(evt_msg_toge, 2, LW(0), LW(1), LW(2))
@@ -960,13 +928,14 @@ EVT_BEGIN(nancy_init_check)
     CALL(evt_npc_restart_regular_event, STRING("me"))
     CALL(evt_npc_change_interrupt, STRING("me"), 6, PTR(nancy_talk))
     CALL(evt_cam3d_evt_off, 0, 11)
+#if VERSION <= VERSION_JP
     CALL(evt_party_run, 0)
     CALL(evt_party_run, 1)
+#endif
     CALL(evt_mario_key_onoff, 1)
     SET_VALUE(GSWF(GSWF_GOR01_ZESS_BLOCKS_GATE), 1)
     RETURN
 EVT_END()
-#endif
 
 EVT_BEGIN(nancy_init)
     SET_VALUE(LSWF(1), 0)
@@ -974,13 +943,13 @@ EVT_BEGIN(nancy_init)
         IF_INT_EQUAL(GSWF(GSWF_GOR01_ZESS_BLOCKS_GATE), 0)
             CALL(evt_npc_set_ry, STRING("me"), 270)
             CALL(evt_npc_set_position, STRING("me"), -500, 0, 75)
-            SPAWN_EVENT(PTR(nancy_init_check))
+            SPAWN_EVENT(nancy_init_check)
         ELSE
             CALL(evt_npc_set_ry, STRING("me"), 90)
             CALL(evt_npc_set_position, STRING("me"), -573, 0, 56)
         END_IF
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_hitobj_attr_onoff, 1, 0, STRING("w_bero"), 8388612)
     ELSE
         CALL(evt_npc_set_ry, STRING("me"), 270)
@@ -1041,13 +1010,16 @@ s32 item_tbl_nancy[] = {
     ITEM_CONTACT_LENS, -1,
 };
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(nancy_talk)
     IF_INT_EQUAL(GSWF(GSWF_GOR01_LENS_DELIVERED), 0)
         CALL(evt_pouch_check_item, ITEM_CONTACT_LENS, LW(0))
         IF_INT_GREATER_OR_EQUAL(LW(0), 1)
             CALL(evt_msg_print, 0, STRING("gor_01_008"), 0, STRING("me"))
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_win_item_select, PTR(item_tbl_nancy), LW(1))
+#else
             CALL(evt_win_item_select, 0, PTR(item_tbl_nancy), LW(1), 0)
+#endif
             IF_INT_EQUAL(LW(1), -1)
                 SET_VALUE(LW(0), 0)
             END_IF
@@ -1077,11 +1049,15 @@ EVT_BEGIN(nancy_talk)
             CALL(evt_msg_print, 0, STRING("gor_01_011"), 0, STRING("me"))
             WAIT_MS(500)
             SET_VALUE(GF(0), 1)
-            SPAWN_EVENT(PTR(nancy_door_anime))
+            SPAWN_EVENT(nancy_door_anime)
             WAIT_MS(500)
             CALL(evt_npc_move_position, STRING("me"), -370, -30, 0, FLOAT(80.0f), 0)
             WAIT_WHILE(GF(0))
+#if VERSION <= VERSION_JP
+            CALL(evt_npc_set_position, STRING("me"), -455, 10, -170)
+#else
             CALL(evt_npc_set_position, STRING("me"), -405, 10, -100)
+#endif
             CALL(evt_npc_set_ry, STRING("me"), 270)
             CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
             SET_VALUE(LW(0), STRING("w_bero"))
@@ -1091,65 +1067,10 @@ EVT_BEGIN(nancy_talk)
             CALL(evt_door_set_param, GW(6), 0, PTR(&door_data_01_npc))
         END_IF
     ELSE
-        CALL_CHILD(PTR(cooking_evt))
+        CALL_CHILD(cooking_evt)
     END_IF
     RETURN
 EVT_END()
-#else
-EVT_BEGIN(nancy_talk)
-    IF_INT_EQUAL(GSWF(GSWF_GOR01_LENS_DELIVERED), 0)
-        CALL(evt_pouch_check_item, ITEM_CONTACT_LENS, LW(0))
-        IF_INT_GREATER_OR_EQUAL(LW(0), 1)
-            CALL(evt_msg_print, 0, STRING("gor_01_008"), 0, STRING("me"))
-            CALL(evt_win_item_select, 0, PTR(item_tbl_nancy), LW(1), 0)
-            IF_INT_EQUAL(LW(1), -1)
-                SET_VALUE(LW(0), 0)
-            END_IF
-        END_IF
-        IF_INT_LESS(LW(0), 1)
-            CALL(evt_mario_set_pose, STRING("M_N_B"))
-            WAIT_MS(800)
-            CALL(evt_mario_set_pose, STRING("M_S_1"))
-            WAIT_MS(200)
-            CALL(evt_msg_print, 0, STRING("gor_01_009"), 0, STRING("me"))
-        ELSE
-            CALL(evt_npc_get_reglid, STRING("me"), LW(10))
-            DELETE_EVENT(LW(10))
-            WAIT_MS(500)
-            CALL(evt_npc_reverse_ry, STRING("me"))
-            WAIT_MS(700)
-            CALL(evt_npc_reverse_ry, STRING("me"))
-            WAIT_MS(1000)
-            CALL(evt_pouch_remove_item, ITEM_CONTACT_LENS, LW(0))
-            CALL(evt_msg_print, 0, STRING("gor_01_010"), 0, STRING("me"))
-            CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
-            CALL(evt_npc_set_ry, STRING("me"), 90)
-            CALL(evt_npc_move_position, STRING("me"), -380, 50, 0, FLOAT(120.0f), 0)
-            CALL(evt_npc_jump_position_nohit, STRING("me"), -380, 10, 20, 200, 30)
-            CALL(evt_npc_set_ry, STRING("me"), 270)
-            WAIT_MS(60)
-            CALL(evt_msg_print, 0, STRING("gor_01_011"), 0, STRING("me"))
-            WAIT_MS(500)
-            SET_VALUE(GF(0), 1)
-            SPAWN_EVENT(PTR(nancy_door_anime))
-            WAIT_MS(500)
-            CALL(evt_npc_move_position, STRING("me"), -370, -30, 0, FLOAT(80.0f), 0)
-            WAIT_WHILE(GF(0))
-            CALL(evt_npc_set_position, STRING("me"), -455, 10, -170)
-            CALL(evt_npc_set_ry, STRING("me"), 270)
-            CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
-            SET_VALUE(LW(0), STRING("w_bero"))
-            CALL_CHILD(PTR(bero_case_switch_on))
-            CALL(evt_hitobj_attr_onoff, 1, 1, STRING("w_bero"), 8388612)
-            SET_VALUE(GSWF(GSWF_GOR01_LENS_DELIVERED), 1)
-            CALL(evt_door_set_param, GW(6), 0, PTR(&door_data_01_npc))
-        END_IF
-    ELSE
-        CALL_CHILD(PTR(cooking_evt))
-    END_IF
-    RETURN
-EVT_END()
-#endif
 
 static EVT_BEGIN(marco_init)
     SWITCH(GSW(GSW_STORY_PROGRESS))
@@ -1241,7 +1162,7 @@ static EVT_BEGIN(marco_talk)
         ADD(LW(0), 20)
         ADD(LW(1), 20)
         ADD(LW(2), 10)
-        CALL(evt_item_entry, STRING("map00"), ITEM_MAGICAL_MAP_LARGE, LW(0), LW(1), LW(2), 16, -1, 0)
+        CALL(evt_item_entry, STRING("map00"), ITEM_MAGICAL_MAP_LARGE, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
         CALL(evt_item_flag_on, STRING("map00"), ITEM_FLAG_NO_TOUCH)
         CALL(evt_item_set_scale, STRING("map00"), FLOAT(0.5498047f))
         WAIT_MS(500)
@@ -1460,7 +1381,7 @@ EVT_BEGIN(master_talk)
         CALL(evt_npc_move_position, STRING("me"), 325, -275, 0, FLOAT(40.0f), 0)
         CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-        CALL(evt_item_entry, STRING("letter"), ITEM_OLD_LETTER, LW(0), LW(1), LW(2), 16, -1, 0)
+        CALL(evt_item_entry, STRING("letter"), ITEM_OLD_LETTER, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
         CALL(evt_item_flag_on, STRING("letter"), ITEM_FLAG_BGM_SILENT | ITEM_FLAG_NO_TOUCH)
         CALL(evt_item_get_item, STRING("letter"))
         CALL(evt_cam3d_evt_set, 300, 95, 27, 300, 43, -268, 500, 11)
@@ -1723,7 +1644,7 @@ EVT_BEGIN(kuribo2_init)
 EVT_END()
 
 EVT_BEGIN(kuribo2_regl)
-    CALL_CHILD(PTR(gor_villager_urouro))
+    CALL_CHILD(gor_villager_urouro)
     RETURN
 EVT_END()
 
@@ -1756,7 +1677,7 @@ EVT_BEGIN(kuribo3_init)
 EVT_END()
 
 EVT_BEGIN(kuribo3_regl)
-    CALL_CHILD(PTR(gor_villager_urouro))
+    CALL_CHILD(gor_villager_urouro)
     RETURN
 EVT_END()
 
@@ -1765,7 +1686,7 @@ EVT_BEGIN(kuribo3_talk)
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_1), 0)
             IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_BASE), 0)
                 CALL(evt_msg_print, 0, STRING("irai_02_00"), 0, STRING("me"))
-                CALL(evt_item_entry, STRING("irai_item"), ITEM_BOX, 0, -1000, 0, 16, -1, 0)
+                CALL(evt_item_entry, STRING("irai_item"), ITEM_BOX, 0, -1000, 0, ITEM_ENTRY_FIXED, -1, 0)
                 CALL(evt_item_flag_on, STRING("irai_item"), ITEM_FLAG_NO_TOUCH)
                 CALL(evt_item_get_item, STRING("irai_item"))
                 SET_VALUE(GSWF(GSWF_TROUBLE_WORK_BASE), 1)
@@ -1811,7 +1732,7 @@ EVT_BEGIN(chusan1_init)
         CALL(evt_npc_set_position, STRING("me"), -80, 0, 40)
         CALL(evt_npc_set_ry, STRING("me"), 270)
         SET_VALUE(GF(9), 1)
-        SPAWN_EVENT(PTR(chusan1_naguru))
+        SPAWN_EVENT(chusan1_naguru)
     END_IF
     RETURN
 EVT_END()
@@ -1819,7 +1740,7 @@ EVT_END()
 EVT_BEGIN(chusan1_regl)
     IF_INT_NOT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 5)
         DEBUG_PUT_MSG(STRING("マルチュロ：普段のうろうろ"))
-        CALL_CHILD(PTR(gor_villager_urouro))
+        CALL_CHILD(gor_villager_urouro)
     END_IF
     DEBUG_PUT_MSG(STRING("マルチュロ：依頼時は何もしない"))
     RETURN
@@ -1883,7 +1804,7 @@ EVT_BEGIN(chusan1_naguru)
     ELSE
         CALL(evt_msg_print, 0, STRING("irai_05_016"), 0, STRING("チューさん１"))
         SET_VALUE(GF(9), 1)
-        SPAWN_EVENT(PTR(chusan1_naguru))
+        SPAWN_EVENT(chusan1_naguru)
     END_IF
     CALL(chusan1_alwaysencont, 0)
     CALL(evt_mario_key_onoff, 1)
@@ -2001,12 +1922,18 @@ EVT_BEGIN(bomhei_talk)
 EVT_END()
 
 EVT_BEGIN(bottakuru_init)
+#if VERSION <= VERSION_DEMO_US
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG2_25_AFTER_THE_BOSS_BATTLE)
+#else
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_17_FATHER_AND_SON_REUNITED)
+#endif
         CALL(evt_npc_set_position, STRING("me"), 0, -1000, 0)
         RETURN
     END_IF
     CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_NO_WALL_HIT)
+#if VERSION >= VERSION_JP
     CALL(evt_npc_set_ry, STRING("me"), 90)
+#endif
     SET_VALUE(GSWF(GSWF_GOR01_CHARLIETON_BOUGHT), 0)
     RETURN
 EVT_END()
@@ -2124,7 +2051,7 @@ EVT_BEGIN(bottakuru_talk)
     GOTO(0)
     RETURN
 EVT_END()
-#else
+#elif VERSION >= VERSION_JP
 EVT_BEGIN(bottakuru_talk)
     CALL(U_evt_badgeShop_get_special_zaiko, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -2231,6 +2158,91 @@ EVT_BEGIN(bottakuru_talk)
     GOTO(0)
     RETURN
 EVT_END()
+#else
+EVT_BEGIN(bottakuru_talk)
+    CALL(evt_badgeShop_bottakuru_get_kind_cnt, LW(0))
+    IF_INT_LESS_OR_EQUAL(LW(0), 0)
+        CALL(evt_msg_print, 0, STRING("bottakuru_03"), 0, STRING("me"))
+        RETURN
+    END_IF
+    IF_INT_EQUAL(GSWF(GSWF_GOR01_CHARLIETON_FIRST_TALK), 0)
+        CALL(evt_msg_print, 0, STRING("bottakuru_00"), 0, STRING("me"))
+        SET_VALUE(GSWF(GSWF_GOR01_CHARLIETON_FIRST_TALK), 1)
+    ELSE
+        IF_INT_EQUAL(GSWF(GSWF_GOR01_CHARLIETON_BOUGHT), 0)
+            CALL(evt_msg_print, 0, STRING("bottakuru_01"), 0, STRING("me"))
+        ELSE
+            CALL(evt_msg_print, 0, STRING("bottakuru_02"), 0, STRING("me"))
+        END_IF
+    END_IF
+    CALL(evt_msg_select, 0, STRING("bottakuru_yesno"))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_msg_print_add, 0, STRING("bottakuru_04"))
+        RETURN
+    END_IF
+    CALL(evt_msg_continue)
+    LABEL(0)
+    CALL(evt_win_coin_on, 0, LW(12))
+    CALL(evt_win_other_select, 14)
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_win_coin_off, LW(12))
+        CALL(evt_msg_print, 0, STRING("bottakuru_14"), 0, STRING("me"))
+        RETURN
+    END_IF
+    CALL(evt_pouch_get_coin, LW(0))
+    IF_INT_LESS(LW(0), LW(3))
+        CALL(evt_win_coin_off, LW(12))
+        CALL(evt_msg_print, 0, STRING("bottakuru_05"), 0, STRING("me"))
+        GOTO(0)
+    END_IF
+    IF_INT_GREATER_OR_EQUAL(LW(1), 240)
+        CALL(evt_msg_print_insert, 0, STRING("bottakuru_07"), 0, STRING("me"), LW(2), LW(3), LW(4))
+    ELSE
+        CALL(evt_msg_print_insert, 0, STRING("bottakuru_06"), 0, STRING("me"), LW(2), LW(3))
+    END_IF
+    CALL(evt_msg_select, 0, STRING("bottakuru_yesno"))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_win_coin_off, LW(12))
+        CALL(evt_msg_print_add, 0, STRING("bottakuru_08"))
+        RETURN
+    END_IF
+    CALL(evt_pouch_add_item, LW(1), LW(0))
+    IF_INT_EQUAL(LW(0), -1)
+        CALL(evt_win_coin_off, LW(12))
+        IF_INT_GREATER_OR_EQUAL(LW(1), 240)
+            CALL(evt_msg_print_add, 0, STRING("bottakuru_12"))
+        ELSE
+            CALL(evt_msg_print_add, 0, STRING("bottakuru_13"))
+        END_IF
+        RETURN
+    END_IF
+    CALL(evt_badgeShop_bottakuru_dec, LW(1))
+    MULTIPLY(LW(3), -1)
+    CALL(evt_pouch_add_coin, LW(3))
+    CALL(evt_win_coin_wait, LW(12))
+    WAIT_MS(500)
+    CALL(evt_win_coin_off, LW(12))
+    SET_VALUE(GSWF(GSWF_GOR01_CHARLIETON_BOUGHT), 1)
+    CALL(evt_badgeShop_bottakuru_get_kind_cnt, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print_add, 0, STRING("bottakuru_09"))
+        RETURN
+    END_IF
+    CALL(evt_pouch_get_coin, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print_add, 0, STRING("bottakuru_09"))
+        RETURN
+    END_IF
+    CALL(evt_msg_print_add, 0, STRING("bottakuru_10"))
+    CALL(evt_msg_select, 0, STRING("bottakuru_yesno"))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_msg_print_add, 0, STRING("bottakuru_11"))
+        RETURN
+    END_IF
+    CALL(evt_msg_continue)
+    GOTO(0)
+    RETURN
+EVT_END()
 #endif
 
 static EVT_BEGIN(luigi_init)
@@ -2249,7 +2261,7 @@ static EVT_BEGIN(luigi_init)
 EVT_END()
 
 static EVT_BEGIN(luigi_talk)
-    CALL_CHILD(PTR(luigi_gor_first_talk))
+    CALL_CHILD(luigi_gor_first_talk)
     RETURN
 EVT_END()
 
@@ -2284,7 +2296,7 @@ EVT_END()
 
 NpcSetupInfo kickEnt[] = {
     {
-        /*"キック"*/"\x83\x4C\x83\x62\x83\x4E", // name
+        "キック", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         kick_init, // initEvent
@@ -2311,7 +2323,7 @@ EVT_END()
 
 NpcSetupInfo torqueEnt[] = {
     {
-        /*"トルク"*/"\x83\x67\x83\x8B\x83\x4E", // name
+        "トルク", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         torque_init, // initEvent
@@ -2343,7 +2355,7 @@ EVT_END()
 
 NpcSetupInfo kick2Ent[] = {
     {
-        /*"キック２"*/"\x83\x4C\x83\x62\x83\x4E\x82\x51", // name
+        "キック２", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         kick2_init, // initEvent
@@ -2511,7 +2523,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"バッジ店長"*/"\x83\x6F\x83\x62\x83\x57\x93\x58\x92\xB7", // name
+        "バッジ店長", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         badgemaster_init, // initEvent
@@ -2523,7 +2535,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"バッジ店員"*/"\x83\x6F\x83\x62\x83\x57\x93\x58\x88\xF5", // name
+        "バッジ店員", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         npc_init_evt, // initEvent
@@ -2535,7 +2547,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"キノじい"*/"\x83\x4C\x83\x6D\x82\xB6\x82\xA2", // name
+        "キノじい", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         kinoji_init, // initEvent
@@ -2547,7 +2559,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ナンシー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B", // name
+        "ナンシー", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         nancy_init, // initEvent
@@ -2559,7 +2571,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", // name
+        "マルコ", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         marco_init, // initEvent
@@ -2571,7 +2583,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"マスター"*/"\x83\x7D\x83\x58\x83\x5E\x81\x5B", // name
+        "マスター", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         master_init, // initEvent
@@ -2583,7 +2595,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"店長"*/"\x93\x58\x92\xB7", // name
+        "店長", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -2592,7 +2604,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"店員"*/"\x93\x58\x88\xF5", // name
+        "店員", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         shoptender_init, // initEvent
@@ -2604,7 +2616,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5", // name
+        "宿店員", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         yadotender_init, // initEvent
@@ -2616,7 +2628,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ロテン１"*/"\x83\x8D\x83\x65\x83\x93\x82\x50", // name
+        "ロテン１", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         roten1_init, // initEvent
@@ -2628,7 +2640,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ロテン２"*/"\x83\x8D\x83\x65\x83\x93\x82\x51", // name
+        "ロテン２", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         roten2_init, // initEvent
@@ -2640,7 +2652,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"クリボー１"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x50", // name
+        "クリボー１", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         kuribo1_init, // initEvent
@@ -2652,7 +2664,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"クリボー２"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x51", // name
+        "クリボー２", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         kuribo2_init, // initEvent
@@ -2664,7 +2676,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"クリボー３"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B\x82\x52", // name
+        "クリボー３", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         kuribo3_init, // initEvent
@@ -2676,7 +2688,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"チューさん１"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x50", // name
+        "チューさん１", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         chusan1_init, // initEvent
@@ -2688,7 +2700,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"チューさん２"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x51", // name
+        "チューさん２", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         chusan2_init, // initEvent
@@ -2700,7 +2712,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA", // name
+        "水夫ボム兵", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         bomhei_init, // initEvent
@@ -2712,7 +2724,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ボッタクール"*/"\x83\x7B\x83\x62\x83\x5E\x83\x4E\x81\x5B\x83\x8B", // name
+        "ボッタクール", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         bottakuru_init, // initEvent
@@ -2724,7 +2736,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ルイージ"*/"\x83\x8B\x83\x43\x81\x5B\x83\x57", // name
+        "ルイージ", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         luigi_init, // initEvent
@@ -2736,7 +2748,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"盗賊"*/"\x93\x90\x91\xAF", // name
+        "盗賊", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         thief_init, // initEvent
@@ -2748,7 +2760,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"キノピコ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x52", // name
+        "キノピコ", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -2765,7 +2777,7 @@ EVT_BEGIN(christine_nakama_before)
         RETURN
     END_IF
     CALL(evt_mario_key_onoff, 0)
-    SPAWN_EVENT(PTR(christine_nakama))
+    SPAWN_EVENT(christine_nakama)
     SET_VALUE(LW(0), 1)
     RETURN
 EVT_END()
@@ -2845,7 +2857,7 @@ static EVT_BEGIN(evt_wall_01)
 EVT_END()
 
 static const char* door_data_01_npc[] = {
-    /*"ナンシー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B",
+    "ナンシー",
     NULL,
 };
 
@@ -2929,13 +2941,13 @@ EVT_BEGIN(evt_wall_02_f1)
 EVT_END()
 
 static const char* door_data_02_npc[] = {
-    /*"店長"*/"\x93\x58\x92\xB7",
-    /*"店員"*/"\x93\x58\x88\xF5",
+    "店長",
+    "店員",
     NULL,
 };
 
 const char* door_data_02_npc_01[] = {
-    /*"店長"*/"\x93\x58\x92\xB7",
+    "店長",
     NULL,
 };
 
@@ -3020,8 +3032,8 @@ EVT_BEGIN(evt_wall_02_f2)
 EVT_END()
 
 const char* badgemise_npc[] = {
-    /*"バッジ店長"*/"\x83\x6F\x83\x62\x83\x57\x93\x58\x92\xB7",
-    /*"バッジ店員"*/"\x83\x6F\x83\x62\x83\x57\x93\x58\x88\xF5",
+    "バッジ店長",
+    "バッジ店員",
     NULL,
 };
 
@@ -3072,7 +3084,7 @@ EVT_BEGIN(evt_badge_dummy)
     CALL(evt_msg_continue)
     RETURN
 EVT_END()
-#else
+#elif VERSION >= VERSION_JP
 EVT_BEGIN(evt_badge_dummy)
     CALL(evt_mario_normalize)
     SET_VALUE(LW(10), LW(0))
@@ -3116,6 +3128,57 @@ EVT_BEGIN(evt_badge_dummy)
     CALL(evt_msg_continue)
     RETURN
 EVT_END()
+#else
+EVT_BEGIN(evt_badge_dummy)
+    SET_VALUE(LW(10), LW(0))
+    CALL(disp_off, LW(10))
+    CALL(evt_set_dir_to_target, STRING("バッジ店員"), STRING("mario"))
+    CALL(evt_mario_set_dir_npc, STRING("バッジ店員"))
+    IF_INT_EQUAL(GSWF(GSWF_GOR01_BADGE_SHOP_FIRST_TALK), 0)
+        CALL_CHILD(first_shopping_evt)
+        SET_VALUE(GSWF(GSWF_GOR01_BADGE_SHOP_FIRST_TALK), 1)
+        RETURN
+    END_IF
+    CALL(unitwincoin_disp_onoff, 1)
+    CALL(get_value, LW(10), LW(11), LW(12), LW(13), LW(14))
+    CALL(evt_msg_print_insert, 0, STRING("badgeshop_00"), 0, STRING("バッジ店員"), LW(11), LW(13), LW(14))
+    CALL(evt_msg_select, 0, STRING("badgeshop_24"))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_msg_continue)
+        CALL(evt_msg_print, 0, STRING("badgeshop_22"), 0, STRING("バッジ店員"))
+        CALL(unitwincoin_disp_onoff, 0)
+        RETURN
+    END_IF
+    CALL(evt_pouch_get_coin, LW(0))
+    IF_INT_LESS(LW(0), LW(13))
+        CALL(evt_msg_continue)
+        CALL(evt_msg_print, 0, STRING("badgeshop_01"), 0, STRING("バッジ店員"))
+        CALL(unitwincoin_disp_onoff, 0)
+        RETURN
+    END_IF
+    CALL(evt_pouch_add_item, LW(12), LW(0))
+    IF_INT_EQUAL(LW(0), -1)
+        CALL(evt_msg_continue)
+        CALL(evt_msg_print, 0, STRING("badgeshop_02"), 0, STRING("バッジ店員"))
+        CALL(unitwincoin_disp_onoff, 0)
+        RETURN
+    END_IF
+    CALL(set_new_goods_list, LW(10), 0)
+    SET_VALUE(LW(0), LW(10))
+    CALL(evt_badgeShop_getBargainKind, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_badgeShop_special_dec, LW(12))
+    ELSE
+        CALL(evt_badgeShop_throw_dec, LW(12))
+    END_IF
+    MULTIPLY(LW(13), -1)
+    CALL(evt_pouch_add_coin, LW(13))
+    CALL(unitwincoin_wait)
+    WAIT_MS(200)
+    CALL(unitwincoin_disp_onoff, 0)
+    CALL(evt_msg_continue)
+    RETURN
+EVT_END()
 #endif
 
 UnitWinSell uwnobj_list[] = {
@@ -3131,7 +3194,11 @@ EVT_BEGIN(evt_open_02_01_f2)
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
     CALL(evt_snd_env_lpf, 0, 800)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_unitwin_alloc)
+#else
     CALL(evt_unitwin_alloc, 1)
+#endif
     CALL(badgeShop_getBargainTable, LW(0))
     CALL(evt_unitwin_selltable_setup, PTR(uwnobj_list), LW(0))
     RETURN
@@ -3147,7 +3214,7 @@ EVT_BEGIN(evt_close_02_01_f2)
     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
     CALL(evt_snd_env_lpf, 0, 0)
-    SPAWN_EVENT(PTR(evt_close_sub))
+    SPAWN_EVENT(evt_close_sub)
     RETURN
 EVT_END()
 
@@ -3171,14 +3238,14 @@ DoorParam door_data_02_f2 = {
     evt_close_02_01_f2, // evtClose
 };
 
-USER_FUNC(house03_f1_fade_func) {
+static USER_FUNC(house03_f1_fade_func) {
     s32 v = evtGetValue(event, event->args[0]);
 
     mapGrpSetColor("S_i03_f1_naka", (GXColor){v, v, v, 0xFF});
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(house03_f2_fade_func) {
+static USER_FUNC(house03_f2_fade_func) {
     u8 v = evtGetValue(event, event->args[0]);
 
     mapGrpSetColor("S_i03_f2_naka", (GXColor){v, v, v, 0xFF});
@@ -3186,7 +3253,7 @@ USER_FUNC(house03_f2_fade_func) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(chk_marco_fuki) {
+static USER_FUNC(chk_marco_fuki) {
     EvtWord* args = event->args;
     NpcEntry* npc;
 
@@ -3202,7 +3269,7 @@ USER_FUNC(chk_marco_fuki) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(maffia_kemuri) {
+static USER_FUNC(maffia_kemuri) {
     EvtWord* args = event->args;
     f32 x = evtGetValue(event, args[0]);
     f32 y = evtGetValue(event, args[1]);
@@ -3299,7 +3366,7 @@ EVT_BEGIN(house03_f1_fade)
         CALL(house03_f1_fade_func, LW(0))
         CALL(evt_npc_set_color, STRING("水夫ボム兵"), LW(0), LW(0), LW(0), 255)
         CALL(evt_npc_set_color, STRING("チューさん２"), LW(0), LW(0), LW(0), 255)
-        CALL_CHILD(PTR(luigi_f1_fade_check))
+        CALL_CHILD(luigi_f1_fade_check)
         WAIT_FRAMES(1)
     END_LOOP
     RETURN
@@ -3333,7 +3400,7 @@ EVT_BEGIN(house03_f2_fade)
         CALL(house03_f2_fade_func, LW(0))
         CALL(evt_npc_set_color, STRING("宿店員"), LW(0), LW(0), LW(0), 255)
         CALL(evt_npc_set_color, STRING("キノじい"), LW(0), LW(0), LW(0), 255)
-        CALL_CHILD(PTR(luigi_f2_fade_check))
+        CALL_CHILD(luigi_f2_fade_check)
         WAIT_FRAMES(1)
     END_LOOP
     RETURN
@@ -3463,20 +3530,20 @@ EVT_BEGIN(evt_wall_03_f1)
 EVT_END()
 
 static const char* door_data_03_npc[] = {
-    /*"マスター"*/"\x83\x7D\x83\x58\x83\x5E\x81\x5B",
-    /*"キノじい"*/"\x83\x4C\x83\x6D\x82\xB6\x82\xA2",
-    /*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5",
-    /*"チューさん２"*/"\x83\x60\x83\x85\x81\x5B\x82\xB3\x82\xF1\x82\x51",
-    /*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA",
-    /*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52",
-    /*"ルイージ"*/"\x83\x8B\x83\x43\x81\x5B\x83\x57",
-    /*"トルク"*/"\x83\x67\x83\x8B\x83\x4E",
-    /*"キック２"*/"\x83\x4C\x83\x62\x83\x4E\x82\x51",
+    "マスター",
+    "キノじい",
+    "宿店員",
+    "チューさん２",
+    "水夫ボム兵",
+    "マルコ",
+    "ルイージ",
+    "トルク",
+    "キック２",
     NULL,
 };
 
 const char* door_data_03_item[] = {
-    /*"ドクロジュエル"*/"\x83\x68\x83\x4E\x83\x8D\x83\x57\x83\x85\x83\x47\x83\x8B",
+    "ドクロジュエル",
     NULL,
 };
 
@@ -3525,46 +3592,27 @@ EVT_BEGIN(house_03_f2_open)
     RETURN
 EVT_END()
 
+EVT_BEGIN(house_03_f2_close)
 #if VERSION >= VERSION_US
-EVT_BEGIN(house_03_f2_close)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_i03_f1_naka"), MAPOBJ_FLAG_HIDE)
-    BEGIN_INLINE_EVENT
-        WAIT_MS(1600)
-        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ie_03_f1_doa"), MAPOBJ_FLAG_NO_BLEND | MAPOBJ_FLAG_NO_BLEND2)
-        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ie_03_f21_doa"), MAPOBJ_FLAG_NO_BLEND | MAPOBJ_FLAG_NO_BLEND2)
-    END_INLINE_EVENT
-    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
-    CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
-    CALL(evt_snd_env_lpf, 0, 0)
-    SET_VALUE(GW(10), 0)
-    DELETE_EVENT(GW(0))
-    CALL(evt_msg_close, STRING("mac_4_004"))
-    DELETE_EVENT(GW(7))
-    DELETE_EVENT(GW(11))
-    DELETE_EVENT(GW(12))
-    DELETE_EVENT(GW(13))
-    RETURN
-EVT_END()
-#else
-EVT_BEGIN(house_03_f2_close)
-    BEGIN_INLINE_EVENT
-        WAIT_MS(1600)
-        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ie_03_f1_doa"), MAPOBJ_FLAG_NO_BLEND | MAPOBJ_FLAG_NO_BLEND2)
-        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ie_03_f21_doa"), MAPOBJ_FLAG_NO_BLEND | MAPOBJ_FLAG_NO_BLEND2)
-    END_INLINE_EVENT
-    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
-    CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
-    CALL(evt_snd_env_lpf, 0, 0)
-    SET_VALUE(GW(10), 0)
-    DELETE_EVENT(GW(0))
-    CALL(evt_msg_close, STRING("mac_4_004"))
-    DELETE_EVENT(GW(7))
-    DELETE_EVENT(GW(11))
-    DELETE_EVENT(GW(12))
-    DELETE_EVENT(GW(13))
-    RETURN
-EVT_END()
 #endif
+    BEGIN_INLINE_EVENT
+        WAIT_MS(1600)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ie_03_f1_doa"), MAPOBJ_FLAG_NO_BLEND | MAPOBJ_FLAG_NO_BLEND2)
+        CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ie_03_f21_doa"), MAPOBJ_FLAG_NO_BLEND | MAPOBJ_FLAG_NO_BLEND2)
+    END_INLINE_EVENT
+    CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
+    CALL(evt_snd_envon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
+    CALL(evt_snd_env_lpf, 0, 0)
+    SET_VALUE(GW(10), 0)
+    DELETE_EVENT(GW(0))
+    CALL(evt_msg_close, STRING("mac_4_004"))
+    DELETE_EVENT(GW(7))
+    DELETE_EVENT(GW(11))
+    DELETE_EVENT(GW(12))
+    DELETE_EVENT(GW(13))
+    RETURN
+EVT_END()
 
 EVT_BEGIN(evt_wall_03_f2)
     SET_FLOAT_VALUE(LW(2), LW(0))
@@ -3644,7 +3692,7 @@ static EVT_BEGIN(evt_door_04_close)
 EVT_END()
 
 static const char* door_data_04_npc[] = {
-    /*"盗賊"*/"\x93\x90\x91\xAF",
+    "盗賊",
     NULL,
 };
 
@@ -3795,7 +3843,7 @@ static ShopDb trade_list[] = {
 };
 
 static ShopperData35 shopper_data = {
-    /*"店長"*/"\x93\x58\x92\xB7", // name
+    "店長", // name
     NULL, NULL, // fook_evt..buy_evt
     {"gor_shop1_00", "gor_shop1_01", "gor_shop1_02", "gor_shop1_03", "gor_shop1_04", "gor_shop1_05", "gor_shop1_06", "gor_shop1_07", "gor_shop1_08", "gor_shop1_09", "gor_shop1_10", "gor_shop1_11", "gor_shop1_12", "gor_shop1_13", "gor_shop1_14", "gor_shop1_15", "gor_shop1_16", "gor_shop1_17", "gor_shop1_18", "gor_shop1_19", "gor_shop1_20", "gor_shop1_21", "gor_shop1_22", "gor_shop1_23", "gor_shop1_24", "gor_shop1_25", "gor_shop1_26", "gor_shop1_27", "gor_shop1_28", "gor_shop1_29", "gor_shop1_30", "gor_shop1_31", "gor_shop1_32", "gor_shop1_33", "gor_shop1_34"}, // msgs
 };
@@ -3873,7 +3921,7 @@ static KinopioData kino_dt = {
     {130.0f, 370.0f, -79.0f, 313.0f, 220.0f, -264.0f}, // cam
     -30.0f, // bedDeg
     {227.0f, 154.0f, -200.0f}, // npcTalk
-    /*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5", // npcName
+    "宿店員", // npcName
     {"yado_00", "yado_01", "yado_02", "yado_03", "yado_04", "yado_05", "yado_06", "yado_07", "yado_08", "yado_09", "yado_10", "yado_11", "yado_12", "yado_13"}, // msg
     NULL, NULL, // toBedEvt..fromBedEvt
 };
@@ -3926,7 +3974,7 @@ EVT_END()
 
 EVT_BEGIN(christine_nakama)
     SET_VALUE(GF(10), 1)
-    SPAWN_EVENT(PTR(maffia_assault))
+    SPAWN_EVENT(maffia_assault)
     CALL(evt_mario_clear_party, 1)
     CALL(evt_cam3d_evt_set, 0, 134, 984, 0, 38, 442, 0, 11)
     CALL(evt_party_stop, 0)
@@ -4003,7 +4051,7 @@ EVT_BEGIN(christine_nakama)
     ADD(LW(0), 20)
     ADD(LW(1), 20)
     ADD(LW(2), 10)
-    CALL(evt_item_entry, STRING("item00"), ITEM_MAGICAL_MAP_LARGE, LW(0), LW(1), LW(2), 16, -1, 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_MAGICAL_MAP_LARGE, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
     CALL(evt_item_set_scale, STRING("item00"), FLOAT(0.5498047f))
     WAIT_MS(500)
@@ -4071,7 +4119,7 @@ EVT_BEGIN(christine_nakama)
         CALL(evt_npc_move_position, STRING("キノじい"), 93, -46, 0, FLOAT(120.0f), 0)
         CALL(evt_npc_set_ry, STRING("キノじい"), 90)
         WAIT_MS(500)
-        SPAWN_EVENT(PTR(bar_door_anime))
+        SPAWN_EVENT(bar_door_anime)
         CALL(evt_npc_move_position, STRING("キノじい"), 74, -25, 0, FLOAT(180.0f), 0)
         WAIT_MS(500)
         CALL(evt_npc_move_position, STRING("キノじい"), 105, -95, 0, FLOAT(180.0f), 0)
@@ -4115,7 +4163,7 @@ EVT_BEGIN(christine_nakama)
     WAIT_MS(800)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(9), 1)
-    CALL_CHILD(PTR(all_party_lecture))
+    CALL_CHILD(all_party_lecture)
     CALL(evt_snd_bgmon_f, PSND_FADE_IN | PSND_FADE_OUT, STRING("BGM_STG0_GOR1"), 2000)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_GOR1"))
     CALL(evt_msg_print_party, STRING("mac_0_053"))
@@ -4124,7 +4172,7 @@ EVT_BEGIN(christine_nakama)
     CALL(evt_party_run, 0)
     CALL(evt_mario_key_onoff, 1)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG0_07_GOOMBELLA_JOINS)
-    SPAWN_EVENT(PTR(christine_nakama_after))
+    SPAWN_EVENT(christine_nakama_after)
     RETURN
 EVT_END()
 
@@ -4155,7 +4203,9 @@ EVT_BEGIN(maffia_turn)
 EVT_END()
 
 EVT_BEGIN(maffia_assault)
+#if VERSION >= VERSION_JP
     SET_VALUE(GF(11), 1)
+#endif
     CALL(evt_npc_set_position, STRING("マフィア１"), 75, 0, -400)
     CALL(evt_npc_set_ry, STRING("マフィア１"), 270)
     CALL(evt_npc_flag_onoff, 1, STRING("マフィア１"), NPC_FLAG_MOVE_ANIM)
@@ -4233,15 +4283,15 @@ EVT_BEGIN(maffia_assault)
     CALL(evt_npc_move_position, STRING("マフィア１"), 110, 15, 0, FLOAT(360.0f), 0)
     CALL(evt_npc_set_anim, STRING("盗賊団１"), STRING("D_1"))
     CALL(evt_npc_set_anim, STRING("盗賊団２"), STRING("D_1"))
-    SPAWN_EVENT(PTR(maffia_turn))
+    SPAWN_EVENT(maffia_turn)
     CALL(evt_npc_move_position, STRING("マフィア１"), 90, 15, 0, FLOAT(360.0f), 0)
     WAIT_MS(500)
     CALL(evt_npc_move_position, STRING("マフィア１"), 110, 15, 0, FLOAT(360.0f), 0)
-    SPAWN_EVENT(PTR(maffia_turn))
+    SPAWN_EVENT(maffia_turn)
     CALL(evt_npc_move_position, STRING("マフィア１"), 90, 15, 0, FLOAT(360.0f), 0)
     WAIT_MS(500)
     CALL(evt_npc_move_position, STRING("マフィア１"), 110, 15, 0, FLOAT(360.0f), 0)
-    SPAWN_EVENT(PTR(maffia_turn))
+    SPAWN_EVENT(maffia_turn)
     CALL(evt_npc_move_position, STRING("マフィア１"), 90, 15, 0, FLOAT(360.0f), 0)
     CALL(evt_npc_set_anim, STRING("マフィア１"), STRING("S_1"))
     CALL(evt_msg_print, 0, STRING("mac_0_054"), 0, STRING("盗賊団１"))
@@ -4350,7 +4400,9 @@ EVT_BEGIN(maffia_assault)
     CALL(evt_npc_set_ry, LW(10), 90)
     CALL(evt_npc_move_position, LW(10), LW(3), LW(2), 0, FLOAT(120.0f), 0)
     CALL(evt_npc_set_position, LW(10), 0, -1000, 0)
+#if VERSION >= VERSION_JP
     SET_VALUE(GF(11), 0)
+#endif
     RETURN
 EVT_END()
 
@@ -4424,7 +4476,7 @@ EVT_BEGIN(ultrahammer_check)
         WAIT_FRAMES(1)
     END_LOOP
     CALL(evt_mobj_flag_onoff, 0, STRING("mobj_box00"), MOBJ_FLAG_FALL)
-    SPAWN_EVENT(PTR(box_copy))
+    SPAWN_EVENT(box_copy)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_TBOX_FALL1"), LW(0), LW(1), LW(2), LW(10))
     CALL(evt_npc_jump_position_nohit, STRING("ダミー"), 275, 0, 75, 500, FLOAT(100.0f))
@@ -4457,7 +4509,7 @@ EVT_BEGIN(ultrahammer_get)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
     CALL(lect_juyoitem_rel_set, PTR(all_juyoitem_lecture_rel))
-    CALL(evt_item_entry, STRING("hammer"), ITEM_ULTRA_HAMMER, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("hammer"), ITEM_ULTRA_HAMMER, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_important_item, STRING("hammer"))
     CALL(evt_item_get_item, STRING("hammer"))
@@ -4856,15 +4908,15 @@ static EVT_BEGIN(sekai_yami_evt)
     CALL(anim_tevcallback_mobj, STRING("mobj_box00"), 1)
     SET_VALUE(GW(0), 700)
     SET_VALUE(LW(0), STRING("キノじい"))
-    SPAWN_EVENT(PTR(sekai_yami_npc))
+    SPAWN_EVENT(sekai_yami_npc)
     SET_VALUE(LW(0), STRING("ロテン１"))
-    SPAWN_EVENT(PTR(sekai_yami_npc))
+    SPAWN_EVENT(sekai_yami_npc)
     SET_VALUE(LW(0), STRING("クリボー１"))
-    SPAWN_EVENT(PTR(sekai_yami_npc))
+    SPAWN_EVENT(sekai_yami_npc)
     SET_VALUE(LW(0), STRING("チューさん１"))
-    SPAWN_EVENT(PTR(sekai_yami_npc))
+    SPAWN_EVENT(sekai_yami_npc)
     SET_VALUE(LW(0), STRING("ボッタクール"))
-    SPAWN_EVENT(PTR(sekai_yami_npc))
+    SPAWN_EVENT(sekai_yami_npc)
     CALL(evt_snd_sfxon, STRING("SFX_STG8_WORLD_DARK1"), 0)
     CALL(evt_sub_intpl_msec_init, 11, 700, -850, 5000)
     LOOP(0)
@@ -5045,7 +5097,11 @@ EVT_BEGIN(iri_09_tentyo_talk)
             LOOP(0)
                 CALL(evt_msg_continue)
                 CALL(iri_09_item_tbl_make, LW(0), LW(1))
+#if VERSION <= VERSION_DEMO_US
+                CALL(evt_win_item_select, LW(1), LW(2))
+#else
                 CALL(evt_win_item_select, 0, LW(1), LW(2), 0)
+#endif
                 IF_INT_EQUAL(LW(2), -1)
                     SET_VALUE(LF(0), 1)
                     BREAK_LOOP
@@ -5072,7 +5128,7 @@ EVT_BEGIN(iri_09_tentyo_talk)
                 END_IF
             ELSE
                 CALL(evt_msg_print_add, 0, STRING("irai_09_004"))
-                CALL(evt_item_entry, STRING("uk"), ITEM_ULTRA_SHROOM, 0, -1000, 0, 17, -1, 0)
+                CALL(evt_item_entry, STRING("uk"), ITEM_ULTRA_SHROOM, 0, -1000, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
                 CALL(evt_item_get_item, STRING("uk"))
                 CALL(evt_item_get_item_end_wait, STRING("uk"))
                 CALL(evt_msg_print, 0, STRING("irai_09_006"), 0, STRING("店長"))
@@ -5106,7 +5162,6 @@ static EVT_BEGIN(iri_16_init)
     RETURN
 EVT_END()
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(iri_16_tyutyu_talk)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 16)
         CALL(evt_snd_bgmoff_f, PSND_FADE_HOLD, 2000)
@@ -5132,7 +5187,11 @@ EVT_BEGIN(iri_16_tyutyu_talk)
                 WAIT_FRAMES(1)
                 CALL(evt_npc_wait_pera, STRING("チュチュリーナ"))
                 CALL(evt_msg_print, 0, STRING("irai_16_02"), 0, STRING("チュチュリーナ"))
+#if VERSION <= VERSION_DEMO_US
+                CALL(evt_win_item_select, PTR(iri_16_item_tbl), LW(0))
+#else
                 CALL(evt_win_item_select, 0, PTR(iri_16_item_tbl), LW(0), 0)
+#endif
                 IF_INT_NOT_EQUAL(LW(0), -1)
                     CALL(evt_pouch_remove_item, ITEM_ATTACK_FX_B_KEY_ITEM, LW(0))
                     CALL(evt_msg_print, 0, STRING("irai_16_03"), 0, STRING("チュチュリーナ"))
@@ -5146,7 +5205,7 @@ EVT_BEGIN(iri_16_tyutyu_talk)
                     CALL(evt_pouch_get_havebadgecnt, LW(0))
                     IF_INT_LESS(LW(0), 200)
                         CALL(evt_msg_continue)
-                        CALL(evt_item_entry, STRING("mb"), ITEM_ATTACK_FX_B, 0, -1000, 0, 17, -1, 0)
+                        CALL(evt_item_entry, STRING("mb"), ITEM_ATTACK_FX_B, 0, -1000, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
                         CALL(evt_item_get_item, STRING("mb"))
                         CALL(evt_item_get_item_end_wait, STRING("mb"))
                         SET_VALUE(GSWF(GSWF_GOR01_TROUBLE16_BADGE_LEFT), 1)
@@ -5190,7 +5249,7 @@ EVT_BEGIN(iri_16_tyutyu_talk)
                         CALL(evt_npc_wait_pera, STRING("チュチュリーナ"))
                         CALL(evt_npc_flag_onoff, 0, STRING("チュチュリーナ"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
                         CALL(evt_msg_print, 0, STRING("irai_16_05_2"), 0, STRING("チュチュリーナ"))
-                        CALL(evt_item_entry, STRING("iri_16"), ITEM_ATTACK_FX_B, -150, 153, -120, 16, GSWF(GSWF_GOR01_TROUBLE16_BADGE_LEFT), 0)
+                        CALL(evt_item_entry, STRING("iri_16"), ITEM_ATTACK_FX_B, -150, 153, -120, ITEM_ENTRY_FIXED, GSWF(GSWF_GOR01_TROUBLE16_BADGE_LEFT), 0)
                     END_IF
                     CALL(evt_msg_print, 0, STRING("irai_16_06"), 0, STRING("チュチュリーナ"))
                     CALL(evt_npc_flag_onoff, 1, STRING("チュチュリーナ"), NPC_FLAG_INTANGIBLE)
@@ -5213,7 +5272,11 @@ EVT_BEGIN(iri_16_tyutyu_talk)
                     CALL(evt_mario_set_pose, STRING("M_S_1"))
                     CALL(evt_npc_move_position, STRING("チュチュリーナ"), LW(0), LW(2), 0, 40, 0)
                     WAIT_MS(1000)
+#if VERSION <= VERSION_JP
+                    CALL(evt_cam3d_evt_set, -525, 290, 230, -525, 225, -140, 800, 11)
+#else
                     CALL(evt_cam3d_evt_set, -516, 290, 230, -516, 225, -140, 800, 11)
+#endif
                     WAIT_MS(800)
                     SET_VALUE(LW(8), STRING("チュチュリーナ"))
                     SET_VALUE(LW(9), 7)
@@ -5233,134 +5296,6 @@ EVT_BEGIN(iri_16_tyutyu_talk)
     END_IF
     RETURN
 EVT_END()
-#else
-EVT_BEGIN(iri_16_tyutyu_talk)
-    IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 16)
-        CALL(evt_snd_bgmoff_f, PSND_FADE_HOLD, 2000)
-        CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
-        CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_EVT_CYUCYURINA1"))
-        IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_BASE), 0)
-            CALL(evt_msg_print, 0, STRING("irai_16_00"), 0, STRING("チュチュリーナ"))
-            SET_VALUE(GSWF(GSWF_TROUBLE_WORK_BASE), 1)
-        ELSE
-            IF_INT_EQUAL(GSWF(GSWF_TROUBLE_WORK_2), 0)
-                CALL(evt_msg_print, 0, STRING("irai_16_01"), 0, STRING("チュチュリーナ"))
-            ELSE
-                CALL(evt_npc_flag_onoff, 1, STRING("チュチュリーナ"), NPC_FLAG_INTANGIBLE)
-                CALL(evt_party_stop, 0)
-                BEGIN_INLINE_EVENT
-                    CALL(evt_party_move_pos2, 0, -448, -110, 60)
-                    CALL(evt_party_set_dir_npc, 0, STRING("チュチュリーナ"))
-                END_INLINE_EVENT
-                CALL(evt_mario_mov_pos2, -485, -110, 60)
-                CALL(evt_mario_set_dir_npc, STRING("チュチュリーナ"))
-                WAIT_MS(500)
-                CALL(evt_set_dir_to_target, STRING("チュチュリーナ"), STRING("mario"))
-                WAIT_FRAMES(1)
-                CALL(evt_npc_wait_pera, STRING("チュチュリーナ"))
-                CALL(evt_msg_print, 0, STRING("irai_16_02"), 0, STRING("チュチュリーナ"))
-                CALL(evt_win_item_select, 0, PTR(iri_16_item_tbl), LW(0), 0)
-                IF_INT_NOT_EQUAL(LW(0), -1)
-                    CALL(evt_pouch_remove_item, ITEM_ATTACK_FX_B_KEY_ITEM, LW(0))
-                    CALL(evt_msg_print, 0, STRING("irai_16_03"), 0, STRING("チュチュリーナ"))
-                    CALL(evt_npc_set_anim, STRING("チュチュリーナ"), STRING("PCH_C_1"))
-                    WAIT_MS(1000)
-                    CALL(evt_msg_print, 0, STRING("irai_16_04"), 0, STRING("チュチュリーナ"))
-                    CALL(evt_mario_set_pose, STRING("M_N_5B"))
-                    WAIT_MS(600)
-                    CALL(evt_mario_set_pose, STRING("M_S_1"))
-                    CALL(evt_msg_print, 0, STRING("irai_16_05"), 0, STRING("チュチュリーナ"))
-                    CALL(evt_pouch_get_havebadgecnt, LW(0))
-                    IF_INT_LESS(LW(0), 200)
-                        CALL(evt_msg_continue)
-                        CALL(evt_item_entry, STRING("mb"), ITEM_ATTACK_FX_B, 0, -1000, 0, 17, -1, 0)
-                        CALL(evt_item_get_item, STRING("mb"))
-                        CALL(evt_item_get_item_end_wait, STRING("mb"))
-                        SET_VALUE(GSWF(GSWF_GOR01_TROUBLE16_BADGE_LEFT), 1)
-                    ELSE
-                        CALL(evt_msg_print_add, 0, STRING("irai_16_05_1"))
-                        BEGIN_INLINE_EVENT
-                            CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-                            LOOP(0)
-                                CALL(evt_npc_get_position, STRING("チュチュリーナ"), LW(3), LW(4), LW(5))
-                                IF_INT_GREATER(LW(3), LW(0))
-                                    BREAK_LOOP
-                                END_IF
-                                WAIT_FRAMES(1)
-                            END_LOOP
-                            CALL(evt_mario_set_dir_npc, STRING("チュチュリーナ"))
-                        END_INLINE_EVENT
-                        CALL(evt_npc_flag_onoff, 1, STRING("チュチュリーナ"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
-                        CALL(evt_npc_get_position, STRING("チュチュリーナ"), LW(0), LW(1), LW(2))
-                        CALL(evt_npc_set_ry, STRING("チュチュリーナ"), 90)
-                        WAIT_FRAMES(1)
-                        CALL(evt_npc_wait_pera, STRING("チュチュリーナ"))
-                        CALL(evt_npc_jump_position_nohit, STRING("チュチュリーナ"), -150, 300, LW(2), 800, 100)
-                        WAIT_MS(2000)
-                        CALL(evt_npc_set_ry, STRING("チュチュリーナ"), 270)
-                        WAIT_FRAMES(1)
-                        CALL(evt_npc_wait_pera, STRING("チュチュリーナ"))
-                        BEGIN_INLINE_EVENT
-                            CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-                            LOOP(0)
-                                CALL(evt_npc_get_position, STRING("チュチュリーナ"), LW(3), LW(4), LW(5))
-                                IF_INT_LESS(LW(3), LW(0))
-                                    BREAK_LOOP
-                                END_IF
-                                WAIT_FRAMES(1)
-                            END_LOOP
-                            CALL(evt_mario_set_dir_npc, STRING("チュチュリーナ"))
-                        END_INLINE_EVENT
-                        CALL(evt_npc_jump_position_nohit, STRING("チュチュリーナ"), LW(0), LW(1), LW(2), 800, 50)
-                        CALL(evt_set_dir_to_target, STRING("チュチュリーナ"), STRING("mario"))
-                        WAIT_FRAMES(1)
-                        CALL(evt_npc_wait_pera, STRING("チュチュリーナ"))
-                        CALL(evt_npc_flag_onoff, 0, STRING("チュチュリーナ"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
-                        CALL(evt_msg_print, 0, STRING("irai_16_05_2"), 0, STRING("チュチュリーナ"))
-                        CALL(evt_item_entry, STRING("iri_16"), ITEM_ATTACK_FX_B, -150, 153, -120, 16, GSWF(GSWF_GOR01_TROUBLE16_BADGE_LEFT), 0)
-                    END_IF
-                    CALL(evt_msg_print, 0, STRING("irai_16_06"), 0, STRING("チュチュリーナ"))
-                    CALL(evt_npc_flag_onoff, 1, STRING("チュチュリーナ"), NPC_FLAG_INTANGIBLE)
-                    CALL(evt_npc_get_position, STRING("チュチュリーナ"), LW(0), LW(1), LW(2))
-                    CALL(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
-                    SUBTRACT(LW(3), 15)
-                    CALL(evt_npc_move_position, STRING("チュチュリーナ"), LW(3), LW(5), 0, 40, 0)
-                    WAIT_FRAMES(1)
-                    CALL(evt_npc_set_anim, STRING("チュチュリーナ"), STRING("PCH_K_1"))
-                    CALL(evt_mario_set_pose, STRING("M_I_O"))
-                    BEGIN_INLINE_EVENT
-                        CALL(evt_npc_get_position, STRING("チュチュリーナ"), LW(0), LW(1), LW(2))
-                        ADD(LW(1), 30)
-                        CALL(evt_eff, 0, STRING("kiss"), 0, LW(0), LW(1), LW(2), -45, 0, 0, 0, 0, 0, 0, 0)
-                        CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_REQUEST_CHURINA_KISS1"), LW(0), LW(1), LW(2), 0)
-                    END_INLINE_EVENT
-                    WAIT_MS(400)
-                    CALL(evt_npc_set_anim, STRING("チュチュリーナ"), STRING("PCH_S_1"))
-                    WAIT_MS(500)
-                    CALL(evt_mario_set_pose, STRING("M_S_1"))
-                    CALL(evt_npc_move_position, STRING("チュチュリーナ"), LW(0), LW(2), 0, 40, 0)
-                    WAIT_MS(1000)
-                    CALL(evt_cam3d_evt_set, -525, 290, 230, -525, 225, -140, 800, 11)
-                    WAIT_MS(800)
-                    SET_VALUE(LW(8), STRING("チュチュリーナ"))
-                    SET_VALUE(LW(9), 7)
-                    CALL_CHILD(PTR(all_party_lecture))
-                    SET_VALUE(GSW(GSW_TROUBLE_ACTIVE), 0)
-                    SET_VALUE(GSWF(GSWF_TROUBLE_16_SOLVED), 1)
-                    CALL(evt_msg_print, 0, STRING("sys_request_finish"), 0, 0)
-                    CALL(evt_cam3d_evt_off, 500, 11)
-                    CALL(evt_party_run, 0)
-                END_IF
-                CALL(evt_party_run, 0)
-            END_IF
-        END_IF
-        CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
-        CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_IN, 0)
-        RETURN
-    END_IF
-    RETURN
-EVT_END()
-#endif
 
 EVT_BEGIN(marco_jewel)
     CALL(evt_mario_key_onoff, 0)
@@ -5388,11 +5323,11 @@ EVT_END()
 
 static EVT_BEGIN(epilogue_evt_sub)
     SET_VALUE(LW(0), PTR(&door_data_03_f2))
-    SPAWN_EVENT(PTR(door_open_se))
+    SPAWN_EVENT(door_open_se)
     CALL(evt_sub_intpl_msec_init, 5, 0, 180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        SPAWN_EVENT(PTR(evt_door_03_00_f2))
+        SPAWN_EVENT(evt_door_03_00_f2)
         WAIT_FRAMES(1)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
@@ -5405,11 +5340,11 @@ static EVT_BEGIN(epilogue_evt_sub)
     END_INLINE_EVENT
     WAIT_MS(1100)
     SET_VALUE(LW(0), PTR(&door_data_03_f2))
-    SPAWN_EVENT(PTR(door_close_se))
+    SPAWN_EVENT(door_close_se)
     CALL(evt_sub_intpl_msec_init, 5, 180, 0, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        SPAWN_EVENT(PTR(evt_door_03_00_f2))
+        SPAWN_EVENT(evt_door_03_00_f2)
         WAIT_FRAMES(1)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
@@ -5417,11 +5352,11 @@ static EVT_BEGIN(epilogue_evt_sub)
     END_LOOP
     WAIT_WHILE(GF(0))
     SET_VALUE(LW(0), PTR(&door_data_02_f2))
-    SPAWN_EVENT(PTR(door_open_se))
+    SPAWN_EVENT(door_open_se)
     CALL(evt_sub_intpl_msec_init, 5, 0, 180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        SPAWN_EVENT(PTR(evt_door_02_00_f2))
+        SPAWN_EVENT(evt_door_02_00_f2)
         WAIT_FRAMES(1)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
@@ -5430,11 +5365,11 @@ static EVT_BEGIN(epilogue_evt_sub)
     CALL(evt_npc_move_position, STRING("バッジ店長"), -114, -100, 0, 60, 0)
     CALL(evt_set_dir_to_target, STRING("バッジ店長"), STRING("クリスチーヌ"))
     SET_VALUE(LW(0), PTR(&door_data_02_f2))
-    SPAWN_EVENT(PTR(door_close_se))
+    SPAWN_EVENT(door_close_se)
     CALL(evt_sub_intpl_msec_init, 5, 180, 0, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        SPAWN_EVENT(PTR(evt_door_02_00_f2))
+        SPAWN_EVENT(evt_door_02_00_f2)
         WAIT_FRAMES(1)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
@@ -5460,7 +5395,11 @@ static EVT_BEGIN(epilogue_evt)
     CALL(evt_npc_set_position, STRING("バッジ店長"), -114, 154, -173)
     CALL(evt_npc_flag_onoff, 1, STRING("バッジ店長"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_INTANGIBLE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ie_02_f2_naka"), MAPOBJ_FLAG_HIDE)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_unitwin_alloc)
+#else
     CALL(evt_unitwin_alloc, 1)
+#endif
     CALL(badgeShop_getBargainTable, LW(0))
     CALL(evt_unitwin_selltable_setup, PTR(uwnobj_list), LW(0))
     CALL(evt_cam3d_evt_set, -80, 225, 400, -80, 200, -100, 0, 11)
@@ -5566,7 +5505,6 @@ EVT_BEGIN(dai_disp)
     RETURN
 EVT_END()
 #endif
-#if VERSION >= VERSION_US
 EVT_BEGIN(gor_01_init_evt)
     SET_VALUE(LF(0), 0)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_55_01_PEACH_TEC_DELETED)
@@ -5650,308 +5588,138 @@ EVT_BEGIN(gor_01_init_evt)
     END_IF
     CALL(evt_mobj_kururing_floor, STRING("kururin1"), -455, 0, -260, STRING("S_ground"), 125, GSWF(GSWF_GOR01_STAR_PIECE_PANEL_1))
     CALL(evt_mobj_kururing_floor, STRING("kururin2"), 0, 0, 450, STRING("S_ground"), 125, GSWF(GSWF_GOR01_STAR_PIECE_PANEL_2))
-    CALL(evt_item_entry, STRING("item_00"), ITEM_STAR_PIECE, 490, 0, 245, 16, GSWF(GSWF_GOR01_STAR_PIECE_1), 0)
-    CALL(evt_item_entry, STRING("item_01"), ITEM_STAR_PIECE, 550, 0, -150, 16, GSWF(GSWF_GOR01_STAR_PIECE_2), 0)
-    CALL(evt_item_entry, STRING("item_02"), ITEM_STAR_PIECE, -565, 162, -160, 16, GSWF(GSWF_GOR01_STAR_PIECE_3), 0)
+    CALL(evt_item_entry, STRING("item_00"), ITEM_STAR_PIECE, 490, 0, 245, ITEM_ENTRY_FIXED, GSWF(GSWF_GOR01_STAR_PIECE_1), 0)
+    CALL(evt_item_entry, STRING("item_01"), ITEM_STAR_PIECE, 550, 0, -150, ITEM_ENTRY_FIXED, GSWF(GSWF_GOR01_STAR_PIECE_2), 0)
+    CALL(evt_item_entry, STRING("item_02"), ITEM_STAR_PIECE, -565, 162, -160, ITEM_ENTRY_FIXED, GSWF(GSWF_GOR01_STAR_PIECE_3), 0)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG4_32_CHATTING_WITH_FLAVIO)
-        CALL(evt_item_entry, STRING("ドクロジュエル"), ITEM_SKULL_GEM, 315, 20, -125, 16, -1, 0)
+        CALL(evt_item_entry, STRING("ドクロジュエル"), ITEM_SKULL_GEM, 315, 20, -125, ITEM_ENTRY_FIXED, -1, 0)
         CALL(evt_item_flag_on, STRING("ドクロジュエル"), ITEM_FLAG_NO_TOUCH)
+#if VERSION >= VERSION_JP
         CALL(evt_item_status_on, STRING("ドクロジュエル"), ITEM_STATUS_NO_KOOPS)
-        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_jewel"), 0, PTR(marco_jewel), GW(8))
-    END_IF
-    IF_INT_EQUAL(GSWF(GSWF_GOR01_LENS_DELIVERED), 0)
-        SET_VALUE(LW(0), PTR(&door_data_01))
-    ELSE
-        SET_VALUE(LW(0), PTR(&door_data_01_01))
-    END_IF
-    CALL(evt_door_data_copy, LW(0), GW(6))
-    SET_VALUE(LW(0), GW(6))
-    CALL_CHILD(evt_door_entry)
-    SET_VALUE(LW(0), PTR(&door_data_02_f1))
-    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG4_32_CHATTING_WITH_FLAVIO)
-        IF_INT_EQUAL(GSWF(GSWF_GOR01_LENS_ARRIVED), 1)
-            SET_VALUE(LW(0), PTR(&door_data_02_f1_01))
-        END_IF
-    END_IF
-    CALL_CHILD(evt_door_entry)
-    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG0_16_FRANKLYS_HOUSE)
-        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ie_02_f2_doa01"), 0, PTR(evt_door_02_f2_junbityu), 0)
-    ELSE
-        SET_VALUE(LW(0), PTR(&door_data_02_f2))
-        CALL_CHILD(evt_door_entry)
-    END_IF
-    SET_VALUE(LW(0), PTR(&door_data_03_f1))
-    CALL_CHILD(evt_door_entry)
-    SET_VALUE(LW(0), PTR(&door_data_03_f2))
-    CALL_CHILD(evt_door_entry)
-    SET_VALUE(LW(0), PTR(&door_data_04))
-    CALL_CHILD(evt_door_entry)
-    CALL_CHILD(gor_01_shop_setup)
-    CALL(evt_kinopio_setup, PTR(&kino_dt))
-    CALL(evt_map_playanim, STRING("hae"), 1, 0)
-    SPAWN_EVENT(koushukei_dai)
-    SPAWN_EVENT(gate_disp)
-    SPAWN_EVENT(gor_goki1_urouro)
-    SPAWN_EVENT(gor_goki2_urouro)
-    IF_INT_EQUAL(LF(1), 0)
-        IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 1)
-            CALL(evt_item_entry, STRING("item_key00"), ITEM_HOUSE_KEY, -280, 153, -100, 0, GSWF(GSWF_TROUBLE_WORK_BASE), 0)
-        END_IF
-        CALL_CHILD(borodo2_init)
-        SPAWN_EVENT(iri_09_init)
-        SPAWN_EVENT(iri_16_init)
-        IF_INT_EQUAL(GSWF(GSWF_TROUBLE_16_SOLVED), 1)
-            CALL(evt_item_entry, STRING("iri_16"), ITEM_ATTACK_FX_B, -150, 153, -120, 16, GSWF(GSWF_GOR01_TROUBLE16_BADGE_LEFT), 0)
-        END_IF
-        IF_INT_EQUAL(GSWF(GSWF_TROUBLE_18_SOLVED), 1)
-            CALL(evt_item_entry, STRING("iri_18"), ITEM_HONEY_SHROOM, -440, 30, -80, 16, GSWF(GSWF_GOR01_TROUBLE18_ITEM_LEFT), 0)
-        END_IF
-    END_IF
-    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_keizi_mae"), 0, PTR(keijiban_omote_joho), 0)
-    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_keizi_ura"), 0, PTR(keijiban_ura_joho), 0)
-    CALL(evt_pouch_check_item, ITEM_ULTRA_HAMMER, LW(0))
-    IF_INT_EQUAL(LW(0), 0)
-        IF_INT_EQUAL(GSWF(GSWF_GOR01_ULTRA_HAMMER_CHEST_FALLEN), 0)
-            CALL(evt_mobj_itembox, STRING("mobj_box00"), 340, 110, -20, 1, 0, PTR(ultrahammer_get), GSWF(GSWF_GOR01_ULTRA_HAMMER_CHEST_OPENED))
-            SPAWN_EVENT(ultrahammer_check)
-        ELSE
-            CALL(evt_mobj_itembox, STRING("mobj_box00"), 275, 0, 75, 1, 0, PTR(ultrahammer_get), GSWF(GSWF_GOR01_ULTRA_HAMMER_CHEST_OPENED))
-        END_IF
-    END_IF
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_saku"), MAPOBJ_FLAG_BBOX_CULL)
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_dai"), MAPOBJ_FLAG_BBOX_CULL)
-    SPAWN_EVENT(dai_disp)
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ie_02_f1A"), MAPOBJ_FLAG_BBOX_CULL)
-    IF_INT_EQUAL(LF(0), 1)
-        CALL(evt_mario_kill_party, 0)
-        SPAWN_EVENT(gor_01_koopa_evt)
-    END_IF
-    IF_INT_EQUAL(LF(1), 1)
-        CALL(evt_bero_get_entername, LW(0))
-        IF_STR_EQUAL(LW(0), STRING("sekai_yami1"))
-            SPAWN_EVENT(sekai_yami_evt)
-        END_IF
-        IF_STR_EQUAL(LW(0), STRING("minnnanokoe"))
-            SPAWN_EVENT(minnnanokoe_evt)
-        END_IF
-    END_IF
-    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_END_AFTER_THE_BATTLE)
-        CALL(evt_mario_kill_party, 0)
-        CALL_CHILD(epilogue_npc_entry)
-        SPAWN_EVENT(epilogue_evt)
-    END_IF
-    SPAWN_EVENT(evt_sub_mail_event)
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_roten"), MAPOBJ_FLAG_HIDE)
-    CALL(evt_hitobj_onoff, STRING("A_roten"), 1, 0)
-    RETURN
-EVT_END()
-#else
-EVT_BEGIN(gor_01_init_evt)
-    SET_VALUE(LF(0), 0)
-    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG6_55_01_PEACH_TEC_DELETED)
-        CALL(evt_mario_set_mode, 2)
-        SET_VALUE(LF(0), 1)
-    END_IF
-    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_15_GRODUS)
-        CALL(evt_bero_get_entername, LW(0))
-        IF_STR_EQUAL(LW(0), STRING("sekai_yami1"))
-            SET_VALUE(LF(1), 1)
-        END_IF
-        IF_STR_EQUAL(LW(0), STRING("minnnanokoe"))
-            SET_VALUE(LF(1), 1)
-        END_IF
-    END_IF
-    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_END_AFTER_THE_BATTLE)
-        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_GOR1"))
-    ELSE
-        IF_INT_EQUAL(LF(0), 0)
-            IF_INT_EQUAL(LF(1), 1)
-                CALL(evt_bero_get_entername, LW(0))
-                IF_STR_EQUAL(LW(0), STRING("sekai_yami1"))
-                    CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG8_WITCH"))
-                    CALL(evt_snd_envoff, PSND_FADE_OUT)
-                END_IF
-                IF_STR_EQUAL(LW(0), STRING("minnnanokoe"))
-                    CALL(evt_snd_bgmoff, PSND_FADE_OUT)
-                    CALL(evt_snd_envoff, PSND_FADE_OUT)
-                    SET_VALUE(LF(1), 1)
-                END_IF
-            ELSE
-                CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_GOR1"))
-                CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
-                CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_GOR1"))
-            END_IF
-        ELSE
-            CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_KUPPA1"))
-            CALL(evt_snd_bgm_scope, 0, 1)
-            CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
-            CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_GOR1"))
-        END_IF
-    END_IF
-    SET_VALUE(LW(0), PTR(bero_entry_data))
-    CALL(evt_bero_get_info)
-    CALL_CHILD(evt_bero_info_run)
-    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG0_06_1000_X_NAUTS_AFTER)
-        CALL_CHILD(christine_nakama_init)
-    END_IF
-    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG0_07_GOOMBELLA_JOINS)
-        IF_INT_EQUAL(GSWF(GSWF_GOR01_GOOMBELLA_SAVE_TALK_DONE), 0)
-            SPAWN_EVENT(christine_nakama_after)
-        END_IF
-    END_IF
-    IF_INT_EQUAL(GSWF(GSWF_GOR01_LENS_ARRIVED), 0)
-        IF_INT_EQUAL(GSWF(GSWF_GOR01_LENS_ORDERED), 1)
-            IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_17_FATHER_AND_SON_REUNITED)
-                SET_VALUE(GSWF(GSWF_GOR01_LENS_ARRIVED), 1)
-            END_IF
-        END_IF
-    END_IF
-    IF_INT_EQUAL(GSWF(GSWF_GOR01_LENS_ARRIVED), 0)
-        IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_17_FATHER_AND_SON_REUNITED)
-            SET_VALUE(LW(0), GSWF(GSWF_GOR01_LENS_ORDERED))
-            ADD(LW(0), GSWF(GSWF_GOR01_LENS_ORDERED_ALT))
-            IF_INT_NOT_EQUAL(LW(0), 0)
-                CALL(evt_sub_load_progresstime, GSW(GSW_GOR01_LENS_ORDER_TIME), LW(0))
-                IF_INT_GREATER_OR_EQUAL(LW(0), 90000)
-                    SET_VALUE(GSWF(GSWF_GOR01_LENS_ARRIVED), 1)
-                END_IF
-            END_IF
-        END_IF
-    END_IF
-    CALL_CHILD(luigi_npcEnt)
-    CALL(evt_npc_setup, PTR(npcEnt))
-    CALL(evt_npc_sound_data_set, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), STRING("SFX_STG5_MARCO_MOVE1L"), STRING("SFX_STG5_MARCO_MOVE1R"), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
-    IF_INT_EQUAL(LF(0), 1)
-        CALL_CHILD(koopa_npc_entry)
-    END_IF
-    IF_INT_NOT_EQUAL(LF(0), 1)
-        CALL(evt_mobj_save_blk, STRING("mobj_save"), 185, 60, -55, 0, 0)
-    END_IF
-    CALL(evt_mobj_kururing_floor, STRING("kururin1"), -455, 0, -260, STRING("S_ground"), 125, GSWF(GSWF_GOR01_STAR_PIECE_PANEL_1))
-    CALL(evt_mobj_kururing_floor, STRING("kururin2"), 0, 0, 450, STRING("S_ground"), 125, GSWF(GSWF_GOR01_STAR_PIECE_PANEL_2))
-    CALL(evt_item_entry, STRING("item_00"), ITEM_STAR_PIECE, 490, 0, 245, 16, GSWF(GSWF_GOR01_STAR_PIECE_1), 0)
-    CALL(evt_item_entry, STRING("item_01"), ITEM_STAR_PIECE, 550, 0, -150, 16, GSWF(GSWF_GOR01_STAR_PIECE_2), 0)
-    CALL(evt_item_entry, STRING("item_02"), ITEM_STAR_PIECE, -565, 162, -160, 16, GSWF(GSWF_GOR01_STAR_PIECE_3), 0)
-    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG4_32_CHATTING_WITH_FLAVIO)
-        CALL(evt_item_entry, STRING(/*"ドクロジュエル"*/"\x83\x68\x83\x4E\x83\x8D\x83\x57\x83\x85\x83\x47\x83\x8B"), ITEM_SKULL_GEM, 315, 20, -125, 16, -1, 0)
-        CALL(evt_item_flag_on, STRING(/*"ドクロジュエル"*/"\x83\x68\x83\x4E\x83\x8D\x83\x57\x83\x85\x83\x47\x83\x8B"), ITEM_FLAG_NO_TOUCH)
-        CALL(evt_item_status_on, STRING(/*"ドクロジュエル"*/"\x83\x68\x83\x4E\x83\x8D\x83\x57\x83\x85\x83\x47\x83\x8B"), ITEM_STATUS_NO_KOOPS)
-        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_jewel"), 0, PTR(marco_jewel), GW(8))
-    END_IF
-    IF_INT_EQUAL(GSWF(GSWF_GOR01_LENS_DELIVERED), 0)
-        SET_VALUE(LW(0), PTR(&door_data_01))
-    ELSE
-        SET_VALUE(LW(0), PTR(&door_data_01_01))
-    END_IF
-    CALL(evt_door_data_copy, LW(0), GW(6))
-    SET_VALUE(LW(0), GW(6))
-    CALL_CHILD(evt_door_entry)
-    SET_VALUE(LW(0), PTR(&door_data_02_f1))
-    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG4_32_CHATTING_WITH_FLAVIO)
-        IF_INT_EQUAL(GSWF(GSWF_GOR01_LENS_ARRIVED), 1)
-            SET_VALUE(LW(0), PTR(&door_data_02_f1_01))
-        END_IF
-    END_IF
-    CALL_CHILD(evt_door_entry)
-    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG0_16_FRANKLYS_HOUSE)
-        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ie_02_f2_doa01"), 0, PTR(evt_door_02_f2_junbityu), 0)
-    ELSE
-        SET_VALUE(LW(0), PTR(&door_data_02_f2))
-        CALL_CHILD(evt_door_entry)
-    END_IF
-    SET_VALUE(LW(0), PTR(&door_data_03_f1))
-    CALL_CHILD(evt_door_entry)
-    SET_VALUE(LW(0), PTR(&door_data_03_f2))
-    CALL_CHILD(evt_door_entry)
-    SET_VALUE(LW(0), PTR(&door_data_04))
-    CALL_CHILD(evt_door_entry)
-    CALL_CHILD(gor_01_shop_setup)
-    CALL(evt_kinopio_setup, PTR(&kino_dt))
-    CALL(evt_map_playanim, STRING("hae"), 1, 0)
-    SPAWN_EVENT(koushukei_dai)
-    SPAWN_EVENT(gate_disp)
-    SPAWN_EVENT(gor_goki1_urouro)
-    SPAWN_EVENT(gor_goki2_urouro)
-    IF_INT_EQUAL(LF(1), 0)
-        IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 1)
-            CALL(evt_item_entry, STRING("item_key00"), ITEM_HOUSE_KEY, -280, 153, -100, 0, GSWF(GSWF_TROUBLE_WORK_BASE), 0)
-        END_IF
-        CALL_CHILD(borodo2_init)
-        SPAWN_EVENT(iri_09_init)
-        SPAWN_EVENT(iri_16_init)
-        IF_INT_EQUAL(GSWF(GSWF_TROUBLE_16_SOLVED), 1)
-            CALL(evt_item_entry, STRING("iri_16"), ITEM_ATTACK_FX_B, -150, 153, -120, 16, GSWF(GSWF_GOR01_TROUBLE16_BADGE_LEFT), 0)
-        END_IF
-        IF_INT_EQUAL(GSWF(GSWF_TROUBLE_18_SOLVED), 1)
-            CALL(evt_item_entry, STRING("iri_18"), ITEM_HONEY_SHROOM, -440, 30, -80, 16, GSWF(GSWF_GOR01_TROUBLE18_ITEM_LEFT), 0)
-        END_IF
-    END_IF
-    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_keizi_mae"), 0, PTR(keijiban_omote_joho), 0)
-    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_keizi_ura"), 0, PTR(keijiban_ura_joho), 0)
-    CALL(evt_pouch_check_item, ITEM_ULTRA_HAMMER, LW(0))
-    IF_INT_EQUAL(LW(0), 0)
-        IF_INT_EQUAL(GSWF(GSWF_GOR01_ULTRA_HAMMER_CHEST_FALLEN), 0)
-            CALL(evt_mobj_itembox, STRING("mobj_box00"), 340, 110, -20, 1, 0, PTR(ultrahammer_get), GSWF(GSWF_GOR01_ULTRA_HAMMER_CHEST_OPENED))
-            SPAWN_EVENT(ultrahammer_check)
-        ELSE
-            CALL(evt_mobj_itembox, STRING("mobj_box00"), 275, 0, 75, 1, 0, PTR(ultrahammer_get), GSWF(GSWF_GOR01_ULTRA_HAMMER_CHEST_OPENED))
-        END_IF
-    END_IF
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_saku"), MAPOBJ_FLAG_BBOX_CULL)
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_dai"), MAPOBJ_FLAG_BBOX_CULL)
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ie_02_f1A"), MAPOBJ_FLAG_BBOX_CULL)
-    IF_INT_EQUAL(LF(0), 1)
-        CALL(evt_mario_kill_party, 0)
-        SPAWN_EVENT(gor_01_koopa_evt)
-    END_IF
-    IF_INT_EQUAL(LF(1), 1)
-        CALL(evt_bero_get_entername, LW(0))
-        IF_STR_EQUAL(LW(0), STRING("sekai_yami1"))
-            SPAWN_EVENT(sekai_yami_evt)
-        END_IF
-        IF_STR_EQUAL(LW(0), STRING("minnnanokoe"))
-            SPAWN_EVENT(minnnanokoe_evt)
-        END_IF
-    END_IF
-    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_END_AFTER_THE_BATTLE)
-        CALL(evt_mario_kill_party, 0)
-        CALL_CHILD(epilogue_npc_entry)
-        SPAWN_EVENT(epilogue_evt)
-    END_IF
-    SPAWN_EVENT(evt_sub_mail_event)
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_roten"), MAPOBJ_FLAG_HIDE)
-    CALL(evt_hitobj_onoff, STRING("A_roten"), 1, 0)
-    RETURN
-EVT_END()
 #endif
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_jewel"), 0, PTR(marco_jewel), GW(8))
+    END_IF
+    IF_INT_EQUAL(GSWF(GSWF_GOR01_LENS_DELIVERED), 0)
+        SET_VALUE(LW(0), PTR(&door_data_01))
+    ELSE
+        SET_VALUE(LW(0), PTR(&door_data_01_01))
+    END_IF
+    CALL(evt_door_data_copy, LW(0), GW(6))
+    SET_VALUE(LW(0), GW(6))
+    CALL_CHILD(evt_door_entry)
+    SET_VALUE(LW(0), PTR(&door_data_02_f1))
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG4_32_CHATTING_WITH_FLAVIO)
+        IF_INT_EQUAL(GSWF(GSWF_GOR01_LENS_ARRIVED), 1)
+            SET_VALUE(LW(0), PTR(&door_data_02_f1_01))
+        END_IF
+    END_IF
+    CALL_CHILD(evt_door_entry)
+    IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG0_16_FRANKLYS_HOUSE)
+        CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_ie_02_f2_doa01"), 0, PTR(evt_door_02_f2_junbityu), 0)
+    ELSE
+        SET_VALUE(LW(0), PTR(&door_data_02_f2))
+        CALL_CHILD(evt_door_entry)
+    END_IF
+    SET_VALUE(LW(0), PTR(&door_data_03_f1))
+    CALL_CHILD(evt_door_entry)
+    SET_VALUE(LW(0), PTR(&door_data_03_f2))
+    CALL_CHILD(evt_door_entry)
+    SET_VALUE(LW(0), PTR(&door_data_04))
+    CALL_CHILD(evt_door_entry)
+    CALL_CHILD(gor_01_shop_setup)
+    CALL(evt_kinopio_setup, PTR(&kino_dt))
+    CALL(evt_map_playanim, STRING("hae"), 1, 0)
+    SPAWN_EVENT(koushukei_dai)
+    SPAWN_EVENT(gate_disp)
+    SPAWN_EVENT(gor_goki1_urouro)
+    SPAWN_EVENT(gor_goki2_urouro)
+    IF_INT_EQUAL(LF(1), 0)
+        IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 1)
+            CALL(evt_item_entry, STRING("item_key00"), ITEM_HOUSE_KEY, -280, 153, -100, ITEM_ENTRY_STAY, GSWF(GSWF_TROUBLE_WORK_BASE), 0)
+        END_IF
+        CALL_CHILD(borodo2_init)
+        SPAWN_EVENT(iri_09_init)
+        SPAWN_EVENT(iri_16_init)
+        IF_INT_EQUAL(GSWF(GSWF_TROUBLE_16_SOLVED), 1)
+            CALL(evt_item_entry, STRING("iri_16"), ITEM_ATTACK_FX_B, -150, 153, -120, ITEM_ENTRY_FIXED, GSWF(GSWF_GOR01_TROUBLE16_BADGE_LEFT), 0)
+        END_IF
+        IF_INT_EQUAL(GSWF(GSWF_TROUBLE_18_SOLVED), 1)
+            CALL(evt_item_entry, STRING("iri_18"), ITEM_HONEY_SHROOM, -440, 30, -80, ITEM_ENTRY_FIXED, GSWF(GSWF_GOR01_TROUBLE18_ITEM_LEFT), 0)
+        END_IF
+    END_IF
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_keizi_mae"), 0, PTR(keijiban_omote_joho), 0)
+    CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_keizi_ura"), 0, PTR(keijiban_ura_joho), 0)
+    CALL(evt_pouch_check_item, ITEM_ULTRA_HAMMER, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        IF_INT_EQUAL(GSWF(GSWF_GOR01_ULTRA_HAMMER_CHEST_FALLEN), 0)
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_mobj_itembox, STRING("mobj_box00"), 340, 146, -20, 1, 0, PTR(ultrahammer_get), GSWF(GSWF_GOR01_ULTRA_HAMMER_CHEST_OPENED))
+#else
+            CALL(evt_mobj_itembox, STRING("mobj_box00"), 340, 110, -20, 1, 0, PTR(ultrahammer_get), GSWF(GSWF_GOR01_ULTRA_HAMMER_CHEST_OPENED))
+#endif
+            SPAWN_EVENT(ultrahammer_check)
+        ELSE
+            CALL(evt_mobj_itembox, STRING("mobj_box00"), 275, 0, 75, 1, 0, PTR(ultrahammer_get), GSWF(GSWF_GOR01_ULTRA_HAMMER_CHEST_OPENED))
+        END_IF
+    END_IF
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_saku"), MAPOBJ_FLAG_BBOX_CULL)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_dai"), MAPOBJ_FLAG_BBOX_CULL)
+#if VERSION >= VERSION_US
+    SPAWN_EVENT(dai_disp)
+#endif
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_ie_02_f1A"), MAPOBJ_FLAG_BBOX_CULL)
+    IF_INT_EQUAL(LF(0), 1)
+        CALL(evt_mario_kill_party, 0)
+        SPAWN_EVENT(gor_01_koopa_evt)
+    END_IF
+    IF_INT_EQUAL(LF(1), 1)
+        CALL(evt_bero_get_entername, LW(0))
+        IF_STR_EQUAL(LW(0), STRING("sekai_yami1"))
+            SPAWN_EVENT(sekai_yami_evt)
+        END_IF
+        IF_STR_EQUAL(LW(0), STRING("minnnanokoe"))
+            SPAWN_EVENT(minnnanokoe_evt)
+        END_IF
+    END_IF
+    IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_END_AFTER_THE_BATTLE)
+        CALL(evt_mario_kill_party, 0)
+        CALL_CHILD(epilogue_npc_entry)
+        SPAWN_EVENT(epilogue_evt)
+    END_IF
+    SPAWN_EVENT(evt_sub_mail_event)
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_roten"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_hitobj_onoff, STRING("A_roten"), 1, 0)
+    RETURN
+EVT_END()
 
+#if VERSION >= VERSION_JP
 SimpleRecipe R_simple_recipe_table[] = {
-    {/*"ファイアフラワー"*/"\x83\x74\x83\x40\x83\x43\x83\x41\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"あつあつスープ"*/"\x82\xA0\x82\xC2\x82\xA0\x82\xC2\x83\x58\x81\x5B\x83\x76", /*"あつあつスープ"*/"\x82\xA0\x82\xC2\x82\xA0\x82\xC2\x83\x58\x81\x5B\x83\x76"},
-    {/*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52", /*"キノコいため"*/"\x83\x4C\x83\x6D\x83\x52\x82\xA2\x82\xBD\x82\xDF", /*"キノコいため"*/"\x83\x4C\x83\x6D\x83\x52\x82\xA2\x82\xBD\x82\xDF"},
-    {/*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"キノコいため"*/"\x83\x4C\x83\x6D\x83\x52\x82\xA2\x82\xBD\x82\xDF", /*"キノコいため"*/"\x83\x4C\x83\x6D\x83\x52\x82\xA2\x82\xBD\x82\xDF"},
-    {/*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"キノコいため"*/"\x83\x4C\x83\x6D\x83\x52\x82\xA2\x82\xBD\x82\xDF", /*"キノコいため"*/"\x83\x4C\x83\x6D\x83\x52\x82\xA2\x82\xBD\x82\xDF"},
-    {/*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"キノコステーキ"*/"\x83\x4C\x83\x6D\x83\x52\x83\x58\x83\x65\x81\x5B\x83\x4C", /*"キノコステーキ"*/"\x83\x4C\x83\x6D\x83\x52\x83\x58\x83\x65\x81\x5B\x83\x4C"},
-    {/*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"キノコホイルやき"*/"\x83\x4C\x83\x6D\x83\x52\x83\x7A\x83\x43\x83\x8B\x82\xE2\x82\xAB", /*"キノコホイルやき"*/"\x83\x4C\x83\x6D\x83\x52\x83\x7A\x83\x43\x83\x8B\x82\xE2\x82\xAB"},
-    {/*"しなびたキノコ"*/"\x82\xB5\x82\xC8\x82\xD1\x82\xBD\x83\x4C\x83\x6D\x83\x52", "", /*"キノコいため"*/"\x83\x4C\x83\x6D\x83\x52\x82\xA2\x82\xBD\x82\xDF"},
-    {/*"ハニーシロップ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58"},
-    {/*"メイプルシロップ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58"},
-    {/*"ローヤルゼリー"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x5B\x83\x8A\x81\x5B", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58"},
-    {/*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52", /*"キノコホイルやき"*/"\x83\x4C\x83\x6D\x83\x52\x83\x7A\x83\x43\x83\x8B\x82\xE2\x82\xAB", /*"キノコホイルやき"*/"\x83\x4C\x83\x6D\x83\x52\x83\x7A\x83\x43\x83\x8B\x82\xE2\x82\xAB"},
-    {/*"じわじわシロップ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x56\x83\x8D\x83\x62\x83\x76", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58"},
-    {/*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", "", /*"あつあつスープ"*/"\x82\xA0\x82\xC2\x82\xA0\x82\xC2\x83\x58\x81\x5B\x83\x76"},
-    {/*"ふしぎなタマゴ"*/"\x82\xD3\x82\xB5\x82\xAC\x82\xC8\x83\x5E\x83\x7D\x83\x53", /*"めだまやき"*/"\x82\xDF\x82\xBE\x82\xDC\x82\xE2\x82\xAB", /*"めだまやき"*/"\x82\xDF\x82\xBE\x82\xDC\x82\xE2\x82\xAB"},
-    {/*"おうごんはっぱ"*/"\x82\xA8\x82\xA4\x82\xB2\x82\xF1\x82\xCD\x82\xC1\x82\xCF", /*"ナンシーティー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x65\x83\x42\x81\x5B", /*"ナンシーティー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x65\x83\x42\x81\x5B"},
-    {/*"トロピコマンゴー"*/"\x83\x67\x83\x8D\x83\x73\x83\x52\x83\x7D\x83\x93\x83\x53\x81\x5B", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58"},
-    {/*"生パスタ"*/"\x90\xB6\x83\x70\x83\x58\x83\x5E", /*"スパゲティ"*/"\x83\x58\x83\x70\x83\x51\x83\x65\x83\x42", /*"スパゲティ"*/"\x83\x58\x83\x70\x83\x51\x83\x65\x83\x42"},
-    {/*"おかしのもと"*/"\x82\xA8\x82\xA9\x82\xB5\x82\xCC\x82\xE0\x82\xC6", /*"ムースケーキ"*/"\x83\x80\x81\x5B\x83\x58\x83\x50\x81\x5B\x83\x4C", /*"ムースケーキ"*/"\x83\x80\x81\x5B\x83\x58\x83\x50\x81\x5B\x83\x4C"},
-    {/*"レッド・カラリン"*/"\x83\x8C\x83\x62\x83\x68\x81\x45\x83\x4A\x83\x89\x83\x8A\x83\x93", "", /*"スッキリドリンク"*/"\x83\x58\x83\x62\x83\x4C\x83\x8A\x83\x68\x83\x8A\x83\x93\x83\x4E"},
-    {/*"カメカメはっぱ"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x82\xCD\x82\xC1\x82\xCF", /*"カメカメティー"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x83\x65\x83\x42\x81\x5B", /*"カメカメティー"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x83\x65\x83\x42\x81\x5B"},
-    {/*"つくしんぼ"*/"\x82\xC2\x82\xAD\x82\xB5\x82\xF1\x82\xDA", "", /*"あつあつスープ"*/"\x82\xA0\x82\xC2\x82\xA0\x82\xC2\x83\x58\x81\x5B\x83\x76"},
-    {/*"ピチピーチ"*/"\x83\x73\x83\x60\x83\x73\x81\x5B\x83\x60", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58"},
-    {/*"ヤシの実"*/"\x83\x84\x83\x56\x82\xCC\x8E\xC0", /*"スッキリドリンク"*/"\x83\x58\x83\x62\x83\x4C\x83\x8A\x83\x68\x83\x8A\x83\x93\x83\x4E", /*"スッキリドリンク"*/"\x83\x58\x83\x62\x83\x4C\x83\x8A\x83\x68\x83\x8A\x83\x93\x83\x4E"},
-    {/*"ゆきうさぎ"*/"\x82\xE4\x82\xAB\x82\xA4\x82\xB3\x82\xAC", "", /*"あつあつスープ"*/"\x82\xA0\x82\xC2\x82\xA0\x82\xC2\x83\x58\x81\x5B\x83\x76"},
-    {/*"どくキノコ"*/"\x82\xC7\x82\xAD\x83\x4C\x83\x6D\x83\x52", "", /*"キノコいため"*/"\x83\x4C\x83\x6D\x83\x52\x82\xA2\x82\xBD\x82\xDF"},
-    {/*"たんこぶ"*/"\x82\xBD\x82\xF1\x82\xB1\x82\xD4", "", /*"ナンシースペシャル"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x58\x83\x79\x83\x56\x83\x83\x83\x8B"},
+    {"ファイアフラワー", "あつあつスープ", "あつあつスープ"},
+    {"びりびりキノコ", "キノコいため", "キノコいため"},
+    {"キノコ", "キノコいため", "キノコいため"},
+    {"スーパーキノコ", "キノコいため", "キノコいため"},
+    {"ウルトラキノコ", "キノコステーキ", "キノコステーキ"},
+    {"きんきゅうキノコ", "キノコホイルやき", "キノコホイルやき"},
+    {"しなびたキノコ", "", "キノコいため"},
+    {"ハニーシロップ", "フレッシュジュース", "フレッシュジュース"},
+    {"メイプルシロップ", "フレッシュジュース", "フレッシュジュース"},
+    {"ローヤルゼリー", "フレッシュジュース", "フレッシュジュース"},
+    {"じわじわキノコ", "キノコホイルやき", "キノコホイルやき"},
+    {"じわじわシロップ", "フレッシュジュース", "フレッシュジュース"},
+    {"ドライフラワー", "", "あつあつスープ"},
+    {"ふしぎなタマゴ", "めだまやき", "めだまやき"},
+    {"おうごんはっぱ", "ナンシーティー", "ナンシーティー"},
+    {"トロピコマンゴー", "フレッシュジュース", "フレッシュジュース"},
+    {"生パスタ", "スパゲティ", "スパゲティ"},
+    {"おかしのもと", "ムースケーキ", "ムースケーキ"},
+    {"レッド・カラリン", "", "スッキリドリンク"},
+    {"カメカメはっぱ", "カメカメティー", "カメカメティー"},
+    {"つくしんぼ", "", "あつあつスープ"},
+    {"ピチピーチ", "フレッシュジュース", "フレッシュジュース"},
+    {"ヤシの実", "スッキリドリンク", "スッキリドリンク"},
+    {"ゆきうさぎ", "", "あつあつスープ"},
+    {"どくキノコ", "", "キノコいため"},
+    {"たんこぶ", "", "ナンシースペシャル"},
 };
 
 #if VERSION >= VERSION_US
@@ -6251,299 +6019,300 @@ CookRecipe R_cookbook_recipe_table[] = {
 };
 #else
 CookRecipe R_cookbook_recipe_table[] = {
-    {/*"かみなりドッカン"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x68\x83\x62\x83\x4A\x83\x93", /*"かみなりゴロゴロ"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x53\x83\x8D\x83\x53\x83\x8D", /*"しれんのナベ"*/"\x82\xB5\x82\xEA\x82\xF1\x82\xCC\x83\x69\x83\x78"},
-    {/*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"かみなりゴロゴロ"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x53\x83\x8D\x83\x53\x83\x8D", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52"},
-    {/*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"かみなりドッカン"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x68\x83\x62\x83\x4A\x83\x93", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52"},
-    {/*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"ファイアフラワー"*/"\x83\x74\x83\x40\x83\x43\x83\x41\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"キノコホイルやき"*/"\x83\x4C\x83\x6D\x83\x52\x83\x7A\x83\x43\x83\x8B\x82\xE2\x82\xAB"},
-    {/*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52", /*"キノコホイルやき"*/"\x83\x4C\x83\x6D\x83\x52\x83\x7A\x83\x43\x83\x8B\x82\xE2\x82\xAB"},
-    {/*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"ふにゃふにゃくん"*/"\x82\xD3\x82\xC9\x82\xE1\x82\xD3\x82\xC9\x82\xE1\x82\xAD\x82\xF1", /*"しなびたキノコ"*/"\x82\xB5\x82\xC8\x82\xD1\x82\xBD\x83\x4C\x83\x6D\x83\x52"},
-    {/*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"かみなりゴロゴロ"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x53\x83\x8D\x83\x53\x83\x8D", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52"},
-    {/*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"かみなりドッカン"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x68\x83\x62\x83\x4A\x83\x93", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52"},
-    {/*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"ファイアフラワー"*/"\x83\x74\x83\x40\x83\x43\x83\x41\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52", /*"キノコホイルやき"*/"\x83\x4C\x83\x6D\x83\x52\x83\x7A\x83\x43\x83\x8B\x82\xE2\x82\xAB"},
-    {/*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"ふにゃふにゃくん"*/"\x82\xD3\x82\xC9\x82\xE1\x82\xD3\x82\xC9\x82\xE1\x82\xAD\x82\xF1", /*"しなびたキノコ"*/"\x82\xB5\x82\xC8\x82\xD1\x82\xBD\x83\x4C\x83\x6D\x83\x52"},
-    {/*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"キノコホイルやき"*/"\x83\x4C\x83\x6D\x83\x52\x83\x7A\x83\x43\x83\x8B\x82\xE2\x82\xAB"},
-    {/*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"かみなりゴロゴロ"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x53\x83\x8D\x83\x53\x83\x8D", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52"},
-    {/*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"かみなりドッカン"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x68\x83\x62\x83\x4A\x83\x93", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52"},
-    {/*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"ファイアフラワー"*/"\x83\x74\x83\x40\x83\x43\x83\x41\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"ナンシースペシャル"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x58\x83\x79\x83\x56\x83\x83\x83\x8B"},
-    {/*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52", /*"キノコステーキ"*/"\x83\x4C\x83\x6D\x83\x52\x83\x58\x83\x65\x81\x5B\x83\x4C"},
-    {/*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"ふにゃふにゃくん"*/"\x82\xD3\x82\xC9\x82\xE1\x82\xD3\x82\xC9\x82\xE1\x82\xAD\x82\xF1", /*"しなびたキノコ"*/"\x82\xB5\x82\xC8\x82\xD1\x82\xBD\x83\x4C\x83\x6D\x83\x52"},
-    {/*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"キノコステーキ"*/"\x83\x4C\x83\x6D\x83\x52\x83\x58\x83\x65\x81\x5B\x83\x4C"},
-    {/*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"キノコステーキ"*/"\x83\x4C\x83\x6D\x83\x52\x83\x58\x83\x65\x81\x5B\x83\x4C"},
-    {/*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"かみなりゴロゴロ"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x53\x83\x8D\x83\x53\x83\x8D", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52"},
-    {/*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"かみなりドッカン"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x68\x83\x62\x83\x4A\x83\x93", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52"},
-    {/*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"ファイアフラワー"*/"\x83\x74\x83\x40\x83\x43\x83\x41\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52", /*"キノコホイルやき"*/"\x83\x4C\x83\x6D\x83\x52\x83\x7A\x83\x43\x83\x8B\x82\xE2\x82\xAB"},
-    {/*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"ふにゃふにゃくん"*/"\x82\xD3\x82\xC9\x82\xE1\x82\xD3\x82\xC9\x82\xE1\x82\xAD\x82\xF1", /*"しなびたキノコ"*/"\x82\xB5\x82\xC8\x82\xD1\x82\xBD\x83\x4C\x83\x6D\x83\x52"},
-    {/*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"キノコステーキ"*/"\x83\x4C\x83\x6D\x83\x52\x83\x58\x83\x65\x81\x5B\x83\x4C"},
-    {/*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"キノコステーキ"*/"\x83\x4C\x83\x6D\x83\x52\x83\x58\x83\x65\x81\x5B\x83\x4C"},
-    {/*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"キノコステーキ"*/"\x83\x4C\x83\x6D\x83\x52\x83\x58\x83\x65\x81\x5B\x83\x4C"},
-    {/*"しなびたキノコ"*/"\x82\xB5\x82\xC8\x82\xD1\x82\xBD\x83\x4C\x83\x6D\x83\x52", /*"ファイアフラワー"*/"\x83\x74\x83\x40\x83\x43\x83\x41\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"キノコいため"*/"\x83\x4C\x83\x6D\x83\x52\x82\xA2\x82\xBD\x82\xDF"},
-    {/*"しなびたキノコ"*/"\x82\xB5\x82\xC8\x82\xD1\x82\xBD\x83\x4C\x83\x6D\x83\x52", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52", /*"キノコいため"*/"\x83\x4C\x83\x6D\x83\x52\x82\xA2\x82\xBD\x82\xDF"},
-    {/*"しなびたキノコ"*/"\x82\xB5\x82\xC8\x82\xD1\x82\xBD\x83\x4C\x83\x6D\x83\x52", /*"デカデカドリンク"*/"\x83\x66\x83\x4A\x83\x66\x83\x4A\x83\x68\x83\x8A\x83\x93\x83\x4E", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52"},
-    {/*"しなびたキノコ"*/"\x82\xB5\x82\xC8\x82\xD1\x82\xBD\x83\x4C\x83\x6D\x83\x52", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"キノコいため"*/"\x83\x4C\x83\x6D\x83\x52\x82\xA2\x82\xBD\x82\xDF"},
-    {/*"しなびたキノコ"*/"\x82\xB5\x82\xC8\x82\xD1\x82\xBD\x83\x4C\x83\x6D\x83\x52", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"キノコホイルやき"*/"\x83\x4C\x83\x6D\x83\x52\x83\x7A\x83\x43\x83\x8B\x82\xE2\x82\xAB"},
-    {/*"しなびたキノコ"*/"\x82\xB5\x82\xC8\x82\xD1\x82\xBD\x83\x4C\x83\x6D\x83\x52", /*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"キノコステーキ"*/"\x83\x4C\x83\x6D\x83\x52\x83\x58\x83\x65\x81\x5B\x83\x4C"},
-    {/*"しなびたキノコ"*/"\x82\xB5\x82\xC8\x82\xD1\x82\xBD\x83\x4C\x83\x6D\x83\x52", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"キノコステーキ"*/"\x83\x4C\x83\x6D\x83\x52\x83\x58\x83\x65\x81\x5B\x83\x4C"},
-    {/*"ハニーシロップ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"こおりのいぶき"*/"\x82\xB1\x82\xA8\x82\xE8\x82\xCC\x82\xA2\x82\xD4\x82\xAB", /*"アイスキャンディ"*/"\x83\x41\x83\x43\x83\x58\x83\x4C\x83\x83\x83\x93\x83\x66\x83\x42"},
-    {/*"ハニーシロップ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52", /*"ハニーキノコ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x4C\x83\x6D\x83\x52"},
-    {/*"ハニーシロップ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"ハニーキノコ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x4C\x83\x6D\x83\x52"},
-    {/*"ハニーシロップ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"ハニーキノコＳ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x4C\x83\x6D\x83\x52\x82\x72"},
-    {/*"ハニーシロップ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"ハニーキノコＺ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x4C\x83\x6D\x83\x52\x82\x79"},
-    {/*"ハニーシロップ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"ハニーキノコＳ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x4C\x83\x6D\x83\x52\x82\x72"},
-    {/*"メイプルシロップ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"こおりのいぶき"*/"\x82\xB1\x82\xA8\x82\xE8\x82\xCC\x82\xA2\x82\xD4\x82\xAB", /*"ナンシーフラッペ"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x74\x83\x89\x83\x62\x83\x79"},
-    {/*"メイプルシロップ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52", /*"メイプルキノコ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x4C\x83\x6D\x83\x52"},
-    {/*"メイプルシロップ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"メイプルキノコ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x4C\x83\x6D\x83\x52"},
-    {/*"メイプルシロップ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"メイプルキノコＳ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x4C\x83\x6D\x83\x52\x82\x72"},
-    {/*"メイプルシロップ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"メイプルキノコＺ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x4C\x83\x6D\x83\x52\x82\x79"},
-    {/*"メイプルシロップ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"メイプルキノコＳ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x4C\x83\x6D\x83\x52\x82\x72"},
-    {/*"メイプルシロップ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"ハニーシロップ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58"},
-    {/*"ローヤルゼリー"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x5B\x83\x8A\x81\x5B", /*"こおりのいぶき"*/"\x82\xB1\x82\xA8\x82\xE8\x82\xCC\x82\xA2\x82\xD4\x82\xAB", /*"ナンシーフラッペ"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x74\x83\x89\x83\x62\x83\x79"},
-    {/*"ローヤルゼリー"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x5B\x83\x8A\x81\x5B", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52", /*"ローヤルキノコ"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x4C\x83\x6D\x83\x52"},
-    {/*"ローヤルゼリー"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x5B\x83\x8A\x81\x5B", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"ローヤルキノコ"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x4C\x83\x6D\x83\x52"},
-    {/*"ローヤルゼリー"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x5B\x83\x8A\x81\x5B", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"ローヤルキノコＳ"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x4C\x83\x6D\x83\x52\x82\x72"},
-    {/*"ローヤルゼリー"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x5B\x83\x8A\x81\x5B", /*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"ローヤルキノコＺ"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x4C\x83\x6D\x83\x52\x82\x79"},
-    {/*"ローヤルゼリー"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x5B\x83\x8A\x81\x5B", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"ローヤルキノコＳ"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x4C\x83\x6D\x83\x52\x82\x72"},
-    {/*"ローヤルゼリー"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x5B\x83\x8A\x81\x5B", /*"ハニーシロップ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58"},
-    {/*"ローヤルゼリー"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x5B\x83\x8A\x81\x5B", /*"メイプルシロップ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"ナンシーティー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x65\x83\x42\x81\x5B"},
-    {/*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52", /*"かみなりゴロゴロ"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x53\x83\x8D\x83\x53\x83\x8D", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52"},
-    {/*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52", /*"かみなりドッカン"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x68\x83\x62\x83\x4A\x83\x93", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52"},
-    {/*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52", /*"キラキラおとし"*/"\x83\x4C\x83\x89\x83\x4C\x83\x89\x82\xA8\x82\xC6\x82\xB5", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52", /*"ファイアフラワー"*/"\x83\x74\x83\x40\x83\x43\x83\x41\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52", /*"キノコホイルやき"*/"\x83\x4C\x83\x6D\x83\x52\x83\x7A\x83\x43\x83\x8B\x82\xE2\x82\xAB"},
-    {/*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"キノコホイルやき"*/"\x83\x4C\x83\x6D\x83\x52\x83\x7A\x83\x43\x83\x8B\x82\xE2\x82\xAB"},
-    {/*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52", /*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"ナンシースペシャル"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x58\x83\x79\x83\x56\x83\x83\x83\x8B"},
-    {/*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52", /*"ハニーシロップ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"ハニーキノコ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x4C\x83\x6D\x83\x52"},
-    {/*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52", /*"メイプルシロップ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"メイプルキノコ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x4C\x83\x6D\x83\x52"},
-    {/*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52", /*"ローヤルゼリー"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x5B\x83\x8A\x81\x5B", /*"メイプルキノコＳ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x4C\x83\x6D\x83\x52\x82\x72"},
-    {/*"じわじわシロップ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x56\x83\x8D\x83\x62\x83\x76", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"キノコホイルやき"*/"\x83\x4C\x83\x6D\x83\x52\x83\x7A\x83\x43\x83\x8B\x82\xE2\x82\xAB"},
-    {/*"じわじわシロップ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x56\x83\x8D\x83\x62\x83\x76", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"じわじわシロップ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x56\x83\x8D\x83\x62\x83\x76", /*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"ナンシースペシャル"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x58\x83\x79\x83\x56\x83\x83\x83\x8B"},
-    {/*"じわじわシロップ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x56\x83\x8D\x83\x62\x83\x76", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"じわじわシロップ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x56\x83\x8D\x83\x62\x83\x76", /*"ハニーシロップ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58"},
-    {/*"じわじわシロップ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x56\x83\x8D\x83\x62\x83\x76", /*"メイプルシロップ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58"},
-    {/*"じわじわシロップ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x56\x83\x8D\x83\x62\x83\x76", /*"ローヤルゼリー"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x5B\x83\x8A\x81\x5B", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58"},
-    {/*"じわじわシロップ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x56\x83\x8D\x83\x62\x83\x76", /*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52", /*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"かみなりゴロゴロ"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x53\x83\x8D\x83\x53\x83\x8D", /*"ゆらゆらじしん"*/"\x82\xE4\x82\xE7\x82\xE4\x82\xE7\x82\xB6\x82\xB5\x82\xF1"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"かみなりドッカン"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x68\x83\x62\x83\x4A\x83\x93", /*"キラキラおとし"*/"\x83\x4C\x83\x89\x83\x4C\x83\x89\x82\xA8\x82\xC6\x82\xB5"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"キラキラおとし"*/"\x83\x4C\x83\x89\x83\x4C\x83\x89\x82\xA8\x82\xC6\x82\xB5", /*"かみなりドッカン"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x68\x83\x62\x83\x4A\x83\x93"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"こおりのいぶき"*/"\x82\xB1\x82\xA8\x82\xE8\x82\xCC\x82\xA2\x82\xD4\x82\xAB", /*"ファイアフラワー"*/"\x83\x74\x83\x40\x83\x43\x83\x41\x83\x74\x83\x89\x83\x8F\x81\x5B"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"ファイアフラワー"*/"\x83\x74\x83\x40\x83\x43\x83\x41\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"こおりのいぶき"*/"\x82\xB1\x82\xA8\x82\xE8\x82\xCC\x82\xA2\x82\xD4\x82\xAB"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"ゆらゆらじしん"*/"\x82\xE4\x82\xE7\x82\xE4\x82\xE7\x82\xB6\x82\xB5\x82\xF1", /*"かみなりゴロゴロ"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x53\x83\x8D\x83\x53\x83\x8D"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"テレサのふく"*/"\x83\x65\x83\x8C\x83\x54\x82\xCC\x82\xD3\x82\xAD", /*"てきヨケール"*/"\x82\xC4\x82\xAB\x83\x88\x83\x50\x81\x5B\x83\x8B"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"てきヨケール"*/"\x82\xC4\x82\xAB\x83\x88\x83\x50\x81\x5B\x83\x8B", /*"テレサのふく"*/"\x83\x65\x83\x8C\x83\x54\x82\xCC\x82\xD3\x82\xAD"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"まどわせのこな"*/"\x82\xDC\x82\xC7\x82\xED\x82\xB9\x82\xCC\x82\xB1\x82\xC8", /*"しかえしのこな"*/"\x82\xB5\x82\xA9\x82\xA6\x82\xB5\x82\xCC\x82\xB1\x82\xC8"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"しかえしのこな"*/"\x82\xB5\x82\xA9\x82\xA6\x82\xB5\x82\xCC\x82\xB1\x82\xC8", /*"まどわせのこな"*/"\x82\xDC\x82\xC7\x82\xED\x82\xB9\x82\xCC\x82\xB1\x82\xC8"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"ねむれよいこよ"*/"\x82\xCB\x82\xDE\x82\xEA\x82\xE6\x82\xA2\x82\xB1\x82\xE6", /*"スッキリドリンク"*/"\x83\x58\x83\x62\x83\x4C\x83\x8A\x83\x68\x83\x8A\x83\x93\x83\x4E"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"デカデカドリンク"*/"\x83\x66\x83\x4A\x83\x66\x83\x4A\x83\x68\x83\x8A\x83\x93\x83\x4E", /*"ミニミニくん"*/"\x83\x7E\x83\x6A\x83\x7E\x83\x6A\x82\xAD\x82\xF1"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"カチカチコウラ"*/"\x83\x4A\x83\x60\x83\x4A\x83\x60\x83\x52\x83\x45\x83\x89", /*"ふにゃふにゃくん"*/"\x82\xD3\x82\xC9\x82\xE1\x82\xD3\x82\xC9\x82\xE1\x82\xAD\x82\xF1"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"ミニミニくん"*/"\x83\x7E\x83\x6A\x83\x7E\x83\x6A\x82\xAD\x82\xF1", /*"デカデカドリンク"*/"\x83\x66\x83\x4A\x83\x66\x83\x4A\x83\x68\x83\x8A\x83\x93\x83\x4E"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"ふにゃふにゃくん"*/"\x82\xD3\x82\xC9\x82\xE1\x82\xD3\x82\xC9\x82\xE1\x82\xAD\x82\xF1", /*"カチカチコウラ"*/"\x83\x4A\x83\x60\x83\x4A\x83\x60\x83\x52\x83\x45\x83\x89"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"ハニーシロップ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x56\x83\x8D\x83\x62\x83\x76"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"メイプルシロップ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x56\x83\x8D\x83\x62\x83\x76"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"ローヤルゼリー"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x5B\x83\x8A\x81\x5B"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"しなびたキノコ"*/"\x82\xB5\x82\xC8\x82\xD1\x82\xBD\x83\x4C\x83\x6D\x83\x52", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"スッキリドリンク"*/"\x83\x58\x83\x62\x83\x4C\x83\x8A\x83\x68\x83\x8A\x83\x93\x83\x4E", /*"ねむれよいこよ"*/"\x82\xCB\x82\xDE\x82\xEA\x82\xE6\x82\xA2\x82\xB1\x82\xE6"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"ハニーシロップ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"メイプルシロップ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"ローヤルゼリー"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x5B\x83\x8A\x81\x5B", /*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52", /*"どくキノコ"*/"\x82\xC7\x82\xAD\x83\x4C\x83\x6D\x83\x52"},
-    {/*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"じわじわシロップ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x56\x83\x8D\x83\x62\x83\x76", /*"ハニーシロップ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x56\x83\x8D\x83\x62\x83\x76"},
-    {/*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"ファイアフラワー"*/"\x83\x74\x83\x40\x83\x43\x83\x41\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"あつあつスープ"*/"\x82\xA0\x82\xC2\x82\xA0\x82\xC2\x83\x58\x81\x5B\x83\x76"},
-    {/*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52", /*"かみなりドッカン"*/"\x82\xA9\x82\xDD\x82\xC8\x82\xE8\x83\x68\x83\x62\x83\x4A\x83\x93"},
-    {/*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"しなびたキノコ"*/"\x82\xB5\x82\xC8\x82\xD1\x82\xBD\x83\x4C\x83\x6D\x83\x52", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"ホットドッグ"*/"\x83\x7A\x83\x62\x83\x67\x83\x68\x83\x62\x83\x4F", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ふしぎなタマゴ"*/"\x82\xD3\x82\xB5\x82\xAC\x82\xC8\x83\x5E\x83\x7D\x83\x53", /*"ファイアフラワー"*/"\x83\x74\x83\x40\x83\x43\x83\x41\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"バクハツタマゴ"*/"\x83\x6F\x83\x4E\x83\x6E\x83\x63\x83\x5E\x83\x7D\x83\x53"},
-    {/*"ふしぎなタマゴ"*/"\x82\xD3\x82\xB5\x82\xAC\x82\xC8\x83\x5E\x83\x7D\x83\x53", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"キセツのオムレツ"*/"\x83\x4C\x83\x5A\x83\x63\x82\xCC\x83\x49\x83\x80\x83\x8C\x83\x63"},
-    {/*"ふしぎなタマゴ"*/"\x82\xD3\x82\xB5\x82\xAC\x82\xC8\x83\x5E\x83\x7D\x83\x53", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"キセツのオムレツ"*/"\x83\x4C\x83\x5A\x83\x63\x82\xCC\x83\x49\x83\x80\x83\x8C\x83\x63"},
-    {/*"ふしぎなタマゴ"*/"\x82\xD3\x82\xB5\x82\xAC\x82\xC8\x83\x5E\x83\x7D\x83\x53", /*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"キセツのオムレツ"*/"\x83\x4C\x83\x5A\x83\x63\x82\xCC\x83\x49\x83\x80\x83\x8C\x83\x63"},
-    {/*"ふしぎなタマゴ"*/"\x82\xD3\x82\xB5\x82\xAC\x82\xC8\x83\x5E\x83\x7D\x83\x53", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"キセツのオムレツ"*/"\x83\x4C\x83\x5A\x83\x63\x82\xCC\x83\x49\x83\x80\x83\x8C\x83\x63"},
-    {/*"ふしぎなタマゴ"*/"\x82\xD3\x82\xB5\x82\xAC\x82\xC8\x83\x5E\x83\x7D\x83\x53", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"おうごんはっぱ"*/"\x82\xA8\x82\xA4\x82\xB2\x82\xF1\x82\xCD\x82\xC1\x82\xCF", /*"こおりのいぶき"*/"\x82\xB1\x82\xA8\x82\xE8\x82\xCC\x82\xA2\x82\xD4\x82\xAB", /*"ゆきうさぎ"*/"\x82\xE4\x82\xAB\x82\xA4\x82\xB3\x82\xAC"},
-    {/*"おうごんはっぱ"*/"\x82\xA8\x82\xA4\x82\xB2\x82\xF1\x82\xCD\x82\xC1\x82\xCF", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52"},
-    {/*"おうごんはっぱ"*/"\x82\xA8\x82\xA4\x82\xB2\x82\xF1\x82\xCD\x82\xC1\x82\xCF", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52"},
-    {/*"おうごんはっぱ"*/"\x82\xA8\x82\xA4\x82\xB2\x82\xF1\x82\xCD\x82\xC1\x82\xCF", /*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52"},
-    {/*"おうごんはっぱ"*/"\x82\xA8\x82\xA4\x82\xB2\x82\xF1\x82\xCD\x82\xC1\x82\xCF", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52"},
-    {/*"おうごんはっぱ"*/"\x82\xA8\x82\xA4\x82\xB2\x82\xF1\x82\xCD\x82\xC1\x82\xCF", /*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52", /*"こうちゃキノコ"*/"\x82\xB1\x82\xA4\x82\xBF\x82\xE1\x83\x4C\x83\x6D\x83\x52"},
-    {/*"おうごんはっぱ"*/"\x82\xA8\x82\xA4\x82\xB2\x82\xF1\x82\xCD\x82\xC1\x82\xCF", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"トロピコマンゴー"*/"\x83\x67\x83\x8D\x83\x73\x83\x52\x83\x7D\x83\x93\x83\x53\x81\x5B", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"トロピコマンゴー"*/"\x83\x67\x83\x8D\x83\x73\x83\x52\x83\x7D\x83\x93\x83\x53\x81\x5B", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"トロピコマンゴー"*/"\x83\x67\x83\x8D\x83\x73\x83\x52\x83\x7D\x83\x93\x83\x53\x81\x5B", /*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"トロピコマンゴー"*/"\x83\x67\x83\x8D\x83\x73\x83\x52\x83\x7D\x83\x93\x83\x53\x81\x5B", /*"ハニーシロップ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"フルーツパフェ"*/"\x83\x74\x83\x8B\x81\x5B\x83\x63\x83\x70\x83\x74\x83\x46"},
-    {/*"トロピコマンゴー"*/"\x83\x67\x83\x8D\x83\x73\x83\x52\x83\x7D\x83\x93\x83\x53\x81\x5B", /*"メイプルシロップ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"フルーツパフェ"*/"\x83\x74\x83\x8B\x81\x5B\x83\x63\x83\x70\x83\x74\x83\x46"},
-    {/*"トロピコマンゴー"*/"\x83\x67\x83\x8D\x83\x73\x83\x52\x83\x7D\x83\x93\x83\x53\x81\x5B", /*"ローヤルゼリー"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x5B\x83\x8A\x81\x5B", /*"フルーツパフェ"*/"\x83\x74\x83\x8B\x81\x5B\x83\x63\x83\x70\x83\x74\x83\x46"},
-    {/*"トロピコマンゴー"*/"\x83\x67\x83\x8D\x83\x73\x83\x52\x83\x7D\x83\x93\x83\x53\x81\x5B", /*"じわじわシロップ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x56\x83\x8D\x83\x62\x83\x76", /*"フルーツパフェ"*/"\x83\x74\x83\x8B\x81\x5B\x83\x63\x83\x70\x83\x74\x83\x46"},
-    {/*"トロピコマンゴー"*/"\x83\x67\x83\x8D\x83\x73\x83\x52\x83\x7D\x83\x93\x83\x53\x81\x5B", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"生パスタ"*/"\x90\xB6\x83\x70\x83\x58\x83\x5E", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"生パスタ"*/"\x90\xB6\x83\x70\x83\x58\x83\x5E", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"生パスタ"*/"\x90\xB6\x83\x70\x83\x58\x83\x5E", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"生パスタ"*/"\x90\xB6\x83\x70\x83\x58\x83\x5E", /*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"ナンシースペシャル"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x58\x83\x79\x83\x56\x83\x83\x83\x8B"},
-    {/*"生パスタ"*/"\x90\xB6\x83\x70\x83\x58\x83\x5E", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"生パスタ"*/"\x90\xB6\x83\x70\x83\x58\x83\x5E", /*"しなびたキノコ"*/"\x82\xB5\x82\xC8\x82\xD1\x82\xBD\x83\x4C\x83\x6D\x83\x52", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"生パスタ"*/"\x90\xB6\x83\x70\x83\x58\x83\x5E", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"生パスタ"*/"\x90\xB6\x83\x70\x83\x58\x83\x5E", /*"ふしぎなタマゴ"*/"\x82\xD3\x82\xB5\x82\xAC\x82\xC8\x83\x5E\x83\x7D\x83\x53", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"おかしのもと"*/"\x82\xA8\x82\xA9\x82\xB5\x82\xCC\x82\xE0\x82\xC6", /*"ファイアフラワー"*/"\x83\x74\x83\x40\x83\x43\x83\x41\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"ファイアキャンディ"*/"\x83\x74\x83\x40\x83\x43\x83\x41\x83\x4C\x83\x83\x83\x93\x83\x66\x83\x42"},
-    {/*"おかしのもと"*/"\x82\xA8\x82\xA9\x82\xB5\x82\xCC\x82\xE0\x82\xC6", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52", /*"びりびりキャンディ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x83\x83\x93\x83\x66\x83\x42"},
-    {/*"おかしのもと"*/"\x82\xA8\x82\xA9\x82\xB5\x82\xCC\x82\xE0\x82\xC6", /*"まどわせのこな"*/"\x82\xDC\x82\xC7\x82\xED\x82\xB9\x82\xCC\x82\xB1\x82\xC8", /*"メロメロケーキ"*/"\x83\x81\x83\x8D\x83\x81\x83\x8D\x83\x50\x81\x5B\x83\x4C"},
-    {/*"おかしのもと"*/"\x82\xA8\x82\xA9\x82\xB5\x82\xCC\x82\xE0\x82\xC6", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"キノコケーキ"*/"\x83\x4C\x83\x6D\x83\x52\x83\x50\x81\x5B\x83\x4C"},
-    {/*"おかしのもと"*/"\x82\xA8\x82\xA9\x82\xB5\x82\xCC\x82\xE0\x82\xC6", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"キノコケーキ"*/"\x83\x4C\x83\x6D\x83\x52\x83\x50\x81\x5B\x83\x4C"},
-    {/*"おかしのもと"*/"\x82\xA8\x82\xA9\x82\xB5\x82\xCC\x82\xE0\x82\xC6", /*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"キノコクレープ"*/"\x83\x4C\x83\x6D\x83\x52\x83\x4E\x83\x8C\x81\x5B\x83\x76"},
-    {/*"おかしのもと"*/"\x82\xA8\x82\xA9\x82\xB5\x82\xCC\x82\xE0\x82\xC6", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"キノコケーキ"*/"\x83\x4C\x83\x6D\x83\x52\x83\x50\x81\x5B\x83\x4C"},
-    {/*"おかしのもと"*/"\x82\xA8\x82\xA9\x82\xB5\x82\xCC\x82\xE0\x82\xC6", /*"ハニーシロップ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"ハニーあめ"*/"\x83\x6E\x83\x6A\x81\x5B\x82\xA0\x82\xDF"},
-    {/*"おかしのもと"*/"\x82\xA8\x82\xA9\x82\xB5\x82\xCC\x82\xE0\x82\xC6", /*"メイプルシロップ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"ナンシークッキー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x4E\x83\x62\x83\x4C\x81\x5B"},
-    {/*"おかしのもと"*/"\x82\xA8\x82\xA9\x82\xB5\x82\xCC\x82\xE0\x82\xC6", /*"ローヤルゼリー"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x5B\x83\x8A\x81\x5B", /*"ローヤルキャンディ"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x4C\x83\x83\x83\x93\x83\x66\x83\x42"},
-    {/*"おかしのもと"*/"\x82\xA8\x82\xA9\x82\xB5\x82\xCC\x82\xE0\x82\xC6", /*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52", /*"キノコケーキ"*/"\x83\x4C\x83\x6D\x83\x52\x83\x50\x81\x5B\x83\x4C"},
-    {/*"おかしのもと"*/"\x82\xA8\x82\xA9\x82\xB5\x82\xCC\x82\xE0\x82\xC6", /*"じわじわシロップ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x56\x83\x8D\x83\x62\x83\x76", /*"ナンシークッキー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x4E\x83\x62\x83\x4C\x81\x5B"},
-    {/*"おかしのもと"*/"\x82\xA8\x82\xA9\x82\xB5\x82\xCC\x82\xE0\x82\xC6", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"おかしのもと"*/"\x82\xA8\x82\xA9\x82\xB5\x82\xCC\x82\xE0\x82\xC6", /*"ふしぎなタマゴ"*/"\x82\xD3\x82\xB5\x82\xAC\x82\xC8\x83\x5E\x83\x7D\x83\x53", /*"ナンシークッキー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x4E\x83\x62\x83\x4C\x81\x5B"},
-    {/*"おかしのもと"*/"\x82\xA8\x82\xA9\x82\xB5\x82\xCC\x82\xE0\x82\xC6", /*"トロピコマンゴー"*/"\x83\x67\x83\x8D\x83\x73\x83\x52\x83\x7D\x83\x93\x83\x53\x81\x5B", /*"マンゴープディング"*/"\x83\x7D\x83\x93\x83\x53\x81\x5B\x83\x76\x83\x66\x83\x42\x83\x93\x83\x4F"},
-    {/*"レッド・カラリン"*/"\x83\x8C\x83\x62\x83\x68\x81\x45\x83\x4A\x83\x89\x83\x8A\x83\x93", /*"ファイアフラワー"*/"\x83\x74\x83\x40\x83\x43\x83\x41\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"あつあつスープ"*/"\x82\xA0\x82\xC2\x82\xA0\x82\xC2\x83\x58\x81\x5B\x83\x76"},
-    {/*"レッド・カラリン"*/"\x83\x8C\x83\x62\x83\x68\x81\x45\x83\x4A\x83\x89\x83\x8A\x83\x93", /*"しなびたキノコ"*/"\x82\xB5\x82\xC8\x82\xD1\x82\xBD\x83\x4C\x83\x6D\x83\x52", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52"},
-    {/*"レッド・カラリン"*/"\x83\x8C\x83\x62\x83\x68\x81\x45\x83\x4A\x83\x89\x83\x8A\x83\x93", /*"スッキリドリンク"*/"\x83\x58\x83\x62\x83\x4C\x83\x8A\x83\x68\x83\x8A\x83\x93\x83\x4E", /*"すみぢる"*/"\x82\xB7\x82\xDD\x82\xC0\x82\xE9"},
-    {/*"レッド・カラリン"*/"\x83\x8C\x83\x62\x83\x68\x81\x45\x83\x4A\x83\x89\x83\x8A\x83\x93", /*"ハニーシロップ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"スッキリドリンク"*/"\x83\x58\x83\x62\x83\x4C\x83\x8A\x83\x68\x83\x8A\x83\x93\x83\x4E"},
-    {/*"レッド・カラリン"*/"\x83\x8C\x83\x62\x83\x68\x81\x45\x83\x4A\x83\x89\x83\x8A\x83\x93", /*"メイプルシロップ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"スッキリドリンク"*/"\x83\x58\x83\x62\x83\x4C\x83\x8A\x83\x68\x83\x8A\x83\x93\x83\x4E"},
-    {/*"レッド・カラリン"*/"\x83\x8C\x83\x62\x83\x68\x81\x45\x83\x4A\x83\x89\x83\x8A\x83\x93", /*"ローヤルゼリー"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x5B\x83\x8A\x81\x5B", /*"スッキリドリンク"*/"\x83\x58\x83\x62\x83\x4C\x83\x8A\x83\x68\x83\x8A\x83\x93\x83\x4E"},
-    {/*"レッド・カラリン"*/"\x83\x8C\x83\x62\x83\x68\x81\x45\x83\x4A\x83\x89\x83\x8A\x83\x93", /*"生パスタ"*/"\x90\xB6\x83\x70\x83\x58\x83\x5E", /*"カラリーナパスタ"*/"\x83\x4A\x83\x89\x83\x8A\x81\x5B\x83\x69\x83\x70\x83\x58\x83\x5E"},
-    {/*"レッド・カラリン"*/"\x83\x8C\x83\x62\x83\x68\x81\x45\x83\x4A\x83\x89\x83\x8A\x83\x93", /*"おかしのもと"*/"\x82\xA8\x82\xA9\x82\xB5\x82\xCC\x82\xE0\x82\xC6", /*"ファイアキャンディ"*/"\x83\x74\x83\x40\x83\x43\x83\x41\x83\x4C\x83\x83\x83\x93\x83\x66\x83\x42"},
-    {/*"カメカメはっぱ"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x82\xCD\x82\xC1\x82\xCF", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52"},
-    {/*"カメカメはっぱ"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x82\xCD\x82\xC1\x82\xCF", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52"},
-    {/*"カメカメはっぱ"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x82\xCD\x82\xC1\x82\xCF", /*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52"},
-    {/*"カメカメはっぱ"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x82\xCD\x82\xC1\x82\xCF", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52"},
-    {/*"カメカメはっぱ"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x82\xCD\x82\xC1\x82\xCF", /*"ハニーシロップ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58"},
-    {/*"カメカメはっぱ"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x82\xCD\x82\xC1\x82\xCF", /*"メイプルシロップ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58"},
-    {/*"カメカメはっぱ"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x82\xCD\x82\xC1\x82\xCF", /*"ローヤルゼリー"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x5B\x83\x8A\x81\x5B", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58"},
-    {/*"カメカメはっぱ"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x82\xCD\x82\xC1\x82\xCF", /*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52", /*"こうちゃキノコ"*/"\x82\xB1\x82\xA4\x82\xBF\x82\xE1\x83\x4C\x83\x6D\x83\x52"},
-    {/*"カメカメはっぱ"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x82\xCD\x82\xC1\x82\xCF", /*"じわじわシロップ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x56\x83\x8D\x83\x62\x83\x76", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58"},
-    {/*"カメカメはっぱ"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x82\xCD\x82\xC1\x82\xCF", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"カメカメはっぱ"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x82\xCD\x82\xC1\x82\xCF", /*"おうごんはっぱ"*/"\x82\xA8\x82\xA4\x82\xB2\x82\xF1\x82\xCD\x82\xC1\x82\xCF", /*"ヘルスィーサラダ"*/"\x83\x77\x83\x8B\x83\x58\x83\x42\x81\x5B\x83\x54\x83\x89\x83\x5F"},
-    {/*"カメカメはっぱ"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x82\xCD\x82\xC1\x82\xCF", /*"トロピコマンゴー"*/"\x83\x67\x83\x8D\x83\x73\x83\x52\x83\x7D\x83\x93\x83\x53\x81\x5B", /*"カメまん"*/"\x83\x4A\x83\x81\x82\xDC\x82\xF1"},
-    {/*"カメカメはっぱ"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x82\xCD\x82\xC1\x82\xCF", /*"生パスタ"*/"\x90\xB6\x83\x70\x83\x58\x83\x5E", /*"カメスパ"*/"\x83\x4A\x83\x81\x83\x58\x83\x70"},
-    {/*"カメカメはっぱ"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x82\xCD\x82\xC1\x82\xCF", /*"レッド・カラリン"*/"\x83\x8C\x83\x62\x83\x68\x81\x45\x83\x4A\x83\x89\x83\x8A\x83\x93", /*"すみぢる"*/"\x82\xB7\x82\xDD\x82\xC0\x82\xE9"},
-    {/*"つくしんぼ"*/"\x82\xC2\x82\xAD\x82\xB5\x82\xF1\x82\xDA", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"つくしんぼ"*/"\x82\xC2\x82\xAD\x82\xB5\x82\xF1\x82\xDA", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"つくしんぼ"*/"\x82\xC2\x82\xAD\x82\xB5\x82\xF1\x82\xDA", /*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"ナンシースペシャル"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x58\x83\x79\x83\x56\x83\x83\x83\x8B"},
-    {/*"つくしんぼ"*/"\x82\xC2\x82\xAD\x82\xB5\x82\xF1\x82\xDA", /*"きんきゅうキノコ"*/"\x82\xAB\x82\xF1\x82\xAB\x82\xE3\x82\xA4\x83\x4C\x83\x6D\x83\x52", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"つくしんぼ"*/"\x82\xC2\x82\xAD\x82\xB5\x82\xF1\x82\xDA", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"つくしんぼ"*/"\x82\xC2\x82\xAD\x82\xB5\x82\xF1\x82\xDA", /*"ふしぎなタマゴ"*/"\x82\xD3\x82\xB5\x82\xAC\x82\xC8\x83\x5E\x83\x7D\x83\x53", /*"キセツのオムレツ"*/"\x83\x4C\x83\x5A\x83\x63\x82\xCC\x83\x49\x83\x80\x83\x8C\x83\x63"},
-    {/*"つくしんぼ"*/"\x82\xC2\x82\xAD\x82\xB5\x82\xF1\x82\xDA", /*"カメカメはっぱ"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x82\xCD\x82\xC1\x82\xCF", /*"ヘルスィーサラダ"*/"\x83\x77\x83\x8B\x83\x58\x83\x42\x81\x5B\x83\x54\x83\x89\x83\x5F"},
-    {/*"ピチピーチ"*/"\x83\x73\x83\x60\x83\x73\x81\x5B\x83\x60", /*"びりびりキノコ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x6D\x83\x52", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"ピチピーチ"*/"\x83\x73\x83\x60\x83\x73\x81\x5B\x83\x60", /*"まどわせのこな"*/"\x82\xDC\x82\xC7\x82\xED\x82\xB9\x82\xCC\x82\xB1\x82\xC8", /*"メロメロケーキ"*/"\x83\x81\x83\x8D\x83\x81\x83\x8D\x83\x50\x81\x5B\x83\x4C"},
-    {/*"ピチピーチ"*/"\x83\x73\x83\x60\x83\x73\x81\x5B\x83\x60", /*"スーパーキノコ"*/"\x83\x58\x81\x5B\x83\x70\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"ピチピーチ"*/"\x83\x73\x83\x60\x83\x73\x81\x5B\x83\x60", /*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"ピチピーチ"*/"\x83\x73\x83\x60\x83\x73\x81\x5B\x83\x60", /*"しなびたキノコ"*/"\x82\xB5\x82\xC8\x82\xD1\x82\xBD\x83\x4C\x83\x6D\x83\x52", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52"},
-    {/*"ピチピーチ"*/"\x83\x73\x83\x60\x83\x73\x81\x5B\x83\x60", /*"ハニーシロップ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"フルーツパフェ"*/"\x83\x74\x83\x8B\x81\x5B\x83\x63\x83\x70\x83\x74\x83\x46"},
-    {/*"ピチピーチ"*/"\x83\x73\x83\x60\x83\x73\x81\x5B\x83\x60", /*"メイプルシロップ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x56\x83\x8D\x83\x62\x83\x76", /*"フルーツパフェ"*/"\x83\x74\x83\x8B\x81\x5B\x83\x63\x83\x70\x83\x74\x83\x46"},
-    {/*"ピチピーチ"*/"\x83\x73\x83\x60\x83\x73\x81\x5B\x83\x60", /*"ローヤルゼリー"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x5B\x83\x8A\x81\x5B", /*"フルーツパフェ"*/"\x83\x74\x83\x8B\x81\x5B\x83\x63\x83\x70\x83\x74\x83\x46"},
-    {/*"ピチピーチ"*/"\x83\x73\x83\x60\x83\x73\x81\x5B\x83\x60", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ピチピーチ"*/"\x83\x73\x83\x60\x83\x73\x81\x5B\x83\x60", /*"トロピコマンゴー"*/"\x83\x67\x83\x8D\x83\x73\x83\x52\x83\x7D\x83\x93\x83\x53\x81\x5B", /*"フルーツパフェ"*/"\x83\x74\x83\x8B\x81\x5B\x83\x63\x83\x70\x83\x74\x83\x46"},
-    {/*"ピチピーチ"*/"\x83\x73\x83\x60\x83\x73\x81\x5B\x83\x60", /*"おかしのもと"*/"\x82\xA8\x82\xA9\x82\xB5\x82\xCC\x82\xE0\x82\xC6", /*"ピーチタルト"*/"\x83\x73\x81\x5B\x83\x60\x83\x5E\x83\x8B\x83\x67"},
-    {/*"ピチピーチ"*/"\x83\x73\x83\x60\x83\x73\x81\x5B\x83\x60", /*"レッド・カラリン"*/"\x83\x8C\x83\x62\x83\x68\x81\x45\x83\x4A\x83\x89\x83\x8A\x83\x93", /*"スッキリドリンク"*/"\x83\x58\x83\x62\x83\x4C\x83\x8A\x83\x68\x83\x8A\x83\x93\x83\x4E"},
-    {/*"ヤシの実"*/"\x83\x84\x83\x56\x82\xCC\x8E\xC0", /*"ファイアフラワー"*/"\x83\x74\x83\x40\x83\x43\x83\x41\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"ココナッツボム"*/"\x83\x52\x83\x52\x83\x69\x83\x62\x83\x63\x83\x7B\x83\x80"},
-    {/*"ヤシの実"*/"\x83\x84\x83\x56\x82\xCC\x8E\xC0", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ヤシの実"*/"\x83\x84\x83\x56\x82\xCC\x8E\xC0", /*"トロピコマンゴー"*/"\x83\x67\x83\x8D\x83\x73\x83\x52\x83\x7D\x83\x93\x83\x53\x81\x5B", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58"},
-    {/*"ヤシの実"*/"\x83\x84\x83\x56\x82\xCC\x8E\xC0", /*"生パスタ"*/"\x90\xB6\x83\x70\x83\x58\x83\x5E", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"ヤシの実"*/"\x83\x84\x83\x56\x82\xCC\x8E\xC0", /*"おかしのもと"*/"\x82\xA8\x82\xA9\x82\xB5\x82\xCC\x82\xE0\x82\xC6", /*"ココナツキャンディ"*/"\x83\x52\x83\x52\x83\x69\x83\x63\x83\x4C\x83\x83\x83\x93\x83\x66\x83\x42"},
-    {/*"ヤシの実"*/"\x83\x84\x83\x56\x82\xCC\x8E\xC0", /*"カメカメはっぱ"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x82\xCD\x82\xC1\x82\xCF", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58"},
-    {/*"ヤシの実"*/"\x83\x84\x83\x56\x82\xCC\x8E\xC0", /*"ピチピーチ"*/"\x83\x73\x83\x60\x83\x73\x81\x5B\x83\x60", /*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58"},
-    {/*"キノコいため"*/"\x83\x4C\x83\x6D\x83\x52\x82\xA2\x82\xBD\x82\xDF", /*"キラキラおとし"*/"\x83\x4C\x83\x89\x83\x4C\x83\x89\x82\xA8\x82\xC6\x82\xB5", /*"ほしふるディナー"*/"\x82\xD9\x82\xB5\x82\xD3\x82\xE9\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"キノコいため"*/"\x83\x4C\x83\x6D\x83\x52\x82\xA2\x82\xBD\x82\xDF", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"キノコホイルやき"*/"\x83\x4C\x83\x6D\x83\x52\x83\x7A\x83\x43\x83\x8B\x82\xE2\x82\xAB", /*"キラキラおとし"*/"\x83\x4C\x83\x89\x83\x4C\x83\x89\x82\xA8\x82\xC6\x82\xB5", /*"ほしふるディナー"*/"\x82\xD9\x82\xB5\x82\xD3\x82\xE9\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"キノコホイルやき"*/"\x83\x4C\x83\x6D\x83\x52\x83\x7A\x83\x43\x83\x8B\x82\xE2\x82\xAB", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"キノコステーキ"*/"\x83\x4C\x83\x6D\x83\x52\x83\x58\x83\x65\x81\x5B\x83\x4C", /*"キラキラおとし"*/"\x83\x4C\x83\x89\x83\x4C\x83\x89\x82\xA8\x82\xC6\x82\xB5", /*"ほしふるディナー"*/"\x82\xD9\x82\xB5\x82\xD3\x82\xE9\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"キノコステーキ"*/"\x83\x4C\x83\x6D\x83\x52\x83\x58\x83\x65\x81\x5B\x83\x4C", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"しっぱいりょうり"*/"\x82\xB5\x82\xC1\x82\xCF\x82\xA2\x82\xE8\x82\xE5\x82\xA4\x82\xE8", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ハニーキノコ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x4C\x83\x6D\x83\x52", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"メイプルキノコ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x4C\x83\x6D\x83\x52", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ローヤルキノコ"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x4C\x83\x6D\x83\x52", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ハニーキノコＳ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x4C\x83\x6D\x83\x52\x82\x72", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"メイプルキノコＳ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x4C\x83\x6D\x83\x52\x82\x72", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ローヤルキノコＳ"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x4C\x83\x6D\x83\x52\x82\x72", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ハニーキノコＺ"*/"\x83\x6E\x83\x6A\x81\x5B\x83\x4C\x83\x6D\x83\x52\x82\x79", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"メイプルキノコＺ"*/"\x83\x81\x83\x43\x83\x76\x83\x8B\x83\x4C\x83\x6D\x83\x52\x82\x79", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ローヤルキノコＺ"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x4C\x83\x6D\x83\x52\x82\x79", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B", /*"カチカチコウラ"*/"\x83\x4A\x83\x60\x83\x4A\x83\x60\x83\x52\x83\x45\x83\x89", /*"カチカチりょうり"*/"\x83\x4A\x83\x60\x83\x4A\x83\x60\x82\xE8\x82\xE5\x82\xA4\x82\xE8"},
-    {/*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ナンシースペシャル"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x58\x83\x79\x83\x56\x83\x83\x83\x8B", /*"カチカチコウラ"*/"\x83\x4A\x83\x60\x83\x4A\x83\x60\x83\x52\x83\x45\x83\x89", /*"カチカチりょうり"*/"\x83\x4A\x83\x60\x83\x4A\x83\x60\x82\xE8\x82\xE5\x82\xA4\x82\xE8"},
-    {/*"ナンシースペシャル"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x58\x83\x79\x83\x56\x83\x83\x83\x8B", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ナンシーデラックス"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x89\x83\x62\x83\x4E\x83\x58", /*"カチカチコウラ"*/"\x83\x4A\x83\x60\x83\x4A\x83\x60\x83\x52\x83\x45\x83\x89", /*"カチカチりょうり"*/"\x83\x4A\x83\x60\x83\x4A\x83\x60\x82\xE8\x82\xE5\x82\xA4\x82\xE8"},
-    {/*"ナンシーデラックス"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x89\x83\x62\x83\x4E\x83\x58", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ナンシーダイナマイ"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x5F\x83\x43\x83\x69\x83\x7D\x83\x43", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"バクハツタマゴ"*/"\x83\x6F\x83\x4E\x83\x6E\x83\x63\x83\x5E\x83\x7D\x83\x53"},
-    {/*"ナンシーティー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x65\x83\x42\x81\x5B", /*"レッド・カラリン"*/"\x83\x8C\x83\x62\x83\x68\x81\x45\x83\x4A\x83\x89\x83\x8A\x83\x93", /*"すみぢる"*/"\x82\xB7\x82\xDD\x82\xC0\x82\xE9"},
-    {/*"ゆきうさぎ"*/"\x82\xE4\x82\xAB\x82\xA4\x82\xB3\x82\xAC", /*"あつあつスープ"*/"\x82\xA0\x82\xC2\x82\xA0\x82\xC2\x83\x58\x81\x5B\x83\x76", /*"いつまでもふたりで"*/"\x82\xA2\x82\xC2\x82\xDC\x82\xC5\x82\xE0\x82\xD3\x82\xBD\x82\xE8\x82\xC5"},
-    {/*"キノコケーキ"*/"\x83\x4C\x83\x6D\x83\x52\x83\x50\x81\x5B\x83\x4C", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"キノコクレープ"*/"\x83\x4C\x83\x6D\x83\x52\x83\x4E\x83\x8C\x81\x5B\x83\x76", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ムースケーキ"*/"\x83\x80\x81\x5B\x83\x58\x83\x50\x81\x5B\x83\x4C", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"フルーツパフェ"*/"\x83\x74\x83\x8B\x81\x5B\x83\x63\x83\x70\x83\x74\x83\x46", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"バクハツタマゴ"*/"\x83\x6F\x83\x4E\x83\x6E\x83\x63\x83\x5E\x83\x7D\x83\x53", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"イカスミパスタ"*/"\x83\x43\x83\x4A\x83\x58\x83\x7E\x83\x70\x83\x58\x83\x5E", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"スパゲティ"*/"\x83\x58\x83\x70\x83\x51\x83\x65\x83\x42", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"スパゲティ"*/"\x83\x58\x83\x70\x83\x51\x83\x65\x83\x42", /*"レッド・カラリン"*/"\x83\x8C\x83\x62\x83\x68\x81\x45\x83\x4A\x83\x89\x83\x8A\x83\x93", /*"カラリーナパスタ"*/"\x83\x4A\x83\x89\x83\x8A\x81\x5B\x83\x69\x83\x70\x83\x58\x83\x5E"},
-    {/*"スパゲティ"*/"\x83\x58\x83\x70\x83\x51\x83\x65\x83\x42", /*"カメカメはっぱ"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x82\xCD\x82\xC1\x82\xCF", /*"カメスパ"*/"\x83\x4A\x83\x81\x83\x58\x83\x70"},
-    {/*"こうちゃキノコ"*/"\x82\xB1\x82\xA4\x82\xBF\x82\xE1\x83\x4C\x83\x6D\x83\x52", /*"レッド・カラリン"*/"\x83\x8C\x83\x62\x83\x68\x81\x45\x83\x4A\x83\x89\x83\x8A\x83\x93", /*"すみぢる"*/"\x82\xB7\x82\xDD\x82\xC0\x82\xE9"},
-    {/*"どくキノコ"*/"\x82\xC7\x82\xAD\x83\x4C\x83\x6D\x83\x52", /*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"ウルトラキノコ"*/"\x83\x45\x83\x8B\x83\x67\x83\x89\x83\x4C\x83\x6D\x83\x52"},
-    {/*"どくキノコ"*/"\x82\xC7\x82\xAD\x83\x4C\x83\x6D\x83\x52", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"どくキノコ"*/"\x82\xC7\x82\xAD\x83\x4C\x83\x6D\x83\x52", /*"おうごんはっぱ"*/"\x82\xA8\x82\xA4\x82\xB2\x82\xF1\x82\xCD\x82\xC1\x82\xCF", /*"こうちゃキノコ"*/"\x82\xB1\x82\xA4\x82\xBF\x82\xE1\x83\x4C\x83\x6D\x83\x52"},
-    {/*"ショコラケーキ"*/"\x83\x56\x83\x87\x83\x52\x83\x89\x83\x50\x81\x5B\x83\x4C", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"マンゴープディング"*/"\x83\x7D\x83\x93\x83\x53\x81\x5B\x83\x76\x83\x66\x83\x42\x83\x93\x83\x4F", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"マンゴープディング"*/"\x83\x7D\x83\x93\x83\x53\x81\x5B\x83\x76\x83\x66\x83\x42\x83\x93\x83\x4F", /*"ふしぎなタマゴ"*/"\x82\xD3\x82\xB5\x82\xAC\x82\xC8\x83\x5E\x83\x7D\x83\x53", /*"はつこいプディング"*/"\x82\xCD\x82\xC2\x82\xB1\x82\xA2\x83\x76\x83\x66\x83\x42\x83\x93\x83\x4F"},
-    {/*"はつこいプディング"*/"\x82\xCD\x82\xC2\x82\xB1\x82\xA2\x83\x76\x83\x66\x83\x42\x83\x93\x83\x4F", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ほしふるディナー"*/"\x82\xD9\x82\xB5\x82\xD3\x82\xE9\x83\x66\x83\x42\x83\x69\x81\x5B", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ほしふるディナー"*/"\x82\xD9\x82\xB5\x82\xD3\x82\xE9\x83\x66\x83\x42\x83\x69\x81\x5B", /*"フルーツパフェ"*/"\x83\x74\x83\x8B\x81\x5B\x83\x63\x83\x70\x83\x74\x83\x46", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"しれんのナベ"*/"\x82\xB5\x82\xEA\x82\xF1\x82\xCC\x83\x69\x83\x78", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"どくキノコ"*/"\x82\xC7\x82\xAD\x83\x4C\x83\x6D\x83\x52"},
-    {/*"いつまでもふたりで"*/"\x82\xA2\x82\xC2\x82\xDC\x82\xC5\x82\xE0\x82\xD3\x82\xBD\x82\xE8\x82\xC5", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"いつまでもふたりで"*/"\x82\xA2\x82\xC2\x82\xDC\x82\xC5\x82\xE0\x82\xD3\x82\xBD\x82\xE8\x82\xC5", /*"どくキノコ"*/"\x82\xC7\x82\xAD\x83\x4C\x83\x6D\x83\x52", /*"しれんのナベ"*/"\x82\xB5\x82\xEA\x82\xF1\x82\xCC\x83\x69\x83\x78"},
-    {/*"すみぢる"*/"\x82\xB7\x82\xDD\x82\xC0\x82\xE9", /*"じわじわキノコ"*/"\x82\xB6\x82\xED\x82\xB6\x82\xED\x83\x4C\x83\x6D\x83\x52", /*"どくキノコ"*/"\x82\xC7\x82\xAD\x83\x4C\x83\x6D\x83\x52"},
-    {/*"すみぢる"*/"\x82\xB7\x82\xDD\x82\xC0\x82\xE9", /*"生パスタ"*/"\x90\xB6\x83\x70\x83\x58\x83\x5E", /*"イカスミパスタ"*/"\x83\x43\x83\x4A\x83\x58\x83\x7E\x83\x70\x83\x58\x83\x5E"},
-    {/*"すみぢる"*/"\x82\xB7\x82\xDD\x82\xC0\x82\xE9", /*"おかしのもと"*/"\x82\xA8\x82\xA9\x82\xB5\x82\xCC\x82\xE0\x82\xC6", /*"ショコラケーキ"*/"\x83\x56\x83\x87\x83\x52\x83\x89\x83\x50\x81\x5B\x83\x4C"},
-    {/*"すみぢる"*/"\x82\xB7\x82\xDD\x82\xC0\x82\xE9", /*"ムースケーキ"*/"\x83\x80\x81\x5B\x83\x58\x83\x50\x81\x5B\x83\x4C", /*"ショコラケーキ"*/"\x83\x56\x83\x87\x83\x52\x83\x89\x83\x50\x81\x5B\x83\x4C"},
-    {/*"すみぢる"*/"\x82\xB7\x82\xDD\x82\xC0\x82\xE9", /*"スパゲティ"*/"\x83\x58\x83\x70\x83\x51\x83\x65\x83\x42", /*"イカスミパスタ"*/"\x83\x43\x83\x4A\x83\x58\x83\x7E\x83\x70\x83\x58\x83\x5E"},
-    {/*"キセツのオムレツ"*/"\x83\x4C\x83\x5A\x83\x63\x82\xCC\x83\x49\x83\x80\x83\x8C\x83\x63", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"カメカメティー"*/"\x83\x4A\x83\x81\x83\x4A\x83\x81\x83\x65\x83\x42\x81\x5B", /*"レッド・カラリン"*/"\x83\x8C\x83\x62\x83\x68\x81\x45\x83\x4A\x83\x89\x83\x8A\x83\x93", /*"すみぢる"*/"\x82\xB7\x82\xDD\x82\xC0\x82\xE9"},
-    {/*"カメスパ"*/"\x83\x4A\x83\x81\x83\x58\x83\x70", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"カメスパ"*/"\x83\x4A\x83\x81\x83\x58\x83\x70", /*"レッド・カラリン"*/"\x83\x8C\x83\x62\x83\x68\x81\x45\x83\x4A\x83\x89\x83\x8A\x83\x93", /*"カラリーナパスタ"*/"\x83\x4A\x83\x89\x83\x8A\x81\x5B\x83\x69\x83\x70\x83\x58\x83\x5E"},
-    {/*"カメスパ"*/"\x83\x4A\x83\x81\x83\x58\x83\x70", /*"すみぢる"*/"\x82\xB7\x82\xDD\x82\xC0\x82\xE9", /*"イカスミパスタ"*/"\x83\x43\x83\x4A\x83\x58\x83\x7E\x83\x70\x83\x58\x83\x5E"},
-    {/*"カラリーナパスタ"*/"\x83\x4A\x83\x89\x83\x8A\x81\x5B\x83\x69\x83\x70\x83\x58\x83\x5E", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"カラリーナパスタ"*/"\x83\x4A\x83\x89\x83\x8A\x81\x5B\x83\x69\x83\x70\x83\x58\x83\x5E", /*"ヤシの実"*/"\x83\x84\x83\x56\x82\xCC\x8E\xC0", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"カラリーナパスタ"*/"\x83\x4A\x83\x89\x83\x8A\x81\x5B\x83\x69\x83\x70\x83\x58\x83\x5E", /*"すみぢる"*/"\x82\xB7\x82\xDD\x82\xC0\x82\xE9", /*"イカスミパスタ"*/"\x83\x43\x83\x4A\x83\x58\x83\x7E\x83\x70\x83\x58\x83\x5E"},
-    {/*"メロメロケーキ"*/"\x83\x81\x83\x8D\x83\x81\x83\x8D\x83\x50\x81\x5B\x83\x4C", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ピーチタルト"*/"\x83\x73\x81\x5B\x83\x60\x83\x5E\x83\x8B\x83\x67", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"びりびりキャンディ"*/"\x82\xD1\x82\xE8\x82\xD1\x82\xE8\x83\x4C\x83\x83\x83\x93\x83\x66\x83\x42", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ファイアキャンディ"*/"\x83\x74\x83\x40\x83\x43\x83\x41\x83\x4C\x83\x83\x83\x93\x83\x66\x83\x42", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ハニーあめ"*/"\x83\x6E\x83\x6A\x81\x5B\x82\xA0\x82\xDF", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ココナツキャンディ"*/"\x83\x52\x83\x52\x83\x69\x83\x63\x83\x4C\x83\x83\x83\x93\x83\x66\x83\x42", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ローヤルキャンディ"*/"\x83\x8D\x81\x5B\x83\x84\x83\x8B\x83\x4C\x83\x83\x83\x93\x83\x66\x83\x42", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ナンシークッキー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x4E\x83\x62\x83\x4C\x81\x5B", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ヘルスィーサラダ"*/"\x83\x77\x83\x8B\x83\x58\x83\x42\x81\x5B\x83\x54\x83\x89\x83\x5F", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"ヘルスィーサラダ"*/"\x83\x77\x83\x8B\x83\x58\x83\x42\x81\x5B\x83\x54\x83\x89\x83\x5F", /*"生パスタ"*/"\x90\xB6\x83\x70\x83\x58\x83\x5E", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"ヘルスィーサラダ"*/"\x83\x77\x83\x8B\x83\x58\x83\x42\x81\x5B\x83\x54\x83\x89\x83\x5F", /*"キノコいため"*/"\x83\x4C\x83\x6D\x83\x52\x82\xA2\x82\xBD\x82\xDF", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"ヘルスィーサラダ"*/"\x83\x77\x83\x8B\x83\x58\x83\x42\x81\x5B\x83\x54\x83\x89\x83\x5F", /*"キノコホイルやき"*/"\x83\x4C\x83\x6D\x83\x52\x83\x7A\x83\x43\x83\x8B\x82\xE2\x82\xAB", /*"ナンシースペシャル"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x58\x83\x79\x83\x56\x83\x83\x83\x8B"},
-    {/*"ヘルスィーサラダ"*/"\x83\x77\x83\x8B\x83\x58\x83\x42\x81\x5B\x83\x54\x83\x89\x83\x5F", /*"キノコステーキ"*/"\x83\x4C\x83\x6D\x83\x52\x83\x58\x83\x65\x81\x5B\x83\x4C", /*"ナンシーデラックス"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x89\x83\x62\x83\x4E\x83\x58"},
-    {/*"ヘルスィーサラダ"*/"\x83\x77\x83\x8B\x83\x58\x83\x42\x81\x5B\x83\x54\x83\x89\x83\x5F", /*"イカスミパスタ"*/"\x83\x43\x83\x4A\x83\x58\x83\x7E\x83\x70\x83\x58\x83\x5E", /*"ナンシースペシャル"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x58\x83\x79\x83\x56\x83\x83\x83\x8B"},
-    {/*"ヘルスィーサラダ"*/"\x83\x77\x83\x8B\x83\x58\x83\x42\x81\x5B\x83\x54\x83\x89\x83\x5F", /*"スパゲティ"*/"\x83\x58\x83\x70\x83\x51\x83\x65\x83\x42", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"ヘルスィーサラダ"*/"\x83\x77\x83\x8B\x83\x58\x83\x42\x81\x5B\x83\x54\x83\x89\x83\x5F", /*"カメスパ"*/"\x83\x4A\x83\x81\x83\x58\x83\x70", /*"ナンシーディナー"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x42\x83\x69\x81\x5B"},
-    {/*"ヘルスィーサラダ"*/"\x83\x77\x83\x8B\x83\x58\x83\x42\x81\x5B\x83\x54\x83\x89\x83\x5F", /*"カラリーナパスタ"*/"\x83\x4A\x83\x89\x83\x8A\x81\x5B\x83\x69\x83\x70\x83\x58\x83\x5E", /*"ナンシースペシャル"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x58\x83\x79\x83\x56\x83\x83\x83\x8B"},
-    {/*"カメまん"*/"\x83\x4A\x83\x81\x82\xDC\x82\xF1", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"フレッシュジュース"*/"\x83\x74\x83\x8C\x83\x62\x83\x56\x83\x85\x83\x57\x83\x85\x81\x5B\x83\x58", /*"レッド・カラリン"*/"\x83\x8C\x83\x62\x83\x68\x81\x45\x83\x4A\x83\x89\x83\x8A\x83\x93", /*"すみぢる"*/"\x82\xB7\x82\xDD\x82\xC0\x82\xE9"},
-    {/*"たんこぶ"*/"\x82\xBD\x82\xF1\x82\xB1\x82\xD4", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"うちゅうしょく"*/"\x82\xA4\x82\xBF\x82\xE3\x82\xA4\x82\xB5\x82\xE5\x82\xAD"},
-    {/*"たんこぶ"*/"\x82\xBD\x82\xF1\x82\xB1\x82\xD4", /*"おうごんはっぱ"*/"\x82\xA8\x82\xA4\x82\xB2\x82\xF1\x82\xCD\x82\xC1\x82\xCF", /*"ナンシーデラックス"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x66\x83\x89\x83\x62\x83\x4E\x83\x58"},
-    {/*"きんかい"*/"\x82\xAB\x82\xF1\x82\xA9\x82\xA2", /*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"キノコ"*/"\x83\x4C\x83\x6D\x83\x52"},
-    {/*"きんかい×３"*/"\x82\xAB\x82\xF1\x82\xA9\x82\xA2\x81\x7E\x82\x52", /*"イレカエール"*/"\x83\x43\x83\x8C\x83\x4A\x83\x47\x81\x5B\x83\x8B", /*"きんかい"*/"\x82\xAB\x82\xF1\x82\xA9\x82\xA2"},
-    {/*"ココナッツボム"*/"\x83\x52\x83\x52\x83\x69\x83\x62\x83\x63\x83\x7B\x83\x80", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"ヤシの実"*/"\x83\x84\x83\x56\x82\xCC\x8E\xC0"},
-    {/*"ココナッツボム"*/"\x83\x52\x83\x52\x83\x69\x83\x62\x83\x63\x83\x7B\x83\x80", /*"バクハツタマゴ"*/"\x83\x6F\x83\x4E\x83\x6E\x83\x63\x83\x5E\x83\x7D\x83\x53", /*"ナンシーダイナマイ"*/"\x83\x69\x83\x93\x83\x56\x81\x5B\x83\x5F\x83\x43\x83\x69\x83\x7D\x83\x43"},
-    {/*"カチカチりょうり"*/"\x83\x4A\x83\x60\x83\x4A\x83\x60\x82\xE8\x82\xE5\x82\xA4\x82\xE8", /*"ドライフラワー"*/"\x83\x68\x83\x89\x83\x43\x83\x74\x83\x89\x83\x8F\x81\x5B", /*"カチカチコウラ"*/"\x83\x4A\x83\x60\x83\x4A\x83\x60\x83\x52\x83\x45\x83\x89"},
+    {"かみなりドッカン", "かみなりゴロゴロ", "しれんのナベ"},
+    {"キノコ", "かみなりゴロゴロ", "びりびりキノコ"},
+    {"キノコ", "かみなりドッカン", "びりびりキノコ"},
+    {"キノコ", "ファイアフラワー", "キノコホイルやき"},
+    {"キノコ", "びりびりキノコ", "キノコホイルやき"},
+    {"キノコ", "ふにゃふにゃくん", "しなびたキノコ"},
+    {"スーパーキノコ", "かみなりゴロゴロ", "びりびりキノコ"},
+    {"スーパーキノコ", "かみなりドッカン", "びりびりキノコ"},
+    {"スーパーキノコ", "ファイアフラワー", "ナンシーディナー"},
+    {"スーパーキノコ", "びりびりキノコ", "キノコホイルやき"},
+    {"スーパーキノコ", "ふにゃふにゃくん", "しなびたキノコ"},
+    {"スーパーキノコ", "キノコ", "キノコホイルやき"},
+    {"ウルトラキノコ", "かみなりゴロゴロ", "びりびりキノコ"},
+    {"ウルトラキノコ", "かみなりドッカン", "びりびりキノコ"},
+    {"ウルトラキノコ", "ファイアフラワー", "ナンシースペシャル"},
+    {"ウルトラキノコ", "びりびりキノコ", "キノコステーキ"},
+    {"ウルトラキノコ", "ふにゃふにゃくん", "しなびたキノコ"},
+    {"ウルトラキノコ", "キノコ", "キノコステーキ"},
+    {"ウルトラキノコ", "スーパーキノコ", "キノコステーキ"},
+    {"きんきゅうキノコ", "かみなりゴロゴロ", "びりびりキノコ"},
+    {"きんきゅうキノコ", "かみなりドッカン", "びりびりキノコ"},
+    {"きんきゅうキノコ", "ファイアフラワー", "ナンシーディナー"},
+    {"きんきゅうキノコ", "びりびりキノコ", "キノコホイルやき"},
+    {"きんきゅうキノコ", "ふにゃふにゃくん", "しなびたキノコ"},
+    {"きんきゅうキノコ", "キノコ", "キノコステーキ"},
+    {"きんきゅうキノコ", "スーパーキノコ", "キノコステーキ"},
+    {"きんきゅうキノコ", "ウルトラキノコ", "キノコステーキ"},
+    {"しなびたキノコ", "ファイアフラワー", "キノコいため"},
+    {"しなびたキノコ", "びりびりキノコ", "キノコいため"},
+    {"しなびたキノコ", "デカデカドリンク", "キノコ"},
+    {"しなびたキノコ", "キノコ", "キノコいため"},
+    {"しなびたキノコ", "スーパーキノコ", "キノコホイルやき"},
+    {"しなびたキノコ", "ウルトラキノコ", "キノコステーキ"},
+    {"しなびたキノコ", "きんきゅうキノコ", "キノコステーキ"},
+    {"ハニーシロップ", "こおりのいぶき", "アイスキャンディ"},
+    {"ハニーシロップ", "びりびりキノコ", "ハニーキノコ"},
+    {"ハニーシロップ", "キノコ", "ハニーキノコ"},
+    {"ハニーシロップ", "スーパーキノコ", "ハニーキノコＳ"},
+    {"ハニーシロップ", "ウルトラキノコ", "ハニーキノコＺ"},
+    {"ハニーシロップ", "きんきゅうキノコ", "ハニーキノコＳ"},
+    {"メイプルシロップ", "こおりのいぶき", "ナンシーフラッペ"},
+    {"メイプルシロップ", "びりびりキノコ", "メイプルキノコ"},
+    {"メイプルシロップ", "キノコ", "メイプルキノコ"},
+    {"メイプルシロップ", "スーパーキノコ", "メイプルキノコＳ"},
+    {"メイプルシロップ", "ウルトラキノコ", "メイプルキノコＺ"},
+    {"メイプルシロップ", "きんきゅうキノコ", "メイプルキノコＳ"},
+    {"メイプルシロップ", "ハニーシロップ", "フレッシュジュース"},
+    {"ローヤルゼリー", "こおりのいぶき", "ナンシーフラッペ"},
+    {"ローヤルゼリー", "びりびりキノコ", "ローヤルキノコ"},
+    {"ローヤルゼリー", "キノコ", "ローヤルキノコ"},
+    {"ローヤルゼリー", "スーパーキノコ", "ローヤルキノコＳ"},
+    {"ローヤルゼリー", "ウルトラキノコ", "ローヤルキノコＺ"},
+    {"ローヤルゼリー", "きんきゅうキノコ", "ローヤルキノコＳ"},
+    {"ローヤルゼリー", "ハニーシロップ", "フレッシュジュース"},
+    {"ローヤルゼリー", "メイプルシロップ", "ナンシーティー"},
+    {"じわじわキノコ", "かみなりゴロゴロ", "びりびりキノコ"},
+    {"じわじわキノコ", "かみなりドッカン", "びりびりキノコ"},
+    {"じわじわキノコ", "キラキラおとし", "ナンシーディナー"},
+    {"じわじわキノコ", "ファイアフラワー", "ナンシーディナー"},
+    {"じわじわキノコ", "びりびりキノコ", "キノコホイルやき"},
+    {"じわじわキノコ", "キノコ", "キノコホイルやき"},
+    {"じわじわキノコ", "スーパーキノコ", "ナンシーディナー"},
+    {"じわじわキノコ", "ウルトラキノコ", "ナンシースペシャル"},
+    {"じわじわキノコ", "きんきゅうキノコ", "ナンシーディナー"},
+    {"じわじわキノコ", "ハニーシロップ", "ハニーキノコ"},
+    {"じわじわキノコ", "メイプルシロップ", "メイプルキノコ"},
+    {"じわじわキノコ", "ローヤルゼリー", "メイプルキノコＳ"},
+    {"じわじわシロップ", "キノコ", "キノコホイルやき"},
+    {"じわじわシロップ", "スーパーキノコ", "ナンシーディナー"},
+    {"じわじわシロップ", "ウルトラキノコ", "ナンシースペシャル"},
+    {"じわじわシロップ", "きんきゅうキノコ", "ナンシーディナー"},
+    {"じわじわシロップ", "ハニーシロップ", "フレッシュジュース"},
+    {"じわじわシロップ", "メイプルシロップ", "フレッシュジュース"},
+    {"じわじわシロップ", "ローヤルゼリー", "フレッシュジュース"},
+    {"じわじわシロップ", "じわじわキノコ", "じわじわキノコ"},
+    {"イレカエール", "かみなりゴロゴロ", "ゆらゆらじしん"},
+    {"イレカエール", "かみなりドッカン", "キラキラおとし"},
+    {"イレカエール", "キラキラおとし", "かみなりドッカン"},
+    {"イレカエール", "こおりのいぶき", "ファイアフラワー"},
+    {"イレカエール", "ファイアフラワー", "こおりのいぶき"},
+    {"イレカエール", "ゆらゆらじしん", "かみなりゴロゴロ"},
+    {"イレカエール", "テレサのふく", "てきヨケール"},
+    {"イレカエール", "びりびりキノコ", "スーパーキノコ"},
+    {"イレカエール", "てきヨケール", "テレサのふく"},
+    {"イレカエール", "まどわせのこな", "しかえしのこな"},
+    {"イレカエール", "しかえしのこな", "まどわせのこな"},
+    {"イレカエール", "ねむれよいこよ", "スッキリドリンク"},
+    {"イレカエール", "デカデカドリンク", "ミニミニくん"},
+    {"イレカエール", "カチカチコウラ", "ふにゃふにゃくん"},
+    {"イレカエール", "ミニミニくん", "デカデカドリンク"},
+    {"イレカエール", "ふにゃふにゃくん", "カチカチコウラ"},
+    {"イレカエール", "キノコ", "ハニーシロップ"},
+    {"イレカエール", "スーパーキノコ", "メイプルシロップ"},
+    {"イレカエール", "ウルトラキノコ", "ローヤルゼリー"},
+    {"イレカエール", "きんきゅうキノコ", "スーパーキノコ"},
+    {"イレカエール", "しなびたキノコ", "キノコ"},
+    {"イレカエール", "スッキリドリンク", "ねむれよいこよ"},
+    {"イレカエール", "ハニーシロップ", "キノコ"},
+    {"イレカエール", "メイプルシロップ", "スーパーキノコ"},
+    {"イレカエール", "ローヤルゼリー", "ウルトラキノコ"},
+    {"イレカエール", "じわじわキノコ", "どくキノコ"},
+    {"イレカエール", "じわじわシロップ", "ハニーシロップ"},
+    {"ドライフラワー", "ファイアフラワー", "あつあつスープ"},
+    {"ドライフラワー", "びりびりキノコ", "かみなりドッカン"},
+    {"ドライフラワー", "キノコ", "うちゅうしょく"},
+    {"ドライフラワー", "スーパーキノコ", "うちゅうしょく"},
+    {"ドライフラワー", "ウルトラキノコ", "うちゅうしょく"},
+    {"ドライフラワー", "きんきゅうキノコ", "うちゅうしょく"},
+    {"ドライフラワー", "しなびたキノコ", "うちゅうしょく"},
+    {"ドライフラワー", "じわじわキノコ", "うちゅうしょく"},
+    {"ドライフラワー", "ホットドッグ", "うちゅうしょく"},
+    {"ふしぎなタマゴ", "ファイアフラワー", "バクハツタマゴ"},
+    {"ふしぎなタマゴ", "キノコ", "キセツのオムレツ"},
+    {"ふしぎなタマゴ", "スーパーキノコ", "キセツのオムレツ"},
+    {"ふしぎなタマゴ", "ウルトラキノコ", "キセツのオムレツ"},
+    {"ふしぎなタマゴ", "きんきゅうキノコ", "キセツのオムレツ"},
+    {"ふしぎなタマゴ", "ドライフラワー", "うちゅうしょく"},
+    {"おうごんはっぱ", "こおりのいぶき", "ゆきうさぎ"},
+    {"おうごんはっぱ", "キノコ", "きんきゅうキノコ"},
+    {"おうごんはっぱ", "スーパーキノコ", "きんきゅうキノコ"},
+    {"おうごんはっぱ", "ウルトラキノコ", "きんきゅうキノコ"},
+    {"おうごんはっぱ", "きんきゅうキノコ", "きんきゅうキノコ"},
+    {"おうごんはっぱ", "じわじわキノコ", "こうちゃキノコ"},
+    {"おうごんはっぱ", "ドライフラワー", "うちゅうしょく"},
+    {"トロピコマンゴー", "びりびりキノコ", "ナンシーディナー"},
+    {"トロピコマンゴー", "スーパーキノコ", "ナンシーディナー"},
+    {"トロピコマンゴー", "ウルトラキノコ", "ナンシーディナー"},
+    {"トロピコマンゴー", "ハニーシロップ", "フルーツパフェ"},
+    {"トロピコマンゴー", "メイプルシロップ", "フルーツパフェ"},
+    {"トロピコマンゴー", "ローヤルゼリー", "フルーツパフェ"},
+    {"トロピコマンゴー", "じわじわシロップ", "フルーツパフェ"},
+    {"トロピコマンゴー", "ドライフラワー", "うちゅうしょく"},
+    {"生パスタ", "びりびりキノコ", "ナンシーディナー"},
+    {"生パスタ", "キノコ", "ナンシーディナー"},
+    {"生パスタ", "スーパーキノコ", "ナンシーディナー"},
+    {"生パスタ", "ウルトラキノコ", "ナンシースペシャル"},
+    {"生パスタ", "きんきゅうキノコ", "ナンシーディナー"},
+    {"生パスタ", "しなびたキノコ", "ナンシーディナー"},
+    {"生パスタ", "ドライフラワー", "うちゅうしょく"},
+    {"生パスタ", "ふしぎなタマゴ", "ナンシーディナー"},
+    {"おかしのもと", "ファイアフラワー", "ファイアキャンディ"},
+    {"おかしのもと", "びりびりキノコ", "びりびりキャンディ"},
+    {"おかしのもと", "まどわせのこな", "メロメロケーキ"},
+    {"おかしのもと", "キノコ", "キノコケーキ"},
+    {"おかしのもと", "スーパーキノコ", "キノコケーキ"},
+    {"おかしのもと", "ウルトラキノコ", "キノコクレープ"},
+    {"おかしのもと", "きんきゅうキノコ", "キノコケーキ"},
+    {"おかしのもと", "ハニーシロップ", "ハニーあめ"},
+    {"おかしのもと", "メイプルシロップ", "ナンシークッキー"},
+    {"おかしのもと", "ローヤルゼリー", "ローヤルキャンディ"},
+    {"おかしのもと", "じわじわキノコ", "キノコケーキ"},
+    {"おかしのもと", "じわじわシロップ", "ナンシークッキー"},
+    {"おかしのもと", "ドライフラワー", "うちゅうしょく"},
+    {"おかしのもと", "ふしぎなタマゴ", "ナンシークッキー"},
+    {"おかしのもと", "トロピコマンゴー", "マンゴープディング"},
+    {"レッド・カラリン", "ファイアフラワー", "あつあつスープ"},
+    {"レッド・カラリン", "しなびたキノコ", "キノコ"},
+    {"レッド・カラリン", "スッキリドリンク", "すみぢる"},
+    {"レッド・カラリン", "ハニーシロップ", "スッキリドリンク"},
+    {"レッド・カラリン", "メイプルシロップ", "スッキリドリンク"},
+    {"レッド・カラリン", "ローヤルゼリー", "スッキリドリンク"},
+    {"レッド・カラリン", "生パスタ", "カラリーナパスタ"},
+    {"レッド・カラリン", "おかしのもと", "ファイアキャンディ"},
+    {"カメカメはっぱ", "キノコ", "きんきゅうキノコ"},
+    {"カメカメはっぱ", "スーパーキノコ", "きんきゅうキノコ"},
+    {"カメカメはっぱ", "ウルトラキノコ", "きんきゅうキノコ"},
+    {"カメカメはっぱ", "きんきゅうキノコ", "きんきゅうキノコ"},
+    {"カメカメはっぱ", "ハニーシロップ", "フレッシュジュース"},
+    {"カメカメはっぱ", "メイプルシロップ", "フレッシュジュース"},
+    {"カメカメはっぱ", "ローヤルゼリー", "フレッシュジュース"},
+    {"カメカメはっぱ", "じわじわキノコ", "こうちゃキノコ"},
+    {"カメカメはっぱ", "じわじわシロップ", "フレッシュジュース"},
+    {"カメカメはっぱ", "ドライフラワー", "うちゅうしょく"},
+    {"カメカメはっぱ", "おうごんはっぱ", "ヘルスィーサラダ"},
+    {"カメカメはっぱ", "トロピコマンゴー", "カメまん"},
+    {"カメカメはっぱ", "生パスタ", "カメスパ"},
+    {"カメカメはっぱ", "レッド・カラリン", "すみぢる"},
+    {"つくしんぼ", "キノコ", "ナンシーディナー"},
+    {"つくしんぼ", "スーパーキノコ", "ナンシーディナー"},
+    {"つくしんぼ", "ウルトラキノコ", "ナンシースペシャル"},
+    {"つくしんぼ", "きんきゅうキノコ", "ナンシーディナー"},
+    {"つくしんぼ", "ドライフラワー", "うちゅうしょく"},
+    {"つくしんぼ", "ふしぎなタマゴ", "キセツのオムレツ"},
+    {"つくしんぼ", "カメカメはっぱ", "ヘルスィーサラダ"},
+    {"ピチピーチ", "びりびりキノコ", "ナンシーディナー"},
+    {"ピチピーチ", "まどわせのこな", "メロメロケーキ"},
+    {"ピチピーチ", "スーパーキノコ", "ナンシーディナー"},
+    {"ピチピーチ", "ウルトラキノコ", "ナンシーディナー"},
+    {"ピチピーチ", "しなびたキノコ", "キノコ"},
+    {"ピチピーチ", "ハニーシロップ", "フルーツパフェ"},
+    {"ピチピーチ", "メイプルシロップ", "フルーツパフェ"},
+    {"ピチピーチ", "ローヤルゼリー", "フルーツパフェ"},
+    {"ピチピーチ", "ドライフラワー", "うちゅうしょく"},
+    {"ピチピーチ", "トロピコマンゴー", "フルーツパフェ"},
+    {"ピチピーチ", "おかしのもと", "ピーチタルト"},
+    {"ピチピーチ", "レッド・カラリン", "スッキリドリンク"},
+    {"ヤシの実", "ファイアフラワー", "ココナッツボム"},
+    {"ヤシの実", "ドライフラワー", "うちゅうしょく"},
+    {"ヤシの実", "トロピコマンゴー", "フレッシュジュース"},
+    {"ヤシの実", "生パスタ", "ナンシーディナー"},
+    {"ヤシの実", "おかしのもと", "ココナツキャンディ"},
+    {"ヤシの実", "カメカメはっぱ", "フレッシュジュース"},
+    {"ヤシの実", "ピチピーチ", "フレッシュジュース"},
+    {"キノコいため", "キラキラおとし", "ほしふるディナー"},
+    {"キノコいため", "ドライフラワー", "うちゅうしょく"},
+    {"キノコホイルやき", "キラキラおとし", "ほしふるディナー"},
+    {"キノコホイルやき", "ドライフラワー", "うちゅうしょく"},
+    {"キノコステーキ", "キラキラおとし", "ほしふるディナー"},
+    {"キノコステーキ", "ドライフラワー", "うちゅうしょく"},
+    {"しっぱいりょうり", "ドライフラワー", "うちゅうしょく"},
+    {"ハニーキノコ", "ドライフラワー", "うちゅうしょく"},
+    {"メイプルキノコ", "ドライフラワー", "うちゅうしょく"},
+    {"ローヤルキノコ", "ドライフラワー", "うちゅうしょく"},
+    {"ハニーキノコＳ", "ドライフラワー", "うちゅうしょく"},
+    {"メイプルキノコＳ", "ドライフラワー", "うちゅうしょく"},
+    {"ローヤルキノコＳ", "ドライフラワー", "うちゅうしょく"},
+    {"ハニーキノコＺ", "ドライフラワー", "うちゅうしょく"},
+    {"メイプルキノコＺ", "ドライフラワー", "うちゅうしょく"},
+    {"ローヤルキノコＺ", "ドライフラワー", "うちゅうしょく"},
+    {"ナンシーディナー", "カチカチコウラ", "カチカチりょうり"},
+    {"ナンシーディナー", "ドライフラワー", "うちゅうしょく"},
+    {"ナンシースペシャル", "カチカチコウラ", "カチカチりょうり"},
+    {"ナンシースペシャル", "ドライフラワー", "うちゅうしょく"},
+    {"ナンシーデラックス", "カチカチコウラ", "カチカチりょうり"},
+    {"ナンシーデラックス", "ドライフラワー", "うちゅうしょく"},
+    {"ナンシーダイナマイ", "ドライフラワー", "バクハツタマゴ"},
+    {"ナンシーティー", "レッド・カラリン", "すみぢる"},
+    {"ゆきうさぎ", "あつあつスープ", "いつまでもふたりで"},
+    {"キノコケーキ", "ドライフラワー", "うちゅうしょく"},
+    {"キノコクレープ", "ドライフラワー", "うちゅうしょく"},
+    {"ムースケーキ", "ドライフラワー", "うちゅうしょく"},
+    {"フルーツパフェ", "ドライフラワー", "うちゅうしょく"},
+    {"バクハツタマゴ", "ドライフラワー", "うちゅうしょく"},
+    {"イカスミパスタ", "ドライフラワー", "うちゅうしょく"},
+    {"スパゲティ", "ドライフラワー", "うちゅうしょく"},
+    {"スパゲティ", "レッド・カラリン", "カラリーナパスタ"},
+    {"スパゲティ", "カメカメはっぱ", "カメスパ"},
+    {"こうちゃキノコ", "レッド・カラリン", "すみぢる"},
+    {"どくキノコ", "イレカエール", "ウルトラキノコ"},
+    {"どくキノコ", "ドライフラワー", "うちゅうしょく"},
+    {"どくキノコ", "おうごんはっぱ", "こうちゃキノコ"},
+    {"ショコラケーキ", "ドライフラワー", "うちゅうしょく"},
+    {"マンゴープディング", "ドライフラワー", "うちゅうしょく"},
+    {"マンゴープディング", "ふしぎなタマゴ", "はつこいプディング"},
+    {"はつこいプディング", "ドライフラワー", "うちゅうしょく"},
+    {"ほしふるディナー", "ドライフラワー", "うちゅうしょく"},
+    {"ほしふるディナー", "フルーツパフェ", "ナンシーディナー"},
+    {"しれんのナベ", "ドライフラワー", "どくキノコ"},
+    {"いつまでもふたりで", "ドライフラワー", "うちゅうしょく"},
+    {"いつまでもふたりで", "どくキノコ", "しれんのナベ"},
+    {"すみぢる", "じわじわキノコ", "どくキノコ"},
+    {"すみぢる", "生パスタ", "イカスミパスタ"},
+    {"すみぢる", "おかしのもと", "ショコラケーキ"},
+    {"すみぢる", "ムースケーキ", "ショコラケーキ"},
+    {"すみぢる", "スパゲティ", "イカスミパスタ"},
+    {"キセツのオムレツ", "ドライフラワー", "うちゅうしょく"},
+    {"カメカメティー", "レッド・カラリン", "すみぢる"},
+    {"カメスパ", "ドライフラワー", "うちゅうしょく"},
+    {"カメスパ", "レッド・カラリン", "カラリーナパスタ"},
+    {"カメスパ", "すみぢる", "イカスミパスタ"},
+    {"カラリーナパスタ", "ドライフラワー", "うちゅうしょく"},
+    {"カラリーナパスタ", "ヤシの実", "ナンシーディナー"},
+    {"カラリーナパスタ", "すみぢる", "イカスミパスタ"},
+    {"メロメロケーキ", "ドライフラワー", "うちゅうしょく"},
+    {"ピーチタルト", "ドライフラワー", "うちゅうしょく"},
+    {"びりびりキャンディ", "ドライフラワー", "うちゅうしょく"},
+    {"ファイアキャンディ", "ドライフラワー", "うちゅうしょく"},
+    {"ハニーあめ", "ドライフラワー", "うちゅうしょく"},
+    {"ココナツキャンディ", "ドライフラワー", "うちゅうしょく"},
+    {"ローヤルキャンディ", "ドライフラワー", "うちゅうしょく"},
+    {"ナンシークッキー", "ドライフラワー", "うちゅうしょく"},
+    {"ヘルスィーサラダ", "ドライフラワー", "うちゅうしょく"},
+    {"ヘルスィーサラダ", "生パスタ", "ナンシーディナー"},
+    {"ヘルスィーサラダ", "キノコいため", "ナンシーディナー"},
+    {"ヘルスィーサラダ", "キノコホイルやき", "ナンシースペシャル"},
+    {"ヘルスィーサラダ", "キノコステーキ", "ナンシーデラックス"},
+    {"ヘルスィーサラダ", "イカスミパスタ", "ナンシースペシャル"},
+    {"ヘルスィーサラダ", "スパゲティ", "ナンシーディナー"},
+    {"ヘルスィーサラダ", "カメスパ", "ナンシーディナー"},
+    {"ヘルスィーサラダ", "カラリーナパスタ", "ナンシースペシャル"},
+    {"カメまん", "ドライフラワー", "うちゅうしょく"},
+    {"フレッシュジュース", "レッド・カラリン", "すみぢる"},
+    {"たんこぶ", "ドライフラワー", "うちゅうしょく"},
+    {"たんこぶ", "おうごんはっぱ", "ナンシーデラックス"},
+    {"きんかい", "イレカエール", "キノコ"},
+    {"きんかい×３", "イレカエール", "きんかい"},
+    {"ココナッツボム", "ドライフラワー", "ヤシの実"},
+    {"ココナッツボム", "バクハツタマゴ", "ナンシーダイナマイ"},
+    {"カチカチりょうり", "ドライフラワー", "カチカチコウラ"},
 };
 #endif
+#endif
 
-s32 R_mystery_cook_list[] = {
+s32 naniga_okorukana_list[] = {
     132, 153, 235, 138, 151, 141, 135, 179,
     223, 192, 222, 211, 207, 183, 193, 129,
     209, 176, 232, 197,
@@ -6621,7 +6390,7 @@ static USER_FUNC(starstone_set_ry) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(wait_mahojin) {
+static USER_FUNC(wait_mahojin) {
     s32 anim = ((s32*)effNameToPtr("mahojin")->userdata)[6];
 
     if (anim != -1 && 0.0f != animPoseGetLoopTimes(anim)) {
@@ -6630,7 +6399,7 @@ USER_FUNC(wait_mahojin) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(iri_09_item_tbl_alloc) {
+static USER_FUNC(iri_09_item_tbl_alloc) {
 #if VERSION >= VERSION_US
     s32 n = evtGetValue(event, event->args[0]);
     iri_09_item_tbl = _mapAlloc((n + 1) * sizeof(s32));
@@ -6640,7 +6409,7 @@ USER_FUNC(iri_09_item_tbl_alloc) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(iri_09_item_tbl_make) {
+static USER_FUNC(iri_09_item_tbl_make) {
     EvtWord* args = event->args;
     s32 n = evtGetValue(event, args[0]);
     s32 i;
@@ -6653,7 +6422,7 @@ USER_FUNC(iri_09_item_tbl_make) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(iri_09_item_tbl_free) {
+static USER_FUNC(iri_09_item_tbl_free) {
     _mapFree(iri_09_item_tbl);
     iri_09_item_tbl = NULL;
     return EVT_RETURN_DONE;
@@ -6667,16 +6436,16 @@ static USER_FUNC(set_fook_evt) {
     return EVT_RETURN_DONE;
 }
 
-s32 naniga_okorukana_cook(void) {
+static s32 naniga_okorukana_cook(void) {
     s32 r = rand() % 100;
 
     if (r < 50) {
-        return R_mystery_cook_list[(s32)((u32)(r * 20) / 50.0f)];
+        return naniga_okorukana_list[(s32)((u32)(r * 20) / 50.0f)];
     }
     return 182;
 }
 
-s32 itemNameToID(const char* name) {
+static s32 itemNameToID(const char* name) {
     s32 i;
 
     for (i = 0; i < 339; i++) {
@@ -6690,7 +6459,109 @@ s32 itemNameToID(const char* name) {
     return i;
 }
 
-USER_FUNC(cook_chk) {
+#if VERSION <= VERSION_DEMO_US
+// The demo reads the recipes from cooking.xml on the disc: <cooking_x1> blocks for one ingredient, <cooking_x2>
+// blocks for two. Each call loads the file (blocking until it is in), scans for the matching block and frees it.
+static USER_FUNC(cook_chk) {
+    EvtWord* args = event->args;
+    s32 item = evtGetValue(event, args[0]);
+    ItemData* data = &itemDataTable[item];
+    FileEntry* file;
+    char ingredient[128];
+    char result[128];
+    char result2[128];
+
+    if (item == 163) {
+        item = naniga_okorukana_cook();
+        evtSetValue(event, args[1], item);
+        evtSetValue(event, args[2], item);
+        return EVT_RETURN_DONE;
+    }
+    file = fileAsyncf(0, NULL, "%s/cooking.xml", getMarioStDvdRoot());
+    if (file == NULL) {
+        return EVT_RETURN_BLOCK;
+    }
+    if (fileAsyncMissing(file)) {
+        evtSetValue(event, args[1], 0);
+        evtSetValue(event, args[2], 0);
+        return EVT_RETURN_DONE;
+    }
+    strcpy(ingredient, "");
+    strcpy(result, "");
+    strcpy(result2, "");
+    file = fileAllocf(0, "%s/cooking.xml", getMarioStDvdRoot());
+    parseInit(file->data[0], (u32)file->data[1]);
+    while (parsePush("<cooking_x1>")) {
+        parseTagGet1("<item>", 0, ingredient);
+        parseTagGet1("<cook_lv1>", 0, result);
+        parseTagGet1("<cook_lv2>", 0, result2);
+        parsePopNext();
+        if (strcmp(ingredient, data->id) == 0) {
+            break;
+        }
+        strcpy(ingredient, "");
+        strcpy(result, "");
+        strcpy(result2, "");
+    }
+    parsePop();
+    fileFree(file);
+    // FAKE: volatile casts, see the retail cook_chk.
+    evtSetValue(event, (volatile u32)args[1], itemNameToID(result));
+    evtSetValue(event, (volatile u32)args[2], itemNameToID(result2));
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(cook_chk2) {
+    EvtWord* args = event->args;
+    s32 item1 = evtGetValue(event, args[0]);
+    s32 item2 = evtGetValue(event, args[1]);
+    ItemData* data1 = &itemDataTable[item1];
+    ItemData* data2 = &itemDataTable[item2];
+    FileEntry* file;
+    char a[128];
+    char b[128];
+    char out[128];
+
+    if (item1 == 163 || item2 == 163) {
+        item2 = naniga_okorukana_cook();
+        // FAKE: volatile cast, see the retail cook_chk.
+        evtSetValue(event, (volatile u32)args[2], item2);
+        return EVT_RETURN_DONE;
+    }
+    file = fileAsyncf(0, NULL, "%s/cooking.xml", getMarioStDvdRoot());
+    if (file == NULL) {
+        return EVT_RETURN_BLOCK;
+    }
+    if (fileAsyncMissing(file)) {
+        evtSetValue(event, args[2], 0);
+        return EVT_RETURN_DONE;
+    }
+    strcpy(a, "");
+    strcpy(b, "");
+    strcpy(out, "");
+    file = fileAllocf(0, "%s/cooking.xml", getMarioStDvdRoot());
+    parseInit(file->data[0], (u32)file->data[1]);
+    while (parsePush("<cooking_x2>")) {
+        parseTagGet1("<item1>", 0, a);
+        parseTagGet1("<item2>", 0, b);
+        parseTagGet1("<cook>", 0, out);
+        parsePopNext();
+        if ((strcmp(a, data1->id) == 0 && strcmp(b, data2->id) == 0) ||
+            (strcmp(a, data2->id) == 0 && strcmp(b, data1->id) == 0)) {
+            break;
+        }
+        strcpy(a, "");
+        strcpy(b, "");
+        strcpy(out, "");
+    }
+    parsePop();
+    fileFree(file);
+    // FAKE: volatile cast, see the retail cook_chk.
+    evtSetValue(event, (volatile u32)args[2], itemNameToID(out));
+    return EVT_RETURN_DONE;
+}
+#else
+static USER_FUNC(cook_chk) {
     EvtWord* args = event->args;
     s32 item = evtGetValue(event, args[0]);
     ItemData* data = &itemDataTable[item];
@@ -6716,7 +6587,7 @@ USER_FUNC(cook_chk) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(cook_chk2) {
+static USER_FUNC(cook_chk2) {
     EvtWord* args = event->args;
     s32 item1 = evtGetValue(event, args[0]);
     s32 item2 = evtGetValue(event, args[1]);
@@ -6745,12 +6616,13 @@ USER_FUNC(cook_chk2) {
     evtSetValue(event, args[2], 0);
     return EVT_RETURN_DONE;
 }
+#endif
 
-BOOL chkCookItem(s32 item) {
+static BOOL chkCookItem(s32 item) {
     return item != 0;
 }
 
-USER_FUNC(make_item_tbl) {
+static USER_FUNC(make_item_tbl) {
     EvtWord* args = event->args;
     s32 skip = evtGetValue(event, args[0]);
     s32 cnt = pouchGetHaveItemCnt();
@@ -6759,9 +6631,18 @@ USER_FUNC(make_item_tbl) {
     s32 item;
 
     for (i = 0; i < cnt; i++) {
+#if VERSION <= VERSION_DEMO_US
+        // the demo's argument is an item id: the first matching item is left out
+        item = pouchHaveItem(i);
+        if (item != 0) {
+            if (skip == item) {
+                skip = 0;
+            } else {
+#else
         if (skip != i) {
             item = pouchHaveItem(i);
             if (item != 0) {
+#endif
                 item_tbl[n] = item;
                 n++;
             }
@@ -6772,7 +6653,7 @@ USER_FUNC(make_item_tbl) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(get_item_name) {
+static USER_FUNC(get_item_name) {
     EvtWord* args = event->args;
     s32 item = evtGetValue(event, args[0]);
 
@@ -6785,7 +6666,7 @@ USER_FUNC(get_item_name) {
     return EVT_RETURN_DONE;
 }
 
-s32 chk_cook_eff_type(s32 item) {
+static s32 chk_cook_eff_type(s32 item) {
     if (item < 148) {
         return 1;
     }
@@ -6819,7 +6700,7 @@ s32 chk_cook_eff_type(s32 item) {
     return 0;
 }
 
-USER_FUNC(cook_effect) {
+static USER_FUNC(cook_effect) {
     switch (chk_cook_eff_type(evtGetValue(event, event->args[0]))) {
         case 0:
             psndSFXOn_3D("SFX_EVT_COOK_FIRE1", &(Vec){-380.0f, 25.0f, -170.0f});
@@ -6911,8 +6792,10 @@ s32 iri_18_item_tbl[] = {
 
 EVT_BEGIN(cooking_evt)
     CALL(evt_mario_key_onoff, 0)
+#if VERSION >= VERSION_JP
     SET_VALUE(LW(11), -1)
     SET_VALUE(LW(12), -1)
+#endif
     SET_VALUE(LW(14), 0)
     SET_VALUE(LW(15), 0)
     CALL(evt_npc_flag_onoff, 1, STRING("ナンシー"), NPC_FLAG_INTANGIBLE)
@@ -6951,7 +6834,11 @@ EVT_BEGIN(cooking_evt)
             CALL(evt_pouch_check_item, ITEM_COOKBOOK, LW(0))
             IF_INT_GREATER_OR_EQUAL(LW(0), 1)
                 CALL(evt_msg_continue)
+#if VERSION <= VERSION_DEMO_US
+                CALL(evt_win_item_select, PTR(iri_18_item_tbl), LW(0))
+#else
                 CALL(evt_win_item_select, 0, PTR(iri_18_item_tbl), LW(0), 0)
+#endif
             ELSE
                 SET_VALUE(LW(0), -1)
                 SET_VALUE(LF(0), 1)
@@ -6968,7 +6855,7 @@ EVT_BEGIN(cooking_evt)
                 END_IF
                 ADD(LW(1), 20)
                 ADD(LW(2), 5)
-                CALL(evt_item_entry, STRING("cb"), ITEM_COOKBOOK, LW(0), LW(1), LW(2), 17, -1, 0)
+                CALL(evt_item_entry, STRING("cb"), ITEM_COOKBOOK, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
                 CALL(evt_mario_set_pose, STRING("M_C_3"))
                 WAIT_MS(800)
                 CALL(evt_item_delete, STRING("cb"))
@@ -6979,7 +6866,7 @@ EVT_BEGIN(cooking_evt)
                 SET_VALUE(LW(13), 183)
                 SET_VALUE(LW(14), 148)
                 SET_VALUE(LW(15), 154)
-                CALL_CHILD(PTR(cooking_evt_sub))
+                CALL_CHILD(cooking_evt_sub)
                 CALL(evt_msg_print, 0, STRING("irai_18_005"), 0, STRING("ナンシー"))
                 SET_VALUE(LF(0), 0)
                 CALL(evt_pouch_get_haveitemcnt, LW(0))
@@ -6995,7 +6882,7 @@ EVT_BEGIN(cooking_evt)
                 END_IF
                 IF_INT_EQUAL(LF(0), 0)
                     CALL(evt_msg_continue)
-                    CALL(evt_item_entry, STRING("hk"), ITEM_HONEY_SHROOM, 0, -1000, 0, 17, -1, 0)
+                    CALL(evt_item_entry, STRING("hk"), ITEM_HONEY_SHROOM, 0, -1000, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
                     CALL(evt_item_get_item, STRING("hk"))
                     CALL(evt_item_get_item_end_wait, STRING("hk"))
                     SET_VALUE(GSWF(GSWF_GOR01_TROUBLE18_ITEM_LEFT), 1)
@@ -7005,7 +6892,7 @@ EVT_BEGIN(cooking_evt)
                     WAIT_FRAMES(1)
                     CALL(evt_npc_wait_pera, STRING("ナンシー"))
                     WAIT_MS(300)
-                    CALL(evt_item_entry, STRING("iri_18"), ITEM_HONEY_SHROOM, -440, 30, -80, 16, GSWF(GSWF_GOR01_TROUBLE18_ITEM_LEFT), 0)
+                    CALL(evt_item_entry, STRING("iri_18"), ITEM_HONEY_SHROOM, -440, 30, -80, ITEM_ENTRY_FIXED, GSWF(GSWF_GOR01_TROUBLE18_ITEM_LEFT), 0)
                     WAIT_MS(300)
                     CALL(evt_npc_set_ry, STRING("ナンシー"), 90)
                     WAIT_FRAMES(1)
@@ -7067,14 +6954,22 @@ EVT_BEGIN(cooking_evt)
     IF_INT_EQUAL(LW(0), 1)
         GOTO(0)
     END_IF
+#if VERSION <= VERSION_DEMO_US
+    CALL(make_item_tbl, LW(14), LW(0))
+#else
     CALL(make_item_tbl, LW(11), LW(0))
+#endif
     IF_INT_EQUAL(LW(0), 0)
         CALL(evt_msg_print_add, 0, STRING("gor_01_cook_005"))
         GOTO(5)
     END_IF
     CALL(evt_msg_print_add, 0, STRING("gor_01_cook_007"))
     LABEL(1)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_win_item_select, PTR(item_tbl), LW(0))
+#else
     CALL(evt_win_item_select, 1, PTR(item_tbl), LW(0), LW(1))
+#endif
     IF_INT_EQUAL(LW(0), -1)
         CALL(evt_msg_print, 0, STRING("gor_01_cook_008"), 0, STRING("ナンシー"))
         CALL(evt_msg_select, 0, STRING("gor_01_select"))
@@ -7087,17 +6982,27 @@ EVT_BEGIN(cooking_evt)
         END_SWITCH
     END_IF
     SET_VALUE(LW(14), LW(0))
+#if VERSION >= VERSION_JP
     SET_VALUE(LW(11), LW(1))
+#endif
     SET_VALUE(LF(0), 0)
     IF_INT_EQUAL(GSWF(GSWF_TROUBLE_18_SOLVED), 1)
+#if VERSION <= VERSION_DEMO_US
+        CALL(make_item_tbl, LW(14), LW(0))
+#else
         CALL(make_item_tbl, LW(11), LW(0))
+#endif
         IF_INT_NOT_EQUAL(LW(0), 0)
             CALL(evt_msg_print, 0, STRING("gor_01_cook_009"), 0, STRING("ナンシー"))
             CALL(evt_msg_select, 0, STRING("gor_01_select"))
             IF_INT_EQUAL(LW(0), 0)
                 CALL(evt_msg_continue)
                 LABEL(2)
+#if VERSION <= VERSION_DEMO_US
+                CALL(evt_win_item_select, PTR(item_tbl), LW(0))
+#else
                 CALL(evt_win_item_select, 1, PTR(item_tbl), LW(0), LW(1))
+#endif
                 IF_INT_EQUAL(LW(0), -1)
                     CALL(evt_msg_print, 0, STRING("gor_01_cook_010"), 0, STRING("ナンシー"))
                     CALL(evt_msg_select, 0, STRING("gor_01_cook_select"))
@@ -7106,7 +7011,9 @@ EVT_BEGIN(cooking_evt)
                         SET_VALUE(LF(0), 1)
                         GOTO(3)
                         CASE_EQUAL(1)
+#if VERSION >= VERSION_JP
                         CALL(evt_msg_continue)
+#endif
                         GOTO(2)
                         CASE_EQUAL(2)
                         GOTO(0)
@@ -7117,7 +7024,9 @@ EVT_BEGIN(cooking_evt)
                     GOTO(2)
                 END_IF
                 SET_VALUE(LW(15), LW(0))
+#if VERSION >= VERSION_JP
                 SET_VALUE(LW(12), LW(1))
+#endif
             ELSE
                 SET_VALUE(LF(0), 1)
             END_IF
@@ -7158,7 +7067,11 @@ EVT_BEGIN(cooking_evt)
     END_IF
     IF_INT_EQUAL(LW(15), 0)
         CALL(cook_chk, LW(14), LW(0), LW(1))
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_pouch_remove_item, LW(14), LW(3))
+#else
         CALL(N_evt_pouch_remove_item_index, LW(14), LW(11), LW(3))
+#endif
         IF_INT_EQUAL(GSWF(GSWF_TROUBLE_18_SOLVED), 1)
             SET_VALUE(LW(2), LW(1))
         ELSE
@@ -7166,15 +7079,20 @@ EVT_BEGIN(cooking_evt)
         END_IF
     ELSE
         CALL(cook_chk2, LW(14), LW(15), LW(2))
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_pouch_remove_item, LW(14), LW(3))
+        CALL(evt_pouch_remove_item, LW(15), LW(3))
+#else
         CALL(N_evt_pouch_remove_item_index, LW(14), LW(11), LW(3))
         CALL(N_evt_pouch_remove_item_index, LW(15), LW(12), LW(3))
+#endif
     END_IF
     IF_INT_EQUAL(LW(2), 0)
         SET_VALUE(LW(2), 182)
     END_IF
     CALL(evt_msg_print_add, 0, STRING("gor_01_cook_015"))
     SET_VALUE(LW(13), LW(2))
-    CALL_CHILD(PTR(cooking_evt_sub))
+    CALL_CHILD(cooking_evt_sub)
     SET_VALUE(LW(2), LW(13))
     CALL(chk_cook_msg, LW(2), LW(3))
     SWITCH(LW(3))
@@ -7190,7 +7108,7 @@ EVT_BEGIN(cooking_evt)
         CALL(evt_msg_print, 0, STRING("gor_01_cook_021"), 0, STRING("ナンシー"))
     END_SWITCH
     CALL(evt_msg_print_add, 0, STRING("gor_01_cook_022"))
-    CALL(evt_item_entry, STRING("cook"), LW(2), 0, -1000, 0, 17, -1, 0)
+    CALL(evt_item_entry, STRING("cook"), LW(2), 0, -1000, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_item_get_item, STRING("cook"))
     SET_VALUE(GSWF(GSWF_RECIPE_LOG_UNLOCKED), 1)
     CALL(cooking_flag, LW(2))
@@ -7207,7 +7125,7 @@ EVT_BEGIN(cooking_evt)
     RETURN
 EVT_END()
 
-USER_FUNC(chk_cook_msg) {
+static USER_FUNC(chk_cook_msg) {
     EvtWord* args = event->args;
     s32 item = evtGetValue(event, args[0]);
     s32 msg;
@@ -7225,12 +7143,12 @@ USER_FUNC(chk_cook_msg) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(cooking_flag) {
+static USER_FUNC(cooking_flag) {
     swSet(evtGetValue(event, event->args[0]) - 114);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(chk_special_cook) {
+static USER_FUNC(chk_special_cook) {
     EvtWord* args = event->args;
     s32 item = evtGetValue(event, args[0]);
     s32 found = FALSE;

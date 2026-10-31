@@ -43,7 +43,6 @@
 #include "evt/evt_snd.h"
 #include "evt/evt_window.h"
 #include "mot/mot_hammer.h"
-#include "party/party_motion.h"
 #include "party/party_nokonoko.h"
 #include <math.h>
 #include "map/senkaron.h"
@@ -64,19 +63,19 @@ SenkaronWork* skwp;
 static void senkaron_ext_disp(CameraId camera, void* param);
 static void senkaron_ext_shadow_disp(CameraId camera, void* param);
 
-USER_FUNC(chk_mario_ctrloff);
-USER_FUNC(get_mario_y_pos);
-USER_FUNC(get_party_y_pos);
+static USER_FUNC(chk_mario_ctrloff);
+static USER_FUNC(get_mario_y_pos);
+static USER_FUNC(get_party_y_pos);
 static USER_FUNC(make_name);
-USER_FUNC(mario_land_on);
-USER_FUNC(party_hit);
-USER_FUNC(party_land_on);
+static USER_FUNC(mario_land_on);
+static USER_FUNC(party_hit);
+static USER_FUNC(party_land_on);
 static USER_FUNC(senkaronAttackStart);
 static USER_FUNC(senkaronFlagOffMesPushing);
 static USER_FUNC(senkaronFlagOnMesPushing);
 static USER_FUNC(senkaronGetMarioPushedFlag);
 static USER_FUNC(senkaronToEscape);
-USER_FUNC(set_mario_y_pos);
+static USER_FUNC(set_mario_y_pos);
 static USER_FUNC(set_party_y_pos);
 
 static BeroEntry bero_entry_data[3];
@@ -1151,7 +1150,7 @@ static EVT_BEGIN(senkaron_event)
         CALL(evt_mario_dispflag_onoff, 0, 2)
         CALL(evt_mario_key_onoff, 1)
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         SET_VALUE(GF(0), 0)
         BEGIN_INLINE_EVENT
             SET_VALUE(LW(7), 0)
@@ -1348,11 +1347,11 @@ static EVT_BEGIN(senkaron_event)
         CALL(senkaronToEscape)
         SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_01_1000_DRY_BONES)
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
         CALL(evt_npc_get_position, STRING("黒カロン"), LW(0), LW(1), LW(2))
         CALL(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
         CALL(evt_sub_get_dir, LW(3), LW(5), LW(0), LW(2), LW(6))
-        CALL(evt_item_entry, STRING("key"), ITEM_PALACE_KEY_0x2E, LW(0), LW(1), LW(2), 4, -1, PTR(key_evt))
+        CALL(evt_item_entry, STRING("key"), ITEM_PALACE_KEY_0x2E, LW(0), LW(1), LW(2), ITEM_ENTRY_LAUNCH, -1, PTR(key_evt))
         CALL(evt_item_set_move_dir_speed, STRING("key"), LW(6), FLOAT(45.0f))
         CALL(evt_item_set_jump_power, STRING("key"), FLOAT(500.0f))
         CALL(evt_item_set_gravity, STRING("key"), FLOAT(1.0f))
@@ -1401,14 +1400,14 @@ static USER_FUNC(senkaronGetMarioPushedFlag) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(get_mario_y_pos) {
+static USER_FUNC(get_mario_y_pos) {
     EvtWord* args = event->args;
 
     evtSetFloat(event, args[0], marioGetPtr()->position.y);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(set_mario_y_pos) {
+static USER_FUNC(set_mario_y_pos) {
     EvtWord* args = event->args;
     f32 y = evtGetFloat(event, args[0]);
 
@@ -1416,7 +1415,7 @@ USER_FUNC(set_mario_y_pos) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(get_party_y_pos) {
+static USER_FUNC(get_party_y_pos) {
     EvtWord* args = event->args;
     PartyEntry* party = partyGetPtr(partyCtrlNo);
 
@@ -1437,7 +1436,7 @@ static USER_FUNC(set_party_y_pos) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(mario_land_on) {
+static USER_FUNC(mario_land_on) {
     MarioWork* mario = marioGetPtr();
 
     if (mario->position.y < 0.0f) {
@@ -1446,7 +1445,7 @@ USER_FUNC(mario_land_on) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(party_land_on) {
+static USER_FUNC(party_land_on) {
     PartyEntry* party = partyGetPtr(partyCtrlNo);
 
     if (party != NULL && party->position.y < 0.0f) {
@@ -1455,14 +1454,14 @@ USER_FUNC(party_land_on) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(chk_mario_ctrloff) {
+static USER_FUNC(chk_mario_ctrloff) {
     EvtWord* args = event->args;
 
     evtSetValue(event, args[0], marioCtrlOffChk());
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(party_hit) {
+static USER_FUNC(party_hit) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     NpcEntry* npc = npcNameToPtr("\x8D\x95\x83\x4A\x83\x8D\x83\x93");
     EvtWord* args = event->args;
@@ -1478,7 +1477,7 @@ USER_FUNC(party_hit) {
 }
 
 EVT_BEGIN(kurokaron_talk)
-    SPAWN_EVENT(PTR(senkaron_event))
+    SPAWN_EVENT(senkaron_event)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_00_START)
         CALL(evt_npc_change_interrupt, STRING("me"), 6, 0)
     END_IF
@@ -1487,7 +1486,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"黒カロン"*/"\x8D\x95\x83\x4A\x83\x8D\x83\x93", // name
+        "黒カロン", // name
         NPC_FLAG_NO_TURN_TO_MARIO, // flags
         0, // reactionFlags
         kurokaron_init, // initEvent
@@ -1499,7 +1498,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"カロン"*/"\x83\x4A\x83\x8D\x83\x93", // name
+        "カロン", // name
         0, 0, NULL, NULL, NULL, NULL, NULL, NULL, // flags..lostEvent
         NULL, NULL, 0, // returnEvent..territoryType
         {0}, // territoryBase
@@ -1521,7 +1520,11 @@ static s32 key_tbl[] = {
 static EVT_BEGIN(key_check_evt)
     CALL(evt_pouch_check_item, ITEM_PALACE_KEY_0x2E, LW(0))
     IF_INT_GREATER(LW(0), 0)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_win_item_select, PTR(key_tbl), LW(0))
+#else
         CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
+#endif
         IF_INT_EQUAL(LW(0), -1)
             CALL(evt_mobj_exec_cancel, STRING("me"))
         END_IF
@@ -1532,7 +1535,7 @@ EVT_END()
 static EVT_BEGIN(unlock_evt)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_01_02_LOCK)
     SET_VALUE(LW(0), STRING("e_bero_1"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     RETURN
 EVT_END()
 
@@ -1551,7 +1554,11 @@ static EVT_BEGIN(shan_init)
             CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, LW(3), MAPOBJ_FLAG_HIDE)
             CALL(evt_mapobj_get_position, LW(3), LW(4), LW(5), LW(6))
             SUBTRACT_FLOAT(LW(5), FLOAT(7.0f))
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_eff, STRING(""), STRING("fire"), 3, LW(4), LW(5), LW(6), FLOAT(0.7998047f), 1000, 0, 0, 0, 0, 0, 0)
+#else
             CALL(evt_eff, 0, STRING("fire"), 3, LW(4), LW(5), LW(6), FLOAT(0.7998047f), 1000, 0, 0, 0, 0, 0, 0)
+#endif
             ADD(LW(1), 1)
         END_LOOP
         ADD(LW(0), 1)
@@ -1562,22 +1569,24 @@ EVT_END()
 EVT_BEGIN(las_05_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 2)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_00_START)
         CALL(evt_npc_setup, PTR(npcEnt))
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_01_1000_DRY_BONES)
-        CALL(evt_item_entry, STRING("key"), ITEM_PALACE_KEY_0x2E, 0, 0, 0, 0, -1, PTR(key_evt))
+        CALL(evt_item_entry, STRING("key"), ITEM_PALACE_KEY_0x2E, 0, 0, 0, ITEM_ENTRY_STAY, -1, PTR(key_evt))
     END_IF
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG8_01_02_LOCK)
         CALL(evt_mobj_lock, STRING("lock"), ITEM_PALACE_KEY_0x2E, 590, 20, 0, -90, PTR(key_check_evt), PTR(unlock_evt), 0)
         SET_VALUE(LW(0), STRING("e_bero_1"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     END_IF
-    CALL_CHILD(PTR(shan_init))
+    CALL_CHILD(shan_init)
     RETURN
 EVT_END()
 

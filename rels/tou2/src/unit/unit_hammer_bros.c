@@ -162,7 +162,11 @@ static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {80, 80, 70, 100, 80, 100, 100, 70, 100, 80, 100, 80, 100, 80, 80, 40, 60, 100, 80, 100, 100, 95};
+#else
 static StatusVulnerability regist = {80, 80, 70, 100, 80, 100, 100, 70, 100, 80, 100, 80, 100, 95, 80, 70, 60, 100, 80, 100, 100, 95};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "BRO_N_1"},
@@ -181,8 +185,8 @@ static PoseTableEntry pose_table[] = {
     {40, "BRO_W_1"},
     {56, "BRO_X_1"},
     {57, "BRO_X_1"},
-    {65, "BRO_T_1"},
-    {69, "BRO_S_1"},
+    {BTL_POSE_TALK, "BRO_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "BRO_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -318,7 +322,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -330,7 +334,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 14, 0)
     CALL(btlevtcmd_check_battleflag, LW(0), 2)
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(normal_attack_event))
+        CALL_CHILD(normal_attack_event)
         GOTO(99)
     END_IF
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
@@ -346,13 +350,13 @@ static EVT_BEGIN(attack_event)
         SUBTRACT(LW(0), 1)
         CALL(evt_sub_random, LW(0), LW(1))
         IF_INT_LESS(LW(1), 50)
-            CALL_CHILD(PTR(renzoku_attack_event))
+            CALL_CHILD(renzoku_attack_event)
             GOTO(99)
         END_IF
-        CALL_CHILD(PTR(nagemakuri_attack_event))
+        CALL_CHILD(nagemakuri_attack_event)
         GOTO(99)
     ELSE
-        CALL_CHILD(PTR(normal_attack_event))
+        CALL_CHILD(normal_attack_event)
         GOTO(99)
     END_IF
     LABEL(99)
@@ -505,7 +509,7 @@ static EVT_BEGIN(damage_check_event_sub)
         CASE_END
     END_SWITCH
     LABEL(90)
-    CALL_CHILD(PTR(hammer_bros_attack_common_event1))
+    CALL_CHILD(hammer_bros_attack_common_event1)
     GOTO(99)
     LABEL(91)
     IF_INT_EQUAL(LW(11), 1)
@@ -529,14 +533,14 @@ static EVT_BEGIN(damage_check_event_sub)
             END_LOOP
         END_IF
     END_IF
-    CALL_CHILD(PTR(hammer_bros_attack_common_event2))
+    CALL_CHILD(hammer_bros_attack_common_event2)
     CALL(btlevtcmd_ResultACDefence, LW(3), LW(9))
     IF_INT_EQUAL(LW(10), 1)
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 256, LW(5))
     ELSE
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), LW(9), 0, LW(5))
     END_IF
-    CALL_CHILD(PTR(hammer_bros_attack_common_event3))
+    CALL_CHILD(hammer_bros_attack_common_event3)
     GOTO(99)
     LABEL(99)
     RETURN
@@ -555,7 +559,7 @@ static EVT_BEGIN(normal_attack_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
@@ -573,7 +577,7 @@ static EVT_BEGIN(normal_attack_event)
     SET_VALUE(LW(9), PTR(&weapon_hammer_bros_attack))
     SET_VALUE(LW(10), 1)
     SET_VALUE(LW(11), 0)
-    CALL_CHILD(PTR(damage_check_event_sub))
+    CALL_CHILD(damage_check_event_sub)
     WAIT_FRAMES(60)
     CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 43)
     LABEL(99)
@@ -588,7 +592,7 @@ static EVT_BEGIN(renzoku_attack_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
@@ -609,9 +613,9 @@ static EVT_BEGIN(renzoku_attack_event)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("BRO_A_1A"))
         WAIT_FRAMES(27)
         IF_INT_EQUAL(LW(14), 3)
-            SPAWN_EVENT(PTR(renzoku_attack_event_sub_last))
+            SPAWN_EVENT(renzoku_attack_event_sub_last)
         ELSE
-            SPAWN_EVENT(PTR(renzoku_attack_event_sub_no_last))
+            SPAWN_EVENT(renzoku_attack_event_sub_no_last)
         END_IF
         WAIT_MS(250)
         ADD(LW(14), 1)
@@ -628,22 +632,22 @@ static EVT_BEGIN(renzoku_attack_event_sub_no_last)
     SET_VALUE(LW(9), PTR(&weapon_hammer_bros_renzoku_attack))
     SET_VALUE(LW(10), 0)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(damage_check_event_sub))
+    CALL_CHILD(damage_check_event_sub)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(renzoku_attack_event_sub_last)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 10, LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL_CHILD(PTR(hammer_bros_attack_common_event2))
+        CALL_CHILD(hammer_bros_attack_common_event2)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_hammer_bros_renzoku_attack))
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_hammer_bros_renzoku_attack), 256, LW(5))
-        CALL_CHILD(PTR(hammer_bros_attack_common_event3))
+        CALL_CHILD(hammer_bros_attack_common_event3)
     ELSE
         SET_VALUE(LW(9), PTR(&weapon_hammer_bros_renzoku_attack))
         SET_VALUE(LW(10), 1)
         SET_VALUE(LW(11), 0)
-        CALL_CHILD(PTR(damage_check_event_sub))
+        CALL_CHILD(damage_check_event_sub)
     END_IF
     RETURN
 EVT_END()
@@ -655,7 +659,7 @@ static EVT_BEGIN(nagemakuri_attack_event)
     IF_INT_EQUAL(LW(3), -1)
         CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
         IF_INT_NOT_EQUAL(LW(0), 0)
-            CALL_CHILD(PTR(subsetevt_confuse_flustered))
+            CALL_CHILD(subsetevt_confuse_flustered)
             RETURN
         END_IF
         GOTO(99)
@@ -690,7 +694,7 @@ static EVT_BEGIN(nagemakuri_attack_event)
         CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(10))
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("BRO_A_1A"))
         WAIT_FRAMES(27)
-        SPAWN_EVENT(PTR(nagemakuri_attack_event_sub))
+        SPAWN_EVENT(nagemakuri_attack_event_sub)
         WAIT_MS(250)
         ADD(LW(12), 1)
         ADD(LW(13), 1)
@@ -709,7 +713,7 @@ static EVT_BEGIN(nagemakuri_attack_event_sub)
     CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(14), LW(4))
     LOOP(0)
         IF_INT_GREATER_OR_EQUAL(LW(13), 3)
-            CALL_CHILD(PTR(nagemakuri_attack_event_sub_last))
+            CALL_CHILD(nagemakuri_attack_event_sub_last)
             BREAK_LOOP
         END_IF
         ADD(LW(13), 1)
@@ -718,7 +722,7 @@ static EVT_BEGIN(nagemakuri_attack_event_sub)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, LW(14), LW(6))
         IF_INT_EQUAL(LW(3), LW(5))
             IF_INT_EQUAL(LW(4), LW(6))
-                CALL_CHILD(PTR(nagemakuri_attack_event_sub_no_last))
+                CALL_CHILD(nagemakuri_attack_event_sub_no_last)
                 BREAK_LOOP
             END_IF
         END_IF
@@ -730,7 +734,7 @@ static EVT_BEGIN(nagemakuri_attack_event_sub_no_last)
     SET_VALUE(LW(9), PTR(&weapon_hammer_bros_nagemakuri_attack))
     SET_VALUE(LW(10), 0)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(damage_check_event_sub))
+    CALL_CHILD(damage_check_event_sub)
     RETURN
 EVT_END()
 
@@ -751,15 +755,15 @@ static EVT_BEGIN(nagemakuri_attack_event_sub_last)
         ADD(LW(14), 1)
     END_LOOP
     IF_INT_EQUAL(LW(0), 1)
-        CALL_CHILD(PTR(hammer_bros_attack_common_event2))
+        CALL_CHILD(hammer_bros_attack_common_event2)
         CALL(btlevtcmd_ResultACDefence, LW(3), PTR(&weapon_hammer_bros_nagemakuri_attack))
         CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_hammer_bros_nagemakuri_attack), 256, LW(5))
-        CALL_CHILD(PTR(hammer_bros_attack_common_event3))
+        CALL_CHILD(hammer_bros_attack_common_event3)
     ELSE
         SET_VALUE(LW(9), PTR(&weapon_hammer_bros_nagemakuri_attack))
         SET_VALUE(LW(10), 1)
         SET_VALUE(LW(11), 0)
-        CALL_CHILD(PTR(damage_check_event_sub))
+        CALL_CHILD(damage_check_event_sub)
     END_IF
     RETURN
 EVT_END()

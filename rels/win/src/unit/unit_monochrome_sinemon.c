@@ -100,7 +100,11 @@ static BattleUnitDefenseAttr defence_attr = {{0, 2, 0, 0, 0}};
 
 static BattleUnitDefense defence_turn = {0};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {50, 90, 50, 100, 50, 100, 0, 70, 100, 70, 100, 70, 100, 80, 80, 50, 70, 100, 80, 100, 100, 95};
+#else
 static StatusVulnerability regist = {50, 100, 50, 100, 50, 100, 0, 70, 100, 70, 100, 70, 100, 100, 70, 50, 70, 100, 70, 100, 100, 95};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_monochrome_sinemon", "c_sinemon_w", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x2009, 0x1, pose_table},
@@ -159,8 +163,8 @@ static PoseTableEntry pose_table[] = {
     {42, "SIN_R_1"},
     {56, "SIN_I_1"},
     {57, "SIN_I_1"},
-    {65, "SIN_T_1"},
-    {69, "SIN_S_1"},
+    {BTL_POSE_TALK, "SIN_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "SIN_S_1"},
 };
 
 static PoseTableEntry pose_table_turn[] = {
@@ -177,8 +181,8 @@ static PoseTableEntry pose_table_turn[] = {
     {39, "SIN_D_2"},
     {56, "SIN_K_2"},
     {57, "SIN_K_2"},
-    {65, "SIN_D_2"},
-    {69, "SIN_D_2"},
+    {BTL_POSE_TALK, "SIN_D_2"},
+    {BTL_POSE_STAY_DEFAULT, "SIN_D_2"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -237,7 +241,7 @@ static EVT_BEGIN(damage_event)
     END_IF
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 

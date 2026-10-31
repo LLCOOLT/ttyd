@@ -29,9 +29,9 @@ typedef struct KissWork {
     s32 pad;      // 0x34
 } KissWork;
 
-void effKissMain(EffectEntry* effect);
-void effKissDisp(CameraId cameraId, EffectEntry* effect);
-void effKissDisp2(CameraId cameraId, EffectEntry* effect);
+static void effKissMain(EffectEntry* effect);
+static void effKissDisp(CameraId cameraId, EffectEntry* effect);
+static void effKissDisp2(CameraId cameraId, EffectEntry* effect);
 
 u8 kuri_kiss[] = {
     0x43, 0x20, 0x12, 0x4F, 0x20, 0x14, 0x5E, 0x20, 0x16, 0x6C, 0x20, 0x19, 0x7A, 0x20, 0x1B, 0x86, 0x20, 0x1D,
@@ -133,7 +133,7 @@ EffectEntry* effKissEntry(s32 type, f32 x, f32 y, f32 z, f32 angle) {
     return effect;
 }
 
-void effKissMain(EffectEntry* effect) {
+static void effKissMain(EffectEntry* effect) {
     KissWork* work = effect->userdata;
     Vec pos;
     s32 type;
@@ -250,7 +250,7 @@ void effKissMain(EffectEntry* effect) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);                                         \
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0)
 
-void effKissDisp(CameraId cameraId, EffectEntry* effect) {
+static void effKissDisp(CameraId cameraId, EffectEntry* effect) {
     KissWork* work = effect->userdata;
     CameraEntry* cam;
     KissWork* q;
@@ -433,7 +433,7 @@ void effKissDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-void effKissDisp2(CameraId cameraId, EffectEntry* effect) {
+static void effKissDisp2(CameraId cameraId, EffectEntry* effect) {
     KissWork* work = effect->userdata;
     CameraEntry* cam;
     Mtx mT, mS, mR, mBase;

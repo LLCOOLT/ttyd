@@ -27,8 +27,8 @@ static effN64Vtx size32x32_tex32x32_vtx[] = {
     {-16, 16, 0, 0, 1024, 0, 0, 0, 255},
 };
 
-void effBomheiMain(EffectEntry* effect);
-void effBomheiDisp(CameraId cameraId, EffectEntry* effect);
+static void effBomheiMain(EffectEntry* effect);
+static void effBomheiDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effBomheiN64Entry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -58,7 +58,7 @@ EffectEntry* effBomheiN64Entry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 
     return effect;
 }
 
-void effBomheiMain(EffectEntry* effect) {
+static void effBomheiMain(EffectEntry* effect) {
     EffBomheiN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -78,7 +78,7 @@ void effBomheiMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effBomheiDisp, effect);
 }
 
-void effBomheiDisp(CameraId cameraId, EffectEntry* effect) {
+static void effBomheiDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffBomheiN64Work* work;
     s32 alpha;

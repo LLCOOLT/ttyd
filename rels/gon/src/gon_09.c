@@ -11,7 +11,6 @@
 #include "evt/evt_npc.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "gon.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -101,7 +100,7 @@ static EVT_BEGIN(init_0)
 EVT_END()
 
 static EVT_BEGIN(main_0)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     SET_TYPE(239)
 #endif
     CALL(evt_mobj_hitevt_onoff, STRING("me"), 0)
@@ -316,7 +315,7 @@ EVT_END()
 EVT_BEGIN(gon_09_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_GON1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_GON1"))
     CALL(evt_snd_set_rev_mode, 2)
@@ -357,13 +356,9 @@ EVT_BEGIN(gon_09_init_evt)
     CALL(evt_npc_flag_onoff, 1, STRING("\"カロン03\""), NPC_FLAG_NO_BILLBOARD)
     CALL(evt_npc_set_width, STRING("\"カロン03\""), 30)
     CALL(evt_npc_set_height, STRING("\"カロン03\""), 7)
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("piece00"), ITEM_STAR_PIECE, 575, 200, -110, 15, GSWF(GSWF_GON09_STAR_PIECE), 0)
-#else
-    CALL(evt_item_entry, STRING("piece00"), ITEM_STAR_PIECE, 575, 200, -110, 16, GSWF(GSWF_GON09_STAR_PIECE), 0)
-#endif
+    CALL(evt_item_entry, STRING("piece00"), ITEM_STAR_PIECE, 575, 200, -110, ITEM_ENTRY_FIXED, GSWF(GSWF_GON09_STAR_PIECE), 0)
     CALL(evt_mobj_float_blk, STRING("blk_0"), 325, -50, 75, 2, 1, 0, LSWF(1))
-    CALL_CHILD(PTR(init_0))
+    CALL_CHILD(init_0)
     CALL(evt_mobj_switch_float_blk, STRING("sw_0"), 588, -50, 138, STRING("blk_0"), 2, PTR(main_0), LSWF(1))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("fuyu_boxS"), MAPOBJ_FLAG_HIDE)
     CALL(evt_map_playanim, STRING("hokori"), 1, 0)

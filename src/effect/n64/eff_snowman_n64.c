@@ -39,7 +39,7 @@ static u8 jump2_hscale_data[] = {100, 90, 82, 76, 72, 70, 70, 70, 70, 70, 70, 70
 
 static s8 jump2_ry_data[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 10, 16, 22, 28, 33, 38, 40, 41, 41, 40, 38, 33, 28, 22, 16, 10, 5, 1, 1, 5, 10, 16, 22, 28, 33, 38, 40, 41, 41, 40, 38, 33, 28, 22, 16, 10, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // An older jump table the demo still carries; nothing reads it.
 typedef struct SnowmanJumpStep {
     s16 x;
@@ -49,7 +49,7 @@ typedef struct SnowmanJumpStep {
     u8 hscale;
 } SnowmanJumpStep;
 
-static SnowmanJumpStep jump_step_data[] = {
+static SnowmanJumpStep adata[] = {
     {-200, 200, 30, 100, 100}, {-180, 180, 30, 100, 100}, {-160, 160, 30, 100, 100}, {-140, 140, 30, 100, 100},
     {-120, 120, 30, 100, 100}, {-100, 100, 30, 100, 100}, {-80, 80, 30, 100, 100}, {-60, 60, 30, 100, 100},
     {-40, 40, 30, 100, 100}, {-20, 20, 30, 100, 100}, {0, 0, 30, 100, 100}, {0, 0, 30, 120, 80},
@@ -62,8 +62,8 @@ static SnowmanJumpStep jump_step_data[] = {
 };
 #endif
 
-void effSnowmanMain(EffectEntry* effect);
-void effSnowmanDisp(CameraId cameraId, EffectEntry* effect);
+static void effSnowmanMain(EffectEntry* effect);
+static void effSnowmanDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effSnowmanN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -106,7 +106,7 @@ EffectEntry* effSnowmanN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32
     return effect;
 }
 
-void effSnowmanMain(EffectEntry* effect) {
+static void effSnowmanMain(EffectEntry* effect) {
     EffSnowmanN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -248,5 +248,5 @@ void effSnowmanMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effSnowmanDisp, effect);
 }
 
-void effSnowmanDisp(CameraId cameraId, EffectEntry* effect) {
+static void effSnowmanDisp(CameraId cameraId, EffectEntry* effect) {
 }

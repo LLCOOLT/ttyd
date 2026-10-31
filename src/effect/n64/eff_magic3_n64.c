@@ -22,8 +22,8 @@ typedef struct EffMagic3N64Work {
     s32 age;      // 0x2C
 } EffMagic3N64Work;
 
-void effMagic3Main(EffectEntry* effect);
-void effMagic3Disp(CameraId cameraId, EffectEntry* effect);
+static void effMagic3Main(EffectEntry* effect);
+static void effMagic3Disp(CameraId cameraId, EffectEntry* effect);
 
 // Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
@@ -112,7 +112,7 @@ inline f32 magic3_scale(f32 a, f32 b) {
     return 3.0f * a + b;
 }
 
-void effMagic3Main(EffectEntry* effect) {
+static void effMagic3Main(EffectEntry* effect) {
     s32 life;
     EffMagic3N64Work* work = effect->userdata;
     Vec position;
@@ -155,7 +155,7 @@ void effMagic3Main(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effMagic3Disp, effect);
 }
 
-void effMagic3Disp(CameraId cameraId, EffectEntry* effect) {
+static void effMagic3Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffMagic3N64Work* work;
     GXTexObj texObj;

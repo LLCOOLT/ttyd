@@ -23,7 +23,6 @@
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
 #include "evt/evt_telop.h"
-#include "party/party_motion.h"
 #include "moo.h"
 #include "math.h"
 #include "version.h"
@@ -33,9 +32,9 @@
 #include "driver/camdrv.h"
 
 static USER_FUNC(mario_kirimomi);
-USER_FUNC(mario_reset);
-USER_FUNC(party_kirimomi);
-USER_FUNC(party_reset);
+static USER_FUNC(mario_reset);
+static USER_FUNC(party_kirimomi);
+static USER_FUNC(party_reset);
 
 static BeroEntry bero_entry_data[3];
 static f32 spline_dt[9];
@@ -131,7 +130,7 @@ static EVT_BEGIN(evt_first)
     WAIT_FRAMES(1)
     CALL(evt_mario_dispflag_onoff, 1, 2)
     CALL(evt_mario_set_pose, STRING("M_F_1"))
-    CALL_CHILD(PTR(party_damage_pose))
+    CALL_CHILD(party_damage_pose)
     WAIT_FRAMES(1)
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
@@ -165,7 +164,7 @@ static EVT_BEGIN(evt_first)
         CALL(evt_eff, 0, STRING("kemuri_test"), 14, LW(0), LW(1), LW(2), FLOAT(1.0f), 0, 0, 0, 0, 0, 0, 0)
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_MARIO_MOON_FALL1"), LW(0), LW(1), LW(2), 0)
         CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 300)
-        CALL_CHILD(PTR(party_damage_pose2))
+        CALL_CHILD(party_damage_pose2)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         CALL(evt_sub_intpl_msec_init, 0, 0, 5620, 1000)
@@ -210,8 +209,10 @@ static EVT_BEGIN(evt_first)
         CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(party_reset)
         CALL(evt_party_jump_pos, 0, LW(0), 0, LW(2), 500, 0, -1000)
+#if VERSION >= VERSION_JP
         DEBUG_PUT_MSG(STRING("ビビアンしっぽ有効"))
         CALL(L_evt_party_vivian_tail, 0, 1)
+#endif
     END_INLINE_EVENT
     WAIT_MS(500)
     LOOP(3)
@@ -264,7 +265,9 @@ static EVT_BEGIN(evt_first)
     WAIT_MS(500)
     CALL(evt_mario_set_pose, STRING("M_S_1"))
     CALL(evt_mario_dispflag_onoff, 0, 2)
+#if VERSION >= VERSION_JP
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
+#endif
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_party_run, 0)
     CALL(evt_cam3d_evt_off, 500, 11)
@@ -330,7 +333,7 @@ static EVT_BEGIN(rock_evt0)
 #endif
     SET_VALUE(LW(10), STRING("S_iwa_01"))
     SET_VALUE(LW(11), STRING("A_iwa_01"))
-    CALL_CHILD(PTR(rock_main))
+    CALL_CHILD(rock_main)
 #if VERSION <= VERSION_JP
     SET_VALUE(GSWF(GSWF_MOO00_ROCK_A_BOMBED), 1)
     CALL(evt_mario_key_onoff, 1)
@@ -347,7 +350,7 @@ static EVT_BEGIN(rock_evt1)
 #endif
     SET_VALUE(LW(10), STRING("S_iwa_08"))
     SET_VALUE(LW(11), STRING("A_iwa_08"))
-    CALL_CHILD(PTR(rock_main))
+    CALL_CHILD(rock_main)
 #if VERSION <= VERSION_JP
     SET_VALUE(GSWF(GSWF_MOO00_ROCK_B_BOMBED), 1)
     CALL(evt_mario_key_onoff, 1)
@@ -361,11 +364,11 @@ EVT_BEGIN(moo_00_init_evt)
         CASE_LESS(STORY_STG7_06_TO_THE_MOON)
         SET_VALUE(LW(0), PTR(bero_entry_data))
         CALL(evt_bero_get_info)
-        CALL_CHILD(PTR(bero_case_entry))
+        CALL_CHILD(bero_case_entry)
         CASE_DEFAULT
         SET_VALUE(LW(0), PTR(bero_entry_data))
         CALL(evt_bero_get_info)
-        CALL_CHILD(PTR(evt_bero_info_run))
+        CALL_CHILD(evt_bero_info_run)
     END_SWITCH
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_MON1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_MOO1"))
@@ -376,7 +379,7 @@ EVT_BEGIN(moo_00_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG7_06_TO_THE_MOON)
         CALL(evt_cam3d_evt_set, -150, 55, 330, -145, 55, -170, 0, 11)
-        SPAWN_EVENT(PTR(evt_first))
+        SPAWN_EVENT(evt_first)
         WAIT_FRAMES(1)
     END_SWITCH
     CALL(evt_paper_entry, STRING("OFF_d_bom_ver2"))
@@ -392,11 +395,11 @@ EVT_BEGIN(moo_00_init_evt)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_iwa_08"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_iwa_08"), 1, 0)
     END_IF
-    CALL(evt_item_entry, STRING("item_01"), ITEM_STOPWATCH, -250, 0, -445, 16, GSWF(GSWF_MOO00_STOPWATCH), 0)
+    CALL(evt_item_entry, STRING("item_01"), ITEM_STOPWATCH, -250, 0, -445, ITEM_ENTRY_FIXED, GSWF(GSWF_MOO00_STOPWATCH), 0)
     RETURN
 EVT_END()
 
-USER_FUNC(party_reset) {
+static USER_FUNC(party_reset) {
     PartyEntry* party = partyGetPtr(0);
 
     party->scale.x = party->scale.y = party->scale.z = 1.0f;
@@ -405,7 +408,7 @@ USER_FUNC(party_reset) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(mario_reset) {
+static USER_FUNC(mario_reset) {
     MarioWork* mario = marioGetPtr();
 
     mario->scale.x = mario->scale.y = mario->scale.z = 1.0f;
@@ -414,7 +417,7 @@ USER_FUNC(mario_reset) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(party_kirimomi) {
+static USER_FUNC(party_kirimomi) {
     f32 angle = evtGetFloat(event, event->args[0]);
     PartyEntry* party = partyGetPtr(0);
 

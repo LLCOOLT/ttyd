@@ -12,18 +12,18 @@
 #include <string.h>
 
 // prototypes for asm stopgap forward references
-void hitDamageReturnSet(HitEntry* hit, HitDamageReturn* damage, BOOL recursion);
-void hitObjGetPosSub(HitEntry* hit, Vec* position, s32* counter, BOOL recursion);
-BOOL chkFilterAttr(HitCheckQuery* query, HitEntry* entry);
-BOOL checkTriVec_xz(HitCheckQuery* query, HitVector* vector);
-s32 hitCalcVtxPosition(HitEntry* hit);
-void hitReCalcMatrix2(HitEntry* hit, Mtx mtx, BOOL recursion);
-void hitAtrOff(HitEntry* hit, u32 mask, s32 r);
-void hitAtrOn(HitEntry* hit, u32 mask, s32 r);
-void hitFlgOff(HitEntry* hit, u16 mask, s32 r);
-void hitFlgOn(HitEntry* hit, u16 mask, s32 r);
-HitEntry* hitEntrySub(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, BOOL ignoreSiblings, s32 mapIndex);
-HitEntry* _hitEnt(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, s32 mapIndex);
+static void hitDamageReturnSet(HitEntry* hit, HitDamageReturn* damage, BOOL recursion);
+static void hitObjGetPosSub(HitEntry* hit, Vec* position, s32* counter, BOOL recursion);
+static BOOL chkFilterAttr(HitCheckQuery* query, HitEntry* entry);
+static BOOL checkTriVec_xz(HitCheckQuery* query, HitVector* vector);
+static s32 hitCalcVtxPosition(HitEntry* hit);
+static void hitReCalcMatrix2(HitEntry* hit, Mtx mtx, BOOL recursion);
+static void hitAtrOff(HitEntry* hit, u32 mask, s32 r);
+static void hitAtrOn(HitEntry* hit, u32 mask, s32 r);
+static void hitFlgOff(HitEntry* hit, u16 mask, s32 r);
+static void hitFlgOn(HitEntry* hit, u16 mask, s32 r);
+static HitEntry* hitEntrySub(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, BOOL ignoreSiblings, s32 mapIndex);
+static HitEntry* _hitEnt(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, s32 mapIndex);
 
 /*
     00012b2c 000004 8001810c  4 hitInit 	hitdrv.o
@@ -78,22 +78,21 @@ HitEntry* _hitEnt(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, s32 mapI
     0000dd7c 005e1c 8001335c  1 .text 	hitdrv.o
 */
 
-#if VERSION != VERSION_DEMO
-s32 hitdrv_unused_sbss;     // nothing reads or writes it
+#if VERSION >= VERSION_JP
 HitEntry* hitActiveListTop; // head of the active hit list (linked through nextActive)
 #endif
 
 // local prototypes
-void hitReCalcMatrix2(HitEntry* hit, Mtx mtx, BOOL recursion);
-s32 hitCalcVtxPosition(HitEntry* hit);
+static void hitReCalcMatrix2(HitEntry* hit, Mtx mtx, BOOL recursion);
+static s32 hitCalcVtxPosition(HitEntry* hit);
 
 inline BOOL tempfunc(HitCheckQuery* query, HitVector* vector);
 inline BOOL tempfunc2(HitCheckQuery* query, HitVector* vector);
 inline BOOL tempfunc3(HitCheckQuery* query, HitVector* vector);
-BOOL checkTriVec_xz(HitCheckQuery* query, HitVector* vector);
-BOOL chkFilterAttr(HitCheckQuery* query, HitEntry* entry);
-void hitObjGetPosSub(HitEntry* hit, Vec* position, s32* counter, BOOL recursion);
-void hitDamageReturnSet(HitEntry* hit, HitDamageReturn* damage, BOOL recursion);
+static BOOL checkTriVec_xz(HitCheckQuery* query, HitVector* vector);
+static BOOL chkFilterAttr(HitCheckQuery* query, HitEntry* entry);
+static void hitObjGetPosSub(HitEntry* hit, Vec* position, s32* counter, BOOL recursion);
+static void hitDamageReturnSet(HitEntry* hit, HitDamageReturn* damage, BOOL recursion);
 s32 hitGetEntNum(HitEntry* hitObject);
 
 void hitInit(void) {
@@ -125,7 +124,7 @@ void hitReInit(void) {
 }
 
 // This function is cursed, managed to hit 99% - https://decomp.me/scratch/FjwSA
-HitEntry* _hitEnt(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, s32 mapIndex) {
+static HitEntry* _hitEnt(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, s32 mapIndex) {
     MapWork* wp = mapGetWork();
     HitEntry* hit = wp->entries[mapIndex].hitEntries;
     Mtx trans, scale, rotX, rotY, rotZ;
@@ -212,7 +211,7 @@ HitEntry* _hitEnt(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, s32 mapI
     return hit;
 }
 
-HitEntry* hitEntrySub(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, BOOL ignoreSiblings, s32 mapIndex) {
+static HitEntry* hitEntrySub(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, BOOL ignoreSiblings, s32 mapIndex) {
     HitEntry* entry = _hitEnt(joint, parent, parentMtx, mapIndex);
     if (joint->child != NULL) {
         entry->child = hitEntrySub(joint->child, entry, entry->worldMtx, FALSE, mapIndex);
@@ -254,7 +253,7 @@ inline void hitPreCheck(void) {
     s32 j;
     MapWork* wp = mapGetWork();
     HitEntry* hit;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     HitEntry* prev;
 
     prev = hitActiveListTop = NULL;
@@ -264,7 +263,7 @@ inline void hitPreCheck(void) {
     for (; i < wp->entries->count; entry++, i++) {
         hit = entry->hitEntries;
         for (j = 0; j < entry->hitNumJoints; j++, hit++) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             hit->flags |= 0x8000;
             if (hit->joint->partCount != 0) {
                 hit->flags &= ~0x8000;
@@ -282,7 +281,7 @@ inline void hitPreCheck(void) {
 #endif
         }
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (prev != NULL) {
         prev->nextActive = NULL;
     }
@@ -320,7 +319,7 @@ void hitDelete(const char* name) {
             }
             if (strcmp(name, hit->joint->name) == 0) {
                 hit->flags |= 0x80;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 hitPreCheck();
 #endif
                 return;
@@ -376,10 +375,10 @@ void hitMain(void) {
     }
 }
 
-void hitFlgOn(HitEntry* hit, u16 mask, s32 r);
-void hitFlgOff(HitEntry* hit, u16 mask, s32 r);
-void hitAtrOn(HitEntry* hit, u32 mask, s32 r);
-void hitAtrOff(HitEntry* hit, u32 mask, s32 r);
+static void hitFlgOn(HitEntry* hit, u16 mask, s32 r);
+static void hitFlgOff(HitEntry* hit, u16 mask, s32 r);
+static void hitAtrOn(HitEntry* hit, u32 mask, s32 r);
+static void hitAtrOff(HitEntry* hit, u32 mask, s32 r);
 
 void hitObjFlagOn(const char* name, u16 mask) {
     HitEntry* hit = hitNameToPtr(name);
@@ -399,7 +398,7 @@ void hitObjFlagOff(const char* name, u16 mask) {
     hit->flags &= ~mask;
 }
 
-void hitFlgOn(HitEntry* hit, u16 mask, s32 r) {
+static void hitFlgOn(HitEntry* hit, u16 mask, s32 r) {
     hit->flags |= mask;
     if (hit->child != NULL) {
         hitFlgOn(hit->child, mask, 1);
@@ -409,7 +408,7 @@ void hitFlgOn(HitEntry* hit, u16 mask, s32 r) {
     }
 }
 
-void hitFlgOff(HitEntry* hit, u16 mask, s32 r) {
+static void hitFlgOff(HitEntry* hit, u16 mask, s32 r) {
     hit->flags &= ~mask;
     if (hit->child != NULL) {
         hitFlgOff(hit->child, mask, 1);
@@ -455,7 +454,7 @@ void hitObjAttrOff(const char* name, u32 mask) {
     hit->attributes &= ~mask;
 }
 
-void hitAtrOn(HitEntry* hit, u32 mask, s32 r) {
+static void hitAtrOn(HitEntry* hit, u32 mask, s32 r) {
     hit->attributes |= mask;
     if (hit->child != NULL) {
         hitAtrOn(hit->child, mask, 1);
@@ -465,7 +464,7 @@ void hitAtrOn(HitEntry* hit, u32 mask, s32 r) {
     }
 }
 
-void hitAtrOff(HitEntry* hit, u32 mask, s32 r) {
+static void hitAtrOff(HitEntry* hit, u32 mask, s32 r) {
     hit->attributes &= ~mask;
     if (hit->child != NULL) {
         hitAtrOff(hit->child, mask, 1);
@@ -502,7 +501,7 @@ void hitReCalcMatrix(HitEntry* hit, Mtx mtx) {
     hit->radius = PSVECDistance(&world, &hit->centerWorld);
 }
 
-void hitReCalcMatrix2(HitEntry* hit, Mtx mtx, BOOL recursion) {
+static void hitReCalcMatrix2(HitEntry* hit, Mtx mtx, BOOL recursion) {
     int doCalc;
 
     doCalc = 0;
@@ -544,7 +543,7 @@ static inline f32 hitDequant(s16* base, s32 idx) {
     return __OSs16tof32(base + idx);
 }
 
-s32 hitCalcVtxPosition(HitEntry* hit) {
+static s32 hitCalcVtxPosition(HitEntry* hit) {
     s32 i;
     Vec a;
     MapWork* wp;
@@ -711,7 +710,7 @@ inline BOOL tempfunc(HitCheckQuery* query, HitVector* vector) {
     query->hitPos.x = query->targetPos.x;
     query->hitPos.y = query->targetPos.y - query->targetDistance;
     query->hitPos.z = query->targetPos.z;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     query->hitNormal = vector->normal;
 #endif
     if (dotProduct >= 0.0f) {
@@ -845,7 +844,7 @@ inline BOOL tempfunc3(HitCheckQuery* query, HitVector* vector) {
     return 1;
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo walks every map entry's hit objects (no active list) and has no separate straight-up case.
 HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) {
     HitVector* vector2;
@@ -1154,7 +1153,7 @@ HitEntry* hitCheckFilter(HitFilterCallback callback, f32* hitX, f32* hitY, f32* 
     return entry;
 }
 
-BOOL checkTriVec_xz(HitCheckQuery* query, HitVector* vector) {
+static BOOL checkTriVec_xz(HitCheckQuery* query, HitVector* vector) {
     Vec v1, v2, v3;
     f32 cosAngle;
     f32 distToTrianglePlane;
@@ -1249,7 +1248,7 @@ BOOL hitCheckVecHitObjXZ(HitCheckQuery* query, HitEntry* entry) { // 1:1
     return 0;
 }
 
-BOOL chkFilterAttr(HitCheckQuery* query, HitEntry* entry) { // 1:1
+static BOOL chkFilterAttr(HitCheckQuery* query, HitEntry* entry) { // 1:1
     return (entry->attributes & query->user0) == 0;
 }
 
@@ -1326,7 +1325,7 @@ HitEntry* hitCheckSphereFilter(HitFilterCallback callback, f32 x, f32 y, f32 z,
     if (objectId < 0) {
         return 0;
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (minDist < (0.5f * radius)) {
         return &map[entryId].hitEntries[objectId];
     }
@@ -1385,7 +1384,7 @@ HitEntry* hitNameToPtr(const char* name) { // 1:1
     return NULL;
 }
 
-void hitObjGetPosSub(HitEntry* hit, Vec* position, s32* counter, BOOL recursion) { // 1:1, awful inlining
+static void hitObjGetPosSub(HitEntry* hit, Vec* position, s32* counter, BOOL recursion) { // 1:1, awful inlining
     Vec center;
 
     if (hit->child != NULL) {
@@ -1427,7 +1426,7 @@ void hitObjGetNormal(const char* name, Vec* normal) { // 1:1
     }
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 const char* hitGetName(HitEntry* hit) {
     if (hit != NULL) {
         return hit->joint->name;
@@ -1465,7 +1464,7 @@ s32 hitGetAttr(HitEntry* hit) { // 1:1
     return hit != NULL ? hit->attributes : 0;
 }
 
-void hitDamageReturnSet(HitEntry* hit, HitDamageReturn* damage, BOOL recursion) { // 1:1
+static void hitDamageReturnSet(HitEntry* hit, HitDamageReturn* damage, BOOL recursion) { // 1:1
     hit->attributes |= 0x40000000;
     hit->damage = damage;
     if (hit->child != NULL) {

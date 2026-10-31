@@ -21,7 +21,7 @@
 #include "battle/battle_camera.h"
 #include "battle/sac/sac_common.h"
 #include "evt/evt_fade.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/sac/sac_zubastar.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
@@ -139,21 +139,21 @@ BattleWeapon weapon_zubastar = {
     marioAttackEvent_ZubaStar, // attackEvtScript
     {0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0}, // stageEffectRates
 };
-s32 zubastar_get_kouten(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy);
+static s32 zubastar_get_kouten(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy);
 
-s32 star_stone_appear(void) {
+static s32 star_stone_appear(void) {
     ZubaStarWork* w = GetZubaStarPtr();
     w->stone_state = 1;
     return 2;
 }
 
-s32 wait_star_stone_up(void) {
+static s32 wait_star_stone_up(void) {
     return GetZubaStarPtr()->stone_state == 4 ? 2 : 0;
 }
 
-void zubaStarDispStar(CameraId cam, void* param);
+static void zubaStarDispStar(CameraId cam, void* param);
 
-s32 main_star(void) {
+static s32 main_star(void) {
     ZubaStarWork* w = GetZubaStarPtr();
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
     switch (w->stone_state) {
@@ -217,7 +217,7 @@ s32 main_star(void) {
     return 0;
 }
 
-void zubaStarDispStar(CameraId cam, void* param) {
+static void zubaStarDispStar(CameraId cam, void* param) {
 }
 
 // inlining off for GetZubaStarPtr, as in the original (the object differs without it)
@@ -233,7 +233,7 @@ s32 weaponGetPower_ZubaStar(BattleUnit* attacker, BattleWeapon* weapon, BattleUn
 
 // inlining off for zubastar_create_takaku, as in the original (the object differs without it)
 #pragma dont_inline on
-void zubastar_create_takaku(s32 n, Vec* pts) {
+static void zubastar_create_takaku(s32 n, Vec* pts) {
     ZubaStarWork* w = GetZubaStarPtr();
     ZSObj* t;
     s32 i;
@@ -252,7 +252,7 @@ void zubastar_create_takaku(s32 n, Vec* pts) {
 }
 #pragma dont_inline reset
 
-void zubastar_bunkatu(Vec* p0, Vec* p1) {
+static void zubastar_bunkatu(Vec* p0, Vec* p1) {
     ZubaStarWork* w = GetZubaStarPtr();
     ZSObj* t;
     s32 i;
@@ -342,7 +342,7 @@ void zubastar_bunkatu(Vec* p0, Vec* p1) {
 
 // inlining off for zubastar_get_kouten, as in the original (the object differs without it)
 #pragma dont_inline on
-s32 zubastar_get_kouten(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy) {
+static s32 zubastar_get_kouten(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy) {
     f32 dx1 = x2 - x1;
     f32 d, a, t, e1, e2, dx2, b;
     if (dx1 == 0.0f && (x4 - x3) == 0.0f)
@@ -377,10 +377,10 @@ static EVT_BEGIN(nice_event)
     CALL(btlevtcmd_ACSuccessEffect, LW(0), -120, 140, 0)
     RETURN
 EVT_END()
-void zubastar_disp2D(CameraId cam, void* param);
+static void zubastar_disp2D(CameraId cam, void* param);
 #define SFXON(s) psndSFXOn(s)
 
-USER_FUNC(zubastar_main) {
+static USER_FUNC(zubastar_main) {
     ZubaStarWork* w = GetZubaStarPtr();
     Vec pts[4] = {{0.0f, 240.0f, 0.0f}, {304.0f, 240.0f, 0.0f}, {304.0f, -240.0f, 0.0f}, {0.0f, -240.0f, 0.0f}};
     s32 audience = BattleAudience_GetAudienceNum();
@@ -504,7 +504,7 @@ USER_FUNC(zubastar_main) {
                     n++;
                 }
             }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             top[n] = 364.0f;
             bot[n] = 304.0f;
 #else
@@ -662,7 +662,7 @@ USER_FUNC(zubastar_main) {
             if (w->ltimer >= 15) {
                 w->cursor.timer = 27;
                 w->cursor.f4 = 0;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 // The demo flashes the screen from here; retail leaves it to marioAttackEvent_ZubaStar.
                 fadeEntry(FADE_OUT_WHITE, 1, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
                 btl_camera_shake_h(0, 5.0f, 0.0f, 30, 0);
@@ -678,7 +678,7 @@ USER_FUNC(zubastar_main) {
             break;
         case 28:
             w->cursor.timer = 30;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             fadeEntry(FADE_IN_WHITE, 150, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 #endif
         case 30:
@@ -780,10 +780,10 @@ USER_FUNC(zubastar_main) {
     return 0;
 }
 
-void zubastar_disp_bomb(CameraId cam, void* param);
-void zubastar_capture(CameraId cam, void* param);
+static void zubastar_disp_bomb(CameraId cam, void* param);
+static void zubastar_capture(CameraId cam, void* param);
 
-USER_FUNC(zubastar_bomb) {
+static USER_FUNC(zubastar_bomb) {
     ZubaStarWork* w = GetZubaStarPtr();
     const char* sfx;
     s32 i;
@@ -855,12 +855,12 @@ USER_FUNC(zubastar_bomb) {
     return 0;
 }
 
-s32 zubastar_init(void) {
+static s32 zubastar_init(void) {
     memset(GetZubaStarPtr(), 0, sizeof(ZubaStarWork));
     return 2;
 }
 
-s32 zubastar_end(void) {
+static s32 zubastar_end(void) {
     ZubaStarWork* w = GetZubaStarPtr();
     s32 i;
     effDelete(((EffStarStoneWork*)w->eff->userdata)->dust);
@@ -879,7 +879,7 @@ s32 zubastar_end(void) {
     return 2;
 }
 
-void zubastar_capture(CameraId cam, void* param) {
+static void zubastar_capture(CameraId cam, void* param) {
     ZubaStarWork* w = GetZubaStarPtr();
     GXSetTexCopySrc(0xd0, 0, 400, 480);
     GXSetTexCopyDst(400, 480, GX_TF_RGB565, GX_FALSE);
@@ -887,7 +887,7 @@ void zubastar_capture(CameraId cam, void* param) {
     GXPixModeSync();
 }
 
-void zubastar_disp_bomb(CameraId cam, void* param) {
+static void zubastar_disp_bomb(CameraId cam, void* param) {
     ZubaStarWork* w = GetZubaStarPtr();
     CameraEntry* camera = camGetPtr((CameraId)CAMERA_2D);
     Mtx tc;
@@ -956,7 +956,7 @@ dispA(Mtx m, s32 i) {
     iconDispGxCol(m, ICON_DISP_2D, ICON_19D, ca);
 }
 
-void zubastar_disp2D(CameraId cam, void* param) {
+static void zubastar_disp2D(CameraId cam, void* param) {
     ZubaStarWork* w = GetZubaStarPtr();
     ZSCursor* cur = &w->cursor;
     ZSLine* l;
@@ -1009,12 +1009,12 @@ void zubastar_disp2D(CameraId cam, void* param) {
     }
 }
 
-s32 star_stone_appear(void);
-s32 wait_star_stone_up(void);
-s32 main_star(void);
-s32 zubastar_init(void);
-s32 zubastar_end(void);
-USER_FUNC(zubastar_main);
+static s32 star_stone_appear(void);
+static s32 wait_star_stone_up(void);
+static s32 main_star(void);
+static s32 zubastar_init(void);
+static s32 zubastar_end(void);
+static USER_FUNC(zubastar_main);
 
 EVT_BEGIN(marioAttackEvent_ZubaStar)
     CALL(zubastar_init)

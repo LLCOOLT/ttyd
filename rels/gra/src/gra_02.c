@@ -16,7 +16,6 @@
 #include "evt/evt_msg.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_urouro.h"
-#include "party/party_motion.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
 
@@ -57,7 +56,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"ブタお店の主人"*/"\x83\x75\x83\x5E\x82\xA8\x93\x58\x82\xCC\x8E\xE5\x90\x6C", // name
+        "ブタお店の主人", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         shopmaster_pig_init, // initEvent
@@ -163,7 +162,7 @@ EVT_BEGIN(gra02_straw_blow_evt)
 EVT_END()
 
 static const char* booboo_name[] = {
-    /*"ブタお店の主人"*/"\x83\x75\x83\x5E\x82\xA8\x93\x58\x82\xCC\x8E\xE5\x90\x6C",
+    "ブタお店の主人",
 };
 
 EVT_BEGIN(gra_02_init_evt)
@@ -172,13 +171,13 @@ EVT_BEGIN(gra_02_init_evt)
     CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_item_entry, STRING("item00"), ITEM_STAR_PIECE, -125, 0, -110, 16, GSWF(GSWF_GRA02_STAR_PIECE_1), 0)
-    CALL(evt_item_entry, STRING("item01"), ITEM_STAR_PIECE, 305, 0, -35, 16, GSWF(GSWF_GRA02_STAR_PIECE_2), 0)
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
+    CALL_CHILD(evt_bero_info_run)
+    CALL(evt_item_entry, STRING("item00"), ITEM_STAR_PIECE, -125, 0, -110, ITEM_ENTRY_FIXED, GSWF(GSWF_GRA02_STAR_PIECE_1), 0)
+    CALL(evt_item_entry, STRING("item01"), ITEM_STAR_PIECE, 305, 0, -35, ITEM_ENTRY_FIXED, GSWF(GSWF_GRA02_STAR_PIECE_2), 0)
+    CALL_CHILD(evt_usu_kagemario_party_kill)
     CALL(evt_npc_setup, PTR(npcEnt))
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG4_03_SHOP_KEY)
-        CALL(evt_item_entry, STRING("key00"), ITEM_SHOP_KEY, -30, 0, 0, 0, -1, PTR(gra02_get_key))
+        CALL(evt_item_entry, STRING("key00"), ITEM_SHOP_KEY, -30, 0, 0, ITEM_ENTRY_STAY, -1, PTR(gra02_get_key))
     END_IF
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG4_05_STRAW_TEPEE)
         CALL(evt_cloud_init)

@@ -26,7 +26,6 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "las.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
@@ -300,16 +299,16 @@ static EVT_BEGIN(first_evt)
     CALL(evt_cam3d_evt_set, 157, 87, 1126, -800, 110, 85, 2000, 11)
     WAIT_MS(2000)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, -180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(10))
         IF_INT_EQUAL(LW(10), 0)
             SET_FLOAT_VALUE(LW(0), FLOAT(-180.0f))
-            CALL_CHILD(PTR(w_door_open))
+            CALL_CHILD(w_door_open)
             BREAK_LOOP
         ELSE
-            CALL_CHILD(PTR(w_door_open))
+            CALL_CHILD(w_door_open)
         END_IF
     END_LOOP
     BEGIN_INLINE_EVENT
@@ -317,16 +316,16 @@ static EVT_BEGIN(first_evt)
     END_INLINE_EVENT
     CALL(evt_mario_mov_pos2, -875, 0, FLOAT(150.0f))
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_close_door_play_se))
+    SPAWN_EVENT(bero_close_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(10))
         IF_INT_EQUAL(LW(10), 0)
             SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
-            CALL_CHILD(PTR(w_door_close))
+            CALL_CHILD(w_door_close)
             BREAK_LOOP
         ELSE
-            CALL_CHILD(PTR(w_door_close))
+            CALL_CHILD(w_door_close)
         END_IF
     END_LOOP
     WAIT_MS(300)
@@ -336,9 +335,11 @@ static EVT_BEGIN(first_evt)
     CALL(evt_msg_print_party, STRING("stg8_las_11"))
     CALL(evt_party_run, 0)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG8_03_THE_PALACE_GARDEN)
-    CALL_CHILD(PTR(bero_case_entry))
+    CALL_CHILD(bero_case_entry)
     CALL(evt_cam3d_evt_off, 500, 11)
+#if VERSION >= VERSION_JP
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
+#endif
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -394,7 +395,7 @@ EVT_BEGIN(bomb_wanwan1_evt)
     CALL(evt_mario_key_onoff, 0)
     SET_VALUE(LW(0), STRING("wan3"))
     SET_VALUE(LW(1), STRING("A_wan1"))
-    CALL_CHILD(PTR(bomb_wanwan))
+    CALL_CHILD(bomb_wanwan)
     SET_VALUE(GSWF(GSWF_LAS09_CHOMP_STATUE_1_BOMBED), 1)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_cam_letter_box_disable, 0)
@@ -407,7 +408,7 @@ EVT_BEGIN(bomb_wanwan2_evt)
     CALL(evt_mario_key_onoff, 0)
     SET_VALUE(LW(0), STRING("wan1"))
     SET_VALUE(LW(1), STRING("A_wan2"))
-    CALL_CHILD(PTR(bomb_wanwan))
+    CALL_CHILD(bomb_wanwan)
     SET_VALUE(GSWF(GSWF_LAS09_CHOMP_STATUE_2_BOMBED), 1)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_cam_letter_box_disable, 0)
@@ -638,7 +639,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"マジョリン"*/"\x83\x7D\x83\x57\x83\x87\x83\x8A\x83\x93", // name
+        "マジョリン", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         majyorin_init, // initEvent
@@ -648,7 +649,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"マリリン"*/"\x83\x7D\x83\x8A\x83\x8A\x83\x93", // name
+        "マリリン", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         maririn_init, // initEvent
@@ -658,7 +659,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", // name
+        "ランペル", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         ranpel_init, // initEvent
@@ -859,27 +860,29 @@ EVT_BEGIN(majyorin_evt)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
-    SPAWN_EVENT(PTR(majyorin_evt_main))
+    SPAWN_EVENT(majyorin_evt_main)
     RETURN
 EVT_END()
 
 EVT_BEGIN(las_09_init_evt)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS3"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 2)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_02_FOLLOW_THE_LIT_TORCHES)
-        CALL_CHILD(PTR(evt_bero_info_run))
+        CALL_CHILD(evt_bero_info_run)
     END_IF
     CALL(evt_hit_damage_return_set, PTR(dmgRetPoint))
-    CALL_CHILD(PTR(evt_gazigazi_entry))
+    CALL_CHILD(evt_gazigazi_entry)
     CALL(evt_map_playanim, STRING("mizu"), 1, 0)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_mobj_recovery_blk, STRING("r_blk"), 10, 190, 50, 25, 0, 0)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), -190, 50, 25, 0, 0)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_02_FOLLOW_THE_LIT_TORCHES)
-        SPAWN_EVENT(PTR(first_evt))
+        SPAWN_EVENT(first_evt)
     END_IF
     IF_INT_EQUAL(GSWF(GSWF_LAS09_CHOMP_STATUE_1_BOMBED), 0)
         CALL(evt_run_case_evt, CASE_COND_BOBBERY, 1, STRING("A_wan1"), 0, PTR(bomb_wanwan1_evt), 0)
@@ -912,7 +915,7 @@ EVT_BEGIN(las_09_init_evt)
     END_IF
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_den"), MAPOBJ_FLAG_BBOX_CULL)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_06_MOVING_PLANETS)
-        CALL_CHILD(PTR(majyorin_evt_npc_entry))
+        CALL_CHILD(majyorin_evt_npc_entry)
         CALL(evt_bero_get_entername, LW(0))
         IF_STR_EQUAL(LW(0), STRING("majyorin_evt"))
             CALL(evt_mario_set_pos, 620, 0, 82)
@@ -922,10 +925,10 @@ EVT_BEGIN(las_09_init_evt)
             BEGIN_INLINE_EVENT
                 CALL(evt_seq_wait, 2)
                 CALL(evt_bero_exec_wait, 65536)
-                SPAWN_EVENT(PTR(majyorin_evt_main))
+                SPAWN_EVENT(majyorin_evt_main)
             END_INLINE_EVENT
         ELSE
-            SPAWN_EVENT(PTR(majyorin_evt))
+            SPAWN_EVENT(majyorin_evt)
         END_IF
     END_IF
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_04_GLOOMTAIL)

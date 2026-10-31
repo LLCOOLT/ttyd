@@ -38,8 +38,8 @@ effN64Vtx foot_vtx[] = {
     {-5, 0, 5, 0, 0, 0, 0, 0, 255},
 };
 
-void effKemuri7Main(EffectEntry* effect);
-void effKemuri7Disp(CameraId cameraId, EffectEntry* effect);
+static void effKemuri7Main(EffectEntry* effect);
+static void effKemuri7Disp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effKemuri7N64Entry(f32 x, f32 y, f32 z, f32 angle, f32 side) {
     EffectEntry* effect;
@@ -82,7 +82,7 @@ EffectEntry* effKemuri7N64Entry(f32 x, f32 y, f32 z, f32 angle, f32 side) {
     return effect;
 }
 
-void effKemuri7Main(EffectEntry* effect) {
+static void effKemuri7Main(EffectEntry* effect) {
     EffKemuri7N64Work* work = effect->userdata;
     s32 i;
     BOOL alive;
@@ -117,7 +117,7 @@ void effKemuri7Main(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effKemuri7Disp, effect);
 }
 
-void effKemuri7Disp(CameraId cameraId, EffectEntry* effect) {
+static void effKemuri7Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffKemuri7N64Work* work;
     s32 i;

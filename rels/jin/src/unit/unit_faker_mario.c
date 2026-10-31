@@ -17,7 +17,7 @@
 #include "manager/evtmgr_cmd.h"
 #include "battle/battle_party.h"
 #include "evt/evt_msg.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "jin.h"
 // FAKE: unit_faker_mario.c calls BattlePartyAnimeLoad through this prototype (the types it was compiled with) instead of the one in battle/battle.h; same registers, behaviour-identical.
 typedef BOOL (*BattlePartyAnimeLoadRetBoolFn)(s32);
@@ -25,32 +25,22 @@ typedef BOOL (*BattlePartyAnimeLoadRetBoolFn)(s32);
 typedef struct FakerStatus {
     s16 data[15];
 } FakerStatus;
+typedef struct FakerParam {
+    f32 size;
+    FakerStatus status;
+    s32 statusFlags;
 #if VERSION >= VERSION_US
-typedef struct FakerParam {
-    f32 size;
-    FakerStatus status;
-    s32 statusFlags;
     u16 commandDisabled[2];
-    s16 currentHp;
-    s16 maxHp;
-    s16 currentFp;
-    s16 maxFp;
-} FakerParam;
-#else
-typedef struct FakerParam {
-    f32 size;
-    FakerStatus status;
-    s32 statusFlags;
-    s16 currentHp;
-    s16 maxHp;
-    s16 currentFp;
-    s16 maxFp;
-} FakerParam;
 #endif
+    s16 currentHp;
+    s16 maxHp;
+    s16 currentFp;
+    s16 maxFp;
+} FakerParam;
 
 static USER_FUNC(_anime_load);
 static USER_FUNC(_anime_load_wait);
-USER_FUNC(_gullible_party_info_init);
+static USER_FUNC(_gullible_party_info_init);
 #if VERSION >= VERSION_US
 USER_FUNC(faker_mario_sync_max_moves);
 #endif
@@ -139,7 +129,7 @@ static USER_FUNC(_anime_load) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_save_param) {
+static USER_FUNC(_save_param) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
     s32 id1 = evtGetValue(event, args[0]);
@@ -177,7 +167,7 @@ USER_FUNC(_save_param) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_load_param) {
+static USER_FUNC(_load_param) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
     s32 id1 = evtGetValue(event, args[0]);
@@ -285,7 +275,11 @@ static BattleUnitDefense defence_fmario = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr_fmario = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist_fmario = {50, 50, 50, 50, 50, 50, 100, 40, 100, 50, 100, 50, 100, 25, 50, 0, 0, 100, 50, 100, 100, 3};
+#else
 static StatusVulnerability regist_fmario = {50, 50, 70, 50, 50, 50, 100, 40, 100, 70, 100, 70, 100, 90, 50, 0, 0, 100, 50, 100, 100, 3};
+#endif
 
 static PoseTableEntry pose_table_fmario_stay[] = {
     {1, "EM_N_1"},
@@ -301,8 +295,8 @@ static PoseTableEntry pose_table_fmario_stay[] = {
     {40, "EM_W_1"},
     {56, "EM_D_3"},
     {57, "EM_D_3"},
-    {65, "EM_T_1"},
-    {69, "EM_S_1"},
+    {BTL_POSE_TALK, "EM_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "EM_S_1"},
 };
 
 static BattleDataEntry data_table_fmario[] = {
@@ -373,7 +367,11 @@ static BattleWeapon weapon_masao_hammer = {
     2, // reserved_6F
     NULL, // acHelpMsg
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_USABLE_IF_CONFUSED, // special
+#if VERSION <= VERSION_DEMO_US
+    COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
+#else
     COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_PAYBACK, // counterResistFlags
+#endif
     TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
@@ -445,7 +443,11 @@ static BattleWeapon weapon_masao_kaiten_hammer = {
     2, // reserved_6F
     NULL, // acHelpMsg
     SPECIAL_BADGE_BUFFABLE | SPECIAL_STATUS_BUFFABLE | SPECIAL_CHARGE_BUFFABLE | SPECIAL_ATTACK_FX | SPECIAL_USABLE_IF_CONFUSED, // special
+#if VERSION <= VERSION_DEMO_US
+    COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY, // counterResistFlags
+#else
     COUNTER_RESIST_PREEMPTIVE_SPIKY | COUNTER_RESIST_FRONT_SPIKY | COUNTER_RESIST_PAYBACK, // counterResistFlags
+#endif
     TARGET_WEIGHT_PREFER_FRONT | TARGET_WEIGHT_UNUSED_2000 | TARGET_WEIGHT_RANDOM, // targetWeightFlags
     0, 0, 0, 0, 0, 0, 0, 0, // sleepChance..poisonTime
     0, 0, 0, 0, 0, 0, 0, 0, // poisonStrength..burnChance
@@ -588,7 +590,7 @@ EVT_END()
 EVT_BEGIN(fmario_entry_event)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     WAIT_MS(2000)
-    CALL_CHILD(PTR(fmario_zoom))
+    CALL_CHILD(fmario_zoom)
     CALL(evt_msg_print, 2, STRING("stg4_jin_22"), 0, BTL_UNIT_SELF)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
     CALL(evt_btl_camera_set_mode, 0, 0)
@@ -647,10 +649,10 @@ static EVT_BEGIN(dead_event_fmario)
     CALL(btlevtcmd_StatusWindowOnOff, 0)
     SWITCH(GW(20))
         CASE_EQUAL(0)
-        CALL_CHILD(PTR(fmario_zoom))
-        CALL_CHILD(PTR(dead_event_fmario_down))
+        CALL_CHILD(fmario_zoom)
+        CALL_CHILD(dead_event_fmario_down)
         WAIT_MS(300)
-        CALL_CHILD(PTR(gparty_zoom))
+        CALL_CHILD(gparty_zoom)
         SWITCH(GW(18))
             CASE_EQUAL(0)
             CALL(evt_msg_print, 2, STRING("stg4_jin_26_05_kur"), 0, GW(17))
@@ -663,19 +665,19 @@ static EVT_BEGIN(dead_event_fmario)
         END_SWITCH
         WAIT_MS(200)
         CASE_EQUAL(1)
-        CALL_CHILD(PTR(enemy_zoom))
-        CALL_CHILD(PTR(dead_event_fmario_down))
+        CALL_CHILD(enemy_zoom)
+        CALL_CHILD(dead_event_fmario_down)
         WAIT_MS(200)
         CASE_EQUAL(2)
-        CALL_CHILD(PTR(fmario_zoom))
-        CALL_CHILD(PTR(dead_event_fmario_down))
+        CALL_CHILD(fmario_zoom)
+        CALL_CHILD(dead_event_fmario_down)
         WAIT_MS(200)
     END_SWITCH
     SET_VALUE(GW(19), 2)
     CALL(btlevtcmd_StatusWindowOnOff, 1)
     CALL(evt_btl_camera_set_mode, 0, 0)
     SET_VALUE(LW(10), -2)
-    CALL_CHILD(PTR(subsetevt_dead_core_nospin_norotate))
+    CALL_CHILD(subsetevt_dead_core_nospin_norotate)
     RETURN
 EVT_END()
 
@@ -686,254 +688,133 @@ static EVT_BEGIN(damage_event_fmario)
     END_IF
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
+EVT_BEGIN(phase_event_fmario)
+    CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_get_turn, LW(0))
+        IF_INT_EQUAL(LW(0), 3)
+            CALL(btlevtcmd_StatusWindowOnOff, 0)
+            CALL(evt_msg_print, 0, STRING("stg4_jin_23"), 0, 0)
+            WAIT_MS(200)
+            SET_VALUE(GW(21), 1)
+            CALL(vivian_comeback)
+            CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entryunit_party[4]), 0)
+            CALL(btlevtcmd_SetHomePos, LW(3), FLOAT(-140.0f), FLOAT(0.0f), FLOAT(5.0f))
+            CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(0))
+            CALL(btlevtcmd_SetUnitWork, LW(3), 1, LW(1))
+            CALL(btlevtcmd_SetUnitWork, LW(3), 2, LW(2))
 #if VERSION >= VERSION_US
-EVT_BEGIN(phase_event_fmario)
-    CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
-    IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_get_turn, LW(0))
-        IF_INT_EQUAL(LW(0), 3)
-            CALL(btlevtcmd_StatusWindowOnOff, 0)
-            CALL(evt_msg_print, 0, STRING("stg4_jin_23"), 0, 0)
-            WAIT_MS(200)
-            SET_VALUE(GW(21), 1)
-            CALL(vivian_comeback)
-            CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entryunit_party[4]), 0)
-            CALL(btlevtcmd_SetHomePos, LW(3), FLOAT(-140.0f), FLOAT(0.0f), FLOAT(5.0f))
-            CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(0))
-            CALL(btlevtcmd_SetUnitWork, LW(3), 1, LW(1))
-            CALL(btlevtcmd_SetUnitWork, LW(3), 2, LW(2))
             CALL(faker_mario_sync_max_moves, LW(3))
-            WAIT_FRAMES(1)
-            CALL(btlevtcmd_GetMarioId, LW(3), LW(5))
-            CALL(btlevtcmd_GetBodyId, LW(5), LW(6))
-            CALL(btlevtcmd_StopWaitEvent, LW(3))
-            CALL(btlevtcmd_StopWaitEvent, LW(5))
-            WAIT_MS(700)
-            SPAWN_EVENT(mario_zoom)
-            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_VIVIAN_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-            CALL(btlevtcmd_SetPos, LW(3), -140, -40, 5)
-            CALL(btlevtcmd_DivePosition, LW(3), -140, 0, 5, 60, 0, 0, 4, 0)
-            CALL(btlevtcmd_AnimeChangePose, LW(5), LW(6), STRING("M_Z_1"))
-            BEGIN_SIBLING_EVENT_GET_ID(LW(0))
-                CALL(evt_sub_intpl_init, 0, 0, 180, 15)
-                LOOP(16)
-                    CALL(evt_sub_intpl_get_value)
-                    CALL(btlevtcmd_SetRotate, BTL_UNIT_MARIO, 0, LW(0), 0)
-                    WAIT_FRAMES(1)
-                END_LOOP
-            END_SIBLING_EVENT
-            CALL(btlevtcmd_WaitEventEnd, LW(0))
-            CALL(evt_msg_print, 2, STRING("stg4_jin_24"), 0, LW(3))
-            WAIT_MS(200)
-            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_FIND1_3"), EVT_NULLPTR, 0, EVT_NULLPTR)
-            CALL(btlevtcmd_GetPos, LW(5), LW(7), LW(8), LW(10))
-            CALL(btlevtcmd_JumpSetting, LW(5), 12, FLOAT(1.0f), FLOAT(1.1992188f))
-            CALL(btlevtcmd_JumpPosition, LW(5), LW(7), LW(8), LW(10), 0, -1)
-            WAIT_MS(1000)
-            CALL(evt_msg_print, 2, STRING("stg4_jin_25"), 0, LW(3))
-            WAIT_MS(1000)
-            BEGIN_SIBLING_EVENT_GET_ID(LW(0))
-                CALL(evt_sub_intpl_init, 0, 180, 0, 15)
-                LOOP(16)
-                    CALL(evt_sub_intpl_get_value)
-                    CALL(btlevtcmd_SetRotate, BTL_UNIT_MARIO, 0, LW(0), 0)
-                    WAIT_FRAMES(1)
-                END_LOOP
-            END_SIBLING_EVENT
-            CALL(btlevtcmd_WaitEventEnd, LW(0))
-            WAIT_MS(200)
-            CALL(btlevtcmd_AnimeChangePose, LW(5), LW(6), STRING("M_I_Y"))
-            WAIT_MS(1000)
-            CALL(btlevtcmd_StatusWindowOnOff, 1)
-            CALL(evt_btl_camera_set_mode, 0, 0)
-            CALL(btlevtcmd_StartWaitEvent, LW(3))
-        END_IF
-    END_IF
-    CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
-    IF_INT_NOT_EQUAL(LW(0), 0)
-        IF_INT_NOT_EQUAL(GW(20), 0)
-            CALL_CHILD(party_change_event)
-        END_IF
-        CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(2))
-        IF_INT_NOT_EQUAL(GW(20), 0)
-            IF_INT_EQUAL(LW(2), 0)
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
-                SET_VALUE(LW(2), 1)
-            END_IF
-        END_IF
-        SWITCH(LW(2))
-            CASE_EQUAL(0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(1))
-            IF_INT_LESS(LW(0), LW(1))
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
-                CALL(btlevtcmd_StatusWindowOnOff, 0)
-                CALL_CHILD(enemy_zoom)
-                SWITCH(GW(18))
-                    CASE_EQUAL(0)
-                    CALL(evt_msg_print, 2, STRING("stg4_jin_26_kur"), 0, GW(17))
-                    CASE_EQUAL(1)
-                    CALL(evt_msg_print, 2, STRING("stg4_jin_26_nok"), 0, GW(17))
-                    CASE_EQUAL(2)
-                    CALL(evt_msg_print, 2, STRING("stg4_jin_26_win"), 0, GW(17))
-                    CASE_EQUAL(3)
-                    CALL(evt_msg_print, 2, STRING("stg4_jin_26_yos"), 0, GW(17))
-                END_SWITCH
-                WAIT_MS(200)
-                CALL(btlevtcmd_StatusWindowOnOff, 1)
-            END_IF
-            CASE_EQUAL(1)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
-            IF_INT_LESS(LW(0), LW(1))
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 2)
-                CALL(btlevtcmd_StatusWindowOnOff, 0)
-                CALL_CHILD(fmario_zoom)
-                CALL(evt_msg_print, 2, STRING("stg4_jin_26_01"), 0, BTL_UNIT_SELF)
-                WAIT_MS(200)
-                CALL(btlevtcmd_StatusWindowOnOff, 1)
-            END_IF
-            CASE_EQUAL(2)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(1))
-            IF_INT_LESS(LW(0), LW(1))
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 3)
-                CALL(btlevtcmd_StatusWindowOnOff, 0)
-                CALL_CHILD(fmario_zoom)
-                CALL(evt_msg_print, 2, STRING("stg4_jin_26_02"), 0, BTL_UNIT_SELF)
-                WAIT_MS(200)
-                CALL(btlevtcmd_StatusWindowOnOff, 1)
-            END_IF
-        END_SWITCH
-    END_IF
-    RETURN
-EVT_END()
-#else
-EVT_BEGIN(phase_event_fmario)
-    CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
-    IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_get_turn, LW(0))
-        IF_INT_EQUAL(LW(0), 3)
-            CALL(btlevtcmd_StatusWindowOnOff, 0)
-            CALL(evt_msg_print, 0, STRING("stg4_jin_23"), 0, 0)
-            WAIT_MS(200)
-            SET_VALUE(GW(21), 1)
-            CALL(vivian_comeback)
-            CALL(btlevtcmd_SpawnUnit, LW(3), PTR(&entryunit_party[4]), 0)
-            CALL(btlevtcmd_SetHomePos, LW(3), FLOAT(-140.0f), FLOAT(0.0f), FLOAT(5.0f))
-            CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_SetUnitWork, LW(3), 0, LW(0))
-            CALL(btlevtcmd_SetUnitWork, LW(3), 1, LW(1))
-            CALL(btlevtcmd_SetUnitWork, LW(3), 2, LW(2))
-            WAIT_FRAMES(1)
-            CALL(btlevtcmd_GetMarioId, LW(3), LW(5))
-            CALL(btlevtcmd_GetBodyId, LW(5), LW(6))
-            CALL(btlevtcmd_StopWaitEvent, LW(3))
-            CALL(btlevtcmd_StopWaitEvent, LW(5))
-            WAIT_MS(700)
-            SPAWN_EVENT(mario_zoom)
-            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_VIVIAN_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-            CALL(btlevtcmd_SetPos, LW(3), -140, -40, 5)
-            CALL(btlevtcmd_DivePosition, LW(3), -140, 0, 5, 60, 0, 0, 4, 0)
-            CALL(btlevtcmd_AnimeChangePose, LW(5), LW(6), STRING("M_Z_1"))
-            BEGIN_SIBLING_EVENT_GET_ID(LW(0))
-                CALL(evt_sub_intpl_init, 0, 0, 180, 15)
-                LOOP(16)
-                    CALL(evt_sub_intpl_get_value)
-                    CALL(btlevtcmd_SetRotate, BTL_UNIT_MARIO, 0, LW(0), 0)
-                    WAIT_FRAMES(1)
-                END_LOOP
-            END_SIBLING_EVENT
-            CALL(btlevtcmd_WaitEventEnd, LW(0))
-            CALL(evt_msg_print, 2, STRING("stg4_jin_24"), 0, LW(3))
-            WAIT_MS(200)
-            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_FIND1_3"), EVT_NULLPTR, 0, EVT_NULLPTR)
-            CALL(btlevtcmd_GetPos, LW(5), LW(7), LW(8), LW(10))
-            CALL(btlevtcmd_JumpSetting, LW(5), 12, FLOAT(1.0f), FLOAT(1.1992188f))
-            CALL(btlevtcmd_JumpPosition, LW(5), LW(7), LW(8), LW(10), 0, -1)
-            WAIT_MS(1000)
-            CALL(evt_msg_print, 2, STRING("stg4_jin_25"), 0, LW(3))
-            WAIT_MS(1000)
-            BEGIN_SIBLING_EVENT_GET_ID(LW(0))
-                CALL(evt_sub_intpl_init, 0, 180, 0, 15)
-                LOOP(16)
-                    CALL(evt_sub_intpl_get_value)
-                    CALL(btlevtcmd_SetRotate, BTL_UNIT_MARIO, 0, LW(0), 0)
-                    WAIT_FRAMES(1)
-                END_LOOP
-            END_SIBLING_EVENT
-            CALL(btlevtcmd_WaitEventEnd, LW(0))
-            WAIT_MS(200)
-            CALL(btlevtcmd_AnimeChangePose, LW(5), LW(6), STRING("M_I_Y"))
-            WAIT_MS(1000)
-            CALL(btlevtcmd_StatusWindowOnOff, 1)
-            CALL(evt_btl_camera_set_mode, 0, 0)
-            CALL(btlevtcmd_StartWaitEvent, LW(3))
-        END_IF
-    END_IF
-    CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
-    IF_INT_NOT_EQUAL(LW(0), 0)
-        IF_INT_NOT_EQUAL(GW(20), 0)
-            CALL_CHILD(party_change_event)
-        END_IF
-        CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(2))
-        IF_INT_NOT_EQUAL(GW(20), 0)
-            IF_INT_EQUAL(LW(2), 0)
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
-                SET_VALUE(LW(2), 1)
-            END_IF
-        END_IF
-        SWITCH(LW(2))
-            CASE_EQUAL(0)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(1))
-            IF_INT_LESS(LW(0), LW(1))
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
-                CALL(btlevtcmd_StatusWindowOnOff, 0)
-                CALL_CHILD(enemy_zoom)
-                SWITCH(GW(18))
-                    CASE_EQUAL(0)
-                    CALL(evt_msg_print, 2, STRING("stg4_jin_26_kur"), 0, GW(17))
-                    CASE_EQUAL(1)
-                    CALL(evt_msg_print, 2, STRING("stg4_jin_26_nok"), 0, GW(17))
-                    CASE_EQUAL(2)
-                    CALL(evt_msg_print, 2, STRING("stg4_jin_26_win"), 0, GW(17))
-                    CASE_EQUAL(3)
-                    CALL(evt_msg_print, 2, STRING("stg4_jin_26_yos"), 0, GW(17))
-                END_SWITCH
-                WAIT_MS(200)
-                CALL(btlevtcmd_StatusWindowOnOff, 1)
-            END_IF
-            CASE_EQUAL(1)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
-            IF_INT_LESS(LW(0), LW(1))
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 2)
-                CALL(btlevtcmd_StatusWindowOnOff, 0)
-                CALL_CHILD(fmario_zoom)
-                CALL(evt_msg_print, 2, STRING("stg4_jin_26_01"), 0, BTL_UNIT_SELF)
-                WAIT_MS(200)
-                CALL(btlevtcmd_StatusWindowOnOff, 1)
-            END_IF
-            CASE_EQUAL(2)
-            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(1))
-            IF_INT_LESS(LW(0), LW(1))
-                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 3)
-                CALL(btlevtcmd_StatusWindowOnOff, 0)
-                CALL_CHILD(fmario_zoom)
-                CALL(evt_msg_print, 2, STRING("stg4_jin_26_02"), 0, BTL_UNIT_SELF)
-                WAIT_MS(200)
-                CALL(btlevtcmd_StatusWindowOnOff, 1)
-            END_IF
-        END_SWITCH
-    END_IF
-    RETURN
-EVT_END()
 #endif
+            WAIT_FRAMES(1)
+            CALL(btlevtcmd_GetMarioId, LW(3), LW(5))
+            CALL(btlevtcmd_GetBodyId, LW(5), LW(6))
+            CALL(btlevtcmd_StopWaitEvent, LW(3))
+            CALL(btlevtcmd_StopWaitEvent, LW(5))
+            WAIT_MS(700)
+            SPAWN_EVENT(mario_zoom)
+            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_VIVIAN_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+            CALL(btlevtcmd_SetPos, LW(3), -140, -40, 5)
+            CALL(btlevtcmd_DivePosition, LW(3), -140, 0, 5, 60, 0, 0, 4, 0)
+            CALL(btlevtcmd_AnimeChangePose, LW(5), LW(6), STRING("M_Z_1"))
+            BEGIN_SIBLING_EVENT_GET_ID(LW(0))
+                CALL(evt_sub_intpl_init, 0, 0, 180, 15)
+                LOOP(16)
+                    CALL(evt_sub_intpl_get_value)
+                    CALL(btlevtcmd_SetRotate, BTL_UNIT_MARIO, 0, LW(0), 0)
+                    WAIT_FRAMES(1)
+                END_LOOP
+            END_SIBLING_EVENT
+            CALL(btlevtcmd_WaitEventEnd, LW(0))
+            CALL(evt_msg_print, 2, STRING("stg4_jin_24"), 0, LW(3))
+            WAIT_MS(200)
+            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_VOICE_MARIO_FIND1_3"), EVT_NULLPTR, 0, EVT_NULLPTR)
+            CALL(btlevtcmd_GetPos, LW(5), LW(7), LW(8), LW(10))
+            CALL(btlevtcmd_JumpSetting, LW(5), 12, FLOAT(1.0f), FLOAT(1.1992188f))
+            CALL(btlevtcmd_JumpPosition, LW(5), LW(7), LW(8), LW(10), 0, -1)
+            WAIT_MS(1000)
+            CALL(evt_msg_print, 2, STRING("stg4_jin_25"), 0, LW(3))
+            WAIT_MS(1000)
+            BEGIN_SIBLING_EVENT_GET_ID(LW(0))
+                CALL(evt_sub_intpl_init, 0, 180, 0, 15)
+                LOOP(16)
+                    CALL(evt_sub_intpl_get_value)
+                    CALL(btlevtcmd_SetRotate, BTL_UNIT_MARIO, 0, LW(0), 0)
+                    WAIT_FRAMES(1)
+                END_LOOP
+            END_SIBLING_EVENT
+            CALL(btlevtcmd_WaitEventEnd, LW(0))
+            WAIT_MS(200)
+            CALL(btlevtcmd_AnimeChangePose, LW(5), LW(6), STRING("M_I_Y"))
+            WAIT_MS(1000)
+            CALL(btlevtcmd_StatusWindowOnOff, 1)
+            CALL(evt_btl_camera_set_mode, 0, 0)
+            CALL(btlevtcmd_StartWaitEvent, LW(3))
+        END_IF
+    END_IF
+    CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_AFTER_PLAYER)
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        IF_INT_NOT_EQUAL(GW(20), 0)
+            CALL_CHILD(party_change_event)
+        END_IF
+        CALL(btlevtcmd_GetHp, BTL_UNIT_SELF, LW(0))
+        CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(2))
+        IF_INT_NOT_EQUAL(GW(20), 0)
+            IF_INT_EQUAL(LW(2), 0)
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+                SET_VALUE(LW(2), 1)
+            END_IF
+        END_IF
+        SWITCH(LW(2))
+            CASE_EQUAL(0)
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(1))
+            IF_INT_LESS(LW(0), LW(1))
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
+                CALL(btlevtcmd_StatusWindowOnOff, 0)
+                CALL_CHILD(enemy_zoom)
+                SWITCH(GW(18))
+                    CASE_EQUAL(0)
+                    CALL(evt_msg_print, 2, STRING("stg4_jin_26_kur"), 0, GW(17))
+                    CASE_EQUAL(1)
+                    CALL(evt_msg_print, 2, STRING("stg4_jin_26_nok"), 0, GW(17))
+                    CASE_EQUAL(2)
+                    CALL(evt_msg_print, 2, STRING("stg4_jin_26_win"), 0, GW(17))
+                    CASE_EQUAL(3)
+                    CALL(evt_msg_print, 2, STRING("stg4_jin_26_yos"), 0, GW(17))
+                END_SWITCH
+                WAIT_MS(200)
+                CALL(btlevtcmd_StatusWindowOnOff, 1)
+            END_IF
+            CASE_EQUAL(1)
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(1))
+            IF_INT_LESS(LW(0), LW(1))
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 2)
+                CALL(btlevtcmd_StatusWindowOnOff, 0)
+                CALL_CHILD(fmario_zoom)
+                CALL(evt_msg_print, 2, STRING("stg4_jin_26_01"), 0, BTL_UNIT_SELF)
+                WAIT_MS(200)
+                CALL(btlevtcmd_StatusWindowOnOff, 1)
+            END_IF
+            CASE_EQUAL(2)
+            CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(1))
+            IF_INT_LESS(LW(0), LW(1))
+                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 3)
+                CALL(btlevtcmd_StatusWindowOnOff, 0)
+                CALL_CHILD(fmario_zoom)
+                CALL(evt_msg_print, 2, STRING("stg4_jin_26_02"), 0, BTL_UNIT_SELF)
+                WAIT_MS(200)
+                CALL(btlevtcmd_StatusWindowOnOff, 1)
+            END_IF
+        END_SWITCH
+    END_IF
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(attack_event_fmario)
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
@@ -946,16 +827,16 @@ static EVT_BEGIN(attack_event_fmario)
     SWITCH(LW(0))
         CASE_EQUAL(0)
         SET_VALUE(LW(9), PTR(&weapon_masao_jump))
-        CALL_CHILD(PTR(marioAttackEvent_NormalJump))
+        CALL_CHILD(marioAttackEvent_NormalJump)
         CASE_EQUAL(1)
         SET_VALUE(LW(9), PTR(&weapon_masao_hammer))
-        CALL_CHILD(PTR(marioAttackEvent_NormalHammer))
+        CALL_CHILD(marioAttackEvent_NormalHammer)
         CASE_EQUAL(2)
         SET_VALUE(LW(9), PTR(&weapon_masao_kururin_jump))
-        CALL_CHILD(PTR(marioAttackEvent_KururinJump))
+        CALL_CHILD(marioAttackEvent_KururinJump)
         CASE_EQUAL(3)
         SET_VALUE(LW(9), PTR(&weapon_masao_kaiten_hammer))
-        CALL_CHILD(PTR(marioAttackEvent_KaitenHammer))
+        CALL_CHILD(marioAttackEvent_KaitenHammer)
     END_SWITCH
     LABEL(90)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -1411,7 +1292,7 @@ EVT_BEGIN(party_change_event)
     RETURN
 EVT_END()
 
-USER_FUNC(_gullible_party_info_init) {
+static USER_FUNC(_gullible_party_info_init) {
     PouchData* pouch = pouchGetPtr();
     s32 id = BattleTransID(event, -2);
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);

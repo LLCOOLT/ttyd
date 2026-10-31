@@ -9,7 +9,6 @@
 #include "evt/evt_map.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "dou.h"
 #include "driver/mapdrv.h"
 
@@ -121,13 +120,13 @@ EVT_BEGIN(dou_08_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     WAIT_FRAMES(1)
     CALL(evt_map_playanim, STRING("nami"), 1, 0)
     CALL(evt_map_playanim, STRING("moku"), 1, 0)
     CALL(evt_map_playanim, STRING("tubo"), 1, 0)
     CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
-    CALL_CHILD(PTR(evt_gazigazi_entry))
+    CALL_CHILD(evt_gazigazi_entry)
     SET_VALUE(LW(0), STRING("s08_bin"))
     SET_VALUE(LW(1), 0)
     SPAWN_EVENT_GET_ID(PTR(dou_puka_event_main0), LW(10))

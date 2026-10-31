@@ -18,7 +18,6 @@
 #include "evt/evt_eff.h"
 #include "evt/evt_map.h"
 #include "evt/evt_msg.h"
-#include "party/party_motion.h"
 #include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "evt/evt_sub.h"
@@ -39,14 +38,23 @@ BattleUnitKind unit_boss_gonbaba;
 static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
+#if VERSION <= VERSION_DEMO_US
+static PoseTableEntry pose_table[7];
+static PoseTableEntry pose_table_weak[7];
+#else
 static PoseTableEntry pose_table[9];
 static PoseTableEntry pose_table_weak[9];
+#endif
 static BattleDataEntry data_table[3];
 static BattleUnitKindPart parts[3];
 extern EvtWord negotiation_event[];
 extern EvtWord gon_extra_eaten_event[];
 extern EvtWord gonbaba_damage_sub_event[];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord dead_event[281];
+#else
 static EvtWord dead_event[283];
+#endif
 static EvtWord init_event[160];
 static EvtWord attack_event[56];
 static EvtWord fumituke_attack_event[386];
@@ -227,7 +235,11 @@ BattleUnitKind unit_boss_gonbaba = {
 #endif
     0.0f,
     0.0f,
+#if VERSION <= VERSION_DEMO_US
+    250.0f,
+#else
     20.0f,
+#endif
     0.0f,
     250.0f,
     0.0f,
@@ -265,30 +277,38 @@ static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {10, 0, 50, 0, 50, 10, 100, 0, 0, 0, 50, 0, 100, 0, 100, 0, 0, 100, 0, 0, 0, 0};
+#else
 static StatusVulnerability regist = {20, 0, 50, 0, 50, 10, 100, 0, 0, 0, 50, 0, 100, 0, 100, 0, 0, 100, 0, 0, 0, 0};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "GNB_N_1"},
     {5, "GNB_X_1"},
+#if VERSION >= VERSION_JP
     {2, "GNB_Z_1"},
     {3, "GNB_X_1"},
+#endif
     {28, "GNB_S_3"},
-    {65, "GNB_T_3"},
+    {BTL_POSE_TALK, "GNB_T_3"},
     {31, "GNB_S_3"},
     {39, "GNB_D_1"},
-    {69, "GNB_S_3"},
+    {BTL_POSE_STAY_DEFAULT, "GNB_S_3"},
 };
 
 static PoseTableEntry pose_table_weak[] = {
     {1, "GNB_N_1"},
     {5, "GNB_X_1"},
+#if VERSION >= VERSION_JP
     {2, "GNB_N_1"},
     {3, "GNB_X_1"},
+#endif
     {28, "GNB_S_4"},
-    {65, "GNB_T_4"},
+    {BTL_POSE_TALK, "GNB_T_4"},
     {31, "GNB_S_4"},
     {39, "GNB_V_1"},
-    {69, "GNB_S_4"},
+    {BTL_POSE_STAY_DEFAULT, "GNB_S_4"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -625,8 +645,13 @@ EVT_BEGIN(negotiation_event)
         CALL(evt_btl_camera_noshake, 1)
         CALL(evt_btl_camera_shake_h, 1, 7, 0, 30, 12)
     END_INLINE_EVENT
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_batstage_set_aud_dark, 0, 180, 0)
+    CALL(evt_batstage_set_aud_dark_base, 0, 180, 0)
+#else
     CALL(evt_batstage_set_aud_dark, 0, 24, 0)
     CALL(evt_batstage_set_aud_dark_base, 0, 24, 0)
+#endif
     BEGIN_INLINE_EVENT
         WAIT_FRAMES(40)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_MARIO, 1, STRING("M_N_7"))
@@ -877,7 +902,7 @@ EVT_BEGIN(negotiation_event)
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_MARIO, LW(3))
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_MARIO, LW(3), STRING("M_I_Y"))
     CALL(btlevtcmd_GetBodyId, BTL_UNIT_PARTNER, LW(4))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_PARTNER, LW(4), 69)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_PARTNER, LW(4), BTL_POSE_STAY_DEFAULT)
     WAIT_FRAMES(30)
     CALL(btlevtcmd_reset_turn)
     CALL(evt_btl_camera_set_prilimit, 0)
@@ -1030,7 +1055,7 @@ USER_FUNC(_wait_damage_event_end) {
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -1134,7 +1159,9 @@ EVT_BEGIN(gonbaba_damage_sub_event)
             RETURN
         END_IF
     END_IF
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_WaitAttackEnd)
+#endif
     CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("GNB_T_4"))
     CALL(btlevtcmd_SetStayPose, BTL_UNIT_SELF, STRING("GNB_S_4"))
     CALL(evt_btl_camera_set_prilimit, 1)
@@ -1165,7 +1192,9 @@ EVT_BEGIN(gonbaba_damage_sub_event)
         RETURN
     END_IF
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, 3)
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_WaitAttackEnd)
+#endif
     CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("GNB_T_4"))
     CALL(btlevtcmd_SetStayPose, BTL_UNIT_SELF, STRING("GNB_S_4"))
     CALL(evt_btl_camera_set_prilimit, 1)
@@ -1191,9 +1220,11 @@ EVT_BEGIN(gonbaba_damage_sub_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
     LABEL(90)
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_GetDamagePartsId, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_GetHitPos, BTL_UNIT_SELF, LW(0), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_BTL_ATTACK_MISS2"), LW(0), LW(1), LW(2), 0)
+#endif
     RETURN
 EVT_END()
 
@@ -1205,7 +1236,9 @@ static EVT_BEGIN(dead_event)
     END_IF
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("GNB_X_1"))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BOSS_GNB_DOWN1"), EVT_NULLPTR, 0, LW(15))
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_WaitAttackEnd)
+#endif
     CALL(evt_btl_camera_set_prilimit, 1)
     CALL(evt_btl_camera_wait_move_end)
     CALL(evt_btl_camera_set_mode, 1, 3)
@@ -1304,7 +1337,11 @@ static EVT_BEGIN(init_event)
     CALL(evt_audience_flag_on, 35, 512)
     CALL(evt_audience_flag_on, 53, 512)
     CALL(evt_audience_flag_on, 54, 512)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_audience_base_flag_on, 32768)
+#else
     CALL(evt_audience_base_flag_on, 16384)
+#endif
     CALL(btlevtcmd_SetEventEntry, BTL_UNIT_SELF, PTR(battle_entry_event))
     CALL(btlevtcmd_SetBaseScale, BTL_UNIT_SELF, FLOAT(1.2998047f), FLOAT(1.2998047f), FLOAT(0.5f))
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
@@ -1332,16 +1369,16 @@ static EVT_BEGIN(attack_event)
     SWITCH(LW(0))
         CASE_EQUAL(0)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, 1)
-        CALL_CHILD(PTR(firebreath_attack_event))
+        CALL_CHILD(firebreath_attack_event)
         CASE_EQUAL(1)
         CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 5, 2)
-        CALL_CHILD(PTR(fumituke_attack_event))
+        CALL_CHILD(fumituke_attack_event)
         CASE_DEFAULT
         CALL(evt_sub_random, 99, LW(0))
         IF_INT_LESS(LW(0), 50)
-            CALL_CHILD(PTR(fumituke_attack_event))
+            CALL_CHILD(fumituke_attack_event)
         ELSE
-            CALL_CHILD(PTR(firebreath_attack_event))
+            CALL_CHILD(firebreath_attack_event)
         END_IF
     END_SWITCH
     RETURN

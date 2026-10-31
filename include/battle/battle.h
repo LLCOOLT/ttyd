@@ -156,8 +156,8 @@ typedef struct BattleAnnounce {
     s16 x;         // 0x0
     s16 y;         // 0x2
     s32 params[4]; // 0x4
-#if VERSION == VERSION_DEMO || VERSION >= VERSION_US
-    char text[0x100]; // 0x14 (US and demo 4 shorter)
+#if VERSION != VERSION_JP
+    char text[0x100]; // 0x14 (4 shorter than JP)
 #else
     char text[0x104]; // 0x14
 #endif
@@ -301,12 +301,6 @@ extern BattleWork* _battleWorkPointer;
 
 void battleMain(void);
 
-void battle_exit(void);
-#if VERSION == VERSION_DEMO
-void battle_init(void);
-#else
-BOOL battle_init(void);
-#endif
 void BattleAfterReactionQueueInit(void);
 
 BattleUnit* BattleGetPartnerPtr(BattleWork* work, BattleUnit* unit);

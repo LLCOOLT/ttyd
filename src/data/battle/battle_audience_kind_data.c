@@ -33,7 +33,7 @@ s32* audience_anim_kuriboo[19];
 s32* audience_anim_pakkun[19];
 s32* audience_anim_luigi[19];
 BattleAudienceItemKind audience_item_kinopio[12];
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 BattleAudienceItemKind audience_item_heiho[18];
 #else
 BattleAudienceItemKind audience_item_heiho[17];
@@ -1310,7 +1310,7 @@ BattleAudienceItemKind audience_item_heiho[] = {
     {ITEM_RUIN_POWDER, 10},
     {ITEM_POWER_PUNCH, 10},
     {ITEM_STOPWATCH, 10},
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     {ITEM_TRADE_OFF, 10},
 #endif
     {ITEM_MINI_MR_MINI, 10},

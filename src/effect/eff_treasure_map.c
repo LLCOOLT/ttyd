@@ -6,6 +6,9 @@
 #include "memory.h"
 #include <dolphin/mtx.h>
 
+static void effTreasureMapDisp(CameraId cameraId, EffectEntry* effect);
+static void effTreasureMapMain(EffectEntry* effect);
+
 EffectEntry* effTreasureMapEntry(s32 type, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
     EffTreasureMapWork* work;
@@ -30,7 +33,7 @@ EffectEntry* effTreasureMapEntry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effTreasureMapMain(EffectEntry* effect) {
+static void effTreasureMapMain(EffectEntry* effect) {
     EffTreasureMapWork* work = effect->userdata;
     Vec position;
     BOOL inBattle;
@@ -68,7 +71,7 @@ void effTreasureMapMain(EffectEntry* effect) {
     dispEntry(work->cameraId, dispCalcZ(&position), 2, (DispCallback)effTreasureMapDisp, effect);
 }
 
-void effTreasureMapDisp(CameraId cameraId, EffectEntry* effect) {
+static void effTreasureMapDisp(CameraId cameraId, EffectEntry* effect) {
     EffTreasureMapWork* work = effect->userdata;
     Mtx trans;
     Mtx scale;

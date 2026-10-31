@@ -8,6 +8,9 @@
 #include <dolphin/mtx.h>
 #include "version.h"
 #include "libc_decls.h"
+
+static void effSpiritDisp(CameraId cameraId, EffectEntry* effect);
+static void effSpiritMain(EffectEntry* effect);
 // US effect texture ids are 0x1C lower for these entries.
 #define EFF_TEX(id) ((id) - VERSION_PICK(0, 0x1C))
 
@@ -72,7 +75,7 @@ EffectEntry* effSpiritEntry(s32 type, s32 time, f32 x1, f32 y1, f32 z1, f32 x2, 
     return effect;
 }
 
-void effSpiritMain(EffectEntry* effect) {
+static void effSpiritMain(EffectEntry* effect) {
     EffSpiritWork* work = effect->userdata;
     Vec position;
 
@@ -159,7 +162,7 @@ void effSpiritMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effSpiritDisp, effect);
 }
 
-void effSpiritDisp(CameraId cameraId, EffectEntry* effect) {
+static void effSpiritDisp(CameraId cameraId, EffectEntry* effect) {
     EffSpiritWork* work = effect->userdata;
     CameraEntry* camera;
     GXTexObj texObj;

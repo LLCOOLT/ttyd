@@ -34,7 +34,7 @@
 #include "evt/evt_img.h"
 #include "evt/evt_map.h"
 #include "evt/evt_paper.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "version.h"
 
 typedef struct SukiBtn {
@@ -76,8 +76,8 @@ typedef struct SukiWork {
 
 extern s32 tou_gamen_screen_tev[];
 
-USER_FUNC(main_suki);
-void set_tev(MapTevCallbackInfo* info);
+static USER_FUNC(main_suki);
+static void set_tev(MapTevCallbackInfo* info);
 static USER_FUNC(set_weapon);
 static USER_FUNC(star_stone_attack);
 static USER_FUNC(star_stone_appear);
@@ -89,7 +89,7 @@ static void disp_2D(CameraId cam, void* param);
 static SukiWork* get_ptr(void);
 static void main_star(void);
 static void main_base(void);
-void main_button(s32 idx);
+static void main_button(s32 idx);
 void N__disp_2D(s32 side, s32 idx);
 
 static BattleWeapon weapon = {
@@ -123,7 +123,7 @@ static BattleWeapon weapon = {
     0, 0, 0, 0, 0, 0, 0, 0, // poisonTime..dodgyTime
     0, 0, 0, 0, 0, 0, 0, 0, // burnChance..atkChangeChance
     0, 0, 0, 0, 0, 0, 0, // atkChangeTime..allergicTime
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     0, // ohkoChance
 #else
     100, // ohkoChance
@@ -140,7 +140,7 @@ static EVT_BEGIN(nice_event)
     RETURN
 EVT_END()
 
-USER_FUNC(main_suki) {
+static USER_FUNC(main_suki) {
     SukiWork* w = get_ptr();
     EvtWord* args = event->args;
     f32 posTbl[18] = {
@@ -318,7 +318,7 @@ static void main_base(void) {
 
 // inlining off for main_button, as in the original (the object differs without it)
 #pragma dont_inline on
-void main_button(s32 idx) {
+static void main_button(s32 idx) {
     SukiWork* w = get_ptr();
     SukiBtn* b = &w->btn[idx];
     s32 tbl[4] = {0x100, 0x200, 0x400, 0x800};
@@ -456,7 +456,7 @@ static void main_star(void) {
     }
 }
 
-USER_FUNC(end_suki) {
+static USER_FUNC(end_suki) {
     SukiWork* w = get_ptr();
     effDelete(((EffStarStoneWork*)w->eff->userdata)->dust);
     effDelete(w->eff);
@@ -486,7 +486,7 @@ static void disp_2D(CameraId cam, void* param) {
         iconDispGx(&b, ICON_DISP_2D, ICON_08F, 1.0f);
     }
     GXSetScissor(0, 0x91, gp->fbWidth, 0x50);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     for (i = 0; i < 7; i++) {
         u16 icon;
         if (w->btn2[i].state != 0) {
@@ -627,7 +627,7 @@ static void disp_2D(CameraId cam, void* param) {
     GXSetScissor(0, 0, gp->fbWidth, gp->efbHeight);
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 void N__disp_2D(s32 side, s32 idx) {
     SukiWork* w = get_ptr();
     SukiBtn* b;
@@ -713,7 +713,7 @@ void N__disp_2D(s32 side, s32 idx) {
 #endif
 
 static void disp_3D(CameraId cam, void* param) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     get_ptr();
 #endif
 }
@@ -750,11 +750,11 @@ static USER_FUNC(star_stone_appear) {
     return 2;
 }
 
-USER_FUNC(wait_star_stone_up_end) {
+static USER_FUNC(wait_star_stone_up_end) {
     return get_ptr()->starState == 4 ? 2 : 0;
 }
 
-USER_FUNC(star_stone_get_attack_point) {
+static USER_FUNC(star_stone_get_attack_point) {
     SukiWork* w = get_ptr();
     EvtWord* args = event->args;
     s32 i = evtGetValue(event, args[0]);
@@ -779,7 +779,7 @@ static USER_FUNC(star_stone_attack) {
     return 2;
 }
 
-USER_FUNC(wait_star_stone_attack_end) {
+static USER_FUNC(wait_star_stone_attack_end) {
     return get_ptr()->starState == 8 ? 2 : 0;
 }
 
@@ -800,7 +800,7 @@ static USER_FUNC(set_weapon) {
     return 2;
 }
 
-USER_FUNC(aud_set_draw) {
+static USER_FUNC(aud_set_draw) {
     EvtWord* args = event->args;
     BattleAudience* a = BattleAudienceBaseGetPtr();
     if (evtGetValue(event, args[0]) == 0) {
@@ -811,13 +811,13 @@ USER_FUNC(aud_set_draw) {
     return 2;
 }
 
-USER_FUNC(flash_update) {
+static USER_FUNC(flash_update) {
     u8 v = evtGetValue(event, event->args[0]);
     get_ptr()->flash = v;
     return 2;
 }
 
-USER_FUNC(exist_map) {
+static USER_FUNC(exist_map) {
     EvtWord* args = event->args;
     if (mapGetMapObj((char*)evtGetValue(event, args[0]))) {
         evtSetValue(event, args[1], 1);
@@ -827,7 +827,7 @@ USER_FUNC(exist_map) {
     return 2;
 }
 
-USER_FUNC(get_screen_point) {
+static USER_FUNC(get_screen_point) {
     EvtWord* args = event->args;
     Vec v;
     v.x = evtGetFloat(event, args[0]);
@@ -839,7 +839,7 @@ USER_FUNC(get_screen_point) {
     return 2;
 }
 
-USER_FUNC(eff_crystal) {
+static USER_FUNC(eff_crystal) {
     EvtWord* args = event->args;
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
@@ -848,7 +848,7 @@ USER_FUNC(eff_crystal) {
     return 2;
 }
 
-USER_FUNC(get_img_name) {
+static USER_FUNC(get_img_name) {
     EvtWord* args = event->args;
     s8 idx = evtGetValue(event, args[0]);
     SukiWork* w = get_ptr();
@@ -863,7 +863,7 @@ static inline GXColor mk_suki(u8 v) {
     c.b = v;
     return c;
 }
-void set_tev(MapTevCallbackInfo* info) {
+static void set_tev(MapTevCallbackInfo* info) {
     u8 v = get_ptr()->flash;
     GXSetTevOrder(0, 0xFF, 0xFF, 4);
     GXSetTevColorOp(0, 0, 0, 0, 1, 0);

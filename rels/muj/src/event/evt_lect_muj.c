@@ -32,7 +32,6 @@
 #include "evt/evt_party.h"
 #include "evt/evt_pouch.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "pmario_sound.h"
 #include "statuswindow.h"
 #include "driver/hitdrv.h"
@@ -51,7 +50,7 @@ static inline void effitemget_cam_move(CameraEntry* camera, Vec ofs) {
     camera->stateA = 3;
     camera->curveA = 11;
 }
-static EffectEntry* balloonEff; // lect_npc_balloon_on_off: the balloon effect over the NPC
+static EffectEntry* eff; // lect_npc_balloon_on_off: the balloon effect over the NPC
 
 static USER_FUNC(effitemget_busaiku);
 static USER_FUNC(effitemget_open);
@@ -195,7 +194,7 @@ static void lecture_button_disp(CameraId camera, void* param) {
             }
             pos = disp->pos;
             pos.y += ofs;
-            iconDispGxAlpha(&pos, 0x50, btn->iconId, btn->alpha, 1.0f);
+            iconDispGxAlpha(&pos, ICON_FLAG_NO_MAP_BLEND | ICON_FLAG_2D, btn->iconId, btn->alpha, 1.0f);
         }
     }
 }
@@ -419,6 +418,11 @@ EVT_BEGIN(sanders_party_lecture)
     CALL(evt_cam_letter_box_disable, 0)
     CALL(evt_party_stop, 0)
     WAIT_FRAMES(16)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    SUBTRACT(LW(0), 40)
+    CALL(evt_party_move_pos2, 0, LW(0), LW(2), FLOAT(80.0f))
+#endif
     CALL(evt_party_set_dir, 0, 90, 300)
     CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(90.0f), FLOAT(510.0f), FLOAT(-20.0f), FLOAT(30.0f), FLOAT(-100.0f), 1000, 0)
     WAIT_MS(1000)
@@ -520,7 +524,7 @@ EVT_BEGIN(all_party_lecture)
     CALL(lect_test_systemlevel)
     SWITCH(LW(9))
         CASE_EQUAL(3)
-        CALL_CHILD(PTR(sanders_party_lecture_init))
+        CALL_CHILD(sanders_party_lecture_init)
     END_SWITCH
     LOOP(6)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -535,7 +539,7 @@ EVT_BEGIN(all_party_lecture)
     CALL(evt_mario_dispflag_onoff, 0, 1)
     SWITCH(LW(9))
         CASE_EQUAL(3)
-        CALL_CHILD(PTR(sanders_party_lecture))
+        CALL_CHILD(sanders_party_lecture)
     END_SWITCH
     LOOP(6)
         CALL(evt_mario_dispflag_onoff, 1, 1)
@@ -623,10 +627,10 @@ static USER_FUNC(lect_npc_balloon_on_off) {
     NpcEntry* npc = evtNpcNameToPtr(event, name);
 
     if (evtGetValue(event, args[1])) {
-        balloonEff = effMarioBalloonEntry(1, npc);
-        ((MarioBalloonWork*)balloonEff->userdata)->camera = 7;
+        eff = effMarioBalloonEntry(1, npc);
+        ((MarioBalloonWork*)eff->userdata)->camera = 7;
     } else {
-        effDelete(balloonEff);
+        effDelete(eff);
     }
     return EVT_RETURN_DONE;
 }

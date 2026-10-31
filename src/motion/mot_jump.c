@@ -23,10 +23,6 @@
 #include "mario/mario_hit.h"
 #include "mot/mot_jump.h"
 
-#if VERSION == VERSION_DEMO
-#else
-#endif
-
 static f32 marioJumpStandData[] = {1.52f, -0.188f, 2.925f, -0.847f, -0.1f, -0.4f, 0.024f, -0.004f, 0.125f, 0.7f};
 f32 marioJumpSwData[] = {2.5f, -0.1f, 0.02f, -0.01f, -0.08f, -0.4f, 0.0f, -0.002f};
 
@@ -358,7 +354,7 @@ void mot_jump(void) {
         mario->multiTimer = 2;
         mario->currSubMotionId = 0;
         marioPreJump();
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         if (mario->currMotionId != MARIO_MOTION_JUMP_3) {
             camFollowYOff();
         }
@@ -448,8 +444,8 @@ void mot_upstairs(void) {
                 if (mario->flags & MARIO_FLAG_PAPER_MODE) {
                     motSlitContinue();
                 } else if (mario->dispFlags & MARIO_DISP_FLAG_SLIT) {
-#if VERSION == VERSION_DEMO
-                    marioSlitResume();
+#if VERSION <= VERSION_DEMO_US
+                    motSlitContinue2();
 #else
                     marioChgMot2(0x15);
 #endif

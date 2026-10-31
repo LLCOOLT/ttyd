@@ -27,7 +27,7 @@
 typedef double (*CosFloatArgFn)(f32);
 // FAKE: mot_hammer.c calls effUltraHammerEntry through this prototype (the types it was compiled with) instead of the one in eff/eff_ultra_hammer.h; same registers, behaviour-identical.
 typedef EffectEntry* (*EffUltraHammerEntryArgOrderFn)(f32, f32, f32, f32, BOOL, s32);
-HitEntry* hitEstimate(s32* out);
+static HitEntry* hitEstimate(s32* out);
 static HitEntry* hammerHitWall(f32 ang, f32* s, f32* co, f32* len, f32* hx, f32* hy, f32* hz, f32* nx, f32* ny, f32* nz);
 
 s32 se_data[] = {315, 357, 316, 359, 317, 358, 318, 360, 319, 361};
@@ -208,7 +208,7 @@ void mot_hammer(void) {
             }
             psndSFXOn_3D(SFX_NAME_WORD(snd), &m->position);
         }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         mario->mot.hammer.hitKind = kind;
 #endif
     }
@@ -252,7 +252,7 @@ void mot_hammer(void) {
         }
         mario->currSubMotionId = 1;
         mario->hitobjHammer = mario->hitobjHammerNew;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         px = mario->position.x;
         py = mario->position.y;
         pz = mario->position.z;
@@ -325,7 +325,7 @@ void mot_hammer(void) {
                     psndSFXOn_3D(SFX_NAME_WORD(0x160), &m->position);
                     break;
             }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             for (i = 0; i < 5; i++) {
 #else
             for (i = 0; (u32)i < 10; i++) {
@@ -700,7 +700,7 @@ void mot_ham2_post(void) {
     marioPaperLightOn();
 #endif
     mario->dispFlags &= ~MARIO_DISP_FLAG_DIR_LOCK;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     mario->dispFlags &= ~MARIO_DISP_FLAG_FRONT_POSE;
 #else
     mario->dispFlags &= ~MARIO_DISP_FLAG_NO_MIRROR;
@@ -711,7 +711,7 @@ void mot_ham2_post(void) {
     marioAdjustMoveDir();
 }
 
-HitEntry* hitEstimate(s32* out) {
+static HitEntry* hitEstimate(s32* out) {
     MarioWork* mario;
     HitCheckQuery q;
     Vec pos;
@@ -724,7 +724,7 @@ HitEntry* hitEstimate(s32* out) {
     f32 h;
     s32 i;
     f32 k5 = 5.0f;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     f32 ang;
 #endif
     mario = marioGetPtr();
@@ -740,7 +740,7 @@ HitEntry* hitEstimate(s32* out) {
     }
     sincosf(&s, &c, a);
     h = mario->wPlayerCollisionBox.y;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     ang = 3.14159265f;
     cy = (f32)cos(ang);
 #else
@@ -762,7 +762,7 @@ HitEntry* hitEstimate(s32* out) {
             return hit;
         }
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     ang = 1.2217306f;
     cy = (f32)cos(ang);
 #else
@@ -785,7 +785,7 @@ HitEntry* hitEstimate(s32* out) {
             return hit;
         }
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     ang = 0.78539816f;
     cy = (f32)cos(ang);
 #else
@@ -808,7 +808,7 @@ HitEntry* hitEstimate(s32* out) {
             return hit;
         }
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     ang = 0.0f;
     cy = (f32)cos(ang);
 #else
@@ -851,9 +851,9 @@ HitEntry* hitEstimate(s32* out) {
     return hit;
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo has a table of the mobj kinds the hammer interacts with; no code reads it.
-const char* hammerMobjNames[] = {
+const char* not_fullswing_mobj[] = {
     "MOBJ_RedJumpStand",
     "MOBJ_RedJumpStand2",
     "MOBJ_BlueJumpStand",

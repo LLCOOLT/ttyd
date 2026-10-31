@@ -10,7 +10,6 @@
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "jin.h"
 #include "evt/evt_story.h"
 #include "driver/camdrv.h"
@@ -109,7 +108,9 @@ EVT_END()
 EVT_BEGIN(evt_kaidan_temae)
     IF_INT_NOT_EQUAL(LSW(1), 1)
         CALL(evt_mario_key_onoff, 0)
+#if VERSION >= VERSION_JP
         CALL(evt_mario_normalize)
+#endif
         CALL(evt_party_stop, 0)
         IF_INT_EQUAL(GSWF(GSWF_JIN_ENDLESS_STAIRS_REACTION_SEEN), 0)
             BEGIN_INLINE_EVENT_GET_ID(LW(3))
@@ -143,7 +144,7 @@ EVT_BEGIN(evt_kaidan_temae)
                 END_LOOP
             END_INLINE_EVENT
         END_IF
-        CALL_CHILD(PTR(cam_shake))
+        CALL_CHILD(cam_shake)
         IF_INT_EQUAL(GSWF(GSWF_JIN_ENDLESS_STAIRS_REACTION_SEEN), 0)
             WAIT_MS(500)
             DELETE_EVENT(LW(3))
@@ -164,8 +165,8 @@ EVT_BEGIN(jin_02_init_evt)
     CALL(evt_kagemario_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(evt_usu_kagemario_party_kill)
     CALL(evt_mobj_switch_red, 0, STRING("mobj_switch1"), 485, 30, -10, PTR(evt_kaidan_temae), 0)
     RETURN
 EVT_END()

@@ -17,12 +17,11 @@
 #include "evt/evt_party.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "las.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
 
-USER_FUNC(get_mobj_seq);
+static USER_FUNC(get_mobj_seq);
 
 static BeroEntry bero_entry_data[2];
 
@@ -63,7 +62,7 @@ static BeroEntry bero_entry_data[] = {
 static EVT_BEGIN(box_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("key"), ITEM_PALACE_KEY_0x2D, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("key"), ITEM_PALACE_KEY_0x2D, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("box"))
     CALL(evt_item_get_item, STRING("key"))
     CALL(evt_mario_key_onoff, 1)
@@ -140,7 +139,7 @@ EVT_BEGIN(vivian_check)
     RETURN
 EVT_END()
 
-USER_FUNC(get_mobj_seq) {
+static USER_FUNC(get_mobj_seq) {
     EvtWord* args = event->args;
     MapObjectEntry* mobj = mobjNameToPtrNoAssert((const char*)evtGetValue(event, args[0]));
 
@@ -162,7 +161,7 @@ static EVT_BEGIN(switch_evt)
     CALL(evt_mobj_flag_onoff, 0, STRING("box"), MOBJ_FLAG_INVISIBLE | MOBJ_FLAG_FALL)
     CALL(evt_mobj_hit_onoff, STRING("box"), 1)
     SET_VALUE(LW(0), STRING("box"))
-    CALL_CHILD(PTR(box_syutugen))
+    CALL_CHILD(box_syutugen)
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_mario_key_onoff, 1)
     RETURN
@@ -178,14 +177,16 @@ EVT_END()
 EVT_BEGIN(las_18_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG8_LST2"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG8_LAS1"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 2)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_mobj_floatswitch_blue, 0, STRING("switch"), 75, 60, 0, PTR(switch_evt), GSWF(GSWF_LAS18_SWITCH_PRESSED))
     CALL(evt_mobj_flag_onoff, 1, STRING("switch"), MOBJ_FLAG_NO_SHADOW)
     IF_INT_EQUAL(GSWF(GSWF_LAS18_SWITCH_PRESSED), 0)
-        SPAWN_EVENT(PTR(vivian_check))
+        SPAWN_EVENT(vivian_check)
     END_IF
     CALL(evt_mobj_itembox, STRING("box"), 0, 0, 0, 0, 0, PTR(box_evt), GSWF(GSWF_LAS18_KEY_CHEST_OPENED))
     IF_INT_EQUAL(GSWF(GSWF_LAS18_SWITCH_PRESSED), 0)

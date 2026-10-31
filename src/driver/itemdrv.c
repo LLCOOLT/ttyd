@@ -62,18 +62,18 @@ inline Vec makeVecByValue(f32 x, f32 y, f32 z) {
     return v;
 }
 
-BOOL itemGetNokoCheck(ItemEntry* entry);
-void winNameDisp(WinMgrEntry* win);
-void winNameDisp2(WinMgrEntry* win);
-void winHelpMain(WinMgrEntry* win);
-void winHelpDisp(WinMgrEntry* win);
-void winFullDisp(WinMgrEntry* win);
+static BOOL itemGetNokoCheck(ItemEntry* entry);
+static void winNameDisp(WinMgrEntry* win);
+static void winNameDisp2(WinMgrEntry* win);
+static void winHelpMain(WinMgrEntry* win);
+static void winHelpDisp(WinMgrEntry* win);
+static void winFullDisp(WinMgrEntry* win);
 
 HitEntry* itemHitCheckY(ItemEntry* entry, f32 z, f32 y, f32 x, f32 vy);
 HitEntry* itemHitCheckUp(ItemEntry* entry, f32 vy);
 
-HitEntry* itemHitCheckSide(ItemEntry* entry, f32* outX, f32 dx, f32* outZ, f32 dz, s32* angle);
-void itemseq_GetItem(ItemEntry* entry);
+static HitEntry* itemHitCheckSide(ItemEntry* entry, f32* outX, f32 dx, f32* outZ, f32 dz, s32* angle);
+static void itemseq_GetItem(ItemEntry* entry);
 
 //.bss
 static ItemWork work[2];
@@ -89,7 +89,7 @@ WinMgrDesc itemdrv_window_desc[4] = {
 // A macro: the symbol map has no itemGetWork function.
 #define itemGetWork() (gp->inBattle ? &work[1] : &work[0])
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo returns a badge to the pouch when its 0x100 flag is clear, in or out of battle
 inline void itemCheckBadge(ItemEntry* entry) {
     if (BADGE_MIN <= entry->itemId && entry->itemId < BADGE_MAX && !(entry->flags & ITEM_FLAG_BADGE_RETURN)) {
@@ -108,7 +108,7 @@ inline void itemCheckBadge(ItemEntry* entry) {
 }
 #endif
 
-void itemseq_Bound(ItemEntry* entry);
+static void itemseq_Bound(ItemEntry* entry);
 static inline BOOL itemGetPouch(ItemEntry* entry) {
     EventEntry* evt;
 
@@ -133,7 +133,7 @@ static inline BOOL itemGetPouch(ItemEntry* entry) {
 static inline void itemGetEnd(ItemEntry* entry) {
     marioStSystemLevel(0);
     psndClearFlag(PSND_FLAG_MUTE_SFX);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (entry->status & ITEM_STATUS_CTRL_OFF) {
         entry->status &= ~ITEM_STATUS_CTRL_OFF;
         marioCtrlOn();
@@ -188,15 +188,15 @@ void itemCoinDrop(Vec* position) {
 
     if (pouchGetCoin() > 0) {
         pouchAddCoin(-1);
-        entry = itemEntry(position->x, position->y, position->z, NULL, 0x79, 8, -1, 0);
+        entry = itemEntry(position->x, position->y, position->z, NULL, 0x79, ITEM_ENTRY_DROP_8S, -1, 0);
         if (entry) {
             entry->status |= ITEM_STATUS_SCATTER;
         }
     }
 }
 
-BOOL itemGetCheck(ItemEntry* entry) {
-#if VERSION == VERSION_DEMO
+static BOOL itemGetCheck(ItemEntry* entry) {
+#if VERSION <= VERSION_DEMO_US
     // the demo has no N_fbatPreventMarioEventChk: only field battle modes 0 and 1 allow pick-ups
     s32 fbatMode = fbatGetPointer()->mode;
 #endif
@@ -206,7 +206,7 @@ BOOL itemGetCheck(ItemEntry* entry) {
         return FALSE;
     if (entry->status & ITEM_STATUS_IN_WATER)
         return FALSE;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (marioStGetSystemLevel() != 0U)
         return FALSE;
     if (mario->flags & (MARIO_FLAG_CTRL_OFF | MARIO_FLAG_KEY_OFF))
@@ -232,7 +232,7 @@ BOOL itemGetCheck(ItemEntry* entry) {
         return FALSE;
     if (mario->currMotionId == MARIO_MOTION_SHIP)
         return FALSE;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (mario->currMotionId == MARIO_MOTION_PLANE)
         return FALSE;
 #endif
@@ -252,7 +252,7 @@ BOOL itemGetCheck(ItemEntry* entry) {
             }
         }
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (fbatMode != 0 && fbatMode != 1)
         return FALSE;
 #else
@@ -281,8 +281,8 @@ BOOL itemGetCheck(ItemEntry* entry) {
     return FALSE;
 }
 
-BOOL itemGetNokoCheck(ItemEntry* entry) {
-#if VERSION == VERSION_DEMO
+static BOOL itemGetNokoCheck(ItemEntry* entry) {
+#if VERSION <= VERSION_DEMO_US
     s32 fbatMode = fbatGetPointer()->mode;
 #endif
     MarioWork* mario = marioGetPtr();
@@ -295,7 +295,7 @@ BOOL itemGetNokoCheck(ItemEntry* entry) {
         return FALSE;
     if (mario->flags & (MARIO_FLAG_CTRL_OFF | MARIO_FLAG_KEY_OFF))
         return FALSE;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (entry->status & ITEM_STATUS_NO_KOOPS)
         return FALSE;
 #endif
@@ -321,7 +321,7 @@ BOOL itemGetNokoCheck(ItemEntry* entry) {
             }
         }
     }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     if (fbatMode != 0 && fbatMode != 1)
         return FALSE;
     return TRUE;
@@ -432,7 +432,7 @@ void itemMain(void) {
                             hitDist = 20.0 + d;
                         }
                         hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, px, py, pz, 0.0f, -1.0f, 0.0f);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                         hit = hit ? hit : NULL;
 #else
                         if (hit) {
@@ -447,7 +447,7 @@ void itemMain(void) {
                 if (!hit) {
                     itemModeChange(entry, 3);
                 }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 else {
                     entry->position.y = newY;
                 }
@@ -469,7 +469,7 @@ void itemMain(void) {
                 }
                 break;
             case 9:
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                 itemCheckBadge(entry);
 #endif
                 itemDelete(entry->name);
@@ -687,7 +687,7 @@ ItemEntry* itemEntry(f32 x, f32 y, f32 z, const char* name, s32 itemId, u16 type
             entry->effect = effStarStoneEntry(entry->itemId - 0x72, x, 16.0f + y, z, 1.0f);
             break;
         default:
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             entry->effect = NULL;
 #endif
             iconEntry(entry->name, itemDataTable[itemId].icon_id);
@@ -710,144 +710,76 @@ ItemEntry* itemEntry(f32 x, f32 y, f32 z, const char* name, s32 itemId, u16 type
             break;
     }
 
-#if VERSION == VERSION_DEMO
-    // The demo has no retail type 9 (badge with flag 0x100), so the retail types from 10 up are one lower.
     switch (type) {
-        case 16:
+        case ITEM_ENTRY_FIXED_NO_TOUCH:
             entry->flags |= ITEM_FLAG_NO_TOUCH;
-        case 15:
+        case ITEM_ENTRY_FIXED:
             itemModeChange(entry, 7);
             break;
-        case 0:
+        case ITEM_ENTRY_STAY:
             itemModeChange(entry, 1);
             break;
-        case 1:
+        case ITEM_ENTRY_STAY_NO_TOUCH:
             itemModeChange(entry, 1);
             entry->flags |= ITEM_FLAG_NO_TOUCH;
             break;
-        case 4:
+        case ITEM_ENTRY_LAUNCH:
             itemModeChange(entry, 6);
             break;
-        case 3:
+        case ITEM_ENTRY_BOUNCE_5S:
             entry->timer = 5000;
             itemModeChange(entry, 5);
             break;
-        case 10:
+        case ITEM_ENTRY_DROP_20S:
             entry->status |= ITEM_STATUS_TIMER_HOLD;
             entry->timer = 20000;
             itemModeChange(entry, 6);
             break;
-        case 11:
+        case ITEM_ENTRY_DROP_20S_REPLACEABLE:
             entry->status |= ITEM_STATUS_TIMER_HOLD;
             entry->timer = 20000;
             itemModeChange(entry, 6);
             entry->flags |= ITEM_FLAG_REPLACEABLE;
             break;
-        case 8:
-            entry->status |= ITEM_STATUS_TIMER_HOLD;
-            entry->timer = 8000;
-            itemModeChange(entry, 6);
-            break;
-        case 9:
-            entry->status |= ITEM_STATUS_TIMER_HOLD;
-            entry->timer = 8000;
-            itemModeChange(entry, 6);
-            entry->flags |= ITEM_FLAG_REPLACEABLE;
-            break;
-        case 7:
-            entry->status |= ITEM_STATUS_TIMER_HOLD;
-        case 5:
-            entry->timer = 5000;
-            itemModeChange(entry, 6);
-            break;
-        case 6:
-            entry->timer = 5000;
-            entry->status |= ITEM_STATUS_SCATTER;
-            itemModeChange(entry, 6);
-            break;
-        case 2:
-            itemModeChange(entry, 5);
-            break;
-        case 12:
-            itemModeChange(entry, 3);
-            break;
-        case 13:
-            itemModeChange(entry, 4);
-            break;
-        case 14:
-            itemModeChange(entry, 10);
-            break;
-    }
-#else
-    switch (type) {
-        case 17:
-            entry->flags |= ITEM_FLAG_NO_TOUCH;
-        case 16:
-            itemModeChange(entry, 7);
-            break;
-        case 0:
-            itemModeChange(entry, 1);
-            break;
-        case 1:
-            itemModeChange(entry, 1);
-            entry->flags |= ITEM_FLAG_NO_TOUCH;
-            break;
-        case 4:
-            itemModeChange(entry, 6);
-            break;
-        case 3:
-            entry->timer = 5000;
-            itemModeChange(entry, 5);
-            break;
-        case 11:
-            entry->status |= ITEM_STATUS_TIMER_HOLD;
-            entry->timer = 20000;
-            itemModeChange(entry, 6);
-            break;
-        case 12:
-            entry->status |= ITEM_STATUS_TIMER_HOLD;
-            entry->timer = 20000;
-            itemModeChange(entry, 6);
-            entry->flags |= ITEM_FLAG_REPLACEABLE;
-            break;
-        case 9:
+#if VERSION >= VERSION_JP
+        case ITEM_ENTRY_DROP_8S_BADGE_RETURN:
             entry->flags |= ITEM_FLAG_BADGE_RETURN;
-        case 8:
+#endif
+        case ITEM_ENTRY_DROP_8S:
             entry->status |= ITEM_STATUS_TIMER_HOLD;
             entry->timer = 8000;
             itemModeChange(entry, 6);
             break;
-        case 10:
+        case ITEM_ENTRY_DROP_8S_REPLACEABLE:
             entry->status |= ITEM_STATUS_TIMER_HOLD;
             entry->timer = 8000;
             itemModeChange(entry, 6);
             entry->flags |= ITEM_FLAG_REPLACEABLE;
             break;
-        case 7:
+        case ITEM_ENTRY_DROP_5S:
             entry->status |= ITEM_STATUS_TIMER_HOLD;
-        case 5:
+        case ITEM_ENTRY_LAUNCH_5S:
             entry->timer = 5000;
             itemModeChange(entry, 6);
             break;
-        case 6:
+        case ITEM_ENTRY_LAUNCH_5S_SCATTER:
             entry->timer = 5000;
             entry->status |= ITEM_STATUS_SCATTER;
             itemModeChange(entry, 6);
             break;
-        case 2:
+        case ITEM_ENTRY_BOUNCE:
             itemModeChange(entry, 5);
             break;
-        case 13:
+        case ITEM_ENTRY_FALL:
             itemModeChange(entry, 3);
             break;
-        case 14:
+        case ITEM_ENTRY_FALL_THROWN:
             itemModeChange(entry, 4);
             break;
-        case 15:
+        case ITEM_ENTRY_POP_VANISH:
             itemModeChange(entry, 10);
             break;
     }
-#endif
     return entry;
 }
 
@@ -858,7 +790,7 @@ void itemDelete(const char* name) {
 
     for (entry = wp->entries, i = 0; i < wp->count; i++, entry++) {
         if (!strcmp(entry->name, name)) {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             itemCheckBadge(entry);
 #endif
             switch (entry->itemId) {
@@ -958,7 +890,7 @@ ItemEntry* itemNearDistCheck(f32 x, f32 y, f32 z, f32 range) {
     for (; i < wp->count; i++, entry++) {
         if (!(entry->flags & ITEM_FLAG_USED))
             continue;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         if (entry->flags & ITEM_FLAG_NO_TOUCH)
             continue;
         if (entry->status & ITEM_STATUS_PARTY_HOLD)
@@ -992,9 +924,10 @@ ItemEntry* itemNearDistCheck(f32 x, f32 y, f32 z, f32 range) {
     return found;
 }
 
+// US and PAL format the message per language and size the window by its line count
 #if VERSION >= VERSION_US
 
-void winNameDisp(WinMgrEntry* win) {
+static void winNameDisp(WinMgrEntry* win) {
     ItemEntry* entry = win->param;
     const char* name;
     u16 width;
@@ -1030,7 +963,7 @@ void winNameDisp(WinMgrEntry* win) {
 }
 
 #else
-void winNameDisp(WinMgrEntry* win) {
+static void winNameDisp(WinMgrEntry* win) {
     ItemEntry* entry = win->param;
     const char* name;
     u16 width;
@@ -1056,8 +989,9 @@ void winNameDisp(WinMgrEntry* win) {
 
 #endif
 
+// US and PAL format the message per language and size the window by its line count
 #if VERSION >= VERSION_US
-void winNameDisp2(WinMgrEntry* win) {
+static void winNameDisp2(WinMgrEntry* win) {
     ItemEntry* entry = win->param;
     const char* name;
     u16 width;
@@ -1085,7 +1019,7 @@ void winNameDisp2(WinMgrEntry* win) {
 }
 
 #else
-void winNameDisp2(WinMgrEntry* win) {
+static void winNameDisp2(WinMgrEntry* win) {
     ItemEntry* entry = win->param;
     const char* name;
     u16 width;
@@ -1107,11 +1041,11 @@ void winNameDisp2(WinMgrEntry* win) {
 
 #endif
 
-void winHelpMain(WinMgrEntry* win) {
+static void winHelpMain(WinMgrEntry* win) {
     winMgrHelpMain(win);
 }
 
-void winHelpDisp(WinMgrEntry* win) {
+static void winHelpDisp(WinMgrEntry* win) {
     ItemEntry* entry = win->param;
 
     if (!winMgrAction(entry->winId[1])) {
@@ -1120,9 +1054,9 @@ void winHelpDisp(WinMgrEntry* win) {
     }
 }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo has no badge-full message
-void winFullDisp(WinMgrEntry* win) {
+static void winFullDisp(WinMgrEntry* win) {
     ItemEntry* entry;
     const char* msg;
     u16 width;
@@ -1144,7 +1078,7 @@ void winFullDisp(WinMgrEntry* win) {
     }
 }
 #else
-void winFullDisp(WinMgrEntry* win) {
+static void winFullDisp(WinMgrEntry* win) {
     ItemEntry* entry = win->param;
     BOOL isBadge = FALSE;
     u16 width;
@@ -1169,11 +1103,11 @@ void winFullDisp(WinMgrEntry* win) {
 }
 #endif
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo's item-get sequence: no retail sub-states 2 (control off) and 8 (motion abort), so retail 3-7 and 9
 // are 2-7 here; no badge flag bookkeeping, no item renaming after a swap, and the icon flags are 0x40/0x100
 // where retail has 0x100/0x200.
-void itemseq_GetItem(ItemEntry* entry) {
+static void itemseq_GetItem(ItemEntry* entry) {
     ItemWork* wp = itemGetWork();
     MarioWork* mario;
     s32 type, bgm;
@@ -1447,7 +1381,7 @@ void itemseq_GetItem(ItemEntry* entry) {
     }
 }
 #else
-void itemseq_GetItem(ItemEntry* entry) {
+static void itemseq_GetItem(ItemEntry* entry) {
     ItemWork* wp = itemGetWork();
     MarioWork* mario;
     s32 type, bgm;
@@ -1799,7 +1733,7 @@ void itemseq_GetItem(ItemEntry* entry) {
 #endif
 
 static s32 _move_dir_1090;
-void itemseq_Bound(ItemEntry* entry) {
+static void itemseq_Bound(ItemEntry* entry) {
     static s32 _move_dir;
     MarioWork* mario;
     CameraEntry* camera;
@@ -1985,7 +1919,7 @@ void itemseq_Bound(ItemEntry* entry) {
                 }
                 entry->status |= ITEM_STATUS_GET_ENDED;
                 entry->status &= ~ITEM_STATUS_PARTY_HOLD;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 entry->flags |= ITEM_FLAG_BADGE_RETURN;
 #endif
                 break;
@@ -2147,7 +2081,7 @@ void itemGetSound(ItemEntry* entry) {
     }
 }
 
-HitEntry* itemHitCheckSide(ItemEntry* entry, f32* outX, f32 dx, f32* outZ, f32 dz, s32* angle) {
+static HitEntry* itemHitCheckSide(ItemEntry* entry, f32* outX, f32 dx, f32* outZ, f32 dz, s32* angle) {
     HitEntry* hit;
     f32 a, b;
     f32 hitX, hitY, hitZ, hitDist, hitNX, hitNY, hitNZ;

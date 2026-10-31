@@ -55,7 +55,7 @@
 #include "evt/evt_sub.h"
 
 // The demo stops gaining levels at 98.
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #define LEVEL_MAX 98
 #else
 #define LEVEL_MAX 99
@@ -112,7 +112,7 @@ typedef struct SeqEndWork {
     s32 confettiEvtId;           // 0x2A4
     s32 rankUpEvtId;             // 0x2A8
 } SeqEndWork;
-void _GetExpIcon_Init(SeqEndWork* work);
+static void _GetExpIcon_Init(SeqEndWork* work);
 
 typedef struct SeqEndUnitSetup {
     u8* kind;                 // 0x0
@@ -132,34 +132,34 @@ typedef struct SeqEndSpot {
     GXColor color; // 0x28
 } SeqEndSpot;
 
-void _GetExpIcon_Main(BattleWork* wp);
-void _LvupParamConfirmDisp(CameraId camId, void* param);
+static void _GetExpIcon_Main(BattleWork* wp);
+static void _LvupParamConfirmDisp(CameraId camId, void* param);
 void L__LvupParamHelpMsgDisp(CameraId camId, void* param);
 #pragma dont_inline reset
-void _MarioExpDisp(CameraId camId, void* param);
-void _GetExpIcon_Disp(CameraId camId, void* param);
-void _lvup_select_object_disp(CameraId camId, void* param);
+static void _MarioExpDisp(CameraId camId, void* param);
+static void _GetExpIcon_Disp(CameraId camId, void* param);
+static void _lvup_select_object_disp(CameraId camId, void* param);
 
 #define SEW(wp) ((SeqEndWork*)(wp)->seqEndWork)
 
 //.data
-USER_FUNC(_check_guard_koura);
-USER_FUNC(_disable_enemy_unit_disp);
-USER_FUNC(_get_rank_up_msg);
-USER_FUNC(_lvup_ap_recover_full);
-USER_FUNC(_lvup_disp_flag_onoff);
-USER_FUNC(_lvup_obj_set_color);
-USER_FUNC(_lvup_object_decide_bound);
-USER_FUNC(_lvup_object_noselect_delete);
-USER_FUNC(_lvup_object_select_move);
-USER_FUNC(_lvup_select_obj_disp_on);
-USER_FUNC(_lvup_select_obj_lvup_param_disp);
-USER_FUNC(_lvup_select_object_init);
-USER_FUNC(_lvup_spot_move);
-USER_FUNC(_lvup_spot_off);
-USER_FUNC(_lvup_spot_on);
-USER_FUNC(_nozzle_set_offset);
-USER_FUNC(_set_confetti_control_evtid);
+static USER_FUNC(_check_guard_koura);
+static USER_FUNC(_disable_enemy_unit_disp);
+static USER_FUNC(_get_rank_up_msg);
+static USER_FUNC(_lvup_ap_recover_full);
+static USER_FUNC(_lvup_disp_flag_onoff);
+static USER_FUNC(_lvup_obj_set_color);
+static USER_FUNC(_lvup_object_decide_bound);
+static USER_FUNC(_lvup_object_noselect_delete);
+static USER_FUNC(_lvup_object_select_move);
+static USER_FUNC(_lvup_select_obj_disp_on);
+static USER_FUNC(_lvup_select_obj_lvup_param_disp);
+static USER_FUNC(_lvup_select_object_init);
+static USER_FUNC(_lvup_spot_move);
+static USER_FUNC(_lvup_spot_off);
+static USER_FUNC(_lvup_spot_on);
+static USER_FUNC(_nozzle_set_offset);
+static USER_FUNC(_set_confetti_control_evtid);
 
 RankUpData _rank_up_data[] = {
     {1, 0, "msg_menu_mario_name_0", "butai_01"},
@@ -180,7 +180,7 @@ s32 fp_tex_tbl[6] = {56, 56, 57, 58, 58, 58};
 s32 bp_tex_tbl[6] = {59, 59, 60, 61, 62, 63};
 #endif
 
-RankUpData* _get_rank_data(s32 level) {
+static RankUpData* _get_rank_data(s32 level) {
     RankUpData* rank;
 
     for (rank = _rank_up_data; level != rank->startLevel; rank++) {
@@ -208,15 +208,15 @@ const char* BattleGetRankNameLabel(s32 level) {
     return found->rankUpName;
 }
 
-void _ExecAllUnitBattleEndEvent(void);
-void _check_audience_battle_end_exec(void);
-void _BattleMarioKouraDelete(void);
+static void _ExecAllUnitBattleEndEvent(void);
+static void _check_audience_battle_end_exec(void);
+static void _BattleMarioKouraDelete(void);
 void _audience_Whistle_control(void);
-void btlseqEnd_DispInit(BattleWork* wp);
-void btlseqEnd_DispMain(CameraId camId, void* param);
+static void btlseqEnd_DispInit(BattleWork* wp);
+static void btlseqEnd_DispMain(CameraId camId, void* param);
 
 #define SS(v) BattleSetSeq(wp, SEQ_END, (v))
-void _GetExpIcon_End(SeqEndWork* work);
+static void _GetExpIcon_End(SeqEndWork* work);
 
 void btlseqEnd(BattleWork* wp) {
     SeqEndWork* work = (SeqEndWork*)wp->seqEndWork;
@@ -803,7 +803,7 @@ void btlseqEnd(BattleWork* wp) {
             NpcEntry* p;
             SS(0x700001D);
             BattleAudienceSoundSetVolAll(0, 30);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             fb = fbatGetPointer();
             p = fb->target;
             if (p)
@@ -863,7 +863,7 @@ void btlseqEnd(BattleWork* wp) {
 
 // inlining off for _ExecAllUnitBattleEndEvent, btlseqEnd_DispInit, btlseqEnd_DispMain and 13 more, as in the original (the object differs without it)
 #pragma dont_inline on
-void _ExecAllUnitBattleEndEvent(void) {
+static void _ExecAllUnitBattleEndEvent(void) {
     BattleUnit* unit;
     BattleWork* wp = _battleWorkPointer;
     s32 i;
@@ -883,11 +883,11 @@ void _ExecAllUnitBattleEndEvent(void) {
     }
 }
 
-void btlseqEnd_DispInit(BattleWork* wp) {
+static void btlseqEnd_DispInit(BattleWork* wp) {
     SEW(wp)->flags = 0;
 }
 
-void btlseqEnd_DispMain(CameraId camId, void* param) {
+static void btlseqEnd_DispMain(CameraId camId, void* param) {
     BattleWork* wp = (BattleWork*)param;
     SeqEndWork* work = SEW(wp);
 
@@ -906,7 +906,7 @@ void btlseqEnd_DispMain(CameraId camId, void* param) {
         if (work->flags & SEQ_END_DISP_LVUP_CONFIRM) {
             dispEntry(camId, 900.0f, 1, _LvupParamConfirmDisp, wp);
         }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         if (work->flags & SEQ_END_DISP_LVUP_HELP) {
             dispEntry(camId, 900.0f, 1, L__LvupParamHelpMsgDisp, wp);
         }
@@ -914,7 +914,7 @@ void btlseqEnd_DispMain(CameraId camId, void* param) {
     }
 }
 
-void _MarioExpDisp(CameraId camId, void* param) {
+static void _MarioExpDisp(CameraId camId, void* param) {
     SeqEndWork* work = SEW((BattleWork*)param);
     char buf[0x10];
     Vec pos;
@@ -938,7 +938,7 @@ void _MarioExpDisp(CameraId camId, void* param) {
     }
 }
 
-void _LvupParamConfirmDisp(CameraId camId, void* param) {
+static void _LvupParamConfirmDisp(CameraId camId, void* param) {
     Vec pos;
     f32 zero = 0.0f;
     u32 len;
@@ -1002,7 +1002,7 @@ void L__LvupParamHelpMsgDisp(CameraId camId, void* param) {
     FontDrawMessage(zero - width / 2, (s32)y + (lines - 1) * 29, msg);
 }
 
-void _GetExpIcon_Init(SeqEndWork* work) {
+static void _GetExpIcon_Init(SeqEndWork* work) {
     s32 i;
     char name[16];
 
@@ -1033,7 +1033,7 @@ void _GetExpIcon_Init(SeqEndWork* work) {
     work->flags |= SEQ_END_DISP_EXP_ICONS;
 }
 
-void _GetExpIcon_Main(BattleWork* wp) {
+static void _GetExpIcon_Main(BattleWork* wp) {
     SeqEndWork* work = SEW(wp);
     s32 exp = work->expDisp;
     s32 i;
@@ -1081,11 +1081,11 @@ void _GetExpIcon_Main(BattleWork* wp) {
     }
 }
 
-void _GetExpIcon_Disp(CameraId camId, void* param) {
+static void _GetExpIcon_Disp(CameraId camId, void* param) {
     windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0x80}, -76.899994f, 21.0f, 165.79999f, 24.199999f, 10.0f);
 }
 
-void _GetExpIcon_End(SeqEndWork* work) {
+static void _GetExpIcon_End(SeqEndWork* work) {
     s32 i;
 
     work->flags &= ~SEQ_END_DISP_EXP_ICONS;
@@ -1094,6 +1094,7 @@ void _GetExpIcon_End(SeqEndWork* work) {
     }
 }
 
+// Two copies: the US release adds the upgrade-select prompt and cursor loop and reorders the closing events.
 #if VERSION >= VERSION_US
 USER_FUNC(N__display_select_one_to_upgrade_text);
 USER_FUNC(N__set_initial_upgrade_cursor_position);
@@ -1422,7 +1423,7 @@ EVT_BEGIN(_curtain_close_event)
         CALL(_lvup_obj_set_color, 0, 100, 128, 128, 255)
         CALL(_lvup_obj_set_color, 1, 100, 128, 128, 255)
         CALL(_lvup_obj_set_color, 2, 100, 128, 128, 255)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         CALL(evt_fade_entry, FADE_CURTAIN_SIDES_A2_3D, 1000, 0, 0, 0)
         CALL(evt_fade_set_anim_ofs_pos, 0, 130)
         CALL(evt_fade_set_anim_virtual_pos, 0, 0, LW(0))
@@ -1581,7 +1582,7 @@ USER_FUNC(N__display_select_one_to_upgrade_text) {
 }
 #endif
 
-USER_FUNC(_nozzle_set_offset) {
+static USER_FUNC(_nozzle_set_offset) {
     EvtWord* args = event->args;
     const char* name;
     f32 ofs;
@@ -1596,7 +1597,7 @@ USER_FUNC(_nozzle_set_offset) {
     return 2;
 }
 
-USER_FUNC(_lvup_ap_recover_full) {
+static USER_FUNC(_lvup_ap_recover_full) {
     BattleAudience* aud = BattleAudienceBaseGetPtr();
 
     aud->excited = TRUE;
@@ -1604,7 +1605,7 @@ USER_FUNC(_lvup_ap_recover_full) {
     return 2;
 }
 
-USER_FUNC(_disable_enemy_unit_disp) {
+static USER_FUNC(_disable_enemy_unit_disp) {
     BattleWork* wp = _battleWorkPointer;
     s32 i;
     BattleUnit* unit;
@@ -1624,7 +1625,7 @@ USER_FUNC(_disable_enemy_unit_disp) {
             continue;
         if (kind == 0xDE)
             continue;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         if (kind >= 0xE0 && kind < 0xE7 && unit->alliance == 0)
             continue;
 #else
@@ -1636,7 +1637,7 @@ USER_FUNC(_disable_enemy_unit_disp) {
             evt = evtEntry(data, 10, 0);
             evt->unitId = unit->unitId;
         } else {
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             if (unit->currentKind != UNIT_BOBBERY)
 #endif
             {
@@ -1654,7 +1655,7 @@ USER_FUNC(_disable_enemy_unit_disp) {
     return 2;
 }
 
-USER_FUNC(_set_confetti_control_evtid) {
+static USER_FUNC(_set_confetti_control_evtid) {
     EvtWord* args = event->args;
     SeqEndWork* work = SEW(_battleWorkPointer);
     if (!_battleWorkPointer->seqEndWork && !_battleWorkPointer->seqEndWork && !_battleWorkPointer->seqEndWork) {
@@ -1664,14 +1665,14 @@ USER_FUNC(_set_confetti_control_evtid) {
     return 2;
 }
 
-USER_FUNC(_lvup_select_obj_disp_on) {
+static USER_FUNC(_lvup_select_obj_disp_on) {
     SeqEndWork* work = SEW(_battleWorkPointer);
 
     work->flags |= SEQ_END_DISP_LVUP_OBJECTS;
     return 2;
 }
 
-USER_FUNC(_lvup_select_obj_lvup_param_disp) {
+static USER_FUNC(_lvup_select_obj_lvup_param_disp) {
     SeqEndWork* work = SEW(_battleWorkPointer);
     s32 i;
 
@@ -1681,7 +1682,7 @@ USER_FUNC(_lvup_select_obj_lvup_param_disp) {
     return 2;
 }
 
-USER_FUNC(_lvup_obj_set_color) {
+static USER_FUNC(_lvup_obj_set_color) {
     EvtWord* args = event->args;
     SeqEndWork* work = SEW(_battleWorkPointer);
     SeqEndObj* obj;
@@ -1694,7 +1695,7 @@ USER_FUNC(_lvup_obj_set_color) {
     return 2;
 }
 
-USER_FUNC(_lvup_disp_flag_onoff) {
+static USER_FUNC(_lvup_disp_flag_onoff) {
     EvtWord* args = event->args;
     SeqEndWork* work = SEW(_battleWorkPointer);
     s32 on = evtGetValue(event, args[0]);
@@ -1708,7 +1709,7 @@ USER_FUNC(_lvup_disp_flag_onoff) {
     return 2;
 }
 
-USER_FUNC(_lvup_spot_on) {
+static USER_FUNC(_lvup_spot_on) {
     BattleSpotWork* spot = BatSpotGetPtr();
     EvtWord* args = event->args;
     s32 n;
@@ -1756,7 +1757,7 @@ USER_FUNC(_lvup_spot_on) {
     return 2;
 }
 
-USER_FUNC(_lvup_spot_move) {
+static USER_FUNC(_lvup_spot_move) {
     BattleSpotWork* spot = BatSpotGetPtr();
     s32 n = evtGetValue(event, event->args[0]);
     SeqEndSpot* e = (SeqEndSpot*)spot->entries + n;
@@ -1819,7 +1820,7 @@ USER_FUNC(_lvup_spot_move) {
     return event->userWork[1] < 4 ? 0 : 2;
 }
 
-USER_FUNC(_lvup_spot_off) {
+static USER_FUNC(_lvup_spot_off) {
     BattleSpotWork* spot = BatSpotGetPtr();
     EvtWord* args = event->args;
     SeqEndSpot* e;
@@ -1844,7 +1845,7 @@ USER_FUNC(_lvup_spot_off) {
     return event->userdata[1] > 0 ? 0 : 2;
 }
 
-USER_FUNC(_lvup_object_noselect_delete) {
+static USER_FUNC(_lvup_object_noselect_delete) {
     SeqEndWork* work = SEW(_battleWorkPointer);
     s32 sel = work->selected;
     s32 i;
@@ -1875,7 +1876,7 @@ USER_FUNC(_lvup_object_noselect_delete) {
     return 2;
 }
 
-USER_FUNC(_lvup_object_select_move) {
+static USER_FUNC(_lvup_object_select_move) {
     SeqEndWork* work = SEW(_battleWorkPointer);
     s32 sel = work->selected;
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
@@ -1901,7 +1902,7 @@ USER_FUNC(_lvup_object_select_move) {
     return 2;
 }
 
-USER_FUNC(_lvup_object_decide_bound) {
+static USER_FUNC(_lvup_object_decide_bound) {
     SeqEndWork* work = SEW(_battleWorkPointer);
     SeqEndObj* obj = &work->objs[work->selected];
     s32 half;
@@ -1929,7 +1930,7 @@ USER_FUNC(_lvup_object_decide_bound) {
     return 2;
 }
 
-USER_FUNC(_lvup_select_object_init) {
+static USER_FUNC(_lvup_select_object_init) {
     SeqEndWork* work = SEW(_battleWorkPointer);
     PouchData* pouch = pouchGetPtr();
 
@@ -1974,7 +1975,7 @@ USER_FUNC(_lvup_select_object_init) {
     return 2;
 }
 
-s32 _keta_get(s32 n) {
+static s32 _keta_get(s32 n) {
 
     s32 k = 0;
 
@@ -2021,7 +2022,7 @@ s32 _keta_get(s32 n) {
         LVOBJ_TEXPLANE(o, n, tbl);                                        \
     }
 
-void _lvup_select_object_disp(CameraId camId, void* param) {
+static void _lvup_select_object_disp(CameraId camId, void* param) {
     SeqEndWork* work = SEW(_battleWorkPointer);
     SeqEndObj* obj;
     s32 i;
@@ -2100,7 +2101,7 @@ void _lvup_select_object_disp(CameraId camId, void* param) {
     }
 }
 #pragma auto_inline reset
-void _check_audience_battle_end_exec(void) {
+static void _check_audience_battle_end_exec(void) {
     BattleWork* wp = _battleWorkPointer;
     SeqEndGroup* group = (SeqEndGroup*)wp->fbatInfo->setup->groupSetup;
     s32 level = group->units[0].kind[0xE];
@@ -2162,14 +2163,14 @@ void _audience_Whistle_control(void) {
     }
 }
 
-void _BattleMarioKouraDelete(void) {
+static void _BattleMarioKouraDelete(void) {
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
     EventEntry* evt = evtEntry(_koura_delete_event, 10, 0);
 
     evt->unitId = mario->unitId;
 }
 
-USER_FUNC(_check_guard_koura) {
+static USER_FUNC(_check_guard_koura) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
     BattleUnit* unit;
@@ -2193,7 +2194,7 @@ USER_FUNC(_check_guard_koura) {
     return 2;
 }
 
-USER_FUNC(_get_rank_up_msg) {
+static USER_FUNC(_get_rank_up_msg) {
     s32 index = event->args[0];
 
     evtSetValue(event, index, (EvtWord)_get_rank_data(pouchGetPtr()->level)->rankUpMessage);

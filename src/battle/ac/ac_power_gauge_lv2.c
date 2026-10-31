@@ -146,7 +146,7 @@ s32 battleAcMain_PowerGaugeLv2(BattleWork* work) {
             if ((s32)ac->outputParams[0] >= ac->params[3]) {
                 ac->outputParams[0] = ac->params[3] - 1;
             }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             if (!((s32)ac->acFlags & 1)) {
                 if (g->gauge >= 100.0f) {
                     ac->outputParams[0]++;

@@ -29,15 +29,14 @@ typedef void (*BtlDispTexPlaneFloatsFirstFn)(f32 tX, f32 tY, f32 tZ, f32 sX, f32
 #include "battle/battle_attack_audience.h"
 #include "evt/evt_eff.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 
 #include "unit/party/unit_party_yoshi.h"
-#if VERSION == VERSION_DEMO
-void _btlYoshiDisp(CameraId camera, YoshiGundanWork* w);
+#if VERSION <= VERSION_DEMO_US
+static void _btlYoshiDisp(CameraId camera, YoshiGundanWork* w);
 #else
-void _btlYoshiDisp(CameraId camera, YoshiGundanPart* p);
+static void _btlYoshiDisp(CameraId camera, YoshiGundanPart* p);
 #endif
-void _yoshi_slide_move_sound(BattleUnit* unit, PoseSoundTiming* s);
+static void _yoshi_slide_move_sound(BattleUnit* unit, PoseSoundTiming* s);
 static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 
 #include "eff/eff_kemu_test.h"
@@ -45,12 +44,12 @@ static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 #include "data_tables.h"
 
 USER_FUNC(yoshi_original_color_anim_set);
-USER_FUNC(_gundan_yoshi_run_effect);
-USER_FUNC(_wait_yoshig_complete);
-USER_FUNC(_wait_yoshig_run);
-USER_FUNC(_check_swallow_attribute);
-USER_FUNC(_get_swallow_param);
-USER_FUNC(_get_nomikomi_hit_position);
+static USER_FUNC(_gundan_yoshi_run_effect);
+static USER_FUNC(_wait_yoshig_complete);
+static USER_FUNC(_wait_yoshig_run);
+static USER_FUNC(_check_swallow_attribute);
+static USER_FUNC(_get_swallow_param);
+static USER_FUNC(_get_nomikomi_hit_position);
 
 PoseTableEntry pose_table_yoshi_stay[25];
 
@@ -87,7 +86,7 @@ static EvtWord wait_event[6];
 u8 _yoshig_tpl_no_tbl[8] __attribute__((aligned(4)));
 
 // The demo defines regist first and data_table after the egg pose tables.
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 #endif
 
@@ -119,7 +118,7 @@ PoseTableEntry pose_table_yoshi_stay[] = {
     {BTL_POSE_STAY_DEFAULT, "PYS_S_1"},
 };
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 static BattleDataEntry data_table[] = {
     {5, yoshi_appeal_event},
     {6, attack_audience_event},
@@ -136,7 +135,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
 #endif
 
@@ -161,7 +160,7 @@ PoseTableEntry pose_table_egg_p[] = {
     {BTL_POSE_STAY_DEFAULT, "CHU_C_3"},
 };
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static BattleDataEntry data_table[] = {
     {5, yoshi_appeal_event},
     {6, attack_audience_event},
@@ -283,12 +282,12 @@ static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
 // The demo defines wait_event here; retail defines it near the end of the file.
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -530,7 +529,7 @@ BattleWeapon partyWeapon_YoshiNomikomi_Involved = {
     NULL, // fpDamageFn
     {0}, // fpDamageWork
     TARGET_CLASS_NO_TREE_OR_SWITCH | TARGET_CLASS_NO_SYSTEM_UNIT | TARGET_CLASS_NO_OWN_ALLIANCE | TARGET_CLASS_MAIN_PARTS | TARGET_CLASS_MULTIPLE, // targetClassFlags
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
 #else
     TARGET_PROP_HAMMERLIKE | TARGET_PROP_RECOIL | TARGET_PROP_START_OPPOSING_SIDE, // targetPropertyFlags
@@ -1680,7 +1679,7 @@ EVT_BEGIN(partyYoshiAttack_CallGuard)
         SET_VALUE(LW(1), 14)
         SET_VALUE(LW(2), 30)
     END_SWITCH
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(btlevtcmd_AcSetParamAll, 15, LW(0), 178, LW(1), LW(2), 17, 18, EVT_NULLPTR)
 #else
     CALL(btlevtcmd_AcSetParamAll, 15, LW(0), 178, LW(1), LW(2), 20, 61, EVT_NULLPTR)
@@ -1699,7 +1698,7 @@ EVT_BEGIN(partyYoshiAttack_CallGuard)
     CALL(btlevtcmd_StartAC, 1)
     CALL(btlevtcmd_ResultAC)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PYS_A_11"))
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // The demo puts the effect at Yoshi's feet and plays no sound.
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
@@ -1927,7 +1926,7 @@ static EVT_BEGIN(attack_event)
     RETURN
 EVT_END()
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 static EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
@@ -2131,11 +2130,11 @@ USER_FUNC(btl_yoshi_yoroyoro_jump_move) {
     return EVT_RETURN_BLOCK;
 }
 
-void _yoshi_slide_move_sound(BattleUnit* unit, PoseSoundTiming* s) {
+static void _yoshi_slide_move_sound(BattleUnit* unit, PoseSoundTiming* s) {
     BtlUnit_snd_se(unit, s->sfxName, -250000000, (s16)(unit->work[4] * unit->work[5] / 100)); // work[4] * work[5] / 100: slide sound volume
 }
 
-USER_FUNC(_get_nomikomi_hit_position) {
+static USER_FUNC(_get_nomikomi_hit_position) {
     BattleWork* wp;
     EvtWord* args;
     BattleUnit* unit;
@@ -2164,7 +2163,7 @@ USER_FUNC(_get_nomikomi_hit_position) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_get_swallow_param) {
+static USER_FUNC(_get_swallow_param) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
     s32 id;
@@ -2179,7 +2178,7 @@ USER_FUNC(_get_swallow_param) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_check_swallow_attribute) {
+static USER_FUNC(_check_swallow_attribute) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
     s32 id, out;
@@ -2199,7 +2198,7 @@ USER_FUNC(_check_swallow_attribute) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_wait_yoshig_run) {
+static USER_FUNC(_wait_yoshig_run) {
     BattleUnit* unit;
     YoshiGundanWork* w;
     s32 id;
@@ -2217,7 +2216,7 @@ USER_FUNC(_wait_yoshig_run) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_wait_yoshig_complete) {
+static USER_FUNC(_wait_yoshig_complete) {
     BattleUnit* unit;
     s32 id;
 
@@ -2271,7 +2270,7 @@ static inline s32 _gundan_part_update(YoshiGundanPart* p, s32 i) {
     return TRUE;
 }
 
-USER_FUNC(_gundan_yoshi_run_effect) {
+static USER_FUNC(_gundan_yoshi_run_effect) {
     BattleUnit* unit;
     YoshiGundanWork* w;
     YoshiGundanPart* p;
@@ -2326,7 +2325,7 @@ USER_FUNC(_gundan_yoshi_run_effect) {
                     f32 sc;
                     p = &w->parts[irand(256)];
                     sc = 1.0f + 0.05f * (f32)irand(20);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
                     effKemuTestEntry(0, p->x, 5.0f + p->y + (f32)irand(10), p->z, sc);
 #else
                     effKemuTestEntry(0, p->x, 5.0f + p->y + (f32)irand(15), 65.0f, sc);
@@ -2347,7 +2346,7 @@ USER_FUNC(_gundan_yoshi_run_effect) {
                 unit->countersetWeapon = NULL;
                 return EVT_RETURN_DONE;
         }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         // The demo draws every Yoshi from one display callback.
         dispEntry(CAMERA_3D, 0.0f, 2, (DispCallback)_btlYoshiDisp, w);
 #else
@@ -2358,8 +2357,8 @@ USER_FUNC(_gundan_yoshi_run_effect) {
     } while (0);
     return EVT_RETURN_BLOCK;
 }
-#if VERSION == VERSION_DEMO
-void _btlYoshiDisp(CameraId camera, YoshiGundanWork* w) {
+#if VERSION <= VERSION_DEMO_US
+static void _btlYoshiDisp(CameraId camera, YoshiGundanWork* w) {
     YoshiGundanPart* p;
     s32 i;
     f32 s;
@@ -2370,7 +2369,7 @@ void _btlYoshiDisp(CameraId camera, YoshiGundanWork* w) {
     }
 }
 #else
-void _btlYoshiDisp(CameraId camera, YoshiGundanPart* p) {
+static void _btlYoshiDisp(CameraId camera, YoshiGundanPart* p) {
     f32 s;
     s = (p->vx < 0.0f) ? 0.4f : -0.4f;
     ((BtlDispTexPlaneFloatsFirstFn)btlDispTexPlane)(p->x, p->y + 20.0f, p->z, s, 0.4f, _yoshig_tpl_no_tbl[p->frame], (GXColor){255, 255, 255, 255}, 0);

@@ -10,8 +10,8 @@
 #include <dolphin/mtx.h>
 #include "libc_decls.h"
 
-void effSnowDustMain(EffectEntry* effect);
-void effSnowDustDisp(CameraId cameraId, EffectEntry* effect);
+static void effSnowDustMain(EffectEntry* effect);
+static void effSnowDustDisp(CameraId cameraId, EffectEntry* effect);
 
 static u8 scale_data[] = {
     2, 4, 8, 13, 15, 13, 9, 6, 4, 3, 2, 4, 8, 13, 15, 13, 9, 6, 4, 3, 2, 4, 8, 13, 15, 13, 9, 6, 4, 3,
@@ -144,7 +144,7 @@ EffectEntry* effSnowDustN64Entry(s32 type, s32 count, s32 lifetime, f32 x, f32 y
     return effect;
 }
 
-void effSnowDustMain(EffectEntry* effect) {
+static void effSnowDustMain(EffectEntry* effect) {
     s32 wi, hi;
     s32 lifetime;
     EffSnowDustN64Work* work = effect->userdata;
@@ -305,7 +305,7 @@ void effSnowDustMain(EffectEntry* effect) {
     dispEntry(camId, dispCalcZ(&position), 2, (DispCallback)effSnowDustDisp, effect);
 }
 
-void effSnowDustDisp(CameraId cameraId, EffectEntry* effect) {
+static void effSnowDustDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* cam;
     EffSnowDustN64Work* work;
     s32 i;

@@ -21,7 +21,7 @@ Vec cloud_at;
 #include "pmario_sound.h"
 #include "mario/mario_motion.h"
 void N__cloud_use(PartyEntry* party);
-void getHitBreatheout2(PartyEntry* party, f32 tilt);
+static void getHitBreatheout2(PartyEntry* party, f32 tilt);
 
 #define CW(p) ((PartyCloud*)(p)->useStruct)
 #define KUMO(p) ((EffKumokumoN64Particle*)(p)->work.cloud.breathEffect->userdata)
@@ -62,11 +62,11 @@ static inline void cloudSweep(PartyEntry* party, f32 sign, s32 i) {
         (party)->moveTarget.y += 10.0f;                                               \
     }
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo defines its functions in a different order (the compiler emits them in reverse), has no hover helpers or
 // mot_cloud, and cloud_use is the whole breath state machine.
 
-void getHitBreatheout2(PartyEntry* party, f32 tilt);
+static void getHitBreatheout2(PartyEntry* party, f32 tilt);
 
 struct HitEntry* cloudGetHitBreathout(s32 rayId) {
     PartyEntry* party = partyGetPtr(PARTY_SLOT_PARTY);
@@ -428,7 +428,7 @@ f32 cloudGetBreathDir() {
     return breathDir;
 }
 
-void getHitBreatheout2(PartyEntry* party, f32 tilt) {
+static void getHitBreatheout2(PartyEntry* party, f32 tilt) {
     f32 dirSin, dirCos, ys, yc;
     f32 hx, hy, hz, dist, nx, ny, nz;
     f32 ofsX, ofsZ;
@@ -1057,7 +1057,7 @@ void cloud_exit(PartyEntry* party) {
     mario->camShiftTargetX = 0.0f;
 }
 
-void getHitBreatheout2(PartyEntry* party, f32 tilt) {
+static void getHitBreatheout2(PartyEntry* party, f32 tilt) {
     f32 dirSin, dirCos, ys, yc;
     f32 hx, hy, hz, dist, nx, ny, nz;
     f32 ofsZ, ofsX;

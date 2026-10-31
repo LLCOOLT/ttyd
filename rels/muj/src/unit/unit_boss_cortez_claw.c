@@ -15,7 +15,11 @@ static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
 BattleWeapon weapon_cortez_claw_float_attack;
+#if VERSION <= VERSION_DEMO_US
+static PoseTableEntry pose_table[4];
+#else
 static PoseTableEntry pose_table[6];
+#endif
 static BattleDataEntry data_table[18];
 static BattleUnitKindPart parts[1];
 static EvtWord init_event[47];
@@ -94,7 +98,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {0, 80, 95, 100, 90, 100, 100, 50, 0, 0, 100, 0, 100, 50, 50, 0, 90, 100, 50, 0, 0, 0};
+#else
 static StatusVulnerability regist = {0, 80, 95, 100, 90, 100, 100, 85, 0, 0, 100, 0, 100, 90, 50, 0, 90, 100, 50, 0, 0, 0};
+#endif
 
 BattleWeapon weapon_cortez_claw_float_attack = {
     NULL, 0, // name..icon
@@ -136,18 +144,24 @@ BattleWeapon weapon_cortez_claw_float_attack = {
 };
 
 static PoseTableEntry pose_table[] = {
+#if VERSION >= VERSION_JP
     {2, "KRT_Z_1"},
     {9, "KRT_Z_1"},
+#endif
     {28, "KRT_S_1"},
     {31, "KRT_S_1"},
     {39, "KRT_S_1"},
-    {69, "KRT_S_1"},
+    {BTL_POSE_STAY_DEFAULT, "KRT_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
     {9, cortez_damage_sub_event},
     {49, cortez_weapon_dead_event},
+#if VERSION <= VERSION_DEMO_US
+    {70, cortez_weapon_break_event},
+#else
     {71, cortez_weapon_break_event},
+#endif
     {58, cortez_weapon_blow_dead_event},
     {36, cortez_weapon_counter_damage_event},
     {24, cortez_weapon_counter_damage_event},
@@ -187,7 +201,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 

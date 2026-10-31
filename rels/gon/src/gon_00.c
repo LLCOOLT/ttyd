@@ -6,7 +6,7 @@
 #include "evt/evt_map.h"
 #include "evt/evt_mobj.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "gon.h"
 #include "version.h"
 #include "mario/mariost.h"
@@ -88,12 +88,12 @@ static BeroEntry e3_bero[] = {
 };
 
 EVT_BEGIN(gon_00_init_evt)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     SET_VALUE(GSWF(GSWF_LOG_MAP_GON_ROUTE_SHOWN), 1)
 #endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     WAIT_FRAMES(1)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT)
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_GON1"))
@@ -105,10 +105,10 @@ EVT_BEGIN(gon_00_init_evt)
     CALL(evt_sub_get_system_flag, LW(0))
     IF_BITS_SET(LW(0), GLOBAL_FLAG_KIOSK)
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_bero_overwrite, STRING("w_bero"), PTR(e3_bero))
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
     END_IF
     RETURN
 EVT_END()

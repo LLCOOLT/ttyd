@@ -32,10 +32,3 @@ extern BattleUnitKind unit_patakuri;
 extern BattleUnitKind unit_sinnosuke;
 extern BattleUnitKind unit_togedaruma;
 extern BattleUnitKind unit_togekuri;
-
-// User functions defined in the area's files (global symbols in the original REL).
-// hei_00.c
-USER_FUNC(make_gonbaba_projection_evt);
-USER_FUNC(shake);
-USER_FUNC(shake_reset);
-USER_FUNC(cam_test2);

@@ -17,10 +17,10 @@ static DVDMgrCallback _callback;
 BOOL dvdmgr_thread_on;
 
 // local prototypes
-void* proc_main(void* param);
+static void* proc_main(void* param);
 static s32 compare(const void* a, const void* b);
 
-void* proc_main(void* param) {
+static void* proc_main(void* param) {
     while (1) {
         DVDMgrMain();
         OSYieldThread();
@@ -48,7 +48,7 @@ void DVDMgrDelete(void) {
 static s32 compare(const void* a, const void* b) {
     u8 priorityA, priorityB;
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // the demo sorts by queue index, not priority
     priorityA = *(u8*)a; // (a const cast here changes the demo code)
     priorityB = *(u8*)b;
@@ -124,7 +124,7 @@ void DVDMgrMain(void) {
 
         if (entry->status & DVDMGR_CLOSED) {
             DVDClose(&entry->info);
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             entry->status &= ~DVDMGR_INUSE;
 #endif
             memset(entry, 0, sizeof(DVDEntry));
@@ -166,7 +166,7 @@ DVDEntry* DVDMgrOpen(const char* path, u8 priority, u16 unknown) {
     entry->position = 0;
     entry->status |= DVDMGR_INUSE;
     if (!DVDOpen(entry->name, &entry->info)) {
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         entry->status |= 0x10;
         entry->status |= DVDMGR_UNK_ERROR2;
         entry->status &= ~DVDMGR_INUSE;

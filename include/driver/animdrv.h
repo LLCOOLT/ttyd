@@ -422,7 +422,7 @@ typedef struct MoaChain {
     const char* to;   // 0x4, joint group it ends at
 } MoaChain;
 
-extern const s32 g_moamoa_chain_num; // entries in g_moamoa_chain_tbl
+extern const s32 g_moamoa_chain_max; // entries in g_moamoa_chain_tbl
 extern MoaChain g_moamoa_chain_tbl[47];
 
 void animPoseAutoRelease(s32 type);

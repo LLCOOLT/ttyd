@@ -101,7 +101,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {60, 70, 60, 40, 60, 40, 100, 60, 30, 60, 30, 60, 40, 60, 60, 0, 60, 100, 60, 70, 70, 50};
+#else
 static StatusVulnerability regist = {90, 80, 80, 40, 90, 40, 100, 70, 30, 90, 30, 90, 40, 95, 70, 0, 60, 100, 70, 70, 70, 50};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
@@ -120,8 +124,8 @@ static PoseTableEntry pose_table[] = {
     {40, "W_1"},
     {56, "X_1"},
     {57, "X_1"},
-    {65, "T_1"},
-    {69, "S_2"},
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_2"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -251,7 +255,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -292,11 +296,11 @@ static EVT_BEGIN(attack_event)
     CALL(evt_sub_random, LW(0), LW(1))
     IF_INT_LESS(LW(1), 50)
         SET_VALUE(LW(9), PTR(&weapon_monban_attack))
-        CALL_CHILD(PTR(normal_attack_event))
+        CALL_CHILD(normal_attack_event)
         GOTO(99)
     END_IF
     SET_VALUE(LW(9), PTR(&weapon_monban_throw_attack))
-    CALL_CHILD(PTR(throw_attack_event))
+    CALL_CHILD(throw_attack_event)
     GOTO(99)
     LABEL(99)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)

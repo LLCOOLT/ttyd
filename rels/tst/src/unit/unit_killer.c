@@ -93,7 +93,11 @@ static BattleUnitDefense defence = {{1, 1, 1, 1, 1}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {0, 0, 100, 0, 50, 150, 100, 75, 100, 75, 100, 75, 100, 75, 75, 0, 100, 100, 75, 100, 100, 95};
+#else
 static StatusVulnerability regist = {0, 0, 105, 0, 50, 150, 100, 70, 100, 95, 100, 95, 100, 95, 75, 0, 100, 100, 75, 100, 100, 95};
+#endif
 
 static BattleUnitKindPart parts[] = {
     {1, "btl_un_killer", "c_kilr", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x9, 0, pose_table},
@@ -152,8 +156,8 @@ static PoseTableEntry pose_table[] = {
     {42, "KIL_R_1"},
     {56, "KIL_X_1"},
     {57, "KIL_X_1"},
-    {65, "KIL_T_1"},
-    {69, "KIL_S_1"},
+    {BTL_POSE_TALK, "KIL_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "KIL_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -176,7 +180,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 

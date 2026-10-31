@@ -29,7 +29,6 @@
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "npc_event.h"
 #include "rsh.h"
 #include "version.h"
@@ -44,15 +43,15 @@ typedef struct RshRndNpc {
     EvtWord* talkEvt;
 } RshRndNpc;
 
-USER_FUNC(debug_print_func);
-USER_FUNC(evt_rsh_get_rnd_npc);
-USER_FUNC(evt_rsh_get_rnd_npc_data);
-USER_FUNC(evt_rsh_get_rnd_npc_talk_evt);
-USER_FUNC(evt_rsh_set_rnd_npc);
-USER_FUNC(evt_rsh_set_rnd_npc_talk_evt);
-BOOL img_wait(void);
-RshRndNpc* _get_rnd_npc_data(s32 room, s32 group, s32 index);
-void rsh_window_tev(MapTevCallbackInfo* info);
+static USER_FUNC(debug_print_func);
+static USER_FUNC(evt_rsh_get_rnd_npc);
+static USER_FUNC(evt_rsh_get_rnd_npc_data);
+static USER_FUNC(evt_rsh_get_rnd_npc_talk_evt);
+static USER_FUNC(evt_rsh_set_rnd_npc);
+static USER_FUNC(evt_rsh_set_rnd_npc_talk_evt);
+static BOOL img_wait(void);
+static RshRndNpc* _get_rnd_npc_data(s32 room, s32 group, s32 index);
+static void rsh_window_tev(MapTevCallbackInfo* info);
 
 extern EvtWord simi_check[];
 extern EvtWord simi_offscreen_check[];
@@ -247,12 +246,14 @@ EVT_BEGIN(evt_rsh_door_open)
     READ_INT(LW(7))
     CALL(evt_hitobj_attr_onoff, 0, 1, LW(4), 8388608)
     CALL(evt_hitobj_attr_onoff, 0, 1, LW(6), 8388608)
+#if VERSION >= VERSION_JP
     CALL(evt_cam_letter_box_disable, 1)
+#endif
     CALL(evt_mario_key_onoff, 0)
     CALL(img_wait)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(1), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, LW(2), MAPOBJ_FLAG_HIDE)
-    CALL_CHILD(PTR(kami_check))
+    CALL_CHILD(kami_check)
     CALL(evt_hit_get_position, LW(4), LW(10), LW(11), LW(12))
     CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_SLIDE1"), LW(10), LW(11), LW(12), 0)
     CALL(evt_map_playanim, LW(5), 0, 0)
@@ -265,9 +266,15 @@ EVT_BEGIN(evt_rsh_door_open)
     CALL(evt_img_free_capture, STRING("capture_img"), 0)
     CALL(evt_img_free_capture, STRING("capture_img"), 1)
     CALL(evt_img_free_capture, STRING("capture_img"), 2)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_img_alloc_capture, STRING("capture_img"), 0, STRING("offscreen"), 0, 0, 0, 0, 0)
+    CALL(evt_img_alloc_capture, STRING("capture_img"), 1, STRING("offscreen"), 0, 0, 0, 0, 0)
+    CALL(evt_img_alloc_capture, STRING("capture_img"), 2, STRING("offscreen"), 0, 0, 0, 0, 0)
+#else
     CALL(evt_img_alloc_capture, STRING("capture_img"), 0, STRING("offscreen"), 1, 0, 0, 0, 0)
+#endif
     CALL(evt_mapobj_set_offscreen, 1, STRING("rouka"), STRING("offscreen"))
-    CALL_CHILD(PTR(simi_offscreen_check))
+    CALL_CHILD(simi_offscreen_check)
     CALL(evt_mapobj_set_offscreen, 1, STRING("w_tobira"), STRING("offscreen"))
     CALL(evt_mapobj_set_offscreen, 1, STRING("e_tobira"), STRING("offscreen"))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("rouka"), MAPOBJ_FLAG_HIDE)
@@ -281,9 +288,15 @@ EVT_BEGIN(evt_rsh_door_open)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_OFF6_ROOM_IN1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_img_set_virtual_point, STRING("capture_img"), 0, 0, -80)
+#endif
     CALL(evt_img_set_paper_anim, STRING("capture_img"), STRING("A_1"))
     CALL(evt_img_onoff, STRING("capture_img"), 1)
     BEGIN_INLINE_EVENT
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_img_wait_animend, STRING("capture_img"))
+#endif
         CALL(evt_mapobj_clear_offscreen, 1, STRING("rouka"))
         CALL(evt_mapobj_clear_offscreen, 1, STRING("w_tobira"))
         CALL(evt_mapobj_clear_offscreen, 1, STRING("e_tobira"))
@@ -291,11 +304,15 @@ EVT_BEGIN(evt_rsh_door_open)
         IF_INT_EQUAL(LW(0), 1)
             CALL(evt_npc_set_offscreen, STRING("車掌"), 0)
         END_IF
+#if VERSION >= VERSION_JP
         CALL(evt_img_wait_animend, STRING("capture_img"))
+#endif
         CALL(evt_img_onoff, STRING("capture_img"), 0)
     END_INLINE_EVENT
     CALL(evt_mario_key_onoff, 1)
+#if VERSION >= VERSION_JP
     CALL(evt_cam_letter_box_disable, 0)
+#endif
     CALL(evt_hitobj_attr_onoff, 0, 0, LW(4), 8388608)
     CALL(evt_hitobj_attr_onoff, 0, 0, LW(6), 8388608)
     SET_VALUE(LF(0), 0)
@@ -438,7 +455,9 @@ EVT_BEGIN(evt_rsh_door_close)
     READ_INT(LW(5))
     READ_INT(LW(6))
     READ_INT(LW(7))
+#if VERSION >= VERSION_JP
     CALL(evt_cam_letter_box_disable, 1)
+#endif
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_hitobj_attr_onoff, 0, 1, LW(4), 8388608)
     CALL(evt_hitobj_attr_onoff, 0, 1, LW(6), 8388608)
@@ -485,6 +504,7 @@ EVT_BEGIN(evt_rsh_door_close)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         CALL(evt_sub_get_mapname, LW(10))
+#if VERSION >= VERSION_JP
         SET_VALUE(LF(0), 0)
         IF_STR_EQUAL(LW(10), STRING("rsh_02_a"))
             SET_VALUE(LF(0), 1)
@@ -492,10 +512,13 @@ EVT_BEGIN(evt_rsh_door_close)
         IF_STR_EQUAL(LW(10), STRING("rsh_02_b"))
             SET_VALUE(LF(0), 1)
         END_IF
+#endif
         IF_STR_EQUAL(LW(10), STRING("rsh_02_c"))
+#if VERSION >= VERSION_JP
             SET_VALUE(LF(0), 1)
         END_IF
         IF_INT_EQUAL(LF(0), 1)
+#endif
             IF_STR_EQUAL(LW(1), STRING("heya_4"))
                 IF_INT_EQUAL(GSWF(GSWF_RSH02_GHOST_APPEARED), 1)
                     CALL(evt_snd_bgmon, PSND_FADE_RESUME | PSND_FADE_UNDIP, 0)
@@ -510,11 +533,17 @@ EVT_BEGIN(evt_rsh_door_close)
     CALL(evt_img_free_capture, STRING("capture_img"), 0)
     CALL(evt_img_free_capture, STRING("capture_img"), 1)
     CALL(evt_img_free_capture, STRING("capture_img"), 2)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_img_alloc_capture, STRING("capture_img"), 0, STRING("offscreen"), 0, 0, 0, 608, 480)
+    CALL(evt_img_alloc_capture, STRING("capture_img"), 1, STRING("offscreen"), 0, 0, 0, 608, 480)
+    CALL(evt_img_alloc_capture, STRING("capture_img"), 2, STRING("offscreen"), 0, 0, 0, 608, 480)
+#else
     CALL(evt_img_alloc_capture, STRING("capture_img"), 0, STRING("offscreen"), 1, 0, 0, 608, 480)
+#endif
     CALL(evt_mapobj_set_offscreen, 1, STRING("rouka"), STRING("offscreen"))
     CALL(evt_img_onoff, STRING("capture_img"), 0)
-    CALL_CHILD(PTR(kami_offscreen_check))
-    CALL_CHILD(PTR(simi_offscreen_check))
+    CALL_CHILD(kami_offscreen_check)
+    CALL_CHILD(simi_offscreen_check)
     CALL(evt_npc_check, STRING("車掌"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_npc_set_offscreen, STRING("車掌"), STRING("offscreen"))
@@ -523,6 +552,9 @@ EVT_BEGIN(evt_rsh_door_close)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_OFF6_ROOM_OUT1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_img_set_virtual_point, STRING("capture_img"), 0, 0, -70)
+#endif
     CALL(evt_img_set_paper_anim, STRING("capture_img"), STRING("A_2"))
     CALL(evt_img_onoff, STRING("capture_img"), 1)
     BEGIN_INLINE_EVENT
@@ -530,6 +562,21 @@ EVT_BEGIN(evt_rsh_door_close)
         CALL(evt_hit_get_position, LW(6), LW(13), LW(14), LW(15))
         CALL(evt_mario_mov_pos, LW(13), LW(12), 300)
     END_INLINE_EVENT
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_img_wait_animend, STRING("capture_img"))
+    CALL(evt_img_onoff, STRING("capture_img"), 0)
+    CALL(evt_mapobj_clear_offscreen, 1, STRING("rouka"))
+    CALL(evt_mapobj_clear_offscreen, 1, LW(1))
+    CALL(evt_mapobj_clear_offscreen, 1, LW(2))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("rouka"), MAPOBJ_FLAG_HIDE)
+    CALL(evt_npc_check, STRING("車掌"), LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_npc_flag_onoff, 0, STRING("車掌"), NPC_FLAG_HIDDEN)
+    END_IF
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_npc_set_offscreen, STRING("車掌"), 0)
+    END_IF
+#else
     BEGIN_INLINE_EVENT
         CALL(evt_mapobj_clear_offscreen, 1, STRING("rouka"))
         CALL(evt_mapobj_clear_offscreen, 1, LW(1))
@@ -545,7 +592,8 @@ EVT_BEGIN(evt_rsh_door_close)
     CALL(evt_img_wait_animend, STRING("capture_img"))
     CALL(evt_img_onoff, STRING("capture_img"), 0)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("rouka"), MAPOBJ_FLAG_HIDE)
-    CALL_CHILD(PTR(simi_check))
+#endif
+    CALL_CHILD(simi_check)
     BEGIN_INLINE_EVENT
         CALL(evt_hit_get_position, LW(6), LW(10), LW(11), LW(12))
         ADD(LW(12), 50)
@@ -562,7 +610,9 @@ EVT_BEGIN(evt_rsh_door_close)
     CALL(evt_hitobj_attr_onoff, 0, 0, LW(4), 8388608)
     CALL(evt_hitobj_attr_onoff, 0, 0, LW(6), 8388608)
     CALL(evt_mario_key_onoff, 1)
+#if VERSION >= VERSION_JP
     CALL(evt_cam_letter_box_disable, 0)
+#endif
     RETURN
 EVT_END()
 
@@ -580,75 +630,77 @@ EVT_BEGIN(evt_rsh_window)
     RETURN
 EVT_END()
 
-static const s32 rsh_texmtx_tbl[] = {
+// rsh_window_tev's texture matrices. The demo map has it as a static local (texmtx_tbl$606); as one it would be
+// emitted after the strings of rsh_01_rnd_npc_1 instead of before them, so it stays at file scope.
+static const s32 texmtx_tbl[] = {
     GX_TEXMTX0, GX_TEXMTX1, GX_TEXMTX2, GX_TEXMTX3, GX_TEXMTX4, GX_TEXMTX5, GX_TEXMTX6, GX_TEXMTX7, GX_TEXMTX8, GX_TEXMTX9,
 };
 
 RshRndNpc rsh_01_rnd_npc_1[] = {
-    {"c_kinopiko_v", /*"キノピオ女紫"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x8E\x87", evt_rsh_rnd_npc_2_1_talk},
-    {"c_kinopio_b", /*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", evt_rsh_rnd_npc_2_2_talk},
-    {"c_kinopio_g", /*"キノピオ緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x97\xCE", evt_rsh_rnd_npc_2_3_talk},
-    {"c_nokonoko", /*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", evt_rsh_rnd_npc_2_4_talk},
-    {"c_kuribo_n", /*"NPCクリボー"*/"\x4E\x50\x43\x83\x4E\x83\x8A\x83\x7B\x81\x5B", evt_rsh_rnd_npc_2_5_talk},
+    {"c_kinopiko_v", "キノピオ女紫", evt_rsh_rnd_npc_2_1_talk},
+    {"c_kinopio_b", "キノピオ青", evt_rsh_rnd_npc_2_2_talk},
+    {"c_kinopio_g", "キノピオ緑", evt_rsh_rnd_npc_2_3_talk},
+    {"c_nokonoko", "ノコノコ", evt_rsh_rnd_npc_2_4_talk},
+    {"c_kuribo_n", "NPCクリボー", evt_rsh_rnd_npc_2_5_talk},
 };
 
 RshRndNpc rsh_01_rnd_npc_2[] = {
-    {"c_kinopiko_p", /*"キノピオ女桃"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x93\x8D", evt_rsh_rnd_npc_2_6_talk},
-    {"c_kinopio_b", /*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", evt_rsh_rnd_npc_2_8_talk},
-    {"c_kinopiko", /*"キノピオ女"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97", evt_rsh_rnd_npc_2_9_talk},
+    {"c_kinopiko_p", "キノピオ女桃", evt_rsh_rnd_npc_2_6_talk},
+    {"c_kinopio_b", "キノピオ青", evt_rsh_rnd_npc_2_8_talk},
+    {"c_kinopiko", "キノピオ女", evt_rsh_rnd_npc_2_9_talk},
 };
 
 RshRndNpc rsh_01_rnd_npc_3[] = {
-    {"c_kokinopio_y", /*"キノピオ子黄緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x89\xA9\x97\xCE", evt_rsh_rnd_npc_2_7_talk},
-    {"c_kokinopio_b", /*"キノピオ子青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x90\xC2", evt_rsh_rnd_npc_2_10_talk},
+    {"c_kokinopio_y", "キノピオ子黄緑", evt_rsh_rnd_npc_2_7_talk},
+    {"c_kokinopio_b", "キノピオ子青", evt_rsh_rnd_npc_2_10_talk},
 };
 
 RshRndNpc rsh_03_rnd_npc_1[] = {
-    {"c_kinopio", /*"キノピオ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49", evt_rsh_rnd_npc_3_1_talk},
-    {"c_kinopiko_p", /*"キノピオ女桃"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x93\x8D", evt_rsh_rnd_npc_3_2_talk},
-    {"c_kinopiko_v", /*"キノピオ女紫"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x8E\x87", evt_rsh_rnd_npc_3_3_talk},
-    {"c_kinopio_b", /*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", evt_rsh_rnd_npc_3_4_talk},
-    {"c_kinopiko_p", /*"キノピオ女桃"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x93\x8D", evt_rsh_rnd_npc_3_5_talk},
-    {"c_kinopiko_v", /*"キノピオ女紫"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x8E\x87", evt_rsh_rnd_npc_3_7_talk},
-    {"c_nokonoko", /*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", evt_rsh_rnd_npc_3_8_talk},
-    {"c_yoshi", /*"ヨッシー大"*/"\x83\x88\x83\x62\x83\x56\x81\x5B\x91\xE5", evt_rsh_rnd_npc_3_9_talk},
-    {"c_nokonoko", /*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", evt_rsh_rnd_npc_4_1_talk},
-    {"c_yoshi", /*"ヨッシー大"*/"\x83\x88\x83\x62\x83\x56\x81\x5B\x91\xE5", evt_rsh_rnd_npc_4_2_talk},
-    {"c_jugem_n", /*"ＮＰＣジュゲム"*/"\x82\x6D\x82\x6F\x82\x62\x83\x57\x83\x85\x83\x51\x83\x80", evt_rsh_rnd_npc_4_3_talk},
-    {"c_kinopio_b", /*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", evt_rsh_rnd_npc_4_4_talk},
-    {"c_nokonoko", /*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", evt_rsh_rnd_npc_4_5_talk},
+    {"c_kinopio", "キノピオ", evt_rsh_rnd_npc_3_1_talk},
+    {"c_kinopiko_p", "キノピオ女桃", evt_rsh_rnd_npc_3_2_talk},
+    {"c_kinopiko_v", "キノピオ女紫", evt_rsh_rnd_npc_3_3_talk},
+    {"c_kinopio_b", "キノピオ青", evt_rsh_rnd_npc_3_4_talk},
+    {"c_kinopiko_p", "キノピオ女桃", evt_rsh_rnd_npc_3_5_talk},
+    {"c_kinopiko_v", "キノピオ女紫", evt_rsh_rnd_npc_3_7_talk},
+    {"c_nokonoko", "ノコノコ", evt_rsh_rnd_npc_3_8_talk},
+    {"c_yoshi", "ヨッシー大", evt_rsh_rnd_npc_3_9_talk},
+    {"c_nokonoko", "ノコノコ", evt_rsh_rnd_npc_4_1_talk},
+    {"c_yoshi", "ヨッシー大", evt_rsh_rnd_npc_4_2_talk},
+    {"c_jugem_n", "ＮＰＣジュゲム", evt_rsh_rnd_npc_4_3_talk},
+    {"c_kinopio_b", "キノピオ青", evt_rsh_rnd_npc_4_4_talk},
+    {"c_nokonoko", "ノコノコ", evt_rsh_rnd_npc_4_5_talk},
 };
 
 RshRndNpc rsh_03_rnd_npc_2[] = {
-    {"c_kokinopio_g", /*"キノピオ子緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x97\xCE", evt_rsh_rnd_npc_3_6_talk},
-    {"c_kokinopio_y", /*"キノピオ子黄緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x89\xA9\x97\xCE", evt_rsh_rnd_npc_3_10_talk},
-    {"c_kinopio", /*"キノピオ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49", evt_rsh_rnd_npc_4_6_talk},
-    {"c_kokinopio_g", /*"キノピオ子緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x97\xCE", evt_rsh_rnd_npc_4_7_talk},
-    {"c_kuribo_n", /*"NPCクリボー"*/"\x4E\x50\x43\x83\x4E\x83\x8A\x83\x7B\x81\x5B", evt_rsh_rnd_npc_4_8_talk},
-    {"c_kinopio_g", /*"キノピオ緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x97\xCE", evt_rsh_rnd_npc_4_9_talk},
-    {"c_nokonoko", /*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", evt_rsh_rnd_npc_4_10_talk},
+    {"c_kokinopio_g", "キノピオ子緑", evt_rsh_rnd_npc_3_6_talk},
+    {"c_kokinopio_y", "キノピオ子黄緑", evt_rsh_rnd_npc_3_10_talk},
+    {"c_kinopio", "キノピオ", evt_rsh_rnd_npc_4_6_talk},
+    {"c_kokinopio_g", "キノピオ子緑", evt_rsh_rnd_npc_4_7_talk},
+    {"c_kuribo_n", "NPCクリボー", evt_rsh_rnd_npc_4_8_talk},
+    {"c_kinopio_g", "キノピオ緑", evt_rsh_rnd_npc_4_9_talk},
+    {"c_nokonoko", "ノコノコ", evt_rsh_rnd_npc_4_10_talk},
 };
 
 RshRndNpc rsh_04_rnd_npc_1[] = {
-    {"c_kinopio_g", /*"キノピオ緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x97\xCE", evt_rsh_rnd_npc_5_2_talk},
-    {"c_kinopio_b", /*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", evt_rsh_rnd_npc_5_10_talk},
+    {"c_kinopio_g", "キノピオ緑", evt_rsh_rnd_npc_5_2_talk},
+    {"c_kinopio_b", "キノピオ青", evt_rsh_rnd_npc_5_10_talk},
 };
 
 RshRndNpc rsh_04_rnd_npc_2[] = {
-    {"c_nokonoko", /*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", evt_rsh_rnd_npc_5_8_talk},
-    {"c_kinopio", /*"キノピオ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49", evt_rsh_rnd_npc_5_9_talk},
+    {"c_nokonoko", "ノコノコ", evt_rsh_rnd_npc_5_8_talk},
+    {"c_kinopio", "キノピオ", evt_rsh_rnd_npc_5_9_talk},
 };
 
 RshRndNpc rsh_04_rnd_npc_3[] = {
-    {"c_kokinopio_g", /*"キノピオ子緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x97\xCE", evt_rsh_rnd_npc_5_5_talk},
-    {"c_kokinopio", /*"キノピオ子"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71", evt_rsh_rnd_npc_5_6_talk},
+    {"c_kokinopio_g", "キノピオ子緑", evt_rsh_rnd_npc_5_5_talk},
+    {"c_kokinopio", "キノピオ子", evt_rsh_rnd_npc_5_6_talk},
 };
 
 RshRndNpc rsh_04_rnd_npc_4[] = {
-    {"c_kokinopio_b", /*"キノピオ子青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x90\xC2", evt_rsh_rnd_npc_5_1_talk},
-    {"c_kokinopio_y", /*"キノピオ子黄緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x89\xA9\x97\xCE", evt_rsh_rnd_npc_5_3_talk},
-    {"c_kokinopio_b", /*"キノピオ子青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x90\xC2", evt_rsh_rnd_npc_5_4_talk},
-    {"c_kinopiko", /*"キノピオ女"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97", evt_rsh_rnd_npc_5_7_talk},
+    {"c_kokinopio_b", "キノピオ子青", evt_rsh_rnd_npc_5_1_talk},
+    {"c_kokinopio_y", "キノピオ子黄緑", evt_rsh_rnd_npc_5_3_talk},
+    {"c_kokinopio_b", "キノピオ子青", evt_rsh_rnd_npc_5_4_talk},
+    {"c_kinopiko", "キノピオ女", evt_rsh_rnd_npc_5_7_talk},
 };
 
 EVT_BEGIN(evt_rsh_rnd_npc_2_1_talk)
@@ -1007,7 +1059,7 @@ EVT_BEGIN(evt_rsh_rnd_npc_init)
     CALL(evt_rsh_set_rnd_npc, 2, 2, LW(0))
     CALL(evt_sub_random, 3, LW(0))
     CALL(evt_rsh_set_rnd_npc, 2, 3, LW(0))
-    CALL_CHILD(PTR(debug_print_rnd_npc))
+    CALL_CHILD(debug_print_rnd_npc)
     RETURN
 EVT_END()
 
@@ -1044,7 +1096,7 @@ EVT_END()
 
 NpcSetupInfo rsh_03_rnd_npc_2_ent[] = {
     {
-        /*"乗客２"*/"\x8F\xE6\x8B\x71\x82\x51", // name
+        "乗客２", // name
         0, 0, // flags..reactionFlags
         npc_urouro_init_event, // initEvent
         npc_urouro_move_event, // regularEvent
@@ -1085,7 +1137,7 @@ EVT_END()
 
 NpcSetupInfo rsh_04_rnd_npc_3_ent[] = {
     {
-        /*"乗客３"*/"\x8F\xE6\x8B\x71\x82\x52", // name
+        "乗客３", // name
         0, 0, // flags..reactionFlags
         npc_urouro_init_event, // initEvent
         npc_urouro_move_event, // regularEvent
@@ -1135,14 +1187,18 @@ EVT_BEGIN(evt_rsh_04_rnd_npc_entry)
     CALL(evt_rsh_get_rnd_npc_talk_evt, 2, 3, LW(0), LW(3))
     CALL(evt_npc_entry, STRING("乗客４"), LW(1))
     CALL(evt_npc_set_tribe, STRING("乗客４"), LW(2))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_npc_set_position, STRING("乗客４"), -50, 30, -260)
+#else
     CALL(evt_npc_set_position, STRING("乗客４"), -85, 16, -255)
+#endif
     CALL(evt_npc_set_ry, STRING("乗客４"), 90)
     CALL(evt_npc_flag_onoff, 1, STRING("乗客４"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
     CALL(evt_rsh_set_rnd_npc_talk_evt, STRING("乗客４"), LW(3))
     RETURN
 EVT_END()
 
-USER_FUNC(debug_print_func) {
+static USER_FUNC(debug_print_func) {
     EvtWord* args = event->args;
     s32 room = evtGetValue(event, args[0]);
     s32 group = evtGetValue(event, args[1]);
@@ -1202,7 +1258,7 @@ USER_FUNC(debug_print_func) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_rsh_set_rnd_npc_talk_evt) {
+static USER_FUNC(evt_rsh_set_rnd_npc_talk_evt) {
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     EvtWord* evt = (EvtWord*)evtGetValue(event, args[1]); // event script for the npc talk
@@ -1211,7 +1267,7 @@ USER_FUNC(evt_rsh_set_rnd_npc_talk_evt) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_rsh_get_rnd_npc_talk_evt) {
+static USER_FUNC(evt_rsh_get_rnd_npc_talk_evt) {
     EvtWord* args = event->args;
     s32 room = evtGetValue(event, args[0]);
     s32 group = evtGetValue(event, args[1]);
@@ -1221,7 +1277,7 @@ USER_FUNC(evt_rsh_get_rnd_npc_talk_evt) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_rsh_get_rnd_npc_data) {
+static USER_FUNC(evt_rsh_get_rnd_npc_data) {
     EvtWord* args = event->args;
     s32 room = evtGetValue(event, args[0]);
     s32 group = evtGetValue(event, args[1]);
@@ -1233,7 +1289,7 @@ USER_FUNC(evt_rsh_get_rnd_npc_data) {
     return EVT_RETURN_DONE;
 }
 
-RshRndNpc* _get_rnd_npc_data(s32 room, s32 group, s32 index) {
+static RshRndNpc* _get_rnd_npc_data(s32 room, s32 group, s32 index) {
     RshRndNpc* data = NULL;
 
     switch (room) {
@@ -1284,7 +1340,7 @@ RshRndNpc* _get_rnd_npc_data(s32 room, s32 group, s32 index) {
     return &data[index];
 }
 
-USER_FUNC(evt_rsh_set_rnd_npc) {
+static USER_FUNC(evt_rsh_set_rnd_npc) {
     EvtWord* args = event->args;
     s32 room = evtGetValue(event, args[0]);
     s32 group = evtGetValue(event, args[1]);
@@ -1341,7 +1397,7 @@ USER_FUNC(evt_rsh_set_rnd_npc) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_rsh_get_rnd_npc) {
+static USER_FUNC(evt_rsh_get_rnd_npc) {
     EvtWord* args = event->args;
     s32 room = evtGetValue(event, args[0]);
     s32 group = evtGetValue(event, args[1]);
@@ -1405,7 +1461,7 @@ USER_FUNC(evt_rsh_get_rnd_npc) {
     return EVT_RETURN_DONE;
 }
 
-void rsh_window_tev(MapTevCallbackInfo* info) {
+static void rsh_window_tev(MapTevCallbackInfo* info) {
     MapObject* p;
     u32 flags;
     GXTevStageID tevStage;
@@ -1487,8 +1543,8 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
                       x1 - gp->fbWidth / 2, gp->efbHeight / 2.0f / t, 0.5f, 0.5f, 0.4f, 0.6f);
     PSMTXConcat(mtx, camGetCurPtr()->view, mtx);
     PSMTXConcat(mtx, info->mtx, mtx);
-    GXSetTexCoordGen2(texCoord, GX_TG_MTX3x4, GX_TG_POS, rsh_texmtx_tbl[texMap], GX_FALSE, GX_PTIDENTITY);
-    GXLoadTexMtxImm(mtx, rsh_texmtx_tbl[texMap], GX_MTX3x4);
+    GXSetTexCoordGen2(texCoord, GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[texMap], GX_FALSE, GX_PTIDENTITY);
+    GXLoadTexMtxImm(mtx, texmtx_tbl[texMap], GX_MTX3x4);
     GXLoadTexObj(&tex, texMap);
     GXSetTevOrder(tevStage, texCoord, texMap, GX_COLOR_NULL);
     GXSetTevColorOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
@@ -1506,7 +1562,7 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     info->texCoord = texMap;
 }
 
-BOOL img_wait(void) {
+static BOOL img_wait(void) {
     ImageEntry* img = imgNameToPtr("capture_img", gp->inBattle != 0);
 
     if (!(img->flags & 2) && img->loopTimes < 1.0f) {

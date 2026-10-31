@@ -41,15 +41,6 @@ static GXColor col_mini[] = {
     {0xAE, 0x69, 0xE0, 0xFF}, {0xBF, 0x7C, 0xF0, 0xFF}, {0xCD, 0x97, 0xF5, 0xFF}, {0xF3, 0xC0, 0xFA, 0xFF}, {0x81, 0x31, 0xBB, 0xFF},
 };
 static GXColor* col_tbl[] = {col_normal, col_poison, col_mega, col_cold, col_confu, col_sleep, col_mini, col_normal};
-#if VERSION != VERSION_DEMO
-#pragma force_active on
-#if VERSION >= VERSION_US
-u32 eff_gonbaba_breath_sdata_pad[7] = {0, 0, 0, 0, 0, 0, 0};
-#else
-u32 eff_gonbaba_breath_sdata_pad[5] = {0, 0, 0, 0, 0};
-#endif
-#pragma force_active reset
-#endif
 
 // cheap polynomial approximations, valid for x in [0, 2pi]
 static inline f32 _sinf(f32 x) {
@@ -124,14 +115,14 @@ static inline f32 _cosf(f32 x) {
     return a;
 }
 
-void effGonbabaBreathMain(EffectEntry* effect);
-void effGonbabaBreathDisp(CameraId cameraId, EffectEntry* effect);
+static void effGonbabaBreathMain(EffectEntry* effect);
+static void effGonbabaBreathDisp(CameraId cameraId, EffectEntry* effect);
 
 // Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
 // lifetimes optimisation off for init_breath: the original register allocation and scheduling need it
 #pragma opt_lifetimes off
-void init_breath(EffGonbabaBreathWork* work, s32 idx, s32 type) {
+static void init_breath(EffGonbabaBreathWork* work, s32 idx, s32 type) {
     f32 ang;
     f32 spd;
     f32 rad;
@@ -286,7 +277,7 @@ EffectEntry* effGonbabaBreathEntry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 
     return effect;
 }
 
-void effGonbabaBreathMain(EffectEntry* effect) {
+static void effGonbabaBreathMain(EffectEntry* effect) {
     EffGonbabaBreathWork* work = effect->userdata;
     Vec position;
     Vec v = {0.0f, 0.0f, 0.0f};
@@ -420,7 +411,7 @@ void effGonbabaBreathMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effGonbabaBreathDisp, effect);
 }
 
-void effGonbabaBreathDisp(CameraId cameraId, EffectEntry* effect) {
+static void effGonbabaBreathDisp(CameraId cameraId, EffectEntry* effect) {
     EffGonbabaBreathWork* work = effect->userdata;
     Mtx trans;
     Mtx rot;

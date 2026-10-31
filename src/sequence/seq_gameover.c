@@ -1,6 +1,4 @@
 // Game over sequence: the game over screen, then a return to the title.
-// NOTE: seq_gameOverExit/seq_gameOverInit and N_evt_snd_bgm_unpause live in the
-// event/evt_snd.c split (0x80077EC4..0x80077F88), which is really the tail of this TU.
 #include "driver/camdrv.h"
 #include "driver/fadedrv.h"
 #include "driver/mapdrv.h"
@@ -10,18 +8,19 @@
 #include "evt/evt_map.h"
 #include "manager/evtmgr.h"
 #include "mario/mario.h"
+#include "mario/mario_pouch.h"
 #include "mario/mariost.h"
 #include "nameent.h"
 #include "pmario_sound.h"
 #include "sound.h"
 #include "system.h"
+#include "win/win_main.h"
 #include <string.h>
 #include "seq/seq_gameover.h"
 #include "cam_road.h"
 #include "cam_shift.h"
 #include "evt/evt_mario.h"
 #include "evt/evt_party.h"
-#include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
 #include "seq/seq_mapchange.h"
 #include "statuswindow.h"
@@ -34,6 +33,8 @@ typedef struct GameOverWork {
 
 static GameOverWork work;
 static GameOverWork* wp = &work;
+
+USER_FUNC(N_evt_snd_bgm_unpause);
 
 s32 fall_data[] = {
     200, 170, 140, 110, 80, 50, 20, 10, 26, 29, 30, 29, 26,
@@ -125,7 +126,7 @@ EVT_BEGIN(fall_gameover)
     END_LOOP
 #if VERSION >= VERSION_US
     WAIT_MS(1000)
-#elif VERSION == VERSION_DEMO
+#elif VERSION <= VERSION_DEMO_US
     WAIT_FRAMES(120)
 #else
     WAIT_FRAMES(60)
@@ -193,7 +194,7 @@ EVT_BEGIN(evt_gameover)
     CALL(evt_party_set_pos, 1, 0, -1000, 0)
     CALL(evt_mario_clear_party, 1)
     WAIT_FRAMES(1)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(N_evt_snd_bgm_unpause)
 #endif
     CALL(evt_mario_dispflag_onoff, 1, 2)
@@ -263,6 +264,46 @@ EVT_BEGIN(evt_gameover)
     RETURN
 EVT_END()
 
+void seq_gameOverInit(SequenceWork* work) {
+    winReInit();
+#if VERSION <= VERSION_DEMO_US
+    psndStopAllFadeOut();
+    psndSetReverb(0);
+    psndClearFlag(PSND_FLAG_SFX_WITH_BGM);
+    psndClearFlag(PSND_FLAG_MUTE_SFX);
+    psndClearFlag(PSND_FLAG_IDLE_MIX);
+    psndClearFlag(PSND_FLAG_IDLE_MIX_OFF);
+#else
+    camDispOn(CAMERA_3D);
+    psndStopAllFadeOut();
+    psndSetReverb(0);
+    L_psndBGM_stop();
+    psndClearFlag(PSND_FLAG_MUTE_SFX);
+    psndClearFlag(PSND_FLAG_IDLE_MIX);
+    psndClearFlag(PSND_FLAG_IDLE_MIX_OFF);
+    N_pouchUnEquipBadgeID(ITEM_SLOW_GO);
+#endif
+    marioStSystemLevel(4); // every system-level flag set, events stopped
+}
+
+void seq_gameOverExit(SequenceWork* work) {
+    psndStopAllFadeOut();
+    marioStSystemLevel(0); // flags cleared, events restarted
+}
+
+#if VERSION >= VERSION_JP
+// Clears bit 0x8000 of the stream of BGM channel 0, if it has one (a stream id of -1 means none), the bit the
+// title and game-over sequences set on the stream they start (called by evt_gameover).
+USER_FUNC(N_evt_snd_bgm_unpause) {
+    if ((u32)psbgm[0].streamId != 0xFFFFFFFFU) {
+        sound.streams[psbgm[0].streamId].flags &= ~0x8000;
+    }
+    return EVT_RETURN_DONE;
+}
+#endif
+
+// seq_gameOverMain is defined last: functions are emitted in reverse order (-inline deferred), so it comes first in
+// the object.
 void seq_gameOverMain(SequenceWork* work) {
     CameraEntry* camera;
     MarioWork* mario;
@@ -341,7 +382,7 @@ void seq_gameOverMain(SequenceWork* work) {
                 GXColor color = {0, 0, 0, 255};
                 fadeEntry(FADE_IN_BLACK, 1000, color);
             }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             psndBGMOn(PSND_FADE_OUT, (char*)0x93);
             marioReset();
             marioEntry();
@@ -366,7 +407,7 @@ void seq_gameOverMain(SequenceWork* work) {
                 GXColor color = {0, 0, 0, 255};
                 fadeEntry(FADE_CURTAIN_CENTER_A2, 0, color);
             }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             psndBGMOff_f_d(PSND_FADE_OUT, 4000, FALSE);
 #endif
             work->state++;
@@ -375,7 +416,7 @@ void seq_gameOverMain(SequenceWork* work) {
             if (!fadeIsFinish()) {
                 break;
             }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             gp->resetType = 1;
 #else
             _relUnLoad();

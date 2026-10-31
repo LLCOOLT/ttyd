@@ -34,7 +34,7 @@ static EVT_BEGIN(quake_bgmode_evt)
     RETURN
 EVT_END()
 
-s32 gazigazi(EventEntry* evt, BOOL isFirstCall);
+static s32 gazigazi(EventEntry* evt, BOOL isFirstCall);
 
 EVT_BEGIN(evt_gazigazi)
     CALL(gazigazi)
@@ -64,7 +64,7 @@ void marioSetSplash(s32 kind, Vec* pos) {
     }
 }
 
-s32 gazigazi(EventEntry* evt, BOOL isFirstCall) {
+static s32 gazigazi(EventEntry* evt, BOOL isFirstCall) {
     MarioWork* mario = marioGetPtr();
     evt->lwData[0] = (s32)mario->position.x;
     evt->lwData[1] = (s32)mario->mot.damage.rootY;
@@ -92,7 +92,7 @@ void mot_damage(void) {
 
     if (mario->trigFlags & MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION) {
         mario->trigFlags &= ~MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         if (mario->jumpVelocityY == 0.0f) {
             mario->jumpVelocityY = -6.0f;
             mario->jumpAccelerationY = 0.0f;
@@ -116,7 +116,7 @@ void mot_damage(void) {
         mario->airTimer = 0;
         mario->baseSpeed = 0.0f;
         mario->multiTimer = 20;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         if (mario->prevMotionId != MARIO_MOTION_YOSHI) {
 #else
         if (mario->prevMotionId != MARIO_MOTION_YOSHI && mario->prevMotionId != MARIO_MOTION_PLANE) {
@@ -223,7 +223,7 @@ void mot_damage(void) {
                 mario->mot.damage.camStepY = (dest.y - mario->mot.damage.rootY) / (f32)(s32)mario->multiTimer;
                 mario->currSubMotionId = 12;
                 mario->dispFlags |= MARIO_DISP_FLAG_HIDDEN;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
                 if ((s32)mario->multiTimer == 0) {
                     mario->multiTimer = 10;
                     mario->mot.damage.camStepY = (dest.y - mario->mot.damage.rootY) / (f32)(s32)mario->multiTimer;
@@ -245,7 +245,7 @@ void mot_damage(void) {
             mario->flags |= MARIO_FLAG_STOP_AIR_MOVEMENT;
             marioSetFallPara();
             mario->dispFlags &= ~MARIO_DISP_FLAG_HIDDEN;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             mario->multiTimer = 1;
 #endif
             break;
@@ -255,7 +255,7 @@ void mot_damage(void) {
             }
             mario->currSubMotionId = 20;
             break;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         case 14:
             mario->camTarget.y += mario->mot.damage.camStepY;
             mario->camTarget.x = mario->position.x;
@@ -365,14 +365,14 @@ void mot_damageToge(void) {
 
     if (mario->trigFlags & MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION) {
         mario->trigFlags &= ~MARIO_TRIG_FLAG_IS_STARTING_NEW_MOTION;
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         marioClearSlitFloor();
 #endif
         mario->dispFlags &= ~MARIO_DISP_FLAG_DIR_LOCK;
         marioAdjustMoveDir();
         marioSlitForceCancel();
         marioYoshiForceCancel();
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         nokonoko_use_cancel();
 #endif
         marioNoUpdateCamPos();

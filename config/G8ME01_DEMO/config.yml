@@ -71,7 +71,7 @@ force_active:
 - evt_cloud_get_mode
 - evt_cloud_set_cap_size
 # event/evt_badgeshop.c
-- evt_badgeShop_bargain_index_check
+- evt_badgeShop_getBargainKind
 - evt_badgeShop_bteresa_get_kind_cnt
 - evt_badgeShop_bottakuru_get_kind_cnt
 - evt_badgeShop_starmaniac_get_kind_cnt
@@ -104,15 +104,15 @@ force_active:
 - set_new_goods_list
 - evt_unitwin_disp_func
 - evt_unitwin_main_func
-- evt_unitwin_select_list
+- unitwin_window_select_func
 - unitwincoin_wait
 - unitwincoin_disp_onoff
-- evt_unitwin_select_func
+- select_func
 - evt_unitwin_selltable_setup
 - evt_unitwin_free
 - evt_unitwin_alloc
-- unitwin_party_name
-- unitwin_party_icon
+- party_name_table_rtn
+- iconid_conv
 # event/evt_window.c
 - evt_win_nameent_off
 - evt_win_nameent_name
@@ -178,10 +178,10 @@ force_active:
 # event/evt_shop.c
 - lbl_80338390
 # event/evt_mobj.c
-- evt_mobj_bombrock
-- mobj_bombrock
-- evt_mobj_trap
-- mobj_trap
+- evt_mobj_breaking_rock
+- mobj_breaking_rock
+- evt_mobj_trap_floor
+- mobj_trap_floor
 - evt_mobj_blk
 - mobj_blk
 - evt_mobj_arrow
@@ -189,10 +189,10 @@ force_active:
 - evt_mobj_signboard
 - mobj_signboard
 - evt_mobj_lock_unlock
-- evt_mobj_rideswitch_b
-- mobj_rideswitch_b
-- evt_mobj_rideswitch_a
-- mobj_rideswitch_a
+- evt_mobj_rideswitch_green
+- mobj_rideswitch_green
+- evt_mobj_rideswitch_orange
+- mobj_rideswitch_orange
 - evt_mobj_tornadoswitch_red
 - evt_mobj_floatswitch_red
 - evt_mobj_tornadoswitch_blue
@@ -455,16 +455,16 @@ force_active:
 - battle_item_zonbaba
 - battle_item_default_param_list
 # battle_database_common: the tst.rel test-battle drop tables (empty), kept by the original link
-- battle_item_test_killer_cannon
-- battle_item_test_yami_pata
-- battle_item_test_yami_noko
-- battle_item_test_yami_kuriboo
-- battle_item_test_togekuri
-- battle_item_test_patakuri
-- battle_item_test_hyper_kuriboo
-- battle_item_test_hyper_togekuri
-- battle_item_test_hyper_patakuri
-- battle_item_test_kuriboo
+- battle_item_kinoko
+- battle_item_funyafunya_kun
+- battle_item_pow_block
+- battle_item_dekadeka_drink
+- battle_item_kirakira_otoshi
+- battle_item_koorino_ibuki
+- battle_item_fire_flower
+- battle_item_yurayura_jishin
+- battle_item_suitooru
+- battle_item_sinabita_kinoko
 # cam_road.c: unreferenced in the demo dol (their callers are in RELs not on the demo disc) but kept by the original link
 - camRoadCurveOff
 - camRoadCurveOn
@@ -476,7 +476,7 @@ force_active:
 - statusAPBlink
 # npc_event.c: unreferenced in the demo dol but kept by the original link
 - enemy_event_dead_event
-- npc_loiter_move_event
+- testnpc_move_event
 - npc_urouro_return_event
 # Kept by the original link but unreferenced in the demo: the RELs that call them are not on the demo disc
 - effKemuTestSetRxRz
@@ -498,10 +498,10 @@ force_active:
 - btlevtcmd_BtlIconSetFallAccel
 - btlevtcmd_BtlIconEntry
 - tou_gamen_screen_tev_init
-- _ufo_main
-- _ufo_damage_start
-- _ufo_damage_end
-- btlevtcmd_SetEventHit
+- btlevtcmd_UFOAction
+- btlevtcmd_UFODamageOn
+- btlevtcmd_UFOEscapeOn
+- btlevtcmd_SetCounterAcCallBack
 - btlevtcmd_PadCheckTrigger
 - btlevtcmd_EnemyItemUseCheck
 - btlevtcmd_snd_se_offset
@@ -578,7 +578,6 @@ force_active:
 - fbatHitCheckAll
 - fbatSetAttackAnnounceEnable
 - fbatSetAttackAnnounce
-- npc_unused_sbss
 - itemFlag
 - shadowSetVolumeDecay
 - fadeWhiteOutOff
@@ -594,6 +593,18 @@ force_active:
 - marioSetSwirlPower
 block_relocations:
 - source: 0x8037E40C
+- source: 0x803AC4A4
+- source: 0x803AC69C
+# nameent.c hiragana_tbl[13] and katakana_tbl[13] point at the "3" string literal in .sdata2, which
+# sits exactly at _SDA_BASE_; point them at the literal instead of the base symbol (the literal has
+# its own name in symbols.txt because a relocation target must be unique by name)
+add_relocations:
+- source: 0x803AC4A4
+  type: abs
+  target: fullwidth_digit_3
+- source: 0x803AC69C
+  type: abs
+  target: fullwidth_digit_3
 extract:
 # manager/cardmgr.c
 - symbol: _mariost_icon_tex

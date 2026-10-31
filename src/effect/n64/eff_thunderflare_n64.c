@@ -20,8 +20,8 @@ static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-12, 12, 0, 512, 1536, 250, 0, 0, 255},
 };
 
-void effThunderflareMain(EffectEntry* effect);
-void effThunderflareDisp(CameraId cameraId, EffectEntry* effect);
+static void effThunderflareMain(EffectEntry* effect);
+static void effThunderflareDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effThunderflareN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -75,7 +75,7 @@ EffectEntry* effThunderflareN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z
     return effect;
 }
 
-void effThunderflareMain(EffectEntry* effect) {
+static void effThunderflareMain(EffectEntry* effect) {
     EffThunderflareN64Elem* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -136,7 +136,7 @@ void effThunderflareMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effThunderflareDisp, effect);
 }
 
-void effThunderflareDisp(CameraId cameraId, EffectEntry* effect) {
+static void effThunderflareDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffThunderflareN64Elem* work;
     s32 cr, cg, cb;

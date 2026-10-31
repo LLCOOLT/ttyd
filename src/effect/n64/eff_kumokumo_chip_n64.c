@@ -34,8 +34,8 @@ static effN64Vtx size32x32_tex32x32_vtx[] = {
     {-16, 32, 0, 0, 1024, 0, 0, 0, 255},
 };
 
-void effKumokumoChipMain(EffectEntry* effect);
-void effKumokumoChipDisp(CameraId cameraId, EffectEntry* effect);
+static void effKumokumoChipMain(EffectEntry* effect);
+static void effKumokumoChipDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effKumokumoChipN64Entry(s32 type, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32 tz, f32 speed, f32 scale) {
     EffectEntry* effect;
@@ -126,7 +126,7 @@ EffectEntry* effKumokumoChipN64Entry(s32 type, f32 x, f32 y, f32 z, f32 tx, f32 
     return effect;
 }
 
-void effKumokumoChipMain(EffectEntry* effect) {
+static void effKumokumoChipMain(EffectEntry* effect) {
     EffKumokumoChipN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -178,7 +178,7 @@ void effKumokumoChipMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effKumokumoChipDisp, effect);
 }
 
-void effKumokumoChipDisp(CameraId cameraId, EffectEntry* effect) {
+static void effKumokumoChipDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffKumokumoChipN64Work* work;
     s32 alpha;

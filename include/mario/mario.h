@@ -134,7 +134,7 @@ typedef enum MarioTrigFlags {
     MARIO_TRIG_FLAG_JABARA_CHK = (1 << 20),
     MARIO_TRIG_FLAG_JABARA_MOVE_CHK = (1 << 21),
     MARIO_TRIG_FLAG_START_JABARA_SPIN = (1 << 22),
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // The demo keeps the ship/plane event flag and the input locks (mario_sbr.c marioUpdateKeyData) elsewhere.
     MARIO_TRIG_FLAG_SHIP_PLANE_EVT_ON = (1 << 24), // the demo also sets it on landing (marioChkGnd)
     MARIO_TRIG_FLAG_DISABLE_UNUSED_INPUT = (1 << 28),
@@ -172,9 +172,9 @@ typedef struct MarioMotSlit { // mot_slit.c (paper slit / side-step)
     s32 counter;              // 0x04
     f32 pushDir;              // 0x08, 0 or 180: slide direction relative to targetYaw while pushing a 0x2000 wall
     f32 lastY;                // 0x0C, position.y last frame
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     s16 reserved_10; // 0x10, demo: mot_slit's second timer, accessed as MarioWork.slitTimer2
-    s16 resumeState; // 0x12, demo: state marioSlitResume returns to
+    s16 resumeState; // 0x12, demo: state motSlitContinue2 returns to
 #else
     u8 pad_10[4]; // 0x10
 #endif
@@ -338,7 +338,7 @@ typedef struct MarioWork {
     s8 hammerChargeTimer;      // 0x41, mot_hammer charge frames (capped at 20)
     s8 hammerChargeLv;         // 0x42, mot_hammer charge stage (3 = full)
     s8 hammerDir;              // 0x43, mot_hammer swing side (0/1)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     union {
         s32 currSubMotionId; // 0x44
         s32 slitState;       // 0x44, demo: mot_slit's state machine runs on the sub-motion id
@@ -426,7 +426,7 @@ typedef struct MarioWork {
     f32 wallPushDir;             // 0x1CC, direction of that push
     s32 wallPushHold;            // 0x1D0, frames the push is held (14)
     struct NpcEntry* touchNpc;   // 0x1D4, NPC Mario is touching (marioGetTouchNpcPtr)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     struct NpcEntry* targetNpc; // 0x1D8, NPC in range for interaction (npcdrv)
 #endif
     struct HitEntry* hitobjFrontA;      // 0x1DC, wall in front found on an A press
@@ -504,7 +504,7 @@ typedef struct MarioWork {
             u8 pad_stay[0x10];  // motion work up to mot_stay's counters
             MarioStayWork stay; // 0x2B0 JP: mot_stay's counters, inside the motion work
         };
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         struct {
             u8 pad_slit[0x10]; // mot.slit up to its second timer
             s16 slitTimer2;    // demo: mot_slit's second timer, inside the motion work
@@ -516,7 +516,7 @@ typedef struct MarioWork {
     s16 coinDropTimer;         // 0x2C0, set to 3 s by npcdrv (with muteki); marioMain drops a coin every 30 frames
     u8 pad_2C2[0x2C4 - 0x2C2]; // 0x2C2, never accessed
     f32 kpaSpeed;              // 0x2C4, Bowser walk speed (koopa.c, koopa_motion.c)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     u32 bottomlessReload;        // 0x2C8, N_marioReloadMapOnBottomlessOn/Off; u32: marioBottomless tests it unsigned (cmplwi)
     Vec bottomlessResetPosition; // 0x2CC JP, 0x2E4 US
     s16 slitState;               // 0x2D8, mot_slit state machine (the demo uses currSubMotionId)
@@ -563,9 +563,7 @@ void marioPoseInit(void);
 void marioInit(void);
 void marioReInit(void);
 void marioMain(void);
-void marioCtrlOff2Main(void);
 void marioMove(void);
-void marioMoveMain(void);
 BOOL marioChkPushAnime(void);
 s32 marioAnimeId(void);
 void marioChgDamagePose(void);

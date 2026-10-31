@@ -29,7 +29,6 @@
 #include "evt/evt_party.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "aaa.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -43,7 +42,7 @@ typedef struct AaaWork {
 
 static AaaWork* wp;
 
-USER_FUNC(mapdraw);
+static USER_FUNC(mapdraw);
 static void draw(CameraId camera, void* param);
 
 static NpcSetupInfo npcEnt[3];
@@ -56,7 +55,7 @@ static BeroEntry bero_entry_data[2];
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"パレッタ"*/"\x83\x70\x83\x8C\x83\x62\x83\x5E", // name
+        "パレッタ", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -65,7 +64,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ルイージ"*/"\x83\x8B\x83\x43\x81\x5B\x83\x57", // name
+        "ルイージ", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -98,7 +97,7 @@ static EVT_BEGIN(evt_wall)
 EVT_END()
 
 static const char* ie_npc[] = {
-    /*"ルイージ"*/"\x83\x8B\x83\x43\x81\x5B\x83\x57",
+    "ルイージ",
     NULL,
 };
 
@@ -172,6 +171,7 @@ static EVT_BEGIN(evt_prologue)
     CALL(evt_cam3d_evt_set, 145, 122, 717, 145, 108, -180, 5000, 11)
     WAIT_MS(4000)
     CALL(evt_npc_set_position, STRING("パレッタ"), 500, 500, 0)
+#if VERSION >= VERSION_JP
     SET_VALUE(GF(1), 0)
     BEGIN_INLINE_EVENT
         WAIT_MS(3000)
@@ -194,6 +194,7 @@ static EVT_BEGIN(evt_prologue)
             WAIT_MS(200)
         END_LOOP
     END_INLINE_EVENT
+#endif
     CALL(evt_npc_glide_position, STRING("パレッタ"), 210, 25, -30, 0, FLOAT(80.0f), FLOAT(-30.0f), 11, 0)
     CALL(evt_npc_reverse_ry, STRING("パレッタ"))
     WAIT_MS(500)
@@ -208,7 +209,9 @@ static EVT_BEGIN(evt_prologue)
     CALL(evt_npc_reverse_ry, STRING("パレッタ"))
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("pro_00"), 0, STRING("パレッタ"))
+#if VERSION >= VERSION_JP
     SET_VALUE(GF(1), 1)
+#endif
     CALL(evt_npc_glide_position, STRING("パレッタ"), 0, 300, -100, 0, FLOAT(80.0f), FLOAT(-30.0f), 11, 0)
     CALL(evt_npc_set_position, STRING("ルイージ"), 20, 30, -150)
     CALL(evt_npc_set_ry, STRING("ルイージ"), 90)
@@ -218,7 +221,7 @@ static EVT_BEGIN(evt_prologue)
     CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL_CHILD(PTR(evt_door))
+        CALL_CHILD(evt_door)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
@@ -230,7 +233,7 @@ static EVT_BEGIN(evt_prologue)
         CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL_CHILD(PTR(evt_door))
+            CALL_CHILD(evt_door)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
@@ -262,7 +265,7 @@ static EVT_BEGIN(evt_prologue)
     CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL_CHILD(PTR(evt_door))
+        CALL_CHILD(evt_door)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
@@ -289,7 +292,7 @@ static EVT_BEGIN(evt_prologue)
         CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL_CHILD(PTR(evt_door))
+            CALL_CHILD(evt_door)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
@@ -379,7 +382,7 @@ EVT_BEGIN(evt_prologue2)
     ADD(LW(0), -25)
     ADD(LW(1), 15)
     ADD(LW(2), -3)
-    CALL(evt_item_entry, STRING("map"), ITEM_MAGICAL_MAP_LARGE, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("map"), ITEM_MAGICAL_MAP_LARGE, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_item_set_scale, STRING("map"), FLOAT(0.5498047f))
     WAIT_MS(1000)
     CALL(evt_item_delete, STRING("map"))
@@ -424,7 +427,7 @@ static EVT_BEGIN(epilogue_evt)
     CALL(evt_fade_entry, FADE_OUT_BLACK, 1, 0, 0, 0)
     WAIT_FRAMES(1)
     SET_VALUE(LW(0), PTR(&door_1))
-    CALL_CHILD(PTR(evt_door_open_quick))
+    CALL_CHILD(evt_door_open_quick)
     CALL(evt_cam3d_evt_set, -360, 154, 80, -46, 81, -232, 0, 11)
     CALL(evt_fade_in, 1000)
     CALL(evt_snd_envoff, PSND_FADE_DIP_TO(50))
@@ -521,7 +524,7 @@ static EVT_BEGIN(epilogue_evt2)
     CALL(evt_seq_wait, 2)
     CALL(evt_mario_set_pose, STRING("M_N_10"))
     SET_VALUE(LW(0), PTR(&door_1))
-    CALL_CHILD(PTR(evt_door_open_quick))
+    CALL_CHILD(evt_door_open_quick)
     CALL(evt_cam3d_evt_set, -307, 117, 9, -58, 58, -244, 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_fade_end_wait)
@@ -561,11 +564,11 @@ static EVT_BEGIN(epilogue_evt2)
     WAIT_MS(900)
     CALL(evt_msg_print, 0, STRING("ep_50"), 0, STRING("キノじい"))
     SET_VALUE(LW(0), PTR(&door_1))
-    SPAWN_EVENT(PTR(door_open_se))
+    SPAWN_EVENT(door_open_se)
     CALL(evt_sub_intpl_msec_init, 5, 0, 180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL_CHILD(PTR(evt_door))
+        CALL_CHILD(evt_door)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
@@ -675,20 +678,20 @@ static BeroEntry bero_entry_data[] = {
 EVT_BEGIN(aaa_00_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_npc_setup, PTR(npcEnt))
     SET_VALUE(LW(0), PTR(&door_1))
-    CALL_CHILD(PTR(evt_door_entry))
+    CALL_CHILD(evt_door_entry)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("sai_ki1"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("sai_ki2"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("prologue"))
-        SPAWN_EVENT(PTR(evt_prologue))
+        SPAWN_EVENT(evt_prologue)
         WAIT_FRAMES(1)
         RETURN
     END_IF
     IF_STR_EQUAL(LW(0), STRING("prologue2"))
-        SPAWN_EVENT(PTR(evt_prologue2))
+        SPAWN_EVENT(evt_prologue2)
         WAIT_FRAMES(1)
         RETURN
     END_IF
@@ -696,20 +699,20 @@ EVT_BEGIN(aaa_00_init_evt)
         CALL(evt_mario_kill_party, 0)
         CALL(evt_bero_get_entername, LW(0))
         IF_STR_EQUAL(LW(0), STRING("epilogue2"))
-            CALL_CHILD(PTR(epilogue_npc_entry))
-            SPAWN_EVENT(PTR(epilogue_evt2))
+            CALL_CHILD(epilogue_npc_entry)
+            SPAWN_EVENT(epilogue_evt2)
         ELSE
-            SPAWN_EVENT(PTR(epilogue_evt))
+            SPAWN_EVENT(epilogue_evt)
         END_IF
     END_IF
     SET_VALUE(LW(0), PTR(ki_data))
-    CALL_CHILD(PTR(evt_sub_tree_access_entry))
+    CALL_CHILD(evt_sub_tree_access_entry)
     SET_VALUE(LW(0), PTR(kusa_data))
-    CALL_CHILD(PTR(evt_sub_kusa_access_entry))
+    CALL_CHILD(evt_sub_kusa_access_entry)
     RETURN
 EVT_END()
 
-USER_FUNC(mapdraw) {
+static USER_FUNC(mapdraw) {
     if (isFirstCall) {
         wp = _mapAlloc(sizeof(AaaWork));
         memset(wp, 0, sizeof(AaaWork));

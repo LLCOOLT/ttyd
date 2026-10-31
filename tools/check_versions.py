@@ -2,15 +2,17 @@
 """Check how the game code tests the version it is built for.
 
 The game code (src/, rels/, include/) writes version conditions with the ordered values from
-include/version.h: `#if VERSION >= VERSION_US`, `#if VERSION == VERSION_DEMO` and so on. This script
+include/version.h: `#if VERSION >= VERSION_US`, `#if VERSION <= VERSION_DEMO_US` and so on. This script
 fails if a file
 
   1. uses one of configure.py's per-version macros (VERSION_G8MJ01, VERSION_G8ME01, VERSION_G8MP01,
-     VERSION_G8ME01_DEMO) instead; only include/version.h turns those into VERSION;
+     VERSION_G8ME01_DEMO, VERSION_G8MJ01_DEMO) instead; only include/version.h turns those into VERSION;
   2. tests one of the ordered values with #ifdef/#ifndef/defined() (VERSION_JP and the others are always
      defined, so such a test is true in every version);
   3. tests VERSION in an #if before include/version.h is included (directly or through another header):
-     an undefined name counts as 0 in #if, so `VERSION == VERSION_DEMO` would quietly be true everywhere.
+     an undefined name counts as 0 in #if, so `VERSION == VERSION_DEMO_JP` would quietly be true everywhere;
+  4. names in an #if a VERSION_ value that include/version.h does not define (such as the old VERSION_DEMO),
+     which counts as 0 the same way.
 
 It needs no game files. Usage: python tools/check_versions.py [-v]
 """
@@ -28,8 +30,10 @@ VERSION_HEADER = "include/version.h"
 # Include search paths of the game code (configure.py), plus each REL's own include folder.
 INCLUDE_DIRS = ["include", "libs/dolsdk2004/include", "libs/dolsdk2004/include/libc", "libs/musyx/include"]
 
-OLD_MACRO = re.compile(r"\bVERSION_G8M(?:J01|E01|P01|E01_DEMO)\b")
-ORDERED = r"VERSION_(?:DEMO|JP|US|EU)\b"
+OLD_MACRO = re.compile(r"\bVERSION_G8M(?:J01|E01|P01)(?:_DEMO)?\b")
+ORDERED = r"VERSION_(?:DEMO_JP|DEMO_US|JP|US|EU)\b"
+VERSION_NAME = re.compile(r"\bVERSION_\w+")
+DEFINE_VALUE = re.compile(r"^\s*#\s*define\s+(VERSION_\w+)\s+\d")
 DEFINED_TEST = re.compile(r"^\s*#\s*(?:ifdef|ifndef)\s+" + ORDERED + r"|\bdefined\s*\(?\s*" + ORDERED)
 IF_LINE = re.compile(r"^\s*#\s*(?:if|elif)\b(.*)")
 USES_VERSION = re.compile(r"\bVERSION\b")
@@ -70,6 +74,11 @@ class Checker:
     def __init__(self) -> None:
         self.lines: Dict[str, List[str]] = {}
         self.provides: Dict[str, bool] = {}
+        self.values: Set[str] = set()
+        for line in self.read(os.path.join(ROOT, VERSION_HEADER)):
+            m = DEFINE_VALUE.match(line)
+            if m:
+                self.values.add(m.group(1))
 
     def read(self, path: str) -> List[str]:
         if path not in self.lines:
@@ -130,6 +139,11 @@ class Checker:
                 errors.append(f"{name}:{no}: tests whether an ordered version value is defined "
                               "(always true); compare VERSION with it instead")
             m = IF_LINE.match(line)
+            if m:
+                for used in VERSION_NAME.findall(m.group(1)):
+                    if used not in self.values and not OLD_MACRO.fullmatch(used):
+                        errors.append(f"{name}:{no}: {used} is not a version value of include/version.h "
+                                      "(an unknown name counts as 0 in #if)")
             if m and USES_VERSION.search(m.group(1)) and not have_version:
                 errors.append(f"{name}:{no}: tests VERSION before include/version.h is included")
                 have_version = True  # one report per file is enough

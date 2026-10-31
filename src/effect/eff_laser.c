@@ -9,6 +9,9 @@
 #include <dolphin/mtx.h>
 #include "version.h"
 
+static void effLaserDisp(CameraId cameraId, EffectEntry* effect);
+static void effLaserMain(EffectEntry* effect);
+
 typedef struct EffLaserWork {
     s32 type;     // 0x0
     Vec position; // 0x4, starts high above the target and drops down
@@ -48,7 +51,7 @@ EffectEntry* effLaserEntry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effLaserMain(EffectEntry* effect) {
+static void effLaserMain(EffectEntry* effect) {
     EffLaserWork* work = effect->userdata;
     Vec position;
     BOOL inBattle;
@@ -88,12 +91,7 @@ void effLaserMain(EffectEntry* effect) {
             break;
         case 2:
             if (fadeIsFinish()) {
-#if VERSION == VERSION_DEMO
-                // fade type 14 in the demo
                 fadeEntry(FADE_IN_WHITE, 100, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
-#else
-                fadeEntry(FADE_IN_WHITE, 100, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
-#endif
                 animPoseSetAnim(work->poseId, "A_1", TRUE);
                 animPoseSetLocalTimeRate(work->poseId, 0.5f);
                 work->state++;
@@ -111,7 +109,7 @@ void effLaserMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effLaserDisp, effect);
 }
 
-void effLaserDisp(CameraId cameraId, EffectEntry* effect) {
+static void effLaserDisp(CameraId cameraId, EffectEntry* effect) {
     EffLaserWork* work = effect->userdata;
     Mtx mtx;
     Mtx scale;

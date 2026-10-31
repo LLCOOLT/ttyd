@@ -31,7 +31,6 @@
 #include "evt/evt_msg.h"
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "gon.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -55,10 +54,10 @@ static USER_FUNC(senkaronFlagOffMesPushing);
 static USER_FUNC(senkaronFlagOnMesPushing);
 static USER_FUNC(senkaronGetMarioPushedFlag);
 static USER_FUNC(senkaronToEscape);
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 USER_FUNC(leader_touch_check);
 #endif
-void nokotaro_callback(s32 type);
+static void nokotaro_callback(s32 type);
 static void senkaron_ext_init(void);
 static void senkaron_ext_main(void);
 static void senkaron_ext_dispent(void);
@@ -81,7 +80,7 @@ extern EvtWord senkaron_escape_event[];
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"カロン1"*/"\x83\x4A\x83\x8D\x83\x93\x31", // name
+        "カロン1", // name
         0, 0, // flags..reactionFlags
         senkarondummy_init_event, // initEvent
         senkarondummy_regl_event, // regularEvent
@@ -92,7 +91,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"リチャード"*/"\x83\x8A\x83\x60\x83\x83\x81\x5B\x83\x68", // name
+        "リチャード", // name
         0, 0, // flags..reactionFlags
         richard_init_event, // initEvent
         richard_regl_event, // regularEvent
@@ -103,7 +102,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"リーダー"*/"\x83\x8A\x81\x5B\x83\x5F\x81\x5B", // name
+        "リーダー", // name
         0, 0, // flags..reactionFlags
         leaderkaron_init_event, // initEvent
         NULL, // regularEvent
@@ -280,7 +279,7 @@ static EVT_BEGIN(senkaron_event)
         SET_VALUE(GW(14), 0)
         SET_VALUE(GW(15), 1)
         CALL(evt_npc_change_interrupt, STRING("リチャード"), 6, 0)
-        CALL_CHILD(PTR(senkaron_entry_event))
+        CALL_CHILD(senkaron_entry_event)
         CALL(evt_snd_bgmoff, PSND_FADE_OUT)
         CALL(evt_snd_envoff, PSND_FADE_OUT)
         CALL(evt_mario_key_onoff, 0)
@@ -366,7 +365,7 @@ static EVT_BEGIN(senkaron_event)
         CALL(evt_mario_dispflag_onoff, 0, 2)
         CALL(evt_mario_key_onoff, 1)
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         IF_INT_EQUAL(GSWF(GSWF_GON03_PUSHING_COMMENT), 0)
             CALL(evt_mario_cont_onoff, 0)
             CALL(senkaronFlagOnMesPushing)
@@ -414,7 +413,7 @@ static EVT_BEGIN(senkaron_event)
         END_SIBLING_EVENT
         LOOP(0)
             WAIT_FRAMES(1)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
             IF_INT_GREATER_OR_EQUAL(LW(0), 350)
 #else
@@ -469,13 +468,13 @@ static EVT_BEGIN(senkaron_event)
         CALL(evt_npc_change_interrupt, STRING("リチャード"), 6, PTR(richard_talk_event))
         CALL(evt_npc_set_position, STRING("リーダー"), 0, -1000, 0)
         CALL(evt_snd_sfxon, STRING("SFX_STG1_HONE_ESCAPE1"), 0)
-        SPAWN_EVENT(PTR(senkaron_escape_event))
+        SPAWN_EVENT(senkaron_escape_event)
         SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG1_11_1000_DRY_BONES)
         CALL(evt_map_playanim, STRING("m_door01_a"), 0, 0)
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
         SET_VALUE(LW(0), STRING("e_bero"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
     END_IF
     RETURN
 EVT_END()
@@ -489,28 +488,24 @@ EVT_BEGIN(gon_03_init_evt)
     CALL(evt_bg_disp_onoff, 0)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     SET_VALUE(LW(0), STRING("e_bero"))
-    CALL_CHILD(PTR(bero_case_switch_off))
+    CALL_CHILD(bero_case_switch_off)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG1_GON1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG1_GON1"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(GW(15), 0)
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG1_11_1000_DRY_BONES)
         SET_VALUE(LW(0), STRING("e_bero"))
-        CALL_CHILD(PTR(bero_case_switch_on))
+        CALL_CHILD(bero_case_switch_on)
     END_IF
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_npc_change_fbat_mode, 1)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_10_FATHERS_LETTER)
-        SPAWN_EVENT(PTR(tegami_event))
+        SPAWN_EVENT(tegami_event)
     END_IF
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG1_13_02_KEY_2)
-#if VERSION == VERSION_DEMO
-        CALL(evt_item_entry, STRING("key00"), ITEM_CASTLE_KEY_0x0C, 200, 0, -200, 15, -1, PTR(key_get))
-#else
-        CALL(evt_item_entry, STRING("key00"), ITEM_CASTLE_KEY_0x0C, 200, 0, -200, 16, -1, PTR(key_get))
-#endif
+        CALL(evt_item_entry, STRING("key00"), ITEM_CASTLE_KEY_0x0C, 200, 0, -200, ITEM_ENTRY_FIXED, -1, PTR(key_get))
     END_IF
     CALL(evt_npc_entry, STRING("\"カロン2\""), STRING("c_karon_g"))
     CALL(evt_npc_set_position, STRING("\"カロン2\""), -150, 0, 130)
@@ -613,7 +608,7 @@ EVT_BEGIN(leaderkaron_talk_event)
     END_INLINE_EVENT
     CALL(evt_npc_flag_onoff, 1, STRING("me"), -2147483648)
     IF_INT_EQUAL(GW(0), 0)
-        CALL(evt_npc_set_width, STRING(/*"リーダー"*/"\x83\x8A\x81\x5B\x83\x5F\x81\x5B"), FLOAT(20.0f))
+        CALL(evt_npc_set_width, STRING("リーダー"), FLOAT(20.0f))
         SPAWN_EVENT(senkaron_event)
         SET_VALUE(GW(0), 1)
     END_IF
@@ -672,7 +667,7 @@ EVT_BEGIN(senkaron_escape_event)
     RETURN
 EVT_END()
 
-void nokotaro_callback(s32 type) {
+static void nokotaro_callback(s32 type) {
     PartyEntry* party = partyGetPtr(partyCtrlNo);
 
     switch (type) {
@@ -691,7 +686,7 @@ void nokotaro_callback(s32 type) {
     }
 }
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 USER_FUNC(leader_touch_check) {
     NpcEntry* npc = marioGetTouchNpcPtr();
     BOOL off = FALSE;

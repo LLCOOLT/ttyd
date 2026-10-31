@@ -79,8 +79,8 @@ effN64Vtx flowers_v[41] = {
     {-11, -5, 0, 0, 0, 100, 160, 60, 255},
 };
 
-void effKemuri4Main(EffectEntry* effect);
-void effKemuri4Disp(CameraId cameraId, EffectEntry* effect);
+static void effKemuri4Main(EffectEntry* effect);
+static void effKemuri4Disp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effKemuri4N64Entry(s32 type, f32 x, f32 y, f32 z, f32 angle, f32 flip) {
     EffectEntry* effect;
@@ -126,7 +126,7 @@ EffectEntry* effKemuri4N64Entry(s32 type, f32 x, f32 y, f32 z, f32 angle, f32 fl
     return effect;
 }
 
-void effKemuri4Main(EffectEntry* effect) {
+static void effKemuri4Main(EffectEntry* effect) {
     EffKemuri4N64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -182,7 +182,7 @@ void effKemuri4Main(EffectEntry* effect) {
     }
 }
 
-void effKemuri4Disp(CameraId cameraId, EffectEntry* effect) {
+static void effKemuri4Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera = camGetPtr(cameraId);
     effN64Vtx* vtx1;
     effN64Vtx* vtx2;

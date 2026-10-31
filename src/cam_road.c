@@ -28,10 +28,10 @@ static const Vec unusedVec2 = {-110.0f, -70.0f, -190.0f};
 static CamRoadWork work;
 static CamRoadWork* wp = &work;
 void OSReport(const char* msg, ...);
-void calcCurrentCamState(CameraParams* out);
-void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
-u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* speed);
-void calcHokanCamRoad(s32 type, CamRoadState* from, CamRoadState* to, CamRoadState* unused, CamRoadState* out, f32 t);
+static void calcCurrentCamState(CameraParams* out);
+static void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
+static u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* speed);
+static void calcHokanCamRoad(s32 type, CamRoadState* from, CamRoadState* to, CamRoadState* unused, CamRoadState* out, f32 t);
 static inline void crCheck(BOOL b) {
 }
 
@@ -40,7 +40,7 @@ static inline void crCheck(BOOL b) {
 // the Japanese July 2004 demo (MarioSt.MAP) names the original: the strings are @2397/@2398, numbered between calcCurrentCamState and
 // camRoadSetup, where the map lists the stripped camRoadDraw (0x8b8 bytes, UNUSED in the demo as well), so
 // no build contains its code.
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
 static void camRoadStrippedReport(const char* p, s32 a, s32 b) {
     OSReport("%scam = %d\n", p, a);
     OSReport("%scurve = %d\n", p, b);
@@ -100,14 +100,14 @@ s32 camRoadSetup(const char* name) {
     }
     return 1;
 }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo pools the two strings ahead of camRoadSetup's, so the stand-in follows camRoadSetup.
 static void camRoadStrippedReport(const char* p, s32 a, s32 b) {
     OSReport("%scam = %d\n", p, a);
     OSReport("%scurve = %d\n", p, b);
 }
 #endif
-void calcCurrentCamState(CameraParams* out) {
+static void calcCurrentCamState(CameraParams* out) {
     Mtx m;
     Vec v;
     Vec res;
@@ -193,7 +193,7 @@ static inline BOOL crVecIsZero(Vec a) {
     }
     return FALSE;
 }
-s32 collisionTri_simple(Vec P, Vec A, Vec B, Vec C, f32* dist) {
+static s32 collisionTri_simple(Vec P, Vec A, Vec B, Vec C, f32* dist) {
     Vec dir = {0.0f, -1.0f, 0.0f};
     Vec nz;
     Vec hit;
@@ -253,7 +253,7 @@ static inline f32 crLen2(f32 x, f32 z) {
     }
     return l;
 }
-s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
+static s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
     f32 lx0;
     f32 ang0, yA, yB, minDist, cx, side;
     f32 dpx, dpz, sgn, s, limA, limB, x0, y0, z0, x1, z1, cz, r0, r1, rp, r0x, r0z, c1;
@@ -705,7 +705,7 @@ static inline void camRoadSgn2(f32 s, f32 t, f32* p1, f32* p2) {
     *p1 = a;
     *p2 = b;
 }
-void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g) {
+static void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g) {
     f32 ax, az; // FAKE: named dA.x/dA.z copies declared first (numbered low, below l2) -> see camRoadSgn2
     f32 nx;
     f32 ny;
@@ -1052,7 +1052,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
 static inline f32 crSq(f32 x) {
     return x * x;
 }
-u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* outSpeed) {
+static u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* outSpeed) {
     u32 flags = 0;
     s32 d;
     s32 n;
@@ -1182,7 +1182,7 @@ static inline f32 angleLerp(f32 a0, f32 a1, f32 r) {
 }
 // FAKE: #pragma dont_inline on: keeps calcHokanCamRoad out of line as in the target; without it calcHokanCamRoad is inlined into camRoadMain (316 -> 436 instructions)
 #pragma dont_inline on
-void calcHokanCamRoad(s32 type, CamRoadState* from, CamRoadState* to, CamRoadState* unused, CamRoadState* out, f32 t) {
+static void calcHokanCamRoad(s32 type, CamRoadState* from, CamRoadState* to, CamRoadState* unused, CamRoadState* out, f32 t) {
     f32 r, a0, a1, a2;
     r = hokanRate(t, 0.0f, 0.0f, 1.0f, 0.0f);
     if (type) {
@@ -1341,9 +1341,9 @@ void camRoadCurveOff(const char* name) {
 
 // prototypes for asm stopgap forward references
 void camRoadCurveOff(const char* name);
-void calcHokanCamRoad(s32 type, CamRoadState* from, CamRoadState* to, CamRoadState* unused, CamRoadState* out, f32 t);
-u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* outSpeed);
-void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
-s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit);
-s32 collisionTri_simple(Vec P, Vec A, Vec B, Vec C, f32* dist);
-void calcCurrentCamState(CameraParams* out);
+static void calcHokanCamRoad(s32 type, CamRoadState* from, CamRoadState* to, CamRoadState* unused, CamRoadState* out, f32 t);
+static u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* outSpeed);
+static void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
+static s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit);
+static s32 collisionTri_simple(Vec P, Vec A, Vec B, Vec C, f32* dist);
+static void calcCurrentCamState(CameraParams* out);

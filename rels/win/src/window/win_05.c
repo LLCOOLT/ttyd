@@ -16,7 +16,6 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "win.h"
 #include "evt/evt_story.h"
 
@@ -25,14 +24,14 @@ static BeroEntry bero_entry_data[2];
 EVT_BEGIN(win_05_door_open)
     SET_VALUE(LW(8), STRING("S_doa_e_l"))
     SET_VALUE(LW(9), STRING("S_doa_e_r"))
-    SPAWN_EVENT(PTR(evt_win_door_open))
+    SPAWN_EVENT(evt_win_door_open)
     RETURN
 EVT_END()
 
 EVT_BEGIN(win_05_door_close)
     SET_VALUE(LW(8), STRING("S_doa_e_l"))
     SET_VALUE(LW(9), STRING("S_doa_e_r"))
-    SPAWN_EVENT(PTR(evt_win_door_close))
+    SPAWN_EVENT(evt_win_door_close)
     RETURN
 EVT_END()
 
@@ -61,8 +60,12 @@ static BeroEntry bero_entry_data[] = {
 static EVT_BEGIN(item_get00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("item00"), ITEM_SUPER_APPEAL_P, LW(0), LW(1), LW(2), 16, -1, 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_SUPER_APPEAL_P, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
+#else
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_BADGE_RETURN | ITEM_FLAG_NO_TOUCH)
+#endif
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_item, STRING("item00"))
     CALL(evt_mario_key_onoff, 1)
@@ -106,13 +109,13 @@ EVT_END()
 EVT_BEGIN(win_05_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_mobj_itembox, STRING("mobj_box00"), -45, 0, -75, 0, 0, PTR(item_get00), GSWF(GSWF_WIN05_SUPER_APPEAL_P_CHEST_OPENED))
     CALL(evt_mobj_kururing_floor, STRING("kururin1"), 64, 0, 118, STRING("S_yukaA"), 125, GSWF(GSWF_WIN05_STAR_PIECE_PANEL))
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG2_WIN1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG2_WIN2"))
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_03_02_SEALED_ENTRANCE_2)
-        SPAWN_EVENT(PTR(cloud_toujou))
+        SPAWN_EVENT(cloud_toujou)
     END_IF
     RETURN
 EVT_END()

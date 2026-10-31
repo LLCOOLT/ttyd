@@ -31,8 +31,8 @@ typedef struct EffKemuri3N64Work {
     f32 cosAngle;    // 0x84
 } EffKemuri3N64Work;
 
-void effKemuri3Main(EffectEntry* effect);
-void effKemuri3Disp(CameraId cameraId, EffectEntry* effect);
+static void effKemuri3Main(EffectEntry* effect);
+static void effKemuri3Disp(CameraId cameraId, EffectEntry* effect);
 
 // Match-forcing setting: the same code without it compiles differently (removal tried).
 #pragma opt_propagation off
@@ -81,7 +81,7 @@ EffectEntry* effKemuri3N64Entry(f32 x, f32 y, f32 z, f32 angle) {
 }
 
 #pragma opt_propagation reset
-void effKemuri3Main(EffectEntry* effect) {
+static void effKemuri3Main(EffectEntry* effect) {
     EffKemuri3N64Work* work = effect->userdata;
     s32 i;
     BOOL alive;
@@ -138,7 +138,7 @@ void effKemuri3Main(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effKemuri3Disp, effect);
 }
 
-void effKemuri3Disp(CameraId cameraId, EffectEntry* effect) {
+static void effKemuri3Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffKemuri3N64Work* work;
     s32 i;

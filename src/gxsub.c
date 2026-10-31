@@ -2,34 +2,40 @@
 // helpers seq_demo draws with.
 #include "gxsub.h"
 #include "version.h"
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 #include "driver/camdrv.h"
 #endif
 
 //.sdata
-f32 queen_uv[4] = {0.0f, -0.0016000001f, 0.0f, -0.00080000004f};
+// Retail gxsub.o starts its .sdata on a 32-byte boundary. The demo copy gets that from the 32-byte
+// aligned 2D-helper data below, which retail no longer has, so in retail queen_uv carries the alignment.
+f32 queen_uv[4]
+#if VERSION >= VERSION_JP
+    ATTRIBUTE_ALIGN(32)
+#endif
+    = {0.0f, -0.0016000001f, 0.0f, -0.00080000004f};
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo still has the 2D textured-quad helpers seq_demo draws with (cut from retail).
 
 //.sdata
-static s32 gxsubMode ATTRIBUTE_ALIGN(32) = 8;                              // last GX setup applied by gxsubChgMode
-static u8 gxsubWhiteTex[4] ATTRIBUTE_ALIGN(32) = {0xFF, 0xFF, 0x00, 0x00}; // 1x1 I4 texel used when no texture is set
+static s32 lastGX ATTRIBUTE_ALIGN(32) = 8; // last GX setup applied by gxsubMiscSetGX
 
 //.sbss
-static BOOL gxsubAlphaTest;
-static BOOL gxsubTexAlphaOff;
-static GXTexObj* gxsubTexObj;
+static BOOL fillTexEdgeOn;
+static BOOL fillTexAlphaOff;
+static GXTexObj* pFillTexObj;
 
-BOOL gxsubChgMode(s32 mode) {
-    if (mode != gxsubMode) {
-        gxsubMode = mode;
+BOOL gxsubMiscSetGX(s32 mode) {
+    if (mode != lastGX) {
+        lastGX = mode;
         return TRUE;
     }
     return FALSE;
 }
 
-void gxsubDrawQuad(s32 x, s32 y, s32 w, s32 h, GXColor* color) {
+void gxsubFillGX(s32 x, s32 y, s32 w, s32 h, GXColor* color) {
+    static u8 filltex[4] ATTRIBUTE_ALIGN(32) = {0xFF, 0xFF, 0x00, 0x00}; // 1x1 I4 texel used when no texture is set
     Mtx mtx;
     GXTexObj obj;
     GXColor c;
@@ -39,7 +45,7 @@ void gxsubDrawQuad(s32 x, s32 y, s32 w, s32 h, GXColor* color) {
     PSMTXConcat(cam->view, mtx, mtx);
     GXLoadPosMtxImm(mtx, GX_PNMTX0);
     GXSetCurrentMtx(GX_PNMTX0);
-    if (gxsubChgMode(5)) {
+    if (gxsubMiscSetGX(5)) {
         GXSetNumChans(0);
         GXSetNumTexGens(1);
         GXSetNumTevStages(1);
@@ -60,16 +66,16 @@ void gxsubDrawQuad(s32 x, s32 y, s32 w, s32 h, GXColor* color) {
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 0);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     }
-    if (gxsubTexObj) {
-        GXLoadTexObj(gxsubTexObj, GX_TEXMAP0);
+    if (pFillTexObj) {
+        GXLoadTexObj(pFillTexObj, GX_TEXMAP0);
     } else {
-        GXInitTexObj(&obj, gxsubWhiteTex, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
+        GXInitTexObj(&obj, filltex, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
         GXLoadTexObj(&obj, GX_TEXMAP0);
     }
-    if (gxsubTexAlphaOff) {
+    if (fillTexAlphaOff) {
         GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_A0);
     }
-    if (gxsubAlphaTest) {
+    if (fillTexEdgeOn) {
         GXSetZCompLoc(GX_FALSE);
         GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
         GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
@@ -90,7 +96,7 @@ void gxsubDrawQuad(s32 x, s32 y, s32 w, s32 h, GXColor* color) {
     GXTexCoord2f32(0.0f, 1.0f);
 }
 
-void gxsubSetTexObj(GXTexObj* obj) {
-    gxsubTexObj = obj;
+void gxsubFillSetTexObj(GXTexObj* obj) {
+    pFillTexObj = obj;
 }
 #endif

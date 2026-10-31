@@ -28,7 +28,9 @@ static GXFifoObj FifoObj;
 static GXData gxData;
 GXData* const __GXData = &gxData;
 
-// these are supposed to be in-function static, but it messed up sbss order
+// These are static locals in the SDK (the Japanese demo's map: peCount$35, time$36 and calledOnce$37 of
+// __GXShutdown, resetFuncRegistered$145 of GXInit). As static locals, or as file-scope statics, they would be
+// emitted before the registers below in .sbss, so they stay global.
 u32 resetFuncRegistered;
 u32 calledOnce;
 OSTime time;

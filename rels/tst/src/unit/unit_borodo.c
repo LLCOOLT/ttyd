@@ -1,5 +1,6 @@
 // tst.rel's version of rels/jon/src/unit/unit_borodo.c (Bandit), an earlier one: the item theft is written
 // differently, with debug prints (sysDebugReport) and an assert, and the older BattleUnit layout (tst_battle.h).
+// The JP demo's copy has none of the debug prints or the assert.
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -17,12 +18,13 @@
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "manager/evtmgr_cmd.h"
 #include "driver/msgdrv.h"
 #include "tst_battle.h"
 #include "tst_debug.h"
+#include "version.h"
 
 static USER_FUNC(_steal_item);
 
@@ -149,7 +151,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {70, 90, 90, 100, 90, 100, 100, 70, 100, 90, 100, 90, 100, 90, 90, 95, 80, 100, 90, 100, 100, 95};
+#else
 static StatusVulnerability regist = {100, 90, 70, 100, 100, 100, 100, 70, 100, 95, 100, 95, 100, 100, 90, 95, 80, 100, 90, 100, 100, 95};
+#endif
 
 static PoseTableEntry pose_table[] = {
     {1, "N_1"},
@@ -168,10 +174,15 @@ static PoseTableEntry pose_table[] = {
     {42, "R_1"},
     {41, "R_1"},
     {40, "W_1"},
+#if VERSION <= VERSION_DEMO_US
+    {56, "I_1"},
+    {57, "I_1"},
+#else
     {56, "X_1"},
     {57, "X_1"},
-    {65, "T_1"},
-    {69, "S_1"},
+#endif
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static PoseTableEntry pose_table_item_have[] = {
@@ -179,8 +190,13 @@ static PoseTableEntry pose_table_item_have[] = {
     {2, "Y_1"},
     {9, "Y_1"},
     {5, "K_1"},
+#if VERSION <= VERSION_DEMO_US
+    {4, "I_1"},
+    {3, "I_1"},
+#else
     {4, "X_1"},
     {3, "X_1"},
+#endif
     {28, "S_2"},
     {29, "Q_1"},
     {30, "Q_1"},
@@ -191,8 +207,8 @@ static PoseTableEntry pose_table_item_have[] = {
     {42, "R_2"},
     {41, "R_2"},
     {40, "W_2"},
-    {65, "S_2"},
-    {69, "S_2"},
+    {BTL_POSE_TALK, "S_2"},
+    {BTL_POSE_STAY_DEFAULT, "S_2"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -223,7 +239,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -234,7 +250,7 @@ EVT_END()
 static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_CheckUnitFlag, BTL_UNIT_SELF, 1073741824, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(escape_event))
+        CALL_CHILD(escape_event)
         RETURN
     END_IF
     CALL(btlevtcmd_EnemyItemUseCheck, BTL_UNIT_SELF, LW(0))
@@ -245,16 +261,16 @@ static EVT_BEGIN(attack_event)
     END_IF
     CALL(btlevtcmd_CheckToken, BTL_UNIT_SELF, 16, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL_CHILD(PTR(_borodo_normal_attack))
+        CALL_CHILD(_borodo_normal_attack)
         RETURN
     END_IF
     SET_VALUE(LW(1), 225)
     SUBTRACT(LW(1), 1)
     CALL(evt_sub_random, LW(1), LW(0))
     IF_INT_LESS(LW(0), 25)
-        CALL_CHILD(PTR(_borodo_normal_attack))
+        CALL_CHILD(_borodo_normal_attack)
     ELSE
-        CALL_CHILD(PTR(_borodo_steal_attack))
+        CALL_CHILD(_borodo_steal_attack)
     END_IF
     RETURN
 EVT_END()
@@ -301,7 +317,11 @@ static EVT_BEGIN(_borodo_normal_attack)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_borodo_attack), 256, LW(5))
     IF_INT_EQUAL(LW(5), 5)
         CALL(btlevtcmd_GetStatusMg, LW(3), LW(6))
+#if VERSION <= VERSION_DEMO_US
+        MULTIPLY(LW(6), 40)
+#else
         MULTIPLY_FLOAT(LW(6), 40)
+#endif
         CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
         CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), LW(6))
@@ -434,7 +454,11 @@ static EVT_BEGIN(_borodo_steal_attack)
     CALL(btlevtcmd_PreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&weapon_borodo_attack), 256, LW(5))
     IF_INT_EQUAL(LW(5), 5)
         CALL(btlevtcmd_GetStatusMg, LW(3), LW(6))
+#if VERSION <= VERSION_DEMO_US
+        MULTIPLY(LW(6), 40)
+#else
         MULTIPLY_FLOAT(LW(6), 40)
+#endif
         CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
         CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
         CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), LW(6))
@@ -623,7 +647,11 @@ static USER_FUNC(_steal_item) {
         }
         if (num > 0) {
             evtSetValue(event, itemVar, ITEM_COIN);
+#if VERSION <= VERSION_DEMO_US
+            evtSetValue(event, iconVar, 394);
+#else
             evtSetValue(event, iconVar, 402);
+#endif
             evtSetValue(event, numVar, num);
             TST_BATTLE_UNIT(unit)->heldItem = ITEM_COIN;
             TST_BATTLE_UNIT(unit)->stolenCoins = num;
@@ -648,7 +676,9 @@ static USER_FUNC(_steal_item) {
             s32 j;
 
             r -= count;
+#if VERSION >= VERSION_JP
             sysDebugReport("unit_borodo_main.c", 673, "%d個目のバッジを盗みます\n", r + 1);
+#endif
             for (j = 0; j < 200; j++) {
                 if (pouch->badges[j] != 0) {
                     if (--r < 0) {
@@ -660,7 +690,9 @@ static USER_FUNC(_steal_item) {
         } else {
             s32 k;
 
+#if VERSION >= VERSION_JP
             sysDebugReport("unit_borodo_main.c", 686, "%d個目のアイテムを盗みます\n", r + 1);
+#endif
             for (k = 0; k < MAX_HELD_ITEMS; k++) {
                 if (pouch->heldItems[k] != 0) {
                     if (--r < 0) {
@@ -671,9 +703,13 @@ static USER_FUNC(_steal_item) {
             }
         }
         if (item != 0) {
+#if VERSION >= VERSION_JP
             sysDebugReport("unit_borodo_main.c", 701, "%sを盗みました\n", msgSearch(itemDataTable[item].name));
+#endif
             if (!pouchRemoveItem(item)) {
+#if VERSION >= VERSION_JP
                 __assert2("unit_borodo_main.c", 703, "0", "持ってるはずのないアイテムを盗んだ");
+#endif
                 return EVT_RETURN_DONE;
             }
             TST_BATTLE_UNIT(unit)->heldItem = item;

@@ -29,11 +29,11 @@
 // which it does only through an array of unknown size).
 extern f32 marioJumpData[];
 
-void kpa2DMain(void);
-void kpa3DMain(void);
-void kpaFireAttack(void);
-void kpaFireMain(void);
-void kpaFall(void);
+static void kpa2DMain(void);
+static void kpa3DMain(void);
+static void kpaFireAttack(void);
+static void kpaFireMain(void);
+static void kpaFall(void);
 const f32 kpaZeroVec[3] = {0.0f, 0.0f, 0.0f};
 
 #define KPW(m) ((m)->kpaWork)
@@ -44,7 +44,6 @@ s32 kpaPauseSeTable[28] = {0x10C, 0x10D, 0x10E, 0x10F, 0x111, 0x112, 0x113, 0x11
                            0x118, 0x119, 0x11B, 0x11E, 0x11F, 0x120, 0x122, 0x123, 0x124, 0x125,
                            0x127, 0x128, 0x129, 0x12A, 0x12C, 0x12D, 0x12E, 0x12F};
 static EffectEntry* fireefp;
-static u8* fireefp_pad;
 
 static inline void kpaFireEntry2(Vec pos) {
     MarioWork* mario = marioGetPtr();
@@ -274,7 +273,7 @@ void kpaMain(void) {
     }
 }
 
-void kpa2DMain(void) {
+static void kpa2DMain(void) {
     MarioWork* mp = marioGetPtr();
     Vec diff;
     Vec saved;
@@ -286,7 +285,7 @@ void kpa2DMain(void) {
     if (mp->kpaNoHitTimer) {
         mp->kpaNoHitTimer--;
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     mp->hitobjHead = NULL;
     mp->hitobjFront = NULL;
     mp->hitobjFrontA = NULL;
@@ -339,7 +338,7 @@ void kpa2DMain(void) {
         }
         marioCheckWall(spd, ang);
     }
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     mp->position.y += mp->floorMove.y;
 #endif
     PSVECSubtract(&mp->position, &saved, &diff);
@@ -379,7 +378,7 @@ void kpa2DMain(void) {
     mp->floorMove.z = 0.0f;
 }
 
-void kpa3DMain(void) {
+static void kpa3DMain(void) {
     MarioWork* mp = marioGetPtr();
     struct HitEntry* h = kpaHitCheck();
     if (h) {
@@ -539,7 +538,7 @@ void kpa_jumpNpc(void) {
     mario->airTimer++;
 }
 
-void kpaFall(void) {
+static void kpaFall(void) {
     MarioWork* mario = marioGetPtr();
     f32 fs;
     f32 ly;
@@ -654,7 +653,7 @@ void kpaAttackStart2(void) {
     }
 }
 
-void kpaFireAttack(void) {
+static void kpaFireAttack(void) {
     MarioWork* mario = marioGetPtr();
     switch (KPW(mario)->attackState) {
         case 1:
@@ -819,7 +818,7 @@ void kpaStrippedPool(f32* f, s32 i) {
     *f = (f32)i;
 }
 
-void kpaFireMain(void) {
+static void kpaFireMain(void) {
     MarioWork* mario = marioGetPtr();
     Mtx mb0;
     Mtx m80;
@@ -861,7 +860,7 @@ void kpaFireMain(void) {
                 ((EffGonbabaBreathWork*)((EffGonbabaBreathWork*)fireefp->userdata)->child->userdata)->position.z = z;
             }
         }
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         // the demo checks the flame against every hit at every level, without the size cut-off
         {
             f32 sc;

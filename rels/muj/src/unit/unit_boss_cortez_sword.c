@@ -9,7 +9,7 @@
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 #include "evt/evt_eff.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "muj.h"
 
 BattleUnitKind unit_boss_cortez_sword;
@@ -17,7 +17,11 @@ static BattleUnitDefense defence;
 static BattleUnitDefenseAttr defence_attr;
 static StatusVulnerability regist;
 BattleWeapon weapon_cortez_sword_float_attack;
+#if VERSION <= VERSION_DEMO_US
+static PoseTableEntry pose_table[4];
+#else
 static PoseTableEntry pose_table[6];
+#endif
 PoseTableEntry pose_table_otitabuki[4];
 static PoseTableEntry pose_table_break[4];
 static BattleDataEntry data_table[21];
@@ -99,7 +103,11 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist = {0, 80, 95, 100, 90, 100, 100, 50, 0, 0, 100, 0, 100, 50, 50, 0, 90, 100, 50, 0, 0, 0};
+#else
 static StatusVulnerability regist = {0, 80, 95, 100, 90, 100, 100, 85, 0, 0, 100, 0, 100, 90, 50, 0, 90, 100, 50, 0, 0, 0};
+#endif
 
 BattleWeapon weapon_cortez_sword_float_attack = {
     NULL, 0, // name..icon
@@ -138,32 +146,38 @@ BattleWeapon weapon_cortez_sword_float_attack = {
 };
 
 static PoseTableEntry pose_table[] = {
+#if VERSION >= VERSION_JP
     {2, "KRT_Z_1"},
     {9, "KRT_Z_1"},
+#endif
     {28, "KRT_S_1"},
     {31, "KRT_S_1"},
     {39, "KRT_S_1"},
-    {69, "KRT_S_1"},
+    {BTL_POSE_STAY_DEFAULT, "KRT_S_1"},
 };
 
 PoseTableEntry pose_table_otitabuki[] = {
     {28, "KRT_Z_1"},
     {31, "KRT_Z_1"},
     {39, "KRT_Z_1"},
-    {69, "KRT_Z_1"},
+    {BTL_POSE_STAY_DEFAULT, "KRT_Z_1"},
 };
 
 static PoseTableEntry pose_table_break[] = {
     {28, "KRT_Z_1"},
     {31, "KRT_Z_1"},
     {39, "KRT_Z_1"},
-    {69, "KRT_Z_1"},
+    {BTL_POSE_STAY_DEFAULT, "KRT_Z_1"},
 };
 
 static BattleDataEntry data_table[] = {
     {9, cortez_damage_sub_event},
     {49, cortez_weapon_dead_event},
+#if VERSION <= VERSION_DEMO_US
+    {70, cortez_weapon_break_event},
+#else
     {71, cortez_weapon_break_event},
+#endif
     {58, cortez_weapon_blow_dead_event},
     {36, cortez_weapon_counter_damage_event},
     {24, cortez_weapon_counter_damage_event},
@@ -206,7 +220,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -291,23 +305,27 @@ EVT_BEGIN(cortez_weapon_unison_phase_event)
     CALL(btlevtcmd_CheckPhase, LW(0), BATTLE_PHASE_BEFORE_PLAYER)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
+#if VERSION >= VERSION_JP
         IF_INT_EQUAL(LW(0), -1)
             RETURN
         END_IF
+#endif
         CALL(btlevtcmd_GetUnitWork, LW(0), 5, LW(1))
         IF_INT_GREATER_OR_EQUAL(LW(1), 4)
             CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 1, LW(0))
             IF_INT_EQUAL(LW(0), 0)
                 CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(9))
+#if VERSION >= VERSION_JP
                 IF_INT_EQUAL(LW(9), -1)
                     RETURN
                 END_IF
-                CALL_CHILD(PTR(cortez_weapon_get_home_height))
+#endif
+                CALL_CHILD(cortez_weapon_get_home_height)
                 IF_INT_NOT_EQUAL(LW(1), LW(5))
                     CALL(btlevtcmd_PhaseEventStartDeclare, BTL_UNIT_SELF)
                     CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(5), LW(2), 60, 0, 4, 0, -1)
                     CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), LW(5), LW(2))
-                    CALL_CHILD(PTR(cortez_weapon_set_formation_attribute))
+                    CALL_CHILD(cortez_weapon_set_formation_attribute)
                     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
                     RETURN
                 END_IF
@@ -337,10 +355,10 @@ EVT_BEGIN(cortez_weapon_phase_event)
                 END_SIBLING_EVENT
                 CALL(btlevtcmd_WaitEventEnd, LW(0))
                 CALL(btlevtcmd_GetUnitId, BTL_UNIT_SELF, LW(9))
-                CALL_CHILD(PTR(cortez_weapon_get_home_height))
+                CALL_CHILD(cortez_weapon_get_home_height)
                 CALL(btlevtcmd_DivePosition, BTL_UNIT_SELF, LW(0), LW(5), LW(2), 60, 0, 4, 0, -1)
                 CALL(btlevtcmd_SetHomePos, BTL_UNIT_SELF, LW(0), LW(5), LW(2))
-                CALL_CHILD(PTR(cortez_weapon_set_formation_attribute))
+                CALL_CHILD(cortez_weapon_set_formation_attribute)
                 CALL(btlevtcmd_GetMaxHp, BTL_UNIT_SELF, LW(0))
                 CALL(btlevtcmd_SetHp, BTL_UNIT_SELF, LW(0))
                 CALL(btlevtcmd_ClearAllStatus, BTL_UNIT_SELF)

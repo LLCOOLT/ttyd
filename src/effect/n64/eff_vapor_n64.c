@@ -52,8 +52,8 @@ static effN64Vtx size64x64_tex32x32_vtx[] = {
 static const GXColor kColor1;
 static const GXColor kColor2;
 
-void effVaporMain(EffectEntry* effect);
-void effVaporDisp(CameraId cameraId, EffectEntry* effect);
+static void effVaporMain(EffectEntry* effect);
+static void effVaporDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effVaporN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -90,7 +90,7 @@ EffectEntry* effVaporN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 s
     return effect;
 }
 
-void effVaporMain(EffectEntry* effect) {
+static void effVaporMain(EffectEntry* effect) {
     EffVaporN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -133,7 +133,7 @@ void effVaporMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effVaporDisp, effect);
 }
 
-void effVaporDisp(CameraId cameraId, EffectEntry* effect) {
+static void effVaporDisp(CameraId cameraId, EffectEntry* effect) {
     GXColor color2;
     GXColor color;
     EffVaporN64Work* work;

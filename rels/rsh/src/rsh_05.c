@@ -47,7 +47,6 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "party/party_nokonoko.h"
 #include "rsh.h"
 #include "evt/evt_story.h"
@@ -217,7 +216,11 @@ static MoamoaData ext_moamoa_data[47];
 extern EvtWord evt_moamoa_help[];
 extern EvtWord evt_moamoa_escape0[];
 extern EvtWord evt_moamoa_escape1[];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord evt_moamoa_escape[205];
+#else
 static EvtWord evt_moamoa_escape[228];
+#endif
 static EvtWord talk_syashou[19];
 static EvtWord talk_waitless[19];
 static BeroEntry bero_data_a[3];
@@ -349,6 +352,8 @@ static void moamoa_pose_main(void) {
 }
 #pragma dont_inline reset
 
+// The model and animation of each moamoa kind. The demo map has it as a static local of moamoa_pose_change
+// (group_tbl$582); here that function also has an inlined copy, so the table stays at file scope.
 static const char* group_tbl[][2] = {
     {("c_n_moa_a"), ("S_1")},
     {("c_n_moa_b"), ("S_1")},
@@ -730,9 +735,13 @@ static s32 moamoa_hit_check(ExtdrvPose* pose, Moamoa* moa) {
         return 0;
     }
     if (distABf((*pose->mtx)[0][3], (*pose->mtx)[2][3], mario->position.x, mario->position.z) < (20.0f + mario->wPlayerCollisionBox.x) / 2.0f && mario->position.y > 10.0f + (*pose->mtx)[1][3] && (mario->flags & MARIO_FLAG_IS_FALLING) && !(mario->flags & MARIO_FLAG_IS_JUMPING) && wp->bounceCount < 2) {
+#if VERSION <= VERSION_DEMO_US
+        marioChgMot(5);
+#else
         if (mario->currMotionId != MARIO_MOTION_ROLL && mario->currMotionId != MARIO_MOTION_YOSHI) {
             marioChgMot(5);
         }
+#endif
         wp->bounceCount++;
         return 1;
     }
@@ -909,7 +918,11 @@ static void ext_moamoa_main(void) {
     for (i = 0; i < wp->count; i++, pose++, moa++) {
         wp->angle = angleABf(mario->position.x, mario->position.z, (*pose->mtx)[0][3], (*pose->mtx)[2][3]);
         wp->dist = distABf(mario->position.x, mario->position.z, (*pose->mtx)[0][3], (*pose->mtx)[2][3]);
+#if VERSION <= VERSION_DEMO_US
+        if ((wp->flags & MOAMOA_WORK_ACTIVE) && !(wp->flags & MOAMOA_WORK_NO_HIT) && !hit && !(moa->flags & (MOAMOA_FLAG_DAMAGED | MOAMOA_FLAG_ESCAPING | MOAMOA_FLAG_OFF_FLOOR | MOAMOA_FLAG_FUSING))) {
+#else
         if ((wp->flags & MOAMOA_WORK_ACTIVE) && !(wp->flags & MOAMOA_WORK_NO_HIT) && !marioKeyOffChk() && !marioCtrlOffChk() && !hit && !(moa->flags & (MOAMOA_FLAG_DAMAGED | MOAMOA_FLAG_ESCAPING | MOAMOA_FLAG_OFF_FLOOR | MOAMOA_FLAG_FUSING))) {
+#endif
             ret = moamoa_hit_check(pose, moa);
             if (ret == 1) {
                 moa->flags |= MOAMOA_FLAG_DAMAGED;
@@ -1397,6 +1410,16 @@ static void ext_moamoa_main(void) {
     }
     moamoa_pose_main();
     wp->mobjY = wp->mobj->modelWorldMtx[1][3];
+#if VERSION <= VERSION_DEMO_US
+    v = (Vec){mario->floorMove.x, mario->floorMove.y, mario->floorMove.z};
+    { static const Vec zv2 = {0.0f, 0.0f, 0.0f}; } // FAKE: unreferenced 12-byte .rodata pad object, defined after the compound literal's template so the template comes first (target order)
+    if (PSVECMag(&v) > 2.0f) {
+        PSVECNormalize(&v, &v);
+        mario->floorMove.x = 2.0f * v.x;
+        mario->floorMove.y = 2.0f * v.y;
+        mario->floorMove.z = 2.0f * v.z;
+    }
+#else
     if (wp->flags & MOAMOA_WORK_PARTNER_IN_USE) {
         mario->floorMove.x = 0.0f;
         mario->floorMove.y = 0.0f;
@@ -1411,6 +1434,7 @@ static void ext_moamoa_main(void) {
             mario->floorMove.z = 2.0f * v.z;
         }
     }
+#endif
 }
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
@@ -1500,11 +1524,11 @@ static EVT_BEGIN(evt_moamoa_init)
     CALL(evt_moamoa_flag_onoff, 1, 1)
     IF_INT_EQUAL(GSWF(GSWF_RSH05_SMORG_RELEASED_WAITRESS), 1)
         CALL(evt_moamoa_target_off, 0)
-        CALL(evt_npc_change_interrupt, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")), 6, PTR(talk_waitless))
+        CALL(evt_npc_change_interrupt, STRING("ウェイトレス"), 6, PTR(talk_waitless))
     END_IF
     IF_INT_EQUAL(GSWF(GSWF_RSH05_SMORG_RELEASED_CONDUCTOR), 1)
         CALL(evt_moamoa_target_off, 1)
-        CALL(evt_npc_change_interrupt, STRING("\x8e\xd4\x8f\xb6"), 6, PTR(talk_syashou))
+        CALL(evt_npc_change_interrupt, STRING("車掌"), 6, PTR(talk_syashou))
     END_IF
     RETURN
 EVT_END()
@@ -1514,8 +1538,8 @@ static EVT_BEGIN(evt_meet_moamoa)
     CALL(evt_seq_wait, 2)
     WAIT_MS(1500)
     CALL(evt_party_stop, 0)
-    CALL(evt_npc_set_anim, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")), STRING("G_1"))
-    CALL(evt_npc_set_anim, STRING("\x8e\xd4\x8f\xb6"), STRING("G_1"))
+    CALL(evt_npc_set_anim, STRING("ウェイトレス"), STRING("G_1"))
+    CALL(evt_npc_set_anim, STRING("車掌"), STRING("G_1"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_SURPRISED2"), LW(0), LW(1), LW(2), 0)
     CALL(evt_eff_fukidashi, 0, STRING("eff0"), 0, 0, 0, 0, 0, 0, 0, 0, 0)
@@ -1566,7 +1590,7 @@ EVT_END()
 EVT_BEGIN(evt_moamoa_help)
     BEGIN_INLINE_EVENT
         CALL(evt_npc_flag_onoff, 0, LW(0), NPC_FLAG_TALK_ANIM)
-        IF_STR_EQUAL(LW(0), STRING("\x8e\xd4\x8f\xb6"))
+        IF_STR_EQUAL(LW(0), STRING("車掌"))
             CALL(evt_msg_print, 0, STRING("stg6_rsh_249_00"), 0, LW(0))
         ELSE
             CALL(evt_msg_print, 0, STRING("stg6_rsh_249_01"), 0, LW(0))
@@ -1577,12 +1601,17 @@ EVT_BEGIN(evt_moamoa_help)
     CALL(evt_npc_flag_onoff, 0, LW(0), NPC_FLAG_MOVE_ANIM)
     SET_VALUE(LW(10), LW(0))
     CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_sub_random, 180, LW(4))
+    ADD(LW(4), 90)
+#else
     CALL(evt_sub_random, 1000, LW(4))
     IF_INT_LESS(LW(4), 500)
         SET_VALUE(LW(4), 90)
     ELSE
         SET_VALUE(LW(4), 270)
     END_IF
+#endif
     CALL(evt_sub_get_sincos, LW(4), LW(5), LW(6))
     MULTIPLY_FLOAT(LW(5), FLOAT(30.0f))
     MULTIPLY_FLOAT(LW(6), FLOAT(30.0f))
@@ -1603,7 +1632,7 @@ EVT_BEGIN(evt_moamoa_help)
     CALL(npc_jump, LW(0), LW(1), LW(2), LW(3), FLOAT(0.0f), FLOAT(0.19921875f), 100)
     CALL(evt_npc_flag_onoff, 1, LW(0), NPC_FLAG_MOVE_ANIM)
     CALL(evt_npc_flag_onoff, 0, LW(0), NPC_FLAG_INTANGIBLE)
-    IF_STR_EQUAL(LW(10), STRING("\x8e\xd4\x8f\xb6"))
+    IF_STR_EQUAL(LW(10), STRING("車掌"))
         CALL(evt_npc_set_anim, LW(10), STRING("O_1"))
     ELSE
         CALL(evt_npc_set_anim, LW(10), STRING("P_1"))
@@ -1612,18 +1641,18 @@ EVT_BEGIN(evt_moamoa_help)
 EVT_END()
 
 EVT_BEGIN(evt_moamoa_escape0)
-    SET_VALUE(LW(0), STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")))
-    SPAWN_EVENT(PTR(evt_moamoa_help))
+    SET_VALUE(LW(0), STRING("ウェイトレス"))
+    SPAWN_EVENT(evt_moamoa_help)
     SET_VALUE(GSWF(GSWF_RSH05_SMORG_RELEASED_WAITRESS), 1)
-    CALL(evt_npc_change_interrupt, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")), 6, PTR(talk_waitless))
+    CALL(evt_npc_change_interrupt, STRING("ウェイトレス"), 6, PTR(talk_waitless))
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_moamoa_escape1)
-    SET_VALUE(LW(0), STRING("\x8e\xd4\x8f\xb6"))
-    SPAWN_EVENT(PTR(evt_moamoa_help))
+    SET_VALUE(LW(0), STRING("車掌"))
+    SPAWN_EVENT(evt_moamoa_help)
     SET_VALUE(GSWF(GSWF_RSH05_SMORG_RELEASED_CONDUCTOR), 1)
-    CALL(evt_npc_change_interrupt, STRING("\x8e\xd4\x8f\xb6"), 6, PTR(talk_syashou))
+    CALL(evt_npc_change_interrupt, STRING("車掌"), 6, PTR(talk_syashou))
     RETURN
 EVT_END()
 
@@ -1638,33 +1667,59 @@ static EVT_BEGIN(evt_moamoa_escape)
     CALL(evt_cam3d_evt_xyz_off, 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_party_stop, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("\x8e\xd4\x8f\xb6"), NPC_FLAG_INTANGIBLE)
-    CALL(evt_npc_flag_onoff, 1, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")), NPC_FLAG_INTANGIBLE)
+    // The demo turns each NPC's intangible flag on and off inside its own walk; the releases set both before the walks.
+#if VERSION <= VERSION_DEMO_US
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_status_onoff, 1, STRING("\x8e\xd4\x8f\xb6"), 2)
-        CALL(evt_npc_move_position, STRING("\x8e\xd4\x8f\xb6"), -80, 22, 1000, 0, 1)
-        CALL(evt_npc_set_ry, STRING("\x8e\xd4\x8f\xb6"), 90)
+        CALL(evt_npc_flag_onoff, 1, STRING("車掌"), NPC_FLAG_INTANGIBLE)
+        CALL(evt_npc_status_onoff, 1, STRING("車掌"), 2)
+        CALL(evt_npc_move_position, STRING("車掌"), -80, 22, 1000, 0, 1)
+        CALL(evt_npc_set_ry, STRING("車掌"), 90)
+        CALL(evt_npc_flag_onoff, 0, STRING("車掌"), NPC_FLAG_INTANGIBLE)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_status_onoff, 1, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")), 2)
-        CALL(evt_npc_move_position, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")), 0, 15, 1000, 0, 1)
-        CALL(evt_npc_set_ry, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")), 270)
+        CALL(evt_npc_flag_onoff, 1, STRING("ウェイトレス"), NPC_FLAG_INTANGIBLE)
+        CALL(evt_npc_status_onoff, 1, STRING("ウェイトレス"), 2)
+        CALL(evt_npc_move_position, STRING("ウェイトレス"), 0, 15, 1000, 0, 1)
+        CALL(evt_npc_set_ry, STRING("ウェイトレス"), 270)
+        CALL(evt_npc_flag_onoff, 0, STRING("ウェイトレス"), NPC_FLAG_INTANGIBLE)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         CALL(evt_party_move_pos2, 0, -20, -10, FLOAT(80.0f))
         CALL(evt_party_set_dir, 0, 270, 300)
     END_INLINE_EVENT
+#else
+    CALL(evt_npc_flag_onoff, 1, STRING("車掌"), NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("ウェイトレス"), NPC_FLAG_INTANGIBLE)
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_status_onoff, 1, STRING("車掌"), 2)
+        CALL(evt_npc_move_position, STRING("車掌"), -80, 22, 1000, 0, 1)
+        CALL(evt_npc_set_ry, STRING("車掌"), 90)
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_status_onoff, 1, STRING("ウェイトレス"), 2)
+        CALL(evt_npc_move_position, STRING("ウェイトレス"), 0, 15, 1000, 0, 1)
+        CALL(evt_npc_set_ry, STRING("ウェイトレス"), 270)
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        CALL(evt_party_move_pos2, 0, -20, -10, FLOAT(80.0f))
+        CALL(evt_party_set_dir, 0, 270, 300)
+    END_INLINE_EVENT
+#endif
+#if VERSION >= VERSION_JP
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     IF_INT_LESS(LW(2), -140)
         CALL(evt_mario_mov_pos2, LW(0), -100, FLOAT(80.0f))
     END_IF
     CALL(evt_mario_flag_onoff, 1, 1024)
+#endif
     CALL(evt_mario_mov_pos2, -45, 5, FLOAT(80.0f))
     CALL(evt_mario_set_dir, 270, 300, 0)
+#if VERSION >= VERSION_JP
     CALL(evt_mario_flag_onoff, 0, 1024)
+#endif
     CALL(evt_cam3d_evt_set, -40, 90, 283, -40, 38, -13, 500, 11)
     WAIT_MS(500)
-    CALL(evt_msg_print, 0, STRING("stg6_rsh_240_00"), 0, STRING("\x8e\xd4\x8f\xb6"))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_240_00"), 0, STRING("車掌"))
     WAIT_MS(500)
     BEGIN_INLINE_EVENT
         CALL(evt_party_set_dir, 0, 90, 300)
@@ -1672,7 +1727,7 @@ static EVT_BEGIN(evt_moamoa_escape)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_set_dir, 90, 300, 0)
     END_INLINE_EVENT
-    CALL(evt_msg_print, 0, STRING("stg6_rsh_241"), 0, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_241"), 0, STRING("ウェイトレス"))
     WAIT_MS(500)
     BEGIN_INLINE_EVENT
         CALL(evt_party_set_dir, 0, 270, 300)
@@ -1680,27 +1735,33 @@ static EVT_BEGIN(evt_moamoa_escape)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_set_dir, 270, 300, 0)
     END_INLINE_EVENT
-    CALL(evt_msg_print, 0, STRING("stg6_rsh_240_01"), 0, STRING("\x8e\xd4\x8f\xb6"))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_240_01"), 0, STRING("車掌"))
     WAIT_MS(500)
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_party_run, 0)
-    CALL(evt_npc_flag_onoff, 0, STRING("\x8e\xd4\x8f\xb6"), NPC_FLAG_INTANGIBLE)
-    CALL(evt_npc_flag_onoff, 0, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")), NPC_FLAG_INTANGIBLE)
-    CALL(evt_npc_change_interrupt, STRING("\x8e\xd4\x8f\xb6"), 6, PTR(talk_syashou))
-    CALL(evt_npc_change_interrupt, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")), 6, PTR(talk_waitless))
+#if VERSION >= VERSION_JP
+    CALL(evt_npc_flag_onoff, 0, STRING("車掌"), NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 0, STRING("ウェイトレス"), NPC_FLAG_INTANGIBLE)
+#endif
+    CALL(evt_npc_change_interrupt, STRING("車掌"), 6, PTR(talk_syashou))
+    CALL(evt_npc_change_interrupt, STRING("ウェイトレス"), 6, PTR(talk_waitless))
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_47_ESCAPING_THE_SMORGS)
     SET_VALUE(LW(0), STRING("w_bero"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(init_syashou)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG6_46_ENGINEER, STORY_STG6_48_SMORG_MIASMA)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_npc_set_position, STRING("me"), -100, 0, 0)
+#else
         CALL(evt_npc_set_position, STRING("me"), -115, 0, 20)
+#endif
         CALL(evt_npc_set_autotalkpose, STRING("me"), STRING("O_1"), STRING("T_3"))
-        CALL(evt_npc_set_tribe, STRING("me"), STRING("\x8e\xd4\x8f\xb6\x94\xdf"))
+        CALL(evt_npc_set_tribe, STRING("me"), STRING("車掌悲"))
         CASE_DEFAULT
         CALL(evt_npc_set_position, STRING("me"), 0, -1000, 0)
     END_SWITCH
@@ -1721,7 +1782,7 @@ static EVT_BEGIN(init_waitless)
         CASE_BETWEEN(STORY_STG6_46_ENGINEER, STORY_STG6_48_SMORG_MIASMA)
         CALL(evt_npc_set_position, STRING("me"), 50, 0, 0)
         CALL(evt_npc_set_autotalkpose, STRING("me"), STRING("P_1"), STRING("T_5"))
-        CALL(evt_npc_set_tribe, STRING("me"), STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X\x94\xdf")))
+        CALL(evt_npc_set_tribe, STRING("me"), STRING("ウェイトレス悲"))
         CASE_DEFAULT
         CALL(evt_npc_set_position, STRING("me"), 0, -1000, 0)
     END_SWITCH
@@ -1853,7 +1914,7 @@ static BeroEntry bero_data_c[] = {
 
 static NpcSetupInfo npc_data[] = {
     {
-        /*"車掌"*/"\x8e\xd4\x8f\xb6", // name
+        "車掌", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_syashou, // initEvent
@@ -1897,7 +1958,7 @@ EVT_BEGIN(evt_ghost_diary_read)
         RETURN
     END_IF
     CALL(evt_msg_print_add, 0, STRING("stg6_rsh_133"))
-    CALL(evt_msg_print, 0, STRING("stg6_rsh_134"), 0, STRING("\x82\xe4\x82\xa4\x82\xea\x82\xa2"))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_134"), 0, STRING("ゆうれい"))
     RETURN
 EVT_END()
 
@@ -1925,7 +1986,7 @@ static EVT_BEGIN(evt_access2)
         SET_VALUE(LSWF(12), 1)
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_277"), 0, 0)
-        CALL(evt_item_entry, STRING("a"), ITEM_POWER_PUNCH, 0, -1000, 0, 17, -1, 0)
+        CALL(evt_item_entry, STRING("a"), ITEM_POWER_PUNCH, 0, -1000, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
         CALL(evt_item_get_item, STRING("a"))
         CALL(evt_mario_key_onoff, 1)
     ELSE
@@ -1955,7 +2016,7 @@ EVT_BEGIN(rsh_05_init_evt)
         CASE_DEFAULT
         CALL(evt_map_playanim, STRING("yure"), 1, 0)
     END_SWITCH
-    CALL_CHILD(PTR(evt_access_entry))
+    CALL_CHILD(evt_access_entry)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG6_02_A_CASE_OF_LOST_STEW, STORY_STG6_04_GRILLING_HEFF_T)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_POWAN1"))
@@ -2002,28 +2063,28 @@ EVT_BEGIN(rsh_05_a_init_evt)
         SET_VALUE(LW(0), PTR(bero_data_a))
     END_SWITCH
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(rsh_05_init_evt))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(rsh_05_init_evt)
     CALL(evt_npc_setup, PTR(npc_data))
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_LESS(STORY_STG6_46_ENGINEER)
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CASE_EQUAL(STORY_STG6_46_ENGINEER)
-        CALL_CHILD(PTR(evt_moamoa_init))
-        SPAWN_EVENT(PTR(evt_meet_moamoa))
+        CALL_CHILD(evt_moamoa_init)
+        SPAWN_EVENT(evt_meet_moamoa)
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CASE_EQUAL(STORY_STG6_47_00_BAGGAGE_CAR_SMORGS)
-        CALL_CHILD(PTR(evt_moamoa_init))
+        CALL_CHILD(evt_moamoa_init)
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CASE_DEFAULT
-        CALL(evt_npc_change_interrupt, STRING("\x8e\xd4\x8f\xb6"), 6, PTR(talk_syashou))
-        CALL(evt_npc_change_interrupt, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")), 6, PTR(talk_waitless))
+        CALL(evt_npc_change_interrupt, STRING("車掌"), 6, PTR(talk_syashou))
+        CALL(evt_npc_change_interrupt, STRING("ウェイトレス"), 6, PTR(talk_waitless))
     END_SWITCH
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG6_17_GHOST_DIARY)
-        CALL(evt_item_entry, STRING("diary"), ITEM_RAGGED_DIARY, -90, 0, -140, 0, -1, PTR(evt_ghost_diary))
+        CALL(evt_item_entry, STRING("diary"), ITEM_RAGGED_DIARY, -90, 0, -140, ITEM_ENTRY_STAY, -1, PTR(evt_ghost_diary))
     END_IF
     RETURN
 EVT_END()
@@ -2044,7 +2105,11 @@ EVT_BEGIN(rsh_05_init_evt_nidome)
     ELSE
         IF_INT_EQUAL(GSWF(GSWF_TRAIN_ARRIVED_ROGUEPORT), 1)
             CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_GOR1"))
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_GOR5"))
+#else
             CALL(evt_snd_envoff, PSND_FADE_OUT)
+#endif
             CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
         ELSE
             CALL(evt_snd_bgmoff, PSND_FADE_OUT)
@@ -2065,7 +2130,7 @@ EVT_BEGIN(rsh_05_a_init_evt_nidome)
         SET_VALUE(LW(0), PTR(bero_data_c))
     END_IF
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(rsh_05_init_evt_nidome))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(rsh_05_init_evt_nidome)
     RETURN
 EVT_END()

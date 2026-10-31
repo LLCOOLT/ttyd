@@ -27,7 +27,7 @@ static YuuTitleWork* _wp;
 
 static EvtWord main_evt[4];
 
-void evt_yuutitle_disp_func(CameraId camera, void* param) {
+static void evt_yuutitle_disp_func(CameraId camera, void* param) {
     YuuTitleWork* wp = param;
     f32 scale = 2.0f;
     f32 halfWidth;
@@ -54,7 +54,7 @@ void evt_yuutitle_disp_func(CameraId camera, void* param) {
     FontDrawEdgeOff();
 }
 
-USER_FUNC(evt_yuutitle_main_func) {
+static USER_FUNC(evt_yuutitle_main_func) {
     YuuTitleWork* wp = (YuuTitleWork*)event->lwData[0];
 
     if (wp->flags & 1) {

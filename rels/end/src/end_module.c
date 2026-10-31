@@ -1,0 +1,31 @@
+// end.rel (エンディング, ending), Japanese store demo: the REL entry points, in a unit of their own after end_00
+// (its "end_00" string starts this unit's .rodata on an 8-byte boundary and the header's math constants follow
+// end_00's data). The releases have them in end_00.c.
+
+#include "evt/evt_cmd.h"
+#include "data/mapdata.h"
+#include "rel_module.h"
+
+extern EvtWord end_00_init_evt[];
+void end_staff_roll_exit(void);
+
+void _prolog(void) {
+    voidfunctionptr* ctor;
+
+    for (ctor = _ctors; *ctor != NULL; ctor++) {
+        (*ctor)();
+    }
+    relSetEvtAddr("end_00", end_00_init_evt);
+}
+
+void _epilog(void) {
+    voidfunctionptr* dtor;
+
+    for (dtor = _dtors; *dtor != NULL; dtor++) {
+        (*dtor)();
+    }
+    end_staff_roll_exit();
+}
+
+void _unresolved(void) {
+}

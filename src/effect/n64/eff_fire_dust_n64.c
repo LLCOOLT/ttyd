@@ -70,8 +70,8 @@ static effN64Vtx size8x8_tex22x22_vtx[] = {
     {-8, 8, 0, 4928, 704, 0, 0, 0, 255},
 };
 
-void effFireDustMain(EffectEntry* effect);
-void effFireDustDisp(CameraId cameraId, EffectEntry* effect);
+static void effFireDustMain(EffectEntry* effect);
+static void effFireDustDisp(CameraId cameraId, EffectEntry* effect);
 static void main_dl(EffectEntry* effect, Mtx mtx);
 
 EffectEntry* effFireDustN64Entry(s32 type, s32 count, s32 lifetime, f32 x, f32 y, f32 z, f32 a, f32 b) {
@@ -121,7 +121,7 @@ EffectEntry* effFireDustN64Entry(s32 type, s32 count, s32 lifetime, f32 x, f32 y
     return effect;
 }
 
-void effFireDustMain(EffectEntry* effect) {
+static void effFireDustMain(EffectEntry* effect) {
     s32 height;
     EffFireDustWork* p;
     Vec position;
@@ -195,7 +195,7 @@ void effFireDustMain(EffectEntry* effect) {
     }
 }
 
-void effFireDustDisp(CameraId cameraId, EffectEntry* effect) {
+static void effFireDustDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffFireDustWork* work;
     GXTexObj texObj;

@@ -30,7 +30,6 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "tou.h"
 #include "version.h"
 #include "mario/mariost.h"
@@ -40,10 +39,10 @@
 
 s32* tbl;
 
-USER_FUNC(free_tbl);
+static USER_FUNC(free_tbl);
 static USER_FUNC(get_pos);
-USER_FUNC(iri_13_make_name);
-USER_FUNC(make_tbl);
+static USER_FUNC(iri_13_make_name);
+static USER_FUNC(make_tbl);
 
 const char* cloud_kontena2_list[5];
 
@@ -182,7 +181,11 @@ static s32 key_tbl[] = {
 static EVT_BEGIN(evt_chk)
     CALL(evt_pouch_check_item, ITEM_STORAGE_KEY_0x13, LW(0))
     IF_INT_GREATER(LW(0), 0)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_win_item_select, PTR(key_tbl), LW(0))
+#else
         CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
+#endif
         IF_INT_EQUAL(LW(0), -1)
             CALL(evt_mobj_exec_cancel, STRING("me"))
         END_IF
@@ -193,7 +196,7 @@ EVT_END()
 static EVT_BEGIN(evt_lock)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG3_20_15_UNLOCKING_THE_DOOR)
     SET_VALUE(LW(0), 1)
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     CALL(evt_pouch_remove_item, ITEM_STORAGE_KEY_0x13, LW(0))
     RETURN
 EVT_END()
@@ -205,9 +208,13 @@ EVT_BEGIN(evt_chuchu)
     CALL(evt_npc_set_position, STRING("チュチュリーナ"), -100, 50, -60)
     CALL(evt_npc_set_ry, STRING("チュチュリーナ"), 270)
     CALL(evt_seq_wait, 2)
+#if VERSION <= VERSION_DEMO_US
+    WAIT_MS(1000)
+#else
     CALL(evt_bero_exec_wait, 65536)
     WAIT_MS(200)
     CALL(evt_party_stop, 0)
+#endif
     BEGIN_INLINE_EVENT
         CALL(evt_mario_set_dir_npc, STRING("チュチュリーナ"))
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
@@ -215,7 +222,11 @@ EVT_BEGIN(evt_chuchu)
         CALL(evt_eff_fukidashi, 0, STRING("m"), 0, 0, 0, 0, 0, 0, 0, 0, 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_party_set_dir_npc, 0, STRING("チュチュリーナ"))
+#else
         CALL(evt_party_set_dir, 0, 270, 300)
+#endif
         CALL(evt_eff_fukidashi, 3, STRING("p"), 0, 0, 0, 0, 0, 0, 0, 0, 0)
     END_INLINE_EVENT
     CALL(evt_set_dir_to_target, STRING("チュチュリーナ"), STRING("mario"))
@@ -274,7 +285,7 @@ EVT_BEGIN(evt_chuchu)
     WAIT_MS(300)
     CALL(evt_npc_move_position, STRING("チュチュリーナ"), 0, -140, 0, FLOAT(80.0f), 1)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -291,7 +302,7 @@ EVT_BEGIN(evt_chuchu)
     END_INLINE_EVENT
     WAIT_MS(500)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_close_door_play_se))
+    SPAWN_EVENT(bero_close_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -402,9 +413,9 @@ EVT_BEGIN(iri_13_init)
             END_IF
         END_IF
         IF_INT_EQUAL(LF(0), 1)
-            CALL(evt_item_entry, LW(6), ITEM_BATTLE_TRUNKS, LW(3), LW(4), LW(5), 16, -1, PTR(iri_13_pants_00_evt))
+            CALL(evt_item_entry, LW(6), ITEM_BATTLE_TRUNKS, LW(3), LW(4), LW(5), ITEM_ENTRY_FIXED, -1, PTR(iri_13_pants_00_evt))
         ELSE
-            CALL(evt_item_entry, LW(6), ITEM_BATTLE_TRUNKS, LW(3), LW(4), LW(5), 16, -1, 0)
+            CALL(evt_item_entry, LW(6), ITEM_BATTLE_TRUNKS, LW(3), LW(4), LW(5), ITEM_ENTRY_FIXED, -1, 0)
         END_IF
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("gor_hae"), MAPOBJ_FLAG_HIDE)
         ADD(LW(2), 1)
@@ -427,7 +438,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"チュチュリーナ"*/"\x83\x60\x83\x85\x83\x60\x83\x85\x83\x8A\x81\x5B\x83\x69", // name
+        "チュチュリーナ", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -441,7 +452,7 @@ static NpcSetupInfo npcEnt[] = {
 static EVT_BEGIN(mobj_box00)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("item00"), ITEM_CHARGE_P, LW(0), LW(1), LW(2), 16, -1, 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_CHARGE_P, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_item, STRING("item00"))
@@ -452,7 +463,7 @@ EVT_END()
 EVT_BEGIN(tou_06_init_evt)
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_run_case_evt, CASE_COND_STAND_ON, 1, STRING("ana"), 0, PTR(evt_ana), 0)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_20_09_BLOWING_CONTAINERS)
@@ -531,13 +542,13 @@ EVT_BEGIN(tou_06_init_evt)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_20_15_UNLOCKING_THE_DOOR)
         CALL(evt_mobj_lock, STRING("lock"), ITEM_STORAGE_KEY_0x13, 95, 210, 50, -80, PTR(evt_chk), PTR(evt_lock), GSWF(GSWF_TOU06_LOCK_OPEN))
         SET_VALUE(LW(0), 1)
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
     END_IF
     CALL(evt_mobj_powerupblk, STRING("pblk00"), -30, 260, -30, 0, GSWF(GSWF_TOU06_SHINE_SPRITE), 0)
     CALL(evt_mobj_kururing_floor, STRING("kururin1"), 50, 0, 0, STRING("tou_6_sita"), 125, GSWF(GSWF_TOU06_STAR_PIECE_PANEL))
     CALL(evt_hitobj_attr_onoff, 0, 1, STRING("MOBJ_kururin1"), 4194304)
-    CALL(evt_item_entry, STRING("item_01"), ITEM_HP_PLUS_P, -450, 250, -25, 16, GSWF(GSWF_TOU06_HP_PLUS_P), 0)
-    CALL(evt_item_entry, STRING("item_02"), ITEM_CHARGE_P, 175, 0, -125, 16, GSWF(GSWF_TOU06_CHARGE_P), 0)
+    CALL(evt_item_entry, STRING("item_01"), ITEM_HP_PLUS_P, -450, 250, -25, ITEM_ENTRY_FIXED, GSWF(GSWF_TOU06_HP_PLUS_P), 0)
+    CALL(evt_item_entry, STRING("item_02"), ITEM_CHARGE_P, 175, 0, -125, ITEM_ENTRY_FIXED, GSWF(GSWF_TOU06_CHARGE_P), 0)
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("fall"))
         CALL(evt_mario_key_onoff, 0)
@@ -583,17 +594,19 @@ EVT_BEGIN(tou_06_init_evt)
 #endif
     END_IF
     CALL(evt_map_playanim, STRING("anm_hae"), 1, 0)
+#if VERSION >= VERSION_JP
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("gor_hae"), MAPOBJ_FLAG_HIDE)
     IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 13)
-        CALL_CHILD(PTR(iri_13_init))
+        CALL_CHILD(iri_13_init)
     END_IF
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("kaidan"), MAPOBJ_FLAG_BBOX_CULL)
+#endif
     CALL(evt_sub_get_system_flag, LW(0))
     IF_BITS_SET(LW(0), GLOBAL_FLAG_SKIP_MAP_EVENTS)
         RETURN
     END_IF
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_20_08_MS_MOWZ)
-        SPAWN_EVENT(PTR(evt_chuchu))
+        SPAWN_EVENT(evt_chuchu)
     ELSE
         IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG3_31_GRUBBAS_PLANS)
             CALL(evt_snd_bgmoff, PSND_FADE_OUT)
@@ -602,11 +615,19 @@ EVT_BEGIN(tou_06_init_evt)
             SWITCH(GSW(GSW_STORY_PROGRESS))
                 CASE_BETWEEN(STORY_STG3_00_WELCOME_TO_GLITZVILLE, STORY_STG3_12_MINI_YOSHI_EGG)
                 CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
+#if VERSION <= VERSION_DEMO_US
+                CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
+#else
                 CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))
+#endif
                 CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
                 CASE_GREATER_OR_EQUAL(STORY_STG3_33_PEACH_THE_SECRET_WEAPON)
                 CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
+#if VERSION <= VERSION_DEMO_US
+                CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
+#else
                 CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))
+#endif
                 CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
                 CASE_DEFAULT
                 CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU1"))
@@ -614,10 +635,16 @@ EVT_BEGIN(tou_06_init_evt)
             END_SWITCH
         END_IF
     END_IF
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("gor_hae"), MAPOBJ_FLAG_HIDE)
+    IF_INT_EQUAL(GSW(GSW_TROUBLE_ACTIVE), 13)
+        CALL_CHILD(iri_13_init)
+    END_IF
+#endif
     RETURN
 EVT_END()
 
-USER_FUNC(iri_13_make_name) {
+static USER_FUNC(iri_13_make_name) {
     static char name[8];
     EvtWord* args = event->args;
 
@@ -626,7 +653,7 @@ USER_FUNC(iri_13_make_name) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(free_tbl) {
+static USER_FUNC(free_tbl) {
     _mapFree(tbl);
     tbl = NULL;
     return EVT_RETURN_DONE;
@@ -644,7 +671,7 @@ static USER_FUNC(get_pos) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(make_tbl) {
+static USER_FUNC(make_tbl) {
     s32 i;
     s32 a;
     s32 b;

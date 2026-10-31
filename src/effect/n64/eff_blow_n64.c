@@ -37,8 +37,8 @@ static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, 8, 0, 0, 1024, 0xFF, 0xFF, 0xFF, 0xFF},
 };
 
-void effBlowMain(EffectEntry* effect);
-void effBlowDisp(CameraId cameraId, EffectEntry* effect);
+static void effBlowMain(EffectEntry* effect);
+static void effBlowDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effBlowN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 dx, f32 dy, f32 dz) {
     EffectEntry* effect;
@@ -135,7 +135,7 @@ EffectEntry* effBlowN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 dx, f
     return effect;
 }
 
-void effBlowMain(EffectEntry* effect) {
+static void effBlowMain(EffectEntry* effect) {
     EffBlowN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -228,7 +228,7 @@ void effBlowMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effBlowDisp, effect);
 }
 
-void effBlowDisp(CameraId cameraId, EffectEntry* effect) {
+static void effBlowDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffBlowN64Work* work;
     s32 i;

@@ -33,7 +33,6 @@
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "version.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
@@ -63,9 +62,9 @@ static void moamoa_pose_change(MoamoaScene* moa, const char* model, const char* 
 static void moamoa_pose_main(void);
 static void ext_disp(CameraId camera, void* param);
 
-void moamoa_dispent(void);
-void moamoa_main(void);
-void moamoa_init(void);
+static void moamoa_dispent(void);
+static void moamoa_main(void);
+static void moamoa_init(void);
 
 MoamoaData moamoa_data[81];
 static BeroEntry bero_data_a[2];
@@ -251,7 +250,7 @@ static f32 randf(f32 min, f32 max) {
     return r * (max - min) + min;
 }
 
-void moamoa_init(void) {
+static void moamoa_init(void) {
     s32 i;
     ExtdrvPose* pose;
     MoamoaScene* moa;
@@ -353,7 +352,7 @@ static void ext_disp(CameraId camera, void* param) {
     extLoadTextureExit();
 }
 
-void moamoa_main(void) {
+static void moamoa_main(void) {
     s32 i;
     ExtdrvPose* pose;
     MoamoaScene* moa;
@@ -406,11 +405,11 @@ void moamoa_main(void) {
     moamoa_pose_main();
 }
 
-void moamoa_dispent(void) {
+static void moamoa_dispent(void) {
     dispEntry(CAMERA_3D, 0.0f, 1, ext_disp, NULL);
 }
 
-USER_FUNC(evt_moamoa_set_one) {
+static USER_FUNC(evt_moamoa_set_one) {
     EvtWord* args = event->args;
     MoamoaScene* moa;
     s32 idx = evtGetValue(event, args[0]);
@@ -430,7 +429,7 @@ USER_FUNC(evt_moamoa_set_one) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_moamoa_set_seq_all) {
+static USER_FUNC(evt_moamoa_set_seq_all) {
     s32 seq = evtGetValue(event, event->args[0]);
     s32 i;
     MoamoaScene* moa;
@@ -757,7 +756,12 @@ static EVT_BEGIN(talk_unten)
         CASE_LESS(STORY_STG6_10_THE_CONDUCTOR_ZIP_TOAD)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_01_01"), 0, 0)
         CASE_LESS(STORY_STG6_11_OBTAIN_AUTOGRAPH)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_npc_flag_onoff, 0, STRING("me"), NPC_FLAG_TALK_ANIM)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_108"), 0, 0)
+#else
         CALL(evt_msg_print, 0, STRING("stg6_rsh_108"), 0, STRING("me"))
+#endif
         CALL(evt_npc_set_anim, STRING("me"), STRING("A_1"))
         WAIT_MS(500)
         CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
@@ -766,12 +770,19 @@ static EVT_BEGIN(talk_unten)
         WAIT_MS(2000)
         CALL(evt_npc_set_anim, STRING("me"), STRING("A_3"))
         WAIT_MS(500)
-        CALL(evt_item_entry, STRING("sign"), ITEM_AUTOGRAPH, 0, 0, 0, 17, -1, 0)
+        CALL(evt_item_entry, STRING("sign"), ITEM_AUTOGRAPH, 0, 0, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
         CALL(evt_item_get_item, STRING("sign"))
         CALL(evt_item_get_item_end_wait, STRING("sign"))
         CALL(evt_npc_set_anim, STRING("me"), STRING("T_1"))
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_110"), 0, 0)
+#else
         CALL(evt_msg_print, 0, STRING("stg6_rsh_110"), 0, STRING("me"))
+#endif
         SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG6_11_OBTAIN_AUTOGRAPH)
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_npc_flag_onoff, 1, STRING("me"), NPC_FLAG_TALK_ANIM)
+#endif
         CASE_LESS(STORY_STG6_12_GIVE_AUTOGRAPH)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_01_01"), 0, 0)
         CASE_LESS(STORY_STG6_19_GIVE_BLANKET)
@@ -790,7 +801,7 @@ static EVT_BEGIN(talk_unten)
         CASE_LESS(STORY_STG6_44_END_OF_DAY_2)
         CALL(evt_msg_print, 0, STRING("stg6_rsh_217"), 0, 0)
         CASE_LESS(STORY_STG6_46_ENGINEER)
-        CALL_CHILD(PTR(evt_moamoa))
+        CALL_CHILD(evt_moamoa)
         CASE_LESS(STORY_STG6_48_SMORG_MIASMA)
         CALL(evt_npc_set_anim, STRING("me"), STRING("T_2"))
         CALL(evt_msg_print, 0, STRING("stg6_rsh_235"), 0, 0)
@@ -805,11 +816,15 @@ static EVT_BEGIN(talk_unten)
         IF_INT_EQUAL(GSWF(GSWF_TRAIN_RETURN_TRIP), 0)
             CALL(evt_msg_print, 0, STRING("stg6_rsh_c_07"), 0, 0)
         ELSE
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_msg_print, 0, STRING("stg6_rsh_c_08"), 0, 0)
+#else
             IF_INT_EQUAL(GSWF(GSWF_TRAIN_AT_ROGUEPORT), 0)
                 CALL(evt_msg_print, 0, STRING("stg6_rsh_c_08"), 0, 0)
             ELSE
                 CALL(evt_msg_print, 0, STRING("stg6_rsh_c_08_1"), 0, 0)
             END_IF
+#endif
         END_IF
     END_SWITCH
     RETURN
@@ -817,7 +832,7 @@ EVT_END()
 
 static NpcSetupInfo npc_data[] = {
     {
-        /*"運転手"*/"\x89\x5E\x93\x5D\x8E\xE8", // name
+        "運転手", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_JUMPING | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_LAND_ON_FLOOR, // flags
         0, // reactionFlags
         init_unten, // initEvent
@@ -871,8 +886,8 @@ EVT_BEGIN(rsh_00_init_evt)
         CALL(evt_map_playanim, STRING("hai_hosi"), 1, 0)
     END_SWITCH
     CALL(evt_npc_setup, PTR(npc_data))
-    CALL_CHILD(PTR(evt_access_entry))
-    SPAWN_EVENT(PTR(evt_handle))
+    CALL_CHILD(evt_access_entry)
+    SPAWN_EVENT(evt_handle)
     CALL(evt_mobj_save_blk, STRING("mobj_save"), -210, 60, -145, 0, 0)
     CALL(evt_sub_get_mapname, LW(0))
     IF_STR_NOT_EQUAL(LW(0), STRING("rsh_00_c"))
@@ -922,8 +937,8 @@ EVT_END()
 EVT_BEGIN(rsh_00_a_init_evt)
     SET_VALUE(LW(0), PTR(bero_data_a))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(rsh_00_init_evt))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(rsh_00_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG6_45_DAY_3_STARTS, STORY_STG6_47_ESCAPING_THE_SMORGS)
         CALL(evt_npc_entry, STRING("moa_a"), STRING("c_n_moa_a"))
@@ -941,8 +956,8 @@ EVT_END()
 EVT_BEGIN(rsh_00_b_init_evt)
     SET_VALUE(LW(0), PTR(bero_data_b))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(rsh_00_init_evt))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(rsh_00_init_evt)
     RETURN
 EVT_END()
 
@@ -957,10 +972,10 @@ static const char* window_tbl[] = {
 EVT_BEGIN(rsh_00_c_init_evt)
     SET_VALUE(LW(0), PTR(bero_data_c))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(rsh_00_init_evt))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(rsh_00_init_evt)
     SET_VALUE(LW(0), PTR(&window_tbl))
-    CALL_CHILD(PTR(evt_rsh_window))
+    CALL_CHILD(evt_rsh_window)
     RETURN
 EVT_END()
 
@@ -991,11 +1006,34 @@ EVT_BEGIN(rsh_00_init_evt_nidome)
     ELSE
         CALL(evt_mobj_kururing_floor, STRING("kururin1"), -132, 0, -95, STRING("s_yuka1"), 125, GSWF(GSWF_RSH00_STAR_PIECE_PANEL))
     END_IF
-    CALL_CHILD(PTR(evt_access_entry))
+    CALL_CHILD(evt_access_entry)
     IF_INT_EQUAL(GSWF(GSWF_TRAIN_ARRIVED_POSHLEY), 1)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG6_PIK1"))
         CALL(evt_snd_envoff, PSND_FADE_OUT)
         CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
+        // The demo checks the Rogueport arrival in its own IF after the Poshley one and restarts the ambient sound;
+        // the releases test it in the ELSE and stop the ambient sound.
+#if VERSION <= VERSION_DEMO_US
+    END_IF
+    IF_INT_EQUAL(GSWF(GSWF_TRAIN_ARRIVED_ROGUEPORT), 1)
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_GOR1"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG0_GOR5"))
+        CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
+    ELSE
+        CALL(evt_sub_get_mapname, LW(0))
+        IF_STR_EQUAL(LW(0), STRING("rsh_00_a"))
+            CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG6_RSH1"))
+            CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_RSH1_4"))
+        END_IF
+        IF_STR_EQUAL(LW(0), STRING("rsh_00_b"))
+        END_IF
+        IF_STR_EQUAL(LW(0), STRING("rsh_00_c"))
+            CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG6_RSH2"))
+            CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG6_RSH1_4"))
+        END_IF
+    END_IF
+    RETURN
+#else
     ELSE
         IF_INT_EQUAL(GSWF(GSWF_TRAIN_ARRIVED_ROGUEPORT), 1)
             CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG0_GOR1"))
@@ -1016,30 +1054,31 @@ EVT_BEGIN(rsh_00_init_evt_nidome)
         END_IF
     END_IF
     RETURN
+#endif
 EVT_END()
 
 EVT_BEGIN(rsh_00_a_init_evt_nidome)
     SET_VALUE(LW(0), PTR(bero_data_a))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(rsh_00_init_evt_nidome))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(rsh_00_init_evt_nidome)
     RETURN
 EVT_END()
 
 EVT_BEGIN(rsh_00_b_init_evt_nidome)
     SET_VALUE(LW(0), PTR(bero_data_b))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(rsh_00_init_evt_nidome))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(rsh_00_init_evt_nidome)
     RETURN
 EVT_END()
 
 EVT_BEGIN(rsh_00_c_init_evt_nidome)
     SET_VALUE(LW(0), PTR(bero_data_c))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL_CHILD(PTR(rsh_00_init_evt_nidome))
+    CALL_CHILD(evt_bero_info_run)
+    CALL_CHILD(rsh_00_init_evt_nidome)
     SET_VALUE(LW(0), PTR(&window_tbl))
-    CALL_CHILD(PTR(evt_rsh_window))
+    CALL_CHILD(evt_rsh_window)
     RETURN
 EVT_END()

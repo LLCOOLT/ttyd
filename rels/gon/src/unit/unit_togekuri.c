@@ -122,7 +122,7 @@ static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static StatusVulnerability regist = {100, 120, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 120, 120, 100, 100, 100, 100, 150};
 #else
 static StatusVulnerability regist = {100, 110, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 110, 110, 100, 100, 100, 100, 150};
@@ -186,13 +186,8 @@ static PoseTableEntry pose_table[] = {
     {40, "TGK_W_1"},
     {56, "TGK_I_1"},
     {57, "TGK_I_1"},
-#if VERSION == VERSION_DEMO
-    {63, "TGK_T_1"},
-    {67, "TGK_S_1"},
-#else
-    {65, "TGK_T_1"},
-    {69, "TGK_S_1"},
-#endif
+    {BTL_POSE_TALK, "TGK_T_1"},
+    {BTL_POSE_STAY_DEFAULT, "TGK_S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -310,7 +305,7 @@ static USER_FUNC(krb_get_dir) {
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 

@@ -25,9 +25,17 @@ static BattleDataEntry data_table_christine[2];
 static BattleUnitKindPart parts_christine[1];
 static EvtWord init_event_christine[42];
 extern EvtWord damage_event_christine[];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord dead_event_christine[126];
+#else
 static EvtWord dead_event_christine[147];
+#endif
 static EvtWord attack_event_christine[690];
+#if VERSION <= VERSION_DEMO_US
+static EvtWord wait_event_christine[6];
+#else
 static EvtWord wait_event_christine[7];
+#endif
 
 BattleUnitKind unit_gullible_christine = {
     80,
@@ -135,7 +143,11 @@ static BattleUnitDefense defence_christine = {{0, 0, 0, 0, 0}};
 
 static BattleUnitDefenseAttr defence_attr_christine = {{0, 0, 0, 0, 0}};
 
+#if VERSION <= VERSION_DEMO_US
+static StatusVulnerability regist_christine = {60, 80, 70, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 70, 70, 0, 0, 100, 70, 100, 100, 0};
+#else
 static StatusVulnerability regist_christine = {60, 80, 70, 100, 70, 100, 100, 70, 100, 70, 100, 70, 100, 90, 70, 0, 0, 100, 70, 100, 100, 0};
+#endif
 
 static BattleDataEntry data_table_christine[] = {
     {49, dead_event_christine},
@@ -179,7 +191,7 @@ EVT_BEGIN(damage_event_christine)
     END_IF
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -207,14 +219,18 @@ static EVT_BEGIN(dead_event_christine)
         CALL_CHILD(gparty_zoom_christine)
         CALL(evt_msg_print, 2, STRING("stg4_jin_26_03_kur"), 0, BTL_UNIT_SELF)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_D_3"))
+#if VERSION >= VERSION_JP
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_DIE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+#endif
         WAIT_MS(500)
         CALL_CHILD(fmario_zoom_christine)
         CALL(evt_msg_print, 2, STRING("stg4_jin_26_04"), 0, GW(16))
         WAIT_MS(200)
         CASE_EQUAL(1)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_D_3"))
+#if VERSION >= VERSION_JP
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_DIE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+#endif
         LOOP(0)
             IF_INT_EQUAL(GW(19), 2)
                 BREAK_LOOP
@@ -223,7 +239,9 @@ static EVT_BEGIN(dead_event_christine)
         END_LOOP
         CASE_EQUAL(2)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_D_3"))
+#if VERSION >= VERSION_JP
         CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_DIE1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+#endif
     END_SWITCH
     CALL(btlevtcmd_KillUnit, BTL_UNIT_SELF, 1)
     SET_VALUE(GW(20), 2)
@@ -441,4 +459,8 @@ static USER_FUNC(_krb_get_dir) {
 static EVT_BEGIN(wait_event_christine)
     CALL(btlevtcmd_AnimeChangePoseFromTable, BTL_UNIT_SELF, 1)
     RETURN
+#if VERSION <= VERSION_DEMO_US
+EVT_END()
+#else
 EVT_END_PAD()
+#endif

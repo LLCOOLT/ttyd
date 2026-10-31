@@ -4,6 +4,8 @@
 #include "driver/seqdrv.h"
 #include "evt/evt_word.h"
 
+void seq_gameOverInit(SequenceWork* work);
 void seq_gameOverMain(SequenceWork* work);
+void seq_gameOverExit(SequenceWork* work);
 
 extern EvtWord fall_gameover_es[];

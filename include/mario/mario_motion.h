@@ -39,6 +39,6 @@ void marioMotion(void);
 void marioSetJumpPara(void);
 void marioJump(void);
 void marioFall(void);
-s32 L_marioChkRub(void);
+s32 marioChkRub(void);
 void marioChgMot2(MarioMotion id);
 s32 marioRollChgChk(void);

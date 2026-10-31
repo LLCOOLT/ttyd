@@ -34,8 +34,8 @@ static effN64Vtx size16x32_tex16x32_vtx[] = {
     {-8, 32, 0, 0, 1024, 0, 0, 0, 255},
 };
 
-void effOnpuMain(EffectEntry* effect);
-void effOnpuDisp(CameraId cameraId, EffectEntry* effect);
+static void effOnpuMain(EffectEntry* effect);
+static void effOnpuDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effOnpuN64Entry(s32 type, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
@@ -79,7 +79,7 @@ EffectEntry* effOnpuN64Entry(s32 type, f32 x, f32 y, f32 z) {
     return effect;
 }
 
-void effOnpuMain(EffectEntry* effect) {
+static void effOnpuMain(EffectEntry* effect) {
     EffOnpuN64Work* work = effect->userdata;
     s32 lifetime;
     Vec position;
@@ -110,7 +110,7 @@ void effOnpuMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effOnpuDisp, effect);
 }
 
-void effOnpuDisp(CameraId cameraId, EffectEntry* effect) {
+static void effOnpuDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffOnpuN64Work* work;
     s32 offset;

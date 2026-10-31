@@ -18,7 +18,6 @@
 #include "evt/evt_mario.h"
 #include "evt/evt_mobj.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "libc_decls.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -33,7 +32,11 @@ const char* hit_list[50];
 static HitDamageReturn dmgReturnPt[2];
 
 static EVT_BEGIN(e_door_close)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("S_door1_1"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("S_door1_2"), 0, 0, LW(0))
@@ -41,7 +44,11 @@ static EVT_BEGIN(e_door_close)
 EVT_END()
 
 static EVT_BEGIN(e_door_open)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("S_door1_1"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("S_door1_2"), 0, 0, LW(0))
@@ -126,7 +133,7 @@ const char* hit_list[] = {
 static EVT_BEGIN(evt_box)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("dummy"), ITEM_CARD_KEY_0x1E, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_item_entry, STRING("dummy"), ITEM_CARD_KEY_0x1E, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(evt_mobj_wait_animation_end, STRING("box"))
     CALL(evt_item_get_item, STRING("dummy"))
     SET_VALUE(GSWF(GSWF_AJI12_CARD_KEY_TAKEN), 1)
@@ -173,13 +180,15 @@ EVT_END()
 EVT_BEGIN(aji_12_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI1"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 1)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("no1"), MAPOBJ_FLAG_HIDE)
     IF_INT_EQUAL(GSWF(GSWF_AJI12_CARD_KEY_TAKEN), 0)
-        CALL_CHILD(PTR(hikaru_yuka_init))
+        CALL_CHILD(hikaru_yuka_init)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("ato"), MAPOBJ_FLAG_HIDE)
     ELSE
         CALL(hikaru_off)
@@ -188,7 +197,7 @@ EVT_BEGIN(aji_12_init_evt)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("ato"), MAPOBJ_FLAG_HIDE)
     END_IF
     CALL(evt_mobj_badgeblk, STRING("mobj00"), 170, 60, 120, ITEM_HP_DRAIN_ITEM, 0, GSWF(GSWF_AJI12_HP_DRAIN_BLOCK_HIT), 0)
-    SPAWN_EVENT(PTR(evt_emergency))
+    SPAWN_EVENT(evt_emergency)
     RETURN
 EVT_END()
 
@@ -222,8 +231,10 @@ static USER_FUNC(mario_chk) {
     s32 n;
     char name[256];
     MarioWork* mario = marioGetPtr();
+#if VERSION >= VERSION_JP
     PartyEntry* party;
     HitEntry* hit;
+#endif
     s32 i;
     s32 j;
 
@@ -243,6 +254,9 @@ static USER_FUNC(mario_chk) {
     for (i = 0; i < 50; i++) {
         hitGrpAttrOn((const char*)hit_list[i], 0x800);
     }
+#if VERSION <= VERSION_DEMO_US
+    if (mario->hitobjUnder == NULL) {
+#else
     party = partyGetPtr(0);
     if (party != NULL && party->currentMemberId == PARTY_MEMBER_YOSHI && (party->flags & PARTY_FLAG_IS_BEING_USED)) {
         hit = mario->hitobjStandOn;
@@ -253,16 +267,25 @@ static USER_FUNC(mario_chk) {
         hit = (HitEntry*)mario->hitobjUnder;
     }
     if (hit == NULL) {
+#endif
         mapGrpFlagOff("hikaru_01", 1);
         mapGrpFlagOn("nashi_01", 1);
         hitGrpAttrOff("A_hikaru_01", 0x800);
         event->userdata[2] = 0;
+#if VERSION <= VERSION_DEMO_US
+    } else if (strncmp(hitGetName(mario->hitobjUnder), "A_hikaru_", strlen("A_hikaru_")) != 0) {
+#else
     } else if (strncmp(hitGetName(hit), "A_hikaru_", strlen("A_hikaru_")) != 0) {
+#endif
         mapGrpFlagOff("hikaru_01", 1);
         mapGrpFlagOn("nashi_01", 1);
         hitGrpAttrOff("A_hikaru_01", 0x800);
         event->userdata[2] = 0;
+#if VERSION <= VERSION_DEMO_US
+    } else if (strcmp(hitGetName(mario->hitobjUnder), "A_hikaru_01") == 0 && event->userdata[2] == 0) {
+#else
     } else if (strcmp(hitGetName(hit), "A_hikaru_01") == 0 && event->userdata[2] == 0) {
+#endif
         event->userdata[2] = 1;
         event->userdata[0] = 0;
         event->userdata[1] = 0;

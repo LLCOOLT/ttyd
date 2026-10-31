@@ -18,11 +18,10 @@
 #include "evt/evt_eff.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "muj.h"
 #include "rel_module.h"
 
-USER_FUNC(muj_ship_puka_func);
+static USER_FUNC(muj_ship_puka_func);
 static USER_FUNC(tornade_alpha_func);
 
 f32 muj_ship_puka_data[16];
@@ -75,7 +74,7 @@ void _epilog(void) {
 void _unresolved(void) {
 }
 
-USER_FUNC(muj_ship_puka_func) {
+static USER_FUNC(muj_ship_puka_func) {
     EvtWord* args = event->args;
     s32 index = evtGetValue(event, args[0]);
     f32 value = evtGetFloat(event, args[1]);

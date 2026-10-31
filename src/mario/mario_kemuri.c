@@ -18,9 +18,9 @@
 
 // FAKE: keeps the following function(s) out of line as in the target; removing it changes the code
 #pragma dont_inline on
-void kemuri(void);
-void kemuri_mugi(void);
-#if VERSION == VERSION_DEMO
+static void kemuri(void);
+static void kemuri_mugi(void);
+#if VERSION <= VERSION_DEMO_US
 static inline void mario_kemuri_landon(void);
 #else
 void mario_kemuri_landon(void);
@@ -114,7 +114,7 @@ void mario_land_kemuri(void) {
 }
 
 // The demo has no mri_05 splash type, and the function is inlined into its two callers.
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static inline
 #endif
     void mario_kemuri_landon(void) {
@@ -123,7 +123,7 @@ static inline
     MarioWork* mario = marioGetPtr();
     s32 type = 0;
 
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     if (strcmp(gp->currentMapName, "mri_05") == 0) {
         type = 10;
     }
@@ -153,7 +153,7 @@ static inline
     }
 }
 
-void kemuri_mugi(void) {
+static void kemuri_mugi(void) {
     static f32 dir = 0;
     static s32 ct = 4;
     static s32 ct2 = 10;
@@ -194,7 +194,7 @@ void kemuri_mugi(void) {
     }
 }
 
-void kemuri(void) {
+static void kemuri(void) {
     static f32 dir = 0;
     static s32 ct = 4;
     MarioWork* mario = marioGetPtr();
@@ -202,11 +202,7 @@ void kemuri(void) {
     f32 s, c;
     f32 x, y, z;
 
-#if VERSION >= VERSION_US
     if (mario->prevAirTimer != 0 && mario->prevHitobjStandOn == NULL && mario->hitobjStandOn != NULL) {
-#else
-    if (mario->prevAirTimer != 0 && mario->prevHitobjStandOn == NULL && mario->hitobjStandOn != NULL) {
-#endif
         if (mario->trigFlags & MARIO_TRIG_FLAG_DISABLE_JUMP_KEMURI) {
             mario->trigFlags &= ~MARIO_TRIG_FLAG_DISABLE_JUMP_KEMURI;
         } else {
@@ -270,6 +266,7 @@ void kemuri(void) {
     }
 }
 
+// US and PAL make no dust at a raised system level, in run mode 10 or on hit attribute 0x100
 #if VERSION >= VERSION_US
 void party_kemuri(PartyEntry* party) {
 

@@ -88,8 +88,8 @@ static effN64Vtx size128x10_tex32x32_2_vtx[] = {
     {128, 5, 0, 0, 4096, 0, 0, 0, 255},
     {0, 5, 0, 1024, 4096, 0, 0, 0, 255},
 };
-void effPokopiPchargeMain(EffectEntry* effect);
-void effPokopiPchargeDisp(CameraId cameraId, EffectEntry* effect);
+static void effPokopiPchargeMain(EffectEntry* effect);
+static void effPokopiPchargeDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effPokopiPchargeN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffPokopiPchargeN64Elem* work;
@@ -210,7 +210,7 @@ EffectEntry* effPokopiPchargeN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 
     return effect;
 }
 
-void effPokopiPchargeMain(EffectEntry* effect) {
+static void effPokopiPchargeMain(EffectEntry* effect) {
     EffPokopiPchargeN64Elem* p = effect->userdata;
     s32 i;
     s32 lifetime;
@@ -268,7 +268,7 @@ void effPokopiPchargeMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effPokopiPchargeDisp, effect);
 }
 
-void effPokopiPchargeDisp(CameraId cameraId, EffectEntry* effect) {
+static void effPokopiPchargeDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffPokopiPchargeN64Elem* p;
     s32 i;

@@ -15,12 +15,12 @@
 #include "libc_decls.h"
 #include "version.h"
 
-s32 nannpc_zcompare(const void* a, const void* b);
+static s32 nannpc_zcompare(const void* a, const void* b);
 
 NanNPCWork* nanNPCWork;
 char makestring[16];
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // The demo turns the name into a string in a helper (same code, other register order).
 // Demo only: in the other versions the helper's "%06x" literal would move ahead in the
 // string pool even unused.
@@ -197,7 +197,7 @@ void nanNPCOption(void) {
 }
 #pragma pop
 
-s32 nannpc_zcompare(const void* a, const void* b) {
+static s32 nannpc_zcompare(const void* a, const void* b) {
     if (((const NanNPCSort*)a)->z < ((const NanNPCSort*)b)->z) {
         return 1;
     }
@@ -219,7 +219,7 @@ static inline void nannpc_loadTev(void) {
     GXSetNumTexGens(1);
     GXSetNumTevStages(1);
 }
-void nannpc_ext_disp(CameraId camera, void* param) {
+static void nannpc_ext_disp(CameraId camera, void* param) {
     NanNPCWork* w = nanNPCWork;
     s32 i;
     s32 idx;
@@ -252,7 +252,7 @@ void nannpc_ext_disp(CameraId camera, void* param) {
     }
 }
 
-void nannpc_ext_shadow_disp(CameraId camera, void* param) {
+static void nannpc_ext_shadow_disp(CameraId camera, void* param) {
     static Mtx mt = {{10.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 10.0f, 0.0f, 0.1f}, {0.0f, 0.0f, 10.0f, 0.0f}};
     extLoadShadowMtx(mt);
     extLoadShadowRenderMode();
@@ -261,7 +261,7 @@ void nannpc_ext_shadow_disp(CameraId camera, void* param) {
     extDrawShadow();
 }
 
-void nannpc_ext_init(void) {
+static void nannpc_ext_init(void) {
     s32 i;
     ExtdrvPose* pose = extGetPosePtr();
     for (i = extGetPoseNum() - 1; i >= 0; i--, pose++) {
@@ -313,7 +313,7 @@ void nannpc_ext_main_sub_fast(void) {
     }
 }
 
-void nannpc_ext_main(void) {
+static void nannpc_ext_main(void) {
     NanNPCWork* w = nanNPCWork;
     if (w->func14) {
         w->func14();
@@ -326,7 +326,7 @@ void nannpc_ext_main(void) {
     }
 }
 
-void nannpc_ext_dispent(void) {
+static void nannpc_ext_dispent(void) {
     if (!(nanNPCWork->flags & 1)) {
         dispEntry(4, 0.0f, 1, nannpc_ext_disp, 0);
         dispEntry(4, 0.0f, 2, nannpc_ext_shadow_disp, 0);
@@ -433,7 +433,7 @@ USER_FUNC(evt_nannpc_entry) {
     w = nanNPCWork;
     for (i = 0, off = 0; i < w->num; off += sizeof(NanNPC), i++) {
         p = (NanNPC*)((u8*)w->npc + off); // FAKE: byte offset; &w->npc[i] reorders the loop
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         str = nanNPCEntryName((char*)name);
 #else
         str = (char*)name;
@@ -583,7 +583,7 @@ USER_FUNC(evt_nannpc_move_position2) {
     Vec diff;
     Vec step;
     args = event->args;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     npc = nanNPCSearch2((char*)evtGetValue(event, args[0]));
     now = gp->inBattle ? gp->renderTime : gp->renderFieldTime;
 #else
@@ -616,7 +616,7 @@ USER_FUNC(evt_nannpc_move_position2) {
 
 USER_FUNC(evt_nannpc_jump_position) {
     EvtWord* args = event->args;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     NanNPC* npc = nanNPCSearch2((char*)evtGetValue(event, args[0]));
 #else
     char* name = (char*)evtGetValue(event, args[0]);

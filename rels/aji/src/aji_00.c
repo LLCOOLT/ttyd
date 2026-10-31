@@ -16,7 +16,6 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_telop.h"
-#include "party/party_motion.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
 
@@ -24,7 +23,11 @@ static BeroEntry bero_entry_data[3];
 static NpcSetupInfo npcEnt[3];
 
 static EVT_BEGIN(w_door_close)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("S_door1_1"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("S_door1_2"), 0, 0, LW(0))
@@ -32,7 +35,11 @@ static EVT_BEGIN(w_door_close)
 EVT_END()
 
 static EVT_BEGIN(w_door_open)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("S_door1_1"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("S_door1_2"), 0, 0, LW(0))
@@ -40,7 +47,11 @@ static EVT_BEGIN(w_door_open)
 EVT_END()
 
 static EVT_BEGIN(e_door_close)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("S_door2_1"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("S_door2_2"), 0, 0, LW(0))
@@ -48,7 +59,11 @@ static EVT_BEGIN(e_door_close)
 EVT_END()
 
 static EVT_BEGIN(e_door_open)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("S_door2_1"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("S_door2_2"), 0, 0, LW(0))
@@ -179,7 +194,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"手下１"*/"\x8E\xE8\x89\xBA\x82\x50", // name
+        "手下１", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -188,7 +203,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"手下２"*/"\x8E\xE8\x89\xBA\x82\x51", // name
+        "手下２", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -206,16 +221,18 @@ EVT_BEGIN(aji_00_init_evt)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
     END_IF
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI2"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 1)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG7_08_ELITE_X_NAUTS)
-        SPAWN_EVENT(PTR(first_evt))
+        SPAWN_EVENT(first_evt)
     END_IF
     CALL(evt_mobj_recovery_blk, STRING("r_blk"), 20, -100, 60, -200, 0, 0)
     CALL(evt_mobj_save_blk, STRING("s_blk"), 100, 60, -200, 0, 0)
-    SPAWN_EVENT(PTR(evt_emergency))
+    SPAWN_EVENT(evt_emergency)
     CALL(evt_npc_setup, PTR(npcEnt))
     CALL(evt_map_playanim, STRING("hosi_01"), 1, 0)
     CALL(evt_map_playanim, STRING("hosi_02"), 1, 0)
@@ -223,7 +240,7 @@ EVT_BEGIN(aji_00_init_evt)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG7_25_THE_LAST_MAIL, STORY_STG8_END_AFTER_THE_BATTLE)
         SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL_CHILD(bero_case_switch_off)
         CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("w_bero"), 0, PTR(evt_door_msg), 0)
     END_SWITCH
     RETURN

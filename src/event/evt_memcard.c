@@ -11,7 +11,7 @@
 #include "evt/evt_story.h"
 
 // Functions are emitted in reverse source order (deferred inlining)
-USER_FUNC(memcard_code) {
+static USER_FUNC(memcard_code) {
     EvtWord* args = event->args;
     s32 code = cardGetCode();
 
@@ -22,7 +22,7 @@ USER_FUNC(memcard_code) {
     return EVT_RETURN_DONE;
 }
 
-#if VERSION != VERSION_DEMO // the demo has no insert watch or buffer reset
+#if VERSION >= VERSION_JP // the demo has no insert watch or buffer reset
 USER_FUNC(memcard_buf_reset) {
     cardBufReset();
     return EVT_RETURN_DONE;
@@ -50,7 +50,7 @@ USER_FUNC(memcard_watch_end) {
 }
 #endif
 
-USER_FUNC(memcard_load) {
+static USER_FUNC(memcard_load) {
     if (isFirstCall) {
         cardBufReset();
         cardReadAll();
@@ -61,7 +61,7 @@ USER_FUNC(memcard_load) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(memcard_format) {
+static USER_FUNC(memcard_format) {
     if (isFirstCall) {
         cardFormat();
     }
@@ -71,7 +71,7 @@ USER_FUNC(memcard_format) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(memcard_create) {
+static USER_FUNC(memcard_create) {
     if (isFirstCall) {
         cardCreate();
     }
@@ -81,7 +81,7 @@ USER_FUNC(memcard_create) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(memcard_delete) {
+static USER_FUNC(memcard_delete) {
     EvtWord* args = event->args;
     s32 slot = evtGetValue(event, args[0]) - 1;
 
@@ -94,7 +94,7 @@ USER_FUNC(memcard_delete) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(memcard_copy) {
+static USER_FUNC(memcard_copy) {
     EvtWord* args = event->args;
     s32 from = evtGetValue(event, args[0]) - 1;
     s32 to = evtGetValue(event, args[1]) - 1;
@@ -108,7 +108,7 @@ USER_FUNC(memcard_copy) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(memcard_header_write) {
+static USER_FUNC(memcard_header_write) {
     if (isFirstCall) {
         cardWriteHeader();
     }
@@ -118,12 +118,12 @@ USER_FUNC(memcard_header_write) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(memcard_ipl) {
+static USER_FUNC(memcard_ipl) {
     gp->resetType = 2;
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(memcard_file_existance) {
+static USER_FUNC(memcard_file_existance) {
     EvtWord* args = event->args;
     s32 slot = evtGetValue(event, args[0]) - 1;
 
@@ -135,7 +135,7 @@ USER_FUNC(memcard_file_existance) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(memcard_write) {
+static USER_FUNC(memcard_write) {
     if (isFirstCall) {
         cardWrite(gp->saveSlot);
     }
@@ -147,7 +147,6 @@ USER_FUNC(memcard_write) {
 
 extern EvtWord evt_memcard_nosave[];
 
-#if VERSION == VERSION_DEMO
 EVT_BEGIN(evt_memcard_nosave)
     CALL(evt_msg_print_add, 0, STRING("msg_nosave_start"))
     CALL(evt_msg_select, 0, STRING("msg_mcard_yesno2"))
@@ -157,19 +156,9 @@ EVT_BEGIN(evt_memcard_nosave)
     END_IF
     RETURN
 EVT_END()
-#else
-EVT_BEGIN(evt_memcard_nosave)
-    CALL(evt_msg_print_add, 0, STRING("msg_nosave_start"))
-    CALL(evt_msg_select, 0, STRING("msg_mcard_yesno2"))
-    CALL(evt_msg_continue)
-    IF_INT_EQUAL(LW(0), 0)
-        SET_VALUE(GF(0), 1)
-    END_IF
-    RETURN
-EVT_END()
-#endif
 
-#if VERSION == VERSION_DEMO
+// The release versions watch for the card being pulled during the check and reset the card buffer first
+#if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(evt_memcard_check)
     SET_VALUE(GF(0), 0)
     LOOP(0)
@@ -285,10 +274,10 @@ EVT_BEGIN(evt_memcard_check)
             SET_VALUE(GF(0), 1)
             CASE_EQUAL(-3)
             CALL(evt_msg_print_add, 0, STRING("msg_mcard_nocard"))
-            CALL_CHILD(PTR(evt_memcard_nosave))
+            CALL_CHILD(evt_memcard_nosave)
             CASE_EQUAL(-2)
             CALL(evt_msg_print_add, 0, STRING("msg_mcard_different_card"))
-            CALL_CHILD(PTR(evt_memcard_nosave))
+            CALL_CHILD(evt_memcard_nosave)
             CASE_OR_EQUAL(-13)
             CASE_OR_EQUAL(-6)
             CALL(memcard_watch_start)
@@ -302,7 +291,7 @@ EVT_BEGIN(evt_memcard_check)
                     CALL(memcard_watch_chk, LW(0))
                     IF_INT_EQUAL(LW(0), 1)
                         CALL(evt_msg_print_add, 0, STRING("msg_out_mcard_warnning"))
-                        CALL_CHILD(PTR(evt_memcard_nosave))
+                        CALL_CHILD(evt_memcard_nosave)
                         BREAK_SWITCH
                     END_IF
                     CALL(evt_msg_print_add, 0, STRING("msg_mcard_format_warning"))
@@ -319,7 +308,7 @@ EVT_BEGIN(evt_memcard_check)
                             CALL(memcard_watch_chk, LW(0))
                             IF_INT_EQUAL(LW(0), 1)
                                 CALL(evt_msg_print_add, 0, STRING("msg_out_mcard_warnning"))
-                                CALL_CHILD(PTR(evt_memcard_nosave))
+                                CALL_CHILD(evt_memcard_nosave)
                                 BREAK_SWITCH
                             END_IF
                             CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data_warning"))
@@ -334,14 +323,14 @@ EVT_BEGIN(evt_memcard_check)
                                 SET_VALUE(GF(0), 1)
                             END_IF
                         ELSE
-                            CALL_CHILD(PTR(evt_memcard_nosave))
+                            CALL_CHILD(evt_memcard_nosave)
                         END_IF
                     END_IF
                 ELSE
-                    CALL_CHILD(PTR(evt_memcard_nosave))
+                    CALL_CHILD(evt_memcard_nosave)
                 END_IF
             ELSE
-                CALL_CHILD(PTR(evt_memcard_nosave))
+                CALL_CHILD(evt_memcard_nosave)
             END_IF
             CASE_END
             CASE_EQUAL(-4)
@@ -352,7 +341,7 @@ EVT_BEGIN(evt_memcard_check)
                 CALL(memcard_watch_chk, LW(0))
                 IF_INT_EQUAL(LW(0), 1)
                     CALL(evt_msg_print_add, 0, STRING("msg_out_mcard_warnning"))
-                    CALL_CHILD(PTR(evt_memcard_nosave))
+                    CALL_CHILD(evt_memcard_nosave)
                     BREAK_SWITCH
                 END_IF
                 CALL(evt_msg_print_add, 0, STRING("msg_mcard_make_data_warning"))
@@ -367,7 +356,7 @@ EVT_BEGIN(evt_memcard_check)
                     SET_VALUE(GF(0), 1)
                 END_IF
             ELSE
-                CALL_CHILD(PTR(evt_memcard_nosave))
+                CALL_CHILD(evt_memcard_nosave)
             END_IF
             CASE_OR_EQUAL(-8)
             CASE_OR_EQUAL(-9)
@@ -378,15 +367,15 @@ EVT_BEGIN(evt_memcard_check)
             IF_INT_EQUAL(LW(0), 0)
                 CALL(memcard_ipl)
             ELSE
-                CALL_CHILD(PTR(evt_memcard_nosave))
+                CALL_CHILD(evt_memcard_nosave)
             END_IF
             CASE_END
             CASE_EQUAL(-10)
             CALL(evt_msg_print_add, 0, STRING("msg_mcard_different_savedata_2"))
-            CALL_CHILD(PTR(evt_memcard_nosave))
+            CALL_CHILD(evt_memcard_nosave)
             CASE_DEFAULT
             CALL(evt_msg_print_add, 0, STRING("msg_mcard_damage"))
-            CALL_CHILD(PTR(evt_memcard_nosave))
+            CALL_CHILD(evt_memcard_nosave)
         END_SWITCH
         CALL(memcard_watch_end, LW(0))
         IF_INT_EQUAL(LF(10), 1)
@@ -400,7 +389,6 @@ EVT_BEGIN(evt_memcard_check)
 EVT_END()
 #endif
 
-#if VERSION == VERSION_DEMO
 EVT_BEGIN(evt_memcard_start)
     SET_VALUE(LW(10), LW(0))
     ADD(LW(10), 1)
@@ -414,23 +402,9 @@ EVT_BEGIN(evt_memcard_start)
     END_IF
     RETURN
 EVT_END()
-#else
-EVT_BEGIN(evt_memcard_start)
-    SET_VALUE(LW(10), LW(0))
-    ADD(LW(10), 1)
-    CALL(evt_msg_print_insert, 0, STRING("msg_savefile_start"), 0, 0, LW(10))
-    CALL(evt_msg_select, 0, STRING("msg_mcard_yesno"))
-    CALL(evt_msg_continue)
-    IF_INT_EQUAL(LW(0), 0)
-        SET_VALUE(GW(0), 1)
-    ELSE
-        SET_VALUE(GW(0), 0)
-    END_IF
-    RETURN
-EVT_END()
-#endif
 
-#if VERSION == VERSION_DEMO
+// The release versions run the curtain fade and set GF(0) after a failed delete; the demo just returns
+#if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(evt_memcard_delete)
     SET_VALUE(LW(10), LW(0))
     ADD(LW(10), 1)
@@ -482,7 +456,8 @@ EVT_BEGIN(evt_memcard_delete)
 EVT_END()
 #endif
 
-#if VERSION == VERSION_DEMO
+// The release versions run the curtain fade and set GF(0) after a failed copy; the demo just returns
+#if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(evt_memcard_copy)
     SET_VALUE(LW(10), LW(0))
     SET_VALUE(LW(11), LW(1))
@@ -563,7 +538,8 @@ EVT_BEGIN(evt_memcard_copy)
 EVT_END()
 #endif
 
-#if VERSION == VERSION_DEMO
+// The release versions watch for a pulled card while saving, retry failed saves and add the ending prompts
+#if VERSION <= VERSION_DEMO_US
 EVT_BEGIN(evt_memcard_save)
     SET_VALUE(LW(10), LW(0))
     IF_INT_EQUAL(LW(10), 23)

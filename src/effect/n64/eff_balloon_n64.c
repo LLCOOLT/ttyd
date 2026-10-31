@@ -60,8 +60,8 @@ static effN64Vtx balloon_vtx[] = {
     {0, 0, 0, 0, 512, 0, 0, 0, 255},
 };
 
-void effBalloonMain(EffectEntry* effect);
-void effBalloonDisp(CameraId cameraId, EffectEntry* effect);
+static void effBalloonMain(EffectEntry* effect);
+static void effBalloonDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effBalloonN64Entry(s32 type, f32 x, f32 y, f32 z, f32 targetScale, f32 rotation) {
     EffectEntry* effect;
@@ -86,7 +86,7 @@ EffectEntry* effBalloonN64Entry(s32 type, f32 x, f32 y, f32 z, f32 targetScale, 
     return effect;
 }
 
-void effBalloonMain(EffectEntry* effect) {
+static void effBalloonMain(EffectEntry* effect) {
     s32 lifetime;
     EffBalloonN64Work* work = effect->userdata;
     EffBalloonN64Point* pt = work->points;
@@ -140,7 +140,7 @@ void effBalloonMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effBalloonDisp, effect);
 }
 
-void effBalloonDisp(CameraId cameraId, EffectEntry* effect) {
+static void effBalloonDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera = camGetPtr(cameraId);
     EffBalloonN64Work* work = effect->userdata;
     s32 type;

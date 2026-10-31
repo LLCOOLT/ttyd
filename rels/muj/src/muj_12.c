@@ -23,14 +23,13 @@
 #include "evt/evt_party.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "muj.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
 #include "driver/camdrv.h"
 
 static USER_FUNC(evtflash);
-USER_FUNC(muj_item_move_3d_position);
+static USER_FUNC(muj_item_move_3d_position);
 static f32 accdec_type(s32 step, s32 total, f32 start, f32 end);
 
 static BeroEntry bero_entry_data[2];
@@ -70,7 +69,7 @@ static EVT_BEGIN(door_custom)
         CALL_CHILD(LW(12))
         CALL(evt_bero_mario_go)
         WAIT_MS(1500)
-        SPAWN_EVENT(PTR(bero_close_door_play_se))
+        SPAWN_EVENT(bero_close_door_play_se)
         SET_VALUE(LW(9), LW(12))
         CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
         LOOP(0)
@@ -90,7 +89,7 @@ EVT_END()
 static EVT_BEGIN(bero_custom)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG5_32_CORTEZS_WARNING)
-        SPAWN_EVENT(PTR(door_custom))
+        SPAWN_EVENT(door_custom)
         CALL(evt_mario_normalize)
         CALL(evt_party_stop, 0)
         CALL(evt_party_stop, 1)
@@ -108,7 +107,7 @@ static EVT_BEGIN(bero_custom)
         SET_VALUE(LW(0), 1)
         RETURN
         CASE_EQUAL(STORY_STG5_40_TRUE_IDENTITY)
-        SPAWN_EVENT(PTR(door_custom))
+        SPAWN_EVENT(door_custom)
         CALL(evt_mario_normalize)
         CALL(evt_party_stop, 0)
         CALL(evt_party_stop, 1)
@@ -378,8 +377,8 @@ static EVT_BEGIN(korutesu_event)
     CALL(evtflash)
     SET_VALUE(GF(0), 0)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG5_KORTESS1"))
-    SPAWN_EVENT(PTR(korutesu_flush))
-    CALL_CHILD(PTR(korutesu_apper))
+    SPAWN_EVENT(korutesu_flush)
+    CALL_CHILD(korutesu_apper)
     SET_VALUE(GF(0), 1)
     CALL(evt_msg_print, 0, STRING("stg5_dou_22"), 0, STRING("コルテス"))
     BEGIN_INLINE_EVENT
@@ -392,7 +391,7 @@ static EVT_BEGIN(korutesu_event)
     CALL(evt_msg_toge, 1, 0, 0, 0)
     SET_VALUE(GF(0), 1)
     SET_VALUE(GF(1), 1)
-    SPAWN_EVENT(PTR(korutesu_blur))
+    SPAWN_EVENT(korutesu_blur)
     CALL(evt_snd_bgmon, PSND_FADE_OUT | PSND_CH(1), STRING("BGM_FF_ENV_SURPRISED3"))
     CALL(evt_msg_print, 0, STRING("stg5_dou_23"), 0, STRING("コルテス"))
     CALL(evt_npc_set_autotalkpose, STRING("コルテス"), STRING("KRT_S_1"), STRING("KRT_T_2"))
@@ -415,8 +414,8 @@ static EVT_BEGIN(korutesu_event)
     CALL(evt_party_set_dir, 0, 90, 0)
     WAIT_MS(1000)
     SET_VALUE(GF(0), 0)
-    SPAWN_EVENT(PTR(korutesu_yure))
-    SPAWN_EVENT(PTR(korutesu_flush2))
+    SPAWN_EVENT(korutesu_yure)
+    SPAWN_EVENT(korutesu_flush2)
     CALL(evt_npc_set_autotalkpose, STRING("コルテス"), STRING("KRT_S_1"), STRING("KRT_T_3"))
     WAIT_FRAMES(1)
     CALL(evt_msg_toge, 1, 0, 0, 0)
@@ -434,8 +433,8 @@ static EVT_BEGIN(korutesu_event)
             WAIT_MS(50)
         END_LOOP
     END_INLINE_EVENT
-    SPAWN_EVENT(PTR(korutesu_rotate))
-    SPAWN_EVENT(PTR(korutesu_small))
+    SPAWN_EVENT(korutesu_rotate)
+    SPAWN_EVENT(korutesu_small)
     WAIT_MS(5000)
     CALL(evt_msg_print, 0, STRING("stg5_dou_26"), 0, STRING("コルテス"))
     CALL(evt_npc_get_position, STRING("コルテス"), LW(0), LW(1), LW(2))
@@ -448,8 +447,8 @@ static EVT_BEGIN(korutesu_event)
             WAIT_MS(50)
         END_LOOP
     END_INLINE_EVENT
-    SPAWN_EVENT(PTR(korutesu_rotate2))
-    SPAWN_EVENT(PTR(korutesu_large))
+    SPAWN_EVENT(korutesu_rotate2)
+    SPAWN_EVENT(korutesu_large)
     WAIT_MS(1500)
     CALL(evt_msg_print, 0, STRING("stg5_dou_27"), 0, STRING("コルテス"))
     CALL(evt_cam3d_evt_set, -20, 125, 505, -20, 80, 7, 500, 11)
@@ -502,11 +501,15 @@ static EVT_BEGIN(korutesu_event)
     SET_VALUE(LW(0), 5)
     SET_VALUE(LW(1), LW(10))
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_33_CORTEZ_AND_THE_TREASURE)
+#if VERSION >= VERSION_JP
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
     CALL(evt_snd_bgmoff, PSND_FADE_OUT | PSND_CH(1))
-    CALL_CHILD(PTR(evt_sub_starstone))
+#endif
+    CALL_CHILD(evt_sub_starstone)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG5_DOU1"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_MUJ9"))
+#endif
     RETURN
 EVT_END()
 
@@ -541,7 +544,7 @@ EVT_BEGIN(korutesu_event_after)
     WAIT_MS(1000)
     DELETE_EVENT(GW(0))
     SET_VALUE(LW(10), 600)
-    CALL_CHILD(PTR(back_dark))
+    CALL_CHILD(back_dark)
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("stg5_dou_39"), 0, 0)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG5_33_CORTEZ_AND_THE_TREASURE)
@@ -560,7 +563,7 @@ EVT_BEGIN(kosho_event)
     WAIT_MS(1000)
     CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
     CALL(evt_snd_bgmon, PSND_CH(1), STRING("BGM_EVT_STG5_KORTESS1"))
-    CALL_CHILD(PTR(korutesu_apper))
+    CALL_CHILD(korutesu_apper)
     CALL(evt_msg_print, 0, STRING("stg5_dou_31"), 0, STRING("コルテス"))
     CALL(evt_party_get_pos, 1, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_MARCO_SHAKE1"), LW(0), LW(1), LW(2), LW(9))
@@ -591,7 +594,7 @@ EVT_BEGIN(kosho_event)
     CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_NPC_BIKKURI_MARK1"), LW(0), LW(1), LW(2), 0)
     WAIT_MS(1000)
     CALL(evt_msg_print, 0, STRING("stg5_dou_36"), 0, STRING("extparty"))
-    CALL(evt_item_entry, STRING("jewel"), ITEM_SKULL_GEM, -115, 0, 30, 16, -1, 0)
+    CALL(evt_item_entry, STRING("jewel"), ITEM_SKULL_GEM, -115, 0, 30, ITEM_ENTRY_FIXED, -1, 0)
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_set, 20, 157, 337, 20, 90, -6, 0, 11)
     WAIT_MS(500)
@@ -643,7 +646,11 @@ EVT_BEGIN(kosho_event)
     SET_VALUE(GF(2), 1)
     DELETE_EVENT(LW(10))
     WAIT_MS(500)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_item_set_position, STRING("jewel"), 0, -1000, 0)
+#else
     CALL(evt_item_delete, STRING("jewel"))
+#endif
     WAIT_MS(500)
     CALL(evt_msg_print, 0, STRING("stg5_dou_37"), 0, STRING("コルテス"))
     CALL(evt_cam3d_evt_set, -120, 107, 337, -120, 40, -6, 0, 11)
@@ -655,7 +662,7 @@ EVT_BEGIN(kosho_event)
     WAIT_MS(300)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT | PSND_CH(1), 2000)
     CALL(evt_snd_bgmon_f, PSND_FADE_RESUME | PSND_FADE_IN, 0, 2000)
-    CALL_CHILD(PTR(korutesu_vanish))
+    CALL_CHILD(korutesu_vanish)
     WAIT_MS(1000)
     CALL(evt_npc_set_position, STRING("コルテス"), 0, -1000, 0)
     CALL(evt_cam3d_evt_off, 500, 11)
@@ -725,7 +732,7 @@ EVT_END()
 EVT_BEGIN(muj_12_init_evt)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG5_33_CORTEZ_AND_THE_TREASURE)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG5_GHOST1"))
         CALL(evt_snd_envoff, PSND_FADE_OUT)
@@ -734,14 +741,14 @@ EVT_BEGIN(muj_12_init_evt)
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_MUJ9"))
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_32_CORTEZS_WARNING)
-        SPAWN_EVENT(PTR(korutesu_event))
-        CALL(evt_item_entry, STRING("stone"), ITEM_SAPPHIRE_STAR, 63, 38, 138, 16, -1, 0)
+        SPAWN_EVENT(korutesu_event)
+        CALL(evt_item_entry, STRING("stone"), ITEM_SAPPHIRE_STAR, 63, 38, 138, ITEM_ENTRY_FIXED, -1, 0)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_33_CORTEZ_AND_THE_TREASURE)
-        SPAWN_EVENT(PTR(korutesu_event_after))
+        SPAWN_EVENT(korutesu_event_after)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_40_TRUE_IDENTITY)
-        SPAWN_EVENT(PTR(kosho_event))
+        SPAWN_EVENT(kosho_event)
     END_IF
     SPAWN_EVENT_GET_ID(PTR(coin_effect), GW(0))
     RETURN
@@ -772,7 +779,7 @@ static f32 accdec_type(s32 step, s32 total, f32 start, f32 end) {
     return start + cur * (end - start) / sum;
 }
 
-USER_FUNC(muj_item_move_3d_position) {
+static USER_FUNC(muj_item_move_3d_position) {
     EvtWord* args = event->args;
     char* name = (char*)evtGetValue(event, args[0]);
     f32 x = evtGetValue(event, args[1]);

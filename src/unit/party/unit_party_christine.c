@@ -25,10 +25,10 @@
 #include "win/win_log.h"
 #include "version.h"
 
-USER_FUNC(_dictionary);
-USER_FUNC(_set_hustle);
-USER_FUNC(_monosiri_flag_on);
-USER_FUNC(btlevtcmd_get_monosiri_msg_no);
+static USER_FUNC(_dictionary);
+static USER_FUNC(_set_hustle);
+static USER_FUNC(_monosiri_flag_on);
+static USER_FUNC(btlevtcmd_get_monosiri_msg_no);
 static void __makeTechMenuFunc(BattleCommand* command, s32* count);
 static USER_FUNC(krb_get_dir);
 
@@ -78,39 +78,26 @@ PoseTableEntry pose_table_christine_stay[] = {
     {42, "PKR_R_1"},
     {57, "PKR_D_2"},
     {56, "PKR_D_2"},
-#if VERSION == VERSION_DEMO
-    {58, "PKR_D_4"},
-    {59, "PKR_D_2"},
-    {63, "PKR_T_1"},
+    {BTL_POSE_ESCAPE_FAIL, "PKR_D_4"},
+    {BTL_POSE_ESCAPE_FAIL_END, "PKR_D_2"},
+    {BTL_POSE_TALK, "PKR_T_1"},
     {52, "PKR_I_1"},
-    {65, "PKR_C_1"},
-    {64, "PKR_O_1"},
-    {62, "PKR_X_1"},
+    {BTL_POSE_COMMAND_WAIT, "PKR_C_1"},
+    {BTL_POSE_APPEAL, "PKR_O_1"},
+    {BTL_POSE_ZERO_GRAVITY, "PKR_X_1"},
     {49, "PKR_A_1"},
     {45, "PKR_G_1"},
-    {67, "PKR_S_1"},
+    {BTL_POSE_STAY_DEFAULT, "PKR_S_1"},
 };
 
+#if VERSION <= VERSION_DEMO_US
 // demo only: not referenced by the demo's own data
-PoseTableEntry pose_table_christine_zyo[] = {
+PoseTableEntry pose_table_dictionary_page[] = {
     {28, "ZYO_Z_1"},
     {31, "ZYO_Z_1"},
     {39, "ZYO_Z_1"},
-    {67, "ZYO_Z_1"},
+    {BTL_POSE_STAY_DEFAULT, "ZYO_Z_1"},
 };
-#else
-{60, "PKR_D_4"},
-    {61, "PKR_D_2"},
-    {65, "PKR_T_1"},
-    {52, "PKR_I_1"},
-    {67, "PKR_C_1"},
-    {66, "PKR_O_1"},
-    {64, "PKR_X_1"},
-    {49, "PKR_A_1"},
-    {45, "PKR_G_1"},
-    {69, "PKR_S_1"},
-}
-;
 #endif
 
 static BattleDataEntry data_table[] = {
@@ -226,7 +213,7 @@ static EVT_BEGIN(damage_event)
     CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
@@ -423,7 +410,6 @@ BattleWeapon partyWeapon_ChristineKiss = {
 #endif
 };
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(partyChristineAttack_NormalAttack)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -473,237 +459,13 @@ EVT_BEGIN(partyChristineAttack_NormalAttack)
     IF_INT_LESS_OR_EQUAL(LW(10), 0)
         CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_A_2B"))
         BEGIN_SIBLING_EVENT
+#if VERSION >= VERSION_US
             WAIT_FRAMES(2)
             CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 0, 7, 7, 0)
-        END_SIBLING_EVENT
-        WAIT_FRAMES(10)
-    END_IF
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_J_1A"))
-    BEGIN_INLINE_EVENT
-        WAIT_FRAMES(15)
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_KURI_ATTACK1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    END_INLINE_EVENT
-    CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
-    IF_INT_GREATER_OR_EQUAL(LW(10), 1)
-        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-        ADD(LW(2), 5)
-        CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 14, 0)
-        CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-        BEGIN_SIBLING_EVENT
-            WAIT_FRAMES(15)
-            LOOP(6)
-                CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(0))
-                MULTIPLY(LW(0), -30)
-                CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, LW(0))
-                WAIT_FRAMES(1)
-            END_LOOP
-        END_SIBLING_EVENT
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 36, 3, 0)
-    ELSE
-        CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 14, 0)
-        CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
-        IF_INT_EQUAL(LW(6), 2)
-            BEGIN_SIBLING_EVENT
-                CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-                CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(0), 1, 0, 0, 0)
-            END_SIBLING_EVENT
-            BEGIN_SIBLING_EVENT
-                CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
-                IF_INT_EQUAL(LW(15), 1)
-                    SET_VALUE(LW(9), -15)
-                ELSE
-                    SET_VALUE(LW(9), 15)
-                END_IF
-                CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
-                SET_VALUE(LW(8), 0)
-                LOOP(36)
-                    CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, LW(9))
-                    WAIT_FRAMES(1)
-                END_LOOP
-            END_SIBLING_EVENT
-        ELSE
-            BEGIN_SIBLING_EVENT
-                CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
-                SET_VALUE(LW(8), 0)
-                LOOP(36)
-                    CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(12), LW(13), LW(14))
-                    CALL(krb_get_dir, LW(5), LW(6), LW(12), LW(13), LW(8))
-                    CALL(btlevtcmd_GetRotate, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-                    CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, LW(0), LW(1), LW(8))
-                    SET_FLOAT_VALUE(LW(5), LW(12))
-                    SET_FLOAT_VALUE(LW(6), LW(13))
-                    WAIT_FRAMES(1)
-                END_LOOP
-            END_SIBLING_EVENT
-        END_IF
-        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-        ADD(LW(2), 5)
-        SET_VALUE(LW(8), 36)
-        CALL(btlevtcmd_MarioJumpParam, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8))
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8), 0, 0)
-    END_IF
-    IF_INT_NOT_EQUAL(LW(5), 1)
-        IF_INT_EQUAL(LW(5), 3)
-            CALL(btlevtcmd_StartAvoid, LW(3), 38)
-        END_IF
-        IF_INT_EQUAL(LW(5), 6)
-            CALL(btlevtcmd_StartAvoid, LW(3), 39)
-        END_IF
-        IF_INT_EQUAL(LW(5), 2)
-            CALL(btlevtcmd_StartAvoid, LW(3), 40)
-        END_IF
-        CALL(btlevtcmd_StopAC)
-        CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
-        CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 0, 0)
-        CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_S_1"))
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_MoveDirectionAdd, BTL_UNIT_SELF, LW(0), 30)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
-        CALL(btlevtcmd_MoveDirectionAdd, BTL_UNIT_SELF, LW(0), 20)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 10, -1)
-        WAIT_MS(500)
-        GOTO(95)
-    END_IF
-    CALL(btlevtcmd_ac_timing_flag_onoff, 1, 1)
-    CALL(btlevtcmd_ac_timing_get_success_frame, LW(0))
-    DIVIDE(LW(0), 2)
-    WAIT_FRAMES(LW(0))
-    CALL(btlevtcmd_ac_timing_flag_onoff, 0, 1)
-    CALL(btlevtcmd_ResultAC)
-    CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
-    CALL(btlevtcmd_GetResultAC, LW(6))
-    IF_BITS_CLEAR(LW(6), 2)
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
-        IF_INT_EQUAL(LW(10), 0)
-            CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-            CALL(btlevtcmd_AudienceDeclareACResult, LW(0), -1)
-        END_IF
-        GOTO(90)
-    END_IF
-    CALL(btlevtcmd_GetResultCountAC, LW(6))
-    IF_INT_LESS_OR_EQUAL(LW(6), 1)
-        BEGIN_INLINE_EVENT
-            CALL(evt_btl_camera_set_moveSpeedLv, 0, 0)
-            CALL(evt_btl_camera_set_zoom, 0, 200)
-            WAIT_FRAMES(10)
-            CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
-            CALL(evt_btl_camera_set_zoom, 0, 250)
-        END_INLINE_EVENT
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 131072, LW(5))
-        CALL(btlevtcmd_GetResultPrizeLv, LW(3), 0, LW(6))
-        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_AudienceDeclareACResult, LW(0), LW(6))
-        ADD(LW(10), 1)
-        GOTO(10)
-    ELSE
-        CALL(evt_btl_camera_set_mode, 0, 0)
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 131328, LW(5))
-        CALL(btlevtcmd_GetResultAC, LW(0))
-    END_IF
-    LABEL(90)
-    CALL(btlevtcmd_StopAC)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_audience_ap_recovery)
-    CALL(btlevtcmd_InviteApInfoReport)
-    BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_GetRotate, BTL_UNIT_SELF, EVT_NULLPTR, EVT_NULLPTR, LW(6))
-        IF_INT_LESS(LW(6), 0)
-            MULTIPLY(LW(6), -1)
-        END_IF
-        CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(0))
-        MULTIPLY(LW(6), LW(0))
-        DIVIDE(LW(6), 15)
-        SET_VALUE(LW(7), 15)
-        LABEL(20)
-        CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, LW(6))
-        SUBTRACT(LW(7), 1)
-        WAIT_FRAMES(1)
-        IF_INT_GREATER_OR_EQUAL(LW(7), 1)
-            GOTO(20)
-        END_IF
-        CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-    END_SIBLING_EVENT
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 60)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
-    LABEL(95)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    LABEL(99)
-    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
-    CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
 #else
-EVT_BEGIN(partyChristineAttack_NormalAttack)
-    CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-    IF_INT_EQUAL(LW(3), -1)
-        GOTO(99)
-    END_IF
-    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(12))
-    CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
-    CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
-    CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
-    CALL(evt_btl_camera_set_mode, 0, 11)
-    CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(evt_btl_camera_set_zoom, 0, 250)
-    CALL(btlevtcmd_CommandGetWeaponActionLv, LW(0))
-    CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 1, 1, 0)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
-    CALL(btlevtcmd_GetTakeoffPosition, BTL_UNIT_SELF, LW(3), LW(4), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_GetMoveFrame, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, LW(14))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(14), -1, 0)
-    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_StartAC, 1)
-    SET_VALUE(LW(10), 0)
-    LABEL(10)
-    IF_INT_GREATER_OR_EQUAL(LW(10), 1)
-        CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 1048832, LW(5))
-    ELSE
-        CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
-    END_IF
-    SWITCH(LW(5))
-        CASE_OR_EQUAL(2)
-        CASE_OR_EQUAL(3)
-        CASE_OR_EQUAL(6)
-        CASE_OR_EQUAL(4)
-        CASE_END
-        CASE_EQUAL(1)
-        CASE_DEFAULT
-        WAIT_MS(1000)
-    END_SWITCH
-    IF_INT_LESS_OR_EQUAL(LW(10), 0)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_A_2B"))
-        BEGIN_SIBLING_EVENT
             WAIT_FRAMES(5)
             CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 0, 4, 4, 0)
+#endif
         END_SIBLING_EVENT
         WAIT_FRAMES(10)
     END_IF
@@ -881,7 +643,6 @@ EVT_BEGIN(partyChristineAttack_NormalAttack)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
-#endif
 
 EVT_BEGIN(christine_dictionary_event)
     LABEL(0)
@@ -895,7 +656,6 @@ EVT_BEGIN(christine_dictionary_event)
     RETURN
 EVT_END()
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(partyChristineAttack_Monosiri)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -1008,122 +768,7 @@ EVT_BEGIN(partyChristineAttack_Monosiri)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
-#else
-EVT_BEGIN(partyChristineAttack_Monosiri)
-    CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-    IF_INT_EQUAL(LW(3), -1)
-        GOTO(99)
-    END_IF
-    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(12))
-    CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
-    CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
-    CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_SELF)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(evt_btl_camera_set_zoom, 0, 350)
-    CALL(evt_btl_camera_set_posoffset, 0, 40, 0, 0)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_2A_1"))
-    WAIT_MS(500)
-    LOOP(2)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_2A_2"))
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_KURI_LEARNED1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        WAIT_MS(400)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_2A_3"))
-        WAIT_MS(350)
-    END_LOOP
-    CALL(btlevtcmd_CommandGetWeaponActionLv, LW(0))
-    CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_AcSetParamAll, LW(3), LW(4), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
-    CALL(btlevtcmd_AcSetFlag, 0)
-    CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 21, 1, 0)
-    BEGIN_SIBLING_EVENT
-        CALL(evt_btl_camera_set_mode, 0, 0)
-        CALL(evt_btl_camera_set_posoffset, 0, 0, 0, 0)
-    END_SIBLING_EVENT
-    WAIT_FRAMES(22)
-    CALL(btlevtcmd_StartAC, 1)
-    CALL(btlevtcmd_ResultAC)
-    CALL(btlevtcmd_GetResultAC, LW(6))
-    IF_BITS_SET(LW(6), 2)
-        CALL(btlevtcmd_GetResultPrizeLv, BTL_UNIT_SYSTEM, 0, LW(6))
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_AudienceDeclareACResult, LW(0), LW(6))
-        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-    ELSE
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_AudienceDeclareACResult, LW(0), -1)
-    END_IF
-    CALL(btlevtcmd_GetResultAC, LW(6))
-    IF_BITS_CLEAR(LW(6), 2)
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(evt_eff_fukidashi, 2, STRING(""), 0, 2, 0, LW(0), LW(1), LW(2), 30, 0, 56)
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_KURI_FAIL_LEARNED1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_2A_4"))
-        WAIT_FRAMES(56)
-        GOTO(90)
-    END_IF
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_KURI_LEARNED2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_2A_4"))
-    WAIT_FRAMES(3)
-    BEGIN_SIBLING_EVENT_GET_ID(LW(15))
-        WAIT_FRAMES(53)
-    END_SIBLING_EVENT
-    CALL(btlevtcmd_ftof, 0, LW(0))
-    CALL(btlevtcmd_ftof, 53, LW(1))
-    CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, LW(0), LW(1), LW(1), 0)
-    CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
-    IF_INT_GREATER_OR_EQUAL(LW(6), 2)
-        DELETE_EVENT(LW(15))
-        CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_Y_1"))
-        CALL(btlevtcmd_ftomsec, 28, LW(0))
-        WAIT_MS(LW(0))
-    ELSE
-        CALL(evt_audience_acrobat_notry)
-        CALL(btlevtcmd_WaitEventEnd, LW(15))
-    END_IF
-    CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("PKR_2A_5"))
-    CALL(btlevtcmd_SetStayPose, BTL_UNIT_SELF, STRING("PKR_2A_5"))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
-    SPAWN_EVENT(christine_dictionary_event)
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 1)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(evt_btl_camera_off_posoffset_manual, 0)
-    LABEL(10)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
-    IF_INT_NOT_EQUAL(LW(0), 3)
-        WAIT_FRAMES(1)
-        GOTO(10)
-    END_IF
-    CALL(btlevtcmd_get_monosiri_msg_no, LW(3), LW(4), LW(0))
-    CALL(evt_msg_print, 2, LW(0), 0, BTL_UNIT_SELF)
-    CALL(_monosiri_flag_on, LW(3))
-    CALL(btlevtcmd_SetTalkPose, BTL_UNIT_SELF, STRING("PKR_T_1"))
-    CALL(btlevtcmd_SetStayPose, BTL_UNIT_SELF, STRING("PKR_S_1"))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 4)
-    LABEL(20)
-    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 0, LW(0))
-    IF_INT_NOT_EQUAL(LW(0), 0)
-        WAIT_FRAMES(1)
-        GOTO(20)
-    END_IF
-    LABEL(90)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(evt_btl_camera_off_posoffset_manual, 0)
-    CALL(evt_audience_ap_recovery)
-    CALL(btlevtcmd_InviteApInfoReport)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
-#endif
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(partyChristineAttack_RenzokuAttack)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -1205,514 +850,221 @@ EVT_BEGIN(partyChristineAttack_RenzokuAttack)
         CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 14, 0)
         BEGIN_SIBLING_EVENT
             IF_INT_GREATER_OR_EQUAL(LW(6), 2)
+#if VERSION >= VERSION_US
                 CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(12), 1, 0, 0, 0)
-                WAIT_FRAMES(20)
-            END_IF
-            CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
-            SET_VALUE(LW(15), 0)
-            LOOP(LW(8))
-                CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(12), LW(13), LW(14))
-                CALL(krb_get_dir, LW(5), LW(6), LW(12), LW(13), LW(15))
-                CALL(btlevtcmd_GetRotate, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(9))
-                ADD(LW(15), LW(9))
-                CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, LW(0), LW(1), LW(15))
-                SET_FLOAT_VALUE(LW(5), LW(12))
-                SET_FLOAT_VALUE(LW(6), LW(13))
-                WAIT_FRAMES(1)
-            END_LOOP
-        END_SIBLING_EVENT
-        BEGIN_INLINE_EVENT
-            IF_INT_GREATER_OR_EQUAL(LW(6), 2)
-                WAIT_FRAMES(20)
-            END_IF
-            WAIT_FRAMES(15)
-            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_KURI_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        END_INLINE_EVENT
-        IF_INT_GREATER_OR_EQUAL(LW(6), 2)
-            BEGIN_SIBLING_EVENT
-                CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
-                MULTIPLY(LW(5), -18)
-                LOOP(20)
-                    CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, LW(5))
-                    WAIT_FRAMES(1)
-                END_LOOP
-            END_SIBLING_EVENT
-            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, 0)
-            BEGIN_SIBLING_EVENT
-                CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-                CALL(evt_eff64, STRING(""), STRING("kemuri2_n64"), 2, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
-            END_SIBLING_EVENT
-            SET_VALUE(LW(9), LW(8))
-            SUBTRACT(LW(9), 1)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(9))
-            BEGIN_SIBLING_EVENT
-                LOOP(LW(9))
-                    WAIT_FRAMES(1)
-                    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
-                    SUBTRACT(LW(0), 1)
-                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(0))
-                END_LOOP
-            END_SIBLING_EVENT
-            BEGIN_SIBLING_EVENT_GET_ID(LW(15))
-                LOOP(1)
-                    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
-                    IF_INT_GREATER(LW(0), 15)
-                        SUBTRACT(LW(0), 15)
-                        CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 0, LW(0), LW(0), 0)
-                        CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
-                        SWITCH(LW(6))
-                            CASE_GREATER_OR_EQUAL(2)
-                            CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-                            CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(0), 1, 0, 0, 0)
-                            LOOP(15)
-                                CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 24, 0)
-                                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(0))
-                                CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(1))
-                                IF_INT_GREATER_OR_EQUAL(LW(1), 0)
-                                    ADD(LW(0), -24)
-                                ELSE
-                                    ADD(LW(0), 24)
-                                END_IF
-                                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, LW(0))
-                                WAIT_FRAMES(1)
-                            END_LOOP
-                            CASE_DEFAULT
-                        END_SWITCH
-                    END_IF
-                END_LOOP
-            END_SIBLING_EVENT
-            CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-            ADD(LW(2), 5)
-            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-            CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8), 0, 0)
-            DELETE_EVENT(15)
-        ELSE
-            BEGIN_SIBLING_EVENT
-                CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-                CALL(evt_eff64, STRING(""), STRING("kemuri2_n64"), 2, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
-            END_SIBLING_EVENT
-            CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-            ADD(LW(2), 5)
-            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-            CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8), 0, 0)
-        END_IF
-    END_IF
-    IF_INT_NOT_EQUAL(LW(5), 1)
-        IF_INT_EQUAL(LW(5), 3)
-            CALL(btlevtcmd_StartAvoid, LW(3), 38)
-        END_IF
-        IF_INT_EQUAL(LW(5), 6)
-            CALL(btlevtcmd_StartAvoid, LW(3), 39)
-        END_IF
-        IF_INT_EQUAL(LW(5), 2)
-            CALL(btlevtcmd_StartAvoid, LW(3), 40)
-        END_IF
-        CALL(btlevtcmd_StopAC)
-        CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
-        CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 0, 0)
-        CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_S_1"))
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_MoveDirectionAdd, BTL_UNIT_SELF, LW(0), 30)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
-        CALL(btlevtcmd_MoveDirectionAdd, BTL_UNIT_SELF, LW(0), 20)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 10, -1)
-        WAIT_MS(500)
-        GOTO(95)
-    END_IF
-    CALL(btlevtcmd_ac_timing_flag_onoff, 1, 1)
-    CALL(btlevtcmd_ac_timing_get_success_frame, LW(0))
-    DIVIDE(LW(0), 2)
-    WAIT_FRAMES(LW(0))
-    CALL(btlevtcmd_ac_timing_flag_onoff, 0, 1)
-    CALL(btlevtcmd_ResultAC)
-    CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
-    CALL(btlevtcmd_GetResultAC, LW(6))
-    IF_BITS_CLEAR(LW(6), 2)
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
-        IF_INT_LESS_OR_EQUAL(LW(10), 0)
-            CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-            CALL(btlevtcmd_AudienceDeclareACResult, LW(0), -1)
-        ELSE
-            SET_VALUE(LW(6), LW(10))
-            SUBTRACT(LW(6), 1)
-            CALL(btlevtcmd_GetResultPrizeLv, LW(3), LW(6), LW(6))
-            CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-            CALL(btlevtcmd_AudienceDeclareACResult, LW(0), LW(6))
-        END_IF
-        GOTO(90)
-    END_IF
-    CALL(btlevtcmd_GetResultCountAC, LW(6))
-    CALL(mario_get_renzoku_count_max, LW(3), LW(6), LW(7))
-    IF_INT_LESS(LW(6), LW(7))
-        BEGIN_INLINE_EVENT
-            CALL(evt_btl_camera_set_moveSpeedLv, 0, 0)
-            CALL(evt_btl_camera_set_zoom, 0, 200)
-            WAIT_FRAMES(10)
-            CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
-            CALL(evt_btl_camera_set_zoom, 0, 250)
-        END_INLINE_EVENT
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 131072, LW(5))
-        CALL(btlevtcmd_GetResultPrizeLv, LW(3), LW(10), LW(6))
-        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-        ADD(LW(10), 1)
-        CALL(btlevtcmd_StartAC, 0)
-        GOTO(10)
-    ELSE
-        CALL(evt_btl_camera_set_mode, 0, 0)
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 131328, LW(5))
-        CALL(btlevtcmd_GetResultPrizeLv, LW(3), LW(10), LW(6))
-        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_AudienceDeclareACResult, LW(0), LW(6))
-    END_IF
-    LABEL(90)
-    CALL(btlevtcmd_StopAC)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_GetRotate, BTL_UNIT_SELF, EVT_NULLPTR, EVT_NULLPTR, LW(6))
-        IF_INT_LESS(LW(6), 0)
-            MULTIPLY(LW(6), -1)
-        END_IF
-        CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(0))
-        MULTIPLY(LW(6), LW(0))
-        DIVIDE(LW(6), 15)
-        SET_VALUE(LW(7), 15)
-        LABEL(20)
-        CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, LW(6))
-        SUBTRACT(LW(7), 1)
-        WAIT_FRAMES(1)
-        IF_INT_GREATER_OR_EQUAL(LW(7), 1)
-            GOTO(20)
-        END_IF
-        CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-    END_SIBLING_EVENT
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 60)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
-    LABEL(95)
-    CALL(evt_audience_ap_recovery)
-    CALL(btlevtcmd_InviteApInfoReport)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    LABEL(99)
-    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
-    CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
-#else
-EVT_BEGIN(partyChristineAttack_RenzokuAttack)
-    CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-    IF_INT_EQUAL(LW(3), -1)
-        GOTO(99)
-    END_IF
-    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(12))
-    CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL(btlevtcmd_AttackDeclare, BTL_UNIT_SELF, LW(3), LW(4))
-    CALL(btlevtcmd_WaitGuardMove)
-    CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
-    CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
-    CALL(evt_btl_camera_set_mode, 0, 11)
-    CALL(evt_btl_camera_set_homing_unitparts, 0, BTL_UNIT_SELF, 1, LW(3), LW(4))
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(evt_btl_camera_set_zoom, 0, 250)
-    CALL(evt_btl_camera_off_posoffset_manual, 0)
-    CALL(btlevtcmd_CommandGetWeaponActionLv, LW(0))
-    CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 1, 1, 0)
-    CALL(btlevtcmd_ac_timing_flag_onoff, 1, 2)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(3.0f))
-    CALL(btlevtcmd_GetTakeoffPosition, BTL_UNIT_SELF, LW(3), LW(4), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(0), LW(2), 1, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_A_2B"))
-    CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 0, 10, 10, 0)
-    WAIT_FRAMES(10)
-    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(btlevtcmd_StartAC, 1)
-    SET_VALUE(LW(10), 0)
-    LABEL(10)
-    IF_INT_GREATER_OR_EQUAL(LW(10), 1)
-        CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 1048832, LW(5))
-    ELSE
-        CALL(btlevtcmd_CommandPreCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
-    END_IF
-    SWITCH(LW(5))
-        CASE_OR_EQUAL(2)
-        CASE_OR_EQUAL(3)
-        CASE_OR_EQUAL(6)
-        CASE_OR_EQUAL(4)
-        CASE_END
-        CASE_EQUAL(1)
-        CASE_DEFAULT
-        WAIT_MS(1000)
-    END_SWITCH
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_J_1A"))
-    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, 0)
-    IF_INT_GREATER_OR_EQUAL(LW(10), 1)
-        CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 14, 0)
-        CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-        BEGIN_SIBLING_EVENT
-            WAIT_FRAMES(15)
-            LOOP(6)
-                CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(0))
-                MULTIPLY(LW(0), -30)
-                CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, LW(0))
-                WAIT_FRAMES(1)
-            END_LOOP
-        END_SIBLING_EVENT
-        BEGIN_INLINE_EVENT
-            WAIT_FRAMES(15)
-            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_KURI_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        END_INLINE_EVENT
-        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-        ADD(LW(2), 5)
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 36, 3, 0)
-    ELSE
-        CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
-        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-        ADD(LW(2), 5)
-        SET_VALUE(LW(8), 40)
-        CALL(btlevtcmd_MarioJumpParam, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8))
-        CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 14, 0)
-        BEGIN_SIBLING_EVENT
-            IF_INT_GREATER_OR_EQUAL(LW(6), 2)
-                WAIT_FRAMES(20)
-            END_IF
-            CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
-            SET_VALUE(LW(15), 0)
-            LOOP(LW(8))
-                CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(12), LW(13), LW(14))
-                CALL(krb_get_dir, LW(5), LW(6), LW(12), LW(13), LW(15))
-                CALL(btlevtcmd_GetRotate, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(9))
-                ADD(LW(15), LW(9))
-                CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, LW(0), LW(1), LW(15))
-                SET_FLOAT_VALUE(LW(5), LW(12))
-                SET_FLOAT_VALUE(LW(6), LW(13))
-                WAIT_FRAMES(1)
-            END_LOOP
-        END_SIBLING_EVENT
-        BEGIN_INLINE_EVENT
-            IF_INT_GREATER_OR_EQUAL(LW(6), 2)
-                WAIT_FRAMES(20)
-            END_IF
-            WAIT_FRAMES(15)
-            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_KURI_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-        END_INLINE_EVENT
-        IF_INT_GREATER_OR_EQUAL(LW(6), 2)
-            BEGIN_SIBLING_EVENT
-                CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
-                MULTIPLY(LW(5), -18)
-                LOOP(20)
-                    CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, LW(5))
-                    WAIT_FRAMES(1)
-                END_LOOP
-            END_SIBLING_EVENT
-            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-            CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, 0)
-            BEGIN_SIBLING_EVENT
-                CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-                CALL(evt_eff64, STRING(""), STRING("kemuri2_n64"), 2, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
-            END_SIBLING_EVENT
-            SET_VALUE(LW(9), LW(8))
-            SUBTRACT(LW(9), 1)
-            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(9))
-            BEGIN_SIBLING_EVENT
-                LOOP(LW(9))
-                    WAIT_FRAMES(1)
-                    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
-                    SUBTRACT(LW(0), 1)
-                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(0))
-                END_LOOP
-            END_SIBLING_EVENT
-            BEGIN_SIBLING_EVENT_GET_ID(LW(15))
-                LOOP(1)
-                    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
-                    IF_INT_GREATER(LW(0), 15)
-                        SUBTRACT(LW(0), 15)
-                        CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 0, LW(0), LW(0), 0)
-                        CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
-                        SWITCH(LW(6))
-                            CASE_GREATER_OR_EQUAL(2)
-                            CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-                            CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(0), 1, 0, 0, 0)
-                            LOOP(15)
-                                CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 24, 0)
-                                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(0))
-                                CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(1))
-                                IF_INT_GREATER_OR_EQUAL(LW(1), 0)
-                                    ADD(LW(0), -24)
-                                ELSE
-                                    ADD(LW(0), 24)
-                                END_IF
-                                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, LW(0))
-                                WAIT_FRAMES(1)
-                            END_LOOP
-                            CASE_DEFAULT
-                        END_SWITCH
-                    END_IF
-                END_LOOP
-            END_SIBLING_EVENT
-            CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-            ADD(LW(2), 5)
-            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-            CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8), 0, 0)
-            DELETE_EVENT(15)
-        ELSE
-            BEGIN_SIBLING_EVENT
-                CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-                CALL(evt_eff64, STRING(""), STRING("kemuri2_n64"), 2, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
-            END_SIBLING_EVENT
-            CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-            ADD(LW(2), 5)
-            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-            CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8), 0, 0)
-        END_IF
-    END_IF
-    IF_INT_NOT_EQUAL(LW(5), 1)
-        IF_INT_EQUAL(LW(5), 3)
-            CALL(btlevtcmd_StartAvoid, LW(3), 38)
-        END_IF
-        IF_INT_EQUAL(LW(5), 6)
-            CALL(btlevtcmd_StartAvoid, LW(3), 39)
-        END_IF
-        IF_INT_EQUAL(LW(5), 2)
-            CALL(btlevtcmd_StartAvoid, LW(3), 40)
-        END_IF
-        CALL(btlevtcmd_StopAC)
-        CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
-        CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 0, 0)
-        CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_S_1"))
-        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_MoveDirectionAdd, BTL_UNIT_SELF, LW(0), 30)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
-        CALL(btlevtcmd_MoveDirectionAdd, BTL_UNIT_SELF, LW(0), 20)
-        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 10, -1)
-        WAIT_MS(500)
-        GOTO(95)
-    END_IF
-    CALL(btlevtcmd_ac_timing_flag_onoff, 1, 1)
-    CALL(btlevtcmd_ac_timing_get_success_frame, LW(0))
-    DIVIDE(LW(0), 2)
-    WAIT_FRAMES(LW(0))
-    CALL(btlevtcmd_ac_timing_flag_onoff, 0, 1)
-    CALL(btlevtcmd_ResultAC)
-    CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
-    CALL(btlevtcmd_GetResultAC, LW(6))
-    IF_BITS_CLEAR(LW(6), 2)
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
-        IF_INT_LESS_OR_EQUAL(LW(10), 0)
-            CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-            CALL(btlevtcmd_AudienceDeclareACResult, LW(0), -1)
-        ELSE
-            SET_VALUE(LW(6), LW(10))
-            SUBTRACT(LW(6), 1)
-            CALL(btlevtcmd_GetResultPrizeLv, LW(3), LW(6), LW(6))
-            CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-            CALL(btlevtcmd_AudienceDeclareACResult, LW(0), LW(6))
-        END_IF
-        GOTO(90)
-    END_IF
-    CALL(btlevtcmd_GetResultCountAC, LW(6))
-    CALL(mario_get_renzoku_count_max, LW(3), LW(6), LW(7))
-    IF_INT_LESS(LW(6), LW(7))
-        BEGIN_INLINE_EVENT
-            CALL(evt_btl_camera_set_moveSpeedLv, 0, 0)
-            CALL(evt_btl_camera_set_zoom, 0, 200)
-            WAIT_FRAMES(10)
-            CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
-            CALL(evt_btl_camera_set_zoom, 0, 250)
-        END_INLINE_EVENT
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 131072, LW(5))
-        CALL(btlevtcmd_GetResultPrizeLv, LW(3), LW(10), LW(6))
-        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-        ADD(LW(10), 1)
-        CALL(btlevtcmd_StartAC, 0)
-        GOTO(10)
-    ELSE
-        CALL(evt_btl_camera_set_mode, 0, 0)
-        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 131328, LW(5))
-        CALL(btlevtcmd_GetResultPrizeLv, LW(3), LW(10), LW(6))
-        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_AudienceDeclareACResult, LW(0), LW(6))
-    END_IF
-    LABEL(90)
-    CALL(btlevtcmd_StopAC)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_GetRotate, BTL_UNIT_SELF, EVT_NULLPTR, EVT_NULLPTR, LW(6))
-        IF_INT_LESS(LW(6), 0)
-            MULTIPLY(LW(6), -1)
-        END_IF
-        CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(0))
-        MULTIPLY(LW(6), LW(0))
-        DIVIDE(LW(6), 15)
-        SET_VALUE(LW(7), 15)
-        LABEL(20)
-        CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, LW(6))
-        SUBTRACT(LW(7), 1)
-        WAIT_FRAMES(1)
-        IF_INT_GREATER_OR_EQUAL(LW(7), 1)
-            GOTO(20)
-        END_IF
-        CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-    END_SIBLING_EVENT
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 60)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
-    LABEL(95)
-    CALL(evt_audience_ap_recovery)
-    CALL(btlevtcmd_InviteApInfoReport)
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    LABEL(99)
-    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
-    CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
 #endif
+                WAIT_FRAMES(20)
+            END_IF
+            CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
+            SET_VALUE(LW(15), 0)
+            LOOP(LW(8))
+                CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(12), LW(13), LW(14))
+                CALL(krb_get_dir, LW(5), LW(6), LW(12), LW(13), LW(15))
+                CALL(btlevtcmd_GetRotate, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(9))
+                ADD(LW(15), LW(9))
+                CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, LW(0), LW(1), LW(15))
+                SET_FLOAT_VALUE(LW(5), LW(12))
+                SET_FLOAT_VALUE(LW(6), LW(13))
+                WAIT_FRAMES(1)
+            END_LOOP
+        END_SIBLING_EVENT
+        BEGIN_INLINE_EVENT
+            IF_INT_GREATER_OR_EQUAL(LW(6), 2)
+                WAIT_FRAMES(20)
+            END_IF
+            WAIT_FRAMES(15)
+            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_KURI_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
+        END_INLINE_EVENT
+        IF_INT_GREATER_OR_EQUAL(LW(6), 2)
+            BEGIN_SIBLING_EVENT
+                CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
+                MULTIPLY(LW(5), -18)
+                LOOP(20)
+                    CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, LW(5))
+                    WAIT_FRAMES(1)
+                END_LOOP
+            END_SIBLING_EVENT
+            CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+            CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, 0)
+            BEGIN_SIBLING_EVENT
+                CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+                CALL(evt_eff64, STRING(""), STRING("kemuri2_n64"), 2, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+            END_SIBLING_EVENT
+            SET_VALUE(LW(9), LW(8))
+            SUBTRACT(LW(9), 1)
+            CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(9))
+            BEGIN_SIBLING_EVENT
+                LOOP(LW(9))
+                    WAIT_FRAMES(1)
+                    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+                    SUBTRACT(LW(0), 1)
+                    CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+                END_LOOP
+            END_SIBLING_EVENT
+            BEGIN_SIBLING_EVENT_GET_ID(LW(15))
+                LOOP(1)
+                    CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 2, LW(0))
+                    IF_INT_GREATER(LW(0), 15)
+                        SUBTRACT(LW(0), 15)
+                        CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, 0, LW(0), LW(0), 0)
+                        CALL(btlevtcmd_ACRGetResult, LW(6), LW(7))
+                        SWITCH(LW(6))
+                            CASE_GREATER_OR_EQUAL(2)
+                            CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
+                            CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(0), 1, 0, 0, 0)
+                            LOOP(15)
+                                CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 24, 0)
+                                CALL(btlevtcmd_GetUnitWork, BTL_UNIT_SELF, 3, LW(0))
+                                CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(1))
+                                IF_INT_GREATER_OR_EQUAL(LW(1), 0)
+                                    ADD(LW(0), -24)
+                                ELSE
+                                    ADD(LW(0), 24)
+                                END_IF
+                                CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 3, LW(0))
+                                WAIT_FRAMES(1)
+                            END_LOOP
+                            CASE_DEFAULT
+                        END_SWITCH
+                    END_IF
+                END_LOOP
+            END_SIBLING_EVENT
+            CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+            ADD(LW(2), 5)
+            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+            CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8), 0, 0)
+            DELETE_EVENT(15)
+        ELSE
+            BEGIN_SIBLING_EVENT
+                CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+                CALL(evt_eff64, STRING(""), STRING("kemuri2_n64"), 2, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+            END_SIBLING_EVENT
+            CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+            ADD(LW(2), 5)
+            CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
+            CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), LW(8), 0, 0)
+        END_IF
+    END_IF
+    IF_INT_NOT_EQUAL(LW(5), 1)
+        IF_INT_EQUAL(LW(5), 3)
+            CALL(btlevtcmd_StartAvoid, LW(3), 38)
+        END_IF
+        IF_INT_EQUAL(LW(5), 6)
+            CALL(btlevtcmd_StartAvoid, LW(3), 39)
+        END_IF
+        IF_INT_EQUAL(LW(5), 2)
+            CALL(btlevtcmd_StartAvoid, LW(3), 40)
+        END_IF
+        CALL(btlevtcmd_StopAC)
+        CALL(btlevtcmd_JumpContinue, BTL_UNIT_SELF)
+        CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 0, 0)
+        CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
+        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_S_1"))
+        CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
+        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_MoveDirectionAdd, BTL_UNIT_SELF, LW(0), 30)
+        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 20, -1)
+        CALL(btlevtcmd_MoveDirectionAdd, BTL_UNIT_SELF, LW(0), 20)
+        CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 10, -1)
+        WAIT_MS(500)
+        GOTO(95)
+    END_IF
+    CALL(btlevtcmd_ac_timing_flag_onoff, 1, 1)
+    CALL(btlevtcmd_ac_timing_get_success_frame, LW(0))
+    DIVIDE(LW(0), 2)
+    WAIT_FRAMES(LW(0))
+    CALL(btlevtcmd_ac_timing_flag_onoff, 0, 1)
+    CALL(btlevtcmd_ResultAC)
+    CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
+    CALL(btlevtcmd_GetResultAC, LW(6))
+    IF_BITS_CLEAR(LW(6), 2)
+        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 256, LW(5))
+        IF_INT_LESS_OR_EQUAL(LW(10), 0)
+            CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_AudienceDeclareACResult, LW(0), -1)
+        ELSE
+            SET_VALUE(LW(6), LW(10))
+            SUBTRACT(LW(6), 1)
+            CALL(btlevtcmd_GetResultPrizeLv, LW(3), LW(6), LW(6))
+            CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
+            CALL(btlevtcmd_AudienceDeclareACResult, LW(0), LW(6))
+        END_IF
+        GOTO(90)
+    END_IF
+    CALL(btlevtcmd_GetResultCountAC, LW(6))
+    CALL(mario_get_renzoku_count_max, LW(3), LW(6), LW(7))
+    IF_INT_LESS(LW(6), LW(7))
+        BEGIN_INLINE_EVENT
+            CALL(evt_btl_camera_set_moveSpeedLv, 0, 0)
+            CALL(evt_btl_camera_set_zoom, 0, 200)
+            WAIT_FRAMES(10)
+            CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
+            CALL(evt_btl_camera_set_zoom, 0, 250)
+        END_INLINE_EVENT
+        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 131072, LW(5))
+        CALL(btlevtcmd_GetResultPrizeLv, LW(3), LW(10), LW(6))
+        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
+        ADD(LW(10), 1)
+        CALL(btlevtcmd_StartAC, 0)
+        GOTO(10)
+    ELSE
+        CALL(evt_btl_camera_set_mode, 0, 0)
+        CALL(btlevtcmd_CommandCheckDamage, BTL_UNIT_SELF, LW(3), LW(4), 131328, LW(5))
+        CALL(btlevtcmd_GetResultPrizeLv, LW(3), LW(10), LW(6))
+        CALL(btlevtcmd_GetHitPos, LW(3), LW(4), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
+        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
+        CALL(btlevtcmd_AudienceDeclareACResult, LW(0), LW(6))
+    END_IF
+    LABEL(90)
+    CALL(btlevtcmd_StopAC)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    BEGIN_SIBLING_EVENT
+        CALL(btlevtcmd_GetRotate, BTL_UNIT_SELF, EVT_NULLPTR, EVT_NULLPTR, LW(6))
+        IF_INT_LESS(LW(6), 0)
+            MULTIPLY(LW(6), -1)
+        END_IF
+        CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(0))
+        MULTIPLY(LW(6), LW(0))
+        DIVIDE(LW(6), 15)
+        SET_VALUE(LW(7), 15)
+        LABEL(20)
+        CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, LW(6))
+        SUBTRACT(LW(7), 1)
+        WAIT_FRAMES(1)
+        IF_INT_GREATER_OR_EQUAL(LW(7), 1)
+            GOTO(20)
+        END_IF
+        CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
+    END_SIBLING_EVENT
+    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
+    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
+    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 60)
+    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
+    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
+    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
+    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
+    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
+    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
+    LABEL(95)
+    CALL(evt_audience_ap_recovery)
+    CALL(btlevtcmd_InviteApInfoReport)
+    CALL(evt_btl_camera_set_mode, 0, 0)
+    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
+    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
+    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
+    LABEL(99)
+    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
+    CALL_CHILD(btldefaultevt_SuitoruBadgeEffect)
+    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
+    RETURN
+EVT_END()
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(partyChristineAttack_Kiss)
     CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
     CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
@@ -1729,15 +1081,18 @@ EVT_BEGIN(partyChristineAttack_Kiss)
     CALL(evt_btl_camera_set_zoom, 0, 250)
     CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
     CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
+#if VERSION >= VERSION_JP
     CALL_CHILD(subsetevt_check_target_movable)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_CalculateFaceDirection, LW(3), LW(4), -2, -1, 16, LW(15))
         CALL(btlevtcmd_ChangeFaceDirection, LW(3), LW(15))
     END_IF
+#endif
     CALL(btlevtcmd_CommandGetWeaponActionLv, LW(0))
     CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(0))
     CALL(btlevtcmd_AcGetDifficulty, LW(0))
     SUBTRACT(LW(0), 3)
+#if VERSION >= VERSION_JP
     SWITCH(LW(0))
         CASE_LESS_OR_EQUAL(-3)
         SET_VALUE(LW(0), 27)
@@ -1761,136 +1116,7 @@ EVT_BEGIN(partyChristineAttack_Kiss)
         SET_VALUE(LW(0), 23)
         SET_VALUE(LW(1), 32)
     END_SWITCH
-    CALL(btlevtcmd_AcSetParamAll, 16, 220, 70, 0, 0, LW(0), LW(1), 0)
-    CALL(btlevtcmd_AcSetFlag, 0)
-    CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 5, 3, 60)
-    WAIT_FRAMES(22)
-    CALL(btlevtcmd_StartAC, 1)
-    CALL(btlevtcmd_GetStatusMg, BTL_UNIT_SELF, LW(6))
-    MULTIPLY_FLOAT(LW(6), 12)
-    CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), LW(6))
-    CALL(btlevtcmd_GetStatusMg, LW(3), LW(6))
-    MULTIPLY_FLOAT(LW(6), 12)
-    CALL(btlevtcmd_FaceDirectionAdd, LW(3), LW(0), LW(6))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 200, -1, 0)
-    CALL(btlevtcmd_ResultAC)
-    CALL(btlevtcmd_GetResultAC, LW(0))
-    IF_BITS_SET(LW(0), 2)
-        CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-        CALL(btlevtcmd_GetHeight, BTL_UNIT_SELF, LW(6))
-        ADD(LW(1), LW(6))
-        CALL(btlevtcmd_GetResultPrizeLv, BTL_UNIT_SYSTEM, 0, LW(6))
-        CALL(btlevtcmd_ACSuccessEffect, LW(6), LW(0), LW(1), LW(2))
-    END_IF
-    CALL(btlevtcmd_GetResultAC, LW(6))
-    CALL(btlevtcmd_StopAC)
-    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
-    CALL(evt_btl_camera_set_zoom, 0, 350)
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_KURI_KISS1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_GetBodyId, BTL_UNIT_SELF, LW(9))
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, LW(9), STRING("PKR_O_1"))
-    WAIT_MS(200)
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 15)
-    ADD(LW(1), 30)
-    CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(14))
-    MULTIPLY(LW(14), 45)
-    CALL(evt_eff, STRING(""), STRING("kiss"), 1, LW(0), LW(1), LW(2), LW(14), 0, 0, 0, 0, 0, 0, 0)
-    BEGIN_INLINE_EVENT_GET_ID(LW(15))
-        IF_BITS_SET(LW(6), 2)
-            CALL_CHILD(subsetevt_check_target_movable)
-            IF_INT_NOT_EQUAL(LW(0), 0)
-                CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 58)
-            END_IF
-            CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
-            ADD(LW(2), 15)
-            CALL(btlevtcmd_GetHeight, LW(3), LW(15))
-            CALL(btlevtcmd_GetStatusMg, LW(3), LW(14))
-            MULTIPLY_FLOAT(LW(15), LW(14))
-            DIVIDE(LW(15), 2)
-            ADD(LW(1), LW(15))
-            CALL(evt_eff, 0, STRING("recovery"), 6, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
-            CALL(evt_snd_sfxon_3d, STRING("SFX_BTL_KURI_CHEER_KISS1"), LW(0), LW(1), LW(2), 0)
-            WAIT_FRAMES(40)
-            CALL(btlevtcmd_GetResultPrizeLv, BTL_UNIT_SYSTEM, 0, LW(6))
-            CALL(btlevtcmd_AudienceDeclareACResult, PTR(&partyWeapon_ChristineKiss), LW(6))
-            CALL(_set_hustle, LW(3))
-        ELSE
-            WAIT_FRAMES(40)
-            CALL(btlevtcmd_AudienceDeclareACResult, PTR(&partyWeapon_ChristineKiss), -1)
-            CALL(btlevtcmd_CheckDamage, BTL_UNIT_SELF, LW(3), LW(4), PTR(&partyWeapon_ChristineKiss), 536871168, LW(5))
-        END_IF
-    END_INLINE_EVENT
-    CALL(btlevtcmd_ftof, 24, LW(0))
-    CALL(btlevtcmd_ftof, 48, LW(1))
-    CALL(btlevtcmd_ACRStart, BTL_UNIT_SELF, LW(0), LW(1), LW(1), 0)
-    CALL(btlevtcmd_ACRGetResult, LW(7), LW(8))
-    IF_INT_GREATER_OR_EQUAL(LW(7), 2)
-        CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(0))
-        CALL(btlevtcmd_AudienceDeclareAcrobatResult, LW(0), 1, 0, 0, 0)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_J_1B"))
-        WAIT_MS(166)
-        CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_Y_1"))
-        WAIT_MS(167)
-    ELSE
-        CALL(evt_audience_acrobat_notry)
-        WAIT_FRAMES(20)
-    END_IF
-    IF_BITS_SET(LW(6), 2)
-        CALL(btlevtcmd_AnnounceMessage, 0, 0, 0, STRING("msg_st_chg_mario_quick"), 60)
-    ELSE
-        WAIT_MS(500)
-    END_IF
-    CALL(evt_btl_camera_set_mode, 0, 0)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(btlevtcmd_WaitEventEnd, LW(15))
-    CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
-    CALL(evt_audience_ap_recovery)
-    CALL(btlevtcmd_InviteApInfoReport)
-    CALL_CHILD(subsetevt_check_target_movable)
-    IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_ResetFaceDirection, LW(3))
-        CALL(btlevtcmd_StartWaitEvent, LW(3))
-    END_IF
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 40)
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
 #else
-EVT_BEGIN(partyChristineAttack_Kiss)
-    CALL(btlevtcmd_JumpSetting, BTL_UNIT_SELF, 20, FLOAT(0.0f), FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetSelectEnemy, LW(3), LW(4))
-    IF_INT_EQUAL(LW(3), -1)
-        GOTO(99)
-    END_IF
-    CALL(btlevtcmd_CommandGetWeaponAddress, BTL_UNIT_SELF, LW(12))
-    CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL(btlevtcmd_CommandPayWeaponCost, BTL_UNIT_SELF)
-    CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
-    CALL(evt_btl_camera_set_mode, 0, 7)
-    CALL(evt_btl_camera_set_homing_unit, 0, BTL_UNIT_SELF, BTL_UNIT_SELF)
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 1)
-    CALL(evt_btl_camera_set_zoom, 0, 250)
-    CALL(btlevtcmd_CalculateFaceDirection, BTL_UNIT_SELF, -1, LW(3), LW(4), 16, LW(15))
-    CALL(btlevtcmd_ChangeFaceDirection, BTL_UNIT_SELF, LW(15))
-#if VERSION != VERSION_DEMO
-    CALL_CHILD(subsetevt_check_target_movable)
-    IF_INT_NOT_EQUAL(LW(0), 0)
-        CALL(btlevtcmd_CalculateFaceDirection, LW(3), LW(4), -2, -1, 16, LW(15))
-        CALL(btlevtcmd_ChangeFaceDirection, LW(3), LW(15))
-    END_IF
-#endif
-    CALL(btlevtcmd_CommandGetWeaponActionLv, LW(0))
-    CALL(btlevtcmd_AcSetDifficulty, BTL_UNIT_SELF, LW(0))
-    CALL(btlevtcmd_AcGetDifficulty, LW(0))
-    SUBTRACT(LW(0), 3)
-#if VERSION == VERSION_DEMO
     SWITCH(LW(0))
         CASE_LESS_OR_EQUAL(-3)
         SET_VALUE(LW(0), 30)
@@ -1914,37 +1140,13 @@ EVT_BEGIN(partyChristineAttack_Kiss)
         SET_VALUE(LW(0), 20)
         SET_VALUE(LW(1), 35)
     END_SWITCH
-#else
-    SWITCH(LW(0))
-        CASE_LESS_OR_EQUAL(-3)
-        SET_VALUE(LW(0), 27)
-        SET_VALUE(LW(1), 20)
-        CASE_EQUAL(-2)
-        SET_VALUE(LW(0), 25)
-        SET_VALUE(LW(1), 28)
-        CASE_EQUAL(-1)
-        SET_VALUE(LW(0), 23)
-        SET_VALUE(LW(1), 30)
-        CASE_EQUAL(0)
-        SET_VALUE(LW(0), 23)
-        SET_VALUE(LW(1), 30)
-        CASE_EQUAL(1)
-        SET_VALUE(LW(0), 23)
-        SET_VALUE(LW(1), 30)
-        CASE_EQUAL(2)
-        SET_VALUE(LW(0), 23)
-        SET_VALUE(LW(1), 30)
-        CASE_DEFAULT
-        SET_VALUE(LW(0), 23)
-        SET_VALUE(LW(1), 32)
-    END_SWITCH
 #endif
     CALL(btlevtcmd_AcSetParamAll, 16, 220, 70, 0, 0, LW(0), LW(1), 0)
     CALL(btlevtcmd_AcSetFlag, 0)
     CALL(btlevtcmd_SetupAC, BTL_UNIT_SELF, 5, 3, 60)
     WAIT_FRAMES(22)
     CALL(btlevtcmd_StartAC, 1)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(btlevtcmd_GetStatusMg, BTL_UNIT_SELF, LW(6))
     MULTIPLY_FLOAT(LW(6), 12)
     CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
@@ -1981,10 +1183,10 @@ EVT_BEGIN(partyChristineAttack_Kiss)
     CALL(evt_eff, STRING(""), STRING("kiss"), 1, LW(0), LW(1), LW(2), LW(14), 0, 0, 0, 0, 0, 0, 0)
     BEGIN_INLINE_EVENT_GET_ID(LW(15))
         IF_BITS_SET(LW(6), 2)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
             CALL_CHILD(subsetevt_check_target_movable)
             IF_INT_NOT_EQUAL(LW(0), 0)
-                CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), 58)
+                CALL(btlevtcmd_AnimeChangePoseType, LW(3), LW(4), BTL_POSE_KISSED_CHRISTINE)
             END_IF
 #endif
             CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
@@ -2032,7 +1234,7 @@ EVT_BEGIN(partyChristineAttack_Kiss)
     CALL(btlevtcmd_ResetFaceDirection, BTL_UNIT_SELF)
     CALL(evt_audience_ap_recovery)
     CALL(btlevtcmd_InviteApInfoReport)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL_CHILD(subsetevt_check_target_movable)
     IF_INT_NOT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_ResetFaceDirection, LW(3))
@@ -2046,12 +1248,10 @@ EVT_BEGIN(partyChristineAttack_Kiss)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
-#endif
 
-#if VERSION >= VERSION_US
 EVT_BEGIN(christine_appeal_event)
     CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 66)
+    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, BTL_POSE_APPEAL)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_MARIO_APPEAL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
@@ -2066,29 +1266,6 @@ EVT_BEGIN(christine_appeal_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
-#else
-EVT_BEGIN(christine_appeal_event)
-    CALL(btlevtcmd_RunDataEventChild, BTL_UNIT_SELF, 7)
-#if VERSION == VERSION_DEMO
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 64)
-#else
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 66)
-#endif
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_MARIO_APPEAL1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_FaceDirectionAdd, BTL_UNIT_SELF, LW(0), 15)
-    ADD(LW(1), 30)
-    CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(14))
-    MULTIPLY(LW(14), 45)
-    CALL(evt_eff, STRING(""), STRING("kiss"), 1, LW(0), LW(1), LW(2), LW(14), 0, 0, 0, 0, 0, 0, 0)
-    WAIT_MS(667)
-    CALL(btlevtcmd_AudienceAppeal, BTL_UNIT_SELF)
-    WAIT_FRAMES(30)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
-#endif
 
 static EVT_BEGIN(party_win_reaction)
     CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_Y_1"))
@@ -2097,7 +1274,6 @@ static EVT_BEGIN(party_win_reaction)
     RETURN
 EVT_END()
 
-#if VERSION >= VERSION_US
 static EVT_BEGIN(attack_audience_event)
     CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_GetStageSize, LW(3), EVT_NULLPTR, EVT_NULLPTR)
@@ -2194,104 +1370,6 @@ static EVT_BEGIN(attack_audience_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
-#else
-static EVT_BEGIN(attack_audience_event)
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetStageSize, LW(3), EVT_NULLPTR, EVT_NULLPTR)
-    CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(4))
-    SET_VALUE(LW(8), LW(3))
-    MULTIPLY(LW(8), LW(4))
-    MULTIPLY(LW(8), -1)
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(6.0f))
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(8), LW(1), LW(2), 0, -1, 0)
-    WAIT_FRAMES(20)
-    CALL(_get_attack_aud_no, LW(3), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetStageAudienceAreaSize, LW(4), EVT_NULLPTR, EVT_NULLPTR)
-    CALL(btlevtcmd_GetFaceDirection, BTL_UNIT_SELF, LW(5))
-    SET_VALUE(LW(6), LW(4))
-    MULTIPLY(LW(6), LW(5))
-    MULTIPLY(LW(6), -1)
-    CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(6), LW(1), LW(2))
-    CALL(evt_btl_camera_set_mode, 0, 13)
-    CALL(evt_btl_camera_set_homing_unit_audience, 0, BTL_UNIT_SELF, 1, LW(3))
-    CALL(evt_btl_camera_set_moveSpeedLv, 0, 2)
-    CALL(evt_btl_camera_set_zoom, 0, 100)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 50)
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(evt_btl_camera_set_zoom, 0, 200)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_A_2B"))
-    WAIT_FRAMES(20)
-    CALL(btlevtcmd_AnimeChangePose, BTL_UNIT_SELF, 1, STRING("PKR_J_1A"))
-    CALL(btlevtcmd_SetRotateOffset, BTL_UNIT_SELF, 0, 14, 0)
-    BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(5), LW(6), LW(7))
-        SET_VALUE(LW(8), 0)
-        LOOP(36)
-            CALL(btlevtcmd_GetPosFloat, BTL_UNIT_SELF, LW(12), LW(13), LW(14))
-            CALL(krb_get_dir, LW(5), LW(6), LW(12), LW(13), LW(8))
-            CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, LW(8))
-            SET_FLOAT_VALUE(LW(5), LW(12))
-            SET_FLOAT_VALUE(LW(6), LW(13))
-            WAIT_FRAMES(1)
-        END_LOOP
-    END_SIBLING_EVENT
-    BEGIN_INLINE_EVENT
-        WAIT_FRAMES(15)
-        CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_BTL_KURI_ATTACK2"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    END_INLINE_EVENT
-    CALL(_get_attack_aud_no, LW(3), LW(0), LW(1), LW(2))
-    ADD(LW(1), 28)
-    ADD(LW(2), 5)
-    CALL(btlevtcmd_snd_se, BTL_UNIT_SELF, STRING("SFX_PARTY_BATTLE_JUMP1"), EVT_NULLPTR, 0, EVT_NULLPTR)
-    CALL(btlevtcmd_MarioJumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 36, 0, 0)
-    WAIT_FRAMES(2)
-    CALL(_attack_aud, LW(3), 0)
-    CALL(evt_btl_camera_set_mode, 0, 3)
-    CALL(btlevtcmd_SetScale, BTL_UNIT_SELF, FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
-    BEGIN_SIBLING_EVENT_GET_ID(LW(15))
-        WAIT_MS(1500)
-        CALL(evt_btl_camera_set_mode, 0, 0)
-        WAIT_MS(1000)
-    END_SIBLING_EVENT
-    BEGIN_SIBLING_EVENT
-        CALL(btlevtcmd_GetRotate, BTL_UNIT_SELF, EVT_NULLPTR, EVT_NULLPTR, LW(6))
-        IF_INT_LESS(LW(6), 0)
-            MULTIPLY(LW(6), -1)
-        END_IF
-        DIVIDE(LW(6), 15)
-        SET_VALUE(LW(7), 15)
-        LABEL(20)
-        CALL(btlevtcmd_AddRotate, BTL_UNIT_SELF, 0, 0, LW(6))
-        SUBTRACT(LW(7), 1)
-        WAIT_FRAMES(1)
-        IF_INT_GREATER_OR_EQUAL(LW(7), 1)
-            GOTO(20)
-        END_IF
-        CALL(btlevtcmd_SetRotate, BTL_UNIT_SELF, 0, 0, 0)
-    END_SIBLING_EVENT
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.69921875f))
-    CALL(btlevtcmd_GetPos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, EVT_NULLPTR, LW(1), EVT_NULLPTR)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 60)
-    CALL(btlevtcmd_TransStageFloorPosition, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 30, -1)
-    CALL(btlevtcmd_SetFallAccel, BTL_UNIT_SELF, FLOAT(0.5996094f))
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 20)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 12, -1)
-    CALL(btlevtcmd_FaceDirectionSub, BTL_UNIT_SELF, LW(0), 8)
-    CALL(btlevtcmd_JumpPosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 8, -1)
-    CALL(btlevtcmd_AnimeChangePoseType, BTL_UNIT_SELF, 1, 42)
-    CALL(btlevtcmd_SetMoveSpeed, BTL_UNIT_SELF, FLOAT(4.0f))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(6), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_GetHomePos, BTL_UNIT_SELF, LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_SetPos, BTL_UNIT_SELF, LW(8), LW(1), LW(2))
-    CALL(btlevtcmd_WaitEventEnd, LW(15))
-    CALL(btlevtcmd_MovePosition, BTL_UNIT_SELF, LW(0), LW(1), LW(2), 0, -1, 0)
-    CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
-    RETURN
-EVT_END()
-#endif
 
 static USER_FUNC(krb_get_dir) {
     EvtWord* args = event->args;
@@ -2356,7 +1434,7 @@ static void __makeTechMenuFunc(BattleCommand* command, s32* count) {
     }
 }
 
-USER_FUNC(btlevtcmd_get_monosiri_msg_no) {
+static USER_FUNC(btlevtcmd_get_monosiri_msg_no) {
     EvtWord* args = event->args;
     BattleUnit* unit;
     s32 id, index;
@@ -2369,14 +1447,14 @@ USER_FUNC(btlevtcmd_get_monosiri_msg_no) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_monosiri_flag_on) {
+static USER_FUNC(_monosiri_flag_on) {
     s32 id = evtGetValue(event, event->args[0]);
 
     battleSetUnitMonosiriFlag(BattleGetUnitPtr(_battleWorkPointer, id)->currentKind);
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_dictionary) {
+static USER_FUNC(_dictionary) {
     EvtWord* args = event->args;
     s32 selfId;
     s32 state;
@@ -2427,7 +1505,7 @@ USER_FUNC(_dictionary) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_set_hustle) {
+static USER_FUNC(_set_hustle) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
     s32 id;
@@ -2438,7 +1516,7 @@ USER_FUNC(_set_hustle) {
         if (unit->movesRemaining <= 0) {
             unit->movesRemaining++;
             unit->moveState = 0;
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
             unit->activeTurns = 0;
             unit->moveColorLv = 0xFF;
 #else

@@ -20,7 +20,6 @@
 #include "evt/evt_paper.h"
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "mri_puni.h"
 #include "mri.h"
 #include "data_tables.h"
@@ -129,7 +128,7 @@ static BeroEntry bero_entry_data[] = {
 };
 
 EVT_BEGIN(wall_roll_sub)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(evt_paper_entry, LW(0))
 #endif
     CALL(evt_img_entry, LW(2))
@@ -179,19 +178,19 @@ EVT_BEGIN(wall_roll)
     SET_VALUE(LW(1), STRING("S_isk_01A01"))
     SET_VALUE(LW(2), STRING("img00"))
     SET_VALUE(LW(3), STRING("ofs00"))
-    SPAWN_EVENT(PTR(wall_roll_sub))
+    SPAWN_EVENT(wall_roll_sub)
     WAIT_MS(2000)
     SET_VALUE(LW(0), STRING("OFF_d_roll_left"))
     SET_VALUE(LW(1), STRING("S_isk_01A02"))
     SET_VALUE(LW(2), STRING("img01"))
     SET_VALUE(LW(3), STRING("ofs01"))
-    SPAWN_EVENT(PTR(wall_roll_sub))
+    SPAWN_EVENT(wall_roll_sub)
     WAIT_MS(2000)
     SET_VALUE(LW(0), STRING("OFF_d_roll_up"))
     SET_VALUE(LW(1), STRING("S_isk_01A03"))
     SET_VALUE(LW(2), STRING("img02"))
     SET_VALUE(LW(3), STRING("ofs02"))
-    SPAWN_EVENT(PTR(wall_roll_sub))
+    SPAWN_EVENT(wall_roll_sub)
     WAIT_MS(2000)
     BEGIN_INLINE_EVENT
         WAIT_MS(2000)
@@ -205,12 +204,12 @@ EVT_BEGIN(wall_roll)
     SET_VALUE(LW(1), STRING("S_isk_01A04"))
     SET_VALUE(LW(2), STRING("img03"))
     SET_VALUE(LW(3), STRING("ofs03"))
-    CALL_CHILD(PTR(wall_roll_sub))
+    CALL_CHILD(wall_roll_sub)
     CALL(evt_hitobj_onoff, STRING("A_isk_01A"), 1, 0)
     CALL(evt_hitobj_onoff, STRING("A_f2_rak03"), 1, 1)
     CALL(evt_hitobj_onoff, STRING("A_f2_rak04"), 1, 0)
     SET_VALUE(GSWF(GSWF_MRI09_WALL_PANELS_ROLLED), 1)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     WAIT_FRAMES(1)
 #endif
     CALL(evt_puni_all_fall_check)
@@ -239,14 +238,14 @@ EVT_BEGIN(wall_roll)
 EVT_END()
 
 static EVT_BEGIN(breakyuka_init)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     // BUG: the demo tests the floor flag the other way round and has no ELSE (fixed in the later builds)
     IF_INT_EQUAL(GSWF(GSWF_MRI09_FLOOR_BROKEN), 1)
 #else
     IF_INT_EQUAL(GSWF(GSWF_MRI09_FLOOR_BROKEN), 0)
 #endif
         CALL(evt_hitobj_onoff, STRING("A_f2_rak_02"), 1, 0)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     ELSE
         CALL(evt_hitobj_onoff, STRING("A_f2_rak_02"), 1, 1)
 #endif
@@ -392,22 +391,18 @@ EVT_BEGIN(slot_event)
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
-    SPAWN_EVENT(PTR(wall_roll))
+    SPAWN_EVENT(wall_roll)
     RETURN
 EVT_END()
 
 EVT_BEGIN(get_blue_jail_key)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("item00"), ITEM_BLUE_KEY, LW(0), LW(1), LW(2), 15, -1, 0)
-#else
-    CALL(evt_item_entry, STRING("item00"), ITEM_BLUE_KEY, LW(0), LW(1), LW(2), 16, -1, 0)
-#endif
+    CALL(evt_item_entry, STRING("item00"), ITEM_BLUE_KEY, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_item, STRING("item00"))
-    CALL_CHILD(PTR(mri_guide_goryu))
+    CALL_CHILD(mri_guide_goryu)
     CALL(evt_puni_flag_onoff, 1, 0, 262144)
     CALL(evt_puni_set_mode, 1, PUNI_MODE_INERT)
     CALL(evt_npc_flag_onoff, 1, STRING("ガイドsp"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
@@ -433,10 +428,10 @@ EVT_BEGIN(get_blue_jail_key)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_18_JABBLE)
     CALL(evt_fade_set_mapchange_type, 0, FADE_OUT_IRIS, 500, FADE_IN_IRIS, 500)
     SET_VALUE(LW(0), STRING("w_bero"))
-    CALL_CHILD(PTR(bero_case_switch_off))
+    CALL_CHILD(bero_case_switch_off)
     CALL(evt_bero_overwrite, STRING("w_bero"), PTR(bero_bluejail))
     SET_VALUE(LW(0), STRING("w_bero"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -449,14 +444,14 @@ EVT_BEGIN(mri_09_init_evt)
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(9), 0)
-    CALL_CHILD(PTR(mri_puni_init))
+    CALL_CHILD(mri_puni_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    SPAWN_EVENT(PTR(puni_disp_info))
-    SPAWN_EVENT(PTR(puni_piders_check))
+    CALL_CHILD(evt_bero_info_run)
+    SPAWN_EVENT(puni_disp_info)
+    SPAWN_EVENT(puni_piders_check)
     SET_VALUE(LW(0), PTR(ueki_access_data))
-    CALL_CHILD(PTR(evt_sub_kusa_access_entry))
+    CALL_CHILD(evt_sub_kusa_access_entry)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG2_23_TIME_BOMB_ACTIVATED, STORY_STG2_23_01_X_NAUT_BATTLE)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
@@ -478,12 +473,12 @@ EVT_BEGIN(mri_09_init_evt)
 #endif
         CASE_EQUAL(STORY_STG2_21_01_MYSTERY_PILLAR)
         CALL(evt_hitobj_onoff, STRING("A_f2_rak03"), 1, 0)
-        SPAWN_EVENT(PTR(slot_event))
+        SPAWN_EVENT(slot_event)
         CALL(evt_mobj_switch_red, 1, STRING("slot00"), -80, 0, 135, PTR(slot00_event), 0)
         CALL(evt_mobj_switch_red, 1, STRING("slot01"), -30, 0, 135, PTR(slot01_event), 0)
         CALL(evt_mobj_switch_red, 1, STRING("slot02"), 30, 0, 135, PTR(slot02_event), 0)
         CALL(evt_mobj_switch_red, 1, STRING("slot03"), 80, 0, 135, PTR(slot03_event), 0)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
         CALL(evt_paper_entry, STRING("OFF_d_roll_down"))
         CALL(evt_paper_entry, STRING("OFF_d_roll_up"))
         CALL(evt_paper_entry, STRING("OFF_d_roll_left"))
@@ -496,13 +491,9 @@ EVT_BEGIN(mri_09_init_evt)
         CALL(evt_hitobj_onoff, STRING("A_f2_rak04"), 1, 0)
     END_SWITCH
     CALL(evt_mobj_itembox, STRING("mobj_box00"), 125, 0, 25, 0, 0, PTR(get_blue_jail_key), GSWF(GSWF_MRI09_BLUE_KEY_CHEST_OPENED))
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("item100"), ITEM_CHARGE, -250, -234, 75, 15, GSWF(GSWF_MRI09_CHARGE_TAKEN), 0)
-#else
-    CALL(evt_item_entry, STRING("item100"), ITEM_CHARGE, -250, -234, 75, 16, GSWF(GSWF_MRI09_CHARGE_TAKEN), 0)
-#endif
+    CALL(evt_item_entry, STRING("item100"), ITEM_CHARGE, -250, -234, 75, ITEM_ENTRY_FIXED, GSWF(GSWF_MRI09_CHARGE_TAKEN), 0)
     CALL(evt_mobj_powerupblk, STRING("pblk1"), 0, -174, -125, 0, GSWF(GSWF_MRI09_SHINE_SPRITE), 0)
-    SPAWN_EVENT(PTR(breakyuka_init))
+    SPAWN_EVENT(breakyuka_init)
     CALL(evt_mobj_breaking_floor, STRING("mobj_bf00"), 0, 0, 75, 1, PTR(breakyuka_main), GSWF(GSWF_MRI09_FLOOR_BROKEN))
     RETURN
 EVT_END()

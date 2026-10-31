@@ -92,8 +92,8 @@ effN64Vtx stg_hahen_v[58] = {
     {-1, -3, -1, -282, 0, 140, 140, 140, 255},
 };
 
-void effRubbleMain(EffectEntry* effect);
-void effRubbleDisp(CameraId cameraId, EffectEntry* effect);
+static void effRubbleMain(EffectEntry* effect);
+static void effRubbleDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effRubbleN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 groundY, f32 velY, f32 gravity, f32 scale) {
     EffectEntry* effect;
@@ -128,7 +128,7 @@ EffectEntry* effRubbleN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 
     return effect;
 }
 
-void effRubbleMain(EffectEntry* effect) {
+static void effRubbleMain(EffectEntry* effect) {
     EffRubbleN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -163,7 +163,7 @@ void effRubbleMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effRubbleDisp, effect);
 }
 
-void effRubbleDisp(CameraId cameraId, EffectEntry* effect) {
+static void effRubbleDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffRubbleN64Work* work;
     s32 alpha;

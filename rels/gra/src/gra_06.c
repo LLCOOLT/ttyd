@@ -17,7 +17,6 @@
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
 #include "evt/evt_telop.h"
-#include "party/party_motion.h"
 #include "gra.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -59,7 +58,9 @@ EVT_BEGIN(gra_06_ido_in_sub)
     CALL(evt_party_set_dir, 1, 270, -1)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_jump_pos, 165, 0, 374, 800, 0, -1000)
+#if VERSION >= VERSION_JP
         CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
+#endif
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(400)
@@ -74,7 +75,7 @@ EVT_BEGIN(gra_06_ido_in_sub)
 EVT_END()
 
 EVT_BEGIN(gra_06_ido_in)
-    SPAWN_EVENT(PTR(gra_06_ido_in_sub))
+    SPAWN_EVENT(gra_06_ido_in_sub)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
@@ -234,7 +235,9 @@ EVT_BEGIN(first_gra06jin)
     CALL(evt_mario_set_pos, -320, 0, 365)
     CALL(evt_party_set_pos, 0, -350, 0, 365)
     CALL(evt_seq_wait, 2)
+#if VERSION >= VERSION_JP
     CALL(evt_mario_normalize)
+#endif
     BEGIN_INLINE_EVENT
         WAIT_MS(1500)
         CALL(evt_telop_entry, 8)
@@ -253,6 +256,9 @@ EVT_BEGIN(first_gra06jin)
     WAIT_FRAMES(1)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_JIN1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_GRA1"))
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_mario_normalize)
+#endif
     CALL(evt_party_stop, 0)
     CALL(evt_party_set_dir, 0, 90, 200)
     WAIT_MS(300)
@@ -261,7 +267,9 @@ EVT_BEGIN(first_gra06jin)
     CALL(evt_cam3d_evt_off, 500, 11)
     WAIT_MS(500)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG4_08_STEEPLE_DEMO_EXT)
+#if VERSION >= VERSION_JP
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
+#endif
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
@@ -324,7 +332,9 @@ EVT_BEGIN(teresa_oidasare_evt)
     END_LOOP
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_LAND_DAMAGE2"), LW(0), LW(1), LW(2), 0)
+#if VERSION >= VERSION_JP
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
+#endif
     CALL(evt_mario_set_pose, STRING("M_D_2"))
     CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 50)
     WAIT_MS(700)
@@ -363,33 +373,33 @@ EVT_BEGIN(teresa_oidasare_evt)
     CALL(evt_party_run, 0)
     SET_VALUE(GSWF(GSWF_JIN00_BOOS_CARRIED_MARIO_OUT), 0)
     SET_VALUE(LW(0), STRING("n_bero"))
-    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL_CHILD(bero_case_switch_on)
     RETURN
 EVT_END()
 
 EVT_BEGIN(gra_06_init_evt)
-    CALL(evt_item_entry, STRING("item00"), ITEM_STAR_PIECE, -130, 0, 150, 16, GSWF(GSWF_GRA06_STAR_PIECE), 0)
+    CALL(evt_item_entry, STRING("item00"), ITEM_STAR_PIECE, -130, 0, 150, ITEM_ENTRY_FIXED, GSWF(GSWF_GRA06_STAR_PIECE), 0)
     CALL(evt_kagemario_init)
     IF_INT_EQUAL(GSWF(GSWF_JIN00_BOOS_CARRIED_MARIO_OUT), 1)
         SET_VALUE(LW(0), PTR(bero_entry_data))
         CALL(evt_bero_get_info)
-        SPAWN_EVENT(PTR(bero_case_entry))
+        SPAWN_EVENT(bero_case_entry)
         SET_VALUE(LW(0), STRING("n_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
-        SPAWN_EVENT(PTR(teresa_oidasare_evt))
+        CALL_CHILD(bero_case_switch_off)
+        SPAWN_EVENT(teresa_oidasare_evt)
     ELSE
         SET_VALUE(LW(0), PTR(bero_entry_data))
         CALL(evt_bero_get_info)
         IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG4_08_STEEPLE_DEMO_EXT)
-            CALL_CHILD(PTR(bero_case_entry))
+            CALL_CHILD(bero_case_entry)
         ELSE
-            CALL_CHILD(PTR(evt_bero_info_run))
+            CALL_CHILD(evt_bero_info_run)
         END_IF
     END_IF
     CALL(evt_mobj_save_blk, STRING("mobj_save"), -125, 60, 235, 0, 0)
     CALL(evt_mobj_recovery_blk, STRING("mobj_recover"), 10, -270, 60, 270, 0, 0)
     CALL(evt_mobj_brick, STRING("mobj_hidden1"), 67, 90, -13, ITEM_COIN, 11, 0, GSWF(GSWF_GRA06_HIDDEN_COIN_BLOCK_HIT))
-    CALL_CHILD(PTR(evt_usu_kagemario_party_kill))
+    CALL_CHILD(evt_usu_kagemario_party_kill)
     IF_INT_EQUAL(GSWF(GSWF_GRA06_STEEPLE_GATE_OPENED), 0)
         CALL(evt_hitobj_onoff, STRING("A_Mon"), 1, 0)
         CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("a_saku01"), 0, PTR(gra_06_saku_open), 0)
@@ -404,7 +414,7 @@ EVT_BEGIN(gra_06_init_evt)
         CALL(evt_hitobj_onoff, STRING("a_saku01"), 1, 0)
     END_IF
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG4_08_STEEPLE_DEMO_EXT)
-        SPAWN_EVENT(PTR(first_gra06jin))
+        SPAWN_EVENT(first_gra06jin)
     ELSE
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG4_JIN1"))
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG4_GRA1"))

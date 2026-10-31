@@ -18,7 +18,6 @@
 #include "evt/evt_party.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_urouro.h"
-#include "party/party_motion.h"
 #include "mri_puni.h"
 #include "data_tables.h"
 #include "evt/evt_story.h"
@@ -195,7 +194,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"トゲ族１"*/"\x83\x67\x83\x51\x91\xB0\x82\x50", // name
+        "トゲ族１", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         toge_1_init, // initEvent
@@ -207,7 +206,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"トゲ族２"*/"\x83\x67\x83\x51\x91\xB0\x82\x51", // name
+        "トゲ族２", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         toge_2_init, // initEvent
@@ -219,7 +218,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"トゲ族３"*/"\x83\x67\x83\x51\x91\xB0\x82\x52", // name
+        "トゲ族３", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         toge_3_init, // initEvent
@@ -231,7 +230,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"トゲ族４"*/"\x83\x67\x83\x51\x91\xB0\x82\x53", // name
+        "トゲ族４", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         toge_4_init, // initEvent
@@ -243,7 +242,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"トゲ族５"*/"\x83\x67\x83\x51\x91\xB0\x82\x54", // name
+        "トゲ族５", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         toge_5_init, // initEvent
@@ -255,7 +254,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"トゲ族６"*/"\x83\x67\x83\x51\x91\xB0\x82\x55", // name
+        "トゲ族６", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         toge_6_init, // initEvent
@@ -402,7 +401,7 @@ static EVT_BEGIN(puni_win)
         WAIT_MS(1000)
         CALL(evt_mri_puni_win_end, 450, 0, 0, 350, 0, 0)
     END_INLINE_EVENT
-    CALL_CHILD(PTR(puni_win_offscreen))
+    CALL_CHILD(puni_win_offscreen)
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
         CALL(evt_snd_bgmon_f, PSND_FADE_IN | PSND_FADE_OUT, STRING("BGM_STG2_MRI1"), 3000)
@@ -449,11 +448,11 @@ static EVT_BEGIN(puni_winlose_check)
         WAIT_FRAMES(1)
     END_LOOP
     IF_INT_EQUAL(LW(10), 1)
-        SPAWN_EVENT(PTR(puni_lose))
+        SPAWN_EVENT(puni_lose)
         RETURN
     END_IF
     IF_INT_EQUAL(LW(11), 1)
-        SPAWN_EVENT(PTR(puni_win))
+        SPAWN_EVENT(puni_win)
         CALL(evt_hitobj_onoff, STRING("A_gra_r"), 1, 1)
         RETURN
     END_IF
@@ -500,7 +499,7 @@ static EVT_BEGIN(puni_vs_toge_battlewait)
         CALL(evt_msg_toge, 1, 0, 0, 0)
         CALL(evt_msg_print, 0, STRING("stg2_mri_e17_00_02"), 0, 0)
     END_INLINE_EVENT
-    SPAWN_EVENT(PTR(puni_winlose_check))
+    SPAWN_EVENT(puni_winlose_check)
     RETURN
 EVT_END()
 
@@ -523,14 +522,14 @@ static EVT_BEGIN(puni_vs_toge_init)
     CALL(evt_cam3d_evt_set, -275, 140, 516, 275, 50, 0, 1000, 11)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
     WAIT_MS(1000)
-    CALL_CHILD(PTR(mri_guide_goryu))
-    CALL_CHILD(PTR(toge_enter))
+    CALL_CHILD(mri_guide_goryu)
+    CALL_CHILD(toge_enter)
     CALL(evt_puni_set_mode, 1, PUNI_MODE_JOIN)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG2_PUNITOGE1"))
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_puni_all_movestop, 0)
     CALL(evt_mario_key_onoff, 1)
-    SPAWN_EVENT(PTR(puni_vs_toge_battlewait))
+    SPAWN_EVENT(puni_vs_toge_battlewait)
     RETURN
 EVT_END()
 
@@ -553,8 +552,8 @@ static EVT_BEGIN(puni_vs_toge)
     CALL(evt_cam3d_evt_set, -275, 140, 516, 275, 50, 0, 1000, 11)
     CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 1000)
     WAIT_MS(1000)
-    CALL_CHILD(PTR(mri_guide_goryu))
-    CALL_CHILD(PTR(toge_enter))
+    CALL_CHILD(mri_guide_goryu)
+    CALL_CHILD(toge_enter)
     WAIT_FRAMES(1)
     CALL(evt_puni_get_position, 1, LW(0), LW(1), LW(2))
     CALL(evt_puni_flag_onoff, 1, 0, 262144)
@@ -571,7 +570,7 @@ static EVT_BEGIN(puni_vs_toge)
     SET_VALUE(GSWF(GSWF_MRI08_JABBI_FIGHT_STARTED), 1)
     CALL(evt_puni_all_movestop, 0)
     CALL(evt_mario_key_onoff, 1)
-    SPAWN_EVENT(PTR(puni_vs_toge_battlewait))
+    SPAWN_EVENT(puni_vs_toge_battlewait)
     RETURN
 EVT_END()
 
@@ -599,15 +598,15 @@ EVT_BEGIN(mri_08_init_evt)
         SET_VALUE(LW(8), 0)
         SET_VALUE(LW(9), 0)
     END_IF
-    CALL_CHILD(PTR(mri_puni_init))
+    CALL_CHILD(mri_puni_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_npc_setup, PTR(npcEnt))
-    SPAWN_EVENT(PTR(puni_disp_info))
-    SPAWN_EVENT(PTR(mri_countdown))
+    SPAWN_EVENT(puni_disp_info)
+    SPAWN_EVENT(mri_countdown)
     SET_VALUE(LW(0), PTR(ueki_access_data))
-    CALL_CHILD(PTR(evt_sub_kusa_access_entry))
+    CALL_CHILD(evt_sub_kusa_access_entry)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_BETWEEN(STORY_STG2_23_TIME_BOMB_ACTIVATED, STORY_STG2_23_01_X_NAUT_BATTLE)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_DANGER4"))
@@ -627,13 +626,13 @@ EVT_BEGIN(mri_08_init_evt)
     SET_VALUE(LW(1), 0)
     SET_VALUE(LW(2), -150)
     SET_FLOAT_VALUE(LW(3), FLOAT(1.0f))
-    SPAWN_EVENT(PTR(mri_waterfall_effect))
+    SPAWN_EVENT(mri_waterfall_effect)
     SET_VALUE(GW(1), 0)
     IF_INT_EQUAL(GSWF(GSWF_MRI08_JABBI_FIGHT_STARTED), 0)
-        SPAWN_EVENT(PTR(puni_vs_toge))
+        SPAWN_EVENT(puni_vs_toge)
     ELSE
         IF_INT_EQUAL(GSWF(GSWF_MRI08_JABBI_FIGHT_WON), 0)
-            SPAWN_EVENT(PTR(puni_vs_toge_init))
+            SPAWN_EVENT(puni_vs_toge_init)
         END_IF
     END_IF
     IF_INT_EQUAL(GSWF(GSWF_MRI08_JABBI_FIGHT_WON), 0)

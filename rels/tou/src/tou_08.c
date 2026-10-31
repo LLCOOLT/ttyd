@@ -28,15 +28,16 @@
 #include "evt/evt_pouch.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "version.h"
 #include "evt/evt_story.h"
 #include "driver/casedrv.h"
 #include "driver/mapdrv.h"
 
 static USER_FUNC(get_yoshi_color);
-USER_FUNC(icon_off);
+static USER_FUNC(icon_off);
+#if VERSION >= VERSION_JP
 USER_FUNC(tou_08_belt_camid);
+#endif
 
 static EVT_BEGIN(evt_toile)
     IF_INT_LESS(GSW(GSW_STORY_PROGRESS), STORY_STG3_21_1ST_MATCH_WITH_RAWK_HAWK)
@@ -70,7 +71,7 @@ EVT_END()
 static EVT_BEGIN(toile_in)
     SET_VALUE(GSWF(GSWF_TOU04_ARRIVED_FROM_TOILET_A), 0)
     SET_VALUE(GSWF(GSWF_TOU04_ARRIVED_FROM_TOILET_B), 0)
-    SPAWN_EVENT(PTR(evt_toile))
+    SPAWN_EVENT(evt_toile)
     SET_VALUE(LW(0), 0)
     RETURN
 EVT_END()
@@ -333,7 +334,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"ガンス"*/"\x83\x4B\x83\x93\x83\x58", // name
+        "ガンス", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -342,7 +343,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F", // name
+        "キノシコワ", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -351,7 +352,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ガードマン"*/"\x83\x4B\x81\x5B\x83\x68\x83\x7D\x83\x93", // name
+        "ガードマン", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -360,7 +361,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"トゲノコエース"*/"\x83\x67\x83\x51\x83\x6D\x83\x52\x83\x47\x81\x5B\x83\x58", // name
+        "トゲノコエース", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_togenoko, // initEvent
@@ -372,7 +373,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"ウラノコ"*/"\x83\x45\x83\x89\x83\x6D\x83\x52", // name
+        "ウラノコ", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         init_uranoko, // initEvent
@@ -384,7 +385,7 @@ static NpcSetupInfo npcEnt[] = {
         0.0f, 0.0f, 0.0f, 0.0f, 0, // searchRange..battleInfoId
     },
     {
-        /*"チャンピョン"*/"\x83\x60\x83\x83\x83\x93\x83\x73\x83\x87\x83\x93", // name
+        "チャンピョン", // name
         NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, // reactionFlags..returnEvent
         NULL, 0, // blowEvent..territoryType
@@ -419,7 +420,7 @@ EVT_BEGIN(evt_1st_sub)
     CALL(evt_npc_move_position, LW(8), 0, -130, 0, FLOAT(80.0f), 1)
     CALL(evt_mario_set_dir_npc, LW(8))
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     IF_STR_EQUAL(LW(8), STRING("キノシコワ"))
         CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
     ELSE
@@ -427,7 +428,7 @@ EVT_BEGIN(evt_1st_sub)
     END_IF
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL_CHILD(PTR(n_door_open))
+        CALL_CHILD(n_door_open)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
@@ -438,7 +439,7 @@ EVT_BEGIN(evt_1st_sub)
     END_INLINE_EVENT
     WAIT_MS(800)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_close_door_play_se))
+    SPAWN_EVENT(bero_close_door_play_se)
     IF_STR_EQUAL(LW(8), STRING("キノシコワ"))
         CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
     ELSE
@@ -446,7 +447,7 @@ EVT_BEGIN(evt_1st_sub)
     END_IF
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL_CHILD(PTR(n_door_open))
+        CALL_CHILD(n_door_open)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
@@ -465,11 +466,11 @@ static EVT_BEGIN(evt_1st_leagu)
         CALL(tou_champion_belt, STRING("チャンピョン"))
     END_INLINE_EVENT
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, -180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL_CHILD(PTR(n_door_open))
+        CALL_CHILD(n_door_open)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
@@ -494,11 +495,11 @@ static EVT_BEGIN(evt_1st_leagu)
     BEGIN_INLINE_EVENT
         WAIT_MS(500)
         SET_VALUE(LW(1), 0)
-        SPAWN_EVENT(PTR(bero_close_door_play_se))
+        SPAWN_EVENT(bero_close_door_play_se)
         CALL(evt_sub_intpl_msec_init, 11, -180, 0, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
-            CALL_CHILD(PTR(n_door_open))
+            CALL_CHILD(n_door_open)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
@@ -514,7 +515,7 @@ static EVT_BEGIN(evt_1st_leagu)
     CALL(evt_npc_set_anim, STRING("キノシコワ"), STRING("S_1"))
     CALL(evt_cam3d_evt_off, 1000, 11)
     SET_VALUE(LW(0), STRING("キノシコワ"))
-    CALL_CHILD(PTR(evt_1st_sub))
+    CALL_CHILD(evt_1st_sub)
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_set, -138, 150, 533, -138, 50, -8, 0, 11)
     WAIT_MS(300)
@@ -528,11 +529,11 @@ static EVT_BEGIN(evt_1st_leagu)
     WAIT_MS(500)
     CALL(evt_npc_set_position, STRING("チャンピョン"), 0, 0, -180)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, -260, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL_CHILD(PTR(n_door_open))
+        CALL_CHILD(n_door_open)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
@@ -548,11 +549,11 @@ static EVT_BEGIN(evt_1st_leagu)
     CALL(evt_npc_status_onoff, 1, STRING("チャンピョン"), 2)
     CALL(evt_npc_move_position, STRING("チャンピョン"), 0, -85, 0, FLOAT(80.0f), 1)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_close_door_play_se))
+    SPAWN_EVENT(bero_close_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, -260, 0, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL_CHILD(PTR(n_door_open))
+        CALL_CHILD(n_door_open)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
@@ -603,7 +604,7 @@ static EVT_BEGIN(evt_1st_leagu)
     CALL(evt_msg_print, 0, STRING("stg3_tou_294_08"), 0, STRING("チャンピョン"))
     WAIT_MS(300)
     SET_VALUE(LW(0), STRING("チャンピョン"))
-    CALL_CHILD(PTR(evt_1st_sub))
+    CALL_CHILD(evt_1st_sub)
     CALL(evt_cam3d_evt_set, -45, 120, 484, -45, 45, -9, 1000, 11)
     WAIT_MS(1000)
     CALL(evt_party_set_dir, 0, 270, 300)
@@ -693,12 +694,14 @@ EVT_BEGIN(evt_toile_door)
         CALL(evt_mario_key_onoff, 1)
         RETURN
     END_IF
+#if VERSION >= VERSION_JP
     IF_INT_EQUAL(GSWF(GSWF_TOU_CHAMP_OPENING_SEEN), 1)
         CALL(evt_mario_key_onoff, 0)
         CALL(evt_msg_print, 0, STRING("stg3_tou_t_00"), 0, 0)
         CALL(evt_mario_key_onoff, 1)
         RETURN
     END_IF
+#endif
     CALL(evt_cam_letter_box_disable, 1)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
@@ -830,8 +833,10 @@ EVT_BEGIN(evt_champion_win)
     ADD(LW(1), 4)
     ADD(LW(2), 15)
     CALL(evt_eff, STRING("belt"), STRING("starstone"), 9, LW(0), LW(1), LW(2), FLOAT(0.75f), 0, 0, 0, 0, 0, 0, 0)
+#if VERSION >= VERSION_JP
     CALL(tou_08_belt_camid)
-    CALL(evt_item_entry, STRING("belt"), ITEM_CHAMPS_BELT, 0, -1000, 0, 17, -1, 0)
+#endif
+    CALL(evt_item_entry, STRING("belt"), ITEM_CHAMPS_BELT, 0, -1000, 0, ITEM_ENTRY_FIXED_NO_TOUCH, -1, 0)
     CALL(icon_off)
     CALL(evt_item_get_item, STRING("belt"))
     CALL(evt_item_get_item_end_wait, STRING("belt"))
@@ -844,11 +849,11 @@ EVT_BEGIN(evt_champion_win)
     CALL(evt_npc_status_onoff, 1, STRING("キノシコワ"), 2)
     CALL(evt_npc_move_position, STRING("キノシコワ"), 0, -130, 0, FLOAT(80.0f), 1)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL_CHILD(PTR(n_door_open))
+        CALL_CHILD(n_door_open)
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
@@ -867,6 +872,7 @@ EVT_BEGIN(evt_champion_win)
     RETURN
 EVT_END()
 
+#if VERSION >= VERSION_JP
 USER_FUNC(tou_08_belt_camid) {
     EffectEntry* eff = effNameToPtr("belt");
     // ベルト
@@ -876,8 +882,9 @@ USER_FUNC(tou_08_belt_camid) {
     npc->cameraId = 7;
     return EVT_RETURN_DONE;
 }
+#endif
 
-USER_FUNC(icon_off) {
+static USER_FUNC(icon_off) {
     iconFlagOn(itemNameToPtr("belt")->name, 2);
     return EVT_RETURN_DONE;
 }
@@ -948,7 +955,7 @@ static EVT_BEGIN(epilogue_evt_sub)
     BEGIN_INLINE_EVENT
         WAIT_MS(3000)
         SET_VALUE(LW(1), 0)
-        SPAWN_EVENT(PTR(bero_open_door_play_se))
+        SPAWN_EVENT(bero_open_door_play_se)
         CALL(evt_sub_intpl_msec_init, 11, 0, -180, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
@@ -963,7 +970,7 @@ static EVT_BEGIN(epilogue_evt_sub)
         CALL(evt_npc_move_position, STRING("ガードマン"), 0, -90, 0, FLOAT(80.0f), 0)
         CALL(evt_set_dir_to_target, STRING("ガードマン"), STRING("チビヨッシー"))
         SET_VALUE(LW(1), 0)
-        SPAWN_EVENT(PTR(bero_close_door_play_se))
+        SPAWN_EVENT(bero_close_door_play_se)
         CALL(evt_sub_intpl_msec_init, 11, -180, 0, 500)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
@@ -1004,7 +1011,7 @@ static EVT_BEGIN(epilogue_evt_sub)
     END_INLINE_EVENT
     CALL(evt_npc_move_position, STRING("チビヨッシー"), -15, -110, 0, FLOAT(80.0f), 0)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    SPAWN_EVENT(bero_open_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -1023,7 +1030,7 @@ static EVT_BEGIN(epilogue_evt_sub)
     CALL(evt_npc_move_position, STRING("チビヨッシー"), 0, -200, 0, FLOAT(80.0f), 0)
     CALL(evt_npc_set_position, STRING("チビヨッシー"), 0, -1000, 0)
     SET_VALUE(LW(1), 0)
-    SPAWN_EVENT(PTR(bero_close_door_play_se))
+    SPAWN_EVENT(bero_close_door_play_se)
     CALL(evt_sub_intpl_msec_init, 11, -180, 0, 500)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
@@ -1050,13 +1057,13 @@ static EVT_BEGIN(epilogue_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_URN1"))
     CALL(evt_snd_bgm_scope, 0, 1)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_mario_dispflag_onoff, 1, 1)
+    CALL(evt_mario_dispflag_onoff, 1, MARIO_DISP_FLAG_HIDDEN)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("cake_tukue"), MAPOBJ_FLAG_HIDE)
     CALL(evt_npc_flag_onoff, 1, STRING("チビヨッシー"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_cam3d_evt_set, 0, 100, 337, 0, 45, -9, 0, 11)
     CALL(evt_seq_wait, 2)
     CALL(evt_npc_flag_onoff, 0, STRING("チビヨッシー"), NPC_FLAG_INSTANT_TURN)
-    SPAWN_EVENT(PTR(epilogue_evt_sub))
+    SPAWN_EVENT(epilogue_evt_sub)
     CALL(evt_fade_end_wait)
     WAIT_MS(1000)
     CALL(evt_pouch_get_yoshiname, LW(0))
@@ -1133,17 +1140,21 @@ EVT_BEGIN(tou_08_init_evt)
     END_IF
     SET_VALUE(LW(0), PTR(bero_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_item_entry, STRING("item_01"), ITEM_ICE_STORM, -240, 0, -90, 16, GSWF(GSWF_TOU08_ICE_STORM), 0)
-    CALL_CHILD(PTR(evt_tou_locker_init))
+    CALL_CHILD(evt_bero_info_run)
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_item_entry, STRING("item_01"), ITEM_ICE_STORM, -120, 12, -135, ITEM_ENTRY_FIXED, GSWF(GSWF_TOU08_ICE_STORM), 0)
+#else
+    CALL(evt_item_entry, STRING("item_01"), ITEM_ICE_STORM, -240, 0, -90, ITEM_ENTRY_FIXED, GSWF(GSWF_TOU08_ICE_STORM), 0)
+#endif
+    CALL_CHILD(evt_tou_locker_init)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("fuku_M"), MAPOBJ_FLAG_HIDE)
     CALL(evt_npc_setup, PTR(npcEnt))
-    CALL_CHILD(PTR(init_hammerbros))
+    CALL_CHILD(init_hammerbros)
     CALL(evt_npc_change_interrupt, STRING("ハンマーブロス"), 6, PTR(talk_hammerbros))
-    CALL_CHILD(PTR(init_togemet))
+    CALL_CHILD(init_togemet)
     CALL(evt_npc_change_interrupt, STRING("トゲメット"), 6, PTR(talk_togemet))
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("M_make"), 0, PTR(evt_tou_match_make_default), 0)
-    CALL_CHILD(PTR(evt_tou_monitor_init))
+    CALL_CHILD(evt_tou_monitor_init)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("isu"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("t_door_2"), 0, PTR(evt_toile_door), 0)
     CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("t_door_3"), 0, PTR(evt_toile_door2), 0)
@@ -1157,12 +1168,12 @@ EVT_BEGIN(tou_08_init_evt)
         CALL(evt_tou_get_ranking, LW(0))
         IF_INT_EQUAL(LW(0), 0)
             SET_VALUE(GSWF(GSWF_TOU_MATCH_RESULT_PENDING), 1)
-            SPAWN_EVENT(PTR(evt_champion_win))
+            SPAWN_EVENT(evt_champion_win)
         ELSE
 #if VERSION >= VERSION_US
-            SPAWN_EVENT(PTR(evt_match_after_stop_npcs))
+            SPAWN_EVENT(evt_match_after_stop_npcs)
 #else
-            SPAWN_EVENT(PTR(evt_tou_match_after_default))
+            SPAWN_EVENT(evt_tou_match_after_default)
 #endif
         END_IF
         RETURN
@@ -1171,17 +1182,25 @@ EVT_BEGIN(tou_08_init_evt)
         CASE_LESS(STORY_STG3_03_GRUBBA)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG3_GANCE1"))
         CALL(evt_snd_envoff, PSND_FADE_OUT)
-        SPAWN_EVENT(PTR(evt_sensyu))
+        SPAWN_EVENT(evt_sensyu)
         CASE_DEFAULT
         SWITCH(GSW(GSW_STORY_PROGRESS))
             CASE_BETWEEN(STORY_STG3_00_WELCOME_TO_GLITZVILLE, STORY_STG3_12_MINI_YOSHI_EGG)
             CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
+#else
             CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))
+#endif
             CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
             CASE_GREATER_OR_EQUAL(STORY_STG3_33_PEACH_THE_SECRET_WEAPON)
             IF_INT_NOT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_END_AFTER_THE_BATTLE)
                 CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
+#if VERSION <= VERSION_DEMO_US
+                CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
+#else
                 CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))
+#endif
                 CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
             END_IF
             CASE_DEFAULT
@@ -1190,22 +1209,26 @@ EVT_BEGIN(tou_08_init_evt)
                 CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))
             ELSE
                 CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG3_TOU2"))
+#if VERSION <= VERSION_DEMO_US
+                CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU2"))
+#else
                 CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG3_TOU6"))
+#endif
                 CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
             END_IF
         END_SWITCH
     END_SWITCH
     IF_INT_EQUAL(GSWF(GSWF_TOU_PROMOTION_PENDING), 1)
         SET_VALUE(GSWF(GSWF_TOU_PROMOTION_PENDING), 0)
-        SPAWN_EVENT(PTR(evt_1st_leagu))
+        SPAWN_EVENT(evt_1st_leagu)
     END_IF
     IF_INT_EQUAL(GSWF(GSWF_TOU_CAKE_WAITING), 1)
-        SPAWN_EVENT(PTR(evt_tou_08_cake))
+        SPAWN_EVENT(evt_tou_08_cake)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_END_AFTER_THE_BATTLE)
         CALL(evt_mario_kill_party, 0)
-        CALL_CHILD(PTR(epilogue_npc_entry))
-        SPAWN_EVENT(PTR(epilogue_evt))
+        CALL_CHILD(epilogue_npc_entry)
+        SPAWN_EVENT(epilogue_evt)
     END_IF
     RETURN
 EVT_END()

@@ -5,7 +5,6 @@
 #include "evt/evt_bero.h"
 #include "evt/evt_npc.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "dou.h"
 
 static BeroEntry bero_entry_data[3];
@@ -52,7 +51,7 @@ EVT_BEGIN(dou_13_init_evt)
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_npc_check, STRING("キラー大砲１"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
         CALL(evt_npc_set_link, STRING("キラー大砲１"), STRING("キラー大砲２"))

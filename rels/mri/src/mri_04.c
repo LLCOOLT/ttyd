@@ -24,7 +24,6 @@
 #include "evt/evt_party.h"
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
-#include "party/party_motion.h"
 #include "mri_puni.h"
 #include "version.h"
 #include "evt/evt_story.h"
@@ -98,11 +97,7 @@ static EVT_BEGIN(chibitoge_talk)
     ADD(LW(0), 25)
     CALL(evt_npc_jump_position_nohit, STRING("me"), LW(0), LW(1), LW(2), 500, 30)
     WAIT_MS(1000)
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("chibitoge_item"), ITEM_MUSHROOM, 0, -1000, 0, 15, -1, 0)
-#else
-    CALL(evt_item_entry, STRING("chibitoge_item"), ITEM_MUSHROOM, 0, -1000, 0, 16, -1, 0)
-#endif
+    CALL(evt_item_entry, STRING("chibitoge_item"), ITEM_MUSHROOM, 0, -1000, 0, ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_get_item, STRING("chibitoge_item"))
     CALL(evt_npc_set_ry, STRING("me"), 90)
     WAIT_MS(200)
@@ -115,7 +110,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"ちびトゲ"*/"\x82\xBF\x82\xD1\x83\x67\x83\x51", // name
+        "ちびトゲ", // name
         NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         chibitoge_init, // initEvent
@@ -151,7 +146,7 @@ static USER_FUNC(evt_chuchu_back_loop) {
 static EVT_BEGIN(chuchurina_sogu)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_party_stop, 0)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(evt_seq_wait, 2)
     CALL(evt_bero_exec_onoff, 0, 2)
 #endif
@@ -187,7 +182,7 @@ static EVT_BEGIN(chuchurina_sogu)
         CALL(evt_party_move_pos2, 0, 145, LW(2), FLOAT(120.0f))
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
         CALL(evt_bero_exec_onoff, 0, 2)
 #endif
         CALL(evt_puni_wait_systemmode, 2)
@@ -202,7 +197,7 @@ static EVT_BEGIN(chuchurina_sogu)
         CALL(evt_puni_set_anim, 1, 0)
         CALL(evt_bero_exec_onoff, 1, 2)
     END_INLINE_EVENT
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(evt_seq_wait, 2)
 #endif
     CALL(evt_npc_set_anim, STRING("第三勢力部下"), STRING("D_2"))
@@ -292,7 +287,7 @@ static EVT_BEGIN(chuchurina_sogu)
     CALL(evt_npc_set_anim, STRING("チュチュリーナ"), STRING("PCH_W_1"))
     CALL(evt_npc_get_position, STRING("チュチュリーナ"), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_CHURINA_ESCAPE1"), LW(0), LW(1), LW(2), 0)
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
     CALL(evt_npc_jump_position_nohit, STRING("チュチュリーナ"), -18, 68, -120, 300, 20)
 #else
     CALL(evt_npc_jump_position_nohit, STRING("チュチュリーナ"), -18, 135, -200, 300, 10)
@@ -334,12 +329,12 @@ static EVT_BEGIN(chuchurina_sogu)
     CALL(evt_npc_wait_battle_end)
     CALL(evt_cam3d_evt_off, 0, 4)
     SET_VALUE(LW(10), STRING("第三勢力部下"))
-    SPAWN_EVENT(PTR(enemy_event_dead_event_sub))
+    SPAWN_EVENT(enemy_event_dead_event_sub)
     WAIT_MS(500)
-    CALL(evt_item_entry, STRING("item_key"), ITEM_RED_KEY, 60, 0, 0, 4, GSWF(GSWF_MRI04_RED_KEY_TAKEN), 0)
+    CALL(evt_item_entry, STRING("item_key"), ITEM_RED_KEY, 60, 0, 0, ITEM_ENTRY_LAUNCH, GSWF(GSWF_MRI04_RED_KEY_TAKEN), 0)
     CALL(evt_puni_set_mode, 1, PUNI_MODE_JOIN)
     SET_VALUE(GSW(GSW_STORY_PROGRESS), STORY_STG2_13_MS_MOWZ)
-#if VERSION != VERSION_DEMO
+#if VERSION >= VERSION_JP
     CALL(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos)
 #endif
     CALL(evt_party_run, 0)
@@ -430,7 +425,7 @@ EVT_END()
 static EVT_BEGIN(evt_ueki_02)
     CALL(evt_item_delete_check, STRING("item_ueki_02"), LW(0))
     IF_INT_EQUAL(LW(0), 1)
-        CALL(evt_item_entry, STRING("item_ueki_02"), ITEM_COIN, 85, 0, 85, 4, GSWF(GSWF_MRI04_PLANTER_COIN_TAKEN), 0)
+        CALL(evt_item_entry, STRING("item_ueki_02"), ITEM_COIN, 85, 0, 85, ITEM_ENTRY_LAUNCH, GSWF(GSWF_MRI04_PLANTER_COIN_TAKEN), 0)
     END_IF
     RETURN
 EVT_END()
@@ -446,11 +441,7 @@ static KusaAccess ueki_access_data[] = {
 EVT_BEGIN(item_mri_04)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
-#if VERSION == VERSION_DEMO
-    CALL(evt_item_entry, STRING("item00"), ITEM_ULTRA_SHROOM, LW(0), LW(1), LW(2), 15, -1, 0)
-#else
-    CALL(evt_item_entry, STRING("item00"), ITEM_ULTRA_SHROOM, LW(0), LW(1), LW(2), 16, -1, 0)
-#endif
+    CALL(evt_item_entry, STRING("item00"), ITEM_ULTRA_SHROOM, LW(0), LW(1), LW(2), ITEM_ENTRY_FIXED, -1, 0)
     CALL(evt_item_flag_on, STRING("item00"), ITEM_FLAG_NO_TOUCH)
     CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
     CALL(evt_item_get_item, STRING("item00"))
@@ -466,15 +457,15 @@ EVT_BEGIN(mri_04_init_evt)
     SET_VALUE(LW(7), 0)
     SET_VALUE(LW(8), 0)
     SET_VALUE(LW(9), 0)
-    CALL_CHILD(PTR(mri_puni_init))
+    CALL_CHILD(mri_puni_init)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_npc_setup, PTR(npcEnt))
-    SPAWN_EVENT(PTR(puni_disp_info))
-    SPAWN_EVENT(PTR(mri_countdown))
+    SPAWN_EVENT(puni_disp_info)
+    SPAWN_EVENT(mri_countdown)
     SET_VALUE(LW(0), PTR(ueki_access_data))
-    CALL_CHILD(PTR(evt_sub_kusa_access_entry))
+    CALL_CHILD(evt_sub_kusa_access_entry)
     SWITCH(GSW(GSW_STORY_PROGRESS))
         CASE_EQUAL(STORY_STG2_12_RIVAL_ARRIVAL)
         CALL(evt_snd_bgmoff, PSND_FADE_OUT)
@@ -498,17 +489,13 @@ EVT_BEGIN(mri_04_init_evt)
     CALL(evt_map_playanim, STRING("awa_02"), 1, 0)
     CALL(evt_map_playanim, STRING("hikari_01"), 1, 0)
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_12_RIVAL_ARRIVAL)
-        SPAWN_EVENT(PTR(black_shadow))
+        SPAWN_EVENT(black_shadow)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_12_02_PUNI_ELDER_IMPRISONED)
-        SPAWN_EVENT(PTR(chuchurina_sogu))
+        SPAWN_EVENT(chuchurina_sogu)
     END_IF
     IF_INT_GREATER_OR_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG2_13_MS_MOWZ)
-#if VERSION == VERSION_DEMO
-        CALL(evt_item_entry, STRING("item_key"), ITEM_RED_KEY, 60, 0, 0, 13, GSWF(GSWF_MRI04_RED_KEY_TAKEN), 0)
-#else
-        CALL(evt_item_entry, STRING("item_key"), ITEM_RED_KEY, 60, 0, 0, 14, GSWF(GSWF_MRI04_RED_KEY_TAKEN), 0)
-#endif
+        CALL(evt_item_entry, STRING("item_key"), ITEM_RED_KEY, 60, 0, 0, ITEM_ENTRY_FALL_THROWN, GSWF(GSWF_MRI04_RED_KEY_TAKEN), 0)
     END_IF
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S"), MAPOBJ_FLAG_BBOX_CULL)
     RETURN

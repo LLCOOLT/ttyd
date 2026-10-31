@@ -302,8 +302,11 @@ def main():
     report = load(args.report)
     baseline = load(args.baseline) if args.baseline else None
     commit = args.commit or git_head(root)
+    # the demo names first: "G8MJ01" and "G8ME01" are substrings of them
+    version = next((v for v in ("G8MJ01_DEMO", "G8ME01_DEMO", "G8MJ01", "G8ME01", "G8MP01")
+                    if v in os.path.abspath(args.report)), "G8MJ01")
     # true C uses the JP source scan and the JP 10-16 baseline, so it only applies to the G8MJ01 report
-    jp = "G8MJ01" in os.path.abspath(args.report)
+    jp = version == "G8MJ01"
     payload = build_payload(report, commit, baseline, args.baseline_label, None if args.raw or not jp else root)
 
     template_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "progress_treemap.html")
@@ -312,7 +315,6 @@ def main():
     data = json.dumps(payload, separators=(",", ":")).replace("</", "<\\/")
     out = template.replace("/*__DATA__*/null", data)
     out = out.replace("__COMMIT__", html.escape(commit or "working tree"))
-    version = next((v for v in ("G8ME01_DEMO", "G8MJ01", "G8ME01", "G8MP01") if v in os.path.abspath(args.report)), "G8MJ01")
     out = out.replace("__VERSION__", version)
     if (t := payload.get("true")) and "true_fuzzy" in t:
         note = (f'<p class="cmp">All code is C. The map colours each file by how closely its C matches the original: '

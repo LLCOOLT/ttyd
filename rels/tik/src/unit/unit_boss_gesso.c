@@ -15,7 +15,6 @@
 #include "battle/battle_weapon_power.h"
 #include "evt/evt_eff.h"
 #include "evt/evt_msg.h"
-#include "party/party_motion.h"
 #include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "manager/evtmgr_cmd.h"
@@ -23,9 +22,9 @@
 #include "version.h"
 
 #if VERSION <= VERSION_JP
-USER_FUNC(_test_rtn);
+static USER_FUNC(_test_rtn);
 #endif
-USER_FUNC(_ikasumi_effect);
+static USER_FUNC(_ikasumi_effect);
 
 BattleUnitKind unit_boss_gesso;
 static BattleUnitDefense defence;
@@ -34,16 +33,16 @@ static StatusVulnerability regist;
 BattleUnitDefense defence_ceil;
 BattleUnitDefenseAttr defence_attr_ceil;
 StatusVulnerability regist_ceil;
-s32 R_defence_turn[2];
-s32 R_defence_attr_turn[2];
-s32 R_regist_turn[6];
+s32 gesso_defence_turn[2];
+s32 gesso_defence_attr_turn[2];
+s32 gesso_regist_turn[6];
 static PoseTableEntry pose_table[11];
 static PoseTableEntry pose_table_ceil[12];
 PoseTableEntry gesso_pose_table_turn[10];
 static BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
 #if VERSION <= VERSION_JP
-extern EvtWord gesso_arm_wait_event[];
+extern EvtWord test_event[];
 #endif
 static EvtWord init_event[121];
 BattleUnitSetup entry_gesso_left_arm_entry_data;
@@ -138,22 +137,31 @@ BattleUnitDefenseAttr defence_attr_ceil = {0};
 
 StatusVulnerability regist_ceil = {0};
 
-s32 R_defence_turn[] = {
+s32 gesso_defence_turn[] = {
     0, 0,
 };
 
-s32 R_defence_attr_turn[] = {
+s32 gesso_defence_attr_turn[] = {
     0, 0,
 };
 
-s32 R_regist_turn[] = {
+s32 gesso_regist_turn[] = {
+#if VERSION <= VERSION_DEMO_US
+    0, 0, 0, 0, 0, 0,
+#else
     1684300900, 1684300900, 1684300900, 1684300800, 6579200, 0,
+#endif
 };
 
 static PoseTableEntry pose_table[] = {
     {1, "GSO_N2_1"},
+#if VERSION <= VERSION_DEMO_US
+    {2, "GSO_K2_1"},
+    {9, "GSO_K2_1"},
+#else
     {2, "GSO_D2_2"},
     {9, "GSO_D2_2"},
+#endif
     {5, "GSO_K2_1"},
     {4, "GSO_X2_1"},
     {3, "GSO_K2_1"},
@@ -161,13 +169,18 @@ static PoseTableEntry pose_table[] = {
     {29, "GSO_Q2_1"},
     {31, "GSO_S2_1"},
     {39, "GSO_D2_1"},
-    {69, "GSO_S2_1"},
+    {BTL_POSE_STAY_DEFAULT, "GSO_S2_1"},
 };
 
 static PoseTableEntry pose_table_ceil[] = {
     {1, "GSO_N1_1"},
+#if VERSION <= VERSION_DEMO_US
+    {2, "GSO_K1_1"},
+    {9, "GSO_K1_1"},
+#else
     {2, "GSO_D1_3"},
     {9, "GSO_D1_3"},
+#endif
     {5, "GSO_K1_1"},
     {4, "GSO_X1_1"},
     {3, "GSO_K1_1"},
@@ -175,21 +188,26 @@ static PoseTableEntry pose_table_ceil[] = {
     {29, "GSO_Q1_2"},
     {31, "GSO_S1_1"},
     {39, "GSO_D1_2"},
-    {65, "GSO_K1_1"},
-    {69, "GSO_S1_1"},
+    {BTL_POSE_TALK, "GSO_K1_1"},
+    {BTL_POSE_STAY_DEFAULT, "GSO_S1_1"},
 };
 
 PoseTableEntry gesso_pose_table_turn[] = {
     {1, "GSO_N3_1"},
+#if VERSION <= VERSION_DEMO_US
+    {2, "GSO_K3_1"},
+    {9, "GSO_K3_1"},
+#else
     {2, "GSO_D3_2"},
     {9, "GSO_D3_2"},
+#endif
     {5, "GSO_K3_1"},
     {4, "GSO_K3_1"},
     {3, "GSO_K3_1"},
     {28, "GSO_V_1"},
     {31, "GSO_D3_1"},
     {39, "GSO_D3_1"},
-    {69, "GSO_V_1"},
+    {BTL_POSE_STAY_DEFAULT, "GSO_V_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -202,7 +220,7 @@ static BattleUnitKindPart parts[] = {
 };
 
 #if VERSION <= VERSION_JP
-EVT_BEGIN(gesso_arm_wait_event)
+EVT_BEGIN(test_event)
     CALL(_test_rtn)
     RETURN
 EVT_END()
@@ -262,7 +280,7 @@ static EVT_BEGIN(battle_entry_event)
         CALL(btlevtcmd_StartWaitEvent, LW(3))
     END_INLINE_EVENT
 #if VERSION <= VERSION_JP
-    SPAWN_EVENT(gesso_arm_wait_event)
+    SPAWN_EVENT(test_event)
 #endif
     CALL(btlevtcmd_WaitEventEnd, LW(14))
     CALL(btlevtcmd_WaitEventEnd, LW(15))
@@ -342,7 +360,7 @@ static EVT_BEGIN(damage_event)
     END_IF
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 4, 0)
     RETURN
 EVT_END()
@@ -493,7 +511,7 @@ static EVT_BEGIN(attack_event)
     IF_INT_NOT_EQUAL(LW(0), 2)
         GOTO(99)
     END_IF
-    CALL_CHILD(PTR(gesso_ikasumi_attack))
+    CALL_CHILD(gesso_ikasumi_attack)
     RETURN
     LABEL(99)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -604,7 +622,7 @@ EVT_BEGIN(gesso_ikasumi_attack)
     RETURN
 EVT_END()
 
-USER_FUNC(_ikasumi_effect) {
+static USER_FUNC(_ikasumi_effect) {
     BattleWork* wp = _battleWorkPointer;
     EvtWord* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -628,7 +646,7 @@ USER_FUNC(_ikasumi_effect) {
 }
 
 #if VERSION <= VERSION_JP
-USER_FUNC(_test_rtn) {
+static USER_FUNC(_test_rtn) {
     BattleWork* wp = _battleWorkPointer;
     s32 id = BattleTransID(event, -2);
     BattleUnit* unit;

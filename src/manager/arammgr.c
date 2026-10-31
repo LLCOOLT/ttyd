@@ -14,9 +14,9 @@ static ARAMWork work;
 static ARAMWork* wp = &work;
 
 // local prototypes
-void aramCallbackGarbage(u32 request);
-void arqCallbackToAram(u32 request);
-void arqCallbackToMram(u32 request);
+static void aramCallbackGarbage(u32 request);
+static void arqCallbackToAram(u32 request);
+static void arqCallbackToMram(u32 request);
 
 void aramMgrInit(void) {
     memset(wp, 0, sizeof(ARAMWork));
@@ -34,13 +34,13 @@ void aramMgrInit(void) {
     wp->tail = NULL;
 }
 
-void aramCallbackGarbage(u32 request) {
+static void aramCallbackGarbage(u32 request) {
     wp->busy = 0;
     DCInvalidateRange(wp->buffer, wp->bufferSize);
     ICInvalidateRange(wp->buffer, wp->bufferSize);
 }
 
-void aramMgrGarbage(void) {
+static void aramMgrGarbage(void) {
     ARAMEntry* head;
     ARAMEntry* entry;
     ARAMEntry* prev;
@@ -106,7 +106,7 @@ void aramMgrGarbage(void) {
     wp->nextAddr = addr;
 }
 
-void arqCallbackToAram(u32 request) {
+static void arqCallbackToAram(u32 request) {
     ARAMEntry* entry;
 
     for (entry = wp->head; entry != NULL; entry = entry->next) {
@@ -162,7 +162,7 @@ ARAMEntry* aramMgrToAram(void* src, u32 size) {
     return entry;
 }
 
-void arqCallbackToMram(u32 request) {
+static void arqCallbackToMram(u32 request) {
     ARAMEntry* entry;
 
     for (entry = wp->head; entry != NULL; entry = entry->next) {

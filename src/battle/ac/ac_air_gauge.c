@@ -32,7 +32,7 @@ typedef struct GaugeKey {
 } GaugeKey;
 
 #define GAUGE_TABLE {{0, 0.0f, 1}, {20, 1.0f, 1}, {40, 1.0f, 1}, {80, 0.0f, 0}, {-1, -1.0f, 0}}
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 // the demo curve rises faster and falls off sooner; table 3 already has the retail one
 #define GAUGE_TABLE_DEMO {{0, 0.0f, 1}, {10, 1.2f, 1}, {30, 0.7f, 1}, {50, 0.0f, 0}, {-1, -1.0f, 0}}
 GaugeKey _table_0[5] = GAUGE_TABLE_DEMO;
@@ -61,7 +61,7 @@ typedef struct AirPw {
 } AirPw;
 
 static void actionCommandDisp(f32 x, f32 y);
-f32 _GetGaugeDecValue(void);
+static f32 _GetGaugeDecValue(void);
 
 s32 battleAcMain_AirGauge(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
@@ -212,7 +212,7 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
     return 1;
 }
 
-f32 _GetGaugeDecValue(void) {
+static f32 _GetGaugeDecValue(void) {
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
     AirPw* pw = (AirPw*)ac->work;
@@ -220,7 +220,8 @@ f32 _GetGaugeDecValue(void) {
     f32 base;
 
     switch ((u32)ac->params[7]) {
-#if VERSION == VERSION_DEMO
+        // Two copies: the demos use different gauge decrease values for most levels.
+#if VERSION <= VERSION_DEMO_US
         case 0:
             base = 0.0f;
             t = _table_0;

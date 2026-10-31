@@ -29,7 +29,6 @@
 #include "evt/evt_npc.h"
 #include "evt/evt_nannpc.h"
 #include "driver/extdrv.h"
-#include "party/party_motion.h"
 #include "eff/eff_mist.h"
 #include "eff/eff_splash.h"
 #include "eff/n64/eff_water_damage_n64.h"
@@ -76,12 +75,12 @@ static void draw(CameraId camera, void* param);
 static USER_FUNC(alpha_init_func);
 static USER_FUNC(alpha_set_func);
 static USER_FUNC(fune_eff);
-USER_FUNC(logo);
-USER_FUNC(marcoship_yure_init_func);
-USER_FUNC(urouro_func);
+static USER_FUNC(logo);
+static USER_FUNC(marcoship_yure_init_func);
+static USER_FUNC(urouro_func);
 static void draw(CameraId camera, void* param);
 static void pressStartGX(TitleLogoWork* wp, s32 alpha, f32 x, f32 y);
-void elmos1000tai_seq00(NanNPC* npc);
+static void elmos1000tai_seq00(NanNPC* npc);
 static void alpha_tev(MapTevCallbackInfo* info);
 
 extern EvtWord hiru_yoru_event[];
@@ -105,7 +104,11 @@ extern EvtWord elmos_a_kakushuku[];
 extern EvtWord elmos_a_kaku[];
 extern EvtWord elmos_a_shuku[];
 static ExtTexInfo ext_entry_data[21];
+#if VERSION <= VERSION_DEMO_US
+static s16 elmos_animtbl[21];
+#else
 static s16 elmos_animtbl[22];
+#endif
 s32 mist_pos[91];
 extern EvtWord mist_setup[];
 extern EvtWord marcoship_shizumu[];
@@ -158,7 +161,7 @@ EVT_BEGIN(yoru_hiru_event)
     RETURN
 EVT_END()
 
-USER_FUNC(urouro_func) {
+static USER_FUNC(urouro_func) {
     int t;
     EvtWord* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -300,7 +303,7 @@ EVT_BEGIN(urouro)
     RETURN
 EVT_END()
 
-USER_FUNC(marcoship_yure_init_func) {
+static USER_FUNC(marcoship_yure_init_func) {
     MarcoShip* ms;
 
     marcoship = ms = _mapAlloc(sizeof(MarcoShip));
@@ -639,7 +642,7 @@ static USER_FUNC(elmos1000tai_start) {
     return EVT_RETURN_DONE;
 }
 
-void elmos1000tai_seq00(NanNPC* npc) {
+static void elmos1000tai_seq00(NanNPC* npc) {
     s32 t;
 
     switch (npc->state) {
@@ -796,13 +799,13 @@ EVT_BEGIN(moonout_effect)
 EVT_END()
 
 EVT_BEGIN(moya_effect)
-    SPAWN_EVENT(PTR(moya_effect01))
-    SPAWN_EVENT(PTR(moya_effect02))
-    SPAWN_EVENT(PTR(moya_effect03))
-    SPAWN_EVENT(PTR(moya_effect04))
-    SPAWN_EVENT(PTR(moya_effect05))
+    SPAWN_EVENT(moya_effect01)
+    SPAWN_EVENT(moya_effect02)
+    SPAWN_EVENT(moya_effect03)
+    SPAWN_EVENT(moya_effect04)
+    SPAWN_EVENT(moya_effect05)
     CALL(evt_map_playanim, STRING("onryou"), 0, 0)
-    SPAWN_EVENT(PTR(moonout_effect))
+    SPAWN_EVENT(moonout_effect)
     RETURN
 EVT_END()
 
@@ -825,22 +828,22 @@ EVT_BEGIN(elmos_a_kakushuku)
     SET_VALUE(LW(0), 100)
     SET_VALUE(LW(1), 0)
     SET_VALUE(LW(2), 150)
-    SPAWN_EVENT(PTR(_kakushuku))
+    SPAWN_EVENT(_kakushuku)
     WAIT_MS(500)
     SET_VALUE(LW(0), 0)
     SET_VALUE(LW(1), 100)
     SET_VALUE(LW(2), 150)
-    SPAWN_EVENT(PTR(_kakushuku))
+    SPAWN_EVENT(_kakushuku)
     LOOP(0)
         SET_VALUE(LW(0), 100)
         SET_VALUE(LW(1), 150)
         SET_VALUE(LW(2), 100)
-        SPAWN_EVENT(PTR(_kakushuku))
+        SPAWN_EVENT(_kakushuku)
         WAIT_MS(100)
         SET_VALUE(LW(0), 150)
         SET_VALUE(LW(1), 100)
         SET_VALUE(LW(2), 100)
-        SPAWN_EVENT(PTR(_kakushuku))
+        SPAWN_EVENT(_kakushuku)
         WAIT_MS(100)
         IF_INT_EQUAL(GF(10), 0)
             BREAK_LOOP
@@ -854,7 +857,7 @@ EVT_BEGIN(elmos_a_kaku)
     SET_VALUE(LW(0), 0)
     SET_VALUE(LW(1), 100)
     SET_VALUE(LW(2), 150)
-    CALL_CHILD(PTR(_kakushuku))
+    CALL_CHILD(_kakushuku)
     RETURN
 EVT_END()
 
@@ -862,7 +865,7 @@ EVT_BEGIN(elmos_a_shuku)
     SET_VALUE(LW(0), 100)
     SET_VALUE(LW(1), 0)
     SET_VALUE(LW(2), 150)
-    CALL_CHILD(PTR(_kakushuku))
+    CALL_CHILD(_kakushuku)
     RETURN
 EVT_END()
 
@@ -893,7 +896,11 @@ static ExtTexInfo ext_entry_data[] = {
 static s16 elmos_animtbl[] = {
     0, 1, 2, 3, 4, 5, 6, 7,
     8, 9, 10, 11, 12, 13, 14, 15,
+#if VERSION <= VERSION_DEMO_US
+    16, 17, 18, 19, -1,
+#else
     16, 17, 18, 19, -1, 0,
+#endif
 };
 
 static EVT_BEGIN(nannpc_mode_setup)
@@ -1045,72 +1052,72 @@ EVT_BEGIN(onryo_event)
     CALL(evt_party_set_pos, 0, 0, -1000, 0)
 #endif
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_a1"), MAPOBJ_FLAG_BBOX_CULL)
-    CALL(evt_npc_set_position, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 116, 116, -100)
-    CALL(evt_npc_set_ry, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 90)
-    CALL(evt_npc_set_position, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), 25, 90, -163)
-    CALL(evt_npc_set_ry, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), 90)
-    CALL(evt_npc_set_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 21, 90, -55)
-    CALL(evt_npc_set_ry, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 90)
-    CALL(evt_npc_set_position, STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"), -11, 90, -163)
-    CALL(evt_npc_set_ry, STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"), 90)
-    CALL(evt_npc_set_position, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), -15, 90, -40)
-    CALL(evt_npc_set_ry, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), 90)
-    CALL(evt_npc_set_position, STRING(/*"水夫A"*/"\x90\x85\x95\x76\x41"), -65, 114, -145)
-    CALL(evt_npc_set_ry, STRING(/*"水夫A"*/"\x90\x85\x95\x76\x41"), 90)
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"水夫A"*/"\x90\x85\x95\x76\x41"), NPC_FLAG_MOVE_ANIM)
-    CALL(evt_npc_set_stay_anim, STRING(/*"水夫A"*/"\x90\x85\x95\x76\x41"))
-    CALL(evt_npc_set_position, STRING(/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA"), -65, 114, -44)
-    CALL(evt_npc_set_ry, STRING(/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA"), 90)
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA"), NPC_FLAG_MOVE_ANIM)
-    CALL(evt_npc_set_stay_anim, STRING(/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA"))
-    CALL(evt_npc_set_position, STRING(/*"店員"*/"\x93\x58\x88\xF5"), -115, 163, -153)
-    CALL(evt_npc_set_ry, STRING(/*"店員"*/"\x93\x58\x88\xF5"), 90)
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"店員"*/"\x93\x58\x88\xF5"), NPC_FLAG_MOVE_ANIM)
-    CALL(evt_npc_set_stay_anim, STRING(/*"店員"*/"\x93\x58\x88\xF5"))
-    CALL(evt_npc_set_position, STRING(/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5"), -119, 163, -62)
-    CALL(evt_npc_set_ry, STRING(/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5"), 90)
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5"), NPC_FLAG_MOVE_ANIM)
-    CALL(evt_npc_set_stay_anim, STRING(/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5"))
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"水夫A"*/"\x90\x85\x95\x76\x41"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"店員"*/"\x93\x58\x88\xF5"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_sound_data_set, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), STRING("SFX_STG5_MARCO_MOVE1L"), STRING("SFX_STG5_MARCO_MOVE1R"), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
+    CALL(evt_npc_set_position, STRING("マルコ"), 116, 116, -100)
+    CALL(evt_npc_set_ry, STRING("マルコ"), 90)
+    CALL(evt_npc_set_position, STRING("オドオド水夫"), 25, 90, -163)
+    CALL(evt_npc_set_ry, STRING("オドオド水夫"), 90)
+    CALL(evt_npc_set_position, STRING("ガラの悪い水夫"), 21, 90, -55)
+    CALL(evt_npc_set_ry, STRING("ガラの悪い水夫"), 90)
+    CALL(evt_npc_set_position, STRING("サンダース"), -11, 90, -163)
+    CALL(evt_npc_set_ry, STRING("サンダース"), 90)
+    CALL(evt_npc_set_position, STRING("めがね水夫"), -15, 90, -40)
+    CALL(evt_npc_set_ry, STRING("めがね水夫"), 90)
+    CALL(evt_npc_set_position, STRING("水夫A"), -65, 114, -145)
+    CALL(evt_npc_set_ry, STRING("水夫A"), 90)
+    CALL(evt_npc_flag_onoff, 0, STRING("水夫A"), NPC_FLAG_MOVE_ANIM)
+    CALL(evt_npc_set_stay_anim, STRING("水夫A"))
+    CALL(evt_npc_set_position, STRING("水夫ボム兵"), -65, 114, -44)
+    CALL(evt_npc_set_ry, STRING("水夫ボム兵"), 90)
+    CALL(evt_npc_flag_onoff, 0, STRING("水夫ボム兵"), NPC_FLAG_MOVE_ANIM)
+    CALL(evt_npc_set_stay_anim, STRING("水夫ボム兵"))
+    CALL(evt_npc_set_position, STRING("店員"), -115, 163, -153)
+    CALL(evt_npc_set_ry, STRING("店員"), 90)
+    CALL(evt_npc_flag_onoff, 0, STRING("店員"), NPC_FLAG_MOVE_ANIM)
+    CALL(evt_npc_set_stay_anim, STRING("店員"))
+    CALL(evt_npc_set_position, STRING("宿店員"), -119, 163, -62)
+    CALL(evt_npc_set_ry, STRING("宿店員"), 90)
+    CALL(evt_npc_flag_onoff, 0, STRING("宿店員"), NPC_FLAG_MOVE_ANIM)
+    CALL(evt_npc_set_stay_anim, STRING("宿店員"))
+    CALL(evt_npc_flag_onoff, 1, STRING("ガラの悪い水夫"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("マルコ"), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM | NPC_FLAG_INTANGIBLE)
+    CALL(evt_npc_flag_onoff, 1, STRING("マルコ"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 1, STRING("オドオド水夫"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 1, STRING("ガラの悪い水夫"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 1, STRING("サンダース"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 1, STRING("めがね水夫"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 1, STRING("水夫A"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 1, STRING("水夫ボム兵"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 1, STRING("店員"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 1, STRING("宿店員"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_sound_data_set, STRING("マルコ"), STRING("SFX_STG5_MARCO_MOVE1L"), STRING("SFX_STG5_MARCO_MOVE1R"), EVT_NULLPTR, EVT_NULLPTR, EVT_NULLPTR)
     CALL(evt_cam3d_evt_set, -10, 340, 558, -11, 131, -108, 0, 11)
     WAIT_MS(1000)
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"水夫A"*/"\x90\x85\x95\x76\x41"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"店員"*/"\x93\x58\x88\xF5"), NPC_FLAG_INSTANT_TURN)
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 0, STRING("マルコ"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 0, STRING("オドオド水夫"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 0, STRING("ガラの悪い水夫"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 0, STRING("サンダース"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 0, STRING("めがね水夫"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 0, STRING("水夫A"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 0, STRING("水夫ボム兵"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 0, STRING("店員"), NPC_FLAG_INSTANT_TURN)
+    CALL(evt_npc_flag_onoff, 0, STRING("宿店員"), NPC_FLAG_INSTANT_TURN)
     WAIT_MS(1000)
-    CALL(evt_msg_print, 0, STRING("stg5_sea_01"), 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_01"), 0, STRING("マルコ"))
     WAIT_MS(500)
     CALL(evt_cam3d_evt_set, 480, 352, 214, 58, 150, -96, 0, 11)
     WAIT_MS(1500)
-    CALL(evt_npc_set_ry, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 270)
+    CALL(evt_npc_set_ry, STRING("マルコ"), 270)
     WAIT_MS(500)
-    CALL(evt_npc_move_position, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 107, -100, 0, FLOAT(60.0f), 0)
+    CALL(evt_npc_move_position, STRING("マルコ"), 107, -100, 0, FLOAT(60.0f), 0)
     WAIT_MS(500)
-    CALL(evt_msg_print, 0, STRING("stg5_sea_02"), 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_02"), 0, STRING("マルコ"))
     CALL(evt_cam3d_evt_set, 0, 300, 985, 0, 175, -108, 0, 11)
     CALL(evt_snd_bgmoff, PSND_FADE_DIP_TO(70))
     SET_VALUE(GW(0), 0)
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), NPC_FLAG_TALK_ANIM)
-    CALL(evt_npc_set_anim, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), STRING("S_2"))
+    CALL(evt_npc_flag_onoff, 0, STRING("マルコ"), NPC_FLAG_TALK_ANIM)
+    CALL(evt_npc_set_anim, STRING("マルコ"), STRING("S_2"))
     BEGIN_INLINE_EVENT
-        CALL(evt_msg_print, 0, STRING("small_01"), 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"))
+        CALL(evt_msg_print, 0, STRING("small_01"), 0, STRING("マルコ"))
         LOOP(0)
             IF_INT_EQUAL(GW(0), 1)
                 BREAK_LOOP
@@ -1122,13 +1129,13 @@ EVT_BEGIN(onryo_event)
     CALL(evt_set_nami_anim_rate, FLOAT(0.69921875f))
     WAIT_MS(1000)
 #if VERSION == VERSION_EU // PAL: NPC flag 0x200 on the two sailors for this part of the scene
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), NPC_FLAG_TALK_ANIM)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), NPC_FLAG_TALK_ANIM)
+    CALL(evt_npc_flag_onoff, 1, STRING("ガラの悪い水夫"), NPC_FLAG_TALK_ANIM)
+    CALL(evt_npc_flag_onoff, 1, STRING("オドオド水夫"), NPC_FLAG_TALK_ANIM)
 #endif
     WAIT_MS(1500)
-    CALL(evt_msg_print, 0, STRING("stg5_sea_03"), 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_03"), 0, STRING("ガラの悪い水夫"))
     WAIT_MS(500)
-    CALL(evt_msg_print, 0, STRING("stg5_sea_04"), 0, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_04"), 0, STRING("オドオド水夫"))
     CALL(marcoship_stop_func)
     BEGIN_INLINE_EVENT
         CALL(evt_snd_bgmoff_f, PSND_FADE_OUT, 2000)
@@ -1145,48 +1152,48 @@ EVT_BEGIN(onryo_event)
     CALL(evt_set_nami_anim_rate, FLOAT(0.099609375f))
     CALL(evt_mapobj_flag_onoff, MAPOBJ_SINGLE, 1, STRING("S_fne_nami"), MAPOBJ_FLAG_HIDE)
     WAIT_MS(500)
-    CALL(evt_msg_print, 0, STRING("stg5_sea_05"), 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_05"), 0, STRING("ガラの悪い水夫"))
     WAIT_MS(1000)
     SET_VALUE(GW(0), 1)
-    CALL(evt_npc_flag_onoff, 1, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), NPC_FLAG_TALK_ANIM)
+    CALL(evt_npc_flag_onoff, 1, STRING("マルコ"), NPC_FLAG_TALK_ANIM)
     CALL(evt_msg_close, STRING("small_01"))
-    CALL(evt_npc_set_anim, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), STRING("T_1"))
+    CALL(evt_npc_set_anim, STRING("マルコ"), STRING("T_1"))
     WAIT_MS(2000)
-    CALL(evt_npc_set_anim, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), STRING("S_1"))
+    CALL(evt_npc_set_anim, STRING("マルコ"), STRING("S_1"))
     CALL(marcoship_stop_wait_func)
     WAIT_MS(500)
-    CALL(evt_npc_move_position, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 68, -71, 0, FLOAT(120.0f), 0)
+    CALL(evt_npc_move_position, STRING("マルコ"), 68, -71, 0, FLOAT(120.0f), 0)
     WAIT_MS(500)
-    CALL(evt_msg_print, 0, STRING("stg5_sea_06"), 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_06"), 0, STRING("マルコ"))
     WAIT_MS(500)
-    CALL(evt_msg_print, 0, STRING("stg5_sea_07"), 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_07"), 0, STRING("ガラの悪い水夫"))
     CALL(evt_cam3d_evt_set, -50, 470, 588, -50, 390, -107, 500, 11)
     WAIT_MS(500)
-    CALL(evt_npc_set_anim, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), STRING("R_1"))
-    CALL(evt_npc_set_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), -12, 90, -80)
-    CALL(evt_npc_set_ry, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 270)
-    CALL(evt_npc_glide_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), -52, 315, -75, 0, FLOAT(120.0f), 0, 0, 0)
-    CALL(evt_npc_set_anim, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), STRING("S_1"))
+    CALL(evt_npc_set_anim, STRING("ガラの悪い水夫"), STRING("R_1"))
+    CALL(evt_npc_set_position, STRING("ガラの悪い水夫"), -12, 90, -80)
+    CALL(evt_npc_set_ry, STRING("ガラの悪い水夫"), 270)
+    CALL(evt_npc_glide_position, STRING("ガラの悪い水夫"), -52, 315, -75, 0, FLOAT(120.0f), 0, 0, 0)
+    CALL(evt_npc_set_anim, STRING("ガラの悪い水夫"), STRING("S_1"))
     WAIT_MS(500)
-    CALL(evt_npc_set_ry, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 270)
-    CALL(evt_npc_set_anim, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), STRING("R_1"))
-    CALL(evt_npc_glide_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), -78, 315, -79, 0, FLOAT(120.0f), 0, 0, 0)
-    CALL(evt_npc_set_anim, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), STRING("S_1"))
+    CALL(evt_npc_set_ry, STRING("ガラの悪い水夫"), 270)
+    CALL(evt_npc_set_anim, STRING("ガラの悪い水夫"), STRING("R_1"))
+    CALL(evt_npc_glide_position, STRING("ガラの悪い水夫"), -78, 315, -79, 0, FLOAT(120.0f), 0, 0, 0)
+    CALL(evt_npc_set_anim, STRING("ガラの悪い水夫"), STRING("S_1"))
     WAIT_MS(1500)
-    CALL(evt_npc_set_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), -23, 315, -79)
-    CALL(evt_npc_set_rotate, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 0, 180, 0)
+    CALL(evt_npc_set_position, STRING("ガラの悪い水夫"), -23, 315, -79)
+    CALL(evt_npc_set_rotate, STRING("ガラの悪い水夫"), 0, 180, 0)
     WAIT_MS(1200)
-    CALL(evt_npc_set_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), -78, 315, -79)
-    CALL(evt_npc_set_rotate, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 0, 0, 0)
+    CALL(evt_npc_set_position, STRING("ガラの悪い水夫"), -78, 315, -79)
+    CALL(evt_npc_set_rotate, STRING("ガラの悪い水夫"), 0, 0, 0)
     WAIT_MS(1800)
-    CALL(evt_npc_set_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), -23, 315, -79)
-    CALL(evt_npc_set_rotate, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 0, 180, 0)
+    CALL(evt_npc_set_position, STRING("ガラの悪い水夫"), -23, 315, -79)
+    CALL(evt_npc_set_rotate, STRING("ガラの悪い水夫"), 0, 180, 0)
     WAIT_MS(1000)
-    CALL(evt_npc_set_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), -45, 336, -73)
+    CALL(evt_npc_set_position, STRING("エルモスA"), -45, 336, -73)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_ELMOS_APPEAR1_2"), -45, 336, -73, 0)
-    CALL(evt_npc_set_ry, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 90)
+    CALL(evt_npc_set_ry, STRING("エルモスA"), 90)
     WAIT_MS(1000)
-    CALL(evt_npc_get_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), LW(10), LW(11), LW(12))
+    CALL(evt_npc_get_position, STRING("エルモスA"), LW(10), LW(11), LW(12))
     SET_VALUE(LW(13), LW(10))
     SET_VALUE(LW(14), LW(11))
     SET_VALUE(LW(15), LW(12))
@@ -1194,19 +1201,19 @@ EVT_BEGIN(onryo_event)
     ADD(LW(14), -5)
     ADD(LW(15), 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_ELMOS_MOVE1"), LW(10), LW(11), LW(12), 0)
-    CALL(evt_npc_glide_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), LW(13), LW(14), LW(15), 0, FLOAT(120.0f), 0, 0, 0)
-    CALL(evt_npc_glide_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), LW(10), LW(11), LW(12), 0, FLOAT(120.0f), 0, 0, 0)
+    CALL(evt_npc_glide_position, STRING("エルモスA"), LW(13), LW(14), LW(15), 0, FLOAT(120.0f), 0, 0, 0)
+    CALL(evt_npc_glide_position, STRING("エルモスA"), LW(10), LW(11), LW(12), 0, FLOAT(120.0f), 0, 0, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_ELMOS_MOVE1"), LW(10), LW(11), LW(12), 0)
-    CALL(evt_npc_glide_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), LW(13), LW(14), LW(15), 0, FLOAT(120.0f), 0, 0, 0)
-    CALL(evt_npc_glide_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), LW(10), LW(11), LW(12), 0, FLOAT(120.0f), 0, 0, 0)
+    CALL(evt_npc_glide_position, STRING("エルモスA"), LW(13), LW(14), LW(15), 0, FLOAT(120.0f), 0, 0, 0)
+    CALL(evt_npc_glide_position, STRING("エルモスA"), LW(10), LW(11), LW(12), 0, FLOAT(120.0f), 0, 0, 0)
     WAIT_MS(500)
-    CALL(evt_msg_print, 0, STRING("stg5_sea_08"), 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"))
-    CALL(evt_npc_set_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 0, -1000, 0)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_08"), 0, STRING("ガラの悪い水夫"))
+    CALL(evt_npc_set_position, STRING("エルモスA"), 0, -1000, 0)
     BEGIN_INLINE_EVENT
         CALL(evt_sub_intpl_msec_init, 0, 180, 0, 200)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
-            CALL(evt_npc_set_rotate, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 0, LW(0), 0)
+            CALL(evt_npc_set_rotate, STRING("ガラの悪い水夫"), 0, LW(0), 0)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
             END_IF
@@ -1217,29 +1224,29 @@ EVT_BEGIN(onryo_event)
     SPAWN_EVENT(moya_effect)
     WAIT_MS(1500)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_get_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), LW(0), LW(1), LW(2))
+        CALL(evt_npc_get_position, STRING("ガラの悪い水夫"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_NPC_QUESTION_MARK1"), LW(0), LW(1), LW(2), 0)
         CALL(evt_eff_fukidashi, 2, STRING(""), 0, 1, 0, LW(0), LW(1), LW(2), 30, 0, 90)
     END_INLINE_EVENT
     WAIT_MS(1000)
-    CALL(evt_npc_set_ry, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 90)
+    CALL(evt_npc_set_ry, STRING("ガラの悪い水夫"), 90)
     WAIT_MS(500)
-    CALL(evt_npc_set_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), LW(10), LW(11), LW(12))
+    CALL(evt_npc_set_position, STRING("エルモスA"), LW(10), LW(11), LW(12))
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_ELMOS_APPEAR1_2"), LW(10), LW(11), LW(12), 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_ELMOS_MOVE1"), LW(10), LW(11), LW(12), 0)
-    CALL(evt_npc_glide_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), LW(13), LW(14), LW(15), 0, FLOAT(120.0f), 0, 0, 0)
-    CALL(evt_npc_glide_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), LW(10), LW(11), LW(12), 0, FLOAT(120.0f), 0, 0, 0)
+    CALL(evt_npc_glide_position, STRING("エルモスA"), LW(13), LW(14), LW(15), 0, FLOAT(120.0f), 0, 0, 0)
+    CALL(evt_npc_glide_position, STRING("エルモスA"), LW(10), LW(11), LW(12), 0, FLOAT(120.0f), 0, 0, 0)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_ELMOS_MOVE1"), LW(10), LW(11), LW(12), 0)
-    CALL(evt_npc_glide_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), LW(13), LW(14), LW(15), 0, FLOAT(120.0f), 0, 0, 0)
-    CALL(evt_npc_glide_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), LW(10), LW(11), LW(12), 0, FLOAT(120.0f), 0, 0, 0)
+    CALL(evt_npc_glide_position, STRING("エルモスA"), LW(13), LW(14), LW(15), 0, FLOAT(120.0f), 0, 0, 0)
+    CALL(evt_npc_glide_position, STRING("エルモスA"), LW(10), LW(11), LW(12), 0, FLOAT(120.0f), 0, 0, 0)
     WAIT_MS(500)
-    CALL(evt_msg_print, 0, STRING("stg5_sea_09"), 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_09"), 0, STRING("ガラの悪い水夫"))
     WAIT_MS(1000)
-    CALL(evt_npc_set_ry, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 270)
+    CALL(evt_npc_set_ry, STRING("ガラの悪い水夫"), 270)
     WAIT_MS(1000)
     CALL(evt_cam3d_evt_set, -50, 412, 340, -50, 360, -108, 100, 11)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_get_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), LW(0), LW(1), LW(2))
+        CALL(evt_npc_get_position, STRING("ガラの悪い水夫"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_NPC_BIKKURI_MARK1"), LW(0), LW(1), LW(2), 0)
         CALL(evt_eff_fukidashi, 2, STRING(""), 0, 0, 0, LW(0), LW(1), LW(2), 30, 0, 60)
     END_INLINE_EVENT
@@ -1259,111 +1266,111 @@ EVT_BEGIN(onryo_event)
         WAIT_MS(100)
         SET_VALUE(GF(0), 0)
     END_INLINE_EVENT
-    CALL(evt_msg_print, 0, STRING("stg5_sea_11"), 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_11"), 0, STRING("ガラの悪い水夫"))
     WAIT_WHILE(GF(0))
 #if VERSION == VERSION_EU
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), NPC_FLAG_TALK_ANIM)
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), NPC_FLAG_TALK_ANIM)
+    CALL(evt_npc_flag_onoff, 0, STRING("ガラの悪い水夫"), NPC_FLAG_TALK_ANIM)
+    CALL(evt_npc_flag_onoff, 0, STRING("オドオド水夫"), NPC_FLAG_TALK_ANIM)
 #endif
-    CALL(evt_npc_set_anim, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), STRING("R_1"))
-    CALL(muj_npc_guruguru, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), -52, -90, 0, FLOAT(-12.0f), 3000)
+    CALL(evt_npc_set_anim, STRING("ガラの悪い水夫"), STRING("R_1"))
+    CALL(muj_npc_guruguru, STRING("ガラの悪い水夫"), -52, -90, 0, FLOAT(-12.0f), 3000)
     SET_VALUE(GF(0), 1)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_set_ry, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 270)
-        CALL(evt_npc_glide_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), -52, 315, -70, 0, FLOAT(180.0f), 0, 0, 0)
-        CALL(evt_npc_set_ry, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 90)
-        CALL(evt_npc_glide_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), -43, 90, -72, 0, FLOAT(180.0f), 0, 0, 0)
-        CALL(evt_npc_set_ry, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 90)
-        CALL(evt_npc_glide_position, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 20, 90, -55, 0, FLOAT(180.0f), 0, 0, 0)
-        CALL(evt_npc_jump_position_nohit, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), 20, 90, -55, 100, 30)
+        CALL(evt_npc_set_ry, STRING("ガラの悪い水夫"), 270)
+        CALL(evt_npc_glide_position, STRING("ガラの悪い水夫"), -52, 315, -70, 0, FLOAT(180.0f), 0, 0, 0)
+        CALL(evt_npc_set_ry, STRING("ガラの悪い水夫"), 90)
+        CALL(evt_npc_glide_position, STRING("ガラの悪い水夫"), -43, 90, -72, 0, FLOAT(180.0f), 0, 0, 0)
+        CALL(evt_npc_set_ry, STRING("ガラの悪い水夫"), 90)
+        CALL(evt_npc_glide_position, STRING("ガラの悪い水夫"), 20, 90, -55, 0, FLOAT(180.0f), 0, 0, 0)
+        CALL(evt_npc_jump_position_nohit, STRING("ガラの悪い水夫"), 20, 90, -55, 100, 30)
         SET_VALUE(GF(0), 0)
     END_INLINE_EVENT
     WAIT_MS(500)
     CALL(evt_cam3d_evt_set, -10, 340, 558, -11, 131, -108, 1000, 11)
     WAIT_WHILE(GF(0))
-    CALL(evt_msg_print, 0, STRING("stg5_sea_12"), 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_12"), 0, STRING("ガラの悪い水夫"))
     WAIT_MS(500)
-    CALL(evt_msg_print, 0, STRING("stg5_sea_13"), 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_13"), 0, STRING("マルコ"))
     WAIT_MS(500)
     SPAWN_EVENT(mist_setup)
-    CALL(evt_npc_set_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 168, 160, -84)
-    CALL(evt_npc_set_position, STRING(/*"エルモスB"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x42"), 105, 100, -200)
-    CALL(evt_npc_set_position, STRING(/*"エルモスC"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x43"), 10, 110, -200)
-    CALL(evt_npc_set_position, STRING(/*"エルモスD"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x44"), -70, 105, -200)
-    CALL(evt_npc_set_position, STRING(/*"エルモスE"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x45"), 125, 105, 0)
-    CALL(evt_npc_set_position, STRING(/*"エルモスF"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x46"), 10, 100, 0)
-    CALL(evt_npc_set_position, STRING(/*"エルモスG"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x47"), -80, 110, 0)
-    CALL(evt_npc_set_ry, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 270)
-    CALL(evt_npc_set_ry, STRING(/*"エルモスB"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x42"), 270)
-    CALL(evt_npc_set_ry, STRING(/*"エルモスC"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x43"), 270)
-    CALL(evt_npc_set_ry, STRING(/*"エルモスD"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x44"), 90)
-    CALL(evt_npc_set_ry, STRING(/*"エルモスE"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x45"), 270)
-    CALL(evt_npc_set_ry, STRING(/*"エルモスF"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x46"), 270)
-    CALL(evt_npc_set_ry, STRING(/*"エルモスG"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x47"), 90)
-    CALL(evt_npc_set_color, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 255, 255, 255, 0)
-    CALL(evt_npc_set_color, STRING(/*"エルモスB"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x42"), 255, 255, 255, 0)
-    CALL(evt_npc_set_color, STRING(/*"エルモスC"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x43"), 255, 255, 255, 0)
-    CALL(evt_npc_set_color, STRING(/*"エルモスD"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x44"), 255, 255, 255, 0)
-    CALL(evt_npc_set_color, STRING(/*"エルモスE"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x45"), 255, 255, 255, 0)
-    CALL(evt_npc_set_color, STRING(/*"エルモスF"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x46"), 255, 255, 255, 0)
-    CALL(evt_npc_set_color, STRING(/*"エルモスG"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x47"), 255, 255, 255, 0)
+    CALL(evt_npc_set_position, STRING("エルモスA"), 168, 160, -84)
+    CALL(evt_npc_set_position, STRING("エルモスB"), 105, 100, -200)
+    CALL(evt_npc_set_position, STRING("エルモスC"), 10, 110, -200)
+    CALL(evt_npc_set_position, STRING("エルモスD"), -70, 105, -200)
+    CALL(evt_npc_set_position, STRING("エルモスE"), 125, 105, 0)
+    CALL(evt_npc_set_position, STRING("エルモスF"), 10, 100, 0)
+    CALL(evt_npc_set_position, STRING("エルモスG"), -80, 110, 0)
+    CALL(evt_npc_set_ry, STRING("エルモスA"), 270)
+    CALL(evt_npc_set_ry, STRING("エルモスB"), 270)
+    CALL(evt_npc_set_ry, STRING("エルモスC"), 270)
+    CALL(evt_npc_set_ry, STRING("エルモスD"), 90)
+    CALL(evt_npc_set_ry, STRING("エルモスE"), 270)
+    CALL(evt_npc_set_ry, STRING("エルモスF"), 270)
+    CALL(evt_npc_set_ry, STRING("エルモスG"), 90)
+    CALL(evt_npc_set_color, STRING("エルモスA"), 255, 255, 255, 0)
+    CALL(evt_npc_set_color, STRING("エルモスB"), 255, 255, 255, 0)
+    CALL(evt_npc_set_color, STRING("エルモスC"), 255, 255, 255, 0)
+    CALL(evt_npc_set_color, STRING("エルモスD"), 255, 255, 255, 0)
+    CALL(evt_npc_set_color, STRING("エルモスE"), 255, 255, 255, 0)
+    CALL(evt_npc_set_color, STRING("エルモスF"), 255, 255, 255, 0)
+    CALL(evt_npc_set_color, STRING("エルモスG"), 255, 255, 255, 0)
     CALL(evt_snd_sfxon, STRING("SFX_STG5_ELMOS_APPEAR1_2"), 0)
     CALL(evt_sub_intpl_msec_init, 11, 0, 255, 1000)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value)
-        CALL(evt_npc_set_color, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 255, 255, 255, LW(0))
-        CALL(evt_npc_set_color, STRING(/*"エルモスB"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x42"), 255, 255, 255, LW(0))
-        CALL(evt_npc_set_color, STRING(/*"エルモスC"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x43"), 255, 255, 255, LW(0))
-        CALL(evt_npc_set_color, STRING(/*"エルモスD"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x44"), 255, 255, 255, LW(0))
-        CALL(evt_npc_set_color, STRING(/*"エルモスE"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x45"), 255, 255, 255, LW(0))
-        CALL(evt_npc_set_color, STRING(/*"エルモスF"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x46"), 255, 255, 255, LW(0))
-        CALL(evt_npc_set_color, STRING(/*"エルモスG"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x47"), 255, 255, 255, LW(0))
+        CALL(evt_npc_set_color, STRING("エルモスA"), 255, 255, 255, LW(0))
+        CALL(evt_npc_set_color, STRING("エルモスB"), 255, 255, 255, LW(0))
+        CALL(evt_npc_set_color, STRING("エルモスC"), 255, 255, 255, LW(0))
+        CALL(evt_npc_set_color, STRING("エルモスD"), 255, 255, 255, LW(0))
+        CALL(evt_npc_set_color, STRING("エルモスE"), 255, 255, 255, LW(0))
+        CALL(evt_npc_set_color, STRING("エルモスF"), 255, 255, 255, LW(0))
+        CALL(evt_npc_set_color, STRING("エルモスG"), 255, 255, 255, LW(0))
         IF_INT_EQUAL(LW(1), 0)
             BREAK_LOOP
         END_IF
         WAIT_FRAMES(1)
     END_LOOP
     WAIT_MS(500)
-    SET_VALUE(LW(0), STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"))
+    SET_VALUE(LW(0), STRING("エルモスA"))
     SPAWN_EVENT_GET_ID(PTR(fuwafuwa), GW(1))
-    SET_VALUE(LW(0), STRING(/*"エルモスB"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x42"))
+    SET_VALUE(LW(0), STRING("エルモスB"))
     CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
     ADD(LW(1), -20)
     SET_VALUE(LW(4), 1)
     SET_VALUE(LW(5), 850)
     SPAWN_EVENT(urouro_fuwafuwa)
-    SET_VALUE(LW(0), STRING(/*"エルモスC"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x43"))
+    SET_VALUE(LW(0), STRING("エルモスC"))
     CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
     ADD(LW(1), -25)
     SET_VALUE(LW(4), 1)
     SET_VALUE(LW(5), 1000)
     SPAWN_EVENT(urouro_fuwafuwa)
-    SET_VALUE(LW(0), STRING(/*"エルモスD"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x44"))
+    SET_VALUE(LW(0), STRING("エルモスD"))
     CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
     ADD(LW(1), -22)
     SET_VALUE(LW(4), 1)
     SET_VALUE(LW(5), 900)
     SPAWN_EVENT(urouro_fuwafuwa)
-    SET_VALUE(LW(0), STRING(/*"エルモスE"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x45"))
+    SET_VALUE(LW(0), STRING("エルモスE"))
     CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
     ADD(LW(1), -30)
     SET_VALUE(LW(4), 1)
     SET_VALUE(LW(5), 1050)
     SPAWN_EVENT(urouro_fuwafuwa)
-    SET_VALUE(LW(0), STRING(/*"エルモスF"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x46"))
+    SET_VALUE(LW(0), STRING("エルモスF"))
     CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
     ADD(LW(1), -20)
     SET_VALUE(LW(4), 1)
     SET_VALUE(LW(5), 950)
     SPAWN_EVENT(urouro_fuwafuwa)
-    SET_VALUE(LW(0), STRING(/*"エルモスG"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x47"))
+    SET_VALUE(LW(0), STRING("エルモスG"))
     CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
     ADD(LW(1), -24)
     SET_VALUE(LW(4), 1)
     SET_VALUE(LW(5), 900)
     SPAWN_EVENT(urouro_fuwafuwa)
     CALL(evt_cam3d_evt_set, 2, 700, 1614, -1, 261, -108, 0, 11)
-    CALL(evt_npc_set_position, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 116, 116, -100)
+    CALL(evt_npc_set_position, STRING("マルコ"), 116, 116, -100)
     WAIT_MS(500)
     CALL(evt_snd_sfxon, STRING("SFX_STG5_ELMOS_VOICE1"), 0)
     CALL(evt_snd_sfxon, STRING("SFX_STG5_KORTESS_VOICE1"), 0)
@@ -1375,7 +1382,7 @@ EVT_BEGIN(onryo_event)
     CALL(evt_msg_toge, 1, 0, 0, 0)
     CALL(evt_msg_print, 0, STRING("stg5_sea_15"), 0, 0)
     WAIT_MS(500)
-    SET_VALUE(LW(0), STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"))
+    SET_VALUE(LW(0), STRING("オドオド水夫"))
     CALL(evt_npc_set_anim, LW(0), STRING("R_2"))
     CALL(evt_npc_flag_onoff, 0, LW(0), NPC_FLAG_MOVE_ANIM)
     CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
@@ -1383,7 +1390,7 @@ EVT_BEGIN(onryo_event)
     SET_VALUE(LW(4), 0)
     SET_VALUE(LW(5), 300)
     SPAWN_EVENT(urouro)
-    SET_VALUE(LW(0), STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"))
+    SET_VALUE(LW(0), STRING("ガラの悪い水夫"))
     CALL(evt_npc_set_run_anim, LW(0))
     CALL(evt_npc_flag_onoff, 0, LW(0), NPC_FLAG_MOVE_ANIM)
     CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
@@ -1391,7 +1398,7 @@ EVT_BEGIN(onryo_event)
     SET_VALUE(LW(4), 0)
     SET_VALUE(LW(5), 330)
     SPAWN_EVENT(urouro)
-    SET_VALUE(LW(0), STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"))
+    SET_VALUE(LW(0), STRING("サンダース"))
     CALL(evt_npc_set_run_anim, LW(0))
     CALL(evt_npc_flag_onoff, 0, LW(0), NPC_FLAG_MOVE_ANIM)
     CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
@@ -1399,7 +1406,7 @@ EVT_BEGIN(onryo_event)
     SET_VALUE(LW(4), 0)
     SET_VALUE(LW(5), 350)
     SPAWN_EVENT_GET_ID(PTR(urouro), GW(2))
-    SET_VALUE(LW(0), STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"))
+    SET_VALUE(LW(0), STRING("めがね水夫"))
     CALL(evt_npc_set_run_anim, LW(0))
     CALL(evt_npc_flag_onoff, 0, LW(0), NPC_FLAG_MOVE_ANIM)
     CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
@@ -1407,7 +1414,7 @@ EVT_BEGIN(onryo_event)
     SET_VALUE(LW(4), 0)
     SET_VALUE(LW(5), 340)
     SPAWN_EVENT_GET_ID(PTR(urouro), GW(3))
-    SET_VALUE(LW(0), STRING(/*"店員"*/"\x93\x58\x88\xF5"))
+    SET_VALUE(LW(0), STRING("店員"))
     CALL(evt_npc_set_run_anim, LW(0))
     CALL(evt_npc_flag_onoff, 0, LW(0), NPC_FLAG_MOVE_ANIM)
     CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
@@ -1415,7 +1422,7 @@ EVT_BEGIN(onryo_event)
     SET_VALUE(LW(4), 0)
     SET_VALUE(LW(5), 300)
     SPAWN_EVENT(urouro)
-    SET_VALUE(LW(0), STRING(/*"宿店員"*/"\x8F\x68\x93\x58\x88\xF5"))
+    SET_VALUE(LW(0), STRING("宿店員"))
     CALL(evt_npc_set_run_anim, LW(0))
     CALL(evt_npc_flag_onoff, 0, LW(0), NPC_FLAG_MOVE_ANIM)
     CALL(evt_npc_get_position, LW(0), LW(1), LW(2), LW(3))
@@ -1423,20 +1430,20 @@ EVT_BEGIN(onryo_event)
     SET_VALUE(LW(4), 0)
     SET_VALUE(LW(5), 340)
     SPAWN_EVENT(urouro)
-    SET_VALUE(LW(0), STRING(/*"水夫A"*/"\x90\x85\x95\x76\x41"))
+    SET_VALUE(LW(0), STRING("水夫A"))
     SPAWN_EVENT(buruburu)
-    SET_VALUE(LW(0), STRING(/*"水夫ボム兵"*/"\x90\x85\x95\x76\x83\x7B\x83\x80\x95\xBA"))
+    SET_VALUE(LW(0), STRING("水夫ボム兵"))
     SPAWN_EVENT(buruburu)
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
-    CALL(evt_npc_set_anim, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), STRING("O_1"))
+    CALL(evt_npc_flag_onoff, 0, STRING("マルコ"), NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM)
+    CALL(evt_npc_set_anim, STRING("マルコ"), STRING("O_1"))
     CALL(evt_mario_set_pose, STRING("M_I_O"))
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"), NPC_FLAG_TALK_ANIM)
-    CALL(evt_npc_flag_onoff, 0, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"), NPC_FLAG_TALK_ANIM)
-    CALL(evt_msg_print, 0, STRING("stg5_sea_16"), 0, STRING(/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76"))
-    CALL(evt_msg_print, 0, STRING("stg5_sea_17"), 0, STRING(/*"オドオド水夫"*/"\x83\x49\x83\x68\x83\x49\x83\x68\x90\x85\x95\x76"))
+    CALL(evt_npc_flag_onoff, 0, STRING("ガラの悪い水夫"), NPC_FLAG_TALK_ANIM)
+    CALL(evt_npc_flag_onoff, 0, STRING("オドオド水夫"), NPC_FLAG_TALK_ANIM)
+    CALL(evt_msg_print, 0, STRING("stg5_sea_16"), 0, STRING("ガラの悪い水夫"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_17"), 0, STRING("オドオド水夫"))
     CALL(evt_cam3d_evt_set, 115, 300, 323, 115, 165, -105, 500, 11)
     WAIT_MS(1000)
-    CALL(evt_msg_print, 0, STRING("stg5_sea_18"), 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_18"), 0, STRING("マルコ"))
     CALL(elmos1000tai_start)
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
@@ -1450,21 +1457,21 @@ EVT_BEGIN(onryo_event)
     SET_VALUE(GF(11), 1)
     SPAWN_EVENT(elmos_a_kakushuku)
     WAIT_MS(500)
-    CALL(evt_npc_set_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 80, 126, -100)
-    CALL(evt_npc_set_ry, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 90)
+    CALL(evt_npc_set_position, STRING("エルモスA"), 80, 126, -100)
+    CALL(evt_npc_set_ry, STRING("エルモスA"), 90)
     WAIT_MS(500)
     WAIT_MS(1000)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_get_position, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), LW(0), LW(1), LW(2))
+        CALL(evt_npc_get_position, STRING("マルコ"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_EVT_NPC_BIKKURI_MARK1"), LW(0), LW(1), LW(2), 0)
         ADD(LW(1), 20)
         CALL(evt_eff_fukidashi, 2, STRING(""), 0, 0, 0, LW(0), LW(1), LW(2), 30, 0, 90)
     END_INLINE_EVENT
     WAIT_MS(1000)
-    CALL(evt_msg_print, 0, STRING("stg5_sea_20"), 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"))
-    CALL(evt_npc_set_anim, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), STRING("B_1"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_20"), 0, STRING("マルコ"))
+    CALL(evt_npc_set_anim, STRING("マルコ"), STRING("B_1"))
     WAIT_MS(1000)
-    CALL(evt_msg_print, 0, STRING("stg5_sea_21"), 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_21"), 0, STRING("マルコ"))
     SET_VALUE(GF(10), 0)
     WAIT_WHILE(GF(11))
     BEGIN_INLINE_EVENT
@@ -1477,14 +1484,14 @@ EVT_BEGIN(onryo_event)
         CALL(evt_cam_shake, CAMERA_3D, FLOAT(0.009765625f), FLOAT(0.0f), 0)
     END_INLINE_EVENT
     CALL_CHILD(elmos_a_shuku)
-    CALL(evt_npc_set_position, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 168, 160, -84)
+    CALL(evt_npc_set_position, STRING("エルモスA"), 168, 160, -84)
     CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_ELMOS_APPEAR1"), 168, 160, -84, 0)
-    CALL(evt_npc_set_ry, STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"), 270)
+    CALL(evt_npc_set_ry, STRING("エルモスA"), 270)
     WAIT_MS(300)
     CALL_CHILD(elmos_a_kaku)
-    SET_VALUE(LW(0), STRING(/*"エルモスA"*/"\x83\x47\x83\x8B\x83\x82\x83\x58\x41"))
+    SET_VALUE(LW(0), STRING("エルモスA"))
     SPAWN_EVENT(fuwafuwa)
-    SET_VALUE(LW(0), STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"))
+    SET_VALUE(LW(0), STRING("マルコ"))
     CALL(evt_npc_set_anim, LW(0), STRING("R_2"))
     CALL(evt_npc_flag_onoff, 0, LW(0), NPC_FLAG_MOVE_ANIM)
     CALL(evt_npc_flag_onoff, 1, LW(0), NPC_FLAG_NO_WALL_HIT | NPC_FLAG_INTANGIBLE)
@@ -1495,35 +1502,35 @@ EVT_BEGIN(onryo_event)
     SPAWN_EVENT_GET_ID(PTR(urouro), GW(0))
     CALL(evt_cam3d_evt_set, 0, 358, 572, -1, 145, -108, 500, 11)
     WAIT_MS(1000)
-    CALL(evt_msg_print, 0, STRING("stg5_sea_22"), 0, STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"))
-    CALL(evt_msg_print, 0, STRING("stg5_sea_23"), 0, STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"))
-    CALL(evt_msg_print, 0, STRING("stg5_sea_24"), 0, STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_22"), 0, STRING("サンダース"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_23"), 0, STRING("サンダース"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_24"), 0, STRING("サンダース"))
     DELETE_EVENT(GW(2))
-    SET_VALUE(LW(10), STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"))
+    SET_VALUE(LW(10), STRING("サンダース"))
     SPAWN_EVENT(kirimomi)
     BEGIN_INLINE_EVENT
         WAIT_MS(400)
-        CALL(evt_npc_get_position, STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"), LW(0), LW(1), LW(2))
+        CALL(evt_npc_get_position, STRING("サンダース"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_NPC_FALL1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
-    CALL(evt_npc_jump_position_nohit, STRING(/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58"), -20, -100, -300, 600, 100)
+    CALL(evt_npc_jump_position_nohit, STRING("サンダース"), -20, -100, -300, 600, 100)
     CALL(evt_eff, 0, STRING("splash"), 0, -20, 30, -150, FLOAT(1.5f), 0, 0, 0, 0, 0, 0, 0)
-    CALL(evt_msg_print, 0, STRING("stg5_sea_25"), 0, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_25"), 0, STRING("めがね水夫"))
     DELETE_EVENT(GW(3))
-    SET_VALUE(LW(10), STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"))
+    SET_VALUE(LW(10), STRING("めがね水夫"))
     SPAWN_EVENT(kirimomi)
     BEGIN_INLINE_EVENT
         WAIT_MS(400)
-        CALL(evt_npc_get_position, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), LW(0), LW(1), LW(2))
+        CALL(evt_npc_get_position, STRING("めがね水夫"), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING("SFX_STG5_NPC_FALL1"), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
-    CALL(evt_npc_jump_position_nohit, STRING(/*"めがね水夫"*/"\x82\xDF\x82\xAA\x82\xCB\x90\x85\x95\x76"), -30, -100, 100, 600, 100)
+    CALL(evt_npc_jump_position_nohit, STRING("めがね水夫"), -30, -100, 100, 600, 100)
     CALL(evt_eff, 0, STRING("splash"), 0, -30, 30, 0, FLOAT(1.5f), 0, 0, 0, 0, 0, 0, 0)
-    CALL(evt_msg_print, 0, STRING("stg5_sea_26"), 0, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"))
+    CALL(evt_msg_print, 0, STRING("stg5_sea_26"), 0, STRING("マルコ"))
     BEGIN_INLINE_EVENT
         DELETE_EVENT(GW(0))
-        CALL(evt_npc_set_ry, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 270)
-        CALL(evt_npc_jump_position_nohit, STRING(/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52"), 20, 90, -90, 500, 50)
+        CALL(evt_npc_set_ry, STRING("マルコ"), 270)
+        CALL(evt_npc_jump_position_nohit, STRING("マルコ"), 20, 90, -90, 500, 50)
     END_INLINE_EVENT
     WAIT_MS(500)
     CALL(evt_mapobj_get_position, STRING("S_a1"), LW(0), LW(1), LW(2))
@@ -1639,12 +1646,12 @@ EVT_BEGIN(gor_muj_ship)
         CALL(kaizoku_fune_eff)
     END_INLINE_EVENT
     CALL(evt_seq_wait, 2)
-    SPAWN_EVENT(PTR(kaizoku_hata))
+    SPAWN_EVENT(kaizoku_hata)
     BEGIN_INLINE_EVENT
         WAIT_MS(3500)
-        CALL_CHILD(PTR(hiru_yoru_event))
+        CALL_CHILD(hiru_yoru_event)
         WAIT_MS(3500)
-        CALL_CHILD(PTR(yoru_hiru_event))
+        CALL_CHILD(yoru_hiru_event)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         LOOP(0)
@@ -1658,7 +1665,7 @@ EVT_BEGIN(gor_muj_ship)
     END_INLINE_EVENT
     SET_RAW_VALUE(LW(0), GW(1))
     SET_FLOAT_VALUE(LW(1), FLOAT(5.0f))
-    SPAWN_EVENT(PTR(muj_ship_puka))
+    SPAWN_EVENT(muj_ship_puka)
     CALL(evt_sub_intpl_msec_init, 0, -1000, 1000, 15000)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
@@ -1698,12 +1705,12 @@ static EVT_BEGIN(muj_gor_ship)
         CALL(kaizoku_fune_eff)
     END_INLINE_EVENT
     CALL(evt_seq_wait, 2)
-    SPAWN_EVENT(PTR(kaizoku_hata))
+    SPAWN_EVENT(kaizoku_hata)
     BEGIN_INLINE_EVENT
         WAIT_MS(3500)
-        CALL_CHILD(PTR(hiru_yoru_event))
+        CALL_CHILD(hiru_yoru_event)
         WAIT_MS(3500)
-        CALL_CHILD(PTR(yoru_hiru_event))
+        CALL_CHILD(yoru_hiru_event)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         LOOP(0)
@@ -1717,7 +1724,7 @@ static EVT_BEGIN(muj_gor_ship)
     END_INLINE_EVENT
     SET_RAW_VALUE(LW(0), GW(1))
     SET_FLOAT_VALUE(LW(1), FLOAT(5.0f))
-    SPAWN_EVENT(PTR(muj_ship_puka))
+    SPAWN_EVENT(muj_ship_puka)
     CALL(evt_sub_intpl_msec_init, 0, 1000, -1000, 15000)
     LOOP(0)
         CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
@@ -1849,6 +1856,7 @@ static USER_FUNC(fune_eff) {
     return EVT_RETURN_BLOCK;
 }
 
+#if VERSION >= VERSION_JP
 static USER_FUNC(fune_curve_pos) {
     f32 x = evtGetFloat(event, GW(0));
     f32 y = evtGetFloat(event, GW(1));
@@ -1872,6 +1880,7 @@ static USER_FUNC(fune_curve_pos) {
     evtSetFloat(event, LW(0), rot + angle);
     return EVT_RETURN_DONE;
 }
+#endif
 
 EVT_BEGIN(anm_yure)
     CALL(evt_mapobj_trans, 1, STRING("S_fune_m"), GW(0), GW(1), GW(2))
@@ -1884,11 +1893,18 @@ EVT_BEGIN(anm_yure)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
             DIVIDE_FLOAT(LW(0), FLOAT(100.0f))
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_mapobj_trans, 1, STRING("S_fune_m"), GW(0), GW(1), GW(2))
+            CALL(evt_mapobj_rotate, 1, STRING("S_fune_m"), 0, 180, LW(0))
+            CALL(evt_snd_sfx_pos, GW(4), GW(0), GW(1), GW(2))
+            CALL(evt_mapobj_trans, 1, STRING("S_umi_l_siro_b"), GW(0), GW(1), GW(2))
+#else
             CALL(fune_curve_pos)
             CALL(evt_mapobj_trans, 1, STRING("S_fune_m"), LW(7), LW(8), LW(9))
             CALL(evt_mapobj_rotate, 1, STRING("S_fune_m"), 0, 180, LW(0))
             CALL(evt_snd_sfx_pos, GW(4), LW(7), LW(8), LW(9))
             CALL(evt_mapobj_trans, 1, STRING("S_umi_l_siro_b"), LW(7), LW(8), LW(9))
+#endif
             WAIT_FRAMES(1)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
@@ -1898,11 +1914,18 @@ EVT_BEGIN(anm_yure)
         LOOP(0)
             CALL(evt_sub_intpl_msec_get_value)
             DIVIDE_FLOAT(LW(0), FLOAT(100.0f))
+#if VERSION <= VERSION_DEMO_US
+            CALL(evt_mapobj_trans, 1, STRING("S_fune_m"), GW(0), GW(1), GW(2))
+            CALL(evt_mapobj_rotate, 1, STRING("S_fune_m"), 0, 180, LW(0))
+            CALL(evt_snd_sfx_pos, GW(4), GW(0), GW(1), GW(2))
+            CALL(evt_mapobj_trans, 1, STRING("S_umi_l_siro_b"), GW(0), GW(1), GW(2))
+#else
             CALL(fune_curve_pos)
             CALL(evt_mapobj_trans, 1, STRING("S_fune_m"), LW(7), LW(8), LW(9))
             CALL(evt_mapobj_rotate, 1, STRING("S_fune_m"), 0, 180, LW(0))
             CALL(evt_snd_sfx_pos, GW(4), LW(7), LW(8), LW(9))
             CALL(evt_mapobj_trans, 1, STRING("S_umi_l_siro_b"), LW(7), LW(8), LW(9))
+#endif
             WAIT_FRAMES(1)
             IF_INT_EQUAL(LW(1), 0)
                 BREAK_LOOP
@@ -1997,8 +2020,23 @@ static void draw(CameraId camera, void* param) {
     winTexInit(*(TEXPalette**)wp->tpl->data);
 #if VERSION >= VERSION_US
     winTexSetNearest(logoTex[gp->language], (Vec){0.0f, 100.0f + wp->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, wp->alpha});
-#else
+#elif VERSION >= VERSION_JP
     winTexSetNearest(5, (Vec){0.0f, 100.0f + wp->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, wp->alpha});
+#else
+    winTexSet(5, (Vec){0.0f, 100.0f + wp->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, wp->alpha});
+    // the demo blinks PRESS START under the logo once the ship has arrived (GF(0))
+    if (evtGetValue(NULL, GF(0))) {
+        f32 s = (f32)sin((f32)gp->retraceCount / 15.0f);
+        s32 alpha = (s32)(1.5f * wp->alpha * s);
+
+        if (alpha < 0) {
+            alpha = 0;
+        }
+        if (alpha > 255) {
+            alpha = 255;
+        }
+        pressStartGX(wp, alpha, 0.0f, -100.0f);
+    }
 #endif
     *camGetCurPtr() = saved;
     GXSetViewport(viewport[0], viewport[1], viewport[2], viewport[3], viewport[4], viewport[5]);
@@ -2006,10 +2044,14 @@ static void draw(CameraId camera, void* param) {
 }
 
 static EVT_BEGIN(evt_prologue)
+#if VERSION <= VERSION_DEMO_US
+    WAIT_MS(4000)
+#else
     WAIT_MS(500)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_OPENING1"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_OPN_MUJ1"))
     WAIT_MS(3500)
+#endif
     SET_VALUE(GF(0), 0)
     SET_VALUE(GF(1), 0)
     SET_VALUE(GF(2), 0)
@@ -2151,7 +2193,7 @@ static EVT_BEGIN(epilogue_evt)
     CALL(evt_npc_flag_onoff, 1, STRING("水夫ボム兵"), NPC_FLAG_INSTANT_TURN)
     CALL(evt_cam3d_evt_set, 25, 305, 1091, 25, 150, -108, 0, 11)
     CALL(evt_seq_wait, 2)
-    SPAWN_EVENT(PTR(fune_move))
+    SPAWN_EVENT(fune_move)
     WAIT_MS(10000)
     CALL(evt_fade_set_mapchange_type, 1, FADE_OUT_BLACK, 900, FADE_IN_BLACK, 900)
     CALL(evt_bero_mapchange, STRING("muj_01"), STRING(""))
@@ -2198,7 +2240,7 @@ EVT_BEGIN(muj_20_init_evt)
         CALL(evt_map_playanim, STRING("fune_01"), 1, 0)
         CALL(evt_map_playanim, STRING("kumo"), 1, 0)
         CALL(evt_map_playanim, STRING("yoru_hiru"), 2, 0)
-        SPAWN_EVENT(PTR(muj_20_koopa_evt))
+        SPAWN_EVENT(muj_20_koopa_evt)
         RETURN
     END_IF
     CALL(evt_map_playanim, STRING("nami"), 1, 0)
@@ -2208,33 +2250,39 @@ EVT_BEGIN(muj_20_init_evt)
     IF_INT_EQUAL(GSWF(GSWF_GOR00_SAIL_TO_KEELHAUL), 1)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG5_GHOST_SHIP1"))
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_MUJ1_1"))
-        SPAWN_EVENT(PTR(gor_muj_ship))
+        SPAWN_EVENT(gor_muj_ship)
     END_IF
     IF_INT_EQUAL(GSWF(GSWF_GOR00_SHIP_ARRIVAL_PENDING), 1)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_STG5_GHOST_SHIP1"))
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_MUJ1_1"))
-        SPAWN_EVENT(PTR(muj_gor_ship))
+        SPAWN_EVENT(muj_gor_ship)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG4_END_OFF_TO_THE_KEYS)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_SAILING1"))
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_MUJ1_1"))
-        SPAWN_EVENT(PTR(onryo_event))
+        SPAWN_EVENT(onryo_event)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG5_00_LOGBOOK)
         CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_EVT_SAILING1"))
         CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG5_MUJ1_1"))
-        SPAWN_EVENT(PTR(onryo_event))
+        SPAWN_EVENT(onryo_event)
     END_IF
     CALL(evt_bero_get_entername, LW(0))
     IF_STR_EQUAL(LW(0), STRING("prologue"))
+#if VERSION <= VERSION_DEMO_US
+        CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_OPENING1"))
+        CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_OPN_MUJ1"))
+#endif
         CALL(evt_cam3d_evt_set, 0, 367, 2093, 0, 343, -115, 0, 11)
         CALL(evt_mario_cont_onoff, 0)
         CALL(evt_party_cont_onoff, 0, 0)
         CALL(evt_mario_set_pos, 0, -1000, 0)
         CALL(evt_party_set_pos, 0, 0, -1000, 0)
         CALL(evt_map_playanim, STRING("yoru_hiru"), 2, 0)
+#if VERSION >= VERSION_JP
         CALL(evt_mapobj_trans, 1, STRING("S_hai03_sun"), 0, -260, 0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_umi_l_siro_b"), MAPOBJ_FLAG_HIDE)
+#endif
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_a1"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_b"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_fune_m"), MAPOBJ_FLAG_HIDE)
@@ -2244,25 +2292,25 @@ EVT_BEGIN(muj_20_init_evt)
         SET_FLOAT_VALUE(GW(0), FLOAT(-2000.0f))
         SET_FLOAT_VALUE(GW(1), FLOAT(0.0f))
         SET_FLOAT_VALUE(GW(2), FLOAT(-3000.0f))
-        SPAWN_EVENT(PTR(anm_kaji))
-        SPAWN_EVENT(PTR(anm_wakka))
-        SPAWN_EVENT(PTR(anm_entotsu))
-        SPAWN_EVENT(PTR(anm_neji))
-        SPAWN_EVENT(PTR(anm_yure))
-        SPAWN_EVENT(PTR(evt_prologue))
+        SPAWN_EVENT(anm_kaji)
+        SPAWN_EVENT(anm_wakka)
+        SPAWN_EVENT(anm_entotsu)
+        SPAWN_EVENT(anm_neji)
+        SPAWN_EVENT(anm_yure)
+        SPAWN_EVENT(evt_prologue)
     END_IF
     IF_INT_EQUAL(GSW(GSW_STORY_PROGRESS), STORY_STG8_END_AFTER_THE_BATTLE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_a1"), MAPOBJ_FLAG_HIDE)
         CALL(evt_hitobj_onoff, STRING("A_a1"), 1, 0)
         CALL(evt_map_playanim, STRING("yoru_hiru"), 2, 0)
         CALL(evt_mario_kill_party, 0)
-        CALL_CHILD(PTR(epilogue_npc_entry))
-        SPAWN_EVENT(PTR(epilogue_evt))
+        CALL_CHILD(epilogue_npc_entry)
+        SPAWN_EVENT(epilogue_evt)
     END_IF
     RETURN
 EVT_END()
 
-USER_FUNC(logo) {
+static USER_FUNC(logo) {
     TitleLogoWork* wp;
 
     if (isFirstCall) {
@@ -2271,9 +2319,11 @@ USER_FUNC(logo) {
         event->userdatap[0] = wp;
     }
     wp = event->userdatap[0];
+#if VERSION >= VERSION_JP
     if (fileAsyncf(4, NULL, "%s/mariost.tpl", getMarioStDvdRoot()) == NULL) {
         return EVT_RETURN_BLOCK;
     }
+#endif
     switch (wp->state) {
         case 0:
             wp->tpl = fileAllocf(4, "%s/mariost.tpl", getMarioStDvdRoot());
@@ -2291,7 +2341,11 @@ USER_FUNC(logo) {
             }
             break;
         case 2:
+#if VERSION <= VERSION_DEMO_US
+            if (evtGetValue(event, GF(0)) && (keyGetButtonTrg(0) & (PAD_BUTTON_A | PAD_BUTTON_START))) {
+#else
             if (evtGetValue(event, GF(0)) && (keyGetButtonTrg(0) & (PAD_BUTTON_A | PAD_BUTTON_B | PAD_BUTTON_START))) {
+#endif
                 wp->counter = 0;
                 wp->state++;
                 evtSetValue(event, GF(1), 1);

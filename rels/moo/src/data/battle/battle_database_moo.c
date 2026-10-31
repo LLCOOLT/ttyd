@@ -497,7 +497,11 @@ BattleUnitSetup btlparty_moo_moo_02_01_off_1[] = {
         1, // alliance
         {0}, // pad_05
         BATTLE_PHASE_ENEMY, // attackPhase
+#if VERSION <= VERSION_DEMO_US
+        {70.0f, 40.0f, 0.0f}, // position
+#else
         {50.0f, 40.0f, -10.0f}, // position
+#endif
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_barriern_z, // itemDropTable
@@ -507,7 +511,11 @@ BattleUnitSetup btlparty_moo_moo_02_01_off_1[] = {
         1, // alliance
         {0}, // pad_05
         BATTLE_PHASE_ENEMY, // attackPhase
+#if VERSION <= VERSION_DEMO_US
+        {110.0f, 40.0f, 10.0f}, // position
+#else
         {130.0f, 40.0f, 10.0f}, // position
+#endif
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_barriern_z, // itemDropTable
@@ -565,7 +573,11 @@ BattleUnitSetup btlparty_moo_moo_02_03_off_1[] = {
         1, // alliance
         {0}, // pad_05
         BATTLE_PHASE_ENEMY, // attackPhase
+#if VERSION <= VERSION_DEMO_US
+        {70.0f, 40.0f, 0.0f}, // position
+#else
         {50.0f, 40.0f, -10.0f}, // position
+#endif
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_barriern_z, // itemDropTable
@@ -575,7 +587,11 @@ BattleUnitSetup btlparty_moo_moo_02_03_off_1[] = {
         1, // alliance
         {0}, // pad_05
         BATTLE_PHASE_ENEMY, // attackPhase
+#if VERSION <= VERSION_DEMO_US
+        {110.0f, 40.0f, 10.0f}, // position
+#else
         {130.0f, 40.0f, 10.0f}, // position
+#endif
         0, // hitOffsetX
         {0}, // unitWork
         battle_item_barriern_z, // itemDropTable
@@ -1181,7 +1197,7 @@ NpcBattleSelect btlgrpsel_moo_btlno_moo_05_05_off[] = {
 
 NpcSetupBattleInfo btlsetup_moo_tbl[] = {
     {
-        /*"マップstg_07_4"*/"\x83\x7D\x83\x62\x83\x76\x73\x74\x67\x5F\x30\x37\x5F\x34", // name
+        "マップstg_07_4", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1191,7 +1207,7 @@ NpcSetupBattleInfo btlsetup_moo_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"moo01シンエモン"*/"\x6D\x6F\x6F\x30\x31\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93", // name
+        "moo01シンエモン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1201,7 +1217,7 @@ NpcSetupBattleInfo btlsetup_moo_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"moo01シンエモン"*/"\x6D\x6F\x6F\x30\x31\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93", // name
+        "moo01シンエモン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1211,7 +1227,7 @@ NpcSetupBattleInfo btlsetup_moo_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"moo01シンエモン"*/"\x6D\x6F\x6F\x30\x31\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93", // name
+        "moo01シンエモン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1221,7 +1237,7 @@ NpcSetupBattleInfo btlsetup_moo_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"moo01シンエモン"*/"\x6D\x6F\x6F\x30\x31\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93", // name
+        "moo01シンエモン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1231,7 +1247,7 @@ NpcSetupBattleInfo btlsetup_moo_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"moo01シンエモン"*/"\x6D\x6F\x6F\x30\x31\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93", // name
+        "moo01シンエモン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1241,7 +1257,7 @@ NpcSetupBattleInfo btlsetup_moo_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"moo02バリアーンZ"*/"\x6D\x6F\x6F\x30\x32\x83\x6F\x83\x8A\x83\x41\x81\x5B\x83\x93\x5A", // name
+        "moo02バリアーンZ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1251,7 +1267,7 @@ NpcSetupBattleInfo btlsetup_moo_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"moo02バリアーンZ"*/"\x6D\x6F\x6F\x30\x32\x83\x6F\x83\x8A\x83\x41\x81\x5B\x83\x93\x5A", // name
+        "moo02バリアーンZ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1261,7 +1277,7 @@ NpcSetupBattleInfo btlsetup_moo_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"moo02バリアーンZ"*/"\x6D\x6F\x6F\x30\x32\x83\x6F\x83\x8A\x83\x41\x81\x5B\x83\x93\x5A", // name
+        "moo02バリアーンZ", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1271,7 +1287,7 @@ NpcSetupBattleInfo btlsetup_moo_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"moo02シンエモン"*/"\x6D\x6F\x6F\x30\x32\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93", // name
+        "moo02シンエモン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1281,7 +1297,7 @@ NpcSetupBattleInfo btlsetup_moo_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"moo02シンエモン"*/"\x6D\x6F\x6F\x30\x32\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93", // name
+        "moo02シンエモン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1291,7 +1307,7 @@ NpcSetupBattleInfo btlsetup_moo_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"moo05シンエモン"*/"\x6D\x6F\x6F\x30\x35\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93", // name
+        "moo05シンエモン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1301,7 +1317,7 @@ NpcSetupBattleInfo btlsetup_moo_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"moo05シンエモン"*/"\x6D\x6F\x6F\x30\x35\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93", // name
+        "moo05シンエモン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1311,7 +1327,7 @@ NpcSetupBattleInfo btlsetup_moo_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"moo05シンエモン"*/"\x6D\x6F\x6F\x30\x35\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93", // name
+        "moo05シンエモン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1321,7 +1337,7 @@ NpcSetupBattleInfo btlsetup_moo_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"moo05シンエモン"*/"\x6D\x6F\x6F\x30\x35\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93", // name
+        "moo05シンエモン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect
@@ -1331,7 +1347,7 @@ NpcSetupBattleInfo btlsetup_moo_tbl[] = {
         "BGM_ZAKO_BATTLE1", // bgmName
     },
     {
-        /*"moo05シンエモン"*/"\x6D\x6F\x6F\x30\x35\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93", // name
+        "moo05シンエモン", // name
         NULL, 0, // mapName..fixedItem
         -1, // swFlag
         NULL, // altSelect

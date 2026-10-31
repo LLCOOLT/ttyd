@@ -25,17 +25,16 @@
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
 #include "evt/evt_window.h"
-#include "party/party_motion.h"
 #include "aji.h"
 #include "evt/evt_story.h"
 #include "driver/mapdrv.h"
 #include "driver/casedrv.h"
 
-void icon_disp(CameraId camera, void* param);
+static void icon_disp(CameraId camera, void* param);
 
-USER_FUNC(evt_sousa_icon);
-USER_FUNC(item_chk);
-void icon_disp(CameraId camera, void* param);
+static USER_FUNC(evt_sousa_icon);
+static USER_FUNC(item_chk);
+static void icon_disp(CameraId camera, void* param);
 
 static BeroEntry bero_entry_data[2];
 extern EvtWord evt_kaitentou[];
@@ -63,7 +62,11 @@ extern EvtWord badge_evt2[];
 extern EvtWord badge_evt3[];
 
 static EVT_BEGIN(e_door_close)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("S_door1_1"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("S_door1_2"), 0, 0, LW(0))
@@ -71,7 +74,11 @@ static EVT_BEGIN(e_door_close)
 EVT_END()
 
 static EVT_BEGIN(e_door_open)
+#if VERSION <= VERSION_DEMO_US
+    MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
+#else
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.25f))
+#endif
     CALL(evt_mapobj_trans, 0, STRING("S_door1_1"), 0, 0, LW(0))
     MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
     CALL(evt_mapobj_trans, 0, STRING("S_door1_2"), 0, 0, LW(0))
@@ -391,10 +398,10 @@ EVT_BEGIN(ufo_main)
         END_IF
         CALL(item_chk, LW(0), LW(8))
         IF_INT_EQUAL(LW(0), 1)
-            CALL_CHILD(PTR(hand_success))
+            CALL_CHILD(hand_success)
             SET_VALUE(LF(0), 1)
         ELSE
-            CALL_CHILD(PTR(hand_success))
+            CALL_CHILD(hand_success)
             SET_VALUE(LF(0), 0)
         END_IF
         IF_INT_EQUAL(LF(0), 1)
@@ -471,9 +478,9 @@ EVT_BEGIN(ufo_main)
                 CALL(evt_item_status_on, LW(8), ITEM_STATUS_CUSTOM_LAUNCH)
                 CALL(evt_item_change_mode, LW(8), 5)
             END_INLINE_EVENT
-            CALL_CHILD(PTR(hand_release))
+            CALL_CHILD(hand_release)
         ELSE
-            CALL_CHILD(PTR(hand_release))
+            CALL_CHILD(hand_release)
         END_IF
         SET_VALUE(GF(12), 0)
         RETURN
@@ -521,7 +528,7 @@ EVT_BEGIN(evt_ufo_init)
             END_IF
         END_LOOP
     END_INLINE_EVENT
-    SPAWN_EVENT(PTR(ufo_main))
+    SPAWN_EVENT(ufo_main)
     RETURN
 EVT_END()
 
@@ -572,221 +579,127 @@ EVT_BEGIN(blink_sw)
     RETURN
 EVT_END()
 
+EVT_BEGIN(evt_ufo_sousaban)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_cam3d_evt_set, 230, 200, 380, 230, 130, -13, 1000, 11)
+    WAIT_MS(1200)
+    CALL(evt_mapobj_get_position, STRING("S_kure"), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_CRANE_MOVE1"), LW(0), LW(1), LW(2), LW(3))
+    SPAWN_EVENT(evt_ufo_init)
+    WAIT_MS(2200)
+    CALL(evt_snd_sfxoff, LW(3))
+    BEGIN_INLINE_EVENT
+        CALL(evt_sub_intpl_msec_init, 11, 2300, 400, 3000)
+        LOOP(0)
+            CALL(evt_sub_intpl_msec_get_value)
+            DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
+            SET_FLOAT_VALUE(GW(10), LW(0))
+            CALL(evt_mapobj_trans, 1, STRING("S_kure"), GW(10), 0, GW(11))
+            WAIT_FRAMES(1)
+            IF_INT_EQUAL(LW(1), 0)
+                BREAK_LOOP
+            END_IF
+        END_LOOP
+    END_INLINE_EVENT
+    CALL(evt_cam3d_evt_set, -65, 175, 529, -65, 80, -13, 3000, 11)
+    WAIT_MS(3400)
+    IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_PANEL_FIRST_USE), 0)
+        SET_VALUE(GSWF(GSWF_AJI03_CRANE_PANEL_FIRST_USE), 1)
+        CALL(evt_msg_print, 0, STRING("stg7_aji_00_01"), 0, 0)
+    END_IF
+    WAIT_MS(300)
+    BEGIN_INLINE_EVENT_GET_ID(LW(10))
+        LOOP(0)
+            CALL(evt_sousa_icon, 0, 200, 130)
+        END_LOOP
+    END_INLINE_EVENT
 #if VERSION >= VERSION_US
-EVT_BEGIN(evt_ufo_sousaban)
-    CALL(evt_mario_key_onoff, 0)
-    CALL(evt_cam3d_evt_set, 230, 200, 380, 230, 130, -13, 1000, 11)
-    WAIT_MS(1200)
-    CALL(evt_mapobj_get_position, STRING("S_kure"), LW(0), LW(1), LW(2))
-    CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_CRANE_MOVE1"), LW(0), LW(1), LW(2), LW(3))
-    SPAWN_EVENT(PTR(evt_ufo_init))
-    WAIT_MS(2200)
-    CALL(evt_snd_sfxoff, LW(3))
-    BEGIN_INLINE_EVENT
-        CALL(evt_sub_intpl_msec_init, 11, 2300, 400, 3000)
-        LOOP(0)
-            CALL(evt_sub_intpl_msec_get_value)
-            DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
-            SET_FLOAT_VALUE(GW(10), LW(0))
-            CALL(evt_mapobj_trans, 1, STRING("S_kure"), GW(10), 0, GW(11))
-            WAIT_FRAMES(1)
-            IF_INT_EQUAL(LW(1), 0)
-                BREAK_LOOP
-            END_IF
-        END_LOOP
-    END_INLINE_EVENT
-    CALL(evt_cam3d_evt_set, -65, 175, 529, -65, 80, -13, 3000, 11)
-    WAIT_MS(3400)
-    IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_PANEL_FIRST_USE), 0)
-        SET_VALUE(GSWF(GSWF_AJI03_CRANE_PANEL_FIRST_USE), 1)
-        CALL(evt_msg_print, 0, STRING("stg7_aji_00_01"), 0, 0)
-    END_IF
-    WAIT_MS(300)
-    BEGIN_INLINE_EVENT_GET_ID(LW(10))
-        LOOP(0)
-            CALL(evt_sousa_icon, 0, 200, 130)
-        END_LOOP
-    END_INLINE_EVENT
     WAIT_FRAMES(1)
-    LOOP(0)
-        CALL(evt_key_get_button, 0, LW(0))
-        IF_BITS_SET(LW(0), 256)
-            BREAK_LOOP
-        END_IF
-        WAIT_FRAMES(1)
-    END_LOOP
-    WAIT_FRAMES(1)
-    SET_VALUE(GF(10), 1)
-    LOOP(0)
-        CALL(evt_key_get_button, 0, LW(0))
-        IF_BITS_SET(LW(0), 256)
-        ELSE
-            BREAK_LOOP
-        END_IF
-        WAIT_FRAMES(1)
-    END_LOOP
-    WAIT_FRAMES(1)
-    SET_VALUE(GF(10), 0)
-    DELETE_EVENT(LW(10))
-    BEGIN_INLINE_EVENT_GET_ID(LW(10))
-        LOOP(0)
-            CALL(evt_sousa_icon, 1, 200, 70)
-        END_LOOP
-    END_INLINE_EVENT
-    WAIT_FRAMES(1)
-    LOOP(0)
-        CALL(evt_key_get_button, 0, LW(0))
-        IF_BITS_SET(LW(0), 512)
-            BREAK_LOOP
-        END_IF
-        WAIT_FRAMES(1)
-    END_LOOP
-    WAIT_FRAMES(1)
-    SET_VALUE(GF(11), 1)
-    LOOP(0)
-        CALL(evt_key_get_button, 0, LW(0))
-        IF_BITS_SET(LW(0), 512)
-        ELSE
-            BREAK_LOOP
-        END_IF
-        WAIT_FRAMES(1)
-    END_LOOP
-    WAIT_FRAMES(1)
-    SET_VALUE(GF(11), 0)
-    DELETE_EVENT(LW(10))
-    LOOP(0)
-        IF_INT_EQUAL(GF(12), 0)
-            BREAK_LOOP
-        END_IF
-        WAIT_FRAMES(1)
-    END_LOOP
-    CALL(evt_sub_intpl_msec_init, 11, 400, 2300, 3000)
-    LOOP(0)
-        CALL(evt_sub_intpl_msec_get_value)
-        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
-        SET_FLOAT_VALUE(GW(10), LW(0))
-        CALL(evt_mapobj_trans, 1, STRING("S_kure"), GW(10), 0, GW(11))
-        WAIT_FRAMES(1)
-        IF_INT_EQUAL(LW(1), 0)
-            BREAK_LOOP
-        END_IF
-    END_LOOP
-    SET_VALUE(GW(10), 230)
-    SET_VALUE(GW(11), 100)
-    CALL(evt_mapobj_trans, 1, STRING("S_kure"), GW(10), 0, GW(11))
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_hikari"), MAPOBJ_FLAG_HIDE)
-    SET_VALUE(GF(14), 1)
-    CALL(evt_cam_shift_reset)
-    CALL(evt_cam3d_evt_off, 500, 11)
-    WAIT_MS(500)
-    CALL(evt_mario_key_onoff, 1)
-    RETURN
-EVT_END()
-#else
-EVT_BEGIN(evt_ufo_sousaban)
-    CALL(evt_mario_key_onoff, 0)
-    CALL(evt_cam3d_evt_set, 230, 200, 380, 230, 130, -13, 1000, 11)
-    WAIT_MS(1200)
-    CALL(evt_mapobj_get_position, STRING("S_kure"), LW(0), LW(1), LW(2))
-    CALL(evt_snd_sfxon_3d, STRING("SFX_STG7_CRANE_MOVE1"), LW(0), LW(1), LW(2), LW(3))
-    SPAWN_EVENT(PTR(evt_ufo_init))
-    WAIT_MS(2200)
-    CALL(evt_snd_sfxoff, LW(3))
-    BEGIN_INLINE_EVENT
-        CALL(evt_sub_intpl_msec_init, 11, 2300, 400, 3000)
-        LOOP(0)
-            CALL(evt_sub_intpl_msec_get_value)
-            DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
-            SET_FLOAT_VALUE(GW(10), LW(0))
-            CALL(evt_mapobj_trans, 1, STRING("S_kure"), GW(10), 0, GW(11))
-            WAIT_FRAMES(1)
-            IF_INT_EQUAL(LW(1), 0)
-                BREAK_LOOP
-            END_IF
-        END_LOOP
-    END_INLINE_EVENT
-    CALL(evt_cam3d_evt_set, -65, 175, 529, -65, 80, -13, 3000, 11)
-    WAIT_MS(3400)
-    IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_PANEL_FIRST_USE), 0)
-        SET_VALUE(GSWF(GSWF_AJI03_CRANE_PANEL_FIRST_USE), 1)
-        CALL(evt_msg_print, 0, STRING("stg7_aji_00_01"), 0, 0)
-    END_IF
-    WAIT_MS(300)
-    BEGIN_INLINE_EVENT_GET_ID(LW(10))
-        LOOP(0)
-            CALL(evt_sousa_icon, 0, 200, 130)
-        END_LOOP
-    END_INLINE_EVENT
-    LOOP(0)
-        CALL(evt_key_get_button, 0, LW(0))
-        IF_BITS_SET(LW(0), 256)
-            BREAK_LOOP
-        END_IF
-        WAIT_FRAMES(1)
-    END_LOOP
-    SET_VALUE(GF(10), 1)
-    LOOP(0)
-        CALL(evt_key_get_button, 0, LW(0))
-        IF_BITS_SET(LW(0), 256)
-        ELSE
-            BREAK_LOOP
-        END_IF
-        WAIT_FRAMES(1)
-    END_LOOP
-    SET_VALUE(GF(10), 0)
-    DELETE_EVENT(LW(10))
-    BEGIN_INLINE_EVENT_GET_ID(LW(10))
-        LOOP(0)
-            CALL(evt_sousa_icon, 1, 200, 70)
-        END_LOOP
-    END_INLINE_EVENT
-    LOOP(0)
-        CALL(evt_key_get_button, 0, LW(0))
-        IF_BITS_SET(LW(0), 512)
-            BREAK_LOOP
-        END_IF
-        WAIT_FRAMES(1)
-    END_LOOP
-    SET_VALUE(GF(11), 1)
-    LOOP(0)
-        CALL(evt_key_get_button, 0, LW(0))
-        IF_BITS_SET(LW(0), 512)
-        ELSE
-            BREAK_LOOP
-        END_IF
-        WAIT_FRAMES(1)
-    END_LOOP
-    SET_VALUE(GF(11), 0)
-    DELETE_EVENT(LW(10))
-    LOOP(0)
-        IF_INT_EQUAL(GF(12), 0)
-            BREAK_LOOP
-        END_IF
-        WAIT_FRAMES(1)
-    END_LOOP
-    CALL(evt_sub_intpl_msec_init, 11, 400, 2300, 3000)
-    LOOP(0)
-        CALL(evt_sub_intpl_msec_get_value)
-        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
-        SET_FLOAT_VALUE(GW(10), LW(0))
-        CALL(evt_mapobj_trans, 1, STRING("S_kure"), GW(10), 0, GW(11))
-        WAIT_FRAMES(1)
-        IF_INT_EQUAL(LW(1), 0)
-            BREAK_LOOP
-        END_IF
-    END_LOOP
-    SET_VALUE(GW(10), 230)
-    SET_VALUE(GW(11), 100)
-    CALL(evt_mapobj_trans, 1, STRING("S_kure"), GW(10), 0, GW(11))
-    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_hikari"), MAPOBJ_FLAG_HIDE)
-    SET_VALUE(GF(14), 1)
-    CALL(evt_cam_shift_reset)
-    CALL(evt_cam3d_evt_off, 500, 11)
-    WAIT_MS(500)
-    CALL(evt_mario_key_onoff, 1)
-    RETURN
-EVT_END()
 #endif
+    LOOP(0)
+        CALL(evt_key_get_button, 0, LW(0))
+        IF_BITS_SET(LW(0), 256)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+#if VERSION >= VERSION_US
+    WAIT_FRAMES(1)
+#endif
+    SET_VALUE(GF(10), 1)
+    LOOP(0)
+        CALL(evt_key_get_button, 0, LW(0))
+        IF_BITS_SET(LW(0), 256)
+        ELSE
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+#if VERSION >= VERSION_US
+    WAIT_FRAMES(1)
+#endif
+    SET_VALUE(GF(10), 0)
+    DELETE_EVENT(LW(10))
+    BEGIN_INLINE_EVENT_GET_ID(LW(10))
+        LOOP(0)
+            CALL(evt_sousa_icon, 1, 200, 70)
+        END_LOOP
+    END_INLINE_EVENT
+#if VERSION >= VERSION_US
+    WAIT_FRAMES(1)
+#endif
+    LOOP(0)
+        CALL(evt_key_get_button, 0, LW(0))
+        IF_BITS_SET(LW(0), 512)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+#if VERSION >= VERSION_US
+    WAIT_FRAMES(1)
+#endif
+    SET_VALUE(GF(11), 1)
+    LOOP(0)
+        CALL(evt_key_get_button, 0, LW(0))
+        IF_BITS_SET(LW(0), 512)
+        ELSE
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+#if VERSION >= VERSION_US
+    WAIT_FRAMES(1)
+#endif
+    SET_VALUE(GF(11), 0)
+    DELETE_EVENT(LW(10))
+    LOOP(0)
+        IF_INT_EQUAL(GF(12), 0)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(evt_sub_intpl_msec_init, 11, 400, 2300, 3000)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
+        SET_FLOAT_VALUE(GW(10), LW(0))
+        CALL(evt_mapobj_trans, 1, STRING("S_kure"), GW(10), 0, GW(11))
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    SET_VALUE(GW(10), 230)
+    SET_VALUE(GW(11), 100)
+    CALL(evt_mapobj_trans, 1, STRING("S_kure"), GW(10), 0, GW(11))
+    CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_hikari"), MAPOBJ_FLAG_HIDE)
+    SET_VALUE(GF(14), 1)
+    CALL(evt_cam_shift_reset)
+    CALL(evt_cam3d_evt_off, 500, 11)
+    WAIT_MS(500)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
 
 static EVT_BEGIN(evt_sw)
     IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_BUTTON_1), 0)
@@ -811,7 +724,7 @@ static EVT_BEGIN(evt_sw)
             CALL(evt_snd_sfxoff, LW(3))
         END_INLINE_EVENT
         SET_VALUE(LW(10), STRING("S_pato4"))
-        SPAWN_EVENT(PTR(evt_kaitentou))
+        SPAWN_EVENT(evt_kaitentou)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_1_1"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_2_1"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_3_1"), MAPOBJ_FLAG_HIDE)
@@ -821,11 +734,11 @@ static EVT_BEGIN(evt_sw)
         SET_VALUE(LW(8), -1)
         SET_VALUE(LW(9), -1)
         SET_VALUE(LW(10), STRING("S_hari01"))
-        SPAWN_EVENT(PTR(evt_hari))
+        SPAWN_EVENT(evt_hari)
         SET_VALUE(LW(8), -1)
         SET_VALUE(LW(9), -1)
         SET_VALUE(LW(10), STRING("S_hari02"))
-        SPAWN_EVENT(PTR(evt_hari))
+        SPAWN_EVENT(evt_hari)
         WAIT_MS(500)
         CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui_01"), 0, PTR(evt_ufo_sousaban), 0)
         CALL(evt_cam3d_evt_off, 500, 11)
@@ -880,15 +793,15 @@ EVT_BEGIN(evt_sw0)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("sui__1"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("sui__2"), MAPOBJ_FLAG_HIDE)
         SET_VALUE(LW(10), STRING("S_pato1"))
-        SPAWN_EVENT(PTR(evt_kaitentou2))
+        SPAWN_EVENT(evt_kaitentou2)
         SET_VALUE(LW(8), STRING("meta_1_1"))
         SET_VALUE(LW(9), STRING("meta_1_2"))
         SET_VALUE(LW(10), STRING("S_hari04"))
-        SPAWN_EVENT(PTR(evt_hari))
-        CALL_CHILD(PTR(evt_sw))
+        SPAWN_EVENT(evt_hari)
+        CALL_CHILD(evt_sw)
         CALL(evt_exit_case_evt)
     ELSE
-        CALL_CHILD(PTR(evt_sw_reinit))
+        CALL_CHILD(evt_sw_reinit)
     END_IF
     RETURN
 EVT_END()
@@ -908,15 +821,15 @@ EVT_BEGIN(evt_sw1)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("sui_2_1"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("sui_2_2"), MAPOBJ_FLAG_HIDE)
         SET_VALUE(LW(10), STRING("S_pato2"))
-        SPAWN_EVENT(PTR(evt_kaitentou2))
+        SPAWN_EVENT(evt_kaitentou2)
         SET_VALUE(LW(8), STRING("meta_2_1"))
         SET_VALUE(LW(9), STRING("meta_2_2"))
         SET_VALUE(LW(10), STRING("S_hari05"))
-        SPAWN_EVENT(PTR(evt_hari))
-        CALL_CHILD(PTR(evt_sw))
+        SPAWN_EVENT(evt_hari)
+        CALL_CHILD(evt_sw)
         CALL(evt_exit_case_evt)
     ELSE
-        CALL_CHILD(PTR(evt_sw_reinit))
+        CALL_CHILD(evt_sw_reinit)
     END_IF
     RETURN
 EVT_END()
@@ -936,15 +849,15 @@ EVT_BEGIN(evt_sw2)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("sui_3_1"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("sui_3_2"), MAPOBJ_FLAG_HIDE)
         SET_VALUE(LW(10), STRING("S_pato3"))
-        SPAWN_EVENT(PTR(evt_kaitentou2))
+        SPAWN_EVENT(evt_kaitentou2)
         SET_VALUE(LW(8), STRING("meta_3_1"))
         SET_VALUE(LW(9), STRING("meta_3_2"))
         SET_VALUE(LW(10), STRING("S_hari06"))
-        SPAWN_EVENT(PTR(evt_hari))
-        CALL_CHILD(PTR(evt_sw))
+        SPAWN_EVENT(evt_hari)
+        CALL_CHILD(evt_sw)
         CALL(evt_exit_case_evt)
     ELSE
-        CALL_CHILD(PTR(evt_sw_reinit))
+        CALL_CHILD(evt_sw_reinit)
     END_IF
     RETURN
 EVT_END()
@@ -961,7 +874,11 @@ static EVT_BEGIN(evt_haguruma)
         CALL(evt_mario_key_onoff, 1)
         RETURN
     END_IF
+#if VERSION <= VERSION_DEMO_US
+    CALL(evt_win_item_select, PTR(haguruma_tbl), LW(0))
+#else
     CALL(evt_win_item_select, 0, PTR(haguruma_tbl), LW(0), 0)
+#endif
     IF_INT_NOT_EQUAL(LW(0), -1)
         BEGIN_INLINE_EVENT
             CALL(evt_snd_bgmoff, PSND_FADE_HOLD)
@@ -972,7 +889,7 @@ static EVT_BEGIN(evt_haguruma)
         END_INLINE_EVENT
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_zenmais_nashi"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_zenmais_ari"), MAPOBJ_FLAG_HIDE)
-        SPAWN_EVENT(PTR(evt_zenmai))
+        SPAWN_EVENT(evt_zenmai)
         CALL(evt_pouch_remove_item, LW(0), LW(1))
         SET_VALUE(GSWF(GSWF_AJI03_COG_INSERTED), 1)
         CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui1"), 0, PTR(evt_sw0), 0)
@@ -1013,10 +930,12 @@ EVT_END()
 EVT_BEGIN(aji_03_init_evt)
     CALL(evt_snd_bgmon, PSND_FADE_OUT, STRING("BGM_STG7_DUN2"))
     CALL(evt_snd_envon, PSND_FADE_RESTART | PSND_FADE_IN, STRING("ENV_STG7_AJI3"))
+#if VERSION >= VERSION_JP
     CALL(evt_snd_set_rev_mode, 1)
+#endif
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(evt_bero_info_run)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_hikari"), MAPOBJ_FLAG_HIDE)
     CALL(evt_mapobj_trans, 1, STRING("S_kure"), 230, 0, 100)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_tama_a"), MAPOBJ_FLAG_HIDE)
@@ -1036,7 +955,7 @@ EVT_BEGIN(aji_03_init_evt)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_zenmais_ari"), MAPOBJ_FLAG_HIDE)
     ELSE
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_zenmais_nashi"), MAPOBJ_FLAG_HIDE)
-        SPAWN_EVENT(PTR(evt_zenmai))
+        SPAWN_EVENT(evt_zenmai)
         IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_ACTIVATED), 1)
             CALL(evt_run_case_evt, CASE_COND_FRONT_A, 1, STRING("A_sui_01"), 0, PTR(evt_ufo_sousaban), 0)
         END_IF
@@ -1071,40 +990,40 @@ EVT_BEGIN(aji_03_init_evt)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_pato3"), MAPOBJ_FLAG_HIDE)
     IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_BUTTON_1), 1)
         SET_VALUE(LW(10), STRING("S_pato1"))
-        SPAWN_EVENT(PTR(evt_kaitentou2))
+        SPAWN_EVENT(evt_kaitentou2)
         SET_VALUE(LW(8), STRING("meta_1_1"))
         SET_VALUE(LW(9), STRING("meta_1_2"))
         SET_VALUE(LW(10), STRING("S_hari04"))
-        SPAWN_EVENT(PTR(evt_hari))
+        SPAWN_EVENT(evt_hari)
     END_IF
     IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_BUTTON_2), 1)
         SET_VALUE(LW(10), STRING("S_pato2"))
-        SPAWN_EVENT(PTR(evt_kaitentou2))
+        SPAWN_EVENT(evt_kaitentou2)
         SET_VALUE(LW(8), STRING("meta_2_1"))
         SET_VALUE(LW(9), STRING("meta_2_2"))
         SET_VALUE(LW(10), STRING("S_hari05"))
-        SPAWN_EVENT(PTR(evt_hari))
+        SPAWN_EVENT(evt_hari)
     END_IF
     IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_BUTTON_3), 1)
         SET_VALUE(LW(10), STRING("S_pato3"))
-        SPAWN_EVENT(PTR(evt_kaitentou2))
+        SPAWN_EVENT(evt_kaitentou2)
         SET_VALUE(LW(8), STRING("meta_3_1"))
         SET_VALUE(LW(9), STRING("meta_3_2"))
         SET_VALUE(LW(10), STRING("S_hari06"))
-        SPAWN_EVENT(PTR(evt_hari))
+        SPAWN_EVENT(evt_hari)
     END_IF
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("S_pato4"), MAPOBJ_FLAG_HIDE)
     IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_ACTIVATED), 1)
         SET_VALUE(LW(10), STRING("S_pato4"))
-        SPAWN_EVENT(PTR(evt_kaitentou))
+        SPAWN_EVENT(evt_kaitentou)
         SET_VALUE(LW(8), -1)
         SET_VALUE(LW(9), -1)
         SET_VALUE(LW(10), STRING("S_hari01"))
-        SPAWN_EVENT(PTR(evt_hari))
+        SPAWN_EVENT(evt_hari)
         SET_VALUE(LW(8), -1)
         SET_VALUE(LW(9), -1)
         SET_VALUE(LW(10), STRING("S_hari02"))
-        SPAWN_EVENT(PTR(evt_hari))
+        SPAWN_EVENT(evt_hari)
     END_IF
     IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_ACTIVATED), 1)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_1_1"), MAPOBJ_FLAG_HIDE)
@@ -1121,26 +1040,26 @@ EVT_BEGIN(aji_03_init_evt)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_2_2"), MAPOBJ_FLAG_HIDE)
         CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 1, STRING("meta_3_2"), MAPOBJ_FLAG_HIDE)
     END_IF
-    CALL(evt_item_entry, STRING("keihin00"), ITEM_COIN, -150, 50, 100, 16, -1, 0)
-    CALL(evt_item_entry, STRING("keihin01"), ITEM_COIN, -100, 50, 100, 16, -1, 0)
-    CALL(evt_item_entry, STRING("keihin02"), ITEM_COIN, -50, 50, 100, 16, -1, 0)
-    CALL(evt_item_entry, STRING("keihin03"), ITEM_COIN, -150, 50, 0, 16, -1, 0)
+    CALL(evt_item_entry, STRING("keihin00"), ITEM_COIN, -150, 50, 100, ITEM_ENTRY_FIXED, -1, 0)
+    CALL(evt_item_entry, STRING("keihin01"), ITEM_COIN, -100, 50, 100, ITEM_ENTRY_FIXED, -1, 0)
+    CALL(evt_item_entry, STRING("keihin02"), ITEM_COIN, -50, 50, 100, ITEM_ENTRY_FIXED, -1, 0)
+    CALL(evt_item_entry, STRING("keihin03"), ITEM_COIN, -150, 50, 0, ITEM_ENTRY_FIXED, -1, 0)
     IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_PRIZE_A), 0)
-        CALL(evt_item_entry, STRING("keihin04"), ITEM_FEELING_FINE, -100, 50, 0, 16, -1, PTR(badge_evt))
+        CALL(evt_item_entry, STRING("keihin04"), ITEM_FEELING_FINE, -100, 50, 0, ITEM_ENTRY_FIXED, -1, PTR(badge_evt))
     END_IF
-    CALL(evt_item_entry, STRING("keihin05"), ITEM_COIN, -50, 50, 0, 16, -1, 0)
+    CALL(evt_item_entry, STRING("keihin05"), ITEM_COIN, -50, 50, 0, ITEM_ENTRY_FIXED, -1, 0)
     IF_INT_EQUAL(GSWF(GSWF_AJI03_CRANE_PRIZE_B), 0)
-        CALL(evt_item_entry, STRING("keihin06"), ITEM_FEELING_FINE_P, -150, 50, -100, 16, -1, PTR(badge_evt2))
+        CALL(evt_item_entry, STRING("keihin06"), ITEM_FEELING_FINE_P, -150, 50, -100, ITEM_ENTRY_FIXED, -1, PTR(badge_evt2))
     END_IF
-    CALL(evt_item_entry, STRING("keihin07"), ITEM_COIN, -100, 50, -100, 16, -1, 0)
+    CALL(evt_item_entry, STRING("keihin07"), ITEM_COIN, -100, 50, -100, ITEM_ENTRY_FIXED, -1, 0)
     IF_INT_EQUAL(GSWF(GSWF_AJI03_STAR_PIECE_PRIZE), 0)
-        CALL(evt_item_entry, STRING("keihin08"), ITEM_STAR_PIECE, -50, 50, -100, 16, -1, PTR(badge_evt3))
+        CALL(evt_item_entry, STRING("keihin08"), ITEM_STAR_PIECE, -50, 50, -100, ITEM_ENTRY_FIXED, -1, PTR(badge_evt3))
     END_IF
-    SPAWN_EVENT(PTR(evt_emergency))
+    SPAWN_EVENT(evt_emergency)
     RETURN
 EVT_END()
 
-USER_FUNC(evt_sousa_icon) {
+static USER_FUNC(evt_sousa_icon) {
     EvtWord* args = event->args;
     s32 type = evtGetValue(event, args[0]);
     s32 x = evtGetValue(event, args[1]);
@@ -1153,7 +1072,7 @@ USER_FUNC(evt_sousa_icon) {
     return EVT_RETURN_YIELD;
 }
 
-void icon_disp(CameraId camera, void* param) {
+static void icon_disp(CameraId camera, void* param) {
     EventEntry* event = param;
     Mtx trans;
     Mtx scale;
@@ -1166,22 +1085,38 @@ void icon_disp(CameraId camera, void* param) {
         PSMTXRotRad(rot, 'z', 0.0f);
         PSMTXConcat(trans, scale, trans);
         PSMTXConcat(trans, rot, trans);
+#if VERSION <= VERSION_DEMO_US
+        iconDispGx2(trans, 0x4, ICON_163);
+#else
         iconDispGx2(trans, 0x10, ICON_163);
+#endif
         PSMTXTrans(trans, event->userdata[1], event->userdata[2], 0.0f);
         PSMTXScale(scale, 1.5f, 1.5f, 1.5f);
         PSMTXConcat(trans, scale, trans);
+#if VERSION <= VERSION_DEMO_US
+        iconDispGx2(trans, 0x4, ICON_064);
+#else
         iconDispGx2(trans, 0x10, ICON_064);
+#endif
     } else {
         PSMTXTrans(trans, event->userdata[1] - 30, event->userdata[2] + 100, 0.0f);
         PSMTXScale(scale, 1.5f, 1.5f, 1.5f);
         PSMTXRotRad(rot, 'z', 4.712389f);
         PSMTXConcat(trans, scale, trans);
         PSMTXConcat(trans, rot, trans);
+#if VERSION <= VERSION_DEMO_US
+        iconDispGx2(trans, 0x4, ICON_163);
+#else
         iconDispGx2(trans, 0x10, ICON_163);
+#endif
         PSMTXTrans(trans, event->userdata[1], event->userdata[2], 0.0f);
         PSMTXScale(scale, 1.5f, 1.5f, 1.5f);
         PSMTXConcat(trans, scale, trans);
+#if VERSION <= VERSION_DEMO_US
+        iconDispGx2(trans, 0x4, ICON_066);
+#else
         iconDispGx2(trans, 0x10, ICON_066);
+#endif
     }
 }
 
@@ -1197,7 +1132,7 @@ static USER_FUNC(evt_itemNameToItemID) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(item_chk) {
+static USER_FUNC(item_chk) {
     char name[256];
     EvtWord* args = event->args;
     f32 x = evtGetValue(event, GW(10));

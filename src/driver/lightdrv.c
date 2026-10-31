@@ -104,12 +104,13 @@ void lightMain(void) {
     booLight.position = (Vec){0.0f, 1000.0f, 0.0f};
 }
 
+static const Vec decay_tbl[] = {
+    {1.0f, 0.0f, 0.0f},
+    {0.0f, 0.1f, 0.0f},
+    {0.0f, 0.0f, 0.01f},
+    {0.0f, 0.0f, 0.01f}};
+
 s32 lightEntry(const char* name, s32 type, Vec* position, Vec* rotation, GXColor color, s32 attenType, s32 flags, f32 spotAngle, f32 attenAngle) {
-    static const Vec decay_tbl[] = {
-        {1.0f, 0.0f, 0.0f},
-        {0.0f, 0.1f, 0.0f},
-        {0.0f, 0.0f, 0.01f},
-        {0.0f, 0.0f, 0.01f}};
     LightWork* wp = lightGetWork();
     LightEntry* entry;
     s32 i, j, n;

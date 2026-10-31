@@ -21,7 +21,6 @@
 #include "evt/evt_seq.h"
 #include "evt/evt_snd.h"
 #include "evt/evt_sub.h"
-#include "party/party_motion.h"
 #include "driver/mapdrv.h"
 
 static USER_FUNC(fune_eff);
@@ -38,7 +37,7 @@ EVT_END()
 
 static NpcSetupInfo npcEnt[] = {
     {
-        /*"ピーチ姫"*/"\x83\x73\x81\x5B\x83\x60\x95\x50", // name
+        "ピーチ姫", // name
         NPC_FLAG_SHADOW_NO_COLLISION | NPC_FLAG_MOVE_ANIM | NPC_FLAG_TALK_ANIM, // flags
         0, // reactionFlags
         peach_init, // initEvent
@@ -168,15 +167,17 @@ EVT_BEGIN(muj_21_init_evt)
         CALL(fune_eff)
     END_INLINE_EVENT
     SET_FLOAT_VALUE(GW(10), FLOAT(1.0f))
-    SPAWN_EVENT(PTR(anm_kaji))
-    SPAWN_EVENT(PTR(anm_wakka))
-    SPAWN_EVENT(PTR(anm_entotsu))
-    SPAWN_EVENT(PTR(anm_neji))
-    SPAWN_EVENT(PTR(fune_yure))
+    SPAWN_EVENT(anm_kaji)
+    SPAWN_EVENT(anm_wakka)
+    SPAWN_EVENT(anm_entotsu)
+    SPAWN_EVENT(anm_neji)
+    SPAWN_EVENT(fune_yure)
     CALL(evt_mapobj_flag_onoff, MAPOBJ_GROUP, 0, STRING("S_f_wa"), MAPOBJ_FLAG_BBOX_CULL)
     CALL(evt_mario_kill_party, 0)
-    SPAWN_EVENT(PTR(epilogue_evt))
+    SPAWN_EVENT(epilogue_evt)
+#if VERSION >= VERSION_JP
     CALL(evt_light_charalight_all_onoff, 1)
+#endif
     RETURN
 EVT_END()
 

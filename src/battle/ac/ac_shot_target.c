@@ -38,7 +38,7 @@ typedef struct ShotTargetWork {
 
 static void _ac_disp_init(BattleWork* work);
 static void actionCommandDisp(f32 x, f32 y);
-void _ac_rumble_param_set(u32 difficulty, s16* period, s16* count, f32* amp);
+static void _ac_rumble_param_set(u32 difficulty, s16* period, s16* count, f32* amp);
 
 s32 battleAcMain_ShotTarget(BattleWork* work) {
     const char* sfxName;
@@ -184,7 +184,7 @@ s32 battleAcMain_ShotTarget(BattleWork* work) {
     return 1;
 }
 
-void _ac_rumble_param_set(u32 difficulty, s16* period, s16* count, f32* amp) {
+static void _ac_rumble_param_set(u32 difficulty, s16* period, s16* count, f32* amp) {
     *period = irand(120) + 120;
     *count = *period - 1;
     *amp = 25.0f;

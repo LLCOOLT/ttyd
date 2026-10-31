@@ -12,7 +12,7 @@
 #include "eff/eff_minigame.h"
 #include "gor.h"
 
-void evt_goryuugijo_disp_func(CameraId camera, void* param);
+static void evt_goryuugijo_disp_func(CameraId camera, void* param);
 
 static EvtWord main_evt[4];
 
@@ -78,7 +78,7 @@ USER_FUNC(evt_goryuugijo_alloc) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_goryuugijo_main_func) {
+static USER_FUNC(evt_goryuugijo_main_func) {
     MiniGameWork* wp = (MiniGameWork*)event->lwData[0];
 
     if (wp->flags & MINIGAME_FLAG_QUIT) {
@@ -97,7 +97,7 @@ disp:
     return EVT_RETURN_BLOCK;
 }
 
-void evt_goryuugijo_disp_func(CameraId camera, void* param) {
+static void evt_goryuugijo_disp_func(CameraId camera, void* param) {
     ((MiniGameWork*)param)->disp(camera, param);
 }
 

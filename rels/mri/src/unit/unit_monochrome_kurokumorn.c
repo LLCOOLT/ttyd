@@ -7,7 +7,7 @@
 #include "battle/battle_camera.h"
 #include "battle/battle_event_subset.h"
 #include "battle/battle_weapon_power.h"
-#include "party/party_motion.h"
+#include "evt/evt_snd.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_sub.h"
 #include "evt/evt_eff.h"
@@ -83,7 +83,7 @@ static BattleUnitDefense defence = {0};
 
 static BattleUnitDefenseAttr defence_attr = {0};
 
-#if VERSION == VERSION_DEMO
+#if VERSION <= VERSION_DEMO_US
 static StatusVulnerability regist = {100, 100, 110, 100, 90, 100, 100, 90, 100, 90, 100, 90, 100, 90, 90, 90, 110, 100, 90, 100, 100, 95};
 #else
 static StatusVulnerability regist = {95, 95, 105, 100, 90, 100, 100, 100, 100, 95, 100, 95, 100, 95, 80, 90, 105, 100, 90, 100, 100, 95};
@@ -197,7 +197,7 @@ static EVT_BEGIN(attack_event)
     CALL(btlevtcmd_CheckPartsCounterAttribute, BTL_UNIT_SELF, 1, 1024, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         SET_VALUE(LW(9), PTR(&weapon_kurokumorn_thunder_attack))
-        CALL_CHILD(PTR(thunder_event))
+        CALL_CHILD(thunder_event)
         GOTO(99)
     END_IF
     SET_VALUE(LW(0), 50)
@@ -207,10 +207,10 @@ static EVT_BEGIN(attack_event)
     SET_VALUE(LW(0), 50)
     IF_INT_LESS(LW(1), LW(0))
         SET_VALUE(LW(9), PTR(&weapon_kurokumorn_attack))
-        CALL_CHILD(PTR(normal_attack_event))
+        CALL_CHILD(normal_attack_event)
         GOTO(99)
     END_IF
-    CALL_CHILD(PTR(charge_event))
+    CALL_CHILD(charge_event)
     GOTO(99)
     LABEL(99)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
@@ -366,13 +366,8 @@ static PoseTableEntry pose_table[] = {
     {42, "R_1"},
     {56, "X_1"},
     {57, "X_1"},
-#if VERSION == VERSION_DEMO
-    {63, "T_1"},
-    {67, "S_1"},
-#else
-    {65, "T_1"},
-    {69, "S_1"},
-#endif
+    {BTL_POSE_TALK, "T_1"},
+    {BTL_POSE_STAY_DEFAULT, "S_1"},
 };
 
 static BattleDataEntry data_table[] = {
@@ -389,7 +384,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventConfusion, BTL_UNIT_SELF, PTR(attack_event))
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 0, 0)
     CALL(btlevtcmd_SetUnitWork, BTL_UNIT_SELF, 1, 0)
-    SPAWN_EVENT(PTR(barrier_event))
+    SPAWN_EVENT(barrier_event)
     CALL(btlevtcmd_StartWaitEvent, BTL_UNIT_SELF)
     RETURN
 EVT_END()
@@ -424,7 +419,7 @@ EVT_END()
 static EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
     SET_VALUE(LW(11), 1)
-    CALL_CHILD(PTR(btldefaultevt_Damage))
+    CALL_CHILD(btldefaultevt_Damage)
     RETURN
 EVT_END()
 
